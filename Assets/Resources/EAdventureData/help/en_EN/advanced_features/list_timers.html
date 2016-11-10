@@ -1,0 +1,122 @@
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" type="text/css" href="../../help.css">
+    
+  </head>
+  <body>
+    <img src="../logo-editor.png" alt="e-Adventure logo">
+    
+
+    <h1>
+      Advanced Features: Timers
+    </h1>
+    <p>
+      A <span class="concepto">Timer</span> allows a set of actions to be 
+      executed after a specified period of time.
+    </p>
+    <p>
+      In <span class="referencia_literal">List of timers</span> tab we can add 
+      new <span class="concepto">Timers</span> by clicking on <img height="16" width="16" src="../../common_img/add_icon.png" alt="add">. 
+      Once one is selected we'll be able to edit the <span class="referencia_literal">Time</span> 
+      for this <span class="concepto">Timer</span> and if we want it to appear 
+      during the game, clicking on <span class="referencia_literal">Display in 
+      game</span> option.
+    </p>
+    <h2>
+      TIMER DOCUMENTATION
+    </h2>
+    <p>
+      Information about the timer. It won't be used in the engine.
+    </p>
+    <h2>
+      TIME
+    </h2>
+    <p>
+      This section is only enabled if <span class="referencia_literal">Display 
+      in game</span> is enabled. Options are:
+    </p>
+    <ul>
+      <li>
+        <span class="referencia_literal">Display name</span>: The name with 
+        which the timer shows in the screen.
+      </li>
+      <li>
+        <span class="referencia_literal">Count-down</span>: If enabled, time 
+        will be a count-down timer.
+      </li>
+      <li>
+        <span class="referencia_literal">Show when stopped</span>: If enabled, 
+        counter will show always, even if it is stopped.
+      </li>
+    </ul>
+    <h2>
+      LOOP CONTROL
+    </h2>
+    <p>
+      In this section we edit the timer's behavior when it's stopped or ends a 
+      loop.
+    </p>
+    <ul>
+      <li>
+        <span class="referencia_literal">Multiple starts</span>:
+
+        <ul>
+          <li>
+            <strong>Set</strong>: Once the timer is stopped, it will start 
+            again once the conditions to start are met again.
+          </li>
+          <li>
+            <strong>Not set</strong>: Once the timer is stopped, it will not 
+            start again even if the conditions to start are met again.
+          </li>
+        </ul>
+      </li>
+      <li>
+        <span class="referencia_literal">Run in loops</span>:
+
+        <ul>
+          <li>
+            <strong>Set: </strong>The timer will run once and again until it 
+            is stopped.
+          </li>
+          <li>
+            <strong>Not set</strong>: The timer will run once and it will stop.
+          </li>
+        </ul>
+      </li>
+    </ul>
+    <h2>
+      CONDITIONS TO START THE TIMER
+    </h2>
+    <p>
+      In this section we can edit the conditions to start the timer. <a href="../general/Conditions_Panel.html">More 
+      info about conditions</a>
+    </p>
+    <h2>
+      CONDITIONS TO STOP THE TIMER
+    </h2>
+    <p>
+      If we check <span class="referencia_literal">Use end conditions</span> 
+      timer will stop when these conditions are met. If not checked, timer 
+      will stop when conditions to start are not met.
+    </p>
+    <h2>
+      EFFECTS
+    </h2>
+    <p>
+      Finally, there are two section in which we can edit effects:
+    </p>
+    <ul>
+      <li class="referencia_literal">
+        Effects to be executed if the timer expires
+      </li>
+      <li class="referencia_literal">
+        Effects to be executed if the timer is stopped
+      </li>
+    </ul>
+    <p>
+      <a href="../effects/Effects_General.html">More info about effects</a>.
+    </p>
+  </body>
+</html>

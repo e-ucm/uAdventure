@@ -1,0 +1,130 @@
+<html>
+  <head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+    <link rel="stylesheet" href="../../help.css" type="text/css">
+    
+  </head>
+  <body>
+    <img src="../logo-editor.png" alt="e-Adventure logo">
+    
+
+    <h1>
+      Caracter&#237;sticas Avanzadas: Temporizadores
+    </h1>
+    <p>
+      Un <span class="concepto">Temporizador</span> es un reloj o contador que 
+      podemos utilizar para realizar una serie de acciones tras un tiempo 
+      determinado.
+    </p>
+    <p>
+      En la pesta&#241;a <span class="referencia_literal">Temporizadores</span> 
+      podemos agregar nuevos <span class="concepto">Temporizadores</span> 
+      pulsando en <img src="../../common_img/add_icon.png" width="16" alt="add" height="16">. 
+      Una vez tengamos uno, si lo seleccionamos podremos editar el <span class="referencia_literal">Tiempo</span> 
+      que queremos que dure, si queremos que se muestra la cuenta durante el 
+      juego, seleccionando <span class="referencia_literal">Mostrar en juego</span> 
+      y otras opciones:
+    </p>
+    <h2>
+      DOCUMENTACI&#211;N DEL TEMPORIZADOR
+    </h2>
+    <p>
+      Informaci&#243;n acerca del temporizador seleccionado. Es s&#243;lo informativo 
+      para las tareas de desarrollo. No se utilizar&#225; en el motor.
+    </p>
+    <h2>
+      TIEMPO
+    </h2>
+    <p>
+      Este apartado s&#243;lo aparece activo si hemos seleccionado <span class="referencia_literal">Mostrar 
+      en juego</span>. Las opciones son:
+    </p>
+    <ul>
+      <li>
+        <span class="referencia_literal">Nombre a mostrar</span>: El nombre 
+        que queremos que aparezca junto al reloj.
+      </li>
+      <li>
+        <span class="referencia_literal">Cuenta regresiva</span>: Si est&#225; 
+        activa, el paso del tiempo ser&#225; regresivo (Desde el tiempo marcado 
+        hasta 0) cuando se muestre en pantalla.
+      </li>
+      <li>
+        <span class="referencia_literal">Mostrar cu&#225;ndo est&#225; parado</span>: 
+        Si est&#225; activa, el contador se mostrar&#225; siempre, aunque no est&#233; activo.
+      </li>
+    </ul>
+    <h2>
+      CONTROL DE CICLOS
+    </h2>
+    <p>
+      En este apartado controlamos el comportamiento del <span class="concepto">temporizador</span> 
+      cu&#225;ndo se detiene o cumple un ciclo.
+    </p>
+    <ul>
+      <li>
+        <span class="referencia_literal">Multiples inicios</span>:
+
+        <ul>
+          <li>
+            <strong>Activo</strong>: Si el temporizador est&#225; parado, cu&#225;ndo se 
+            cumplan las condiciones de inicio comenzar&#225; nuevamente desde cero.
+          </li>
+          <li>
+            <strong>Inactivo</strong>: Si el temporizador est&#225; parado no 
+            vuelve a empezar incluso aunque se cumplen las condiciones de 
+            inicio.
+          </li>
+        </ul>
+      </li>
+      <li>
+        <span class="referencia_literal">Utiliza bucles</span>:
+
+        <ul>
+          <li>
+            <strong>Activo: </strong>Si transcurre el tiempo del temporizador, 
+            este entrar&#225; en un bucle una y otra vez hasta ser detenido.
+          </li>
+          <li>
+            <strong>Inactivo</strong>: Cu&#225;ndo transcurre el tiempo, el 
+            temporizador se detiene.
+          </li>
+        </ul>
+      </li>
+    </ul>
+    <h2>
+      CONDICIONES PARA ACTIVACI&#211;N DEL TEMPORIZADOR
+    </h2>
+    <p>
+      En este apartado editamos las condiciones que inician el temporizador. <a href="../general/Conditions_Panel.html">M&#225;s 
+      informaci&#243;n sobre condiciones</a>.
+    </p>
+    <h2>
+      CONDICIONES PARA LA DESACTIVACI&#211;N DEL TEMPORIZADOR
+    </h2>
+    <p>
+      Si marcamos <span class="referencia_literal">Utiliza condiciones para 
+      desactivaci&#243;n</span> el temporizador se detendr&#225; cu&#225;ndo se cumplan 
+      las condiciones aqu&#237; definidas. En el caso de no haber marcado esa 
+      casilla, el temporizador se detendr&#225; cu&#225;ndo dejen de cumplirse las 
+      condiciones iniciales.
+    </p>
+    <h2>
+      EFECTOS
+    </h2>
+    <p>
+      Finalmente, tenemos dos apartados en los que editar efectos:
+    </p>
+    <ul>
+      <li class="referencia_literal">
+        Efectos a ejecutar si expira el temporizador
+      </li>
+      <li class="referencia_literal">
+        Efectos a ejecutar si se desactiva el temporizador
+      </li>
+    </ul>
+    <p>
+      <a href="../effects/Effects_General.html">M&#225;s informaci&#243;n sobre efectos</a>.
+    </p>
+  </body>
+</html>

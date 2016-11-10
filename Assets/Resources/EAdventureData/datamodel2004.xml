@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<!-- <entry key="cmi._version">#1#0#characterstring</entry> -->
+<!-- <entry key="cmi.comments_from_learner._children">#1#0#characterstring</entry>
+<entry key="cmi.comments_from_learner._count">#1#0#integer</entry>-->
+<entry key="cmi.comments_from_learner">#1#1#localized_string_type</entry>
+<entry key="cmi.comments_from_learner.n.comment">#1#1#localized_string_type</entry>
+<entry key="cmi.comments_from_learner.n.location">#1#1#characterstring</entry>
+<entry key="cmi.comments_from_learner.n.timestamp">#1#1#time(second,10,0)</entry>
+<!--<entry key="cmi.comments_from_lms._children">#1#0#characterstring</entry>
+<entry key="cmi.comments_from_lms._count">#1#0#integer</entry>-->
+<entry key="cmi.comments_from_lms">#1#0#localized_string_type</entry>
+<entry key="cmi.comments_from_lms.n.comment">#1#0#localized_string_type</entry>
+<entry key="cmi.comments_from_lms.n.location">#1#0#characterstring</entry>
+<entry key="cmi.comments_from_lms.n.timestamp">#1#0#time(second,10,0)</entry>
+<entry key="cmi.completion_status">#1#1#state(completed,incomplete,not_attempted,unknown)</entry>
+<entry key="cmi.completion_threshold">#1#0#real(10,7)range(0,1)</entry>
+<entry key="cmi.credit">#1#0#state(credit,no_credit)</entry>
+<entry key="cmi.entry">#1#0#state(ab_initio,resume,_nil_)</entry>
+<entry key="cmi.exit">#0#1#state(timeout,suspend,logout,normal,_nil_)</entry>
+
+<!-- INTERACTIONS -->
+<!--<entry key="cmi.interactions._children">#1#0#characterstring</entry>
+<entry key="cmi.interactions._count">#1#0#integer</entry>-->
+
+<entry key="cmi.interactions">#1#1#long_identifier_type</entry>
+<entry key="cmi.interactions.n.id">#1#1#long_identifier_type</entry>
+<entry key="cmi.interactions.n.type">#1#1#state(true_false,multiple_choice,fill_in, long_fill_in,matching,performance,sequencing,likert,numeric,other)</entry>
+
+<!--<entry key="cmi.interactions.n.objectives._count">#1#0#integer</entry>-->
+<entry key="cmi.interactions.n.objectives.m.id">#1#1#long_identifier_type</entry>
+
+<entry key="cmi.interactions.n.timestamp">#1#1#time(second,10,0)</entry>
+<!--<entry key="cmi.interactions.n.correct_responses._count">#1#0#integer</entry>-->
+<entry key="cmi.interactions.n.correct_responses.m.pattern">#1#1#type</entry>
+<entry key="cmi.interactions.n.weighting">#1#1#real(10,7)</entry>
+<entry key="cmi.interactions.n.learner_response">#1#1#type</entry>
+<entry key="cmi.interactions.n.result">#1#1#state(correct,incorrect,unanticipated,neutral,real(10,7))</entry>
+<entry key="cmi.interactions.n.latency">#1#1#timeinterval(second,10,2)</entry>
+<entry key="cmi.interactions.n.description">#1#1#localized_string_type</entry>
+<entry key="cmi.launch_data">#1#0#characterstring</entry>
+<entry key="cmi.learner_id">#1#0#long_identifier_type</entry>
+<entry key="cmi.learner_name">#1#0#localized_string_type</entry>
+<!--<entry key="cmi.learner_preference._children">#1#0#characterstring</entry>-->
+<entry key="cmi.learner_preference.audio_level">#1#1#real(10,7),range(0,*)</entry>
+<entry key="cmi.learner_preference.language">#1#1#language_type</entry>
+<entry key="cmi.learner_preference.delivery_speed">#1#1#real(10,7),range(0,*)</entry>
+<entry key="cmi.learner_preference.audio_captioning">#1#1#state(off,no_change,on)</entry>
+<entry key="cmi.location">#1#1#characterstring</entry>
+<entry key="cmi.max_time_allowed">#1#0#timeinterval(second,10,2)</entry>
+<entry key="cmi.mode">#1#0#state(browse,normal,review)</entry>
+<!--<entry key="cmi.objectives._children">#1#0#characterstring</entry> 
+<entry key="cmi.objectives.count">#1#0#integer</entry>-->
+<entry key="cmi.objectives">#1#1#long_identifier_type</entry>
+<entry key="cmi.objectives.n.id">#1#1#long_identifier_type</entry>
+<!--<entry key="cmi.objectives.n.score._children">#1#0#characterstring</entry>-->
+<entry key="cmi.objectives.n.score.scaled">#1#1#real(10,7),range(-1,1)</entry>
+<entry key="cmi.objectives.n.score.raw">#1#1#real(10,7)</entry>
+<entry key="cmi.objectives.n.score.min">#1#1#real(10,7)</entry>
+<entry key="cmi.objectives.n.score.max">#1#1#real(10,7)</entry>
+<entry key="cmi.objectives.n.success_status">#1#1#state(passed,failed,unknown)</entry>
+<entry key="cmi.objectives.n.completion_status">#1#1#state(completed,incomplete,not_attempted,unknown)</entry>
+<entry key="cmi.objectives.n.description">#1#1#localized_string_type</entry>
+<entry key="cmi.progress_measure">#1#1#real(10,7),range(0,1)</entry>
+<entry key="cmi.scaled_passing_score">#1#0#real(10,7),range(-1,1)</entry>
+<!--<entry key="cmi.score._children">#1#0#characterstring</entry>-->
+<entry key="cmi.score.scaled">#1#1#real(10,7),range(-1,1)</entry>
+<entry key="cmi.score.raw">#1#1#real(10,7)</entry>
+<entry key="cmi.score.min">#1#1#real(10,7)</entry>
+<entry key="cmi.score.max">#1#1#real(10,7)</entry>
+<entry key="cmi.session_time">#0#1#timeinterval(second,10,2)</entry>
+<entry key="cmi.success_status">#1#1#state(passed,failed,unknown)</entry>
+<entry key="cmi.suspend_data">#1#1#characterstring</entry>
+<entry key="cmi.time_limit_action">#1#0#state(exit_message,continue_message,exit_no_message,continue_no_message)</entry>
+<entry key="cmi.total_time">#1#0#timeinterval(second,10,2)</entry>
+</properties>

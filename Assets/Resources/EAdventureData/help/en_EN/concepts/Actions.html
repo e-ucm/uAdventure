@@ -1,0 +1,68 @@
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" href="../../help.css" type="text/css">
+    
+  </head>
+  <body>
+    <img src="../logo-editor.png" alt="e-Adventure LOGO">
+    
+
+    <h1>
+      Actions
+    </h1>
+    <p>
+      Actions define what can be performed over an object, character or active 
+      area.
+    </p>
+    <h2>
+      Type of actions
+    </h2>
+    <p>
+      &quot;Examine&quot; &quot;Take&quot; (only objects and active areas) &quot;Use&quot; &quot;Custom&quot; (both 
+      with one element and with two) &quot;Use with&quot; (only objects) &quot;Give to&quot; (only 
+      objects) &quot;Talk to...&quot; (only characters)
+    </p>
+    <h2>
+      Conditions
+    </h2>
+    <p>
+      The conditions of the actions indicate when it can be performed. If the 
+      conditions of the actions are not active, the action button will not be 
+      drawn (unless it is an action with a default behaviour, see below).
+    </p>
+    <h2>
+      Effects
+    </h2>
+    <p>
+      The effect of the actions are the consequence of it being chosen by the 
+      player.
+    </p>
+    <h2>
+      Not effects
+    </h2>
+    <p>
+      When an action has &quot;Not effects&quot; defined, it will always be available to 
+      the player (even when its conditions are not met). This are the effects 
+      of the action when the conditions aren't met.
+    </p>
+    <h2>
+      Default actions
+    </h2>
+    <p>
+      All elements have the &quot;Examine&quot; action by default, which leads the main 
+      character to &quot;speak&quot; the &quot;Detailed description&quot; of the element. In 
+      objects, the &quot;Grab/Use&quot; action also appears by default, and results on 
+      the main character indicating that such an action cannot be performed if 
+      the player choses it. The same is true for the &quot;Talk to...&quot; action with 
+      NPCs. The behavior of the default actions is overwriten if any of these 
+      actions is defined by the creator.
+    </p>
+    <h3>
+      See also
+    </h3>
+    <p>
+      <a href="../general/Conditions.html">More information about conditions</a>
+    </p>
+  </body>
+</html>

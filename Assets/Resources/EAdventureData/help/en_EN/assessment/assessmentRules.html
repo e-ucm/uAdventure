@@ -1,0 +1,102 @@
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" type="text/css" href="../../help.css">
+    
+  </head>
+  <body>
+    <img src="../logo-editor.png" alt="TEST IMAGE fail!" style="margin-top: 10px; margin-bottom: 10px; display: block; margin-right: 10px; margin-left: 10px">
+    
+
+    <h1>
+      Assessment rules
+    </h1>
+    <p>
+      To edit an assessment rule it must be selected on the rules list. New 
+      rules can be also added following these <a title="Tablas" href="../general/Tables.html">instructions</a>. 
+      The next fields can be edited in an assessment rule:
+    </p>
+    <p>
+      <img src="AssessmentRules_Files/assessmentRules2.jpg" alt="ASSESSMENT RULES.JPG fail!">
+      
+    </p>
+    <ul>
+      <li>
+        <b>Importance: </b>This field accepts one of the next values (from 
+        lowest to highest): <em>Very low, low, normal, high and very high</em>. 
+        By default the rule will be given the &quot;normal&quot; value. When an 
+        assessment report is generated manually by the student (using the 
+        appropriate option on the game menu) he or she can select the 
+        importance threshold. In this manner, the student will only get the 
+        feedback that he or she considers relevant.
+      </li>
+      <li>
+        <b>Concept:</b> Brief textual description of what the rule aims to 
+        evaluate. This field will be written onto the assessment report using 
+        a <b>bold</b> font.
+      </li>
+      <li>
+        <b>Conditions: </b>The set of conditions (over flags and variables) 
+        that must be satisfied to trigger the rule. The game author can modify 
+        the values of those flags and variables by triggering appropriate 
+        effects when the student performs any action that deserves evaluation 
+        and/or feedback. For instance, the game author may decide to activate 
+        a flag when a student fails on the achievement of a game task, and use 
+        that flag to trigger an assessment rule that subtracts some points 
+        from the final score of the student. (for more information see <a title="Condiciones" label="Condiciones" href="../general/Conditions.html">conditions</a>)
+      </li>
+      <li>
+        <b>Text: </b>Complete text description of the concept that triggered 
+        the assessment rule. This field will be written onto the assessment 
+        report just behind the concept, but using a normal font size. It will 
+        typically contain detailed information about what the student did 
+        right or wrong, and what should the correct answer be.
+      </li>
+      <li>
+        <b>Properties: </b>Each property is a pair of the form &lt;key, value&gt;. 
+        When the rule is satisfied the key will be assigned the value 
+        specified. These properties can be sent to a central Learning 
+        Management System (LMS) such as Moodle or Sakai for processing and 
+        attachment to the student's profile. Therefore the values of these 
+        properties will not be printed on the assessment report that the 
+        student will see. They can be used to define global or partial scores 
+        for the student, or to indicate the LMS what are the learning 
+        outcomes. If the profile is based on SCORM the keys will be the fields 
+        specified by the CMI data model (More info in: <a title="Tipo de perfil" label="Tipo de perfil" href="assessmentProfileType.html">Profile 
+        Type</a>).
+      </li>
+    </ul>
+    <h1>
+      Timed Assessment Rules
+    </h1>
+    <p>
+      These rules have an associated timer that will start timing when the <b>init 
+      conditions</b> are met. The timer is stopped when the <b>end conditions</b> 
+      are satisfied. The game author can define different effects to be 
+      triggered depending on the elapsed time. Each effect will be assigned a 
+      time range, so if the elapsed time fits within a time range the 
+      corresponding effect will be triggered. The effect is compounded by the <b>text</b> 
+      and the <b>&lt;key, value&gt; list </b>as for normal assessment rules. 
+      If the elapsed time does not fit in any of the time ranges defined, no 
+      action is performed. If the elapsed time fits in two or more different 
+      ranges, the effect defined for the first one will be triggered (note 
+      that time ranges do not need to be disjoint).
+    </p>
+    <p align="center">
+      <img src="AssessmentRules_Files/assessmentRules.jpg" alt="ASSESSMENT RULES.JPG fail!">
+      
+    </p>
+    <p>
+      In this manner game authors can define evaluations that depend on the 
+      time that the student invests in completing the tasks.
+    </p>
+    <p>
+      Finally, both the normal and timed assessment rules can be used to 
+      generate a human-readable HTML report (like the one below), devised for 
+      the student, or an XML machine-readable report, designed for the LMS.
+    </p>
+    <p>
+      <img alt="ASSESSMENT RULES.JPG fail!" width="614" src="AssessmentRules_Files/assessmentRules3.jpg" height="376" border="0">
+    </p>
+  </body>
+</html>

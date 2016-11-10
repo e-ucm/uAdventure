@@ -1,0 +1,22 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="../../help.css" type="text/css" rel="stylesheet">
+</head>
+<body>
+<img src="../logo-editor.png" alt="TEST IMAGE fail!" style="display:block; " />
+<h1>Flags edition</h1>
+<p>The flags can be seen as indicators of a specific property. The meaning of this property is given by the name of the flag. If it is active, the property is fulfilled. The flags allow to give a sense of narrative to &lt;e-Adventure&gt; games. The way to give this sense of narration lies in the use of flags (including <a href="../flagsVars/vars.html" label="variables" title="variables">variables</a>) within the conditions, when we check if the flags are either activated or deactivated.</p>
+<p>For example, we define a flag called &quot;phoneAnswered. We associate a condition to examine the action of an object &quot;telephone&quot; in which the flag should be enabled so that they will launch the effects associated with the action. If we intend to examine something when the flag &quot;telephone&quot; is on, there will be the effects associated with the action, and if not nothing happens. </p>
+<h2>A simple condition</h2>
+<p>Suppose we have a game with two objects: a steak meat and fish. The idea is that the player can only catch the fish when the meat has been  caught previously. In our adventure we translate this condition to &quot;the language of flags&quot;, therefore we define a flag &quot;meatTaken&quot;, which is inactive until the meat is caught. At that time the flag will be active, and therefore the fish will be available to the player. Consider the process:</p>
+<ol>
+<li>First we need to add a new flag. For this purpose we will look on the Chapter menu, which can be found on the top bar. There, select the option &quot;Edit flags of the Chapter&quot; (abbreviated ctrl. + F). Then you will see a window like the one shown in Figure below. Click on the &quot;Add flag&quot; and type &quot;meatTaken&quot;. Click OK and create a new flag with 0 referrals. <img src="Flags_Files/flags1.jpg" alt="FLAG CREATION.JPG fail!" style="display:block; margin:10px;"/></li>
+<li>You can use this dialog to add or delete flags (and variables) of the chapter (the flags are unique to each chapter.) However, if you want to remove a flag, it must first have 0 references (speak with references to flags of those elements of the game using this flag, either in a condition or an effect). We also have to take into account some restrictions to define flags: no spaces are allowed and the first character must be a letter.</li>
+<li>Once the flag has been created, you can make references to it. Then we can go to our object &quot;Fish&quot; and add a new &quot;Take&quot; action. </li>
+<li> Expand the node for the object &gt; Right click on &quot;Actions&quot; &gt; Add &quot;take&quot; action. After that, click on the &quot;Edit conditions&quot; in the action panel. This opens a dialog to edit the conditions.</li>
+<li> Press the &quot;Add condition&quot; and you will be asked which flag will form the condition, and in which state should be to assess the condition as true (active or inactive). In our case we selected &quot;active&quot; flag and &quot;meatTaken&quot;.<img src="Flags_Files/flags2.jpg" alt="FLAG SELECTION.JPG fail!" style="display:block; margin:10px;" /></li>
+<li>Note that the drop-down list where you select the flag is editable. Thanks to this, we can just write there the name of the flag. If this does not yet exist, is created automatically, thus avoiding to open the chapter menu so often.</li>
+</ol>
+</body>
+</html>

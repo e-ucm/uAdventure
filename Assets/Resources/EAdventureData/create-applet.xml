@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project basedir="." default="generate" name="build.eAdventureApplet">
+	<description>
+    This ant build file is used to build the project as a jar file.
+	</description>
+	
+	<property name="lib.dir" value="jars" />
+	<property name="gui.dir" value="gui" />
+	<property name="img.dir" value="img" />
+	<property name="web.dir" value="web" />
+	<property name="plugin.dir" value="C:/Program Files (x86)/Java/jre6/lib" />
+	<property name="lanengine.dir" value="i18n/editor" />
+	<property name="laneditor.dir" value="i18n/engine" />
+	<property name="release.version" value="1.5RC3" />
+
+	<path id="project.class.path">
+		<fileset dir="${lib.dir}">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+	<path id="plugin.class.path">
+		<fileset dir="${plugin.dir}">
+			<include name="*.jar"/>
+		</fileset>
+	</path>
+	
+		
+	<target name="compile">
+		<mkdir dir="web/tempcompile/" />
+		<javac srcdir="src/es/eucm/" destdir="web/tempcompile/" source="1.5" target="1.5">
+			<exclude name="src/es/eucm/eadventure/editor/**" />
+			<exclude name="src/es/eucm/eadventure/assistant/**" />
+			<classpath refid="project.class.path" />
+			<classpath refid="plugin.class.path" />
+		</javac>
+		
+	</target>
+
+
+	<target name="cleanup">
+		<delete file="web/eAdventure_S.jar" />
+		<delete file="web/eAdventure.jar" />
+		<delete>
+			<fileset dir="web">
+				<include name="temp/**/*.*"/>
+				<include name="tempcompile/**/*.*"/>
+			</fileset>
+		</delete>
+		<delete dir="web/tempcompile"/>
+		<delete dir="web/temp/es"/>
+		<delete dir="web/temp/gui"/>
+		<delete dir="web/temp/i18n/engine"/>
+		<delete dir="web/temp/i18n/editor"/>
+	</target>
+
+	<target name="jar" depends="compile" description="generate the eadventure applet">
+		<delete file="web/eAdventure_temp.jar" />
+		<delete file="web/eAdventure.jar" />
+		<copy todir="web/temp">
+			<fileset dir=".">
+				<include name="gui/cursors/action.png" />
+				<include name="gui/cursors/default.png" />
+				<include name="gui/cursors/exit.png" />
+				<include name="gui/cursors/nocursor.png" />
+				<include name="gui/cursors/over.png" />
+				<include name="gui/defaultassets/**" />
+				<include name="gui/hud/contextual/btnDrag**" />
+				<include name="gui/hud/contextual/btnError**" />
+				<include name="gui/hud/contextual/btnExamine**" />
+				<include name="gui/hud/contextual/btnGive**" />
+				<include name="gui/hud/contextual/btnGrab**" />
+				<include name="gui/hud/contextual/btnTalk**" />
+				<include name="gui/hud/contextual/btnUse**" />
+				<include name="gui/hud/contextual/left.png" />
+				<include name="gui/hud/contextual/right.png" />
+				<include name="gui/options/Button.png" />
+				<include name="gui/options/PressedButton.png" />
+				<include name="gui/options/quicksand_bold.ttf" />
+				<include name="gui/*.png" />
+				<include name="gui/*.jpg" />
+				<!--<include name="java.policy.applet" />-->
+			</fileset>
+			<fileset dir="./web/tempcompile">
+				<exclude name="es/eucm/eadventure/editor/**" />
+				<exclude name="es/eucm/eadventure/assistant/**" />
+				<include name="**" />
+			</fileset>
+		</copy>
+		<jar compress="true" destfile="web/eAdventure.jar">
+			<fileset dir="web/temp">
+				<exclude name="CVS/**" />
+				<exclude name=".svn/**" />
+				<include name="**" />
+			</fileset>
+			<manifest>
+				<attribute name="Main-Class" value="es.eucm.eadventure.engine.EAdventureApplet" />
+			</manifest>
+
+		</jar>
+
+		<zip destfile="web/eAdventure_temp.jar"> 
+		        <zipfileset src="web/eAdventure.jar"> 
+		                <exclude name="**/MANIFEST.MF" /> 
+		        </zipfileset> 
+		</zip>
+		
+	</target>	
+
+	<target name="generate" description="Clean and Generate">
+		<antcall target="cleanup"></antcall>
+		<antcall target="jar"></antcall>
+		<antcall target="cleanup"></antcall>
+	</target>
+</project>

@@ -1,0 +1,51 @@
+<html>
+<head>
+<title>Efecto lanzar escena intermedia</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="../../help.css" type="text/css" rel="stylesheet">
+</head>
+<body>
+<h1>Efecto Lanzar Escena Intermedia</h1>
+<p>Mediante este efecto se lanza una escena intermedia. 
+Las escenas intermedias
+	prove&eacute;n de informaci&oacute;n al usuario. Estas escenas
+	pueden ser de diapositivas o de v&iacute;deo.</p>
+<p>Crear un efecto lanzar escena intermedia:</p>
+<ul>
+	<li><b>Seleccionar el efecto: </b>seleccionar el efecto en el
+	panel de creaci&oacute;n de efectos. Pulsar el bot&oacute;n OK.</li>
+	<li><b>Panel de creaci&oacute;n del efecto: </b>a
+	continuaci&oacute;n nos aparecer&aacute; un panel de edici&oacute;n del
+	efecto:
+	<ul>
+		<li>Se puede elegir entre las escenas intermedias que existan
+		para este cap&iacute;tulo. Cabe destacar que una vez ejecutada la
+		escena intermedia se ejecutar&aacute;n los efectos y cambios de escena
+		que tenga asociada la ejecuci&oacute;n de dicha escena.</li>
+		<li>Una vez terminados los efectos asociados a la escena
+		intermedia se continuar&aacute;n ejecutando los efectos que siguen en
+		orden al efecto lanzar escena intermedia en cuestion. Es decir, aunque
+		se el hecho de lanzar un objeto desencadene lanzar otros efectos de
+		forma indirecta, no implica que se corte el flujo esperado de los
+		efectos a lanzar.</li>
+	</ul>
+	</li>
+</ul>
+<b>Ejemplo:</b>
+Tenemos los siguientes efectos asociados a mirar un objeto:
+<ol>
+	<li>Lanzar escena intermedia "XXXX"
+
+	<li>Hablar protagonista: "Segundo comentario"
+</ol>
+<p>A su vez, la escena intermedia tiene asociado el efecto "Hablar protagonista:
+"Segundo comentario"", 
+el cual se ejecutar&aacute; seg&uacute;n termine de mostrarse la escena intermedia,
+antes del siguiente efecto en la lista anterior. (M&aacute;s info en la ayuda de las 
+escenas de corte)</p>
+
+<p>Por tanto, los efectos se ejecutaran en este orden: 1 Lanzar escena intermedia;
+2 Hablar protagonista: "Primer comentario"; 3 Hablar protagonista:
+"Segundo comentario"</p>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<html>
+  <head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+    <link rel="stylesheet" href="../../help.css" type="text/css">
+    
+  </head>
+  <body>
+    <img src="../logo-editor.png" alt="e-Adventure LOGO">
+    
+
+    <h1>
+      Actions
+    </h1>
+    Las acciones definen qu&#233; puede hacer el jugador con un objeto, personaje o 
+    zona activa.
+
+    <h2>
+      Tipos de acciones
+    </h2>
+    <p>
+      Los tipos de acci&#243;n disponible son:
+    </p>
+    <ul>
+      <li>
+        <b>Examinar</b>: acci&#243;n de examinar u obtener informaci&#243;n adicional 
+        sobre un objeto. Esta acci&#243;n se define por defecto para mostrar la 
+        descripci&#243;n detallada del personaje. Su compartamiento se puede 
+        sobreescribir.
+      </li>
+      <li>
+        <b>Coger</b>: acci&#243;n de coger un objeto de la escena. Esta acci&#243;n 
+        tiene por defecto el comportamiento de quitar el objeto de la escena y 
+        a&#241;adirlo al inventario del jugador.
+      </li>
+      <li>
+        <b>Usar</b>: acci&#243;n de utilizar un objeto. Esta acci&#243;n no tiene 
+        comportamiento por defecto.
+      </li>
+      <li>
+        <b>Personalizable</b>: acci&#243;n que permite personalizaci&#243;n, como el 
+        nombre o el ic&#243;no. Existen dos tipos, una que funciona sobre el objeto 
+        en si (Acci&#243;n) y otra que funciona combinando el objeto con otro 
+        (Interacci&#243;n).
+      </li>
+      <li>
+        <b>Dar a</b>: acci&#243;n de dar un objeto. Esta acci&#243;n tiene el 
+        comportamiento por defecto de consumir el objeto (es decir, quitarlo 
+        del inventario del personaje).
+      </li>
+      <li>
+        <b>Hablar con</b>: acci&#243;n de hablar con el personaje. Esta acci&#243;n por 
+        defecto comienza una conversaci&#243;n con el personaje, a elegir por el 
+        creador del juego.
+      </li>
+    </ul>
+    <h2>
+      Condiciones
+    </h2>
+    <p>
+      Las condiciones de la acci&#243;n indican cu&#225;ndo se puede realizar. Si las 
+      condiciones de la acci&#243;n no est&#225;n activas, el bot&#243;n de la acci&#243;n no se 
+      dibujar&#225; (salvo que sea una acci&#243;n con un comportamiento por defecto o 
+      tenga efectos alternativos, ver m&#225;s abajo).
+    </p>
+    <h2>
+      Efectos alternativos o no-efectos
+    </h2>
+    <p>
+      Cuando se crea una acci&#243;n, es posible definir efectos alternativos para 
+      la acci&#243;n que se lanzar&#225;n cuando no se cumplan las condiciones de &#233;sta. 
+      De esta forma, por ejemplo, se puede dar informaci&#243;n al usuario sobre 
+      porque no esta disponible la acci&#243;n.
+    </p>
+    <h2>
+      Acciones por defecto
+    </h2>
+    <p>
+      En todos los elementos aparece por defecto la acci&#243;n de &quot;Examinar&quot; que 
+      lleva a que el protagonista diga la &quot;Descripci&#243;n detallada&quot; de dicho 
+      elemento.
+    </p>
+    <p>
+      En los objetos, aparece por defecto la acci&#243;n de coger/usar aunque no 
+      realice ninguna acci&#243;n salvo que el protagonista indica que no puede 
+      coger dicho objeto.
+    </p>
+    <p>
+      En los personajes, aparece por defecto la acci&#243;n de &quot;Hablar con...&quot;, 
+      pero el protagonista dir&#225; que no puede hablar con el personaje.
+    </p>
+    <p>
+      El comportamiento de las acciones por defecto se cambia a&#241;adiendo una 
+      acci&#243;n del tipo correspondiente.
+    </p>
+    <h2>
+      Ver tambi&#233;n
+    </h2>
+    <p>
+      <a href="../general/Conditions.html">M&#225;s informaci&#243;n sobre condicones</a>
+    </p>
+  </body>
+</html>

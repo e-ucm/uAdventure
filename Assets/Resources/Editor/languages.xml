@@ -1,0 +1,461 @@
+<root>
+    <languages>
+        <available lang="Polski" />
+        <available lang="English" />
+    </languages>
+
+    <labels>
+	
+        <label id="ERROR">
+            <text lang="Polski">Błąd</text>
+            <text lang="English">Error</text>
+        </label>
+
+      <label id="EMPTY_STRING">
+        <text lang="Polski">""</text>
+        <text lang="English">""</text>
+      </label>
+
+      <label id="NEW_GAME">
+        <text lang="Polski">Nowa gra</text>
+        <text lang="English">New game</text>
+      </label>
+      
+      <label id="OPEN_GAME">
+        <text lang="Polski">Otwórz grę</text>
+        <text lang="English">Open game</text>
+      </label>
+
+      <label id="RECENT_GAME">
+        <text lang="Polski">Ostatnie gry</text>
+        <text lang="English">Recent games</text>
+      </label>
+
+      <label id="CANCEL">
+        <text lang="Polski">Anuluj</text>
+        <text lang="English">Cancel</text>
+      </label>
+
+      <label id="EXIT">
+        <text lang="Polski">Wyjście</text>
+        <text lang="English">Exit</text>
+      </label>
+
+      <label id="ADVENTURE">
+        <text lang="Polski">Przygoda</text>
+        <text lang="English">Adventure</text>
+      </label>
+
+      <label id="ADVENTURE_TITLE">
+        <text lang="Polski">Tytuł gry</text>
+        <text lang="English">Title of the adventure</text>
+      </label>
+
+      <label id="ADVENTURE_PATH">
+        <text lang="Polski">Ścieżka</text>
+        <text lang="English">Complete path</text>
+      </label>
+
+      <label id="ADVENTURE_DESCRIPTION">
+        <text lang="Polski">Opis przygody</text>
+        <text lang="English">Description of the adventure</text>
+      </label>
+
+      <label id="ADVENTURE_MODE">
+        <text lang="Polski">Tryb gry</text>
+        <text lang="English">Player mode (3rd or 1st person)</text>
+      </label>
+      
+      <label id="ADVENTURE_MODE_1ST">
+        <text lang="Polski">1-osoba</text>
+        <text lang="English">1st person</text>
+      </label>
+      
+      <label id="ADVENTURE_MODE_3RD">
+        <text lang="Polski">3-osobowa</text>
+        <text lang="English">3rd person</text>
+      </label>
+
+      <label id="FILES">
+        <text lang="Polski">Pliki</text>
+        <text lang="English">Files</text>
+      </label>
+
+      <!--                        -->
+      <!--      Menu elements     -->
+      <!--                        -->
+      
+      <!--Menu FILE elements -->
+      <label id="FILE">
+        <text lang="Polski">Plik</text>
+        <text lang="English">File</text>
+      </label>
+      
+      <label id="NEW_PROJECT">
+        <text lang="Polski">Nowy projekt</text>
+        <text lang="English">New project</text>
+      </label>
+      
+      <label id="LOAD_PROJECT">
+        <text lang="Polski">Załaduj projekt</text>
+        <text lang="English">Load project</text>
+      </label>
+      
+      <label id="SAVE_PROJECT">
+        <text lang="Polski">Zapisz projekt</text>
+        <text lang="English">Save project</text>
+      </label>
+
+      <label id="SAVE_PROJECT_AS">
+        <text lang="Polski">Zapisz projekt jako ...</text>
+        <text lang="English">Save project as ...</text>
+      </label>
+      
+      <label id="LOM_METADATA_EDITOR">
+        <text lang="Polski">Metadane LOM edytora </text>
+        <text lang="English">Lom metadata editor</text>
+      </label>
+      
+      <label id="LEARNING_OBJECTS_PROPERTIES">
+        <text lang="Polski"></text>
+        <text lang="English">Learning object properties</text>
+      </label>
+      
+      <label id="LEARNING_OBJECTS_PROPERTIES_SCORM">
+        <text lang="Polski">Pliki</text>
+        <text lang="English">Learning object properties for SCORM</text>
+      </label>
+
+      <label id="EXPORT_PROJECT">
+        <text lang="Polski">Eksportuj projekt...</text>
+        <text lang="English">Export project...</text>
+      </label>
+
+      <label id="EXPORT_PROJECT_EAD">
+        <text lang="Polski">Eksportuj projekt jako plik .ead</text>
+        <text lang="English">Export project as .ead file</text>
+      </label>
+      
+      <!--Menu EDIT elements -->
+
+      <label id="EDIT">
+        <text lang="Polski">Edycja</text>
+        <text lang="English">Edit</text>
+      </label>
+
+      <label id="UNDO">
+        <text lang="Polski">Cofnij</text>
+        <text lang="English">Undo</text>
+      </label>
+
+      <label id="REDO">
+        <text lang="Polski">Przywróć</text>
+        <text lang="English">Redo</text>
+      </label>
+
+      <label id="SEARCH">
+        <text lang="Polski">Wyszukaj</text>
+        <text lang="English">Search</text>
+      </label>
+      
+      <!--Menu ADVENTURE elements -->
+
+      <label id="CHECK_ADVENTURE_CONSISTENCY">
+        <text lang="Polski">Sprawdź spójność</text>
+        <text lang="English">Check adventure consistency</text>
+      </label>
+      
+      <label id="EDIT_ADVENTURE_DATA">
+        <text lang="Polski">Edytuj dane gry...</text>
+        <text lang="English">Edit adventure data...</text>
+      </label>
+      
+      <label id="VISUALIZATION">
+        <text lang="Polski">Wizualizacja...</text>
+        <text lang="English">Visualisation...</text>
+      </label>
+      
+      <label id="CONVERT_TO">
+        <text lang="Polski">Konwertuj do </text>
+        <text lang="English">Convert to </text>
+      </label>
+      
+      <label id="DELETE_UNUSED_DATA">
+        <text lang="Polski">Usuń niewykorzystywane dane</text>
+        <text lang="English">Delete unused data</text>
+      </label>
+      
+      <!--Menu CHAPTERS elements -->
+
+      <label id="CHAPTERS">
+        <text lang="Polski">Rodziały</text>
+        <text lang="English">Chapters</text>
+      </label>
+
+      <label id="ADD_CHAPTER">
+        <text lang="Polski">Dodaj rozdział</text>
+        <text lang="English">Add chapter</text>
+      </label>
+
+      <label id="DELETE_CHAPTER">
+        <text lang="Polski">Usuń rozdział</text>
+        <text lang="English">Delete chapter</text>
+      </label>
+
+      <label id="IMPORT_CHAPTER">
+        <text lang="Polski">Importuj rozdział</text>
+        <text lang="English">Import chapter</text>
+      </label>
+
+      <label id="EDIT_FLAGS_VARIABLES">
+        <text lang="Polski">Edytuj flagi i zmienne</text>
+        <text lang="English">Edit flags and variables</text>
+      </label>
+
+
+      <!--Menu RUN elements -->
+
+      <label id="RUN">
+        <text lang="Polski">Uruchom</text>
+        <text lang="English">Run</text>
+      </label>
+
+      <label id="DEBUG">
+        <text lang="Polski">Debug</text>
+        <text lang="English">Debug</text>
+      </label>
+
+      <label id="NORMAL">
+        <text lang="Polski">Normal</text>
+        <text lang="English">Normal</text>
+      </label>
+
+      <!--Menu CONFIGURATION elements -->
+
+      <label id="CONFIGURATION">
+        <text lang="Polski">Konfiguracja</text>
+        <text lang="English">Configuration</text>
+      </label>
+      
+      <!--Menu ABOUT elements -->
+
+      <label id="ABOUT">
+        <text lang="Polski">O nas</text>
+        <text lang="English">About</text>
+      </label>
+      
+      <label id="ABOUT_EADVENTURE">
+        <text lang="Polski">O eAdventure</text>
+        <text lang="English">About eAdventure</text>
+      </label>
+      
+      <label id="ABOUT_SEND">
+        <text lang="Polski">Wyślij sugestie i uwagi </text>
+        <text lang="English">Send comments and suggestions</text>
+      </label>
+
+      <!--                        -->
+      <!-- Editor window elements -->
+      <!--                        -->
+
+      <!-- Editor window Chapter elements -->
+
+      <label id="CHAPTER">
+        <text lang="Polski">Rozdział</text>
+        <text lang="English">Chapter</text>
+      </label>
+
+      <label id="TITLE_OF_CHAPTER">
+        <text lang="Polski">Tytuł rozdziału</text>
+        <text lang="English">Title of the chapter</text>
+      </label>
+
+      <label id="DESCRIPTION_OF_CHAPTER">
+        <text lang="Polski">Opis rozdziału</text>
+        <text lang="English">Description of the chapter</text>
+      </label>
+
+      <label id="ASSESMENT_FILE_CHAPTER">
+        <text lang="Polski">Plik assesment rozdziału</text>
+        <text lang="English">Assesment file of the chapter</text>
+      </label>
+
+      <label id="ADAPTATION_FILE_CHAPTER">
+        <text lang="Polski">Plik apdaptacji dla rozdziału</text>
+        <text lang="English">Adaptation file of the chapter</text>
+      </label>
+
+      <label id="INITIAL_SCENE_CHAPTER">
+        <text lang="Polski">Scena początkowa rozdziału</text>
+        <text lang="English">Initial scene of the chapter</text>
+      </label>
+      <!-- Editor window Scenes elements -->
+
+      <label id="SCENES">
+        <text lang="Polski">Sceny</text>
+        <text lang="English">Scenes</text>
+      </label>
+      
+      <label id="SHOW_?">
+        <text lang="Polski">Widoczne?</text>
+        <text lang="English">Show?</text>
+      </label>
+      
+      <label id="SCENE_ID">
+        <text lang="Polski">ID sceny</text>
+        <text lang="English">Scene ID</text>
+      </label>
+      
+      <label id="FULL_DESCIPTION_OF_THE_SCENE">
+        <text lang="Polski">Pełny opis sceny</text>
+        <text lang="English">Full description of the scene</text>
+      </label>
+      
+      <label id="NAME_OF_THE_SCENE">
+        <text lang="Polski">Nazwa sceny</text>
+        <text lang="English">Name of the scene</text>
+      </label>
+      
+      <!-- Editor window Cutscenes elements -->
+
+      <label id="CUTSCENES">
+        <text lang="Polski">Filmy przerywnikowe </text>
+        <text lang="English">Cutscenes</text>
+      </label>
+
+      <!-- Editor window Books elements -->
+      
+      <label id="BOOKS">
+        <text lang="Polski">Książki</text>
+        <text lang="English">Books</text>
+      </label>
+
+      <!-- Editor window Items elements -->
+
+      <label id="ITEMS">
+        <text lang="Polski">Przedmioty</text>
+        <text lang="English">Items</text>
+      </label>
+
+      <!-- Editor window SetItems elements -->
+
+      <label id="SET_ITEMS">
+        <text lang="Polski">Ustaw przedmioty</text>
+        <text lang="English">Set items</text>
+      </label>
+
+      <!-- Editor window Player elements -->
+
+      <label id="PLAYER">
+        <text lang="Polski">Gracz</text>
+        <text lang="English">Player</text>
+      </label>
+
+      <!-- Editor window Characters elements -->
+
+      <label id="CHARACTERS">
+        <text lang="Polski">Postaci</text>
+        <text lang="English">Characters</text>
+      </label>
+
+      <!-- Editor window Conversation elements -->
+
+      <label id="CONVERSATION">
+        <text lang="Polski">Konwersacje</text>
+        <text lang="English">Conversations</text>
+      </label>
+
+      <!-- Editor window Advenced Features elements -->
+
+      <label id="ADVANCED_FEATURES">
+        <text lang="Polski">Zaawansowane funkcje</text>
+        <text lang="English">Advenced features</text>
+      </label>
+
+      <!-- Editor window Adaptation Profiles elements -->
+
+      <label id="ADAPTATION_PROFILES">
+        <text lang="Polski">Profil adaptacji</text>
+        <text lang="English">Adaptation profiles</text>
+      </label>
+      
+      <!-- Editor window Assesment Profiles elements -->
+
+      <label id="ASSESMENT_PROFILES">
+        <text lang="Polski">Assesment profiles</text>
+        <text lang="English">Assesment profiles</text>
+      </label>
+      
+      <!--                        -->
+      <!--     EDITOR LABELS      -->
+      <!--                        -->
+      
+      <label id="APPEARANCE">
+        <text lang="Polski">Wygląd</text>
+        <text lang="English">Appearance</text>
+      </label> 
+      
+      <label id="DOCUMENTATION">
+        <text lang="Polski">Dokumentacja</text>
+        <text lang="English">Documentation</text>
+      </label>
+      
+      <label id="ELEMENT_REFERENCES">
+        <text lang="Polski">Referencje elementów</text>
+        <text lang="English">Element references</text>
+      </label>
+      
+      <label id="ACTIVE_AREAS">
+        <text lang="Polski">Obszary aktywne</text>
+        <text lang="English">Active areas</text>
+      </label>
+      
+      <label id="EXITS">
+        <text lang="Polski">Wyjścia</text>
+        <text lang="English">Exits</text>
+      </label>
+      
+      <label id="CUTSCENES_AND_CONFIGURATION">
+        <text lang="Polski">Filmy przerywnikowe i konfiguracja</text>
+        <text lang="English">Cutscenes and configuration</text>
+      </label>
+      
+      <label id="CONTENTS">
+        <text lang="Polski">Zawartość</text>
+        <text lang="English">Content</text>
+      </label>
+      
+      <label id="DESCRIPTION_AND_CONFIG">
+        <text lang="Polski">Opis i konfiguracja</text>
+        <text lang="English">Description and config</text>
+      </label>
+      
+      <label id="ACTIONS">
+        <text lang="Polski">Akcje</text>
+        <text lang="English">Actions</text>
+      </label>
+      
+      <label id="DIALOG_CONFIGURATION">
+        <text lang="Polski">Konfiguracja dialogu</text>
+        <text lang="English">Dialog configuration</text>
+      </label>
+      
+      <label id="LIST_OF_TIMERS">
+        <text lang="Polski">Lista timerów</text>
+        <text lang="English">List of timers</text>
+      </label>
+      
+      <label id="GLOBAL_STATES">
+        <text lang="Polski">Stany globalne</text>
+        <text lang="English">Global states</text>
+      </label>
+      
+      <label id="MACROS">
+        <text lang="Polski">Makra</text>
+        <text lang="English">Macros</text>
+      </label>
+    
+    
+
+    </labels>
+</root>

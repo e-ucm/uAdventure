@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<comment>eAdventure engine configuration</comment>
+<entry key="AboutFile">about-en_EN.html</entry>
+<entry key="LanguageFile">en_EN.xml</entry>
+</properties>

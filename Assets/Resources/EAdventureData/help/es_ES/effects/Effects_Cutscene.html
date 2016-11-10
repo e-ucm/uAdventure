@@ -1,0 +1,50 @@
+<html>
+<head>
+<title>Efecto lanzar escena intermedia</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="../../help.css" type="text/css" rel="stylesheet">
+</head>
+<body>
+<img src="../logo-editor.png" alt="TEST IMAGE fail!"
+	style="display: block; margin: 10px" />
+<h1>Efecto Lanzar Escena Intermedia</h1>
+<p>Mediante este efecto se lanza una escena intermedia.</p>
+<p>Crear un efecto lanzar escena intermedia:</p>
+<ul>
+	<li><b>Seleccionar el efecto: </b>seleccionar el efecto en el
+	panel de creaci&oacute;n de efectos. Pulsar el bot&oacute;n OK.</li>
+	</li>
+	<li><b>Panel de creaci&oacute;n del efecto: </b>a
+	continuaci&oacute;n nos aparecer&aacute; el siguiente panel:<img
+		src="Effects_Cutscene_files/Cutscene_effect_ES.jpg"
+		alt="CUTSCENE EFFECT.JPG fail!" style="display: block; margin: 10px" /></li>
+</ul>
+<p class="no_se_entiende">Se puede elegir entre las escenas
+intermedias que existan para este cap&iacute;tulo. Cabe destacar que una
+vez ejecutada la escena intermedia se ejecutar&aacute;n los efectos y
+cambios de escena que tenga asociada la ejecuci&oacute;n de dicha
+escena.</p>
+<p class="no_se_entiende">Una vez terminados los efectos asociados a
+la escena intermedia se continuar&aacute;n ejecutando los efectos que
+siguen en orden al efecto &quot;<em>lanzar escena intermedia</em>&quot;
+en cuesti&oacute;n. Es decir, aunque el hecho de lanzar un objeto desencadene
+lanzar otros efectos de forma indirecta, no implica que se corte el
+flujo esperado de los efectos a lanzar.</p>
+<p class="no_se_entiende"><b>Ejemplo:</b> Tenemos los siguientes
+efectos asociados a mirar un objeto:</p>
+<ol>
+	<li>Lanzar escena intermedia "XXXX", la cual tiene asociados los
+	efectos:</li>
+	<ol>
+		<li>Hablar protagonista: "Primer comentario"</li>
+	</ol>
+	<li>Hablar protagonista: "Segundo comentario"</li>
+</ol>
+<p>Los efectos se ejecutaran en este orden:</p>
+<ol>
+	<li>Lanzar escena intermedia</li>
+	<li>Hablar protagonista: "Primer comentario"</li>
+	<li>Hablar protagonista: "Segundo comentario"</li>
+</ol>
+</body>
+</html>

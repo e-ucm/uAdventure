@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<!-- <entry key="cmi.core._version">#1#0#CMIString255</entry>-->
+<entry key="cmi.core.student_id">#1#0#CMIIdentifier</entry>
+<entry key="cmi.core.student_name">#1#0#CMIString255</entry>
+<entry key="cmi.core.lesson_location">#1#1#CMIString255</entry>
+<entry key="cmi.core.credit">#1#0#CMIVocabulary(credit,no-credit)</entry>
+<entry key="cmi.core.lesson_status">#1#1#CMIVocabulary(passed,completed,failed,incomplete,browsed,not attempted)</entry>
+<entry key="cmi.core.entry">#1#0#CMIVocabulary(ab-initio,resume,emptyString)</entry>
+<!-- <entry key="cmi.core.score._children">#1#0#CMIString255</entry> -->
+<entry key="cmi.core.score.raw">#1#1#CMIDecimal,CMIBlank</entry> 
+<entry key="cmi.core.score.max">#1#1#CMIDecimal,CMIBlank</entry> 
+<entry key="cmi.core.score.min">#1#1#CMIDecimal,CMIBlank</entry> 
+<entry key="cmi.core.total_time">#1#0#CMITimespan</entry> 
+<entry key="cmi.core.lesson_mode">#1#0#CMIVocabulary(browse,normal,review)</entry> 
+<entry key="cmi.core.exit">#0#1#CMIVocabulary(timed-out,suspend,logout,emptyString)</entry> 
+<entry key="cmi.core.session_time">#0#1#CMITimespan</entry> 
+<entry key="cmi.suspend_data">#1#1#CMIString4096</entry> 
+<entry key="cmi.launch_data">#1#0#CMIString4096</entry> 
+<entry key="cmi.comments">#1#1#CMIString4096</entry> 
+<entry key="cmi.comments_from_lms">#1#0#CMIString4096</entry> 
+<!-- <entry key="cmi.objectives._children">#1#0#CMIString255</entry> 
+<entry key="cmi.objectives._count">#1#0#CMIInteger</entry> -->
+<!--   prueba    -->
+<entry key="cmi.objectives">#1#1#CMIIdentifier</entry> 
+<!--   prueba    -->
+<entry key="cmi.objectives.n.id">#1#1#CMIIdentifier</entry> 
+<!-- <entry key="cmi.objectives.n.score._children">#1#0#CMIString255</entry> -->
+<entry key="cmi.objectives.n.score.raw">#1#1#CMIDecimal,CMIBlank</entry> 
+<entry key="cmi.objectives.n.score.max">#1#1#CMIDecimal,CMIBlank</entry> 
+<entry key="cmi.objectives.n.score.min">#1#1#CMIDecimal,CMIBlank</entry>
+<entry key="cmi.objectives.n.status">#1#1#CMIVocabulary(passed,completed,failed,incomplete,browsed,not attempted)</entry> 
+<!-- <entry key="cmi.student_data._children">#1#0#CMIString255</entry> -->
+<entry key="cmi.student_data.mastery_score">#1#0#CMIDecimal</entry> 
+<entry key="cmi.student_data.max_time_allowed">#1#0#CMITimespan</entry> 
+<entry key="cmi.student_data.time_limit_action">#1#0#CMIVocabulary("exit,message","exit,no message","continue,message","continue,no message")</entry> 
+<entry key="cmi.student_preference._children">#1#0#CMIString255</entry> 
+<entry key="cmi.student_preference.audio">#1#1#CMISInteger</entry> 
+<entry key="cmi.student_preference.language">#1#1#CMIString255</entry>
+<entry key="cmi.student_preference.speed">#1#1#CMISInteger</entry>
+<entry key="cmi.student_preference.text">#1#1#CMISInteger</entry>
+
+
+<!-- INTERACTIONS -->
+
+<!--<entry key="cmi.interactions._children">#1#0#CMIString255</entry>
+<entry key="cmi.interactions._count">#1#0#CMIInteger</entry>-->
+
+<entry key="cmi.interactions">#0#1#CMIIdentifier</entry>
+
+<entry key="cmi.interactions.n.id">#0#1#CMIIdentifier</entry>
+
+<!--<entry key="cmi.interactions.n.objectives._count">#1#0#CMIInteger</entry>-->
+<entry key="cmi.interactions.n.objectives.m.id">#0#1#CMIIdentifier</entry>
+
+<entry key="cmi.interactions.n.time">#0#1#CMITime</entry>
+<entry key="cmi.interactions.n.type">#0#1#CMIVocabulary(true-false,choice,fill-in,matching,performance,sequencing,likert,numeric)</entry>
+<!--<entry key="cmi.interactions.n.correct_responses._count">#1#0#CMIInteger</entry>-->
+<entry key="cmi.interactions.n.correct_responses.m.pattern">#0#1#CMIFeedback</entry>
+<entry key="cmi.interactions.n.weigh">#0#1#CMIDecimal</entry>
+<entry key="cmi.interactions.n.student_response">#0#1#CMIFeedback</entry>
+<entry key="cmi.interactions.n.result">#0#1#CMIVocabulary(correct,wrong,unanticipated,neutral,CMIDecimal)</entry>
+<entry key="cmi.interactions.n.latency">#0#1#CMITimespan</entry>
+</properties>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<comment>&lt;e-Adventure&gt; editor configuration</comment>
+<entry key="RecentFiles">0</entry>
+<entry key="LoadingImage">img/loading/en_EN/Editor2D-Loading.png</entry>
+<entry key="AboutFile">i18n/editor/about-en_EN.html</entry>
+<entry key="DebugWindowY">2147483647</entry>
+<entry key="DebugWindowX">2147483647</entry>
+<entry key="EditorWindowHeight">976</entry>
+<entry key="DebugWindowWidth">2147483647</entry>
+<entry key="PaintHotSpots">false</entry>
+<entry key="EngineWindowY">2147483647</entry>
+<entry key="EngineWindowX">2147483647</entry>
+<entry key="PaintBoundingAreas">false</entry>
+<entry key="EngineWindowHeight">2147483647</entry>
+<entry key="ShowNPCReferences">false</entry>
+<entry key="EditorWindowWidth">1670</entry>
+<entry key="EditorWindowY">0</entry>
+<entry key="PaintGrid">false</entry>
+<entry key="EditorWindowX">0</entry>
+<entry key="EngineWindowWidth">2147483647</entry>
+<entry key="ShowStartDialog">true</entry>
+<entry key="LanguageFile">en_EN.xml</entry>
+<entry key="ShowAtrezzoReferences">false</entry>
+<entry key="DebugWindowHeight">2147483647</entry>
+<entry key="ShowItemReferences">false</entry>
+</properties>

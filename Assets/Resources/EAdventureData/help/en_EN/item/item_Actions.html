@@ -1,0 +1,38 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="../../help.css" type="text/css" rel="stylesheet">
+</head>
+<body>
+<img src="../logo-editor.png" alt="e-Adventure logo"/>
+<h1>Items: Actions</h1>
+<h2>actions table</h2>
+<p>We can define actions and their consequences (effects) for each <span class="concepto">item</span>. To add a new action you click on <img src="../../common_img/add_icon.png" width="16" height="16">. Availables actions are:</p>
+<ul>
+  <li><strong>Normal actions</strong>: with <span class="referencia_literal">Examine</span>, <span class="referencia_literal">Grab</span>, <span class="referencia_literal">Use</span>.</li>
+  <li><strong><span id="result_box"><span title="Acciones que necesitan de otro elemento">Actions that need another element</span></span></strong>: 
+    <ul>
+      <li><span class="referencia_literal">Use with</span>: <span class="concepto">Item</span> must be used with another one. Then, the effecs will be triggered. This <span class="concepto">item</span> is choosen by a list.</li>
+      <li><span class="referencia_literal">Give to: <span class="concepto">Item</span> </span>must be used with a character. Then, the effecs will be triggered. This character is decided making a choice in a list which is displayed to the user.</li>
+    </ul>
+  </li>
+  <li>    <strong>Custom action</strong>:  <span class="referencia_literal">Custom</span> action allows us defining one action which adapts to our requirements. Once selected, a dialog will ask us for a name for the action, (e.g.: buy, open, throw, etc. ) and then if the action needs of another <span class="concepto">item</span>:
+  <ul>
+    <li>If we select <span class="referencia_literal">Action</span>, interaction with antoher item will not be necessary.</li>
+    <li>If we select <span class="referencia_literal">Interaction</span>, a dialog will ask us for the item which interacts with it.</li>
+    <li>Once decided, we can custom the button appearance for the action in the tab <span class="referencia_literal">Personalization</span>.</li>
+    </ul>
+  </li>
+</ul>
+<p>Each <span class="concepto">action</span> is related, beyond some <strong>effects</strong> that will be explained later, some conditions that appear in the top table.</p>
+<ul>
+  <li><span class="referencia_literal"><a href="../actions/NeedsGetTo.html">Needs get to</a></span>: if it is necessary to reach and <span class="concepto">item</span> to perform an action. We can set the minimum distance between the <span class="concepto">item</span> and the main character necessary to perform the action. This condition only have sense if it is a <strong>third person</strong> adventure.</li>
+  <li><a href="../general/Conditions.html"><span class="referencia_literal">Conditions</span></a>: in here we define the conditions which must be checked before the action is performed. If not, nothing will happen.  <a href="../general/Conditions.html">More info about conditions</a>.</li>
+</ul>
+<h2>Description and effects</h2>
+<p>Any action has a <span class="referencia_literal">Full description for the action</span> and <span class="referencia_literal">Effects</span>.</p>
+<p>In the first, we can add all the information we want about the action.</p>
+<p>In the second, clicking on <img src="../../common_img/add_icon.png" alt="añadir" width="16" height="16"> we can add <a href="../effects/Effects_General.html">Effects</a> for the action. <a href="../effects/Effects_General.html">More about effects</a>.</p>
+<p>Also, selecting <span class="referencia_literal">Active when conditions are not</span> and then clicking on <span class="referencia_literal">Edit not-effects</span> we can define the effects that will have when we perform the action but the conditions defined in top table are not met. </p>
+</body>
+</html>

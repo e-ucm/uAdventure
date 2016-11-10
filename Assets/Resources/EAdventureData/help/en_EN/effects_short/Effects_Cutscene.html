@@ -1,0 +1,30 @@
+<html>
+<head>
+<title>Efecto lanzar escena intermedia</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link href="../../help.css" type="text/css" rel="stylesheet"></head>
+<body>
+
+<h1>Effect trigger cutscene</h1>
+<p>Through this effect a cutscene is triggered. </p>
+<p>Create a trigger cutscene effect:</p>
+<ul>
+  <li><b>Select the effect: </b>Select the effect on the creation effects panel. Press OK.</li>
+  <li><b>Creation effect panel: </b>afterwards an edition panel will appear:
+<BR></p>We can choose among the cutscenes of the chapter.Se puede elegir entre las escenas intermedias que existan para este cap&iacute;tulo.
+It is noticeable that once the cutscene  the effects and the switches of the scene associated are executed.
+Once the associated cutscene effects are over they will continue executing the other effects in order. Una vez terminados los efectos asociados a la escena intermedia se continuar&aacute;n ejecutando los efectos que siguen en orden al efecto lanzar escena
+intermedia en cuestion. That is, although the fact of launching an object triggers other indirect effects, this does not involve cutting the flow of the effects expected to be launched.
+ 
+</ul>
+<b>Example:</b>
+We have the following effects asociated to watch an object::
+<ol>
+<li>Launch cutscene "XXXX", which has the following associated effect:
+  <ol>
+<li>Player says: "First commentar"
+</ol>
+<li> Player says: "Second commentar"
+</ol>Effects will execute in this order:: 1 Launch cutscene; 2Player says: "First commentar"; 3 Player says: "Second commentar"
+</body>
+</html>

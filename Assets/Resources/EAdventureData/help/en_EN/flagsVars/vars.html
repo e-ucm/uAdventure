@@ -1,0 +1,19 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link href="../../help.css" type="text/css" rel="stylesheet">
+</head>
+<body>
+<img src="../logo-editor.png" alt="TEST IMAGE fail!" style="display:block; margin:10px" />
+<h1>Variable edition</h1>
+<p>The <a href="../flagsVars/flags.html" label="flags" title="flags">flags</a>  system allows us to add  narrative behavior to our games. However, the use becomes too hard in various situations. For example, suppose we want to limit the number of times a player can perform a certain action (like catch upthe fish) to 3. To allow remember numbers with flags we should have a flag for each possible value (0, 1, 2 and 3 in this case).</p>
+<p>Therefore &lt;e-Adventure&gt; also includes variables. On an intuitive way we can define variables as elements that always have an associated value, the default is 0, and that we can change during the games. To add a reference to the value of a variable we just have to perform a process similar to the flags. Let's see an example.</p>
+<p>We have a book we created earlier. To do that we create a variable <strong>NumberOfTimesBookWasChecked</strong> which counts the number of times the book has been examined. Afterwards we add to the action examine of the book one condition: NumberOfTimesBookWasChecked must be less than 3. </p>
+<p>The process is as follows:</p>
+<ol><li>First we create the new action &quot;Examine&quot; in the object book. To do this we click on the &quot;Actions&quot; node which is hanging from the object Book (do not be confused with the books themselves) with the right button and then click &quot;Add Action Examine.&quot; </li>
+  <li>Click &quot;Edit conditions&quot; and then &quot;Add condition&quot;. The difference is that now we press the button in the middle, named &quot;Variables&quot;. </li>
+  <li>We fill in the fields below with the data <strong>NumberOfTimesBookWasChecked</strong> for the variable name, &quot;&lt;&quot; as a comparison function and 3 as a value.</li>
+</ol>
+<img src="Vars_Files/Vars.jpg" alt="VAR SELECTION.JPG fail!" style="display:block; margin:10px" />
+</body>
+</html>

@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 
+To create a release, a directory named "release-dir" must be created in
+the root directory of the project and the following files must be downloaded
+from the wiki:
+* config_editor.xml
+* config_engine.xml
+* eAdventure-editor.sh
+* eAdventure-engine.sh
+* Run eAdventure editor.bat
+* Run eAdventure engine.bat
+* license files
+
+All these files are packaged in a single zip file that can be downloaded from sourceforge.net 
+
+Any documentation, example games, readme-files, etc. and be added manually
+to the generated zip file.
+
+Steps:
+0) Download the <e-Adventure> project from sourceforge.net SVN.  Use your favourite SVN client to do so (e.g. subclipse, 
+   tortoiseSVN, etc.). Detailed instructions about how to get connected to the SVN repository can be found on sourceforge.net.
+   However, if you are familiar with SVN you will just need the following information:
+   
+   svn co https://e-adventure.svn.sourceforge.net/svnroot/e-adventure/trunk e-adventure
+
+1) Create a directory "release-dir" under the root directory of the project. If this directory already exists, ensure that
+   it is empty before you go on.
+   
+2) Download all the complementary files for creating the release from sourceforge.net. Although the release that this ant will
+   generate is multiplatform and multilanguage, please note that you can choose the default language to be used in the release.
+   If you want the <e-Adventure> platform to be in Spanish by default, download the "E-Adventure-Ficheros-GenerarReleaseMulti-es_ES.zip"
+   file that is under the "packages_build_release" folder in the <e-Adventure>'s SF.net site and extract all its contents into
+   the "release-dir" folder that you created in the previous stage. If you want <e-Adventure> to be in English by default, use 
+   the "E-Adventure-Files-BuildRelease-en_ENMulti.zip" package instead. This will only adjust the language of the readme files,
+   the shortcuts, the licenses and the default selected language for <e-Adventure>. Nevertheless users would be able to change the
+   language of the platform directly from the editor and the engine.
+   
+   You might need to review these files in order to check that author names are correct, that the license is ok, etc. 
+
+3) Change properties below in this ant-file as needed. You will typically need to change the "release.version" property. 
+   This is the syntax we use for the multiplatform release:
+                    releaseVersion-Date{OptionalValues}
+   To numerate the release versions (releaseVersion) we use the next format: Number . Number Character? 
+   For major changes we increment the number of the version (e.g. 0.8 is then 0.9, etc.). If the release is just
+   a set of minor changes (i.e. resolution of bugs) we append a character: a, b, c, d, e... and so on.
+   Therefore typical version numbers would be 1.0, 1.1a, 1.1b, 1.1c...
+   
+   To define the date when the release was created we use the format: YYYYMMDD (4-digits year, 2-digits month, 2-digits day).
+   
+   The optional values are a capital letter if the default language is not spanish (e.g. E for English) and other stuff if
+   it is required.
+   
+4) You might need to modify also the file "create-applet.xml" that should be under the root of the <e-Adventure> project folder.
+    This ant file is used to make the jar file that contains a flat version of the e-adventure engine and referenced libraries. 
+    The e-adventure editor uses this jar file during the exportation process.
+    
+    Go to this file and check the property:
+    <property name="plugin.dir" value="C:/Program Files/Java/jre1.5.0_19/lib/" />
+    Ensure that this property points to the folder where your JRE 1.5 is installed.
+    
+5) Run this ant. After just a few minutes you will obtain a zip file with the release under "release-dir". Enjoy!
+-->
+
+<project basedir="." default="build" name="build.eAdventureApplet">
+	<description>
+    This ant build file is used to build the project as a jar file.
+	</description>
+
+	<property name="lib.dir" value="jars" />
+	<property name="gui.dir" value="gui" />
+	<property name="img.dir" value="img" />
+	<property name="web.dir" value="web" />
+	<property name="help.dir" value="help" />
+	<property name="lanengine.dir" value="i18n/engine" />
+	<property name="laneditor.dir" value="i18n/editor" />
+	<property name="release.version" value="1.2 RC1-20100907" />
+
+	<property name="plugin.dir" value="C:/Archivos de programa/Java/jre6/lib" />
+
+	<path id="project.class.path">
+		<fileset dir="${lib.dir}">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+
+	<path id="plugin.class.path">
+		<fileset dir="${plugin.dir}">
+			<include name="*.jar"/>
+		</fileset>
+	</path>
+	
+	<target name="complie">
+		<javac srcdir="./src/" destdir="release-dir/">
+			<classpath refid="project.class.path" />
+			<classpath refid="plugin.class.path" />
+		</javac>
+	</target>
+
+	<pathconvert property="lib.project.manifest.classpath" pathsep=" ">
+		<path refid="project.class.path" />
+		<map from="${basedir}\${lib.dir}\" to="jars/" />
+	</pathconvert>
+
+	<target name="jar-engine" description="generate the engine jar" depends="complie">
+		<delete file="release-dir/eadventure/eadventure-engine.jar" />
+		<jar compress="true" destfile="release-dir/eadventure/eadventure-engine.jar">
+			<fileset dir="release-dir/">
+				<include name="es/eucm/eadventure/engine/*.class" />
+				<include name="es/eucm/eadventure/engine/**/*.class" />
+			</fileset>
+
+			<manifest>
+				<attribute name="Main-Class" value="es.eucm.eadventure.engine.EAdventure" />
+				<attribute name="Class-Path" value="${lib.project.manifest.classpath} jars/eadventure-common.jar jars/eadventure-comm.jar" />
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="jar-editor" description="generate the editor jar" depends="complie">
+		<delete file="release-dir/eadventure/eadventure-editor.jar" />
+		<jar compress="true" destfile="release-dir/eadventure/eadventure-editor.jar">
+			<fileset dir="release-dir/">
+				<include name="es/eucm/eadventure/editor/*.class" />
+				<include name="es/eucm/eadventure/editor/**/*.class" />
+			</fileset>
+			<manifest>
+				<attribute name="Main-Class" value="es.eucm.eadventure.editor.AdventureEditor" />
+				<attribute name="Class-Path" value="${lib.project.manifest.classpath} jars/eadventure-common.jar eadventure-engine.jar jars/eadventure-comm-jar" />
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="jar-comm" description="generate the comm jar" depends="complie">
+		<delete file="release-dir/eadventure/jars/eadventure-comm.jar" />
+		<jar compress="true" destfile="release-dir/eadventure/jars/eadventure-comm.jar">
+			<fileset dir="release-dir/">
+				<include name="es/eucm/eadventure/comm/*.class" />
+				<include name="es/eucm/eadventure/comm/**/*.class" />
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="jar-common" description="generate the common jar" depends="complie">
+		<delete file="release-dir/eadventure/jars/eadventure-common.jar" />
+		<jar compress="true" destfile="release-dir/eadventure/jars/eadventure-common.jar">
+			<fileset dir="release-dir/">
+				<include name="es/eucm/eadventure/common/*.class" />
+				<include name="es/eucm/eadventure/common/**/*.class" />
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="clear-all" description="clear all the generated files">
+		<delete>
+			<fileset dir="${basedir}/release-dir">
+				<include name="es/**/*.*" />
+				<include name="eadventure/**/*.*" />
+			</fileset>
+		</delete>
+	</target>
+
+	<target name="copy-files" description="copy the necessary files">
+		<copy todir="${basedir}/release-dir/eadventure/jars" flatten="true">
+			<fileset dir="${lib.dir}">
+				<include name="*.jar" />
+			</fileset>
+		</copy>
+		<copy todir="${basedir}/release-dir/eadventure/gui" flatten="false">
+			<fileset dir="${gui.dir}">
+				<include name="**/*.*" />
+				<exclude name=".svn*/**" />
+			</fileset>
+		</copy>
+		<copy todir="${basedir}/release-dir/eadventure/img" flatten="false">
+			<fileset dir="${img.dir}">
+				<include name="**/*.*" />
+				<exclude name=".svn*/**" />
+			</fileset>
+		</copy>
+		<copy todir="${basedir}/release-dir/eadventure/web" flatten="true">
+			<fileset dir="${web.dir}">
+				<include name="eAdventure_temp.jar" />
+				<include name="*.zip" />
+				<include name="*.js" />
+				<include name="*.xsd" />
+				<include name="*.gif" />
+			</fileset>
+		</copy>
+		<copy todir="${basedir}/release-dir/eadventure/i18n/engine" flatten="true">
+			<fileset dir="${lanengine.dir}">
+				<exclude name=".snv/**" />
+			</fileset>
+		</copy>
+		<copy todir="${basedir}/release-dir/eadventure/i18n/editor" flatten="true">
+			<fileset dir="${laneditor.dir}">
+				<exclude name=".snv/**" />
+			</fileset>
+		</copy>
+		<copy todir="${basedir}/release-dir/eadventure/help" flatten="false">
+			<fileset dir="${help.dir}">
+				<exclude name=".snv/**" />
+			</fileset>
+		</copy>
+		<copy todir="${basedir}/release-dir/eadventure" flatten="true">
+			<fileset dir="${basedir}">
+				<include name="*.dtd" />
+                <include name="datamodel*.xml" />
+			</fileset>
+		</copy>
+		<copy todir="${basedir}/release-dir/eadventure" flatten="true">
+			<fileset dir="${basedir}/release-dir">
+				<include name="*.xml" />
+			</fileset>
+		</copy>
+
+	</target>
+
+	<target name="create-special-files" description="create files inside eadventure folder: RELEASE and eAdventure.keystore (empty)">
+		<echo file="${basedir}/release-dir/eadventure/RELEASE">${release.version}</echo>
+		<touch file="${basedir}/release-dir/eadventure/eAdventure.keystore"></touch>
+	</target>	
+	
+	<target name="create-zip" description="creates the release zip">
+		<delete>
+			<fileset dir="${basedir}/release-dir">
+				<include name="es/**/*.*" />
+			</fileset>
+		</delete>
+		<zip destfile="${basedir}/release-dir/eAdventure-v${release.version}-multiplatform-nodoc.zip">
+			<zipfileset dir="${basedir}/release-dir">
+				<exclude name="*.zip" />
+				<exclude name="es*/**" />
+				<exclude name="*.xml" />
+			</zipfileset>
+		</zip>
+		<delete>
+			<fileset dir="${basedir}/release-dir">
+				<include name="eadventure/**/*.*" />
+			</fileset>
+		</delete>
+	</target>
+
+	<target name="cleanup">
+		<delete>
+			<fileset dir="${basedir}/release-dir">
+				<include name="es/**/*.*" />
+				<include name="eadventure/**/*.*" />
+			</fileset>
+		</delete>
+	</target>
+
+	<target name="build" description="build a project release">
+		<antcall target="clear-all" />
+		<ant antfile="create-applet.xml" target="generate" />
+		<mkdir dir="release-dir/eadventure" />
+		<mkdir dir="release-dir/eadventure/jars" />
+		<antcall target="jar-engine" />
+		<antcall target="jar-editor" />
+		<antcall target="jar-comm" />
+		<antcall target="jar-common" />
+		<antcall target="copy-files" />
+		<antcall target="create-special-files" />
+		<antcall target="create-zip" />
+		<antcall target="cleanup" />
+	</target>
+
+</project>
