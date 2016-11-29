@@ -2,40 +2,44 @@
 using System.Collections;
 using System.Xml;
 
-public class TransitionSubParser_ : Subparser_ {
-    private Animation animation;
-
-    private Transition transition;
-
-    public TransitionSubParser_(Animation animation):base(null)
+namespace uAdventure.Core
+{
+    public class TransitionSubParser_ : Subparser_
     {
-        this.animation = animation;
-        transition = new Transition();
-    }
+        private Animation animation;
 
-    public override void ParseElement(XmlElement element)
-    {
-        string tmpArgVal = "";
+        private Transition transition;
 
-        tmpArgVal = element.GetAttribute("type");
-        if (!string.IsNullOrEmpty(tmpArgVal))
+        public TransitionSubParser_(Animation animation) : base(null)
         {
-            if (tmpArgVal.Equals("none"))
-                transition.setType(Transition.TYPE_NONE);
-            else if (tmpArgVal.Equals("fadein"))
-                transition.setType(Transition.TYPE_FADEIN);
-            else if (tmpArgVal.Equals("vertical"))
-                transition.setType(Transition.TYPE_VERTICAL);
-            else if (tmpArgVal.Equals("horizontal"))
-                transition.setType(Transition.TYPE_HORIZONTAL);
+            this.animation = animation;
+            transition = new Transition();
         }
 
-        tmpArgVal = element.GetAttribute("time");
-        if (!string.IsNullOrEmpty(tmpArgVal))
+        public override void ParseElement(XmlElement element)
         {
-            transition.setTime(long.Parse(tmpArgVal));
-        }
+            string tmpArgVal = "";
 
-        animation.getTransitions().Add(transition);
+            tmpArgVal = element.GetAttribute("type");
+            if (!string.IsNullOrEmpty(tmpArgVal))
+            {
+                if (tmpArgVal.Equals("none"))
+                    transition.setType(Transition.TYPE_NONE);
+                else if (tmpArgVal.Equals("fadein"))
+                    transition.setType(Transition.TYPE_FADEIN);
+                else if (tmpArgVal.Equals("vertical"))
+                    transition.setType(Transition.TYPE_VERTICAL);
+                else if (tmpArgVal.Equals("horizontal"))
+                    transition.setType(Transition.TYPE_HORIZONTAL);
+            }
+
+            tmpArgVal = element.GetAttribute("time");
+            if (!string.IsNullOrEmpty(tmpArgVal))
+            {
+                transition.setTime(long.Parse(tmpArgVal));
+            }
+
+            animation.getTransitions().Add(transition);
+        }
     }
 }

@@ -2,43 +2,48 @@
 using UnityEngine;
 using UnityEditor;
 
-public class TriggerLastSceneEffectEditor : EffectEditor
+using uAdventure.Core;
+
+namespace uAdventure.Editor
 {
-    private bool collapsed = false;
-    public bool Collapsed { get { return collapsed; } set { collapsed = value; } }
-    private Rect window = new Rect(0, 0, 300, 0);
-    public Rect Window
+    public class TriggerLastSceneEffectEditor : EffectEditor
     {
-        get
+        private bool collapsed = false;
+        public bool Collapsed { get { return collapsed; } set { collapsed = value; } }
+        private Rect window = new Rect(0, 0, 300, 0);
+        public Rect Window
         {
-            if (collapsed) return new Rect(window.x, window.y, 50, 30);
-            else return window;
+            get
+            {
+                if (collapsed) return new Rect(window.x, window.y, 50, 30);
+                else return window;
+            }
+            set
+            {
+                if (collapsed) window = new Rect(value.x, value.y, window.width, window.height);
+                else window = value;
+            }
         }
-        set
+
+        private TriggerLastSceneEffect effect;
+
+        public TriggerLastSceneEffectEditor()
         {
-            if (collapsed) window = new Rect(value.x, value.y, window.width, window.height);
-            else window = value;
+            this.effect = new TriggerLastSceneEffect();
         }
-    }
 
-    private TriggerLastSceneEffect effect;
+        public void draw()
+        {
+            EditorGUILayout.HelpBox(TC.get("Effect.TriggerLastScene"), MessageType.Info);
+        }
 
-    public TriggerLastSceneEffectEditor()
-    {
-        this.effect = new TriggerLastSceneEffect();
-    }
+        public AbstractEffect Effect { get { return effect; } set { effect = value as TriggerLastSceneEffect; } }
+        public string EffectName { get { return TC.get("Effect.TriggerLastSceneInfo"); } }
+        public EffectEditor clone() { return new TriggerLastSceneEffectEditor(); }
 
-    public void draw()
-    {
-        EditorGUILayout.HelpBox(TC.get("Effect.TriggerLastScene"), MessageType.Info);
-    }
-
-    public AbstractEffect Effect { get { return effect; } set { effect = value as TriggerLastSceneEffect; } }
-    public string EffectName { get { return TC.get("Effect.TriggerLastSceneInfo"); } }
-    public EffectEditor clone() { return new TriggerLastSceneEffectEditor(); }
-
-    public bool manages(AbstractEffect c)
-    {
-        return c.GetType() == effect.GetType();
+        public bool manages(AbstractEffect c)
+        {
+            return c.GetType() == effect.GetType();
+        }
     }
 }

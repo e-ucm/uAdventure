@@ -2,80 +2,85 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public abstract class DataControlWithResources : DataControl
+using uAdventure.Core;
+
+namespace uAdventure.Editor
 {
-    /**
-     * List of resources.
-     */
-    protected List<ResourcesUni> resourcesList;
-
-    /**
-     * List of resources controllers.
-     */
-    protected List<ResourcesDataControl> resourcesDataControlList;
-
-    /**
-     * The resources that must be used in the previews.
-     */
-    protected int selectedResources;
-
-    public List<ResourcesDataControl> getResources()
+    public abstract class DataControlWithResources : DataControl
     {
+        /**
+         * List of resources.
+         */
+        protected List<ResourcesUni> resourcesList;
 
-        return resourcesDataControlList;
-    }
+        /**
+         * List of resources controllers.
+         */
+        protected List<ResourcesDataControl> resourcesDataControlList;
 
-    public int getResourcesCount()
-    {
+        /**
+         * The resources that must be used in the previews.
+         */
+        protected int selectedResources;
 
-        return resourcesDataControlList.Count;
-    }
+        public List<ResourcesDataControl> getResources()
+        {
 
-    /**
-     * Returns the last resources controller of the list.
-     * 
-     * @return Last resources controller
-     */
-    public ResourcesDataControl getLastResources()
-    {
+            return resourcesDataControlList;
+        }
 
-        return resourcesDataControlList[resourcesDataControlList.Count - 1];
-    }
+        public int getResourcesCount()
+        {
 
-    /**
-     * Returns the selected resources block of the list.
-     * 
-     * @return Selected block of resources
-     */
-    public int getSelectedResources()
-    {
+            return resourcesDataControlList.Count;
+        }
 
-        return selectedResources;
-    }
+        /**
+         * Returns the last resources controller of the list.
+         * 
+         * @return Last resources controller
+         */
+        public ResourcesDataControl getLastResources()
+        {
 
-    /**
-     * Sets the new selected resources block of the list.
-     * 
-     * @param selectedResources
-     *            New selected block of resources
-     */
-    public void setSelectedResources(int selectedResources)
-    {
+            return resourcesDataControlList[resourcesDataControlList.Count - 1];
+        }
 
-        this.selectedResources = selectedResources;
-    }
+        /**
+         * Returns the selected resources block of the list.
+         * 
+         * @return Selected block of resources
+         */
+        public int getSelectedResources()
+        {
 
-    // This method only caters for deleting RESOURCES. Subclasses should override this method
-    // to implement removal of other element types
-    public override bool deleteElement(DataControl dataControl, bool askConfirmation)
-    {
+            return selectedResources;
+        }
 
-        return controller.addTool(new DeleteResourcesBlockTool(resourcesList, resourcesDataControlList, dataControl, this));
-    }
+        /**
+         * Sets the new selected resources block of the list.
+         * 
+         * @param selectedResources
+         *            New selected block of resources
+         */
+        public void setSelectedResources(int selectedResources)
+        {
 
-    public bool duplicateResources(DataControl dataControl)
-    {
+            this.selectedResources = selectedResources;
+        }
 
-        return controller.addTool(new DuplicateResourcesBlockTool(dataControl, resourcesList, resourcesDataControlList, this));
+        // This method only caters for deleting RESOURCES. Subclasses should override this method
+        // to implement removal of other element types
+        public override bool deleteElement(DataControl dataControl, bool askConfirmation)
+        {
+
+            return controller.addTool(new DeleteResourcesBlockTool(resourcesList, resourcesDataControlList, dataControl, this));
+        }
+
+        public bool duplicateResources(DataControl dataControl)
+        {
+
+            return controller.addTool(new DuplicateResourcesBlockTool(dataControl, resourcesList, resourcesDataControlList, this));
+        }
     }
 }

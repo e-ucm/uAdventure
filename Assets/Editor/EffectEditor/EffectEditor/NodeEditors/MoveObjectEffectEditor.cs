@@ -4,80 +4,84 @@ using System;
 using System.Collections;
 using System.Text.RegularExpressions;
 
+using uAdventure.Core;
 
-public class MoveObjectEffectEditor : EffectEditor
+namespace uAdventure.Editor
 {
-    private bool collapsed = false;
-    public bool Collapsed { get { return collapsed; } set { collapsed = value; } }
-    private Rect window = new Rect(0, 0, 300, 0);
-    private string[] items;
-    private string xString = "", yString = "", translateSpeed ="", scaleSpeed = "";
-    private float floatScale ;
-
-    public Rect Window
+    public class MoveObjectEffectEditor : EffectEditor
     {
-        get
+        private bool collapsed = false;
+        public bool Collapsed { get { return collapsed; } set { collapsed = value; } }
+        private Rect window = new Rect(0, 0, 300, 0);
+        private string[] items;
+        private string xString = "", yString = "", translateSpeed = "", scaleSpeed = "";
+        private float floatScale;
+
+        public Rect Window
         {
-            if (collapsed) return new Rect(window.x, window.y, 50, 30);
-            else return window;
+            get
+            {
+                if (collapsed) return new Rect(window.x, window.y, 50, 30);
+                else return window;
+            }
+            set
+            {
+                if (collapsed) window = new Rect(value.x, value.y, window.width, window.height);
+                else window = value;
+            }
         }
-        set
+
+        private MoveObjectEffect effect;
+
+        public MoveObjectEffectEditor()
         {
-            if (collapsed) window = new Rect(value.x, value.y, window.width, window.height);
-            else window = value;
+            items = Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItemsIDs();
+            this.effect = new MoveObjectEffect(items[0], 300, 300, 1.0f, false, 1, 1);
         }
-    }
 
-    private MoveObjectEffect effect;
+        public void draw()
+        {
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField(TC.get("Element.Name19"));
+            effect.setTargetId(items[EditorGUILayout.Popup(Array.IndexOf(items, effect.getTargetId()), items)]);
+            EditorGUILayout.EndHorizontal();
 
-    public MoveObjectEffectEditor()
-    {
-        items = Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItemsIDs();
-        this.effect = new MoveObjectEffect(items[0], 300, 300, 1.0f, false, 1, 1);
-    }
+            xString = effect.getX().ToString();
+            yString = effect.getY().ToString();
+            translateSpeed = effect.getTranslateSpeed().ToString();
+            scaleSpeed = effect.getScaleSpeed().ToString();
+            floatScale = effect.getScale();
 
-    public void draw()
-    {
-        EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.LabelField(TC.get("Element.Name19"));
-        effect.setTargetId(items[EditorGUILayout.Popup(Array.IndexOf(items, effect.getTargetId()), items)]);
-        EditorGUILayout.EndHorizontal();
+            xString = EditorGUILayout.TextField(xString);
+            xString = Regex.Replace(xString, "[^0-9]", "");
 
-        xString = effect.getX().ToString();
-        yString = effect.getY().ToString();
-        translateSpeed = effect.getTranslateSpeed().ToString();
-        scaleSpeed = effect.getScaleSpeed().ToString();
-        floatScale = effect.getScale();
+            yString = EditorGUILayout.TextField(yString);
+            yString = Regex.Replace(xString, "[^0-9]", "");
 
-        xString = EditorGUILayout.TextField(xString);
-        xString = Regex.Replace(xString, "[^0-9]", "");
+            translateSpeed = EditorGUILayout.TextField(translateSpeed);
+            translateSpeed = Regex.Replace(translateSpeed, "[^0-9]", "");
 
-        yString = EditorGUILayout.TextField(yString);
-        yString = Regex.Replace(xString, "[^0-9]", "");
+            scaleSpeed = EditorGUILayout.TextField(scaleSpeed);
+            scaleSpeed = Regex.Replace(scaleSpeed, "[^0-9]", "");
 
-        translateSpeed = EditorGUILayout.TextField(translateSpeed);
-        translateSpeed = Regex.Replace(translateSpeed, "[^0-9]", "");
+            floatScale = EditorGUILayout.FloatField(floatScale);
 
-        scaleSpeed = EditorGUILayout.TextField(scaleSpeed);
-        scaleSpeed = Regex.Replace(scaleSpeed, "[^0-9]", "");
+            effect.setX(int.Parse(xString));
+            effect.setY(int.Parse(yString));
+            effect.setTranslateSpeed(int.Parse(translateSpeed));
+            effect.setScaleSpeed(int.Parse(scaleSpeed));
+            effect.setScale(floatScale);
 
-        floatScale = EditorGUILayout.FloatField(floatScale);
+            EditorGUILayout.HelpBox(TC.get("MoveObjectEffect.Title"), MessageType.Info);
+        }
 
-        effect.setX(int.Parse(xString));
-        effect.setY(int.Parse(yString));
-        effect.setTranslateSpeed(int.Parse(translateSpeed));
-        effect.setScaleSpeed(int.Parse(scaleSpeed));
-        effect.setScale(floatScale);
+        public AbstractEffect Effect { get { return effect; } set { effect = value as MoveObjectEffect; } }
+        public string EffectName { get { return TC.get("Effect.MoveObject"); } }
+        public EffectEditor clone() { return new MoveObjectEffectEditor(); }
 
-        EditorGUILayout.HelpBox(TC.get("MoveObjectEffect.Title"), MessageType.Info);
-    }
-
-    public AbstractEffect Effect { get { return effect; } set { effect = value as MoveObjectEffect; } }
-    public string EffectName { get { return TC.get("Effect.MoveObject"); } }
-    public EffectEditor clone() { return new MoveObjectEffectEditor(); }
-
-    public bool manages(AbstractEffect c)
-    {
-        return c.GetType() == effect.GetType();
+        public bool manages(AbstractEffect c)
+        {
+            return c.GetType() == effect.GetType();
+        }
     }
 }

@@ -2,123 +2,130 @@
 using System.Collections;
 using System.Collections.Generic;
 
-/**
- * Controller that manages a double list of tools for undo/redo
- */
-public class ToolManager  {
+using uAdventure.Core;
 
-    private List<Tool> undoList;
-
-    private List<Tool> redoList;
-
-    private bool notifyController;
-
+namespace uAdventure.Editor
+{
     /**
-     * Void and private constructor.
+     * Controller that manages a double list of tools for undo/redo
      */
-    public ToolManager(bool notifyController)
+    public class ToolManager
     {
 
-        undoList = new List<Tool>();
-        redoList = new List<Tool>();
-        this.notifyController = notifyController;
-    }
+        private List<Tool> undoList;
 
-    public bool addTool(Tool tool)
-    {
+        private List<Tool> redoList;
 
-        return addTool(true, tool);
-    }
+        private bool notifyController;
 
-    public bool addTool(bool execute, Tool tool)
-    {
-
-        bool done = execute ? tool.doTool() : true;
-        if (done)
+        /**
+         * Void and private constructor.
+         */
+        public ToolManager(bool notifyController)
         {
-            if (undoList.Count == 0)
-                undoList.Add(tool);
-            else {
-                Tool last = undoList[undoList.Count - 1];
-                if (last.getTimeStamp() < tool.getTimeStamp() - 1500 || !last.combine(tool))
-                    undoList.Add(tool);
-            }
-            redoList.Clear();
-            if (notifyController)
-                Controller.getInstance().dataModified();
 
-            if (!tool.canUndo())
-            {
-                undoList.Clear();
-            }
+            undoList = new List<Tool>();
+            redoList = new List<Tool>();
+            this.notifyController = notifyController;
         }
-        return done;
-    }
 
-    public bool undoTool()
-    {
-
-        if (undoList.Count > 0)
+        public bool addTool(Tool tool)
         {
-            Tool temp = undoList[undoList.Count - 1];
-            undoList.RemoveAt(undoList.Count - 1);
-            bool undone = temp.undoTool();
-            if (undone)
-            {
-                if (temp.canRedo())
-                    redoList.Add(temp);
-                else
-                    redoList.Clear();
-                return true;
-            }
+
+            return addTool(true, tool);
         }
-        return false;
-    }
 
-    public bool redoTool()
-    {
-
-        if (redoList.Count > 0)
+        public bool addTool(bool execute, Tool tool)
         {
-            Tool temp = redoList[redoList.Count - 1];
-            redoList.RemoveAt(redoList.Count - 1);
-            bool done = temp.redoTool();
+
+            bool done = execute ? tool.doTool() : true;
             if (done)
             {
-                undoList.Add(temp);
-                if (!temp.canUndo())
+                if (undoList.Count == 0)
+                    undoList.Add(tool);
+                else
+                {
+                    Tool last = undoList[undoList.Count - 1];
+                    if (last.getTimeStamp() < tool.getTimeStamp() - 1500 || !last.combine(tool))
+                        undoList.Add(tool);
+                }
+                redoList.Clear();
+                if (notifyController)
+                    Controller.getInstance().dataModified();
+
+                if (!tool.canUndo())
                 {
                     undoList.Clear();
                 }
             }
             return done;
         }
-        return false;
-    }
 
-    public void clear()
-    {
+        public bool undoTool()
+        {
 
-        undoList.Clear();
-        redoList.Clear();
-    }
+            if (undoList.Count > 0)
+            {
+                Tool temp = undoList[undoList.Count - 1];
+                undoList.RemoveAt(undoList.Count - 1);
+                bool undone = temp.undoTool();
+                if (undone)
+                {
+                    if (temp.canRedo())
+                        redoList.Add(temp);
+                    else
+                        redoList.Clear();
+                    return true;
+                }
+            }
+            return false;
+        }
 
-    // DEbugging
-    /**
-     * @return the undoList
-     */
-    public List<Tool> getUndoList()
-    {
+        public bool redoTool()
+        {
 
-        return undoList;
-    }
+            if (redoList.Count > 0)
+            {
+                Tool temp = redoList[redoList.Count - 1];
+                redoList.RemoveAt(redoList.Count - 1);
+                bool done = temp.redoTool();
+                if (done)
+                {
+                    undoList.Add(temp);
+                    if (!temp.canUndo())
+                    {
+                        undoList.Clear();
+                    }
+                }
+                return done;
+            }
+            return false;
+        }
 
-    /**
-     * @return the redoList
-     */
-    public List<Tool> getRedoList()
-    {
+        public void clear()
+        {
 
-        return redoList;
+            undoList.Clear();
+            redoList.Clear();
+        }
+
+        // DEbugging
+        /**
+         * @return the undoList
+         */
+        public List<Tool> getUndoList()
+        {
+
+            return undoList;
+        }
+
+        /**
+         * @return the redoList
+         */
+        public List<Tool> getRedoList()
+        {
+
+            return redoList;
+        }
     }
 }

@@ -1,32 +1,37 @@
 ﻿using UnityEngine;
 using UnityEditor;
 
-public class AboutMenu : WindowMenuContainer
+using uAdventure.Core;
+
+namespace uAdventure.Editor
 {
-    private AboutEAMenuItem about;
-    private AboutEASendMenuItem send;
-
-    public AboutMenu()
+    public class AboutMenu : WindowMenuContainer
     {
-        SetMenuItems();
-    }
+        private AboutEAMenuItem about;
+        private AboutEASendMenuItem send;
 
-    protected override void Callback(object obj)
-    {
-        if ((obj as AboutEAMenuItem) != null)
-            about.OnCliked();
-        else if ((obj as AboutEASendMenuItem) != null)
-            send.OnCliked();
-    }
+        public AboutMenu()
+        {
+            SetMenuItems();
+        }
 
-    protected override void SetMenuItems()
-    {
-        menu = new GenericMenu();
+        protected override void Callback(object obj)
+        {
+            if ((obj as AboutEAMenuItem) != null)
+                about.OnCliked();
+            else if ((obj as AboutEASendMenuItem) != null)
+                send.OnCliked();
+        }
 
-        about = new AboutEAMenuItem("Menu.AboutEAD");
-        send = new AboutEASendMenuItem("Menu.SendComments");
+        protected override void SetMenuItems()
+        {
+            menu = new GenericMenu();
 
-        menu.AddItem(new GUIContent(TC.get(about.Label)), false, Callback, about);
-        menu.AddItem(new GUIContent(TC.get(send.Label)), false, Callback, send);
+            about = new AboutEAMenuItem("Menu.AboutEAD");
+            send = new AboutEASendMenuItem("Menu.SendComments");
+
+            menu.AddItem(new GUIContent(TC.get(about.Label)), false, Callback, about);
+            menu.AddItem(new GUIContent(TC.get(send.Label)), false, Callback, send);
+        }
     }
 }

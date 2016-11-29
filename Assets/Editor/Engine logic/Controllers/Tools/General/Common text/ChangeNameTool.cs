@@ -1,81 +1,88 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class ChangeNameTool : Tool {
+using uAdventure.Core;
 
-    private Named named;
-
-    private string name;
-
-    private string oldName;
-
-    private Controller controller;
-
-    public ChangeNameTool(Named scene, string name)
+namespace uAdventure.Editor
+{
+    public class ChangeNameTool : Tool
     {
 
-        this.named = scene;
-        this.name = name;
-        this.controller = Controller.getInstance();
-    }
+        private Named named;
 
-    public override bool canRedo()
-    {
+        private string name;
 
-        return true;
-    }
+        private string oldName;
 
-  
-    public override bool canUndo()
-    {
+        private Controller controller;
 
-        return true;
-    }
-
-  
-    public override bool doTool()
-    {
-
-        if (!name.Equals(named.getName()))
+        public ChangeNameTool(Named scene, string name)
         {
-            oldName = named.getName();
-            named.setName(name);
+
+            this.named = scene;
+            this.name = name;
+            this.controller = Controller.getInstance();
+        }
+
+        public override bool canRedo()
+        {
+
             return true;
         }
-        return false;
-    }
 
-  
-    public override bool redoTool()
-    {
 
-        named.setName(name);
-        controller.updatePanel();
-        return true;
-    }
+        public override bool canUndo()
+        {
 
-  
-    public override bool undoTool()
-    {
+            return true;
+        }
 
-        named.setName(oldName);
-        controller.updatePanel();
-        return true;
-    }
 
-  
-    public override bool combine(Tool other)
-    {
+        public override bool doTool()
+        {
 
-        if (other is ChangeNameTool ) {
-            ChangeNameTool cnt = (ChangeNameTool)other;
-            if (cnt.named == named && cnt.oldName == name)
+            if (!name.Equals(named.getName()))
             {
-                name = cnt.name;
-                timeStamp = cnt.timeStamp;
+                oldName = named.getName();
+                named.setName(name);
                 return true;
             }
+            return false;
         }
-        return false;
+
+
+        public override bool redoTool()
+        {
+
+            named.setName(name);
+            controller.updatePanel();
+            return true;
+        }
+
+
+        public override bool undoTool()
+        {
+
+            named.setName(oldName);
+            controller.updatePanel();
+            return true;
+        }
+
+
+        public override bool combine(Tool other)
+        {
+
+            if (other is ChangeNameTool)
+            {
+                ChangeNameTool cnt = (ChangeNameTool)other;
+                if (cnt.named == named && cnt.oldName == name)
+                {
+                    name = cnt.name;
+                    timeStamp = cnt.timeStamp;
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }

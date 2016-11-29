@@ -1,6 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public interface Secuence {
-	bool execute();
+namespace uAdventure.Runner
+{
+    public interface Secuence
+    {
+        bool execute();
+    }
 }

@@ -1,167 +1,172 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class AdvencedFeaturesWindowGlobalStates : LayoutWindow
+using uAdventure.Core;
+
+namespace uAdventure.Editor
 {
-    private Texture2D addTex = null;
-    private Texture2D duplicateTex = null;
-    private Texture2D clearTex = null;
-
-    private float windowWidth, windowHeight;
-
-    private static GUISkin defaultSkin;
-    private static GUISkin noBackgroundSkin;
-    private static GUISkin selectedAreaSkin;
-
-    private Vector2 scrollPosition;
-
-    private int selectedGlobalState;
-
-    private Rect globalStatesTableRect, rightPanelRect, descriptionRect, conditionsRect;
-
-    private string globalStateName, globalStateNameLast;
-    private string globalStateDocumentation, globalStateDocumentationLast;
-
-    public AdvencedFeaturesWindowGlobalStates(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
-        : base(aStartPos, aContent, aStyle, aOptions)
+    public class AdvencedFeaturesWindowGlobalStates : LayoutWindow
     {
-        clearTex = (Texture2D)Resources.Load("EAdventureData/img/icons/deleteContent", typeof(Texture2D));
-        addTex = (Texture2D)Resources.Load("EAdventureData/img/icons/addNode", typeof(Texture2D));
-        duplicateTex = (Texture2D)Resources.Load("EAdventureData/img/icons/duplicateNode", typeof(Texture2D));
+        private Texture2D addTex = null;
+        private Texture2D duplicateTex = null;
+        private Texture2D clearTex = null;
 
-        windowWidth = aStartPos.width;
-        windowHeight = aStartPos.height;
+        private float windowWidth, windowHeight;
 
-        noBackgroundSkin = (GUISkin)Resources.Load("Editor/EditorNoBackgroundSkin", typeof(GUISkin));
-        selectedAreaSkin = (GUISkin)Resources.Load("Editor/EditorLeftMenuItemSkinConcreteOptions", typeof(GUISkin));
+        private static GUISkin defaultSkin;
+        private static GUISkin noBackgroundSkin;
+        private static GUISkin selectedAreaSkin;
 
-        globalStatesTableRect = new Rect(0f, 0.1f * windowHeight, 0.9f * windowWidth, 0.5f * windowHeight);
-        rightPanelRect = new Rect(0.9f * windowWidth, 0.1f * windowHeight, 0.08f * windowWidth, 0.5f * windowHeight);
-        descriptionRect = new Rect(0f, 0.6f * windowHeight, 0.95f * windowWidth, 0.2f * windowHeight);
-        conditionsRect = new Rect(0f, 0.8f * windowHeight, windowWidth, windowHeight * 0.15f);
+        private Vector2 scrollPosition;
 
-        selectedGlobalState = -1;
-    }
+        private int selectedGlobalState;
 
-    public override void Draw(int aID)
-    {
+        private Rect globalStatesTableRect, rightPanelRect, descriptionRect, conditionsRect;
 
-        GUILayout.BeginArea(globalStatesTableRect);
-        GUILayout.Box(TC.get("GlobalStatesList.ID"), GUILayout.Width(0.85f * windowWidth));
+        private string globalStateName, globalStateNameLast;
+        private string globalStateDocumentation, globalStateDocumentationLast;
 
-        scrollPosition = GUILayout.BeginScrollView(scrollPosition);
-        for (int i = 0;
-            i <
-            Controller.getInstance().getSelectedChapterDataControl().getGlobalStatesListDataControl().getGlobalStates().Count;
-            i++)
+        public AdvencedFeaturesWindowGlobalStates(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
+            : base(aStartPos, aContent, aStyle, aOptions)
         {
-            if (i != selectedGlobalState)
-            {
-                GUI.skin = noBackgroundSkin;
+            clearTex = (Texture2D)Resources.Load("EAdventureData/img/icons/deleteContent", typeof(Texture2D));
+            addTex = (Texture2D)Resources.Load("EAdventureData/img/icons/addNode", typeof(Texture2D));
+            duplicateTex = (Texture2D)Resources.Load("EAdventureData/img/icons/duplicateNode", typeof(Texture2D));
 
-                if (
-                    GUILayout.Button(
-                        Controller.getInstance().getSelectedChapterDataControl().getGlobalStatesListDataControl().getGlobalStates()[
-                            i].getId(), GUILayout.Width(0.85f * windowWidth)))
-                {
-                    OnSelectedGlobalStateChanged(i);
-                }
-            }
-            else
-            {
-                GUI.skin = selectedAreaSkin;
+            windowWidth = aStartPos.width;
+            windowHeight = aStartPos.height;
 
-                globalStateName = GUILayout.TextField(globalStateName, GUILayout.Width(0.85f * windowWidth));
-                if (!globalStateName.Equals(globalStateNameLast))
-                    OnGlobalStateNameChanged(globalStateName);
-            }
-            GUI.skin = defaultSkin;
-        }
-        GUILayout.EndScrollView();
-        GUILayout.EndArea();
+            noBackgroundSkin = (GUISkin)Resources.Load("Editor/EditorNoBackgroundSkin", typeof(GUISkin));
+            selectedAreaSkin = (GUISkin)Resources.Load("Editor/EditorLeftMenuItemSkinConcreteOptions", typeof(GUISkin));
 
-        /*
-        * Right panel
-        */
-        GUILayout.BeginArea(rightPanelRect);
-        GUI.skin = noBackgroundSkin;
-        if (GUILayout.Button(addTex, GUILayout.MaxWidth(0.08f * windowWidth)))
-        {
-            Controller.getInstance().getSelectedChapterDataControl().getGlobalStatesListDataControl()
-                .addElement(Controller.GLOBAL_STATE, "GlobalState" + Random.Range(0, 10000).ToString());
-        }
-        if (GUILayout.Button(duplicateTex, GUILayout.MaxWidth(0.08f * windowWidth)))
-        {
-            Controller.getInstance().getSelectedChapterDataControl().getGlobalStatesListDataControl()
-                .duplicateElement(Controller.getInstance().getSelectedChapterDataControl().getGlobalStatesListDataControl().getGlobalStates()[selectedGlobalState]);
-        }
-        if (GUILayout.Button(clearTex, GUILayout.MaxWidth(0.08f * windowWidth)))
-        {
-            Controller.getInstance().getSelectedChapterDataControl().getGlobalStatesListDataControl()
-                .deleteElement(Controller.getInstance().getSelectedChapterDataControl().getGlobalStatesListDataControl().getGlobalStates()[selectedGlobalState], false);
+            globalStatesTableRect = new Rect(0f, 0.1f * windowHeight, 0.9f * windowWidth, 0.5f * windowHeight);
+            rightPanelRect = new Rect(0.9f * windowWidth, 0.1f * windowHeight, 0.08f * windowWidth, 0.5f * windowHeight);
+            descriptionRect = new Rect(0f, 0.6f * windowHeight, 0.95f * windowWidth, 0.2f * windowHeight);
+            conditionsRect = new Rect(0f, 0.8f * windowHeight, windowWidth, windowHeight * 0.15f);
+
             selectedGlobalState = -1;
         }
-        GUI.skin = defaultSkin;
-        GUILayout.EndArea();
 
-        if (selectedGlobalState != -1)
+        public override void Draw(int aID)
         {
-            GUILayout.Space(10);
-            GUILayout.BeginArea(descriptionRect);
-            GUILayout.Label(TC.get("GlobalState.Documentation"));
-            GUILayout.Space(10);
-            globalStateDocumentation = GUILayout.TextArea(globalStateDocumentation, GUILayout.MinHeight(0.15f*windowHeight));
-            if (!globalStateDocumentation.Equals(globalStateDocumentationLast))
-                OnGlobalStateDocumentationChanged(globalStateDocumentation);
-            GUILayout.EndArea();
 
-            GUILayout.BeginArea(conditionsRect);
-            if (GUILayout.Button(TC.get("GlobalState.Conditions")))
+            GUILayout.BeginArea(globalStatesTableRect);
+            GUILayout.Box(TC.get("GlobalStatesList.ID"), GUILayout.Width(0.85f * windowWidth));
+
+            scrollPosition = GUILayout.BeginScrollView(scrollPosition);
+            for (int i = 0;
+                i <
+                Controller.getInstance().getSelectedChapterDataControl().getGlobalStatesListDataControl().getGlobalStates().Count;
+                i++)
             {
-                ConditionEditorWindow window =
-                        (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
-                window.Init(Controller.getInstance()
-                    .getSelectedChapterDataControl()
-                    .getGlobalStatesListDataControl().getGlobalStates()[selectedGlobalState].getController());
+                if (i != selectedGlobalState)
+                {
+                    GUI.skin = noBackgroundSkin;
+
+                    if (
+                        GUILayout.Button(
+                            Controller.getInstance().getSelectedChapterDataControl().getGlobalStatesListDataControl().getGlobalStates()[
+                                i].getId(), GUILayout.Width(0.85f * windowWidth)))
+                    {
+                        OnSelectedGlobalStateChanged(i);
+                    }
+                }
+                else
+                {
+                    GUI.skin = selectedAreaSkin;
+
+                    globalStateName = GUILayout.TextField(globalStateName, GUILayout.Width(0.85f * windowWidth));
+                    if (!globalStateName.Equals(globalStateNameLast))
+                        OnGlobalStateNameChanged(globalStateName);
+                }
+                GUI.skin = defaultSkin;
             }
+            GUILayout.EndScrollView();
             GUILayout.EndArea();
+
+            /*
+            * Right panel
+            */
+            GUILayout.BeginArea(rightPanelRect);
+            GUI.skin = noBackgroundSkin;
+            if (GUILayout.Button(addTex, GUILayout.MaxWidth(0.08f * windowWidth)))
+            {
+                Controller.getInstance().getSelectedChapterDataControl().getGlobalStatesListDataControl()
+                    .addElement(Controller.GLOBAL_STATE, "GlobalState" + Random.Range(0, 10000).ToString());
+            }
+            if (GUILayout.Button(duplicateTex, GUILayout.MaxWidth(0.08f * windowWidth)))
+            {
+                Controller.getInstance().getSelectedChapterDataControl().getGlobalStatesListDataControl()
+                    .duplicateElement(Controller.getInstance().getSelectedChapterDataControl().getGlobalStatesListDataControl().getGlobalStates()[selectedGlobalState]);
+            }
+            if (GUILayout.Button(clearTex, GUILayout.MaxWidth(0.08f * windowWidth)))
+            {
+                Controller.getInstance().getSelectedChapterDataControl().getGlobalStatesListDataControl()
+                    .deleteElement(Controller.getInstance().getSelectedChapterDataControl().getGlobalStatesListDataControl().getGlobalStates()[selectedGlobalState], false);
+                selectedGlobalState = -1;
+            }
+            GUI.skin = defaultSkin;
+            GUILayout.EndArea();
+
+            if (selectedGlobalState != -1)
+            {
+                GUILayout.Space(10);
+                GUILayout.BeginArea(descriptionRect);
+                GUILayout.Label(TC.get("GlobalState.Documentation"));
+                GUILayout.Space(10);
+                globalStateDocumentation = GUILayout.TextArea(globalStateDocumentation, GUILayout.MinHeight(0.15f * windowHeight));
+                if (!globalStateDocumentation.Equals(globalStateDocumentationLast))
+                    OnGlobalStateDocumentationChanged(globalStateDocumentation);
+                GUILayout.EndArea();
+
+                GUILayout.BeginArea(conditionsRect);
+                if (GUILayout.Button(TC.get("GlobalState.Conditions")))
+                {
+                    ConditionEditorWindow window =
+                            (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
+                    window.Init(Controller.getInstance()
+                        .getSelectedChapterDataControl()
+                        .getGlobalStatesListDataControl().getGlobalStates()[selectedGlobalState].getController());
+                }
+                GUILayout.EndArea();
+            }
         }
-    }
 
-    void OnSelectedGlobalStateChanged(int i)
-    {
-        selectedGlobalState = i;
-
-        globalStateName =
-            globalStateNameLast =
-                Controller.getInstance().getSelectedChapterDataControl().getGlobalStatesListDataControl().getGlobalStates()[
-                    selectedGlobalState].getId();
-
-        if (globalStateName == null)
-            globalStateName =
-                globalStateNameLast = "";
-
-        globalStateDocumentation = globalStateDocumentationLast =
-                Controller.getInstance().getSelectedChapterDataControl().getGlobalStatesListDataControl().getGlobalStates()[
-                    selectedGlobalState].getDocumentation();
-
-        if (globalStateDocumentation == null)
-            globalStateDocumentation =
-                globalStateDocumentationLast = "";
-    }
-
-    private void OnGlobalStateNameChanged(string val)
-    {
-        if (Controller.getInstance().isElementIdValid(val, false))
+        void OnSelectedGlobalStateChanged(int i)
         {
-            globalStateNameLast = val;
-            Controller.getInstance().getSelectedChapterDataControl().getGlobalStatesListDataControl().getGlobalStates()[selectedGlobalState].setId(val);
-        }
-    }
+            selectedGlobalState = i;
 
-    private void OnGlobalStateDocumentationChanged(string val)
-    {
-        globalStateDocumentationLast = val;
-        Controller.getInstance().getSelectedChapterDataControl().getGlobalStatesListDataControl().getGlobalStates()[selectedGlobalState].setDocumentation(val);
+            globalStateName =
+                globalStateNameLast =
+                    Controller.getInstance().getSelectedChapterDataControl().getGlobalStatesListDataControl().getGlobalStates()[
+                        selectedGlobalState].getId();
+
+            if (globalStateName == null)
+                globalStateName =
+                    globalStateNameLast = "";
+
+            globalStateDocumentation = globalStateDocumentationLast =
+                    Controller.getInstance().getSelectedChapterDataControl().getGlobalStatesListDataControl().getGlobalStates()[
+                        selectedGlobalState].getDocumentation();
+
+            if (globalStateDocumentation == null)
+                globalStateDocumentation =
+                    globalStateDocumentationLast = "";
+        }
+
+        private void OnGlobalStateNameChanged(string val)
+        {
+            if (Controller.getInstance().isElementIdValid(val, false))
+            {
+                globalStateNameLast = val;
+                Controller.getInstance().getSelectedChapterDataControl().getGlobalStatesListDataControl().getGlobalStates()[selectedGlobalState].setId(val);
+            }
+        }
+
+        private void OnGlobalStateDocumentationChanged(string val)
+        {
+            globalStateDocumentationLast = val;
+            Controller.getInstance().getSelectedChapterDataControl().getGlobalStatesListDataControl().getGlobalStates()[selectedGlobalState].setDocumentation(val);
+        }
     }
 }

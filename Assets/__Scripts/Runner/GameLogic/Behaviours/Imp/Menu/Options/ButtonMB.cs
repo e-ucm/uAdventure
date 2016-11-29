@@ -2,107 +2,129 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class ButtonMB : MonoBehaviour, Interactuable {
-     
+using uAdventure.Core;
 
-    public ResourcesUni resource;
+namespace uAdventure.Runner
+{
+    public class ButtonMB : MonoBehaviour, Interactuable
+    {
 
-    Action action;
-    string name;
-    public Action Action{
-        set { 
-            this.action = value;
+
+        public ResourcesUni resource;
+
+        Action action;
+        string actionName;
+        public Action Action
+        {
+            set
+            {
+                this.action = value;
+            }
+            get { return this.action; }
         }
-        get { return this.action; }
-    }
 
-    bool showText = false;
+        bool showText = false;
 
-	// Use this for initialization
-	void Start () {
-        if (this.action.getType () == Action.CUSTOM) {
-            name = ((CustomAction)action).getName ();
+        // Use this for initialization
+        void Start()
+        {
+            if (this.action.getType() == Action.CUSTOM)
+            {
+                actionName = ((CustomAction)action).getName();
 
-            CustomAction ca = action as CustomAction;
-            foreach (ResourcesUni ru in ca.getResources()) {
-                if (ConditionChecker.check (ru.getConditions ())) {
-                    this.resource = ru;
+                CustomAction ca = action as CustomAction;
+                foreach (ResourcesUni ru in ca.getResources())
+                {
+                    if (ConditionChecker.check(ru.getConditions()))
+                    {
+                        this.resource = ru;
+                    }
                 }
             }
-        }else {
-            /*resource = new ResourcesUni ();
-            CustomButton button = Game.Instance.getButton (ActionNameWrapper.Names [action.getType ()],DescriptorData.NORMAL_BUTTON);
-            CustomButton highlighted = Game.Instance.getButton (ActionNameWrapper.Names [action.getType ()],DescriptorData.HIGHLIGHTED_BUTTON);
+            else
+            {
+                /*resource = new ResourcesUni ();
+                CustomButton button = Game.Instance.getButton (ActionNameWrapper.Names [action.getType ()],DescriptorData.NORMAL_BUTTON);
+                CustomButton highlighted = Game.Instance.getButton (ActionNameWrapper.Names [action.getType ()],DescriptorData.HIGHLIGHTED_BUTTON);
 
-            if (button == null || highlighted == null) {
-                button = Game.Instance.getButton (ActionNameWrapper.AuxNames [action.getType ()], DescriptorData.NORMAL_BUTTON);
-                highlighted = Game.Instance.getButton (ActionNameWrapper.AuxNames [action.getType ()], DescriptorData.HIGHLIGHTED_BUTTON);
+                if (button == null || highlighted == null) {
+                    button = Game.Instance.getButton (ActionNameWrapper.AuxNames [action.getType ()], DescriptorData.NORMAL_BUTTON);
+                    highlighted = Game.Instance.getButton (ActionNameWrapper.AuxNames [action.getType ()], DescriptorData.HIGHLIGHTED_BUTTON);
+                }
+
+                resource.addAsset (DescriptorData.NORMAL_BUTTON, button.getPath());
+                resource.addAsset (DescriptorData.HIGHLIGHTED_BUTTON, highlighted.getPath());*/
+
+                resource = GUIManager.Instance.Provider.getButton(this.action);
+
+                actionName = ConstantNames.L["ES"].Actions[action.getType()];
             }
 
-            resource.addAsset (DescriptorData.NORMAL_BUTTON, button.getPath());
-            resource.addAsset (DescriptorData.HIGHLIGHTED_BUTTON, highlighted.getPath());*/
+            Texture2D tmp;
+            if (this.action.getType() == Action.CUSTOM)
+                tmp = ResourceManager.Instance.getImage(resource.getAssetPath("buttonNormal"));
+            else
+                tmp = ResourceManager.Instance.getImage(resource.getAssetPath(DescriptorData.NORMAL_BUTTON));
 
-			resource = GUIManager.Instance.Provider.getButton (this.action);
-
-            name = ConstantNames.L ["ES"].Actions [action.getType ()];
+            this.GetComponent<Renderer>().material.mainTexture = tmp;
+            this.transform.localScale = new Vector3(tmp.width / 75f, tmp.height / 75f, 1);
         }
 
-        Texture2D tmp;
-        if(this.action.getType() == Action.CUSTOM)
-            tmp = ResourceManager.Instance.getImage (resource.getAssetPath ("buttonNormal"));
-        else
-            tmp = ResourceManager.Instance.getImage (resource.getAssetPath (DescriptorData.NORMAL_BUTTON));
-        
-        this.GetComponent<Renderer> ().material.mainTexture = tmp;
-        this.transform.localScale = new Vector3 (tmp.width / 75f, tmp.height / 75f, 1);
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+        // Update is called once per frame
+        void Update()
+        {
 
-    void OnMouseEnter(){
-        showText = true;
-        transform.parent.GetComponent<OptionMB> ().Highlight = true;
-        if(this.action.getType() == Action.CUSTOM)
-            GetComponent<Renderer> ().material.mainTexture = ResourceManager.Instance.getImage (resource.getAssetPath ("buttonOver"));
-        else
-            GetComponent<Renderer> ().material.mainTexture = ResourceManager.Instance.getImage (resource.getAssetPath (DescriptorData.HIGHLIGHTED_BUTTON));
+        }
 
-		GUIManager.Instance.showHand (true);
-    }
+        void OnMouseEnter()
+        {
+            showText = true;
+            transform.parent.GetComponent<OptionMB>().Highlight = true;
+            if (this.action.getType() == Action.CUSTOM)
+                GetComponent<Renderer>().material.mainTexture = ResourceManager.Instance.getImage(resource.getAssetPath("buttonOver"));
+            else
+                GetComponent<Renderer>().material.mainTexture = ResourceManager.Instance.getImage(resource.getAssetPath(DescriptorData.HIGHLIGHTED_BUTTON));
 
-    void OnMouseExit() {
-        showText = false;
-        transform.parent.GetComponent<OptionMB> ().Highlight = false;
-        if(this.action.getType() == Action.CUSTOM)
-            GetComponent<Renderer> ().material.mainTexture = ResourceManager.Instance.getImage (resource.getAssetPath ("buttonNormal"));
-        else
-            GetComponent<Renderer> ().material.mainTexture = ResourceManager.Instance.getImage (resource.getAssetPath (DescriptorData.NORMAL_BUTTON));
+            GUIManager.Instance.showHand(true);
+        }
 
-		GUIManager.Instance.showHand (false);
-    }
+        void OnMouseExit()
+        {
+            showText = false;
+            transform.parent.GetComponent<OptionMB>().Highlight = false;
+            if (this.action.getType() == Action.CUSTOM)
+                GetComponent<Renderer>().material.mainTexture = ResourceManager.Instance.getImage(resource.getAssetPath("buttonNormal"));
+            else
+                GetComponent<Renderer>().material.mainTexture = ResourceManager.Instance.getImage(resource.getAssetPath(DescriptorData.NORMAL_BUTTON));
 
-	bool interactable = false;
-	public bool canBeInteracted(){
-		return interactable;
-	}
+            GUIManager.Instance.showHand(false);
+        }
 
-	public void setInteractuable(bool state){
-		this.interactable = state;
-	}
+        bool interactable = false;
+        public bool canBeInteracted()
+        {
+            return interactable;
+        }
 
-    public InteractuableResult Interacted (RaycastHit hit = new RaycastHit()){
-        Game.Instance.Execute(new EffectHolder(action.getEffects()));
-        return InteractuableResult.DOES_SOMETHING;
-    }
+        public void setInteractuable(bool state)
+        {
+            this.interactable = state;
+        }
 
-    void OnGUI () {
-        if (showText) {
-            GUILayout.BeginArea (new Rect (Input.mousePosition.x-100, Screen.height-Input.mousePosition.y + 20, 200, 300));
-            GUILayout.Label (name,Game.Instance.Style.label);
-            GUILayout.EndArea ();
+        public InteractuableResult Interacted(RaycastHit hit = new RaycastHit())
+        {
+            Game.Instance.Execute(new EffectHolder(action.getEffects()));
+            return InteractuableResult.DOES_SOMETHING;
+        }
+
+        void OnGUI()
+        {
+            if (showText)
+            {
+                GUILayout.BeginArea(new Rect(Input.mousePosition.x - 100, Screen.height - Input.mousePosition.y + 20, 200, 300));
+                GUILayout.Label(actionName, Game.Instance.Style.label);
+                GUILayout.EndArea();
+            }
         }
     }
 }

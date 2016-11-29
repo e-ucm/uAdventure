@@ -4,59 +4,64 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-public class IncrementVarEffectEditor : EffectEditor
+using uAdventure.Core;
+
+namespace uAdventure.Editor
 {
-    private bool collapsed = false;
-    public bool Collapsed { get { return collapsed; } set { collapsed = value; } }
-    private Rect window = new Rect(0, 0, 300, 0);
-    public Rect Window
+    public class IncrementVarEffectEditor : EffectEditor
     {
-        get
+        private bool collapsed = false;
+        public bool Collapsed { get { return collapsed; } set { collapsed = value; } }
+        private Rect window = new Rect(0, 0, 300, 0);
+        public Rect Window
         {
-            if (collapsed) return new Rect(window.x, window.y, 50, 30);
-            else return window;
+            get
+            {
+                if (collapsed) return new Rect(window.x, window.y, 50, 30);
+                else return window;
+            }
+            set
+            {
+                if (collapsed) window = new Rect(value.x, value.y, window.width, window.height);
+                else window = value;
+            }
         }
-        set
+        private string[] vars;
+
+        private IncrementVarEffect effect;
+
+        public IncrementVarEffectEditor()
         {
-            if (collapsed) window = new Rect(value.x, value.y, window.width, window.height);
-            else window = value;
+            List<string> tmp = new List<string>();
+            tmp.Add("");
+            tmp.AddRange(Controller.getInstance().getVarFlagSummary().getVars());
+            vars = tmp.ToArray();
+
+            this.effect = new IncrementVarEffect(vars[0], 1);
         }
-    }
-    private string[] vars;
 
-    private IncrementVarEffect effect;
+        public void draw()
+        {
 
-    public IncrementVarEffectEditor()
-    {
-        List<string> tmp = new List<string> ();
-        tmp.Add ("");
-        tmp.AddRange(Controller.getInstance().getVarFlagSummary().getVars());
-        vars = tmp.ToArray ();
+            EditorGUILayout.BeginHorizontal();
 
-        this.effect = new IncrementVarEffect (vars [0], 1);
-    }
+            EditorGUILayout.LabelField(TC.get("Vars.Var"));
 
-    public void draw()
-    {
+            effect.setTargetId(vars[EditorGUILayout.Popup(Array.IndexOf(vars, effect.getTargetId()), vars)]);
+            effect.setIncrement(EditorGUILayout.IntField(effect.getIncrement()));
+            EditorGUILayout.EndHorizontal();
 
-        EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.HelpBox(TC.get("IncrementVarEffect.Description"), MessageType.Info);
+        }
 
-        EditorGUILayout.LabelField(TC.get("Vars.Var"));
+        public AbstractEffect Effect { get { return effect; } set { effect = value as IncrementVarEffect; } }
+        public string EffectName { get { return TC.get("IncrementVarEffect.Title"); } }
+        public EffectEditor clone() { return new IncrementVarEffectEditor(); }
 
-        effect.setTargetId(vars[EditorGUILayout.Popup(Array.IndexOf(vars, effect.getTargetId()), vars)]);
-        effect.setIncrement(EditorGUILayout.IntField(effect.getIncrement()));
-        EditorGUILayout.EndHorizontal();
+        public bool manages(AbstractEffect c)
+        {
 
-        EditorGUILayout.HelpBox(TC.get("IncrementVarEffect.Description"), MessageType.Info);
-    }
-
-    public AbstractEffect Effect { get { return effect; } set { effect = value as IncrementVarEffect; } }
-    public string EffectName { get { return TC.get("IncrementVarEffect.Title"); } }
-    public EffectEditor clone() { return new IncrementVarEffectEditor(); }
-
-    public bool manages(AbstractEffect c)
-    {
-
-        return c.GetType() == effect.GetType();
+            return c.GetType() == effect.GetType();
+        }
     }
 }

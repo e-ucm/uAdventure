@@ -3,162 +3,165 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Xml;
 
-public class ItemSubParser_ : Subparser_
+namespace uAdventure.Core
 {
-
-    /**
-     * parsedObject being parsed.
-     */
-    private Item parsedObject;
-
-    /**
-     * Current resources being parsed.
-     */
-    private ResourcesUni currentResources;
-
-    /**
-     * Current conditions being parsed.
-     */
-    private Conditions currentConditions;
-
-    /**
-     * Current effects being parsed.
-     */
-    private Effects currentEffects;
-
-    /**
-     * Subparser for effects and conditions.
-     */
-    private SubParser subParser;
-
-
-    private List<Description> descriptions;
-
-    private Description description;
-
-    public ItemSubParser_(Chapter chapter) : base(chapter)
+    public class ItemSubParser_ : Subparser_
     {
-    }
 
-    public override void ParseElement(XmlElement element)
-    {
-        XmlNodeList
-            resourcess = element.SelectNodes("resources"),
-            descriptionss = element.SelectNodes("description"),
-            assets,
-            conditions,
-            actionss = element.SelectNodes("actions"),
-            effects = element.SelectNodes("effect");
+        /**
+         * parsedObject being parsed.
+         */
+        private Item parsedObject;
 
-        string tmpArgVal;
+        /**
+         * Current resources being parsed.
+         */
+        private ResourcesUni currentResources;
 
-        string parsedObjectId = "";
-        bool returnsWhenDragged = true;
+        /**
+         * Current conditions being parsed.
+         */
+        private Conditions currentConditions;
 
-        Item.BehaviourType behaviour = Item.BehaviourType.NORMAL;
-        long resourceTransition = 0;
+        /**
+         * Current effects being parsed.
+         */
+        private Effects currentEffects;
 
-        if (element.SelectSingleNode("documentation") != null)
-            parsedObject.setDocumentation(element.SelectSingleNode("documentation").InnerText);
+        /**
+         * Subparser for effects and conditions.
+         */
+        private SubParser subParser;
 
-        tmpArgVal = element.GetAttribute("id");
-        if (!string.IsNullOrEmpty(tmpArgVal))
+
+        private List<Description> descriptions;
+
+        private Description description;
+
+        public ItemSubParser_(Chapter chapter) : base(chapter)
         {
-            parsedObjectId = tmpArgVal;
         }
 
-        tmpArgVal = element.GetAttribute("returnsWhenDragged");
-        if (!string.IsNullOrEmpty(tmpArgVal))
+        public override void ParseElement(XmlElement element)
         {
-            returnsWhenDragged = (tmpArgVal.Equals("yes") ? true : false);
-        }
+            XmlNodeList
+                resourcess = element.SelectNodes("resources"),
+                descriptionss = element.SelectNodes("description"),
+                assets,
+                conditions,
+                actionss = element.SelectNodes("actions"),
+                effects = element.SelectNodes("effect");
 
-        tmpArgVal = element.GetAttribute("behaviour");
-        if (!string.IsNullOrEmpty(tmpArgVal))
-        {
-            if (tmpArgVal.Equals("normal"))
-            {
-                behaviour = Item.BehaviourType.NORMAL;
-            }
-            else if (tmpArgVal.Equals("atrezzo"))
-            {
-                behaviour = Item.BehaviourType.ATREZZO;
-            }
-            else if (tmpArgVal.Equals("first-action"))
-            {
-                behaviour = Item.BehaviourType.FIRST_ACTION;
-            }
-        }
+            string tmpArgVal;
 
-        tmpArgVal = element.GetAttribute("resources-transition-time");
-        if (!string.IsNullOrEmpty(tmpArgVal))
-        {
-            resourceTransition = long.Parse(tmpArgVal);
-        }
+            string parsedObjectId = "";
+            bool returnsWhenDragged = true;
 
-        parsedObject = new Item(parsedObjectId);
-        parsedObject.setReturnsWhenDragged(returnsWhenDragged);
+            Item.BehaviourType behaviour = Item.BehaviourType.NORMAL;
+            long resourceTransition = 0;
 
-        parsedObject.setResourcesTransitionTime(resourceTransition);
-        parsedObject.setBehaviour(behaviour);
+            if (element.SelectSingleNode("documentation") != null)
+                parsedObject.setDocumentation(element.SelectSingleNode("documentation").InnerText);
 
-        descriptions = new List<Description>();
-        parsedObject.setDescriptions(descriptions);
-
-        foreach (XmlElement el in resourcess)
-        {
-            currentResources = new ResourcesUni();
-            tmpArgVal = el.GetAttribute("name");
+            tmpArgVal = element.GetAttribute("id");
             if (!string.IsNullOrEmpty(tmpArgVal))
             {
-                currentResources.setName(el.GetAttribute(tmpArgVal));
+                parsedObjectId = tmpArgVal;
             }
 
-            assets = el.SelectNodes("asset");
-            foreach (XmlElement ell in assets)
+            tmpArgVal = element.GetAttribute("returnsWhenDragged");
+            if (!string.IsNullOrEmpty(tmpArgVal))
             {
-                string type = "";
-                string path = "";
+                returnsWhenDragged = (tmpArgVal.Equals("yes") ? true : false);
+            }
 
-                tmpArgVal = ell.GetAttribute("type");
+            tmpArgVal = element.GetAttribute("behaviour");
+            if (!string.IsNullOrEmpty(tmpArgVal))
+            {
+                if (tmpArgVal.Equals("normal"))
+                {
+                    behaviour = Item.BehaviourType.NORMAL;
+                }
+                else if (tmpArgVal.Equals("atrezzo"))
+                {
+                    behaviour = Item.BehaviourType.ATREZZO;
+                }
+                else if (tmpArgVal.Equals("first-action"))
+                {
+                    behaviour = Item.BehaviourType.FIRST_ACTION;
+                }
+            }
+
+            tmpArgVal = element.GetAttribute("resources-transition-time");
+            if (!string.IsNullOrEmpty(tmpArgVal))
+            {
+                resourceTransition = long.Parse(tmpArgVal);
+            }
+
+            parsedObject = new Item(parsedObjectId);
+            parsedObject.setReturnsWhenDragged(returnsWhenDragged);
+
+            parsedObject.setResourcesTransitionTime(resourceTransition);
+            parsedObject.setBehaviour(behaviour);
+
+            descriptions = new List<Description>();
+            parsedObject.setDescriptions(descriptions);
+
+            foreach (XmlElement el in resourcess)
+            {
+                currentResources = new ResourcesUni();
+                tmpArgVal = el.GetAttribute("name");
                 if (!string.IsNullOrEmpty(tmpArgVal))
                 {
-                    type = tmpArgVal;
+                    currentResources.setName(el.GetAttribute(tmpArgVal));
                 }
-                tmpArgVal = ell.GetAttribute("uri");
-                if (!string.IsNullOrEmpty(tmpArgVal))
+
+                assets = el.SelectNodes("asset");
+                foreach (XmlElement ell in assets)
                 {
-                    path = tmpArgVal;
+                    string type = "";
+                    string path = "";
+
+                    tmpArgVal = ell.GetAttribute("type");
+                    if (!string.IsNullOrEmpty(tmpArgVal))
+                    {
+                        type = tmpArgVal;
+                    }
+                    tmpArgVal = ell.GetAttribute("uri");
+                    if (!string.IsNullOrEmpty(tmpArgVal))
+                    {
+                        path = tmpArgVal;
+                    }
+                    currentResources.addAsset(type, path);
                 }
-                currentResources.addAsset(type, path);
+
+                conditions = el.SelectNodes("condition");
+                foreach (XmlElement ell in conditions)
+                {
+                    currentConditions = new Conditions();
+                    new ConditionSubParser_(currentConditions, chapter).ParseElement(ell);
+                    currentResources.setConditions(currentConditions);
+                }
+
+                parsedObject.addResources(currentResources);
             }
 
-            conditions = el.SelectNodes("condition");
-            foreach (XmlElement ell in conditions)
+            foreach (XmlElement el in descriptionss)
             {
-                currentConditions = new Conditions();
-                new ConditionSubParser_(currentConditions, chapter).ParseElement(ell);
-                currentResources.setConditions(currentConditions);
+                description = new Description();
+                new DescriptionsSubParser_(description, chapter).ParseElement(el);
+                this.descriptions.Add(description);
+            }
+            foreach (XmlElement el in actionss)
+            {
+                new ActionsSubParser_(chapter, parsedObject).ParseElement(el);
+            }
+            foreach (XmlElement el in effects)
+            {
+                new ActionsSubParser_(chapter, parsedObject).ParseElement(el);
             }
 
-            parsedObject.addResources(currentResources);
+            chapter.addItem(parsedObject);
         }
-
-        foreach (XmlElement el in descriptionss)
-        {
-            description = new Description();
-            new DescriptionsSubParser_(description, chapter).ParseElement(el);
-            this.descriptions.Add(description);
-        }
-        foreach (XmlElement el in actionss)
-        {
-            new ActionsSubParser_(chapter, parsedObject).ParseElement(el);
-        }
-        foreach (XmlElement el in effects)
-        {
-            new ActionsSubParser_(chapter, parsedObject).ParseElement(el);
-        }
-
-        chapter.addItem(parsedObject);
     }
 }

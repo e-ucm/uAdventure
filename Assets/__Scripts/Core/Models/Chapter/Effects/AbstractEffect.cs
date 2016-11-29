@@ -2,56 +2,59 @@
 using UnityEngine;
 using System.Collections;
 
-public abstract class AbstractEffect: Effect, ICloneable
+namespace uAdventure.Core
 {
-
-    private Conditions conditions;
-
-    public AbstractEffect()
+    public abstract class AbstractEffect : Effect, ICloneable
     {
 
-        conditions = new Conditions();
-    }
+        private Conditions conditions;
 
-    /**
-     * @return the conditions
-     */
-    public Conditions getConditions()
+        public AbstractEffect()
+        {
+
+            conditions = new Conditions();
+        }
+
+        /**
+         * @return the conditions
+         */
+        public Conditions getConditions()
+        {
+
+            return conditions;
+        }
+
+        /**
+         * @param conditions
+         *            the conditions to set
+         */
+        public void setConditions(Conditions conditions)
+        {
+
+            this.conditions = conditions;
+        }
+
+        /**
+         * Returns the type of the effect.
+         * 
+         * @return Type of the effect
+         */
+        public abstract EffectType getType();
+
+        public virtual object Clone()
+        {
+            AbstractEffect absEf = (AbstractEffect)this.MemberwiseClone();
+            absEf.conditions = (Conditions)conditions.Clone();
+            return absEf;
+        }
+        /*
+    @Override
+    public Object clone() throws CloneNotSupportedException
     {
 
-        return conditions;
+       AbstractEffect absEf = (AbstractEffect) super.clone( );
+       absEf.conditions = (Conditions) conditions.clone( );
+      return absEf;
+    }*/
     }
-
-    /**
-     * @param conditions
-     *            the conditions to set
-     */
-    public void setConditions(Conditions conditions)
-    {
-
-        this.conditions = conditions;
-    }
-
-    /**
-     * Returns the type of the effect.
-     * 
-     * @return Type of the effect
-     */
-    public abstract EffectType getType();
-
-    public virtual object Clone()
-    {
-        AbstractEffect absEf = (AbstractEffect)this.MemberwiseClone();
-        absEf.conditions = (Conditions)conditions.Clone();
-        return absEf;
-    }
-    /*
-@Override
-public Object clone() throws CloneNotSupportedException
-{
-
-   AbstractEffect absEf = (AbstractEffect) super.clone( );
-   absEf.conditions = (Conditions) conditions.clone( );
-  return absEf;
-}*/
 }

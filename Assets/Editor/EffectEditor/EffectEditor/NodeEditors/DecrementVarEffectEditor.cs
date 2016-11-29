@@ -4,59 +4,64 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-public class DecrementVarEffectEditor : EffectEditor
+using uAdventure.Core;
+
+namespace uAdventure.Editor
 {
-    private bool collapsed = false;
-    public bool Collapsed { get { return collapsed; } set { collapsed = value; } }
-    private Rect window = new Rect(0, 0, 300, 0);
-    public Rect Window
+    public class DecrementVarEffectEditor : EffectEditor
     {
-        get
+        private bool collapsed = false;
+        public bool Collapsed { get { return collapsed; } set { collapsed = value; } }
+        private Rect window = new Rect(0, 0, 300, 0);
+        public Rect Window
         {
-            if (collapsed) return new Rect(window.x, window.y, 50, 30);
-            else return window;
+            get
+            {
+                if (collapsed) return new Rect(window.x, window.y, 50, 30);
+                else return window;
+            }
+            set
+            {
+                if (collapsed) window = new Rect(value.x, value.y, window.width, window.height);
+                else window = value;
+            }
         }
-        set
+
+        private string[] vars;
+
+        private DecrementVarEffect effect;
+
+        public DecrementVarEffectEditor()
         {
-            if (collapsed) window = new Rect(value.x, value.y, window.width, window.height);
-            else window = value;
+            List<string> tmp = new List<string>();
+            tmp.Add("");
+            tmp.AddRange(Controller.getInstance().getVarFlagSummary().getVars());
+            vars = tmp.ToArray();
+
+            this.effect = new DecrementVarEffect(vars[0], 1);
         }
-    }
 
-    private string[] vars;
+        public void draw()
+        {
 
-    private DecrementVarEffect effect;
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField(TC.get("Vars.Var"));
 
-    public DecrementVarEffectEditor()
-    {
-        List<string> tmp = new List<string> ();
-        tmp.Add ("");
-        tmp.AddRange(Controller.getInstance().getVarFlagSummary().getVars());
-        vars = tmp.ToArray ();
+            effect.setTargetId(vars[EditorGUILayout.Popup(Array.IndexOf(vars, effect.getTargetId()), vars)]);
+            effect.setDecrement(EditorGUILayout.IntField(effect.getDecrement()));
+            EditorGUILayout.EndHorizontal();
 
-        this.effect = new DecrementVarEffect (vars [0], 1);
-    }
+            EditorGUILayout.HelpBox(TC.get("DecrementVarEffect.Description"), MessageType.Info);
+        }
 
-    public void draw()
-    {
+        public AbstractEffect Effect { get { return effect; } set { effect = value as DecrementVarEffect; } }
+        public string EffectName { get { return TC.get("DecrementVarEffect.Title"); } }
+        public EffectEditor clone() { return new DecrementVarEffectEditor(); }
 
-        EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.LabelField(TC.get("Vars.Var"));
+        public bool manages(AbstractEffect c)
+        {
 
-        effect.setTargetId(vars[EditorGUILayout.Popup(Array.IndexOf(vars, effect.getTargetId()), vars)]);
-        effect.setDecrement(EditorGUILayout.IntField(effect.getDecrement()));
-        EditorGUILayout.EndHorizontal();
-
-        EditorGUILayout.HelpBox(TC.get("DecrementVarEffect.Description"), MessageType.Info);
-    }
-
-    public AbstractEffect Effect { get { return effect; } set { effect = value as DecrementVarEffect; } }
-    public string EffectName { get { return TC.get("DecrementVarEffect.Title"); } }
-    public EffectEditor clone() { return new DecrementVarEffectEditor(); }
-
-    public bool manages(AbstractEffect c)
-    {
-
-        return c.GetType() == effect.GetType();
+            return c.GetType() == effect.GetType();
+        }
     }
 }

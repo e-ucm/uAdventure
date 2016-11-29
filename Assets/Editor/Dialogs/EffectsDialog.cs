@@ -1,38 +1,40 @@
 ﻿using UnityEngine;
-using System.Collections;
 using UnityEditor;
 
-public class EffectsDialog : EditorWindow
+namespace uAdventure.Editor
 {
-
-    string prefabName;
-
-    void OnGUI()
+    public class EffectsDialog : EditorWindow
     {
-        prefabName = EditorGUILayout.TextField("Prefab Name", prefabName);
 
-        if (GUILayout.Button("Save Prefab"))
+        string prefabName;
+
+        void OnGUI()
         {
-            OnClickSavePrefab();
-            GUIUtility.ExitGUI();
-        }
-    }
+            prefabName = EditorGUILayout.TextField("Prefab Name", prefabName);
 
-    void OnClickSavePrefab()
-    {
-        prefabName = prefabName.Trim();
-
-        if (string.IsNullOrEmpty(prefabName))
-        {
-            EditorUtility.DisplayDialog("Unable to save prefab", "Please specify a valid prefab name.", "Close");
-            return;
+            if (GUILayout.Button("Save Prefab"))
+            {
+                OnClickSavePrefab();
+                GUIUtility.ExitGUI();
+            }
         }
 
-        // You may also want to check for illegal characters :)
+        void OnClickSavePrefab()
+        {
+            prefabName = prefabName.Trim();
 
-        // Save your prefab
+            if (string.IsNullOrEmpty(prefabName))
+            {
+                EditorUtility.DisplayDialog("Unable to save prefab", "Please specify a valid prefab name.", "Close");
+                return;
+            }
 
-        Close();
+            // You may also want to check for illegal characters :)
+
+            // Save your prefab
+
+            Close();
+        }
+
     }
-
 }

@@ -202,10 +202,12 @@ namespace MapzenGo.Models.Factories
 
         private void CreateMesh(List<Vector3> corners, BuildingSettings typeSettings, MeshData data, Vector2 min, Vector2 size)
         {
-            var vertsStartCount = _useTriangulationNet 
-                    ? CreateRoofTriangulation(corners, data)
-                    : CreateRoofClass(corners, data);
-            
+
+            if (_useTriangulationNet)
+                CreateRoofTriangulation(corners, data);
+            else
+                CreateRoofClass(corners, data);
+
             foreach (var c in corners)
             {
                 data.UV.Add(new Vector2((c.x - min.x), (c.z - min.y)));

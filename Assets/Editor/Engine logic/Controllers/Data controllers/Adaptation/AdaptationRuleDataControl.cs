@@ -2,398 +2,403 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class AdaptationRuleDataControl //: DataControl
+using uAdventure.Core;
+
+namespace uAdventure.Editor
 {
-    //private AdaptationRule adaptationRule;
+    public class AdaptationRuleDataControl //: DataControl
+    {
+        //private AdaptationRule adaptationRule;
 
-    //private AdaptationProfile profile;
+        //private AdaptationProfile profile;
 
-    //public AdaptationRuleDataControl(AdaptationRule adpRule, AdaptationProfile profile)
-    //{
+        //public AdaptationRuleDataControl(AdaptationRule adpRule, AdaptationProfile profile)
+        //{
 
-    //    this.adaptationRule = adpRule;
-    //    this.profile = profile;
-    //}
+        //    this.adaptationRule = adpRule;
+        //    this.profile = profile;
+        //}
 
-   
-    //public override bool addElement(int type, string id)
-    //{
 
-    //    return false;
-    //}
+        //public override bool addElement(int type, string id)
+        //{
 
-   
-    //public override bool canAddElement(int type)
-    //{
+        //    return false;
+        //}
 
-    //    return false;
-    //}
 
-   
-    //public override bool canBeDeleted()
-    //{
+        //public override bool canAddElement(int type)
+        //{
 
-    //    return true;
-    //}
+        //    return false;
+        //}
 
-   
-    //public override bool canBeMoved()
-    //{
 
-    //    return true;
-    //}
+        //public override bool canBeDeleted()
+        //{
 
-   
-    //public override bool canBeRenamed()
-    //{
+        //    return true;
+        //}
 
-    //    return false;
-    //}
 
-   
-    //public override int countAssetReferences(string assetPath)
-    //{
+        //public override bool canBeMoved()
+        //{
 
-    //    return 0;
-    //}
+        //    return true;
+        //}
 
-   
-    //public override int countIdentifierReferences(string id)
-    //{
 
+        //public override bool canBeRenamed()
+        //{
 
-    //    if (adaptationRule.getId().Equals(id))
-    //    {
-    //        return 1;
-    //    }
-    //    else if (adaptationRule.getAdaptedState() != null && adaptationRule.getAdaptedState().getTargetId() != null &&
-    //            adaptationRule.getAdaptedState().getTargetId().Equals(id))
-    //    {
-    //        return 1;
-    //    }
-    //    else {
-    //        return 0;
-    //    }
+        //    return false;
+        //}
 
 
-    //}
+        //public override int countAssetReferences(string assetPath)
+        //{
 
-   
-    //public override void deleteAssetReferences(string assetPath)
-    //{
+        //    return 0;
+        //}
 
-    //}
 
-   
-    //public override bool deleteElement(DataControl dataControl, bool askConfirmation)
-    //{
+        //public override int countIdentifierReferences(string id)
+        //{
 
-    //    return false;
-    //}
 
-   
-    //public override void deleteIdentifierReferences(string id)
-    //{
+        //    if (adaptationRule.getId().Equals(id))
+        //    {
+        //        return 1;
+        //    }
+        //    else if (adaptationRule.getAdaptedState() != null && adaptationRule.getAdaptedState().getTargetId() != null &&
+        //            adaptationRule.getAdaptedState().getTargetId().Equals(id))
+        //    {
+        //        return 1;
+        //    }
+        //    else {
+        //        return 0;
+        //    }
 
-    //    if (adaptationRule.getAdaptedState() != null && adaptationRule.getAdaptedState().getTargetId() != null &&
-    //            adaptationRule.getAdaptedState().getTargetId().Equals(id))
-    //        adaptationRule.getAdaptedState().setTargetId(null);
-    //}
 
-   
-    //public override int[] getAddableElements()
-    //{
+        //}
 
-    //    return new int[0];
-    //}
 
-   
-    //public override System.Object getContent()
-    //{
+        //public override void deleteAssetReferences(string assetPath)
+        //{
 
-    //    return adaptationRule;
-    //}
+        //}
 
-   
-    //public override bool isValid(string currentPath, List<string> incidences)
-    //{
 
-    //    return true;
-    //}
+        //public override bool deleteElement(DataControl dataControl, bool askConfirmation)
+        //{
 
-   
-    //public override bool moveElementDown(DataControl dataControl)
-    //{
+        //    return false;
+        //}
 
-    //    return false;
-    //}
 
-   
-    //public override bool moveElementUp(DataControl dataControl)
-    //{
+        //public override void deleteIdentifierReferences(string id)
+        //{
 
-    //    return false;
-    //}
+        //    if (adaptationRule.getAdaptedState() != null && adaptationRule.getAdaptedState().getTargetId() != null &&
+        //            adaptationRule.getAdaptedState().getTargetId().Equals(id))
+        //        adaptationRule.getAdaptedState().setTargetId(null);
+        //}
 
-   
-    //public override string renameElement(string name)
-    //{
 
-    //    return null;
-    //}
+        //public override int[] getAddableElements()
+        //{
 
-   
-    //public override void replaceIdentifierReferences(string oldId, string newId)
-    //{
+        //    return new int[0];
+        //}
 
-    //    if (adaptationRule.getAdaptedState() != null && adaptationRule.getAdaptedState().getTargetId() != null &&
-    //            adaptationRule.getAdaptedState().getTargetId().Equals(oldId))
-    //        adaptationRule.getAdaptedState().setTargetId(newId);
-    //}
 
-   
-    //public override void updateVarFlagSummary(VarFlagSummary varFlagSummary)
-    //{
+        //public override System.Object getContent()
+        //{
 
-    //    foreach (string flag in adaptationRule.getAdaptedState().getFlagsVars())
-    //    {
-    //        if (isFlag(flag))
-    //            varFlagSummary.addFlagReference(flag);
-    //        else
-    //            varFlagSummary.addVarReference(flag);
-    //    }
+        //    return adaptationRule;
+        //}
 
-    //}
 
-    //public string getDescription()
-    //{
+        //public override bool isValid(string currentPath, List<string> incidences)
+        //{
 
-    //    return adaptationRule.getDescription();
-    //}
+        //    return true;
+        //}
 
-    //public void setInitialScene(string initScene)
-    //{
 
-    //    controller.addTool(new ChangeTargetIdTool(adaptationRule.getAdaptedState(), initScene));
-    //    //adaptationRule.getAdaptedState( ).setTargetId( initScene );
-    //}
+        //public override bool moveElementDown(DataControl dataControl)
+        //{
 
-    //public string getInitialScene()
-    //{
+        //    return false;
+        //}
 
-    //    return adaptationRule.getAdaptedState().getTargetId();
-    //}
 
-    //private AdaptedState getGameState()
-    //{
+        //public override bool moveElementUp(DataControl dataControl)
+        //{
 
-    //    return adaptationRule.getAdaptedState();
-    //}
+        //    return false;
+        //}
 
-    //public bool moveUOLPropertyUp(int selectedRow)
-    //{
 
-    //    return controller.addTool(new MoveObjectTool(adaptationRule.getUOLProperties(), selectedRow, MoveObjectTool.MODE_UP));
-    //}
+        //public override string renameElement(string name)
+        //{
 
-    //public bool moveUOLPropertyDown(int selectedRow)
-    //{
+        //    return null;
+        //}
 
-    //    return controller.addTool(new MoveObjectTool(adaptationRule.getUOLProperties(), selectedRow, MoveObjectTool.MODE_DOWN));
-    //}
 
-    //public bool addFlagAction(int selectedRow)
-    //{
+        //public override void replaceIdentifierReferences(string oldId, string newId)
+        //{
 
-    //    return controller.addTool(new AddActionTool(adaptationRule.getAdaptedState(), selectedRow));
-    //}
+        //    if (adaptationRule.getAdaptedState() != null && adaptationRule.getAdaptedState().getTargetId() != null &&
+        //            adaptationRule.getAdaptedState().getTargetId().Equals(oldId))
+        //        adaptationRule.getAdaptedState().setTargetId(newId);
+        //}
 
-    //public void deleteFlagAction(int selectedRow)
-    //{
 
-    //    controller.addTool(new DeleteActionTool(adaptationRule, selectedRow));
-    //}
+        //public override void updateVarFlagSummary(VarFlagSummary varFlagSummary)
+        //{
 
-    //public int getFlagActionCount()
-    //{
+        //    foreach (string flag in adaptationRule.getAdaptedState().getFlagsVars())
+        //    {
+        //        if (isFlag(flag))
+        //            varFlagSummary.addFlagReference(flag);
+        //        else
+        //            varFlagSummary.addVarReference(flag);
+        //    }
 
-    //    return adaptationRule.getAdaptedState().getFlagsVars().Count;
-    //}
+        //}
 
-    //public void setFlag(int rowIndex, string flag)
-    //{
+        //public string getDescription()
+        //{
 
-    //    controller.addTool(new ChangeActionTool(adaptationRule, rowIndex, flag, ChangeActionTool.SET_ID));
-    //}
+        //    return adaptationRule.getDescription();
+        //}
 
-    //public void change(int rowIndex, string name)
-    //{
+        //public void setInitialScene(string initScene)
+        //{
 
-    //    //profile.getAdaptedState().change(rowIndex, name);
-    //    controller.addTool(new ChangeVarFlagTool(adaptationRule.getAdaptedState(), rowIndex, name));
-    //}
+        //    controller.addTool(new ChangeTargetIdTool(adaptationRule.getAdaptedState(), initScene));
+        //    //adaptationRule.getAdaptedState( ).setTargetId( initScene );
+        //}
 
-    //public string getFlag(int rowIndex)
-    //{
+        //public string getInitialScene()
+        //{
 
-    //    return this.adaptationRule.getAdaptedState().getFlagVar(rowIndex);
-    //}
+        //    return adaptationRule.getAdaptedState().getTargetId();
+        //}
 
-    //public string getAction(int rowIndex)
-    //{
+        //private AdaptedState getGameState()
+        //{
 
-    //    return this.adaptationRule.getAdaptedState().getAction(rowIndex);
-    //}
+        //    return adaptationRule.getAdaptedState();
+        //}
 
-    //public bool isFlag(int rowIndex)
-    //{
+        //public bool moveUOLPropertyUp(int selectedRow)
+        //{
 
-    //    return this.adaptationRule.getAdaptedState().isFlag(rowIndex);
-    //}
+        //    return controller.addTool(new MoveObjectTool(adaptationRule.getUOLProperties(), selectedRow, MoveObjectTool.MODE_UP));
+        //}
 
-    //public bool isFlag(string name)
-    //{
+        //public bool moveUOLPropertyDown(int selectedRow)
+        //{
 
-    //    return this.adaptationRule.getAdaptedState().isFlag(name);
-    //}
+        //    return controller.addTool(new MoveObjectTool(adaptationRule.getUOLProperties(), selectedRow, MoveObjectTool.MODE_DOWN));
+        //}
 
-    //public string getId()
-    //{
+        //public bool addFlagAction(int selectedRow)
+        //{
 
-    //    return adaptationRule.getId();
-    //}
+        //    return controller.addTool(new AddActionTool(adaptationRule.getAdaptedState(), selectedRow));
+        //}
 
-    //public void addBlankUOLProperty(int selectedRow)
-    //{
+        //public void deleteFlagAction(int selectedRow)
+        //{
 
-    //    //controller.addTool(new AddUOLPropertyTool(adaptationRule, selectedRow));
-    //}
+        //    controller.addTool(new DeleteActionTool(adaptationRule, selectedRow));
+        //}
 
-    //public void deleteUOLProperty(int selectedRow)
-    //{
+        //public int getFlagActionCount()
+        //{
 
-    //   // controller.addTool(new DeleteUOLPropertyTool(adaptationRule, selectedRow));
-    //}
+        //    return adaptationRule.getAdaptedState().getFlagsVars().Count;
+        //}
 
-    //public int getUOLPropertyCount()
-    //{
+        //public void setFlag(int rowIndex, string flag)
+        //{
 
-    //    return adaptationRule.getUOLProperties().Count;
-    //}
+        //    controller.addTool(new ChangeActionTool(adaptationRule, rowIndex, flag, ChangeActionTool.SET_ID));
+        //}
 
-    //public void setUOLPropertyValue(int rowIndex, string s )
-    //{
+        //public void change(int rowIndex, string name)
+        //{
 
-    //   // controller.addTool(new ChangeUOLPropertyTool(adaptationRule, s, rowIndex, ChangeUOLPropertyTool.SET_VALUE));
-    //}
+        //    //profile.getAdaptedState().change(rowIndex, name);
+        //    controller.addTool(new ChangeVarFlagTool(adaptationRule.getAdaptedState(), rowIndex, name));
+        //}
 
-    //public void setUOLPropertyId(int rowIndex, string s )
-    //{
-    //    //if (SCORMConfigData.isArrayAttribute(string))
-    //    //{
-    //    //    //check if "string" has a previous value of the same kind of selected attribute
-    //    //    if (adaptationRule.getUOLProperties().get(rowIndex).getId().startsWith(string))
-    //    //        string = adaptationRule.getUOLProperties().get(rowIndex).getId();
-    //    //    string = SCORMAttributeDialog.showAttributeDialogForRead(getProfileType(), string);
-    //    //}
+        //public string getFlag(int rowIndex)
+        //{
 
-    //    //if (!SCORMConfigData.isArrayAttribute(string))
-    //    //    controller.addTool(new ChangeUOLPropertyTool(adaptationRule, string, rowIndex, ChangeUOLPropertyTool.SET_ID));
-    //}
+        //    return this.adaptationRule.getAdaptedState().getFlagVar(rowIndex);
+        //}
 
-    //public void setUOLPropertyOp(int rowIndex, string s )
-    //{
+        //public string getAction(int rowIndex)
+        //{
 
-    //    //controller.addTool(new ChangeUOLPropertyTool(adaptationRule, s, rowIndex, ChangeUOLPropertyTool.SET_OP));
-    //}
+        //    return this.adaptationRule.getAdaptedState().getAction(rowIndex);
+        //}
 
-    //public string getUOLPropertyId(int rowIndex)
-    //{
+        //public bool isFlag(int rowIndex)
+        //{
 
-    //    return this.adaptationRule.getUOLProperties()[rowIndex].getId();
-    //}
+        //    return this.adaptationRule.getAdaptedState().isFlag(rowIndex);
+        //}
 
-    //public string getUOLPropertyValue(int rowIndex)
-    //{
+        //public bool isFlag(string name)
+        //{
 
-    //    return adaptationRule.getUOLProperties()[rowIndex].getValue();
-    //}
+        //    return this.adaptationRule.getAdaptedState().isFlag(name);
+        //}
 
-    //public string getUOLPropertyOp(int rowIndex)
-    //{
+        //public string getId()
+        //{
 
-    //    return adaptationRule.getUOLProperties()[rowIndex].getOperation();
-    //}
+        //    return adaptationRule.getId();
+        //}
 
-    //public void setAction(int rowIndex, string s )
-    //{
+        //public void addBlankUOLProperty(int selectedRow)
+        //{
 
-    //    controller.addTool(new ChangeActionTool(adaptationRule, rowIndex, s, ChangeActionTool.SET_VALUE));
-    //}
+        //    //controller.addTool(new AddUOLPropertyTool(adaptationRule, selectedRow));
+        //}
 
-    //public int getValueToSet(int rowIndex)
-    //{
+        //public void deleteUOLProperty(int selectedRow)
+        //{
 
-    //    if (adaptationRule.getAdaptedState().getValueToSet(rowIndex) == int.MinValue)
-    //        return 0;
-    //    else
-    //        return adaptationRule.getAdaptedState().getValueToSet(rowIndex);
+        //   // controller.addTool(new DeleteUOLPropertyTool(adaptationRule, selectedRow));
+        //}
 
-    //}
+        //public int getUOLPropertyCount()
+        //{
 
-   
-    //public override void getAssetReferences(List<string> assetPaths, List<int> assetTypes)
-    //{
+        //    return adaptationRule.getUOLProperties().Count;
+        //}
 
-    //    // Do nothing
-    //}
+        //public void setUOLPropertyValue(int rowIndex, string s )
+        //{
 
-   
-    //public override bool canBeDuplicated()
-    //{
+        //   // controller.addTool(new ChangeUOLPropertyTool(adaptationRule, s, rowIndex, ChangeUOLPropertyTool.SET_VALUE));
+        //}
 
-    //    return true;
-    //}
+        //public void setUOLPropertyId(int rowIndex, string s )
+        //{
+        //    //if (SCORMConfigData.isArrayAttribute(string))
+        //    //{
+        //    //    //check if "string" has a previous value of the same kind of selected attribute
+        //    //    if (adaptationRule.getUOLProperties().get(rowIndex).getId().startsWith(string))
+        //    //        string = adaptationRule.getUOLProperties().get(rowIndex).getId();
+        //    //    string = SCORMAttributeDialog.showAttributeDialogForRead(getProfileType(), string);
+        //    //}
 
-   
-    //public override void recursiveSearch()
-    //{
+        //    //if (!SCORMConfigData.isArrayAttribute(string))
+        //    //    controller.addTool(new ChangeUOLPropertyTool(adaptationRule, string, rowIndex, ChangeUOLPropertyTool.SET_ID));
+        //}
 
-    //    //check(getDescription(), Language.GetText("Search.Description"));
-    //    //check(getId(), "ID");
-    //    //check(getInitialScene(), Language.GetText("Search.InitialScene"));
+        //public void setUOLPropertyOp(int rowIndex, string s )
+        //{
 
-    //    //for (int i = 0; i < this.getFlagActionCount(); i++)
-    //    //{
-    //    //    if (isFlag(i))
-    //    //        check(getFlag(i), Language.GetText("Search.Flag"));
-    //    //    else
-    //    //        check(getFlag(i), Language.GetText("Search.Var"));
+        //    //controller.addTool(new ChangeUOLPropertyTool(adaptationRule, s, rowIndex, ChangeUOLPropertyTool.SET_OP));
+        //}
 
-    //    //    check(getAction(i), Language.GetText("Search.ActionOverGameState"));
-    //    //}
-    //    //for (int i = 0; i < this.getUOLPropertyCount(); i++)
-    //    //{
-    //    //    check(this.getUOLPropertyId(i), Language.GetText("Search.LMSPropertyID"));
-    //    //    check(this.getUOLPropertyValue(i), Language.GetText("Search.LMSPropertyValue"));
-    //    //}
-    //}
+        //public string getUOLPropertyId(int rowIndex)
+        //{
 
+        //    return this.adaptationRule.getUOLProperties()[rowIndex].getId();
+        //}
 
-    //public int getProfileType()
-    //{
-    //    //if (profile.isScorm12())
-    //    //    return SCORMConfigData.SCORM_V12;
-    //    //else if (profile.isScorm2004())
-    //    //    return SCORMConfigData.SCORM_2004;
-    //    //else
-    //        return -1;
+        //public string getUOLPropertyValue(int rowIndex)
+        //{
 
-    //}
+        //    return adaptationRule.getUOLProperties()[rowIndex].getValue();
+        //}
 
-    //public override List<Searchable> getPathToDataControl(Searchable dataControl)
-    //{
+        //public string getUOLPropertyOp(int rowIndex)
+        //{
 
-    //    return null;
-    //}
+        //    return adaptationRule.getUOLProperties()[rowIndex].getOperation();
+        //}
+
+        //public void setAction(int rowIndex, string s )
+        //{
+
+        //    controller.addTool(new ChangeActionTool(adaptationRule, rowIndex, s, ChangeActionTool.SET_VALUE));
+        //}
+
+        //public int getValueToSet(int rowIndex)
+        //{
+
+        //    if (adaptationRule.getAdaptedState().getValueToSet(rowIndex) == int.MinValue)
+        //        return 0;
+        //    else
+        //        return adaptationRule.getAdaptedState().getValueToSet(rowIndex);
+
+        //}
+
+
+        //public override void getAssetReferences(List<string> assetPaths, List<int> assetTypes)
+        //{
+
+        //    // Do nothing
+        //}
+
+
+        //public override bool canBeDuplicated()
+        //{
+
+        //    return true;
+        //}
+
+
+        //public override void recursiveSearch()
+        //{
+
+        //    //check(getDescription(), Language.GetText("Search.Description"));
+        //    //check(getId(), "ID");
+        //    //check(getInitialScene(), Language.GetText("Search.InitialScene"));
+
+        //    //for (int i = 0; i < this.getFlagActionCount(); i++)
+        //    //{
+        //    //    if (isFlag(i))
+        //    //        check(getFlag(i), Language.GetText("Search.Flag"));
+        //    //    else
+        //    //        check(getFlag(i), Language.GetText("Search.Var"));
+
+        //    //    check(getAction(i), Language.GetText("Search.ActionOverGameState"));
+        //    //}
+        //    //for (int i = 0; i < this.getUOLPropertyCount(); i++)
+        //    //{
+        //    //    check(this.getUOLPropertyId(i), Language.GetText("Search.LMSPropertyID"));
+        //    //    check(this.getUOLPropertyValue(i), Language.GetText("Search.LMSPropertyValue"));
+        //    //}
+        //}
+
+
+        //public int getProfileType()
+        //{
+        //    //if (profile.isScorm12())
+        //    //    return SCORMConfigData.SCORM_V12;
+        //    //else if (profile.isScorm2004())
+        //    //    return SCORMConfigData.SCORM_2004;
+        //    //else
+        //        return -1;
+
+        //}
+
+        //public override List<Searchable> getPathToDataControl(Searchable dataControl)
+        //{
+
+        //    return null;
+        //}
+    }
 }

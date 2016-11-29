@@ -3,183 +3,187 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-public class ItemsListDataControl : DataControl
+using uAdventure.Core;
+
+namespace uAdventure.Editor
 {
-    /**
-         * List of items.
+    public class ItemsListDataControl : DataControl
+    {
+        /**
+             * List of items.
+             */
+        private List<Item> itemsList;
+
+        /**
+         * List of item controllers.
          */
-    private List<Item> itemsList;
+        private List<ItemDataControl> itemsDataControlList;
 
-    /**
-     * List of item controllers.
-     */
-    private List<ItemDataControl> itemsDataControlList;
-
-    /**
-     * Constructor.
-     * 
-     * @param itemsList
-     *            List of items
-     */
-    public ItemsListDataControl(List<Item> itemsList)
-    {
-
-        this.itemsList = itemsList;
-
-        // Create subcontrollers
-        itemsDataControlList = new List<ItemDataControl>();
-        foreach (Item item in itemsList)
-            itemsDataControlList.Add(new ItemDataControl(item));
-    }
-
-    /**
-     * Returns the list of item controllers.
-     * 
-     * @return Item controllers
-     */
-    public List<ItemDataControl> getItems()
-    {
-
-        return itemsDataControlList;
-    }
-
-    /**
-     * Returns the last item controller from the list.
-     * 
-     * @return Last item controller
-     */
-    public ItemDataControl getLastItem()
-    {
-
-        return itemsDataControlList[itemsDataControlList.Count - 1];
-    }
-
-
-    public string[] getItemsIDs()
-    {
-        string[] scenesInfo = null;
-        scenesInfo = new string[itemsList.Count];
-        for (int i = 0; i < itemsList.Count; i++)
+        /**
+         * Constructor.
+         * 
+         * @param itemsList
+         *            List of items
+         */
+        public ItemsListDataControl(List<Item> itemsList)
         {
-            scenesInfo[i] = itemsList[i].getId();
+
+            this.itemsList = itemsList;
+
+            // Create subcontrollers
+            itemsDataControlList = new List<ItemDataControl>();
+            foreach (Item item in itemsList)
+                itemsDataControlList.Add(new ItemDataControl(item));
         }
 
-        return scenesInfo;
-    }
-
-    public int getItemIndexByID(string id)
-    {
-        for (int i = 0; i < itemsList.Count; i++)
+        /**
+         * Returns the list of item controllers.
+         * 
+         * @return Item controllers
+         */
+        public List<ItemDataControl> getItems()
         {
-            if (itemsList[i].getId().Equals(id))
-                return i;
-        }
-        return -1;
-    }
 
-    /**
-     * Returns the info of the items contained in the list.
-     * 
-     * @return Array with the information of the items. It contains the
-     *         identifier of each item, and the number of actions
-     */
-    public string[][] getItemsInfo()
-    {
-
-        string[][] itemsInfo = null;
-
-        // Create the list for the items
-        itemsInfo = new string[itemsList.Count][];
-        for(int i = 0; i < itemsList.Count; i++)
-            itemsInfo[i] = new string[2];
-
-        // Fill the array with the info
-        for (int i = 0; i < itemsList.Count; i++)
-        {
-            Item item = itemsList[i];
-            itemsInfo[i][0] = item.getId();
-            itemsInfo[i][1] = TC.get("ItemsList.ActionsNumber", item.getActions().Count.ToString());
+            return itemsDataControlList;
         }
 
-        return itemsInfo;
-    }
-
-    
-    public override System.Object getContent()
-    {
-
-        return itemsList;
-    }
-
-    
-    public override int[] getAddableElements()
-    {
-
-        return new int[] { Controller.ITEM };
-    }
-
-    
-    public override bool canAddElement(int type)
-    {
-
-        // It can always add new items
-        return type == Controller.ITEM;
-    }
-
-    
-    public override bool canBeDeleted()
-    {
-
-        return false;
-    }
-
-    
-    public override  bool canBeMoved()
-    {
-
-        return false;
-    }
-
-    
-    public override bool canBeRenamed()
-    {
-
-        return false;
-    }
-
-    
-    public override bool addElement(int type, string itemId)
-    {
-
-        bool elementAdded = false;
-
-        if (type == Controller.ITEM)
+        /**
+         * Returns the last item controller from the list.
+         * 
+         * @return Last item controller
+         */
+        public ItemDataControl getLastItem()
         {
 
-            if (itemId == null || itemId.Equals(""))
-                itemId = controller.showInputDialog(TC.get("Operation.AddItemTitle"), TC.get("Operation.AddItemMessage"), TC.get("Operation.AddItemDefaultValue"));
+            return itemsDataControlList[itemsDataControlList.Count - 1];
+        }
 
-            if (itemId != null && controller.isElementIdValid(itemId))
+
+        public string[] getItemsIDs()
+        {
+            string[] scenesInfo = null;
+            scenesInfo = new string[itemsList.Count];
+            for (int i = 0; i < itemsList.Count; i++)
             {
-                Item newItem = new Item(itemId);
-                itemsList.Add(newItem);
-                itemsDataControlList.Add(new ItemDataControl(newItem));
-                controller.getIdentifierSummary().addItemId(itemId);
-                elementAdded = true;
+                scenesInfo[i] = itemsList[i].getId();
             }
+
+            return scenesInfo;
         }
 
-        return elementAdded;
-    }
+        public int getItemIndexByID(string id)
+        {
+            for (int i = 0; i < itemsList.Count; i++)
+            {
+                if (itemsList[i].getId().Equals(id))
+                    return i;
+            }
+            return -1;
+        }
 
-    
-    public override bool duplicateElement(DataControl dataControl)
-    {
+        /**
+         * Returns the info of the items contained in the list.
+         * 
+         * @return Array with the information of the items. It contains the
+         *         identifier of each item, and the number of actions
+         */
+        public string[][] getItemsInfo()
+        {
 
-        if (!(dataControl is ItemDataControl ) )
+            string[][] itemsInfo = null;
+
+            // Create the list for the items
+            itemsInfo = new string[itemsList.Count][];
+            for (int i = 0; i < itemsList.Count; i++)
+                itemsInfo[i] = new string[2];
+
+            // Fill the array with the info
+            for (int i = 0; i < itemsList.Count; i++)
+            {
+                Item item = itemsList[i];
+                itemsInfo[i][0] = item.getId();
+                itemsInfo[i][1] = TC.get("ItemsList.ActionsNumber", item.getActions().Count.ToString());
+            }
+
+            return itemsInfo;
+        }
+
+
+        public override System.Object getContent()
+        {
+
+            return itemsList;
+        }
+
+
+        public override int[] getAddableElements()
+        {
+
+            return new int[] { Controller.ITEM };
+        }
+
+
+        public override bool canAddElement(int type)
+        {
+
+            // It can always add new items
+            return type == Controller.ITEM;
+        }
+
+
+        public override bool canBeDeleted()
+        {
+
             return false;
+        }
 
-       
+
+        public override bool canBeMoved()
+        {
+
+            return false;
+        }
+
+
+        public override bool canBeRenamed()
+        {
+
+            return false;
+        }
+
+
+        public override bool addElement(int type, string itemId)
+        {
+
+            bool elementAdded = false;
+
+            if (type == Controller.ITEM)
+            {
+
+                if (itemId == null || itemId.Equals(""))
+                    itemId = controller.showInputDialog(TC.get("Operation.AddItemTitle"), TC.get("Operation.AddItemMessage"), TC.get("Operation.AddItemDefaultValue"));
+
+                if (itemId != null && controller.isElementIdValid(itemId))
+                {
+                    Item newItem = new Item(itemId);
+                    itemsList.Add(newItem);
+                    itemsDataControlList.Add(new ItemDataControl(newItem));
+                    controller.getIdentifierSummary().addItemId(itemId);
+                    elementAdded = true;
+                }
+            }
+
+            return elementAdded;
+        }
+
+
+        public override bool duplicateElement(DataControl dataControl)
+        {
+
+            if (!(dataControl is ItemDataControl))
+                return false;
+
+
             Item newElement = (Item)(((Item)(dataControl.getContent())).Clone());
             string id = newElement.getId();
             int i = 1;
@@ -193,200 +197,201 @@ public class ItemsListDataControl : DataControl
             itemsDataControlList.Add(new ItemDataControl(newElement));
             controller.getIdentifierSummary().addItemId(id);
             return true;
-    }
+        }
 
-    
-    public override string getDefaultId(int type)
-    {
 
-        return TC.get("Operation.AddItemDefaultValue");
-    }
-
-    
-    public override bool deleteElement(DataControl dataControl, bool askConfirmation)
-    {
-
-        bool elementDeleted = false;
-        string itemId = ((ItemDataControl)dataControl).getId();
-        string references = controller.countIdentifierReferences(itemId).ToString();
-
-        // Ask for confirmation
-        if (!askConfirmation || controller.showStrictConfirmDialog(TC.get("Operation.DeleteElementTitle"), TC.get("Operation.DeleteElementWarning", new string[] { itemId, references })))
+        public override string getDefaultId(int type)
         {
-            if (itemsList.Remove((Item)dataControl.getContent()))
+
+            return TC.get("Operation.AddItemDefaultValue");
+        }
+
+
+        public override bool deleteElement(DataControl dataControl, bool askConfirmation)
+        {
+
+            bool elementDeleted = false;
+            string itemId = ((ItemDataControl)dataControl).getId();
+            string references = controller.countIdentifierReferences(itemId).ToString();
+
+            // Ask for confirmation
+            if (!askConfirmation || controller.showStrictConfirmDialog(TC.get("Operation.DeleteElementTitle"), TC.get("Operation.DeleteElementWarning", new string[] { itemId, references })))
             {
-                itemsDataControlList.Remove((ItemDataControl)dataControl);
-                controller.deleteIdentifierReferences(itemId);
-                controller.getIdentifierSummary().deleteItemId(itemId);
-                //controller.dataModified( );
-                elementDeleted = true;
+                if (itemsList.Remove((Item)dataControl.getContent()))
+                {
+                    itemsDataControlList.Remove((ItemDataControl)dataControl);
+                    controller.deleteIdentifierReferences(itemId);
+                    controller.getIdentifierSummary().deleteItemId(itemId);
+                    //controller.dataModified( );
+                    elementDeleted = true;
+                }
             }
+
+            return elementDeleted;
         }
 
-        return elementDeleted;
-    }
 
-    
-    public override bool moveElementUp(DataControl dataControl)
-    {
-
-        bool elementMoved = false;
-        int elementIndex = itemsList.IndexOf((Item)dataControl.getContent());
-
-        if (elementIndex > 0)
+        public override bool moveElementUp(DataControl dataControl)
         {
-            Item e = itemsList[elementIndex];
-            ItemDataControl c = itemsDataControlList[elementIndex];
-            itemsList.RemoveAt(elementIndex);
-            itemsDataControlList.RemoveAt(elementIndex);
-            itemsList.Insert(elementIndex - 1, e);
-            itemsDataControlList.Insert(elementIndex - 1, c);
-            //controller.dataModified( );
-            elementMoved = true;
+
+            bool elementMoved = false;
+            int elementIndex = itemsList.IndexOf((Item)dataControl.getContent());
+
+            if (elementIndex > 0)
+            {
+                Item e = itemsList[elementIndex];
+                ItemDataControl c = itemsDataControlList[elementIndex];
+                itemsList.RemoveAt(elementIndex);
+                itemsDataControlList.RemoveAt(elementIndex);
+                itemsList.Insert(elementIndex - 1, e);
+                itemsDataControlList.Insert(elementIndex - 1, c);
+                //controller.dataModified( );
+                elementMoved = true;
+            }
+
+            return elementMoved;
         }
 
-        return elementMoved;
-    }
 
-    
-    public override bool moveElementDown(DataControl dataControl)
-    {
-
-        bool elementMoved = false;
-        int elementIndex = itemsList.IndexOf((Item)dataControl.getContent());
-
-        if (elementIndex < itemsList.Count - 1)
+        public override bool moveElementDown(DataControl dataControl)
         {
-            Item e = itemsList[elementIndex];
-            ItemDataControl c = itemsDataControlList[elementIndex];
-            itemsList.RemoveAt(elementIndex);
-            itemsDataControlList.RemoveAt(elementIndex);
-            itemsList.Insert(elementIndex + 1, e);
-            itemsDataControlList.Insert(elementIndex + 1, c);
-            //controller.dataModified( );
-            elementMoved = true;
+
+            bool elementMoved = false;
+            int elementIndex = itemsList.IndexOf((Item)dataControl.getContent());
+
+            if (elementIndex < itemsList.Count - 1)
+            {
+                Item e = itemsList[elementIndex];
+                ItemDataControl c = itemsDataControlList[elementIndex];
+                itemsList.RemoveAt(elementIndex);
+                itemsDataControlList.RemoveAt(elementIndex);
+                itemsList.Insert(elementIndex + 1, e);
+                itemsDataControlList.Insert(elementIndex + 1, c);
+                //controller.dataModified( );
+                elementMoved = true;
+            }
+
+            return elementMoved;
         }
 
-        return elementMoved;
-    }
 
-    
-    public override string renameElement(string name)
-    {
-
-        return null;
-    }
-
-    
-    public override void updateVarFlagSummary(VarFlagSummary varFlagSummary)
-    {
-
-        // Iterate through each item
-        foreach (ItemDataControl itemDataControl in itemsDataControlList)
-            itemDataControl.updateVarFlagSummary(varFlagSummary);
-    }
-
-    
-    public override bool isValid(string currentPath, List<string> incidences)
-    {
-
-        bool valid = true;
-
-        // Update the current path
-        currentPath += " >> " + TC.getElement(Controller.ITEMS_LIST);
-
-        // Iterate through the items
-        foreach (ItemDataControl itemDataControl in itemsDataControlList)
+        public override string renameElement(string name)
         {
-            string itemPath = currentPath + " >> " + itemDataControl.getId();
-            valid &= itemDataControl.isValid(itemPath, incidences);
+
+            return null;
         }
 
-        return valid;
-    }
 
-    
-    public override int countAssetReferences(string assetPath)
-    {
+        public override void updateVarFlagSummary(VarFlagSummary varFlagSummary)
+        {
 
-        int count = 0;
+            // Iterate through each item
+            foreach (ItemDataControl itemDataControl in itemsDataControlList)
+                itemDataControl.updateVarFlagSummary(varFlagSummary);
+        }
 
-        // Iterate through each item
-        foreach (ItemDataControl itemDataControl in itemsDataControlList)
-            count += itemDataControl.countAssetReferences(assetPath);
 
-        return count;
-    }
+        public override bool isValid(string currentPath, List<string> incidences)
+        {
 
-    
-    public override void getAssetReferences(List<string> assetPaths, List<int> assetTypes)
-    {
+            bool valid = true;
 
-        // Iterate through each item
-        foreach (ItemDataControl itemDataControl in itemsDataControlList)
-            itemDataControl.getAssetReferences(assetPaths, assetTypes);
-    }
+            // Update the current path
+            currentPath += " >> " + TC.getElement(Controller.ITEMS_LIST);
 
-    
-    public override void deleteAssetReferences(string assetPath)
-    {
+            // Iterate through the items
+            foreach (ItemDataControl itemDataControl in itemsDataControlList)
+            {
+                string itemPath = currentPath + " >> " + itemDataControl.getId();
+                valid &= itemDataControl.isValid(itemPath, incidences);
+            }
 
-        // Iterate through each item
-        foreach (ItemDataControl itemDataControl in itemsDataControlList)
-            itemDataControl.deleteAssetReferences(assetPath);
-    }
+            return valid;
+        }
 
-    
-    public override int countIdentifierReferences(string id)
-    {
 
-        int count = 0;
+        public override int countAssetReferences(string assetPath)
+        {
 
-        // Iterate through each item
-        foreach (ItemDataControl itemDataControl in itemsDataControlList)
-            count += itemDataControl.countIdentifierReferences(id);
+            int count = 0;
 
-        return count;
-    }
+            // Iterate through each item
+            foreach (ItemDataControl itemDataControl in itemsDataControlList)
+                count += itemDataControl.countAssetReferences(assetPath);
 
-    
-    public override void replaceIdentifierReferences(string oldId, string newId)
-    {
+            return count;
+        }
 
-        // Iterate through each item
-        foreach (ItemDataControl itemDataControl in itemsDataControlList)
-            itemDataControl.replaceIdentifierReferences(oldId, newId);
-    }
 
-    
-    public override void deleteIdentifierReferences(string id)
-    {
+        public override void getAssetReferences(List<string> assetPaths, List<int> assetTypes)
+        {
 
-        // Spread the call to every item
-        foreach (ItemDataControl itemDataControl in itemsDataControlList)
-            itemDataControl.deleteIdentifierReferences(id);
-    }
+            // Iterate through each item
+            foreach (ItemDataControl itemDataControl in itemsDataControlList)
+                itemDataControl.getAssetReferences(assetPaths, assetTypes);
+        }
 
-    
-    public override bool canBeDuplicated()
-    {
 
-        // TODO Auto-generated method stub
-        return false;
-    }
+        public override void deleteAssetReferences(string assetPath)
+        {
 
-    
-    public override void recursiveSearch()
-    {
+            // Iterate through each item
+            foreach (ItemDataControl itemDataControl in itemsDataControlList)
+                itemDataControl.deleteAssetReferences(assetPath);
+        }
 
-        foreach (DataControl dc in this.itemsDataControlList)
-            dc.recursiveSearch();
-    }
 
-    
-    public override List<Searchable> getPathToDataControl(Searchable dataControl)
-    {
+        public override int countIdentifierReferences(string id)
+        {
 
-        return getPathFromChild(dataControl, itemsDataControlList.Cast<Searchable>().ToList());
+            int count = 0;
+
+            // Iterate through each item
+            foreach (ItemDataControl itemDataControl in itemsDataControlList)
+                count += itemDataControl.countIdentifierReferences(id);
+
+            return count;
+        }
+
+
+        public override void replaceIdentifierReferences(string oldId, string newId)
+        {
+
+            // Iterate through each item
+            foreach (ItemDataControl itemDataControl in itemsDataControlList)
+                itemDataControl.replaceIdentifierReferences(oldId, newId);
+        }
+
+
+        public override void deleteIdentifierReferences(string id)
+        {
+
+            // Spread the call to every item
+            foreach (ItemDataControl itemDataControl in itemsDataControlList)
+                itemDataControl.deleteIdentifierReferences(id);
+        }
+
+
+        public override bool canBeDuplicated()
+        {
+
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+
+        public override void recursiveSearch()
+        {
+
+            foreach (DataControl dc in this.itemsDataControlList)
+                dc.recursiveSearch();
+        }
+
+
+        public override List<Searchable> getPathToDataControl(Searchable dataControl)
+        {
+
+            return getPathFromChild(dataControl, itemsDataControlList.Cast<Searchable>().ToList());
+        }
     }
 }

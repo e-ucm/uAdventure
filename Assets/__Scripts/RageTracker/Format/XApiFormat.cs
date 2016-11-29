@@ -19,10 +19,12 @@ using System.Collections.Generic;
 using SimpleJSON;
 using System;
 
-public class XApiFormat : Tracker.ITraceFormatter
+namespace uAdventure.RageTracker
 {
+    public class XApiFormat : Tracker.ITraceFormatter
+    {
 
-    private Dictionary<string, string> verbIds = new Dictionary<string, string>()
+        private Dictionary<string, string> verbIds = new Dictionary<string, string>()
     {
         { Tracker.Verb.Initialized.ToString().ToLower(), "https://w3id.org/xapi/adb/verbs/initialized"},
         { Tracker.Verb.Progressed.ToString().ToLower(), "http://adlnet.gov/expapi/verbs/progressed"},
@@ -35,7 +37,7 @@ public class XApiFormat : Tracker.ITraceFormatter
         { Tracker.Verb.Used.ToString().ToLower(), "https://w3id.org/xapi/seriousgames/verbs/used"}
     };
 
-    private Dictionary<string, string> objectIds = new Dictionary<string, string>()
+        private Dictionary<string, string> objectIds = new Dictionary<string, string>()
     {
         // Completable
         { CompletableTracker.Completable.Game.ToString().ToLower(), "https://w3id.org/xapi/seriousgames/activity-types/serious-game" },
@@ -70,168 +72,172 @@ public class XApiFormat : Tracker.ITraceFormatter
         { GameObjectTracker.TrackedGameObject.GameObject.ToString().ToLower(), "https://w3id.org/xapi/seriousgames/activity-types/game-object"}
     };
 
-    private Dictionary<string, string> extensionIds = new Dictionary<string, string>()
+        private Dictionary<string, string> extensionIds = new Dictionary<string, string>()
     {
         { Tracker.Extension.Health.ToString().ToLower(), "https://w3id.org/xapi/seriousgames/extensions/health"},
         { Tracker.Extension.Position.ToString().ToLower(), "https://w3id.org/xapi/seriousgames/extensions/position"},
         { Tracker.Extension.Progress.ToString().ToLower(), "https://w3id.org/xapi/seriousgames/extensions/progress"}
     };
 
-    private List<JSONNode> statements = new List<JSONNode> ();
-	private string objectId;
-	private JSONNode actor;
+        private List<JSONNode> statements = new List<JSONNode>();
+        private string objectId;
+        private JSONNode actor;
 
-public void StartData (JSONNode data)
-	{
-		actor = data ["actor"];
-		objectId = data ["objectId"].ToString();
-		if (!objectId.EndsWith ("/")) {
-            objectId = objectId.Replace("\"", "");
-			objectId += "/";
-            UnityEngine.Debug.Log("objectId::: " + objectId);
-		}
-	}
-
-	public string Serialize (List<string> traces)
-	{
-		statements.Clear ();
-
-		foreach (string trace in traces) {
-			statements.Add (CreateStatement (trace));
-		}
-
-		string result = "[";
-		foreach (JSONNode statement in statements) {
-			result += statement.ToString () + ",";
-		}
-		return result.Substring (0, result.Length - 1).Replace ("[\n\t]", "").Replace (": ", ":") + "]";
-	}
-
-	private JSONNode CreateStatement (string trace)
-	{
-		string[] parts = trace.Split (',');
-		string timestamp = new System.DateTime (1970, 1, 1, 0, 0, 0, System.DateTimeKind.Utc).AddMilliseconds (long.Parse (parts [0])).ToString ("yyyy-MM-ddTHH:mm:ss.fffZ");
-
-		JSONNode statement = JSONNode.Parse ("{\"timestamp\": \"" + timestamp + "\"}");
-
-		if (actor != null) {
-			statement.Add ("actor", actor);		      
-		}
-		statement.Add ("verb", CreateVerb (parts [1]));
-
-
-		statement.Add ("object", CreateObject(parts));
-
-		if (parts.Length > 4) {
-            // Parse extensions
-
-            int extCount = parts.Length - 4;
-            if(extCount > 0 && extCount % 2 == 0)
+        public void StartData(JSONNode data)
+        {
+            actor = data["actor"];
+            objectId = data["objectId"].ToString();
+            if (!objectId.EndsWith("/"))
             {
-                // Extensions come in <key, value> pairs
-
-                JSONClass extensions = new JSONClass();
-                JSONNode extensionsChild = null;
-
-                for (int i = 4; i < parts.Length; i+= 2)
-                {
-                    string key = parts[i];
-                    string value = parts[i + 1];
-                    if (key.Equals("") || value.Equals(""))
-                    {
-                        continue;
-                    }
-                    if (key.Equals(Tracker.Extension.Score.ToString().ToLower()))
-                    {
-
-                        JSONClass score = new JSONClass();
-                        float valueResult = 0f;
-                        float.TryParse(value, out valueResult);
-                        score.Add("raw", new JSONData(valueResult));
-                        extensions.Add("score", score);
-                    }
-                    else if (key.Equals(Tracker.Extension.Success.ToString().ToLower()))
-                    {
-                        bool valueResult = false;
-                        bool.TryParse(value, out valueResult);
-                        extensions.Add("success", new JSONData(valueResult));
-                    }
-                    else if (key.Equals(Tracker.Extension.Completion.ToString().ToLower()))
-                    {
-                        bool valueResult = false;
-                        bool.TryParse(value, out valueResult);
-                        extensions.Add("completion", new JSONData(valueResult));
-                    }
-                    else if (key.Equals(Tracker.Extension.Response.ToString().ToLower()))
-                    {
-                        extensions.Add("response", new JSONData(value));
-                    }
-                    else
-                    {
-                        if(extensionsChild == null)
-                        {
-                            extensionsChild = JSONNode.Parse("{}");
-                            extensions.Add("extensions", extensionsChild);
-                        }
-
-                        string id = key;
-                        bool tbool;
-                        int tint;
-                        float tfloat;
-                        double tdouble;
-
-                        if (extensionIds.ContainsKey(key))
-                            id = extensionIds[key];
-
-                        if (int.TryParse(value, out tint))
-                            extensionsChild.Add(id, new JSONData(tint));
-                        else if(float.TryParse(value, out tfloat))
-                            extensionsChild.Add(id, new JSONData(tfloat));
-                        else if(double.TryParse(value, out tdouble))
-                            extensionsChild.Add(id, new JSONData(tdouble));
-                        else if(bool.TryParse(value, out tbool))
-                            extensionsChild.Add(id, new JSONData(tbool));
-                        else
-                            extensionsChild.Add(id, new JSONData(value));
-                    }
-                }
-                statement.Add("result", extensions);
+                objectId = objectId.Replace("\"", "");
+                objectId += "/";
+                UnityEngine.Debug.Log("objectId::: " + objectId);
             }
-		}
+        }
 
-        return statement;
-	}
+        public string Serialize(List<string> traces)
+        {
+            statements.Clear();
 
-	private JSONNode CreateVerb (string ev)
-	{
+            foreach (string trace in traces)
+            {
+                statements.Add(CreateStatement(trace));
+            }
 
-        string id = ev;
-        verbIds.TryGetValue(ev, out id);
+            string result = "[";
+            foreach (JSONNode statement in statements)
+            {
+                result += statement.ToString() + ",";
+            }
+            return result.Substring(0, result.Length - 1).Replace("[\n\t]", "").Replace(": ", ":") + "]";
+        }
 
-		JSONNode verb = JSONNode.Parse ("{id: }");
-		verb ["id"] = id;
+        private JSONNode CreateStatement(string trace)
+        {
+            string[] parts = trace.Split(',');
+            string timestamp = new System.DateTime(1970, 1, 1, 0, 0, 0, System.DateTimeKind.Utc).AddMilliseconds(long.Parse(parts[0])).ToString("yyyy-MM-ddTHH:mm:ss.fffZ");
 
-		return verb;
-	}
+            JSONNode statement = JSONNode.Parse("{\"timestamp\": \"" + timestamp + "\"}");
 
-	private JSONNode CreateObject (string[] parts)
-	{
-		string type = parts [2];
+            if (actor != null)
+            {
+                statement.Add("actor", actor);
+            }
+            statement.Add("verb", CreateVerb(parts[1]));
 
-        string id = parts[3];
-        string typeKey = type;
-        objectIds.TryGetValue(type, out typeKey);
 
-        JSONNode obj = JSONNode.Parse("{id: }");
-        obj["id"] = objectId + id;
+            statement.Add("object", CreateObject(parts));
 
-        JSONNode definition = JSONNode.Parse("{type: }");
-        definition["type"] = typeKey;
+            if (parts.Length > 4)
+            {
+                // Parse extensions
 
-        obj.Add("definition", definition);
+                int extCount = parts.Length - 4;
+                if (extCount > 0 && extCount % 2 == 0)
+                {
+                    // Extensions come in <key, value> pairs
 
-        return obj;
-	}
+                    JSONClass extensions = new JSONClass();
+                    JSONNode extensionsChild = null;
+
+                    for (int i = 4; i < parts.Length; i += 2)
+                    {
+                        string key = parts[i];
+                        string value = parts[i + 1];
+                        if (key.Equals("") || value.Equals(""))
+                        {
+                            continue;
+                        }
+                        if (key.Equals(Tracker.Extension.Score.ToString().ToLower()))
+                        {
+
+                            JSONClass score = new JSONClass();
+                            float valueResult = 0f;
+                            float.TryParse(value, out valueResult);
+                            score.Add("raw", new JSONData(valueResult));
+                            extensions.Add("score", score);
+                        }
+                        else if (key.Equals(Tracker.Extension.Success.ToString().ToLower()))
+                        {
+                            bool valueResult = false;
+                            bool.TryParse(value, out valueResult);
+                            extensions.Add("success", new JSONData(valueResult));
+                        }
+                        else if (key.Equals(Tracker.Extension.Completion.ToString().ToLower()))
+                        {
+                            bool valueResult = false;
+                            bool.TryParse(value, out valueResult);
+                            extensions.Add("completion", new JSONData(valueResult));
+                        }
+                        else if (key.Equals(Tracker.Extension.Response.ToString().ToLower()))
+                        {
+                            extensions.Add("response", new JSONData(value));
+                        }
+                        else
+                        {
+                            if (extensionsChild == null)
+                            {
+                                extensionsChild = JSONNode.Parse("{}");
+                                extensions.Add("extensions", extensionsChild);
+                            }
+
+                            string id = key;
+                            bool tbool;
+                            int tint;
+                            float tfloat;
+                            double tdouble;
+
+                            if (extensionIds.ContainsKey(key))
+                                id = extensionIds[key];
+
+                            if (int.TryParse(value, out tint))
+                                extensionsChild.Add(id, new JSONData(tint));
+                            else if (float.TryParse(value, out tfloat))
+                                extensionsChild.Add(id, new JSONData(tfloat));
+                            else if (double.TryParse(value, out tdouble))
+                                extensionsChild.Add(id, new JSONData(tdouble));
+                            else if (bool.TryParse(value, out tbool))
+                                extensionsChild.Add(id, new JSONData(tbool));
+                            else
+                                extensionsChild.Add(id, new JSONData(value));
+                        }
+                    }
+                    statement.Add("result", extensions);
+                }
+            }
+
+            return statement;
+        }
+
+        private JSONNode CreateVerb(string ev)
+        {
+
+            string id = ev;
+            verbIds.TryGetValue(ev, out id);
+
+            JSONNode verb = JSONNode.Parse("{id: }");
+            verb["id"] = id;
+
+            return verb;
+        }
+
+        private JSONNode CreateObject(string[] parts)
+        {
+            string type = parts[2];
+
+            string id = parts[3];
+            string typeKey = type;
+            objectIds.TryGetValue(type, out typeKey);
+
+            JSONNode obj = JSONNode.Parse("{id: }");
+            obj["id"] = objectId + id;
+
+            JSONNode definition = JSONNode.Parse("{type: }");
+            definition["type"] = typeKey;
+
+            obj.Add("definition", definition);
+
+            return obj;
+        }
+    }
 }
-
-

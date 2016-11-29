@@ -2,77 +2,85 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class AddBookPageTool : Tool {
-    private List<BookPage> bookPagesList;
+using uAdventure.Core;
 
-    private BookPage newBookPage;
-
-    private int selectedPage;
-
-    public AddBookPageTool(List<BookPage> bookPagesList, BookPage newBookPage, int selectedPage)
+namespace uAdventure.Editor
+{
+    public class AddBookPageTool : Tool
     {
+        private List<BookPage> bookPagesList;
 
-        this.bookPagesList = bookPagesList;
-        this.newBookPage = newBookPage;
-        this.selectedPage = selectedPage;
-    }
+        private BookPage newBookPage;
 
-    
-    public override bool canRedo()
-    {
+        private int selectedPage;
 
-        return true;
-    }
-
-    
-    public override bool canUndo()
-    {
-
-        return true;
-    }
-
-    
-    public override bool combine(Tool other)
-    {
-
-        return false;
-    }
-
-    
-    public override bool doTool()
-    {
-
-        if (selectedPage >= 0 && selectedPage < bookPagesList.Count)
+        public AddBookPageTool(List<BookPage> bookPagesList, BookPage newBookPage, int selectedPage)
         {
-            bookPagesList.Insert(selectedPage + 1, newBookPage);
-        }
-        else {
-            bookPagesList.Add(newBookPage);
-        }
-        return true;
-    }
 
-    
-    public override bool redoTool()
-    {
+            this.bookPagesList = bookPagesList;
+            this.newBookPage = newBookPage;
+            this.selectedPage = selectedPage;
+        }
 
-        if (selectedPage >= 0 && selectedPage < bookPagesList.Count)
+
+        public override bool canRedo()
         {
-            bookPagesList.Insert(selectedPage + 1, newBookPage);
-        }
-        else {
-            bookPagesList.Add(newBookPage);
-        }
-        Controller.getInstance().updatePanel();
-        return true;
-    }
 
-    
-    public override bool undoTool()
-    {
+            return true;
+        }
 
-        bookPagesList.Remove(newBookPage);
-        Controller.getInstance().updatePanel();
-        return true;
+
+        public override bool canUndo()
+        {
+
+            return true;
+        }
+
+
+        public override bool combine(Tool other)
+        {
+
+            return false;
+        }
+
+
+        public override bool doTool()
+        {
+
+            if (selectedPage >= 0 && selectedPage < bookPagesList.Count)
+            {
+                bookPagesList.Insert(selectedPage + 1, newBookPage);
+            }
+            else
+            {
+                bookPagesList.Add(newBookPage);
+            }
+            return true;
+        }
+
+
+        public override bool redoTool()
+        {
+
+            if (selectedPage >= 0 && selectedPage < bookPagesList.Count)
+            {
+                bookPagesList.Insert(selectedPage + 1, newBookPage);
+            }
+            else
+            {
+                bookPagesList.Add(newBookPage);
+            }
+            Controller.getInstance().updatePanel();
+            return true;
+        }
+
+
+        public override bool undoTool()
+        {
+
+            bookPagesList.Remove(newBookPage);
+            Controller.getInstance().updatePanel();
+            return true;
+        }
     }
 }

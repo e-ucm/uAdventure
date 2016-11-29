@@ -2,77 +2,83 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class DeleteNodeLineTool : Tool {
-    protected ConversationNode parent;
+using uAdventure.Core;
 
-    protected int lineIndex;
-
-    protected ConversationLine lineDeleted;
-
-    protected List<ConditionsController> node;
-
-    protected ConditionsController conditionDeleted;
-
-    public DeleteNodeLineTool(ConversationNodeView nodeView, int lineIndex, List<ConditionsController> node):this((ConversationNode)nodeView, lineIndex, node)
-    {}
-
-    public DeleteNodeLineTool(ConversationNode parent, int lineIndex, List<ConditionsController> node)
+namespace uAdventure.Editor
+{
+    public class DeleteNodeLineTool : Tool
     {
+        protected ConversationNode parent;
 
-        this.parent = parent;
-        this.lineIndex = lineIndex;
-        this.node = node;
-    }
+        protected int lineIndex;
 
-    
-    public override bool canRedo()
-    {
+        protected ConversationLine lineDeleted;
 
-        return true;
-    }
+        protected List<ConditionsController> node;
 
-    
-    public override bool canUndo()
-    {
+        protected ConditionsController conditionDeleted;
 
-        return lineDeleted != null;
-    }
+        public DeleteNodeLineTool(ConversationNodeView nodeView, int lineIndex, List<ConditionsController> node) : this((ConversationNode)nodeView, lineIndex, node)
+        { }
 
-    
-    public override bool combine(Tool other)
-    {
+        public DeleteNodeLineTool(ConversationNode parent, int lineIndex, List<ConditionsController> node)
+        {
 
-        return false;
-    }
+            this.parent = parent;
+            this.lineIndex = lineIndex;
+            this.node = node;
+        }
 
-    
-    public override bool doTool()
-    {
 
-        lineDeleted = parent.getLine(lineIndex);
-        parent.removeLine(lineIndex);
-        conditionDeleted = node[lineIndex];
-        node.RemoveAt(lineIndex);
-        return true;
-    }
+        public override bool canRedo()
+        {
 
-    
-    public override bool redoTool()
-    {
+            return true;
+        }
 
-        parent.removeLine(lineIndex);
-        node.RemoveAt(lineIndex);
-        Controller.getInstance().updatePanel();
-        return true;
-    }
 
-    
-    public override bool undoTool()
-    {
+        public override bool canUndo()
+        {
 
-        parent.addLine(lineIndex, lineDeleted);
-        node.Insert(lineIndex, conditionDeleted);
-        Controller.getInstance().updatePanel();
-        return true;
+            return lineDeleted != null;
+        }
+
+
+        public override bool combine(Tool other)
+        {
+
+            return false;
+        }
+
+
+        public override bool doTool()
+        {
+
+            lineDeleted = parent.getLine(lineIndex);
+            parent.removeLine(lineIndex);
+            conditionDeleted = node[lineIndex];
+            node.RemoveAt(lineIndex);
+            return true;
+        }
+
+
+        public override bool redoTool()
+        {
+
+            parent.removeLine(lineIndex);
+            node.RemoveAt(lineIndex);
+            Controller.getInstance().updatePanel();
+            return true;
+        }
+
+
+        public override bool undoTool()
+        {
+
+            parent.addLine(lineIndex, lineDeleted);
+            node.Insert(lineIndex, conditionDeleted);
+            Controller.getInstance().updatePanel();
+            return true;
+        }
     }
 }

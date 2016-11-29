@@ -2,159 +2,164 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class EndSceneDataControl : DataControl
+using uAdventure.Core;
+
+namespace uAdventure.Editor
 {
-
-    
-    public override System.Object getContent()
+    public class EndSceneDataControl : DataControl
     {
 
-        return Controller.END_SCENE;
-    }
 
-    
-    public override int[] getAddableElements()
-    {
+        public override System.Object getContent()
+        {
 
-        return new int[] { };
-    }
+            return Controller.END_SCENE;
+        }
 
-    
-    public override bool canAddElement(int type)
-    {
 
-        return false;
-    }
+        public override int[] getAddableElements()
+        {
 
-    
-    public override bool canBeDeleted()
-    {
+            return new int[] { };
+        }
 
-        return true;
-    }
 
-    
-    public override bool canBeMoved()
-    {
+        public override bool canAddElement(int type)
+        {
 
-        return false;
-    }
+            return false;
+        }
 
-    
-    public override bool canBeRenamed()
-    {
 
-        return false;
-    }
+        public override bool canBeDeleted()
+        {
 
-    
-    public override bool addElement(int type, string id)
-    {
+            return true;
+        }
 
-        return false;
-    }
 
-    
-    public override bool deleteElement(DataControl dataControl, bool askConfirmation)
-    {
+        public override bool canBeMoved()
+        {
 
-        return false;
-    }
+            return false;
+        }
 
-    
-    public override bool moveElementUp(DataControl dataControl)
-    {
 
-        return false;
-    }
+        public override bool canBeRenamed()
+        {
 
-    
-    public override bool moveElementDown(DataControl dataControl)
-    {
+            return false;
+        }
 
-        return false;
-    }
 
-    
-    public override string renameElement(string name)
-    {
+        public override bool addElement(int type, string id)
+        {
 
-        return null;
-    }
+            return false;
+        }
 
-    
-    public override void updateVarFlagSummary(VarFlagSummary varFlagSummary)
-    {
 
-        // Do nothing
-    }
+        public override bool deleteElement(DataControl dataControl, bool askConfirmation)
+        {
 
-    
-    public override bool isValid(string currentPath, List<string> incidences)
-    {
+            return false;
+        }
 
-        return true;
-    }
 
-    
-    public override int countAssetReferences(string assetPath)
-    {
+        public override bool moveElementUp(DataControl dataControl)
+        {
 
-        return 0;
-    }
+            return false;
+        }
 
-    
-    public override void getAssetReferences(List<string> assetPaths, List<int> assetTypes)
-    {
 
-        // Do nothing
-    }
+        public override bool moveElementDown(DataControl dataControl)
+        {
 
-    
-    public override void deleteAssetReferences(string assetPath)
-    {
+            return false;
+        }
 
-        // Do nothing
-    }
 
-    
-    public override int countIdentifierReferences(string id)
-    {
+        public override string renameElement(string name)
+        {
 
-        return 0;
-    }
+            return null;
+        }
 
-    
-    public override void replaceIdentifierReferences(string oldId, string newId)
-    {
 
-        // Do nothing
-    }
+        public override void updateVarFlagSummary(VarFlagSummary varFlagSummary)
+        {
 
-    
-    public override void deleteIdentifierReferences(string id)
-    {
+            // Do nothing
+        }
 
-        // Do nothing
-    }
 
-    
-    public override bool canBeDuplicated()
-    {
+        public override bool isValid(string currentPath, List<string> incidences)
+        {
 
-        return false;
-    }
+            return true;
+        }
 
-    
-    public override void recursiveSearch()
-    {
 
-    }
+        public override int countAssetReferences(string assetPath)
+        {
 
-    
-    public override List<Searchable> getPathToDataControl(Searchable dataControl)
-    {
+            return 0;
+        }
 
-        return null;
+
+        public override void getAssetReferences(List<string> assetPaths, List<int> assetTypes)
+        {
+
+            // Do nothing
+        }
+
+
+        public override void deleteAssetReferences(string assetPath)
+        {
+
+            // Do nothing
+        }
+
+
+        public override int countIdentifierReferences(string id)
+        {
+
+            return 0;
+        }
+
+
+        public override void replaceIdentifierReferences(string oldId, string newId)
+        {
+
+            // Do nothing
+        }
+
+
+        public override void deleteIdentifierReferences(string id)
+        {
+
+            // Do nothing
+        }
+
+
+        public override bool canBeDuplicated()
+        {
+
+            return false;
+        }
+
+
+        public override void recursiveSearch()
+        {
+
+        }
+
+
+        public override List<Searchable> getPathToDataControl(Searchable dataControl)
+        {
+
+            return null;
+        }
     }
 }

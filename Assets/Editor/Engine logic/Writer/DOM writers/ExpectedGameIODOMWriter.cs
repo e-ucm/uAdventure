@@ -1,7 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class ExpectedGameIODOMWriter{
+using uAdventure.Core;
 
-    
+namespace uAdventure.Editor
+{
+    public class ExpectedGameIODOMWriter
+    {
+
+
+    }
 }

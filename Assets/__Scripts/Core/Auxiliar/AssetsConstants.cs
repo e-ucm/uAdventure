@@ -1,75 +1,80 @@
-﻿/**
- * Set of constants for identifying types of Asssets. AssetsController (editor)
- * must implement it.
- * 
- */
-public static class AssetsConstants
+﻿namespace uAdventure.Core
 {
 
     /**
-     * Background category.
+     * Set of constants for identifying types of Asssets. AssetsController (editor)
+     * must implement it.
+     * 
      */
-    public const int CATEGORY_BACKGROUND = 0;
+    public static class AssetsConstants
+    {
 
-    /**
-     * Animation category.
-     */
-    public const int CATEGORY_ANIMATION = 1;
+        /**
+         * Background category.
+         */
+        public const int CATEGORY_BACKGROUND = 0;
 
-    /**
-     * Image category.
-     */
-    public const int CATEGORY_IMAGE = 2;
+        /**
+         * Animation category.
+         */
+        public const int CATEGORY_ANIMATION = 1;
 
-    /**
-     * Icon category.
-     */
-    public const int CATEGORY_ICON = 3;
+        /**
+         * Image category.
+         */
+        public const int CATEGORY_IMAGE = 2;
 
-    /**
-     * Audio category.
-     */
-    public const int CATEGORY_AUDIO = 4;
+        /**
+         * Icon category.
+         */
+        public const int CATEGORY_ICON = 3;
 
-    /**
-     * Video category.
-     */
-    public const int CATEGORY_VIDEO = 5;
+        /**
+         * Audio category.
+         */
+        public const int CATEGORY_AUDIO = 4;
 
-    /**
-     * Cursor category.
-     */
-    public const int CATEGORY_CURSOR = 6;
+        /**
+         * Video category.
+         */
+        public const int CATEGORY_VIDEO = 5;
 
-    /**
-     * Cursor category.
-     */
-    public const int CATEGORY_STYLED_TEXT = 7;
+        /**
+         * Cursor category.
+         */
+        public const int CATEGORY_CURSOR = 6;
 
-    /**
-     * Animation Image category
-     */
-    public const int CATEGORY_ANIMATION_IMAGE = 8;
+        /**
+         * Cursor category.
+         */
+        public const int CATEGORY_STYLED_TEXT = 7;
 
-    /**
-     * Customized button category
-     */
-    public const int CATEGORY_BUTTON = 9;
+        /**
+         * Animation Image category
+         */
+        public const int CATEGORY_ANIMATION_IMAGE = 8;
 
-    /**
-     * Animation sound category
-     */
-    public const int CATEGORY_ANIMATION_AUDIO = 10;
+        /**
+         * Customized button category
+         */
+        public const int CATEGORY_BUTTON = 9;
 
-    /**
-     * Arrows for books
-     */
-    public const int CATEGORY_ARROW_BOOK = 11;
+        /**
+         * Animation sound category
+         */
+        public const int CATEGORY_ANIMATION_AUDIO = 10;
 
-    /**
-     * Number of categories.
-     */
-    public const int CATEGORIES_COUNT = 12;
+        /**
+         * Arrows for books
+         */
+        public const int CATEGORY_ARROW_BOOK = 11;
 
+        /**
+         * Number of categories.
+         */
+        public const int CATEGORIES_COUNT = 12;
+
+
+    }
 
 }

@@ -3,212 +3,215 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-/**
- * The influence area for an item reference or active area
- */
-public class InfluenceArea :  Rectangle, ICloneable
+namespace uAdventure.Core
 {
-
     /**
-     * True if the influence area exists (is defined)
+     * The influence area for an item reference or active area
      */
-    private bool exists = false;
-
-    /**
-     * The x axis value of the influence area, relative to the objects top left
-     * corner
-     */
-    private int x;
-
-    /**
-     * The y axis value of the influence area, relative to the objects top left
-     * corner
-     */
-    private int y;
-
-    /**
-     * The width of the active area
-     */
-    private int width;
-
-    /**
-     * The height of the active area
-     */
-    private int height;
-
-    public InfluenceArea()
+    public class InfluenceArea : Rectangle, ICloneable
     {
 
-    }
+        /**
+         * True if the influence area exists (is defined)
+         */
+        private bool exists = false;
 
-    /**
-     * Creates a new influence area with the given parameters
-     * 
-     * @param x
-     *            The x axis value
-     * @param y
-     *            The y axis value
-     * @param width
-     *            The width of the influence area
-     * @param height
-     *            The height of the influence area
-     */
-    public InfluenceArea(int x, int y, int width, int height)
-    {
+        /**
+         * The x axis value of the influence area, relative to the objects top left
+         * corner
+         */
+        private int x;
 
-        exists = true;
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-    }
+        /**
+         * The y axis value of the influence area, relative to the objects top left
+         * corner
+         */
+        private int y;
 
-    /**
-     * @return the exists
-     */
-    public bool isExists()
-    {
+        /**
+         * The width of the active area
+         */
+        private int width;
 
-        return exists;
-    }
+        /**
+         * The height of the active area
+         */
+        private int height;
 
-    /**
-     * @param exists
-     *            the exists to set
-     */
-    public void setExists(bool exists)
-    {
+        public InfluenceArea()
+        {
 
-        this.exists = exists;
-    }
+        }
 
-    /**
-     * @return the x
-     */
-    public int getX()
-    {
+        /**
+         * Creates a new influence area with the given parameters
+         * 
+         * @param x
+         *            The x axis value
+         * @param y
+         *            The y axis value
+         * @param width
+         *            The width of the influence area
+         * @param height
+         *            The height of the influence area
+         */
+        public InfluenceArea(int x, int y, int width, int height)
+        {
 
-        return x;
-    }
-
-    /**
-     * @param x
-     *            the x to set
-     */
-    public void setX(int x)
-    {
-
-        if (x > 0)
+            exists = true;
             this.x = x;
-    }
-
-    /**
-     * @return the y
-     */
-    public int getY()
-    {
-
-        return y;
-    }
-
-    /**
-     * @param y
-     *            the y to set
-     */
-    public void setY(int y)
-    {
-
-        if (y > 0)
             this.y = y;
-    }
-
-    /**
-     * @return the width
-     */
-    public int getWidth()
-    {
-
-        return width;
-    }
-
-    /**
-     * @param width
-     *            the width to set
-     */
-    public void setWidth(int width)
-    {
-
-        if (width > 0)
             this.width = width;
-    }
-
-    /**
-     * @return the height
-     */
-    public int getHeight()
-    {
-
-        return height;
-    }
-
-    /**
-     * @param height
-     *            the height to set
-     */
-    public void setHeight(int height)
-    {
-
-        if (height > 0)
             this.height = height;
-    }
+        }
 
-    public void setValues(int x, int y, int width, int height)
-    {
+        /**
+         * @return the exists
+         */
+        public bool isExists()
+        {
 
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-    }
-    /*
-    @Override
-    public Object clone() throws CloneNotSupportedException
-    {
+            return exists;
+        }
 
-        InfluenceArea ia = (InfluenceArea) super.clone( );
-        ia.exists = exists;
-        ia.height = height;
-        ia.width = width;
-        ia.x = x;
-        ia.y = y;
-        return ia;
-    }
-    */
-    public bool isRectangular()
-    {
+        /**
+         * @param exists
+         *            the exists to set
+         */
+        public void setExists(bool exists)
+        {
 
-        return true;
-    }
+            this.exists = exists;
+        }
 
-    public void setRectangular(bool rectangular)
-    {
+        /**
+         * @return the x
+         */
+        public int getX()
+        {
 
-    }
+            return x;
+        }
 
-    public List<Vector2> getPoints()
-    {
+        /**
+         * @param x
+         *            the x to set
+         */
+        public void setX(int x)
+        {
 
-        return null;
-    }
+            if (x > 0)
+                this.x = x;
+        }
 
-    public object Clone()
-    {
-        InfluenceArea ia = (InfluenceArea)this.MemberwiseClone();
-        ia.exists = exists;
-        ia.height = height;
-        ia.width = width;
-        ia.x = x;
-        ia.y = y;
-        return ia;
+        /**
+         * @return the y
+         */
+        public int getY()
+        {
+
+            return y;
+        }
+
+        /**
+         * @param y
+         *            the y to set
+         */
+        public void setY(int y)
+        {
+
+            if (y > 0)
+                this.y = y;
+        }
+
+        /**
+         * @return the width
+         */
+        public int getWidth()
+        {
+
+            return width;
+        }
+
+        /**
+         * @param width
+         *            the width to set
+         */
+        public void setWidth(int width)
+        {
+
+            if (width > 0)
+                this.width = width;
+        }
+
+        /**
+         * @return the height
+         */
+        public int getHeight()
+        {
+
+            return height;
+        }
+
+        /**
+         * @param height
+         *            the height to set
+         */
+        public void setHeight(int height)
+        {
+
+            if (height > 0)
+                this.height = height;
+        }
+
+        public void setValues(int x, int y, int width, int height)
+        {
+
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+        }
+        /*
+        @Override
+        public Object clone() throws CloneNotSupportedException
+        {
+
+            InfluenceArea ia = (InfluenceArea) super.clone( );
+            ia.exists = exists;
+            ia.height = height;
+            ia.width = width;
+            ia.x = x;
+            ia.y = y;
+            return ia;
+        }
+        */
+        public bool isRectangular()
+        {
+
+            return true;
+        }
+
+        public void setRectangular(bool rectangular)
+        {
+
+        }
+
+        public List<Vector2> getPoints()
+        {
+
+            return null;
+        }
+
+        public object Clone()
+        {
+            InfluenceArea ia = (InfluenceArea)this.MemberwiseClone();
+            ia.exists = exists;
+            ia.height = height;
+            ia.width = width;
+            ia.x = x;
+            ia.y = y;
+            return ia;
+        }
     }
 }

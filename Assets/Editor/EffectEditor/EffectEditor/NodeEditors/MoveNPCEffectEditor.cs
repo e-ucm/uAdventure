@@ -4,62 +4,67 @@ using System;
 using System.Collections;
 using System.Text.RegularExpressions;
 
-public class MoveNPCEffectEditor : EffectEditor
+using uAdventure.Core;
+
+namespace uAdventure.Editor
 {
-    private bool collapsed = false;
-    public bool Collapsed { get { return collapsed; } set { collapsed = value; } }
-    private Rect window = new Rect(0, 0, 300, 0);
-    private string[] npc;
-    private string xString = "", yString = "";
-
-    public Rect Window
+    public class MoveNPCEffectEditor : EffectEditor
     {
-        get
+        private bool collapsed = false;
+        public bool Collapsed { get { return collapsed; } set { collapsed = value; } }
+        private Rect window = new Rect(0, 0, 300, 0);
+        private string[] npc;
+        private string xString = "", yString = "";
+
+        public Rect Window
         {
-            if (collapsed) return new Rect(window.x, window.y, 50, 30);
-            else return window;
+            get
+            {
+                if (collapsed) return new Rect(window.x, window.y, 50, 30);
+                else return window;
+            }
+            set
+            {
+                if (collapsed) window = new Rect(value.x, value.y, window.width, window.height);
+                else window = value;
+            }
         }
-        set
+
+        private MoveNPCEffect effect;
+
+        public MoveNPCEffectEditor()
         {
-            if (collapsed) window = new Rect(value.x, value.y, window.width, window.height);
-            else window = value;
+            npc = Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCsIDs();
+            this.effect = new MoveNPCEffect(npc[0], 300, 300);
         }
-    }
 
-    private MoveNPCEffect effect;
+        public void draw()
+        {
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField(TC.get("Element.Name28"));
+            effect.setTargetId(npc[EditorGUILayout.Popup(Array.IndexOf(npc, effect.getTargetId()), npc)]);
+            EditorGUILayout.EndHorizontal();
 
-    public MoveNPCEffectEditor()
-    {
-        npc = Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCsIDs();
-        this.effect = new MoveNPCEffect(npc[0], 300, 300);
-    }
+            xString = effect.getX().ToString();
+            yString = effect.getY().ToString();
 
-    public void draw()
-    {
-        EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.LabelField(TC.get("Element.Name28"));
-        effect.setTargetId(npc[EditorGUILayout.Popup(Array.IndexOf(npc, effect.getTargetId()), npc)]);
-        EditorGUILayout.EndHorizontal();
+            xString = EditorGUILayout.TextField(xString);
+            xString = Regex.Replace(xString, "[^0-9]", "");
 
-        xString = effect.getX().ToString();
-        yString = effect.getY().ToString();
+            yString = EditorGUILayout.TextField(yString);
+            yString = Regex.Replace(xString, "[^0-9]", "");
+            effect.setDestiny(int.Parse(xString), int.Parse(yString));
 
-        xString = EditorGUILayout.TextField(xString);
-        xString = Regex.Replace(xString, "[^0-9]", "");
+            EditorGUILayout.HelpBox(TC.get("MoveNPCEffect.Description"), MessageType.Info);
+        }
 
-        yString = EditorGUILayout.TextField(yString);
-        yString = Regex.Replace(xString, "[^0-9]", "");
-        effect.setDestiny(int.Parse(xString), int.Parse(yString));
+        public AbstractEffect Effect { get { return effect; } set { effect = value as MoveNPCEffect; } }
+        public string EffectName { get { return TC.get("MoveNPCEffect.Title"); } }
+        public EffectEditor clone() { return new MoveNPCEffectEditor(); }
 
-        EditorGUILayout.HelpBox(TC.get("MoveNPCEffect.Description"), MessageType.Info);
-    }
-
-    public AbstractEffect Effect { get { return effect; } set { effect = value as MoveNPCEffect; } }
-    public string EffectName { get { return TC.get("MoveNPCEffect.Title"); } }
-    public EffectEditor clone() { return new MoveNPCEffectEditor(); }
-
-    public bool manages(AbstractEffect c)
-    {
-        return c.GetType() == effect.GetType();
+        public bool manages(AbstractEffect c)
+        {
+            return c.GetType() == effect.GetType();
+        }
     }
 }

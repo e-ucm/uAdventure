@@ -1,20 +1,27 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class LoaderController {
+namespace uAdventure.GameSelector
+{
+    public class LoaderController
+    {
 
-    static LoaderController instance;
-    public static LoaderController Instance{
-        get {
-            if (instance == null)
-                instance = new LoaderController ();
+        static LoaderController instance;
+        public static LoaderController Instance
+        {
+            get
+            {
+                if (instance == null)
+                    instance = new LoaderController();
 
-			return instance;
+                return instance;
+            }
         }
-    }
 
-    private LoaderController(){
-    }
+        private LoaderController()
+        {
+        }
 
-    public string gamePath = "";
+        public string gamePath = "";
+    }
 }

@@ -1,43 +1,47 @@
 ﻿using UnityEngine;
-using System.Collections;
 using UnityEditor;
 
-public class ConfirmationDialog : EditorWindow
+using uAdventure.Core;
+
+namespace uAdventure.Editor
 {
-    protected DialogReceiverInterface reference;
-    protected string question;
-    protected GUIStyle style;
-
-    public virtual void Init(DialogReceiverInterface e, string startTextContent)
+    public class ConfirmationDialog : EditorWindow
     {
-        ConfirmationDialog window = this;
-        reference = e;
-        style = new GUIStyle();
-        style.fontStyle = FontStyle.Bold;
+        protected DialogReceiverInterface reference;
+        protected string question;
+        protected GUIStyle style;
 
-        question = startTextContent;
-        window.position = new Rect(Screen.width / 2 - 50, Screen.height / 2 - 150, 500, 100);
-        window.Show();
-    }
-
-    void OnGUI()
-    {
-        GUILayout.Space(15);
-        EditorGUILayout.LabelField(question, EditorStyles.boldLabel);
-        GUILayout.Space(15);
-        EditorGUILayout.LabelField("GeneralText.ConfirmationQuestion", EditorStyles.wordWrappedLabel);
-
-        GUILayout.BeginHorizontal();
-        if (GUILayout.Button("OK"))
+        public virtual void Init(DialogReceiverInterface e, string startTextContent)
         {
-            reference.OnDialogOk("", this);
-            this.Close();
+            ConfirmationDialog window = this;
+            reference = e;
+            style = new GUIStyle();
+            style.fontStyle = FontStyle.Bold;
+
+            question = startTextContent;
+            window.position = new Rect(Screen.width / 2 - 50, Screen.height / 2 - 150, 500, 100);
+            window.Show();
         }
-        if (GUILayout.Button(TC.get("GeneralText.Cancel")))
+
+        void OnGUI()
         {
-            reference.OnDialogCanceled();
-            this.Close();
+            GUILayout.Space(15);
+            EditorGUILayout.LabelField(question, EditorStyles.boldLabel);
+            GUILayout.Space(15);
+            EditorGUILayout.LabelField("GeneralText.ConfirmationQuestion", EditorStyles.wordWrappedLabel);
+
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("OK"))
+            {
+                reference.OnDialogOk("", this);
+                this.Close();
+            }
+            if (GUILayout.Button(TC.get("GeneralText.Cancel")))
+            {
+                reference.OnDialogCanceled();
+                this.Close();
+            }
+            GUILayout.EndHorizontal();
         }
-        GUILayout.EndHorizontal();
     }
 }

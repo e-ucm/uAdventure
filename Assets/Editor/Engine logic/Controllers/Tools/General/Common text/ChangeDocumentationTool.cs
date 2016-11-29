@@ -1,88 +1,94 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class ChangeDocumentationTool : Tool
+using uAdventure.Core;
+
+namespace uAdventure.Editor
 {
-    private Documented documented;
-
-    private string documentation;
-
-    private string oldDocumentation;
-
-    private Controller controller;
-
-    public ChangeDocumentationTool(Documented documented, string documentation)
+    public class ChangeDocumentationTool : Tool
     {
+        private Documented documented;
 
-        this.documented = documented;
-        this.documentation = documentation;
-        this.controller = Controller.getInstance();
-    }
+        private string documentation;
 
-    public override bool canRedo()
-    {
+        private string oldDocumentation;
 
-        return true;
-    }
+        private Controller controller;
 
-    
-    public override bool canUndo()
-    {
-
-        return true;
-    }
-
-    
-    public override bool doTool()
-    {
-
-        if (!documentation.Equals(documented.getDocumentation()))
+        public ChangeDocumentationTool(Documented documented, string documentation)
         {
-            oldDocumentation = documented.getDocumentation();
-            documented.setDocumentation(documentation);
+
+            this.documented = documented;
+            this.documentation = documentation;
+            this.controller = Controller.getInstance();
+        }
+
+        public override bool canRedo()
+        {
+
             return true;
         }
-        return false;
-    }
 
-    
-    public override string getToolName()
-    {
 
-        return "change docuemntation";
-    }
+        public override bool canUndo()
+        {
 
-    
-    public override bool redoTool()
-    {
+            return true;
+        }
 
-        documented.setDocumentation(documentation);
-        controller.updatePanel();
-        return true;
-    }
 
-    
-    public override bool undoTool()
-    {
+        public override bool doTool()
+        {
 
-        documented.setDocumentation(oldDocumentation);
-        controller.updatePanel();
-        return true;
-    }
-
-    
-    public override bool combine(Tool other)
-    {
-
-        if (other is ChangeDocumentationTool ) {
-            ChangeDocumentationTool cnt = (ChangeDocumentationTool)other;
-            if (cnt.documented == documented && cnt.oldDocumentation == documentation)
+            if (!documentation.Equals(documented.getDocumentation()))
             {
-                documentation = cnt.documentation;
-                timeStamp = cnt.timeStamp;
+                oldDocumentation = documented.getDocumentation();
+                documented.setDocumentation(documentation);
                 return true;
             }
+            return false;
         }
-        return false;
+
+
+        public override string getToolName()
+        {
+
+            return "change docuemntation";
+        }
+
+
+        public override bool redoTool()
+        {
+
+            documented.setDocumentation(documentation);
+            controller.updatePanel();
+            return true;
+        }
+
+
+        public override bool undoTool()
+        {
+
+            documented.setDocumentation(oldDocumentation);
+            controller.updatePanel();
+            return true;
+        }
+
+
+        public override bool combine(Tool other)
+        {
+
+            if (other is ChangeDocumentationTool)
+            {
+                ChangeDocumentationTool cnt = (ChangeDocumentationTool)other;
+                if (cnt.documented == documented && cnt.oldDocumentation == documentation)
+                {
+                    documentation = cnt.documentation;
+                    timeStamp = cnt.timeStamp;
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }

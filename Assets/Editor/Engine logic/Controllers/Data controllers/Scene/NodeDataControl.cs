@@ -2,280 +2,285 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class NodeDataControl : DataControl
+using uAdventure.Core;
+
+namespace uAdventure.Editor
 {
-
-  /* Scene controller that contains this element reference(used to extract
-     * the id of the scene).
-     */
-    private SceneDataControl sceneDataControl;
-
-    private Trajectory trajectory;
-
-    /**
-     * Contained node.
-     */
-    private Trajectory.Node node;
-
-    private bool initial;
-
-    /**
-     * Constructor.
-     * 
-     * @param sceneDataControl
-     *            Parent scene controller
-     * @param activeArea
-     *            Exit of the data control structure
-     */
-    public NodeDataControl(SceneDataControl sceneDataControl, Trajectory.Node node, Trajectory trajectory)
+    public class NodeDataControl : DataControl
     {
 
-        this.sceneDataControl = sceneDataControl;
-        this.node = node;
-        this.trajectory = trajectory;
-        initial = false;
-    }
-
-    /**
-     * Returns the id of the scene that contains this element reference.
-     * 
-     * @return Parent scene id
-     */
-    public string getParentSceneId()
-    {
-
-        return sceneDataControl.getId();
-    }
-
-    /**
-     * Returns the X coordinate of the upper left position of the exit.
-     * 
-     * @return X coordinate of the upper left point
-     */
-    public int getX()
-    {
-
-        return node.getX();
-    }
-
-    /**
-     * Returns the Y coordinate of the upper left position of the exit.
-     * 
-     * @return Y coordinate of the upper left point
-     */
-    public int getY()
-    {
-
-        return node.getY();
-    }
-
-    /**
-     * Sets the new values for the exit.
-     * 
-     * @param x
-     *            X coordinate of the upper left point
-     * @param y
-     *            Y coordinate of the upper left point
-     * @param scale
-     *            the scale of the player on the node
-     */
-    public void setNode(int x, int y, float scale)
-    {
-
-        controller.addTool(new SetNodeValuesTool(node, trajectory, x, y, scale));
-    }
-
-    
-    public override System.Object getContent()
-    {
-
-        return node;
-    }
-
-    
-    public override int[] getAddableElements()
-    {
-
-        return new int[] { };
-    }
-
-    
-    public override bool canAddElement(int type)
-    {
-
-        return false;
-    }
-
-    
-    public override bool canBeDeleted()
-    {
-
-        return true;
-    }
-
-    
-    public override bool canBeMoved()
-    {
-
-        return true;
-    }
-
-    
-    public override bool canBeRenamed()
-    {
-
-        return false;
-    }
-
-    
-    public override bool addElement(int type, string id)
-    {
-
-        bool elementAdded = false;
-        return elementAdded;
-    }
+        /* Scene controller that contains this element reference(used to extract
+           * the id of the scene).
+           */
+        private SceneDataControl sceneDataControl;
+
+        private Trajectory trajectory;
+
+        /**
+         * Contained node.
+         */
+        private Trajectory.Node node;
+
+        private bool initial;
+
+        /**
+         * Constructor.
+         * 
+         * @param sceneDataControl
+         *            Parent scene controller
+         * @param activeArea
+         *            Exit of the data control structure
+         */
+        public NodeDataControl(SceneDataControl sceneDataControl, Trajectory.Node node, Trajectory trajectory)
+        {
 
-    
-    public override bool deleteElement(DataControl dataControl, bool askConfirmation)
-    {
+            this.sceneDataControl = sceneDataControl;
+            this.node = node;
+            this.trajectory = trajectory;
+            initial = false;
+        }
 
-        bool elementDeleted = false;
-        return elementDeleted;
-    }
+        /**
+         * Returns the id of the scene that contains this element reference.
+         * 
+         * @return Parent scene id
+         */
+        public string getParentSceneId()
+        {
 
-    
-    public override bool moveElementUp(DataControl dataControl)
-    {
+            return sceneDataControl.getId();
+        }
 
-        bool elementMoved = false;
-        return elementMoved;
-    }
+        /**
+         * Returns the X coordinate of the upper left position of the exit.
+         * 
+         * @return X coordinate of the upper left point
+         */
+        public int getX()
+        {
 
-    
-    public override bool moveElementDown(DataControl dataControl)
-    {
+            return node.getX();
+        }
 
-        bool elementMoved = false;
-        return elementMoved;
-    }
+        /**
+         * Returns the Y coordinate of the upper left position of the exit.
+         * 
+         * @return Y coordinate of the upper left point
+         */
+        public int getY()
+        {
 
-    
-    public override string renameElement(string name)
-    {
+            return node.getY();
+        }
 
-        return null;
-    }
+        /**
+         * Sets the new values for the exit.
+         * 
+         * @param x
+         *            X coordinate of the upper left point
+         * @param y
+         *            Y coordinate of the upper left point
+         * @param scale
+         *            the scale of the player on the node
+         */
+        public void setNode(int x, int y, float scale)
+        {
 
-    
-    public override void updateVarFlagSummary(VarFlagSummary varFlagSummary)
-    {
+            controller.addTool(new SetNodeValuesTool(node, trajectory, x, y, scale));
+        }
 
-    }
 
-    
-    public override bool isValid(string currentPath, List<string> incidences)
-    {
+        public override System.Object getContent()
+        {
 
-        return true;
-    }
+            return node;
+        }
 
-    
-    public override int countAssetReferences(string assetPath)
-    {
 
-        int count = 0;
+        public override int[] getAddableElements()
+        {
 
-        return count;
-    }
+            return new int[] { };
+        }
 
-    
-    public override void getAssetReferences(List<string> assetPaths, List<int> assetTypes)
-    {
 
-        // DO nothing
-    }
+        public override bool canAddElement(int type)
+        {
 
-    
-    public override void deleteAssetReferences(string assetPath)
-    {
+            return false;
+        }
 
-        // Delete the references from the actions
-        // Do nothing
-    }
 
-    
-    public override int countIdentifierReferences(string id)
-    {
+        public override bool canBeDeleted()
+        {
 
-        return 0;
-    }
+            return true;
+        }
 
-    
-    public override void replaceIdentifierReferences(string oldId, string newId)
-    {
 
-        //actionsListDataControl.replaceIdentifierReferences( oldId, newId );
-    }
+        public override bool canBeMoved()
+        {
 
-    
-    public override void deleteIdentifierReferences(string id)
-    {
+            return true;
+        }
 
-        //actionsListDataControl.deleteIdentifierReferences( id );
-    }
 
-    
-    public override bool canBeDuplicated()
-    {
+        public override bool canBeRenamed()
+        {
 
-        return true;
-    }
+            return false;
+        }
 
-    public float getScale()
-    {
 
-        return node.getScale();
-    }
+        public override bool addElement(int type, string id)
+        {
 
-    public string getID()
-    {
+            bool elementAdded = false;
+            return elementAdded;
+        }
 
-        return node.getID();
-    }
 
-    public string getPlayerImagePath()
-    {
+        public override bool deleteElement(DataControl dataControl, bool askConfirmation)
+        {
 
-        return controller.getPlayerImagePath();
-    }
+            bool elementDeleted = false;
+            return elementDeleted;
+        }
 
-    public int getPlayerLayer()
-    {
-        return sceneDataControl.getPlayerLayer();
-    }
 
-    public void setInitial(bool b)
-    {
+        public override bool moveElementUp(DataControl dataControl)
+        {
 
-        initial = b;
-    }
+            bool elementMoved = false;
+            return elementMoved;
+        }
 
-    public bool isInitial()
-    {
 
-        return initial;
-    }
+        public override bool moveElementDown(DataControl dataControl)
+        {
 
-    
-    public override void recursiveSearch()
-    {
+            bool elementMoved = false;
+            return elementMoved;
+        }
 
-    }
 
-    
-    public override List<Searchable> getPathToDataControl(Searchable dataControl)
-    {
+        public override string renameElement(string name)
+        {
 
-        return null;
+            return null;
+        }
+
+
+        public override void updateVarFlagSummary(VarFlagSummary varFlagSummary)
+        {
+
+        }
+
+
+        public override bool isValid(string currentPath, List<string> incidences)
+        {
+
+            return true;
+        }
+
+
+        public override int countAssetReferences(string assetPath)
+        {
+
+            int count = 0;
+
+            return count;
+        }
+
+
+        public override void getAssetReferences(List<string> assetPaths, List<int> assetTypes)
+        {
+
+            // DO nothing
+        }
+
+
+        public override void deleteAssetReferences(string assetPath)
+        {
+
+            // Delete the references from the actions
+            // Do nothing
+        }
+
+
+        public override int countIdentifierReferences(string id)
+        {
+
+            return 0;
+        }
+
+
+        public override void replaceIdentifierReferences(string oldId, string newId)
+        {
+
+            //actionsListDataControl.replaceIdentifierReferences( oldId, newId );
+        }
+
+
+        public override void deleteIdentifierReferences(string id)
+        {
+
+            //actionsListDataControl.deleteIdentifierReferences( id );
+        }
+
+
+        public override bool canBeDuplicated()
+        {
+
+            return true;
+        }
+
+        public float getScale()
+        {
+
+            return node.getScale();
+        }
+
+        public string getID()
+        {
+
+            return node.getID();
+        }
+
+        public string getPlayerImagePath()
+        {
+
+            return controller.getPlayerImagePath();
+        }
+
+        public int getPlayerLayer()
+        {
+            return sceneDataControl.getPlayerLayer();
+        }
+
+        public void setInitial(bool b)
+        {
+
+            initial = b;
+        }
+
+        public bool isInitial()
+        {
+
+            return initial;
+        }
+
+
+        public override void recursiveSearch()
+        {
+
+        }
+
+
+        public override List<Searchable> getPathToDataControl(Searchable dataControl)
+        {
+
+            return null;
+        }
     }
 }

@@ -1,103 +1,110 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class SetTrajectoryInitialNodeTool : Tool {
+using uAdventure.Core;
 
-
-    private Trajectory trajectory;
-
-    private TrajectoryDataControl trajectoryDataControl;
-
-    private NodeDataControl nodeDataControl;
-
-    private NodeDataControl oldInitialNodeDataControl;
-
-    public SetTrajectoryInitialNodeTool(Trajectory trajectory, TrajectoryDataControl trajectoryDataControl, NodeDataControl nodeDataControl)
+namespace uAdventure.Editor
+{
+    public class SetTrajectoryInitialNodeTool : Tool
     {
 
-        this.trajectory = trajectory;
-        this.trajectoryDataControl = trajectoryDataControl;
-        this.nodeDataControl = nodeDataControl;
-        this.oldInitialNodeDataControl = trajectoryDataControl.getInitialNode();
-    }
 
-    
-    public override bool canRedo()
-    {
+        private Trajectory trajectory;
 
-        return true;
-    }
+        private TrajectoryDataControl trajectoryDataControl;
 
-    
-    public override bool canUndo()
-    {
+        private NodeDataControl nodeDataControl;
 
-        return true;
-    }
+        private NodeDataControl oldInitialNodeDataControl;
 
-    
-    public override bool combine(Tool other)
-    {
+        public SetTrajectoryInitialNodeTool(Trajectory trajectory, TrajectoryDataControl trajectoryDataControl, NodeDataControl nodeDataControl)
+        {
 
-        return false;
-    }
+            this.trajectory = trajectory;
+            this.trajectoryDataControl = trajectoryDataControl;
+            this.nodeDataControl = nodeDataControl;
+            this.oldInitialNodeDataControl = trajectoryDataControl.getInitialNode();
+        }
 
-    
-    public override bool doTool()
-    {
 
-        if (trajectory.getInitial() != null && trajectory.getInitial().getID().Equals(nodeDataControl.getID()))
+        public override bool canRedo()
+        {
+
+            return true;
+        }
+
+
+        public override bool canUndo()
+        {
+
+            return true;
+        }
+
+
+        public override bool combine(Tool other)
+        {
+
             return false;
-
-        trajectory.setInitial(nodeDataControl.getID());
-
-        if (trajectoryDataControl.initialNode != null)
-        {
-            trajectoryDataControl.initialNode.setInitial(false);
         }
 
-        trajectoryDataControl.initialNode = nodeDataControl;
-        trajectoryDataControl.initialNode.setInitial(true);
 
-        return true;
-    }
-
-    
-    public override bool redoTool()
-    {
-
-        trajectory.setInitial(nodeDataControl.getID());
-
-        if (trajectoryDataControl.initialNode != null)
+        public override bool doTool()
         {
-            trajectoryDataControl.initialNode.setInitial(false);
-        }
 
-        trajectoryDataControl.initialNode = nodeDataControl;
-        trajectoryDataControl.initialNode.setInitial(true);
+            if (trajectory.getInitial() != null && trajectory.getInitial().getID().Equals(nodeDataControl.getID()))
+                return false;
 
-        Controller.getInstance().updatePanel();
+            trajectory.setInitial(nodeDataControl.getID());
 
-        return true;
-    }
+            if (trajectoryDataControl.initialNode != null)
+            {
+                trajectoryDataControl.initialNode.setInitial(false);
+            }
 
-    
-    public override bool undoTool()
-    {
-
-        nodeDataControl.setInitial(false);
-        trajectoryDataControl.initialNode = oldInitialNodeDataControl;
-
-        if (trajectoryDataControl.initialNode != null)
-        {
-            trajectory.setInitial(trajectoryDataControl.getInitialNode().getID());
+            trajectoryDataControl.initialNode = nodeDataControl;
             trajectoryDataControl.initialNode.setInitial(true);
-        }
-        else {
-            trajectory.setInitial("");
+
+            return true;
         }
 
-        Controller.getInstance().updatePanel();
-        return true;
+
+        public override bool redoTool()
+        {
+
+            trajectory.setInitial(nodeDataControl.getID());
+
+            if (trajectoryDataControl.initialNode != null)
+            {
+                trajectoryDataControl.initialNode.setInitial(false);
+            }
+
+            trajectoryDataControl.initialNode = nodeDataControl;
+            trajectoryDataControl.initialNode.setInitial(true);
+
+            Controller.getInstance().updatePanel();
+
+            return true;
+        }
+
+
+        public override bool undoTool()
+        {
+
+            nodeDataControl.setInitial(false);
+            trajectoryDataControl.initialNode = oldInitialNodeDataControl;
+
+            if (trajectoryDataControl.initialNode != null)
+            {
+                trajectory.setInitial(trajectoryDataControl.getInitialNode().getID());
+                trajectoryDataControl.initialNode.setInitial(true);
+            }
+            else
+            {
+                trajectory.setInitial("");
+            }
+
+            Controller.getInstance().updatePanel();
+            return true;
+        }
     }
 }

@@ -1,94 +1,99 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class ChangeSimpleSoundTool : SelectResourceTool
+using uAdventure.Core;
+
+namespace uAdventure.Editor
 {
-    protected const string AUDIO_STR = "audio";
-
-    private HasSound objectWithSound;
-
-    //  private string oldName;
-
-    private Controller controller = Controller.getInstance();
-
-    protected static AssetInformation[] createAssetInfoArray()
+    public class ChangeSimpleSoundTool : SelectResourceTool
     {
+        protected const string AUDIO_STR = "audio";
 
-        AssetInformation[] array = new AssetInformation[1];
-        array[0] = new AssetInformation("", AUDIO_STR, true, AssetsConstants.CATEGORY_AUDIO,
-            AssetsController.FILTER_NONE);
-        return array;
-    }
+        private HasSound objectWithSound;
 
-    protected static ResourcesUni createResources(HasSound objectWithSound)
-    {
+        //  private string oldName;
 
-        ResourcesUni resources = new ResourcesUni();
+        private Controller controller = Controller.getInstance();
 
-        string soundPath = objectWithSound.getSoundPath();
-        if (soundPath != null)
+        protected static AssetInformation[] createAssetInfoArray()
         {
-            resources.addAsset(AUDIO_STR, soundPath);
+
+            AssetInformation[] array = new AssetInformation[1];
+            array[0] = new AssetInformation("", AUDIO_STR, true, AssetsConstants.CATEGORY_AUDIO,
+                AssetsController.FILTER_NONE);
+            return array;
         }
-        return resources;
-    }
 
-    public ChangeSimpleSoundTool(HasSound descrSound) : base(createResources(descrSound), createAssetInfoArray(), 0, 0)
-    {
-        this.objectWithSound = descrSound;
-    }
-
-    public override bool doTool()
-    {
-
-        //string selectedName;
-
-        bool done = base.doTool();
-        if (!done)
-            return false;
-        else
+        protected static ResourcesUni createResources(HasSound objectWithSound)
         {
 
-            objectWithSound.setSoundPath(resources.getAssetPath(AUDIO_STR));
-            controller.updatePanel();
-            return true;
+            ResourcesUni resources = new ResourcesUni();
 
-        } // end else
+            string soundPath = objectWithSound.getSoundPath();
+            if (soundPath != null)
+            {
+                resources.addAsset(AUDIO_STR, soundPath);
+            }
+            return resources;
+        }
 
-
-    }
-
-
-    public override bool redoTool()
-    {
-
-        bool done = base.redoTool();
-        if (!done)
-            return false;
-        else
+        public ChangeSimpleSoundTool(HasSound descrSound) : base(createResources(descrSound), createAssetInfoArray(), 0, 0)
         {
-            objectWithSound.setSoundPath(resources.getAssetPath(AUDIO_STR));
-            controller.updatePanel();
-            return true;
-        } // end else
+            this.objectWithSound = descrSound;
+        }
 
-    }
-
-
-    public override bool undoTool()
-    {
-
-        bool done = base.undoTool();
-        if (!done)
-            return false;
-        else
+        public override bool doTool()
         {
 
-            objectWithSound.setSoundPath(resources.getAssetPath(AUDIO_STR));
-            controller.updatePanel();
-            return true;
+            //string selectedName;
 
-        } // end else
+            bool done = base.doTool();
+            if (!done)
+                return false;
+            else
+            {
 
+                objectWithSound.setSoundPath(resources.getAssetPath(AUDIO_STR));
+                controller.updatePanel();
+                return true;
+
+            } // end else
+
+
+        }
+
+
+        public override bool redoTool()
+        {
+
+            bool done = base.redoTool();
+            if (!done)
+                return false;
+            else
+            {
+                objectWithSound.setSoundPath(resources.getAssetPath(AUDIO_STR));
+                controller.updatePanel();
+                return true;
+            } // end else
+
+        }
+
+
+        public override bool undoTool()
+        {
+
+            bool done = base.undoTool();
+            if (!done)
+                return false;
+            else
+            {
+
+                objectWithSound.setSoundPath(resources.getAssetPath(AUDIO_STR));
+                controller.updatePanel();
+                return true;
+
+            } // end else
+
+        }
     }
 }

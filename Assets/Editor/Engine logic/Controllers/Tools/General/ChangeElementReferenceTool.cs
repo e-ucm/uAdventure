@@ -1,134 +1,140 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class ChangeElementReferenceTool : Tool
+using uAdventure.Core;
+
+namespace uAdventure.Editor
 {
-
-    private ElementReference elementReference;
-
-    private int x, y;
-
-    private int oldX, oldY;
-
-    private bool changePosition;
-
-    private bool changeScale;
-
-    private float scale, oldScale;
-
-    public ChangeElementReferenceTool(ElementReference elementReference, int x, int y)
+    public class ChangeElementReferenceTool : Tool
     {
 
-        this.elementReference = elementReference;
-        this.x = x;
-        this.y = y;
-        this.oldX = elementReference.getX();
-        this.oldY = elementReference.getY();
-        changePosition = true;
-        changeScale = false;
-    }
+        private ElementReference elementReference;
 
-    public ChangeElementReferenceTool(ElementReference elementReference2, float scale2)
-    {
+        private int x, y;
 
-        this.elementReference = elementReference2;
-        this.scale = scale2;
-        this.oldScale = elementReference.getScale();
-        changePosition = false;
-        changeScale = true;
-    }
+        private int oldX, oldY;
 
-    
-    public override bool canRedo()
-    {
+        private bool changePosition;
 
-        return true;
-    }
+        private bool changeScale;
 
-    
-    public override bool canUndo()
-    {
+        private float scale, oldScale;
 
-        return true;
-    }
+        public ChangeElementReferenceTool(ElementReference elementReference, int x, int y)
+        {
 
-    
-    public override bool combine(Tool other)
-    {
+            this.elementReference = elementReference;
+            this.x = x;
+            this.y = y;
+            this.oldX = elementReference.getX();
+            this.oldY = elementReference.getY();
+            changePosition = true;
+            changeScale = false;
+        }
 
-        if (other is ChangeElementReferenceTool ) {
-            ChangeElementReferenceTool crvt = (ChangeElementReferenceTool)other;
-            if (crvt.elementReference != elementReference)
-                return false;
-            if (crvt.changePosition && changePosition)
+        public ChangeElementReferenceTool(ElementReference elementReference2, float scale2)
+        {
+
+            this.elementReference = elementReference2;
+            this.scale = scale2;
+            this.oldScale = elementReference.getScale();
+            changePosition = false;
+            changeScale = true;
+        }
+
+
+        public override bool canRedo()
+        {
+
+            return true;
+        }
+
+
+        public override bool canUndo()
+        {
+
+            return true;
+        }
+
+
+        public override bool combine(Tool other)
+        {
+
+            if (other is ChangeElementReferenceTool)
             {
-                x = crvt.x;
-                y = crvt.y;
-                timeStamp = crvt.timeStamp;
-                return true;
+                ChangeElementReferenceTool crvt = (ChangeElementReferenceTool)other;
+                if (crvt.elementReference != elementReference)
+                    return false;
+                if (crvt.changePosition && changePosition)
+                {
+                    x = crvt.x;
+                    y = crvt.y;
+                    timeStamp = crvt.timeStamp;
+                    return true;
+                }
+                if (crvt.changeScale && changeScale)
+                {
+                    scale = crvt.scale;
+                    timeStamp = crvt.timeStamp;
+                    return true;
+                }
             }
-            if (crvt.changeScale && changeScale)
+            return false;
+        }
+
+
+        public override bool doTool()
+        {
+
+            if (changeScale)
             {
-                scale = crvt.scale;
-                timeStamp = crvt.timeStamp;
-                return true;
+                elementReference.setScale(scale);
             }
+            else if (changePosition)
+            {
+                elementReference.setPosition(x, y);
+            }
+            return true;
         }
-        return false;
-    }
 
-    
-    public override bool doTool()
-    {
 
-        if (changeScale)
+        public override string getToolName()
         {
-            elementReference.setScale(scale);
+
+            // TODO Auto-generated method stub
+            return null;
         }
-        else if (changePosition)
+
+
+        public override bool redoTool()
         {
-            elementReference.setPosition(x, y);
+
+            if (changeScale)
+            {
+                elementReference.setScale(scale);
+            }
+            else if (changePosition)
+            {
+                elementReference.setPosition(x, y);
+            }
+            Controller.getInstance().reloadPanel();
+            return true;
         }
-        return true;
-    }
 
-    
-    public override string getToolName()
-    {
 
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    
-    public override bool redoTool()
-    {
-
-        if (changeScale)
+        public override bool undoTool()
         {
-            elementReference.setScale(scale);
-        }
-        else if (changePosition)
-        {
-            elementReference.setPosition(x, y);
-        }
-        Controller.getInstance().reloadPanel();
-        return true;
-    }
 
-    
-    public override bool undoTool()
-    {
-
-        if (changeScale)
-        {
-            elementReference.setScale(oldScale);
+            if (changeScale)
+            {
+                elementReference.setScale(oldScale);
+            }
+            else if (changePosition)
+            {
+                elementReference.setPosition(oldX, oldY);
+            }
+            Controller.getInstance().reloadPanel();
+            return true;
         }
-        else if (changePosition)
-        {
-            elementReference.setPosition(oldX, oldY);
-        }
-        Controller.getInstance().reloadPanel();
-        return true;
     }
 }

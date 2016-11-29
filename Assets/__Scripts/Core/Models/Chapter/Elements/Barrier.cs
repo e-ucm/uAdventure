@@ -3,179 +3,182 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-/**
- * This class holds the data of an exit in eAdventure
- */
-public class Barrier : Element, Rectangle, ICloneable
+namespace uAdventure.Core
 {
     /**
-        * X position of the upper left corner of the exit
-        */
-    private int x;
-
-    /**
-     * Y position of the upper left corner of the exit
+     * This class holds the data of an exit in eAdventure
      */
-    private int y;
-
-    /**
-     * Width of the exit
-     */
-    private int width;
-
-    /**
-     * Height of the exit
-     */
-    private int height;
-
-    /**
-     * Conditions of the active area
-     */
-    private Conditions conditions;
-
-    /**
-     * Creates a new Exit
-     * 
-     * @param x
-     *            The horizontal coordinate of the upper left corner of the exit
-     * @param y
-     *            The vertical coordinate of the upper left corner of the exit
-     * @param width
-     *            The width of the exit
-     * @param height
-     *            The height of the exit
-     */
-    public Barrier(string id, int x, int y, int width, int height): base(id)
+    public class Barrier : Element, Rectangle, ICloneable
     {
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-        conditions = new Conditions();
-    }
+        /**
+            * X position of the upper left corner of the exit
+            */
+        private int x;
 
-    /**
-     * Returns the horizontal coordinate of the upper left corner of the exit
-     * 
-     * @return the horizontal coordinate of the upper left corner of the exit
-     */
-    public int getX()
-    {
+        /**
+         * Y position of the upper left corner of the exit
+         */
+        private int y;
 
-        return x;
-    }
+        /**
+         * Width of the exit
+         */
+        private int width;
 
-    /**
-     * Returns the horizontal coordinate of the bottom right of the exit
-     * 
-     * @return the horizontal coordinate of the bottom right of the exit
-     */
-    public int getY()
-    {
+        /**
+         * Height of the exit
+         */
+        private int height;
 
-        return y;
-    }
+        /**
+         * Conditions of the active area
+         */
+        private Conditions conditions;
 
-    /**
-     * Returns the width of the exit
-     * 
-     * @return Width of the exit
-     */
-    public int getWidth()
-    {
+        /**
+         * Creates a new Exit
+         * 
+         * @param x
+         *            The horizontal coordinate of the upper left corner of the exit
+         * @param y
+         *            The vertical coordinate of the upper left corner of the exit
+         * @param width
+         *            The width of the exit
+         * @param height
+         *            The height of the exit
+         */
+        public Barrier(string id, int x, int y, int width, int height) : base(id)
+        {
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+            conditions = new Conditions();
+        }
 
-        return width;
-    }
+        /**
+         * Returns the horizontal coordinate of the upper left corner of the exit
+         * 
+         * @return the horizontal coordinate of the upper left corner of the exit
+         */
+        public int getX()
+        {
 
-    /**
-     * Returns the height of the exit
-     * 
-     * @return Height of the exit
-     */
-    public int getHeight()
-    {
+            return x;
+        }
 
-        return height;
-    }
+        /**
+         * Returns the horizontal coordinate of the bottom right of the exit
+         * 
+         * @return the horizontal coordinate of the bottom right of the exit
+         */
+        public int getY()
+        {
 
-    /**
-     * Set the values of the exit.
-     * 
-     * @param x
-     *            X coordinate of the upper left point
-     * @param y
-     *            Y coordinate of the upper left point
-     * @param width
-     *            Width of the exit area
-     * @param height
-     *            Height of the exit area
-     */
-    public void setValues(int x, int y, int width, int height)
-    {
+            return y;
+        }
 
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-    }
+        /**
+         * Returns the width of the exit
+         * 
+         * @return Width of the exit
+         */
+        public int getWidth()
+        {
 
-    /**
-     * @return the conditions
-     */
-    public Conditions getConditions()
-    {
+            return width;
+        }
 
-        return conditions;
-    }
+        /**
+         * Returns the height of the exit
+         * 
+         * @return Height of the exit
+         */
+        public int getHeight()
+        {
 
-    /**
-     * @param conditions
-     *            the conditions to set
-     */
-    public void setConditions(Conditions conditions)
-    {
+            return height;
+        }
 
-        this.conditions = conditions;
-    }
-    /*
-    @Override
-    public Object clone() throws CloneNotSupportedException
-    {
+        /**
+         * Set the values of the exit.
+         * 
+         * @param x
+         *            X coordinate of the upper left point
+         * @param y
+         *            Y coordinate of the upper left point
+         * @param width
+         *            Width of the exit area
+         * @param height
+         *            Height of the exit area
+         */
+        public void setValues(int x, int y, int width, int height)
+        {
 
-        Barrier b = (Barrier) super.clone( );
-        b.conditions = ( conditions != null ? (Conditions) conditions.clone( ) : null );
-        b.height = height;
-        b.width = width;
-        b.x = x;
-        b.y = y;
-        return b;
-    }*/
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+        }
 
-    public override object Clone()
-    {
-        Barrier b = (Barrier)base.Clone();
-        b.conditions = (conditions != null ? (Conditions)conditions.Clone() : null);
-        b.height = height;
-        b.width = width;
-        b.x = x;
-        b.y = y;
-        return b;
-    }
+        /**
+         * @return the conditions
+         */
+        public Conditions getConditions()
+        {
 
-    public List<Vector2> getPoints()
-    {
+            return conditions;
+        }
 
-        return null;
-    }
+        /**
+         * @param conditions
+         *            the conditions to set
+         */
+        public void setConditions(Conditions conditions)
+        {
 
-    public bool isRectangular()
-    {
+            this.conditions = conditions;
+        }
+        /*
+        @Override
+        public Object clone() throws CloneNotSupportedException
+        {
 
-        return true;
-    }
+            Barrier b = (Barrier) super.clone( );
+            b.conditions = ( conditions != null ? (Conditions) conditions.clone( ) : null );
+            b.height = height;
+            b.width = width;
+            b.x = x;
+            b.y = y;
+            return b;
+        }*/
 
-    public void setRectangular(bool rectangular)
-    {
+        public override object Clone()
+        {
+            Barrier b = (Barrier)base.Clone();
+            b.conditions = (conditions != null ? (Conditions)conditions.Clone() : null);
+            b.height = height;
+            b.width = width;
+            b.x = x;
+            b.y = y;
+            return b;
+        }
 
+        public List<Vector2> getPoints()
+        {
+
+            return null;
+        }
+
+        public bool isRectangular()
+        {
+
+            return true;
+        }
+
+        public void setRectangular(bool rectangular)
+        {
+
+        }
     }
 }

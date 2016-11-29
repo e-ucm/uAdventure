@@ -3,178 +3,182 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-public class MacroListDataControl : DataControl
-{/**
+using uAdventure.Core;
+
+namespace uAdventure.Editor
+{
+    public class MacroListDataControl : DataControl
+    {/**
      * List of macros.
      */
-    private List<Macro> macrosList;
+        private List<Macro> macrosList;
 
-    /**
-     * List of macro controllers.
-     */
-    private List<MacroDataControl> macrosDataControlList;
+        /**
+         * List of macro controllers.
+         */
+        private List<MacroDataControl> macrosDataControlList;
 
-    /**
-     * Constructor.
-     * 
-     * @param macrosList
-     *            List of macros
-     */
-    public MacroListDataControl(List<Macro> macrosList)
-    {
-
-        this.macrosList = macrosList;
-
-        // Create subcontrollers
-        macrosDataControlList = new List<MacroDataControl>();
-        foreach (Macro macro in macrosList)
-            macrosDataControlList.Add(new MacroDataControl(macro));
-    }
-
-    /**
-     * Returns the list of macro controllers.
-     * 
-     * @return Macro controllers
-     */
-    public List<MacroDataControl> getMacros()
-    {
-
-        return macrosDataControlList;
-    }
-
-    /**
-     * Returns the last macro controller from the list.
-     * 
-     * @return Last macro controller
-     */
-    public MacroDataControl getLastMacro()
-    {
-
-        return macrosDataControlList[macrosDataControlList.Count - 1];
-    }
-
-    /**
-     * Returns the info of the macros contained in the list.
-     * 
-     * @return Array with the information of the macros. It contains the
-     *         identifier of each macro, and the number of actions
-     */
-    public string[][] getMacrosInfo()
-    {
-
-        string[][] macrosInfo = null;
-
-        // Create the list for the macros
-        macrosInfo = new string[macrosList.Count][];
-        for(int i=0; i<macrosList.Count;i++)
-            macrosInfo[i] = new string[2];
-
-        // Fill the array with the info
-        for (int i = 0; i < macrosList.Count; i++)
+        /**
+         * Constructor.
+         * 
+         * @param macrosList
+         *            List of macros
+         */
+        public MacroListDataControl(List<Macro> macrosList)
         {
-            Macro macro = macrosList[i];
-            macrosInfo[i][0] = macro.getId();
-            macrosInfo[i][1] = Controller.getInstance().countIdentifierReferences(macro.getId()).ToString();
+
+            this.macrosList = macrosList;
+
+            // Create subcontrollers
+            macrosDataControlList = new List<MacroDataControl>();
+            foreach (Macro macro in macrosList)
+                macrosDataControlList.Add(new MacroDataControl(macro));
         }
 
-        return macrosInfo;
-    }
-
-    public string[] getMacrosIDs()
-    {
-
-        string[] macrosInfo = null;
-
-        // Create the list for the macros
-        macrosInfo = new string[macrosList.Count];
-
-        // Fill the array with the info
-        for (int i = 0; i < macrosList.Count; i++)
+        /**
+         * Returns the list of macro controllers.
+         * 
+         * @return Macro controllers
+         */
+        public List<MacroDataControl> getMacros()
         {
-            Macro macro = macrosList[i];
-            macrosInfo[i] = macro.getId();
+
+            return macrosDataControlList;
         }
 
-        return macrosInfo;
-    }
-
-    public override System.Object getContent()
-    {
-
-        return macrosList;
-    }
-
-    
-    public override int[] getAddableElements()
-    {
-
-        return new int[] { Controller.MACRO };
-    }
-
-    
-    public override bool canAddElement(int type)
-    {
-
-        // It can always add new macros
-        return type == Controller.MACRO;
-    }
-
-    
-    public override bool canBeDeleted()
-    {
-
-        return false;
-    }
-
-    
-    public override bool canBeMoved()
-    {
-
-        return false;
-    }
-
-    
-    public override bool canBeRenamed()
-    {
-
-        return false;
-    }
-
-    
-    public override bool addElement(int type, string macroId)
-    {
-
-        bool elementAdded = false;
-
-        if (type == Controller.MACRO)
+        /**
+         * Returns the last macro controller from the list.
+         * 
+         * @return Last macro controller
+         */
+        public MacroDataControl getLastMacro()
         {
 
-            // Show a dialog asking for the macro id
-            if (macroId == null)
-                macroId = controller.showInputDialog(TC.get("Operation.AddMacroTitle"), TC.get("Operation.AddMacroMessage"), TC.get("Operation.AddMacroDefaultValue"));
+            return macrosDataControlList[macrosDataControlList.Count - 1];
+        }
 
-            // If some value was typed and the identifier is valid
-            if (macroId != null && controller.isElementIdValid(macroId))
+        /**
+         * Returns the info of the macros contained in the list.
+         * 
+         * @return Array with the information of the macros. It contains the
+         *         identifier of each macro, and the number of actions
+         */
+        public string[][] getMacrosInfo()
+        {
+
+            string[][] macrosInfo = null;
+
+            // Create the list for the macros
+            macrosInfo = new string[macrosList.Count][];
+            for (int i = 0; i < macrosList.Count; i++)
+                macrosInfo[i] = new string[2];
+
+            // Fill the array with the info
+            for (int i = 0; i < macrosList.Count; i++)
             {
-                // Add thew new macro
-                Macro newMacro = new Macro(macroId);
-                macrosList.Add(newMacro);
-                macrosDataControlList.Add(new MacroDataControl(newMacro));
-                controller.getIdentifierSummary().addMacroId(macroId);
-                //controller.dataModified( );
-                elementAdded = true;
+                Macro macro = macrosList[i];
+                macrosInfo[i][0] = macro.getId();
+                macrosInfo[i][1] = Controller.getInstance().countIdentifierReferences(macro.getId()).ToString();
             }
+
+            return macrosInfo;
         }
 
-        return elementAdded;
-    }
+        public string[] getMacrosIDs()
+        {
 
-    
-    public override bool duplicateElement(DataControl dataControl)
-    {
+            string[] macrosInfo = null;
 
-        if (!(dataControl is MacroDataControl ) )
+            // Create the list for the macros
+            macrosInfo = new string[macrosList.Count];
+
+            // Fill the array with the info
+            for (int i = 0; i < macrosList.Count; i++)
+            {
+                Macro macro = macrosList[i];
+                macrosInfo[i] = macro.getId();
+            }
+
+            return macrosInfo;
+        }
+
+        public override System.Object getContent()
+        {
+
+            return macrosList;
+        }
+
+
+        public override int[] getAddableElements()
+        {
+
+            return new int[] { Controller.MACRO };
+        }
+
+
+        public override bool canAddElement(int type)
+        {
+
+            // It can always add new macros
+            return type == Controller.MACRO;
+        }
+
+
+        public override bool canBeDeleted()
+        {
+
             return false;
+        }
+
+
+        public override bool canBeMoved()
+        {
+
+            return false;
+        }
+
+
+        public override bool canBeRenamed()
+        {
+
+            return false;
+        }
+
+
+        public override bool addElement(int type, string macroId)
+        {
+
+            bool elementAdded = false;
+
+            if (type == Controller.MACRO)
+            {
+
+                // Show a dialog asking for the macro id
+                if (macroId == null)
+                    macroId = controller.showInputDialog(TC.get("Operation.AddMacroTitle"), TC.get("Operation.AddMacroMessage"), TC.get("Operation.AddMacroDefaultValue"));
+
+                // If some value was typed and the identifier is valid
+                if (macroId != null && controller.isElementIdValid(macroId))
+                {
+                    // Add thew new macro
+                    Macro newMacro = new Macro(macroId);
+                    macrosList.Add(newMacro);
+                    macrosDataControlList.Add(new MacroDataControl(newMacro));
+                    controller.getIdentifierSummary().addMacroId(macroId);
+                    //controller.dataModified( );
+                    elementAdded = true;
+                }
+            }
+
+            return elementAdded;
+        }
+
+
+        public override bool duplicateElement(DataControl dataControl)
+        {
+
+            if (!(dataControl is MacroDataControl))
+                return false;
 
             Macro newElement = (Macro)(((Macro)(dataControl.getContent())).Clone());
             string id = newElement.getId();
@@ -190,205 +194,206 @@ public class MacroListDataControl : DataControl
             controller.getIdentifierSummary().addMacroId(id);
             return true;
 
-    }
+        }
 
-    
-    public override string getDefaultId(int type)
-    {
 
-        return TC.get("Operation.AddMacroDefaultValue");
-    }
-
-    
-    public override bool deleteElement(DataControl dataControl, bool askConfirmation)
-    {
-
-        bool elementDeleted = false;
-        string macroId = ((MacroDataControl)dataControl).getId();
-        string references = controller.countIdentifierReferences(macroId).ToString();
-
-        // Ask for confirmation
-        if (!askConfirmation || controller.showStrictConfirmDialog(TC.get("Operation.DeleteElementTitle"), TC.get("Operation.DeleteElementWarning", new string[] { macroId, references })))
+        public override string getDefaultId(int type)
         {
-            if (macrosList.Remove((Macro)dataControl.getContent()))
+
+            return TC.get("Operation.AddMacroDefaultValue");
+        }
+
+
+        public override bool deleteElement(DataControl dataControl, bool askConfirmation)
+        {
+
+            bool elementDeleted = false;
+            string macroId = ((MacroDataControl)dataControl).getId();
+            string references = controller.countIdentifierReferences(macroId).ToString();
+
+            // Ask for confirmation
+            if (!askConfirmation || controller.showStrictConfirmDialog(TC.get("Operation.DeleteElementTitle"), TC.get("Operation.DeleteElementWarning", new string[] { macroId, references })))
             {
-                macrosDataControlList.Remove((MacroDataControl)dataControl);
-                controller.deleteIdentifierReferences(macroId);
-                controller.getIdentifierSummary().deleteMacroId(macroId);
-                //controller.dataModified( );
-                elementDeleted = true;
+                if (macrosList.Remove((Macro)dataControl.getContent()))
+                {
+                    macrosDataControlList.Remove((MacroDataControl)dataControl);
+                    controller.deleteIdentifierReferences(macroId);
+                    controller.getIdentifierSummary().deleteMacroId(macroId);
+                    //controller.dataModified( );
+                    elementDeleted = true;
+                }
             }
+
+            return elementDeleted;
         }
 
-        return elementDeleted;
-    }
 
-    
-    public override bool moveElementUp(DataControl dataControl)
-    {
-
-        bool elementMoved = false;
-        int elementIndex = macrosList.IndexOf((Macro)dataControl.getContent());
-
-        if (elementIndex > 0)
+        public override bool moveElementUp(DataControl dataControl)
         {
-            Macro e = macrosList[elementIndex];
-            MacroDataControl c = macrosDataControlList[elementIndex];
-            macrosList.RemoveAt(elementIndex);
-            macrosDataControlList.RemoveAt(elementIndex);
-            macrosList.Insert(elementIndex - 1, e);
-            macrosDataControlList.Insert(elementIndex - 1, c);
-            //controller.dataModified( );
-            elementMoved = true;
+
+            bool elementMoved = false;
+            int elementIndex = macrosList.IndexOf((Macro)dataControl.getContent());
+
+            if (elementIndex > 0)
+            {
+                Macro e = macrosList[elementIndex];
+                MacroDataControl c = macrosDataControlList[elementIndex];
+                macrosList.RemoveAt(elementIndex);
+                macrosDataControlList.RemoveAt(elementIndex);
+                macrosList.Insert(elementIndex - 1, e);
+                macrosDataControlList.Insert(elementIndex - 1, c);
+                //controller.dataModified( );
+                elementMoved = true;
+            }
+
+            return elementMoved;
         }
 
-        return elementMoved;
-    }
 
-    
-    public override bool moveElementDown(DataControl dataControl)
-    {
-
-        bool elementMoved = false;
-        int elementIndex = macrosList.IndexOf((Macro)dataControl.getContent());
-
-        if (elementIndex < macrosList.Count - 1)
+        public override bool moveElementDown(DataControl dataControl)
         {
-            Macro e = macrosList[elementIndex];
-            MacroDataControl c = macrosDataControlList[elementIndex];
-            macrosList.RemoveAt(elementIndex);
-            macrosDataControlList.RemoveAt(elementIndex);
-            macrosList.Insert(elementIndex + 1, e);
-            macrosDataControlList.Insert(elementIndex + 1, c);
-            //controller.dataModified( );
-            elementMoved = true;
+
+            bool elementMoved = false;
+            int elementIndex = macrosList.IndexOf((Macro)dataControl.getContent());
+
+            if (elementIndex < macrosList.Count - 1)
+            {
+                Macro e = macrosList[elementIndex];
+                MacroDataControl c = macrosDataControlList[elementIndex];
+                macrosList.RemoveAt(elementIndex);
+                macrosDataControlList.RemoveAt(elementIndex);
+                macrosList.Insert(elementIndex + 1, e);
+                macrosDataControlList.Insert(elementIndex + 1, c);
+                //controller.dataModified( );
+                elementMoved = true;
+            }
+
+            return elementMoved;
         }
 
-        return elementMoved;
-    }
 
-    
-    public override string renameElement(string name)
-    {
-
-        return null;
-    }
-
-    
-    public override void updateVarFlagSummary(VarFlagSummary varFlagSummary)
-    {
-
-        // Iterate through each macro
-        foreach (MacroDataControl macroDataControl in macrosDataControlList)
-            macroDataControl.updateVarFlagSummary(varFlagSummary);
-    }
-
-    
-    public override bool isValid(string currentPath, List<string> incidences)
-    {
-
-        bool valid = true;
-
-        // Update the current path
-        currentPath += " >> " + TC.getElement(Controller.GLOBAL_STATE_LIST);
-
-        // Iterate through the macros
-        foreach (MacroDataControl macroDataControl in macrosDataControlList)
+        public override string renameElement(string name)
         {
-            string macroPath = currentPath + " >> " + macroDataControl.getId();
-            valid &= macroDataControl.isValid(macroPath, incidences);
+
+            return null;
         }
 
-        return valid;
-    }
 
-    
-    public override int countAssetReferences(string assetPath)
-    {
+        public override void updateVarFlagSummary(VarFlagSummary varFlagSummary)
+        {
 
-        int count = 0;
+            // Iterate through each macro
+            foreach (MacroDataControl macroDataControl in macrosDataControlList)
+                macroDataControl.updateVarFlagSummary(varFlagSummary);
+        }
 
-        // Iterate through each macro
-        foreach (MacroDataControl macroDataControl in macrosDataControlList)
-            count += macroDataControl.countAssetReferences(assetPath);
 
-        return count;
-    }
+        public override bool isValid(string currentPath, List<string> incidences)
+        {
 
-    
-    public override void getAssetReferences(List<string> assetPaths, List<int> assetTypes)
-    {
+            bool valid = true;
 
-        // Iterate through each macro
-        foreach (MacroDataControl macroDataControl in macrosDataControlList)
-            macroDataControl.getAssetReferences(assetPaths, assetTypes);
-    }
+            // Update the current path
+            currentPath += " >> " + TC.getElement(Controller.GLOBAL_STATE_LIST);
 
-    
-    public override void deleteAssetReferences(string assetPath)
-    {
+            // Iterate through the macros
+            foreach (MacroDataControl macroDataControl in macrosDataControlList)
+            {
+                string macroPath = currentPath + " >> " + macroDataControl.getId();
+                valid &= macroDataControl.isValid(macroPath, incidences);
+            }
 
-        // Iterate through each macro
-        foreach (MacroDataControl macroDataControl in macrosDataControlList)
-            macroDataControl.deleteAssetReferences(assetPath);
-    }
+            return valid;
+        }
 
-    
-    public override int countIdentifierReferences(string id)
-    {
 
-        int count = 0;
+        public override int countAssetReferences(string assetPath)
+        {
 
-        // Iterate through each macro
-        foreach (MacroDataControl macroDataControl in macrosDataControlList)
-            count += macroDataControl.countIdentifierReferences(id);
+            int count = 0;
 
-        return count;
-    }
+            // Iterate through each macro
+            foreach (MacroDataControl macroDataControl in macrosDataControlList)
+                count += macroDataControl.countAssetReferences(assetPath);
 
-    
-    public override void replaceIdentifierReferences(string oldId, string newId)
-    {
+            return count;
+        }
 
-        // Iterate through each macro
-        foreach (MacroDataControl macroDataControl in macrosDataControlList)
-            macroDataControl.replaceIdentifierReferences(oldId, newId);
-    }
 
-    
-    public override void deleteIdentifierReferences(string id)
-    {
+        public override void getAssetReferences(List<string> assetPaths, List<int> assetTypes)
+        {
 
-        // Spread the call to every macro
-        foreach (MacroDataControl macroDataControl in macrosDataControlList)
-            macroDataControl.deleteIdentifierReferences(id);
-    }
+            // Iterate through each macro
+            foreach (MacroDataControl macroDataControl in macrosDataControlList)
+                macroDataControl.getAssetReferences(assetPaths, assetTypes);
+        }
 
-    
-    public override bool canBeDuplicated()
-    {
 
-        return false;
-    }
+        public override void deleteAssetReferences(string assetPath)
+        {
 
-    
-    public override void recursiveSearch()
-    {
+            // Iterate through each macro
+            foreach (MacroDataControl macroDataControl in macrosDataControlList)
+                macroDataControl.deleteAssetReferences(assetPath);
+        }
 
-        foreach (DataControl dc in this.macrosDataControlList)
-            dc.recursiveSearch();
-    }
 
-    
-    public override List<Searchable> getPathToDataControl(Searchable dataControl)
-    {
+        public override int countIdentifierReferences(string id)
+        {
 
-        return getPathFromChild(dataControl, macrosDataControlList.Cast<Searchable>().ToList());
-    }
+            int count = 0;
 
-    public List<Macro> getMacrosList()
-    {
+            // Iterate through each macro
+            foreach (MacroDataControl macroDataControl in macrosDataControlList)
+                count += macroDataControl.countIdentifierReferences(id);
 
-        return this.macrosList;
+            return count;
+        }
+
+
+        public override void replaceIdentifierReferences(string oldId, string newId)
+        {
+
+            // Iterate through each macro
+            foreach (MacroDataControl macroDataControl in macrosDataControlList)
+                macroDataControl.replaceIdentifierReferences(oldId, newId);
+        }
+
+
+        public override void deleteIdentifierReferences(string id)
+        {
+
+            // Spread the call to every macro
+            foreach (MacroDataControl macroDataControl in macrosDataControlList)
+                macroDataControl.deleteIdentifierReferences(id);
+        }
+
+
+        public override bool canBeDuplicated()
+        {
+
+            return false;
+        }
+
+
+        public override void recursiveSearch()
+        {
+
+            foreach (DataControl dc in this.macrosDataControlList)
+                dc.recursiveSearch();
+        }
+
+
+        public override List<Searchable> getPathToDataControl(Searchable dataControl)
+        {
+
+            return getPathFromChild(dataControl, macrosDataControlList.Cast<Searchable>().ToList());
+        }
+
+        public List<Macro> getMacrosList()
+        {
+
+            return this.macrosList;
+        }
     }
 }

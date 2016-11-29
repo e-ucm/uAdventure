@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
-using UnityEditor;
+﻿using UnityEditor;
 
-public abstract class WindowMenuContainer{
-    public GenericMenu menu { get; set; }
+namespace uAdventure.Editor
+{
+    public abstract class WindowMenuContainer
+    {
+        public GenericMenu menu { get; set; }
 
-    protected abstract void SetMenuItems();
-    protected abstract void Callback(object obj);
+        protected abstract void SetMenuItems();
+        protected abstract void Callback(object obj);
+    }
 }

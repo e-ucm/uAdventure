@@ -1,57 +1,63 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class DeleteSimpleSoundTool : Tool {
+using uAdventure.Core;
 
-    private HasSound objectWithSound;
-
-    private string oldPath;
-
-    public DeleteSimpleSoundTool(HasSound objectWithSound)
+namespace uAdventure.Editor
+{
+    public class DeleteSimpleSoundTool : Tool
     {
-        this.objectWithSound = objectWithSound;
-        oldPath = objectWithSound.getSoundPath();
-    }
+
+        private HasSound objectWithSound;
+
+        private string oldPath;
+
+        public DeleteSimpleSoundTool(HasSound objectWithSound)
+        {
+            this.objectWithSound = objectWithSound;
+            oldPath = objectWithSound.getSoundPath();
+        }
 
 
-    public override bool doTool()
-    {
-        objectWithSound.setSoundPath(null);
-        Controller.getInstance().updatePanel();
-        return true;
-    }
+        public override bool doTool()
+        {
+            objectWithSound.setSoundPath(null);
+            Controller.getInstance().updatePanel();
+            return true;
+        }
 
 
-    public override bool redoTool()
-    {
-        objectWithSound.setSoundPath(null);
-        Controller.getInstance().updatePanel();
-        return true;
-    }
+        public override bool redoTool()
+        {
+            objectWithSound.setSoundPath(null);
+            Controller.getInstance().updatePanel();
+            return true;
+        }
 
 
-    public override bool undoTool()
-    {
-        objectWithSound.setSoundPath(oldPath);
-        Controller.getInstance().updatePanel();
-        return true;
-    }
+        public override bool undoTool()
+        {
+            objectWithSound.setSoundPath(oldPath);
+            Controller.getInstance().updatePanel();
+            return true;
+        }
 
 
-    public override bool canRedo()
-    {
-        return true;
-    }
+        public override bool canRedo()
+        {
+            return true;
+        }
 
 
-    public override bool canUndo()
-    {
-        return true;
-    }
+        public override bool canUndo()
+        {
+            return true;
+        }
 
 
-    public override bool combine(Tool other)
-    {
-        return true;
+        public override bool combine(Tool other)
+        {
+            return true;
+        }
     }
 }

@@ -1,79 +1,85 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class ChangeParagraphContentTool : Tool
+using uAdventure.Core;
+
+namespace uAdventure.Editor
 {
-
-
-    private BookParagraph bookParagraph;
-
-    private string newContent;
-
-    private string oldContent;
-
-    public ChangeParagraphContentTool(BookParagraph bookParagraph, string content)
+    public class ChangeParagraphContentTool : Tool
     {
 
-        this.bookParagraph = bookParagraph;
-        this.newContent = content;
-        this.oldContent = bookParagraph.getContent();
-    }
 
-    
-    public override bool canRedo()
-    {
+        private BookParagraph bookParagraph;
 
-        return true;
-    }
+        private string newContent;
 
-    
-    public override bool canUndo()
-    {
+        private string oldContent;
 
-        return true;
-    }
+        public ChangeParagraphContentTool(BookParagraph bookParagraph, string content)
+        {
 
-    
-    public override bool combine(Tool other)
-    {
-
-        if (other is ChangeParagraphContentTool ) {
-            ChangeParagraphContentTool tool = (ChangeParagraphContentTool)other;
-            if (tool.bookParagraph == bookParagraph)
-            {
-                newContent = tool.newContent;
-                timeStamp = tool.timeStamp;
-                return true;
-            }
+            this.bookParagraph = bookParagraph;
+            this.newContent = content;
+            this.oldContent = bookParagraph.getContent();
         }
-        return false;
-    }
 
-    
-    public override bool doTool()
-    {
 
-        if (oldContent != null && oldContent.Equals(newContent))
+        public override bool canRedo()
+        {
+
+            return true;
+        }
+
+
+        public override bool canUndo()
+        {
+
+            return true;
+        }
+
+
+        public override bool combine(Tool other)
+        {
+
+            if (other is ChangeParagraphContentTool)
+            {
+                ChangeParagraphContentTool tool = (ChangeParagraphContentTool)other;
+                if (tool.bookParagraph == bookParagraph)
+                {
+                    newContent = tool.newContent;
+                    timeStamp = tool.timeStamp;
+                    return true;
+                }
+            }
             return false;
-        bookParagraph.setContent(newContent);
-        return true;
-    }
+        }
 
-    
-    public override bool redoTool()
-    {
 
-        bookParagraph.setContent(newContent);
-        Controller.getInstance().updatePanel();
-        return true;
-    }
+        public override bool doTool()
+        {
 
-    
-    public override bool undoTool()
-    {
+            if (oldContent != null && oldContent.Equals(newContent))
+                return false;
+            bookParagraph.setContent(newContent);
+            return true;
+        }
 
-        bookParagraph.setContent(oldContent);
-        Controller.getInstance().updatePanel();
-        return true;
+
+        public override bool redoTool()
+        {
+
+            bookParagraph.setContent(newContent);
+            Controller.getInstance().updatePanel();
+            return true;
+        }
+
+
+        public override bool undoTool()
+        {
+
+            bookParagraph.setContent(oldContent);
+            Controller.getInstance().updatePanel();
+            return true;
+        }
     }
 }

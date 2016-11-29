@@ -1,81 +1,88 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class ChangeDescriptionTool : Tool {
+using uAdventure.Core;
 
-    private Described described;
-
-    private string description;
-
-    private string oldDescription;
-
-    private Controller controller;
-
-    public ChangeDescriptionTool(Described described, string description)
+namespace uAdventure.Editor
+{
+    public class ChangeDescriptionTool : Tool
     {
 
-        this.described = described;
-        this.description = description;
-        this.controller = Controller.getInstance();
-    }
+        private Described described;
 
-    public override bool canRedo()
-    {
+        private string description;
 
-        return true;
-    }
+        private string oldDescription;
 
-    public override bool canUndo()
-    {
-        return true;
-    }
+        private Controller controller;
 
-    public override bool doTool()
-    {
-
-        if (!description.Equals(described.getDescription()))
+        public ChangeDescriptionTool(Described described, string description)
         {
-            oldDescription = described.getDescription();
-            described.setDescription(description);
+
+            this.described = described;
+            this.description = description;
+            this.controller = Controller.getInstance();
+        }
+
+        public override bool canRedo()
+        {
+
             return true;
         }
-        return false;
-    }
 
-    public override string getToolName()
-    {
+        public override bool canUndo()
+        {
+            return true;
+        }
 
-        return "Change description";
-    }
+        public override bool doTool()
+        {
 
-    public override bool redoTool()
-    {
-
-        described.setDescription(description);
-        controller.updatePanel();
-        return true;
-    }
-
-    public override bool undoTool()
-    {
-
-        described.setDescription(oldDescription);
-        controller.updatePanel();
-        return true;
-    }
-
-    public override bool combine(Tool other)
-    {
-
-        if (other is ChangeDescriptionTool ) {
-            ChangeDescriptionTool cnt = (ChangeDescriptionTool)other;
-            if (cnt.described == described && cnt.oldDescription == description)
+            if (!description.Equals(described.getDescription()))
             {
-                description = cnt.description;
-                timeStamp = cnt.timeStamp;
+                oldDescription = described.getDescription();
+                described.setDescription(description);
                 return true;
             }
+            return false;
         }
-        return false;
+
+        public override string getToolName()
+        {
+
+            return "Change description";
+        }
+
+        public override bool redoTool()
+        {
+
+            described.setDescription(description);
+            controller.updatePanel();
+            return true;
+        }
+
+        public override bool undoTool()
+        {
+
+            described.setDescription(oldDescription);
+            controller.updatePanel();
+            return true;
+        }
+
+        public override bool combine(Tool other)
+        {
+
+            if (other is ChangeDescriptionTool)
+            {
+                ChangeDescriptionTool cnt = (ChangeDescriptionTool)other;
+                if (cnt.described == described && cnt.oldDescription == description)
+                {
+                    description = cnt.description;
+                    timeStamp = cnt.timeStamp;
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }

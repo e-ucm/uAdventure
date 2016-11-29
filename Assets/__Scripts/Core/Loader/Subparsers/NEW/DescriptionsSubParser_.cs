@@ -2,68 +2,71 @@
 using System.Collections;
 using System.Xml;
 
-public class DescriptionsSubParser_ : Subparser_
+namespace uAdventure.Core
 {
-    private Conditions currentConditions;
-
-    private Description description;
-
-    public DescriptionsSubParser_(Description description, Chapter chapter) : base(chapter)
+    public class DescriptionsSubParser_ : Subparser_
     {
-        this.description = description;
-    }
+        private Conditions currentConditions;
 
-    public override void ParseElement(XmlElement element)
-    {
-        XmlNodeList
-            names = element.SelectNodes("name"),
-            briefs = element.SelectNodes("brief"),
-            detaileds = element.SelectNodes("detailed"),
-            conditions = element.SelectNodes("condition");
+        private Description description;
 
-        string tmpArgVal;
-        foreach (XmlElement el in names)
+        public DescriptionsSubParser_(Description description, Chapter chapter) : base(chapter)
         {
-            string soundPath = "";
-
-            tmpArgVal = el.GetAttribute("soundPath");
-            if (!string.IsNullOrEmpty(tmpArgVal))
-            {
-                soundPath = tmpArgVal;
-            }
-            description.setNameSoundPath(soundPath);
-            description.setName(el.InnerText);
+            this.description = description;
         }
 
-        foreach (XmlElement el in briefs)
+        public override void ParseElement(XmlElement element)
         {
-            string soundPath = "";
+            XmlNodeList
+                names = element.SelectNodes("name"),
+                briefs = element.SelectNodes("brief"),
+                detaileds = element.SelectNodes("detailed"),
+                conditions = element.SelectNodes("condition");
 
-            tmpArgVal = el.GetAttribute("soundPath");
-            if (!string.IsNullOrEmpty(tmpArgVal))
+            string tmpArgVal;
+            foreach (XmlElement el in names)
             {
-                soundPath = tmpArgVal;
-            }
-            description.setDescriptionSoundPath(soundPath);
-            description.setDescription(el.InnerText);
-        }
-        foreach (XmlElement el in detaileds)
-        {
-            string soundPath = "";
+                string soundPath = "";
 
-            tmpArgVal = el.GetAttribute("soundPath");
-            if (!string.IsNullOrEmpty(tmpArgVal))
-            {
-                soundPath = tmpArgVal;
+                tmpArgVal = el.GetAttribute("soundPath");
+                if (!string.IsNullOrEmpty(tmpArgVal))
+                {
+                    soundPath = tmpArgVal;
+                }
+                description.setNameSoundPath(soundPath);
+                description.setName(el.InnerText);
             }
-            description.setDetailedDescriptionSoundPath(soundPath);
-            description.setDetailedDescription(el.InnerText);
-        }
-        foreach (XmlElement el in conditions)
-        {
-            currentConditions = new Conditions();
-            new ConditionSubParser_(currentConditions, chapter).ParseElement(el);
-            this.description.setConditions(currentConditions);
+
+            foreach (XmlElement el in briefs)
+            {
+                string soundPath = "";
+
+                tmpArgVal = el.GetAttribute("soundPath");
+                if (!string.IsNullOrEmpty(tmpArgVal))
+                {
+                    soundPath = tmpArgVal;
+                }
+                description.setDescriptionSoundPath(soundPath);
+                description.setDescription(el.InnerText);
+            }
+            foreach (XmlElement el in detaileds)
+            {
+                string soundPath = "";
+
+                tmpArgVal = el.GetAttribute("soundPath");
+                if (!string.IsNullOrEmpty(tmpArgVal))
+                {
+                    soundPath = tmpArgVal;
+                }
+                description.setDetailedDescriptionSoundPath(soundPath);
+                description.setDetailedDescription(el.InnerText);
+            }
+            foreach (XmlElement el in conditions)
+            {
+                currentConditions = new Conditions();
+                new ConditionSubParser_(currentConditions, chapter).ParseElement(el);
+                this.description.setConditions(currentConditions);
+            }
         }
     }
 }

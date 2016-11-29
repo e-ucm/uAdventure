@@ -3,51 +3,56 @@ using UnityEditor;
 using System;
 using System.Collections;
 
-public class MacroReferenceEffectEditor : EffectEditor
+using uAdventure.Core;
+
+namespace uAdventure.Editor
 {
-    private bool collapsed = false;
-    public bool Collapsed { get { return collapsed; } set { collapsed = value; } }
-    private Rect window = new Rect(0, 0, 300, 0);
-    private string[] macros;
-
-    public Rect Window
+    public class MacroReferenceEffectEditor : EffectEditor
     {
-        get
+        private bool collapsed = false;
+        public bool Collapsed { get { return collapsed; } set { collapsed = value; } }
+        private Rect window = new Rect(0, 0, 300, 0);
+        private string[] macros;
+
+        public Rect Window
         {
-            if (collapsed) return new Rect(window.x, window.y, 50, 30);
-            else return window;
+            get
+            {
+                if (collapsed) return new Rect(window.x, window.y, 50, 30);
+                else return window;
+            }
+            set
+            {
+                if (collapsed) window = new Rect(value.x, value.y, window.width, window.height);
+                else window = value;
+            }
         }
-        set
+
+        private MacroReferenceEffect effect;
+
+        public MacroReferenceEffectEditor()
         {
-            if (collapsed) window = new Rect(value.x, value.y, window.width, window.height);
-            else window = value;
+            macros = Controller.getInstance().getAdvancedFeaturesController().getMacrosListDataControl().getMacrosIDs();
+            this.effect = new MacroReferenceEffect(macros[0]);
         }
-    }
 
-    private MacroReferenceEffect effect;
+        public void draw()
+        {
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField(TC.get("Element.Name56"));
+            effect.setTargetId(macros[EditorGUILayout.Popup(Array.IndexOf(macros, effect.getTargetId()), macros)]);
+            EditorGUILayout.EndHorizontal();
 
-    public MacroReferenceEffectEditor()
-    {
-        macros = Controller.getInstance().getAdvancedFeaturesController().getMacrosListDataControl().getMacrosIDs();
-        this.effect = new MacroReferenceEffect(macros[0]);
-    }
+            EditorGUILayout.HelpBox(TC.get("Effect.MacroReference"), MessageType.Info);
+        }
 
-    public void draw()
-    {
-        EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.LabelField(TC.get("Element.Name56"));
-        effect.setTargetId(macros[EditorGUILayout.Popup(Array.IndexOf(macros, effect.getTargetId()), macros)]);
-        EditorGUILayout.EndHorizontal();
+        public AbstractEffect Effect { get { return effect; } set { effect = value as MacroReferenceEffect; } }
+        public string EffectName { get { return TC.get("MacroReferenceEffect.Title"); } }
+        public EffectEditor clone() { return new MacroReferenceEffectEditor(); }
 
-        EditorGUILayout.HelpBox(TC.get("Effect.MacroReference"), MessageType.Info);
-    }
-
-    public AbstractEffect Effect { get { return effect; } set { effect = value as MacroReferenceEffect; } }
-    public string EffectName { get { return TC.get("MacroReferenceEffect.Title"); } }
-    public EffectEditor clone() { return new MacroReferenceEffectEditor(); }
-
-    public bool manages(AbstractEffect c)
-    {
-        return c.GetType() == effect.GetType();
+        public bool manages(AbstractEffect c)
+        {
+            return c.GetType() == effect.GetType();
+        }
     }
 }

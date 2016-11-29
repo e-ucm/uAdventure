@@ -1,49 +1,54 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class DeleteResourceTool : ResourcesTool
+using uAdventure.Core;
+
+namespace uAdventure.Editor
 {
-
-    public DeleteResourceTool(ResourcesUni resources, AssetInformation[] assetsInformation, int index)
-        : base(resources, assetsInformation, -1, index)
-    {
-    }
-
-    
-    public override bool doTool()
+    public class DeleteResourceTool : ResourcesTool
     {
 
-        bool done = false;
-        // If the given asset is not empty, delete it
-        if (resources.getAssetPath(assetsInformation[index].name) != null)
+        public DeleteResourceTool(ResourcesUni resources, AssetInformation[] assetsInformation, int index)
+            : base(resources, assetsInformation, -1, index)
         {
-            resources.deleteAsset(assetsInformation[index].name);
-            done = true;
         }
-        return done;
-    }
 
-    
-    public override bool undoTool()
-    {
 
-        bool done = base.undoTool();
-        if (done)
+        public override bool doTool()
         {
-            Controller.getInstance().updatePanel();
+
+            bool done = false;
+            // If the given asset is not empty, delete it
+            if (resources.getAssetPath(assetsInformation[index].name) != null)
+            {
+                resources.deleteAsset(assetsInformation[index].name);
+                done = true;
+            }
+            return done;
         }
-        return done;
-    }
 
-    
-    public override bool redoTool()
-    {
 
-        bool done = base.redoTool();
-        if (done)
+        public override bool undoTool()
         {
-            Controller.getInstance().updatePanel();
+
+            bool done = base.undoTool();
+            if (done)
+            {
+                Controller.getInstance().updatePanel();
+            }
+            return done;
         }
-        return done;
+
+
+        public override bool redoTool()
+        {
+
+            bool done = base.redoTool();
+            if (done)
+            {
+                Controller.getInstance().updatePanel();
+            }
+            return done;
+        }
     }
 }

@@ -2,23 +2,28 @@
 using System.Collections;
 using System;
 
-/**
- * Edition tool for changing the destiny position of a NextScene
- */
+using uAdventure.Core;
 
-public class ChangeNSDestinyPositionTool : ChangePositionTool
+namespace uAdventure.Editor
 {
+    /**
+     * Edition tool for changing the destiny position of a NextScene
+     */
 
-    public ChangeNSDestinyPositionTool(Positioned nextScene, int newX, int newY) : base(nextScene, newX, newY)
+    public class ChangeNSDestinyPositionTool : ChangePositionTool
     {
-        this.addListener(new ChangePositionToolListenerImplementation());
-    }
 
-    public class ChangePositionToolListenerImplementation: ChangePositionToolListener
-    {
-        public void positionUpdated(int newX, int newY)
+        public ChangeNSDestinyPositionTool(Positioned nextScene, int newX, int newY) : base(nextScene, newX, newY)
         {
-            // TODO: implentation ?
+            this.addListener(new ChangePositionToolListenerImplementation());
+        }
+
+        public class ChangePositionToolListenerImplementation : ChangePositionToolListener
+        {
+            public void positionUpdated(int newX, int newY)
+            {
+                // TODO: implentation ?
+            }
         }
     }
 }

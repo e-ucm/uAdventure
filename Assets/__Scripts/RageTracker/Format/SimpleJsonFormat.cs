@@ -28,26 +28,28 @@ using System;
 using System.Collections.Generic;
 using SimpleJSON;
 
-public class SimpleJsonFormat : Tracker.ITraceFormatter
+namespace uAdventure.RageTracker
 {
-
-	public string Serialize (List<string> traces)
-	{
-		String result = "[";	
-		foreach (String trace in traces){
-			string[] parts = trace.Split(',');
-			result += "{\"event\":\"" + parts[1] + "\", " +
-				"\"target\":\"" + parts[2] + "\"" +
-				( parts.Length == 4 ? ",\"value\":\"" + parts[3] + "\"" : "")
-				+ "},";
-		}
-		return result.Substring(0, result.Length - 1) + "]";
-	}
-
-    public void StartData(JSONNode data)
+    public class SimpleJsonFormat : Tracker.ITraceFormatter
     {
 
+        public string Serialize(List<string> traces)
+        {
+            String result = "[";
+            foreach (String trace in traces)
+            {
+                string[] parts = trace.Split(',');
+                result += "{\"event\":\"" + parts[1] + "\", " +
+                    "\"target\":\"" + parts[2] + "\"" +
+                    (parts.Length == 4 ? ",\"value\":\"" + parts[3] + "\"" : "")
+                    + "},";
+            }
+            return result.Substring(0, result.Length - 1) + "]";
+        }
+
+        public void StartData(JSONNode data)
+        {
+
+        }
     }
 }
-
-

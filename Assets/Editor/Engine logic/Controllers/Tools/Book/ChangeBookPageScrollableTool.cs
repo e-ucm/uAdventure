@@ -1,68 +1,74 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class ChangeBookPageScrollableTool : Tool {
+using uAdventure.Core;
 
-    private BookPage bookPage;
-
-    private bool newScrollable;
-
-    private bool oldScrollable;
-
-    public ChangeBookPageScrollableTool(BookPage bookPage, bool scrollable)
+namespace uAdventure.Editor
+{
+    public class ChangeBookPageScrollableTool : Tool
     {
 
-        this.bookPage = bookPage;
-        this.newScrollable = scrollable;
-        this.oldScrollable = bookPage.getScrollable();
-    }
+        private BookPage bookPage;
 
-    
-    public override bool canRedo()
-    {
+        private bool newScrollable;
 
-        return true;
-    }
+        private bool oldScrollable;
 
-    
-    public override bool canUndo()
-    {
+        public ChangeBookPageScrollableTool(BookPage bookPage, bool scrollable)
+        {
 
-        return false;
-    }
+            this.bookPage = bookPage;
+            this.newScrollable = scrollable;
+            this.oldScrollable = bookPage.getScrollable();
+        }
 
-    
-    public override bool combine(Tool other)
-    {
 
-        return false;
-    }
+        public override bool canRedo()
+        {
 
-    
-    public override bool doTool()
-    {
+            return true;
+        }
 
-        if (oldScrollable == newScrollable)
+
+        public override bool canUndo()
+        {
+
             return false;
-        bookPage.setScrollable(newScrollable);
-        return true;
-    }
+        }
 
-    
-    public override bool redoTool()
-    {
 
-        bookPage.setScrollable(newScrollable);
-        Controller.getInstance().updatePanel();
-        return true;
-    }
+        public override bool combine(Tool other)
+        {
 
-    
-    public override bool undoTool()
-    {
+            return false;
+        }
 
-        bookPage.setScrollable(oldScrollable);
-        Controller.getInstance().updatePanel();
-        return true;
+
+        public override bool doTool()
+        {
+
+            if (oldScrollable == newScrollable)
+                return false;
+            bookPage.setScrollable(newScrollable);
+            return true;
+        }
+
+
+        public override bool redoTool()
+        {
+
+            bookPage.setScrollable(newScrollable);
+            Controller.getInstance().updatePanel();
+            return true;
+        }
+
+
+        public override bool undoTool()
+        {
+
+            bookPage.setScrollable(oldScrollable);
+            Controller.getInstance().updatePanel();
+            return true;
+        }
     }
 }

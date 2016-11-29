@@ -2,71 +2,77 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class ProjectConfigData{
+using uAdventure.Core;
 
-    private const string FILE_NAME = "project.xml";
-
-    private static Properties properties;
-
-    private static List<ProjectConfigDataConsumer> consumers = new List<ProjectConfigDataConsumer>();
-
-    public static void init()
+namespace uAdventure.Editor
+{
+    public class ProjectConfigData
     {
 
-        consumers = new List<ProjectConfigDataConsumer>();
-        properties = new Properties(Controller.getInstance().getProjectFolder() + "/" + FILE_NAME);
-        storeToXML();
-    }
+        private const string FILE_NAME = "project.xml";
 
-    public static void addConsumer(ProjectConfigDataConsumer consumer)
-    {
-        consumers.Add(consumer);
-    }
+        private static Properties properties;
 
-    public static void loadFromXML()
-    {
+        private static List<ProjectConfigDataConsumer> consumers = new List<ProjectConfigDataConsumer>();
 
-        properties = new Properties(Controller.getInstance().getProjectFolder() + "/" + FILE_NAME);
-        foreach (ProjectConfigDataConsumer consumer in consumers)
+        public static void init()
         {
-            consumer.updateData();
-        }
-        //LOMConfigData.loadData();
-    }
 
-    public static void storeToXML()
-    {
-        if(properties == null)
+            consumers = new List<ProjectConfigDataConsumer>();
             properties = new Properties(Controller.getInstance().getProjectFolder() + "/" + FILE_NAME);
-        properties.Save();
-    }
-
-    public static string getProperty(string key)
-    {
-
-        if (properties.getProperty(key) != null)
-        {
-            return properties.getProperty(key);
+            storeToXML();
         }
-        else
-            return null;
-    }
 
-    public static void setProperty(string key, string value)
-    {
+        public static void addConsumer(ProjectConfigDataConsumer consumer)
+        {
+            consumers.Add(consumer);
+        }
 
-        properties.setProperty(key, value);
-    }
+        public static void loadFromXML()
+        {
 
-    public static bool existsKey(string key)
-    {
-        bool exists = (properties.getProperty(key)!= null);
-        return exists;
-    }
+            properties = new Properties(Controller.getInstance().getProjectFolder() + "/" + FILE_NAME);
+            foreach (ProjectConfigDataConsumer consumer in consumers)
+            {
+                consumer.updateData();
+            }
+            //LOMConfigData.loadData();
+        }
 
-    public static void registerConsumer(ProjectConfigDataConsumer newConsumer)
-    {
+        public static void storeToXML()
+        {
+            if (properties == null)
+                properties = new Properties(Controller.getInstance().getProjectFolder() + "/" + FILE_NAME);
+            properties.Save();
+        }
 
-        consumers.Add(newConsumer);
+        public static string getProperty(string key)
+        {
+
+            if (properties.getProperty(key) != null)
+            {
+                return properties.getProperty(key);
+            }
+            else
+                return null;
+        }
+
+        public static void setProperty(string key, string value)
+        {
+
+            properties.setProperty(key, value);
+        }
+
+        public static bool existsKey(string key)
+        {
+            bool exists = (properties.getProperty(key) != null);
+            return exists;
+        }
+
+        public static void registerConsumer(ProjectConfigDataConsumer newConsumer)
+        {
+
+            consumers.Add(newConsumer);
+        }
     }
 }

@@ -1,80 +1,86 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class DeleteNodeLinkTool : Tool {
+using uAdventure.Core;
 
-    protected ConversationNode parent;
-
-    protected int linkIndex;
-
-    protected ConversationNode linkDeleted;
-
-    protected string confirmTitle;
-
-    protected string confirmText;
-
-    public DeleteNodeLinkTool(ConversationNodeView nodeView):this((ConversationNode)nodeView)
-    { 
-    }
-
-    public DeleteNodeLinkTool(ConversationNode parent)
+namespace uAdventure.Editor
+{
+    public class DeleteNodeLinkTool : Tool
     {
 
-        this.parent = parent;
-        this.linkIndex = 0;
-        this.confirmTitle = TC.get("Conversation.OperationDeleteLink");
-        this.confirmText = TC.get("Conversation.ConfirmationDeleteLink");
-    }
+        protected ConversationNode parent;
 
-    
-    public override bool canRedo()
-    {
+        protected int linkIndex;
 
-        return true;
-    }
+        protected ConversationNode linkDeleted;
 
-    
-    public override bool canUndo()
-    {
+        protected string confirmTitle;
 
-        return linkDeleted != null;
-    }
+        protected string confirmText;
 
-    
-    public override bool combine(Tool other)
-    {
-
-        return false;
-    }
-
-    
-    public override bool doTool()
-    {
-
-        // Ask for confirmation
-        if (Controller.getInstance().showStrictConfirmDialog(confirmTitle, confirmText))
+        public DeleteNodeLinkTool(ConversationNodeView nodeView) : this((ConversationNode)nodeView)
         {
-            linkDeleted = parent.removeChild(linkIndex);
+        }
+
+        public DeleteNodeLinkTool(ConversationNode parent)
+        {
+
+            this.parent = parent;
+            this.linkIndex = 0;
+            this.confirmTitle = TC.get("Conversation.OperationDeleteLink");
+            this.confirmText = TC.get("Conversation.ConfirmationDeleteLink");
+        }
+
+
+        public override bool canRedo()
+        {
+
             return true;
         }
-        return false;
-    }
 
-    
-    public override bool redoTool()
-    {
 
-        parent.removeChild(linkIndex);
-        Controller.getInstance().updatePanel();
-        return true;
-    }
+        public override bool canUndo()
+        {
 
-    
-    public override bool undoTool()
-    {
+            return linkDeleted != null;
+        }
 
-        parent.addChild(linkIndex, linkDeleted);
-        Controller.getInstance().updatePanel();
-        return true;
+
+        public override bool combine(Tool other)
+        {
+
+            return false;
+        }
+
+
+        public override bool doTool()
+        {
+
+            // Ask for confirmation
+            if (Controller.getInstance().showStrictConfirmDialog(confirmTitle, confirmText))
+            {
+                linkDeleted = parent.removeChild(linkIndex);
+                return true;
+            }
+            return false;
+        }
+
+
+        public override bool redoTool()
+        {
+
+            parent.removeChild(linkIndex);
+            Controller.getInstance().updatePanel();
+            return true;
+        }
+
+
+        public override bool undoTool()
+        {
+
+            parent.addChild(linkIndex, linkDeleted);
+            Controller.getInstance().updatePanel();
+            return true;
+        }
     }
 }

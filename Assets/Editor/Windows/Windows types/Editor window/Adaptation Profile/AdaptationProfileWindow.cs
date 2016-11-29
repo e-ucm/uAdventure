@@ -1,18 +1,20 @@
 ﻿using UnityEngine;
-using System.Collections;
 
-public class AdaptationProfileWindow : LayoutWindow
+namespace uAdventure.Editor
 {
-    public AdaptationProfileWindow(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
-        : base(aStartPos, aContent, aStyle, aOptions)
+    public class AdaptationProfileWindow : LayoutWindow
     {
+        public AdaptationProfileWindow(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
+            : base(aStartPos, aContent, aStyle, aOptions)
+        {
+
+        }
+
+
+        public override void Draw(int aID)
+        {
+            GUILayout.Label("AdaptationProfileWindow");
+        }
 
     }
-
-
-    public override void Draw(int aID)
-    {
-        GUILayout.Label("AdaptationProfileWindow");
-    }
-
 }

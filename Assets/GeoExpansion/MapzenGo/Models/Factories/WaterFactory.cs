@@ -95,8 +95,6 @@ namespace MapzenGo.Models.Factories
                 ? geo["properties"]["kind"].str.ConvertToWaterType()
                 : WaterType.Water;
 
-                var typeSettings = FactorySettings.GetSettingsFor<WaterSettings>(kind);
-
                 //if we dont have a setting defined for that, it'Ll be merged to "unknown" 
                 if (!FactorySettings.HasSettingsFor(kind))
                     kind = WaterType.Water;

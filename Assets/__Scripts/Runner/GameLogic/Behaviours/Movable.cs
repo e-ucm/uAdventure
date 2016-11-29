@@ -1,7 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public interface Movable{
-    void Move (Vector2 position);
+namespace uAdventure.Runner
+{
+    public interface Movable
+    {
+        void Move(Vector2 position);
+    }
 }
 

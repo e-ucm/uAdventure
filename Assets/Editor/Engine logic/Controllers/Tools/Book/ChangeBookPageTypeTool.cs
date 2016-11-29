@@ -1,52 +1,73 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class ChangeBookPageTypeTool : Tool {
+using uAdventure.Core;
 
-    private BookPage bookPage;
-
-    private int newType;
-
-    private int oldType;
-
-    private string oldUri;
-
-    public ChangeBookPageTypeTool(BookPage bookPage, int newType)
+namespace uAdventure.Editor
+{
+    public class ChangeBookPageTypeTool : Tool
     {
 
-        this.bookPage = bookPage;
-        this.newType = newType;
-        this.oldType = bookPage.getType();
-        this.oldUri = bookPage.getUri();
-    }
+        private BookPage bookPage;
 
-    
-    public override bool canRedo()
-    {
+        private int newType;
 
-        return true;
-    }
+        private int oldType;
 
-    
-    public override bool canUndo()
-    {
+        private string oldUri;
 
-        return true;
-    }
-
-    
-    public override bool combine(Tool other)
-    {
-
-        return false;
-    }
-
-    
-    public override bool doTool()
-    {
-
-        if (newType != oldType)
+        public ChangeBookPageTypeTool(BookPage bookPage, int newType)
         {
+
+            this.bookPage = bookPage;
+            this.newType = newType;
+            this.oldType = bookPage.getType();
+            this.oldUri = bookPage.getUri();
+        }
+
+
+        public override bool canRedo()
+        {
+
+            return true;
+        }
+
+
+        public override bool canUndo()
+        {
+
+            return true;
+        }
+
+
+        public override bool combine(Tool other)
+        {
+
+            return false;
+        }
+
+
+        public override bool doTool()
+        {
+
+            if (newType != oldType)
+            {
+                bookPage.setType(newType);
+                if (newType == BookPage.TYPE_RESOURCE)
+                    bookPage.setUri("");
+                else if (newType == BookPage.TYPE_IMAGE)
+                    bookPage.setUri("");
+                else
+                    bookPage.setUri("http://www.");
+                return true;
+            }
+            return false;
+        }
+
+
+        public override bool redoTool()
+        {
+
             bookPage.setType(newType);
             if (newType == BookPage.TYPE_RESOURCE)
                 bookPage.setUri("");
@@ -54,33 +75,18 @@ public class ChangeBookPageTypeTool : Tool {
                 bookPage.setUri("");
             else
                 bookPage.setUri("http://www.");
+            Controller.getInstance().updatePanel();
             return true;
         }
-        return false;
-    }
 
-    
-    public override bool redoTool()
-    {
 
-        bookPage.setType(newType);
-        if (newType == BookPage.TYPE_RESOURCE)
-            bookPage.setUri("");
-        else if (newType == BookPage.TYPE_IMAGE)
-            bookPage.setUri("");
-        else
-            bookPage.setUri("http://www.");
-        Controller.getInstance().updatePanel();
-        return true;
-    }
+        public override bool undoTool()
+        {
 
-    
-    public override bool undoTool()
-    {
-
-        bookPage.setType(oldType);
-        bookPage.setUri(oldUri);
-        Controller.getInstance().updatePanel();
-        return true;
+            bookPage.setType(oldType);
+            bookPage.setUri(oldUri);
+            Controller.getInstance().updatePanel();
+            return true;
+        }
     }
 }

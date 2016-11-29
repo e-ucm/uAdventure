@@ -102,7 +102,7 @@ public class WebGLMovieTexture
 
 	public void Update()
 	{
-		WebGLMovieTextureUpdate(m_Instance, m_Texture.GetNativeTextureID());
+		WebGLMovieTextureUpdate(m_Instance, m_Texture.GetNativeTexturePtr().ToInt32());
 	}
 
 	public void Play()

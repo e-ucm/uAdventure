@@ -1,141 +1,148 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using Side = Trajectory.Side;
-using Node = Trajectory.Node;
 
-public class DeleteTrajectoryNodeTool : Tool {
+using uAdventure.Core;
 
+using Side = uAdventure.Core.Trajectory.Side;
+using Node = uAdventure.Core.Trajectory.Node;
 
-    NodeDataControl oldNodeDataControl;
-
-    Trajectory trajectory;
-
-    TrajectoryDataControl trajectoryDataControl;
-
-    List<SideDataControl> oldSides;
-
-    private bool wasInitial;
-
-    public DeleteTrajectoryNodeTool(DataControl dataControl, Trajectory trajectory, TrajectoryDataControl trajectoryDataControl)
+namespace uAdventure.Editor
+{
+    public class DeleteTrajectoryNodeTool : Tool
     {
 
-        this.oldNodeDataControl = (NodeDataControl)dataControl;
-        this.trajectory = trajectory;
-        this.trajectoryDataControl = trajectoryDataControl;
-        this.oldSides = new List<SideDataControl>();
-        this.wasInitial = (trajectoryDataControl.getInitialNode() == oldNodeDataControl);
-    }
 
-   
-    public override bool canRedo()
-    {
+        NodeDataControl oldNodeDataControl;
 
-        return true;
-    }
+        Trajectory trajectory;
 
-   
-    public override bool canUndo()
-    {
+        TrajectoryDataControl trajectoryDataControl;
 
-        return true;
-    }
+        List<SideDataControl> oldSides;
 
-   
-    public override bool combine(Tool other)
-    {
+        private bool wasInitial;
 
-        return false;
-    }
-
-   
-    public override bool doTool()
-    {
-
-        Node temp = (Node)oldNodeDataControl.getContent();
-        trajectory.removeNode(temp.getX(), temp.getY());
-        trajectoryDataControl.getNodes().Remove(oldNodeDataControl);
-
-        if (wasInitial)
+        public DeleteTrajectoryNodeTool(DataControl dataControl, Trajectory trajectory, TrajectoryDataControl trajectoryDataControl)
         {
-            trajectory.setInitial(null);
-            trajectoryDataControl.initialNode = null;
 
-            trajectory.setInitial(trajectory.getNodes()[0].getID());
-            trajectoryDataControl.initialNode = trajectoryDataControl.getNodes()[0];
+            this.oldNodeDataControl = (NodeDataControl)dataControl;
+            this.trajectory = trajectory;
+            this.trajectoryDataControl = trajectoryDataControl;
+            this.oldSides = new List<SideDataControl>();
+            this.wasInitial = (trajectoryDataControl.getInitialNode() == oldNodeDataControl);
         }
 
-        foreach (SideDataControl side in trajectoryDataControl.getSides())
+
+        public override bool canRedo()
         {
-            if (!trajectory.getSides().Contains((Side)side.getContent()))
+
+            return true;
+        }
+
+
+        public override bool canUndo()
+        {
+
+            return true;
+        }
+
+
+        public override bool combine(Tool other)
+        {
+
+            return false;
+        }
+
+
+        public override bool doTool()
+        {
+
+            Node temp = (Node)oldNodeDataControl.getContent();
+            trajectory.removeNode(temp.getX(), temp.getY());
+            trajectoryDataControl.getNodes().Remove(oldNodeDataControl);
+
+            if (wasInitial)
             {
-                oldSides.Add(side);
+                trajectory.setInitial(null);
+                trajectoryDataControl.initialNode = null;
+
+                trajectory.setInitial(trajectory.getNodes()[0].getID());
+                trajectoryDataControl.initialNode = trajectoryDataControl.getNodes()[0];
             }
-        }
-        foreach (SideDataControl side in oldSides)
-        {
-            trajectoryDataControl.getSides().Remove(side);
-        }
 
-        return true;
-    }
-
-   
-    public override bool redoTool()
-    {
-
-        Node temp = (Node)oldNodeDataControl.getContent();
-        trajectory.removeNode(temp.getX(), temp.getY());
-        trajectoryDataControl.getNodes().Remove(oldNodeDataControl);
-
-        if (wasInitial)
-        {
-            trajectory.setInitial(null);
-            trajectoryDataControl.initialNode = null;
-
-            trajectory.setInitial(trajectory.getNodes()[0].getID());
-            trajectoryDataControl.initialNode = trajectoryDataControl.getNodes()[0];
-        }
-
-        foreach (SideDataControl side in trajectoryDataControl.getSides())
-        {
-            if (!trajectory.getSides().Contains((Side)side.getContent()))
+            foreach (SideDataControl side in trajectoryDataControl.getSides())
             {
-                oldSides.Add(side);
+                if (!trajectory.getSides().Contains((Side)side.getContent()))
+                {
+                    oldSides.Add(side);
+                }
             }
+            foreach (SideDataControl side in oldSides)
+            {
+                trajectoryDataControl.getSides().Remove(side);
+            }
+
+            return true;
         }
-        foreach (SideDataControl side in oldSides)
+
+
+        public override bool redoTool()
         {
-            trajectoryDataControl.getSides().Remove(side);
+
+            Node temp = (Node)oldNodeDataControl.getContent();
+            trajectory.removeNode(temp.getX(), temp.getY());
+            trajectoryDataControl.getNodes().Remove(oldNodeDataControl);
+
+            if (wasInitial)
+            {
+                trajectory.setInitial(null);
+                trajectoryDataControl.initialNode = null;
+
+                trajectory.setInitial(trajectory.getNodes()[0].getID());
+                trajectoryDataControl.initialNode = trajectoryDataControl.getNodes()[0];
+            }
+
+            foreach (SideDataControl side in trajectoryDataControl.getSides())
+            {
+                if (!trajectory.getSides().Contains((Side)side.getContent()))
+                {
+                    oldSides.Add(side);
+                }
+            }
+            foreach (SideDataControl side in oldSides)
+            {
+                trajectoryDataControl.getSides().Remove(side);
+            }
+
+            Controller.getInstance().updatePanel();
+
+            return true;
         }
 
-        Controller.getInstance().updatePanel();
 
-        return true;
-    }
-
-   
-    public override bool undoTool()
-    {
-
-        Node temp = (Node)oldNodeDataControl.getContent();
-        trajectory.getNodes().Add(temp);
-        trajectoryDataControl.getNodes().Add(oldNodeDataControl);
-
-        if (wasInitial)
+        public override bool undoTool()
         {
-            trajectory.setInitial(temp.getID());
-            trajectoryDataControl.initialNode = oldNodeDataControl;
+
+            Node temp = (Node)oldNodeDataControl.getContent();
+            trajectory.getNodes().Add(temp);
+            trajectoryDataControl.getNodes().Add(oldNodeDataControl);
+
+            if (wasInitial)
+            {
+                trajectory.setInitial(temp.getID());
+                trajectoryDataControl.initialNode = oldNodeDataControl;
+            }
+
+            foreach (SideDataControl side in oldSides)
+            {
+                trajectory.getSides().Add((Side)side.getContent());
+                trajectoryDataControl.getSides().Add(side);
+            }
+
+            Controller.getInstance().updatePanel();
+
+            return true;
         }
-
-        foreach (SideDataControl side in oldSides)
-        {
-            trajectory.getSides().Add((Side)side.getContent());
-            trajectoryDataControl.getSides().Add(side);
-        }
-
-        Controller.getInstance().updatePanel();
-
-        return true;
     }
 }

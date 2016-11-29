@@ -3,151 +3,154 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-/**
- * A list of effects that can be triggered by an unique player's action during
- * the game.
- */
-
-public class Effects : ICloneable
+namespace uAdventure.Core
 {
-
     /**
-     * List of effects to be triggered
-     */
-    private List<AbstractEffect> effects;
-
-    /**
-     * Creates a new list of Effects.
+     * A list of effects that can be triggered by an unique player's action during
+     * the game.
      */
 
-    public Effects()
+    public class Effects : ICloneable
     {
 
-        effects = new List<AbstractEffect>();
-    }
+        /**
+         * List of effects to be triggered
+         */
+        private List<AbstractEffect> effects;
 
-    /**
-     * Returns whether the effects block is empty or not.
-     * 
-     * @return True if the block has no effects, false otherwise
-     */
+        /**
+         * Creates a new list of Effects.
+         */
 
-    public bool isEmpty()
-    {
-
-        return effects.Count == 0;
-    }
-
-    /**
-     * Clear the list of effects.
-     */
-
-    public void clear()
-    {
-
-        effects.Clear();
-    }
-
-    /**
-     * Adds a new effect to the list.
-     * 
-     * @param effect
-     *            the effect to be added
-     */
-
-    public void add(AbstractEffect effect)
-    {
-        effects.Add(effect);
-
-        //Check if the effect has resources, to add it in the AllAssetsPaths
-        if (effect.getType() == EffectType.PLAY_ANIMATION || effect.getType() == EffectType.PLAY_SOUND ||
-            effect.getType() == EffectType.SPEAK_CHAR || effect.getType() == EffectType.SPEAK_PLAYER ||
-            effect.getType() == EffectType.SHOW_TEXT)
+        public Effects()
         {
-            AllElementsWithAssets.addAsset(effect);
+
+            effects = new List<AbstractEffect>();
         }
-        else if (effect.getType() == EffectType.RANDOM_EFFECT)
+
+        /**
+         * Returns whether the effects block is empty or not.
+         * 
+         * @return True if the block has no effects, false otherwise
+         */
+
+        public bool isEmpty()
         {
-            if (((RandomEffect) effect).getPositiveEffect() != null)
+
+            return effects.Count == 0;
+        }
+
+        /**
+         * Clear the list of effects.
+         */
+
+        public void clear()
+        {
+
+            effects.Clear();
+        }
+
+        /**
+         * Adds a new effect to the list.
+         * 
+         * @param effect
+         *            the effect to be added
+         */
+
+        public void add(AbstractEffect effect)
+        {
+            effects.Add(effect);
+
+            //Check if the effect has resources, to add it in the AllAssetsPaths
+            if (effect.getType() == EffectType.PLAY_ANIMATION || effect.getType() == EffectType.PLAY_SOUND ||
+                effect.getType() == EffectType.SPEAK_CHAR || effect.getType() == EffectType.SPEAK_PLAYER ||
+                effect.getType() == EffectType.SHOW_TEXT)
             {
-                EffectType peType = ((RandomEffect) effect).getPositiveEffect().getType();
-                if (peType == EffectType.PLAY_ANIMATION || peType == EffectType.PLAY_SOUND ||
-                    peType == EffectType.SPEAK_CHAR || peType == EffectType.SPEAK_PLAYER ||
-                    peType == EffectType.SHOW_TEXT)
+                AllElementsWithAssets.addAsset(effect);
+            }
+            else if (effect.getType() == EffectType.RANDOM_EFFECT)
+            {
+                if (((RandomEffect)effect).getPositiveEffect() != null)
                 {
-                    AllElementsWithAssets.addAsset(((RandomEffect) effect).getPositiveEffect());
+                    EffectType peType = ((RandomEffect)effect).getPositiveEffect().getType();
+                    if (peType == EffectType.PLAY_ANIMATION || peType == EffectType.PLAY_SOUND ||
+                        peType == EffectType.SPEAK_CHAR || peType == EffectType.SPEAK_PLAYER ||
+                        peType == EffectType.SHOW_TEXT)
+                    {
+                        AllElementsWithAssets.addAsset(((RandomEffect)effect).getPositiveEffect());
+                    }
+                }
+                if (((RandomEffect)effect).getNegativeEffect() != null)
+                {
+                    EffectType neType = ((RandomEffect)effect).getNegativeEffect().getType();
+                    if (neType == EffectType.PLAY_ANIMATION || neType == EffectType.PLAY_SOUND ||
+                        neType == EffectType.SPEAK_CHAR || neType == EffectType.SPEAK_PLAYER ||
+                        neType == EffectType.SHOW_TEXT)
+                    {
+                        AllElementsWithAssets.addAsset(((RandomEffect)effect).getNegativeEffect());
+                    }
                 }
             }
-            if (((RandomEffect) effect).getNegativeEffect() != null)
+
+        }
+
+        /**
+         * Returns the contained list of effects
+         * 
+         * @return List of effects
+         */
+
+        public List<AbstractEffect> getEffects()
+        {
+
+            return effects;
+        }
+
+        /**
+         * Checks if there is any cancel action effect in the list
+         */
+
+        public bool hasCancelAction()
+        {
+
+            bool hasCancelAction = false;
+            foreach (Effect effect in effects)
             {
-                EffectType neType = ((RandomEffect) effect).getNegativeEffect().getType();
-                if (neType == EffectType.PLAY_ANIMATION || neType == EffectType.PLAY_SOUND ||
-                    neType == EffectType.SPEAK_CHAR || neType == EffectType.SPEAK_PLAYER ||
-                    neType == EffectType.SHOW_TEXT)
+                if (effect.getType() == EffectType.CANCEL_ACTION)
                 {
-                    AllElementsWithAssets.addAsset(((RandomEffect) effect).getNegativeEffect());
+                    hasCancelAction = true;
+                    break;
                 }
             }
+            return hasCancelAction;
         }
 
-    }
-
-    /**
-     * Returns the contained list of effects
-     * 
-     * @return List of effects
-     */
-
-    public List<AbstractEffect> getEffects()
-    {
-
-        return effects;
-    }
-
-    /**
-     * Checks if there is any cancel action effect in the list
-     */
-
-    public bool hasCancelAction()
-    {
-
-        bool hasCancelAction = false;
-        foreach (Effect effect in effects)
+        public virtual object Clone()
         {
-            if (effect.getType() == EffectType.CANCEL_ACTION)
+
+            Effects e = (Effects)this.MemberwiseClone();
+            if (effects != null)
             {
-                hasCancelAction = true;
-                break;
+                e.effects = new List<AbstractEffect>();
+                //TODO: check if its working
+                foreach (AbstractEffect ef in effects)
+                    e.effects.Add((AbstractEffect)ef.Clone());
             }
+            return e;
         }
-        return hasCancelAction;
-    }
 
-    public virtual object Clone()
+        /*
+    @Override
+    public Object clone() throws CloneNotSupportedException
     {
 
-        Effects e = (Effects) this.MemberwiseClone();
-        if (effects != null)
-        {
-            e.effects = new List<AbstractEffect>();
-            //TODO: check if its working
-            foreach (AbstractEffect ef in effects)
-                e.effects.Add((AbstractEffect) ef.Clone());
-        }
-        return e;
+       Effects e = (Effects) super.clone( );
+       if( effects != null ) {
+           e.effects = new List<AbstractEffect>();
+           for (Effect ef : effects)
+               e.effects.add((AbstractEffect)ef.clone());
+       }
+       return e;
+    }*/
     }
-
-    /*
-@Override
-public Object clone() throws CloneNotSupportedException
-{
-
-   Effects e = (Effects) super.clone( );
-   if( effects != null ) {
-       e.effects = new List<AbstractEffect>();
-       for (Effect ef : effects)
-           e.effects.add((AbstractEffect)ef.clone());
-   }
-   return e;
-}*/
 }

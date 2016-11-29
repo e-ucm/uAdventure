@@ -1,152 +1,157 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class MoveNodeLineTool : Tool
+using uAdventure.Core;
+
+namespace uAdventure.Editor
 {
-    public const int UP = 1;
-
-    public const int DOWN = 2;
-
-    protected ConversationNode parent;
-
-    protected int lineIndex;
-
-    protected int mode;
-
-    public MoveNodeLineTool(ConversationNodeView nodeView, int lineIndex, int mode):this((ConversationNode)nodeView, lineIndex, mode)
-    { }
-
-    public MoveNodeLineTool(ConversationNode parent, int lineIndex, int mode)
+    public class MoveNodeLineTool : Tool
     {
+        public const int UP = 1;
 
-        this.parent = parent;
-        this.lineIndex = lineIndex;
-        this.mode = mode;
-    }
+        public const int DOWN = 2;
 
-    
-    public override bool canRedo()
-    {
+        protected ConversationNode parent;
 
-        return true;
-    }
+        protected int lineIndex;
 
-    
-    public override bool canUndo()
-    {
+        protected int mode;
 
-        return true;
-    }
+        public MoveNodeLineTool(ConversationNodeView nodeView, int lineIndex, int mode) : this((ConversationNode)nodeView, lineIndex, mode)
+        { }
 
-    
-    public override bool combine(Tool other)
-    {
-
-        return false;
-    }
-
-    
-    public override bool doTool()
-    {
-
-        if (mode == UP)
+        public MoveNodeLineTool(ConversationNode parent, int lineIndex, int mode)
         {
-            return moveUp();
+
+            this.parent = parent;
+            this.lineIndex = lineIndex;
+            this.mode = mode;
         }
-        else if (mode == DOWN)
+
+
+        public override bool canRedo()
         {
-            return moveDown();
+
+            return true;
         }
-        else
+
+
+        public override bool canUndo()
+        {
+
+            return true;
+        }
+
+
+        public override bool combine(Tool other)
+        {
+
             return false;
-
-    }
-
-    
-    public override bool redoTool()
-    {
-
-        bool moved = false;
-        if (mode == UP)
-        {
-            moved = moveUp();
-        }
-        else if (mode == DOWN)
-        {
-            moved = moveDown();
         }
 
-        if (moved)
-            Controller.getInstance().updatePanel();
-        return moved;
-    }
 
-    
-    public override bool undoTool()
-    {
-
-        bool moved = false;
-        if (mode == UP)
+        public override bool doTool()
         {
-            moved = moveDown();
-        }
-        else if (mode == DOWN)
-        {
-            moved = moveUp();
-        }
 
-        if (moved)
-            Controller.getInstance().updatePanel();
-        return moved;
-
-    }
-
-    protected bool moveDown()
-    {
-
-        bool lineMoved = false;
-
-        // Cannot move the line down if it is the last position
-        if (lineIndex < parent.getLineCount() - 1)
-        {
-            // Remove the line and insert it in the lower position
-            parent.addLine(lineIndex + 1, parent.removeLine(lineIndex));
-
-            // If the node is a OptionNode, move the respective child along the line
-            if (parent.getType() == ConversationNodeViewEnum.OPTION)
+            if (mode == UP)
             {
-                ConversationNode nodeMoved = parent.removeChild(lineIndex);
-                parent.addChild(lineIndex + 1, nodeMoved);
+                return moveUp();
+            }
+            else if (mode == DOWN)
+            {
+                return moveDown();
+            }
+            else
+                return false;
+
+        }
+
+
+        public override bool redoTool()
+        {
+
+            bool moved = false;
+            if (mode == UP)
+            {
+                moved = moveUp();
+            }
+            else if (mode == DOWN)
+            {
+                moved = moveDown();
             }
 
-            lineMoved = true;
+            if (moved)
+                Controller.getInstance().updatePanel();
+            return moved;
         }
 
-        return lineMoved;
 
-    }
-
-    protected bool moveUp()
-    {
-
-        bool lineMoved = false;
-
-        // Cannot move the line up if it is in the first position
-        if (lineIndex > 0)
+        public override bool undoTool()
         {
-            // Remove the line and insert it in the upper position
-            parent.addLine(lineIndex - 1, parent.removeLine(lineIndex));
 
-            // If the node is a OptionNode, move the respective child along the line
-            if (parent.getType() == ConversationNodeViewEnum.OPTION)
+            bool moved = false;
+            if (mode == UP)
             {
-                ConversationNode nodeMoved = parent.removeChild(lineIndex);
-                parent.addChild(lineIndex - 1, nodeMoved);
+                moved = moveDown();
+            }
+            else if (mode == DOWN)
+            {
+                moved = moveUp();
             }
 
-            lineMoved = true;
+            if (moved)
+                Controller.getInstance().updatePanel();
+            return moved;
+
         }
 
-        return lineMoved;
+        protected bool moveDown()
+        {
+
+            bool lineMoved = false;
+
+            // Cannot move the line down if it is the last position
+            if (lineIndex < parent.getLineCount() - 1)
+            {
+                // Remove the line and insert it in the lower position
+                parent.addLine(lineIndex + 1, parent.removeLine(lineIndex));
+
+                // If the node is a OptionNode, move the respective child along the line
+                if (parent.getType() == ConversationNodeViewEnum.OPTION)
+                {
+                    ConversationNode nodeMoved = parent.removeChild(lineIndex);
+                    parent.addChild(lineIndex + 1, nodeMoved);
+                }
+
+                lineMoved = true;
+            }
+
+            return lineMoved;
+
+        }
+
+        protected bool moveUp()
+        {
+
+            bool lineMoved = false;
+
+            // Cannot move the line up if it is in the first position
+            if (lineIndex > 0)
+            {
+                // Remove the line and insert it in the upper position
+                parent.addLine(lineIndex - 1, parent.removeLine(lineIndex));
+
+                // If the node is a OptionNode, move the respective child along the line
+                if (parent.getType() == ConversationNodeViewEnum.OPTION)
+                {
+                    ConversationNode nodeMoved = parent.removeChild(lineIndex);
+                    parent.addChild(lineIndex - 1, nodeMoved);
+                }
+
+                lineMoved = true;
+            }
+
+            return lineMoved;
+        }
     }
 }

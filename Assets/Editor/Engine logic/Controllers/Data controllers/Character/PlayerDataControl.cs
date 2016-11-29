@@ -1,117 +1,122 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PlayerDataControl : NPCDataControl
+using uAdventure.Core;
+
+namespace uAdventure.Editor
 {
-
-    /**
-       * Contained player data.
-       */
-    private Player player;
-
-    /**
-     * Constructor.
-     * 
-     * @param player
-     *            Contained player data
-     */
-    public PlayerDataControl(Player player) : base(player)
-    {
-        this.player = player;
-    }
-
-    /**
-     * Notify to all scenes that the player image has been changed
-     */
-    public void playerImageChange()
+    public class PlayerDataControl : NPCDataControl
     {
 
-        string preview = getPreviewImage();
-        if (preview != null)
+        /**
+           * Contained player data.
+           */
+        private Player player;
+
+        /**
+         * Constructor.
+         * 
+         * @param player
+         *            Contained player data
+         */
+        public PlayerDataControl(Player player) : base(player)
         {
-            foreach (SceneDataControl scene in Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes())
+            this.player = player;
+        }
+
+        /**
+         * Notify to all scenes that the player image has been changed
+         */
+        public void playerImageChange()
+        {
+
+            string preview = getPreviewImage();
+            if (preview != null)
             {
-                scene.imageChangeNotify(preview);
+                foreach (SceneDataControl scene in Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes())
+                {
+                    scene.imageChangeNotify(preview);
+                }
             }
         }
-    }
 
-    
-    public override System.Object getContent()
-    {
 
-        return player;
-    }
-
-    
-    public override int[] getAddableElements()
-    {
-
-        return new int[] { };
-    }
-
-    
-    public override bool canAddElement(int type)
-    {
-
-        return false;
-    }
-
-    
-    public override bool canBeDeleted()
-    {
-
-        return false;
-    }
-
-    
-    public override bool canBeMoved()
-    {
-
-        return false;
-    }
-
-    
-    public override bool canBeRenamed()
-    {
-
-        return false;
-    }
-
-    
-    public override bool addElement(int type, string id)
-    {
-
-        bool elementAdded = false;
-
-        if (type == Controller.RESOURCES && !Controller.getInstance().isPlayTransparent())
+        public override System.Object getContent()
         {
-            return base.addElement(type, id);
+
+            return player;
         }
 
-        return elementAdded;
-    }
 
-    
-    public override bool buildResourcesTab()
-    {
+        public override int[] getAddableElements()
+        {
 
-        return !Controller.getInstance().isPlayTransparent();
-    }
-
-    
-    public override string renameElement(string name)
-    {
-
-        return null;
-    }
+            return new int[] { };
+        }
 
 
-    
-    public override bool canBeDuplicated()
-    {
+        public override bool canAddElement(int type)
+        {
 
-        return false;
+            return false;
+        }
 
+
+        public override bool canBeDeleted()
+        {
+
+            return false;
+        }
+
+
+        public override bool canBeMoved()
+        {
+
+            return false;
+        }
+
+
+        public override bool canBeRenamed()
+        {
+
+            return false;
+        }
+
+
+        public override bool addElement(int type, string id)
+        {
+
+            bool elementAdded = false;
+
+            if (type == Controller.RESOURCES && !Controller.getInstance().isPlayTransparent())
+            {
+                return base.addElement(type, id);
+            }
+
+            return elementAdded;
+        }
+
+
+        public override bool buildResourcesTab()
+        {
+
+            return !Controller.getInstance().isPlayTransparent();
+        }
+
+
+        public override string renameElement(string name)
+        {
+
+            return null;
+        }
+
+
+
+        public override bool canBeDuplicated()
+        {
+
+            return false;
+
+        }
     }
 }

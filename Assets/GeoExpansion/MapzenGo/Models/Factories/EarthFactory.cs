@@ -95,8 +95,6 @@ namespace MapzenGo.Models.Factories
                 ? geo["properties"]["kind"].str.ConvertToEarthType()
                 : EarthType.Earth;
 
-                var typeSettings = FactorySettings.GetSettingsFor<EarthSettings>(kind);
-
                 //if we dont have a setting defined for that, it'Ll be merged to "unknown" 
                 if (!FactorySettings.HasSettingsFor(kind))
                     kind = EarthType.Earth;

@@ -1,6 +1,8 @@
 ﻿using System;
 
-public interface Resource
+namespace uAdventure.Runner
 {
+    public interface Resource 
+    {
+    }
 }
-

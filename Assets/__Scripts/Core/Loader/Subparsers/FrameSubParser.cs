@@ -3,87 +3,91 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Xml;
 
-public class FrameSubParser : SubParser {
-    private Animation animation;
-
-    private Frame frame;
-
-    private ResourcesUni currentResources;
-
-    public FrameSubParser(Animation animation):base(null)
+namespace uAdventure.Core
+{
+    public class FrameSubParser : SubParser
     {
-        this.animation = animation;
-        frame = new Frame(animation.getImageLoaderFactory());
-        animation.getFrames().Add(frame);
-    } 
+        //private Animation animation;
 
-    public override void startElement(string namespaceURI, string sName, string qName, Dictionary<string, string> attrs)
-    {
+        private Frame frame;
 
-        if (qName.Equals("frame"))
+        private ResourcesUni currentResources;
+
+        public FrameSubParser(Animation animation) : base(null)
         {
-            foreach (KeyValuePair<string, string> entry in attrs)
+            //this.animation = animation;
+            frame = new Frame(animation.getImageLoaderFactory());
+            animation.getFrames().Add(frame);
+        }
+
+        public override void startElement(string namespaceURI, string sName, string qName, Dictionary<string, string> attrs)
+        {
+
+            if (qName.Equals("frame"))
             {
-                if (entry.Key.Equals("uri"))
-                    frame.setUri(entry.Value.ToString());
-                if (entry.Key.Equals("type"))
+                foreach (KeyValuePair<string, string> entry in attrs)
                 {
-                    if (entry.Value.ToString().Equals("image"))
-                        frame.setType(Frame.TYPE_IMAGE);
-                    if (entry.Value.ToString().Equals("video"))
-                        frame.setType(Frame.TYPE_VIDEO);
+                    if (entry.Key.Equals("uri"))
+                        frame.setUri(entry.Value.ToString());
+                    if (entry.Key.Equals("type"))
+                    {
+                        if (entry.Value.ToString().Equals("image"))
+                            frame.setType(Frame.TYPE_IMAGE);
+                        if (entry.Value.ToString().Equals("video"))
+                            frame.setType(Frame.TYPE_VIDEO);
+                    }
+                    if (entry.Key.Equals("time"))
+                    {
+                        frame.setTime(long.Parse(entry.Value.ToString()));
+                    }
+                    if (entry.Key.Equals("waitforclick"))
+                        frame.setWaitforclick(entry.Value.ToString().Equals("yes"));
+                    if (entry.Key.Equals("soundUri"))
+                        frame.setSoundUri(entry.Value.ToString());
+                    if (entry.Key.Equals("maxSoundTime"))
+                        frame.setMaxSoundTime(int.Parse(entry.Value.ToString()));
                 }
-                if (entry.Key.Equals("time"))
+            }
+
+            if (qName.Equals("resources"))
+            {
+                currentResources = new ResourcesUni();
+
+                foreach (KeyValuePair<string, string> entry in attrs)
                 {
-                    frame.setTime(long.Parse(entry.Value.ToString()));
+                    if (entry.Key.Equals("name"))
+                        currentResources.setName(entry.Value.ToString());
                 }
-                if (entry.Key.Equals("waitforclick"))
-                    frame.setWaitforclick(entry.Value.ToString().Equals("yes"));
-                if (entry.Key.Equals("soundUri"))
-                    frame.setSoundUri(entry.Value.ToString());
-                if (entry.Key.Equals("maxSoundTime"))
-                    frame.setMaxSoundTime(int.Parse(entry.Value.ToString()));
+
             }
-        }
 
-        if (qName.Equals("resources"))
-        {
-            currentResources = new ResourcesUni();
-
-            foreach (KeyValuePair<string, string> entry in attrs)
+            if (qName.Equals("asset"))
             {
-                if (entry.Key.Equals("name"))
-                    currentResources.setName(entry.Value.ToString());
-            }
+                string type = "";
+                string path = "";
 
+                foreach (KeyValuePair<string, string> entry in attrs)
+                {
+                    if (entry.Key.Equals("type"))
+                        type = entry.Value.ToString();
+                    if (entry.Key.Equals("uri"))
+                        path = entry.Value.ToString();
+                }
+
+                // If the asset is not an special one
+                //if( !AssetsController.isAssetSpecial( path ) )
+                currentResources.addAsset(type, path);
+            }
         }
 
-        if (qName.Equals("asset"))
+        public override void endElement(string namespaceURI, string sName, string qName)
         {
-            string type = "";
-            string path = "";
 
-            foreach (KeyValuePair<string, string> entry in attrs)
+            if (qName.Equals("resources"))
             {
-                if (entry.Key.Equals("type"))
-                    type = entry.Value.ToString();
-                if (entry.Key.Equals("uri"))
-                    path = entry.Value.ToString();
+                frame.addResources(currentResources);
             }
 
-            // If the asset is not an special one
-            //if( !AssetsController.isAssetSpecial( path ) )
-            currentResources.addAsset(type, path);
         }
-    }
-
-    public override void endElement(string namespaceURI, string sName, string qName)
-    {
-
-        if (qName.Equals("resources"))
-        {
-            frame.addResources(currentResources);
-        }
-
     }
 }

@@ -86,7 +86,7 @@ namespace MapzenGo.Models.Factories
                 if (!FactorySettings.HasSettingsFor(kind) && !JustDrawEverythingFam)
                     continue;
 
-                var typeSettings = FactorySettings.GetSettingsFor<LanduseSettings>(kind);
+                //var typeSettings = FactorySettings.GetSettingsFor<LanduseSettings>(kind);
                 if (!_meshes.ContainsKey(kind))
                     _meshes.Add(kind, new MeshData());
 

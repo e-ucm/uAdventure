@@ -1,21 +1,24 @@
-﻿/**
- * The object has a name
- */
-public interface Named
+﻿namespace uAdventure.Core
 {
-
     /**
-     * Set the name of the object
-     * 
-     * @param name
-     *            The new name of the object
+     * The object has a name
      */
-    void setName(string name);
+    public interface Named
+    {
 
-    /**
-     * Get the name of the object
-     * 
-     * @return The name of the object
-     */
-    string getName();
+        /**
+         * Set the name of the object
+         * 
+         * @param name
+         *            The new name of the object
+         */
+        void setName(string name);
+
+        /**
+         * Get the name of the object
+         * 
+         * @return The name of the object
+         */
+        string getName();
+    }
 }

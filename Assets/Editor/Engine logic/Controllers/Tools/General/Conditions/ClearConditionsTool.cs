@@ -1,76 +1,81 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-/**
- * 
- * Clear conditions tool
- * 
- */
+using uAdventure.Core;
 
-public class ClearConditionsTool : Tool
+namespace uAdventure.Editor
 {
+    /**
+     * 
+     * Clear conditions tool
+     * 
+     */
 
-
-    Conditions conditions;
-    Conditions conditionsOld;
-
-    public ClearConditionsTool(Conditions conditions)
+    public class ClearConditionsTool : Tool
     {
 
-        this.conditionsOld = (Conditions) conditions;
-        this.conditions = conditions;
 
-    }
+        Conditions conditions;
+        Conditions conditionsOld;
 
-
-    public override bool canRedo()
-    {
-
-        return true;
-    }
-
-    public override bool canUndo()
-    {
-
-        return true;
-    }
-
-    public override bool combine(Tool other)
-    {
-
-        return false;
-    }
-
-    public override bool doTool()
-    {
-        if (conditions != null)
+        public ClearConditionsTool(Conditions conditions)
         {
-            conditions.getConditionsList().Clear();
-            Controller.getInstance().updateVarFlagSummary();
-            Controller.getInstance().updatePanel();
+
+            this.conditionsOld = (Conditions)conditions;
+            this.conditions = conditions;
+
+        }
+
+
+        public override bool canRedo()
+        {
+
             return true;
         }
-        else
-            return false;
-    }
 
-    public override bool redoTool()
-    {
-
-        return doTool();
-    }
-
-    public override bool undoTool()
-    {
-
-        if (conditionsOld != null)
+        public override bool canUndo()
         {
-            conditions = (Conditions) conditionsOld;
-            Controller.getInstance().updateVarFlagSummary();
-            Controller.getInstance().updatePanel();
+
+            return true;
         }
-        else
+
+        public override bool combine(Tool other)
+        {
+
             return false;
-        return true;
+        }
+
+        public override bool doTool()
+        {
+            if (conditions != null)
+            {
+                conditions.getConditionsList().Clear();
+                Controller.getInstance().updateVarFlagSummary();
+                Controller.getInstance().updatePanel();
+                return true;
+            }
+            else
+                return false;
+        }
+
+        public override bool redoTool()
+        {
+
+            return doTool();
+        }
+
+        public override bool undoTool()
+        {
+
+            if (conditionsOld != null)
+            {
+                conditions = (Conditions)conditionsOld;
+                Controller.getInstance().updateVarFlagSummary();
+                Controller.getInstance().updatePanel();
+            }
+            else
+                return false;
+            return true;
+        }
     }
 }

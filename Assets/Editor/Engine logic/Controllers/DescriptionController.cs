@@ -1,76 +1,82 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class DescriptionController{
+using uAdventure.Core;
 
-    private Description description;
-
-    private ConditionsController conditionsController;
-
-    public DescriptionController(Description description)
+namespace uAdventure.Editor
+{
+    public class DescriptionController
     {
-        this.description = description;
 
-        if (description.getConditions() == null)
+        private Description description;
+
+        private ConditionsController conditionsController;
+
+        public DescriptionController(Description description)
         {
-            description.setConditions(new Conditions());
+            this.description = description;
+
+            if (description.getConditions() == null)
+            {
+                description.setConditions(new Conditions());
+            }
+
+
+            conditionsController = new ConditionsController(description.getConditions());
+
+        }
+
+        public ConditionsController getConditionsController()
+        {
+            return conditionsController;
+        }
+
+        public string getName()
+        {
+            return description.getName();
+
+        }
+
+        public string getBriefDescription()
+        {
+            return description.getDescription();
+
+        }
+
+        public string getDetailedDescription()
+        {
+            return description.getDetailedDescription();
+
+        }
+
+        public string getNameSoundPath()
+        {
+            return description.getNameSoundPath();
+
+        }
+
+        public string getDescriptionSoundPath()
+        {
+            return description.getDescriptionSoundPath();
+
+        }
+
+        public string getDetailedDescriptionSoundPath()
+        {
+            return description.getDetailedDescriptionSoundPath();
+
         }
 
 
-        conditionsController = new ConditionsController(description.getConditions());
-
-    }
-
-    public ConditionsController getConditionsController()
-    {
-        return conditionsController;
-    }
-
-    public string getName()
-    {
-        return description.getName();
-
-    }
-
-    public string getBriefDescription()
-    {
-        return description.getDescription();
-
-    }
-
-    public string getDetailedDescription()
-    {
-        return description.getDetailedDescription();
-
-    }
-
-    public string getNameSoundPath()
-    {
-        return description.getNameSoundPath();
-
-    }
-
-    public string getDescriptionSoundPath()
-    {
-        return description.getDescriptionSoundPath();
-
-    }
-
-    public string getDetailedDescriptionSoundPath()
-    {
-        return description.getDetailedDescriptionSoundPath();
-
-    }
+        public void setDescriptionData(Description description)
+        {
+            this.description = description;
+        }
 
 
-    public void setDescriptionData(Description description)
-    {
-        this.description = description;
-    }
-
-
-    public Description getDescriptionData()
-    {
-        return description;
+        public Description getDescriptionData()
+        {
+            return description;
+        }
     }
 }

@@ -1,21 +1,24 @@
-﻿/**
- * The object has an ID
- */
-public interface HasId
+﻿namespace uAdventure.Core
 {
-
     /**
-     * Get the id of the object
-     * 
-     * @return The objects id
+     * The object has an ID
      */
-    string getId();
+    public interface HasId
+    {
 
-    /**
-     * Set the id of the object
-     * 
-     * @param id
-     *            The new id
-     */
-    void setId(string id);
+        /**
+         * Get the id of the object
+         * 
+         * @return The objects id
+         */
+        string getId();
+
+        /**
+         * Set the id of the object
+         * 
+         * @param id
+         *            The new id
+         */
+        void setId(string id);
+    }
 }

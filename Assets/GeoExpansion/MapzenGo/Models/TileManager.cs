@@ -42,8 +42,6 @@ namespace MapzenGo.Models
         protected Vector2d CenterTms; //tms tile coordinate
         protected Vector2d CenterInMercator; //this is like distance (meters) in mercator 
 
-        private Queue<Tile> _readyToProcess;
-
         private List<Plugin> _plugins;
 
         private void InitFactories()
@@ -58,8 +56,7 @@ namespace MapzenGo.Models
         public virtual void Start()
         {
             InitFactories();
-
-            _readyToProcess = new Queue<Tile>();
+            
             _removeAfter = Math.Max(_removeAfter, Range * 2 + 1);
             var centerrect = new Vector2(TileSize, TileSize);
             _centerCollider = new Rect(Vector2.zero - centerrect / 2, centerrect);

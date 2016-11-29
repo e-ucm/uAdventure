@@ -1,123 +1,129 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class AddNewPointTool : Tool {
+using uAdventure.Core;
 
-
-    private Rectangle rectangle;
-
-    private Vector2 newPoint;
-
-    private InfluenceAreaDataControl iadc;
-
-    private InfluenceArea oldInfluenceArea;
-
-    private InfluenceArea newInfluenceArea;
-
-    public AddNewPointTool(Rectangle rectangle, int x, int y)
+namespace uAdventure.Editor
+{
+    public class AddNewPointTool : Tool
     {
 
-        this.rectangle = rectangle;
-        newPoint = new Vector2(x, y);
-    }
 
-    public AddNewPointTool(Rectangle rectangle, int x, int y, InfluenceAreaDataControl iadc)
-    {
+        private Rectangle rectangle;
 
-        this.rectangle = rectangle;
-        this.iadc = iadc;
-        oldInfluenceArea = (InfluenceArea)iadc.getContent();
-        newPoint = new Vector2(x, y);
-    }
+        private Vector2 newPoint;
 
-  
-    public override bool canRedo()
-    {
+        private InfluenceAreaDataControl iadc;
 
-        return true;
-    }
+        private InfluenceArea oldInfluenceArea;
 
-  
-    public override bool canUndo()
-    {
+        private InfluenceArea newInfluenceArea;
 
-        return true;
-    }
-
-  
-    public override bool combine(Tool other)
-    {
-
-        return false;
-    }
-
-  
-    public override bool doTool()
-    {
-
-        if (rectangle.isRectangular())
+        public AddNewPointTool(Rectangle rectangle, int x, int y)
         {
+
+            this.rectangle = rectangle;
+            newPoint = new Vector2(x, y);
+        }
+
+        public AddNewPointTool(Rectangle rectangle, int x, int y, InfluenceAreaDataControl iadc)
+        {
+
+            this.rectangle = rectangle;
+            this.iadc = iadc;
+            oldInfluenceArea = (InfluenceArea)iadc.getContent();
+            newPoint = new Vector2(x, y);
+        }
+
+
+        public override bool canRedo()
+        {
+
+            return true;
+        }
+
+
+        public override bool canUndo()
+        {
+
+            return true;
+        }
+
+
+        public override bool combine(Tool other)
+        {
+
             return false;
         }
-        rectangle.getPoints().Add(newPoint);
 
-        if (iadc != null)
+
+        public override bool doTool()
         {
-            int minX = int.MaxValue;
-            int minY = int.MaxValue;
-            int maxX = 0;
-            int maxY = 0;
-            foreach (Vector2 point in rectangle.getPoints())
+
+            if (rectangle.isRectangular())
             {
-                if (point.x > maxX)
-                    maxX = (int)point.x;
-                if (point.x < minX)
-                    minX = (int)point.x;
-                if (point.y > maxY)
-                    maxY = (int)point.y;
-                if (point.y < minY)
-                    minY = (int)point.y;
+                return false;
             }
-            newInfluenceArea = new InfluenceArea();
-            newInfluenceArea.setX(-20);
-            newInfluenceArea.setY(-20);
-            newInfluenceArea.setHeight(maxY - minY + 40);
-            newInfluenceArea.setWidth(maxX - minX + 40);
+            rectangle.getPoints().Add(newPoint);
 
-            ActiveArea aa = (ActiveArea)rectangle;
-            aa.setInfluenceArea(newInfluenceArea);
-            iadc.setInfluenceArea(newInfluenceArea);
+            if (iadc != null)
+            {
+                int minX = int.MaxValue;
+                int minY = int.MaxValue;
+                int maxX = 0;
+                int maxY = 0;
+                foreach (Vector2 point in rectangle.getPoints())
+                {
+                    if (point.x > maxX)
+                        maxX = (int)point.x;
+                    if (point.x < minX)
+                        minX = (int)point.x;
+                    if (point.y > maxY)
+                        maxY = (int)point.y;
+                    if (point.y < minY)
+                        minY = (int)point.y;
+                }
+                newInfluenceArea = new InfluenceArea();
+                newInfluenceArea.setX(-20);
+                newInfluenceArea.setY(-20);
+                newInfluenceArea.setHeight(maxY - minY + 40);
+                newInfluenceArea.setWidth(maxX - minX + 40);
+
+                ActiveArea aa = (ActiveArea)rectangle;
+                aa.setInfluenceArea(newInfluenceArea);
+                iadc.setInfluenceArea(newInfluenceArea);
+            }
+            return true;
         }
-        return true;
-    }
 
-  
-    public override bool redoTool()
-    {
 
-        rectangle.getPoints().Add(newPoint);
-        if (iadc != null)
+        public override bool redoTool()
         {
-            ActiveArea aa = (ActiveArea)rectangle;
-            aa.setInfluenceArea(newInfluenceArea);
-            iadc.setInfluenceArea(newInfluenceArea);
+
+            rectangle.getPoints().Add(newPoint);
+            if (iadc != null)
+            {
+                ActiveArea aa = (ActiveArea)rectangle;
+                aa.setInfluenceArea(newInfluenceArea);
+                iadc.setInfluenceArea(newInfluenceArea);
+            }
+            Controller.getInstance().updatePanel();
+            return true;
         }
-        Controller.getInstance().updatePanel();
-        return true;
-    }
 
-  
-    public override bool undoTool()
-    {
 
-        rectangle.getPoints().Remove(newPoint);
-        if (iadc != null)
+        public override bool undoTool()
         {
-            ActiveArea aa = (ActiveArea)rectangle;
-            aa.setInfluenceArea(oldInfluenceArea);
-            iadc.setInfluenceArea(oldInfluenceArea);
+
+            rectangle.getPoints().Remove(newPoint);
+            if (iadc != null)
+            {
+                ActiveArea aa = (ActiveArea)rectangle;
+                aa.setInfluenceArea(oldInfluenceArea);
+                iadc.setInfluenceArea(oldInfluenceArea);
+            }
+            Controller.getInstance().updatePanel();
+            return true;
         }
-        Controller.getInstance().updatePanel();
-        return true;
     }
 }

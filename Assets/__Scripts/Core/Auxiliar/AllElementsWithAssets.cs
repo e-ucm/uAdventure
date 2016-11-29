@@ -2,71 +2,75 @@
 using System.Collections;
 using System.Collections.Generic;
 
-/**
- * 
- * This class is used to store all the element with asset present in a chapter when it is imported.
- *
- */
-public class AllElementsWithAssets  {
-
-
+namespace uAdventure.Core
+{
     /**
-     * Check if store or not in allAssets list
-     */
-    private static bool storePath = false;
-
-    /**
-     * Store all the elements with assets an their references
-     */
-    private static List<System.Object> allAssets = new List<System.Object>();
-
-    /**
-     * change the storePath attribute
-     * @param store
-     */
-    public static void setStorePath(bool store)
-    {
-        storePath = store;
-    }
-
-    /**
-     * Store the element with asset if storePath att allows for it
      * 
-     * @param value
-     * @param key
+     * This class is used to store all the element with asset present in a chapter when it is imported.
+     *
      */
-    public static void addAsset(System.Object element)
+    public class AllElementsWithAssets
     {
-        if (storePath)
+
+
+        /**
+         * Check if store or not in allAssets list
+         */
+        private static bool storePath = false;
+
+        /**
+         * Store all the elements with assets an their references
+         */
+        private static List<System.Object> allAssets = new List<System.Object>();
+
+        /**
+         * change the storePath attribute
+         * @param store
+         */
+        public static void setStorePath(bool store)
         {
-            bool found = false;
-            foreach (System.Object o in allAssets)
+            storePath = store;
+        }
+
+        /**
+         * Store the element with asset if storePath att allows for it
+         * 
+         * @param value
+         * @param key
+         */
+        public static void addAsset(System.Object element)
+        {
+            if (storePath)
             {
-                if (o == element)
+                bool found = false;
+                foreach (System.Object o in allAssets)
                 {
-                    found = true; break;
+                    if (o == element)
+                    {
+                        found = true; break;
+                    }
+                }
+                if (!found)
+                {
+                    allAssets.Add(element);
                 }
             }
-            if (!found)
-            {
-                allAssets.Add(element);
-            }
         }
-    }
 
-    /**
-     * Clear the allAssets structure
-     */
-    public static void resetAllAssets()
-    {
-        allAssets.Clear();
-    }
+        /**
+         * Clear the allAssets structure
+         */
+        public static void resetAllAssets()
+        {
+            allAssets.Clear();
+        }
 
-    /**
-     * Return the allAssets
-     */
-    public static List<System.Object> getAllAssets()
-    {
-        return allAssets;
+        /**
+         * Return the allAssets
+         */
+        public static List<System.Object> getAllAssets()
+        {
+            return allAssets;
+        }
     }
 }

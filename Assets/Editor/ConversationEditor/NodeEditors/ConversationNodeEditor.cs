@@ -1,16 +1,22 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public interface ConversationNodeEditor {
-    void setParent (ConversationEditorWindow parent);
+using uAdventure.Core;
 
-	void draw();
-	ConversationNode Node { get; set; }
-	string NodeName{ get; }
-    ConversationNodeEditor clone();
-	bool manages(ConversationNode c);
+namespace uAdventure.Editor
+{
+    public interface ConversationNodeEditor
+    {
+        void setParent(ConversationEditorWindow parent);
 
-	bool Collapsed { get; set; }
+        void draw();
+        ConversationNode Node { get; set; }
+        string NodeName { get; }
+        ConversationNodeEditor clone();
+        bool manages(ConversationNode c);
 
-	Rect Window { get; set; }
+        bool Collapsed { get; set; }
+
+        Rect Window { get; set; }
+    }
 }

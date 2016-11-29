@@ -1,90 +1,97 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class ChangeDetailedDescriptionTool : Tool {
+using uAdventure.Core;
 
-
-    private Detailed detailed;
-
-    private string description;
-
-    private string oldDescription;
-
-    private Controller controller;
-
-    public ChangeDetailedDescriptionTool(Detailed described, string description)
+namespace uAdventure.Editor
+{
+    public class ChangeDetailedDescriptionTool : Tool
     {
 
-        this.detailed = described;
-        this.description = description;
-        this.controller = Controller.getInstance();
-    }
 
-    
-    public override bool canRedo()
-    {
+        private Detailed detailed;
 
-        return true;
-    }
+        private string description;
 
-    
-    public override bool canUndo()
-    {
+        private string oldDescription;
 
-        return true;
-    }
+        private Controller controller;
 
-    
-    public override bool doTool()
-    {
-
-        if (!description.Equals(detailed.getDetailedDescription()))
+        public ChangeDetailedDescriptionTool(Detailed described, string description)
         {
-            oldDescription = detailed.getDetailedDescription();
-            detailed.setDetailedDescription(description);
+
+            this.detailed = described;
+            this.description = description;
+            this.controller = Controller.getInstance();
+        }
+
+
+        public override bool canRedo()
+        {
+
             return true;
         }
-        return false;
-    }
 
-    
-    public override string getToolName()
-    {
 
-        return "Change description";
-    }
+        public override bool canUndo()
+        {
 
-    
-    public override bool redoTool()
-    {
+            return true;
+        }
 
-        detailed.setDetailedDescription(description);
-        controller.updatePanel();
-        return true;
-    }
 
-    
-    public override bool undoTool()
-    {
+        public override bool doTool()
+        {
 
-        detailed.setDetailedDescription(oldDescription);
-        controller.updatePanel();
-        return true;
-    }
-
-    
-    public override bool combine(Tool other)
-    {
-
-        if (other is ChangeDetailedDescriptionTool ) {
-            ChangeDetailedDescriptionTool cnt = (ChangeDetailedDescriptionTool)other;
-            if (cnt.detailed == detailed && cnt.oldDescription == description)
+            if (!description.Equals(detailed.getDetailedDescription()))
             {
-                description = cnt.description;
-                timeStamp = cnt.timeStamp;
+                oldDescription = detailed.getDetailedDescription();
+                detailed.setDetailedDescription(description);
                 return true;
             }
+            return false;
         }
-        return false;
+
+
+        public override string getToolName()
+        {
+
+            return "Change description";
+        }
+
+
+        public override bool redoTool()
+        {
+
+            detailed.setDetailedDescription(description);
+            controller.updatePanel();
+            return true;
+        }
+
+
+        public override bool undoTool()
+        {
+
+            detailed.setDetailedDescription(oldDescription);
+            controller.updatePanel();
+            return true;
+        }
+
+
+        public override bool combine(Tool other)
+        {
+
+            if (other is ChangeDetailedDescriptionTool)
+            {
+                ChangeDetailedDescriptionTool cnt = (ChangeDetailedDescriptionTool)other;
+                if (cnt.detailed == detailed && cnt.oldDescription == description)
+                {
+                    description = cnt.description;
+                    timeStamp = cnt.timeStamp;
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }

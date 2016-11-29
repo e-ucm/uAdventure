@@ -2,70 +2,74 @@
 using UnityEngine;
 using UnityEditor;
 
+using uAdventure.Core;
 
-public class WaitTimeEffectEditor : EffectEditor
+namespace uAdventure.Editor
 {
-    private bool collapsed = false;
-
-    public bool Collapsed
+    public class WaitTimeEffectEditor : EffectEditor
     {
-        get { return collapsed; }
-        set { collapsed = value; }
-    }
+        private bool collapsed = false;
 
-    private Rect window = new Rect(0, 0, 300, 0);
-    private int time = 0;
-
-    public Rect Window
-    {
-        get
+        public bool Collapsed
         {
-            if (collapsed) return new Rect(window.x, window.y, 50, 30);
-            else return window;
+            get { return collapsed; }
+            set { collapsed = value; }
         }
-        set
+
+        private Rect window = new Rect(0, 0, 300, 0);
+        private int time = 0;
+
+        public Rect Window
         {
-            if (collapsed) window = new Rect(value.x, value.y, window.width, window.height);
-            else window = value;
+            get
+            {
+                if (collapsed) return new Rect(window.x, window.y, 50, 30);
+                else return window;
+            }
+            set
+            {
+                if (collapsed) window = new Rect(value.x, value.y, window.width, window.height);
+                else window = value;
+            }
         }
-    }
 
-    private WaitTimeEffect effect;
+        private WaitTimeEffect effect;
 
-    public WaitTimeEffectEditor()
-    {
-        this.effect = new WaitTimeEffect(time);
-    }
+        public WaitTimeEffectEditor()
+        {
+            this.effect = new WaitTimeEffect(time);
+        }
 
-    public void draw()
-    {
-        EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.LabelField(TC.get("Effect.WaitTime"));
-        time = EditorGUILayout.IntField(effect.getTime());
-        effect.setTime(time);
-        EditorGUILayout.EndHorizontal();
+        public void draw()
+        {
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField(TC.get("Effect.WaitTime"));
+            time = EditorGUILayout.IntField(effect.getTime());
+            effect.setTime(time);
+            EditorGUILayout.EndHorizontal();
 
-        EditorGUILayout.HelpBox(TC.get("WaitTimeEffect.Label"), MessageType.Info);
-    }
+            EditorGUILayout.HelpBox(TC.get("WaitTimeEffect.Label"), MessageType.Info);
+        }
 
-    public AbstractEffect Effect
-    {
-        get { return effect; }
-        set { effect = value as WaitTimeEffect; }
-    }
+        public AbstractEffect Effect
+        {
+            get { return effect; }
+            set { effect = value as WaitTimeEffect; }
+        }
 
-    public string EffectName
-    {
-        get { return TC.get("Effect.WaitTime"); }
-    }
+        public string EffectName
+        {
+            get { return TC.get("Effect.WaitTime"); }
+        }
 
-    public EffectEditor clone()
-    {
-        return new WaitTimeEffectEditor();
-    }
+        public EffectEditor clone()
+        {
+            return new WaitTimeEffectEditor();
+        }
 
-    public bool manages(AbstractEffect c)
-    {
-        return c.GetType() == effect.GetType();
+        public bool manages(AbstractEffect c)
+        {
+            return c.GetType() == effect.GetType();
+        }
     }
 }

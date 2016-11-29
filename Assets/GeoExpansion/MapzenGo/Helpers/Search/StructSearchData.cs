@@ -42,7 +42,7 @@ namespace MapzenGo.Helpers.Search
     [Serializable]
     public class SearchData
     {
-        private string url = "http://b.tile.openstreetmap.org/";
+        public string url = "http://b.tile.openstreetmap.org/";
         public Vector2 coordinates;
         public string label;
     }

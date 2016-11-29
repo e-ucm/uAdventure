@@ -1,16 +1,24 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class AtrezzoMB : Representable {
-	
-	void Start () {
-		base.Start ();
-		base.setTexture(Atrezzo.RESOURCE_TYPE_IMAGE);
-		base.Positionate ();
-	}
+using uAdventure.Core;
 
-	// Update is called once per frame
-	void Update () {
-	
-	}
+namespace uAdventure.Runner
+{
+    public class AtrezzoMB : Representable
+    {
+
+        protected override void Start()
+        {
+            base.Start();
+            base.setTexture(Atrezzo.RESOURCE_TYPE_IMAGE);
+            base.Positionate();
+        }
+
+        // Update is called once per frame
+        protected override void Update()
+        {
+
+        }
+    }
 }

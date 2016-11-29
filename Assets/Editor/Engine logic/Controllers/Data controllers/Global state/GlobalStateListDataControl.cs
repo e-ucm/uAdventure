@@ -3,182 +3,186 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-public class GlobalStateListDataControl : DataControl
+using uAdventure.Core;
+
+namespace uAdventure.Editor
 {
-
-
-    /**
-     * List of globalStates.
-     */
-    private List<GlobalState> globalStatesList;
-
-    /**
-     * List of globalState controllers.
-     */
-    private List<GlobalStateDataControl> globalStatesDataControlList;
-
-    /**
-     * Constructor.
-     * 
-     * @param globalStatesList
-     *            List of globalStates
-     */
-    public GlobalStateListDataControl(List<GlobalState> globalStatesList)
+    public class GlobalStateListDataControl : DataControl
     {
 
-        this.globalStatesList = globalStatesList;
 
-        // Create subcontrollers
-        globalStatesDataControlList = new List<GlobalStateDataControl>();
-        foreach (GlobalState globalState in globalStatesList)
-            globalStatesDataControlList.Add(new GlobalStateDataControl(globalState));
-    }
+        /**
+         * List of globalStates.
+         */
+        private List<GlobalState> globalStatesList;
 
-    /**
-     * Returns the list of globalState controllers.
-     * 
-     * @return GlobalState controllers
-     */
-    public List<GlobalStateDataControl> getGlobalStates()
-    {
+        /**
+         * List of globalState controllers.
+         */
+        private List<GlobalStateDataControl> globalStatesDataControlList;
 
-        return globalStatesDataControlList;
-    }
-
-    /**
-     * Returns the last globalState controller from the list.
-     * 
-     * @return Last globalState controller
-     */
-    public GlobalStateDataControl getLastGlobalState()
-    {
-
-        return globalStatesDataControlList[globalStatesDataControlList.Count - 1];
-    }
-
-    /**
-     * Returns the info of the globalStates contained in the list.
-     * 
-     * @return Array with the information of the globalStates. It contains the
-     *         identifier of each globalState, and the number of actions
-     */
-    public string[][] getGlobalStatesInfo()
-    {
-
-        string[][] globalStatesInfo = null;
-
-        // Create the list for the globalStates
-        globalStatesInfo = new string[globalStatesList.Count][];
-        for (int i =0; i < globalStatesList.Count;i++)
-            globalStatesInfo[i] = new string[2];
-
-        // Fill the array with the info
-        for (int i = 0; i < globalStatesList.Count; i++)
+        /**
+         * Constructor.
+         * 
+         * @param globalStatesList
+         *            List of globalStates
+         */
+        public GlobalStateListDataControl(List<GlobalState> globalStatesList)
         {
-            GlobalState globalState = globalStatesList[i];
-            globalStatesInfo[i][0] = globalState.getId();
-            globalStatesInfo[i][1] = Controller.getInstance().countIdentifierReferences(globalState.getId()).ToString();
+
+            this.globalStatesList = globalStatesList;
+
+            // Create subcontrollers
+            globalStatesDataControlList = new List<GlobalStateDataControl>();
+            foreach (GlobalState globalState in globalStatesList)
+                globalStatesDataControlList.Add(new GlobalStateDataControl(globalState));
         }
 
-        return globalStatesInfo;
-    }
-
-    public string[] getGlobalStatesIds()
-    {
-
-        string[]globalStatesInfo = null;
-
-        // Create the list for the globalStates
-        globalStatesInfo = new string[globalStatesList.Count];
-
-        // Fill the array with the info
-        for (int i = 0; i < globalStatesList.Count; i++)
+        /**
+         * Returns the list of globalState controllers.
+         * 
+         * @return GlobalState controllers
+         */
+        public List<GlobalStateDataControl> getGlobalStates()
         {
-            globalStatesInfo[i] = globalStatesList[i].getId();
+
+            return globalStatesDataControlList;
         }
 
-        return globalStatesInfo;
-    }
-
-    public override System.Object getContent()
-    {
-
-        return globalStatesList;
-    }
-
-    
-    public override int[] getAddableElements()
-    {
-
-        return new int[] { Controller.GLOBAL_STATE };
-    }
-
-    
-    public override bool canAddElement(int type)
-    {
-
-        // It can always add new globalStates
-        return type == Controller.GLOBAL_STATE;
-    }
-
-    
-    public override bool canBeDeleted()
-    {
-
-        return false;
-    }
-
-    
-    public override bool canBeMoved()
-    {
-
-        return false;
-    }
-
-    
-    public override bool canBeRenamed()
-    {
-
-        return false;
-    }
-
-    
-    public override bool addElement(int type, string globalStateId)
-    {
-
-        bool elementAdded = false;
-
-        if (type == Controller.GLOBAL_STATE)
+        /**
+         * Returns the last globalState controller from the list.
+         * 
+         * @return Last globalState controller
+         */
+        public GlobalStateDataControl getLastGlobalState()
         {
 
-            // Show a dialog asking for the globalState id
-            if (globalStateId == null)
-                globalStateId = controller.showInputDialog(TC.get("Operation.AddGlobalStateTitle"), TC.get("Operation.AddGlobalStateMessage"), TC.get("Operation.AddGlobalStateDefaultValue"));
+            return globalStatesDataControlList[globalStatesDataControlList.Count - 1];
+        }
 
-            // If some value was typed and the identifier is valid
-            if (globalStateId != null && controller.isElementIdValid(globalStateId))
+        /**
+         * Returns the info of the globalStates contained in the list.
+         * 
+         * @return Array with the information of the globalStates. It contains the
+         *         identifier of each globalState, and the number of actions
+         */
+        public string[][] getGlobalStatesInfo()
+        {
+
+            string[][] globalStatesInfo = null;
+
+            // Create the list for the globalStates
+            globalStatesInfo = new string[globalStatesList.Count][];
+            for (int i = 0; i < globalStatesList.Count; i++)
+                globalStatesInfo[i] = new string[2];
+
+            // Fill the array with the info
+            for (int i = 0; i < globalStatesList.Count; i++)
             {
-                // Add thew new globalState
-                GlobalState newGlobalState = new GlobalState(globalStateId);
-                globalStatesList.Add(newGlobalState);
-                globalStatesDataControlList.Add(new GlobalStateDataControl(newGlobalState));
-                controller.getIdentifierSummary().addGlobalStateId(globalStateId);
-                //controller.dataModified( );
-                elementAdded = true;
+                GlobalState globalState = globalStatesList[i];
+                globalStatesInfo[i][0] = globalState.getId();
+                globalStatesInfo[i][1] = Controller.getInstance().countIdentifierReferences(globalState.getId()).ToString();
             }
+
+            return globalStatesInfo;
         }
 
-        return elementAdded;
-    }
+        public string[] getGlobalStatesIds()
+        {
 
-    
-    public override bool duplicateElement(DataControl dataControl)
-    {
+            string[] globalStatesInfo = null;
 
-        if (!(dataControl is GlobalStateDataControl ) )
+            // Create the list for the globalStates
+            globalStatesInfo = new string[globalStatesList.Count];
+
+            // Fill the array with the info
+            for (int i = 0; i < globalStatesList.Count; i++)
+            {
+                globalStatesInfo[i] = globalStatesList[i].getId();
+            }
+
+            return globalStatesInfo;
+        }
+
+        public override System.Object getContent()
+        {
+
+            return globalStatesList;
+        }
+
+
+        public override int[] getAddableElements()
+        {
+
+            return new int[] { Controller.GLOBAL_STATE };
+        }
+
+
+        public override bool canAddElement(int type)
+        {
+
+            // It can always add new globalStates
+            return type == Controller.GLOBAL_STATE;
+        }
+
+
+        public override bool canBeDeleted()
+        {
+
             return false;
+        }
 
-          GlobalState newElement = (GlobalState)(((GlobalState)(dataControl.getContent())).Clone());
+
+        public override bool canBeMoved()
+        {
+
+            return false;
+        }
+
+
+        public override bool canBeRenamed()
+        {
+
+            return false;
+        }
+
+
+        public override bool addElement(int type, string globalStateId)
+        {
+
+            bool elementAdded = false;
+
+            if (type == Controller.GLOBAL_STATE)
+            {
+
+                // Show a dialog asking for the globalState id
+                if (globalStateId == null)
+                    globalStateId = controller.showInputDialog(TC.get("Operation.AddGlobalStateTitle"), TC.get("Operation.AddGlobalStateMessage"), TC.get("Operation.AddGlobalStateDefaultValue"));
+
+                // If some value was typed and the identifier is valid
+                if (globalStateId != null && controller.isElementIdValid(globalStateId))
+                {
+                    // Add thew new globalState
+                    GlobalState newGlobalState = new GlobalState(globalStateId);
+                    globalStatesList.Add(newGlobalState);
+                    globalStatesDataControlList.Add(new GlobalStateDataControl(newGlobalState));
+                    controller.getIdentifierSummary().addGlobalStateId(globalStateId);
+                    //controller.dataModified( );
+                    elementAdded = true;
+                }
+            }
+
+            return elementAdded;
+        }
+
+
+        public override bool duplicateElement(DataControl dataControl)
+        {
+
+            if (!(dataControl is GlobalStateDataControl))
+                return false;
+
+            GlobalState newElement = (GlobalState)(((GlobalState)(dataControl.getContent())).Clone());
             string id = newElement.getId();
             int i = 1;
             do
@@ -191,208 +195,209 @@ public class GlobalStateListDataControl : DataControl
             globalStatesDataControlList.Add(new GlobalStateDataControl(newElement));
             controller.getIdentifierSummary().addGlobalStateId(id);
             return true;
-    }
+        }
 
-    
-    public override string getDefaultId(int type)
-    {
 
-        return TC.get("Operation.AddGlobalStateDefaultValue");
-    }
-
-    
-    public override bool deleteElement(DataControl dataControl, bool askConfirmation)
-    {
-
-        bool elementDeleted = false;
-        string globalStateId = ((GlobalStateDataControl)dataControl).getId();
-        string references = controller.countIdentifierReferences(globalStateId).ToString();
-
-        // Ask for confirmation
-        if (!askConfirmation || controller.showStrictConfirmDialog(TC.get("Operation.DeleteElementTitle"), TC.get("Operation.DeleteElementWarning", new string[] { globalStateId, references })))
+        public override string getDefaultId(int type)
         {
-            if (globalStatesList.Remove((GlobalState)dataControl.getContent()))
+
+            return TC.get("Operation.AddGlobalStateDefaultValue");
+        }
+
+
+        public override bool deleteElement(DataControl dataControl, bool askConfirmation)
+        {
+
+            bool elementDeleted = false;
+            string globalStateId = ((GlobalStateDataControl)dataControl).getId();
+            string references = controller.countIdentifierReferences(globalStateId).ToString();
+
+            // Ask for confirmation
+            if (!askConfirmation || controller.showStrictConfirmDialog(TC.get("Operation.DeleteElementTitle"), TC.get("Operation.DeleteElementWarning", new string[] { globalStateId, references })))
             {
-                globalStatesDataControlList.Remove((GlobalStateDataControl)dataControl);
-                controller.deleteIdentifierReferences(globalStateId);
-                controller.getIdentifierSummary().deleteGlobalStateId(globalStateId);
+                if (globalStatesList.Remove((GlobalState)dataControl.getContent()))
+                {
+                    globalStatesDataControlList.Remove((GlobalStateDataControl)dataControl);
+                    controller.deleteIdentifierReferences(globalStateId);
+                    controller.getIdentifierSummary().deleteGlobalStateId(globalStateId);
+                    //controller.dataModified( );
+                    elementDeleted = true;
+                }
+            }
+
+            return elementDeleted;
+        }
+
+
+        public override bool moveElementUp(DataControl dataControl)
+        {
+
+            bool elementMoved = false;
+            int elementIndex = globalStatesList.IndexOf((GlobalState)dataControl.getContent());
+
+            if (elementIndex > 0)
+            {
+                GlobalState e = globalStatesList[elementIndex];
+                GlobalStateDataControl c = globalStatesDataControlList[elementIndex];
+                globalStatesList.RemoveAt(elementIndex);
+                globalStatesDataControlList.RemoveAt(elementIndex);
+                globalStatesList.Insert(elementIndex - 1, e);
+                globalStatesDataControlList.Insert(elementIndex - 1, c);
                 //controller.dataModified( );
-                elementDeleted = true;
+                elementMoved = true;
+            }
+
+            return elementMoved;
+        }
+
+
+        public override bool moveElementDown(DataControl dataControl)
+        {
+
+            bool elementMoved = false;
+            int elementIndex = globalStatesList.IndexOf((GlobalState)dataControl.getContent());
+
+            if (elementIndex < globalStatesList.Count - 1)
+            {
+                GlobalState e = globalStatesList[elementIndex];
+                GlobalStateDataControl c = globalStatesDataControlList[elementIndex];
+                globalStatesList.RemoveAt(elementIndex);
+                globalStatesDataControlList.RemoveAt(elementIndex);
+                globalStatesList.Insert(elementIndex + 1, e);
+                globalStatesDataControlList.Insert(elementIndex + 1, c);
+                //controller.dataModified( );
+                elementMoved = true;
+            }
+
+            return elementMoved;
+        }
+
+
+        public override string renameElement(string name)
+        {
+
+            return null;
+        }
+
+
+        public override void updateVarFlagSummary(VarFlagSummary varFlagSummary)
+        {
+
+            // Iterate through each globalState
+            foreach (GlobalStateDataControl globalStateDataControl in globalStatesDataControlList)
+                globalStateDataControl.updateVarFlagSummary(varFlagSummary);
+        }
+
+
+        public override bool isValid(string currentPath, List<string> incidences)
+        {
+
+            bool valid = true;
+
+            // Update the current path
+            currentPath += " >> " + TC.getElement(Controller.GLOBAL_STATE_LIST);
+
+            // Iterate through the globalStates
+            foreach (GlobalStateDataControl globalStateDataControl in globalStatesDataControlList)
+            {
+                string globalStatePath = currentPath + " >> " + globalStateDataControl.getId();
+                valid &= globalStateDataControl.isValid(globalStatePath, incidences);
+            }
+
+            return valid;
+        }
+
+
+        public override int countAssetReferences(string assetPath)
+        {
+
+            int count = 0;
+
+            // Iterate through each globalState
+            foreach (GlobalStateDataControl globalStateDataControl in globalStatesDataControlList)
+                count += globalStateDataControl.countAssetReferences(assetPath);
+
+            return count;
+        }
+
+
+        public override void getAssetReferences(List<string> assetPaths, List<int> assetTypes)
+        {
+
+            // Iterate through each globalState
+            foreach (GlobalStateDataControl globalStateDataControl in globalStatesDataControlList)
+                globalStateDataControl.getAssetReferences(assetPaths, assetTypes);
+        }
+
+
+        public override void deleteAssetReferences(string assetPath)
+        {
+
+            // Iterate through each globalState
+            foreach (GlobalStateDataControl globalStateDataControl in globalStatesDataControlList)
+                globalStateDataControl.deleteAssetReferences(assetPath);
+        }
+
+
+        public override int countIdentifierReferences(string id)
+        {
+
+            int count = 0;
+
+            // Iterate through each globalState
+            foreach (GlobalStateDataControl globalStateDataControl in globalStatesDataControlList)
+                count += globalStateDataControl.countIdentifierReferences(id);
+
+            return count;
+        }
+
+
+        public override void replaceIdentifierReferences(string oldId, string newId)
+        {
+
+            // Iterate through each globalState
+            foreach (GlobalStateDataControl globalStateDataControl in globalStatesDataControlList)
+                globalStateDataControl.replaceIdentifierReferences(oldId, newId);
+        }
+
+
+        public override void deleteIdentifierReferences(string id)
+        {
+
+            // Spread the call to every globalState
+            foreach (GlobalStateDataControl globalStateDataControl in globalStatesDataControlList)
+            {
+                globalStateDataControl.deleteIdentifierReferences(id);
+
             }
         }
 
-        return elementDeleted;
-    }
 
-    
-    public override bool moveElementUp(DataControl dataControl)
-    {
-
-        bool elementMoved = false;
-        int elementIndex = globalStatesList.IndexOf((GlobalState)dataControl.getContent());
-
-        if (elementIndex > 0)
+        public override bool canBeDuplicated()
         {
-            GlobalState e = globalStatesList[elementIndex];
-            GlobalStateDataControl c = globalStatesDataControlList[elementIndex];
-            globalStatesList.RemoveAt(elementIndex);
-            globalStatesDataControlList.RemoveAt(elementIndex);
-            globalStatesList.Insert(elementIndex - 1, e);
-            globalStatesDataControlList.Insert(elementIndex - 1, c);
-            //controller.dataModified( );
-            elementMoved = true;
+
+            return false;
         }
 
-        return elementMoved;
-    }
 
-    
-    public override bool moveElementDown(DataControl dataControl)
-    {
-
-        bool elementMoved = false;
-        int elementIndex = globalStatesList.IndexOf((GlobalState)dataControl.getContent());
-
-        if (elementIndex < globalStatesList.Count - 1)
+        public override void recursiveSearch()
         {
-            GlobalState e = globalStatesList[elementIndex];
-            GlobalStateDataControl c = globalStatesDataControlList[elementIndex];
-            globalStatesList.RemoveAt(elementIndex);
-            globalStatesDataControlList.RemoveAt(elementIndex);
-            globalStatesList.Insert(elementIndex + 1, e);
-            globalStatesDataControlList.Insert(elementIndex + 1, c);
-            //controller.dataModified( );
-            elementMoved = true;
+
+            foreach (DataControl dc in this.globalStatesDataControlList)
+                dc.recursiveSearch();
         }
 
-        return elementMoved;
-    }
 
-    
-    public override string renameElement(string name)
-    {
-
-        return null;
-    }
-
-    
-    public override void updateVarFlagSummary(VarFlagSummary varFlagSummary)
-    {
-
-        // Iterate through each globalState
-        foreach (GlobalStateDataControl globalStateDataControl in globalStatesDataControlList)
-            globalStateDataControl.updateVarFlagSummary(varFlagSummary);
-    }
-
-    
-    public override bool isValid(string currentPath, List<string> incidences)
-    {
-
-        bool valid = true;
-
-        // Update the current path
-        currentPath += " >> " + TC.getElement(Controller.GLOBAL_STATE_LIST);
-
-        // Iterate through the globalStates
-        foreach (GlobalStateDataControl globalStateDataControl in globalStatesDataControlList)
+        public override List<Searchable> getPathToDataControl(Searchable dataControl)
         {
-            string globalStatePath = currentPath + " >> " + globalStateDataControl.getId();
-            valid &= globalStateDataControl.isValid(globalStatePath, incidences);
+
+            return getPathFromChild(dataControl, globalStatesDataControlList.Cast<Searchable>().ToList());
         }
 
-        return valid;
-    }
-
-    
-    public override int countAssetReferences(string assetPath)
-    {
-
-        int count = 0;
-
-        // Iterate through each globalState
-        foreach (GlobalStateDataControl globalStateDataControl in globalStatesDataControlList)
-            count += globalStateDataControl.countAssetReferences(assetPath);
-
-        return count;
-    }
-
-    
-    public override void getAssetReferences(List<string> assetPaths, List<int> assetTypes)
-    {
-
-        // Iterate through each globalState
-        foreach (GlobalStateDataControl globalStateDataControl in globalStatesDataControlList)
-            globalStateDataControl.getAssetReferences(assetPaths, assetTypes);
-    }
-
-    
-    public override void deleteAssetReferences(string assetPath)
-    {
-
-        // Iterate through each globalState
-        foreach (GlobalStateDataControl globalStateDataControl in globalStatesDataControlList)
-            globalStateDataControl.deleteAssetReferences(assetPath);
-    }
-
-    
-    public override int countIdentifierReferences(string id)
-    {
-
-        int count = 0;
-
-        // Iterate through each globalState
-        foreach (GlobalStateDataControl globalStateDataControl in globalStatesDataControlList)
-            count += globalStateDataControl.countIdentifierReferences(id);
-
-        return count;
-    }
-
-    
-    public override void replaceIdentifierReferences(string oldId, string newId)
-    {
-
-        // Iterate through each globalState
-        foreach (GlobalStateDataControl globalStateDataControl in globalStatesDataControlList)
-            globalStateDataControl.replaceIdentifierReferences(oldId, newId);
-    }
-
-    
-    public override void deleteIdentifierReferences(string id)
-    {
-
-        // Spread the call to every globalState
-        foreach (GlobalStateDataControl globalStateDataControl in globalStatesDataControlList)
+        public List<GlobalState> getGlobalStatesList()
         {
-            globalStateDataControl.deleteIdentifierReferences(id);
 
+            return this.globalStatesList;
         }
-    }
-
-    
-    public override bool canBeDuplicated()
-    {
-
-        return false;
-    }
-
-    
-    public override void recursiveSearch()
-    {
-
-        foreach (DataControl dc in this.globalStatesDataControlList)
-            dc.recursiveSearch();
-    }
-
-    
-    public override List<Searchable> getPathToDataControl(Searchable dataControl)
-    {
-
-        return getPathFromChild(dataControl, globalStatesDataControlList.Cast<Searchable>().ToList());
-    }
-
-    public List<GlobalState> getGlobalStatesList()
-    {
-
-        return this.globalStatesList;
     }
 }

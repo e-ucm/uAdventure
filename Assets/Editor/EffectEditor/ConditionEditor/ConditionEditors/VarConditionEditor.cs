@@ -3,60 +3,70 @@ using UnityEditor;
 using System.Collections;
 using System;
 
-public class VarConditionEditor : ConditionEditor {
-    VarCondition condition = new VarCondition("",4,0);
-    string[] types = { " > ", " >= ", " == ", " <= ", " != "};
-    string name = TC.get("Vars.Var");
-    private string[] vars;
+using uAdventure.Core;
 
-    public VarConditionEditor()
+namespace uAdventure.Editor
+{
+    public class VarConditionEditor : ConditionEditor
     {
-        vars = Controller.getInstance().getVarFlagSummary().getVars();
-        if (vars == null || vars.Length == 0)
-        {
-            Avaiable = false;
-        }
-        else
-        {
-            Avaiable = true;
-            condition = new VarCondition(vars[0], 4, 0);
-        }
-    }
+        VarCondition condition = new VarCondition("", 4, 0);
+        string[] types = { " > ", " >= ", " == ", " <= ", " != " };
+        string name = TC.get("Vars.Var");
+        private string[] vars;
 
-    public void draw(Condition c){
-        condition = c as VarCondition;
-
-        EditorGUILayout.BeginHorizontal ();
-        EditorGUILayout.LabelField (TC.get("Condition.VarID"));
-
-        if (Avaiable)
+        public VarConditionEditor()
         {
-            int index = Array.IndexOf(vars, c.getId());
-            condition.setId(vars[EditorGUILayout.Popup(index >= 0 ? index : 0, vars)]);
-            condition.setState(EditorGUILayout.Popup(c.getState() - 4, types) + 4);
-            condition.setValue(int.Parse(EditorGUILayout.TextField(condition.getValue().ToString())));
-        }
-        else
-        {
-            EditorGUILayout.HelpBox(TC.get("Condition.Var.Warning"), MessageType.Error);
+            vars = Controller.getInstance().getVarFlagSummary().getVars();
+            if (vars == null || vars.Length == 0)
+            {
+                Avaiable = false;
+            }
+            else
+            {
+                Avaiable = true;
+                condition = new VarCondition(vars[0], 4, 0);
+            }
         }
 
-        EditorGUILayout.EndHorizontal ();
-    }
+        public void draw(Condition c)
+        {
+            condition = c as VarCondition;
 
-    public bool manages(Condition c) {
-        return c.GetType() == condition.GetType();
-    }
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField(TC.get("Condition.VarID"));
 
-    public string conditionName(){
-        return name;
-    }
+            if (Avaiable)
+            {
+                int index = Array.IndexOf(vars, c.getId());
+                condition.setId(vars[EditorGUILayout.Popup(index >= 0 ? index : 0, vars)]);
+                condition.setState(EditorGUILayout.Popup(c.getState() - 4, types) + 4);
+                condition.setValue(int.Parse(EditorGUILayout.TextField(condition.getValue().ToString())));
+            }
+            else
+            {
+                EditorGUILayout.HelpBox(TC.get("Condition.Var.Warning"), MessageType.Error);
+            }
 
-    public Condition InstanceManagedCondition(){
-        return new VarCondition ("",4,0);
-    }
+            EditorGUILayout.EndHorizontal();
+        }
 
-    public bool Collapsed { get; set; }
-    public Rect Window { get; set; }
-    public bool Avaiable { get; set; }
+        public bool manages(Condition c)
+        {
+            return c.GetType() == condition.GetType();
+        }
+
+        public string conditionName()
+        {
+            return name;
+        }
+
+        public Condition InstanceManagedCondition()
+        {
+            return new VarCondition("", 4, 0);
+        }
+
+        public bool Collapsed { get; set; }
+        public Rect Window { get; set; }
+        public bool Avaiable { get; set; }
+    }
 }

@@ -1,17 +1,20 @@
-﻿public interface HasTargetId
+﻿namespace uAdventure.Core
 {
-    /**
-     * Get the target id of the object
-     * 
-     * @return The objects target id
-     */
-    string getTargetId();
+    public interface HasTargetId
+    {
+        /**
+         * Get the target id of the object
+         * 
+         * @return The objects target id
+         */
+        string getTargetId();
 
-    /**
-     * Set the target id of the object
-     * 
-     * @param id
-     *            The objects new target id
-     */
-    void setTargetId(string id);
+        /**
+         * Set the target id of the object
+         * 
+         * @param id
+         *            The objects new target id
+         */
+        void setTargetId(string id);
+    }
 }
