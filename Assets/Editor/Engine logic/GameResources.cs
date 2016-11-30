@@ -42,7 +42,13 @@ namespace uAdventure.Editor
             instance = null;
         }
 
-        public static void LoadOrCreateGameProject(string selectedGameProjectPath)
+        public static bool CreateGameProject(string selectedGameProjectPath, int type)
+        {
+            List<Incidence> list = new List<Incidence>(), adventureList = new List<Incidence>();
+            return Controller.getInstance().newFile(selectedGameProjectPath, type);
+        }
+
+        public static void LoadGameProject(string selectedGameProjectPath)
         {
             List<Incidence> list = new List<Incidence>(), adventureList = new List<Incidence>();
             Controller.getInstance().init(selectedGameProjectPath);

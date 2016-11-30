@@ -3,6 +3,8 @@ using UnityEditor;
 using System.Collections;
 
 using uAdventure.Core;
+using System.IO;
+using System.Windows.Forms;
 
 namespace uAdventure.Editor
 {
@@ -13,6 +15,9 @@ namespace uAdventure.Editor
             FPS = 0,
             TPS = 1
         };
+
+        private System.Windows.Forms.SaveFileDialog sfd;
+        private string selectedGameProjectPath = "";
 
         public NewGameWindow(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
@@ -28,6 +33,7 @@ namespace uAdventure.Editor
 
             screenRect = new Rect(0.01f * m_Rect.width, 0.5f * m_Rect.height, 0.98f * m_Rect.width, 0.4f * m_Rect.height);
             bottomButtonRect = new Rect(0.8f * m_Rect.width, 0.9f * m_Rect.height, 0.15f * m_Rect.width, 0.1f * m_Rect.height);
+            sfd = new System.Windows.Forms.SaveFileDialog();
         }
 
         public Vector2 scrollPositionButtons;
@@ -108,10 +114,41 @@ namespace uAdventure.Editor
 
         private void startNewGame()
         {
-            GameRources.LoadOrCreateGameProject(null);
-            EditorWindowBase.Init();
-            EditorWindowBase window = (EditorWindowBase)EditorWindow.GetWindow(typeof(EditorWindowBase));
-            window.Show();
+            int type = -1;
+            switch (selectedGameType)
+            {
+                default:
+                case GameType.FPS: type = Controller.FILE_ADVENTURE_1STPERSON_PLAYER; break;
+                case GameType.TPS: type = Controller.FILE_ADVENTURE_3RDPERSON_PLAYER; break;
+            }
+
+            Stream myStream = null;
+            sfd.InitialDirectory = "c:\\";
+            sfd.Filter = "ead files (*.ead) | *.ead |eap files (*.eap) | *.eap | All files(*.*) | *.* ";
+            sfd.FilterIndex = 2;
+            sfd.RestoreDirectory = true;
+
+            if (sfd.ShowDialog() == DialogResult.OK)
+            {
+
+                if ((myStream = sfd.OpenFile()) != null)
+                {
+                    using (myStream)
+                    {
+                        // Insert code to read the stream here.
+                        selectedGameProjectPath = sfd.FileName;
+                        if(GameRources.CreateGameProject(selectedGameProjectPath, type))
+                        {
+                            GameRources.LoadGameProject(selectedGameProjectPath);
+                            EditorWindowBase.Init();
+                            EditorWindowBase window = (EditorWindowBase)EditorWindow.GetWindow(typeof(EditorWindowBase));
+                            window.Show();
+                        }
+                    }
+                    myStream.Dispose();
+                }
+
+            }
         }
 
         //public void OnDialogOk(string message, object workingObject = null, object workingObjectSecond = null)

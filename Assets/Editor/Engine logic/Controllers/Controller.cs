@@ -545,7 +545,7 @@ namespace uAdventure.Editor
             DirectoryInfo tempFolder = new DirectoryInfo(ReleaseFolders.WEB_TEMP_FOLDER);
             if (!tempFolder.Exists)
             {
-                projectsFolder.Create();
+                tempFolder.Create();
             }
             DirectoryInfo exportsFolder = new DirectoryInfo(ReleaseFolders.EXPORTS_FOLDER);
             if (!exportsFolder.Exists)
@@ -805,14 +805,16 @@ namespace uAdventure.Editor
          * @return True if the new data was created successfully, false otherwise
          */
 
-        public bool newFile(int fileType)
+        public bool newFile(string gamePath, int fileType)
         {
+
+            ConfigData.loadFromXML(ReleaseFolders.configFileEditorRelativePath());
 
             bool fileCreated = false;
 
             if (fileType == Controller.FILE_ADVENTURE_1STPERSON_PLAYER ||
                 fileType == Controller.FILE_ADVENTURE_3RDPERSON_PLAYER)
-                fileCreated = newAdventureFile(fileType);
+                fileCreated = newAdventureFile(gamePath, fileType);
             else if (fileType == Controller.FILE_ASSESSMENT)
             {
                 //fileCreated = newAssessmentFile();
@@ -928,7 +930,7 @@ namespace uAdventure.Editor
         //        return createNewFile;
         //    }
 
-        private bool newAdventureFile(int fileType)
+        private bool newAdventureFile(string fileName, int fileType)
         {
 
             bool fileCreated = false;
@@ -958,96 +960,79 @@ namespace uAdventure.Editor
             //FrameForInitialDialogs start = new FrameForInitialDialogs(false);
             //int op = start.showStartDialog();
             // If some folder is selected, check all characters are correct  
-            // if( folderSelector.showOpenDialog( mainWindow ) == JFileChooser.APPROVE_OPTION ) {
-
-            Stream myStream = null;
-            sfd = new System.Windows.Forms.SaveFileDialog();
-            sfd.InitialDirectory = "c:\\";
-            sfd.Filter = "ead files (*.ead) | *.ead |eap files (*.eap) | *.eap";
-            sfd.FilterIndex = 2;
-            sfd.RestoreDirectory = true;
-
-            if (sfd.ShowDialog() == DialogResult.OK)
+            
             {
-
-                if ((myStream = sfd.OpenFile()) != null)
+                DirectoryInfo selectedFolder = new DirectoryInfo(fileName);
+                selectedFile = new FileInfo(fileName);
+                if (selectedFile.FullName.EndsWith(".eap"))
                 {
-                    using (myStream)
+                    string absolutePath = selectedFolder.FullName;
+                    selectedFolder = new DirectoryInfo(absolutePath.Substring(0, absolutePath.Length - 4));
+                }
+                else
+                {
+                    selectedFile = new FileInfo(selectedFile.FullName + ".eap");
+                }
+                selectedDir = selectedFolder;
+
+                // Check the parent folder is not forbidden
+                if (isValidTargetProject(selectedFile))
+                {
+
+                    //if (FolderFileFilter.checkCharacters(selectedFolder.getName()))
+                    //{
+                    // Folder can be created/used
+                    // Does the folder exist?
+                    if (selectedFolder.Exists)
                     {
-                        DirectoryInfo selectedFolder = new DirectoryInfo(sfd.FileName);
-                        selectedFile = new FileInfo(sfd.FileName);
-                        if (selectedFile.FullName.EndsWith(".eap"))
+                        //Is the folder empty?
+                        if (selectedFolder.GetFiles().Length > 0)
                         {
-                            string absolutePath = selectedFolder.FullName;
-                            selectedFolder = new DirectoryInfo(absolutePath.Substring(0, absolutePath.Length - 4));
-                        }
-                        else
-                        {
-                            selectedFile = new FileInfo(selectedFile.FullName + ".eap");
-                        }
-                        selectedDir = selectedFolder;
-
-                        // Check the parent folder is not forbidden
-                        if (isValidTargetProject(selectedFile))
-                        {
-
-                            //if (FolderFileFilter.checkCharacters(selectedFolder.getName()))
-                            //{
-                            // Folder can be created/used
-                            // Does the folder exist?
-                            if (selectedFolder.Exists)
+                            // Delete content?
+                            if (this.showStrictConfirmDialog(TC.get("Operation.NewProject.FolderNotEmptyTitle"),
+                                TC.get("Operation.NewProject.FolderNotEmptyMessage")))
                             {
-                                //Is the folder empty?
-                                if (selectedFolder.GetFiles().Length > 0)
-                                {
-                                    // Delete content?
-                                    if (this.showStrictConfirmDialog(TC.get("Operation.NewProject.FolderNotEmptyTitle"),
-                                        TC.get("Operation.NewProject.FolderNotEmptyMessage")))
-                                    {
-                                        DirectoryInfo directory = new DirectoryInfo(selectedFolder.FullName);
-                                        directory.Delete(true);
-                                    }
-                                }
+                                DirectoryInfo directory = new DirectoryInfo(selectedFolder.FullName);
+                                directory.Delete(true);
+                            }
+                        }
+                        create = true;
+                    }
+                    else
+                    {
+                        // Create new folder?
+                        if (this.showStrictConfirmDialog(TC.get("Operation.NewProject.FolderNotCreatedTitle"),
+                            TC.get("Operation.NewProject.FolderNotCreatedMessage")))
+                        {
+                            DirectoryInfo directory = new DirectoryInfo(selectedFolder.FullName);
+                            directory.Create();
+                            if (directory.Exists)
+                            {
                                 create = true;
                             }
                             else
                             {
-                                // Create new folder?
-                                if (this.showStrictConfirmDialog(TC.get("Operation.NewProject.FolderNotCreatedTitle"),
-                                    TC.get("Operation.NewProject.FolderNotCreatedMessage")))
-                                {
-                                    DirectoryInfo directory = new DirectoryInfo(selectedFolder.FullName);
-                                    directory.Create();
-                                    if (directory.Exists)
-                                    {
-                                        create = true;
-                                    }
-                                    else
-                                    {
-                                        this.showStrictConfirmDialog(TC.get("Error.Title"), TC.get("Error.CreatingFolder"));
-                                    }
-
-                                }
-                                else
-                                {
-                                    create = false;
-                                }
+                                this.showStrictConfirmDialog(TC.get("Error.Title"), TC.get("Error.CreatingFolder"));
                             }
-                            //}
-                            //else {
-                            //    // Display error message
-                            //    this.showErrorDialog(TC.get("Error.Title"), TC.get("Error.ProjectFolderName", FolderFileFilter.getAllowedChars()));
-                            //}
+
                         }
                         else
                         {
-                            // Show error: The target dir cannot be contained 
-                            Debug.LogError(TC.get("Operation.NewProject.ForbiddenParent.Title") + " \n " +
-                                           TC.get("Operation.NewProject.ForbiddenParent.Message"));
                             create = false;
                         }
                     }
-                    myStream.Dispose();
+                    //}
+                    //else {
+                    //    // Display error message
+                    //    this.showErrorDialog(TC.get("Error.Title"), TC.get("Error.ProjectFolderName", FolderFileFilter.getAllowedChars()));
+                    //}
+                }
+                else
+                {
+                    // Show error: The target dir cannot be contained 
+                    Debug.LogError(TC.get("Operation.NewProject.ForbiddenParent.Title") + " \n " +
+                                    TC.get("Operation.NewProject.ForbiddenParent.Message"));
+                    create = false;
                 }
             }
 
