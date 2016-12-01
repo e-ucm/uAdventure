@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 
 using uAdventure.Core;
+using System;
+using UnityEditorInternal;
 
 namespace uAdventure.Editor
 {
-    public class ScenesWindow : LayoutWindow
+    public class ScenesWindow : ReorderableListEditorWindowExtension
     {
         private enum ScenesWindowType
         {
@@ -42,6 +44,14 @@ namespace uAdventure.Editor
             : base(aStartPos, aContent, aStyle, aOptions)
         {
             thisRect = aStartPos;
+            var content = new GUIContent();
+
+            // Button
+            content.image = (Texture2D) Resources.Load("EAdventureData/img/icons/scenes", typeof(Texture2D));
+            content.text = TC.get("Element.Name1");
+            ButtonContent = content;
+
+            // Windows
             scenesWindowActiveAreas = new ScenesWindowActiveAreas(aStartPos,
                 new GUIContent(TC.get("ActiveAreasList.Title")), "Window");
             scenesWindowAppearance = new ScenesWindowAppearance(aStartPos, new GUIContent(TC.get("Scene.LookPanelTitle")),
@@ -67,6 +77,8 @@ namespace uAdventure.Editor
 
         public override void Draw(int aID)
         {
+            Elements = Controller.getInstance().getCharapterList().getSelectedChapterData().getScenes().ConvertAll(s => s.getId());
+
             // Show information of concrete item
             if (isConcreteItemVisible)
             {
@@ -244,6 +256,88 @@ namespace uAdventure.Editor
                 new List<bool>(Controller.getInstance().getCharapterList().getSelectedChapterData().getScenes().Count);
             for (int i = 0; i < Controller.getInstance().getCharapterList().getSelectedChapterData().getScenes().Count; i++)
                 toggleList.Add(true);
+        }
+
+        // ---------------------------------------------
+        //         Reorderable List Handlers
+        // ---------------------------------------------
+
+        protected override void OnElementNameChanged(ReorderableList r, int index, string newName)
+        {
+            Controller.getInstance().getCharapterList().getSelectedChapterData().getScenes()[index].setId(newName);
+        }
+
+        protected override void OnAdd(ReorderableList r)
+        {
+            if(r.index != -1 || r.index >= r.list.Count)
+            {
+                Controller.getInstance()
+                           .getCharapterList()
+                           .getSelectedChapterDataControl()
+                           .getScenesList()
+                           .duplicateElement(
+                               Controller.getInstance()
+                                   .getCharapterList()
+                                   .getSelectedChapterDataControl()
+                                   .getScenesList()
+                                   .getScenes()[r.index]);
+            }
+            else
+            {
+                Controller.getInstance().getSelectedChapterDataControl().getScenesList().addElement(Controller.SCENE, "newScene");
+            }
+            
+        }
+
+        protected override void OnAddOption(ReorderableList r, string option)
+        {
+            // No options
+        }
+
+        protected override void OnRemove(ReorderableList r)
+        {
+            if(r.index != -1)
+            {
+                Controller.getInstance()
+                              .getCharapterList()
+                              .getSelectedChapterDataControl()
+                              .getScenesList()
+                              .deleteElement(
+                                  Controller.getInstance()
+                                      .getCharapterList()
+                                      .getSelectedChapterDataControl()
+                                      .getScenesList()
+                                      .getScenes()[r.index], false);
+
+                ShowBaseWindowView();
+            }
+        }
+
+        protected override void OnSelect(ReorderableList r)
+        {
+            ShowItemWindowView(r.index);
+        }
+
+        protected override void OnReorder(ReorderableList r)
+        {
+            List<Scene> previousList = Controller.getInstance()
+                              .getCharapterList()
+                              .getSelectedChapterData()
+                              .getScenes();
+
+            List<Scene> scenes = new List<Scene>();
+            foreach (string sceneName in r.list)
+                scenes.Add(previousList.Find(s => s.getId() == sceneName));
+
+
+            previousList.Clear();
+            previousList.AddRange(scenes);
+        }
+
+        protected override void OnButton()
+        {
+            ShowBaseWindowView();
+            reorderableList.index = -1;
         }
     }
 }

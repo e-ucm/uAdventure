@@ -1,6 +1,7 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
+using System.Collections.Generic;
 using uAdventure.Core;
 
 namespace uAdventure.Editor
@@ -21,8 +22,6 @@ namespace uAdventure.Editor
         public enum EditorWindowType
         {
             Chapter,
-            Scenes,
-            Cutscenes,
             Books,
             Items,
             SetItems,
@@ -32,7 +31,10 @@ namespace uAdventure.Editor
             AdvancedFeatures,
             AdaptationProfiles,
             AssesmentProfiles,
-            completables
+            completables,
+            MapScenes,
+            GeoElements,
+            AdvancedGeo
         };
 
         // The position of the window
@@ -52,8 +54,6 @@ namespace uAdventure.Editor
 
         private LayoutWindow m_Window1 = null;
         private static ChapterWindow chapterWindow;
-        private static ScenesWindow scenesWindow;
-        private static CutscenesWindow cutscenesWindow;
         private static BooksWindow booksWindow;
         private static ItemsWindow itemsWindow;
         private static SetItemsWindow setItemsWindow;
@@ -77,10 +77,7 @@ namespace uAdventure.Editor
 
         private static Texture2D redoTexture = null;
         private static Texture2D undoTexture = null;
-
-
-        private static Texture2D sceneTexture = null;
-        private static Texture2D cutsceneTexture = null;
+        
         private static Texture2D bookTexture = null;
         private static Texture2D itemTexture = null;
         private static Texture2D setItemTexture = null;
@@ -91,9 +88,7 @@ namespace uAdventure.Editor
         private static Texture2D adaptationTexture = null;
         private static Texture2D assessmentTexture = null;
         private static Texture2D completableTexture = null;
-
-        private static GUIContent leftMenuContentScene;
-        private static GUIContent leftMenuContentCutscene;
+        
         private static GUIContent leftMenuContentBook;
         private static GUIContent leftMenuContentItem;
         private static GUIContent leftMenuContentSetItem;
@@ -103,6 +98,9 @@ namespace uAdventure.Editor
         private static GUIContent leftMenuContentAdvanced;
         private static GUIContent leftMenuContentAdaptation;
         private static GUIContent leftMenuContentAssessment;
+
+        private static List<EditorWindowExtension> extensions;
+        private static EditorWindowExtension extensionSelected;
 
         [MenuItem("eAdventure/Open eAdventure editor")]
         public static void Init()
@@ -132,9 +130,7 @@ namespace uAdventure.Editor
 
             deleteImg = (Texture2D)Resources.Load("EAdventureData/img/icons/deleteContent", typeof(Texture2D));
             duplicateImg = (Texture2D)Resources.Load("EAdventureData/img/icons/duplicateNode", typeof(Texture2D));
-
-            sceneTexture = (Texture2D)Resources.Load("EAdventureData/img/icons/scenes", typeof(Texture2D));
-            cutsceneTexture = (Texture2D)Resources.Load("EAdventureData/img/icons/cutscenes", typeof(Texture2D));
+            
             bookTexture = (Texture2D)Resources.Load("EAdventureData/img/icons/books", typeof(Texture2D));
             itemTexture = (Texture2D)Resources.Load("EAdventureData/img/icons/items", typeof(Texture2D));
             setItemTexture = (Texture2D)Resources.Load("EAdventureData/img/icons/Atrezzo-List-1", typeof(Texture2D));
@@ -155,14 +151,17 @@ namespace uAdventure.Editor
             configurationMenu = new ConfigurationMenu();
             aboutMenu = new AboutMenu();
 
+            extensions = new List<EditorWindowExtension>();
+
             InitGUI();
         }
 
         public static void InitGUI()
         {
+            extensions.Add(new ScenesWindow(windowRect, new GUIContent(TC.get("Element.Name1")), "Window"));
+            extensions.Add(new CutscenesWindow(windowRect, new GUIContent(TC.get("Element.Name9")), "Window"));
+
             chapterWindow = new ChapterWindow(windowRect, new GUIContent(TC.get("Element.Name0")), "Window");
-            scenesWindow = new ScenesWindow(windowRect, new GUIContent(TC.get("Element.Name1")), "Window");
-            cutscenesWindow = new CutscenesWindow(windowRect, new GUIContent(TC.get("Element.Name9")), "Window");
             booksWindow = new BooksWindow(windowRect, new GUIContent(TC.get("Element.Name11")), "Window");
             itemsWindow = new ItemsWindow(windowRect, new GUIContent(TC.get("Element.Name18")), "Window");
             setItemsWindow = new SetItemsWindow(windowRect, new GUIContent(TC.get("Element.Name59")), "Window");
@@ -176,13 +175,6 @@ namespace uAdventure.Editor
 
 
             // Left menu buttons
-            leftMenuContentScene = new GUIContent();
-            leftMenuContentScene.image = (Texture2D)sceneTexture;
-            leftMenuContentScene.text = TC.get("Element.Name1");
-
-            leftMenuContentCutscene = new GUIContent();
-            leftMenuContentCutscene.image = (Texture2D)cutsceneTexture;
-            leftMenuContentCutscene.text = TC.get("Element.Name9");
 
             leftMenuContentBook = new GUIContent();
             leftMenuContentBook.image = (Texture2D)bookTexture;
@@ -293,156 +285,16 @@ namespace uAdventure.Editor
             }
 
             // Button event scene
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button(leftMenuContentScene))
+            extensions.ForEach(e =>
             {
-                OnWindowTypeChanged(EditorWindowType.Scenes);
-                scenesWindow.ShowBaseWindowView();
-            }
-            //Add button scene
-            if (openedWindow == EditorWindowType.Scenes)
-            {
-                if (GUILayout.Button(addTexture))
-                {
-                    ChapterElementNameInputPopup window =
-                        (ChapterElementNameInputPopup)
-                            ScriptableObject.CreateInstance(typeof(ChapterElementNameInputPopup));
-                    window.Init(this, "Scene", EditorWindowType.Scenes);
+                if (e.LayoutDrawButton()) {
+                    extensionSelected = e;
+                    OnWindowTypeChanged(EditorWindowType.MapScenes);
                 }
-            }
-            GUILayout.EndHorizontal();
-            // Item sublist scene
-            if (openedWindow == EditorWindowType.Scenes)
-            {
-                GUI.skin = leftSubMenuSkin;
-                for (int i = 0;
-                    i < Controller.getInstance().getCharapterList().getSelectedChapterData().getScenes().Count;
-                    i++)
-                {
-                    if (i == GameRources.GetInstance().selectedSceneIndex)
-                    {
-                        GUI.skin = leftSubMenuConcreteItemSkin;
-                    }
+                if (extensionSelected == e) e.LayoutDrawMenu();
+            });
 
-                    if (
-                        GUILayout.Button(
-                            Controller.getInstance().getCharapterList().getSelectedChapterData().getScenes()[i].getId()))
-                    {
-                        scenesWindow.ShowItemWindowView(i);
-                    }
-
-                    if (i == GameRources.GetInstance().selectedSceneIndex)
-                    {
-                        GUILayout.BeginHorizontal();
-                        if (GUILayout.Button("Rename"))
-                        {
-                            Debug.Log("Rename");
-                        }
-                        if (GUILayout.Button(duplicateImg))
-                        {
-                            Controller.getInstance()
-                                .getCharapterList()
-                                .getSelectedChapterDataControl()
-                                .getScenesList()
-                                .duplicateElement(
-                                    Controller.getInstance()
-                                        .getCharapterList()
-                                        .getSelectedChapterDataControl()
-                                        .getScenesList()
-                                        .getScenes()[i]);
-
-                        }
-                        if (GUILayout.Button(deleteImg))
-                        {
-                            Controller.getInstance()
-                                .getCharapterList()
-                                .getSelectedChapterDataControl()
-                                .getScenesList()
-                                .deleteElement(
-                                    Controller.getInstance()
-                                        .getCharapterList()
-                                        .getSelectedChapterDataControl()
-                                        .getScenesList()
-                                        .getScenes()[i], false);
-                            scenesWindow.ShowBaseWindowView();
-                        }
-                        GUILayout.EndHorizontal();
-                        GUI.skin = leftSubMenuSkin;
-                    }
-                }
-                GUI.skin = defaultGUISkin;
-            }
-
-
-
-            // Button event cutscene
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button(leftMenuContentCutscene))
-            {
-                OnWindowTypeChanged(EditorWindowType.Cutscenes);
-                cutscenesWindow.ShowBaseWindowView();
-            }
-            //Add button cutscene
-            if (openedWindow == EditorWindowType.Cutscenes)
-            {
-                if (GUILayout.Button(addTexture))
-                {
-                    ChapterElementNewCutsceneInputPopup window =
-                        (ChapterElementNewCutsceneInputPopup)
-                            ScriptableObject.CreateInstance(typeof(ChapterElementNewCutsceneInputPopup));
-                    window.Init(this, "Cutscene", EditorWindowType.Cutscenes);
-                }
-            }
-            GUILayout.EndHorizontal();
-            // Item sublist cutscene
-            if (openedWindow == EditorWindowType.Cutscenes)
-            {
-                GUI.skin = leftSubMenuSkin;
-                for (int i = 0;
-                    i < Controller.getInstance().getCharapterList().getSelectedChapterData().getCutscenes().Count;
-                    i++)
-                {
-                    if (i == GameRources.GetInstance().selectedCutsceneIndex)
-                    {
-                        GUI.skin = leftSubMenuConcreteItemSkin;
-                    }
-
-                    if (
-                        GUILayout.Button(
-                            Controller.getInstance().getCharapterList().getSelectedChapterData().getCutscenes()[i].getId()))
-                    {
-                        cutscenesWindow.ShowItemWindowView(i);
-                    }
-
-                    if (i == GameRources.GetInstance().selectedCutsceneIndex)
-                    {
-                        GUILayout.BeginHorizontal();
-                        if (GUILayout.Button("Rename"))
-                        {
-                            Debug.Log("Rename");
-                        }
-                        if (GUILayout.Button(deleteImg))
-                        {
-                            Controller.getInstance()
-                                .getCharapterList()
-                                .getSelectedChapterDataControl()
-                                .getCutscenesList()
-                                .deleteElement(
-                                    Controller.getInstance()
-                                        .getCharapterList()
-                                        .getSelectedChapterDataControl()
-                                        .getCutscenesList()
-                                        .getCutscenes()[i], false);
-                            scenesWindow.ShowBaseWindowView();
-                        }
-                        GUILayout.EndHorizontal();
-                        GUI.skin = leftSubMenuSkin;
-                    }
-                }
-                GUI.skin = defaultGUISkin;
-            }
-
-
+            //extensionSelected.OnGUI();
 
             // Button event book
             GUILayout.BeginHorizontal();
@@ -516,7 +368,6 @@ namespace uAdventure.Editor
                                         .getSelectedChapterDataControl()
                                         .getBooksList()
                                         .getBooks()[i], false);
-                            scenesWindow.ShowBaseWindowView();
                         }
                         GUILayout.EndHorizontal();
                         GUI.skin = leftSubMenuSkin;
@@ -599,7 +450,6 @@ namespace uAdventure.Editor
                                         .getSelectedChapterDataControl()
                                         .getItemsList()
                                         .getItems()[i], false);
-                            scenesWindow.ShowBaseWindowView();
                         }
                         GUILayout.EndHorizontal();
                         GUI.skin = leftSubMenuSkin;
@@ -682,7 +532,6 @@ namespace uAdventure.Editor
                                         .getSelectedChapterDataControl()
                                         .getAtrezzoList()
                                         .getAtrezzoList()[i], false);
-                            scenesWindow.ShowBaseWindowView();
                         }
                         GUILayout.EndHorizontal();
                         GUI.skin = leftSubMenuSkin;
@@ -771,7 +620,6 @@ namespace uAdventure.Editor
                                         .getSelectedChapterDataControl()
                                         .getNPCsList()
                                         .getNPCs()[i], false);
-                            scenesWindow.ShowBaseWindowView();
                         }
                         GUILayout.EndHorizontal();
                         GUI.skin = leftSubMenuSkin;
@@ -888,17 +736,12 @@ namespace uAdventure.Editor
             WINDOWS
             */
             BeginWindows();
+            //extensionSelected.OnGUI();
 
             switch (openedWindow)
             {
                 case EditorWindowType.Chapter:
                     m_Window1 = chapterWindow;
-                    break;
-                case EditorWindowType.Scenes:
-                    m_Window1 = scenesWindow;
-                    break;
-                case EditorWindowType.Cutscenes:
-                    m_Window1 = cutscenesWindow;
                     break;
                 case EditorWindowType.Books:
                     m_Window1 = booksWindow;
@@ -924,6 +767,10 @@ namespace uAdventure.Editor
                 case EditorWindowType.AssesmentProfiles:
                     m_Window1 = assesmentProfileWindow;
                     break;
+                default:
+                    if (extensionSelected != null)
+                        m_Window1 = extensionSelected;
+                    break;
             }
 
             if (m_Window1 != null)
@@ -948,31 +795,6 @@ namespace uAdventure.Editor
             Controller.getInstance().undoTool();
         }
 
-        void AddScene(string name)
-        {
-            Controller.getInstance().getSelectedChapterDataControl().getScenesList().addElement(Controller.SCENE, name);
-            scenesWindow.ShowBaseWindowView();
-        }
-
-        void AddCutsceneSlide(string name)
-        {
-            Debug.Log("Slide");
-            Controller.getInstance()
-                .getSelectedChapterDataControl()
-                .getCutscenesList()
-                .addElement(Controller.CUTSCENE_SLIDES, name);
-            cutscenesWindow.ShowBaseWindowView();
-        }
-
-        void AddCutsceneVideo(string name)
-        {
-            Debug.Log("Video");
-            Controller.getInstance()
-                .getSelectedChapterDataControl()
-                .getCutscenesList()
-                .addElement(Controller.CUTSCENE_VIDEO, name);
-            cutscenesWindow.ShowBaseWindowView();
-        }
 
         void AddBook(string name)
         {
@@ -1014,18 +836,6 @@ namespace uAdventure.Editor
                 EditorWindowType callbackType = ((ChapterElementNameInputPopup)workingObject).connectedAsssetType;
                 switch (callbackType)
                 {
-                    case EditorWindowType.Scenes:
-                        AddScene(message);
-                        break;
-                    case EditorWindowType.Cutscenes:
-                        int cutsceneType = ((ChapterElementNewCutsceneInputPopup)workingObject).cutsceneType;
-
-                        if (cutsceneType == Controller.CUTSCENE_SLIDES)
-                            AddCutsceneSlide(message);
-                        else if (cutsceneType == Controller.CUTSCENE_VIDEO)
-                            AddCutsceneVideo(message);
-
-                        break;
                     case EditorWindowType.Books:
                         AddBook(message);
                         break;

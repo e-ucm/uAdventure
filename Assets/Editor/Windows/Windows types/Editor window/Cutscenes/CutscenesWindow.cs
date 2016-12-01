@@ -2,10 +2,13 @@
 using System.Collections;
 
 using uAdventure.Core;
+using System;
+using UnityEditorInternal;
+using System.Collections.Generic;
 
 namespace uAdventure.Editor
 {
-    public class CutscenesWindow : LayoutWindow
+    public class CutscenesWindow : ReorderableListEditorWindowExtension
     {
         private enum CutscenesWindowType { Appearance, Documentation, EndConfiguration }
 
@@ -28,6 +31,11 @@ namespace uAdventure.Editor
         public CutscenesWindow(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
         {
+            GUIContent content = new GUIContent();
+            // Button
+            content.image = (Texture2D)Resources.Load("EAdventureData/img/icons/cutscenes", typeof(Texture2D));
+            content.text = TC.get("Element.Name9");
+            ButtonContent = content;
 
             cutscenesWindowAppearance = new CutscenesWindowAppearance(aStartPos, new GUIContent(TC.get("Cutscene.App")), "Window");
             cutscenesWindowDocumentation = new CutscenesWindowDocumentation(aStartPos, new GUIContent(TC.get("Cutscene.Doc")), "Window");
@@ -43,6 +51,8 @@ namespace uAdventure.Editor
 
         public override void Draw(int aID)
         {
+            Elements = Controller.getInstance().getCharapterList().getSelectedChapterData().getCutscenes().ConvertAll(s => s.getId());
+
             // Show information of concrete item
             if (isConcreteItemVisible)
             {
@@ -133,6 +143,94 @@ namespace uAdventure.Editor
             cutscenesWindowAppearance = new CutscenesWindowAppearance(thisRect, new GUIContent(TC.get("Cutscene.App")), "Window");
             cutscenesWindowDocumentation = new CutscenesWindowDocumentation(thisRect, new GUIContent(TC.get("Cutscene.Doc")), "Window");
             cutscenesWindowEndConfiguration = new CutscenesWindowEndConfiguration(thisRect, new GUIContent(TC.get("Cutscene.CutsceneEnd")), "Window");
+        }
+
+        protected override void OnElementNameChanged(ReorderableList r, int index, string newName)
+        {
+            Controller.getInstance().getCharapterList().getSelectedChapterData().getCutscenes()[index].setId(newName);
+        }
+
+        protected override void OnAdd(ReorderableList r)
+        {
+            if (r.index != -1 || r.index >= r.list.Count)
+            {
+                Controller.getInstance()
+                           .getCharapterList()
+                           .getSelectedChapterDataControl()
+                           .getCutscenesList()
+                           .duplicateElement(
+                               Controller.getInstance()
+                                   .getCharapterList()
+                                   .getSelectedChapterDataControl()
+                                   .getCutscenesList()
+                                   .getCutscenes()[r.index]);
+            }
+
+        }
+
+        protected override void OnAddOption(ReorderableList r, string option)
+        {
+
+            Controller.getInstance()
+                .getSelectedChapterDataControl()
+                .getCutscenesList()
+                .addElement(option == "Slides" ? Controller.CUTSCENE_SLIDES : Controller.CUTSCENE_VIDEO, "new Cutscene");
+        }
+
+        protected override void OnRemove(ReorderableList r)
+        {
+            if (r.index != -1)
+            {
+                Controller.getInstance()
+                              .getCharapterList()
+                              .getSelectedChapterDataControl()
+                              .getCutscenesList()
+                              .deleteElement(
+                                  Controller.getInstance()
+                                      .getCharapterList()
+                                      .getSelectedChapterDataControl()
+                                      .getCutscenesList()
+                                      .getCutscenes()[r.index], false);
+
+                ShowBaseWindowView();
+            }
+        }
+
+        protected override void OnSelect(ReorderableList r)
+        {
+            if (GameRources.GetInstance().selectedCutsceneIndex == r.index)
+            {
+                r.index = -1;
+                this.Options = new List<string>() { "Video", "Slides" };
+            }
+            else
+            {
+                this.Options = new List<string>();
+            }
+
+            ShowItemWindowView(r.index);
+        }
+
+        protected override void OnReorder(ReorderableList r)
+        {
+            List<Cutscene> previousList = Controller.getInstance()
+                              .getCharapterList()
+                              .getSelectedChapterData()
+                              .getCutscenes();
+
+            List<Cutscene> cutscenes = new List<Cutscene>();
+            foreach (string sceneName in r.list)
+                cutscenes.Add(previousList.Find(s => s.getId() == sceneName));
+
+
+            previousList.Clear();
+            previousList.AddRange(cutscenes);
+        }
+
+        protected override void OnButton()
+        {
+            ShowBaseWindowView();
+            reorderableList.index = -1;
         }
     }
 }
