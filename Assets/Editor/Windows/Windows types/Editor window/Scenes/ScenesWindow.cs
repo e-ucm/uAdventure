@@ -77,8 +77,6 @@ namespace uAdventure.Editor
 
         public override void Draw(int aID)
         {
-            Elements = Controller.getInstance().getCharapterList().getSelectedChapterData().getScenes().ConvertAll(s => s.getId());
-
             // Show information of concrete item
             if (isConcreteItemVisible)
             {
@@ -269,7 +267,7 @@ namespace uAdventure.Editor
 
         protected override void OnAdd(ReorderableList r)
         {
-            if(r.index != -1 || r.index >= r.list.Count)
+            if(r.index != -1 && r.index < r.list.Count)
             {
                 Controller.getInstance()
                            .getCharapterList()
@@ -338,6 +336,11 @@ namespace uAdventure.Editor
         {
             ShowBaseWindowView();
             reorderableList.index = -1;
+        }
+
+        protected override void OnUpdateList(ReorderableList r)
+        {
+            Elements = Controller.getInstance().getCharapterList().getSelectedChapterData().getScenes().ConvertAll(s => s.getId());
         }
     }
 }

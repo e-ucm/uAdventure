@@ -169,16 +169,17 @@ namespace uAdventure.Editor
                 if (sceneId == null || sceneId.Equals(""))
                     sceneId = controller.showInputDialog(TC.get("Operation.AddSceneTitle"), TC.get("Operation.AddSceneMessage"), TC.get("Operation.AddSceneDefaultValue"));
                 // If some value was typed and the identifier is valid
-                if (sceneId != null && controller.isElementIdValid(sceneId))
-                {
-                    // Add thew new scene
-                    Scene newScene = new Scene(sceneId);
-                    scenesList.Add(newScene);
-                    scenesDataControlList.Add(new SceneDataControl(newScene, controller.getPlayerImagePath()));
-                    controller.getIdentifierSummary().addSceneId(sceneId);
-                    //controller.dataModified( );
-                    elementAdded = true;
-                }
+                if (!controller.isElementIdValid(sceneId))
+                    sceneId = controller.makeElementValid(sceneId);
+                
+                // Add thew new scene
+                Scene newScene = new Scene(sceneId);
+                scenesList.Add(newScene);
+                scenesDataControlList.Add(new SceneDataControl(newScene, controller.getPlayerImagePath()));
+                controller.getIdentifierSummary().addSceneId(sceneId);
+                //controller.dataModified( );
+                elementAdded = true;
+                
             }
 
             return elementAdded;

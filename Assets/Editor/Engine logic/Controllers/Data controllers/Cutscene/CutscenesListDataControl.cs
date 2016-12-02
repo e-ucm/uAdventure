@@ -181,21 +181,21 @@ namespace uAdventure.Editor
                         TC.get("Operation.AddCutsceneMessage"), TC.get("Operation.AddCutsceneDefaultValue"));
 
                 // If some value was typed and the identifier is valid
-                if (cutsceneId != null && controller.isElementIdValid(cutsceneId))
-                {
-                    Cutscene newCutscene = null;
+                if (!controller.isElementIdValid(cutsceneId))
+                    cutsceneId = controller.makeElementValid(cutsceneId);
 
-                    // Create the new cutscene
-                    if (type == Controller.CUTSCENE_SLIDES)
-                        newCutscene = new Slidescene(cutsceneId);
+                Cutscene newCutscene = null;
 
-                    // Add the new cutscene
-                    cutscenesList.Add(newCutscene);
-                    cutscenesDataControlList.Add(new CutsceneDataControl(newCutscene));
-                    controller.getIdentifierSummary().addCutsceneId(cutsceneId);
-                    //controller.dataModified( );
-                    elementAdded = true;
-                }
+                // Create the new cutscene
+                if (type == Controller.CUTSCENE_SLIDES)
+                    newCutscene = new Slidescene(cutsceneId);
+
+                // Add the new cutscene
+                cutscenesList.Add(newCutscene);
+                cutscenesDataControlList.Add(new CutsceneDataControl(newCutscene));
+                controller.getIdentifierSummary().addCutsceneId(cutsceneId);
+                //controller.dataModified( );
+                elementAdded = true;
             }
 
             else if (type == Controller.CUTSCENE_VIDEO)
@@ -207,21 +207,20 @@ namespace uAdventure.Editor
                         TC.get("Operation.AddCutsceneMessage"), TC.get("Operation.AddCutsceneDefaultValue"));
 
                 // If some value was typed and the identifier is valid
-                if (cutsceneId != null && controller.isElementIdValid(cutsceneId))
-                {
-                    Cutscene newCutscene = null;
+                if (!controller.isElementIdValid(cutsceneId))
+                    cutsceneId = controller.makeElementValid(cutsceneId);
+                Cutscene newCutscene = null;
 
-                    // Create the new cutscene
-                    if (type == Controller.CUTSCENE_VIDEO)
-                        newCutscene = new Videoscene(cutsceneId);
+                // Create the new cutscene
+                if (type == Controller.CUTSCENE_VIDEO)
+                    newCutscene = new Videoscene(cutsceneId);
 
-                    // Add the new cutscene
-                    cutscenesList.Add(newCutscene);
-                    cutscenesDataControlList.Add(new CutsceneDataControl(newCutscene));
-                    controller.getIdentifierSummary().addCutsceneId(cutsceneId);
-                    //controller.dataModified( );
-                    elementAdded = true;
-                }
+                // Add the new cutscene
+                cutscenesList.Add(newCutscene);
+                cutscenesDataControlList.Add(new CutsceneDataControl(newCutscene));
+                controller.getIdentifierSummary().addCutsceneId(cutsceneId);
+                //controller.dataModified( );
+                elementAdded = true;
             }
             //}
 

@@ -9,15 +9,14 @@ namespace uAdventure.Editor
         {
         }
 
-        public bool Selected { get; set; }
-        public float ButtonHeight { get; set; }
-        public abstract bool DrawButton(Rect rect, GUIStyle aStyle);
-        public abstract bool LayoutDrawButton(GUIStyle aStyle, params GUILayoutOption[] aOptions);
-        public bool LayoutDrawButton() { return LayoutDrawButton("Button"); }
-        public float MenuHeight { get; set; }
-        public abstract void DrawMenu(Rect rect, GUIStyle aStyle);
-        public abstract void LayoutDrawMenu(GUIStyle aStyle, params GUILayoutOption[] aOptions);
-        public void LayoutDrawMenu() { LayoutDrawMenu(null); }
+        // Request main view
+        public delegate void RequestMainView(EditorWindowExtension extension);
+        public RequestMainView OnRequestMainView;
+
+        public virtual bool Selected { get; set; }
+        public float ContentHeight { get; set; }
+        public abstract void DrawLeftPanelContent(Rect rect, GUIStyle aStyle);
+        public abstract void LayoutDrawLeftPanelContent(GUIStyle aStyle, params GUILayoutOption[] aOptions);
     }
 
 }

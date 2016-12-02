@@ -8,6 +8,11 @@ namespace uAdventure.Editor
         protected GUIContent m_Content;
         protected GUIStyle m_Style;
         protected Rect m_Rect;
+        
+        // Request repaint
+        public delegate void RequestRepaint();
+        public RequestRepaint OnRequestRepaint;
+        protected void Repaint(){ OnRequestRepaint(); }
 
         public int WindowID { get { return m_WindowID; } }
         public BaseWindow(Rect aStartPos, GUIContent aContent, GUIStyle aStyle)

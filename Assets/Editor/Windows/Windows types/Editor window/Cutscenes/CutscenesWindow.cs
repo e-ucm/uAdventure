@@ -51,8 +51,6 @@ namespace uAdventure.Editor
 
         public override void Draw(int aID)
         {
-            Elements = Controller.getInstance().getCharapterList().getSelectedChapterData().getCutscenes().ConvertAll(s => s.getId());
-
             // Show information of concrete item
             if (isConcreteItemVisible)
             {
@@ -152,7 +150,7 @@ namespace uAdventure.Editor
 
         protected override void OnAdd(ReorderableList r)
         {
-            if (r.index != -1 || r.index >= r.list.Count)
+            if (r.index != -1 && r.index < r.list.Count)
             {
                 Controller.getInstance()
                            .getCharapterList()
@@ -174,7 +172,7 @@ namespace uAdventure.Editor
             Controller.getInstance()
                 .getSelectedChapterDataControl()
                 .getCutscenesList()
-                .addElement(option == "Slides" ? Controller.CUTSCENE_SLIDES : Controller.CUTSCENE_VIDEO, "new Cutscene");
+                .addElement(option == "Slides" ? Controller.CUTSCENE_SLIDES : Controller.CUTSCENE_VIDEO, "newCutscene");
         }
 
         protected override void OnRemove(ReorderableList r)
@@ -231,6 +229,12 @@ namespace uAdventure.Editor
         {
             ShowBaseWindowView();
             reorderableList.index = -1;
+            this.Options = new List<string>() { "Video", "Slides" };
+        }
+
+        protected override void OnUpdateList(ReorderableList r)
+        {
+            Elements = Controller.getInstance().getCharapterList().getSelectedChapterData().getCutscenes().ConvertAll(s => s.getId());
         }
     }
 }

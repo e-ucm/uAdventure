@@ -10,6 +10,8 @@ using System.Windows.Forms;
 using uAdventure.Core;
 
 using Animation = uAdventure.Core.Animation;
+using System.Text.RegularExpressions;
+using System.Globalization;
 
 namespace uAdventure.Editor
 {
@@ -3291,6 +3293,33 @@ namespace uAdventure.Editor
 
             return isElementIdValid(elementId, true);
         }
+
+        public string makeElementValid(string elementId)
+        {
+            if (elementId == null) elementId = "new";
+            var clean = elementId.Replace(" ", "").Replace("'"," ");
+            while (clean != "" && !char.IsLetter(clean[0]))
+                clean.Remove(0, 1);
+            if (clean == "") clean = "new";
+
+            if (clean.Equals(Player.IDENTIFIER) || clean.Equals(TC.get("ConversationLine.PlayerName")))
+                clean = "new";
+            
+            while (getIdentifierSummary().existsId(clean))
+            {
+                int lastN = 0;
+                for (Match match = Regex.Match(clean, @"\d+$"); match.Success; match = match.NextMatch())
+                    lastN = int.Parse(match.Value, NumberFormatInfo.InvariantInfo); // do something with it
+                if (lastN == 0) clean += "0";
+                clean = clean.Substring(0, clean.Length - ("" + lastN).Length);
+                lastN++;
+                clean = clean + lastN;
+            }
+
+            return clean;
+        }
+
+        
 
         ///**
         // * Returns whether the given identifier is valid or not. If the element

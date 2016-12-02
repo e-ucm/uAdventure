@@ -2,14 +2,29 @@
 using System.Collections.Generic;
 using UnityEditorInternal;
 using UnityEditor;
+using UnityEditor.AnimatedValues;
 
 namespace uAdventure.Editor
 {
-    public abstract class ReorderableListEditorWindowExtension : EditorWindowExtension
+    public abstract class ReorderableListEditorWindowExtension : ButtonMenuEditorWindowExtension
     {
         public GUIContent ButtonContent { get; set; }
+        /*public override bool Selected
+        {
+            get
+            {
+                return base.Selected;
+            }
+
+            set
+            {
+                extended.target = value;
+                base.Selected = value;
+            }
+        }*/
 
         protected ReorderableList reorderableList;
+        protected AnimBool extended;
         protected List<string> options;
         protected List<string> Options {
             get
@@ -28,6 +43,7 @@ namespace uAdventure.Editor
                     reorderableList.onAddDropdownCallback += OnAddDropdown;
                     reorderableList.onAddCallback = null;
                 }
+                options = value;
             }
 
         } 
@@ -55,6 +71,7 @@ namespace uAdventure.Editor
         public ReorderableListEditorWindowExtension(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions) : base(aStartPos, aContent, aStyle, aOptions)
         {
 
+            extended = new AnimBool(true);
             elements = new List<string>();
 
             reorderableList = new ReorderableList(elements, typeof(string));
@@ -72,14 +89,14 @@ namespace uAdventure.Editor
             reorderableList.onRemoveCallback += OnRemove;
             reorderableList.onReorderCallback += OnReorder;
 
-            OnSelect(reorderableList);
-
             Options = new List<string>();
+            OnSelect(reorderableList);
         }
 
         public override bool DrawButton(Rect rect, GUIStyle style)
         {
             Selected = GUI.Button(rect, ButtonContent, style);
+            extended.target = Selected;
             return Selected;
         }
 
@@ -90,13 +107,29 @@ namespace uAdventure.Editor
 
         public override bool LayoutDrawButton(GUIStyle style, params GUILayoutOption[] options)
         {
-            Selected = GUILayout.Button(ButtonContent, style, options);
-            return Selected;
+            if (style == null) style = "Button";
+
+            var r = GUILayout.Button(ButtonContent, style, options);
+            if (r) OnRequestMainView(this);
+            return r;
         }
 
         public override void LayoutDrawMenu(GUIStyle style, params GUILayoutOption[] options)
         {
-            reorderableList.DoLayoutList();
+            extended.target = Selected;
+            if (EditorGUILayout.BeginFadeGroup(extended.faded))
+            {
+                OnUpdateList(reorderableList);
+                try
+                {
+                    reorderableList.DoLayoutList();
+                }catch(System.Exception e)
+                {
+                    Debug.Log(e);
+                }
+            }
+            EditorGUILayout.EndFadeGroup();
+            OnRequestRepaint();
         }
 
         // ---------------------------------------
@@ -114,8 +147,8 @@ namespace uAdventure.Editor
         }
         protected abstract void OnElementNameChanged(ReorderableList r, int index, string newName);
 
-        protected abstract void OnButton();
         protected abstract void OnAdd(ReorderableList r);
+        protected abstract void OnUpdateList(ReorderableList r);
         protected abstract void OnAddOption(ReorderableList r, string option);
         protected abstract void OnSelect(ReorderableList r);
         protected abstract void OnRemove(ReorderableList r);

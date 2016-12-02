@@ -161,6 +161,11 @@ namespace uAdventure.Editor
             extensions.Add(new ScenesWindow(windowRect, new GUIContent(TC.get("Element.Name1")), "Window"));
             extensions.Add(new CutscenesWindow(windowRect, new GUIContent(TC.get("Element.Name9")), "Window"));
 
+            foreach(var e in extensions)
+            {
+                e.OnRequestMainView += (thisWindowReference as EditorWindowBase).RequestMainView;
+                e.OnRequestRepaint += thisWindowReference.Repaint;
+            }
             chapterWindow = new ChapterWindow(windowRect, new GUIContent(TC.get("Element.Name0")), "Window");
             booksWindow = new BooksWindow(windowRect, new GUIContent(TC.get("Element.Name11")), "Window");
             itemsWindow = new ItemsWindow(windowRect, new GUIContent(TC.get("Element.Name18")), "Window");
@@ -285,14 +290,7 @@ namespace uAdventure.Editor
             }
 
             // Button event scene
-            extensions.ForEach(e =>
-            {
-                if (e.LayoutDrawButton()) {
-                    extensionSelected = e;
-                    OnWindowTypeChanged(EditorWindowType.MapScenes);
-                }
-                if (extensionSelected == e) e.LayoutDrawMenu();
-            });
+            extensions.ForEach(e => e.LayoutDrawLeftPanelContent(null, null));
 
             //extensionSelected.OnGUI();
 
@@ -859,6 +857,15 @@ namespace uAdventure.Editor
         public void OnDialogCanceled(System.Object workingObject = null)
         {
             Debug.Log("Canceled clicked");
+        }
+
+        // Request
+
+        void RequestMainView(EditorWindowExtension who)
+        {
+            extensionSelected = who;
+            OnWindowTypeChanged(EditorWindowType.MapScenes);
+            extensions.ForEach(e => e.Selected = e == who);
         }
     }
 }
