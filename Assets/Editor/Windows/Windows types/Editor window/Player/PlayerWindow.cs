@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
 
 using uAdventure.Core;
+using System;
 
 namespace uAdventure.Editor
 {
-    public class PlayerWindow : LayoutWindow
+    public class PlayerWindow : DefaultButtonMenuEditorWindowExtension
     {
         private enum PlayerWindowType
         {
@@ -26,6 +27,11 @@ namespace uAdventure.Editor
         public PlayerWindow(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
         {
+            var c = new GUIContent();
+            c.image = (Texture2D)Resources.Load("EAdventureData/img/icons/player", typeof(Texture2D));
+            c.text = TC.get("Element.Name26");
+            ButtonContent = c;
+
             playerWindowAppearance = new PlayerWindowAppearance(aStartPos,
                 new GUIContent(TC.get("NPC.LookPanelTitle")), "Window");
             playerWindowDialogConfiguration = new PlayerWindowDialogConfiguration(aStartPos,
@@ -89,6 +95,11 @@ namespace uAdventure.Editor
         void OnWindowTypeChanged(PlayerWindowType type_)
         {
             openedWindow = type_;
+        }
+
+        protected override void OnButton()
+        {
+            OnWindowTypeChanged(PlayerWindowType.Appearance);
         }
     }
 }

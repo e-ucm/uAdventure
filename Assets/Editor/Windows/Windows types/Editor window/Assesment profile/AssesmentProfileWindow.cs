@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using UnityEditor;
 
 using uAdventure.Core;
+using System;
 
 namespace uAdventure.Editor
 {
-    public class AssesmentProfileWindow : LayoutWindow
+    public class AssesmentProfileWindow : DefaultButtonMenuEditorWindowExtension
     {
         string[] endoptions = { "Final Scene is reached", "All levels completed" };
         string[] progressoptions = { "Number of levels completed", "Manual progress..." };
@@ -34,6 +35,11 @@ namespace uAdventure.Editor
         public AssesmentProfileWindow(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
         {
+            var buttonContent = new GUIContent();
+            buttonContent.image = (Texture2D)Resources.Load("EAdventureData/img/icons/assessmentProfiles", typeof(Texture2D)); ;
+            buttonContent.text = TC.get("AssessmentFeatures.Title");
+            ButtonContent = buttonContent;
+
             clearImg = (Texture2D)Resources.Load("EAdventureData/img/icons/deleteContent", typeof(Texture2D));
             addTexture = (Texture2D)Resources.Load("EAdventureData/img/icons/addNode", typeof(Texture2D));
             moveUp = (Texture2D)Resources.Load("EAdventureData/img/icons/moveNodeUp", typeof(Texture2D));
@@ -168,5 +174,6 @@ namespace uAdventure.Editor
             //GUILayout.EndArea();
         }
 
+        protected override void OnButton() {}
     }
 }

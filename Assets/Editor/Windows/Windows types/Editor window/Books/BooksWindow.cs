@@ -1,10 +1,13 @@
 ﻿using UnityEngine;
 
 using uAdventure.Core;
+using System;
+using UnityEditorInternal;
+using System.Collections.Generic;
 
 namespace uAdventure.Editor
 {
-    public class BooksWindow : LayoutWindow
+    public class BooksWindow : ReorderableListEditorWindowExtension
     {
         private enum BookWindowType { Appearance, Content, Documentation }
 
@@ -27,6 +30,13 @@ namespace uAdventure.Editor
         public BooksWindow(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
         {
+            var c = new GUIContent();
+            c = new GUIContent();
+            c.image = (Texture2D)Resources.Load("EAdventureData/img/icons/books", typeof(Texture2D)); ;
+            c.text = TC.get("Element.Name11");
+
+            ButtonContent = c;
+
             booksWindowAppearance = new BooksWindowAppearance(aStartPos, new GUIContent(TC.get("Book.App")), "Window");
             booksWindowContents = new BooksWindowContents(aStartPos, new GUIContent(TC.get("Book.Contents")), "Window");
             booksWindowDocumentation = new BooksWindowDocumentation(aStartPos, new GUIContent(TC.get("Book.Documentation")), "Window");
@@ -130,6 +140,89 @@ namespace uAdventure.Editor
             booksWindowAppearance = new BooksWindowAppearance(thisRect, new GUIContent(TC.get("Book.App")), "Window");
             booksWindowContents = new BooksWindowContents(thisRect, new GUIContent(TC.get("Book.Contents")), "Window");
             booksWindowDocumentation = new BooksWindowDocumentation(thisRect, new GUIContent(TC.get("Book.Documentation")), "Window");
+        }
+
+        protected override void OnElementNameChanged(ReorderableList r, int index, string newName)
+        {
+            Controller.getInstance().getCharapterList().getSelectedChapterData().getBooks()[index].setId(newName);
+        }
+
+        protected override void OnAdd(ReorderableList r)
+        {
+            if (r.index != -1 && r.index < r.list.Count)
+            {
+                Controller.getInstance()
+                           .getCharapterList()
+                           .getSelectedChapterDataControl()
+                           .getBooksList()
+                           .duplicateElement(
+                               Controller.getInstance()
+                                   .getCharapterList()
+                                   .getSelectedChapterDataControl()
+                                   .getBooksList()
+                                   .getBooks()[r.index]);
+            }
+            else
+            {
+                Controller.getInstance().getSelectedChapterDataControl().getBooksList().addElement(Controller.BOOK, "newBook");
+            }
+
+        }
+
+        protected override void OnAddOption(ReorderableList r, string option)
+        {
+            // No options
+        }
+
+        protected override void OnRemove(ReorderableList r)
+        {
+            if (r.index != -1)
+            {
+                Controller.getInstance()
+                              .getCharapterList()
+                              .getSelectedChapterDataControl()
+                              .getBooksList()
+                              .deleteElement(
+                                  Controller.getInstance()
+                                      .getCharapterList()
+                                      .getSelectedChapterDataControl()
+                                      .getBooksList()
+                                      .getBooks()[r.index], false);
+
+                ShowBaseWindowView();
+            }
+        }
+
+        protected override void OnSelect(ReorderableList r)
+        {
+            ShowItemWindowView(r.index);
+        }
+
+        protected override void OnReorder(ReorderableList r)
+        {
+            List<Book> previousList = Controller.getInstance()
+                              .getCharapterList()
+                              .getSelectedChapterData()
+                              .getBooks();
+
+            List<Book> books = new List<Book>();
+            foreach (string bookName in r.list)
+                books.Add(previousList.Find(s => s.getId() == bookName));
+
+
+            previousList.Clear();
+            previousList.AddRange(books);
+        }
+
+        protected override void OnButton()
+        {
+            ShowBaseWindowView();
+            reorderableList.index = -1;
+        }
+
+        protected override void OnUpdateList(ReorderableList r)
+        {
+            Elements = Controller.getInstance().getCharapterList().getSelectedChapterData().getBooks().ConvertAll(s => s.getId());
         }
     }
 }

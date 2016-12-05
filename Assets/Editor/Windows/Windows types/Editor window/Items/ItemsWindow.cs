@@ -1,10 +1,12 @@
 ﻿using UnityEngine;
 
 using uAdventure.Core;
+using UnityEditorInternal;
+using System.Collections.Generic;
 
 namespace uAdventure.Editor
 {
-    public class ItemsWindow : LayoutWindow
+    public class ItemsWindow : ReorderableListEditorWindowExtension
     {
         private enum ItemsWindowType { Appearance, DescriptionConfig, Actions }
 
@@ -26,6 +28,11 @@ namespace uAdventure.Editor
         public ItemsWindow(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
         {
+            var c = new GUIContent();
+            c.image = (Texture2D)Resources.Load("EAdventureData/img/icons/items", typeof(Texture2D));
+            c.text = TC.get("Element.Name18");
+            this.ButtonContent = c;
+
             itemsWindowActions = new ItemsWindowActions(aStartPos, new GUIContent(TC.get("Item.ActionsPanelTitle")), "Window");
             itemsWindowAppearance = new ItemsWindowAppearance(aStartPos, new GUIContent(TC.get("Item.LookPanelTitle")), "Window");
             itemsWindowDescription = new ItemsWindowDescription(aStartPos, new GUIContent(TC.get("Item.DocPanelTitle")), "Window");
@@ -128,6 +135,91 @@ namespace uAdventure.Editor
         void OnWindowTypeChanged(ItemsWindowType type_)
         {
             openedWindow = type_;
+        }
+        
+        //////////////////////////////////
+
+        protected override void OnElementNameChanged(ReorderableList r, int index, string newName)
+        {
+            Controller.getInstance().getCharapterList().getSelectedChapterData().getItems()[index].setId(newName);
+        }
+
+        protected override void OnAdd(ReorderableList r)
+        {
+            if (r.index != -1 && r.index < r.list.Count)
+            {
+                Controller.getInstance()
+                           .getCharapterList()
+                           .getSelectedChapterDataControl()
+                           .getItemsList()
+                           .duplicateElement(
+                               Controller.getInstance()
+                                   .getCharapterList()
+                                   .getSelectedChapterDataControl()
+                                   .getItemsList()
+                                   .getItems()[r.index]);
+            }
+            else
+            {
+                Controller.getInstance().getSelectedChapterDataControl().getItemsList().addElement(Controller.ITEM, "newItem");
+            }
+
+        }
+
+        protected override void OnAddOption(ReorderableList r, string option)
+        {
+            // No options
+        }
+
+        protected override void OnRemove(ReorderableList r)
+        {
+            if (r.index != -1)
+            {
+                Controller.getInstance()
+                              .getCharapterList()
+                              .getSelectedChapterDataControl()
+                              .getItemsList()
+                              .deleteElement(
+                                  Controller.getInstance()
+                                      .getCharapterList()
+                                      .getSelectedChapterDataControl()
+                                      .getItemsList()
+                                      .getItems()[r.index], false);
+
+                ShowBaseWindowView();
+            }
+        }
+
+        protected override void OnSelect(ReorderableList r)
+        {
+            ShowItemWindowView(r.index);
+        }
+
+        protected override void OnReorder(ReorderableList r)
+        {
+            List<Item> previousList = Controller.getInstance()
+                              .getCharapterList()
+                              .getSelectedChapterData()
+                              .getItems();
+
+            List<Item> reordered = new List<Item>();
+            foreach (string name in r.list)
+                reordered.Add(previousList.Find(s => s.getId() == name));
+
+
+            previousList.Clear();
+            previousList.AddRange(reordered);
+        }
+
+        protected override void OnButton()
+        {
+            ShowBaseWindowView();
+            reorderableList.index = -1;
+        }
+
+        protected override void OnUpdateList(ReorderableList r)
+        {
+            Elements = Controller.getInstance().getCharapterList().getSelectedChapterData().getItems().ConvertAll(s => s.getId());
         }
     }
 }

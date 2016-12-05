@@ -1,10 +1,13 @@
 ﻿using UnityEngine;
 
 using uAdventure.Core;
+using System;
+using UnityEditorInternal;
+using System.Collections.Generic;
 
 namespace uAdventure.Editor
 {
-    public class CharactersWindow : LayoutWindow
+    public class CharactersWindow : ReorderableListEditorWindowExtension
     {
         private enum CharactersWindowType { Action, Appearance, DialogConfiguration, Documentation }
 
@@ -26,6 +29,11 @@ namespace uAdventure.Editor
         public CharactersWindow(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
         {
+            var c = new GUIContent();
+            c.image = (Texture2D)Resources.Load("EAdventureData/img/icons/npcs", typeof(Texture2D));
+            c.text = TC.get("Element.Name27");
+            ButtonContent = c;
+
             charactersWindowActions = new CharactersWindowActions(aStartPos, new GUIContent(TC.get("NPC.ActionsPanelTitle")), "Window");
             charactersWindowAppearance = new CharactersWindowAppearance(aStartPos, new GUIContent(TC.get("NPC.LookPanelTitle")), "Window");
             charactersWindowDialogConfiguration = new CharactersWindowDialogConfiguration(aStartPos, new GUIContent(TC.get("NPC.DialogPanelTitle")), "Window");
@@ -144,6 +152,87 @@ namespace uAdventure.Editor
             charactersWindowDialogConfiguration = new CharactersWindowDialogConfiguration(thisRect, new GUIContent(TC.get("NPC.DialogPanelTitle")), "Window");
             charactersWindowDocumentation = new CharactersWindowDocumentation(thisRect, new GUIContent(TC.get("NPC.Documentation")), "Window");
         }
+        
+        ///////////////////////////////
 
+        protected override void OnElementNameChanged(ReorderableList r, int index, string newName)
+        {
+            Controller.getInstance().getCharapterList().getSelectedChapterData().getCharacters()[index].setId(newName);
+        }
+
+        protected override void OnAdd(ReorderableList r)
+        {
+            if (r.index != -1 && r.index < r.list.Count)
+            {
+                Controller.getInstance()
+                           .getCharapterList()
+                           .getSelectedChapterDataControl()
+                           .getNPCsList()
+                           .duplicateElement(
+                               Controller.getInstance()
+                                   .getCharapterList()
+                                   .getSelectedChapterDataControl()
+                                   .getNPCsList()
+                                   .getNPCs()[r.index]);
+            }
+            else
+            {
+                Controller.getInstance().getSelectedChapterDataControl().getNPCsList().addElement(Controller.NPC, "newCharacter");
+            }
+
+        }
+
+        protected override void OnAddOption(ReorderableList r, string option){}
+
+        protected override void OnRemove(ReorderableList r)
+        {
+            if (r.index != -1)
+            {
+                Controller.getInstance()
+                              .getCharapterList()
+                              .getSelectedChapterDataControl()
+                              .getScenesList()
+                              .deleteElement(
+                                  Controller.getInstance()
+                                      .getCharapterList()
+                                      .getSelectedChapterDataControl()
+                                      .getNPCsList()
+                                      .getNPCs()[r.index], false);
+
+                ShowBaseWindowView();
+            }
+        }
+
+        protected override void OnSelect(ReorderableList r)
+        {
+            ShowItemWindowView(r.index);
+        }
+
+        protected override void OnReorder(ReorderableList r)
+        {
+            List<NPC> previousList = Controller.getInstance()
+                              .getCharapterList()
+                              .getSelectedChapterData()
+                              .getCharacters();
+
+            List<NPC> reordered = new List<NPC>();
+            foreach (string name in r.list)
+                reordered.Add(previousList.Find(s => s.getId() == name));
+
+
+            previousList.Clear();
+            previousList.AddRange(reordered);
+        }
+
+        protected override void OnButton()
+        {
+            ShowBaseWindowView();
+            reorderableList.index = -1;
+        }
+
+        protected override void OnUpdateList(ReorderableList r)
+        {
+            Elements = Controller.getInstance().getCharapterList().getSelectedChapterData().getCharacters().ConvertAll(s => s.getId());
+        }
     }
 }

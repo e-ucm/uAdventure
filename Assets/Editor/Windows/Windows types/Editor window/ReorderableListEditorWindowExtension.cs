@@ -8,7 +8,6 @@ namespace uAdventure.Editor
 {
     public abstract class ReorderableListEditorWindowExtension : ButtonMenuEditorWindowExtension
     {
-        public GUIContent ButtonContent { get; set; }
         /*public override bool Selected
         {
             get
@@ -24,7 +23,6 @@ namespace uAdventure.Editor
         }*/
 
         protected ReorderableList reorderableList;
-        protected AnimBool extended;
         protected List<string> options;
         protected List<string> Options {
             get
@@ -70,8 +68,6 @@ namespace uAdventure.Editor
 
         public ReorderableListEditorWindowExtension(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions) : base(aStartPos, aContent, aStyle, aOptions)
         {
-
-            extended = new AnimBool(true);
             elements = new List<string>();
 
             reorderableList = new ReorderableList(elements, typeof(string));
@@ -95,14 +91,10 @@ namespace uAdventure.Editor
 
         public override bool DrawButton(Rect rect, GUIStyle style)
         {
-            Selected = GUI.Button(rect, ButtonContent, style);
-            extended.target = Selected;
-            return Selected;
-        }
-
-        public override void DrawMenu(Rect rect, GUIStyle style)
-        {
-            reorderableList.DoList(rect);
+            if (style == null) style = "Button";
+            var r = GUI.Button(rect, ButtonContent, style);
+            if (r) OnRequestMainView(this);
+            return r;
         }
 
         public override bool LayoutDrawButton(GUIStyle style, params GUILayoutOption[] options)
@@ -114,22 +106,22 @@ namespace uAdventure.Editor
             return r;
         }
 
+        public override void DrawMenu(Rect rect, GUIStyle style)
+        {
+            reorderableList.DoList(rect);
+        }
+        
+
         public override void LayoutDrawMenu(GUIStyle style, params GUILayoutOption[] options)
         {
-            extended.target = Selected;
-            if (EditorGUILayout.BeginFadeGroup(extended.faded))
+            OnUpdateList(reorderableList);
+            try
             {
-                OnUpdateList(reorderableList);
-                try
-                {
-                    reorderableList.DoLayoutList();
-                }catch(System.Exception e)
-                {
-                    Debug.Log(e);
-                }
+                reorderableList.DoLayoutList();
+            }catch(System.Exception e)
+            {
+                Debug.Log(e);
             }
-            EditorGUILayout.EndFadeGroup();
-            OnRequestRepaint();
         }
 
         // ---------------------------------------

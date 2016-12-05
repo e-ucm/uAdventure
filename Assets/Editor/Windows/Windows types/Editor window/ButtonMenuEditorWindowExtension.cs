@@ -1,13 +1,35 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using UnityEditor.AnimatedValues;
+using UnityEditor;
 
 namespace uAdventure.Editor
 {
     public abstract class ButtonMenuEditorWindowExtension : EditorWindowExtension
     {
+        protected AnimBool extended;
+        public GUIContent ButtonContent { get; set; }
+        protected bool UseAnimation { get; set; }
+
+        public override bool Selected
+        {
+            get
+            {
+                return base.Selected;
+            }
+
+            set
+            {
+                base.Selected = value;
+                extended.target = Selected;
+            }
+        }
+
         public ButtonMenuEditorWindowExtension(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions) : base(aStartPos, aContent, aStyle, aOptions)
         {
+            UseAnimation = true;
+            extended = new AnimBool(false);
         }
 
         public override void DrawLeftPanelContent(Rect rect, GUIStyle aStyle)
@@ -25,7 +47,15 @@ namespace uAdventure.Editor
         {
             if (LayoutDrawButton(aStyle, aOptions))
                 OnButton();
-            LayoutDrawMenu(aStyle, aOptions);
+
+            if (!UseAnimation || EditorGUILayout.BeginFadeGroup(extended.faded))
+                LayoutDrawMenu(aStyle, aOptions);
+
+            if (UseAnimation)
+            {
+                EditorGUILayout.EndFadeGroup();
+                OnRequestRepaint();
+            }
         }
 
         void UpdateTotalHeight()

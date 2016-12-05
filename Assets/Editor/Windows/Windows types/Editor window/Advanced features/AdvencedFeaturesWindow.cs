@@ -2,10 +2,11 @@
 using System.Collections;
 
 using uAdventure.Core;
+using System;
 
 namespace uAdventure.Editor
 {
-    public class AdvencedFeaturesWindow : LayoutWindow
+    public class AdvencedFeaturesWindow : DefaultButtonMenuEditorWindowExtension
     {
         private enum AdvencedFeaturesWindowType
         {
@@ -27,6 +28,11 @@ namespace uAdventure.Editor
             params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
         {
+            var c = new GUIContent();
+            c.image = (Texture2D)Resources.Load("EAdventureData/img/icons/advanced", typeof(Texture2D));
+            c.text = TC.get("AdvancedFeatures.Title");
+            ButtonContent = c;
+
             advencedFeaturesWindowGlobalStates = new AdvencedFeaturesWindowGlobalStates(aStartPos,
                 new GUIContent(TC.get("Element.Name55")), "Window");
             advencedFeaturesWindowListOfTimers = new AdvencedFeaturesWindowListOfTimers(aStartPos,
@@ -91,6 +97,11 @@ namespace uAdventure.Editor
         void OnWindowTypeChanged(AdvencedFeaturesWindowType type_)
         {
             openedWindow = type_;
+        }
+
+        protected override void OnButton()
+        {
+            OnWindowTypeChanged(AdvencedFeaturesWindowType.GlobalStates);
         }
     }
 }
