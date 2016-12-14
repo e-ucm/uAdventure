@@ -3,10 +3,12 @@ using System.Collections;
 using System.Xml;
 
 using uAdventure.Core;
+using System;
 
 namespace uAdventure.Editor
 {
-    public class EffectsDOMWriter
+    [DOMWriter(typeof(Effects), typeof(Macro))]
+    public class EffectsDOMWriter : ParametrizedDOMWriter
     {
         /**
                  * Constant for the effect block.
@@ -35,42 +37,46 @@ namespace uAdventure.Editor
         {
 
         }
-
-        public static XmlNode buildDOM(string type, Effects effects)
+        
+        protected override string GetElementNameFor(object target)
         {
-            XmlNode effectsNode = null;
+            if (target is Effects)
+                return EFFECTS;
+            else if (target is Macro)
+                return MACRO;
 
-
-            // Create the necessary elements to create the DOM
-            XmlDocument doc = Writer.GetDoc();
-
-            // Create the root node
-            effectsNode = doc.CreateElement(type);
-            appendEffects(doc, effectsNode, effects);
-
-            return effectsNode;
-
+            return "";
         }
 
-        public static XmlElement buildDOM(Macro macro)
+        protected override void FillNode(XmlNode node, object target, params IDOMWriterParam[] options)
         {
+            if (target is Effects)
+                FillNode(node, target as Effects, options);
+            else if (target is Macro)
+                FillNode(node, target as Macro, options);
+        }
 
-            XmlElement effectsNode = null;
+        protected void FillNode(XmlNode node, Effects effects, params IDOMWriterParam[] options)
+        {
+            appendEffects(Writer.GetDoc(), node, effects);
+        }
 
-
+        protected void FillNode(XmlNode node, Macro macro, params IDOMWriterParam[] options)
+        {
+            var elem = node as XmlElement;
             // Create the necessary elements to create the DOM
-            XmlDocument doc = Writer.GetDoc();
+            var doc = Writer.GetDoc();
 
-            // Create the root node
-            effectsNode = doc.CreateElement(MACRO);
-            effectsNode.SetAttribute("id", macro.getId());
+            // Set attribute
+            elem.SetAttribute("id", macro.getId());
+
+            // Add documentation
             XmlNode documentationNode = doc.CreateElement("documentation");
             documentationNode.AppendChild(doc.CreateTextNode(macro.getDocumentation()));
-            effectsNode.AppendChild(documentationNode);
-            appendEffects(doc, effectsNode, macro);
+            elem.AppendChild(documentationNode);
 
-            return effectsNode;
-
+            // Add effects
+            appendEffects(doc, elem, macro);
         }
 
         public static void appendEffects(XmlDocument doc, XmlNode effectsNode, Effects effects)
@@ -105,14 +111,14 @@ namespace uAdventure.Editor
                     }
 
                 }
-                // Create conditions for current effect
-                conditionsNode = ConditionsDOMWriter.buildDOM(effect.getConditions());
-                doc.ImportNode(conditionsNode, true);
+
                 // Add the effect
                 effectsNode.AppendChild(effectElement);
 
-                // Add conditions associated to that effect
-                effectsNode.AppendChild(conditionsNode);
+                // Add conditions associated to that effect               
+                // Create conditions for current effect
+
+                DOMWriterUtility.DOMWrite(effectsNode, effect.getConditions());
 
             }
 

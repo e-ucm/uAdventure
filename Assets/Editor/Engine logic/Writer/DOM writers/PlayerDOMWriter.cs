@@ -3,30 +3,34 @@ using System.Collections;
 using System.Xml;
 
 using uAdventure.Core;
+using System;
 
 namespace uAdventure.Editor
 {
-    public class PlayerDOMWriter
+    [DOMWriter(typeof(Player))]
+    public class PlayerDOMWriter : ParametrizedDOMWriter
     {
-        /**
-             * Private constructor.
-             */
 
-        private PlayerDOMWriter()
+        public PlayerDOMWriter()
         {
 
         }
+        
 
-        public static XmlNode buildDOM(Player player)
+        protected override string GetElementNameFor(object target)
         {
+            return "player";
+        }
 
-            XmlNode playerNode = null;
+        protected override void FillNode(XmlNode node, object target, params IDOMWriterParam[] options)
+        {
+            var player = target as Player;
+
+            XmlNode playerNode = node;
 
             // Create the necessary elements to create the DOM
             XmlDocument doc = Writer.GetDoc();
-
-            // Create the root node
-            playerNode = doc.CreateElement("player");
+            
 
             // Append the documentation (if avalaible)
             if (player.getDocumentation() != null)
@@ -72,9 +76,7 @@ namespace uAdventure.Editor
                 // Append the conditions (if available)
                 if (description.getConditions() != null && !description.getConditions().isEmpty())
                 {
-                    XmlNode conditionsNode = ConditionsDOMWriter.buildDOM(description.getConditions());
-                    doc.ImportNode(conditionsNode, true);
-                    descriptionNode.AppendChild(conditionsNode);
+                    DOMWriterUtility.DOMWrite(descriptionNode, description.getConditions());
                 }
 
                 // Create and append the name, brief description and detailed description
@@ -120,8 +122,6 @@ namespace uAdventure.Editor
             // Append the voice tag
 
             playerNode.AppendChild(voiceNode);
-
-            return playerNode;
         }
     }
 }

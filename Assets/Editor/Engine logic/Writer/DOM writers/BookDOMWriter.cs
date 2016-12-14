@@ -3,31 +3,32 @@ using System.Collections;
 using System.Xml;
 
 using uAdventure.Core;
+using System;
 
 namespace uAdventure.Editor
 {
-    public class BookDOMWriter
+    [DOMWriter(typeof(Book))]
+    public class BookDOMWriter : ParametrizedDOMWriter
     {
-        /**
-             * Private constructor.
-             */
-
-        private BookDOMWriter()
+        public BookDOMWriter()
         {
 
         }
 
-        public static XmlNode buildDOM(Book book)
+        protected override string GetElementNameFor(object target)
         {
+            return "book";
+        }
 
-            XmlElement bookElement = null;
-
+        protected override void FillNode(XmlNode node, object target, params IDOMWriterParam[] options)
+        {
+            var book = target as Book;
+            XmlElement bookElement = node as XmlElement;
 
             // Create the necessary elements to create the DOM
             XmlDocument doc = Writer.GetDoc();
 
-            // Create the root node
-            bookElement = doc.CreateElement("book");
+            // Add attributes to root node
             bookElement.SetAttribute("id", book.getId());
 
             // Adding next page position
@@ -146,9 +147,7 @@ namespace uAdventure.Editor
             }
             // Append the text element
             bookElement.AppendChild(textPagesElement);
-
-
-            return bookElement;
         }
+
     }
 }

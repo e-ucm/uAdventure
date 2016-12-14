@@ -7,16 +7,39 @@ using uAdventure.Core;
 
 namespace uAdventure.Editor
 {
-    public class ChapterDOMWriter
+    [DOMWriter(typeof(Chapter))]
+    public class ChapterDOMWriter : ParametrizedDOMWriter
     {
-
-        /**
-             * Private constructor.
-             */
-
-        private ChapterDOMWriter()
+        public ChapterDOMWriter()
         {
 
+        }
+
+        protected override string GetElementNameFor(object target)
+        {
+            return "eAdventure";
+        }
+
+        public class ChapterTargetIDParam : IDOMWriterParam
+        {
+            private string targetId;
+            public ChapterTargetIDParam(string targetId)
+            {
+                this.targetId = targetId;
+            }
+
+            public string TargetId
+            {
+                get
+                {
+                    return this.targetId;
+                }
+            }
+        }
+
+        public static IDOMWriterParam ChapterTargetID(string id)
+        {
+            return new ChapterTargetIDParam(id);
         }
 
         /**
@@ -27,10 +50,11 @@ namespace uAdventure.Editor
          * @return DOM element with the chapter data
          */
 
-        public static XmlNode buildDOM(Chapter chapter, String zipFile, XmlDocument doc)
+        protected override void FillNode(XmlNode node, object target, params IDOMWriterParam[] options)
         {
-
-            XmlElement chapterNode = null;
+            var chapter = target as Chapter;
+            var doc = Writer.GetDoc();
+            XmlElement chapterNode = node as XmlElement;
 
             //try {
             // Create the necessary elements to create the DOM
@@ -51,106 +75,97 @@ namespace uAdventure.Editor
                 chapterNode.SetAttribute("assessProfile", chapter.getAssessmentName());
             }
 
+            var targetParam = ChapterTargetID(chapter.getTargetId());
+
             // Append the scene elements
             foreach (Scene scene in chapter.getScenes())
             {
-                bool initialScene = chapter.getTargetId().Equals(scene.getId());
-                XmlNode sceneNode = SceneDOMWriter.buildDOM(scene, initialScene);
-                doc.ImportNode(sceneNode, true);
-                chapterNode.AppendChild(sceneNode);
+                DOMWriterUtility.DOMWrite(chapterNode, scene, targetParam);
             }
 
             // Append the cutscene elements
             foreach (Cutscene cutscene in chapter.getCutscenes())
             {
-                bool initialScene = chapter.getTargetId().Equals(cutscene.getId());
-                XmlNode cutsceneNode = CutsceneDOMWriter.buildDOM(cutscene, initialScene);
-                doc.ImportNode(cutsceneNode, true);
-                chapterNode.AppendChild(cutsceneNode);
+                DOMWriterUtility.DOMWrite(chapterNode, cutscene, targetParam);
             }
 
             // Append the book elements
             foreach (Book book in chapter.getBooks())
             {
-                XmlNode bookNode = BookDOMWriter.buildDOM(book);
-                doc.ImportNode(bookNode, true);
-                chapterNode.AppendChild(bookNode);
+                DOMWriterUtility.DOMWrite(chapterNode, book, targetParam);
             }
 
             // Append the item elements
             foreach (Item item in chapter.getItems())
             {
-                XmlNode itemNode = ItemDOMWriter.buildDOM(item);
-                doc.ImportNode(itemNode, true);
-                chapterNode.AppendChild(itemNode);
+                DOMWriterUtility.DOMWrite(chapterNode, item, targetParam);
             }
 
             // Append the player element
-            XmlNode playerNode = PlayerDOMWriter.buildDOM(chapter.getPlayer());
-            doc.ImportNode(playerNode, true);
-            chapterNode.AppendChild(playerNode);
+            DOMWriterUtility.DOMWrite(chapterNode, chapter.getPlayer(), targetParam);
 
             // Append the character element
             foreach (NPC character in chapter.getCharacters())
             {
-                XmlNode characterNode = CharacterDOMWriter.buildDOM(character);
-                doc.ImportNode(characterNode, true);
-                chapterNode.AppendChild(characterNode);
+                DOMWriterUtility.DOMWrite(chapterNode, character, targetParam);
             }
 
             // Append the conversation element
             foreach (Conversation conversation in chapter.getConversations())
             {
-                XmlNode conversationNode = ConversationDOMWriter.buildDOM(conversation);
-                doc.ImportNode(conversationNode, true);
-                chapterNode.AppendChild(conversationNode);
+                DOMWriterUtility.DOMWrite(chapterNode, conversation, targetParam);
             }
 
             // Append the timers
             foreach (Timer timer in chapter.getTimers())
             {
-                XmlNode timerNode = TimerDOMWriter.buildDOM(timer);
-                doc.ImportNode(timerNode, true);
-                chapterNode.AppendChild(timerNode);
+                DOMWriterUtility.DOMWrite(chapterNode, timer, targetParam);
             }
 
             // Append global states
             foreach (GlobalState globalState in chapter.getGlobalStates())
             {
-                XmlElement globalStateElement = ConditionsDOMWriter.buildDOM(globalState);
-                doc.ImportNode(globalStateElement, true);
-                chapterNode.AppendChild(globalStateElement);
+                DOMWriterUtility.DOMWrite(chapterNode, globalState, targetParam);
             }
 
             // Append macros
             foreach (Macro macro in chapter.getMacros())
             {
-                XmlElement macroElement = EffectsDOMWriter.buildDOM(macro);
-                doc.ImportNode(macroElement, true);
-                chapterNode.AppendChild(macroElement);
+                DOMWriterUtility.DOMWrite(chapterNode, macro, targetParam);
             }
 
             // Append the atrezzo item elements
             foreach (Atrezzo atrezzo in chapter.getAtrezzo())
             {
-                XmlNode atrezzoNode = AtrezzoDOMWriter.buildDOM(atrezzo);
-                doc.ImportNode(atrezzoNode, true);
-                chapterNode.AppendChild(atrezzoNode);
+                DOMWriterUtility.DOMWrite(chapterNode, atrezzo, targetParam);
             }
 
             // Append the completables
             foreach (Completable completable in chapter.getCompletabes())
             {
-                XmlNode completableNode = CompletableDOMWriter.buildDOM(completable);
-                doc.ImportNode(completableNode, true);
-                chapterNode.AppendChild(completableNode);
+                DOMWriterUtility.DOMWrite(chapterNode, completable, targetParam);
             }
 
             /*} catch( ParserConfigurationException e ) {
                 ReportDialog.GenerateErrorReport(e, true, "UNKNOWERROR");
             }*/
 
-            return chapterNode;
+
+            // TODO FIX THIS and use normal domwriter
+
+            /** ******* START WRITING THE ADAPTATION DATA ***** */
+            foreach (AdaptationProfile profile in chapter.getAdaptationProfiles())
+            {
+                chapterNode.AppendChild(Writer.writeAdaptationData(profile, true, doc));
+            }
+            /** ******* END WRITING THE ADAPTATION DATA ***** */
+
+            /** ******* START WRITING THE ASSESSMENT DATA ***** */
+            foreach (AssessmentProfile profile in chapter.getAssessmentProfiles())
+            {
+                chapterNode.AppendChild(Writer.writeAssessmentData(profile, true, doc));
+            }
+            /** ******* END WRITING THE ASSESSMENT DATA ***** */
         }
     }
 }

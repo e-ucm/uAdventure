@@ -3,31 +3,34 @@ using System.Collections;
 using System.Xml;
 
 using uAdventure.Core;
+using System;
 
 namespace uAdventure.Editor
 {
-    public class CharacterDOMWriter
+    [DOMWriter(typeof(NPC))]
+    public class CharacterDOMWriter : ParametrizedDOMWriter
     {
 
-        /**
-         * Private constructor.
-         */
-
-        private CharacterDOMWriter()
+        public CharacterDOMWriter()
         {
 
         }
 
-        public static XmlNode buildDOM(NPC character)
+        protected override string GetElementNameFor(object target)
         {
+            return "character";
+        }
 
-            XmlElement characterElement = null;
+        protected override void FillNode(XmlNode node, object target, params IDOMWriterParam[] options)
+        {
+            var character = target as NPC;
+
+            XmlElement characterElement = node as XmlElement;
 
             // Create the necessary elements to create the DOM
             XmlDocument doc = Writer.GetDoc();
 
-            // Create the root node
-            characterElement = doc.CreateElement("character");
+            // Add root node attributes
             characterElement.SetAttribute("id", character.getId());
 
             // Append the documentation (if avalaible)
@@ -73,9 +76,7 @@ namespace uAdventure.Editor
                 // Append the conditions (if available)
                 if (description.getConditions() != null && !description.getConditions().isEmpty())
                 {
-                    XmlNode conditionsNode = ConditionsDOMWriter.buildDOM(description.getConditions());
-                    doc.ImportNode(conditionsNode, true);
-                    descriptionNode.AppendChild(conditionsNode);
+                    DOMWriterUtility.DOMWrite(descriptionNode, description.getConditions());
                 }
 
                 // Create and append the name, brief description and detailed description and its soundPaths
@@ -127,8 +128,6 @@ namespace uAdventure.Editor
                 doc.ImportNode(actionsNode, true);
                 characterElement.AppendChild(actionsNode);
             }
-
-            return characterElement;
         }
     }
 }

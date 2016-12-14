@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using UnityEngine;
 using System.Collections;
 using System.Xml;
@@ -7,28 +8,24 @@ using uAdventure.Core;
 
 namespace uAdventure.Editor
 {
-    public class TrajectoryDOMWriter
+    [DOMWriter(typeof(Trajectory))]
+    public class TrajectoryDOMWriter : ParametrizedDOMWriter
     {
 
         /**
          * Private constructor.
          */
 
-        private TrajectoryDOMWriter()
+        public TrajectoryDOMWriter()
         {
 
         }
 
-        public static XmlNode buildDOM(Trajectory trajectory)
+        protected override void FillNode(XmlNode xmlNode, object target, params IDOMWriterParam[] options)
         {
+            var trajectory = target as Trajectory;
 
-            XmlElement itemElement = null;
-
-            // Create the necessary elements to create the DOM
-            XmlDocument doc = Writer.GetDoc();
-
-            // Create the root node
-            itemElement = doc.CreateElement("trajectory");
+            var doc = Writer.GetDoc();
 
             foreach (Trajectory.Node node in trajectory.getNodes())
             {
@@ -37,14 +34,14 @@ namespace uAdventure.Editor
                 nodeElement.SetAttribute("x", node.getX().ToString());
                 nodeElement.SetAttribute("y", node.getY().ToString());
                 nodeElement.SetAttribute("scale", node.getScale().ToString());
-                itemElement.AppendChild(nodeElement);
+                xmlNode.AppendChild(nodeElement);
             }
 
             if (trajectory.getInitial() != null)
             {
                 XmlElement initialNodeElement = doc.CreateElement("initialnode");
                 initialNodeElement.SetAttribute("id", trajectory.getInitial().getID());
-                itemElement.AppendChild(initialNodeElement);
+                xmlNode.AppendChild(initialNodeElement);
             }
 
             foreach (Trajectory.Side side in trajectory.getSides())
@@ -53,10 +50,13 @@ namespace uAdventure.Editor
                 sideElement.SetAttribute("idStart", side.getIDStart());
                 sideElement.SetAttribute("idEnd", side.getIDEnd());
                 sideElement.SetAttribute("length", ((int)side.getLength()).ToString());
-                itemElement.AppendChild(sideElement);
+                xmlNode.AppendChild(sideElement);
             }
+        }
 
-            return itemElement;
+        protected override string GetElementNameFor(object target)
+        {
+            return "trajectory";
         }
     }
 }

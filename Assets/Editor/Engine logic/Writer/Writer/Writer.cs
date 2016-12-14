@@ -90,10 +90,14 @@ namespace uAdventure.Editor
             XmlDocumentType typeDescriptor = doc.CreateDocumentType("game-descriptor", "SYSTEM", "descriptor.dtd", null);
             doc.AppendChild(declaration);
             doc.AppendChild(typeDescriptor);
-            XmlNode mainNode = DescriptorDOMWriter.buildDOM(adventureData, valid);
-            indentDOM(mainNode, 0);
-            doc.ImportNode(mainNode, true);
-            doc.AppendChild(mainNode);
+
+            if (!valid)
+                DOMWriterUtility.DOMWrite(doc, adventureData, new DescriptorDOMWriter.InvalidAdventureDataControlParam());
+            else
+                DOMWriterUtility.DOMWrite(doc, adventureData);
+
+            // TODO re-add indentation
+            //indentDOM(mainNode, 0);
 
             // Create the necessary elements for export the DOM into a XML file
             //transformer = tFactory.newTransformer();
@@ -122,26 +126,18 @@ namespace uAdventure.Editor
                 doc.AppendChild(declaration);
                 doc.AppendChild(typeChapter);
                 // Pick the main node of the chapter
-                mainNode = ChapterDOMWriter.buildDOM(chapter, folderName, doc);
-                /** ******* START WRITING THE ADAPTATION DATA ***** */
-                foreach (AdaptationProfile profile in chapter.getAdaptationProfiles())
-                {
-                    mainNode.AppendChild(Writer.writeAdaptationData(profile, true, doc));
-                }
-                /** ******* END WRITING THE ADAPTATION DATA ***** */
 
-                /** ******* START WRITING THE ASSESSMENT DATA ***** */
-                foreach (AssessmentProfile profile in chapter.getAssessmentProfiles())
-                {
-                    mainNode.AppendChild(Writer.writeAssessmentData(profile, true, doc));
-                }
-                /** ******* END WRITING THE ASSESSMENT DATA ***** */
+                // TODO FIX THIS and use normal domwriter
 
-                indentDOM(mainNode, 0);
+                var chapterwriter = new ChapterDOMWriter();
+
+                DOMWriterUtility.DOMWrite(doc, chapter);
+
+                // TODO re-add indentation
+                //indentDOM(mainNode, 0);
+
                 //TODO: testing
                 //doc = new XmlDocument();
-                doc.ImportNode(mainNode, true);
-                doc.AppendChild(mainNode);
 
                 // Create the necessary elements for export the DOM into a XML file
                 //transformer = tFactory.newTransformer();

@@ -3,30 +3,37 @@ using System.Collections;
 using System.Xml;
 
 using uAdventure.Core;
+using System;
 
 namespace uAdventure.Editor
 {
-    public class ItemDOMWriter
+    [DOMWriter(typeof(Item))]
+    public class ItemDOMWriter : ParametrizedDOMWriter
     {
         /**
-            * Private constructor.
-            */
+        * Private constructor.
+        */
 
-        private ItemDOMWriter()
+        public ItemDOMWriter()
         {
 
         }
 
-        public static XmlNode buildDOM(Item item)
+        protected override string GetElementNameFor(object target)
         {
+            return "object";
+        }
 
-            XmlElement itemElement = null;
+        protected override void FillNode(XmlNode node, object target, params IDOMWriterParam[] options)
+        {
+            var item = target as Item;
+
+            XmlElement itemElement = node as XmlElement;
 
 
             // Create the necessary elements to create the DOM
             XmlDocument doc = Writer.GetDoc();
             // Create the root node
-            itemElement = doc.CreateElement("object");
             itemElement.SetAttribute("id", item.getId());
             itemElement.SetAttribute("returnsWhenDragged", (item.isReturnsWhenDragged() ? "yes" : "no"));
 
@@ -65,9 +72,7 @@ namespace uAdventure.Editor
                 // Append the conditions (if available)
                 if (description.getConditions() != null && !description.getConditions().isEmpty())
                 {
-                    XmlNode conditionsNode = ConditionsDOMWriter.buildDOM(description.getConditions());
-                    doc.ImportNode(conditionsNode, true);
-                    descriptionNode.AppendChild(conditionsNode);
+                    DOMWriterUtility.DOMWrite(descriptionNode, description.getConditions());
                 }
 
                 // Create and append the name, brief description and detailed description and its soundPaths
@@ -111,10 +116,8 @@ namespace uAdventure.Editor
                 // Append the actions node
                 itemElement.AppendChild(actionsNode);
             }
-
-
-
-            return itemElement;
+            
+            
         }
     }
 }

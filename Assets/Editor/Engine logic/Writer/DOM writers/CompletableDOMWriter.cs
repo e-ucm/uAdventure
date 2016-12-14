@@ -8,16 +8,18 @@ using uAdventure.Core;
 
 namespace uAdventure.Editor
 {
-    public class CompletableDOMWriter
+    [DOMWriter(typeof(Completable))]
+    public class CompletableDOMWriter : ParametrizedDOMWriter
     {
 
-        /**
-         * Private constructor.
-         */
-
-        private CompletableDOMWriter()
+        public CompletableDOMWriter()
         {
 
+        }
+        
+        protected override string GetElementNameFor(object target)
+        {
+            return "completable";
         }
 
         /**
@@ -27,11 +29,10 @@ namespace uAdventure.Editor
          *            Chapter data to be written
          * @return DOM element with the chapter data
          */
-
-        public static XmlElement buildDOM(Completable completable)
+        protected override void FillNode(XmlNode node, object target, params IDOMWriterParam[] options)
         {
-
-            XmlElement completableNode = Writer.GetDoc().CreateElement("completable");
+            var completable = target as Completable;
+            XmlElement completableNode = node as XmlElement;
 
             string type = "";
             switch (completable.getType())
@@ -66,8 +67,7 @@ namespace uAdventure.Editor
 
             if (completable.getScore() != null)
                 completableNode.AppendChild(CompletableDOMWriter.buildScoreDOM(completable.getScore()));
-
-            return completableNode;
+            
         }
 
         public static XmlElement buildMilestoneDOM(Completable.Milestone milestone, string elementName = "milestone")
@@ -82,7 +82,7 @@ namespace uAdventure.Editor
             }
             else
             {
-                milestoneNode.AppendChild(ConditionsDOMWriter.buildDOM(milestone.getConditions()));
+                DOMWriterUtility.DOMWrite(milestoneNode, milestone.getConditions());
             }
 
             if (milestone.getProgress() >= 0)

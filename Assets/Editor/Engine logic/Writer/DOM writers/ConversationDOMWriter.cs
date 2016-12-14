@@ -4,45 +4,50 @@ using System.Collections.Generic;
 using System.Xml;
 
 using uAdventure.Core;
+using System;
 
 namespace uAdventure.Editor
 {
-    public class ConversationDOMWriter
+    [DOMWriter(typeof(Conversation), typeof(TreeConversation), typeof(GraphConversation))]
+    public class ConversationDOMWriter : ParametrizedDOMWriter
     {
-
-        /**
-         * Private constructor.
-         */
-
-        private ConversationDOMWriter()
+        
+        public ConversationDOMWriter()
         {
 
         }
-
-        public static XmlNode buildDOM(Conversation conversation)
+        
+        protected override string GetElementNameFor(object target)
         {
-
-            XmlNode conversationNode = null;
+            var conversation = target as Conversation;
 
             if (conversation.getType() == Conversation.TREE)
-                conversationNode = buildTreeConversationDOM((TreeConversation)conversation);
+                return "tree-conversation";
             else if (conversation.getType() == Conversation.GRAPH)
-                conversationNode = buildGraphConversationDOM((GraphConversation)conversation);
+                return "graph-conversation";
 
-            return conversationNode;
+            return "conversation";
         }
 
-        protected static XmlNode buildTreeConversationDOM(TreeConversation treeConversation)
+        protected override void FillNode(XmlNode node, object target, params IDOMWriterParam[] options)
+        {
+            var conversation = target as Conversation;
+
+            if (conversation.getType() == Conversation.TREE)
+                FillNode(node, (TreeConversation)conversation, options);
+            else if (conversation.getType() == Conversation.GRAPH)
+                FillNode(node, (GraphConversation)conversation, options);
+            
+        }
+
+        private void FillNode(XmlNode node, TreeConversation treeConversation, params IDOMWriterParam[] options)
         {
 
-            XmlElement rootNode = null;
+            XmlElement rootNode = node as XmlElement;
 
 
             // Create the necessary elements to create the DOM
             XmlDocument doc = Writer.GetDoc();
-
-            // Create the root node
-            rootNode = doc.CreateElement("tree-conversation");
 
             // Set the identification attribute of the new conversation, and its type
             rootNode.SetAttribute("id", treeConversation.getId());
@@ -50,8 +55,6 @@ namespace uAdventure.Editor
             // Call the recursive function that will create the nodes. We pass the root of the tree, the DOM document,
             // the root DOM node that will be used to add the elements, and a depth level for indentation (2 by default)
             writeNodeInDOM(treeConversation.getRootNode(), rootNode);
-
-            return rootNode;
         }
 
         /**
@@ -113,11 +116,7 @@ namespace uAdventure.Editor
                     rootDOMNode.AppendChild(phrase);
 
                     // Create conditions for current effect
-                    conditionsNode = ConditionsDOMWriter.buildDOM(line.getConditions());
-                    document.ImportNode(conditionsNode, true);
-
-                    // Add conditions associated to that effect
-                    rootDOMNode.AppendChild(conditionsNode);
+                    DOMWriterUtility.DOMWrite(rootDOMNode, line.getConditions());
                 }
 
                 // Check if the node is terminal
@@ -129,12 +128,7 @@ namespace uAdventure.Editor
                     // If the terminal node has an effect, include it into the DOM
                     if (currentNode.hasEffects())
                     {
-                        // Extract the root node
-                        XmlNode effect = EffectsDOMWriter.buildDOM(EffectsDOMWriter.EFFECTS, currentNode.getEffects());
-
-                        // Insert it into the DOM
-                        document.ImportNode(effect, true);
-                        endConversation.AppendChild(effect);
+                        DOMWriterUtility.DOMWrite(endConversation, currentNode.getEffects());
                     }
 
                     // Add the "end-conversation" tag into the root
@@ -196,12 +190,7 @@ namespace uAdventure.Editor
                 // If the terminal node has an effect, include it into the DOM
                 if (currentNode.hasEffects())
                 {
-                    // Extract the root node
-                    XmlNode effect = EffectsDOMWriter.buildDOM(EffectsDOMWriter.EFFECTS, currentNode.getEffects());
-
-                    // Insert it into the DOM
-                    document.ImportNode(effect, true);
-                    response.AppendChild(effect);
+                    DOMWriterUtility.DOMWrite(response, currentNode.getEffects());
                 }
 
                 // Add the element
@@ -209,10 +198,10 @@ namespace uAdventure.Editor
             }
         }
 
-        private static XmlNode buildGraphConversationDOM(GraphConversation graphConversation)
+        private void FillNode(XmlNode toFill, GraphConversation graphConversation, params IDOMWriterParam[] options)
         {
 
-            XmlElement conversationElement = null;
+            XmlElement conversationElement = toFill as XmlElement;
 
             // Get the complete node list
             List<ConversationNode> nodes = graphConversation.getAllNodes();
@@ -221,7 +210,6 @@ namespace uAdventure.Editor
             XmlDocument doc = Writer.GetDoc();
 
             // Create the root node
-            conversationElement = doc.CreateElement("graph-conversation");
             conversationElement.SetAttribute("id", graphConversation.getId());
 
             // For each node
@@ -287,10 +275,7 @@ namespace uAdventure.Editor
                         nodeElement.AppendChild(phrase);
 
                         // Create conditions for current effect
-                        conditionsNode = ConditionsDOMWriter.buildDOM(line.getConditions());
-                        doc.ImportNode(conditionsNode, true);
-                        // Add conditions associated to that effect
-                        nodeElement.AppendChild(conditionsNode);
+                        DOMWriterUtility.DOMWrite(nodeElement, line.getConditions());
 
                     }
 
@@ -303,12 +288,7 @@ namespace uAdventure.Editor
                         // If the terminal node has an effect, include it into the DOM
                         if (node.hasEffects())
                         {
-                            // Extract the root node
-                            XmlNode effect = EffectsDOMWriter.buildDOM(EffectsDOMWriter.EFFECTS, node.getEffects());
-
-                            // Insert it into the DOM
-                            doc.ImportNode(effect, true);
-                            endConversation.AppendChild(effect);
+                            DOMWriterUtility.DOMWrite(nodeElement, node.getEffects());
                         }
 
                         // Add the "end-conversation" tag into the node
@@ -329,12 +309,7 @@ namespace uAdventure.Editor
                         // If the terminal node has an effect, include it into the DOM
                         if (node.hasEffects())
                         {
-                            // Extract the root node
-                            XmlNode effect = EffectsDOMWriter.buildDOM(EffectsDOMWriter.EFFECTS, node.getEffects());
-
-                            // Insert it into the DOM
-                            doc.ImportNode(effect, true);
-                            nodeElement.AppendChild(effect);
+                            DOMWriterUtility.DOMWrite(nodeElement, node.getEffects());
                         }
 
                     }
@@ -388,11 +363,7 @@ namespace uAdventure.Editor
                         //If there is a synthesizer valid voice, store it as attribute
                         if (line.getSynthesizerVoice())
                             lineElement.SetAttribute("synthesize", "yes");
-
-                        // Create conditions for current effect
-                        conditionsNode = ConditionsDOMWriter.buildDOM(line.getConditions());
-                        doc.ImportNode(conditionsNode, true);
-
+                        
                         // Create a child tag, and set it the index of the child
                         XmlElement childElement = doc.CreateElement("child");
                         childElement.SetAttribute("nodeindex", nodes.IndexOf(node.getChild(j)).ToString());
@@ -400,28 +371,20 @@ namespace uAdventure.Editor
                         // Insert the text line in the option node
                         nodeElement.AppendChild(lineElement);
                         // Add conditions associated to that effect
-                        nodeElement.AppendChild(conditionsNode);
+                        DOMWriterUtility.DOMWrite(nodeElement, line.getConditions());
                         // Insert child tag
                         nodeElement.AppendChild(childElement);
                     }
                     // If node has an effect, include it into the DOM
                     if (node.hasEffects())
                     {
-                        // Extract the root node
-                        XmlNode effect = EffectsDOMWriter.buildDOM(EffectsDOMWriter.EFFECTS, node.getEffects());
-
-                        // Insert it into the DOM
-                        doc.ImportNode(effect, true);
-                        nodeElement.AppendChild(effect);
+                        DOMWriterUtility.DOMWrite(nodeElement, node.getEffects());
                     }
                 }
 
                 // Add the node to the conversation
                 conversationElement.AppendChild(nodeElement);
             }
-
-
-            return conversationElement;
         }
     }
 }

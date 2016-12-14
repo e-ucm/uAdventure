@@ -3,32 +3,37 @@ using System.Collections;
 using System.Xml;
 
 using uAdventure.Core;
+using System;
 
 namespace uAdventure.Editor
 {
-    public class AtrezzoDOMWriter
+    [DOMWriter(typeof(Atrezzo))]
+    public class AtrezzoDOMWriter : ParametrizedDOMWriter
     {
-
-
         /**
          * Private constructor.
          */
 
-        private AtrezzoDOMWriter()
+        public AtrezzoDOMWriter()
         {
 
         }
+        
 
-        public static XmlNode buildDOM(Atrezzo atrezzo)
+        protected override string GetElementNameFor(object target)
         {
+            return "atrezzoobject";
+        }
 
-            XmlElement atrezzoElement = null;
+        protected override void FillNode(XmlNode node, object target, params IDOMWriterParam[] options)
+        {
+            var atrezzo = target as Atrezzo;
+            XmlElement atrezzoElement = node as XmlElement;
 
             // Create the necessary elements to create the DOM
             XmlDocument doc = Writer.GetDoc();
 
             // Create the root node
-            atrezzoElement = doc.CreateElement("atrezzoobject");
             atrezzoElement.SetAttribute("id", atrezzo.getId());
 
             // Append the documentation (if avalaible)
@@ -79,9 +84,6 @@ namespace uAdventure.Editor
 
             // Append the description
             atrezzoElement.AppendChild(descriptionNode);
-
-
-            return atrezzoElement;
         }
     }
 }

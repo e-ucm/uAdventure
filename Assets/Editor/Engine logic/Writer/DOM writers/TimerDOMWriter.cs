@@ -1,33 +1,35 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System.Collections.Specialized;
 using System.Xml;
 
 using uAdventure.Core;
 
 namespace uAdventure.Editor
 {
-    public class TimerDOMWriter
+    [DOMWriter(typeof(Timer))]
+    public class TimerDOMWriter : ParametrizedDOMWriter
     {
 
-        /**
-         * Private constructor.
-         */
-
-        private TimerDOMWriter()
+        public TimerDOMWriter()
         {
 
         }
 
-        public static XmlNode buildDOM(Timer timer)
+        protected override string GetElementNameFor(object target)
         {
+            return "timer";
+        }
 
-            XmlElement timerElement = null;
+
+        protected override void FillNode(XmlNode node, object target, params IDOMWriterParam[] options)
+        {
+            var timer = target as Timer;
+
+            var timerElement = node as XmlElement;
 
             // Create the necessary elements to create the DOM
             XmlDocument doc = Writer.GetDoc();
 
             // Create the root node
-            timerElement = doc.CreateElement("timer");
 
             // Set the time attribute
             timerElement.SetAttribute("time", timer.getTime().ToString());
@@ -47,40 +49,34 @@ namespace uAdventure.Editor
                 timerElement.AppendChild(timerDocumentationNode);
             }
 
+            OrderedDictionary conditionsAndEffects = new OrderedDictionary();
+
+
             // Append the init conditions (if avalaible)
             if (!timer.getInitCond().isEmpty())
             {
-                XmlNode conditionsNode = ConditionsDOMWriter.buildDOM(ConditionsDOMWriter.INIT_CONDITIONS,
-                    timer.getInitCond());
-                doc.ImportNode(conditionsNode, true);
-                timerElement.AppendChild(conditionsNode);
+                conditionsAndEffects.Add(ConditionsDOMWriter.INIT_CONDITIONS, timer.getInitCond());
             }
 
             // Append the end-conditions (if avalaible)
             if (!timer.getEndCond().isEmpty())
             {
-                XmlNode conditionsNode = ConditionsDOMWriter.buildDOM(ConditionsDOMWriter.END_CONDITIONS, timer.getEndCond());
-                doc.ImportNode(conditionsNode, true);
-                timerElement.AppendChild(conditionsNode);
+                conditionsAndEffects.Add(ConditionsDOMWriter.END_CONDITIONS, timer.getEndCond());
             }
 
             // Append the effects (if avalaible)
             if (!timer.getEffects().isEmpty())
             {
-                XmlNode effectsNode = EffectsDOMWriter.buildDOM(EffectsDOMWriter.EFFECTS, timer.getEffects());
-                doc.ImportNode(effectsNode, true);
-                timerElement.AppendChild(effectsNode);
+                conditionsAndEffects.Add(EffectsDOMWriter.EFFECTS, timer.getEffects());
             }
 
             // Append the post-effects (if avalaible)
             if (!timer.getPostEffects().isEmpty())
             {
-                XmlNode postEffectsNode = EffectsDOMWriter.buildDOM(EffectsDOMWriter.POST_EFFECTS, timer.getPostEffects());
-                doc.ImportNode(postEffectsNode, true);
-                timerElement.AppendChild(postEffectsNode);
+                conditionsAndEffects.Add(EffectsDOMWriter.POST_EFFECTS, timer.getPostEffects());
             }
 
-            return timerElement;
+            DOMWriterUtility.DOMWrite(timerElement, conditionsAndEffects, DOMWriterUtility.DontCreateElement());
         }
     }
 }

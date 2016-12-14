@@ -2,37 +2,46 @@
 using UnityEngine;
 using System.Collections;
 using System.Xml;
+using System.Linq;
 
 using uAdventure.Core;
 
 namespace uAdventure.Editor
 {
-    public class CutsceneDOMWriter
-    {
-        /**
-            * Private constructor.
-            */
+    using CIP = ChapterDOMWriter.ChapterTargetIDParam;
 
-        private CutsceneDOMWriter()
+    [DOMWriter(typeof(Cutscene))]
+    public class CutsceneDOMWriter : ParametrizedDOMWriter
+    {
+        public CutsceneDOMWriter()
         {
 
         }
 
-        public static XmlNode buildDOM(Cutscene cutscene, bool initialScene)
+        protected override string GetElementNameFor(object target)
         {
+            var cutscene = target as Cutscene;
+            // Create the root node
 
-            XmlElement cutsceneElement = null;
+            if (cutscene.getType() == GeneralScene.GeneralSceneSceneType.SLIDESCENE)
+                return "slidescene";
+            else if (cutscene.getType() == GeneralScene.GeneralSceneSceneType.VIDEOSCENE)
+                return "videoscene";
 
+            return "";
+        }
 
+        protected override void FillNode(XmlNode node, object target, params IDOMWriterParam[] options)
+        {
+            var cutscene = target as Cutscene;
+            var cutsceneElement = node as XmlElement;
+            
             // Create the necessary elements to create the DOM
             XmlDocument doc = Writer.GetDoc();
 
             // Create the root node
-            if (cutscene.getType() == GeneralScene.GeneralSceneSceneType.SLIDESCENE)
-                cutsceneElement = doc.CreateElement("slidescene");
-            else if (cutscene.getType() == GeneralScene.GeneralSceneSceneType.VIDEOSCENE)
+            if (cutscene.getType() == GeneralScene.GeneralSceneSceneType.VIDEOSCENE)
             {
-                cutsceneElement = doc.CreateElement("videoscene");
                 if (((Videoscene)cutscene).isCanSkip())
                     cutsceneElement.SetAttribute("canSkip", "yes");
                 else
@@ -41,7 +50,9 @@ namespace uAdventure.Editor
 
             // Set the attributes
             cutsceneElement.SetAttribute("id", cutscene.getId());
-            if (initialScene)
+
+
+            if (options.Any(o => o is CIP && (o as CIP).TargetId.Equals(cutscene.getId())))
                 cutsceneElement.SetAttribute("start", "yes");
             else
                 cutsceneElement.SetAttribute("start", "no");
@@ -77,9 +88,7 @@ namespace uAdventure.Editor
 
             if (!cutscene.getEffects().isEmpty())
             {
-                XmlNode effectsNode = EffectsDOMWriter.buildDOM(EffectsDOMWriter.EFFECTS, cutscene.getEffects());
-                doc.ImportNode(effectsNode, true);
-                cutsceneElement.AppendChild(effectsNode);
+                DOMWriterUtility.DOMWrite(cutsceneElement, cutscene.getEffects());
             }
 
             // Append the resources
@@ -94,8 +103,6 @@ namespace uAdventure.Editor
             XmlNode nameNode = doc.CreateElement("name");
             nameNode.AppendChild(doc.CreateTextNode(cutscene.getName()));
             cutsceneElement.AppendChild(nameNode);
-
-            return cutsceneElement;
         }
     }
 }

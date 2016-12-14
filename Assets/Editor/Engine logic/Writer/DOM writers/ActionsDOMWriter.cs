@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Xml;
@@ -114,25 +114,18 @@ namespace uAdventure.Editor
                     // Append the conditions (if avalaible)
                     if (!action.getConditions().isEmpty())
                     {
-                        XmlNode conditionsXmlNode = ConditionsDOMWriter.buildDOM(action.getConditions());
-                        doc.ImportNode(conditionsXmlNode, true);
-                        actionElement.AppendChild(conditionsXmlNode);
+                        DOMWriterUtility.DOMWrite(actionElement, action.getConditions());
                     }
 
                     // Append the effects (if avalaible)
                     if (!action.getEffects().isEmpty())
                     {
-                        XmlNode effectsXmlNode = EffectsDOMWriter.buildDOM(EffectsDOMWriter.EFFECTS, action.getEffects());
-                        doc.ImportNode(effectsXmlNode, true);
-                        actionElement.AppendChild(effectsXmlNode);
+                        DOMWriterUtility.DOMWrite(actionElement, action.getEffects());
                     }
                     // Append the not effects (if avalaible)
                     if (action.getNotEffects() != null && !action.getNotEffects().isEmpty())
                     {
-                        XmlNode notEffectsXmlNode = EffectsDOMWriter.buildDOM(EffectsDOMWriter.NOT_EFFECTS,
-                            action.getNotEffects());
-                        doc.ImportNode(notEffectsXmlNode, true);
-                        actionElement.AppendChild(notEffectsXmlNode);
+                        DOMWriterUtility.DOMWrite(actionElement, action.getNotEffects(), DOMWriterUtility.Name(EffectsDOMWriter.NOT_EFFECTS));
                     }
 
                     // Append the action element

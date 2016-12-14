@@ -56,9 +56,7 @@ namespace uAdventure.Editor
             // Append the conditions block (if there is one)
             if (!resources.getConditions().isEmpty())
             {
-                XmlNode conditionsNode = ConditionsDOMWriter.buildDOM(resources.getConditions());
-                doc.ImportNode(conditionsNode, true);
-                resourcesNode.AppendChild(conditionsNode);
+                DOMWriterUtility.DOMWrite(resourcesNode, resources.getConditions());
             }
 
             // Take the array of types and values of the assets

@@ -3,18 +3,22 @@ using System.Collections;
 using System.Xml;
 
 using uAdventure.Core;
+using System;
 
 namespace uAdventure.Editor
 {
-    public class DescriptorDOMWriter
+    [DOMWriter(typeof(AdventureDataControl))]
+    public class DescriptorDOMWriter : ParametrizedDOMWriter
     {
-        /**
-            * Private constructor.
-            */
-
-        private DescriptorDOMWriter()
+        public DescriptorDOMWriter()
         {
 
+        }
+        
+
+        protected override string GetElementNameFor(object target)
+        {
+            return "game-descriptor";
         }
 
         /**
@@ -27,17 +31,24 @@ namespace uAdventure.Editor
          *            engine), false otherwise
          * @return DOM element with the descriptor data
          */
+         public class InvalidAdventureDataControlParam : IDOMWriterParam {
 
-        public static XmlNode buildDOM(AdventureDataControl adventureData, bool valid)
+         }
+
+        /// <summary>
+        /// Fills the descriptor node with the addventure data control data
+        /// </summary>
+        /// <param name="descriptorNode"></param>
+        /// <param name="target"></param>
+        /// <param name="options">InvalidAdventureDataControlParam is accepted</param>
+        protected override void FillNode(XmlNode descriptorNode, object target, params IDOMWriterParam[] options)
         {
-
-            XmlNode descriptorNode = null;
+            var adventureData = target as AdventureDataControl;
 
             // Create the necessary elements to create the DOM
             XmlDocument doc = Writer.GetDoc();
 
             // Create the root node
-            descriptorNode = doc.CreateElement("game-descriptor");
             ((XmlElement)descriptorNode).SetAttribute("versionNumber", adventureData.getAdventureData().getVersionNumber());
 
             // Create and append the title
@@ -51,6 +62,11 @@ namespace uAdventure.Editor
             descriptorNode.AppendChild(adventureDescriptionNode);
 
             // Create and append the "invalid" tag (if necessary)
+            var valid = true;
+            foreach (var o in options)
+                if (o is InvalidAdventureDataControlParam)
+                    valid = false;
+
             if (!valid)
                 descriptorNode.AppendChild(doc.CreateElement("invalid"));
             if (adventureData.isCommentaries())
@@ -234,9 +250,6 @@ namespace uAdventure.Editor
             }
             // Store the chapters in the descriptor
             descriptorNode.AppendChild(contentsNode);
-
-
-            return descriptorNode;
         }
     }
 }

@@ -110,19 +110,13 @@ namespace uAdventure.Editor
                     //Append conditions (always required at least one)
                     if (!tRule.getInitConditions().isEmpty())
                     {
-                        XmlNode conditionsNode = ConditionsDOMWriter.buildDOM(ConditionsDOMWriter.INIT_CONDITIONS,
-                            tRule.getInitConditions());
-                        doc.ImportNode(conditionsNode, true);
-                        ruleNode.AppendChild(conditionsNode);
+                        DOMWriterUtility.DOMWrite(ruleNode, tRule.getInitConditions(), DOMWriterUtility.Name(ConditionsDOMWriter.INIT_CONDITIONS));
                     }
 
                     //Append conditions (always required at least one)
                     if (!tRule.getEndConditions().isEmpty())
                     {
-                        XmlNode conditionsNode = ConditionsDOMWriter.buildDOM(ConditionsDOMWriter.END_CONDITIONS,
-                            tRule.getEndConditions());
-                        doc.ImportNode(conditionsNode, true);
-                        ruleNode.AppendChild(conditionsNode);
+                        DOMWriterUtility.DOMWrite(ruleNode, tRule.getEndConditions(), DOMWriterUtility.Name(ConditionsDOMWriter.END_CONDITIONS));
                     }
 
                     // Create effects
@@ -177,9 +171,7 @@ namespace uAdventure.Editor
                     //Append conditions (always required at least one)
                     if (!rule.getConditions().isEmpty())
                     {
-                        XmlNode conditionsNode = ConditionsDOMWriter.buildDOM(rule.getConditions());
-                        doc.ImportNode(conditionsNode, true);
-                        ruleNode.AppendChild(conditionsNode);
+                        DOMWriterUtility.DOMWrite(ruleNode, rule.getConditions());
                     }
 
                     //Create effect element and append it

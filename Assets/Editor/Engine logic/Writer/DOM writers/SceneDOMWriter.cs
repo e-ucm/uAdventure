@@ -1,27 +1,38 @@
 ﻿using System;
 using UnityEngine;
 using System.Collections;
+using System.Collections.Specialized;
 using System.Xml;
+using System.Linq;
 
 using uAdventure.Core;
 
+
 namespace uAdventure.Editor
 {
-    public class SceneDOMWriter
+    using CIP = ChapterDOMWriter.ChapterTargetIDParam;
+
+    [DOMWriter(typeof(Scene))]
+    public class SceneDOMWriter : ParametrizedDOMWriter
     {
         /**
             * Private constructor.
             */
 
-        private SceneDOMWriter()
+        public SceneDOMWriter()
         {
 
         }
 
-        public static XmlNode buildDOM(Scene scene, bool initialScene)
+        protected override string GetElementNameFor(object target)
         {
+            return "scene";
+        }
 
-            XmlElement sceneElement = null;
+        protected override void FillNode(XmlNode node, object target, params IDOMWriterParam[] options)
+        {
+            var sceneElement = node as XmlElement;
+            var scene = target as Scene;
 
             if (scene != null)
             {
@@ -30,9 +41,9 @@ namespace uAdventure.Editor
             // Create the necessary elements to create the DOM
             XmlDocument doc = Writer.GetDoc();
             // Create the root node
-            sceneElement = doc.CreateElement("scene");
             sceneElement.SetAttribute("id", scene.getId());
-            if (initialScene)
+            
+            if (options.Any(o => o is CIP && (o as CIP).TargetId.Equals(scene.getId())))
                 sceneElement.SetAttribute("start", "yes");
             else
                 sceneElement.SetAttribute("start", "no");
@@ -148,9 +159,7 @@ namespace uAdventure.Editor
                         // Append the conditions (if avalaible)
                         if (!nextScene.getConditions().isEmpty())
                         {
-                            XmlNode conditionsNode = ConditionsDOMWriter.buildDOM(nextScene.getConditions());
-                            doc.ImportNode(conditionsNode, true);
-                            nextSceneElement.AppendChild(conditionsNode);
+                            DOMWriterUtility.DOMWrite(nextSceneElement, nextScene.getConditions());
                         }
 
                         //Append the default exit look (if available)
@@ -169,25 +178,17 @@ namespace uAdventure.Editor
                                 nextSceneElement.AppendChild(exitLook);
                         }
 
-                        // Append the effects (if avalaible)
-                        if (!nextScene.getEffects().isEmpty())
-                        {
-                            XmlNode effectsNode = EffectsDOMWriter.buildDOM(EffectsDOMWriter.EFFECTS,
-                                nextScene.getEffects());
-                            doc.ImportNode(effectsNode, true);
-                            nextSceneElement.AppendChild(effectsNode);
-                        }
+                        OrderedDictionary nextSceneEffects = new OrderedDictionary();
 
-                        // Append the post-effects (if avalaible)
-                        if (!nextScene.getPostEffects().isEmpty())
-                        {
-                            XmlNode postEffectsNode = EffectsDOMWriter.buildDOM(EffectsDOMWriter.POST_EFFECTS,
-                                nextScene.getPostEffects());
-                            doc.ImportNode(postEffectsNode, true);
-                            nextSceneElement.AppendChild(postEffectsNode);
-                        }
+                        if (nextScene.getEffects() != null && !nextScene.getEffects().isEmpty())
+                            nextSceneEffects.Add(EffectsDOMWriter.EFFECTS, nextScene.getEffects());
+
+                        if (nextScene.getPostEffects() != null && !nextScene.getPostEffects().isEmpty())
+                            nextSceneEffects.Add(EffectsDOMWriter.POST_EFFECTS, nextScene.getPostEffects());
 
                         // Append the next scene
+                        DOMWriterUtility.DOMWrite(nextSceneElement, nextSceneEffects, DOMWriterUtility.DontCreateElement());
+
                         exitElement.AppendChild(nextSceneElement);
                     }
 
@@ -204,36 +205,22 @@ namespace uAdventure.Editor
 
                     if (exit.getConditions() != null && !exit.getConditions().isEmpty())
                     {
-                        XmlNode conditionsNode = ConditionsDOMWriter.buildDOM(exit.getConditions());
-                        doc.ImportNode(conditionsNode, true);
-                        exitElement.AppendChild(conditionsNode);
+                        DOMWriterUtility.DOMWrite(exitElement, exit.getConditions());
                     }
+
+                    OrderedDictionary effectsTypes = new OrderedDictionary();
 
                     if (exit.getEffects() != null && !exit.getEffects().isEmpty())
-                    {
-                        Debug.Log("SceneDOM Effects: " + exit.getEffects().getEffects().Count);
-                        XmlNode effectsNode = EffectsDOMWriter.buildDOM(EffectsDOMWriter.EFFECTS, exit.getEffects());
-                        doc.ImportNode(effectsNode, true);
-                        exitElement.AppendChild(effectsNode);
-                    }
+                        effectsTypes.Add(EffectsDOMWriter.EFFECTS, exit.getEffects());
 
                     if (exit.getPostEffects() != null && !exit.getPostEffects().isEmpty())
-                    {
-                        Debug.Log("SceneDOM PostEffects: " + exit.getPostEffects().getEffects().Count);
-                        XmlNode postEffectsNode = EffectsDOMWriter.buildDOM(EffectsDOMWriter.POST_EFFECTS,
-                            exit.getPostEffects());
-                        doc.ImportNode(postEffectsNode, true);
-                        exitElement.AppendChild(postEffectsNode);
-                    }
+                        effectsTypes.Add(EffectsDOMWriter.POST_EFFECTS, exit.getPostEffects());
 
                     if (exit.getNotEffects() != null && !exit.getNotEffects().isEmpty())
-                    {
-                        Debug.Log("SceneDOM NonEffects: " + exit.getNotEffects().getEffects().Count);
-                        XmlNode notEffectsNode = EffectsDOMWriter.buildDOM(EffectsDOMWriter.NOT_EFFECTS,
-                            exit.getNotEffects());
-                        doc.ImportNode(notEffectsNode, true);
-                        exitElement.AppendChild(notEffectsNode);
-                    }
+                        effectsTypes.Add(EffectsDOMWriter.NOT_EFFECTS, exit.getNotEffects());
+
+
+                    DOMWriterUtility.DOMWrite(exitElement, effectsTypes, DOMWriterUtility.DontCreateElement());
 
                     // Append the exit
                     exitsElement.AppendChild(exitElement);
@@ -283,9 +270,7 @@ namespace uAdventure.Editor
                     // Append the conditions (if avalaible)
                     if (!itemReference.getConditions().isEmpty())
                     {
-                        XmlNode conditionsNode = ConditionsDOMWriter.buildDOM(itemReference.getConditions());
-                        doc.ImportNode(conditionsNode, true);
-                        itemReferenceElement.AppendChild(conditionsNode);
+                        DOMWriterUtility.DOMWrite(itemReferenceElement, itemReference.getConditions());
                     }
 
                     // Append the exit
@@ -336,9 +321,7 @@ namespace uAdventure.Editor
                     // Append the conditions (if avalaible)
                     if (!characterReference.getConditions().isEmpty())
                     {
-                        XmlNode conditionsNode = ConditionsDOMWriter.buildDOM(characterReference.getConditions());
-                        doc.ImportNode(conditionsNode, true);
-                        npcReferenceElement.AppendChild(conditionsNode);
+                        DOMWriterUtility.DOMWrite(npcReferenceElement, characterReference.getConditions());
                     }
 
                     // Append the exit
@@ -390,9 +373,7 @@ namespace uAdventure.Editor
                     // Append the conditions (if avalaible)
                     if (!activeArea.getConditions().isEmpty())
                     {
-                        XmlNode conditionsNode = ConditionsDOMWriter.buildDOM(activeArea.getConditions());
-                        doc.ImportNode(conditionsNode, true);
-                        aaElement.AppendChild(conditionsNode);
+                        DOMWriterUtility.DOMWrite(aaElement, activeArea.getConditions());
                     }
 
 
@@ -404,9 +385,7 @@ namespace uAdventure.Editor
                         // Append the conditions (if available)
                         if (description.getConditions() != null && !description.getConditions().isEmpty())
                         {
-                            XmlNode conditionsNode = ConditionsDOMWriter.buildDOM(description.getConditions());
-                            doc.ImportNode(conditionsNode, true);
-                            descriptionNode.AppendChild(conditionsNode);
+                            DOMWriterUtility.DOMWrite(descriptionNode, description.getConditions());
                         }
 
                         // Create and append the name, brief description and detailed description
@@ -443,11 +422,7 @@ namespace uAdventure.Editor
                     // Append the actions (if there is at least one)
                     if (activeArea.getActions().Count > 0)
                     {
-                        XmlNode actionsNode = ActionsDOMWriter.buildDOM(activeArea.getActions());
-                        doc.ImportNode(actionsNode, true);
-
-                        // Append the actions node
-                        aaElement.AppendChild(actionsNode);
+                        DOMWriterUtility.DOMWrite(aaElement, activeArea.getActions());
                     }
 
                     if (!activeArea.isRectangular())
@@ -494,9 +469,7 @@ namespace uAdventure.Editor
                     // Append the conditions (if avalaible)
                     if (!barrier.getConditions().isEmpty())
                     {
-                        XmlNode conditionsNode = ConditionsDOMWriter.buildDOM(barrier.getConditions());
-                        doc.ImportNode(conditionsNode, true);
-                        barrierElement.AppendChild(conditionsNode);
+                        DOMWriterUtility.DOMWrite(barrierElement, barrier.getConditions());
                     }
 
                     // Append the barrier
@@ -534,9 +507,7 @@ namespace uAdventure.Editor
                     // Append the conditions (if avalaible)
                     if (!atrezzoReference.getConditions().isEmpty())
                     {
-                        XmlNode conditionsNode = ConditionsDOMWriter.buildDOM(atrezzoReference.getConditions());
-                        doc.ImportNode(conditionsNode, true);
-                        atrezzoReferenceElement.AppendChild(conditionsNode);
+                        DOMWriterUtility.DOMWrite(atrezzoReferenceElement, atrezzoReference.getConditions());
                     }
 
                     // Append the atrezzo reference
@@ -548,12 +519,9 @@ namespace uAdventure.Editor
 
             if (scene.getTrajectory() != null)
             {
-                XmlNode trajectoryNode = TrajectoryDOMWriter.buildDOM(scene.getTrajectory());
-                doc.ImportNode(trajectoryNode, true);
-                sceneElement.AppendChild(trajectoryNode);
+                DOMWriterUtility.DOMWrite(sceneElement, scene.getTrajectory());
             }
-
-            return sceneElement;
         }
+
     }
 }
