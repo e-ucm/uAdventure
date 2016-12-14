@@ -98,6 +98,13 @@ namespace uAdventure.Core
          * Empty constructor. Sets values to null and creates empty lists.
          */
 
+        // ------------------------------
+        // EXTENSIONS
+        // ------------------------------
+
+        Dictionary<Type, IList> extensionObjects;
+
+
         public Chapter() : base()
         {
             // Create lists
@@ -115,6 +122,8 @@ namespace uAdventure.Core
             globalStates = new List<GlobalState>();
             macros = new List<Macro>();
             completables = new List<Completable>();
+
+            extensionObjects = new Dictionary<Type, IList>();
         }
 
         /**
@@ -148,6 +157,8 @@ namespace uAdventure.Core
             flags = new List<string>();
             vars = new List<string>();
             completables = new List<Completable>();
+
+            extensionObjects = new Dictionary<Type, IList>();
         }
 
         /**
@@ -845,6 +856,32 @@ namespace uAdventure.Core
             this.completables.Add(completable);
         }
 
+        /// <summary>
+        /// Obtain extension objects by type
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public List<T> getObjects<T>()
+        {
+            if (!extensionObjects.ContainsKey(typeof(T)))
+                extensionObjects.Add(typeof(T), new List<T>());
+
+            return extensionObjects[typeof(T)] as List<T>; ;
+        }
+
+        public IList getObjects(Type t)
+        {
+            dynamic r = null;
+            if (extensionObjects.ContainsKey(t))
+                r = extensionObjects[t];
+
+            return r as IList;
+        }
+
+        public List<Type> getObjectTypes()
+        {
+            return new List<Type>(extensionObjects.Keys);
+        }
 
 
         public override object Clone()
@@ -936,6 +973,26 @@ namespace uAdventure.Core
                 c.adaptationProfiles = new List<AdaptationProfile>();
                 foreach (AdaptationProfile ap in adaptationProfiles)
                     c.adaptationProfiles.Add(ap);
+            }
+
+            if (extensionObjects != null)
+            {
+                c.extensionObjects = new Dictionary<Type, IList>();
+                foreach (var eo in extensionObjects)
+                {
+                    var listType = typeof(List<>).MakeGenericType(eo.Key);
+                    var l = Activator.CreateInstance(listType) as IList;
+                    
+                    foreach(var o in eo.Value)
+                    {
+                        if (o is ICloneable)
+                            l.Add((o as ICloneable).Clone());
+                        else
+                            l.Add(o);
+                    }
+
+                    c.extensionObjects.Add(eo.Key, l);
+                }
             }
 
             return c;

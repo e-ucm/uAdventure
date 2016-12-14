@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Linq;
+using System.Collections.Generic;
 using UnityEditor;
 
 using uAdventure.Core;
@@ -26,13 +27,20 @@ namespace uAdventure.Editor
 
             int amountOfScenes = Controller.getInstance().getCharapterList().getSelectedChapterData().getScenes().Count;
             selStringsInitialScene = new string[amountOfScenes];
-            for (int i = 0; i < amountOfScenes; i++)
+
+            var names = getSceneNames();
+            var selName = Controller.getInstance().getCharapterList().getSelectedChapterDataControl().getInitialScene();
+
+            selStringsInitialScene = names.ToArray();
+            selInitialScene = names.FindIndex(s => s == selName);
+
+            /*for (int i = 0; i < amountOfScenes; i++)
             {
                 selStringsInitialScene[i] = Controller.getInstance().getCharapterList().getSelectedChapterData().getScenes()[i].getId();
                 // Set index for selction grid
                 if (selStringsInitialScene[i] == Controller.getInstance().getCharapterList().getSelectedChapterDataControl().getInitialScene())
                     selInitialScene = i;
-            }
+            }*/
 
             clearImg = (Texture2D)Resources.Load("EAdventureData/img/icons/deleteContent", typeof(Texture2D));
 
@@ -83,8 +91,19 @@ namespace uAdventure.Editor
             Controller.getInstance()
                 .getCharapterList()
                 .getSelectedChapterDataControl()
-                .setInitialScene(
-                    Controller.getInstance().getCharapterList().getSelectedChapterData().getCutscenes()[i].getId());
+                .setInitialScene(getSceneNames()[i]);
+        }
+
+        private List<string> getSceneNames()
+        {
+            var scenes = Controller.getInstance().getCharapterList().getSelectedChapterData().getScenes();
+            var cutscenes = Controller.getInstance().getCharapterList().getSelectedChapterData().getCutscenes();
+
+            var names = new List<string>();
+            names.AddRange(scenes.ConvertAll(s => s.getId()));
+            names.AddRange(cutscenes.ConvertAll(s => s.getId()));
+
+            return names;
         }
     }
 }

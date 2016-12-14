@@ -88,6 +88,9 @@ namespace uAdventure.Editor
 
         private static IDOMWriter GetWritterFor(object o)
         {
+            if (knownWritters == null)
+                knownWritters = new Dictionary<Type, IDOMWriter>();
+
             if (!knownWritters.ContainsKey(o.GetType()))
             {
                 // Make sure is a DOMWriter
@@ -100,7 +103,8 @@ namespace uAdventure.Editor
                         // Try create an instance with the Activator
                         var instance = (IDOMWriter)Activator.CreateInstance(writer);
                         foreach (var writterType in dwattr.Types)
-                            knownWritters.Add(writterType, instance);
+                            if(!knownWritters.ContainsKey(writterType))
+                                knownWritters.Add(writterType, instance);
                     }
                 }
             }

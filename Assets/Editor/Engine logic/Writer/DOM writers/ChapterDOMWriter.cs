@@ -62,9 +62,7 @@ namespace uAdventure.Editor
             DocumentBuilder db = dbf.newDocumentBuilder( );
             Document doc = db.newDocument( );
             */
-            // Create the root node
-            chapterNode = doc.CreateElement("eAdventure");
-
+            
             // Add the adaptation and assessment active profiles
             if (!chapter.getAdaptationName().Equals(""))
                 chapterNode.SetAttribute("adaptProfile", chapter.getAdaptationName());
@@ -149,6 +147,15 @@ namespace uAdventure.Editor
             /*} catch( ParserConfigurationException e ) {
                 ReportDialog.GenerateErrorReport(e, true, "UNKNOWERROR");
             }*/
+
+            
+            foreach(var type in chapter.getObjectTypes())
+            {
+                foreach(var tosave in chapter.getObjects(type))
+                {
+                    DOMWriterUtility.DOMWrite(chapterNode, tosave, targetParam);
+                }
+            }
 
 
             // TODO FIX THIS and use normal domwriter

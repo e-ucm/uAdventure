@@ -33,7 +33,7 @@ namespace uAdventure.Editor
         /**
          * Private constructor.
          */
-        private EffectsDOMWriter()
+        public EffectsDOMWriter()
         {
 
         }

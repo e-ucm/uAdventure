@@ -637,6 +637,10 @@ namespace uAdventure.Editor
             return this.completables;
         }
 
+        public List<T> getObjects<T>()
+        {
+            return chapter.getObjects<T>();
+        }
 
         public override void recursiveSearch()
         {

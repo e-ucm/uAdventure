@@ -15,6 +15,28 @@ namespace uAdventure.Geo
 
         List<MapElement> mapElements;
 
+        public MapScene(string id)
+        {
+            Id = id;
+        }
+
+        public string Id { get; set; }
+
+        public void setId(string id)
+        {
+            Id = id;
+        }
+
+        public string getId()
+        {
+            return Id;
+        }
+
+        public override string ToString()
+        {
+            return Id;
+        }
     }
+
 }
 

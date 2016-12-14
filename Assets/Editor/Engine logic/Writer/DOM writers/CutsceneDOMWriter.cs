@@ -10,7 +10,7 @@ namespace uAdventure.Editor
 {
     using CIP = ChapterDOMWriter.ChapterTargetIDParam;
 
-    [DOMWriter(typeof(Cutscene))]
+    [DOMWriter(typeof(Cutscene), typeof(Videoscene), typeof(Slidescene))]
     public class CutsceneDOMWriter : ParametrizedDOMWriter
     {
         public CutsceneDOMWriter()
