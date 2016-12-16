@@ -77,7 +77,7 @@ public class GUIMap
                     // Draw the GeoShapes
                     DrawGeometries(area);
 
-                    if(selectedGeometry != null)
+                    if(selectedGeometry != null && selectedGeometry.Points.Count > 0)
                     {
                         var pixels = PixelsToRelative(LatLonToPixels(selectedGeometry.Points)).ConvertAll(p => p.ToVector2());
                         var v2mousepos = mousePos.ToVector2();
@@ -150,14 +150,14 @@ public class GUIMap
                 break;
             case EventType.mouseDown:
                 {
-                    selectedGeometry = Geometries.Find(g =>
+                    selectedGeometry = Geometries.Find(g => 
                     {
                         List<Vector2d> points = PixelsToRelative(LatLonToPixels(g.Points))
                             .ConvertAll(p => p - Event.current.mousePosition.ToVector2d());
 
                         selectedPoint = points.FindIndex(p => p.magnitude < SelectPointDistance);
 
-                        return Inside(mousePos, points) || selectedPoint != -1; 
+                        return g.Inside(GeoMousePosition) || selectedPoint != -1; 
                     });
 
                     if (area.Contains(Event.current.mousePosition))
@@ -281,42 +281,29 @@ public class GUIMap
         return l.ConvertAll(p => new Vector3(p.x, p.y, 0f)).ToArray();
     }
 
-    private List<Vector2d> LatLonToPixels(List<Vector2d> points)
+    public List<Vector2d> LatLonToPixels(List<Vector2d> points)
     {        
         return points.ConvertAll(p => GM.MetersToPixels(GM.LatLonToMeters(p.y, p.x), Zoom)); 
     }
 
-    private List<Vector2d> PixelsToLatLon(List<Vector2d> points)
+    public List<Vector2d> PixelsToLatLon(List<Vector2d> points)
     {
         return points.ConvertAll(p => GM.MetersToLatLon(GM.PixelsToMeters(p, Zoom)));
     }
 
-    private Vector2d PixelToRelative(Vector2d pixel)
+    public Vector2d PixelToRelative(Vector2d pixel)
     {
         return pixel + PATR;
     }
 
-    private Vector2d RelativeToAbsolute(Vector2d pixel)
+    public Vector2d RelativeToAbsolute(Vector2d pixel)
     {
         return pixel - PATR;
     }
 
-    private List<Vector2d> PixelsToRelative(List<Vector2d> pixels)
+    public List<Vector2d> PixelsToRelative(List<Vector2d> pixels)
     {
         return pixels.ConvertAll(p => PixelToRelative(p));
-    }
-
-    private bool Inside(Vector2d pixel, List<Vector2d> polygon)
-    {
-        var inside = false;
-        for (int i = 0; i < polygon.Count - 1; i++)
-        {
-            if (((polygon[i].y > 0) != (polygon[i + 1].y > 0))
-            && ((polygon[i].y > 0) == (polygon[i].y * polygon[i + 1].x > polygon[i + 1].y * polygon[i].x)))
-                inside = !inside;
-        }
-
-        return inside;
     }
 }
 

@@ -123,6 +123,7 @@ namespace uAdventure.Editor
             extensions.Add(new AdvencedFeaturesWindow(windowRect, new GUIContent(TC.get("AdvancedFeatures.Title")), "Window"));
             extensions.Add(new AssesmentProfileWindow(windowRect, new GUIContent(Language.GetText("ASSESMENT_PROFILES")), "Window"));
             extensions.Add(new MapSceneWindow(windowRect, new GUIContent("MapSceneWindow"), "Window"));
+            extensions.Add(new GeoElementWindow(windowRect, new GUIContent("GeoElements"), "Window"));
 
             foreach (var e in extensions)
             {
