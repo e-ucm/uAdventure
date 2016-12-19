@@ -34,6 +34,7 @@ namespace uAdventure.Editor
         private Rect mm_Rect;
         private string[] menus;
         private Texture2D imagePreview;
+        private ReorderableList actionsList;
 
         /* ----------------------------------
          * GUI ELEMENTS
@@ -188,8 +189,9 @@ namespace uAdventure.Editor
                     break;
                 case 2:
                     {
-
-                    }break;
+                        
+                    }
+                    break;
             }
 
             
