@@ -4,8 +4,6 @@ using System.Xml;
 
 namespace uAdventure.Core
 {
-    [DOMNameParser("action", "acciones", "ms-accion")]
-    [DOMTypeParser(typeof(Action))]
     public class ActionsSubParser_ : Subparser_
     {
         /**

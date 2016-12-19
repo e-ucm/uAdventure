@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml;
+using System.Linq;
 
 // TODO possible unnecesary coupling
 using uAdventure.Runner;
@@ -107,6 +108,27 @@ namespace uAdventure.Core
                 assessment = element.SelectNodes("/eAdventure/assessment"),
                 completables = element.SelectNodes("/eAdventure/completable"),
                 adaptation = element.SelectNodes("/eAdventure/adaptation");
+
+            var restNodes = new List<XmlNode>();
+            var e = element.ChildNodes.GetEnumerator();
+            while (e.MoveNext()) restNodes.Add(e.Current as XmlNode);
+
+            var l = new List<XmlNodeList>();
+            l.Add(eAdventure);         l.Add(scenes);              l.Add(slidescenes);    l.Add(videoscenes);
+            l.Add(books);              l.Add(objects);             l.Add(players);        l.Add(characters);
+            l.Add(treeconversations);  l.Add(graphconversations);  l.Add(globalstates);   l.Add(macros);
+            l.Add(timers);             l.Add(atrezzoobjects);      l.Add(assessment);     l.Add(completables);
+            l.Add(adaptation);
+
+            foreach(var xmlnodelist in l)
+            {
+                var enumerator = xmlnodelist.GetEnumerator();
+                while (enumerator.MoveNext())
+                {
+                    restNodes.Remove(enumerator.Current as XmlNode);
+                }
+            }
+
 
             foreach (XmlElement el in eAdventure)
             {
@@ -213,6 +235,16 @@ namespace uAdventure.Core
                 //TODO: 
                 new AdaptationSubParser_(chapter).ParseElement(el);
             }
+
+            foreach(var el in restNodes)
+            {
+                object parsed = DOMParserUtility.DOMParse(el);
+                if(parsed != null)
+                {
+                    chapter.getObjects(parsed.GetType()).Add(parsed);
+                }
+            }
+
             // In the end of the document, if the chapter has no initial scene
             if (chapter.getTargetId() == null)
             {

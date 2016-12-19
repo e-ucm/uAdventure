@@ -165,16 +165,20 @@ namespace uAdventure.Editor
                     } break;
                 case 1:
                     {
-                        element.Name = GUILayout.TextField(element.Name);
-                        element.Description = GUILayout.TextArea(element.Description);
-
+                        GUILayout.Label("Full description");
+                        element.FullDescription = GUILayout.TextArea(element.FullDescription, GUILayout.Height(250));
+                        
+                        element.Name = EditorGUILayout.TextField("Name", element.Name);
+                        element.BriefDescription = EditorGUILayout.TextField("Brief description", element.BriefDescription);
+                        element.DetailedDescription = EditorGUILayout.TextField("Detailed description", element.DetailedDescription);
+                        
                         GUILayout.Label("Element image");
                         GUILayout.BeginHorizontal();
                        /* if (GUILayout.Button(clearImg, GUILayout.Width(0.1f * windowWidth)))
                         {
                             foregroundMaskPath = "";
                         }*/
-                        GUILayout.Box(element.Image, GUILayout.Width(0.8f * m_Rect.width));
+                        GUILayout.Box(element.Image, GUILayout.Width(0.78f * m_Rect.width));
                         if (GUILayout.Button(TC.get("Buttons.Select"), GUILayout.Width(0.2f * m_Rect.width)))
                         {
                             ShowAssetChooser(AssetType.Image);

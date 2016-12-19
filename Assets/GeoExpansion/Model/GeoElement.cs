@@ -7,11 +7,19 @@ public class GeoElement  {
     {
         Id = id;
         Geometry = new GMLGeometry();
+        Name = "";
+        DetailedDescription = "";
+        FullDescription = "";
+        BriefDescription = "";
+        Influence = 0f;
+        Image = "";
     }
 
     public string Id { get; set; }
     public string Name { get; set; }
-    public string Description { get; set; }
+    public string DetailedDescription { get; set; }
+    public string FullDescription { get; set; }
+    public string BriefDescription { get; set; }
     public GMLGeometry Geometry { get; set; }
 
     public GeoElementDrawer Drawer { get; set; }
