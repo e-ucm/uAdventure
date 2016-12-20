@@ -34,14 +34,13 @@ namespace uAdventure.Editor
         private Rect mm_Rect;
         private string[] menus;
         private Texture2D imagePreview;
-        private ReorderableList actionsList;
 
         /* ----------------------------------
          * GUI ELEMENTS
          * -----------------------------------*/
         private DropDown addressDropdown;
         private GUIMap map;
-        private ReorderableList geometriesReorderableList;
+        private ReorderableList actionsList;
 
         public GeoElementWindow(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions) : base(aStartPos, aContent, aStyle, aOptions)
         {
@@ -79,8 +78,96 @@ namespace uAdventure.Editor
             map = new GUIMap();
             map.Repaint += Repaint;
             map.Zoom = 19;
+
+            actionsList = new ReorderableList(new List<GeoAction>(), typeof(GeoAction));
+            actionsList.headerHeight = 40;
+            actionsList.elementHeight = 60;
+            actionsList.drawHeaderCallback = DrawActionsHeader;
+            actionsList.drawElementCallback = DrawActionElement;
+            actionsList.onAddDropdownCallback = OnAddActionDropdown;
+        }
+
+        private void DrawActionsHeader(Rect r)
+        {
+            GUILayout.BeginArea(new Rect(r.x, r.y, r.width, r.height / 2f));
+            GUILayout.Label("Actions");
+            GUILayout.EndArea();
+
+            GUILayout.BeginArea(new Rect(r.x, r.y + (r.height / 2f), r.width, r.height / 2f), "", "toolbar");
+            GUILayout.BeginHorizontal(); 
+            GUILayout.Label("Name", GUILayout.Width(r.width * 0.2f));
+            GUILayout.Label("Parameters", GUILayout.Width(r.width * 0.6f));
+            GUILayout.Label("C&E", GUILayout.Width(r.width * 0.2f));
+            GUILayout.EndHorizontal();
+            GUILayout.EndArea();
+        }
+
+        private void DrawActionElement(Rect rect, int index, bool isActive, bool isFocused)
+        {
+            GUILayout.BeginArea(rect);
+
+            var action = actionsList.list[index] as GeoAction;
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(action.Name, GUILayout.MaxWidth(rect.width * 0.2f));
+
+            //Action Parameters
+            GUILayout.BeginVertical(GUILayout.MaxWidth(rect.width * 0.6f));
             
-            
+            if(action is EnterAction)
+            {
+                var specialized = action as EnterAction;
+                specialized.OnlyFromOutside = EditorGUILayout.Toggle("Only from outside", specialized.OnlyFromOutside);
+            }
+            if (action is ExitAction)
+            {
+                var specialized = action as ExitAction;
+                specialized.OnlyFromInside = EditorGUILayout.Toggle("Only from inside", specialized.OnlyFromInside);
+
+            }
+            if (action is InspectAction)
+            {
+                var specialized = action as InspectAction;
+                specialized.Inside = EditorGUILayout.Toggle("On range", specialized.Inside);
+
+            }
+            if (action is LookToAction)
+            {
+                var specialized = action as LookToAction;
+                specialized.Inside = EditorGUILayout.Toggle("On range", specialized.Inside);
+                specialized.Center = EditorGUILayout.Toggle("Look to center", specialized.Center);
+                if(!specialized.Center)
+                    specialized.Direction = EditorGUILayout.Vector2Field("Look to direction", specialized.Direction);
+            }
+
+            GUILayout.EndVertical();
+
+            // Conditions and effects
+            GUILayout.BeginVertical(GUILayout.MaxWidth(rect.width * 0.2f));
+            if (GUILayout.Button("Conditions"))
+            {
+                ConditionEditorWindow window =
+                    (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
+                window.Init(action.Conditions);
+            }
+            if(GUILayout.Button("Effects")){
+
+                EffectEditorWindow window =
+                    (EffectEditorWindow)ScriptableObject.CreateInstance(typeof(EffectEditorWindow));
+                window.Init(action.Effects);
+            }
+            GUILayout.EndVertical();
+
+            // End eleemnt
+            GUILayout.EndHorizontal();
+            GUILayout.EndArea();
+        }
+
+        protected virtual void OnAddActionDropdown(Rect r, ReorderableList rl)
+        {
+            var menu = new GenericMenu();
+            foreach(var a in GeoActionsFactory.Instance.AvaliableActions)
+                menu.AddItem(new GUIContent(a.Value), false, (t) => element.Actions.Add(GeoActionsFactory.Instance.CreateActionFor(t as Type)), a.Key);
+            menu.ShowAsContext();
         }
 
         /* ----------------------------------
@@ -98,6 +185,8 @@ namespace uAdventure.Editor
 
             element = Controller.getInstance().getSelectedChapterDataControl().getObjects<GeoElement>()[selectedElement];
 
+
+            actionsList.list = element.Actions;
             // Set geometries list reference
             map.Geometries = new List<GMLGeometry>() { element.Geometry };
 
@@ -114,8 +203,7 @@ namespace uAdventure.Editor
 
                         if (GUILayout.Button("Center") && element.Geometry.Points.Count > 0)
                         {
-                            location = element.Geometry.Points.Aggregate(new Vector2(), (p, n) => p + n.ToVector2()) / element.Geometry.Points.Count;
-                            map.Center = location.ToVector2d();
+                            Center(element);
                         }
 
                         if (GUILayout.Button(!editing ? "Edit" : "Finish"))
@@ -189,7 +277,8 @@ namespace uAdventure.Editor
                     break;
                 case 2:
                     {
-                        
+                        actionsList.list = element.Actions;
+                        actionsList.DoList(new Rect(0, 50, m_Rect.width * 0.99f, m_Rect.height));
                     }
                     break;
             }
@@ -226,11 +315,23 @@ namespace uAdventure.Editor
         protected override void OnSelect(ReorderableList r)
         {
             selectedElement = r.index;
+            if(r.index >= 0 )
+                Center(Controller.getInstance().getSelectedChapterDataControl().getObjects<GeoElement>()[selectedElement]);
         }
 
         protected override void OnUpdateList(ReorderableList r)
         {
             r.list = Controller.getInstance().getSelectedChapterDataControl().getObjects<GeoElement>().ConvertAll(s => s.Id);
+        }
+
+        private void Center(GeoElement element)
+        {
+            if(element.Geometry.Points.Count > 0)
+            {
+                location = element.Geometry.Points.Aggregate(new Vector2(), (p, n) => p + n.ToVector2()) / element.Geometry.Points.Count;
+                map.Center = location.ToVector2d();
+            }
+
         }
 
         /* ------------------------------------------

@@ -25,7 +25,10 @@ namespace uAdventure.Geo
             actionsList = new List<GeoAction>();
 
             // Add actions here
-
+            actionsList.Add(new EnterAction());
+            actionsList.Add(new ExitAction());
+            actionsList.Add(new InspectAction());
+            actionsList.Add(new LookToAction());
             // End add
 
             avaliableActions = new Dictionary<Type, string>();

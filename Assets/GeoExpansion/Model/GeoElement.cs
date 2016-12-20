@@ -18,6 +18,7 @@ namespace uAdventure.Geo
             BriefDescription = "";
             Influence = 0f;
             Image = "";
+            Actions = new List<GeoAction>();
         }
 
         public string Id { get; set; }
