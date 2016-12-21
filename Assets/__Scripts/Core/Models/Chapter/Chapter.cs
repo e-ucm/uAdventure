@@ -866,16 +866,17 @@ namespace uAdventure.Core
             if (!extensionObjects.ContainsKey(typeof(T)))
                 extensionObjects.Add(typeof(T), new List<T>());
 
-            return extensionObjects[typeof(T)] as List<T>; ;
+            return extensionObjects[typeof(T)] as List<T>;
         }
 
         public IList getObjects(Type t)
         {
-            dynamic r = null;
-            if (extensionObjects.ContainsKey(t))
-                r = extensionObjects[t];
+            var listType = typeof(List<>).MakeGenericType(t);
+                
+            if (!extensionObjects.ContainsKey(t))
+                extensionObjects.Add(t, Activator.CreateInstance(listType) as IList);
 
-            return r as IList;
+            return extensionObjects[t] as IList;
         }
 
         public List<Type> getObjectTypes()

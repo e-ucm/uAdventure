@@ -238,9 +238,13 @@ namespace uAdventure.Core
 
             foreach(var el in restNodes)
             {
-                object parsed = DOMParserUtility.DOMParse(el);
+                object parsed = DOMParserUtility.DOMParse(el as XmlElement, chapter);
                 if(parsed != null)
                 {
+                    var t = parsed.GetType();
+                    if (parsed is ITypeGroupable)
+                        t = (parsed as ITypeGroupable).GetGroupType();
+
                     chapter.getObjects(parsed.GetType()).Add(parsed);
                 }
             }

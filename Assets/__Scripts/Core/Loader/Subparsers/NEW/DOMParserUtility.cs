@@ -10,19 +10,71 @@ namespace uAdventure.Core
     public class DOMParserUtility
     {
 
-        public static object DOMParse(XmlNode el)
+        /// <summary>
+        /// Parses the element based on the avaliable parsers for the node name.
+        /// </summary>
+        /// <param name="el">Element to extract info from</param>
+        /// <returns>An object returned by a IDOMParser that can handle the node</returns>
+        public static object DOMParse(XmlElement el, params object[] parameters)
         {
-            throw new NotImplementedException();
+            var parser = GetParserFor(el.Name);
+            if (parser != null) return parser.DOMParse(el, parameters);
+            else throw new Exception("Parser not found for the desired name: " + el.Name);
+        }
+
+        /// <summary>
+        /// DOMParse all the elements by just using the element name
+        /// </summary>
+        /// <param name="nl">Nodes to parse</param>
+        /// <returns>A list of elements of any type</returns>
+        public static IList DOMParse(XmlNodeList nl, params object[] parameters)
+        {
+            ArrayList parsed = new ArrayList();
+            foreach(var o in nl)
+            {
+                parsed.Add(DOMParse(o as XmlElement, parameters));
+            }
+            return parsed;
+        }
+
+        /// <summary>
+        /// DOMParse by using only parsers of type T
+        /// </summary>
+        /// <typeparam name="T">Type of the desired output object and parser used</typeparam>
+        /// <param name="el">node that contains the data to parse from</param>
+        /// <returns>Parsed element</returns>
+        public static T DOMParse<T>(XmlElement el, params object[] parameters)
+        {
+            var parser = GetParserFor(typeof(T));
+            if (parser != null) return (T)parser.DOMParse(el, parameters);
+            else throw new Exception("Parser not found for the desired type: "+ typeof(T));
+        }
+
+        /// <summary>
+        /// DOMParses a list of nodes returning the same type of elements
+        /// </summary>
+        /// <typeparam name="T">Type of the desired output object list and elements to select the parser</typeparam>
+        /// <param name="nl">list of nodes to parse from</param>
+        /// <returns>A list of elements of type T parsed from xml</returns>
+        public static IList<T> DOMParse<T>(XmlNodeList nl, params object[] parameters)
+        {
+            List<T> parsed = new List<T>();
+            foreach(var o in nl)
+            {
+                parsed.Add(DOMParse<T>(o as XmlElement, parameters));
+            }
+
+            return parsed;
         }
 
         // ------------------
         // Aux methods
         // ------------------
 
-        private static Dictionary<Type, Subparser_> knownTypeParsers;
-        private static Dictionary<string, Subparser_> knownNameParsers;
+        private static Dictionary<Type, IDOMParser> knownTypeParsers;
+        private static Dictionary<string, IDOMParser> knownNameParsers;
 
-        private static Subparser_ GetParserFor(string nodename)
+        private static IDOMParser GetParserFor(string nodename)
         {
             init();
 
@@ -34,16 +86,16 @@ namespace uAdventure.Core
             return knownNameParsers.ContainsKey(nodename) ? knownNameParsers[nodename] : null;
         }
 
-        private static Subparser_ GetParserFor(object o)
+        private static IDOMParser GetParserFor(Type t)
         {
             init();
 
-            if (!knownTypeParsers.ContainsKey(o.GetType()))
+            if (!knownTypeParsers.ContainsKey(t))
             {
                 fillParsers();
             }
 
-            return knownTypeParsers.ContainsKey(o.GetType()) ? knownTypeParsers[o.GetType()] : null;
+            return knownTypeParsers.ContainsKey(t) ? knownTypeParsers[t] : null;
         }
 
         static IEnumerable<Type> GetTypesWith<TAttribute>(bool inherit)
@@ -58,24 +110,25 @@ namespace uAdventure.Core
         private static void init()
         {
             if (knownTypeParsers == null)
-                knownTypeParsers = new Dictionary<Type, Subparser_>();
+                knownTypeParsers = new Dictionary<Type, IDOMParser>();
 
             if (knownNameParsers == null)
-                knownNameParsers = new Dictionary<string, Subparser_>();
+                knownNameParsers = new Dictionary<string, IDOMParser>();
         }
 
         private static void fillParsers()
         {
             // Make sure is a DOMWriter
-            var writers = GetTypesWith<DOMParserAttribute>(true).Where(t => t.IsAssignableFrom(typeof(Subparser_)));
-            foreach (var writer in writers)
+            var parsers = GetTypesWith<DOMParserAttribute>(true).Where(t => t.GetInterfaces().Contains(typeof(IDOMParser)));
+            foreach (var parser in parsers)
             {
-                foreach (var attr in writer.GetCustomAttributes(typeof(DOMParserAttribute), true))
+                // Try create an instance with the Activator
+                var instance = (IDOMParser)Activator.CreateInstance(parser);
+
+                foreach (var attr in parser.GetCustomAttributes(typeof(DOMParserAttribute), true))
                 {
                     var dwattr = attr as DOMParserAttribute;
-                    // Try create an instance with the Activator
-                    var instance = (Subparser_)Activator.CreateInstance(writer);
-
+                    
                     foreach (var writterType in dwattr.Types)
                         if (!knownTypeParsers.ContainsKey(writterType))
                             knownTypeParsers.Add(writterType, instance);

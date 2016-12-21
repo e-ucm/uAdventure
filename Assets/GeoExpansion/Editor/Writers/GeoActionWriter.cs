@@ -52,14 +52,14 @@ namespace uAdventure.Editor
             }
             else
             {
-                AddChild(node, "direction", target.Direction.ToString());
+                AddChild(node, "direction", target.Direction.x + " " + target.Direction.y);
             }
 
         }
 
         protected void FillNode(XmlNode node, InspectAction target, params IDOMWriterParam[] options)
         {
-            AddChild(node, "only-from-inside", target.Inside.ToString());
+            AddChild(node, "inside", target.Inside.ToString());
         }
 
         private void AddChild(XmlNode parent, string name, string content)
