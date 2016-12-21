@@ -328,8 +328,8 @@ namespace uAdventure.Editor
         {
             if(element.Geometry.Points.Count > 0)
             {
-                location = element.Geometry.Points.Aggregate(new Vector2(), (p, n) => p + n.ToVector2()) / element.Geometry.Points.Count;
-                map.Center = location.ToVector2d();
+                map.Center = element.Geometry.Center;
+                location = map.Center.ToVector2();
             }
 
         }

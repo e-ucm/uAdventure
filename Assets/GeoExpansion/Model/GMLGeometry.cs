@@ -85,4 +85,16 @@ public class GMLGeometry
 
         return inside;
     }
+
+    public Vector2d Center {
+        get
+        {
+            if (Points.Count == 0)
+                return Vector2d.zero;
+            else if (Points.Count == 1)
+                return Points[0];
+
+            return Points.Aggregate(new Vector2d(), (p, n) => p + n) / Points.Count;
+        }
+    }
 }

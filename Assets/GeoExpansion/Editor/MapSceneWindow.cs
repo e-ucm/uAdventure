@@ -11,6 +11,7 @@ using UnityEditor;
 using System.Linq;
 using MapzenGo.Helpers;
 using MapzenGo.Models.Settings.Editor;
+using System;
 
 public class MapSceneWindow : ReorderableListEditorWindowExtension {
 
@@ -27,8 +28,7 @@ public class MapSceneWindow : ReorderableListEditorWindowExtension {
     private Vector2 location;
     private string lastSearch = "";
     private float timeSinceLastWrite;
-    private List<GMLGeometry> geometries;
-    private GMLGeometry editing;
+    private MapScene mapScene;
     private Rect mm_Rect;
 
     /* ----------------------------------
@@ -36,7 +36,7 @@ public class MapSceneWindow : ReorderableListEditorWindowExtension {
      * -----------------------------------*/
     private DropDown addressDropdown;
     private GUIMap map;
-    private ReorderableList geometriesReorderableList;
+    private ReorderableList mapElementReorderableList;
 
     public MapSceneWindow(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions) : base(aStartPos, aContent, aStyle, aOptions)
     {
@@ -74,18 +74,12 @@ public class MapSceneWindow : ReorderableListEditorWindowExtension {
         map.Repaint += Repaint;
         map.Zoom = 19;
 
-        geometriesReorderableList = new ReorderableList(new ArrayList(), typeof(GMLGeometry), true, true, true, true);
-        geometriesReorderableList.drawHeaderCallback += DrawGMLGeometryHeader;
-        geometriesReorderableList.drawElementCallback += DrawGMLGeometry;
-        geometriesReorderableList.onAddCallback += AddGMLGeometry;
-        geometriesReorderableList.onRemoveCallback += RemoveGMLGeometry;
-        geometriesReorderableList.onReorderCallback += ReorderGMLGeometries;
+        mapElementReorderableList = new ReorderableList(new ArrayList(), typeof(MapElement), true, true, true, true);
+        mapElementReorderableList.drawHeaderCallback += DrawMapElementsHeader;
+        mapElementReorderableList.drawElementCallback += DrawMapElement;
+        mapElementReorderableList.onAddDropdownCallback += OnAddMapElementDropdown;
+        mapElementReorderableList.onRemoveCallback += RemoveMapElement;
 
-        // Creating the geometry list
-        geometries = new List<GMLGeometry>();
-        // Set geometries list reference
-        geometriesReorderableList.list = geometries;
-        map.Geometries = geometries;
     }
     /* ----------------------------------
   * ON GUI: Used for drawing the window every unity event
@@ -114,73 +108,19 @@ public class MapSceneWindow : ReorderableListEditorWindowExtension {
         GUILayout.BeginHorizontal();
         // Geometries control
         var geometriesWidth = 150;
-        geometriesReorderableList.elementHeight = geometriesReorderableList.list.Count == 0 ? 20 : 70;
+        mapElementReorderableList.elementHeight = mapElementReorderableList.list.Count == 0 ? 20 : 70;
         var rect = GUILayoutUtility.GetRect(geometriesWidth, mm_Rect.height - lastRect.y - lastRect.height);
-        geometriesReorderableList.DoList(rect);
+        mapElementReorderableList.DoList(rect);
 
         // Map drawing
-        map.selectedGeometry = geometriesReorderableList.index >= 0 ? geometries[geometriesReorderableList.index] : null;
         if (map.DrawMap(GUILayoutUtility.GetRect(mm_Rect.width - geometriesWidth, mm_Rect.height - lastRect.y - lastRect.height)))
         {
-            Debug.Log(map.GeoMousePosition);
-            if (editing != null)
-            {
-                switch (editing.Type)
-                {
-                    case GMLGeometry.GeometryType.Point:
-                        if (editing.Points.Count == 1) editing.Points[0] = map.GeoMousePosition;
-                        else editing.Points.Add(map.GeoMousePosition);
-                        break;
-                    case GMLGeometry.GeometryType.LineString:
-                        editing.Points.Add(map.GeoMousePosition);
-                        break;
-                    case GMLGeometry.GeometryType.Polygon:
-                        if (editing.Points.Count <= 1)
-                        {
-                            editing.Points.Add(map.GeoMousePosition);
-                        }
-                        else
-                        {
-                            // Find the closest index
-                            var min = editing.Points.Min(p => (p - map.GeoMousePosition).magnitude);
-                            var closest = editing.Points.FindIndex(p => (p - map.GeoMousePosition).magnitude == min);
 
-                            // Fix the previous and next
-                            var prev = closest == 0 ? editing.Points.Count - 1 : closest - 1;
-                            var next = (closest + 1) % editing.Points.Count;
-                            // Calculate the normal to both adjacent axis to closest point
-                            var c = editing.Points[closest];
-                            var v1 = (editing.Points[closest] - editing.Points[prev]).normalized;
-                            var v2 = (editing.Points[closest] - editing.Points[next]).normalized;
-
-                            var closestNormal = (v1 + v2).normalized;
-                            var convex = Vector3.Cross(v1.ToVector2(), v2.ToVector2()).z > 0;
-
-                            var mouseVector = (map.GeoMousePosition - c);
-                            var left = Vector3.Cross(closestNormal.ToVector2(), mouseVector.ToVector2()).z > 0;
-
-                            Debug.Log(convex ? "Convex" : "Concave");
-                            if ((left && convex) || (!left && !convex))
-                            {
-                                Debug.Log("Prev");
-                                // We insert at the closest
-                                editing.Points.Insert(closest, map.GeoMousePosition);
-                            }
-                            else
-                            {
-                                Debug.Log("Next");
-                                // We insert at the next
-                                editing.Points.Insert(next, map.GeoMousePosition);
-                            }
-                        }
-                        break;
-                }
-            }
         }
 
 
         location = map.Center.ToVector2();
-        geometriesReorderableList.index = map.selectedGeometry != null ? geometries.IndexOf(map.selectedGeometry) : -1;
+        //geometriesReorderableList.index = map.selectedGeometry != null ? geometries.IndexOf(map.selectedGeometry) : -1;
 
         GUILayout.EndHorizontal();
 
@@ -191,23 +131,16 @@ public class MapSceneWindow : ReorderableListEditorWindowExtension {
             foreach (var l in place.DataStructure.dataChache)
                 if (l.label == address)
                     location = l.coordinates;
-
-            var geometry = new GMLGeometry();
-            geometry.Type = GMLGeometry.GeometryType.Polygon;
-
-            var points = 5f;
-            var radius = 0.00005;
-            for (float i = 0; i < 5; i++)
-                geometry.Points.Add(new Vector2d(location.x + radius * Mathf.Sin(i * 2f * Mathf.PI / points) * 1.33333f, location.y + radius * Mathf.Cos(i * 2f * Mathf.PI / points)));
-
-
-            geometries.Add(geometry);
+            
 
             place.DataStructure.dataChache.Clear();
             Repaint();
         }
     }
 
+    // -----------------------------
+    //  MapScenes management
+    // -----------------------------
     protected override void OnAdd(ReorderableList r)
     {
         Controller.getInstance().getSelectedChapterDataControl().getObjects<MapScene>().Add(new MapScene("newMapscene"));
@@ -237,11 +170,18 @@ public class MapSceneWindow : ReorderableListEditorWindowExtension {
     protected override void OnSelect(ReorderableList r)
     {
         selectedElement = r.index;
+
+        if(selectedElement != -1)
+        {
+            mapScene = Controller.getInstance().getSelectedChapterDataControl().getObjects<MapScene>()[selectedElement];
+            // Set geometries list reference
+            mapElementReorderableList.list = mapScene.Elements;
+        }
     }
 
     protected override void OnUpdateList(ReorderableList r)
     {
-        r.list = Controller.getInstance().getSelectedChapterDataControl().getObjects<MapScene>().ConvertAll(s => s.getId());
+        r.list = Controller.getInstance().getSelectedChapterDataControl().getObjects<MapScene>().ConvertAll(s => s.Id);
     }
 
     /* ------------------------------------------
@@ -280,52 +220,128 @@ public class MapSceneWindow : ReorderableListEditorWindowExtension {
     }
 
 
-    /*----------------------------
-     * GML GEOMETRY OPERATIONS
-     *----------------------------*/
+    // -----------------------------
+    //  MapScene elements management
+    // -----------------------------
+
+    private void OnAddElement()
+    {
+
+    }
+
+    private void OnDrawMapElementsHeader(Rect rect)
+    {
+
+    }
+
+    private void OnDrawMapElement(Rect rect, int index, int a, int b)
+    {
+
+    }
 
     Rect typePopupRect = new Rect(0, 2, 150, 15);
     Rect infoRect = new Rect(9, 20, 150, 15);
     Rect centerButtonRect = new Rect(0, 40, 75, 15);
     Rect editButtonRect = new Rect(75, 40, 75, 15);
 
-    private void DrawGMLGeometryHeader(Rect rect)
+    private void DrawMapElementsHeader(Rect rect)
     {
         GUI.Label(rect, "Geometries");
     }
 
-    private void DrawGMLGeometry(Rect rect, int index, bool active, bool focused)
+    private void DrawMapElement(Rect rect, int index, bool active, bool focused)
     {
-        GMLGeometry geo = (GMLGeometry)geometriesReorderableList.list[index];
+        MapElement mapElement = (MapElement)mapElementReorderableList.list[index];
 
-        EditorGUI.LabelField(infoRect.GUIAdapt(rect), "Points: " + geo.Points.Count);
+        EditorGUI.LabelField(infoRect.GUIAdapt(rect), mapElement.getTargetId());
 
-        geo.Type = (GMLGeometry.GeometryType)EditorGUI.EnumPopup(typePopupRect.GUIAdapt(rect), geo.Type);
-
-        if (GUI.Button(centerButtonRect.GUIAdapt(rect), "Center") && geo.Points.Count > 0)
+        //geo.Type = (GMLGeometry.GeometryType)EditorGUI.EnumPopup(typePopupRect.GUIAdapt(rect), geo.Type);
+        var center = map.Center;
+        if (mapElement is GeoReference)
         {
-            location = geo.Points.Aggregate(new Vector2(), (p, n) => p + n.ToVector2()) / geo.Points.Count;
-            map.Center = location.ToVector2d();
+            var geoReference = mapElement as GeoReference;
+            var geoElement = Controller.getInstance().getSelectedChapterDataControl().getObjects<GeoElement>().Find(e => e.Id == geoReference.getTargetId());
+            if (geoElement != null && geoElement.Geometry.Points.Count > 0)
+            {
+                center = geoElement.Geometry.Center;
+            }
+        }
+        else if (mapElement is ExtElemReference)
+        {
+            var extReference = mapElement as ExtElemReference;
+            var extElement = findExternalReferenceById(extReference.getTargetId());
+            if (extElement != null && extReference != null)
+            {
+                center = extReference.Position.ToVector2d();
+            }
         }
 
-        if (GUI.Button(editButtonRect.GUIAdapt(rect), editing != geo ? "Edit" : "Finish"))
+        if (GUI.Button(centerButtonRect.GUIAdapt(rect), "Center"))
+        {
+            map.Center = center;
+        }
+
+        /*if (GUI.Button(editButtonRect.GUIAdapt(rect), editing != geo ? "Unlocked" : "Locked"))
         {
             editing = editing == geo ? null : geo;
+        }*/
+
+        if (GUI.Button(editButtonRect.GUIAdapt(rect), "Conditions"))
+        {
+            ConditionEditorWindow window =
+                (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
+            window.Init(mapElement.Conditions);
         }
     }
 
-    private void AddGMLGeometry(ReorderableList list)
+    private object findExternalReferenceById(string id)
     {
-        geometries.Add(new GMLGeometry());
+        // TODO extend here
+        var item = Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems().Find(i => i.getId() == id);
+        if (item != null)
+            return item;
+
+        var atrezzo = Controller.getInstance().getSelectedChapterDataControl().getAtrezzoList().getAtrezzoList().Find(a => a.getId() == id);
+        if (atrezzo != null)
+            return atrezzo;
+
+        var npc = Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPC(id);
+        if (npc != null)
+            return npc;
+
+        return null;
     }
 
-    private void RemoveGMLGeometry(ReorderableList list)
+    private Dictionary<string, object> getObjectReferences()
     {
-        geometries.RemoveAt(list.index);
+        Dictionary<string, object> objects = new Dictionary<string, object>();
+        // TODO extend here
+        Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems().ForEach(i => objects.Add("Item/" + i.getId(), i));
+        Controller.getInstance().getSelectedChapterDataControl().getAtrezzoList().getAtrezzoList().ForEach(a => objects.Add("Atrezzo/" + a.getId(), a));
+        Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs().ForEach(npc => objects.Add("Character/"+ npc.getId(), npc));
+
+        return null;
     }
 
-    private void ReorderGMLGeometries(ReorderableList list)
+    protected void OnAddMapElementDropdown(Rect r, ReorderableList rl)
     {
-        geometries = (List<GMLGeometry>)geometriesReorderableList.list;
+        var menu = new GenericMenu();
+
+        var mapElements = Controller.getInstance().getSelectedChapterDataControl().getObjects<GeoElement>();
+        mapElements.ForEach(me =>
+        {
+            menu.AddItem(new GUIContent("GeoElement/"+me.Id), false, (elem) => mapScene.Elements.Add(elem as MapElement), me);
+        });
+
+        foreach(var pair in getObjectReferences())
+        {
+            menu.AddItem(new GUIContent(pair.Key), false, (elem) => mapScene.Elements.Add(elem as MapElement), pair.Value);
+        }
+        menu.ShowAsContext();
+    }
+
+    private void RemoveMapElement(ReorderableList list)
+    {
+        mapScene.Elements.RemoveAt(list.index);
     }
 }

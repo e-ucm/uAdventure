@@ -11,27 +11,27 @@ namespace uAdventure.Geo
 
     public class MapScene
     {
+        //-------------
+        // Properties
+        //-------------
         public CameraType CameraType { get; set; }
+        public string Id { get; set; }
+        public List<MapElement> Elements { get; set; }
 
-        List<MapElement> mapElements;
-
+        /// <summary>
+        /// Creates a mapScene using the id. Initializing its elements to an empty list.
+        /// </summary>
+        /// <param name="id">Id to use</param>
         public MapScene(string id)
         {
             Id = id;
+            Elements = new List<MapElement>();
         }
 
-        public string Id { get; set; }
-
-        public void setId(string id)
-        {
-            Id = id;
-        }
-
-        public string getId()
-        {
-            return Id;
-        }
-
+        /// <summary>
+        /// ToString writes down the ID
+        /// </summary>
+        /// <returns>string with the id</returns>
         public override string ToString()
         {
             return Id;
