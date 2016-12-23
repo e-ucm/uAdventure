@@ -14,6 +14,11 @@ namespace uAdventure.Geo
         public int Layer { get; set; }
 
         public Conditions Conditions { get; set; }
+
+        public MapElement(string targetId)
+        {
+            this.targetId = targetId;
+        }
         
         public string getTargetId()
         {

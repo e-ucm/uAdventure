@@ -12,6 +12,7 @@ using System.Linq;
 using MapzenGo.Helpers;
 using MapzenGo.Models.Settings.Editor;
 using System;
+using uAdventure.Core;
 
 public class MapSceneWindow : ReorderableListEditorWindowExtension {
 
@@ -80,12 +81,18 @@ public class MapSceneWindow : ReorderableListEditorWindowExtension {
         mapElementReorderableList.onAddDropdownCallback += OnAddMapElementDropdown;
         mapElementReorderableList.onRemoveCallback += RemoveMapElement;
 
+        mapResources = new Dictionary<ExtElemReference, GUIMap.MapResources>();
     }
     /* ----------------------------------
   * ON GUI: Used for drawing the window every unity event
   * ----------------------------------*/
     public override void Draw(int aID)
     {
+        if(mapScene == null)
+        {
+            GUILayout.Label("There is no selected element. Please select or create one.");
+            return;
+        }
 
       
         if (addressDropdown == null)
@@ -106,18 +113,30 @@ public class MapSceneWindow : ReorderableListEditorWindowExtension {
             map.Center = new Vector2d(location.x, location.y);
 
         GUILayout.BeginHorizontal();
-        // Geometries control
-        var geometriesWidth = 150;
+        // Map Elements
+        mapElementReorderableList.list = mapScene.Elements;
+        var elementsWidth = 150;
         mapElementReorderableList.elementHeight = mapElementReorderableList.list.Count == 0 ? 20 : 70;
-        var rect = GUILayoutUtility.GetRect(geometriesWidth, mm_Rect.height - lastRect.y - lastRect.height);
+        var rect = GUILayoutUtility.GetRect(elementsWidth, mm_Rect.height - lastRect.y - lastRect.height);
         mapElementReorderableList.DoList(rect);
 
-        // Map drawing
-        if (map.DrawMap(GUILayoutUtility.GetRect(mm_Rect.width - geometriesWidth, mm_Rect.height - lastRect.y - lastRect.height)))
-        {
 
+        // Map drawing
+        if (map.DrawMap(GUILayoutUtility.GetRect(mm_Rect.width - elementsWidth, mm_Rect.height - lastRect.y - lastRect.height)))
+        {
+            if (movingReference != null)
+            {
+                movingReference.Position = map.GeoMousePosition;
+                mapResources[movingReference].Position = movingReference.Position;
+                movingReference = null;
+            }
         }
 
+        if (movingReference != null && Event.current.type == EventType.repaint)
+        {
+            movingReference.Position = map.GeoMousePosition;
+            mapResources[movingReference].Position = movingReference.Position;
+        }
 
         location = map.Center.ToVector2();
         //geometriesReorderableList.index = map.selectedGeometry != null ? geometries.IndexOf(map.selectedGeometry) : -1;
@@ -136,6 +155,51 @@ public class MapSceneWindow : ReorderableListEditorWindowExtension {
             place.DataStructure.dataChache.Clear();
             Repaint();
         }
+    }
+
+    private List<DataControlWithResources> extElems;
+    private void UpdateMapResources()
+    {
+        extElems = getAllElements();
+        // Put the elements into the map
+        map.Geometries = mapScene.Elements
+            .FindAll(e => e is GeoReference)
+            .ConvertAll(e => FindGeoElem(e.getTargetId()).Geometry);
+        var allElements = mapScene.Elements
+            .FindAll(e => e is ExtElemReference)
+            .ConvertAll(e => e as ExtElemReference);
+
+        mapResources.Clear();
+        foreach (var elem in allElements)
+        {
+            var extElem = FindExtElem(elem.getTargetId());
+            var textures = new List<Texture2D>();
+            var previewImage = extElem.GetType().GetMethod("getPreviewImage");
+            if(previewImage != null)
+            {
+                var image = previewImage.Invoke(extElem, null) as string;
+                if(image != null)
+                {
+                    textures.Add(AssetsController.getImage(image).texture);
+                }
+                mapResources.Add(elem, new GUIMap.MapResources(textures, elem.Scale.x, elem.Position));
+            }
+        }
+
+        map.PositionedResources = mapResources.Values.ToList();
+           
+    }
+
+    private Dictionary<ExtElemReference, GUIMap.MapResources> mapResources;
+
+    private GeoElement FindGeoElem(string id)
+    {
+        return Controller.getInstance().getSelectedChapterDataControl().getObjects<GeoElement>().Find(e => e.Id == id);
+    }
+
+    private DataControlWithResources FindExtElem(string id)
+    {
+        return extElems.Find(ext => id == (ext.GetType().GetMethod("getId").Invoke(ext, null) as string));
     }
 
     // -----------------------------
@@ -163,9 +227,7 @@ public class MapSceneWindow : ReorderableListEditorWindowExtension {
         Controller.getInstance().getSelectedChapterDataControl().getObjects<MapScene>().RemoveAt(r.index);
     }
 
-    protected override void OnReorder(ReorderableList r)
-    {
-    }
+    protected override void OnReorder(ReorderableList r) {}
 
     protected override void OnSelect(ReorderableList r)
     {
@@ -176,6 +238,8 @@ public class MapSceneWindow : ReorderableListEditorWindowExtension {
             mapScene = Controller.getInstance().getSelectedChapterDataControl().getObjects<MapScene>()[selectedElement];
             // Set geometries list reference
             mapElementReorderableList.list = mapScene.Elements;
+            // Update map resources
+            UpdateMapResources();
         }
     }
 
@@ -243,12 +307,14 @@ public class MapSceneWindow : ReorderableListEditorWindowExtension {
     Rect infoRect = new Rect(9, 20, 150, 15);
     Rect centerButtonRect = new Rect(0, 40, 75, 15);
     Rect editButtonRect = new Rect(75, 40, 75, 15);
+    Rect positionRect = new Rect(0, 2, 150, 15);
 
     private void DrawMapElementsHeader(Rect rect)
     {
         GUI.Label(rect, "Geometries");
     }
 
+    private ExtElemReference movingReference = null;
     private void DrawMapElement(Rect rect, int index, bool active, bool focused)
     {
         MapElement mapElement = (MapElement)mapElementReorderableList.list[index];
@@ -269,17 +335,23 @@ public class MapSceneWindow : ReorderableListEditorWindowExtension {
         else if (mapElement is ExtElemReference)
         {
             var extReference = mapElement as ExtElemReference;
-            var extElement = findExternalReferenceById(extReference.getTargetId());
-            if (extElement != null && extReference != null)
+            //extReference.Position = EditorGUI.Vector2Field(positionRect.GUIAdapt(rect), "", extReference.Position.ToVector2()).ToVector2d();
+            //mapResources[extReference].Position = extReference.Position;
+            var x = EditorGUI.FloatField(positionRect.GUIAdapt(rect), extReference.Scale.x);
+            extReference.Scale = new Vector3(x, x, x);
+            mapResources[extReference].Scale = extReference.Scale.x;
+            center = extReference.Position;
+
+            if (GUI.Button(centerButtonRect.GUIAdapt(rect), "Move"))
             {
-                center = extReference.Position.ToVector2d();
+                movingReference = extReference;
             }
         }
 
-        if (GUI.Button(centerButtonRect.GUIAdapt(rect), "Center"))
+        /*if (GUI.Button(centerButtonRect.GUIAdapt(rect), "Center"))
         {
             map.Center = center;
-        }
+        }*/
 
         /*if (GUI.Button(editButtonRect.GUIAdapt(rect), editing != geo ? "Unlocked" : "Locked"))
         {
@@ -312,15 +384,26 @@ public class MapSceneWindow : ReorderableListEditorWindowExtension {
         return null;
     }
 
-    private Dictionary<string, object> getObjectReferences()
+    public List<DataControlWithResources> getAllElements()
     {
-        Dictionary<string, object> objects = new Dictionary<string, object>();
-        // TODO extend here
-        Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems().ForEach(i => objects.Add("Item/" + i.getId(), i));
-        Controller.getInstance().getSelectedChapterDataControl().getAtrezzoList().getAtrezzoList().ForEach(a => objects.Add("Atrezzo/" + a.getId(), a));
-        Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs().ForEach(npc => objects.Add("Character/"+ npc.getId(), npc));
+        var all = new List<DataControlWithResources>();
 
-        return null;
+        all.AddRange(Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems().ConvertAll(i => i as DataControlWithResources));
+        all.AddRange(Controller.getInstance().getSelectedChapterDataControl().getAtrezzoList().getAtrezzoList().ConvertAll(i => i as DataControlWithResources));
+        all.AddRange(Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs().ConvertAll(i => i as DataControlWithResources));
+
+        return all;
+    }
+
+    private Dictionary<string, string> getObjectIDReferences()
+    {
+        Dictionary<string, string> objects = new Dictionary<string, string>();
+        // TODO extend here
+        Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems().ForEach(i => objects.Add("Item/" + i.getId(), i.getId()));
+        Controller.getInstance().getSelectedChapterDataControl().getAtrezzoList().getAtrezzoList().ForEach(a => objects.Add("Atrezzo/" + a.getId(), a.getId()));
+        Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs().ForEach(npc => objects.Add("Character/"+ npc.getId(), npc.getId()));
+
+        return objects;
     }
 
     protected void OnAddMapElementDropdown(Rect r, ReorderableList rl)
@@ -330,12 +413,20 @@ public class MapSceneWindow : ReorderableListEditorWindowExtension {
         var mapElements = Controller.getInstance().getSelectedChapterDataControl().getObjects<GeoElement>();
         mapElements.ForEach(me =>
         {
-            menu.AddItem(new GUIContent("GeoElement/"+me.Id), false, (elem) => mapScene.Elements.Add(elem as MapElement), me);
+            menu.AddItem(new GUIContent("GeoElement/"+me.Id), false, (id) => 
+            {
+                mapScene.Elements.Add(new GeoReference(id as string));
+                UpdateMapResources();
+            }, me.Id);
         });
 
-        foreach(var pair in getObjectReferences())
+        foreach(var pair in getObjectIDReferences())
         {
-            menu.AddItem(new GUIContent(pair.Key), false, (elem) => mapScene.Elements.Add(elem as MapElement), pair.Value);
+            menu.AddItem(new GUIContent(pair.Key), false, (id) => 
+            {
+                mapScene.Elements.Add(new ExtElemReference(id as string));
+                UpdateMapResources();
+            }, pair.Value);
         }
         menu.ShowAsContext();
     }

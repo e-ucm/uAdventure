@@ -7,11 +7,16 @@ namespace uAdventure.Geo
 
     public class ExtElemReference : MapElement
     {
+        public ExtElemReference(string targetId) : base(targetId)
+        {
+            Scale = Vector3.one;
+        }
+
         public ExtElemReferenceTransformManagerDescriptor TransformManagerDescriptor { get; set; }
         public Dictionary<string, object> TransformManagerParameters { get; set; }
         
         public Vector3 Scale { get; set; }
-        public Vector2 Position { get; set; }
+        public Vector2d Position { get; set; }
     }
 
     /// <summary>

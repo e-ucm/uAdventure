@@ -5,6 +5,8 @@ using System.Linq;
 using System.Collections.Generic;
 using MapzenGo.Helpers;
 using MapzenGo.Helpers.VectorD;
+using uAdventure.Core;
+using System;
 
 public class GUIMap
 {
@@ -24,6 +26,21 @@ public class GUIMap
             centerPixel = GM.MetersToPixels(GM.LatLonToMeters(Center.y, Center.x), zoom);
         }
     }
+
+    public class MapResources
+    {
+        public MapResources(List<Texture2D> resources, float scale, Vector2d position)
+        {
+            Resources = resources;
+            Scale = scale;
+            Position = position;
+        }
+        public List<Texture2D> Resources { get; set; }
+        public float Scale { get; set; }
+        public Vector2d Position { get; set; }
+    }
+
+    public List<MapResources> PositionedResources { get; set; }
     public List<GMLGeometry> Geometries { get; set; }
     public GMLGeometry selectedGeometry;
     public double SelectPointDistance { get; set; }
@@ -52,6 +69,8 @@ public class GUIMap
     {
         Geometries = new List<GMLGeometry>();
         SelectPointDistance = 15.0;
+        
+        PositionedResources = new List<MapResources>();
     }
 
     /* -----------------------------
@@ -60,12 +79,18 @@ public class GUIMap
 
     public bool DrawMap(Rect area)
     {
+
+        bool r = false;
+        //GUILayout.BeginArea(area);
+        //area = new Rect(Vector2.zero, area.size);
         // update the pixel absolute to relative convert variable
         PATR = -(centerPixel - (area.size / 2f).ToVector2d() - area.position.ToVector2d());
 
         var mousePos = Event.current.mousePosition.ToVector2d();
         var delta = new Vector2d(Event.current.delta.x, Event.current.delta.y);
-        GeoMousePosition = GM.MetersToLatLon(GM.PixelsToMeters(RelativeToAbsolute(mousePos), Zoom));
+
+        if(Event.current.type != EventType.layout)
+            GeoMousePosition = GM.MetersToLatLon(GM.PixelsToMeters(RelativeToAbsolute(mousePos), Zoom));
 
         switch (Event.current.type)
         {
@@ -76,6 +101,9 @@ public class GUIMap
 
                     // Draw the GeoShapes
                     DrawGeometries(area);
+
+                    // Draw the Resources
+                    DrawResources(area);
 
                     if(selectedGeometry != null && selectedGeometry.Points.Count > 0)
                     {
@@ -163,16 +191,18 @@ public class GUIMap
                     if (area.Contains(Event.current.mousePosition))
                     {
                         GUI.FocusControl(null);
-                        return true;
+                        r = true;
                     }
 
                 }
                 break;
         }
 
-        return false;
+        //GUILayout.EndArea();
+        return r;
 
     }
+
 
     /* -----------------------------
      *  Drawing methods
@@ -241,6 +271,31 @@ public class GUIMap
 
             Handles.EndGUI();
 
+        }
+    }
+
+
+    private void DrawResources(Rect area)
+    {
+        foreach(var r in PositionedResources)
+        {
+            var center = PixelToRelative(GM.MetersToPixels(GM.LatLonToMeters(new Vector2d(r.Position.y, r.Position.x)), Zoom)).ToVector2();
+            foreach (var i in r.Resources)
+            {
+                var size = new Vector2(i.width, i.height);
+
+                // Scale of 1 means 1 pixel is 1 map pixel in scale 19
+                // Scale of 2 means 1 pixel is 0.5 map pixel in scale 18
+                // and so on...
+                var pixelsSize = GM.MetersToPixels(GM.PixelsToMeters(size.ToVector2d() * r.Scale, 19), Zoom);
+                var midWidthHeight = pixelsSize.ToVector2() / 2f;
+                var textRect = ExtensionRect.FromCorners(center - midWidthHeight, center + midWidthHeight);
+
+
+                /*var areaRect = textRect.Intersection(area);
+                GUI.DrawTextureWithTexCoords(areaRect, i, textRect.ToTexCoords(areaRect));*/
+                GUI.DrawTexture(textRect, i);
+            }
         }
     }
 

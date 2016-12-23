@@ -15,7 +15,7 @@ namespace uAdventure.Editor
             var geoelement = target as GeoElement;
             var doc = Writer.GetDoc();
 
-            AddChild(node, "id", geoelement.Id);
+            (node as XmlElement).SetAttribute("id", geoelement.Id);
             AddChild(node, "name", geoelement.Name);
             AddChild(node, "description", geoelement.FullDescription);
             AddChild(node, "brief-description", geoelement.BriefDescription);
