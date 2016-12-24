@@ -200,7 +200,7 @@ namespace UnityEngine
 
         public override string ToString()
         {
-            return this.x + " - " + this.y;
+            return "("+this.x + ", " + this.y + ")";
             //string fmt = "({0:D1}, {1:D1})";
             //object[] objArray = new object[2];
             //int index1 = 0;
