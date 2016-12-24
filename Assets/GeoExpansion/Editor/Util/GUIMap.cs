@@ -7,6 +7,7 @@ using MapzenGo.Helpers;
 using MapzenGo.Helpers.VectorD;
 using uAdventure.Core;
 using System;
+using uAdventure.Editor;
 
 public class GUIMap
 {
@@ -27,20 +28,8 @@ public class GUIMap
         }
     }
 
-    public class MapResources
-    {
-        public MapResources(List<Texture2D> resources, float scale, Vector2d position)
-        {
-            Resources = resources;
-            Scale = scale;
-            Position = position;
-        }
-        public List<Texture2D> Resources { get; set; }
-        public float Scale { get; set; }
-        public Vector2d Position { get; set; }
-    }
 
-    public List<MapResources> PositionedResources { get; set; }
+    public List<ExtElemReferenceGUIMapPositionManager> PositionedResources { get; set; }
     public List<GMLGeometry> Geometries { get; set; }
     public GMLGeometry selectedGeometry;
     public double SelectPointDistance { get; set; }
@@ -70,7 +59,7 @@ public class GUIMap
         Geometries = new List<GMLGeometry>();
         SelectPointDistance = 15.0;
         
-        PositionedResources = new List<MapResources>();
+        PositionedResources = new List<ExtElemReferenceGUIMapPositionManager>();
     }
 
     /* -----------------------------
@@ -279,23 +268,7 @@ public class GUIMap
     {
         foreach(var r in PositionedResources)
         {
-            var center = PixelToRelative(GM.MetersToPixels(GM.LatLonToMeters(new Vector2d(r.Position.y, r.Position.x)), Zoom)).ToVector2();
-            foreach (var i in r.Resources)
-            {
-                var size = new Vector2(i.width, i.height);
-
-                // Scale of 1 means 1 pixel is 1 map pixel in scale 19
-                // Scale of 2 means 1 pixel is 0.5 map pixel in scale 18
-                // and so on...
-                var pixelsSize = GM.MetersToPixels(GM.PixelsToMeters(size.ToVector2d() * r.Scale, 19), Zoom);
-                var midWidthHeight = pixelsSize.ToVector2() / 2f;
-                var textRect = ExtensionRect.FromCorners(center - midWidthHeight, center + midWidthHeight);
-
-
-                /*var areaRect = textRect.Intersection(area);
-                GUI.DrawTextureWithTexCoords(areaRect, i, textRect.ToTexCoords(areaRect));*/
-                GUI.DrawTexture(textRect, i);
-            }
+            r.Draw(this, area);
         }
     }
 

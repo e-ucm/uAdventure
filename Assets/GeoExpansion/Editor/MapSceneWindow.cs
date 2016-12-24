@@ -81,7 +81,7 @@ public class MapSceneWindow : ReorderableListEditorWindowExtension {
         mapElementReorderableList.onAddDropdownCallback += OnAddMapElementDropdown;
         mapElementReorderableList.onRemoveCallback += RemoveMapElement;
 
-        mapResources = new Dictionary<ExtElemReference, GUIMap.MapResources>();
+        this.positionManagers = new Dictionary<ExtElemReference, ExtElemReferenceGUIMapPositionManager>();
     }
     /* ----------------------------------
   * ON GUI: Used for drawing the window every unity event
@@ -122,20 +122,19 @@ public class MapSceneWindow : ReorderableListEditorWindowExtension {
 
 
         // Map drawing
-        if (map.DrawMap(GUILayoutUtility.GetRect(mm_Rect.width - elementsWidth, mm_Rect.height - lastRect.y - lastRect.height)))
+        var mapRect = GUILayoutUtility.GetRect(mm_Rect.width - elementsWidth, mm_Rect.height - lastRect.y - lastRect.height);
+        if (map.DrawMap(mapRect))
         {
             if (movingReference != null)
             {
-                movingReference.Position = map.GeoMousePosition;
-                mapResources[movingReference].Position = movingReference.Position;
+                this.positionManagers[movingReference].Repositionate(map, mapRect);
                 movingReference = null;
             }
         }
 
         if (movingReference != null && Event.current.type == EventType.repaint)
         {
-            movingReference.Position = map.GeoMousePosition;
-            mapResources[movingReference].Position = movingReference.Position;
+            this.positionManagers[movingReference].Repositionate(map, mapRect);
         }
 
         location = map.Center.ToVector2();
@@ -169,28 +168,32 @@ public class MapSceneWindow : ReorderableListEditorWindowExtension {
             .FindAll(e => e is ExtElemReference)
             .ConvertAll(e => e as ExtElemReference);
 
-        mapResources.Clear();
+        positionManagers.Clear();
         foreach (var elem in allElements)
         {
+            // Create the positionManager based on the descriptor
+            var guiMapPositionManager = ExtElemReferenceGUIMapPositionManagerFactory.Instance.CreateInstance(elem.TransformManagerDescriptor, elem);
+            positionManagers.Add(elem, guiMapPositionManager);
+
+            // Look for the texture
             var extElem = FindExtElem(elem.getTargetId());
-            var textures = new List<Texture2D>();
             var previewImage = extElem.GetType().GetMethod("getPreviewImage");
             if(previewImage != null)
             {
                 var image = previewImage.Invoke(extElem, null) as string;
                 if(image != null)
                 {
-                    textures.Add(AssetsController.getImage(image).texture);
+                    guiMapPositionManager.Texture = AssetsController.getImage(image).texture;
                 }
-                mapResources.Add(elem, new GUIMap.MapResources(textures, elem.Scale.x, elem.Position));
             }
         }
 
-        map.PositionedResources = mapResources.Values.ToList();
+        // Update the positioned resources
+        map.PositionedResources = positionManagers.Values.ToList();
            
     }
 
-    private Dictionary<ExtElemReference, GUIMap.MapResources> mapResources;
+    private Dictionary<ExtElemReference, ExtElemReferenceGUIMapPositionManager> positionManagers;
 
     private GeoElement FindGeoElem(string id)
     {
@@ -333,14 +336,20 @@ public class MapSceneWindow : ReorderableListEditorWindowExtension {
             }
         }
         else if (mapElement is ExtElemReference)
-        {
+        { 
             var extReference = mapElement as ExtElemReference;
-            //extReference.Position = EditorGUI.Vector2Field(positionRect.GUIAdapt(rect), "", extReference.Position.ToVector2()).ToVector2d();
-            //mapResources[extReference].Position = extReference.Position;
-            var x = EditorGUI.FloatField(positionRect.GUIAdapt(rect), extReference.Scale.x);
-            extReference.Scale = new Vector3(x, x, x);
-            mapResources[extReference].Scale = extReference.Scale.x;
-            center = extReference.Position;
+
+            // Trasnform manager descriptor selection
+            var avaliableDescriptors = TransformManagerDescriptorFactory.Instance.AvaliableTransformManagers.ToList();
+            var selected = avaliableDescriptors.FindIndex(d => d.Key == extReference.TransformManagerDescriptor.GetType());
+            var newSelected = EditorGUI.Popup(positionRect.GUIAdapt(rect), selected, avaliableDescriptors.ConvertAll(d => d.Value).ToArray());
+
+            if(newSelected != selected)
+            {
+                // In case of change, reinstance a new one
+                extReference.TransformManagerDescriptor = TransformManagerDescriptorFactory.Instance.CreateDescriptor(avaliableDescriptors[newSelected].Key);
+                UpdateMapResources();
+            }
 
             if (GUI.Button(centerButtonRect.GUIAdapt(rect), "Move"))
             {

@@ -9,14 +9,18 @@ namespace uAdventure.Geo
     {
         public ExtElemReference(string targetId) : base(targetId)
         {
-            Scale = Vector3.one;
+            TransformManagerParameters = new Dictionary<string, object>();
+            var keys = TransformManagerDescriptorFactory.Instance.AvaliableTransformManagers.Keys.GetEnumerator();
+            if (keys.MoveNext())
+            {
+                // If there is at least one descriptor, we create the first one avaliable by default
+                TransformManagerDescriptor = TransformManagerDescriptorFactory.Instance
+                    .CreateDescriptor(keys.Current);
+            }
         }
 
         public ExtElemReferenceTransformManagerDescriptor TransformManagerDescriptor { get; set; }
         public Dictionary<string, object> TransformManagerParameters { get; set; }
-        
-        public Vector3 Scale { get; set; }
-        public Vector2d Position { get; set; }
     }
 
     /// <summary>
@@ -24,10 +28,23 @@ namespace uAdventure.Geo
     /// </summary>
     public class ParameterDescription
     {
+        public ParameterDescription(System.Type type, object defaultValue) : this(type, defaultValue, null, null, null) { }
+        public ParameterDescription(System.Type type, object defaultValue, object minValue, object maxValue) : this(type, defaultValue, minValue, maxValue, null) { }
+        public ParameterDescription(System.Type type, object defaultValue, List<object> allowedValues) : this(type, defaultValue, null, null, allowedValues) { }
+        public ParameterDescription(System.Type type, object defaultValue, object minValue, object maxValue, List<object> allowedValues)
+        {
+            this.Type = type;
+            this.MinValue = minValue;
+            this.MaxValue = maxValue;
+            this.AllowedValues = allowedValues;
+            this.DefaultValue = defaultValue;
+        }
+
         public System.Type Type { get; set; }
         public object MinValue { get; set; }
         public object MaxValue { get; set; }
         public List<object> AllowedValues { get; set; }
+        public object DefaultValue { get; set; }
     }
 
 
@@ -63,12 +80,52 @@ namespace uAdventure.Geo
         /// Allows the ExtElemReference to reposition the element
         /// </summary>
         void Update();
-        
+
         /// <summary>
         /// Configures the Transform Manager
         /// </summary>
         /// <param name="parameters">Dictionary of parameters to extract</param>
         void Configure(Dictionary<string, object> parameters);
+    }
+
+    public class TransformManagerDescriptorFactory
+    {
+
+        private List<ExtElemReferenceTransformManagerDescriptor> descriptors;
+
+        private static TransformManagerDescriptorFactory instance;
+        public static TransformManagerDescriptorFactory Instance
+        {
+            get
+            {
+                if (instance == null)
+                    instance = new TransformManagerDescriptorFactory();
+                return instance;
+            }
+        }
+
+        private TransformManagerDescriptorFactory()
+        {
+            descriptors = new List<ExtElemReferenceTransformManagerDescriptor>();
+            AvaliableTransformManagers = new Dictionary<Type, string>();
+
+            // Add descriptrs here
+
+            descriptors.Add(new GeoPositionedTransformManagerDescriptor());
+            descriptors.Add(new ScreenPositionedTransformManagerDescriptor());
+            descriptors.Add(new RadialCenterTransformManagerDescriptor());
+
+            // End add descriptors
+
+            descriptors.ForEach(d => AvaliableTransformManagers.Add(d.GetType(),d.Name));
+        }
+
+        public Dictionary<Type, string> AvaliableTransformManagers { get; private set; }
+
+        public ExtElemReferenceTransformManagerDescriptor CreateDescriptor(Type type)
+        {
+            return Activator.CreateInstance(type) as ExtElemReferenceTransformManagerDescriptor;
+        }
     }
 
     public class ExtElemReferenceTransformManagerFactory
@@ -92,5 +149,134 @@ namespace uAdventure.Geo
         }
     }
 
+
+
+    public class GeoPositionedTransformManagerDescriptor : ExtElemReferenceTransformManagerDescriptor
+    {
+
+        public GeoPositionedTransformManagerDescriptor()
+        {
+            ParameterDescription = new Dictionary<string, Geo.ParameterDescription>();
+            ParameterDescription.Add("Position", new Geo.ParameterDescription(typeof(Vector2d), Vector2d.zero));
+            ParameterDescription.Add("Scale", new Geo.ParameterDescription(typeof(Vector3), Vector3.one));
+            ParameterDescription.Add("Rotation", new Geo.ParameterDescription(typeof(float), 0f));
+        }
+
+        public string Name { get { return "World positioned"; } }
+        public Dictionary<string, ParameterDescription> ParameterDescription { get; private set; }
+        public Type Type { get { return typeof(GeoPositionedTransformManager); } }
+    }
+
+    public class ScreenPositionedTransformManagerDescriptor : ExtElemReferenceTransformManagerDescriptor
+    {
+
+        public ScreenPositionedTransformManagerDescriptor()
+        {
+            ParameterDescription = new Dictionary<string, Geo.ParameterDescription>();
+            ParameterDescription.Add("Position", new Geo.ParameterDescription(typeof(Vector2d), Vector2d.zero));
+            ParameterDescription.Add("Scale", new Geo.ParameterDescription(typeof(Vector3), Vector3.one));
+            ParameterDescription.Add("Rotation", new Geo.ParameterDescription(typeof(float), 0f));
+        }
+
+        public string Name { get { return "Screen positioned"; } }
+        public Dictionary<string, ParameterDescription> ParameterDescription { get; private set; }
+        public Type Type { get { return typeof(ScreenPositionedTransformManager); } }
+    }
+
+    public class RadialCenterTransformManagerDescriptor : ExtElemReferenceTransformManagerDescriptor
+    {
+
+        public RadialCenterTransformManagerDescriptor()
+        {
+            ParameterDescription = new Dictionary<string, Geo.ParameterDescription>();
+            ParameterDescription.Add("Degree", new Geo.ParameterDescription(typeof(float), 0f));
+            ParameterDescription.Add("Distance", new Geo.ParameterDescription(typeof(float), 50f));
+            ParameterDescription.Add("Scale", new Geo.ParameterDescription(typeof(Vector3), Vector3.one));
+            ParameterDescription.Add("Rotation", new Geo.ParameterDescription(typeof(float), 0f));
+            ParameterDescription.Add("RotateAround", new Geo.ParameterDescription(typeof(bool), true));
+        }
+
+        public string Name { get { return "Radial to center positioned"; } }
+        public Dictionary<string, ParameterDescription> ParameterDescription { get; private set; }
+        public Type Type { get { return typeof(RadialCenterTransformManager); } }
+    }
+
+    public class ScreenPositionedTransformManager : ExtElemReferenceTransformManager
+    {
+        public Transform ExtElemReferenceTransform
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public void Configure(Dictionary<string, object> parameters)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Update()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class RadialCenterTransformManager : ExtElemReferenceTransformManager
+    {
+        public Transform ExtElemReferenceTransform
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public void Configure(Dictionary<string, object> parameters)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Update()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class GeoPositionedTransformManager : ExtElemReferenceTransformManager
+    {
+        public Transform ExtElemReferenceTransform
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public void Configure(Dictionary<string, object> parameters)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Update()
+        {
+            throw new NotImplementedException();
+        }
+    }
 }
 
