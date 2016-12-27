@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 using uAdventure.Core;
 using uAdventure.RageTracker;
+using System;
 
 namespace uAdventure.Runner
 {
@@ -17,17 +18,17 @@ namespace uAdventure.Runner
         private Dictionary<string, int> flags = new Dictionary<string, int>();
         private Dictionary<string, int> variables = new Dictionary<string, int>();
         int current_chapter = 0;
-        string current_scene = "";
+        string current_target = "";
 
         public AdventureData Data
         {
             get { return data; }
         }
 
-        public string CurrentScene
+        public string CurrentTarget
         {
-            get { return current_scene; }
-            set { current_scene = value; }
+            get { return current_target; }
+            set { current_target = value; }
         }
 
         public GameState(AdventureData data)
@@ -163,10 +164,16 @@ namespace uAdventure.Runner
         {
             return data.getChapters()[current_chapter].getGeneralScene(scene_id).getType() != GeneralScene.GeneralSceneSceneType.SCENE;
         }
+        
+        /*private GeneralScene getInitialScene()
+        { 
 
-        public GeneralScene getInitialScene()
-        {
             return data.getChapters()[current_chapter].getInitialGeneralScene();
+        }*/
+
+        public IChapterTarget getInitialChapterTarget()
+        {
+            return data.getChapters()[current_chapter].getInitialChapterTarget();
         }
 
         public GeneralScene getLastScene()
@@ -188,6 +195,13 @@ namespace uAdventure.Runner
         public List<Completable> getCompletables()
         {
             return null;
+        }
+
+        internal IChapterTarget getChapterTarget(string scene_id)
+        {
+            return (IChapterTarget) data.getChapters()[current_chapter]
+                .getObjects()
+                .Find(o => o is IChapterTarget && (o as IChapterTarget).getId() == scene_id);
         }
 
         //##########################################################################

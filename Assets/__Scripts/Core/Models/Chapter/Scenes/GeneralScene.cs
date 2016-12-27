@@ -7,7 +7,7 @@ namespace uAdventure.Core
     /**
      * This class holds the data of a scene of any type in eAdventure.
      */
-    public abstract class GeneralScene : Documented, Named, HasId, ICloneable
+    public abstract class GeneralScene : IChapterTarget, Documented, Named, HasId, ICloneable
     {
 
         public enum GeneralSceneSceneType { SCENE = 0, SLIDESCENE = 1, VIDEOSCENE = 2 };

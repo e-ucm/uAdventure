@@ -8,6 +8,7 @@ namespace uAdventure.Core
     /**
      * This class holds the data for a scene in eAdventure
      */
+    [ChapterTarget]
     public class Scene : GeneralScene, Positioned, ICloneable
     {
         public override string ToString()

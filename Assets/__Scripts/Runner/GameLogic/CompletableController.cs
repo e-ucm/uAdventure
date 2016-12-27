@@ -62,7 +62,7 @@ namespace uAdventure.Runner
             this.completables = completables;
         }
 
-        public void sceneChanged(GeneralScene scene)
+        public void targetChanged(IChapterTarget target)
         {
             //Complete if any scene is completed on exit.
             if (completeOnExit != null)
@@ -74,10 +74,10 @@ namespace uAdventure.Runner
             //Buscamos en nuestra lista de completables si algun completable se completa o progresa al llegar aquí
             foreach (Completable toComplete in completables)
             {
-                if (toComplete.getProgress().updateMilestones(scene))
+                if (toComplete.getProgress().updateMilestones(target))
                     Tracker.T.completable.Progressed(toComplete.getId(), (CompletableTracker.Completable)toComplete.getType(), toComplete.currentProgress());
 
-                if (toComplete.getEnd().Update(scene))
+                if (toComplete.getEnd().Update(target))
                 {
                     trackCompleted(toComplete);
                     toRemove.Push(toComplete);
@@ -92,7 +92,7 @@ namespace uAdventure.Runner
                 // TODO:
                 // prevent levels overlaping.
 
-                if (completable.getStart().Update(scene))
+                if (completable.getStart().Update(target))
                 {
                     trackingCompletables.Add(completable);
                     times.Add(completable, DateTime.Now);
@@ -107,7 +107,7 @@ namespace uAdventure.Runner
             }
         }
 
-        public void elementInteracted(Interactuable interactuable)
+        public void elementInteracted(IRunnerChapterTarget interactuable)
         {
             // TODO
             // implement completable changes on interaction

@@ -7,6 +7,7 @@ namespace uAdventure.Core
     /**
      * This class holds the data of a slidescene in eAdventure
      */
+    [ChapterTarget]
     public class Slidescene : Cutscene, ICloneable
     {
 

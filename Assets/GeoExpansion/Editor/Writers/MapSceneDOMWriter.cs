@@ -1,12 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using System.Linq;
 
 using uAdventure.Editor;
 using System.Xml;
 
 namespace uAdventure.Geo
 {
+    using CIP = ChapterDOMWriter.ChapterTargetIDParam;
+
     [DOMWriter(typeof(MapScene))]
     public class MapSceneDOMWriter : ParametrizedDOMWriter
     {
@@ -18,7 +21,12 @@ namespace uAdventure.Geo
             element.SetAttribute("id", mapScene.Id);
             element.SetAttribute("cameraType", mapScene.CameraType.ToString());
 
-            foreach(var mapElement in mapScene.Elements)
+            if (options.Any(o => o is CIP && (o as CIP).TargetId.Equals(mapScene.getId())))
+                element.SetAttribute("start", "yes");
+            else
+                element.SetAttribute("start", "no");
+
+            foreach (var mapElement in mapScene.Elements)
             {
                 DumpMapElement(node, mapElement, options);   
             }
@@ -32,7 +40,8 @@ namespace uAdventure.Geo
             mapElementNode.SetAttribute("layer", mapElement.Layer.ToString());
             node.AppendChild(mapElementNode);
 
-            if(mapElement is ExtElemReference)
+
+            if (mapElement is ExtElemReference)
             {
                 var elemRef = mapElement as ExtElemReference;
                 var elemRefNode = Writer.GetDoc().CreateElement("ext-elem-ref");

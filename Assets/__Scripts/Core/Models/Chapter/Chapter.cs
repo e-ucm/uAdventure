@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
@@ -179,7 +180,7 @@ namespace uAdventure.Core
          * @return the initial scene
          */
 
-        public GeneralScene getInitialGeneralScene()
+        private GeneralScene getInitialGeneralScene()
         {
 
             GeneralScene initialGeneralScene = null;
@@ -200,6 +201,20 @@ namespace uAdventure.Core
             }
 
             return initialGeneralScene;
+        }
+
+        public IChapterTarget getInitialChapterTarget()
+        {
+            if(initialScene != null && initialScene != "")
+            {
+                // return the initial scene
+                return (IChapterTarget) getObjects().Find(o => o is IChapterTarget && (o as IChapterTarget).getId() == initialScene);
+            }
+            else
+            {
+                // return the first scene possible
+                return (IChapterTarget) getObjects().Find(o => o is IChapterTarget);
+            }
         }
 
         /**
@@ -867,6 +882,35 @@ namespace uAdventure.Core
                 extensionObjects.Add(typeof(T), new List<T>());
 
             return extensionObjects[typeof(T)] as List<T>;
+        }
+
+        public List<object> getObjects()
+        {
+
+            // Let's return all the objects
+            List<object> allObjects = new List<object>();
+            
+            allObjects.AddRange(scenes.Cast<object>());
+            allObjects.AddRange(cutscenes.Cast<object>());
+            allObjects.AddRange(books.Cast<object>());
+            allObjects.AddRange(items.Cast<object>());
+            allObjects.AddRange(atrezzo.Cast<object>());
+            allObjects.Add(player);
+            allObjects.AddRange(characters.Cast<object>());
+            allObjects.AddRange(conversations.Cast<object>());
+            allObjects.AddRange(timers.Cast<object>());
+            allObjects.AddRange(globalStates.Cast<object>());
+            allObjects.AddRange(macros.Cast<object>());
+            allObjects.AddRange(flags.Cast<object>());
+            allObjects.AddRange(vars.Cast<object>());
+            allObjects.AddRange(completables.Cast<object>());
+
+            foreach (var kp in extensionObjects)
+            {
+                allObjects.AddRange(kp.Value.Cast<object>());
+            }
+
+            return allObjects;
         }
 
         public IList getObjects(Type t)

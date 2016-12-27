@@ -96,14 +96,12 @@ namespace uAdventure.Editor
 
         private List<string> getSceneNames()
         {
-            var scenes = Controller.getInstance().getCharapterList().getSelectedChapterData().getScenes();
-            var cutscenes = Controller.getInstance().getCharapterList().getSelectedChapterData().getCutscenes();
+            var all = Controller.getInstance().getCharapterList().getSelectedChapterData().getObjects();
 
-            var names = new List<string>();
-            names.AddRange(scenes.ConvertAll(s => s.getId()));
-            names.AddRange(cutscenes.ConvertAll(s => s.getId()));
-
-            return names;
+            var names = new List<object>();
+            foreach (var e in all) names.Add(e);
+            
+            return names.FindAll(o => o is IChapterTarget).ConvertAll(o => (o as IChapterTarget).getId());
         }
     }
 }

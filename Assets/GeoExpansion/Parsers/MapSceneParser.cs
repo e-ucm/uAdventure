@@ -15,9 +15,19 @@ namespace uAdventure.Geo
         public object DOMParse(XmlElement element, params object[] parameters)
         {
             var mapScene = new MapScene(element.Attributes["id"].Value);
+            var chapter = parameters[0] as Chapter;
             mapScene.CameraType = element.Attributes["cameraType"].Value.ToEnum<CameraType>();
+            
+            var tmpArgVal = element.GetAttribute("start");
+            if (!string.IsNullOrEmpty(tmpArgVal))
+            {
+                if (tmpArgVal.Equals("yes"))
+                {
+                    chapter.setTargetId(mapScene.getId());
+                }
+            }
 
-            foreach(var e in element.SelectNodes("map-element"))
+            foreach (var e in element.SelectNodes("map-element"))
             {
                 var mapElementNode = e as XmlElement;
                 MapElement mapElement = null;

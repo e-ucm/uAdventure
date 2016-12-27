@@ -71,7 +71,7 @@ namespace uAdventure.Runner
                                 {
                                     if (!aditional_info.ContainsKey("cutscene_effect"))
                                     {
-                                        InteractuableResult res = ((SceneMB)aditional_info["scene"]).Interacted();
+                                        InteractuableResult res = ((Interactuable)aditional_info["scene"]).Interacted();
                                         if (res == InteractuableResult.REQUIRES_MORE_INTERACTION)
                                             forcewait = true;
                                         else if (res == InteractuableResult.DOES_SOMETHING)
@@ -86,12 +86,12 @@ namespace uAdventure.Runner
                                 else
                                 {
                                     aditional_info = new Dictionary<string, object>();
-                                    aditional_info.Add("lastscene", Game.Instance.GameState.CurrentScene);
-                                    aditional_info.Add("scene", Game.Instance.renderScene(tce.getTargetId()).GetComponent<SceneMB>());
+                                    aditional_info.Add("lastscene", Game.Instance.GameState.CurrentTarget);
+                                    aditional_info.Add("scene", Game.Instance.renderScene(tce.getTargetId()));
                                     forcewait = true;
                                 }
 
-                                if (!forcewait && ((Cutscene)((SceneMB)aditional_info["scene"]).sceneData).getNext() == Cutscene.GOBACK)
+                                if (!forcewait && ((Cutscene)((IRunnerChapterTarget)aditional_info["scene"]).Data).getNext() == Cutscene.GOBACK)
                                 {
                                     string last = (string)aditional_info["lastscene"];
                                     Game.Instance.renderScene(last);

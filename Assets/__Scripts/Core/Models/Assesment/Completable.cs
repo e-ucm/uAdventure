@@ -74,9 +74,9 @@ namespace uAdventure.Core
                 this.reached = reached;
             }
 
-            public bool Update(GeneralScene scene)
+            public bool Update(IChapterTarget target)
             {
-                if (!reached && type == Completable.Milestone.MilestoneType.SCENE && id == scene.getId())
+                if (!reached && type == Completable.Milestone.MilestoneType.SCENE && id == target.getId())
                     reached = true;
 
                 return reached;
@@ -175,12 +175,12 @@ namespace uAdventure.Core
                 this.milestones.Add(milestone);
             }
 
-            public bool updateMilestones(GeneralScene scene)
+            public bool updateMilestones(IChapterTarget target)
             {
                 bool reached = false;
 
                 foreach (Milestone m in milestones)
-                    reached = m.Update(scene) || reached;
+                    reached = m.Update(target) || reached;
 
                 return reached;
             }

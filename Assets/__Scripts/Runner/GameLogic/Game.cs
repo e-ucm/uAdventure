@@ -43,10 +43,10 @@ namespace uAdventure.Runner
         private GUISkin style;
         public string gamePath = "c:/Games/", gameName = "Fire", scene_name = "";
         private string /*playerName = "Jugador",*/ selected_game, selected_path;
-        public GameObject Scene_Prefab, Blur_Prefab;
+        public GameObject Blur_Prefab;
         MenuMB menu;
         Interactuable next_interaction = null;
-        GameObject current_scene;
+        IRunnerChapterTarget runnerTarget;
         GameState game_state;
 
         public GUISkin Style
@@ -94,10 +94,13 @@ namespace uAdventure.Runner
             else
                 hostfile = SimpleJSON.JSON.Parse(System.IO.File.ReadAllText("host.cfg"));
 #endif
-
-            Tracker.T.host = hostfile["host"];
-            Tracker.T.trackingCode = hostfile["trackingCode"];
-            //End tracker data loading
+            try
+            {
+                Tracker.T.host = hostfile["host"];
+                Tracker.T.trackingCode = hostfile["trackingCode"];
+                //End tracker data loading
+            }
+            catch { }
 
             style = Resources.Load("basic") as GUISkin;
             optionlabel = new GUIStyle(style.label);
@@ -138,7 +141,7 @@ namespace uAdventure.Runner
         void Start()
         {
             if (!forceScene)
-                renderScene(GameState.getInitialScene().getId());
+                renderScene(GameState.getInitialChapterTarget().getId());
             else
                 renderScene(scene_name);
 
@@ -165,7 +168,7 @@ namespace uAdventure.Runner
                         bool no_interaction = true;
                         foreach (RaycastHit hit in hits)
                         {
-                            Interactuable interacted = hit.transform.GetComponent<Interactuable>();
+                            IRunnerChapterTarget interacted = hit.transform.GetComponent<IRunnerChapterTarget>();
                             if (interacted != null && InteractWith(interacted))
                             {
                                 trackInteraction(interacted);
@@ -175,7 +178,7 @@ namespace uAdventure.Runner
                         }
 
                         if (no_interaction)
-                            current_scene.GetComponent<SceneMB>().Interacted();
+                            runnerTarget.Interacted();
                     }
                 }
             }
@@ -198,7 +201,7 @@ namespace uAdventure.Runner
             }
         }
 
-        private bool InteractWith(Interactuable interacted)
+        private bool InteractWith(IRunnerChapterTarget interacted)
         {
             bool exit = false;
             next_interaction = null;
@@ -258,38 +261,38 @@ namespace uAdventure.Runner
         //################################################################
         #region Tracking
 
-        GeneralScene alternative;
+        IChapterTarget alternative;
 
         // TODO ?????
         //List<GeneralScene> finalprogress = new List<GeneralScene>();
 
-        public GeneralScene getAlternativeScene()
+        public IChapterTarget getAlternativeTarget()
         {
             return alternative;
         }
 
-        private void trackSceneChange(GeneralScene scene)
+        private void trackSceneChange(IChapterTarget target)
         {
             alternative = null;
 
-            if (!string.IsNullOrEmpty(scene.getXApiClass()))
+            if (!string.IsNullOrEmpty(target.getXApiClass()))
             {
-                if (scene.getXApiClass() == "accesible")
+                if (target.getXApiClass() == "accesible")
                 {
-                    Tracker.T.accessible.Accessed(scene.getId(), ParseEnum<AccessibleTracker.Accessible>(scene.getXApiType()));
+                    Tracker.T.accessible.Accessed(target.getId(), ParseEnum<AccessibleTracker.Accessible>(target.getXApiType()));
                 }
-                else if (scene.getXApiClass() == "alternative")
+                else if (target.getXApiClass() == "alternative")
                 {
-                    alternative = scene;
+                    alternative = target;
                 }
             }
 
-            CompletableController.Instance.sceneChanged(scene);
+            CompletableController.Instance.targetChanged(target);
 
             Tracker.T.RequestFlush();
         }
 
-        private void trackInteraction(Interactuable with)
+        private void trackInteraction(IRunnerChapterTarget with)
         {
             switch (with.GetType().ToString())
             {
@@ -311,32 +314,33 @@ namespace uAdventure.Runner
             return (T)System.Enum.Parse(typeof(T), value, true);
         }
 
-        public GameObject renderScene(string scene_id, int transition_time = 0, int transition_type = 0)
+        public IRunnerChapterTarget renderScene(string scene_id, int transition_time = 0, int transition_type = 0)
         {
             MenuMB.Instance.hide(true);
-            if (current_scene != null)
+            if (runnerTarget != null)
             {
-                current_scene.GetComponent<SceneMB>().destroy(transition_time / 1000f);
+                runnerTarget.Destroy(transition_time / 1000f);
             }
 
-            GameObject ret = null;
-            GeneralScene toRender = GameState.getGeneralScene(scene_id);
-            ret = GameObject.Instantiate(Scene_Prefab);
-            ret.GetComponent<Transform>().localPosition = new Vector2(0f, 0f);
-            ret.GetComponent<SceneMB>().sceneData = toRender;
+            // Here we connect with the IChapterTargetFactory and create an IRunnerChapterTarget
+            IChapterTarget target = GameState.getChapterTarget(scene_id);
 
-            trackSceneChange(toRender);
+            runnerTarget = RunnerChapterTargetFactory.Instance.Instantiate(target);
 
-            current_scene = ret;
-            GameState.CurrentScene = scene_id;
+            runnerTarget.Data = target;
+            runnerTarget.gameObject.GetComponent<Transform>().localPosition = new Vector2(0f, 0f);
 
-            return ret;
+            trackSceneChange(target);
+            
+            GameState.CurrentTarget = target.getId();
+
+            return runnerTarget;
         }
 
         public void reRenderScene()
         {
-            if (current_scene != null)
-                current_scene.GetComponent<SceneMB>().renderScene();
+            if (runnerTarget != null)
+                runnerTarget.RenderScene();
         }
 
         public void renderLastScene()

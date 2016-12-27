@@ -4,10 +4,11 @@ using System.Collections.Generic;
 
 using uAdventure.Core;
 using uAdventure.RageTracker;
+using System;
 
 namespace uAdventure.Runner
 {
-    public class SceneMB : MonoBehaviour, Interactuable
+    public class SceneMB : MonoBehaviour, IRunnerChapterTarget
     {
 
         public GameObject Exit_Prefab, ActiveArea_Prefab, Character_Prefab, Object_Prefab, Atrezzo_Prefab, Player_Prefab;
@@ -21,6 +22,12 @@ namespace uAdventure.Runner
             set { sd = value; }
         }
 
+        public object Data
+        {
+            get { return sceneData; }
+            set { sceneData = (GeneralScene)value; }
+        }
+
         private ElementReference player_context;
         private TrajectoryHandler trajectory;
         private Dictionary<ElementReference, ElementReference> contexts = new Dictionary<ElementReference, ElementReference>();
@@ -29,7 +36,7 @@ namespace uAdventure.Runner
         void Start()
         {
             this.gameObject.name = sd.getId();
-            renderScene();
+            RenderScene();
         }
 
         bool fading = false;
@@ -70,7 +77,7 @@ namespace uAdventure.Runner
 #endif
         }
 
-        public void destroy(float time = 0)
+        public void Destroy(float time = 0)
         {
             if (time != 0)
             {
@@ -96,7 +103,7 @@ namespace uAdventure.Runner
         private int current_slide;
         //private SlidesceneResource current_resource;
 
-        public void renderScene()
+        public void RenderScene()
         {
             switch (sd.getType())
             {

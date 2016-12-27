@@ -7,6 +7,7 @@ namespace uAdventure.Core
     /**
      * This class holds the data of a videoscene in eAdventure
      */
+     [ChapterTarget]
     public class Videoscene : Cutscene, ICloneable
     {
         /**

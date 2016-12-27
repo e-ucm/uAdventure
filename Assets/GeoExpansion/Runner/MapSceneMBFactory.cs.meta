@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 6055b9f13e06e4740b9b950745a38cea
+timeCreated: 1482812730
+licenseType: Free
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - geoScenePrefab: {fileID: 1000012495496332, guid: 474cd556349fba54d8894c92dcbbb047,
+      type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

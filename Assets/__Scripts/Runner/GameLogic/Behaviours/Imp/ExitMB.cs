@@ -50,12 +50,12 @@ namespace uAdventure.Runner
                     }
                 }
 
-                if (Game.Instance.getAlternativeScene() != null)
+                if (Game.Instance.getAlternativeTarget() != null)
                 {
-                    if (Game.Instance.getAlternativeScene().getXApiType() == "menu")
-                        Tracker.T.alternative.Selected(Game.Instance.getAlternativeScene().getId(), ed.getNextSceneId(), AlternativeTracker.Alternative.Menu);
+                    if (Game.Instance.getAlternativeTarget().getXApiType() == "menu")
+                        Tracker.T.alternative.Selected(Game.Instance.getAlternativeTarget().getId(), ed.getNextSceneId(), AlternativeTracker.Alternative.Menu);
                     else
-                        Tracker.T.alternative.Selected(Game.Instance.getAlternativeScene().getId(), ed.getNextSceneId(), true);
+                        Tracker.T.alternative.Selected(Game.Instance.getAlternativeTarget().getId(), ed.getNextSceneId(), true);
                 }
 
                 Game.Instance.Execute(effect);
@@ -63,10 +63,10 @@ namespace uAdventure.Runner
             }
             else
             {
-                if (Game.Instance.getAlternativeScene() != null)
+                if (Game.Instance.getAlternativeTarget() != null)
                 {
-                    if (Game.Instance.getAlternativeScene().getXApiType() != "menu")
-                        Tracker.T.alternative.Selected(Game.Instance.getAlternativeScene().getId(), "Incorrect", false);
+                    if (Game.Instance.getAlternativeTarget().getXApiType() != "menu")
+                        Tracker.T.alternative.Selected(Game.Instance.getAlternativeTarget().getId(), "Incorrect", false);
                 }
 
                 if (ed.isHasNotEffects())

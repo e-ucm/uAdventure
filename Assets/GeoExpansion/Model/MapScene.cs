@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
-
+using uAdventure.Core;
+using System;
 
 namespace uAdventure.Geo
 {
@@ -9,7 +10,7 @@ namespace uAdventure.Geo
         Aerial2D, Ortographic3D, Perspective3D
     };
 
-    public class MapScene
+    public class MapScene : IChapterTarget
     {
         //-------------
         // Properties
@@ -35,6 +36,21 @@ namespace uAdventure.Geo
         public override string ToString()
         {
             return Id;
+        }
+
+        public string getId()
+        {
+            return Id;
+        }
+
+        public string getXApiClass()
+        {
+            throw new NotImplementedException();
+        }
+
+        public string getXApiType()
+        {
+            throw new NotImplementedException();
         }
     }
 
