@@ -328,7 +328,6 @@ namespace uAdventure.Runner
             runnerTarget = RunnerChapterTargetFactory.Instance.Instantiate(target);
 
             runnerTarget.Data = target;
-            runnerTarget.gameObject.GetComponent<Transform>().localPosition = new Vector2(0f, 0f);
 
             trackSceneChange(target);
             

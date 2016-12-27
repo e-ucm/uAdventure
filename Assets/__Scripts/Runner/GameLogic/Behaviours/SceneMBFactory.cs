@@ -18,7 +18,9 @@ namespace uAdventure.Runner
 
         public IRunnerChapterTarget Instantiate(IChapterTarget modelObject)
         {
-            return GameObject.Instantiate(prefab).GetComponent<SceneMB>();
+            var s = GameObject.Instantiate(prefab).GetComponent<SceneMB>();
+            s.gameObject.GetComponent<Transform>().localPosition = new Vector2(0f, 0f);
+            return s;
         }
     }
 }

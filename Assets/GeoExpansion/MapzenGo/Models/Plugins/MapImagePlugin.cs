@@ -16,7 +16,7 @@ public class MapImagePlugin : Plugin
         go.name = "map";
         go.SetParent(tile.transform, true);
         go.localScale = new Vector3((float)tile.Rect.Width, (float)tile.Rect.Width, 1);
-        go.rotation = Quaternion.AngleAxis(90, new Vector3(1, 0, 0));
+        go.rotation = Quaternion.Euler(new Vector3(0, 0, 0));//.AngleAxis(90, new Vector3(1, 0, 0));
         go.localPosition = Vector3.zero;
         go.localPosition -= new Vector3(0, 1, 0);
         var rend = go.GetComponent<Renderer>();

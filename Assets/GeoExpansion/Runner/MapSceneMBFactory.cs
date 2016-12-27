@@ -14,7 +14,8 @@ namespace uAdventure.Geo
 
         public IRunnerChapterTarget Instantiate(IChapterTarget modelObject)
         {
-            return GameObject.Instantiate(geoScenePrefab).GetComponent<MapSceneMB>();
+            var ms =  GameObject.Instantiate(geoScenePrefab).GetComponent<MapSceneMB>();
+            return ms;
         }
     }
 

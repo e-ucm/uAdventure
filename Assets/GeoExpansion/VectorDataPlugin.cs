@@ -27,7 +27,7 @@ namespace MapzenGo.Models
 
         protected readonly string _mapzenFormat = "json";
 
-        void Start()
+        void Awake()
         {
 #if UNITY_ANDROID || UNITY_IPHONE
             CacheFolderPath = Path.Combine(Application.persistentDataPath, RelativeCachePath);

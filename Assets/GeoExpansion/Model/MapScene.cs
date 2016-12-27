@@ -12,6 +12,16 @@ namespace uAdventure.Geo
 
     public class MapScene : IChapterTarget
     {
+        /**
+         * xApi Class
+         */
+        protected string xapiClass = "accesible";
+
+        /**
+         * xApi Class type
+         */
+        protected string xapiType = "area";
+
         //-------------
         // Properties
         //-------------
@@ -45,12 +55,12 @@ namespace uAdventure.Geo
 
         public string getXApiClass()
         {
-            throw new NotImplementedException();
+            return xapiClass;
         }
 
         public string getXApiType()
         {
-            throw new NotImplementedException();
+            return xapiType;
         }
     }
 
