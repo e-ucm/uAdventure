@@ -1,11 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using uAdventure.Core;
+using System;
 
 namespace uAdventure.Geo
 {
 
-    public class GeoElement
+    public class GeoElement : HasId
     {
 
         public GeoElement(string id)
@@ -33,6 +35,16 @@ namespace uAdventure.Geo
         public string Image { get; set; }
 
         public List<GeoAction> Actions { get; set; }
+
+        public string getId()
+        {
+            return Id;
+        }
+
+        public void setId(string id)
+        {
+            Id = id;
+        }
     }
 
     public interface GeoElementDrawer

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using System;
+using MapzenGo.Helpers;
 
 namespace uAdventure.Geo
 {
@@ -259,23 +260,33 @@ namespace uAdventure.Geo
         {
             get
             {
-                throw new NotImplementedException();
+                return transform;
             }
-
             set
             {
-                throw new NotImplementedException();
+                transform = value;
+                wrapper = transform.gameObject.GetComponent<GeoWrapper>();
             }
         }
+        private Vector2d latLon;
+        private Vector3 scale;
+        private float rotation;
+        private GeoWrapper wrapper;
+        private Transform transform;
 
         public void Configure(Dictionary<string, object> parameters)
         {
-            throw new NotImplementedException();
+            latLon = (Vector2d) parameters["Position"];
+            scale = (Vector3)parameters["Scale"];
+            rotation = (float)parameters["Rotation"];
         }
 
         public void Update()
         {
-            throw new NotImplementedException();
+            var pos = GM.LatLonToMeters(latLon.y, latLon.x) - wrapper.Tile.Rect.Center;
+            transform.localPosition = new Vector3((float)pos.x, 0, (float)pos.y);
+            transform.localScale = scale;
+            transform.localRotation = Quaternion.Euler(0, rotation, 0);
         }
     }
 }

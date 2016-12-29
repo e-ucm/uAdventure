@@ -155,6 +155,28 @@ namespace uAdventure.Runner
             return c.getAtrezzo(name);
         }
 
+        public T FindElement<T>(string id)
+        {
+            if(typeof(T) == typeof(Element))
+            {
+                Element r = getCharacter(id);
+                if (r != null)
+                    return (T) (r as object);
+                r = getObject(id);
+                if (r != null)
+                    return (T)(r as object);
+                r = getAtrezzo(id);
+                if (r != null)
+                    return (T)(r as object);
+            }
+
+            return data.getChapters()[current_chapter].getObjects<T>().Find(e =>
+            {
+                var idMethod = e.GetType().GetMethod("getId");
+                return idMethod != null && ((string)idMethod.Invoke(e, null)) == id;
+            });
+        }
+
         public GeneralScene getGeneralScene(string scene_id)
         {
             return data.getChapters()[current_chapter].getGeneralScene(scene_id);

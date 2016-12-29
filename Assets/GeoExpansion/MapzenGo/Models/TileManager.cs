@@ -44,7 +44,7 @@ namespace MapzenGo.Models
 
         private List<Plugin> _plugins;
 
-        private void InitFactories()
+        private void InitPlugins()
         {
             _plugins = new List<Plugin>();
             foreach (var plugin in GetComponentsInChildren<Plugin>())
@@ -55,7 +55,7 @@ namespace MapzenGo.Models
 
         public virtual void Start()
         {
-            InitFactories();
+            InitPlugins();
             
             _removeAfter = Math.Max(_removeAfter, Range * 2 + 1);
             var centerrect = new Vector2(TileSize, TileSize);
@@ -128,7 +128,7 @@ namespace MapzenGo.Models
             Tiles.Add(tileTms, tile);
             tile.transform.position = (rect.Center - centerInMercator).ToVector3();
             tile.transform.SetParent(TileHost, false);
-            ExecutePlugins(tile);
+            ExecutePlugins((plugin, onFinish) => plugin.Create(tile, onFinish));
             
             yield return null;
         }
@@ -163,6 +163,7 @@ namespace MapzenGo.Models
             foreach (var key in Tiles.Keys.Where(x => x.ManhattanTo(currentTms) > _removeAfter))
             {
                 rem.Add(key);
+                ExecutePlugins((plugin, onFinish) => plugin.UnLoad(Tiles[key], onFinish));
                 Destroy(Tiles[key].gameObject);
             }
             foreach (var v in rem)
@@ -171,19 +172,16 @@ namespace MapzenGo.Models
             }
         }
 
-        protected void ExecutePlugins(Tile tile)
+        protected void ExecutePlugins(Action<Plugin, Action<Plugin, bool>> whatToDo)
         {
             List<Plugin> todo = new List<Plugin>(_plugins);
             List<Plugin> doing = new List<Plugin>();
 
-            ContinuePlugins(tile, todo, doing);
+            ContinuePlugins(todo, doing, whatToDo);
         }
 
-        private void ContinuePlugins(Tile tile, List<Plugin> todo, List<Plugin> doing)
+        private void ContinuePlugins(List<Plugin> todo, List<Plugin> doing, Action<Plugin, Action<Plugin, bool>> whatToDo)
         {
-            if (!tile)
-                return;
-
             var pluginsToStart = new List<Plugin>();
             foreach (var plugin in todo)
             {
@@ -198,13 +196,13 @@ namespace MapzenGo.Models
             foreach(var toStart in pluginsToStart)
             {
                 doing.Add(toStart);
-                toStart.Create(tile, (pluginDone, success) =>
+                whatToDo(toStart, (pluginDone, success) =>
                 {
                     todo.Remove(pluginDone);
                     doing.Remove(pluginDone);
 
                     if (success)
-                        ContinuePlugins(tile, todo, doing);
+                        ContinuePlugins(todo, doing, whatToDo);
                 });
             }
         }

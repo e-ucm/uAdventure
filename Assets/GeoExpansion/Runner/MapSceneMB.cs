@@ -1,14 +1,21 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 using uAdventure.Runner;
 using System;
+using System.Collections.Generic;
 
 namespace uAdventure.Geo
 {
     public class MapSceneMB : MonoBehaviour, IRunnerChapterTarget
     {
         private MapScene mapScene;
+
+        public List<MapElement> MapElements {
+            get
+            {
+                return mapScene.Elements;
+            }
+        }
 
         public object Data
         {
@@ -40,7 +47,6 @@ namespace uAdventure.Geo
 
         public void RenderScene()
         {
-            throw new NotImplementedException();
         }
 
         public void setInteractuable(bool state)
