@@ -3,6 +3,7 @@ using UnityEngine;
 
 using System.Collections.Generic;
 using uAdventure.Core;
+using uAdventure.QR;
 
 namespace uAdventure.Editor
 {
@@ -124,6 +125,7 @@ namespace uAdventure.Editor
             extensions.Add(new AssesmentProfileWindow(windowRect, new GUIContent(Language.GetText("ASSESMENT_PROFILES")), "Window"));
             extensions.Add(new MapSceneWindow(windowRect, new GUIContent("MapSceneWindow"), "Window"));
             extensions.Add(new GeoElementWindow(windowRect, new GUIContent("GeoElements"), "Window"));
+            extensions.Add(new QRCodeEditorWindow(windowRect, new GUIContent("QR Codes"), "Window"));
 
             foreach (var e in extensions)
             {
