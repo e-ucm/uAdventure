@@ -129,8 +129,12 @@ namespace uAdventure.Core
         /**
          * Constant for move object effect
          */
-        MOVE_OBJECT = 24
+        MOVE_OBJECT = 24,
 
+        /// <summary>
+        /// use this for any other custom effect customly executed
+        /// </summary>
+        CUSTOM_EFFECT = 25
     }
 
     /**
