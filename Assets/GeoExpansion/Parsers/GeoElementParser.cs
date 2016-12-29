@@ -38,16 +38,16 @@ namespace uAdventure.Geo
                     case "geometry":
                         parsed.Geometry = ParseGeometry(node); break;
                     case "actions":
-                        parsed.Actions = ParseActions(node); break;
+                        parsed.Actions = ParseActions(node, parameters); break;
                 }
             }
             // TODO parsed.Image = element.SelectNodes("/image")[0].InnerText;
             return parsed;
         }
 
-        private List<GeoAction> ParseActions(XmlNode node)
+        private List<GeoAction> ParseActions(XmlNode node, params object[] parameters)
         {
-            return DOMParserUtility.DOMParse<GeoAction>(node.ChildNodes) as List<GeoAction>;
+            return DOMParserUtility.DOMParse<GeoAction>(node.ChildNodes, parameters) as List<GeoAction>;
         }
 
         private GMLGeometry ParseGeometry(XmlNode node)

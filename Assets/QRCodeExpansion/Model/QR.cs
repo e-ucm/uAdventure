@@ -8,6 +8,8 @@ namespace uAdventure.QR
         public QR(string id)
         {
             Id = id;
+            Conditions = new Conditions();
+            Effects = new Effects();
         }
 
         // ID of the QR code in order to manage them

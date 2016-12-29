@@ -19,8 +19,7 @@ namespace uAdventure.QR
         public QRCodeEditorWindow(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions) : base(aStartPos, aContent, aStyle, aOptions)
         {
             mm_Rect = aStartPos;
-
-
+            
             var bc = new GUIContent();
             bc.image = (Texture2D)Resources.Load("qr", typeof(Texture2D));
             bc.text = "QR Codes";  //TC.get("Element.Name1");
@@ -52,8 +51,19 @@ namespace uAdventure.QR
                 // Conditions and Effects
                 EditorGUILayout.BeginHorizontal();
                 {
-                    GUILayout.Button("Conditions");
-                    GUILayout.Button("Effects");
+                    if (GUILayout.Button("Conditions"))
+                    {
+
+                        ConditionEditorWindow window =
+                        (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
+                        window.Init(selectedQR.Conditions);
+                    }
+                    if (GUILayout.Button("Effects"))
+                    {
+                        EffectEditorWindow window =
+                            (EffectEditorWindow)ScriptableObject.CreateInstance(typeof(EffectEditorWindow));
+                        window.Init(selectedQR.Effects);
+                    }
                 }
                 EditorGUILayout.EndHorizontal();
 

@@ -24,8 +24,8 @@ namespace uAdventure.Core
 
         /*int x = 0;
         int y = 0;*/
-        int frontColor = 0;
-        int borderColor = 0;
+        string frontColor = "";
+        string borderColor = "";
 
         /**
          * Constants for reading random-effect
@@ -308,8 +308,8 @@ namespace uAdventure.Core
                     case "show-text":
                         x = 0;
                         y = 0;
-                        frontColor = 0;
-                        borderColor = 0;
+                        frontColor = "";
+                        borderColor = "";
                         audioPath = "";
                         tmpArgVal = effect.GetAttribute("x");
                         if (!string.IsNullOrEmpty(tmpArgVal))
@@ -324,12 +324,13 @@ namespace uAdventure.Core
                         tmpArgVal = effect.GetAttribute("frontColor");
                         if (!string.IsNullOrEmpty(tmpArgVal))
                         {
-                            frontColor = int.Parse(tmpArgVal);
+                            
+                            frontColor = tmpArgVal;
                         }
                         tmpArgVal = effect.GetAttribute("borderColor");
                         if (!string.IsNullOrEmpty(tmpArgVal))
                         {
-                            borderColor = int.Parse(tmpArgVal);
+                            borderColor = tmpArgVal;
                         }
                         tmpArgVal = effect.GetAttribute("uri");
                         if (!string.IsNullOrEmpty(tmpArgVal))
@@ -338,7 +339,7 @@ namespace uAdventure.Core
                         }
 
                         // Add the new ShowTextEffect
-                        currentEffect = new ShowTextEffect(effect.InnerText.ToString().Trim(), x, y, frontColor.ToString(), borderColor.ToString());
+                        currentEffect = new ShowTextEffect(effect.InnerText.ToString().Trim(), x, y, frontColor, borderColor);
                         ((ShowTextEffect)currentEffect).setAudioPath(audioPath);
                         break;
                     case "highlight-item":

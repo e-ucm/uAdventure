@@ -54,7 +54,7 @@ namespace uAdventure.Editor
             {
                 chapterDataControlList.Add(new ChapterDataControl(chapter));
                 chapterToolManagers.Add(new ChapterToolManager());
-                Debug.Log(chapter);
+                //Debug.Log(chapter);
             }
             if (chapters.Count > 0)
                 setSelectedChapterInternal(0);
