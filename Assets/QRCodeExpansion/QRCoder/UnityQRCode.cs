@@ -33,6 +33,7 @@ namespace QRCoder
 
         public Texture2D GetGraphic(int pixelsPerModule, Color darkColor, Color lightColor)
         {
+            var count = this.QrCodeData.ModuleMatrix.Count;
             var size = this.QrCodeData.ModuleMatrix.Count * pixelsPerModule;
             var gfx = new Texture2D(size, size, TextureFormat.ARGB32, false);
             var darkBrush = this.GetBrush(pixelsPerModule, pixelsPerModule, darkColor);
@@ -41,7 +42,7 @@ namespace QRCoder
             {
                 for (var y = 0; y < size; y = y + pixelsPerModule)
                 {
-                    var module = this.QrCodeData.ModuleMatrix[(y + pixelsPerModule) / pixelsPerModule - 1][(x + pixelsPerModule) / pixelsPerModule - 1];
+                    var module = this.QrCodeData.ModuleMatrix[count - ((y + pixelsPerModule) / pixelsPerModule - 1) - 1][(x + pixelsPerModule) / pixelsPerModule - 1];
                     if (module)
                         gfx.SetPixels(x, y, pixelsPerModule, pixelsPerModule, darkBrush);
                     else
