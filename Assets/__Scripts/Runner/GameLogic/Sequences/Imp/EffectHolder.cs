@@ -164,6 +164,14 @@ namespace uAdventure.Runner
                                 MoveObjectEffect moe = (MoveObjectEffect)effect;
                                 Game.Instance.GameState.Move(moe.getTargetId(), new Vector2(moe.getX(), 600 - moe.getY()) / 10f);
                                 break;
+                            case EffectType.CUSTOM_EFFECT:
+                                runs_once = false;
+                                if(times_runed == 0)
+                                {
+                                    this.aditional_info["custom_effect_runner"] = CustomEffectRunnerFactory.Instance.CreateRunnerFor(effect);
+                                }
+                                forcewait = ((CustomEffectRunner)this.aditional_info["custom_effect_runner"]).execute();
+                                break;
                         }
                     }
                 }

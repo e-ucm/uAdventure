@@ -168,7 +168,7 @@ namespace uAdventure.Runner
                         bool no_interaction = true;
                         foreach (RaycastHit hit in hits)
                         {
-                            IRunnerChapterTarget interacted = hit.transform.GetComponent<IRunnerChapterTarget>();
+                            Interactuable interacted = hit.transform.GetComponent<Interactuable>();
                             if (interacted != null && InteractWith(interacted))
                             {
                                 trackInteraction(interacted);
@@ -201,7 +201,7 @@ namespace uAdventure.Runner
             }
         }
 
-        private bool InteractWith(IRunnerChapterTarget interacted)
+        private bool InteractWith(Interactuable interacted)
         {
             bool exit = false;
             next_interaction = null;
@@ -292,7 +292,7 @@ namespace uAdventure.Runner
             Tracker.T.RequestFlush();
         }
 
-        private void trackInteraction(IRunnerChapterTarget with)
+        private void trackInteraction(Interactuable with)
         {
             switch (with.GetType().ToString())
             {

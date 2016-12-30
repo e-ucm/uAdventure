@@ -35,5 +35,12 @@ namespace uAdventure.Editor
 
         protected abstract string GetElementNameFor(object target);
         protected abstract void FillNode(XmlNode node, object target, params IDOMWriterParam[] options);
+
+        protected void AddNode(XmlNode parent, string name, string content)
+        {
+            var element = Writer.GetDoc().CreateElement(name);
+            element.InnerText = content;
+            parent.AppendChild(element);
+        }
     }
 }

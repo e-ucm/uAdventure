@@ -20,13 +20,6 @@ namespace uAdventure.QR
             DOMWriterUtility.DOMWrite(element, qr.Effects);
         }
 
-        private void AddNode(XmlNode parent, string name, string content)
-        {
-            var element = Writer.GetDoc().CreateElement(name);
-            element.InnerText = content;
-            parent.AppendChild(element);
-        }
-
         protected override string GetElementNameFor(object target)
         {
             return "qr-code";

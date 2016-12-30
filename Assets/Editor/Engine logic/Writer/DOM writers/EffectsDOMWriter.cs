@@ -86,40 +86,43 @@ namespace uAdventure.Editor
             {
 
                 XmlElement effectElement = null;
-                XmlNode conditionsNode = null;
 
-                if (effect.getType() != EffectType.RANDOM_EFFECT)
-                    effectElement = buildEffectNode(effect, doc);
+                if(effect.getType() == EffectType.CUSTOM_EFFECT)
+                {
+                    DOMWriterUtility.DOMWrite(effectsNode, effect);
+                }
                 else
                 {
-                    RandomEffect randomEffect = (RandomEffect)effect;
-                    effectElement = doc.CreateElement("random-effect");
-                    effectElement.SetAttribute("probability", randomEffect.getProbability().ToString());
-
-                    XmlElement posEfElement = null;
-                    XmlElement negEfElement = null;
-
-                    if (randomEffect.getPositiveEffect() != null)
+                    if (effect.getType() != EffectType.RANDOM_EFFECT)
+                        effectElement = buildEffectNode(effect, doc);
+                    else
                     {
-                        posEfElement = buildEffectNode(randomEffect.getPositiveEffect(), doc);
-                        effectElement.AppendChild(posEfElement);
-                        if (randomEffect.getNegativeEffect() != null)
+                        RandomEffect randomEffect = (RandomEffect)effect;
+                        effectElement = doc.CreateElement("random-effect");
+                        effectElement.SetAttribute("probability", randomEffect.getProbability().ToString());
+
+                        XmlElement posEfElement = null;
+                        XmlElement negEfElement = null;
+
+                        if (randomEffect.getPositiveEffect() != null)
                         {
-                            negEfElement = buildEffectNode(randomEffect.getNegativeEffect(), doc);
-                            effectElement.AppendChild(negEfElement);
+                            posEfElement = buildEffectNode(randomEffect.getPositiveEffect(), doc);
+                            effectElement.AppendChild(posEfElement);
+                            if (randomEffect.getNegativeEffect() != null)
+                            {
+                                negEfElement = buildEffectNode(randomEffect.getNegativeEffect(), doc);
+                                effectElement.AppendChild(negEfElement);
+                            }
                         }
                     }
-
+                    // Add the effect
+                    effectsNode.AppendChild(effectElement);
                 }
-
-                // Add the effect
-                effectsNode.AppendChild(effectElement);
 
                 // Add conditions associated to that effect               
                 // Create conditions for current effect
 
                 DOMWriterUtility.DOMWrite(effectsNode, effect.getConditions());
-
             }
 
         }

@@ -7,14 +7,15 @@ using uAdventure.Core;
 
 namespace uAdventure.Editor
 {
-    public class ActionsDOMWriter
+    [DOMWriter(typeof(List<Action>))]
+    public class ActionsDOMWriter : IDOMWriter
     {
 
         /**
          * Private constructor.
          */
 
-        private ActionsDOMWriter()
+        public ActionsDOMWriter()
         {
 
         }
@@ -27,9 +28,9 @@ namespace uAdventure.Editor
          * @return the xml node with the list of actions
          */
 
-        public static XmlNode buildDOM(List<Action> actions)
+        public void BuildDOM(XmlNode parent, object target, params IDOMWriterParam[] options)
         {
-
+            var actions = target as List<Action>;
             XmlElement actionsElement = null;
 
 
@@ -133,7 +134,7 @@ namespace uAdventure.Editor
                 }
             }
 
-            return actionsElement;
+            parent.AppendChild(actionsElement);
         }
     }
 }

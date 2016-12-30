@@ -451,8 +451,19 @@ namespace uAdventure.Core
                         addeffect = false;
                         break;
                     default:
-                        addeffect = false;
-                        Debug.LogWarning("EFFECT NOT SUPPORTED: " + effect.Name);
+
+                        currentEffect = DOMParserUtility.DOMParse(effect) as AbstractEffect;
+                        if(currentEffect == null)
+                        {
+                            addeffect = false;
+                            Debug.LogWarning("EFFECT NOT SUPPORTED: " + effect.Name);
+                        }
+                        else
+                        {
+                            addeffect = true;
+                        }
+
+
                         break;
                 }
 

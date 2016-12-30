@@ -124,9 +124,7 @@ namespace uAdventure.Editor
             characterElement.AppendChild(voiceNode);
             if (character.getActionsCount() > 0)
             {
-                XmlNode actionsNode = ActionsDOMWriter.buildDOM(character.getActions());
-                doc.ImportNode(actionsNode, true);
-                characterElement.AppendChild(actionsNode);
+                DOMWriterUtility.DOMWrite(characterElement, character.getActions());
             }
         }
     }

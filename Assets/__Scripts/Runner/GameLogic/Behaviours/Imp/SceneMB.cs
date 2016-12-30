@@ -261,18 +261,18 @@ namespace uAdventure.Runner
             GameObject base_prefab;
             Transform parent;
 
-            switch (typeof(T).ToString())
+            if (typeof(T) == typeof(ActiveArea))
             {
-                case "ActiveArea":
-                    base_prefab = ActiveArea_Prefab;
-                    parent = ActiveAreas;
-                    break;
-                case "Exit":
-                    base_prefab = Exit_Prefab;
-                    parent = Exits;
-                    break;
-                default:
-                    return;
+                base_prefab = ActiveArea_Prefab;
+                parent = ActiveAreas;
+            }
+            else if(typeof(T) == typeof(Exit))
+            {
+                base_prefab = Exit_Prefab;
+                parent = Exits;
+            }else
+            {
+                return;
             }
 
             GameObject ret = GameObject.Instantiate(base_prefab);

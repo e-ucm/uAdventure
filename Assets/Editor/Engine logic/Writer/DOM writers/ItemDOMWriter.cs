@@ -111,10 +111,7 @@ namespace uAdventure.Editor
             if (item.getActions().Count > 0)
             {
                 // Create the actions node
-                XmlNode actionsNode = ActionsDOMWriter.buildDOM(item.getActions());
-                doc.ImportNode(actionsNode, true);
-                // Append the actions node
-                itemElement.AppendChild(actionsNode);
+                DOMWriterUtility.DOMWrite(itemElement, item.getActions());
             }
             
             
