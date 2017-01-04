@@ -41,6 +41,8 @@ public class GeoElementMB : MonoBehaviour {
         mesh.triangles = md.Indices.ToArray();
         mesh.SetUVs(0, md.UV);
         mesh.RecalculateNormals();
+
+        
     }
 	
 	// Update is called once per frame
@@ -75,5 +77,11 @@ public class GeoElementMB : MonoBehaviour {
             landuseCorners[i] = landuseCorners[i] - landuseCenter;
         }
         return landuseCenter;
+    }
+
+    void OnDestroy()
+    {
+        var ua = uAdventurePlugin.FindObjectOfType<uAdventurePlugin>();
+        ua.ReleaseElement(Reference);
     }
 }

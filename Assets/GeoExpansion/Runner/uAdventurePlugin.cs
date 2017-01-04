@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 
 using uAdventure.Runner;
+using System.Runtime.CompilerServices;
 
 namespace uAdventure.Geo
 {
@@ -47,6 +48,7 @@ namespace uAdventure.Geo
             yield return null;
         }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public bool AdoptElement(MapElement mapElement)
         {
             if(OrphanElements.Contains(mapElement))
@@ -59,6 +61,7 @@ namespace uAdventure.Geo
             return false;
         }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public void ReleaseElement(MapElement mapElement)
         {
             if (AdoptedElements.Contains(mapElement))

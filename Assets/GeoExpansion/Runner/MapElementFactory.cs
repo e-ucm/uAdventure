@@ -29,16 +29,30 @@ namespace uAdventure.Geo
             Query = (mapElement, tile) => true;
         }
 
-
         protected override IEnumerator CreateRoutine(Tile tile, Action<bool> finished)
         {
-            foreach (var entity in uAdventurePlugin.OrphanElements.Where(x => Query(x, tile)).SelectMany(elem => Create(tile, elem)))
+            foreach(var elem in uAdventurePlugin.OrphanElements)
+            {
+                if (uAdventurePlugin.OrphanElements.Contains(elem) && Query(elem, tile))
+                {
+                    foreach(var createdElem in Create(tile, elem))
+                    {
+                        if(createdElem != null)
+                        {
+                            createdElem.transform.SetParent(tile.transform, false);
+                            uAdventurePlugin.AdoptElement(elem);
+                        }
+                    }
+                }
+            }
+
+            /*foreach (var entity in uAdventurePlugin.OrphanElements.Where(x => Query(x, tile)).SelectMany(elem => Create(tile, elem)))
             {
                 if (entity != null)
                 {
                     entity.transform.SetParent(tile.transform, false);
                 }
-            }
+            }*/
 
             finished(true);
 

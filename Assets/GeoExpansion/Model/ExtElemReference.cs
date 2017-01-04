@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System;
 using MapzenGo.Helpers;
+using MapzenGo.Models;
 
 namespace uAdventure.Geo
 {
@@ -161,6 +162,8 @@ namespace uAdventure.Geo
             ParameterDescription.Add("Position", new Geo.ParameterDescription(typeof(Vector2d), Vector2d.zero));
             ParameterDescription.Add("Scale", new Geo.ParameterDescription(typeof(Vector3), Vector3.one));
             ParameterDescription.Add("Rotation", new Geo.ParameterDescription(typeof(float), 0f));
+            ParameterDescription.Add("InteractionRange", new Geo.ParameterDescription(typeof(float), 25f)); // 25 metros
+            ParameterDescription.Add("RevealOnlyOnRange", new Geo.ParameterDescription(typeof(bool), true));
         }
 
         public string Name { get { return "World positioned"; } }
@@ -266,12 +269,19 @@ namespace uAdventure.Geo
             {
                 transform = value;
                 wrapper = transform.gameObject.GetComponent<GeoWrapper>();
+                particles = transform.gameObject.GetComponent<ParticleSystem>();
+                tileManager = GameObject.FindObjectOfType<TileManager>();
             }
         }
+
+        private TileManager tileManager;
         private Vector2d latLon;
         private Vector3 scale;
         private float rotation;
+        private float interactionRange;
+        private bool revealOnRange;
         private GeoWrapper wrapper;
+        private ParticleSystem particles;
         private Transform transform;
 
         public void Configure(Dictionary<string, object> parameters)
@@ -279,14 +289,16 @@ namespace uAdventure.Geo
             latLon = (Vector2d) parameters["Position"];
             scale = (Vector3)parameters["Scale"];
             rotation = (float)parameters["Rotation"];
+            interactionRange = (float)parameters["InteractionRange"];
+            revealOnRange = (bool)parameters["RevealOnlyOnRange"];
         }
 
         public void Update()
         {
             var pos = GM.LatLonToMeters(latLon.y, latLon.x) - wrapper.Tile.Rect.Center;
-            transform.localPosition = new Vector3((float)pos.x, 0, (float)pos.y);
+            transform.localPosition = new Vector3((float)pos.x, 0, (float)pos.y) - new Vector3(transform.GetChild(0).localPosition.x, 0, transform.GetChild(0).localPosition.y);
             transform.localScale = scale;
-            transform.localRotation = Quaternion.Euler(0, rotation, 0);
+            transform.localRotation = Quaternion.Euler(90, rotation, 0);
         }
     }
 }

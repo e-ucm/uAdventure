@@ -23,6 +23,8 @@ namespace MapzenGo.Models
         public int Zoom = 16;
         [SerializeField]
         public float TileSize = 100;
+        [SerializeField]
+        public bool RealisticTileSize = true;
 
         [SerializeField]
         protected Material MapMaterial;
@@ -58,8 +60,19 @@ namespace MapzenGo.Models
             InitPlugins();
             
             _removeAfter = Math.Max(_removeAfter, Range * 2 + 1);
-            var centerrect = new Vector2(TileSize, TileSize);
-            _centerCollider = new Rect(Vector2.zero - centerrect / 2, centerrect);
+            if (!RealisticTileSize)
+            {
+                var centerrect = new Vector2(TileSize, TileSize);
+                centerrect.Scale(transform.localScale.ToVector2xz());
+                _centerCollider = new Rect((Vector2.zero - centerrect / 2), centerrect);
+            }
+            else
+            {
+                var realisticTileSize = GM.TileBounds(Vector2d.zero, Zoom);
+                var centerrect = realisticTileSize.Size.ToVector2();
+                centerrect = new Vector2(Mathf.Abs(centerrect.x), Mathf.Abs(centerrect.y));
+                _centerCollider = new Rect((Vector2.zero - centerrect / 2),centerrect);
+            }
 
             var v2 = GM.LatLonToMeters(Latitude, Longitude);
             var tile = GM.MetersToTile(v2, Zoom);
@@ -74,7 +87,8 @@ namespace MapzenGo.Models
             LoadTiles(CenterTms, CenterInMercator);
 
             var rect = GM.TileBounds(CenterTms, Zoom);
-            transform.localScale = Vector3.one * (float)(TileSize / rect.Width);
+            if(!RealisticTileSize)
+                transform.localScale = Vector3.one * (float)(TileSize / rect.Width);
             if (MapMaterial == null)
                 MapMaterial = Resources.Load<Material>("Ground");
         }
@@ -86,7 +100,7 @@ namespace MapzenGo.Models
 
         private void UpdateTiles()
         {
-            if (!_centerCollider.Contains(_player.transform.position.ToVector2xz(), true))
+            if (!_centerCollider.Contains(_player.transform.localPosition.ToVector2xz(), true))
             {
                 //player movement in TMS tiles
                 var tileDif = GetMovementVector();
@@ -94,8 +108,8 @@ namespace MapzenGo.Models
                 //move locals
                 Centralize(tileDif);
                 //create new tiles
-                LoadTiles(CenterTms, CenterInMercator);
                 UnloadTiles(CenterTms);
+                LoadTiles(CenterTms, CenterInMercator);
             }
         }
 
@@ -126,7 +140,7 @@ namespace MapzenGo.Models
             tile.Rect = GM.TileBounds(tileTms, Zoom);
 
             Tiles.Add(tileTms, tile);
-            tile.transform.position = (rect.Center - centerInMercator).ToVector3();
+            tile.transform.localPosition = (rect.Center - centerInMercator).ToVector3();
             tile.transform.SetParent(TileHost, false);
             ExecutePlugins((plugin, onFinish) => plugin.Create(tile, onFinish));
             
@@ -139,20 +153,55 @@ namespace MapzenGo.Models
             CenterTms += tileDif.ToVector2d();
             if (_keepCentralized)
             {
-                foreach (var tile in Tiles.Values)
+                if (RealisticTileSize)
                 {
-                    tile.transform.position -= new Vector3((float)(tileDif.x * TileSize), 0, (float)(-tileDif.y * TileSize));
+                    foreach (var tile in Tiles.Values)
+                    {
+                        tile.transform.localPosition -= new Vector3((float)(tileDif.x * _centerCollider.width), 0, (float)(-tileDif.y * _centerCollider.height));
+                    }
                 }
+                else
+                {
+                    foreach (var tile in Tiles.Values)
+                    {
+                        tile.transform.localPosition -= new Vector3((float)(tileDif.x * TileSize), 0, (float)(-tileDif.y * TileSize));
+                    }
+                }                
 
                 CenterInMercator = GM.TileBounds(CenterTms, Zoom).Center;
-                var difInUnity = new Vector3((float)(tileDif.x * TileSize), 0, (float)(-tileDif.y * TileSize));
-                _player.position -= difInUnity;
+                Vector3 difInUnity;
+                if (RealisticTileSize)
+                {
+                    difInUnity = new Vector3(tileDif.x * _centerCollider.width, 0, -tileDif.y * _centerCollider.height);
+                }
+                else
+                {
+                    difInUnity = new Vector3((float)(tileDif.x * TileSize), 0, (float)(-tileDif.y * TileSize));
+                }
+
+                var realisticTileSize = GM.TileBounds(Vector2d.zero, Zoom);
+                var newLatLon = GM.MetersToLatLon(GM.LatLonToMeters(
+                    new Vector2d(Latitude, Longitude)) + new Vector2d(realisticTileSize.Size.x * tileDif.x, realisticTileSize.Size.y * tileDif.y));
+                Latitude = (float) newLatLon.y;
+                Longitude = (float) newLatLon.x;
+
+                _player.localPosition -= difInUnity;
+                if(RealisticTileSize)
+                    difInUnity.Scale(new Vector3(1/transform.lossyScale.x, 1/transform.lossyScale.y, 1/transform.lossyScale.z));
                 Camera.main.transform.position -= difInUnity;
             }
             else
             {
-                var difInUnity = new Vector2(tileDif.x * TileSize, -tileDif.y * TileSize);
-                _centerCollider.position += difInUnity;
+                if (RealisticTileSize)
+                {
+                    var difInUnity = new Vector2(tileDif.x * _centerCollider.width, -tileDif.y * _centerCollider.height);
+                    _centerCollider.position += difInUnity;
+                }
+                else
+                {
+                    var difInUnity = new Vector2(tileDif.x * TileSize, -tileDif.y * TileSize);
+                    _centerCollider.position += difInUnity;
+                }
             }
         }
 
@@ -164,7 +213,7 @@ namespace MapzenGo.Models
             {
                 rem.Add(key);
                 ExecutePlugins((plugin, onFinish) => plugin.UnLoad(Tiles[key], onFinish));
-                Destroy(Tiles[key].gameObject);
+                DestroyImmediate(Tiles[key].gameObject);
             }
             foreach (var v in rem)
             {
@@ -209,7 +258,7 @@ namespace MapzenGo.Models
 
         private Vector2 GetMovementVector()
         {
-            var dif = _player.transform.position.ToVector2xz();
+            var dif = _player.transform.localPosition.ToVector2xz();
             var tileDif = Vector2.zero;
             if (dif.x < Math.Min(_centerCollider.xMin, _centerCollider.xMax))
                 tileDif.x = -1;

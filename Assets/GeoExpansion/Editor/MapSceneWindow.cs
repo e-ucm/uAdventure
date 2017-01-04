@@ -26,7 +26,6 @@ public class MapSceneWindow : ReorderableListEditorWindowExtension {
 
     private SearchPlace place;
     private string address = "";
-    private Vector2 location;
     private string lastSearch = "";
     private float timeSinceLastWrite;
     private MapScene mapScene;
@@ -107,10 +106,10 @@ public class MapSceneWindow : ReorderableListEditorWindowExtension {
 
 
         // Location control
-        location = EditorGUILayout.Vector2Field("Location", location);
+        mapScene.LatLon = EditorGUILayout.Vector2Field("Location", mapScene.LatLon.ToVector2()).ToVector2d();
         var lastRect = GUILayoutUtility.GetLastRect();
-        if (location != map.Center.ToVector2())
-            map.Center = new Vector2d(location.x, location.y);
+        if (mapScene.LatLon != map.Center)
+            map.Center = mapScene.LatLon;
 
         GUILayout.BeginHorizontal();
         // Map Elements
@@ -137,7 +136,7 @@ public class MapSceneWindow : ReorderableListEditorWindowExtension {
             this.positionManagers[movingReference].Repositionate(map, mapRect);
         }
 
-        location = map.Center.ToVector2();
+        mapScene.LatLon = map.Center;
         //geometriesReorderableList.index = map.selectedGeometry != null ? geometries.IndexOf(map.selectedGeometry) : -1;
 
         GUILayout.EndHorizontal();
@@ -148,7 +147,7 @@ public class MapSceneWindow : ReorderableListEditorWindowExtension {
             lastSearch = address = addressDropdown.Value;
             foreach (var l in place.DataStructure.dataChache)
                 if (l.label == address)
-                    location = l.coordinates;
+                    mapScene.LatLon = l.coordinates.ToVector2d();
             
 
             place.DataStructure.dataChache.Clear();

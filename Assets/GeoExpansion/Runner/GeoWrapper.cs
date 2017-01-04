@@ -33,6 +33,7 @@ namespace uAdventure.Geo
                 ret.GetComponent<Representable>().Context = new ElementReference(Reference.getTargetId(), 0, 0);
                 ret.GetComponent<Representable>().Element = Element;
                 ret.transform.SetParent(transform);
+                ret.transform.localPosition = Vector3.zero;
             }
         }
 
@@ -45,6 +46,12 @@ namespace uAdventure.Geo
                 var i = mb as Interactuable;
                 i.setInteractuable(false);
             }
+        }
+
+        void OnDestroy()
+        {
+            var ua = uAdventurePlugin.FindObjectOfType<uAdventurePlugin>();
+            ua.ReleaseElement(Reference);
         }
     }
 

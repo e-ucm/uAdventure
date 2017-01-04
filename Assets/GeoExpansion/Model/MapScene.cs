@@ -28,6 +28,7 @@ namespace uAdventure.Geo
         public CameraType CameraType { get; set; }
         public string Id { get; set; }
         public List<MapElement> Elements { get; set; }
+        public Vector2d LatLon { get; set; }
 
         /// <summary>
         /// Creates a mapScene using the id. Initializing its elements to an empty list.

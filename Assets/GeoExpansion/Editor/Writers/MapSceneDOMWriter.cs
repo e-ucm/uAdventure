@@ -20,6 +20,7 @@ namespace uAdventure.Geo
 
             element.SetAttribute("id", mapScene.Id);
             element.SetAttribute("cameraType", mapScene.CameraType.ToString());
+            element.SetAttribute("center", mapScene.LatLon.ToString());
 
             if (options.Any(o => o is CIP && (o as CIP).TargetId.Equals(mapScene.getId())))
                 element.SetAttribute("start", "yes");

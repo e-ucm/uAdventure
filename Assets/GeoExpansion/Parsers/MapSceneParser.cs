@@ -27,6 +27,12 @@ namespace uAdventure.Geo
                 }
             }
 
+            tmpArgVal = element.GetAttribute("center");
+            if (!string.IsNullOrEmpty(tmpArgVal))
+            {
+                mapScene.LatLon = (Vector2d) parseParam(typeof(Vector2d), tmpArgVal);
+            }
+
             foreach (var e in element.SelectNodes("map-element"))
             {
                 var mapElementNode = e as XmlElement;

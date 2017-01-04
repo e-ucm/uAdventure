@@ -19,7 +19,7 @@ public class ExtElemFactory : MapElementFactory {
         base.Awake();
         cache = new Dictionary<ExtElemReference, Element>();
         clipper = new Clipper();
-        Query = (elem, tile) => elem is ExtElemReference;// && Intersects(tile, elem as GeoReference);
+        Query = (elem,tile) => elem is ExtElemReference;// && Intersects(tile, elem as GeoReference);
     }
 
     private Element FindElement(ExtElemReference reference)
