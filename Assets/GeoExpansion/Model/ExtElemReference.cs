@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System;
 using MapzenGo.Helpers;
 using MapzenGo.Models;
+using uAdventure.Runner;
 
 namespace uAdventure.Geo
 {
@@ -269,12 +270,13 @@ namespace uAdventure.Geo
             {
                 transform = value;
                 wrapper = transform.gameObject.GetComponent<GeoWrapper>();
-                particles = transform.gameObject.GetComponent<ParticleSystem>();
-                tileManager = GameObject.FindObjectOfType<TileManager>();
+                particles = transform.gameObject.GetComponentInChildren<ParticleSystem>();
+                character = GameObject.FindObjectOfType<GeoPositionedCharacter>();
+                interactuable = transform.GetComponentInChildren<Interactuable>();
             }
         }
 
-        private TileManager tileManager;
+        private GeoPositionedCharacter character;
         private Vector2d latLon;
         private Vector3 scale;
         private float rotation;
@@ -283,6 +285,7 @@ namespace uAdventure.Geo
         private GeoWrapper wrapper;
         private ParticleSystem particles;
         private Transform transform;
+        private Interactuable interactuable;
 
         public void Configure(Dictionary<string, object> parameters)
         {
@@ -292,13 +295,42 @@ namespace uAdventure.Geo
             interactionRange = (float)parameters["InteractionRange"];
             revealOnRange = (bool)parameters["RevealOnlyOnRange"];
         }
-
+        bool hidden = false;
         public void Update()
         {
             var pos = GM.LatLonToMeters(latLon.y, latLon.x) - wrapper.Tile.Rect.Center;
-            transform.localPosition = new Vector3((float)pos.x, 0, (float)pos.y) - new Vector3(transform.GetChild(0).localPosition.x, 0, transform.GetChild(0).localPosition.y);
+            particles.transform.localPosition = transform.GetChild(1).localPosition;
+            transform.localPosition = new Vector3((float)pos.x, 0, (float)pos.y) - new Vector3(transform.GetChild(1).localPosition.x, 0, transform.GetChild(0).localPosition.y);
             transform.localScale = scale;
             transform.localRotation = Quaternion.Euler(90, rotation, 0);
+
+
+            var distanceToObject = GM.LatLonToMeters(character.LatLon) - GM.LatLonToMeters(latLon.x, latLon.y);
+            Debug.Log(distanceToObject.magnitude);
+            if (interactionRange <= 0 || distanceToObject.magnitude <= interactionRange*2)
+            {
+                if (hidden)
+                {
+                    Debug.Log("Unhidden");
+                    hidden = false;
+                    if (revealOnRange)
+                    {
+                        particles.gameObject.SetActive(true);
+                        particles.Play();
+                        transform.GetChild(1).gameObject.GetComponent<Renderer>().enabled = true;
+                    }
+                    if (interactuable != null) transform.GetChild(1).GetComponent<Collider>().enabled = true;
+                }
+            }
+            else if(!hidden)
+            {
+                hidden = true;
+                particles.gameObject.SetActive(false);
+                particles.time = 0;
+                particles.Stop();
+                if (revealOnRange) transform.GetChild(1).gameObject.GetComponent<Renderer>().enabled = false;
+                if (interactuable != null) transform.GetChild(1).GetComponent<Collider>().enabled = false;
+            }
         }
     }
 }

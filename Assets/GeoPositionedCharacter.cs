@@ -34,6 +34,6 @@ public class GeoPositionedCharacter : MonoBehaviour {
         thirdPersonCharacter.Move(new Vector3((float)destinationMeters.y, 0, (float)destinationMeters.x), false, false);
 
         this.LatLon = GM.MetersToLatLon(transform.localPosition.ToVector2xz().ToVector2d() + tileManagerRelative);
-        Debug.Log("Character at: " + this.LatLon +" moving to " + destination);
+        //Debug.Log("Character at: " + this.LatLon +" moving to " + destination);
     }
 }

@@ -31,7 +31,9 @@ namespace uAdventure.Geo
 
         protected override IEnumerator CreateRoutine(Tile tile, Action<bool> finished)
         {
-            foreach(var elem in uAdventurePlugin.OrphanElements)
+            
+
+            foreach(var elem in new List<MapElement>(uAdventurePlugin.OrphanElements))
             {
                 if (uAdventurePlugin.OrphanElements.Contains(elem) && Query(elem, tile))
                 {

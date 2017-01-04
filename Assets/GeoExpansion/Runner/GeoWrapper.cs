@@ -19,8 +19,6 @@ namespace uAdventure.Geo
 
         void Start()
         {
-            transformManager = ExtElemReferenceTransformManagerFactory.Instance.CreateInstance(Reference.TransformManagerDescriptor, Reference.TransformManagerParameters);
-            transformManager.ExtElemReferenceTransform = this.transform;
 
             GameObject base_prefab = null;
             if (Element is Atrezzo) base_prefab = Atrezzo_Prefab;
@@ -35,6 +33,10 @@ namespace uAdventure.Geo
                 ret.transform.SetParent(transform);
                 ret.transform.localPosition = Vector3.zero;
             }
+
+
+            transformManager = ExtElemReferenceTransformManagerFactory.Instance.CreateInstance(Reference.TransformManagerDescriptor, Reference.TransformManagerParameters);
+            transformManager.ExtElemReferenceTransform = this.transform;
         }
 
         // Update is called once per frame
