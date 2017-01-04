@@ -9,6 +9,11 @@ using uAdventure.Core;
 using System;
 using uAdventure.Editor;
 
+using ClipperLib;
+
+using Path = System.Collections.Generic.List<ClipperLib.IntPoint>;
+using Paths = System.Collections.Generic.List<System.Collections.Generic.List<ClipperLib.IntPoint>>;
+
 public class GUIMap
 {
     /* -----------------------------
@@ -258,16 +263,25 @@ public class GUIMap
                     break;
             }
 
-            DrawInfluenceArea(points.ConvertAll(p => p.ToVector2()).ToArray(), (float)GM.MetersToPixels(new Vector2d(g.Influence,0), Zoom).x - (float)GM.MetersToPixels(new Vector2d(0,0),Zoom).x);
+            DrawInfluenceArea(points.ConvertAll(p => p.ToVector2()).ToArray(), (float)GM.MetersToPixels(new Vector2d(g.Influence,0), Zoom).x - (float)GM.MetersToPixels(new Vector2d(0,0),Zoom).x, g.Type);
 
             Handles.EndGUI();
 
         }
     }
 
-    private void DrawInfluenceArea(Vector2[] points, float radius)
+    private void DrawInfluenceArea(Vector2[] points, float radius, GMLGeometry.GeometryType type)
     {
-        var prev = points[points.Length - 1];
+        if(points.Length == 1)
+        {
+            Handles.color = Color.black;
+            Handles.DrawWireArc(points[0], Vector3.back, Vector2.up, 360, radius);
+            return;
+        }
+
+        DrawPolyLine(ExtendPolygon(new List<Vector2>(points), radius, type).ToArray());
+
+        /*var prev = points[points.Length - 1];
         Vector2 prTh, thNx, prevVector = Vector2.zero;
         for(int i = 0; i<= points.Length; i++)
         {
@@ -290,8 +304,8 @@ public class GUIMap
                 }
             }
             prevVector = thNx;
-            prev = points[i % points.Length];
-        }
+            prev = points[i % points.Length];*/
+        
     }
 
     private void DrawResources(Rect area)
@@ -396,8 +410,19 @@ public class GUIMap
             (A1 * C2 - A2 * C1) / delta
         );
     }
+
+    public List<Vector2> ExtendPolygon(List<Vector2> points, float radius, GMLGeometry.GeometryType type)
+    {
+        Path polygon = points.ConvertAll(p => new IntPoint(p.x, p.y));
+        
+        Paths solution = new Paths();
+
+        ClipperOffset c = new ClipperOffset();
+        c.AddPath(polygon, JoinType.jtRound, type == GMLGeometry.GeometryType.Polygon ? EndType.etClosedPolygon : EndType.etOpenRound);
+        c.Execute(ref solution, radius);
+        
+        var r = solution[0].ConvertAll(p => new Vector2(p.X, p.Y));
+        r.Add(r[0]);
+        return r;
+    }
 }
-
-
-
-
