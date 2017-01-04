@@ -194,11 +194,11 @@ namespace uAdventure.Editor
 
             switch (selected)
             {
-                case 0:
+                case 0: // Map view
                     {
                         element.Geometry.Type = (GMLGeometry.GeometryType)EditorGUILayout.EnumPopup("Geometry type", element.Geometry.Type);
                         EditorGUILayout.LabelField("Points: " + element.Geometry.Points.Count);
-                        element.Influence = EditorGUILayout.FloatField("Influence Radius", element.Influence);
+                        element.Geometry.Influence = EditorGUILayout.FloatField("Influence Radius", element.Geometry.Influence);
 
 
                         if (GUILayout.Button("Center") && element.Geometry.Points.Count > 0)
@@ -227,7 +227,9 @@ namespace uAdventure.Editor
 
 
                         // Map drawing
-                        map.selectedGeometry = element.Geometry;
+                        if(editing)
+                            map.selectedGeometry = element.Geometry;
+
                         if (map.DrawMap(GUILayoutUtility.GetRect(mm_Rect.width, mm_Rect.height - lastRect.y - lastRect.height)))
                         {
                             Debug.Log(map.GeoMousePosition);

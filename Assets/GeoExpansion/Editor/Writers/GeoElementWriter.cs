@@ -21,7 +21,6 @@ namespace uAdventure.Editor
             AddChild(node, "brief-description", geoelement.BriefDescription);
             AddChild(node, "detailed-description", geoelement.DetailedDescription);
             DumpGML(node, "geometry", geoelement.Geometry);
-            AddChild(node, "detailed-description", geoelement.Influence.ToString());
             var actions = doc.CreateElement("actions");
             node.AppendChild(actions);
             DOMWriterUtility.DOMWrite(actions, geoelement.Actions);
@@ -41,6 +40,7 @@ namespace uAdventure.Editor
             // base element
             var elem = doc.CreateElement(name);
             parent.AppendChild(elem);
+            elem.SetAttribute("influence", content.Influence.ToString());
 
             // Dump geometry type
             XmlNode gmlElement;

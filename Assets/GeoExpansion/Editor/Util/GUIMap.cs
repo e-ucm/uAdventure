@@ -258,11 +258,41 @@ public class GUIMap
                     break;
             }
 
+            DrawInfluenceArea(points.ConvertAll(p => p.ToVector2()).ToArray(), (float)GM.MetersToPixels(new Vector2d(g.Influence,0), Zoom).x - (float)GM.MetersToPixels(new Vector2d(0,0),Zoom).x);
+
             Handles.EndGUI();
 
         }
     }
 
+    private void DrawInfluenceArea(Vector2[] points, float radius)
+    {
+        var prev = points[points.Length - 1];
+        Vector2 prTh, thNx, prevVector = Vector2.zero;
+        for(int i = 0; i<= points.Length; i++)
+        {
+            prTh = points[i % points.Length] - prev;
+            thNx = points[(i + 1) % points.Length] - points[i % points.Length];
+
+            prTh = RotateVector(prTh, -90).normalized;
+            thNx = RotateVector(thNx, -90).normalized;
+
+            if (i > 0) {
+                if (Vector3.Cross(prTh, thNx).z < 0)
+                {
+                    Handles.color = Color.blue;
+                    Handles.DrawLine(prev + prevVector * radius, points[i % points.Length] + prTh * radius);
+                    Handles.DrawWireArc(points[i % points.Length], Vector3.back, prTh, Vector3.Angle(prTh, thNx), radius);
+                }
+                else
+                {
+                    Handles.DrawLine(prev + prevVector, LineIntersectionPoint(prev + prevVector * radius*2, prev + prevVector*radius, points[i % points.Length] + prTh * radius*2, points[i % points.Length] + prTh * radius));
+                }
+            }
+            prevVector = thNx;
+            prev = points[i % points.Length];
+        }
+    }
 
     private void DrawResources(Rect area)
     {
@@ -332,6 +362,39 @@ public class GUIMap
     public List<Vector2d> PixelsToRelative(List<Vector2d> pixels)
     {
         return pixels.ConvertAll(p => PixelToRelative(p));
+    }
+
+    private Vector2 RotateVector(Vector2 vector, float angle)
+    {
+
+        return Quaternion.Euler(0, 0, -angle) * vector;
+
+
+    }
+
+    // http://www.wyrmtale.com/blog/2013/115/2d-line-intersection-in-c
+    Vector2 LineIntersectionPoint(Vector2 ps1, Vector2 pe1, Vector2 ps2, Vector2 pe2)
+    {
+        // Get A,B,C of first line - points : ps1 to pe1
+        float A1 = pe1.y - ps1.y;
+        float B1 = ps1.x - pe1.x;
+        float C1 = A1 * ps1.x + B1 * ps1.y;
+
+        // Get A,B,C of second line - points : ps2 to pe2
+        float A2 = pe2.y - ps2.y;
+        float B2 = ps2.x - pe2.x;
+        float C2 = A2 * ps2.x + B2 * ps2.y;
+
+        // Get delta and check if the lines are parallel
+        float delta = A1 * B2 - A2 * B1;
+        if (delta == 0)
+            throw new System.Exception("Lines are parallel");
+
+        // now return the Vector2 intersection point
+        return new Vector2(
+            (B2 * C1 - B1 * C2) / delta,
+            (A1 * C2 - A2 * C1) / delta
+        );
     }
 }
 

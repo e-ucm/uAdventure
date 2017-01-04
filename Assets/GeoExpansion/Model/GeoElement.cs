@@ -18,7 +18,7 @@ namespace uAdventure.Geo
             DetailedDescription = "";
             FullDescription = "";
             BriefDescription = "";
-            Influence = 0f;
+            Geometry.Influence = 0f;
             Image = "";
             Actions = new List<GeoAction>();
         }
@@ -31,7 +31,6 @@ namespace uAdventure.Geo
         public GMLGeometry Geometry { get; set; }
 
         public GeoElementDrawer Drawer { get; set; }
-        public float Influence { get; set; }
         public string Image { get; set; }
 
         public List<GeoAction> Actions { get; set; }

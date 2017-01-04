@@ -33,8 +33,6 @@ namespace uAdventure.Geo
                         parsed.BriefDescription = node.InnerText; break;
                     case "detailed-description":
                         parsed.DetailedDescription = node.InnerText; break;
-                    case "influence":
-                        parsed.Influence = float.Parse(node.InnerText); break;
                     case "geometry":
                         parsed.Geometry = ParseGeometry(node); break;
                     case "actions":
@@ -53,7 +51,9 @@ namespace uAdventure.Geo
         private GMLGeometry ParseGeometry(XmlNode node)
         {
             var gmlNode = node.FirstChild;
+            
             var geometry = new GMLGeometry();
+            geometry.Influence = float.Parse((node as XmlElement).GetAttribute("influence"));
             XmlNode pointsNode;
             switch (gmlNode.Name)
             {

@@ -15,6 +15,7 @@ public class GMLGeometry
 
     public GeometryType Type { get; set; }
     public List<Vector2d> Points { get; set; }
+    public float Influence { get; set; }
 
     public void AddPoint(Vector2d point)
     {
