@@ -299,13 +299,10 @@ public class MapSceneWindow : ReorderableListEditorWindowExtension {
     {
 
     }
+    
 
-    private void OnDrawMapElement(Rect rect, int index, int a, int b)
-    {
-
-    }
-
-    Rect typePopupRect = new Rect(0, 2, 150, 15);
+    Rect typePopupRect = new Rect(0, 2, 110, 15);
+    Rect typeConfigRect = new Rect(111, 2, 15, 15);
     Rect infoRect = new Rect(9, 20, 150, 15);
     Rect centerButtonRect = new Rect(0, 40, 75, 15);
     Rect editButtonRect = new Rect(75, 40, 75, 15);
@@ -341,13 +338,24 @@ public class MapSceneWindow : ReorderableListEditorWindowExtension {
             // Trasnform manager descriptor selection
             var avaliableDescriptors = TransformManagerDescriptorFactory.Instance.AvaliableTransformManagers.ToList();
             var selected = avaliableDescriptors.FindIndex(d => d.Key == extReference.TransformManagerDescriptor.GetType());
-            var newSelected = EditorGUI.Popup(positionRect.GUIAdapt(rect), selected, avaliableDescriptors.ConvertAll(d => d.Value).ToArray());
+            var newSelected = EditorGUI.Popup(typePopupRect.GUIAdapt(rect), selected, avaliableDescriptors.ConvertAll(d => d.Value).ToArray());
 
             if(newSelected != selected)
             {
                 // In case of change, reinstance a new one
                 extReference.TransformManagerDescriptor = TransformManagerDescriptorFactory.Instance.CreateDescriptor(avaliableDescriptors[newSelected].Key);
                 UpdateMapResources();
+            }
+
+            using (new EditorGUI.DisabledScope())
+            {
+                if (GUI.Button(typeConfigRect.GUIAdapt(rect), "*"))
+                {
+                    //DrawerParametersMenu.s_SpriteEditor = this;
+                    var o = DrawerParametersMenu.ShowAtPosition(typeConfigRect.GUIAdapt(rect));
+                    DrawerParametersMenu.s_DrawerParametersMenu.ExtElemReference = extReference;
+                    if (o)GUIUtility.ExitGUI();
+                }
             }
 
             if (GUI.Button(centerButtonRect.GUIAdapt(rect), "Move"))

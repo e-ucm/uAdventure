@@ -19,28 +19,48 @@ public class GeoElementMB : MonoBehaviour {
         
         var inp = new InputGeometry(Element.Geometry.Points.Count);
         int i = 0;
-        foreach (var p in Element.Geometry.Points)
+
+        switch (Element.Geometry.Type)
         {
-            var dotMerc = GM.LatLonToMeters(p.y, p.x);
-            var localMercPos = dotMerc - Tile.Rect.Center;
-            inp.AddPoint(localMercPos.x, localMercPos.y);
-            inp.AddSegment(i, (i + 1) % Element.Geometry.Points.Count);
-            i++;
+            case GMLGeometry.GeometryType.Point:
+                var poi = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                var renderer = poi.GetComponent<Renderer>();
+                renderer.material.color = Color.blue;
+                poi.transform.SetParent(this.transform);
+                poi.transform.localPosition = new Vector3(0, 0, .5f);
+                poi.transform.localScale = new Vector3(10,10,10);
+                break;
+            case GMLGeometry.GeometryType.LineString:
+
+                break;
+            case GMLGeometry.GeometryType.Polygon:
+
+                foreach (var p in Element.Geometry.Points)
+                {
+                    var dotMerc = GM.LatLonToMeters(p.y, p.x);
+                    var localMercPos = dotMerc - Tile.Rect.Center;
+                    inp.AddPoint(localMercPos.x, localMercPos.y);
+                    inp.AddSegment(i, (i + 1) % Element.Geometry.Points.Count);
+                    i++;
+                }
+                var md = new MeshData();
+                var mesh = GetComponent<MeshFilter>().mesh;
+
+                CreateMesh(inp, md);
+
+                //I want object center to be in the middle of object, not at the corner of the tile
+                var center = ChangeToRelativePositions(md.Vertices);
+                transform.localPosition = center;
+
+                mesh.vertices = md.Vertices.ToArray();
+                mesh.triangles = md.Indices.ToArray();
+                mesh.SetUVs(0, md.UV);
+                mesh.RecalculateNormals();
+
+                break;
+            default:
+                break;
         }
-        
-        var md = new MeshData();
-        var mesh = GetComponent<MeshFilter>().mesh;
-        
-        CreateMesh(inp, md);
-
-        //I want object center to be in the middle of object, not at the corner of the tile
-        var center = ChangeToRelativePositions(md.Vertices);
-        transform.localPosition = center;
-
-        mesh.vertices = md.Vertices.ToArray();
-        mesh.triangles = md.Indices.ToArray();
-        mesh.SetUVs(0, md.UV);
-        mesh.RecalculateNormals();
 
         
     }
