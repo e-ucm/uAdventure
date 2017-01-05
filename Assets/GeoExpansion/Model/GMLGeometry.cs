@@ -73,7 +73,6 @@ public class GMLGeometry
     
     public bool Inside(Vector2d point)
     {
-
         var originPoints = Points.ConvertAll(p => p - point);
 
         var inside = false;
@@ -85,6 +84,58 @@ public class GMLGeometry
         }
 
         return inside;
+    }
+
+    private bool InsidePointInfluence(Vector2d point)
+    {
+        var mp = GM.LatLonToMeters(point);
+        return Points.Any(p => (GM.LatLonToMeters(p) - mp).magnitude <= Influence);
+    }
+
+    private bool InsideEdgeInfluence(Vector2d point)
+    {
+        if (Points.Count <= 1) // If there are not edges, no sense to do it...
+            return false;
+
+        Vector2d closestPoin = Vector2d.zero;
+        int l = Points.Count - 1;
+        var mp = GM.LatLonToMeters(point);
+        for (int i = 0; i < Points.Count; i++)
+        {
+            closestPoin = GetClosestPointOnLineSegment(Points[l], Points[i], point);
+            if ((GM.LatLonToMeters(closestPoin) - mp).magnitude <= Influence)
+                return true;
+        }
+        return false;
+    }
+
+    //http://stackoverflow.com/questions/3120357/get-closest-point-to-a-line
+    public static Vector2d GetClosestPointOnLineSegment(Vector2d A, Vector2d B, Vector2d P)
+    {
+        Vector2d AP = P - A;       //Vector from A to P   
+        Vector2d AB = B - A;       //Vector from A to B  
+
+        double magnitudeAB = AB.magnitude;     //Magnitude of AB vector (it's length squared)     
+        double ABAPproduct = Vector2d.Dot(AP, AB);    //The DOT product of a_to_p and a_to_b     
+        double distance = ABAPproduct / magnitudeAB; //The normalized "distance" from a to your closest point  
+
+        if (distance < 0)     //Check if P projection is over vectorAB     
+        {
+            return A;
+        }
+        else if (distance > 1)
+        {
+            return B;
+        }
+        else
+        {
+            return A + AB * distance;
+        }
+    }
+
+    public bool InsideInfluence(Vector2d point)
+    {
+        return Inside(point) || InsidePointInfluence(point) || InsideEdgeInfluence(point);
     }
 
     public Vector2d Center {
