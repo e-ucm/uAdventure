@@ -168,6 +168,7 @@ namespace uAdventure.Runner
                 option.transform.parent = this.transform;
                 option.transform.localPosition = new Vector3(0, 0, 0);
                 option.transform.localScale = new Vector3(1f, 1f, 1f);
+                option.transform.localRotation = Quaternion.Euler(Vector3.zero);
                 Vector2 v = new Vector2(Mathf.Cos(current_angle) / 1.5f, Mathf.Sin(current_angle) / 1.5f);
                 option.GetComponent<OptionMB>().moveTo(v);
                 current_angle += angle;

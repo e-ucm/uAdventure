@@ -166,6 +166,9 @@ namespace uAdventure.Runner
 
                     if (!Game.Instance.GameState.isFirstPerson())
                     {
+                        if (rsd.getTrajectory() == null)
+                            break;
+
                         trajectory = new TrajectoryHandler(rsd.getTrajectory());
                         if (player_context == null)
                         {
@@ -225,25 +228,28 @@ namespace uAdventure.Runner
             GameObject base_prefab;
             Transform parent;
             Element element;
-            switch (typeof(T).ToString())
+
+            if (typeof(T) == typeof(Atrezzo))
             {
-                case "Atrezzo":
-                    base_prefab = Atrezzo_Prefab;
-                    parent = Atrezzos;
-                    element = Game.Instance.GameState.getAtrezzo(context.getTargetId());
-                    break;
-                case "NPC":
-                    base_prefab = Character_Prefab;
-                    parent = Characters;
-                    element = Game.Instance.GameState.getCharacter(context.getTargetId());
-                    break;
-                case "Item":
-                    base_prefab = Object_Prefab;
-                    parent = Objects;
-                    element = Game.Instance.GameState.getObject(context.getTargetId());
-                    break;
-                default:
-                    return;
+                base_prefab = Atrezzo_Prefab;
+                parent = Atrezzos;
+                element = Game.Instance.GameState.getAtrezzo(context.getTargetId());
+            }
+            else if (typeof(T) == typeof(NPC))
+            {
+                base_prefab = Character_Prefab;
+                parent = Characters;
+                element = Game.Instance.GameState.getCharacter(context.getTargetId());
+            }
+            else if (typeof(T) == typeof(Item))
+            {
+                base_prefab = Object_Prefab;
+                parent = Objects;
+                element = Game.Instance.GameState.getObject(context.getTargetId());
+            }
+            else
+            {
+                return;
             }
 
             GameObject ret = GameObject.Instantiate(base_prefab);

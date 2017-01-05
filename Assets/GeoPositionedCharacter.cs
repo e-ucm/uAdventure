@@ -37,7 +37,7 @@ public class GeoPositionedCharacter : MonoBehaviour {
         var destinationMeters = GM.LatLonToMeters(destination) - tileManagerRelative;
         destinationMeters -= latLonMeters;
 
-        if(destinationMeters.sqrMagnitude <= minDistanceToWalk * minDistanceToWalk)
+        if(destinationMeters.sqrMagnitude >= minDistanceToWalk * minDistanceToWalk)
         {
             thirdPersonCharacter.Move(new Vector3((float)destinationMeters.y, 0, (float)destinationMeters.x), false, false);
         }

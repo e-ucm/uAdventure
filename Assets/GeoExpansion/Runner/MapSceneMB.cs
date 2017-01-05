@@ -43,7 +43,7 @@ namespace uAdventure.Geo
 
         public bool canBeInteracted()
         {
-            throw new NotImplementedException();
+            return false;
         }
 
         public void Destroy(float time = 0)
@@ -53,7 +53,7 @@ namespace uAdventure.Geo
 
         public InteractuableResult Interacted(RaycastHit hit = default(RaycastHit))
         {
-            throw new NotImplementedException();
+            return InteractuableResult.IGNORES;
         }
 
         public void RenderScene()

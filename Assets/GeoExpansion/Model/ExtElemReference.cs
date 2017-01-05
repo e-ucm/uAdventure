@@ -120,7 +120,7 @@ namespace uAdventure.Geo
 
             // End add descriptors
 
-            descriptors.ForEach(d => AvaliableTransformManagers.Add(d.GetType(),d.Name));
+            descriptors.ForEach(d => AvaliableTransformManagers.Add(d.GetType(), d.Name));
         }
 
         public Dictionary<Type, string> AvaliableTransformManagers { get; private set; }
@@ -146,7 +146,7 @@ namespace uAdventure.Geo
 
         public ExtElemReferenceTransformManager CreateInstance(ExtElemReferenceTransformManagerDescriptor element, Dictionary<string, object> parameters)
         {
-            var elem = (ExtElemReferenceTransformManager) Activator.CreateInstance(element.Type);
+            var elem = (ExtElemReferenceTransformManager)Activator.CreateInstance(element.Type);
             elem.Configure(parameters);
             return elem;
         }
@@ -212,23 +212,43 @@ namespace uAdventure.Geo
         {
             get
             {
-                throw new NotImplementedException();
+                return transform;
             }
-
             set
             {
-                throw new NotImplementedException();
+                transform = value;
+                wrapper = transform.gameObject.GetComponent<GeoWrapper>();
+                representable = transform.gameObject.GetComponentInChildren<Representable>();
+                var ls = transform.lossyScale;
+                transform.localScale = new Vector3(1 / ls.x, 1 / ls.y, 1 / ls.z);
             }
         }
+
+        private Vector2 position;
+        private Vector3 scale;
+        private float rotation;
+        private GeoWrapper wrapper;
+        private Representable representable;
+        private Transform transform;
+        private Interactuable interactuable;
 
         public void Configure(Dictionary<string, object> parameters)
         {
-            throw new NotImplementedException();
+            position = ((Vector2d)parameters["Position"]).ToVector2() - new Vector2(40, 30);
+            scale = (Vector3)parameters["Scale"];
+            rotation = (float)parameters["Rotation"];
         }
-
+        bool hidden = false;
         public void Update()
         {
-            throw new NotImplementedException();
+
+            transform.position = Camera.main.transform.position + Camera.main.transform.rotation * Vector3.forward * 10;
+            transform.rotation = Camera.main.transform.rotation;
+            representable.setPosition(position);
+
+            //transform.localScale = scale;
+            //transform.localRotation = Quaternion.Euler(90, 0, 0);
+            transform.GetChild(1).localRotation = Quaternion.Euler(0, rotation, 0);
         }
     }
 
@@ -270,9 +290,10 @@ namespace uAdventure.Geo
             {
                 transform = value;
                 wrapper = transform.gameObject.GetComponent<GeoWrapper>();
-                particles = transform.gameObject.GetComponentInChildren<ParticleSystem>();
+                particles = transform.gameObject.GetComponentInChildren<ParticleSystem>(true);
                 character = GameObject.FindObjectOfType<GeoPositionedCharacter>();
                 interactuable = transform.GetComponentInChildren<Interactuable>();
+                interactuable.setInteractuable(true);
             }
         }
 
@@ -289,7 +310,7 @@ namespace uAdventure.Geo
 
         public void Configure(Dictionary<string, object> parameters)
         {
-            latLon = (Vector2d) parameters["Position"];
+            latLon = (Vector2d)parameters["Position"];
             scale = (Vector3)parameters["Scale"];
             rotation = (float)parameters["Rotation"];
             interactionRange = (float)parameters["InteractionRange"];
@@ -299,15 +320,15 @@ namespace uAdventure.Geo
         public void Update()
         {
             var pos = GM.LatLonToMeters(latLon.y, latLon.x) - wrapper.Tile.Rect.Center;
-            particles.transform.localPosition = transform.GetChild(1).localPosition;
             transform.localPosition = new Vector3((float)pos.x, 0, (float)pos.y) - new Vector3(transform.GetChild(1).localPosition.x, 0, transform.GetChild(0).localPosition.y);
-            transform.localScale = scale;
-            transform.localRotation = Quaternion.Euler(90, rotation, 0);
+            transform.localRotation = Quaternion.Euler(90, 0, 0);
+            //transform.GetChild(1).localScale = scale*100;
+            transform.GetChild(1).localRotation = Quaternion.Euler(0, rotation, 0);
 
 
             var distanceToObject = GM.LatLonToMeters(character.LatLon) - GM.LatLonToMeters(latLon.x, latLon.y);
             Debug.Log(distanceToObject.magnitude);
-            if (interactionRange <= 0 || distanceToObject.magnitude <= interactionRange*2)
+            if (interactionRange <= 0 || distanceToObject.magnitude <= interactionRange * 2)
             {
                 if (hidden)
                 {
@@ -317,12 +338,13 @@ namespace uAdventure.Geo
                     {
                         particles.gameObject.SetActive(true);
                         particles.Play();
+                        particles.transform.localPosition = transform.GetChild(1).localPosition;
                         transform.GetChild(1).gameObject.GetComponent<Renderer>().enabled = true;
                     }
                     if (interactuable != null) transform.GetChild(1).GetComponent<Collider>().enabled = true;
                 }
             }
-            else if(!hidden)
+            else if (!hidden)
             {
                 hidden = true;
                 particles.gameObject.SetActive(false);
@@ -334,4 +356,3 @@ namespace uAdventure.Geo
         }
     }
 }
-

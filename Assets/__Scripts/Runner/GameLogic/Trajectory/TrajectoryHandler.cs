@@ -13,6 +13,9 @@ namespace uAdventure.Runner
 
         public TrajectoryHandler(Trajectory trajectory)
         {
+            if (trajectory == null)
+                return;
+
             lines = new List<LineHandler>();
             foreach (Trajectory.Side side in trajectory.getSides())
             {

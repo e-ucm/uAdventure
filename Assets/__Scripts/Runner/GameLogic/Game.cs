@@ -357,7 +357,9 @@ namespace uAdventure.Runner
         public void showActions(List<Action> actions, Vector2 position/*, SceneElement shower = null*/)
         {
             Vector3 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            MenuMB.Instance.transform.position = new Vector3(pos.x, pos.y, -30); ;
+            var mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
+            MenuMB.Instance.transform.position = new Vector3(pos.x, pos.y, pos.z) + mouseRay.direction.normalized * 10;
+            MenuMB.Instance.transform.rotation = Camera.main.transform.rotation;
             MenuMB.Instance.setActions(actions);
             MenuMB.Instance.show();
             // TODO why isnt position used?
