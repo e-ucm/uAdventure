@@ -293,7 +293,7 @@ namespace uAdventure.Geo
                 particles = transform.gameObject.GetComponentInChildren<ParticleSystem>(true);
                 character = GameObject.FindObjectOfType<GeoPositionedCharacter>();
                 interactuable = transform.GetComponentInChildren<Interactuable>();
-                interactuable.setInteractuable(true);
+                //interactuable.setInteractuable(true);
             }
         }
 
@@ -320,7 +320,7 @@ namespace uAdventure.Geo
         public void Update()
         {
             var pos = GM.LatLonToMeters(latLon.y, latLon.x) - wrapper.Tile.Rect.Center;
-            transform.localPosition = new Vector3((float)pos.x, 0, (float)pos.y) - new Vector3(transform.GetChild(1).localPosition.x, 0, transform.GetChild(0).localPosition.y);
+            transform.localPosition = new Vector3((float)pos.x, 10, (float)pos.y) - new Vector3(transform.GetChild(1).localPosition.x, 0, transform.GetChild(0).localPosition.y);
             transform.localRotation = Quaternion.Euler(90, 0, 0);
             //transform.GetChild(1).localScale = scale*100;
             transform.GetChild(1).localRotation = Quaternion.Euler(0, rotation, 0);

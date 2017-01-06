@@ -36,8 +36,8 @@ namespace uAdventure.Geo
             set
             {
                 mapScene = (MapScene) value;
-                tileManager.Latitude = (float) mapScene.LatLon.x;
                 tileManager.Latitude = (float) mapScene.LatLon.y;
+                tileManager.Longitude = (float) mapScene.LatLon.x;
             }
         }
 
@@ -132,10 +132,13 @@ namespace uAdventure.Geo
                     throw new System.NotImplementedException();
                 default:
                     break;
+
             }
+            //            Debug.Log("LatLon: " + geoCharacter.LatLon + " LT->Meters->LT: " + GM.MetersToLatLon(GM.LatLonToMeters(geoCharacter.LatLon)));
 
             //geoCharacter.MoveTo(geoCharacter.LatLon + GM.MetersToLatLon(new Vector2d(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"))));
-            geoCharacter.MoveTo(mapScene.LatLon + GM.MetersToLatLon(new Vector2d(100, 100)));
+            geoCharacter.MoveTo(GM.MetersToLatLon(GM.LatLonToMeters(mapScene.LatLon.y, mapScene.LatLon.x) + new Vector2d(100, 100)));
+            //geoCharacter.MoveTo(new Vector2d(-3.707398, 40.415363));
             //character.Move(new Vector3(Input.GetAxis("Horizontal"),0, Input.GetAxis("Vertical")), false, false);
         }
     }

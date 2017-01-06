@@ -8,10 +8,12 @@ namespace uAdventure.Runner
 
         bool checkingTransparency = false;
         Interactuable interactuable;
+        private Renderer m_renderer;
 
         void Start()
         {
             interactuable = this.GetComponent<Interactuable>();
+            m_renderer = GetComponent<Renderer>();
         }
 
         void Update()
@@ -21,7 +23,7 @@ namespace uAdventure.Runner
                 RaycastHit hit;
                 Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit);
 
-                if (((Texture2D)GetComponent<Renderer>().material.mainTexture).GetPixelBilinear(hit.textureCoord.x, hit.textureCoord.y).a > 0f)
+                if (((Texture2D)m_renderer.material.mainTexture).GetPixelBilinear(hit.textureCoord.x, hit.textureCoord.y).a > 0f)
                 {
                     interactuable.setInteractuable(true);
                     GUIManager.Instance.showHand(true);
@@ -36,6 +38,7 @@ namespace uAdventure.Runner
 
         void OnMouseEnter()
         {
+            Debug.Log("MouseEnter");
             checkingTransparency = true;
         }
 

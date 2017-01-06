@@ -192,20 +192,22 @@ namespace uAdventure.Runner
             Quadrant x_quad = Quadrant.MIDDLE
                 , y_quad = Quadrant.MIDDLE;
 
-            if (this.transform.position.x < 10)
+            var elementScreenPos = Camera.main.WorldToScreenPoint(this.transform.position);
+            
+            if (elementScreenPos.x < Screen.width * .15f)
             {
                 x_quad = Quadrant.LEFT;
             }
-            else if (this.transform.position.x > 70)
+            else if (elementScreenPos.x > Screen.width * .85f)
             {
                 x_quad = Quadrant.RIGHT;
             }
 
-            if (this.transform.position.y < 10)
+            if (elementScreenPos.y < Screen.height  * .15f)
             {
                 y_quad = Quadrant.BOTTOM;
             }
-            else if (this.transform.position.y > 50)
+            else if (elementScreenPos.y > Screen.height * .85f)
             {
                 y_quad = Quadrant.TOP;
             }

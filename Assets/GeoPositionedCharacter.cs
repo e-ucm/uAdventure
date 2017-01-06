@@ -58,6 +58,7 @@ public class GeoPositionedCharacter : MonoBehaviour
              transform.localRotation = Quaternion.Euler(0, 0, Input.compass.trueHeading);
          }*/
 
+
         this.LatLon = GM.MetersToLatLon(transform.localPosition.ToVector2xz().ToVector2d() + tileManagerRelative);
         //Debug.Log("Character at: " + this.LatLon +" moving to " + destination);
     }
