@@ -53,7 +53,8 @@ namespace uAdventure.Geo
         void OnDestroy()
         {
             var ua = uAdventurePlugin.FindObjectOfType<uAdventurePlugin>();
-            ua.ReleaseElement(Reference);
+            if(ua)
+                ua.ReleaseElement(Reference);
         }
     }
 

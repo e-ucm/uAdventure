@@ -327,7 +327,7 @@ namespace uAdventure.Geo
 
 
             var distanceToObject = GM.LatLonToMeters(character.LatLon) - GM.LatLonToMeters(latLon.x, latLon.y);
-            Debug.Log(distanceToObject.magnitude);
+            //Debug.Log(distanceToObject.magnitude);
             if (interactionRange <= 0 || distanceToObject.magnitude <= interactionRange * 2)
             {
                 if (hidden)
