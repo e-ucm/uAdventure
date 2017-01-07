@@ -1,15 +1,28 @@
 ﻿using UnityEngine;
 using System.Collections;
+using uAdventure.Core;
+using System;
 
-public class NavigationControlEffect : MonoBehaviour {
+namespace uAdventure.Geo
+{
+    public class NavigationControlEffect : AbstractEffect
+    {
+        public enum ControlType { Next, Previous, Index, ReferenceId }
 
-	// Use this for initialization
-	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+        public override EffectType getType()
+        {
+            return EffectType.CUSTOM_EFFECT;
+        }
+        
+        public NavigationControlEffect()
+        {
+            Type = ControlType.Next;
+            Index = 0;
+            Reference = "";
+        }
+
+        public ControlType Type { get; set; }
+        public int Index { get; set; }
+        public string Reference { get; set; }
+    }
 }

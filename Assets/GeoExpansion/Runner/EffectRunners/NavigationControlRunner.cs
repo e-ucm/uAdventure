@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class NavigationRunner : MonoBehaviour {
+public class NavigationControlRunner : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {

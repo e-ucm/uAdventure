@@ -10,27 +10,29 @@ namespace uAdventure.Geo
 
     public class NavigationStep
     {
-        public NavigationStep(MapElement destination = null, bool lockNavigation = false)
+        public NavigationStep(string destination = null, bool lockNavigation = false)
         {
-            Destination = destination;
+            Reference = destination;
             LockNavigation = lockNavigation;
         }
 
         public bool LockNavigation { get; set; }
-        public MapElement Destination { get; set; }
+        public string Reference { get; set; }
     }
 
     public class NavigateEffect : AbstractEffect
     {
+        public NavigateEffect()
+        {
+            Steps = new List<NavigationStep>();
+        }
 
         public override EffectType getType()
         {
             return EffectType.CUSTOM_EFFECT;
         }
-
-        public MapScene MapScene { get; set; }
-        public List<MapElement> ElementsPath { get; set; }
-
+        
+        public List<NavigationStep> Steps { get; set; }
         public NavigationType NavigationType { get; set; }
 
     }
