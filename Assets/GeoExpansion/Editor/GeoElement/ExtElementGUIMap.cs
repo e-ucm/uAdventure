@@ -251,11 +251,11 @@ namespace uAdventure.Editor
         public void Draw(GUIMap map, Rect area)
         {
             UpdateValues();
-            var corner = area.position + new Vector2(position.x * area.width / gameWidth, position.y * area.height / gameHeight);
+            var corner = area.position + new Vector2(position.x * area.width / gameWidth, area.height - (position.y * area.height / gameHeight));
             if (Texture != null)
             {
                 var size = new Vector2(Texture.width * scale.x, Texture.height * scale.y);
-                GUI.DrawTexture(new Rect(corner, size), Texture);
+                GUI.DrawTexture(new Rect(corner - new Vector2(size.x / 2f, size.y), size), Texture);
             }
         }
         
@@ -268,8 +268,8 @@ namespace uAdventure.Editor
             
             // save position based on texture starting coord, by placing it on mouse center
             reference.TransformManagerParameters["Position"] = new Vector2d(
-                elemMapPosition.x * gameWidth / area.width - (Texture.width * scale.x)/2f,
-                elemMapPosition.y * gameHeight / area.height - (Texture.height * scale.y)/2f);
+                elemMapPosition.x * gameWidth / area.width,
+                gameHeight - (elemMapPosition.y * gameHeight / area.height + (Texture.height * scale.y)/2f));
         }
     }
 

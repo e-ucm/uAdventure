@@ -4,6 +4,7 @@ using System;
 using MapzenGo.Helpers;
 using MapzenGo.Models;
 using uAdventure.Runner;
+using uAdventure.Core;
 
 namespace uAdventure.Geo
 {
@@ -78,6 +79,11 @@ namespace uAdventure.Geo
         /// Transform of the referenced element to update
         /// </summary>
         Transform ExtElemReferenceTransform { get; set; }
+
+        /// <summary>
+        /// Context for the element
+        /// </summary>
+        ElementReference Context { get; set; }
 
         /// <summary>
         /// Allows the ExtElemReference to reposition the element
@@ -221,8 +227,11 @@ namespace uAdventure.Geo
                 representable = transform.gameObject.GetComponentInChildren<Representable>();
                 var ls = transform.lossyScale;
                 transform.localScale = new Vector3(1 / ls.x, 1 / ls.y, 1 / ls.z);
+                Context.setScale((scale.x + scale.y) / 2f); // Average scale
             }
         }
+
+        public ElementReference Context { get; set; }
 
         private Vector2 position;
         private Vector3 scale;
@@ -234,17 +243,17 @@ namespace uAdventure.Geo
 
         public void Configure(Dictionary<string, object> parameters)
         {
-            position = ((Vector2d)parameters["Position"]).ToVector2() - new Vector2(40, 30);
+            position = ((Vector2d)parameters["Position"]).ToVector2();
             scale = (Vector3)parameters["Scale"];
             rotation = (float)parameters["Rotation"];
         }
         bool hidden = false;
         public void Update()
         {
-
-            transform.position = Camera.main.transform.position + Camera.main.transform.rotation * Vector3.forward * 10;
+            var ray = Camera.main.ScreenPointToRay(new Vector2(0, 0));
+            transform.position = ray.origin + ray.direction * 10f;
             transform.rotation = Camera.main.transform.rotation;
-            representable.setPosition(position);
+            representable.setPosition(position/10);
 
             //transform.localScale = scale;
             //transform.localRotation = Quaternion.Euler(90, 0, 0);
@@ -254,6 +263,19 @@ namespace uAdventure.Geo
 
     public class RadialCenterTransformManager : ExtElemReferenceTransformManager
     {
+        public ElementReference Context
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         public Transform ExtElemReferenceTransform
         {
             get
@@ -293,9 +315,11 @@ namespace uAdventure.Geo
                 particles = transform.gameObject.GetComponentInChildren<ParticleSystem>(true);
                 character = GameObject.FindObjectOfType<GeoPositionedCharacter>();
                 interactuable = transform.GetComponentInChildren<Interactuable>();
-                //interactuable.setInteractuable(true);
+                Context.setScale((scale.x + scale.y)*2f / 2f); // Average scale
             }
         }
+
+        public ElementReference Context { get; set; }
 
         private GeoPositionedCharacter character;
         private Vector2d latLon;
@@ -322,7 +346,6 @@ namespace uAdventure.Geo
             var pos = GM.LatLonToMeters(latLon.y, latLon.x) - wrapper.Tile.Rect.Center;
             transform.localPosition = new Vector3((float)pos.x, 10, (float)pos.y) - new Vector3(transform.GetChild(1).localPosition.x, 0, transform.GetChild(0).localPosition.y);
             transform.localRotation = Quaternion.Euler(90, 0, 0);
-            //transform.GetChild(1).localScale = scale*100;
             transform.GetChild(1).localRotation = Quaternion.Euler(0, rotation, 0);
 
 

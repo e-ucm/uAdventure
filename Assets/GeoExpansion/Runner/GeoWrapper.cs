@@ -25,10 +25,11 @@ namespace uAdventure.Geo
             if (Element is NPC) base_prefab = Character_Prefab;
             if (Element is Item) base_prefab = Object_Prefab;
 
-            if(base_prefab != null)
+            var context = new ElementReference(Reference.getTargetId(), 0, 0);
+            if (base_prefab != null)
             {
                 GameObject ret = GameObject.Instantiate(base_prefab);
-                ret.GetComponent<Representable>().Context = new ElementReference(Reference.getTargetId(), 0, 0);
+                ret.GetComponent<Representable>().Context = context;
                 ret.GetComponent<Representable>().Element = Element;
                 ret.transform.SetParent(transform);
                 ret.transform.localPosition = Vector3.zero;
@@ -36,6 +37,7 @@ namespace uAdventure.Geo
 
 
             transformManager = ExtElemReferenceTransformManagerFactory.Instance.CreateInstance(Reference.TransformManagerDescriptor, Reference.TransformManagerParameters);
+            transformManager.Context = context;
             transformManager.ExtElemReferenceTransform = this.transform;
         }
 
