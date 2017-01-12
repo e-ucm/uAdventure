@@ -48,7 +48,8 @@ namespace uAdventure.Geo
 
         public void Destroy(float time = 0)
         {
-            throw new NotImplementedException();
+            DestroyImmediate(this.gameObject);
+            Camera.main.transform.Restore(bkCameraTransform);
         }
 
         public InteractuableResult Interacted(RaycastHit hit = default(RaycastHit))
@@ -68,12 +69,13 @@ namespace uAdventure.Geo
         // ------------------------------
         // MONO Behaviour
         // ---------------------------
-
+        private TransformData bkCameraTransform;
         
         void Start()
         {
             StartCoroutine(StartLocation());
-            Physics.gravity = this.transform.rotation * Physics.gravity;
+            //Physics.gravity = this.transform.rotation * Physics.gravity;
+            bkCameraTransform = Camera.main.transform.Backup();
         }
 
         IEnumerator StartLocation()
@@ -140,6 +142,35 @@ namespace uAdventure.Geo
             geoCharacter.MoveTo(GM.MetersToLatLon(GM.LatLonToMeters(mapScene.LatLon.y, mapScene.LatLon.x) + new Vector2d(100, 100)));
             //geoCharacter.MoveTo(new Vector2d(-3.707398, 40.415363));
             //character.Move(new Vector3(Input.GetAxis("Horizontal"),0, Input.GetAxis("Vertical")), false, false);
+        }
+
+
+    }
+
+    // Transform management
+    internal class TransformData
+    {
+        public Vector3 position, scale;
+        public Quaternion rotation;
+
+    }
+
+    internal static class TransformDataManagement
+    {
+        public static TransformData Backup(this Transform t)
+        {
+            var td = new TransformData();
+            td.position = t.position;
+            td.scale = t.localScale;
+            td.rotation = t.rotation;
+            return td;
+        }
+
+        public static void Restore(this Transform t, TransformData backup)
+        {
+            t.position = backup.position;
+            t.localScale = backup.scale;
+            t.rotation = backup.rotation;
         }
     }
 }

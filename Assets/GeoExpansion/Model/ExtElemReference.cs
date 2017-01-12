@@ -315,7 +315,8 @@ namespace uAdventure.Geo
                 particles = transform.gameObject.GetComponentInChildren<ParticleSystem>(true);
                 character = GameObject.FindObjectOfType<GeoPositionedCharacter>();
                 interactuable = transform.GetComponentInChildren<Interactuable>();
-                Context.setScale((scale.x + scale.y)*2f / 2f); // Average scale
+                childTransform = transform.GetComponentInChildren<Representable>().gameObject.transform;
+                Context.setScale((scale.x + scale.y)); // Average scale
             }
         }
 
@@ -330,6 +331,7 @@ namespace uAdventure.Geo
         private GeoWrapper wrapper;
         private ParticleSystem particles;
         private Transform transform;
+        private Transform childTransform;
         private Interactuable interactuable;
 
         public void Configure(Dictionary<string, object> parameters)
@@ -344,14 +346,14 @@ namespace uAdventure.Geo
         public void Update()
         {
             var pos = GM.LatLonToMeters(latLon.y, latLon.x) - wrapper.Tile.Rect.Center;
-            transform.localPosition = new Vector3((float)pos.x, 10, (float)pos.y) - new Vector3(transform.GetChild(1).localPosition.x, 0, transform.GetChild(0).localPosition.y);
+            transform.localPosition = new Vector3((float)pos.x, 10, (float)pos.y) - new Vector3(childTransform.localPosition.x, 0, childTransform.localPosition.y);
             transform.localRotation = Quaternion.Euler(90, 0, 0);
-            transform.GetChild(1).localRotation = Quaternion.Euler(0, rotation, 0);
+            childTransform.localRotation = Quaternion.Euler(0, rotation, 0);
 
 
             var distanceToObject = GM.LatLonToMeters(character.LatLon) - GM.LatLonToMeters(latLon.x, latLon.y);
             //Debug.Log(distanceToObject.magnitude);
-            if (interactionRange <= 0 || distanceToObject.magnitude <= interactionRange * 2)
+            if (interactionRange <= 0 || distanceToObject.magnitude <= interactionRange)
             {
                 if (hidden)
                 {
@@ -361,10 +363,10 @@ namespace uAdventure.Geo
                     {
                         particles.gameObject.SetActive(true);
                         particles.Play();
-                        particles.transform.localPosition = transform.GetChild(1).localPosition;
-                        transform.GetChild(1).gameObject.GetComponent<Renderer>().enabled = true;
+                        particles.transform.localPosition = childTransform.localPosition;
+                        childTransform.gameObject.GetComponent<Renderer>().enabled = true;
                     }
-                    if (interactuable != null) transform.GetChild(1).GetComponent<Collider>().enabled = true;
+                    if (interactuable != null) childTransform.GetComponent<Collider>().enabled = true;
                 }
             }
             else if (!hidden)
@@ -373,8 +375,8 @@ namespace uAdventure.Geo
                 particles.gameObject.SetActive(false);
                 particles.time = 0;
                 particles.Stop();
-                if (revealOnRange) transform.GetChild(1).gameObject.GetComponent<Renderer>().enabled = false;
-                if (interactuable != null) transform.GetChild(1).GetComponent<Collider>().enabled = false;
+                if (revealOnRange) childTransform.gameObject.GetComponent<Renderer>().enabled = false;
+                if (interactuable != null) childTransform.GetComponent<Collider>().enabled = false;
             }
         }
     }

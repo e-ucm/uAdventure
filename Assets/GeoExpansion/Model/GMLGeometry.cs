@@ -73,13 +73,14 @@ public class GMLGeometry
     
     public bool Inside(Vector2d point)
     {
-        var originPoints = Points.ConvertAll(p => p - point);
+        var meters = GM.LatLonToMeters(point);
+        var originPoints = Points.ConvertAll(p => GM.LatLonToMeters(p) - meters);
 
         var inside = false;
-        for (int i = 0; i < originPoints.Count - 1; i++)
+        for (int i = 0; i < originPoints.Count; i++)
         {
-            if (((originPoints[i].y > 0) != (originPoints[i + 1].y > 0))
-            && ((originPoints[i].y > 0) == (originPoints[i].y * originPoints[i + 1].x > originPoints[i + 1].y * originPoints[i].x)))
+            if (((originPoints[i].y > 0) != (originPoints[(i + 1)% originPoints.Count].y > 0))
+            && ((originPoints[i].y > 0) == (originPoints[i].y * originPoints[(i + 1) % originPoints.Count].x > originPoints[(i + 1) % originPoints.Count].y * originPoints[i].x)))
                 inside = !inside;
         }
 

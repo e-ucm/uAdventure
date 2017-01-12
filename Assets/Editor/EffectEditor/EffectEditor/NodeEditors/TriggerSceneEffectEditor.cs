@@ -28,7 +28,7 @@ namespace uAdventure.Editor
             }
         }
 
-        private TriggerSceneEffect effect;
+        protected TriggerSceneEffect effect;
 
         public TriggerSceneEffectEditor()
         {
@@ -36,7 +36,7 @@ namespace uAdventure.Editor
             this.effect = new TriggerSceneEffect(scenes[0], x, y);
         }
 
-        public void draw()
+        public virtual void draw()
         {
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(TC.get("Element.Name2"));
@@ -54,8 +54,8 @@ namespace uAdventure.Editor
         }
 
         public AbstractEffect Effect { get { return effect; } set { effect = value as TriggerSceneEffect; } }
-        public string EffectName { get { return TC.get("TriggerSceneEffect.Title"); } }
-        public EffectEditor clone() { return new TriggerSceneEffectEditor(); }
+        public virtual string EffectName { get { return TC.get("TriggerSceneEffect.Title"); } }
+        public virtual EffectEditor clone() { return new TriggerSceneEffectEditor(); }
 
         public bool manages(AbstractEffect c)
         {

@@ -30,7 +30,10 @@ public class GeoElementMB : MonoBehaviour {
         geoActionManagers = new List<GeoActionManager>();
         foreach (var action in Element.Actions)
         {
-            geoActionManagers.Add(GeoActionManagerFactory.Instance.CreateFor(action));
+            var newManager = GeoActionManagerFactory.Instance.CreateFor(action);
+            newManager.Element = Element;
+            newManager.Holder = this;
+            geoActionManagers.Add(newManager);
         }
 
         switch (Element.Geometry.Type)
@@ -123,7 +126,8 @@ public class GeoElementMB : MonoBehaviour {
     void OnDestroy()
     {
         var ua = uAdventurePlugin.FindObjectOfType<uAdventurePlugin>();
-        ua.ReleaseElement(Reference);
+        if(ua)
+            ua.ReleaseElement(Reference);
     }
 
     // ---------------------------------------
@@ -150,7 +154,9 @@ public class GeoElementMB : MonoBehaviour {
         public GeoActionManager CreateFor(GeoAction geoAction)
         {
             // Create a clone using activator
-            return (GeoActionManager) Activator.CreateInstance(geoActionManagers.Find(m => m.ActionType == geoAction.GetType()).GetType());
+            var r = (GeoActionManager) Activator.CreateInstance(geoActionManagers.Find(m => m.ActionType == geoAction.GetType()).GetType());
+            r.Action = geoAction;
+            return r;
         }
     }
 

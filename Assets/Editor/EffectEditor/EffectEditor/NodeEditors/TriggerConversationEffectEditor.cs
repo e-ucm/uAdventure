@@ -40,7 +40,8 @@ namespace uAdventure.Editor
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(TC.get("Conversation.Title"));
 
-            effect.setTargetId(conversations[EditorGUILayout.Popup(Array.IndexOf(conversations, effect.getTargetId()), conversations)]);
+            var conversationIndex = Array.IndexOf(conversations, effect.getTargetId());
+            effect.setTargetId(conversations[EditorGUILayout.Popup(conversationIndex == -1 ? 0 : conversationIndex, conversations)]);
 
             EditorGUILayout.EndHorizontal();
 

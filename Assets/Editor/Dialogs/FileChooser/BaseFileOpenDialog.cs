@@ -157,14 +157,16 @@ namespace uAdventure.Editor
                 Directory.CreateDirectory(path.FullName);
 
             string nameOnly = Path.GetFileName(selectedAssetPath);
+            if(selectedAssetPath != Path.Combine(path.FullName, nameOnly)) // Avoid to copy the same origin to same destination files
+            {
+                File.Copy(selectedAssetPath, Path.Combine(path.FullName, nameOnly), true);
 
-            File.Copy(selectedAssetPath, Path.Combine(path.FullName, nameOnly), true);
-
-            if (fileType == FileType.CUTSCENE_SLIDES || fileType == FileType.CHARACTER_ANIM || fileType == FileType.PLAY_ANIMATION_EFFECT)
-                AssetsController.copyAllFiles(Path.GetDirectoryName(selectedAssetPath), path.FullName);
+                if (fileType == FileType.CUTSCENE_SLIDES || fileType == FileType.CHARACTER_ANIM || fileType == FileType.PLAY_ANIMATION_EFFECT)
+                    AssetsController.copyAllFiles(Path.GetDirectoryName(selectedAssetPath), path.FullName);
+                AssetDatabase.Refresh();
+            }
 
             returnPath = assetTypeDir + "/" + nameOnly;
-            AssetDatabase.Refresh();
         }
 
         protected abstract void ChoosedCorrectFile();
