@@ -75,8 +75,8 @@ public class GUIMap
     {
 
         bool r = false;
-        //GUILayout.BeginArea(area);
-        //area = new Rect(Vector2.zero, area.size);
+        GUI.BeginGroup(area);
+        area = new Rect(Vector2.zero, area.size);
         // update the pixel absolute to relative convert variable
         PATR = -(centerPixel - (area.size / 2f).ToVector2d() - area.position.ToVector2d());
 
@@ -192,7 +192,7 @@ public class GUIMap
                 break;
         }
 
-        //GUILayout.EndArea();
+        GUI.EndGroup();
         return r;
 
     }

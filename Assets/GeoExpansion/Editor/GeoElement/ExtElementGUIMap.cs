@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using uAdventure.Geo;
 using System;
 using MapzenGo.Helpers;
+using UnityEditor;
 
 namespace uAdventure.Editor
 {
@@ -96,6 +97,7 @@ namespace uAdventure.Editor
         private Vector3 scale;
         private float rotation;
         private ExtElemReference reference;
+        private float interactionRange;
 
         public Texture2D Texture { get; set; }
         public Type ForType { get { return typeof(GeoPositionedTransformManager); } }
@@ -142,6 +144,15 @@ namespace uAdventure.Editor
             {
                 if (rotation is float) this.rotation = ((float)rotation);
             }
+
+            object interactionRange;
+            parameters.TryGetValue("interactionRange", out interactionRange);
+            if (interactionRange == null) parameters.TryGetValue("InteractionRange", out interactionRange);
+
+            if (interactionRange != null)
+            {
+                if (interactionRange is float) this.interactionRange = ((float)interactionRange);
+            }
         }
 
         public void Draw(GUIMap map, Rect area)
@@ -162,6 +173,14 @@ namespace uAdventure.Editor
                 /*var areaRect = textRect.Intersection(area);
                 GUI.DrawTextureWithTexCoords(areaRect, i, textRect.ToTexCoords(areaRect));*/
                 GUI.DrawTexture(textRect, Texture);
+
+                Handles.BeginGUI();
+
+                var influencePixels = map.PixelToRelative(GM.MetersToPixels(GM.LatLonToMeters(position.y, position.x) + new Vector2d(interactionRange, 0), map.Zoom)).ToVector2() - center;
+
+                Handles.color = Color.black;
+                Handles.DrawWireArc(center, Vector3.back, Vector2.up, 360, influencePixels.magnitude);
+                Handles.EndGUI();
             }
         }
 
@@ -176,6 +195,9 @@ namespace uAdventure.Editor
 
     public class ScreenPositionedGUIMapPositionManager : ExtElemReferenceGUIMapPositionManager
     {
+        private const float gameWidth = 800f;
+        private const float gameHeight = 600f;
+
         private Vector2 position;
         private Vector3 scale;
         private float rotation;
@@ -229,15 +251,11 @@ namespace uAdventure.Editor
         public void Draw(GUIMap map, Rect area)
         {
             UpdateValues();
-            var center = new Vector2(position.x, position.y);
+            var corner = area.position + new Vector2(position.x * area.width / gameWidth, position.y * area.height / gameHeight);
             if (Texture != null)
             {
                 var size = new Vector2(Texture.width * scale.x, Texture.height * scale.y);
-                    
-                var midWidthHeight = size / 2f;
-                var textRect = ExtensionRect.FromCorners(center - midWidthHeight, center + midWidthHeight);
-                    
-                GUI.DrawTexture(textRect, Texture);
+                GUI.DrawTexture(new Rect(corner, size), Texture);
             }
         }
         
@@ -246,7 +264,12 @@ namespace uAdventure.Editor
             if (!reference.TransformManagerParameters.ContainsKey("Position"))
                 reference.TransformManagerParameters.Add("Position", Vector2.zero);
 
-            reference.TransformManagerParameters["Position"] = Event.current.mousePosition - area.position;
+            var elemMapPosition = Event.current.mousePosition - area.position;
+            
+            // save position based on texture starting coord, by placing it on mouse center
+            reference.TransformManagerParameters["Position"] = new Vector2d(
+                elemMapPosition.x * gameWidth / area.width - (Texture.width * scale.x)/2f,
+                elemMapPosition.y * gameHeight / area.height - (Texture.height * scale.y)/2f);
         }
     }
 
@@ -334,6 +357,8 @@ namespace uAdventure.Editor
         public void Draw(GUIMap map, Rect area)
         {
             UpdateValues();
+
+            var degree = this.degree * Mathf.Deg2Rad;
 
             var center = (map.Center + GM.MetersToLatLon(new Vector2d(distance * Mathd.Sin(degree), distance * Mathd.Cos(degree)))).ToVector2();
             center = map.PixelToRelative(GM.MetersToPixels(GM.LatLonToMeters(new Vector2d(center.y, center.x)), map.Zoom)).ToVector2();
