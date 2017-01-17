@@ -23,6 +23,7 @@ namespace uAdventure.Geo
             base.Awake();
             cache = new Dictionary<GeoReference, GeoElement>();
             clipper = new Clipper();
+            _createdCache = new Dictionary<Tile, List<GeoElementMB>>();
             Query = (elem, tile) => elem is GeoReference;// && Intersects(tile, elem as GeoReference);
         }
 
@@ -37,6 +38,8 @@ namespace uAdventure.Geo
             return cache.ContainsKey(reference) ? cache[reference] : null;
         }
 
+        private Dictionary<Tile, List<GeoElementMB>> _createdCache;
+
         protected override IEnumerable<MonoBehaviour> Create(Tile tile, MapElement mapElement)
         {
             var geoRef = mapElement as GeoReference;
@@ -48,8 +51,28 @@ namespace uAdventure.Geo
             geoElementMB.Element = geoEle;
             geoElementMB.Tile = tile;
 
+            if (!_createdCache.ContainsKey(tile))
+                _createdCache.Add(tile, new List<GeoElementMB>());
+
+            _createdCache[tile].Add(geoElementMB);
+
             yield return geoElementMB;
                 
+        }
+
+        protected override IEnumerable<MapElement> Destroy(Tile tile, MapElement mapElement)
+        {
+            if (_createdCache.ContainsKey(tile))
+            {
+                var geoElementMB = _createdCache[tile].Find(mb => mb.Element.Id == mapElement.getTargetId());
+                if (geoElementMB != null)
+                {
+                    DestroyImmediate(geoElementMB.gameObject);
+                    yield return mapElement;
+                }
+            }
+
+            yield return null;
         }
 
         private List<IntPoint> AdaptToClipper(List<Vector2d> geoPoints)

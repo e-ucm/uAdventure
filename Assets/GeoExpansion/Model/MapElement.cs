@@ -15,6 +15,11 @@ namespace uAdventure.Geo
 
         public Conditions Conditions { get; set; }
 
+        public MapElement()
+        {
+            Conditions = new Conditions();
+        }
+
         public MapElement(string targetId)
         {
             this.targetId = targetId;

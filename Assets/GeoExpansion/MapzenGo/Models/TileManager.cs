@@ -93,6 +93,19 @@ namespace MapzenGo.Models
                 MapMaterial = Resources.Load<Material>("Ground");
         }
 
+        public virtual void ReloadPlugins<T>() where T : Plugin
+        {
+            foreach(var t in Tiles)
+            {
+                ExecutePlugins<T>((plugin, onFinish) => plugin.UnLoad(t.Value, onFinish));
+            }
+
+            foreach (var t in Tiles)
+            {
+                ExecutePlugins<T>((plugin, onFinish) => plugin.Create(t.Value, onFinish));
+            }
+        }
+
         public virtual void Update()
         {
             UpdateTiles();
@@ -229,16 +242,24 @@ namespace MapzenGo.Models
             ContinuePlugins(todo, doing, whatToDo);
         }
 
-        private void ContinuePlugins(List<Plugin> todo, List<Plugin> doing, Action<Plugin, Action<Plugin, bool>> whatToDo)
+        protected void ExecutePlugins<T>(Action<T, Action<Plugin, bool>> whatToDo) where T : Plugin
         {
-            var pluginsToStart = new List<Plugin>();
+            List<Plugin> todo = _plugins.FindAll(p => p is T);
+            List<Plugin> doing = new List<Plugin>();
+
+        }
+
+
+        private void ContinuePlugins<T>(List<Plugin> todo, List<Plugin> doing, Action<T, Action<Plugin, bool>> whatToDo) where T : Plugin
+        {
+            var pluginsToStart = new List<T>();
             foreach (var plugin in todo)
             {
                 if (doing.Contains(plugin)) continue;
                 // Check dependencies
                 if (plugin.Dependencies.All(dependencie => !todo.Contains(dependencie)))
                 {
-                    pluginsToStart.Add(plugin);
+                    pluginsToStart.Add(plugin as T);
                 }
             }
 

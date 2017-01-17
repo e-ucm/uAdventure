@@ -61,10 +61,35 @@ namespace uAdventure.Geo
             yield return null;
         }
 
+        protected override IEnumerator UnLoadRoutine(Tile tile, Action<bool> finished)
+        {
+            foreach (var elem in new List<MapElement>(uAdventurePlugin.AdoptedElements))
+            {
+                if (uAdventurePlugin.AdoptedElements.Contains(elem) && Query(elem, tile))
+                {
+                    foreach (var destroyed in Destroy(tile, elem))
+                    {
+                        if (destroyed != null)
+                        {
+                            uAdventurePlugin.ReleaseElement(destroyed);
+                        }
+                    }
+                }
+            }
+
+            finished(true);
+
+            yield return null;
+        }
+
         protected virtual IEnumerable<MonoBehaviour> Create(Tile tile, MapElement mapElement)
         {
             return null;
         }
-        
+
+        protected virtual IEnumerable<MapElement> Destroy(Tile tile, MapElement mapElement)
+        {
+            return null;
+        }
     }
 }

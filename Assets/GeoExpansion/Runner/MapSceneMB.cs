@@ -13,6 +13,7 @@ namespace uAdventure.Geo
     public class MapSceneMB : MonoBehaviour, IRunnerChapterTarget
     {
         public TileManager tileManager;
+        public uAdventurePlugin uAdventurePlugin;
         public GeoPositionedCharacter geoCharacter;
         public ThirdPersonCharacter character;
 
@@ -59,6 +60,8 @@ namespace uAdventure.Geo
 
         public void RenderScene()
         {
+            tileManager.ReloadPlugins<uAdventurePlugin>();
+            tileManager.ReloadPlugins<MapElementFactory>();
         }
 
         public void setInteractuable(bool state)
@@ -71,11 +74,17 @@ namespace uAdventure.Geo
         // ---------------------------
         private TransformData bkCameraTransform;
         
+        void Awake()
+        {
+            uAdventurePlugin.MapSceneMB = this;
+        }
+
         void Start()
         {
             StartCoroutine(StartLocation());
             //Physics.gravity = this.transform.rotation * Physics.gravity;
             bkCameraTransform = Camera.main.transform.Backup();
+            geoCharacter.LatLon = new Vector2d(tileManager.Longitude, tileManager.Latitude);
         }
 
         IEnumerator StartLocation()
@@ -139,7 +148,7 @@ namespace uAdventure.Geo
             //            Debug.Log("LatLon: " + geoCharacter.LatLon + " LT->Meters->LT: " + GM.MetersToLatLon(GM.LatLonToMeters(geoCharacter.LatLon)));
 
             //geoCharacter.MoveTo(geoCharacter.LatLon + GM.MetersToLatLon(new Vector2d(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"))));
-            geoCharacter.MoveTo(GM.MetersToLatLon(GM.LatLonToMeters(mapScene.LatLon.y, mapScene.LatLon.x) + new Vector2d(100, 100)));
+            //geoCharacter.MoveTo(GM.MetersToLatLon(GM.LatLonToMeters(mapScene.LatLon.y, mapScene.LatLon.x) + new Vector2d(100, 100)));
             //geoCharacter.MoveTo(new Vector2d(-3.707398, 40.415363));
             //character.Move(new Vector3(Input.GetAxis("Horizontal"),0, Input.GetAxis("Vertical")), false, false);
         }

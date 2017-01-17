@@ -18,11 +18,24 @@ public class GeoPositionedCharacter : MonoBehaviour
 
     public void InstantMoveTo(Vector2d latLon)
     {
-        destination = latLon;
         LatLon = latLon;
     }
 
-    public Vector2d LatLon { get; set; }
+    private Vector2d latLon;
+    public Vector2d LatLon {
+        get
+        {
+            return latLon;
+        }
+        set
+        {
+            latLon = value;
+            destination = value;
+            var tileManagerRelative = GM.LatLonToMeters(tileManager.Latitude, tileManager.Longitude);
+            var positionRelative = (GM.LatLonToMeters(latLon.y, latLon.x) - tileManagerRelative).ToVector2();
+            transform.localPosition = new Vector3(positionRelative.x, transform.localPosition.y, positionRelative.y);
+        }
+    }
 
     private Vector2d destination;
 
@@ -33,7 +46,6 @@ public class GeoPositionedCharacter : MonoBehaviour
 
     void Update()
     {
-
         var tileManagerRelative = GM.LatLonToMeters(tileManager.Latitude, tileManager.Longitude);
         var latLonMeters = GM.LatLonToMeters(LatLon.y, LatLon.x) - tileManagerRelative;
         var destinationMeters = GM.LatLonToMeters(destination.y, destination.x) - tileManagerRelative;
@@ -43,9 +55,11 @@ public class GeoPositionedCharacter : MonoBehaviour
             thirdPersonCharacter.Move(Vector3.ClampMagnitude(new Vector3((float)destinationMeters.x, 0, (float)destinationMeters.y), minDistanceToWalk*3) / (minDistanceToWalk*3), false, false);
         else
         {
+            destination = latLon;
             thirdPersonCharacter.Move(new Vector3(0, 0, 0), false, false);
             transform.localRotation = Quaternion.Euler(0, 0, Input.compass.trueHeading);
         }
+        
 
 
         /* if (destinationMeters.sqrMagnitude >= minDistanceToWalk * minDistanceToWalk)
@@ -59,7 +73,7 @@ public class GeoPositionedCharacter : MonoBehaviour
          }*/
 
 
-        this.LatLon = GM.MetersToLatLon(transform.localPosition.ToVector2xz().ToVector2d() + tileManagerRelative);
+        this.latLon = GM.MetersToLatLon(transform.localPosition.ToVector2xz().ToVector2d() + tileManagerRelative);
         //Debug.Log("Character at: " + this.LatLon +" moving to " + destination);
     }
 

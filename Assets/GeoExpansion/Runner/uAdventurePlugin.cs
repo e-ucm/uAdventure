@@ -12,7 +12,7 @@ namespace uAdventure.Geo
 {
     public class uAdventurePlugin : Plugin
     {
-        MapSceneMB mapSceneMB;
+        public MapSceneMB MapSceneMB { get; set; }
 
         public List<MapElement> OrphanElements
         {
@@ -26,7 +26,6 @@ namespace uAdventure.Geo
 
         void Awake()
         {
-            mapSceneMB = FindObjectOfType<MapSceneMB>();
             OrphanElements = new List<MapElement>();
             AdoptedElements = new List<MapElement>();
         }
@@ -34,12 +33,29 @@ namespace uAdventure.Geo
         protected override IEnumerator CreateRoutine(Tile tile, Action<bool> finished)
         {
             
-            var allElements = mapSceneMB.MapElements.FindAll(elem => elem.Conditions == null || ConditionChecker.check(elem.Conditions));
+            var allElements = MapSceneMB.MapElements.FindAll(elem => elem.Conditions == null || ConditionChecker.check(elem.Conditions));
             foreach(var elem in allElements)
             {
                 if (!AdoptedElements.Contains(elem) && !OrphanElements.Contains(elem))
                 {
                     OrphanElements.Add(elem);
+                }
+            }
+
+            finished(true);
+
+            yield return null;
+        }
+
+        protected override IEnumerator UnLoadRoutine(Tile tile, Action<bool> finished)
+        {
+
+            var notExisting = MapSceneMB.MapElements.FindAll(elem => elem.Conditions != null && !ConditionChecker.check(elem.Conditions));
+            foreach (var elem in notExisting)
+            {
+                if (OrphanElements.Contains(elem))
+                {
+                    OrphanElements.Remove(elem);
                 }
             }
 
@@ -67,7 +83,8 @@ namespace uAdventure.Geo
             if (AdoptedElements.Contains(mapElement))
             {
                 AdoptedElements.Remove(mapElement);
-                OrphanElements.Add(mapElement);
+                if(mapElement.Conditions != null && !ConditionChecker.check(mapElement.Conditions))
+                    OrphanElements.Add(mapElement);
             }
         }
     }

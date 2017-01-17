@@ -19,6 +19,7 @@ public class ExtElemFactory : MapElementFactory {
         base.Awake();
         cache = new Dictionary<ExtElemReference, Element>();
         clipper = new Clipper();
+        _createdCache = new Dictionary<Tile, List<GeoWrapper>>();
         Query = (elem,tile) => elem is ExtElemReference;// && Intersects(tile, elem as GeoReference);
     }
 
@@ -33,6 +34,8 @@ public class ExtElemFactory : MapElementFactory {
         return cache.ContainsKey(reference) ? cache[reference] : null;
     }
 
+    private Dictionary<Tile, List<GeoWrapper>> _createdCache;
+
     protected override IEnumerable<MonoBehaviour> Create(Tile tile, MapElement mapElement)
     {
         var extRef = mapElement as ExtElemReference;
@@ -45,7 +48,27 @@ public class ExtElemFactory : MapElementFactory {
         geoWrapper.Element = element;
         geoWrapper.Tile = tile;
 
+        if (!_createdCache.ContainsKey(tile))
+            _createdCache.Add(tile, new List<GeoWrapper>());
+
+        _createdCache[tile].Add(geoWrapper);
+
         yield return geoWrapper;
 
+    }
+
+    protected override IEnumerable<MapElement> Destroy(Tile tile, MapElement mapElement)
+    {
+        if (_createdCache.ContainsKey(tile))
+        {
+            var geoWrapper = _createdCache[tile].Find(mb => mb.Element.getId() == mapElement.getTargetId());
+            if (geoWrapper != null)
+            {
+                DestroyImmediate(geoWrapper.gameObject);
+                yield return mapElement;
+            }
+        }
+
+        yield return null;
     }
 }
