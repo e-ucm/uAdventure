@@ -247,6 +247,7 @@ namespace MapzenGo.Models
             List<Plugin> todo = _plugins.FindAll(p => p is T);
             List<Plugin> doing = new List<Plugin>();
 
+            ContinuePlugins<T>(todo, doing, whatToDo);
         }
 
 
