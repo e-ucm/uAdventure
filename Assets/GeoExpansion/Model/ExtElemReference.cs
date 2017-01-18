@@ -5,6 +5,7 @@ using MapzenGo.Helpers;
 using MapzenGo.Models;
 using uAdventure.Runner;
 using uAdventure.Core;
+using uAdventure.RageTracker;
 
 namespace uAdventure.Geo
 {
@@ -361,6 +362,7 @@ namespace uAdventure.Geo
                     hidden = false;
                     if (revealOnRange)
                     {
+                        Tracker.T.setExtension("geo_element_" + wrapper.Element.getId(), true);
                         particles.gameObject.SetActive(true);
                         particles.Play();
                         particles.transform.localPosition = childTransform.localPosition;

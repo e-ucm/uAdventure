@@ -7,6 +7,7 @@ using System.Collections;
 using MapzenGo.Models;
 using UnityStandardAssets.Characters.ThirdPerson;
 using MapzenGo.Helpers;
+using uAdventure.RageTracker;
 
 namespace uAdventure.Geo
 {
@@ -124,11 +125,24 @@ namespace uAdventure.Geo
             }
         }
 
+        public float maxTimeToFlushPosition;
+        private float timeSinceLastPositionUpdate = 0;
+        private Vector2d lastUpdatedPosition;
+
         void Update()
         {
             if(Input.location.status == LocationServiceStatus.Running)
             {
-                geoCharacter.MoveTo(new Vector2d(Input.location.lastData.latitude, Input.location.lastData.longitude));
+                timeSinceLastPositionUpdate += Time.deltaTime;
+                if (timeSinceLastPositionUpdate > maxTimeToFlushPosition || (GM.LatLonToMeters(lastUpdatedPosition) - GM.LatLonToMeters(Input.location.lastData.latitude, Input.location.lastData.longitude)).sqrMagnitude >= 1f)
+                {
+                    geoCharacter.MoveTo(new Vector2d(Input.location.lastData.longitude, Input.location.lastData.latitude));
+                    Tracker.T.setExtension("location", string.Format("{1},{2}", Input.location.lastData.latitude, Input.location.lastData.longitude));
+                    Tracker.T.Trace("moved", "geoposition", "player");// Tracker.Verb.Completed.ToString().ToLower(), type.ToString().ToLower(), completableId);
+                    Tracker.T.RequestFlush();
+                    timeSinceLastPositionUpdate = 0;
+                }
+                
             }
 
             switch (mapScene.CameraType)
