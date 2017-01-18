@@ -57,6 +57,7 @@ namespace uAdventure.Geo
                     mapElement = new GeoReference(mapElementNode.Attributes["targetId"].Value);
                 }
 
+                mapElement.Conditions = (Conditions) DOMParserUtility.DOMParse(mapElementNode.SelectSingleNode("condition") as XmlElement, parameters);
                 mapElement.Layer = int.Parse(mapElementNode.Attributes["layer"].Value);
                 mapScene.Elements.Add(mapElement);
             }

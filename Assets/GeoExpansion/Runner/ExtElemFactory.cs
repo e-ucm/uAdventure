@@ -65,6 +65,7 @@ public class ExtElemFactory : MapElementFactory {
             if (geoWrapper != null)
             {
                 DestroyImmediate(geoWrapper.gameObject);
+                _createdCache[tile].Remove(geoWrapper);
                 yield return mapElement;
             }
         }

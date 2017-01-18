@@ -15,14 +15,12 @@ namespace uAdventure.Geo
 
         public Conditions Conditions { get; set; }
 
-        public MapElement()
-        {
-            Conditions = new Conditions();
-        }
+        public MapElement() : this("") { }
 
         public MapElement(string targetId)
         {
             this.targetId = targetId;
+            Conditions = new Conditions();
         }
         
         public string getTargetId()

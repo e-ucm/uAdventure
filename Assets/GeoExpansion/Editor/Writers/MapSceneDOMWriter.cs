@@ -41,6 +41,7 @@ namespace uAdventure.Geo
             mapElementNode.SetAttribute("layer", mapElement.Layer.ToString());
             node.AppendChild(mapElementNode);
 
+            DOMWriterUtility.DOMWrite(mapElementNode, mapElement.Conditions, options);
 
             if (mapElement is ExtElemReference)
             {

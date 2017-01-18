@@ -83,7 +83,7 @@ namespace uAdventure.Geo
             if (AdoptedElements.Contains(mapElement))
             {
                 AdoptedElements.Remove(mapElement);
-                if(mapElement.Conditions != null && !ConditionChecker.check(mapElement.Conditions))
+                if(mapElement.Conditions == null || ConditionChecker.check(mapElement.Conditions))
                     OrphanElements.Add(mapElement);
             }
         }
