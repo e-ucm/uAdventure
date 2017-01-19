@@ -5,10 +5,12 @@ namespace uAdventure.Runner
 {
     public class MovieHolder
     {
-#if !(UNITY_WEBPLAYER || UNITY_WEBGL)
-        public MovieTexture Movie;
-#else
+#if UNITY_WEBPLAYER || UNITY_WEBGL
     public WebGLMovieTexture Movie;
+#elif UNITY_ANDROID || UNITY_IPHONE
+    public Texture Movie;
+#else
+    public MovieTexture Movie;
 #endif
 
         bool loaded = false;
@@ -22,7 +24,11 @@ namespace uAdventure.Runner
         {
             loaded = true;
             this.path = path;
-#if !(UNITY_WEBPLAYER || UNITY_WEBGL)
+#if UNITY_WEBPLAYER || UNITY_WEBGL
+            LoadFromWebGL(path);
+#elif UNITY_ANDROID || UNITY_IPHONE
+
+#else
             switch (type)
             {
                 case ResourceManager.LoadingType.RESOURCES_LOAD:
@@ -32,8 +38,6 @@ namespace uAdventure.Runner
                     Game.Instance.StartCoroutine(LoadFromSystem(path));
                     break;
             }
-#else
-        LoadFromWebGL(path);
 #endif
         }
 
@@ -49,30 +53,34 @@ namespace uAdventure.Runner
         System.DateTime started_playing;
         public bool isPlaying()
         {
-#if !(UNITY_WEBPLAYER || UNITY_WEBGL)
-            return Movie.isPlaying;
+#if UNITY_WEBPLAYER || UNITY_WEBGL
+            return true;
+#elif UNITY_ANDROID || UNITY_IPHONE
+            return true;
 #else
-        return true;
+            return Movie.isPlaying;
 #endif
         }
 
         public void Play()
         {
-#if !(UNITY_WEBPLAYER || UNITY_WEBGL)
-            Movie.Play();
-#else
+#if UNITY_WEBPLAYER || UNITY_WEBGL
         Debug.Log("playing");
+        Movie.Play();
+#elif UNITY_ANDROID || UNITY_IPHONE
+#else
         Movie.Play();
 #endif
         }
 
         public void Stop()
         {
-#if !(UNITY_WEBPLAYER || UNITY_WEBGL)
-            Movie.Stop();
-#else
+#if UNITY_WEBPLAYER || UNITY_WEBGL
         Movie.Pause();
         Movie.Seek(0f);
+#elif UNITY_ANDROID || UNITY_IPHONE
+#else
+            Movie.Stop();
 #endif
         }
 
@@ -80,7 +88,44 @@ namespace uAdventure.Runner
         // ################## LOADING METHODS ##################
         // #####################################################
 
-#if !(UNITY_WEBPLAYER || UNITY_WEBGL)
+#if UNITY_WEBPLAYER || UNITY_WEBGL
+
+    private WebGLMovieTexture LoadFromWebGL(string uri)
+    {
+        string videoname = uri;
+        string[] splitted = videoname.Split('/');
+
+        splitted = splitted[splitted.Length-1].Split('.');
+        string fullname = splitted[0];
+
+        for (int i = 1; i < splitted.Length - 1; i++)
+            fullname += "." + splitted[i];
+
+        fullname = "StreamingAssets/" + fullname + ".ogv";
+
+        Debug.Log(fullname);
+        
+        Movie = new WebGLMovieTexture(fullname);
+        loaded = true;
+
+        return Movie;
+    }
+       
+
+#elif UNITY_ANDROID || UNITY_IPHONE
+
+
+        private IEnumerator LoadFromSystem(string uri)
+        {
+            yield return null;
+        }
+
+        private Texture LoadFromResources(string uri)
+        {
+            return new Texture();
+        }
+
+#else
         private IEnumerator LoadFromSystem(string uri)
         {
             string url_prefix = "file:///";
@@ -139,30 +184,6 @@ namespace uAdventure.Runner
 
             return Movie;
         }
-
-#else
-
-    private WebGLMovieTexture LoadFromWebGL(string uri)
-    {
-        string videoname = uri;
-        string[] splitted = videoname.Split('/');
-
-        splitted = splitted[splitted.Length-1].Split('.');
-        string fullname = splitted[0];
-
-        for (int i = 1; i < splitted.Length - 1; i++)
-            fullname += "." + splitted[i];
-
-        fullname = "StreamingAssets/" + fullname + ".ogv";
-
-        Debug.Log(fullname);
-        
-        Movie = new WebGLMovieTexture(fullname);
-        loaded = true;
-
-        return Movie;
-    }
-
 #endif
 
     }
