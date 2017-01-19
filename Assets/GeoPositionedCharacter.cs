@@ -32,7 +32,7 @@ public class GeoPositionedCharacter : MonoBehaviour
             latLon = value;
             destination = value;
             var tileManagerRelative = GM.LatLonToMeters(tileManager.Latitude, tileManager.Longitude);
-            var positionRelative = (GM.LatLonToMeters(latLon.y, latLon.x) - tileManagerRelative).ToVector2();
+            var positionRelative = (GM.LatLonToMeters(latLon.x, latLon.y) - tileManagerRelative).ToVector2();
             transform.localPosition = new Vector3(positionRelative.x, transform.localPosition.y, positionRelative.y);
         }
     }
@@ -47,8 +47,8 @@ public class GeoPositionedCharacter : MonoBehaviour
     void Update()
     {
         var tileManagerRelative = GM.LatLonToMeters(tileManager.Latitude, tileManager.Longitude);
-        var latLonMeters = GM.LatLonToMeters(LatLon.y, LatLon.x) - tileManagerRelative;
-        var destinationMeters = GM.LatLonToMeters(destination.y, destination.x) - tileManagerRelative;
+        var latLonMeters = GM.LatLonToMeters(LatLon.x, LatLon.y) - tileManagerRelative;
+        var destinationMeters = GM.LatLonToMeters(destination.x, destination.y) - tileManagerRelative;
         destinationMeters -= latLonMeters;
 
         if (destinationMeters.sqrMagnitude >= minDistanceToWalk * minDistanceToWalk)
@@ -74,6 +74,7 @@ public class GeoPositionedCharacter : MonoBehaviour
 
 
         this.latLon = GM.MetersToLatLon(transform.localPosition.ToVector2xz().ToVector2d() + tileManagerRelative);
+        this.transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y >= 0 ? transform.localPosition.y : 0, transform.localPosition.z);
         //Debug.Log("Character at: " + this.LatLon +" moving to " + destination);
     }
 

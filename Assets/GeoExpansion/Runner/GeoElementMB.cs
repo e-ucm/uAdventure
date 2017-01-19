@@ -47,7 +47,7 @@ public class GeoElementMB : MonoBehaviour {
                     GetComponent<MeshFilter>().mesh = poi.GetComponent<MeshFilter>().mesh;
                     DestroyImmediate(poi);
 
-                    var dotMerc = GM.LatLonToMeters(Element.Geometry.Points[0].y, Element.Geometry.Points[0].x);
+                    var dotMerc = GM.LatLonToMeters(Element.Geometry.Points[0].x, Element.Geometry.Points[0].y);
                     var localMercPos = dotMerc - Tile.Rect.Center;
 
                     transform.localPosition = new Vector3((float)localMercPos.x, (float)localMercPos.y, 10f);
@@ -61,7 +61,7 @@ public class GeoElementMB : MonoBehaviour {
 
                 foreach (var p in Element.Geometry.Points)
                 {
-                    var dotMerc = GM.LatLonToMeters(p.y, p.x);
+                    var dotMerc = GM.LatLonToMeters(p.x, p.y);
                     var localMercPos = dotMerc - Tile.Rect.Center;
                     inp.AddPoint(localMercPos.x, localMercPos.y);
                     inp.AddSegment(i, (i + 1) % Element.Geometry.Points.Count);
@@ -188,7 +188,7 @@ public class GeoElementMB : MonoBehaviour {
 
         protected virtual bool Check()
         {
-            return ConditionChecker.check(Action.Conditions) && CustomChecks();
+            return !Game.Instance.isSomethingRunning() && ConditionChecker.check(Action.Conditions) && CustomChecks();
         }
 
         protected abstract bool CustomChecks();

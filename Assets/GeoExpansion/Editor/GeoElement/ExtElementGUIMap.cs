@@ -158,7 +158,7 @@ namespace uAdventure.Editor
         public void Draw(GUIMap map, Rect area)
         {
             UpdateValues();
-            var center = map.PixelToRelative(GM.MetersToPixels(GM.LatLonToMeters(new Vector2d(position.y, position.x)), map.Zoom)).ToVector2();
+            var center = map.PixelToRelative(GM.MetersToPixels(GM.LatLonToMeters(position.x, position.y), map.Zoom)).ToVector2();
             if(Texture != null)
             {
                 var size = new Vector2(Texture.width, Texture.height);
@@ -176,7 +176,7 @@ namespace uAdventure.Editor
 
                 Handles.BeginGUI();
 
-                var influencePixels = map.PixelToRelative(GM.MetersToPixels(GM.LatLonToMeters(position.y, position.x) + new Vector2d(interactionRange, 0), map.Zoom)).ToVector2() - center;
+                var influencePixels = map.PixelToRelative(GM.MetersToPixels(GM.LatLonToMeters(position.x, position.y) + new Vector2d(interactionRange, 0), map.Zoom)).ToVector2() - center;
 
                 Handles.color = Color.black;
                 Handles.DrawWireArc(center, Vector3.back, Vector2.up, 360, influencePixels.magnitude);
@@ -361,7 +361,7 @@ namespace uAdventure.Editor
             var degree = this.degree * Mathf.Deg2Rad;
 
             var center = (map.Center + GM.MetersToLatLon(new Vector2d(distance * Mathd.Sin(degree), distance * Mathd.Cos(degree)))).ToVector2();
-            center = map.PixelToRelative(GM.MetersToPixels(GM.LatLonToMeters(new Vector2d(center.y, center.x)), map.Zoom)).ToVector2();
+            center = map.PixelToRelative(GM.MetersToPixels(GM.LatLonToMeters(center.x, center.y), map.Zoom)).ToVector2();
             if (Texture != null)
             {
                 var size = new Vector2(Texture.width, Texture.height);

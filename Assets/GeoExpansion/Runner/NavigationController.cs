@@ -160,7 +160,7 @@ namespace uAdventure.Geo
                 var position = (Vector2d)wrap.Reference.TransformManagerParameters["Position"];
                 var interactionRange = (float) wrap.Reference.TransformManagerParameters["InteractionRange"];
 
-                var distance = GM.LatLonToMeters(position.y, position.x) - GM.LatLonToMeters(character.LatLon.y, character.LatLon.x);
+                var distance = GM.LatLonToMeters(position) - GM.LatLonToMeters(character.LatLon);
                 return distance.magnitude < interactionRange;
             }
             else if (mb is GeoElementMB)
@@ -230,7 +230,7 @@ namespace uAdventure.Geo
             if(currentStep != null)
             {
                 var pos = GetElementPosition(currentStep.Reference);
-                var direction = GM.LatLonToMeters(pos.y, pos.x) - GM.LatLonToMeters(character.LatLon.y, character.LatLon.x);
+                var direction = GM.LatLonToMeters(pos) - GM.LatLonToMeters(character.LatLon);
                 arrow.position = character.transform.position;
                 arrow.rotation = Quaternion.Euler(0, Mathf.Atan2((float)direction.normalized.x, (float)direction.normalized.y)*Mathf.Rad2Deg, 0);
             }
@@ -250,7 +250,7 @@ namespace uAdventure.Geo
                 if (!character) return steps[0]; // Is not possible to determine the closest
             }
 
-            var characterMeters = GM.LatLonToMeters(character.LatLon.y, character.LatLon.x);
+            var characterMeters = GM.LatLonToMeters(character.LatLon);
             return steps.FindAll(e => !stepCompleted[e]).OrderBy(s => (GetElementPosition(s.Reference) - characterMeters).magnitude).ElementAt(0);
         }
 

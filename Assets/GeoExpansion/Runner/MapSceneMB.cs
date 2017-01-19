@@ -38,8 +38,8 @@ namespace uAdventure.Geo
             set
             {
                 mapScene = (MapScene) value;
-                tileManager.Latitude = (float) mapScene.LatLon.y;
-                tileManager.Longitude = (float) mapScene.LatLon.x;
+                tileManager.Latitude = (float) mapScene.LatLon.x;
+                tileManager.Longitude = (float) mapScene.LatLon.y;
             }
         }
 
@@ -85,7 +85,7 @@ namespace uAdventure.Geo
             StartCoroutine(StartLocation());
             //Physics.gravity = this.transform.rotation * Physics.gravity;
             bkCameraTransform = Camera.main.transform.Backup();
-            geoCharacter.LatLon = new Vector2d(tileManager.Longitude, tileManager.Latitude);
+            geoCharacter.LatLon = new Vector2d(tileManager.Latitude, tileManager.Longitude);
         }
 
         IEnumerator StartLocation()
@@ -134,9 +134,13 @@ namespace uAdventure.Geo
             if(Input.location.status == LocationServiceStatus.Running)
             {
                 timeSinceLastPositionUpdate += Time.deltaTime;
-                if (timeSinceLastPositionUpdate > maxTimeToFlushPosition || (GM.LatLonToMeters(lastUpdatedPosition) - GM.LatLonToMeters(Input.location.lastData.latitude, Input.location.lastData.longitude)).sqrMagnitude >= 1f)
+                var inputLatLon = new Vector2d(Input.location.lastData.latitude, Input.location.lastData.longitude);
+                if (timeSinceLastPositionUpdate > maxTimeToFlushPosition || (GM.LatLonToMeters(lastUpdatedPosition) - GM.LatLonToMeters(inputLatLon)).sqrMagnitude >= 1f)
                 {
-                    geoCharacter.MoveTo(new Vector2d(Input.location.lastData.longitude, Input.location.lastData.latitude));
+
+                    if (GM.SeparationInMeters(geoCharacter.LatLon, inputLatLon) > 1000) geoCharacter.LatLon = inputLatLon;
+                    else geoCharacter.MoveTo(inputLatLon);
+
                     Tracker.T.setExtension("location", string.Format("{1},{2}", Input.location.lastData.latitude, Input.location.lastData.longitude));
                     Tracker.T.Trace("moved", "geoposition", "player");// Tracker.Verb.Completed.ToString().ToLower(), type.ToString().ToLower(), completableId);
                     Tracker.T.RequestFlush();
@@ -169,6 +173,8 @@ namespace uAdventure.Geo
 
 
     }
+
+
 
     // Transform management
     internal class TransformData

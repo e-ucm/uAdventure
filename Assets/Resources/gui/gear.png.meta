@@ -1,9 +1,10 @@
 fileFormatVersion: 2
-guid: 8ac913a1a13692040ab8b255ed2c164f
-timeCreated: 1473252453
+guid: a840dc16cd661c344add4028d7c64646
+timeCreated: 1464113255
 licenseType: Free
 TextureImporter:
-  fileIDToRecycleName: {}
+  fileIDToRecycleName:
+    21300000: gear_0
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -43,13 +44,36 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spriteBorder: {x: 6, y: 5, z: 6, w: 4}
+  spriteBorder: {x: 16, y: 16, z: 16, w: 16}
   spritePixelsToUnits: 100
   alphaIsTransparency: 1
   textureType: 8
   buildTargetSettings: []
   spriteSheet:
-    sprites: []
+    sprites:
+    - name: gear_0
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 16
+        width: 96
+        height: 96
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 23, y: 48}
+        - {x: -24, y: 48}
+        - {x: -34, y: 44}
+        - {x: -47, y: 23}
+        - {x: -48, y: 17}
+        - {x: -48, y: -16}
+        - {x: -41, y: -32}
+        - {x: -32, y: -48}
+        - {x: 39, y: -48}
+        - {x: 48, y: -32}
+        - {x: 48, y: 17}
+        - {x: 36, y: 46}
     outline: []
   spritePackingTag: 
   userData: 

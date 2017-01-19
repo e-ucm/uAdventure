@@ -16,6 +16,25 @@ namespace MapzenGo.Helpers
         private const double InitialResolution = 2 * Math.PI * EarthRadius / TileSize;
         private const double OriginShift = 2 * Math.PI * EarthRadius / 2;
 
+        public static float distFrom(float lat1, float lng1, float lat2, float lng2)
+        {
+            double earthRadius = 6371000; //meters
+            double dLat = (lat2 - lat1)*Mathf.Deg2Rad;
+            double dLng = Mathf.Deg2Rad * (lng2 - lng1);
+            double a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
+                       Math.Cos(Mathf.Deg2Rad * (lat1)) * Math.Cos(Mathf.Deg2Rad * (lat2)) *
+                       Math.Sin(dLng / 2) * Math.Sin(dLng / 2);
+            double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+            float dist = (float)(earthRadius * c);
+
+            return dist;
+        }
+
+        public static double SeparationInMeters(Vector2d latlon1, Vector2d latlon2)
+        {
+            return (LatLonToMeters(latlon1) - LatLonToMeters(latlon2)).magnitude;
+        }
+
         public static Vector2d LatLonToMeters(Vector2d v)
         {
             return LatLonToMeters(v.x, v.y);
@@ -84,9 +103,9 @@ namespace MapzenGo.Helpers
         public static Vector2d MetersToLatLon(Vector2d m)
         {
             var ll = new Vector2d();
-            ll.x = (m.x / OriginShift) * 180;
-            ll.y = (m.y / OriginShift) * 180;
-            ll.y = 180 / Math.PI * (2 * Math.Atan(Math.Exp(ll.y * Math.PI / 180)) - Math.PI / 2);
+            ll.y = (m.x / OriginShift) * 180;
+            ll.x = (m.y / OriginShift) * 180;
+            ll.x = 180 / Math.PI * (2 * Math.Atan(Math.Exp(ll.x * Math.PI / 180)) - Math.PI / 2);
             return ll;
         }
 

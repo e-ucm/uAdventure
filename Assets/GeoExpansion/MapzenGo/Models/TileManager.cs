@@ -34,6 +34,8 @@ namespace MapzenGo.Models
         [SerializeField]
         private Transform _player;
         [SerializeField]
+        private Transform _ground;
+        [SerializeField]
         private int _removeAfter;
         [SerializeField]
         private bool _keepCentralized;
@@ -82,7 +84,8 @@ namespace MapzenGo.Models
 
             Tiles = new Dictionary<Vector2d, Tile>();
             CenterTms = tile;
-            CenterInMercator = GM.TileBounds(CenterTms, Zoom).Center;
+            var centerold = GM.TileBounds(CenterTms, Zoom).Center; 
+            CenterInMercator = GM.LatLonToMeters(Latitude, Longitude);//
 
             LoadTiles(CenterTms, CenterInMercator);
 
@@ -109,6 +112,8 @@ namespace MapzenGo.Models
         public virtual void Update()
         {
             UpdateTiles();
+            // Move the ground
+            _ground.transform.position = _player.transform.position;
         }
 
         private void UpdateTiles()

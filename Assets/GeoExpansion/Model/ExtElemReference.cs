@@ -346,15 +346,12 @@ namespace uAdventure.Geo
         bool hidden = false;
         public void Update()
         {
-            var pos = GM.LatLonToMeters(latLon.y, latLon.x) - wrapper.Tile.Rect.Center;
+            var pos = GM.LatLonToMeters(latLon) - wrapper.Tile.Rect.Center;
             transform.localPosition = new Vector3((float)pos.x, 10, (float)pos.y) - new Vector3(childTransform.localPosition.x, 0, childTransform.localPosition.y);
             transform.localRotation = Quaternion.Euler(90, 0, 0);
             childTransform.localRotation = Quaternion.Euler(0, rotation, 0);
 
-
-            var distanceToObject = GM.LatLonToMeters(character.LatLon) - GM.LatLonToMeters(latLon.x, latLon.y);
-            //Debug.Log(distanceToObject.magnitude);
-            if (interactionRange <= 0 || distanceToObject.magnitude <= interactionRange)
+            if (interactionRange <= 0 || GM.SeparationInMeters(character.LatLon, latLon) <= interactionRange)
             {
                 if (hidden)
                 {

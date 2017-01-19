@@ -29,7 +29,7 @@ public class GUIMap
         set
         {
             zoom = Mathf.Clamp(value, 0, 19);
-            centerPixel = GM.MetersToPixels(GM.LatLonToMeters(Center.y, Center.x), zoom);
+            centerPixel = GM.MetersToPixels(GM.LatLonToMeters(Center.x, Center.y), zoom);
         }
     }
 
@@ -42,7 +42,7 @@ public class GUIMap
         set
         {
             center = value;
-            centerPixel = GM.MetersToPixels(GM.LatLonToMeters(center.y, center.x), Zoom);
+            centerPixel = GM.MetersToPixels(GM.LatLonToMeters(center.x, center.y), Zoom);
         }
     }
     public Vector2d GeoMousePosition { get; set; }
@@ -205,7 +205,7 @@ public class GUIMap
     protected void DrawTiles(Rect area)
     {
         // Download and draw tiles
-        var tile = GM.MetersToTile(GM.LatLonToMeters(Center.y, Center.x), Zoom);
+        var tile = GM.MetersToTile(GM.LatLonToMeters(Center.x, Center.y), Zoom);
 
         Vector2d topLeftCorner = GM.PixelsToTile(centerPixel - new Vector2d(area.width / 2f, area.height / 2f)),
             bottomRightCorner = GM.PixelsToTile(centerPixel + new Vector2d(area.width / 2f, area.height / 2f));
@@ -355,7 +355,7 @@ public class GUIMap
 
     public List<Vector2d> LatLonToPixels(List<Vector2d> points)
     {        
-        return points.ConvertAll(p => GM.MetersToPixels(GM.LatLonToMeters(p.y, p.x), Zoom)); 
+        return points.ConvertAll(p => GM.MetersToPixels(GM.LatLonToMeters(p.x, p.y), Zoom)); 
     }
 
     public List<Vector2d> PixelsToLatLon(List<Vector2d> points)
