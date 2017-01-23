@@ -82,48 +82,20 @@ namespace uAdventure.Geo
 
         void Start()
         {
-            StartCoroutine(StartLocation());
             //Physics.gravity = this.transform.rotation * Physics.gravity;
             bkCameraTransform = Camera.main.transform.Backup();
-            geoCharacter.LatLon = new Vector2d(tileManager.Latitude, tileManager.Longitude);
+
+            // Start the gps just in case is not
+            if (GPSController.Instance.IsStarted())
+                GPSController.Instance.Start();
+
+            // If the location is valid
+            if(GPSController.Instance.IsLocationValid())
+                geoCharacter.LatLon = new Vector2d(Input.location.lastData.latitude, Input.location.lastData.longitude);
+            else // if not, just put the character in the center of the map
+                geoCharacter.LatLon = new Vector2d(tileManager.Latitude, tileManager.Longitude);
         }
 
-        IEnumerator StartLocation()
-        {
-            // First, check if user has location service enabled
-            if (!Input.location.isEnabledByUser)
-                yield break;
-
-            // Start service before querying location
-            Input.location.Start();
-
-            // Wait until service initializes
-            int maxWait = 20;
-            while (Input.location.status == LocationServiceStatus.Initializing && maxWait > 0)
-            {
-                yield return new WaitForSeconds(1);
-                maxWait--;
-            }
-
-            // Service didn't initialize in 20 seconds
-            if (maxWait < 1)
-            {
-                print("Timed out");
-                yield break;
-            }
-
-            // Connection has failed
-            if (Input.location.status == LocationServiceStatus.Failed)
-            {
-                print("Unable to determine device location");
-                yield break;
-            }
-            else
-            {
-                // Access granted and location value could be retrieved
-                print("Location: " + Input.location.lastData.latitude + " " + Input.location.lastData.longitude + " " + Input.location.lastData.altitude + " " + Input.location.lastData.horizontalAccuracy + " " + Input.location.lastData.timestamp);
-            }
-        }
 
         public float maxTimeToFlushPosition;
         private float timeSinceLastPositionUpdate = 0;
@@ -135,9 +107,10 @@ namespace uAdventure.Geo
             {
                 timeSinceLastPositionUpdate += Time.deltaTime;
                 var inputLatLon = new Vector2d(Input.location.lastData.latitude, Input.location.lastData.longitude);
-                if (timeSinceLastPositionUpdate > maxTimeToFlushPosition || (GM.LatLonToMeters(lastUpdatedPosition) - GM.LatLonToMeters(inputLatLon)).sqrMagnitude >= 1f)
+                if (GPSController.Instance.IsLocationValid() 
+                    && (timeSinceLastPositionUpdate > maxTimeToFlushPosition 
+                        || (GM.LatLonToMeters(lastUpdatedPosition) - GM.LatLonToMeters(inputLatLon)).sqrMagnitude >= 1f))
                 {
-
                     if (GM.SeparationInMeters(geoCharacter.LatLon, inputLatLon) > 1000) geoCharacter.LatLon = inputLatLon;
                     else geoCharacter.MoveTo(inputLatLon);
 

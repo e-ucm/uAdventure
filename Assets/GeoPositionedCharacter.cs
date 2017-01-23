@@ -55,7 +55,7 @@ public class GeoPositionedCharacter : MonoBehaviour
 
         if (destinationMeters.sqrMagnitude >= minDistanceToWalk * minDistanceToWalk)
             thirdPersonCharacter.Move(Vector3.ClampMagnitude(new Vector3((float)destinationMeters.x, 0, (float)destinationMeters.y), minDistanceToWalk*3) / (minDistanceToWalk*3), false, false);
-        else if(lastPos == transform.position)
+        else if(lastPos ==  transform.position)
         {
             destination = latLon;
             thirdPersonCharacter.Move(new Vector3(0, 0, 0), false, false);

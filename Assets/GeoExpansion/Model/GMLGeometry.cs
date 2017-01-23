@@ -87,13 +87,13 @@ public class GMLGeometry
         return inside;
     }
 
-    private bool InsidePointInfluence(Vector2d point)
+    private bool InsidePointInfluence(Vector2d point, float extraMargin)
     {
         var mp = GM.LatLonToMeters(point);
-        return Points.Any(p => (GM.LatLonToMeters(p) - mp).magnitude <= Influence);
+        return Points.Any(p => (GM.LatLonToMeters(p) - mp).magnitude <= Influence + extraMargin);
     }
 
-    private bool InsideEdgeInfluence(Vector2d point)
+    private bool InsideEdgeInfluence(Vector2d point, float extraMargin)
     {
         if (Points.Count <= 1) // If there are not edges, no sense to do it...
             return false;
@@ -104,7 +104,7 @@ public class GMLGeometry
         for (int i = 0; i < Points.Count; i++)
         {
             closestPoin = GetClosestPointOnLineSegment(Points[l], Points[i], point);
-            if ((GM.LatLonToMeters(closestPoin) - mp).magnitude <= Influence)
+            if ((GM.LatLonToMeters(closestPoin) - mp).magnitude <= Influence + extraMargin)
                 return true;
         }
         return false;
@@ -136,7 +136,13 @@ public class GMLGeometry
 
     public bool InsideInfluence(Vector2d point)
     {
-        return Inside(point) || InsidePointInfluence(point) || InsideEdgeInfluence(point);
+        return InsideInfluence(point, 0);
+    }
+
+
+    public bool InsideInfluence(Vector2d point, float extraMargin)
+    {
+        return Inside(point) || InsidePointInfluence(point, extraMargin) || InsideEdgeInfluence(point, extraMargin);
     }
 
     public Vector2d Center {

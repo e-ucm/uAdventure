@@ -22,6 +22,7 @@ namespace uAdventure.Geo
             var zc = go.AddComponent<ZoneControl>();
             zc.zone = geoElement.Geometry;
             zc.loadOnExit = Game.Instance.GameState.CurrentTarget;
+            zc.transitionTime = effect.getTransitionTime();
 
             Game.Instance.renderScene(effect.getTargetId(), effect.getTransitionTime(), effect.getTransitionType());
 
@@ -33,67 +34,37 @@ namespace uAdventure.Geo
     {
         public GMLGeometry zone;
         public string loadOnExit;
+        public float transitionTime;
 
         public Vector2 debugLatLong;
 
         void Start()
         {
             debugLatLong = zone.Center.ToVector2();
-            StartCoroutine(StartLocation());
+            if (!GPSController.Instance.IsStarted())
+                GPSController.Instance.Start();
+
+            if (GPSController.Instance.IsLocationValid())
+                debugLatLong = new Vector2(Input.location.lastData.latitude, Input.location.lastData.longitude);
         }
-
-        IEnumerator StartLocation()
-        {
-            // First, check if user has location service enabled
-            if (!Input.location.isEnabledByUser)
-                yield break;
-
-            // Start service before querying location
-            Input.location.Start();
-
-            // Wait until service initializes
-            int maxWait = 20;
-            while (Input.location.status == LocationServiceStatus.Initializing && maxWait > 0)
-            {
-                yield return new WaitForSeconds(1);
-                maxWait--;
-            }
-
-            // Service didn't initialize in 20 seconds
-            if (maxWait < 1)
-            {
-                print("Timed out");
-                yield break;
-            }
-
-            // Connection has failed
-            if (Input.location.status == LocationServiceStatus.Failed)
-            {
-                print("Unable to determine device location");
-                yield break;
-            }
-            else
-            {
-                // Access granted and location value could be retrieved
-                print("Location: " + Input.location.lastData.latitude + " " + Input.location.lastData.longitude + " " + Input.location.lastData.altitude + " " + Input.location.lastData.horizontalAccuracy + " " + Input.location.lastData.timestamp);
-            }
-        }
+        
 
         void Update()
         {
-            if(Input.location.status == LocationServiceStatus.Running)
+            if(GPSController.Instance.IsLocationValid())
             {
-                if (!zone.InsideInfluence(new Vector2d(Input.location.lastData.longitude, Input.location.lastData.latitude)))
+                if (!zone.InsideInfluence(new Vector2d(Input.location.lastData.latitude, Input.location.lastData.longitude),5))
                 {
+                    Debug.Log("No está en la influencia, pero la ubicación es válida");
                     Game.Instance.renderScene(loadOnExit, 0, 0);
                     DestroyImmediate(this.gameObject);
                 }
             }
-
-            if (Input.location.status == LocationServiceStatus.Stopped)
+            else if (!GPSController.Instance.IsStarted())
             {
-                if (!zone.InsideInfluence(debugLatLong.ToVector2d()))
+                if (!zone.InsideInfluence(debugLatLong.ToVector2d(),5))
                 {
+                    Debug.Log("No está en la influencia");
                     Game.Instance.renderScene(loadOnExit, 0, 0);
                     DestroyImmediate(this.gameObject);
                 }
