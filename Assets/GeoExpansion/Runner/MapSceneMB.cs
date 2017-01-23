@@ -131,7 +131,7 @@ namespace uAdventure.Geo
 
         void Update()
         {
-            if(Input.location.status == LocationServiceStatus.Running)
+            if(Input.location.status == LocationServiceStatus.Running && Input.location.lastData.timestamp != 0 && Input.location.lastData.latitude != 0)
             {
                 timeSinceLastPositionUpdate += Time.deltaTime;
                 var inputLatLon = new Vector2d(Input.location.lastData.latitude, Input.location.lastData.longitude);

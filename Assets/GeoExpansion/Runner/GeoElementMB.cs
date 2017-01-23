@@ -50,7 +50,7 @@ public class GeoElementMB : MonoBehaviour {
                     var dotMerc = GM.LatLonToMeters(Element.Geometry.Points[0].x, Element.Geometry.Points[0].y);
                     var localMercPos = dotMerc - Tile.Rect.Center;
 
-                    transform.localPosition = new Vector3((float)localMercPos.x, (float)localMercPos.y, 10f);
+                    transform.localPosition = new Vector3((float)localMercPos.x, 1f, (float)localMercPos.y);
                     transform.localScale = new Vector3(10, 10, 10);
                 }
                 break;
@@ -84,9 +84,20 @@ public class GeoElementMB : MonoBehaviour {
                 break;
             default:
                 break;
+
+        }
+        if(Element.Name != "")
+        {
+            var tooltip = GameObject.Instantiate(Resources.Load<GameObject>("Tooltip"));
+            tooltip.transform.SetParent(this.transform);
+            tooltip.transform.localRotation = Quaternion.Euler(90, 0, 0);
+            tooltip.transform.localScale = new Vector3(1 / transform.localScale.x, 1 / transform.localScale.y, 1 / transform.localScale.z);
+            tooltip.transform.localPosition = Vector3.zero;
+
+            tooltip.GetComponent<UnityEngine.UI.Text>().text = Element.Name;
         }
 
-        
+
     }
 
 	// Update is called once per frame

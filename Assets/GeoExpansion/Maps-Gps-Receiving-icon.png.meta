@@ -1,14 +1,14 @@
 fileFormatVersion: 2
-guid: 45181fca6be161f41a0f77c5076cfaf8
-timeCreated: 1481824297
+guid: 004ceb1dc4fc2af4982d09a5add33081
+timeCreated: 1485195319
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName: {}
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
-    enableMipMap: 1
-    linearTexture: 0
+    enableMipMap: 0
+    linearTexture: 1
     correctGamma: 0
     fadeOut: 0
     borderMipMap: 0
@@ -30,7 +30,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     filterMode: -1
-    aniso: 16
+    aniso: 1
     mipBias: -1
     wrapMode: 1
   nPOTScale: 0
@@ -38,7 +38,7 @@ TextureImporter:
   rGBM: 0
   compressionQuality: 50
   allowsAlphaSplitting: 0
-  spriteMode: 1
+  spriteMode: 0
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -47,23 +47,8 @@ TextureImporter:
   spritePixelsToUnits: 100
   alphaIsTransparency: 1
   spriteTessellationDetail: -1
-  textureType: 8
-  buildTargetSettings:
-  - buildTarget: Standalone
-    maxTextureSize: 32
-    textureFormat: -1
-    compressionQuality: 50
-    allowsAlphaSplitting: 0
-  - buildTarget: iPhone
-    maxTextureSize: 32
-    textureFormat: -1
-    compressionQuality: 50
-    allowsAlphaSplitting: 0
-  - buildTarget: Android
-    maxTextureSize: 32
-    textureFormat: -1
-    compressionQuality: 50
-    allowsAlphaSplitting: 0
+  textureType: 2
+  buildTargetSettings: []
   spriteSheet:
     serializedVersion: 2
     sprites: []

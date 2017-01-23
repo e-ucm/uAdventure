@@ -25,9 +25,10 @@ public class ScreenLogger : MonoBehaviour {
     bool showLog = false;
     void OnGUI()
     {
-        GUILayout.Button("Show/Hide log", GUILayout.Width(Screen.width), GUILayout.Height(50));
+        if (GUILayout.Button("Show/Hide log", GUILayout.Width(Screen.width), GUILayout.Height(50))) showLog = !showLog;
         if (showLog)
         {
+            
             sc = GUILayout.BeginScrollView(sc, GUILayout.Width(Screen.width), GUILayout.Height(Screen.height));
             GUILayout.BeginVertical();
             logs.ForEach(l => GUILayout.Label(l));

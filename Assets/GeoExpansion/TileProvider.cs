@@ -30,7 +30,6 @@ public class TilePromise
         if (!loadingTexture)
         {
             loadingTexture = Resources.Load<Texture2D>("tile_loading");
-            Debug.Log(loadingTexture);
         }
     }
 

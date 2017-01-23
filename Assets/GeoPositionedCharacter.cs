@@ -9,7 +9,7 @@ public class GeoPositionedCharacter : MonoBehaviour
 
     public TileManager tileManager;
     public ThirdPersonCharacter thirdPersonCharacter;
-    public float minDistanceToWalk = 10; // 2 meters
+    public float minDistanceToWalk = 5; // 2 meters
 
     public void MoveTo(Vector2d latLon)
     {
@@ -44,6 +44,8 @@ public class GeoPositionedCharacter : MonoBehaviour
         Input.compass.enabled = true;
     }
 
+    private Vector3 lastPos = Vector3.zero;
+
     void Update()
     {
         var tileManagerRelative = GM.LatLonToMeters(tileManager.Latitude, tileManager.Longitude);
@@ -53,13 +55,14 @@ public class GeoPositionedCharacter : MonoBehaviour
 
         if (destinationMeters.sqrMagnitude >= minDistanceToWalk * minDistanceToWalk)
             thirdPersonCharacter.Move(Vector3.ClampMagnitude(new Vector3((float)destinationMeters.x, 0, (float)destinationMeters.y), minDistanceToWalk*3) / (minDistanceToWalk*3), false, false);
-        else
+        else if(lastPos == transform.position)
         {
             destination = latLon;
             thirdPersonCharacter.Move(new Vector3(0, 0, 0), false, false);
             transform.localRotation = Quaternion.Euler(0, Input.compass.trueHeading, 0);
         }
-        
+
+        lastPos = transform.position;
 
 
         /* if (destinationMeters.sqrMagnitude >= minDistanceToWalk * minDistanceToWalk)

@@ -39,6 +39,15 @@ namespace uAdventure.Editor
             //LOMConfigData.loadData();
         }
 
+        public static void loadFromXML(string folder)
+        {
+            properties = new Properties("Assets\\Resources\\CurrentGame\\" + FILE_NAME);
+            foreach (ProjectConfigDataConsumer consumer in consumers)
+            {
+                consumer.updateData();
+            }
+        }
+
         public static void storeToXML()
         {
             if (properties == null)

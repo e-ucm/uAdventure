@@ -82,7 +82,7 @@ namespace uAdventure.Editor
             //}
 
             // Add the special asset files
-            AssetsController.addSpecialAssets();
+            // TODO AssetsController.addSpecialAssets();
 
             /** ******* START WRITING THE DESCRIPTOR ********* */
             // Pick the main node for the descriptor

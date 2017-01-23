@@ -1529,7 +1529,7 @@ namespace uAdventure.Editor
 
                         adventureDataControl = new AdventureDataControl(loadedAdventureData);
                         chaptersController = new ChapterListDataControl(adventureDataControl.getChapters());
-                        ProjectConfigData.loadFromXML();
+                        ProjectConfigData.loadFromXML("Assets\\Resources\\CurrentGame");
                         /*AssetsController.checkAssetFilesConsistency(incidences);
                         Incidence.sortIncidences(incidences);
 
@@ -1548,7 +1548,7 @@ namespace uAdventure.Editor
                     ConfigData.fileLoaded(currentZipFile);
                     AssetsController.resetCache();
                     // Load project config file
-                    ProjectConfigData.loadFromXML();
+                    //ProjectConfigData.loadFromXML();
 
                     //startAutoSave(15);
 
