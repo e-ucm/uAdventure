@@ -57,7 +57,7 @@ public class GeoPositionedCharacter : MonoBehaviour
         {
             destination = latLon;
             thirdPersonCharacter.Move(new Vector3(0, 0, 0), false, false);
-            transform.localRotation = Quaternion.Euler(0, 0, Input.compass.trueHeading);
+            transform.localRotation = Quaternion.Euler(0, Input.compass.trueHeading, 0);
         }
         
 

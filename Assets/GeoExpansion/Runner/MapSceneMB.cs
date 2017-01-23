@@ -141,7 +141,7 @@ namespace uAdventure.Geo
                     if (GM.SeparationInMeters(geoCharacter.LatLon, inputLatLon) > 1000) geoCharacter.LatLon = inputLatLon;
                     else geoCharacter.MoveTo(inputLatLon);
 
-                    Tracker.T.setExtension("location", string.Format("{1},{2}", Input.location.lastData.latitude, Input.location.lastData.longitude));
+                    Tracker.T.setExtension("location", Input.location.lastData.latitude + ","+ Input.location.lastData.longitude);
                     Tracker.T.Trace("moved", "geoposition", "player");// Tracker.Verb.Completed.ToString().ToLower(), type.ToString().ToLower(), completableId);
                     Tracker.T.RequestFlush();
                     timeSinceLastPositionUpdate = 0;

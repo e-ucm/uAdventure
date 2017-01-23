@@ -84,15 +84,20 @@ namespace uAdventure.Runner
             //Load tracker data
             SimpleJSON.JSONNode hostfile = new SimpleJSON.JSONClass();
 
-#if !(UNITY_WEBPLAYER || UNITY_WEBGL)
-            if (!System.IO.File.Exists("host.cfg"))
+#if UNITY_WEBPLAYER || UNITY_WEBGL
+#elif UNITY_ANDROID || UNITY_IPHONE
+#else
+            if (useSystemIO)
             {
-                hostfile.Add("host", new SimpleJSON.JSONData("http://192.168.175.117:3000/api/proxy/gleaner/collector/"));
-                hostfile.Add("trackingCode", new SimpleJSON.JSONData("57d81d5585b094006eab04d6ndecvjlvjss8aor"));
-                System.IO.File.WriteAllText("host.cfg", hostfile.ToString());
+                if (!System.IO.File.Exists("host.cfg"))
+                {
+                    hostfile.Add("host", new SimpleJSON.JSONData("http://192.168.175.117:3000/api/proxy/gleaner/collector/"));
+                    hostfile.Add("trackingCode", new SimpleJSON.JSONData("57d81d5585b094006eab04d6ndecvjlvjss8aor"));
+                    System.IO.File.WriteAllText("host.cfg", hostfile.ToString());
+                }
+                else
+                    hostfile = SimpleJSON.JSON.Parse(System.IO.File.ReadAllText("host.cfg"));
             }
-            else
-                hostfile = SimpleJSON.JSON.Parse(System.IO.File.ReadAllText("host.cfg"));
 #endif
             try
             {
