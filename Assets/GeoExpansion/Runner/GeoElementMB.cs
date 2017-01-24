@@ -10,8 +10,14 @@ using System.Linq;
 using System;
 using uAdventure.Runner;
 using uAdventure.RageTracker;
+using ClipperLib;
+
+using Path = System.Collections.Generic.List<ClipperLib.IntPoint>;
+using Paths = System.Collections.Generic.List<System.Collections.Generic.List<ClipperLib.IntPoint>>;
 
 public class GeoElementMB : MonoBehaviour {
+
+    public Material poiMat, pathMat, polyMat;
 
     public Tile Tile { get; set; }
     public GeoElement Element { get; set; }
@@ -22,9 +28,6 @@ public class GeoElementMB : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        
-        var inp = new InputGeometry(Element.Geometry.Points.Count);
-        int i = 0;
 
         player = FindObjectOfType<GeoPositionedCharacter>();
 
@@ -37,15 +40,17 @@ public class GeoElementMB : MonoBehaviour {
             geoActionManagers.Add(newManager);
         }
 
+        var mesh = GetComponent<MeshFilter>().mesh;
+
         switch (Element.Geometry.Type)
         {
             case GMLGeometry.GeometryType.Point:
                 {
                     var poi = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                    var renderer = poi.GetComponent<Renderer>();
-                    renderer.material.color = Color.blue;
                     GetComponent<MeshFilter>().mesh = poi.GetComponent<MeshFilter>().mesh;
+                    GetComponent<MeshRenderer>().material = poiMat;
                     DestroyImmediate(poi);
+
 
                     var dotMerc = GM.LatLonToMeters(Element.Geometry.Points[0].x, Element.Geometry.Points[0].y);
                     var localMercPos = dotMerc - Tile.Rect.Center;
@@ -55,37 +60,35 @@ public class GeoElementMB : MonoBehaviour {
                 }
                 break;
             case GMLGeometry.GeometryType.LineString:
+                {
+                    // First we extend the line for it to have some width using clipper
+                    Path polygon = Element.Geometry.Points
+                        .ConvertAll(p => GM.LatLonToMeters(p.x, p.y)) // To meters
+                        .ConvertAll(p => new IntPoint(p.x, p.y)); // To IntPoint type usable by clipper
 
+                    Paths solution = new Paths();
+
+                    ClipperOffset c = new ClipperOffset();
+
+                    c.AddPath(polygon, JoinType.jtSquare, EndType.etOpenSquare);
+                    c.Execute(ref solution, 5); // 5 meters
+
+                    var r = solution[0].ConvertAll(p => new Vector2d(p.X, p.Y)); // ConvertBack to Vector2d all the points (meters)
+
+                    // Then create the polygon that represents the path
+                    CreatePolygonMesh(r, ref mesh);
+                    GetComponent<MeshRenderer>().material = pathMat;
+                }
                 break;
             case GMLGeometry.GeometryType.Polygon:
-
-                foreach (var p in Element.Geometry.Points)
-                {
-                    var dotMerc = GM.LatLonToMeters(p.x, p.y);
-                    var localMercPos = dotMerc - Tile.Rect.Center;
-                    inp.AddPoint(localMercPos.x, localMercPos.y);
-                    inp.AddSegment(i, (i + 1) % Element.Geometry.Points.Count);
-                    i++;
-                }
-                var md = new MeshData();
-                var mesh = GetComponent<MeshFilter>().mesh;
-
-                CreateMesh(inp, md);
-
-                //I want object center to be in the middle of object, not at the corner of the tile
-                var center = ChangeToRelativePositions(md.Vertices);
-                transform.localPosition = center;
-
-                mesh.vertices = md.Vertices.ToArray();
-                mesh.triangles = md.Indices.ToArray();
-                mesh.SetUVs(0, md.UV);
-                mesh.RecalculateNormals();
-
+                CreatePolygonMesh(Element.Geometry.Points.ConvertAll(p => GM.LatLonToMeters(p.x, p.y)), ref mesh);
+                GetComponent<MeshRenderer>().material = polyMat;
                 break;
             default:
                 break;
 
         }
+
         if(Element.Name != "")
         {
             var tooltip = GameObject.Instantiate(Resources.Load<GameObject>("Tooltip"));
@@ -105,6 +108,32 @@ public class GeoElementMB : MonoBehaviour {
         geoActionManagers.ForEach(g => g.Update());
     }
 
+    private void CreatePolygonMesh(List<Vector2d> points, ref UnityEngine.Mesh mesh)
+    {
+        var inp = new InputGeometry(points.Count);
+        int i = 0;
+
+        foreach (var p in points)
+        {
+            var localMercPos = p - Tile.Rect.Center;
+            inp.AddPoint(localMercPos.x, localMercPos.y);
+            inp.AddSegment(i, (i + 1) % points.Count);
+            i++;
+        }
+
+        var md = new MeshData();
+
+        CreateMesh(inp, md);
+
+        //I want object center to be in the middle of object, not at the corner of the tile
+        var center = ChangeToRelativePositions(md.Vertices);
+        transform.localPosition = center;
+
+        mesh.vertices = md.Vertices.ToArray();
+        mesh.triangles = md.Indices.ToArray();
+        mesh.SetUVs(0, md.UV);
+        mesh.RecalculateNormals();
+    }
 
     private void CreateMesh(InputGeometry corners, MeshData meshdata)
     {
