@@ -26,11 +26,6 @@ namespace uAdventure.Core
         private ConversationNode nextNode;
 
         /**
-         * Indicates if the node is terminal or not
-         */
-        private bool terminal;
-
-        /**
          * Effect to be triggered when the node has finished (if it's terminal)
          */
         private Effects effects;
@@ -57,7 +52,6 @@ namespace uAdventure.Core
 
             dialogue = new List<ConversationLine>();
             nextNode = null;
-            terminal = true;
             effects = new Effects();
             this.keepShowing = waitUserInteraction;
         }
@@ -83,7 +77,7 @@ namespace uAdventure.Core
         public override bool isTerminal()
         {
 
-            return terminal;
+            return nextNode == null;
         }
 
         /*
@@ -119,7 +113,6 @@ namespace uAdventure.Core
                 throw new System.Exception();
 
             nextNode = child;
-            terminal = false;
             //TODO MODIFIED
             //effects.clear( );
         }
@@ -131,7 +124,6 @@ namespace uAdventure.Core
                 throw new System.Exception();
 
             nextNode = child;
-            terminal = false;
             //TODO MODIFIED
             //effects.clear( );
         }
@@ -144,7 +136,6 @@ namespace uAdventure.Core
 
             ConversationNode deletedChild = nextNode;
             nextNode = null;
-            terminal = true;
             return deletedChild;
         }
 
@@ -267,7 +258,6 @@ namespace uAdventure.Core
             dcn.effects = (effects != null ? (Effects)effects.Clone() : null);
             //dcn.nextNode = (nextNode != null ? (ConversationNode) nextNode.clone() : null);
             dcn.nextNode = null;
-            dcn.terminal = terminal;
             dcn.keepShowing = keepShowing;
             return dcn;
         }

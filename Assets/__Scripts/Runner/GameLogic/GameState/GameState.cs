@@ -176,15 +176,11 @@ namespace uAdventure.Runner
                 return idMethod != null && ((string)idMethod.Invoke(e, null)) == id;
             });
         }
-
-        public GeneralScene getGeneralScene(string scene_id)
-        {
-            return data.getChapters()[current_chapter].getGeneralScene(scene_id);
-        }
+        
 
         public bool isCutscene(string scene_id)
         {
-            return data.getChapters()[current_chapter].getGeneralScene(scene_id).getType() != GeneralScene.GeneralSceneSceneType.SCENE;
+            return data.getChapters()[current_chapter].getObjects<Cutscene>().Exists(s => s.getId() == scene_id);
         }
         
         /*private GeneralScene getInitialScene()
@@ -219,11 +215,9 @@ namespace uAdventure.Runner
             return null;
         }
 
-        internal IChapterTarget getChapterTarget(string scene_id)
+        public IChapterTarget getChapterTarget(string runnerTargetId)
         {
-            return (IChapterTarget) data.getChapters()[current_chapter]
-                .getObjects()
-                .Find(o => o is IChapterTarget && (o as IChapterTarget).getId() == scene_id);
+            return data.getChapters()[current_chapter].getObjects<IChapterTarget>().Find(o => o.getId() == runnerTargetId);
         }
 
         //##########################################################################

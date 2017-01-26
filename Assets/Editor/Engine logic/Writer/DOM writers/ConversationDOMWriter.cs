@@ -125,14 +125,14 @@ namespace uAdventure.Editor
                     // If it is terminal add a "end-conversation" element
                     XmlElement endConversation = document.CreateElement("end-conversation");
 
+                    // Add the "end-conversation" tag into the root
+                    rootDOMNode.AppendChild(endConversation);
+
                     // If the terminal node has an effect, include it into the DOM
                     if (currentNode.hasEffects())
                     {
                         DOMWriterUtility.DOMWrite(endConversation, currentNode.getEffects());
                     }
-
-                    // Add the "end-conversation" tag into the root
-                    rootDOMNode.AppendChild(endConversation);
                 }
                 else
                 {
@@ -288,7 +288,7 @@ namespace uAdventure.Editor
                         // If the terminal node has an effect, include it into the DOM
                         if (node.hasEffects())
                         {
-                            DOMWriterUtility.DOMWrite(nodeElement, node.getEffects());
+                            DOMWriterUtility.DOMWrite(endConversation, node.getEffects());
                         }
 
                         // Add the "end-conversation" tag into the node

@@ -879,7 +879,13 @@ namespace uAdventure.Core
         public List<T> getObjects<T>()
         {
             if (!extensionObjects.ContainsKey(typeof(T)))
-                extensionObjects.Add(typeof(T), new List<T>());
+            {
+                var exists = new List<T>(getObjects().FindAll(o => o is T).Cast<T>());
+                if (exists.Count == 0)
+                    extensionObjects.Add(typeof(T), new List<T>());
+                else
+                    return exists;
+            }
 
             return extensionObjects[typeof(T)] as List<T>;
         }

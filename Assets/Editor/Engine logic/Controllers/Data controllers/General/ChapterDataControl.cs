@@ -637,6 +637,11 @@ namespace uAdventure.Editor
             return this.completables;
         }
 
+        public List<object> getObjects()
+        {
+            return chapter.getObjects();
+        }
+
         public List<T> getObjects<T>()
         {
             return chapter.getObjects<T>();

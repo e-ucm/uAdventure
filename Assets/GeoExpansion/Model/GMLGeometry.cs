@@ -104,6 +104,7 @@ public class GMLGeometry
         for (int i = 0; i < Points.Count; i++)
         {
             closestPoin = GetClosestPointOnLineSegment(Points[l], Points[i], point);
+            l = i;
             if ((GM.LatLonToMeters(closestPoin) - mp).magnitude <= Influence + extraMargin)
                 return true;
         }

@@ -137,8 +137,8 @@ namespace uAdventure.Core
                 Action currentAction = new Action(0);
                 switch (action.Name)
                 {
-                    case "examines": currentAction = new Action(Action.EXAMINE, currentConditions, currentEffects, currentNotEffects); break;
-                    case "grabs": currentAction = new Action(Action.GRAB, currentConditions, currentEffects, currentNotEffects); break;
+                    case "examine": currentAction = new Action(Action.EXAMINE, currentConditions, currentEffects, currentNotEffects); break;
+                    case "grab": currentAction = new Action(Action.GRAB, currentConditions, currentEffects, currentNotEffects); break;
                     case "use": currentAction = new Action(Action.USE, currentConditions, currentEffects, currentNotEffects); break;
                     case "talk-to": currentAction = new Action(Action.TALK_TO, currentConditions, currentEffects, currentNotEffects); break;
                     case "use-with": currentAction = new Action(Action.USE_WITH, currentIdTarget, currentConditions, currentEffects, currentNotEffects, currentClickEffects); break;

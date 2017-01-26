@@ -32,7 +32,12 @@ namespace uAdventure.Editor
 
         public TriggerSceneEffectEditor()
         {
-            scenes = Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenesIDs();
+            scenes = Controller.getInstance().getSelectedChapterDataControl()
+                .getObjects()
+                .FindAll(o => o is IChapterTarget)
+                .ConvertAll(t => (t as IChapterTarget).getId())
+                .ToArray();
+
             this.effect = new TriggerSceneEffect(scenes[0], x, y);
         }
 

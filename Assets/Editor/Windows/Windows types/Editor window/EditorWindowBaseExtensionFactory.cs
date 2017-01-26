@@ -43,8 +43,13 @@ namespace uAdventure.Editor
             {
                 knownExtensions = new Dictionary<Type, Type>();
                 priorities = new Dictionary<Type, int>();
+
             }
-            else knownExtensions.Clear();
+            else
+            {
+                knownExtensions.Clear();
+                priorities.Clear();
+            }
 
             // Make sure is a DOMWriter
             var extensions = GetTypesWith<EditorWindowExtensionAttribute>(true).Where(t => typeof(EditorWindowExtension).IsAssignableFrom(t));

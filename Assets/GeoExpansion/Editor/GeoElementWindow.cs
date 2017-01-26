@@ -20,8 +20,6 @@ namespace uAdventure.Geo
     {
         private int selectedElement;
 
-        const string PATH_SAVE_SCRIPTABLE_OBJECT = "Assets/MapzenGo/Resources/Settings/";
-
         /* ---------------------------------
          * Attributes
          * -------------------------------- */

@@ -19,9 +19,13 @@ public class GeoElementMB : MonoBehaviour {
 
     public Material poiMat, pathMat, polyMat;
 
+    public GameObject Tooltip;
+
     public Tile Tile { get; set; }
     public GeoElement Element { get; set; }
     public GeoReference Reference { get; set; }
+
+    public bool inside;
 
     protected GeoPositionedCharacter player;
     private List<GeoActionManager> geoActionManagers;
@@ -91,16 +95,16 @@ public class GeoElementMB : MonoBehaviour {
 
         if(Element.Name != "")
         {
-            var tooltip = GameObject.Instantiate(Resources.Load<GameObject>("Tooltip"));
+            var tooltip = GameObject.Instantiate(Tooltip);
             tooltip.transform.SetParent(this.transform);
             tooltip.transform.localRotation = Quaternion.Euler(90, 0, 0);
             tooltip.transform.localScale = new Vector3(1 / transform.localScale.x, 1 / transform.localScale.y, 1 / transform.localScale.z);
             tooltip.transform.localPosition = Vector3.zero;
 
-            tooltip.GetComponent<UnityEngine.UI.Text>().text = Element.Name;
+            tooltip.GetComponentInChildren<UnityEngine.UI.Text>().text = Element.Name;
         }
 
-
+        inside = Element.Geometry.InsideInfluence(player.LatLon);
     }
 
 	// Update is called once per frame

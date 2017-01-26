@@ -59,7 +59,8 @@ public class GeoPositionedCharacter : MonoBehaviour
         {
             destination = latLon;
             thirdPersonCharacter.Move(new Vector3(0, 0, 0), false, false);
-            transform.localRotation = Quaternion.Euler(0, Input.compass.trueHeading, 0);
+            if(Input.compass.enabled)
+                transform.localRotation = Quaternion.Euler(0, Input.compass.trueHeading, 0);
         }
 
         lastPos = transform.position;
@@ -88,7 +89,11 @@ public class GeoPositionedCharacter : MonoBehaviour
 
     public bool IsLookingTowards(Vector2d direction)
     {
-        return Vector3.Angle(direction.ToVector3().normalized, Quaternion.Euler(0, 0, Input.compass.trueHeading) * Vector3.forward) < 15; // 15 degree tolerance
+        var headingTo = Input.compass.enabled ? Quaternion.Euler(0, Input.compass.trueHeading, 0) * Vector3.forward : transform.rotation * Vector3.forward;
+        var directionNo = direction.ToVector3().normalized;
+        var angle = Vector3.Angle(directionNo, headingTo);
+
+        return angle < 15; // 15 degree tolerance
     }
 }
     
