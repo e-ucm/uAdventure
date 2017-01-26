@@ -422,8 +422,11 @@ public class GUIMap
         c.AddPath(polygon, JoinType.jtRound, type == GMLGeometry.GeometryType.Polygon ? EndType.etClosedPolygon : EndType.etOpenRound);
         c.Execute(ref solution, radius);
         
-        var r = solution[0].ConvertAll(p => new Vector2(p.X, p.Y));
-        r.Add(r[0]);
+        var r = solution.Count > 0 ? solution[0].ConvertAll(p => new Vector2(p.X, p.Y)) : new List<Vector2>();
+
+        if(r.Count > 0)
+            r.Add(r[0]);
+
         return r;
     }
 }

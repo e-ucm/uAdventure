@@ -5,14 +5,11 @@ using System.Collections.Generic;
 using uAdventure.Editor;
 using UnityEditorInternal;
 
-using uAdventure.Geo;
 using MapzenGo.Helpers.Search;
 using UnityEditor;
 using System.Linq;
 using MapzenGo.Helpers;
 using MapzenGo.Models.Settings.Editor;
-using System;
-using uAdventure.Core;
 
 namespace uAdventure.Geo
 {
@@ -22,23 +19,18 @@ namespace uAdventure.Geo
 
         private int selectedElement;
 
-        const string PATH_SAVE_SCRIPTABLE_OBJECT = "Assets/MapzenGo/Resources/Settings/";
 
         /* ---------------------------------
          * Attributes
          * -------------------------------- */
 
-        private SearchPlace place;
-        private string address = "";
-        private string lastSearch = "";
-        private float timeSinceLastWrite;
+        private PlaceSearcher placeSearcher;
         private MapScene mapScene;
         private Rect mm_Rect;
 
         /* ----------------------------------
          * GUI ELEMENTS
          * -----------------------------------*/
-        private DropDown addressDropdown;
         private GUIMap map;
         private ReorderableList mapElementReorderableList;
 
@@ -50,14 +42,7 @@ namespace uAdventure.Geo
             bc.image = (Texture2D)Resources.Load("EAdventureData/img/icons/map", typeof(Texture2D));
             bc.text = "MapScenes";  //TC.get("Element.Name1");
             ButtonContent = bc;
-
-            // Get existing open window or if none, make a new one:
-            place = UnityEngine.Object.FindObjectOfType<SearchPlace>();
-            if (place == null)
-            {
-                SearchPlace search = new GameObject("Searcher").AddComponent<SearchPlace>();
-                place = search;
-            }
+            
 
             Init();
         }
@@ -67,13 +52,9 @@ namespace uAdventure.Geo
          * ----------------------------------*/
         void Init()
         {
-            EditorApplication.update += this.Update;
+            placeSearcher = new PlaceSearcher("Address");
+            placeSearcher.OnRequestRepaint += Repaint;
 
-            place.DataStructure = HelperExtention.GetOrCreateSObjectReturn<StructSearchData>(ref place.DataStructure, PATH_SAVE_SCRIPTABLE_OBJECT);
-            place.namePlaceСache = "";
-            place.DataStructure.dataChache.Clear();
-
-            addressDropdown = new DropDown("Address");
             map = new GUIMap();
             map.Repaint += Repaint;
             map.Zoom = 19;
@@ -98,16 +79,10 @@ namespace uAdventure.Geo
             }
 
 
-            if (addressDropdown == null)
+            if (placeSearcher == null)
                 Init();
 
-            var prevAddress = address;
-            address = addressDropdown.LayoutBegin();
-            if (address != prevAddress)
-            {
-                timeSinceLastWrite = 0;
-            }
-
+            placeSearcher.LayoutBegin();
 
             // Location control
             mapScene.LatLon = EditorGUILayout.Vector2Field("Location", mapScene.LatLon.ToVector2()).ToVector2d();
@@ -145,16 +120,9 @@ namespace uAdventure.Geo
 
             GUILayout.EndHorizontal();
 
-            if (addressDropdown.LayoutEnd())
+            if (placeSearcher.LayoutEnd())
             {
-                // If new Location is selected from the dropdown
-                lastSearch = address = addressDropdown.Value;
-                foreach (var l in place.DataStructure.dataChache)
-                    if (l.label == address)
-                        mapScene.LatLon = l.coordinates.ToVector2d();
-
-
-                place.DataStructure.dataChache.Clear();
+                mapScene.LatLon = placeSearcher.LatLon;
                 Repaint();
             }
         }
@@ -252,41 +220,6 @@ namespace uAdventure.Geo
         protected override void OnUpdateList(ReorderableList r)
         {
             r.list = Controller.getInstance().getSelectedChapterDataControl().getObjects<MapScene>().ConvertAll(s => s.Id);
-        }
-
-        /* ------------------------------------------
-         * Update: used for taking care of the http requests
-         * ------------------------------------------ */
-        void Update()
-        {
-            //Debug.Log(Time.fixedDeltaTime);
-            timeSinceLastWrite += Time.fixedDeltaTime;
-            if (timeSinceLastWrite > 3f)
-            {
-                PerformSearch();
-            }
-
-            if (place.DataStructure.dataChache.Count > 0)
-            {
-                var addresses = new List<string>();
-                foreach (var r in place.DataStructure.dataChache)
-                    addresses.Add(r.label);
-                addressDropdown.Elements = addresses;
-                Repaint();
-            }
-        }
-
-        /* ---------------------------------------
-         * PerformSearch: Used to control the start of searches
-         * --------------------------------------- */
-        private void PerformSearch()
-        {
-            if (address != null && address.Trim() != "" && lastSearch != address)
-            {
-                place.namePlace = address;
-                place.SearchInMapzen();
-                lastSearch = address;
-            }
         }
 
 

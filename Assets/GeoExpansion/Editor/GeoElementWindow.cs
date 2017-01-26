@@ -25,12 +25,8 @@ namespace uAdventure.Geo
         /* ---------------------------------
          * Attributes
          * -------------------------------- */
-
-        private SearchPlace place;
-        private string address = "";
+         
         private Vector2 location;
-        private string lastSearch = "";
-        private float timeSinceLastWrite;
         private bool editing;
         private GeoElement element;
         private Rect mm_Rect;
@@ -40,7 +36,7 @@ namespace uAdventure.Geo
         /* ----------------------------------
          * GUI ELEMENTS
          * -----------------------------------*/
-        private DropDown addressDropdown;
+        private PlaceSearcher placeSearcher;
         private GUIMap map;
         private ReorderableList actionsList;
 
@@ -52,14 +48,7 @@ namespace uAdventure.Geo
             bc.image = (Texture2D)Resources.Load("EAdventureData/img/icons/poi", typeof(Texture2D));
             bc.text = "GeoElements";  //TC.get("Element.Name1");
             ButtonContent = bc;
-
-            // Get existing open window or if none, make a new one:
-            place = UnityEngine.Object.FindObjectOfType<SearchPlace>();
-            if (place == null)
-            {
-                SearchPlace search = new GameObject("Searcher").AddComponent<SearchPlace>();
-                place = search;
-            }
+            
             menus = new string[] { "Position", "Attributes", "Actions" };
 
             Init();
@@ -70,13 +59,8 @@ namespace uAdventure.Geo
          * ----------------------------------*/
         void Init()
         {
-            EditorApplication.update += this.Update;
-            
-            place.DataStructure = HelperExtention.GetOrCreateSObjectReturn<StructSearchData>(ref place.DataStructure, PATH_SAVE_SCRIPTABLE_OBJECT);
-            place.namePlaceСache = "";
-            place.DataStructure.dataChache.Clear();
-
-            addressDropdown = new DropDown("Address");
+            placeSearcher = new PlaceSearcher("Address");
+            placeSearcher.OnRequestRepaint += Repaint;
             map = new GUIMap();
             map.Repaint += Repaint;
             map.Zoom = 19;
@@ -214,12 +198,7 @@ namespace uAdventure.Geo
                         }
                         
                         EditorGUILayout.Separator();
-                        var prevAddress = address;
-                        address = addressDropdown.LayoutBegin();
-                        if (address != prevAddress)
-                        {
-                            timeSinceLastWrite = 0;
-                        }
+                        placeSearcher.LayoutBegin();
 
                         // Location control
                         location = EditorGUILayout.Vector2Field("Location", location);
@@ -244,15 +223,10 @@ namespace uAdventure.Geo
                         location = map.Center.ToVector2();
                         
 
-                        if (addressDropdown.LayoutEnd())
+                        if (placeSearcher.LayoutEnd())
                         {
                             // If new Location is selected from the dropdown
-                            lastSearch = address = addressDropdown.Value;
-                            foreach (var l in place.DataStructure.dataChache)
-                                if (l.label == address)
-                                    location = l.coordinates;
-
-                            place.DataStructure.dataChache.Clear();
+                            location = placeSearcher.LatLon.ToVector2();
                             Repaint();
                         }
                     } break;
@@ -336,41 +310,6 @@ namespace uAdventure.Geo
                 location = map.Center.ToVector2();
             }
 
-        }
-
-        /* ------------------------------------------
-         * Update: used for taking care of the http requests
-         * ------------------------------------------ */
-        void Update()
-        {
-            //Debug.Log(Time.fixedDeltaTime);
-            timeSinceLastWrite += Time.fixedDeltaTime;
-            if (timeSinceLastWrite > 3f)
-            {
-                PerformSearch();
-            }
-
-            if (place.DataStructure.dataChache.Count > 0)
-            {
-                var addresses = new List<string>();
-                foreach (var r in place.DataStructure.dataChache)
-                    addresses.Add(r.label);
-                addressDropdown.Elements = addresses;
-                Repaint();
-            }
-        }
-
-        /* ---------------------------------------
-         * PerformSearch: Used to control the start of searches
-         * --------------------------------------- */
-        private void PerformSearch()
-        {
-            if (address != null && address.Trim() != "" && lastSearch != address)
-            {
-                place.namePlace = address;
-                place.SearchInMapzen();
-                lastSearch = address;
-            }
         }
 
         enum AssetType
