@@ -5,25 +5,28 @@ namespace uAdventure.Editor
     {
         protected static int m_WindowIDCounter = 5555;
         private int m_WindowID = m_WindowIDCounter++; // simple automatic id distribution
-        protected GUIContent m_Content;
-        protected GUIStyle m_Style;
         protected Rect m_Rect;
-        
+
+        public GUIStyle Style;
+        public GUIContent Content;
+
         // Request repaint
         public delegate void RequestRepaint();
         public RequestRepaint OnRequestRepaint;
         protected void Repaint(){ OnRequestRepaint(); }
 
         public int WindowID { get { return m_WindowID; } }
+        
         public BaseWindow(Rect aStartPos, GUIContent aContent, GUIStyle aStyle)
         {
-            m_Content = aContent;
-            m_Style = aStyle;
+            Content = aContent;
+            Style = aStyle;
             m_Rect = aStartPos;
         }
+
         public virtual void OnGUI()
         {
-            m_Rect = GUI.Window(WindowID, m_Rect, Draw, m_Content, m_Style);
+            m_Rect = GUI.Window(WindowID, m_Rect, Draw, Content, Style);
         }
         public virtual void Draw(int aID)
         { }

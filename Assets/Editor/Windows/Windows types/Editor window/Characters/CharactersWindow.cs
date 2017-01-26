@@ -7,6 +7,7 @@ using System.Collections.Generic;
 
 namespace uAdventure.Editor
 {
+    [EditorWindowExtension(50, typeof(NPC))]
     public class CharactersWindow : ReorderableListEditorWindowExtension
     {
         private enum CharactersWindowType { Action, Appearance, DialogConfiguration, Documentation }
@@ -26,8 +27,8 @@ namespace uAdventure.Editor
         private static GUISkin selectedButtonSkin;
         private static GUISkin defaultSkin;
 
-        public CharactersWindow(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
-            : base(aStartPos, aContent, aStyle, aOptions)
+        public CharactersWindow(Rect aStartPos, GUIStyle aStyle, params GUILayoutOption[] aOptions)
+            : base(aStartPos, new GUIContent(TC.get("Element.Name27")), aStyle, aOptions)
         {
             var c = new GUIContent();
             c.image = (Texture2D)Resources.Load("EAdventureData/img/icons/npcs", typeof(Texture2D));

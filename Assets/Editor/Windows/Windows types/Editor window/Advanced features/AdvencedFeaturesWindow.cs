@@ -6,6 +6,7 @@ using System;
 
 namespace uAdventure.Editor
 {
+    [EditorWindowExtension(90, typeof(AdvencedFeaturesWindow))]
     public class AdvencedFeaturesWindow : DefaultButtonMenuEditorWindowExtension
     {
         private enum AdvencedFeaturesWindowType
@@ -24,9 +25,9 @@ namespace uAdventure.Editor
         private static AdvencedFeaturesWindowListOfTimers advencedFeaturesWindowListOfTimers;
         private static AdvencedFeaturesWindowMacros advencedFeaturesWindowMacros;
 
-        public AdvencedFeaturesWindow(Rect aStartPos, GUIContent aContent, GUIStyle aStyle,
+        public AdvencedFeaturesWindow(Rect aStartPos, GUIStyle aStyle,
             params GUILayoutOption[] aOptions)
-            : base(aStartPos, aContent, aStyle, aOptions)
+            : base(aStartPos, new GUIContent(TC.get("AdvancedFeatures.Title")), aStyle, aOptions)
         {
             var c = new GUIContent();
             c.image = (Texture2D)Resources.Load("EAdventureData/img/icons/advanced", typeof(Texture2D));

@@ -6,6 +6,9 @@ namespace uAdventure.Editor
 {
     public abstract class DefaultButtonMenuEditorWindowExtension : ButtonMenuEditorWindowExtension
     {
+        public DefaultButtonMenuEditorWindowExtension(Rect rect, params GUILayoutOption[] options) : this(rect, null, null, options) { }
+        public DefaultButtonMenuEditorWindowExtension(Rect rect, GUIContent content, params GUILayoutOption[] options) : this(rect, content, null, options) { }
+        public DefaultButtonMenuEditorWindowExtension(Rect rect, GUIStyle style, params GUILayoutOption[] options) : this(rect, null, style, options) { }
         public DefaultButtonMenuEditorWindowExtension(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions) : base(aStartPos, aContent, aStyle, aOptions)
         {
             UseAnimation = false;

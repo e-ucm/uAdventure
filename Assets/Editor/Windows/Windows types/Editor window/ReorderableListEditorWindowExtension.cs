@@ -66,7 +66,10 @@ namespace uAdventure.Editor
             }
         }
 
-        public ReorderableListEditorWindowExtension(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions) : base(aStartPos, aContent, aStyle, aOptions)
+        public ReorderableListEditorWindowExtension(Rect rect, params GUILayoutOption[] options) : this(rect, null, null, options) { }
+        public ReorderableListEditorWindowExtension(Rect rect, GUIContent content, params GUILayoutOption[] options) : this(rect, content, null, options) { }
+        public ReorderableListEditorWindowExtension(Rect rect, GUIStyle style, params GUILayoutOption[] options) : this(rect, null, style, options) { }
+        public ReorderableListEditorWindowExtension(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
         {
             elements = new List<string>();
 
@@ -131,11 +134,18 @@ namespace uAdventure.Editor
         protected virtual void DrawHeader(Rect rect){}
         protected virtual void DrawFooter(Rect rect){}
 
-        protected virtual void DrawElement(Rect rect, int index, bool b, bool b2)
+        protected virtual void DrawElement(Rect rect, int index, bool active, bool focused)
         {
             var oldName = reorderableList.list[index] as string;
-            var newName = GUI.TextField(rect, oldName);
-            if (oldName != newName) OnElementNameChanged(reorderableList, index, newName);
+            if (active)
+            {
+                var newName = GUI.TextField(rect, oldName);
+                if (oldName != newName) OnElementNameChanged(reorderableList, index, newName);
+            }
+            else
+            {
+                GUI.Label(rect, oldName);
+            }
         }
         protected abstract void OnElementNameChanged(ReorderableList r, int index, string newName);
 

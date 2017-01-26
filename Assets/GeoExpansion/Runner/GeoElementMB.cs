@@ -76,7 +76,7 @@ public class GeoElementMB : MonoBehaviour {
                     var r = solution[0].ConvertAll(p => new Vector2d(p.X, p.Y)); // ConvertBack to Vector2d all the points (meters)
 
                     // Then create the polygon that represents the path
-                    CreatePolygonMesh(r, ref mesh);
+                    CreatePolygonMesh(r, ref mesh); 
                     GetComponent<MeshRenderer>().material = pathMat;
                 }
                 break;

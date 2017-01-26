@@ -7,6 +7,7 @@ using System.Collections.Generic;
 
 namespace uAdventure.Editor
 {
+    [EditorWindowExtension(80, typeof(Book))]
     public class BooksWindow : ReorderableListEditorWindowExtension
     {
         private enum BookWindowType { Appearance, Content, Documentation }
@@ -27,8 +28,8 @@ namespace uAdventure.Editor
         // Flag determining visibility of concrete item information
         private bool isConcreteItemVisible = false;
 
-        public BooksWindow(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
-            : base(aStartPos, aContent, aStyle, aOptions)
+        public BooksWindow(Rect aStartPos, GUIStyle aStyle, params GUILayoutOption[] aOptions)
+            : base(aStartPos, new GUIContent(TC.get("Element.Name11")), aStyle, aOptions)
         {
             var c = new GUIContent();
             c = new GUIContent();

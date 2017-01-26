@@ -113,7 +113,8 @@ namespace uAdventure.Editor
             chapterWindow = new ChapterWindow(windowRect, new GUIContent(TC.get("Element.Name0")), "Window");
 
             // Extensions of the editor
-            extensions.Add(new ScenesWindow(windowRect, new GUIContent(TC.get("Element.Name1")), "Window"));
+            extensions = EditorWindowBaseExtensionFactory.Instance.CreateAllExistingExtensions(windowRect, "Window");
+            /*extensions.Add(new ScenesWindow(windowRect, new GUIContent(TC.get("Element.Name1")), "Window"));
             extensions.Add(new CutscenesWindow(windowRect, new GUIContent(TC.get("Element.Name9")), "Window"));
             extensions.Add(new BooksWindow(windowRect, new GUIContent(TC.get("Element.Name11")), "Window"));
             extensions.Add(new ItemsWindow(windowRect, new GUIContent(TC.get("Element.Name18")), "Window"));
@@ -125,7 +126,7 @@ namespace uAdventure.Editor
             extensions.Add(new AssesmentProfileWindow(windowRect, new GUIContent(Language.GetText("ASSESMENT_PROFILES")), "Window"));
             extensions.Add(new MapSceneWindow(windowRect, new GUIContent("MapSceneWindow"), "Window"));
             extensions.Add(new GeoElementWindow(windowRect, new GUIContent("GeoElements"), "Window"));
-            extensions.Add(new QRCodeEditorWindow(windowRect, new GUIContent("QR Codes"), "Window"));
+            extensions.Add(new QRCodeEditorWindow(windowRect, new GUIContent("QR Codes"), "Window"));*/
 
             foreach (var e in extensions)
             {

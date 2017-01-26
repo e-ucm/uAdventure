@@ -26,7 +26,10 @@ namespace uAdventure.Editor
             }
         }
 
-        public ButtonMenuEditorWindowExtension(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions) : base(aStartPos, aContent, aStyle, aOptions)
+        public ButtonMenuEditorWindowExtension(Rect rect, params GUILayoutOption[] aOptions) : this(rect, null, null, aOptions) { }
+        public ButtonMenuEditorWindowExtension(Rect rect, GUIStyle style, params GUILayoutOption[] aOptions) : this(rect, null, style, aOptions) { }
+        public ButtonMenuEditorWindowExtension(Rect rect, GUIContent content, params GUILayoutOption[] aOptions) : this(rect, content, null, aOptions) { }
+        public ButtonMenuEditorWindowExtension(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] aOptions) : base(rect, content, style, aOptions)
         {
             UseAnimation = true;
             extended = new AnimBool(false);

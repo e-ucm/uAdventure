@@ -5,9 +5,10 @@ namespace uAdventure.Editor
 {
     public abstract class EditorWindowExtension : LayoutWindow
     {
-        public EditorWindowExtension(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions) : base(aStartPos, aContent, aStyle, aOptions)
-        {
-        }
+        public EditorWindowExtension(Rect rect, params GUILayoutOption[] options) : this(rect, null, null, options) { }
+        public EditorWindowExtension(Rect rect, GUIContent content, params GUILayoutOption[] options) : this(rect, content, null, options) { }
+        public EditorWindowExtension(Rect rect, GUIStyle style, params GUILayoutOption[] options) : this(rect, null, style, options) { }
+        public EditorWindowExtension(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options) {}
 
         // Request main view
         public delegate void RequestMainView(EditorWindowExtension extension);

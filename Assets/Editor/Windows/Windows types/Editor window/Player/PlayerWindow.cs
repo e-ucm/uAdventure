@@ -5,6 +5,7 @@ using System;
 
 namespace uAdventure.Editor
 {
+    [EditorWindowExtension(60, typeof(Player))]
     public class PlayerWindow : DefaultButtonMenuEditorWindowExtension
     {
         private enum PlayerWindowType
@@ -24,8 +25,8 @@ namespace uAdventure.Editor
         private static GUISkin selectedButtonSkin;
         private static GUISkin defaultSkin;
 
-        public PlayerWindow(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
-            : base(aStartPos, aContent, aStyle, aOptions)
+        public PlayerWindow(Rect aStartPos, GUIStyle aStyle, params GUILayoutOption[] aOptions)
+            : base(aStartPos, new GUIContent(TC.get("Element.Name26")), aStyle, aOptions)
         {
             var c = new GUIContent();
             c.image = (Texture2D)Resources.Load("EAdventureData/img/icons/player", typeof(Texture2D));

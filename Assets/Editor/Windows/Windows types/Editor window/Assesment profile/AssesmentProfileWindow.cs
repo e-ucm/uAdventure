@@ -7,6 +7,7 @@ using System;
 
 namespace uAdventure.Editor
 {
+    [EditorWindowExtension(100, typeof(Completable))]
     public class AssesmentProfileWindow : DefaultButtonMenuEditorWindowExtension
     {
         string[] endoptions = { "Final Scene is reached", "All levels completed" };
@@ -32,8 +33,8 @@ namespace uAdventure.Editor
 
         private List<Completable> completables = new List<Completable>();
 
-        public AssesmentProfileWindow(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
-            : base(aStartPos, aContent, aStyle, aOptions)
+        public AssesmentProfileWindow(Rect aStartPos, GUIStyle aStyle, params GUILayoutOption[] aOptions)
+            : base(aStartPos, new GUIContent(TC.get("AssessmentFeatures.Title")), aStyle, aOptions)
         {
             var buttonContent = new GUIContent();
             buttonContent.image = (Texture2D)Resources.Load("EAdventureData/img/icons/assessmentProfiles", typeof(Texture2D)); ;

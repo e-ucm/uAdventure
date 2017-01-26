@@ -12,7 +12,7 @@ namespace uAdventure.Editor
         }
         public override void OnGUI()
         {
-            m_Rect = GUILayout.Window(WindowID, m_Rect, Draw, m_Content, m_Style, m_Options);
+            m_Rect = GUILayout.Window(WindowID, m_Rect, Draw, Content, Style, m_Options);
         }
     }
 }

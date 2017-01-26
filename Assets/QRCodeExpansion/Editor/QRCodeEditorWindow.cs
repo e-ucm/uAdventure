@@ -12,13 +12,14 @@ using System.Drawing.Printing;
 
 namespace uAdventure.QR
 {
+    [EditorWindowExtension(120, typeof(QR))]
     public class QRCodeEditorWindow : ReorderableListEditorWindowExtension
     {
         private QR selectedQR;
         private Texture2D qrCodeImage;
 
         private Rect mm_Rect;
-        public QRCodeEditorWindow(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions) : base(aStartPos, aContent, aStyle, aOptions)
+        public QRCodeEditorWindow(Rect aStartPos, GUIStyle aStyle, params GUILayoutOption[] aOptions) : base(aStartPos, new GUIContent("QR Codes"), aStyle, aOptions)
         {
             mm_Rect = aStartPos;
             

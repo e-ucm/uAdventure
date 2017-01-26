@@ -7,6 +7,7 @@ using UnityEditorInternal;
 
 namespace uAdventure.Editor
 {
+    [EditorWindowExtension(10, typeof(Scene))]
     public class ScenesWindow : ReorderableListEditorWindowExtension
     {
         private enum ScenesWindowType
@@ -40,10 +41,10 @@ namespace uAdventure.Editor
         private static GUISkin selectedButtonSkin;
         private static GUISkin defaultSkin;
 
-        public ScenesWindow(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
-            : base(aStartPos, aContent, aStyle, aOptions)
+        public ScenesWindow(Rect rect, GUIStyle style, params GUILayoutOption[] options)
+            : base(rect, new GUIContent(TC.get("Element.Name1")), style, options)
         {
-            thisRect = aStartPos;
+            thisRect = rect;
             var content = new GUIContent();
 
             // Button
@@ -52,22 +53,22 @@ namespace uAdventure.Editor
             ButtonContent = content;
 
             // Windows
-            scenesWindowActiveAreas = new ScenesWindowActiveAreas(aStartPos,
+            scenesWindowActiveAreas = new ScenesWindowActiveAreas(rect,
                 new GUIContent(TC.get("ActiveAreasList.Title")), "Window");
-            scenesWindowAppearance = new ScenesWindowAppearance(aStartPos, new GUIContent(TC.get("Scene.LookPanelTitle")),
+            scenesWindowAppearance = new ScenesWindowAppearance(rect, new GUIContent(TC.get("Scene.LookPanelTitle")),
                 "Window");
-            scenesWindowDocumentation = new ScenesWindowDocumentation(aStartPos,
+            scenesWindowDocumentation = new ScenesWindowDocumentation(rect,
                 new GUIContent(TC.get("Scene.DocPanelTitle")), "Window");
-            scenesWindowElementReference = new ScenesWindowElementReference(aStartPos,
+            scenesWindowElementReference = new ScenesWindowElementReference(rect,
                 new GUIContent(TC.get("ItemReferencesList.Title")), "Window");
-            scenesWindowExits = new ScenesWindowExits(aStartPos, new GUIContent(TC.get("Element.Name3")), "Window");
+            scenesWindowExits = new ScenesWindowExits(rect, new GUIContent(TC.get("Element.Name3")), "Window");
 
-            scenesWindowBarriers = new ScenesWindowBarriers(aStartPos, new GUIContent(TC.get("BarriersList.Title")), "Window");
-            scenesWindowPlayerMovement = new ScenesWindowPlayerMovement(aStartPos, new GUIContent(TC.get("Trajectory.Title")), "Window");
+            scenesWindowBarriers = new ScenesWindowBarriers(rect, new GUIContent(TC.get("BarriersList.Title")), "Window");
+            scenesWindowPlayerMovement = new ScenesWindowPlayerMovement(rect, new GUIContent(TC.get("Trajectory.Title")), "Window");
 
 
-            windowWidth = aStartPos.width;
-            windowHeight = aStartPos.height;
+            windowWidth = rect.width;
+            windowHeight = rect.height;
 
             selectedButtonSkin = (GUISkin)Resources.Load("Editor/ButtonSelected", typeof(GUISkin));
 

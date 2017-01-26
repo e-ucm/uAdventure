@@ -8,6 +8,7 @@ using System.Collections.Generic;
 
 namespace uAdventure.Editor
 {
+    [EditorWindowExtension(20, typeof(Cutscene), typeof(Videoscene), typeof(Slidescene))]
     public class CutscenesWindow : ReorderableListEditorWindowExtension
     {
         private enum CutscenesWindowType { Appearance, Documentation, EndConfiguration }
@@ -28,8 +29,8 @@ namespace uAdventure.Editor
         private static GUISkin selectedButtonSkin;
         private static GUISkin defaultSkin;
 
-        public CutscenesWindow(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
-            : base(aStartPos, aContent, aStyle, aOptions)
+        public CutscenesWindow(Rect aStartPos, GUIStyle aStyle, params GUILayoutOption[] aOptions)
+            : base(aStartPos, new GUIContent(TC.get("Element.Name9")), aStyle, aOptions)
         {
             GUIContent content = new GUIContent();
             // Button

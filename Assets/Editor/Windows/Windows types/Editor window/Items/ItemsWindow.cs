@@ -6,6 +6,7 @@ using System.Collections.Generic;
 
 namespace uAdventure.Editor
 {
+    [EditorWindowExtension(30, typeof(Item))]
     public class ItemsWindow : ReorderableListEditorWindowExtension
     {
         private enum ItemsWindowType { Appearance, DescriptionConfig, Actions }
@@ -25,8 +26,8 @@ namespace uAdventure.Editor
         private static GUISkin selectedButtonSkin;
         private static GUISkin defaultSkin;
 
-        public ItemsWindow(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
-            : base(aStartPos, aContent, aStyle, aOptions)
+        public ItemsWindow(Rect aStartPos, GUIStyle aStyle, params GUILayoutOption[] aOptions)
+            : base(aStartPos, new GUIContent(TC.get("Element.Name18")), aStyle, aOptions)
         {
             var c = new GUIContent();
             c.image = (Texture2D)Resources.Load("EAdventureData/img/icons/items", typeof(Texture2D));

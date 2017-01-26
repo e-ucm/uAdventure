@@ -6,6 +6,7 @@ using System.Collections.Generic;
 
 namespace uAdventure.Editor
 {
+    [EditorWindowExtension(70, typeof(Conversation))]
     public class ConversationWindow : ReorderableListEditorWindowExtension
     {
         private static float windowWidth, windowHeight;
@@ -15,8 +16,8 @@ namespace uAdventure.Editor
 
         private Dictionary<Conversation, ConversationEditorWindow> conversationWindows;
 
-        public ConversationWindow(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
-            : base(aStartPos, aContent, aStyle, aOptions)
+        public ConversationWindow(Rect aStartPos, GUIStyle aStyle, params GUILayoutOption[] aOptions)
+            : base(aStartPos, new GUIContent(TC.get("Element.Name31")), aStyle, aOptions)
         {
             var c = new GUIContent();
             c.image = (Texture2D)Resources.Load("EAdventureData/img/icons/conversations", typeof(Texture2D));

@@ -10,10 +10,12 @@ using System.Collections.Generic;
 using MapzenGo.Helpers.Search;
 using MapzenGo.Models.Settings.Editor;
 using uAdventure.Core;
+using uAdventure.Editor;
 
-namespace uAdventure.Editor
+namespace uAdventure.Geo
 {
 
+    [EditorWindowExtension(115, typeof(GeoElement))]
     public class GeoElementWindow : ReorderableListEditorWindowExtension, DialogReceiverInterface
     {
         private int selectedElement;
@@ -42,7 +44,7 @@ namespace uAdventure.Editor
         private GUIMap map;
         private ReorderableList actionsList;
 
-        public GeoElementWindow(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions) : base(aStartPos, aContent, aStyle, aOptions)
+        public GeoElementWindow(Rect aStartPos, GUIStyle aStyle, params GUILayoutOption[] aOptions) : base(aStartPos, new GUIContent("Geo Elements"), aStyle, aOptions)
         {
             mm_Rect = aStartPos;
 

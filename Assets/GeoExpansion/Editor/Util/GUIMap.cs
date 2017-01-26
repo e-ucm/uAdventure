@@ -418,6 +418,7 @@ public class GUIMap
         Paths solution = new Paths();
 
         ClipperOffset c = new ClipperOffset();
+        
         c.AddPath(polygon, JoinType.jtRound, type == GMLGeometry.GeometryType.Polygon ? EndType.etClosedPolygon : EndType.etOpenRound);
         c.Execute(ref solution, radius);
         
