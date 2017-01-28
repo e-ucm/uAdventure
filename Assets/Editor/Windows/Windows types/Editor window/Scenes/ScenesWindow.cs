@@ -29,12 +29,9 @@ namespace uAdventure.Editor
         private static ScenesWindowExits scenesWindowExits;
         private static ScenesWindowBarriers scenesWindowBarriers;
         private static ScenesWindowPlayerMovement scenesWindowPlayerMovement;
-
-        private static float windowWidth, windowHeight;
+        
         private static List<bool> toggleList;
-
-        private static Rect thisRect;
-
+        
         // Flag determining visibility of concrete item information
         private bool isConcreteItemVisible = false;
 
@@ -44,7 +41,6 @@ namespace uAdventure.Editor
         public ScenesWindow(Rect rect, GUIStyle style, params GUILayoutOption[] options)
             : base(rect, new GUIContent(TC.get("Element.Name1")), style, options)
         {
-            thisRect = rect;
             var content = new GUIContent();
 
             // Button
@@ -65,10 +61,7 @@ namespace uAdventure.Editor
 
             scenesWindowBarriers = new ScenesWindowBarriers(rect, new GUIContent(TC.get("BarriersList.Title")), "Window");
             scenesWindowPlayerMovement = new ScenesWindowPlayerMovement(rect, new GUIContent(TC.get("Trajectory.Title")), "Window");
-
-
-            windowWidth = rect.width;
-            windowHeight = rect.height;
+            
 
             selectedButtonSkin = (GUISkin)Resources.Load("Editor/ButtonSelected", typeof(GUISkin));
 
@@ -155,24 +148,31 @@ namespace uAdventure.Editor
                 switch (openedWindow)
                 {
                     case ScenesWindowType.ActiveAreas:
+                        scenesWindowActiveAreas.Rect = this.Rect;
                         scenesWindowActiveAreas.Draw(aID);
                         break;
                     case ScenesWindowType.Appearance:
+                        scenesWindowAppearance.Rect = this.Rect;
                         scenesWindowAppearance.Draw(aID);
                         break;
                     case ScenesWindowType.Documentation:
+                        scenesWindowDocumentation.Rect = this.Rect;
                         scenesWindowDocumentation.Draw(aID);
                         break;
                     case ScenesWindowType.ElementRefrence:
+                        scenesWindowElementReference.Rect = this.Rect;
                         scenesWindowElementReference.Draw(aID);
                         break;
                     case ScenesWindowType.Exits:
+                        scenesWindowExits.Rect = this.Rect;
                         scenesWindowExits.Draw(aID);
                         break;
                     case ScenesWindowType.Barriers:
+                        scenesWindowBarriers.Rect = this.Rect;
                         scenesWindowBarriers.Draw(aID);
                         break;
                     case ScenesWindowType.PlayerMovement:
+                        scenesWindowPlayerMovement.Rect = this.Rect;
                         scenesWindowPlayerMovement.Draw(aID);
                         break;
                 }
@@ -195,8 +195,8 @@ namespace uAdventure.Editor
                     GUILayout.BeginHorizontal();
                     GUILayout.Label(
                         Controller.getInstance().getCharapterList().getSelectedChapterData().getScenes()[i].getId(),
-                        GUILayout.Width(windowWidth * 0.65f));
-                    if (GUILayout.Button(TC.get("GeneralText.Edit"), GUILayout.MaxWidth(windowWidth * 0.3f)))
+                        GUILayout.Width(m_Rect.width * 0.65f));
+                    if (GUILayout.Button(TC.get("GeneralText.Edit"), GUILayout.MaxWidth(m_Rect.width * 0.3f)))
                     {
                         ShowItemWindowView(i);
                     }
@@ -231,21 +231,21 @@ namespace uAdventure.Editor
             GenerateToggleList();
 
             // Reload windows for newly selected scene
-            scenesWindowActiveAreas = new ScenesWindowActiveAreas(thisRect, new GUIContent(TC.get("ActiveAreasList.Title")),
+            scenesWindowActiveAreas = new ScenesWindowActiveAreas(m_Rect, new GUIContent(TC.get("ActiveAreasList.Title")),
                 "Window");
-            scenesWindowAppearance = new ScenesWindowAppearance(thisRect, new GUIContent(TC.get("Scene.LookPanelTitle")),
+            scenesWindowAppearance = new ScenesWindowAppearance(m_Rect, new GUIContent(TC.get("Scene.LookPanelTitle")),
                 "Window");
-            scenesWindowDocumentation = new ScenesWindowDocumentation(thisRect,
+            scenesWindowDocumentation = new ScenesWindowDocumentation(m_Rect,
                 new GUIContent(TC.get("Scene.DocPanelTitle")), "Window");
-            scenesWindowElementReference = new ScenesWindowElementReference(thisRect,
+            scenesWindowElementReference = new ScenesWindowElementReference(m_Rect,
                 new GUIContent(TC.get("ItemReferencesList.Title")), "Window");
-            scenesWindowExits = new ScenesWindowExits(thisRect, new GUIContent(TC.get("Element.Name3")), "Window");
+            scenesWindowExits = new ScenesWindowExits(m_Rect, new GUIContent(TC.get("Element.Name3")), "Window");
 
             // Only visible for 3rd person
             if (Controller.getInstance().playerMode() == DescriptorData.MODE_PLAYER_3RDPERSON)
             {
-                scenesWindowBarriers = new ScenesWindowBarriers(thisRect, new GUIContent(TC.get("BarriersList.Title")), "Window");
-                scenesWindowPlayerMovement = new ScenesWindowPlayerMovement(thisRect, new GUIContent(TC.get("Trajectory.Title")), "Window");
+                scenesWindowBarriers = new ScenesWindowBarriers(m_Rect, new GUIContent(TC.get("BarriersList.Title")), "Window");
+                scenesWindowPlayerMovement = new ScenesWindowPlayerMovement(m_Rect, new GUIContent(TC.get("Trajectory.Title")), "Window");
             }
         }
 

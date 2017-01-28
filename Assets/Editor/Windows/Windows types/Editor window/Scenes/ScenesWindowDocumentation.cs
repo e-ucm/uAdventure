@@ -9,7 +9,6 @@ namespace uAdventure.Editor
     public class ScenesWindowDocumentation : LayoutWindow
     {
         private string descriptionOfScene, nameOfScene, descriptionOfSceneLast, nameOfSceneLast, sceneclass = "", sceneclasslast, scenetype = "", scenetypelast;
-        private float windowHeight;
         private Scene current;
 
         public ScenesWindowDocumentation(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
@@ -39,8 +38,7 @@ namespace uAdventure.Editor
             nameOfScene = nameOfSceneLast = name;
             sceneclass = sceneclasslast = sclass;
             scenetype = scenetypelast = stype;
-
-            windowHeight = aStartPos.height;
+            
         }
 
         public override void Draw(int aID)
@@ -52,7 +50,7 @@ namespace uAdventure.Editor
             if (!scenetype.Equals(scenetypelast)) ChangeType(scenetype);
 
             GUILayout.Label(TC.get("Scene.Documentation"));
-            descriptionOfScene = GUILayout.TextArea(descriptionOfScene, GUILayout.MinHeight(0.4f * windowHeight));
+            descriptionOfScene = GUILayout.TextArea(descriptionOfScene, GUILayout.MinHeight(0.4f * m_Rect.height));
             if (!descriptionOfScene.Equals(descriptionOfSceneLast))
                 ChangeDocumentation(descriptionOfScene);
 

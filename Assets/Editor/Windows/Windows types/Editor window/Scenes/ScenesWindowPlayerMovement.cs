@@ -10,7 +10,6 @@ namespace uAdventure.Editor
         private string backgroundPath = "";
         private Texture2D backgroundPreviewTex = null;
         private static Rect previewRect;
-        private static float windowWidth, windowHeight;
 
         public ScenesWindowPlayerMovement(Rect aStartPos, GUIContent aContent, GUIStyle aStyle,
             params GUILayoutOption[] aOptions)
@@ -22,11 +21,14 @@ namespace uAdventure.Editor
                         GameRources.GetInstance().selectedSceneIndex].getPreviewBackground();
             if (backgroundPath != null && !backgroundPath.Equals(""))
                 backgroundPreviewTex = AssetsController.getImage(backgroundPath).texture;
-            previewRect = new Rect(0f, 0.3f * windowHeight, windowWidth, windowHeight * 0.65f);
         }
 
         public override void Draw(int aID)
         {
+            var windowWidth = m_Rect.width;
+            var windowHeight = m_Rect.height;
+            previewRect = new Rect(0f, 0.3f * windowHeight, windowWidth, windowHeight * 0.65f);
+
             // Show preview dialog
             if (GUILayout.Button(TC.get("GeneralText.Edit")))
             {

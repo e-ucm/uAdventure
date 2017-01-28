@@ -6,7 +6,6 @@ namespace uAdventure.Editor
     public class PlayerWindowDocumentation : LayoutWindow
     {
         private string documentation, documentationLast;
-        private float windowHeight;
 
         public PlayerWindowDocumentation(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
@@ -14,7 +13,6 @@ namespace uAdventure.Editor
             documentation = documentationLast = Controller.getInstance().getCharapterList().getSelectedChapterData().getPlayer().getDocumentation();
             if (documentation == null)
                 documentation = documentationLast = "";
-            windowHeight = aStartPos.height;
         }
 
 
@@ -23,7 +21,7 @@ namespace uAdventure.Editor
             GUILayout.Space(20);
             GUILayout.Label(TC.get("NPC.Documentation"));
             GUILayout.Space(20);
-            documentation = GUILayout.TextArea(documentation, GUILayout.MinHeight(0.4f * windowHeight));
+            documentation = GUILayout.TextArea(documentation, GUILayout.MinHeight(0.4f * m_Rect.height));
             if (!documentation.Equals(documentationLast))
                 OnDocumentationChanged(documentation);
         }

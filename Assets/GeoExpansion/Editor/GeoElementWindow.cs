@@ -27,7 +27,6 @@ namespace uAdventure.Geo
         private Vector2 location;
         private bool editing;
         private GeoElement element;
-        private Rect mm_Rect;
         private string[] menus;
         private Texture2D imagePreview;
 
@@ -40,8 +39,6 @@ namespace uAdventure.Geo
 
         public GeoElementWindow(Rect aStartPos, GUIStyle aStyle, params GUILayoutOption[] aOptions) : base(aStartPos, new GUIContent("Geo Elements"), aStyle, aOptions)
         {
-            mm_Rect = aStartPos;
-
             var bc = new GUIContent();
             bc.image = (Texture2D)Resources.Load("EAdventureData/img/icons/poi", typeof(Texture2D));
             bc.text = "GeoElements";  //TC.get("Element.Name1");
@@ -163,7 +160,7 @@ namespace uAdventure.Geo
 
             if (selectedElement == -1)
             {
-                GUILayout.Label("Nothing selected", GUILayout.Width(mm_Rect.width), GUILayout.Height(mm_Rect.height));
+                GUILayout.Label("Nothing selected");
                 return;
             }
 
@@ -209,7 +206,7 @@ namespace uAdventure.Geo
                         if(editing)
                             map.selectedGeometry = element.Geometry;
 
-                        if (map.DrawMap(GUILayoutUtility.GetRect(mm_Rect.width, mm_Rect.height - lastRect.y - lastRect.height)))
+                        if (map.DrawMap(GUILayoutUtility.GetRect(0,0, GUILayout.ExpandHeight(true), GUILayout.ExpandWidth(true))))
                         {
                             Debug.Log(map.GeoMousePosition);
                             if (element != null && editing)
@@ -220,7 +217,6 @@ namespace uAdventure.Geo
                         
                         location = map.Center.ToVector2();
                         
-
                         if (placeSearcher.LayoutEnd())
                         {
                             // If new Location is selected from the dropdown

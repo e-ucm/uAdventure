@@ -4,11 +4,23 @@ using UnityEngine;
 using System.Collections.Generic;
 using uAdventure.Core;
 using uAdventure.QR;
+using System;
 
 namespace uAdventure.Editor
 {
     public class EditorWindowBase : EditorWindow
     {
+        /* -----------------------
+         * WINDOW CONSTS
+         * ----------------------*/
+
+        public const float LEFT_MENU_WIDTH = 250;
+        public const float TOP_MENU_HEIGHT = 15;
+
+        /* -----------------------
+         * END WINDOW CONSTS
+         * ----------------------*/
+
         public enum EditorMenuItem
         {
             File,
@@ -24,16 +36,12 @@ namespace uAdventure.Editor
         {
             Chapter,
             AdaptationProfiles,
-            completables,
-            MapScenes,
-            GeoElements,
-            AdvancedGeo
+            Extension
         };
 
         // The position of the window
-        private static float windowWidth, windowHeight;
-        private static EditorWindow thisWindowReference;
-        private static Rect buttonMenuRect, leftMenuRect, windowRect;
+        private static EditorWindowBase thisWindowReference;
+
 
         private static WindowMenuContainer fileMenu,
             editMenu,
@@ -43,25 +51,26 @@ namespace uAdventure.Editor
             configurationMenu,
             aboutMenu;
 
-        private static EditorWindowType openedWindow = EditorWindowType.Chapter;
+        private EditorWindowType openedWindow = EditorWindowType.Chapter;
 
-        private LayoutWindow m_Window1 = null;
-        private static ChapterWindow chapterWindow;
-        private static AdvencedFeaturesWindow completablesWindow;
+        private LayoutWindow m_Window = null;
+        private ChapterWindow chapterWindow;
         //private static AdaptationProfileWindow adapatationProfileWindow;
 
-        private static Vector2 scrollPosition;
+        private Vector2 scrollPosition;
 
         private static Texture2D redoTexture = null;
         private static Texture2D undoTexture = null;
         
         private static Texture2D adaptationTexture = null;
-        private static Texture2D completableTexture = null;
         
         private static GUIContent leftMenuContentAdaptation;
 
-        private static List<EditorWindowExtension> extensions;
-        private static EditorWindowExtension extensionSelected;
+        private List<EditorWindowExtension> extensions;
+        private EditorWindowExtension extensionSelected;
+
+        private static Rect zeroRect;
+        private Rect windowArea;
 
         [MenuItem("eAdventure/Open eAdventure editor")]
         public static void Init()
@@ -73,25 +82,15 @@ namespace uAdventure.Editor
                 Controller.getInstance().init();
             }
 
-            thisWindowReference = EditorWindow.GetWindow(typeof(EditorWindowBase));
-            windowWidth = EditorWindow.focusedWindow.position.width;
-            windowHeight = EditorWindow.focusedWindow.position.height;
-            buttonMenuRect = new Rect(0.01f * windowWidth, 0.01f * windowHeight, windowWidth * 0.98f, windowHeight * 0.10f);
-            leftMenuRect = new Rect(0.01f * windowWidth, 0.12f * windowHeight, windowWidth * 0.14f, windowHeight * 0.87f);
-            windowRect = new Rect(0.16f * windowWidth, 0.12f * windowHeight, windowWidth * 0.83f, windowHeight * 0.85f);
 
-            //leftSubMenuSkin = (GUISkin)Resources.Load("Editor/EditorLeftMenuItemSkin", typeof(GUISkin));
-            //leftSubMenuConcreteItemSkin =(GUISkin)Resources.Load("Editor/EditorLeftMenuItemSkinConcreteOptions", typeof(GUISkin));
+            thisWindowReference = EditorWindow.GetWindow<EditorWindowBase>();
 
             redoTexture = (Texture2D)Resources.Load("EAdventureData/img/icons/redo", typeof(Texture2D));
             undoTexture = (Texture2D)Resources.Load("EAdventureData/img/icons/undo", typeof(Texture2D));
-
-            //addTexture = (Texture2D)Resources.Load("EAdventureData/img/icons/addNode", typeof(Texture2D));
-            //deleteImg = (Texture2D)Resources.Load("EAdventureData/img/icons/deleteContent", typeof(Texture2D));
-            //duplicateImg = (Texture2D)Resources.Load("EAdventureData/img/icons/duplicateNode", typeof(Texture2D));
             
             adaptationTexture = (Texture2D)Resources.Load("EAdventureData/img/icons/adaptationProfiles", typeof(Texture2D));
 
+            thisWindowReference.InitGUI();
             thisWindowReference.Show();
 
             fileMenu = new FileMenu();
@@ -101,19 +100,16 @@ namespace uAdventure.Editor
             runMenu = new RunMenu();
             configurationMenu = new ConfigurationMenu();
             aboutMenu = new AboutMenu();
-
-            extensions = new List<EditorWindowExtension>();
-
-            InitGUI();
         }
 
-        public static void InitGUI()
+        public void InitGUI()
         {
+            zeroRect = new Rect(0, 0, 0, 0);
 
-            chapterWindow = new ChapterWindow(windowRect, new GUIContent(TC.get("Element.Name0")), "Window");
+            chapterWindow = new ChapterWindow(zeroRect, new GUIContent(TC.get("Element.Name0")), "Window");
 
             // Extensions of the editor
-            extensions = EditorWindowBaseExtensionFactory.Instance.CreateAllExistingExtensions(windowRect, "Window");
+            extensions = EditorWindowBaseExtensionFactory.Instance.CreateAllExistingExtensions(zeroRect, "Window");
             /*extensions.Add(new ScenesWindow(windowRect, new GUIContent(TC.get("Element.Name1")), "Window"));
             extensions.Add(new CutscenesWindow(windowRect, new GUIContent(TC.get("Element.Name9")), "Window"));
             extensions.Add(new BooksWindow(windowRect, new GUIContent(TC.get("Element.Name11")), "Window"));
@@ -128,8 +124,13 @@ namespace uAdventure.Editor
             extensions.Add(new GeoElementWindow(windowRect, new GUIContent("GeoElements"), "Window"));
             extensions.Add(new QRCodeEditorWindow(windowRect, new GUIContent("QR Codes"), "Window"));*/
 
+            var ops = new GUILayoutOption[] {
+                    GUILayout.ExpandWidth(true),
+                    GUILayout.ExpandHeight(true)
+                };
             foreach (var e in extensions)
             {
+                e.Options = ops;
                 e.OnRequestMainView += (thisWindowReference as EditorWindowBase).RequestMainView;
                 e.OnRequestRepaint += thisWindowReference.Repaint;
             }
@@ -140,8 +141,8 @@ namespace uAdventure.Editor
 
         public static void RefreshChapter()
         {
-            chapterWindow = new ChapterWindow(windowRect, new GUIContent(TC.get("Element.Name0")), "Window");
-            openedWindow = EditorWindowType.Chapter;
+            thisWindowReference.chapterWindow = new ChapterWindow(zeroRect, new GUIContent(TC.get("Element.Name0")), "Window");
+            thisWindowReference.openedWindow = EditorWindowType.Chapter;
         }
 
         void OnGUI()
@@ -149,97 +150,102 @@ namespace uAdventure.Editor
             /**
             UPPER MENU
             */
-            GUILayout.BeginArea(buttonMenuRect);
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button(TC.get("MenuFile.Title")))
+            EditorGUILayout.BeginHorizontal("Toolbar", GUILayout.Height(TOP_MENU_HEIGHT));
+            if (GUILayout.Button(TC.get("MenuFile.Title"),"toolbarButton"))
             {
                 fileMenu.menu.ShowAsContext();
             }
-            //if (GUILayout.Button(Language.GetText("GeneralText.Edit")))
-            //{
-            //    editMenu.menu.ShowAsContext();
-            //}
-            //if (GUILayout.Button(Language.GetText("ADVENTURE")))
-            //{
-            //    adventureMenu.menu.ShowAsContext();
-            //}
-            if (GUILayout.Button(TC.get("MenuChapters.Title")))
+            if (GUILayout.Button(TC.get("MenuChapters.Title"), "toolbarButton"))
             {
                 chaptersMenu.menu.ShowAsContext();
             }
-            //if (GUILayout.Button(Language.GetText("RUN")))
-            //{
-            //    runMenu.menu.ShowAsContext();
-            //}
-            if (GUILayout.Button(TC.get("MenuConfiguration.Title")))
+            if (GUILayout.Button(TC.get("MenuConfiguration.Title"), "toolbarButton"))
             {
                 configurationMenu.menu.ShowAsContext();
             }
-            if (GUILayout.Button(TC.get("About")))
+            if (GUILayout.Button(TC.get("About"), "toolbarButton"))
             {
                 aboutMenu.menu.ShowAsContext();
             }
-            GUILayout.EndHorizontal();
-            GUILayout.EndArea();
+            EditorGUILayout.EndHorizontal();
 
             /**
             LEFT MENU
             */
-            GUILayout.BeginArea(leftMenuRect);
-            GUILayout.BeginVertical();
+            EditorGUILayout.BeginHorizontal(GUILayout.ExpandWidth(true));
+            var leftMenuRect = EditorGUILayout.BeginVertical(GUILayout.Width(LEFT_MENU_WIDTH), GUILayout.ExpandHeight(true));
 
-            //GUILayout.BeginHorizontal(GUILayout.MaxWidth(25), GUILayout.MaxHeight(25));
-            //if (GUILayout.Button(undoTexture, GUILayout.MaxWidth(25), GUILayout.MaxHeight(25)))
+            //EditorGUILayout.BeginHorizontal(EditorGUILayout.MaxWidth(25), EditorGUILayout.MaxHeight(25));
+            //if (EditorGUILayout.Button(undoTexture, EditorGUILayout.MaxWidth(25), EditorGUILayout.MaxHeight(25)))
             //{
             //    UndoAction();
             //}
 
-            //GUILayout.Space(5);
+            //EditorGUILayout.Space(5);
 
-            //if (GUILayout.Button(redoTexture, GUILayout.MaxWidth(25), GUILayout.MaxHeight(25)))
+            //if (EditorGUILayout.Button(redoTexture, EditorGUILayout.MaxWidth(25), EditorGUILayout.MaxHeight(25)))
             //{
             //    RedoAction();
             //}
-            //GUILayout.EndHorizontal();
+            //EditorGUILayout.EndHorizontal();
 
-            //GUILayout.Space(25);
+            //EditorGUILayout.Space(25);
 
-            scrollPosition = GUILayout.BeginScrollView(scrollPosition);
+            scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
 
             // Button event chapter
             if (GUILayout.Button(TC.get("Element.Name0")))
             {
-                chapterWindow = new ChapterWindow(windowRect, new GUIContent(TC.get("Element.Name0")), "Window");
                 OnWindowTypeChanged(EditorWindowType.Chapter);
             }
 
             // Button event scene
             extensions.ForEach(e => e.LayoutDrawLeftPanelContent(null, null));
 
-            GUILayout.EndScrollView();
-            GUILayout.EndVertical();
-            GUILayout.EndArea();
+            EditorGUILayout.EndScrollView();
+            EditorGUILayout.EndVertical();
 
             /**
             WINDOWS
             */
+
+            windowArea = EditorGUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+            /*if (windowArea != null)
+            {
+                windowArea = GUILayoutUtility.GetRect(0, 0, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+                Debug.Log(Event.current.type + " " + windowArea);
+            }*/
+            //GUI.BeginGroup(windowArea);
+            GUILayout.Label("Here should be windows");
             BeginWindows();
             //extensionSelected.OnGUI();
-
+            
             switch (openedWindow)
             {
                 case EditorWindowType.Chapter:
-                    m_Window1 = chapterWindow;
+                    m_Window = chapterWindow;
                     break;
                 default:
                     if (extensionSelected != null)
-                        m_Window1 = extensionSelected;
+                        m_Window = extensionSelected;
                     break;
             }
 
-            if (m_Window1 != null)
-                m_Window1.OnGUI();
+            if (m_Window != null)
+            {
+                //leftMenuRect
+                if(Event.current.type == EventType.repaint)
+                {
+                    m_Window.Rect = windowArea;
+                    extensions.ForEach(e => e.Rect = windowArea);
+                }
+
+                m_Window.OnGUI();
+            }
             EndWindows();
+            //GUI.EndGroup();
+            EditorGUILayout.EndVertical();
+            EditorGUILayout.EndHorizontal();
         }
 
         void OnWindowTypeChanged(EditorWindowType type_)
@@ -264,8 +270,13 @@ namespace uAdventure.Editor
         void RequestMainView(EditorWindowExtension who)
         {
             extensionSelected = who;
-            OnWindowTypeChanged(EditorWindowType.MapScenes);
+            OnWindowTypeChanged(EditorWindowType.Extension);
             extensions.ForEach(e => e.Selected = e == who);
+        }
+
+        internal static void LanguageChanged()
+        {
+            thisWindowReference.InitGUI();
         }
     }
 }

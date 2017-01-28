@@ -17,10 +17,6 @@ namespace uAdventure.Editor
         private static BooksWindowContents booksWindowContents;
         private static BooksWindowDocumentation booksWindowDocumentation;
 
-        private static float windowWidth, windowHeight;
-
-        private static Rect thisRect;
-
         private static GUISkin selectedButtonSkin;
         private static GUISkin defaultSkin;
 
@@ -41,11 +37,7 @@ namespace uAdventure.Editor
             booksWindowAppearance = new BooksWindowAppearance(aStartPos, new GUIContent(TC.get("Book.App")), "Window");
             booksWindowContents = new BooksWindowContents(aStartPos, new GUIContent(TC.get("Book.Contents")), "Window");
             booksWindowDocumentation = new BooksWindowDocumentation(aStartPos, new GUIContent(TC.get("Book.Documentation")), "Window");
-
-            windowWidth = aStartPos.width;
-            windowHeight = aStartPos.height;
-
-            thisRect = aStartPos;
+            
             selectedButtonSkin = (GUISkin)Resources.Load("Editor/ButtonSelected", typeof(GUISkin));
         }
 
@@ -91,12 +83,15 @@ namespace uAdventure.Editor
                 switch (openedWindow)
                 {
                     case BookWindowType.Appearance:
+                        booksWindowAppearance.Rect = Rect;
                         booksWindowAppearance.Draw(aID);
                         break;
                     case BookWindowType.Documentation:
+                        booksWindowDocumentation.Rect = Rect;
                         booksWindowDocumentation.Draw(aID);
                         break;
                     case BookWindowType.Content:
+                        booksWindowContents.Rect = Rect;
                         booksWindowContents.Draw(aID);
                         break;
                 }
@@ -107,8 +102,8 @@ namespace uAdventure.Editor
                 for (int i = 0; i < Controller.getInstance().getCharapterList().getSelectedChapterData().getBooks().Count; i++)
                 {
                     GUILayout.BeginHorizontal();
-                    GUILayout.Box(Controller.getInstance().getCharapterList().getSelectedChapterData().getBooks()[i].getId(), GUILayout.Width(windowWidth * 0.75f));
-                    if (GUILayout.Button(TC.get("GeneralText.Edit"), GUILayout.MaxWidth(windowWidth * 0.2f)))
+                    GUILayout.Box(Controller.getInstance().getCharapterList().getSelectedChapterData().getBooks()[i].getId(), GUILayout.Width(m_Rect.width * 0.75f));
+                    if (GUILayout.Button(TC.get("GeneralText.Edit"), GUILayout.MaxWidth(m_Rect.width * 0.2f)))
                     {
                         ShowItemWindowView(i);
                     }
@@ -138,9 +133,9 @@ namespace uAdventure.Editor
             GameRources.GetInstance().selectedBookIndex = o;
 
             // Reload windows for newly selected book
-            booksWindowAppearance = new BooksWindowAppearance(thisRect, new GUIContent(TC.get("Book.App")), "Window");
-            booksWindowContents = new BooksWindowContents(thisRect, new GUIContent(TC.get("Book.Contents")), "Window");
-            booksWindowDocumentation = new BooksWindowDocumentation(thisRect, new GUIContent(TC.get("Book.Documentation")), "Window");
+            booksWindowAppearance = new BooksWindowAppearance(m_Rect, new GUIContent(TC.get("Book.App")), "Window");
+            booksWindowContents = new BooksWindowContents(m_Rect, new GUIContent(TC.get("Book.Contents")), "Window");
+            booksWindowDocumentation = new BooksWindowDocumentation(m_Rect, new GUIContent(TC.get("Book.Documentation")), "Window");
         }
 
         protected override void OnElementNameChanged(ReorderableList r, int index, string newName)

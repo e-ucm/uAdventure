@@ -9,8 +9,6 @@ namespace uAdventure.Editor
 {
     public class BooksWindowContents : LayoutWindow, DialogReceiverInterface
     {
-        private static float windowWidth, windowHeight;
-
         private Texture2D addTex = null;
         private Texture2D moveUpTex, moveDownTex = null;
         private Texture2D clearTex = null;
@@ -45,9 +43,6 @@ namespace uAdventure.Editor
         public BooksWindowContents(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
         {
-            windowWidth = aStartPos.width;
-            windowHeight = aStartPos.height;
-
             clearTex = (Texture2D)Resources.Load("EAdventureData/img/icons/deleteContent", typeof(Texture2D));
             addTex = (Texture2D)Resources.Load("EAdventureData/img/icons/addNode", typeof(Texture2D));
             moveUpTex = (Texture2D)Resources.Load("EAdventureData/img/icons/moveNodeUp", typeof(Texture2D));
@@ -64,11 +59,7 @@ namespace uAdventure.Editor
 
             selectedElementSkin = (GUISkin)Resources.Load("Editor/EditorLeftMenuItemSkinConcreteOptions", typeof(GUISkin));
             noBackgroundSkin = (GUISkin)Resources.Load("Editor/EditorNoBackgroundSkin", typeof(GUISkin));
-
-            tableRect = new Rect(0f, 0.1f * windowHeight, 0.9f * windowWidth, windowHeight * 0.33f);
-            rightPanelRect = new Rect(0.9f * windowWidth, 0.1f * windowHeight, 0.08f * windowWidth, 0.33f * windowHeight);
-            previewRect = new Rect(0f, 0.5f * windowHeight, windowWidth, windowHeight * 0.45f);
-
+            
             selectedElement = -1;
 
             addMenu = new AddParagraphMenu();
@@ -76,6 +67,13 @@ namespace uAdventure.Editor
 
         public override void Draw(int aID)
         {
+            var windowWidth = m_Rect.width;
+            var windowHeight = m_Rect.height;
+
+            tableRect = new Rect(0f, 0.1f * windowHeight, 0.9f * windowWidth, windowHeight * 0.33f);
+            rightPanelRect = new Rect(0.9f * windowWidth, 0.1f * windowHeight, 0.08f * windowWidth, 0.33f * windowHeight);
+            previewRect = new Rect(0f, 0.5f * windowHeight, windowWidth, windowHeight * 0.45f);
+
             GUILayout.BeginArea(tableRect);
             GUILayout.BeginHorizontal();
             GUILayout.Box(TC.get("BookParagraphsList.ParagraphType"), GUILayout.Width(windowWidth * 0.19f));

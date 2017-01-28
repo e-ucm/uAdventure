@@ -21,8 +21,7 @@ namespace uAdventure.Editor
         private string[] cutscenesNextNames;
         private string[] joinedNextScenesList;
         private int selectedSceneNext, selectedSceneNextLast;
-
-        private static float windowWidth, windowHeight;
+        
         private Rect selectorRect, goesToNewSceneRect;
 
         private string timeString, timeStringLast;
@@ -44,13 +43,7 @@ namespace uAdventure.Editor
             joinedNextScenesList = new string[scenesNextNames.Length + cutscenesNextNames.Length];
             scenesNextNames.CopyTo(joinedNextScenesList, 0);
             cutscenesNextNames.CopyTo(joinedNextScenesList, scenesNextNames.Length);
-
-            windowWidth = aStartPos.width;
-            windowHeight = aStartPos.height;
-
-            selectorRect = new Rect(0f, 0.2f * windowHeight, 0.9f * windowWidth, 0.2f * windowHeight);
-            goesToNewSceneRect = new Rect(0.2f * windowWidth, 0.35f * windowHeight, 0.6f * windowWidth, 0.35f * windowHeight);
-
+            
             selectedOption = selectedOptionLast = 0;
             selectedSceneNext = selectedSceneNextLast = 0;
             timeInt = 0;
@@ -97,6 +90,12 @@ namespace uAdventure.Editor
 
         public override void Draw(int aID)
         {
+            var windowWidth = m_Rect.width;
+            var windowHeight = m_Rect.height;
+
+            selectorRect = new Rect(0f, 0.2f * windowHeight, 0.9f * windowWidth, 0.2f * windowHeight);
+            goesToNewSceneRect = new Rect(0.2f * windowWidth, 0.35f * windowHeight, 0.6f * windowWidth, 0.35f * windowHeight);
+
             GUILayout.Label(TC.get("Cutscene.CutsceneEndReached"));
             GUILayout.Space(20);
 

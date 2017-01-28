@@ -10,18 +10,14 @@ namespace uAdventure.Editor
         private Texture2D clearImg = null;
         private Texture2D atrezzoImg = null;
         private static Rect previewRect;
-
-        private static float windowWidth, windowHeight;
-
+        
         private string pathToImg = "";
 
         public SetItemsWindowApperance(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
         {
             clearImg = (Texture2D)Resources.Load("EAdventureData/img/icons/deleteContent", typeof(Texture2D));
-
-            windowWidth = aStartPos.width;
-            windowHeight = aStartPos.height;
+            
             if (GameRources.GetInstance().selectedSetItemIndex >= 0)
             {
                 pathToImg =
@@ -29,7 +25,6 @@ namespace uAdventure.Editor
                         GameRources.GetInstance().selectedSetItemIndex].getPreviewImage();
             }
 
-            previewRect = new Rect(0f, 0.5f * windowHeight, windowWidth, windowHeight * 0.45f);
 
             if (pathToImg != null && !pathToImg.Equals(""))
                 atrezzoImg = AssetsController.getImage(pathToImg).texture;
@@ -38,6 +33,10 @@ namespace uAdventure.Editor
 
         public override void Draw(int aID)
         {
+            var windowWidth = m_Rect.width;
+            var windowHeight = m_Rect.height;
+            previewRect = new Rect(0f, 0.5f * windowHeight, windowWidth, windowHeight * 0.45f);
+
             // Background chooser
             GUILayout.Label(TC.get("Resources.DescriptionItemImage"));
 

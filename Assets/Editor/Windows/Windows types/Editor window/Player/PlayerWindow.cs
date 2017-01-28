@@ -82,12 +82,15 @@ namespace uAdventure.Editor
             switch (openedWindow)
             {
                 case PlayerWindowType.Appearance:
+                    playerWindowAppearance.Rect = Rect;
                     playerWindowAppearance.Draw(aID);
                     break;
                 case PlayerWindowType.DialogConfiguration:
+                    playerWindowDialogConfiguration.Rect = Rect;
                     playerWindowDialogConfiguration.Draw(aID);
                     break;
                 case PlayerWindowType.Documentation:
+                    playerWindowDocumentation.Rect = Rect;
                     playerWindowDocumentation.Draw(aID);
                     break;
             }

@@ -23,8 +23,7 @@ namespace uAdventure.Editor
         private Texture2D conditionsTex = null;
         private Texture2D noConditionsTex = null;
         private Texture2D tmpTex = null;
-
-        private static float windowWidth, windowHeight;
+        
         private static Rect descriptionRect, descriptionTableRect, settingsTable, rightPanelRect;
 
         private static GUISkin defaultSkin;
@@ -73,20 +72,13 @@ namespace uAdventure.Editor
 
             conditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/conditions-24x24", typeof(Texture2D));
             noConditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/no-conditions-24x24", typeof(Texture2D));
-
-            windowWidth = aStartPos.width;
-            windowHeight = aStartPos.height;
-
+            
             noBackgroundSkin = (GUISkin)Resources.Load("Editor/EditorNoBackgroundSkin", typeof(GUISkin));
             selectedAreaSkin = (GUISkin)Resources.Load("Editor/EditorLeftMenuItemSkinConcreteOptions", typeof(GUISkin));
 
             noAudioTexture = (Texture2D)Resources.Load("EAdventureData/img/icons/noAudio", typeof(Texture2D));
             audioTexture = (Texture2D)Resources.Load("EAdventureData/img/icons/audio", typeof(Texture2D));
 
-            descriptionRect = new Rect(0f, 0.1f * windowHeight, windowWidth, 0.1f * windowHeight);
-            rightPanelRect = new Rect(0.9f * windowWidth, 0.2f * windowHeight, 0.08f * windowWidth, 0.15f * windowHeight);
-            descriptionTableRect = new Rect(0f, 0.2f * windowHeight, 0.9f * windowWidth, 0.15f * windowHeight);
-            settingsTable = new Rect(0f, 0.35f * windowHeight, windowWidth, windowHeight * 0.65f);
 
             if (GameRources.GetInstance().selectedItemIndex >= 0)
             {
@@ -113,15 +105,22 @@ namespace uAdventure.Editor
 
         public override void Draw(int aID)
         {
+            var windowWidth = m_Rect.width;
+            var windowHeight = m_Rect.height;
+
+            descriptionRect = new Rect(0f, 0.1f * windowHeight, windowWidth, 0.1f * windowHeight);
+            rightPanelRect = new Rect(0.9f * windowWidth, 0.2f * windowHeight, 0.08f * windowWidth, 0.15f * windowHeight);
+            descriptionTableRect = new Rect(0f, 0.2f * windowHeight, 0.9f * windowWidth, 0.15f * windowHeight);
+            settingsTable = new Rect(0f, 0.35f * windowHeight, windowWidth, windowHeight * 0.65f);
+
+
             GUILayout.BeginArea(descriptionRect);
             GUILayout.Label(TC.get("Item.Documentation"));
             fullItemDescription = GUILayout.TextField(fullItemDescription);
             if (!fullItemDescription.Equals(fullItemDescriptionLast))
                 OnItemDescriptionChanged(fullItemDescription);
             GUILayout.EndArea();
-
-
-
+            
             /*
             * Desciptor table
             */

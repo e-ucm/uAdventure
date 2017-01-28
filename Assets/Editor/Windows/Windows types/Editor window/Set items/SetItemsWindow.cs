@@ -15,10 +15,7 @@ namespace uAdventure.Editor
         private static SetItemsWindowType openedWindow = SetItemsWindowType.Appearance;
         private static SetItemsWindowApperance setItemsWindowApperance;
         private static SetItemsWindowDocumentation setItemsWindowDocumentation;
-
-        private static float windowWidth, windowHeight;
-        private static Rect thisRect;
-
+        
         // Flag determining visibility of concrete item information
         private bool isConcreteItemVisible = false;
 
@@ -35,17 +32,16 @@ namespace uAdventure.Editor
 
             setItemsWindowApperance = new SetItemsWindowApperance(aStartPos, new GUIContent(TC.get("Atrezzo.LookPanelTitle")), "Window");
             setItemsWindowDocumentation = new SetItemsWindowDocumentation(aStartPos, new GUIContent(TC.get("Atrezzo.DocPanelTitle")), "Window");
-
-            windowWidth = aStartPos.width;
-            windowHeight = aStartPos.height;
-
-            thisRect = aStartPos;
+            
             selectedButtonSkin = (GUISkin)Resources.Load("Editor/ButtonSelected", typeof(GUISkin));
         }
 
 
         public override void Draw(int aID)
         {
+            var windowWidth = m_Rect.width;
+            var windowHeight = m_Rect.height;
+
             // Show information of concrete item
             if (isConcreteItemVisible)
             {
@@ -75,9 +71,11 @@ namespace uAdventure.Editor
                 switch (openedWindow)
                 {
                     case SetItemsWindowType.Appearance:
+                        setItemsWindowApperance.Rect = Rect;
                         setItemsWindowApperance.Draw(aID);
                         break;
                     case SetItemsWindowType.Documentation:
+                        setItemsWindowApperance.Rect = Rect;
                         setItemsWindowDocumentation.Draw(aID);
                         break;
                 }
@@ -117,8 +115,8 @@ namespace uAdventure.Editor
             isConcreteItemVisible = true;
             GameRources.GetInstance().selectedSetItemIndex = o;
 
-            setItemsWindowApperance = new SetItemsWindowApperance(thisRect, new GUIContent(TC.get("Atrezzo.LookPanelTitle")), "Window");
-            setItemsWindowDocumentation = new SetItemsWindowDocumentation(thisRect, new GUIContent(TC.get("Atrezzo.DocPanelTitle")), "Window");
+            setItemsWindowApperance = new SetItemsWindowApperance(m_Rect, new GUIContent(TC.get("Atrezzo.LookPanelTitle")), "Window");
+            setItemsWindowDocumentation = new SetItemsWindowDocumentation(m_Rect, new GUIContent(TC.get("Atrezzo.DocPanelTitle")), "Window");
         }
 
         /////////////////////

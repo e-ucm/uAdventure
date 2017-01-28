@@ -7,7 +7,6 @@ namespace uAdventure.Editor
     public class SetItemsWindowDocumentation : LayoutWindow
     {
         private string documentation, documentationLast;
-        private float windowHeight;
 
         public SetItemsWindowDocumentation(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
@@ -19,7 +18,6 @@ namespace uAdventure.Editor
                     GameRources.GetInstance().selectedSetItemIndex].getDocumentation();
             doc = (doc == null ? "" : doc);
             documentation = documentationLast = doc;
-            windowHeight = aStartPos.height;
         }
 
 
@@ -28,7 +26,7 @@ namespace uAdventure.Editor
             GUILayout.Space(20);
             GUILayout.Label(TC.get("Atrezzo.DocPanelTitle"));
             GUILayout.Space(20);
-            documentation = GUILayout.TextArea(documentation, GUILayout.MinHeight(0.4f * windowHeight));
+            documentation = GUILayout.TextArea(documentation, GUILayout.MinHeight(0.4f * m_Rect.height));
             if (!documentation.Equals(documentationLast))
                 OnDocumentationChanged(documentation);
         }

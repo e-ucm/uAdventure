@@ -18,9 +18,6 @@ namespace uAdventure.Editor
         private static CharactersWindowDialogConfiguration charactersWindowDialogConfiguration;
         private static CharactersWindowDocumentation charactersWindowDocumentation;
 
-        private static float windowWidth, windowHeight;
-        private static Rect thisRect;
-
         // Flag determining visibility of concrete item information
         private bool isConcreteItemVisible = false;
 
@@ -39,11 +36,7 @@ namespace uAdventure.Editor
             charactersWindowAppearance = new CharactersWindowAppearance(aStartPos, new GUIContent(TC.get("NPC.LookPanelTitle")), "Window");
             charactersWindowDialogConfiguration = new CharactersWindowDialogConfiguration(aStartPos, new GUIContent(TC.get("NPC.DialogPanelTitle")), "Window");
             charactersWindowDocumentation = new CharactersWindowDocumentation(aStartPos, new GUIContent(TC.get("NPC.Documentation")), "Window");
-
-            windowWidth = aStartPos.width;
-            windowHeight = aStartPos.height;
-
-            thisRect = aStartPos;
+            
             selectedButtonSkin = (GUISkin)Resources.Load("Editor/ButtonSelected", typeof(GUISkin));
         }
 
@@ -99,15 +92,19 @@ namespace uAdventure.Editor
                 switch (openedWindow)
                 {
                     case CharactersWindowType.Appearance:
+                        charactersWindowAppearance.Rect = Rect;
                         charactersWindowAppearance.Draw(aID);
                         break;
                     case CharactersWindowType.Action:
+                        charactersWindowActions.Rect = Rect;
                         charactersWindowActions.Draw(aID);
                         break;
                     case CharactersWindowType.DialogConfiguration:
+                        charactersWindowDialogConfiguration.Rect = Rect;
                         charactersWindowDialogConfiguration.Draw(aID);
                         break;
                     case CharactersWindowType.Documentation:
+                        charactersWindowDocumentation.Rect = Rect;
                         charactersWindowDocumentation.Draw(aID);
                         break;
                 }
@@ -118,8 +115,8 @@ namespace uAdventure.Editor
                 for (int i = 0; i < Controller.getInstance().getCharapterList().getSelectedChapterData().getCharacters().Count; i++)
                 {
                     GUILayout.BeginHorizontal();
-                    GUILayout.Box(Controller.getInstance().getCharapterList().getSelectedChapterData().getCharacters()[i].getId(), GUILayout.Width(windowWidth * 0.75f));
-                    if (GUILayout.Button(TC.get("GeneralText.Edit"), GUILayout.MaxWidth(windowWidth * 0.2f)))
+                    GUILayout.Box(Controller.getInstance().getCharapterList().getSelectedChapterData().getCharacters()[i].getId(), GUILayout.Width(m_Rect.width * 0.75f));
+                    if (GUILayout.Button(TC.get("GeneralText.Edit"), GUILayout.MaxWidth(m_Rect.width * 0.2f)))
                     {
                         ShowItemWindowView(i);
                     }
@@ -148,10 +145,10 @@ namespace uAdventure.Editor
             isConcreteItemVisible = true;
             GameRources.GetInstance().selectedCharacterIndex = o;
 
-            charactersWindowActions = new CharactersWindowActions(thisRect, new GUIContent(TC.get("NPC.ActionsPanelTitle")), "Window");
-            charactersWindowAppearance = new CharactersWindowAppearance(thisRect, new GUIContent(TC.get("NPC.LookPanelTitle")), "Window");
-            charactersWindowDialogConfiguration = new CharactersWindowDialogConfiguration(thisRect, new GUIContent(TC.get("NPC.DialogPanelTitle")), "Window");
-            charactersWindowDocumentation = new CharactersWindowDocumentation(thisRect, new GUIContent(TC.get("NPC.Documentation")), "Window");
+            charactersWindowActions = new CharactersWindowActions(m_Rect, new GUIContent(TC.get("NPC.ActionsPanelTitle")), "Window");
+            charactersWindowAppearance = new CharactersWindowAppearance(m_Rect, new GUIContent(TC.get("NPC.LookPanelTitle")), "Window");
+            charactersWindowDialogConfiguration = new CharactersWindowDialogConfiguration(m_Rect, new GUIContent(TC.get("NPC.DialogPanelTitle")), "Window");
+            charactersWindowDocumentation = new CharactersWindowDocumentation(m_Rect, new GUIContent(TC.get("NPC.Documentation")), "Window");
         }
         
         ///////////////////////////////

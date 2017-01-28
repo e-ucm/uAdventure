@@ -17,12 +17,9 @@ namespace uAdventure.QR
     {
         private QR selectedQR;
         private Texture2D qrCodeImage;
-
-        private Rect mm_Rect;
-        public QRCodeEditorWindow(Rect aStartPos, GUIStyle aStyle, params GUILayoutOption[] aOptions) : base(aStartPos, new GUIContent("QR Codes"), aStyle, aOptions)
-        {
-            mm_Rect = aStartPos;
-            
+        
+        public QRCodeEditorWindow(Rect rect, GUIStyle style, params GUILayoutOption[] options) : base(rect, new GUIContent("QR Codes"), style, options)
+        {            
             var bc = new GUIContent();
             bc.image = (Texture2D)Resources.Load("qr", typeof(Texture2D));
             bc.text = "QR Codes";  //TC.get("Element.Name1");
@@ -32,14 +29,12 @@ namespace uAdventure.QR
 
         public override void Draw(int aID)
         {
-            base.Draw(aID);
-
             if(selectedQR == null)
             {
-                GUILayout.Label("Please select or create a new QR.", GUILayout.Width(mm_Rect.width * .99f));
+                GUILayout.Label("Please select or create a new QR.");
                 return;
             }
-            EditorGUILayout.BeginVertical(GUILayout.Width(mm_Rect.width * .99f));
+            EditorGUILayout.BeginVertical();
             {
                 EditorGUI.BeginChangeCheck();
                 // Delayed in order to use content to render the QR
@@ -73,7 +68,7 @@ namespace uAdventure.QR
                 // QRCODE and buttons
                 EditorGUILayout.BeginHorizontal();
                 {
-                    var rect = EditorGUILayout.BeginVertical("preBackground", GUILayout.Width(mm_Rect.width * .75f), GUILayout.ExpandHeight(true));
+                    var rect = EditorGUILayout.BeginVertical("preBackground", GUILayout.Width(Rect.width * .75f), GUILayout.ExpandHeight(true));
                     {
                         GUILayout.BeginHorizontal();
                         {

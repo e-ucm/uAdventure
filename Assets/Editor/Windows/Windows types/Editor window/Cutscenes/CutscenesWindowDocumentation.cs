@@ -10,7 +10,6 @@ namespace uAdventure.Editor
     public class CutscenesWindowDocumentation : LayoutWindow
     {
         private string descriptionOfCutscene, nameOfCutscene, descriptionOfCutsceneLast, nameOfCutsceneLast, sceneclass = "", sceneclasslast, scenetype = "", scenetypelast;
-        private float windowHeight;
         private Cutscene current;
 
         public CutscenesWindowDocumentation(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
@@ -37,8 +36,7 @@ namespace uAdventure.Editor
             nameOfCutscene = nameOfCutsceneLast = name;
             sceneclass = sceneclasslast = sclass;
             scenetype = scenetypelast = stype;
-
-            windowHeight = aStartPos.height;
+            
         }
 
 
@@ -51,7 +49,7 @@ namespace uAdventure.Editor
             if (!scenetype.Equals(scenetypelast)) ChangeType(scenetype);
 
             GUILayout.Label(TC.get("Cutscene.Documentation"));
-            descriptionOfCutscene = GUILayout.TextArea(descriptionOfCutscene, GUILayout.MinHeight(0.4f * windowHeight));
+            descriptionOfCutscene = GUILayout.TextArea(descriptionOfCutscene, GUILayout.MinHeight(0.4f * m_Rect.height));
             if (!descriptionOfCutscene.Equals(descriptionOfCutsceneLast))
                 ChangeDocumentation(descriptionOfCutscene);
 

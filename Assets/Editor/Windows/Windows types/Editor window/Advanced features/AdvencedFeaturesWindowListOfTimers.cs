@@ -11,8 +11,7 @@ namespace uAdventure.Editor
         private Texture2D addTex = null;
         private Texture2D duplicateTex = null;
         private Texture2D clearTex = null;
-
-        private static float windowWidth, windowHeight;
+        
         private static Rect timerTableRect, rightPanelRect, settingsTable;
 
         private static GUISkin defaultSkin;
@@ -36,17 +35,10 @@ namespace uAdventure.Editor
             clearTex = (Texture2D)Resources.Load("EAdventureData/img/icons/deleteContent", typeof(Texture2D));
             addTex = (Texture2D)Resources.Load("EAdventureData/img/icons/addNode", typeof(Texture2D));
             duplicateTex = (Texture2D)Resources.Load("EAdventureData/img/icons/duplicateNode", typeof(Texture2D));
-
-            windowWidth = aStartPos.width;
-            windowHeight = aStartPos.height;
-
+            
             noBackgroundSkin = (GUISkin)Resources.Load("Editor/EditorNoBackgroundSkin", typeof(GUISkin));
             selectedAreaSkin = (GUISkin)Resources.Load("Editor/EditorLeftMenuItemSkinConcreteOptions", typeof(GUISkin));
-
-            timerTableRect = new Rect(0f, 0.1f * windowHeight, 0.9f * windowWidth, 0.2f * windowHeight);
-            rightPanelRect = new Rect(0.9f * windowWidth, 0.1f * windowHeight, 0.08f * windowWidth, 0.2f * windowHeight);
-            settingsTable = new Rect(0f, 0.3f * windowHeight, windowWidth, windowHeight * 0.65f);
-
+      
             smallFontStyle = new GUIStyle();
             smallFontStyle.fontSize = 8;
 
@@ -55,6 +47,13 @@ namespace uAdventure.Editor
 
         public override void Draw(int aID)
         {
+            var windowWidth = m_Rect.width;
+            var windowHeight = m_Rect.height;
+
+            timerTableRect = new Rect(0f, 0.1f * windowHeight, 0.9f * windowWidth, 0.2f * windowHeight);
+            rightPanelRect = new Rect(0.9f * windowWidth, 0.1f * windowHeight, 0.08f * windowWidth, 0.2f * windowHeight);
+            settingsTable = new Rect(0f, 0.3f * windowHeight, windowWidth, windowHeight * 0.65f);
+
             /*
             * Timer table
             */

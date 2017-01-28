@@ -11,8 +11,6 @@ namespace uAdventure.Editor
         private Texture2D duplicateTex = null;
         private Texture2D clearTex = null;
 
-        private float windowWidth, windowHeight;
-
         private static GUISkin defaultSkin;
         private static GUISkin noBackgroundSkin;
         private static GUISkin selectedAreaSkin;
@@ -32,23 +30,23 @@ namespace uAdventure.Editor
             clearTex = (Texture2D)Resources.Load("EAdventureData/img/icons/deleteContent", typeof(Texture2D));
             addTex = (Texture2D)Resources.Load("EAdventureData/img/icons/addNode", typeof(Texture2D));
             duplicateTex = (Texture2D)Resources.Load("EAdventureData/img/icons/duplicateNode", typeof(Texture2D));
-
-            windowWidth = aStartPos.width;
-            windowHeight = aStartPos.height;
-
+            
             noBackgroundSkin = (GUISkin)Resources.Load("Editor/EditorNoBackgroundSkin", typeof(GUISkin));
             selectedAreaSkin = (GUISkin)Resources.Load("Editor/EditorLeftMenuItemSkinConcreteOptions", typeof(GUISkin));
 
-            globalStatesTableRect = new Rect(0f, 0.1f * windowHeight, 0.9f * windowWidth, 0.5f * windowHeight);
-            rightPanelRect = new Rect(0.9f * windowWidth, 0.1f * windowHeight, 0.08f * windowWidth, 0.5f * windowHeight);
-            descriptionRect = new Rect(0f, 0.6f * windowHeight, 0.95f * windowWidth, 0.2f * windowHeight);
-            conditionsRect = new Rect(0f, 0.8f * windowHeight, windowWidth, windowHeight * 0.15f);
 
             selectedGlobalState = -1;
         }
 
         public override void Draw(int aID)
         {
+            var windowWidth = m_Rect.width;
+            var windowHeight = m_Rect.height;
+
+            globalStatesTableRect = new Rect(0f, 0.1f * windowHeight, 0.9f * windowWidth, 0.5f * windowHeight);
+            rightPanelRect = new Rect(0.9f * windowWidth, 0.1f * windowHeight, 0.08f * windowWidth, 0.5f * windowHeight);
+            descriptionRect = new Rect(0f, 0.6f * windowHeight, 0.95f * windowWidth, 0.2f * windowHeight);
+            conditionsRect = new Rect(0f, 0.8f * windowHeight, windowWidth, windowHeight * 0.15f);
 
             GUILayout.BeginArea(globalStatesTableRect);
             GUILayout.Box(TC.get("GlobalStatesList.ID"), GUILayout.Width(0.85f * windowWidth));

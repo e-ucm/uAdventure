@@ -18,7 +18,6 @@ namespace uAdventure.Editor
         private Texture2D clearImg = null;
 
         private Texture2D backgroundPreview = null;
-        private static float windowWidth, windowHeight;
         private static Rect previewRect, appearanceTableRect, propertiesTable, rightPanelRect;
 
         private static GUISkin defaultSkin;
@@ -36,9 +35,7 @@ namespace uAdventure.Editor
             clearImg = (Texture2D)Resources.Load("EAdventureData/img/icons/deleteContent", typeof(Texture2D));
             addTexture = (Texture2D)Resources.Load("EAdventureData/img/icons/addNode", typeof(Texture2D));
             duplicateImg = (Texture2D)Resources.Load("EAdventureData/img/icons/duplicateNode", typeof(Texture2D));
-
-            windowWidth = aStartPos.width;
-            windowHeight = aStartPos.height;
+            
 
             if (GameRources.GetInstance().selectedSceneIndex >= 0)
             {
@@ -64,15 +61,19 @@ namespace uAdventure.Editor
 
             noBackgroundSkin = (GUISkin)Resources.Load("Editor/EditorNoBackgroundSkin", typeof(GUISkin));
 
-            appearanceTableRect = new Rect(0f, 0.1f * windowHeight, 0.9f * windowWidth, 0.15f * windowHeight);
-            rightPanelRect = new Rect(0.9f * windowWidth, 0.1f * windowHeight, 0.08f * windowWidth, 0.15f * windowHeight);
-            propertiesTable = new Rect(0f, 0.25f * windowHeight, windowWidth, 0.25f * windowHeight);
-            previewRect = new Rect(0f, 0.5f * windowHeight, windowWidth, windowHeight * 0.45f);
         }
 
 
         public override void Draw(int aID)
         {
+            var windowWidth = m_Rect.width;
+            var windowHeight = m_Rect.height;
+
+            appearanceTableRect = new Rect(0f, 0.1f * windowHeight, 0.9f * windowWidth, 0.15f * windowHeight);
+            rightPanelRect = new Rect(0.9f * windowWidth, 0.1f * windowHeight, 0.08f * windowWidth, 0.15f * windowHeight);
+            propertiesTable = new Rect(0f, 0.25f * windowHeight, windowWidth, 0.25f * windowHeight);
+            previewRect = new Rect(0f, 0.5f * windowHeight, windowWidth, windowHeight * 0.45f);
+
             GUILayout.BeginArea(appearanceTableRect);
             GUILayout.BeginHorizontal();
             GUILayout.Box(TC.get("Scene.LookPanelTitle"), GUILayout.Width(windowWidth * 0.44f));

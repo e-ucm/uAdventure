@@ -538,7 +538,7 @@ namespace uAdventure.Editor
         public void OnCliked()
         {
             TC.loadstrings(ReleaseFolders.getLanguageFilePath4Editor(true, ReleaseFolders.LANGUAGE_ENGLISH));
-            EditorWindowBase.InitGUI();
+            EditorWindowBase.LanguageChanged();
         }
     }
 
@@ -557,7 +557,7 @@ namespace uAdventure.Editor
         public void OnCliked()
         {
             TC.loadstrings(ReleaseFolders.getLanguageFilePath4Editor(true, ReleaseFolders.LANGUAGE_DEUTSCH));
-            EditorWindowBase.InitGUI();
+            EditorWindowBase.LanguageChanged();
         }
     }
 
@@ -576,7 +576,7 @@ namespace uAdventure.Editor
         public void OnCliked()
         {
             TC.loadstrings(ReleaseFolders.getLanguageFilePath4Editor(true, ReleaseFolders.LANGUAGE_SPANISH));
-            EditorWindowBase.InitGUI();
+            EditorWindowBase.LanguageChanged();
         }
     }
 
@@ -595,7 +595,7 @@ namespace uAdventure.Editor
         public void OnCliked()
         {
             TC.loadstrings(ReleaseFolders.getLanguageFilePath4Editor(true, ReleaseFolders.LANGUAGE_GALEGO));
-            EditorWindowBase.InitGUI();
+            EditorWindowBase.LanguageChanged();
         }
     }
 
@@ -614,7 +614,7 @@ namespace uAdventure.Editor
         public void OnCliked()
         {
             TC.loadstrings(ReleaseFolders.getLanguageFilePath4Editor(true, ReleaseFolders.LANGUAGE_ITALIANO));
-            EditorWindowBase.InitGUI();
+            EditorWindowBase.LanguageChanged();
         }
     }
 
@@ -633,7 +633,7 @@ namespace uAdventure.Editor
         public void OnCliked()
         {
             TC.loadstrings(ReleaseFolders.getLanguageFilePath4Editor(true, ReleaseFolders.LANGUAGE_PORTUGESE));
-            EditorWindowBase.InitGUI();
+            EditorWindowBase.LanguageChanged();
         }
     }
 
@@ -652,7 +652,7 @@ namespace uAdventure.Editor
         public void OnCliked()
         {
             TC.loadstrings(ReleaseFolders.getLanguageFilePath4Editor(true, ReleaseFolders.LANGUAGE_PORTUGESE_BRAZIL));
-            EditorWindowBase.InitGUI();
+            EditorWindowBase.LanguageChanged();
         }
     }
 
@@ -671,7 +671,7 @@ namespace uAdventure.Editor
         public void OnCliked()
         {
             TC.loadstrings(ReleaseFolders.getLanguageFilePath4Editor(true, ReleaseFolders.LANGUAGE_ROMANIA));
-            EditorWindowBase.InitGUI();
+            EditorWindowBase.LanguageChanged();
         }
     }
 
@@ -690,7 +690,7 @@ namespace uAdventure.Editor
         public void OnCliked()
         {
             TC.loadstrings(ReleaseFolders.getLanguageFilePath4Editor(true, ReleaseFolders.LANGUAGE_RUSSIAN));
-            EditorWindowBase.InitGUI();
+            EditorWindowBase.LanguageChanged();
         }
     }
 
@@ -709,7 +709,7 @@ namespace uAdventure.Editor
         public void OnCliked()
         {
             TC.loadstrings(ReleaseFolders.getLanguageFilePath4Editor(true, ReleaseFolders.LANGUAGE_CHINA));
-            EditorWindowBase.InitGUI();
+            EditorWindowBase.LanguageChanged();
         }
     }
 

@@ -26,7 +26,6 @@ namespace uAdventure.Geo
 
         private PlaceSearcher placeSearcher;
         private MapScene mapScene;
-        private Rect mm_Rect;
 
         /* ----------------------------------
          * GUI ELEMENTS
@@ -36,8 +35,6 @@ namespace uAdventure.Geo
 
         public MapSceneWindow(Rect aStartPos, GUIStyle aStyle, params GUILayoutOption[] aOptions) : base(aStartPos, new GUIContent("Map Scenes"), aStyle, aOptions)
         {
-            mm_Rect = aStartPos;
-
             var bc = new GUIContent();
             bc.image = (Texture2D)Resources.Load("EAdventureData/img/icons/map", typeof(Texture2D));
             bc.text = "MapScenes";  //TC.get("Element.Name1");
@@ -86,21 +83,20 @@ namespace uAdventure.Geo
 
             // Location control
             mapScene.LatLon = EditorGUILayout.Vector2Field("Location", mapScene.LatLon.ToVector2()).ToVector2d();
-            var lastRect = GUILayoutUtility.GetLastRect();
             if (mapScene.LatLon != map.Center)
                 map.Center = mapScene.LatLon;
 
-            GUILayout.BeginHorizontal();
+            EditorGUILayout.BeginHorizontal();
             // Map Elements
             mapElementReorderableList.list = mapScene.Elements;
             var elementsWidth = 150;
             mapElementReorderableList.elementHeight = mapElementReorderableList.list.Count == 0 ? 20 : 70;
-            var rect = GUILayoutUtility.GetRect(elementsWidth, mm_Rect.height - lastRect.y - lastRect.height);
-            mapElementReorderableList.DoList(rect);
+            var rect = EditorGUILayout.BeginVertical(GUILayout.Width(elementsWidth), GUILayout.ExpandHeight(true));
+            mapElementReorderableList.DoLayoutList();
+            EditorGUILayout.EndVertical();
 
-
+            var mapRect = EditorGUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
             // Map drawing
-            var mapRect = GUILayoutUtility.GetRect(mm_Rect.width - elementsWidth, mm_Rect.height - lastRect.y - lastRect.height);
             if (map.DrawMap(mapRect))
             {
                 if (movingReference != null)
@@ -117,8 +113,8 @@ namespace uAdventure.Geo
 
             mapScene.LatLon = map.Center;
             //geometriesReorderableList.index = map.selectedGeometry != null ? geometries.IndexOf(map.selectedGeometry) : -1;
-
-            GUILayout.EndHorizontal();
+            EditorGUILayout.EndVertical();
+            EditorGUILayout.EndHorizontal();
 
             if (placeSearcher.LayoutEnd())
             {

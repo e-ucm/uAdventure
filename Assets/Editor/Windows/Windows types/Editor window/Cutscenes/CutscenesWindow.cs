@@ -17,9 +17,7 @@ namespace uAdventure.Editor
         private static CutscenesWindowAppearance cutscenesWindowAppearance;
         private static CutscenesWindowDocumentation cutscenesWindowDocumentation;
         private static CutscenesWindowEndConfiguration cutscenesWindowEndConfiguration;
-
-        private static float windowWidth, windowHeight;
-
+        
 
         // Flag determining visibility of concrete item information
         private bool isConcreteItemVisible = false;
@@ -41,9 +39,7 @@ namespace uAdventure.Editor
             cutscenesWindowAppearance = new CutscenesWindowAppearance(aStartPos, new GUIContent(TC.get("Cutscene.App")), "Window");
             cutscenesWindowDocumentation = new CutscenesWindowDocumentation(aStartPos, new GUIContent(TC.get("Cutscene.Doc")), "Window");
             cutscenesWindowEndConfiguration = new CutscenesWindowEndConfiguration(aStartPos, new GUIContent(TC.get("Cutscene.CutsceneEnd")), "Window");
-
-            windowWidth = aStartPos.width;
-            windowHeight = aStartPos.height;
+            
 
             thisRect = aStartPos;
             selectedButtonSkin = (GUISkin)Resources.Load("Editor/ButtonSelected", typeof(GUISkin));
@@ -52,6 +48,9 @@ namespace uAdventure.Editor
 
         public override void Draw(int aID)
         {
+            var windowWidth = m_Rect.width;
+            var windowHeight = m_Rect.height;
+
             // Show information of concrete item
             if (isConcreteItemVisible)
             {
@@ -90,12 +89,15 @@ namespace uAdventure.Editor
                 switch (openedWindow)
                 {
                     case CutscenesWindowType.Appearance:
+                        cutscenesWindowAppearance.Rect = this.Rect;
                         cutscenesWindowAppearance.Draw(aID);
                         break;
                     case CutscenesWindowType.Documentation:
+                        cutscenesWindowAppearance.Rect = this.Rect;
                         cutscenesWindowDocumentation.Draw(aID);
                         break;
                     case CutscenesWindowType.EndConfiguration:
+                        cutscenesWindowAppearance.Rect = this.Rect;
                         cutscenesWindowEndConfiguration.Draw(aID);
                         break;
                 }

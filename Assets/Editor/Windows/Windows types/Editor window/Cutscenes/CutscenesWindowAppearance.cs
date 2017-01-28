@@ -17,7 +17,6 @@ namespace uAdventure.Editor
         private Texture2D clearImg = null;
         private Texture2D slidesPreview = null;
         private Texture2D slidePreviewMovie = null;
-        private static float windowWidth, windowHeight;
         private static Rect previewRect;
 
         private string slidesPath = "";
@@ -32,10 +31,7 @@ namespace uAdventure.Editor
             : base(aStartPos, aContent, aStyle, aOptions)
         {
             clearImg = (Texture2D)Resources.Load("EAdventureData/img/icons/deleteContent", typeof(Texture2D));
-
-            windowWidth = aStartPos.width;
-            windowHeight = aStartPos.height;
-
+            
             if (GameRources.GetInstance().selectedCutsceneIndex >= 0)
             {
                 slidesPath =
@@ -63,12 +59,15 @@ namespace uAdventure.Editor
 
 
             slidePreviewMovie = (Texture2D)Resources.Load("EAdventureData/img/icons/video", typeof(Texture2D));
-            previewRect = new Rect(0f, 0.5f * windowHeight, windowWidth, windowHeight * 0.45f);
         }
 
 
         public override void Draw(int aID)
         {
+            var windowWidth = m_Rect.width;
+            var windowHeight = m_Rect.height;
+            previewRect = new Rect(0f, 0.5f * windowHeight, windowWidth, windowHeight * 0.45f);
+
             /*
             * View for videoscene
             */
@@ -108,13 +107,13 @@ namespace uAdventure.Editor
                 {
                     OnSlidesceneChanged("");
                 }
-                GUILayout.Box(slidesPath, GUILayout.Width(0.6f * windowWidth));
+                GUILayout.Box(slidesPath, GUILayout.ExpandWidth(true));
                 if (GUILayout.Button(TC.get("Buttons.Select"), GUILayout.Width(0.1f * windowWidth)))
                 {
                     ShowAssetChooser(AssetType.SELECT_SLIDES);
                 }
                 // Create/edit slidescene
-                if (GUILayout.Button(TC.get("Resources.Create") + "/" + TC.get("Resources.Edit"), GUILayout.Width(0.2f * windowWidth)))
+                if (GUILayout.Button(TC.get("Resources.Create") + "/" + TC.get("Resources.Edit"), GUILayout.Width(0.18f * windowWidth)))
                 {
                     // For not-existing cutscene - show new cutscene name dialog
                     if (slidesPath == null || slidesPath.Equals(""))
@@ -136,7 +135,7 @@ namespace uAdventure.Editor
                 {
                     musicPath = "";
                 }
-                GUILayout.Box(musicPath, GUILayout.Width(0.7f * windowWidth));
+                GUILayout.Box(musicPath, GUILayout.ExpandWidth(true));
                 if (GUILayout.Button(TC.get("Buttons.Select"), GUILayout.Width(0.19f * windowWidth)))
                 {
                     ShowAssetChooser(AssetType.MUSIC);
@@ -150,11 +149,12 @@ namespace uAdventure.Editor
             if (Controller.getInstance().getSelectedChapterDataControl().getCutscenesList().getCutscenes()[
                 GameRources.GetInstance().selectedCutsceneIndex].isVideoscene())
             {
-                GUI.DrawTexture(previewRect, slidePreviewMovie, ScaleMode.ScaleToFit);
+                if (slidePreviewMovie != null)
+                    GUI.DrawTexture(previewRect, slidePreviewMovie, ScaleMode.ScaleToFit);
             }
             else
             {
-                if (slidesPath != "")
+                if (slidesPath != "" && slidesPreview != null)
                 {
                     GUI.DrawTexture(previewRect, slidesPreview, ScaleMode.ScaleToFit);
                 }

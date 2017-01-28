@@ -9,9 +9,6 @@ namespace uAdventure.Editor
     [EditorWindowExtension(70, typeof(Conversation))]
     public class ConversationWindow : ReorderableListEditorWindowExtension
     {
-        private static float windowWidth, windowHeight;
-
-        private static Rect thisRect;
         //private ConversationEditorWindow convEditor;
 
         private Dictionary<Conversation, ConversationEditorWindow> conversationWindows;
@@ -24,17 +21,14 @@ namespace uAdventure.Editor
             c.text = TC.get("Element.Name31");
             ButtonContent = c;
 
-            windowWidth = aStartPos.width;
-            windowHeight = aStartPos.height;
-
-            thisRect = aStartPos;
-
             conversationWindows = new Dictionary<Conversation, ConversationEditorWindow>();
         }
 
 
         public override void Draw(int aID)
         {
+            var windowWidth = m_Rect.width;
+
             GUILayout.Space(30);
             for (int i = 0; i < Controller.getInstance().getCharapterList().getSelectedChapterData().getConversations().Count; i++)
             {

@@ -15,8 +15,7 @@ namespace uAdventure.Editor
         private Texture2D noConditionsTex = null;
         private Texture2D moveUp, moveDown = null;
         private Texture2D tmpTex = null;
-
-        private static float windowWidth, windowHeight;
+        
         private static Rect actionTableRect, rightPanelRect, descriptionRect, effectsRect;
 
         private static GUISkin defaultSkin;
@@ -60,16 +59,8 @@ namespace uAdventure.Editor
 
             selectedTarget = selectedTargetLast = 0;
 
-            windowWidth = aStartPos.width;
-            windowHeight = aStartPos.height;
-
             noBackgroundSkin = (GUISkin)Resources.Load("Editor/EditorNoBackgroundSkin", typeof(GUISkin));
             selectedAreaSkin = (GUISkin)Resources.Load("Editor/EditorLeftMenuItemSkinConcreteOptions", typeof(GUISkin));
-
-            actionTableRect = new Rect(0f, 0.1f * windowHeight, 0.9f * windowWidth, 0.5f * windowHeight);
-            rightPanelRect = new Rect(0.9f * windowWidth, 0.1f * windowHeight, 0.08f * windowWidth, 0.5f * windowHeight);
-            descriptionRect = new Rect(0f, 0.6f * windowHeight, 0.95f * windowWidth, 0.2f * windowHeight);
-            effectsRect = new Rect(0f, 0.8f * windowHeight, windowWidth, windowHeight * 0.15f);
 
             selectedAction = -1;
 
@@ -78,6 +69,15 @@ namespace uAdventure.Editor
 
         public override void Draw(int aID)
         {
+            var windowWidth = m_Rect.width;
+            var windowHeight = m_Rect.height;
+
+            actionTableRect = new Rect(0f, 0.1f * windowHeight, 0.9f * windowWidth, 0.5f * windowHeight);
+            rightPanelRect = new Rect(0.9f * windowWidth, 0.1f * windowHeight, 0.08f * windowWidth, 0.5f * windowHeight);
+            descriptionRect = new Rect(0f, 0.6f * windowHeight, 0.95f * windowWidth, 0.2f * windowHeight);
+            effectsRect = new Rect(0f, 0.8f * windowHeight, windowWidth, windowHeight * 0.15f);
+
+
             GUILayout.BeginArea(actionTableRect);
             GUILayout.BeginHorizontal();
             GUILayout.Box(TC.get("Element.Action"), GUILayout.Width(windowWidth * 0.39f));

@@ -7,7 +7,6 @@ namespace uAdventure.Editor
     public class BooksWindowDocumentation : LayoutWindow
     {
         private string documentation, documentationLast;
-        private float windowHeight;
 
         public BooksWindowDocumentation(Rect aStartPos, GUIContent aContent, GUIStyle aStyle,
             params GUILayoutOption[] aOptions)
@@ -20,7 +19,6 @@ namespace uAdventure.Editor
                     GameRources.GetInstance().selectedBookIndex].getDocumentation();
             doc = (doc == null ? "" : doc);
             documentation = documentationLast = doc;
-            windowHeight = aStartPos.height;
         }
 
         public override void Draw(int aID)
@@ -28,7 +26,7 @@ namespace uAdventure.Editor
             GUILayout.Space(20);
             GUILayout.Label(TC.get("Book.Documentation"));
             GUILayout.Space(20);
-            documentation = GUILayout.TextArea(documentation, GUILayout.MinHeight(0.4f * windowHeight));
+            documentation = GUILayout.TextArea(documentation, GUILayout.MinHeight(0.4f * m_Rect.height));
             if (!documentation.Equals(documentationLast))
                 OnDocumentationChanged(documentation);
         }

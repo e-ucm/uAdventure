@@ -83,12 +83,15 @@ namespace uAdventure.Editor
             switch (openedWindow)
             {
                 case AdvencedFeaturesWindowType.GlobalStates:
+                    advencedFeaturesWindowGlobalStates.Rect = Rect;
                     advencedFeaturesWindowGlobalStates.Draw(aID);
                     break;
                 case AdvencedFeaturesWindowType.ListOfTimers:
+                    advencedFeaturesWindowListOfTimers.Rect = Rect;
                     advencedFeaturesWindowListOfTimers.Draw(aID);
                     break;
                 case AdvencedFeaturesWindowType.Macros:
+                    advencedFeaturesWindowMacros.Rect = Rect;
                     advencedFeaturesWindowMacros.Draw(aID);
                     break;
             }

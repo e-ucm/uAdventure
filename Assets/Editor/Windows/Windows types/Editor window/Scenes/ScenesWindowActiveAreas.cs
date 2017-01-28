@@ -17,8 +17,7 @@ namespace uAdventure.Editor
         private Texture2D duplicateImg = null;
 
         private string backgroundPath = "";
-
-        private static float windowWidth, windowHeight;
+        
         private static Rect tableRect;
         private static Rect actionRect;
         private static Rect previewRect;
@@ -46,10 +45,7 @@ namespace uAdventure.Editor
             moveUp = (Texture2D)Resources.Load("EAdventureData/img/icons/moveNodeUp", typeof(Texture2D));
             moveDown = (Texture2D)Resources.Load("EAdventureData/img/icons/moveNodeDown", typeof(Texture2D));
             duplicateImg = (Texture2D)Resources.Load("EAdventureData/img/icons/duplicateNode", typeof(Texture2D));
-
-            windowWidth = aStartPos.width;
-            windowHeight = aStartPos.height;
-
+            
             if (GameRources.GetInstance().selectedSceneIndex >= 0)
                 backgroundPath =
                     Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
@@ -62,12 +58,6 @@ namespace uAdventure.Editor
             selectedAreaSkin = (GUISkin)Resources.Load("Editor/EditorLeftMenuItemSkinConcreteOptions", typeof(GUISkin));
             noBackgroundSkin = (GUISkin)Resources.Load("Editor/EditorNoBackgroundSkin", typeof(GUISkin));
 
-            tableRect = new Rect(0f, 0.1f * windowHeight, 0.9f * windowWidth, windowHeight * 0.33f);
-            rightPanelRect = new Rect(0.9f * windowWidth, 0.1f * windowHeight, 0.08f * windowWidth, 0.33f * windowHeight);
-            infoPreviewRect = new Rect(0f, 0.65f * windowHeight, windowWidth, windowHeight * 0.05f);
-            previewRect = new Rect(0f, 0.7f * windowHeight, windowWidth, windowHeight * 0.25f);
-            actionRect = new Rect(0f, 0.45f * windowHeight, 0.9f * windowWidth, windowHeight * 0.2f);
-            actionRightPanelRect = new Rect(0.9f * windowWidth, 0.45f * windowHeight, 0.1f * windowWidth, windowHeight * 0.2f);
 
             selectedArea = -1;
             selectedAction = -1;
@@ -75,6 +65,16 @@ namespace uAdventure.Editor
 
         public override void Draw(int aID)
         {
+            var windowWidth = m_Rect.width;
+            var windowHeight = m_Rect.height;
+
+            tableRect = new Rect(0f, 0.1f * windowHeight, 0.9f * windowWidth, windowHeight * 0.33f);
+            rightPanelRect = new Rect(0.9f * windowWidth, 0.1f * windowHeight, 0.08f * windowWidth, 0.33f * windowHeight);
+            infoPreviewRect = new Rect(0f, 0.65f * windowHeight, windowWidth, windowHeight * 0.05f);
+            previewRect = new Rect(0f, 0.7f * windowHeight, windowWidth, windowHeight * 0.25f);
+            actionRect = new Rect(0f, 0.45f * windowHeight, 0.9f * windowWidth, windowHeight * 0.2f);
+            actionRightPanelRect = new Rect(0.9f * windowWidth, 0.45f * windowHeight, 0.1f * windowWidth, windowHeight * 0.2f);
+
             GUILayout.BeginArea(tableRect);
             GUILayout.BeginHorizontal();
             GUILayout.Box(TC.get("ActiveAreasList.Id"), GUILayout.Width(windowWidth * 0.54f));

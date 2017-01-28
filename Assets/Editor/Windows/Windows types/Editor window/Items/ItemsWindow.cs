@@ -15,11 +15,7 @@ namespace uAdventure.Editor
         private static ItemsWindowActions itemsWindowActions;
         private static ItemsWindowAppearance itemsWindowAppearance;
         private static ItemsWindowDescription itemsWindowDescription;
-
-        private static float windowWidth, windowHeight;
-
-        private static Rect thisRect;
-
+        
         // Flag determining visibility of concrete item information
         private bool isConcreteItemVisible = false;
 
@@ -37,11 +33,7 @@ namespace uAdventure.Editor
             itemsWindowActions = new ItemsWindowActions(aStartPos, new GUIContent(TC.get("Item.ActionsPanelTitle")), "Window");
             itemsWindowAppearance = new ItemsWindowAppearance(aStartPos, new GUIContent(TC.get("Item.LookPanelTitle")), "Window");
             itemsWindowDescription = new ItemsWindowDescription(aStartPos, new GUIContent(TC.get("Item.DocPanelTitle")), "Window");
-
-            windowWidth = aStartPos.width;
-            windowHeight = aStartPos.height;
-
-            thisRect = aStartPos;
+            
             selectedButtonSkin = (GUISkin)Resources.Load("Editor/ButtonSelected", typeof(GUISkin));
         }
 
@@ -87,12 +79,15 @@ namespace uAdventure.Editor
                 switch (openedWindow)
                 {
                     case ItemsWindowType.Actions:
+                        itemsWindowActions.Rect = Rect;
                         itemsWindowActions.Draw(aID);
                         break;
                     case ItemsWindowType.Appearance:
+                        itemsWindowAppearance.Rect = Rect;
                         itemsWindowAppearance.Draw(aID);
                         break;
                     case ItemsWindowType.DescriptionConfig:
+                        itemsWindowDescription.Rect = Rect;
                         itemsWindowDescription.Draw(aID);
                         break;
                 }
@@ -103,8 +98,8 @@ namespace uAdventure.Editor
                 for (int i = 0; i < Controller.getInstance().getCharapterList().getSelectedChapterData().getItems().Count; i++)
                 {
                     GUILayout.BeginHorizontal();
-                    GUILayout.Box(Controller.getInstance().getCharapterList().getSelectedChapterData().getItems()[i].getId(), GUILayout.Width(windowWidth * 0.75f));
-                    if (GUILayout.Button(TC.get("GeneralText.Edit"), GUILayout.MaxWidth(windowWidth * 0.2f)))
+                    GUILayout.Box(Controller.getInstance().getCharapterList().getSelectedChapterData().getItems()[i].getId(), GUILayout.Width(m_Rect.width * 0.75f));
+                    if (GUILayout.Button(TC.get("GeneralText.Edit"), GUILayout.MaxWidth(m_Rect.width * 0.2f)))
                     {
                         ShowItemWindowView(i);
                     }
@@ -128,9 +123,9 @@ namespace uAdventure.Editor
             isConcreteItemVisible = true;
             GameRources.GetInstance().selectedItemIndex = o;
 
-            itemsWindowActions = new ItemsWindowActions(thisRect, new GUIContent(TC.get("Item.ActionsPanelTitle")), "Window");
-            itemsWindowAppearance = new ItemsWindowAppearance(thisRect, new GUIContent(TC.get("Item.LookPanelTitle")), "Window");
-            itemsWindowDescription = new ItemsWindowDescription(thisRect, new GUIContent(TC.get("Item.DocPanelTitle")), "Window");
+            itemsWindowActions = new ItemsWindowActions(m_Rect, new GUIContent(TC.get("Item.ActionsPanelTitle")), "Window");
+            itemsWindowAppearance = new ItemsWindowAppearance(m_Rect, new GUIContent(TC.get("Item.LookPanelTitle")), "Window");
+            itemsWindowDescription = new ItemsWindowDescription(m_Rect, new GUIContent(TC.get("Item.DocPanelTitle")), "Window");
         }
 
         void OnWindowTypeChanged(ItemsWindowType type_)

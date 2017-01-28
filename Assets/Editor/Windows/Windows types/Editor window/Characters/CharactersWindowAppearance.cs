@@ -46,8 +46,6 @@ namespace uAdventure.Editor
         private Texture2D slidesPreviewWalkRight = null;
         private Texture2D slidesPreviewWalkLeft = null;
 
-        private static float windowWidth, windowHeight;
-
         private static Rect previewLabelsRect;
         private static Rect previewRect4_0, previewRect4_1, previewRect4_2, previewRect4_3;
         private static Rect previewRect2_0, previewRect2_1;
@@ -75,9 +73,6 @@ namespace uAdventure.Editor
             : base(aStartPos, aContent, aStyle, aOptions)
         {
             clearImg = (Texture2D)Resources.Load("EAdventureData/img/icons/deleteContent", typeof(Texture2D));
-
-            windowWidth = aStartPos.width;
-            windowHeight = aStartPos.height;
 
             selectedAnimationGroup = selectedAnimationGroupLast = 0;
             animationGroupNamesList = new string[]
@@ -226,6 +221,13 @@ namespace uAdventure.Editor
                     slidesPreviewWalkLeft = AssetsController.getImage(slidesPathWalkLeftPreview).texture;
             }
 
+        }
+
+        public override void Draw(int aID)
+        {
+            var windowWidth = m_Rect.width;
+            var windowHeight = m_Rect.height;
+
             previewRect2_0 = new Rect(0f, 0.5f * windowHeight, 0.5f * windowWidth, 0.48f * windowHeight);
             previewRect2_1 = new Rect(0.5f * windowWidth, 0.5f * windowHeight, 0.5f * windowWidth, 0.48f * windowHeight);
 
@@ -235,10 +237,7 @@ namespace uAdventure.Editor
             previewRect4_3 = new Rect(0.75f * windowWidth, 0.5f * windowHeight, 0.25f * windowWidth, 0.48f * windowHeight);
 
             previewLabelsRect = new Rect(0f, 0.45f * windowHeight, windowWidth, 0.05f * windowHeight);
-        }
 
-        public override void Draw(int aID)
-        {
             GUILayout.Label(TC.get("Resources.ResourcesGroup"));
             selectedAnimationGroup =
                 EditorGUILayout.Popup(selectedAnimationGroup, animationGroupNamesList);
@@ -254,7 +253,7 @@ namespace uAdventure.Editor
                     {
                         OnSlidesceneChangedLookUp("");
                     }
-                    GUILayout.Box(slidesPathLookUp, GUILayout.Width(0.6f * windowWidth));
+                    GUILayout.Box(slidesPathLookUp, GUILayout.ExpandWidth(true));
                     if (GUILayout.Button(TC.get("Buttons.Select"), GUILayout.Width(0.1f * windowWidth)))
                     {
                         ShowAssetChooser(CharacterAnimationType.LOOKING_UP);
@@ -282,7 +281,7 @@ namespace uAdventure.Editor
                     {
                         OnSlidesceneChangedLookDown("");
                     }
-                    GUILayout.Box(slidesPathLookDown, GUILayout.Width(0.6f * windowWidth));
+                    GUILayout.Box(slidesPathLookDown, GUILayout.ExpandWidth(true));
                     if (GUILayout.Button(TC.get("Buttons.Select"), GUILayout.Width(0.1f * windowWidth)))
                     {
                         ShowAssetChooser(CharacterAnimationType.LOOKING_DOWN);
@@ -310,7 +309,7 @@ namespace uAdventure.Editor
                     {
                         OnSlidesceneChangedLookRight("");
                     }
-                    GUILayout.Box(slidesPathLookRight, GUILayout.Width(0.6f * windowWidth));
+                    GUILayout.Box(slidesPathLookRight, GUILayout.ExpandWidth(true));
                     if (GUILayout.Button(TC.get("Buttons.Select"), GUILayout.Width(0.1f * windowWidth)))
                     {
                         ShowAssetChooser(CharacterAnimationType.LOOKING_RIGHT);
@@ -338,7 +337,7 @@ namespace uAdventure.Editor
                     {
                         OnSlidesceneChangedLookLeft("");
                     }
-                    GUILayout.Box(slidesPathLookLeft, GUILayout.Width(0.6f * windowWidth));
+                    GUILayout.Box(slidesPathLookLeft, GUILayout.ExpandWidth(true));
                     if (GUILayout.Button(TC.get("Buttons.Select"), GUILayout.Width(0.1f * windowWidth)))
                     {
                         ShowAssetChooser(CharacterAnimationType.LOOKING_LEFT);
@@ -387,7 +386,7 @@ namespace uAdventure.Editor
                     {
                         OnSlidesceneChangedSpeakUp("");
                     }
-                    GUILayout.Box(slidesPathTalkUp, GUILayout.Width(0.6f * windowWidth));
+                    GUILayout.Box(slidesPathTalkUp, GUILayout.ExpandWidth(true));
                     if (GUILayout.Button(TC.get("Buttons.Select"), GUILayout.Width(0.1f * windowWidth)))
                     {
                         ShowAssetChooser(CharacterAnimationType.TALKING_UP);
@@ -415,7 +414,7 @@ namespace uAdventure.Editor
                     {
                         OnSlidesceneChangedSpeakDown("");
                     }
-                    GUILayout.Box(slidesPathTalkDown, GUILayout.Width(0.6f * windowWidth));
+                    GUILayout.Box(slidesPathTalkDown, GUILayout.ExpandWidth(true));
                     if (GUILayout.Button(TC.get("Buttons.Select"), GUILayout.Width(0.1f * windowWidth)))
                     {
                         ShowAssetChooser(CharacterAnimationType.TALKING_DOWN);
@@ -443,7 +442,7 @@ namespace uAdventure.Editor
                     {
                         OnSlidesceneChangedSpeakRight("");
                     }
-                    GUILayout.Box(slidesPathTalkRight, GUILayout.Width(0.6f * windowWidth));
+                    GUILayout.Box(slidesPathTalkRight, GUILayout.ExpandWidth(true));
                     if (GUILayout.Button(TC.get("Buttons.Select"), GUILayout.Width(0.1f * windowWidth)))
                     {
                         ShowAssetChooser(CharacterAnimationType.TALKING_RIGHT);
@@ -471,7 +470,7 @@ namespace uAdventure.Editor
                     {
                         OnSlidesceneChangedSpeakLeft("");
                     }
-                    GUILayout.Box(slidesPathTalkLeft, GUILayout.Width(0.6f * windowWidth));
+                    GUILayout.Box(slidesPathTalkLeft, GUILayout.ExpandWidth(true));
                     if (GUILayout.Button(TC.get("Buttons.Select"), GUILayout.Width(0.1f * windowWidth)))
                     {
                         ShowAssetChooser(CharacterAnimationType.TALKING_LEFT);
@@ -518,7 +517,7 @@ namespace uAdventure.Editor
                     {
                         OnSlidesceneChangedUseRight("");
                     }
-                    GUILayout.Box(slidesPathUseRight, GUILayout.Width(0.6f * windowWidth));
+                    GUILayout.Box(slidesPathUseRight, GUILayout.ExpandWidth(true));
                     if (GUILayout.Button(TC.get("Buttons.Select"), GUILayout.Width(0.1f * windowWidth)))
                     {
                         ShowAssetChooser(CharacterAnimationType.USE_TO_RIGHT);
@@ -546,7 +545,7 @@ namespace uAdventure.Editor
                     {
                         OnSlidesceneChangedUseLeft("");
                     }
-                    GUILayout.Box(slidesPathUseLeft, GUILayout.Width(0.6f * windowWidth));
+                    GUILayout.Box(slidesPathUseLeft, GUILayout.ExpandWidth(true));
                     if (GUILayout.Button(TC.get("Buttons.Select"), GUILayout.Width(0.1f * windowWidth)))
                     {
                         ShowAssetChooser(CharacterAnimationType.USE_TO_LEFT);
@@ -592,7 +591,7 @@ namespace uAdventure.Editor
                     {
                         OnSlidesceneChangedWalkUp("");
                     }
-                    GUILayout.Box(slidesPathWalkUp, GUILayout.Width(0.6f * windowWidth));
+                    GUILayout.Box(slidesPathWalkUp, GUILayout.ExpandWidth(true));
                     if (GUILayout.Button(TC.get("Buttons.Select"), GUILayout.Width(0.1f * windowWidth)))
                     {
                         ShowAssetChooser(CharacterAnimationType.WALKING_UP);
@@ -620,7 +619,7 @@ namespace uAdventure.Editor
                     {
                         OnSlidesceneChangedWalkDown("");
                     }
-                    GUILayout.Box(slidesPathWalkDown, GUILayout.Width(0.6f * windowWidth));
+                    GUILayout.Box(slidesPathWalkDown, GUILayout.ExpandWidth(true));
                     if (GUILayout.Button(TC.get("Buttons.Select"), GUILayout.Width(0.1f * windowWidth)))
                     {
                         ShowAssetChooser(CharacterAnimationType.WALKING_DOWN);
@@ -648,7 +647,7 @@ namespace uAdventure.Editor
                     {
                         OnSlidesceneChangedWalkRight("");
                     }
-                    GUILayout.Box(slidesPathWalkRight, GUILayout.Width(0.6f * windowWidth));
+                    GUILayout.Box(slidesPathWalkRight, GUILayout.ExpandWidth(true));
                     if (GUILayout.Button(TC.get("Buttons.Select"), GUILayout.Width(0.1f * windowWidth)))
                     {
                         ShowAssetChooser(CharacterAnimationType.WALKING_RIGHT);
@@ -676,7 +675,7 @@ namespace uAdventure.Editor
                     {
                         OnSlidesceneChangedWalkLeft("");
                     }
-                    GUILayout.Box(slidesPathWalkLeft, GUILayout.Width(0.6f * windowWidth));
+                    GUILayout.Box(slidesPathWalkLeft, GUILayout.ExpandWidth(true));
                     if (GUILayout.Button(TC.get("Buttons.Select"), GUILayout.Width(0.1f * windowWidth)))
                     {
                         ShowAssetChooser(CharacterAnimationType.WALKING_LEFT);

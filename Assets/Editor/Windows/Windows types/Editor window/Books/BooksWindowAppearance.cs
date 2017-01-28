@@ -10,7 +10,6 @@ namespace uAdventure.Editor
         private Texture2D clearImg = null;
 
         private Texture2D backgroundPreview = null;
-        private static float windowWidth, windowHeight;
         private static Rect tableRect;
         private static Rect previewRect;
         private static Rect infoPreviewRect;
@@ -24,13 +23,6 @@ namespace uAdventure.Editor
             : base(aStartPos, aContent, aStyle, aOptions)
         {
             clearImg = (Texture2D)Resources.Load("EAdventureData/img/icons/deleteContent", typeof(Texture2D));
-
-            windowWidth = aStartPos.width;
-            windowHeight = aStartPos.height;
-
-            tableRect = new Rect(0f, 0.1f * windowHeight, windowWidth, windowHeight * 0.33f);
-            infoPreviewRect = new Rect(0f, 0.45f * windowHeight, windowWidth, windowHeight * 0.05f);
-            previewRect = new Rect(0f, 0.5f * windowHeight, windowWidth, windowHeight * 0.45f);
 
             if (GameRources.GetInstance().selectedBookIndex >= 0)
             {
@@ -61,6 +53,13 @@ namespace uAdventure.Editor
 
         public override void Draw(int aID)
         {
+            var windowWidth = m_Rect.width;
+            var windowHeight = m_Rect.height;
+
+            tableRect = new Rect(0f, 0.1f * windowHeight, windowWidth, windowHeight * 0.33f);
+            infoPreviewRect = new Rect(0f, 0.45f * windowHeight, windowWidth, windowHeight * 0.05f);
+            previewRect = new Rect(0f, 0.5f * windowHeight, windowWidth, windowHeight * 0.45f);
+
             /**
             * TABLE
             */
