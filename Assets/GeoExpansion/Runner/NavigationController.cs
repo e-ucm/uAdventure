@@ -148,7 +148,6 @@ namespace uAdventure.Geo
             if (!character)
             {
                 character = FindObjectOfType<GeoPositionedCharacter>();
-                if (!character) return false;
             }
 
             var mb = GetReference(currentStep.Reference);
@@ -159,16 +158,26 @@ namespace uAdventure.Geo
                 var wrap = mb as GeoWrapper;
                 var position = (Vector2d)wrap.Reference.TransformManagerParameters["Position"];
                 var interactionRange = (float) wrap.Reference.TransformManagerParameters["InteractionRange"];
+                
+                var distance = GM.SeparationInMeters(position, character.LatLon);
+                var realDistance = GM.SeparationInMeters(position, Input.location.lastData.LatLonD());
 
-                var distance = GM.LatLonToMeters(position) - GM.LatLonToMeters(character.LatLon);
-                return distance.magnitude < interactionRange;
+                // Is inside if the character is in range but also the real coords are saying so
+                // Otherwise, if there is no character or gps, only one of the checks is valid
+
+                return (!character || distance < interactionRange) 
+                    && (!GPSController.Instance.IsStarted() || realDistance < interactionRange);
             }
             else if (mb is GeoElementMB)
             {
                 var geomb = mb as GeoElementMB;
-                // If the player is inside the influence is reached
+
+                // Is inside if the character is inside the influence but also the real coords are saying so
+                // Otherwise, if there is no character or gps, only one of the checks is valid
+
                 // TODO check if the line element is reached
-                return geomb.Element.Geometry.InsideInfluence(character.LatLon);
+                return (!character || geomb.Element.Geometry.InsideInfluence(character.LatLon)) 
+                    && (!GPSController.Instance.IsStarted() || geomb.Element.Geometry.InsideInfluence(Input.location.lastData.LatLonD()));
             }
             else return true;
         }
@@ -225,9 +234,9 @@ namespace uAdventure.Geo
 
         private void UpdateArrow(bool reached)
         {
-            arrow.gameObject.SetActive(!reached);
+            arrow.gameObject.SetActive(!reached && character);
 
-            if(currentStep != null)
+            if(currentStep != null && character)
             {
                 var pos = GetElementPosition(currentStep.Reference);
                 var direction = GM.LatLonToMeters(pos) - GM.LatLonToMeters(character.LatLon);
@@ -247,11 +256,17 @@ namespace uAdventure.Geo
             if (!character)
             {
                 character = FindObjectOfType<GeoPositionedCharacter>();
-                if (!character) return steps[0]; // Is not possible to determine the closest
             }
 
-            var characterMeters = GM.LatLonToMeters(character.LatLon);
-            return steps.FindAll(e => !stepCompleted[e]).OrderBy(s => (GetElementPosition(s.Reference) - characterMeters).magnitude).ElementAt(0);
+            var latLon = character // If there is a character
+                ? character.LatLon // use the position of the character to calculate distance
+                : GPSController.Instance.IsLocationValid() // If not, but we have a location source
+                    ? Input.location.lastData.LatLonD() // Use the location
+                    : new Vector2d(double.NegativeInfinity, double.NegativeInfinity); // Otherwise, minus infinite, as the elements will be positioned at inifine
+
+            return steps
+                .FindAll(e => !stepCompleted[e]) // Filter the completed
+                .FindMin(s => GM.SeparationInMeters(GetElementPosition(s.Reference), latLon)); // Order the rest to distance
         }
 
         /// <summary>
@@ -274,7 +289,7 @@ namespace uAdventure.Geo
                 return (Vector2d) (mb as GeoWrapper).Reference.TransformManagerParameters["Position"];
             }
 
-            return new Vector2d(double.NaN, double.NaN);
+            return new Vector2d(double.PositiveInfinity, double.PositiveInfinity);
         }
 
         /// <summary>
@@ -315,6 +330,28 @@ namespace uAdventure.Geo
                 case GMLGeometry.GeometryType.Point:
                     return geoElementMB.Element.Geometry.Center;
             }
+        }
+    }
+
+    public static class ExtensionLocationInfo
+    {
+        public static Vector2 LatLon(this LocationInfo l)
+        {
+            return new Vector2(l.latitude, l.longitude);
+        }
+
+        public static Vector2d LatLonD(this LocationInfo l)
+        {
+            return new Vector2d(l.latitude, l.longitude);
+        }
+    }
+
+    public static class ExtensionList
+    {
+        public static T FindMin<T,TResult>(this List<T> l, Func<T,TResult> selector)
+        {
+            var min = l.Min(selector);
+            return l.Find(e => selector(e).Equals(min));
         }
     }
 }
