@@ -13,6 +13,7 @@ public class GeoPositionedCharacter : MonoBehaviour
 
     public void MoveTo(Vector2d latLon)
     {
+        moving = true;
         destination = latLon;
     }
 
@@ -37,6 +38,7 @@ public class GeoPositionedCharacter : MonoBehaviour
         }
     }
 
+    private bool moving = false;
     private Vector2d destination;
 
     void Start()
@@ -53,10 +55,11 @@ public class GeoPositionedCharacter : MonoBehaviour
         var destinationMeters = GM.LatLonToMeters(destination.x, destination.y) - tileManagerRelative;
         destinationMeters -= latLonMeters;
 
-        if (destinationMeters.sqrMagnitude >= minDistanceToWalk * minDistanceToWalk)
+        if (moving && destinationMeters.sqrMagnitude >= minDistanceToWalk * minDistanceToWalk)
             thirdPersonCharacter.Move(Vector3.ClampMagnitude(new Vector3((float)destinationMeters.x, 0, (float)destinationMeters.y), minDistanceToWalk*3) / (minDistanceToWalk*3), false, false);
         else if(lastPos ==  transform.position)
         {
+            moving = false;
             destination = latLon;
             thirdPersonCharacter.Move(new Vector3(0, 0, 0), false, false);
             if(Input.compass.enabled)
@@ -64,18 +67,6 @@ public class GeoPositionedCharacter : MonoBehaviour
         }
 
         lastPos = transform.position;
-
-
-        /* if (destinationMeters.sqrMagnitude >= minDistanceToWalk * minDistanceToWalk)
-         {
-             Debug.Log("Moving because: " + destinationMeters.magnitude);
-         }
-         else
-         {
-             thirdPersonCharacter.Move(new Vector3((float)latLonMeters.y, 0, (float)latLonMeters.x), false, false);
-             transform.localRotation = Quaternion.Euler(0, 0, Input.compass.trueHeading);
-         }*/
-
 
         this.latLon = GM.MetersToLatLon(transform.localPosition.ToVector2xz().ToVector2d() + tileManagerRelative);
         this.transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y >= 0 ? transform.localPosition.y : 0, transform.localPosition.z);

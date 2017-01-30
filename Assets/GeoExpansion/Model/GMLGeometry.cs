@@ -71,41 +71,59 @@ public class GMLGeometry
         }
     }
     
-    public bool Inside(Vector2d point)
+    public bool InsideMargin(Vector2d point, float margin)
+    {
+        return Inside(Points, Type, point) || InsidePointRadius(Points, point, margin) || InsideEdgeRange(Points, point, margin);
+    }
+
+    private static bool Inside(List<Vector2d> points, GMLGeometry.GeometryType type, Vector2d point)
     {
         var meters = GM.LatLonToMeters(point);
-        var originPoints = Points.ConvertAll(p => GM.LatLonToMeters(p) - meters);
 
         var inside = false;
-        for (int i = 0; i < originPoints.Count; i++)
+
+        switch (type)
         {
-            if (((originPoints[i].y > 0) != (originPoints[(i + 1)% originPoints.Count].y > 0))
-            && ((originPoints[i].y > 0) == (originPoints[i].y * originPoints[(i + 1) % originPoints.Count].x > originPoints[(i + 1) % originPoints.Count].y * originPoints[i].x)))
-                inside = !inside;
+            case GeometryType.Point:
+                break;
+            case GeometryType.LineString:
+                break;
+            case GeometryType.Polygon:
+                var originPoints = points.ConvertAll(p => GM.LatLonToMeters(p) - meters);
+                for (int i = 0; i < originPoints.Count; i++)
+                {
+                    if (((originPoints[i].y > 0) != (originPoints[(i + 1) % originPoints.Count].y > 0))
+                    && ((originPoints[i].y > 0) == (originPoints[i].y * originPoints[(i + 1) % originPoints.Count].x > originPoints[(i + 1) % originPoints.Count].y * originPoints[i].x)))
+                        inside = !inside;
+                }
+                break;
+            default:
+                break;
         }
+
+        
 
         return inside;
     }
 
-    private bool InsidePointInfluence(Vector2d point, float extraMargin)
+    private static bool InsidePointRadius(List<Vector2d> points, Vector2d point, float radius)
     {
-        var mp = GM.LatLonToMeters(point);
-        return Points.Any(p => (GM.LatLonToMeters(p) - mp).magnitude <= Influence + extraMargin);
+        return points.Any(p => (GM.SeparationInMeters(p, point) <= radius));
     }
 
-    private bool InsideEdgeInfluence(Vector2d point, float extraMargin)
+    private static bool InsideEdgeRange(List<Vector2d> points, Vector2d point, float radius)
     {
-        if (Points.Count <= 1) // If there are not edges, no sense to do it...
+        if (points.Count <= 1) // If there are not edges, no sense to do it...
             return false;
 
         Vector2d closestPoin = Vector2d.zero;
-        int l = Points.Count - 1;
-        var mp = GM.LatLonToMeters(point);
-        for (int i = 0; i < Points.Count; i++)
+        int l = points.Count - 1;
+        for (int i = 0; i < points.Count; i++)
         {
-            closestPoin = GetClosestPointOnLineSegment(Points[l], Points[i], point);
+            closestPoin = GetClosestPointOnLineSegment(points[l], points[i], point);
+            Debug.Log(GM.SeparationInMeters(closestPoin, point));
             l = i;
-            if ((GM.LatLonToMeters(closestPoin) - mp).magnitude <= Influence + extraMargin)
+            if (GM.SeparationInMeters(closestPoin, point) <= radius)
                 return true;
         }
         return false;
@@ -117,7 +135,7 @@ public class GMLGeometry
         Vector2d AP = P - A;       //Vector from A to P   
         Vector2d AB = B - A;       //Vector from A to B  
 
-        double magnitudeAB = AB.magnitude;     //Magnitude of AB vector (it's length squared)     
+        double magnitudeAB = AB.sqrMagnitude;     //Magnitude of AB vector (it's length squared)     
         double ABAPproduct = Vector2d.Dot(AP, AB);    //The DOT product of a_to_p and a_to_b     
         double distance = ABAPproduct / magnitudeAB; //The normalized "distance" from a to your closest point  
 
@@ -143,7 +161,7 @@ public class GMLGeometry
 
     public bool InsideInfluence(Vector2d point, float extraMargin)
     {
-        return Inside(point) || InsidePointInfluence(point, extraMargin) || InsideEdgeInfluence(point, extraMargin);
+        return InsideMargin(point, Influence + extraMargin);
     }
 
     public Vector2d Center {

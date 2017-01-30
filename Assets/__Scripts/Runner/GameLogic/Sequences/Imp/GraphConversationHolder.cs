@@ -3,7 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 
 using uAdventure.Core;
-using uAdventure.RageTracker;
+using RAGE.Analytics;
+using RAGE.Analytics.Formats;
 
 namespace uAdventure.Runner
 {

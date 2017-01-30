@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 using uAdventure.Core;
-using uAdventure.RageTracker;
+using RAGE.Analytics;
 using System;
 
 namespace uAdventure.Runner

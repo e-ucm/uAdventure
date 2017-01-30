@@ -9,7 +9,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using uAdventure.Runner;
-using uAdventure.RageTracker;
+using RAGE.Analytics;
+using RAGE.Analytics.Formats;
 using ClipperLib;
 
 using Path = System.Collections.Generic.List<ClipperLib.IntPoint>;
@@ -241,6 +242,17 @@ public class GeoElementMB : MonoBehaviour {
             EffectHolder eh = new EffectHolder(Action.Effects);
             Game.Instance.Execute(eh);
         }
+
+        protected Vector2d LatLon
+        {
+            get
+            {
+                return GPSController.Instance.IsStarted() && GPSController.Instance.IsLocationValid()
+                    ? Input.location.lastData.LatLonD()
+                    : Holder.player.LatLon;
+            }
+        }
+        
     }
 
     // Individual actions
@@ -253,7 +265,7 @@ public class GeoElementMB : MonoBehaviour {
 
         public override void Start()
         {
-            wasInside = Element.Geometry.InsideInfluence(Holder.player.LatLon);
+            wasInside = Element.Geometry.InsideInfluence(LatLon);
         }
 
         protected override bool CustomChecks()
@@ -267,7 +279,7 @@ public class GeoElementMB : MonoBehaviour {
                 first = true;
             }
 
-            if (Element.Geometry.InsideInfluence(Holder.player.LatLon))
+            if (Element.Geometry.InsideInfluence(LatLon))
             {
                 if (!wasInside)
                 {
@@ -280,6 +292,8 @@ public class GeoElementMB : MonoBehaviour {
 
         protected override void Execute()
         {
+            var latlon = LatLon.ToVector2();
+            Tracker.T.setGeopoint(latlon.x, latlon.y);
             Tracker.T.setExtension("geocommand", "enter");
             Tracker.T.accessible.Accessed(Element.Id, AccessibleTracker.Accessible.Zone);
             Tracker.T.RequestFlush();
@@ -296,7 +310,7 @@ public class GeoElementMB : MonoBehaviour {
 
         public override void Start()
         {
-            wasInside = Element.Geometry.InsideInfluence(Holder.player.LatLon);
+            wasInside = Element.Geometry.InsideInfluence(LatLon);
         }
 
         protected override bool CustomChecks()
@@ -310,7 +324,7 @@ public class GeoElementMB : MonoBehaviour {
                 first = false;
             }
 
-            if (!Element.Geometry.InsideInfluence(Holder.player.LatLon))
+            if (!Element.Geometry.InsideInfluence(LatLon))
             {
                 if (wasInside)
                 {
@@ -323,6 +337,8 @@ public class GeoElementMB : MonoBehaviour {
 
         protected override void Execute()
         {
+            var latlon = LatLon.ToVector2();
+            Tracker.T.setGeopoint(latlon.x, latlon.y);
             Tracker.T.setExtension("geocommand", "exit");
             Tracker.T.accessible.Accessed(Element.Id, AccessibleTracker.Accessible.Zone);
             Tracker.T.RequestFlush();
@@ -340,7 +356,7 @@ public class GeoElementMB : MonoBehaviour {
             LookToAction ea = Action as LookToAction;
             var r = false;
 
-            if (!ea.Inside || Element.Geometry.InsideInfluence(Holder.player.LatLon))
+            if (!ea.Inside || Element.Geometry.InsideInfluence(LatLon))
             {
                 if (ea.Center)
                 {
@@ -357,6 +373,8 @@ public class GeoElementMB : MonoBehaviour {
 
         protected override void Execute()
         {
+            var latlon = LatLon.ToVector2();
+            Tracker.T.setGeopoint(latlon.x, latlon.y);
             Tracker.T.setExtension("geocommand", "look");
             Tracker.T.accessible.Accessed(Element.Id, AccessibleTracker.Accessible.Zone);
             Tracker.T.RequestFlush();

@@ -179,7 +179,11 @@ public class GUIMap
 
                         selectedPoint = points.FindIndex(p => p.magnitude < SelectPointDistance);
 
-                        return g.Inside(GeoMousePosition) || selectedPoint != -1; 
+                        var marginMeters = (GM.PixelsToMeters(-PATR, Zoom) - GM.PixelsToMeters(-PATR + new Vector2d(SelectPointDistance,0), Zoom)).magnitude;
+
+                        var i = g.InsideMargin(GeoMousePosition, (float)marginMeters);
+
+                        return i || selectedPoint != -1; 
                     });
 
                     if (area.Contains(Event.current.mousePosition))

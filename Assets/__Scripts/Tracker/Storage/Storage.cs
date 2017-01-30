@@ -16,26 +16,23 @@
  * limitations under the License.
  */
 using System;
-using System.Collections.Generic;
-using SimpleJSON;
 
-namespace uAdventure.RageTracker
+namespace RAGE.Analytics.Storages
 {
-    public class DefaultTraceFromat : Tracker.ITraceFormatter
-    {
-        public string Serialize(List<string> traces)
-        {
-            string result = "";
-            foreach (string trace in traces)
-            {
-                result += trace + "\n";
-            }
-            return result;
-        }
+	public interface Storage
+	{
+		void SetTracker (Tracker tracker);
+		
+		/// <summary>
+		/// The tracker wants to start sending traces
+		///</summary>
+		void Start (Net.IRequestListener startListener);
+		
+		///<summary>
+		/// The tracker wants to send the given data
+		///</summary>
+		void Send (String data, Net.IRequestListener flushListener);
 
-        public void StartData(JSONNode data)
-        {
-
-        }
-    }
+		bool IsAvailable();
+	}
 }

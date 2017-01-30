@@ -4,7 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 
 using uAdventure.Core;
-using uAdventure.RageTracker;
+using RAGE.Analytics;
+using RAGE.Analytics.Formats;
 
 namespace uAdventure.Runner
 {
@@ -83,6 +84,7 @@ namespace uAdventure.Runner
             Game.instance = this;
             //Load tracker data
             SimpleJSON.JSONNode hostfile = new SimpleJSON.JSONClass();
+            bool loaded = false;
 
 #if UNITY_WEBPLAYER || UNITY_WEBGL
 #elif UNITY_ANDROID || UNITY_IPHONE
@@ -97,13 +99,17 @@ namespace uAdventure.Runner
                 }
                 else
                     hostfile = SimpleJSON.JSON.Parse(System.IO.File.ReadAllText("host.cfg"));
+                loaded = true;
             }
 #endif
             try
             {
-                Tracker.T.host = hostfile["host"];
-                Tracker.T.trackingCode = hostfile["trackingCode"];
-                //End tracker data loading
+                if (loaded)
+                {
+                    Tracker.T.host = hostfile["host"];
+                    Tracker.T.trackingCode = hostfile["trackingCode"];
+                    //End tracker data loading
+                }
             }
             catch { }
 

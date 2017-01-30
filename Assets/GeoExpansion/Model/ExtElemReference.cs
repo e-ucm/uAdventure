@@ -5,7 +5,7 @@ using MapzenGo.Helpers;
 using MapzenGo.Models;
 using uAdventure.Runner;
 using uAdventure.Core;
-using uAdventure.RageTracker;
+using RAGE.Analytics;
 
 namespace uAdventure.Geo
 {

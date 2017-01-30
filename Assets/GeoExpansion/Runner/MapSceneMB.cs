@@ -7,7 +7,7 @@ using System.Collections;
 using MapzenGo.Models;
 using UnityStandardAssets.Characters.ThirdPerson;
 using MapzenGo.Helpers;
-using uAdventure.RageTracker;
+using RAGE.Analytics;
 
 namespace uAdventure.Geo
 {
@@ -97,27 +97,18 @@ namespace uAdventure.Geo
         }
 
 
-        public float maxTimeToFlushPosition;
-        private float timeSinceLastPositionUpdate = 0;
         private Vector2d lastUpdatedPosition;
 
         void Update()
         {
             if(Input.location.status == LocationServiceStatus.Running && Input.location.lastData.timestamp != 0 && Input.location.lastData.latitude != 0)
             {
-                timeSinceLastPositionUpdate += Time.deltaTime;
                 var inputLatLon = new Vector2d(Input.location.lastData.latitude, Input.location.lastData.longitude);
                 if (GPSController.Instance.IsLocationValid() 
-                    && (timeSinceLastPositionUpdate > maxTimeToFlushPosition 
-                        || (GM.LatLonToMeters(lastUpdatedPosition) - GM.LatLonToMeters(inputLatLon)).sqrMagnitude >= 1f))
+                    && (GM.LatLonToMeters(lastUpdatedPosition) - GM.LatLonToMeters(inputLatLon)).sqrMagnitude >= 1f)
                 {
-                    if (GM.SeparationInMeters(geoCharacter.LatLon, inputLatLon) > 1000) geoCharacter.LatLon = inputLatLon;
+                    if (GM.SeparationInMeters(geoCharacter.LatLon, inputLatLon) > 150) geoCharacter.LatLon = inputLatLon;
                     else geoCharacter.MoveTo(inputLatLon);
-
-                    Tracker.T.setExtension("location", Input.location.lastData.latitude + ","+ Input.location.lastData.longitude);
-                    Tracker.T.Trace("moved", "geoposition", "player");// Tracker.Verb.Completed.ToString().ToLower(), type.ToString().ToLower(), completableId);
-                    Tracker.T.RequestFlush();
-                    timeSinceLastPositionUpdate = 0;
                 }
                 
             }
