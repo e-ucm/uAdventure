@@ -150,7 +150,8 @@ namespace uAdventure.Geo
         public bool IsLocationValid()
         {
             return Input.location.status == LocationServiceStatus.Running
-                && Input.location.lastData.timestamp > 0
+                && Input.location.lastData.timestamp > 0 
+                && Input.location.lastData.LatLon() != Vector2.zero
                 && Mathf.Max(Input.location.lastData.horizontalAccuracy, Input.location.lastData.verticalAccuracy) < 50; // Max 50 metros
         }
     }

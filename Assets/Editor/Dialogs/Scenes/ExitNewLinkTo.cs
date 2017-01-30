@@ -12,7 +12,7 @@ namespace uAdventure.Editor
 
         public override void Init(DialogReceiverInterface e)
         {
-            elements = Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenesIDs().Concat(Controller.getInstance().getSelectedChapterDataControl().getCutscenesList().getCutscenesIDs()).ToArray();
+            elements = Controller.getInstance().getSelectedChapterDataControl().getObjects<IChapterTarget>().ConvertAll(o => o.getId()).ToArray();
             selectedElementID = elements[0];
 
             base.Init(e);
