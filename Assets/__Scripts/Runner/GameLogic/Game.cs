@@ -146,9 +146,9 @@ namespace uAdventure.Runner
         void Start()
         {
             if (!forceScene)
-                renderScene(GameState.getInitialChapterTarget().getId());
+                RunTarget(GameState.getInitialChapterTarget().getId());
             else
-                renderScene(scene_name);
+                RunTarget(scene_name);
 
             TimerController.Instance.Timers = GameState.getTimers();
             TimerController.Instance.Run();
@@ -319,7 +319,7 @@ namespace uAdventure.Runner
             return (T)System.Enum.Parse(typeof(T), value, true);
         }
 
-        public IRunnerChapterTarget renderScene(string scene_id, int transition_time = 0, int transition_type = 0)
+        public IRunnerChapterTarget RunTarget(string scene_id, int transition_time = 0, int transition_type = 0)
         {
             MenuMB.Instance.hide(true);
             if (runnerTarget != null)
@@ -347,12 +347,12 @@ namespace uAdventure.Runner
                 runnerTarget.RenderScene();
         }
 
-        public void renderLastScene()
+        public void SwitchToLastTarget()
         {
             GeneralScene scene = GameState.getLastScene();
 
             if (scene != null)
-                renderScene(scene.getId());
+                RunTarget(scene.getId());
         }
         #endregion Rendering
         //#################################################################

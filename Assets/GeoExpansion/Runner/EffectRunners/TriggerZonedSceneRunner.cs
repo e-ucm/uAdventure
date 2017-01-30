@@ -24,7 +24,7 @@ namespace uAdventure.Geo
             zc.loadOnExit = Game.Instance.GameState.CurrentTarget;
             zc.transitionTime = effect.getTransitionTime();
 
-            Game.Instance.renderScene(effect.getTargetId(), effect.getTransitionTime(), effect.getTransitionType());
+            Game.Instance.RunTarget(effect.getTargetId(), effect.getTransitionTime(), effect.getTransitionType());
 
             return false;
         }
@@ -56,7 +56,7 @@ namespace uAdventure.Geo
                 if (!zone.InsideInfluence(new Vector2d(Input.location.lastData.latitude, Input.location.lastData.longitude),5))
                 {
                     Debug.Log("No está en la influencia, pero la ubicación es válida");
-                    Game.Instance.renderScene(loadOnExit, 0, 0);
+                    Game.Instance.RunTarget(loadOnExit, 0, 0);
                     DestroyImmediate(this.gameObject);
                 }
             }
@@ -65,7 +65,7 @@ namespace uAdventure.Geo
                 if (!zone.InsideInfluence(debugLatLong.ToVector2d(),5))
                 {
                     Debug.Log("No está en la influencia");
-                    Game.Instance.renderScene(loadOnExit, 0, 0);
+                    Game.Instance.RunTarget(loadOnExit, 0, 0);
                     DestroyImmediate(this.gameObject);
                 }
             }

@@ -331,7 +331,7 @@ namespace uAdventure.Runner
                         switch (((Slidescene)sceneData).getNext())
                         {
                             case Slidescene.NEWSCENE:
-                                Game.Instance.renderScene(((Slidescene)sceneData).getTargetId());
+                                Game.Instance.RunTarget(((Slidescene)sceneData).getTargetId());
                                 break;
                             case Slidescene.ENDCHAPTER:
                                 //Game.Instance(); 
@@ -348,7 +348,7 @@ namespace uAdventure.Runner
                     switch (((Videoscene)sceneData).getNext())
                     {
                         case Slidescene.NEWSCENE:
-                            Game.Instance.renderScene(((Videoscene)sceneData).getTargetId());
+                            Game.Instance.RunTarget(((Videoscene)sceneData).getTargetId());
                             break;
                         case Slidescene.ENDCHAPTER:
                             break;

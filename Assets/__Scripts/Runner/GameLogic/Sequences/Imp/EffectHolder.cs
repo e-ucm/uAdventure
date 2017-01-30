@@ -62,7 +62,7 @@ namespace uAdventure.Runner
                             case EffectType.TRIGGER_SCENE:
                                 runs_once = false;
                                 TriggerSceneEffect tse = ((TriggerSceneEffect)effect);
-                                Game.Instance.renderScene(tse.getTargetId(), tse.getTransitionTime(), tse.getTransitionType());
+                                Game.Instance.RunTarget(tse.getTargetId(), tse.getTransitionTime(), tse.getTransitionType());
                                 break;
                             case EffectType.TRIGGER_CUTSCENE:
                                 runs_once = false;
@@ -87,20 +87,20 @@ namespace uAdventure.Runner
                                 {
                                     aditional_info = new Dictionary<string, object>();
                                     aditional_info.Add("lastscene", Game.Instance.GameState.CurrentTarget);
-                                    aditional_info.Add("scene", Game.Instance.renderScene(tce.getTargetId()));
+                                    aditional_info.Add("scene", Game.Instance.RunTarget(tce.getTargetId()));
                                     forcewait = true;
                                 }
 
                                 if (!forcewait && ((Cutscene)((IRunnerChapterTarget)aditional_info["scene"]).Data).getNext() == Cutscene.GOBACK)
                                 {
                                     string last = (string)aditional_info["lastscene"];
-                                    Game.Instance.renderScene(last);
+                                    Game.Instance.RunTarget(last);
                                 }
 
                                 break;
                             case EffectType.TRIGGER_LAST_SCENE:
                                 runs_once = false;
-                                Game.Instance.renderLastScene();
+                                Game.Instance.SwitchToLastTarget();
                                 break;
                             case EffectType.TRIGGER_CONVERSATION:
                                 runs_once = false;
