@@ -49,6 +49,9 @@ namespace uAdventure.Geo
         {
             if (!IsStarted())
                 StartCoroutine(StartLocation());
+
+            // In case is necesary
+            GameObject.Instantiate(Resources.Load<GameObject>("navigation"));
         }
 
 

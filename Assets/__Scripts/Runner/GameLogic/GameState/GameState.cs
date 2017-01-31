@@ -15,8 +15,6 @@ namespace uAdventure.Runner
         //###########################################################################
 
         AdventureData data;
-        private Dictionary<string, int> flags = new Dictionary<string, int>();
-        private Dictionary<string, int> variables = new Dictionary<string, int>();
         int current_chapter = 0;
         string current_target = "";
 
@@ -27,38 +25,35 @@ namespace uAdventure.Runner
 
         public string CurrentTarget
         {
-            get { return current_target; }
-            set { current_target = value; }
+            get {
+                return current_target;
+            }
+            set {
+                current_target = value;
+                PlayerPrefs.SetString("target", current_target);
+                PlayerPrefs.Save();
+            }
         }
 
         public GameState(AdventureData data)
         {
             this.data = data;
-            flags = new Dictionary<string, int>();
-            variables = new Dictionary<string, int>();
         }
 
         public int checkFlag(string flag)
         {
             int ret = FlagCondition.FLAG_INACTIVE;
-            if (flags.ContainsKey(flag))
+            if (PlayerPrefs.HasKey("flag_"+flag))
             {
-                ret = flags[flag];
+                ret = PlayerPrefs.GetInt("flag_" + flag);
             }
             return ret;
         }
 
         public void setFlag(string name, int state)
         {
-
-            if (flags.ContainsKey(name))
-            {
-                flags[name] = state;
-            }
-            else
-            {
-                flags.Add(name, state);
-            }
+            PlayerPrefs.SetInt("flag_" + name, state);
+            PlayerPrefs.Save();
 
             //Debug.Log ("Flag '" + name + " puesta a " + state);
             bool bstate = state == FlagCondition.FLAG_ACTIVE;
@@ -70,27 +65,19 @@ namespace uAdventure.Runner
         public int getVariable(string var)
         {
             int ret = 0;
-            if (variables.ContainsKey(var))
+            if (PlayerPrefs.HasKey("var_" + var))
             {
-                ret = variables[var];
+                ret = PlayerPrefs.GetInt("var_" + var);
             }
             return ret;
         }
 
         public void setVariable(string name, int value)
         {
-            if (variables.ContainsKey(name))
-            {
-                variables[name] = value;
-            }
-            else
-            {
-                variables.Add(name, value);
-            }
+            PlayerPrefs.SetInt("var_" + name, value);
+            PlayerPrefs.Save();
 
             Tracker.T.setExtension(name, value);
-
-
 
             Game.Instance.reRenderScene();
         }
@@ -191,7 +178,8 @@ namespace uAdventure.Runner
 
         public IChapterTarget getInitialChapterTarget()
         {
-            return data.getChapters()[current_chapter].getInitialChapterTarget();
+            if (PlayerPrefs.HasKey("target")) return data.getChapters()[current_chapter].getObjects<IChapterTarget>().Find(t => t.getId() == PlayerPrefs.GetString("target"));
+            else return data.getChapters()[current_chapter].getInitialChapterTarget();
         }
 
         public GeneralScene getLastScene()

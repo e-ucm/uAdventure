@@ -215,6 +215,13 @@ namespace uAdventure.Runner
             this.Config_Menu_Ref.SetActive(!Config_Menu_Ref.activeSelf);
         }
 
+        public void resetAndExit()
+        {
+            PlayerPrefs.DeleteAll();
+            PlayerPrefs.Save();
+            Application.Quit();
+        }
+
         public void exitApplication()
         {
             Application.Quit();

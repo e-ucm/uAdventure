@@ -89,6 +89,45 @@ namespace uAdventure.Geo
             navigating = true;
             if (Steps.Count > 0)
                 currentStep = Steps[0];
+
+            SaveNavigation();
+        }
+
+        private void SaveNavigation()
+        {
+            PlayerPrefs.SetInt("navigating", navigating ? 1 : 0);
+            if (navigating)
+            {
+                PlayerPrefs.SetString("navigation_strategy", NavigationStrategy.ToString());
+                PlayerPrefs.SetString("navigation_steps", String.Join(",", Steps.ConvertAll(s => s.Reference).ToArray()));
+                PlayerPrefs.SetString("navigation_locks", String.Join(",", Steps.ConvertAll(s => s.LockNavigation.ToString()).ToArray()));
+                PlayerPrefs.SetString("navigation_completed", String.Join(",", Steps.ConvertAll(s => stepCompleted.ContainsKey(s) ? stepCompleted[s] : false).ConvertAll(b => b.ToString()).ToArray()));
+                PlayerPrefs.SetString("navigation_elems_completed", String.Join(",", Steps.ConvertAll(s => completedElementsForStep.ContainsKey(s) ? completedElementsForStep[s] : 0).ConvertAll(i => i.ToString()).ToArray()));
+            }
+            PlayerPrefs.Save();
+        }
+
+        private void RestoreNavigation()
+        {
+            if(PlayerPrefs.HasKey("navigating") && PlayerPrefs.GetInt("navigating") == 1)
+            {
+                stepCompleted.Clear();
+                completedElementsForStep.Clear();
+
+                navigating = true;
+                NavigationStrategy = PlayerPrefs.GetString("navigation_strategy").ToEnum<NavigationType>();
+                var locks = PlayerPrefs.GetString("navigation_locks").Split(',').ToList().ConvertAll(l => bool.Parse(l));
+                var completed = PlayerPrefs.GetString("navigation_completed").Split(',').ToList().ConvertAll(l => bool.Parse(l));
+                var elems = PlayerPrefs.GetString("navigation_elems_completed").Split(',').ToList().ConvertAll(l => int.Parse(l));
+
+                Steps = PlayerPrefs.GetString("navigation_steps").Split(',').ToList().ConvertAll(r => new NavigationStep(r));
+                for(int i = 0; i< steps.Count; i++)
+                {
+                    Steps[i].LockNavigation = locks[i];
+                    stepCompleted[Steps[i]] = completed[i];
+                    completedElementsForStep.Add(Steps[i], elems[i]);
+                }
+            }
         }
 
         public void FlagsUpdated()
@@ -105,6 +144,7 @@ namespace uAdventure.Geo
         {
             Instance = this;
             Init();
+            RestoreNavigation();
         }
 
         public void Update()
@@ -133,10 +173,12 @@ namespace uAdventure.Geo
                         if (CompleteStep(currentStep))
                         {
                             currentStep = null;
-                            if(stepCompleted.All(kv => kv.Value == true))
+
+                            if (stepCompleted.All(kv => kv.Value == true))
                             {
                                 // Navigation finished
                                 navigating = false;
+                                SaveNavigation();
                                 DestroyImmediate(this.gameObject);
                             }
                         }
@@ -229,6 +271,8 @@ namespace uAdventure.Geo
             completed &= !currentStep.LockNavigation;
 
             stepCompleted[currentStep] = completed;
+
+            SaveNavigation();
             return completed;
         }
 
@@ -285,9 +329,11 @@ namespace uAdventure.Geo
                     ? Input.location.lastData.LatLonD() // Use the location
                     : new Vector2d(double.NegativeInfinity, double.NegativeInfinity); // Otherwise, minus infinite, as the elements will be positioned at inifine
 
-            return steps
-                .FindAll(e => !stepCompleted[e] && !double.IsNaN(GetElementPosition(e.Reference).x)) // Filter the completed
-                .FindMin(s => GM.SeparationInMeters(GetElementPosition(s.Reference), latLon)); // Order the rest to distance
+            var notCompleted = steps
+                .FindAll(e => !stepCompleted[e] && !double.IsNaN(GetElementPosition(e.Reference).x)); // Filter the completed
+
+            if (notCompleted.Count > 0) return notCompleted.FindMin(s => GM.SeparationInMeters(GetElementPosition(s.Reference), latLon)); // Order the rest to distance
+            else return null;
         }
 
         /// <summary>
