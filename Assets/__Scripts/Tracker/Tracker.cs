@@ -502,7 +502,8 @@ namespace RAGE.Analytics
 		private void EnqueueTrace(params string[] values){
 			string result = "";
 			foreach (string value in values) {
-				result += value.Replace(",", "\\,") + ",";
+                if(value != null)
+                    result += value.Replace(",", "\\,") + ",";
 			}
 
 			result = result.Substring (0, result.Length - 1);

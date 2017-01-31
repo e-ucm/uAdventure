@@ -91,6 +91,12 @@ namespace uAdventure.Geo
                 currentStep = Steps[0];
         }
 
+        public void FlagsUpdated()
+        {
+            referenceCache.Clear();
+            this.Update();
+        }
+
         // -----------------------
         // MonoBehaviour methods
         // ------------------------
@@ -124,8 +130,16 @@ namespace uAdventure.Geo
                     if (reached && !currentStep.LockNavigation)
                     {
                         // If the step is completed successfully we set the current step to null
-                        if (CompleteStep(currentStep)) 
+                        if (CompleteStep(currentStep))
+                        {
                             currentStep = null;
+                            if(stepCompleted.All(kv => kv.Value == true))
+                            {
+                                // Navigation finished
+                                navigating = false;
+                                DestroyImmediate(this.gameObject);
+                            }
+                        }
                     }
                 }
             }
@@ -152,7 +166,7 @@ namespace uAdventure.Geo
 
             var mb = GetReference(currentStep.Reference);
             if (mb == null)
-                return true; // If the element is not there, just try to skip it
+                return false; // If the element is not there, just try to skip it
             else if (mb is GeoWrapper)
             {
                 var wrap = mb as GeoWrapper;
@@ -166,7 +180,8 @@ namespace uAdventure.Geo
                 // Otherwise, if there is no character or gps, only one of the checks is valid
 
                 return (!character || distance < interactionRange) 
-                    && (!GPSController.Instance.IsStarted() || realDistance < interactionRange);
+                    && (!GPSController.Instance.IsStarted() || realDistance < interactionRange)
+                    && (GPSController.Instance.IsStarted() || character);
             }
             else if (mb is GeoElementMB)
             {
@@ -177,9 +192,10 @@ namespace uAdventure.Geo
 
                 // TODO check if the line element is reached
                 return (!character || geomb.Element.Geometry.InsideInfluence(character.LatLon)) 
-                    && (!GPSController.Instance.IsStarted() || geomb.Element.Geometry.InsideInfluence(Input.location.lastData.LatLonD()));
+                    && (!GPSController.Instance.IsStarted() || geomb.Element.Geometry.InsideInfluence(Input.location.lastData.LatLonD()))
+                    && (GPSController.Instance.IsStarted() || character);
             }
-            else return true;
+            else return false;
         }
 
         /// <summary>
@@ -234,15 +250,20 @@ namespace uAdventure.Geo
 
         private void UpdateArrow(bool reached)
         {
-            arrow.gameObject.SetActive(!reached && character);
-
+            var nan = false;
             if(currentStep != null && character)
             {
                 var pos = GetElementPosition(currentStep.Reference);
-                var direction = GM.LatLonToMeters(pos) - GM.LatLonToMeters(character.LatLon);
-                arrow.position = character.transform.position;
-                arrow.rotation = Quaternion.Euler(0, Mathf.Atan2((float)direction.normalized.x, (float)direction.normalized.y)*Mathf.Rad2Deg, 0);
+                nan = double.IsNaN(pos.x);
+                if (!nan)
+                {
+                    var direction = GM.LatLonToMeters(pos) - GM.LatLonToMeters(character.LatLon);
+                    arrow.position = character.transform.position;
+                    arrow.rotation = Quaternion.Euler(0, Mathf.Atan2((float)direction.normalized.x, (float)direction.normalized.y) * Mathf.Rad2Deg, 0);
+                }
             }
+            arrow.gameObject.SetActive(!reached && character && !nan);
+
         }
         
 
@@ -265,7 +286,7 @@ namespace uAdventure.Geo
                     : new Vector2d(double.NegativeInfinity, double.NegativeInfinity); // Otherwise, minus infinite, as the elements will be positioned at inifine
 
             return steps
-                .FindAll(e => !stepCompleted[e]) // Filter the completed
+                .FindAll(e => !stepCompleted[e] && !double.IsNaN(GetElementPosition(e.Reference).x)) // Filter the completed
                 .FindMin(s => GM.SeparationInMeters(GetElementPosition(s.Reference), latLon)); // Order the rest to distance
         }
 

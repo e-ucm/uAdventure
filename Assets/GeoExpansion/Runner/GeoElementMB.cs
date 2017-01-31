@@ -100,7 +100,7 @@ public class GeoElementMB : MonoBehaviour {
             tooltip.transform.SetParent(this.transform);
             tooltip.transform.localRotation = Quaternion.Euler(90, 0, 0);
             tooltip.transform.localScale = new Vector3(1 / transform.localScale.x, 1 / transform.localScale.y, 1 / transform.localScale.z);
-            tooltip.transform.localPosition = Vector3.zero;
+            tooltip.transform.localPosition = Tooltip.transform.localPosition * (tooltip.transform.localScale.x/ Tooltip.transform.localScale.x);
 
             tooltip.GetComponentInChildren<UnityEngine.UI.Text>().text = Element.Name;
         }

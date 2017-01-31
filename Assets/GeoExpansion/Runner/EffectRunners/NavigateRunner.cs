@@ -15,10 +15,13 @@ namespace uAdventure.Geo
         
         public NavigateRunner()
         {
-            var navigationPrefab = Resources.Load<GameObject>("navigation");
-            if(navigationPrefab != null)
+            if(NavigationController.Instance == null)
             {
-                GameObject.Instantiate(navigationPrefab);
+                var navigationPrefab = Resources.Load<GameObject>("navigation");
+                if (navigationPrefab != null)
+                {
+                    GameObject.Instantiate(navigationPrefab);
+                }
             }
         }
 

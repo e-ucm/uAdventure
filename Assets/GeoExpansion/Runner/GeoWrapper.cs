@@ -34,11 +34,11 @@ namespace uAdventure.Geo
                 ret.transform.SetParent(transform);
                 ret.transform.localPosition = Vector3.zero;
             }
-
-
+            
             transformManager = ExtElemReferenceTransformManagerFactory.Instance.CreateInstance(Reference.TransformManagerDescriptor, Reference.TransformManagerParameters);
             transformManager.Context = context;
             transformManager.ExtElemReferenceTransform = this.transform;
+            transformManager.Update();
         }
 
         // Update is called once per frame

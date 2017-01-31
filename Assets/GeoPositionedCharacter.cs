@@ -3,6 +3,7 @@ using System.Collections;
 using MapzenGo.Models;
 using UnityStandardAssets.Characters.ThirdPerson;
 using MapzenGo.Helpers;
+using uAdventure.Geo;
 
 public class GeoPositionedCharacter : MonoBehaviour
 {
@@ -66,6 +67,11 @@ public class GeoPositionedCharacter : MonoBehaviour
                 transform.localRotation = Quaternion.Euler(0, Input.compass.trueHeading, 0);
         }
 
+        if (!moving && !GPSController.Instance.IsStarted())
+        {
+            thirdPersonCharacter.Move(new Vector3(Input.GetAxis("Horizontal")*10, 0, Input.GetAxis("Vertical")*10), false, false);
+        }
+
         lastPos = transform.position;
 
         this.latLon = GM.MetersToLatLon(transform.localPosition.ToVector2xz().ToVector2d() + tileManagerRelative);
@@ -75,7 +81,7 @@ public class GeoPositionedCharacter : MonoBehaviour
 
     public bool IsLookingTo(Vector2d point)
     {
-        return IsLookingTowards((point - LatLon).normalized);
+        return IsLookingTowards((point - LatLon).ToVector3xz().normalized);
     }
 
     public bool IsLookingTowards(Vector2d direction)

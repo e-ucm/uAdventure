@@ -121,7 +121,7 @@ public class GMLGeometry
         for (int i = 0; i < points.Count; i++)
         {
             closestPoin = GetClosestPointOnLineSegment(points[l], points[i], point);
-            Debug.Log(GM.SeparationInMeters(closestPoin, point));
+            //Debug.Log(GM.SeparationInMeters(closestPoin, point));
             l = i;
             if (GM.SeparationInMeters(closestPoin, point) <= radius)
                 return true;

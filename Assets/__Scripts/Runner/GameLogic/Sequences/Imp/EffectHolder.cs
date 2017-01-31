@@ -63,6 +63,7 @@ namespace uAdventure.Runner
                                 runs_once = false;
                                 TriggerSceneEffect tse = ((TriggerSceneEffect)effect);
                                 Game.Instance.RunTarget(tse.getTargetId(), tse.getTransitionTime(), tse.getTransitionType());
+                                // DODO make something to wait until the target is ready to prevent undesired effect advance
                                 break;
                             case EffectType.TRIGGER_CUTSCENE:
                                 runs_once = false;

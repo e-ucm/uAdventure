@@ -47,6 +47,7 @@ public class ExtElemFactory : MapElementFactory {
         geoWrapper.Reference = extRef;
         geoWrapper.Element = element;
         geoWrapper.Tile = tile;
+        //geoWrapper.SendMessage("Start");
 
         if (!_createdCache.ContainsKey(tile))
             _createdCache.Add(tile, new List<GeoWrapper>());

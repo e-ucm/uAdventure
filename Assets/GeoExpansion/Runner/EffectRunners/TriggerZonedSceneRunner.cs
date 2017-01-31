@@ -51,6 +51,9 @@ namespace uAdventure.Geo
 
         void Update()
         {
+            if (Game.Instance.isSomethingRunning())
+                return; // We have to respect if something is running, like a conversation or an effect
+
             if(GPSController.Instance.IsLocationValid())
             {
                 if (!zone.InsideInfluence(new Vector2d(Input.location.lastData.latitude, Input.location.lastData.longitude),5))

@@ -39,7 +39,7 @@ namespace uAdventure.Editor
             {
                 int index = Array.IndexOf(vars, c.getId());
                 condition.setId(vars[EditorGUILayout.Popup(index >= 0 ? index : 0, vars)]);
-                condition.setState(EditorGUILayout.Popup(c.getState() - 4, types) + 4);
+                condition.setState(EditorGUILayout.Popup(c.getState() - 2, types) + 2);
                 condition.setValue(int.Parse(EditorGUILayout.TextField(condition.getValue().ToString())));
             }
             else

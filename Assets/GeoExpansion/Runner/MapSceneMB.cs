@@ -50,8 +50,8 @@ namespace uAdventure.Geo
 
         public void Destroy(float time = 0)
         {
-            DestroyImmediate(this.gameObject);
             Camera.main.transform.Restore(bkCameraTransform);
+            DestroyImmediate(this.gameObject);
         }
 
         public InteractuableResult Interacted(RaycastHit hit = default(RaycastHit))
