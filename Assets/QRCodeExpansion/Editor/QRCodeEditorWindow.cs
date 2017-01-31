@@ -141,7 +141,7 @@ namespace uAdventure.QR
         private void RegenerateQR()
         {
             QRCodeGenerator qrGenerator = new QRCodeGenerator();
-            QRCodeData qrCodeData = qrGenerator.CreateQrCode(selectedQR.Content, QRCodeGenerator.ECCLevel.Q);
+            QRCodeData qrCodeData = qrGenerator.CreateQrCode(selectedQR.Id, QRCodeGenerator.ECCLevel.Q);
             UnityQRCode qrCode = new UnityQRCode(qrCodeData);
             qrCodeImage = qrCode.GetGraphic(20);
            // qrCodeImage = FlipTexture(qrCodeImage, false, true);

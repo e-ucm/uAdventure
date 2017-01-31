@@ -26,6 +26,15 @@ namespace uAdventure.QR
             reader.OnQrCodeDetected.AddListener(OnQRCode);
         }
 
+        bool finished = false;
+        void Update()
+        {
+            if (finished)
+            {
+                DestroyImmediate(this.gameObject);
+            }
+        }
+
         private QR qr;
         private EffectHolder effectHolder;
         public void OnQRCode(string content)
@@ -51,6 +60,7 @@ namespace uAdventure.QR
                     foreach(var effect in qr.Effects.getEffects()) effects.add(effect);
 
                     effectHolder = new EffectHolder(effects);
+                    this.transform.GetChild(0).gameObject.SetActive(false);
                 }
             }
         }
@@ -60,7 +70,7 @@ namespace uAdventure.QR
             if(effectHolder == null)
             {
                 force_wait = false;
-                DestroyImmediate(this.gameObject);
+                finished = true;
             }
         }
 
@@ -69,7 +79,9 @@ namespace uAdventure.QR
             if (effectHolder != null)
             {
                 force_wait = effectHolder.execute();
-                DestroyImmediate(this.gameObject);
+                if (!force_wait)
+                    finished = true;
+                //DestroyImmediate(this.gameObject);
             }
 
             return force_wait;
