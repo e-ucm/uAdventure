@@ -93,7 +93,7 @@ namespace uAdventure.Runner
                 // TODO:
                 // prevent levels overlaping.
 
-                if (completable.getStart().Update(target))
+                if (!trackingCompletables.Contains(completable) && completable.getStart().Update(target))
                 {
                     trackingCompletables.Add(completable);
                     times.Add(completable, DateTime.Now);
@@ -122,8 +122,7 @@ namespace uAdventure.Runner
                 {
                     Tracker.T.completable.Progressed(c.getId(), (CompletableTracker.Completable)c.getType(), c.currentProgress());
                 }
-
-                if (c.getEnd().getType() == Completable.Milestone.MilestoneType.CONDITION && c.getEnd().getReached())
+                if (c.getEnd().getType() == Completable.Milestone.MilestoneType.CONDITION && c.getEnd().Update())
                 {
                     trackCompleted(c);
                     toRemove.Push(c);
@@ -135,7 +134,7 @@ namespace uAdventure.Runner
             //Any completable starts when this condition changes?
             foreach (Completable completable in completables)
             {
-                if (completable.getStart().Update())
+                if (!trackingCompletables.Contains(completable) && completable.getStart().Update())
                 {
                     trackingCompletables.Add(completable);
                     times.Add(completable, DateTime.Now);
@@ -153,8 +152,7 @@ namespace uAdventure.Runner
         public void trackCompleted(Completable c)
         {
             float score = Mathf.Max(Mathf.Min(c.getScore().getScore() / 10f, 1f), 0f);
-
-            Tracker.T.completable.Completed(c.getId(), (CompletableTracker.Completable)c.getType(), true, score);
+            
             Tracker.T.setExtension("time", (DateTime.Now - times[c]).TotalSeconds);
             Tracker.T.completable.Completed(c.getId(), (CompletableTracker.Completable)c.getType(), true, score);
         }

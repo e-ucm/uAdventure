@@ -107,7 +107,7 @@ namespace uAdventure.Core
                 if (c != null)
                 {
                     Conditions conditions = new Conditions();
-                    //ConditionSubParser_ p = new ConditionSubParser_(conditions, chapter);
+                    new ConditionSubParser_(conditions, chapter).ParseElement(c);
                     milestone.setConditions(conditions);
                 }
             }

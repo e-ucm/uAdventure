@@ -114,6 +114,9 @@ namespace MapzenGo.Models
             UpdateTiles();
             // Move the ground
             _ground.transform.position = _player.transform.position;
+
+            var visualGround = _ground.transform.GetChild(0);
+            visualGround.position = new Vector3(_ground.transform.position.x, transform.position.y - .5f, _ground.transform.position.z);
         }
 
         private void UpdateTiles()

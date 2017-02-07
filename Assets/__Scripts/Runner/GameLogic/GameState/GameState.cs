@@ -59,6 +59,7 @@ namespace uAdventure.Runner
             bool bstate = state == FlagCondition.FLAG_ACTIVE;
             Tracker.T.setExtension(name, bstate);
             TimerController.Instance.checkTimers();
+            CompletableController.Instance.conditionChanged();
             Game.Instance.reRenderScene();
         }
 
@@ -78,6 +79,7 @@ namespace uAdventure.Runner
             PlayerPrefs.Save();
 
             Tracker.T.setExtension(name, value);
+            CompletableController.Instance.conditionChanged();
 
             Game.Instance.reRenderScene();
         }
@@ -200,7 +202,7 @@ namespace uAdventure.Runner
 
         public List<Completable> getCompletables()
         {
-            return null;
+            return data.getChapters()[current_chapter].getCompletabes();
         }
 
         public IChapterTarget getChapterTarget(string runnerTargetId)

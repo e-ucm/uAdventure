@@ -20,8 +20,7 @@ namespace uAdventure.Editor
         private Texture2D addTexture = null;
         private Texture2D moveUp, moveDown = null;
         private Texture2D clearImg = null;
-
-        private static float windowWidth, windowHeight;
+        
         private static Rect tableRect;
         private Rect rightPanelRect;
         private static Vector2 scrollPosition;
@@ -46,13 +45,8 @@ namespace uAdventure.Editor
             moveUp = (Texture2D)Resources.Load("EAdventureData/img/icons/moveNodeUp", typeof(Texture2D));
             moveDown = (Texture2D)Resources.Load("EAdventureData/img/icons/moveNodeDown", typeof(Texture2D));
 
-            windowWidth = aStartPos.width;
-            windowHeight = aStartPos.height;
 
-            tableRect = new Rect(0f, 200, 0.9f * windowWidth, windowHeight * 0.33f);
-            rightPanelRect = new Rect(0.9f * windowWidth, 0.1f * windowHeight, 0.08f * windowWidth, 0.33f * windowHeight);
-
-            col_width = 0.88f / num_colums;
+            col_width = 0.8f / num_colums;
 
             variables = Controller.getInstance().getVarFlagSummary().getVars();
 
@@ -74,6 +68,12 @@ namespace uAdventure.Editor
 
         public override void Draw(int aID)
         {
+            var windowWidth = Rect.width;
+            var windowHeight = Rect.height;
+
+            tableRect = new Rect(0f, 200, 0.8f * windowWidth, windowHeight * 0.33f);
+            rightPanelRect = new Rect(0.85f * windowWidth, 0.1f * windowHeight, 0.08f * windowWidth, 0.33f * windowHeight);
+
             GUILayout.Label("Game starts in " + Controller.getInstance().getSelectedChapterDataControl().getInitialScene());
             GUILayout.Label("Ends when: ");
 
@@ -90,7 +90,7 @@ namespace uAdventure.Editor
 
             //GUILayout.BeginArea(tableRect);
             GUILayout.BeginHorizontal();
-            GUILayout.BeginVertical(GUILayout.Width(windowWidth * 0.9f));
+            GUILayout.BeginVertical(GUILayout.ExpandWidth(true));
             GUILayout.BeginHorizontal();
             GUILayout.Box("ID", GUILayout.Width(windowWidth * col_width));
             GUILayout.Box("Start", GUILayout.Width(windowWidth * col_width));

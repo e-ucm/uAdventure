@@ -145,8 +145,9 @@ namespace uAdventure.Runner
                     ResourceManager.Instance.Path = selected_game;
                     break;
             }
-
+            
             game_state = new GameState(data);
+            CompletableController.Instance.setCompletables(GameState.getCompletables());
         }
 
         void Start()

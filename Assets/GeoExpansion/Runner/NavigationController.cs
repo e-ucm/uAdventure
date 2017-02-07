@@ -114,18 +114,25 @@ namespace uAdventure.Geo
                 stepCompleted.Clear();
                 completedElementsForStep.Clear();
 
-                navigating = true;
-                NavigationStrategy = PlayerPrefs.GetString("navigation_strategy").ToEnum<NavigationType>();
-                var locks = PlayerPrefs.GetString("navigation_locks").Split(',').ToList().ConvertAll(l => bool.Parse(l));
-                var completed = PlayerPrefs.GetString("navigation_completed").Split(',').ToList().ConvertAll(l => bool.Parse(l));
-                var elems = PlayerPrefs.GetString("navigation_elems_completed").Split(',').ToList().ConvertAll(l => int.Parse(l));
-
-                Steps = PlayerPrefs.GetString("navigation_steps").Split(',').ToList().ConvertAll(r => new NavigationStep(r));
-                for(int i = 0; i< steps.Count; i++)
+                try
                 {
-                    Steps[i].LockNavigation = locks[i];
-                    stepCompleted[Steps[i]] = completed[i];
-                    completedElementsForStep.Add(Steps[i], elems[i]);
+                    navigating = true;
+                    NavigationStrategy = PlayerPrefs.GetString("navigation_strategy").ToEnum<NavigationType>();
+                    var locks = PlayerPrefs.GetString("navigation_locks").Split(',').ToList().ConvertAll(l => bool.Parse(l));
+                    var completed = PlayerPrefs.GetString("navigation_completed").Split(',').ToList().ConvertAll(l => bool.Parse(l));
+                    var elems = PlayerPrefs.GetString("navigation_elems_completed").Split(',').ToList().ConvertAll(l => int.Parse(l));
+
+                    Steps = PlayerPrefs.GetString("navigation_steps").Split(',').ToList().ConvertAll(r => new NavigationStep(r));
+                    for (int i = 0; i < steps.Count; i++)
+                    {
+                        Steps[i].LockNavigation = locks[i];
+                        stepCompleted[Steps[i]] = completed[i];
+                        completedElementsForStep.Add(Steps[i], elems[i]);
+                    }
+                }
+                catch
+                {
+                    navigating = false;
                 }
             }
         }

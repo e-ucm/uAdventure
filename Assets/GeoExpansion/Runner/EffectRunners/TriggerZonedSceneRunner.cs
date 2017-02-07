@@ -23,6 +23,8 @@ namespace uAdventure.Geo
             zc.zone = geoElement.Geometry;
             zc.loadOnExit = Game.Instance.GameState.CurrentTarget;
             zc.transitionTime = effect.getTransitionTime();
+            zc.zoneid = geoElement.Id;
+            zc.Save();
 
             Game.Instance.RunTarget(effect.getTargetId(), effect.getTransitionTime(), effect.getTransitionType());
 
@@ -33,6 +35,7 @@ namespace uAdventure.Geo
     public class ZoneControl : MonoBehaviour
     {
         public GMLGeometry zone;
+        public string zoneid;
         public string loadOnExit;
         public float transitionTime;
 
@@ -60,6 +63,7 @@ namespace uAdventure.Geo
                 {
                     Debug.Log("No está en la influencia, pero la ubicación es válida");
                     Game.Instance.RunTarget(loadOnExit, 0, 0);
+                    RemoveKeys();
                     DestroyImmediate(this.gameObject);
                 }
             }
@@ -69,9 +73,35 @@ namespace uAdventure.Geo
                 {
                     Debug.Log("No está en la influencia");
                     Game.Instance.RunTarget(loadOnExit, 0, 0);
+                    RemoveKeys();
                     DestroyImmediate(this.gameObject);
                 }
             }
+        }
+
+        void RemoveKeys()
+        {
+            PlayerPrefs.DeleteKey("zone_control");
+            PlayerPrefs.DeleteKey("zone_control_loadonexit");
+            PlayerPrefs.DeleteKey("zone_control_id");
+            PlayerPrefs.DeleteKey("zone_control_transitiontime");
+            PlayerPrefs.Save();
+        }
+
+        public void Save()
+        {
+            PlayerPrefs.SetInt("zone_control", 1);
+            PlayerPrefs.SetString("zone_control_loadonexit", loadOnExit);
+            PlayerPrefs.SetString("zone_control_id", zoneid);
+            PlayerPrefs.SetFloat("zone_control_transitiontime", transitionTime);
+            PlayerPrefs.Save();
+        }
+
+        public void Restore()
+        {
+            loadOnExit = PlayerPrefs.GetString("zone_control_loadonexit");
+            zone = Game.Instance.GameState.FindElement<GeoElement>(PlayerPrefs.GetString("zone_control_id")).Geometry;
+            transitionTime = PlayerPrefs.GetFloat("zone_control_transitiontime");
         }
     }
 }
