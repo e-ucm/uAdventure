@@ -153,7 +153,7 @@ namespace uAdventure.Runner
         {
             float score = Mathf.Max(Mathf.Min(c.getScore().getScore() / 10f, 1f), 0f);
             
-            Tracker.T.setExtension("time", (DateTime.Now - times[c]).TotalSeconds);
+            Tracker.T.setVar("time", (DateTime.Now - times[c]).TotalSeconds);
             Tracker.T.completable.Completed(c.getId(), (CompletableTracker.Completable)c.getType(), true, score);
         }
 

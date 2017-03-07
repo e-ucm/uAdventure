@@ -57,7 +57,9 @@ namespace uAdventure.Runner
 
             //Debug.Log ("Flag '" + name + " puesta a " + state);
             bool bstate = state == FlagCondition.FLAG_ACTIVE;
-            Tracker.T.setExtension(name, bstate);
+
+            // TODO check this after this: https://github.com/e-ucm/unity-tracker/issues/29
+            Tracker.T.setVar(name, bstate ? 1 : 0);
             TimerController.Instance.checkTimers();
             CompletableController.Instance.conditionChanged();
             Game.Instance.reRenderScene();
@@ -78,7 +80,7 @@ namespace uAdventure.Runner
             PlayerPrefs.SetInt("var_" + name, value);
             PlayerPrefs.Save();
 
-            Tracker.T.setExtension(name, value);
+            Tracker.T.setVar(name, value);
             CompletableController.Instance.conditionChanged();
 
             Game.Instance.reRenderScene();

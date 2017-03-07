@@ -359,7 +359,8 @@ namespace uAdventure.Geo
                     hidden = false;
                     if (revealOnRange)
                     {
-                        Tracker.T.setExtension("geo_element_" + wrapper.Element.getId(), true);
+                        // TODO change this after: https://github.com/e-ucm/unity-tracker/issues/29
+                        Tracker.T.setVar("geo_element_" + wrapper.Element.getId(), 1);
                         particles.gameObject.SetActive(true);
                         particles.Play();
                         particles.transform.localPosition = childTransform.localPosition;

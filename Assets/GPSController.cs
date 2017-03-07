@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using System.Collections;
-using System;
 using RAGE.Analytics;
 using MapzenGo.Helpers;
 
@@ -124,8 +123,10 @@ namespace uAdventure.Geo
                 if (IsStarted() || geochar)
                 {
                     var latlon = IsStarted() ? Input.location.lastData.LatLon() : geochar.LatLon.ToVector2();
-                    
-                    Tracker.T.movement.Geoposition("player", latlon);
+
+                    //Tracker.T.movement.Geoposition("player", latlon);
+
+                    TrackerExtension.Movement.Geoposition("player", latlon);
                     Tracker.T.RequestFlush();
                     timeSinceLastPositionUpdate = 0;
 

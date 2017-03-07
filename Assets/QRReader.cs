@@ -142,7 +142,7 @@ namespace dZine4D.Misc.QR
         void DecodeQR()
         {
             // create a reader with a custom luminance source
-            var barcodeReader = new BarcodeReader { AutoRotate = false, TryHarder = false };
+            var barcodeReader = new BarcodeReader { AutoRotate = false };
 
             while (true)
             {
