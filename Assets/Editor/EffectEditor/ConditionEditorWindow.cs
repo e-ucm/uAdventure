@@ -114,7 +114,8 @@ namespace uAdventure.Editor
             //##################################################################################
             //############################### CONDITION HANDLING ###############################
             //##################################################################################
-
+            var toRemove = new List<Condition>();
+            var listsToRemove = new List<List<Condition>>();
             foreach (List<Condition> cl in conditions.getConditionsList())
             {
                 if (cl.Count > 1)
@@ -138,17 +139,24 @@ namespace uAdventure.Editor
 
                     if (GUILayout.Button("X", closeStyle, GUILayout.Width(15), GUILayout.Height(15)))
                     {
-                        cl.Remove(cl[i]);
+                        toRemove.Add(cl[i]);
 
-                        if (cl.Count == 0)
-                            conditions.getConditionsList().Remove(cl);
                     }
 
                     GUILayout.EndHorizontal();
                 }
                 if (cl.Count > 1)
                     GUILayout.EndVertical();
+
+                foreach(var t in toRemove)
+                    cl.Remove(t);
+
+                if (cl.Count == 0)
+                    listsToRemove.Add(cl);
             }
+
+            foreach(var l in listsToRemove)
+                conditions.getConditionsList().Remove(l);
         }
     }
 }
