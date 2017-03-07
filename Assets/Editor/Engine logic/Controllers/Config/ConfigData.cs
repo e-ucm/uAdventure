@@ -407,10 +407,10 @@ namespace uAdventure.Editor
             {
                 configuration.Save();
             }
-            catch (FileNotFoundException e)
+            catch (FileNotFoundException)
             {
             }
-            catch (IOException e)
+            catch (IOException)
             {
             }
 
@@ -435,7 +435,7 @@ namespace uAdventure.Editor
                         editorWindowX=int.MaxValue;
                     }*/
                 }
-                catch (FormatException ne)
+                catch (FormatException)
                 {
                     editorWindowX = int.MaxValue;
                 }
@@ -446,7 +446,7 @@ namespace uAdventure.Editor
                         editorWindowY=int.MaxValue;
                     }*/
                 }
-                catch (FormatException ne)
+                catch (FormatException)
                 {
                     editorWindowY = int.MaxValue;
                 }
@@ -457,7 +457,7 @@ namespace uAdventure.Editor
                         editorWindowW=int.MaxValue;
                     }*/
                 }
-                catch (FormatException ne)
+                catch (FormatException)
                 {
                     editorWindowW = int.MaxValue;
                 }
@@ -468,7 +468,7 @@ namespace uAdventure.Editor
                         editorWindowH=int.MaxValue;
                     }*/
                 }
-                catch (FormatException ne)
+                catch (FormatException)
                 {
                     editorWindowH = int.MaxValue;
                 }
@@ -481,7 +481,7 @@ namespace uAdventure.Editor
                         engineWindowX=int.MaxValue;
                     }*/
                 }
-                catch (FormatException ne)
+                catch (FormatException)
                 {
                     engineWindowX = int.MaxValue;
                 }
@@ -492,7 +492,7 @@ namespace uAdventure.Editor
                         engineWindowY=int.MaxValue;
                     }*/
                 }
-                catch (FormatException ne)
+                catch (FormatException)
                 {
                     engineWindowY = int.MaxValue;
                 }
@@ -503,7 +503,7 @@ namespace uAdventure.Editor
                         engineWindowW=int.MaxValue;
                     }*/
                 }
-                catch (FormatException ne)
+                catch (FormatException)
                 {
                     engineWindowW = int.MaxValue;
                 }
@@ -514,7 +514,7 @@ namespace uAdventure.Editor
                         engineWindowH=int.MaxValue;
                     }*/
                 }
-                catch (FormatException ne)
+                catch (FormatException)
                 {
                     engineWindowH = int.MaxValue;
                 }
@@ -527,7 +527,7 @@ namespace uAdventure.Editor
                         debugWindowX=int.MaxValue;
                     }*/
                 }
-                catch (FormatException ne)
+                catch (FormatException)
                 {
                     debugWindowX = int.MaxValue;
                 }
@@ -538,7 +538,7 @@ namespace uAdventure.Editor
                         debugWindowY=int.MaxValue;
                     }*/
                 }
-                catch (FormatException ne)
+                catch (FormatException)
                 {
                     debugWindowY = int.MaxValue;
                 }
@@ -549,7 +549,7 @@ namespace uAdventure.Editor
                         debugWindowW=int.MaxValue;
                     }*/
                 }
-                catch (FormatException ne)
+                catch (FormatException)
                 {
                     debugWindowW = int.MaxValue;
                 }
@@ -560,7 +560,7 @@ namespace uAdventure.Editor
                         debugWindowH=int.MaxValue;
                     }*/
                 }
-                catch (FormatException ne)
+                catch (FormatException)
                 {
                     debugWindowH = int.MaxValue;
                 }
@@ -591,22 +591,22 @@ namespace uAdventure.Editor
                 {
                     effectSelectorTab = int.Parse(configuration.getProperty("EffectSelectorTab"));
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     effectSelectorTab = 0;
                 }
 
                 recentFiles = new RecentFiles(configuration);
             }
-            catch (FileNotFoundException e)
+            catch (FileNotFoundException)
             {
                 checkConsistency();
             }
-            catch (IOException e)
+            catch (IOException)
             {
                 checkConsistency();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 checkConsistency();
             }

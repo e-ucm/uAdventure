@@ -95,6 +95,11 @@ namespace uAdventure.Geo
             var geoPoints = AdaptToClipper(element.Geometry.Points);
 
             var solution = new List<List<IntPoint>>();
+
+            clipper.Clear();
+            clipper.AddPath(tilePoints, PolyType.ptSubject, true);
+            clipper.AddPath(geoPoints, PolyType.ptSubject, true);
+
             return clipper.Execute(ClipType.ctIntersection, solution) && solution.Count > 0;
         }
     }

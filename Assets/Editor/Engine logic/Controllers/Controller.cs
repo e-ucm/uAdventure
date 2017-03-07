@@ -450,20 +450,7 @@ namespace uAdventure.Editor
         private ChapterListDataControl chaptersController = new ChapterListDataControl();
 
         private MainWindowWrapper mainWindow;
-        //   // private AutoSave autoSave;
 
-        //   // private Timer autoSaveTimer;
-
-        //    //private bool isLomEs = false;
-
-        //    /**
-        //     * Store all effects selection. Connects the type of effect with the number
-        //     * of times that has been used
-        //     */
-        //    // private SelectedEffectsController selectedEffects;
-        //    /**
-        //     * Void and private constructor.
-        //     */
         private Controller()
         {
 
@@ -483,23 +470,6 @@ namespace uAdventure.Editor
 
             return ReleaseFolders.PROJECTS_FOLDER;
         }
-
-        //    public void setLastDirectory(string directory)
-        //    {
-
-        //        this.lastDialogDirectory = directory;
-        //    }
-
-        //    public string getLastDirectory()
-        //    {
-
-        //        if (lastDialogDirectory != null)
-        //        {
-        //            return lastDialogDirectory;
-        //        }
-        //        else
-        //            return ReleaseFolders.PROJECTS_FOLDER.getAbsolutePath();
-        //    }
 
         /**
          * Returns the instance of the controller.
@@ -528,9 +498,9 @@ namespace uAdventure.Editor
             return adventureDataControl.getPlayerMode();
         }
 
-        //    /**
-        //     * Initializing function.
-        //     */
+        /**
+        * Initializing function.
+        */
         public void init(string loadProjectPath = null)
         {
             ConfigData.loadFromXML(ReleaseFolders.configFileEditorRelativePath());
@@ -597,48 +567,6 @@ namespace uAdventure.Editor
             return adventureDataControl != null;
         }
 
-        //    /*public void addSelectedEffect(string name){
-        //        selectedEffects.addSelectedEffect(name);
-        //    }
-
-        //    public SelectedEffectsController getSelectedEffectsController(){
-        //        return selectedEffects;
-        //    }*/
-
-        //    //public void startAutoSave(int minutes)
-        //    //{
-
-        //    //    stopAutoSave();
-
-        //    //    if ((ProjectConfigData.existsKey("autosave") && ProjectConfigData.getProperty("autosave").Equals("yes")) || !ProjectConfigData.existsKey("autosave"))
-        //    //    {
-        //    //        /*			autoSaveTimer = new Timer();
-        //    //        			autoSave = new AutoSave();
-        //    //        			autoSaveTimer.schedule(autoSave, 10000, minutes * 60 * 1000);
-        //    //        */
-        //    //    }
-        //    //    if (!ProjectConfigData.existsKey("autosave"))
-        //    //        ProjectConfigData.setProperty("autosave", "yes");
-        //    //}
-
-        //    //public void stopAutoSave()
-        //    //{
-
-        //    //    if (autoSaveTimer != null)
-        //    //    {
-        //    //        autoSaveTimer.cancel();
-        //    //        autoSave.stop();
-        //    //        autoSaveTimer = null;
-        //    //    }
-        //    //    autoSave = null;
-        //    //}
-
-        //    //private ToolSystemDebugger tsd;
-
-        //    // ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        //    // General data functions of the aplication
-
         /**
          * Returns the complete path to the currently open Project.
          * 
@@ -661,59 +589,7 @@ namespace uAdventure.Editor
 
             return new FileInfo(currentZipFile);
         }
-
-        //    /**
-        //     * Returns the name of the file currently open.
-        //     * 
-        //     * @return The name of the current file
-        //     */
-        //    public string getFileName()
-        //    {
-
-        //        string filename;
-
-        //        // Show "New" if no current file is currently open
-        //        if (currentZipName != null)
-        //            filename = currentZipName;
-        //        else
-        //            filename = "http://e-adventure.e-ucm.es";
-
-        //        return filename;
-        //    }
-
-        //    /**
-        //     * Returns the parent path of the file being currently edited.
-        //     * 
-        //     * @return Parent path of the current file
-        //     */
-        //    public string getFilePath()
-        //    {
-
-        //        return currentZipPath;
-        //    }
-
-        //    /**
-        //     * Returns an array with the chapter titles.
-        //     * 
-        //     * @return Array with the chapter titles
-        //     */
-        //    public string[] getChapterTitles()
-        //    {
-
-        //        return chaptersController.getChapterTitles();
-        //    }
-
-        //    /**
-        //     * Returns the index of the chapter currently selected.
-        //     * 
-        //     * @return Index of the selected chapter
-        //     */
-        //    public int getSelectedChapter()
-        //    {
-
-        //        return chaptersController.getSelectedChapter();
-        //    }
-
+        
         /**
          * Returns the selected chapter data controller.
          * 
@@ -737,11 +613,11 @@ namespace uAdventure.Editor
             return chaptersController.getIdentifierSummary();
         }
 
-        //    /**
-        //     * Returns the varFlag summary.
-        //     * 
-        //     * @return The varFlag summary
-        //     */
+        /**
+         * Returns the varFlag summary.
+         * 
+         * @return The varFlag summary
+         */
         public VarFlagSummary getVarFlagSummary()
         {
 
@@ -766,9 +642,9 @@ namespace uAdventure.Editor
             return dataModified_F;
         }
 
-        //    ///**
-        //    // * Called when the data has been modified, it sets the value to true.
-        //    // */
+        /**
+         * Called when the data has been modified, it sets the value to true.
+         */
         public void dataModified()
         {
 
@@ -791,13 +667,12 @@ namespace uAdventure.Editor
 
         }
 
+        // TODO enable this
         //    public void swapPlayerMode(bool showConfirmation)
         //    {
 
         //        addTool(new SwapPlayerModeTool(showConfirmation, adventureDataControl, chaptersController));
         //    }
-
-        //    // ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         // Functions that perform usual application actions
 
@@ -838,121 +713,11 @@ namespace uAdventure.Editor
             UnityEditor.AssetDatabase.Refresh();
         }
 
-        //    public bool newFile()
-        //    {
-
-        //        bool createNewFile = true;
-
-        //        if (dataModified)
-        //        {
-        //            int option = mainWindow.showConfirmDialog(TC.get("Operation.NewFileTitle"), TC.get("Operation.NewFileMessage"));
-
-        //            // If the data must be saved, create the new file only if the save was successful
-        //            if (option == JOptionPane.YES_OPTION)
-        //                createNewFile = saveFile(false);
-
-        //            // If the data must not be saved, create the new data directly
-        //            else if (option == JOptionPane.NO_OPTION)
-        //            {
-        //                createNewFile = true;
-        //                dataModified = false;
-        //                mainWindow.updateTitle();
-        //            }
-
-        //            // Cancel the action if selected
-        //            else if (option == JOptionPane.CANCEL_OPTION)
-        //            {
-        //                createNewFile = false;
-        //            }
-
-        //        }
-
-        //        if (createNewFile)
-        //        {
-        //            stopAutoSave();
-        //            ConfigData.storeToXML();
-        //            ProjectConfigData.storeToXML();
-        //            ConfigData.loadFromXML(ReleaseFolders.configFileEditorRelativePath());
-        //            ProjectConfigData.init();
-
-        //            // Show dialog
-        //            //StartDialog start = new StartDialog( StartDialog.NEW_TAB );
-        //            FrameForInitialDialogs start = new FrameForInitialDialogs(StartDialog.NEW_TAB);
-
-        //            //mainWindow.setEnabled( false );
-        //            //mainWindow.setExtendedState(JFrame.ICONIFIED | mainWindow.getExtendedState());
-        //            mainWindow.setVisible(false);
-
-        //            //int op = start.showOpenDialog( mainWindow );
-        //            int op = start.showStartDialog();
-        //            //start.end();
-        //            if (op == StartDialog.NEW_FILE_OPTION)
-        //            {
-        //                newFile(start.getFileType());
-        //            }
-        //            else if (op == StartDialog.OPEN_FILE_OPTION)
-        //            {
-        //                java.io.File selectedFile = start.getSelectedFile();
-        //                if (selectedFile.getAbsolutePath().toLowerCase().endsWith(".eap"))
-        //                {
-        //                    string absolutePath = selectedFile.getPath();
-        //                    loadFile(absolutePath.substring(0, absolutePath.length() - 4), true);
-        //                }
-        //                else if (selectedFile.isDirectory() && selectedFile.exists())
-        //                    loadFile(start.getSelectedFile().getAbsolutePath(), true);
-        //                else {
-        //                    this.importGame(selectedFile.getAbsolutePath());
-        //                }
-        //            }
-        //            else if (op == StartDialog.RECENT_FILE_OPTION)
-        //            {
-        //                loadFile(start.getRecentFile().getAbsolutePath(), true);
-        //            }
-        //            else if (op == StartDialog.CANCEL_OPTION)
-        //            {
-        //                //exit( );
-        //            }
-
-        //            start.remove();
-
-        //            if (currentZipFile == null)
-        //            {
-        //                mainWindow.reloadData();
-        //            }
-
-        //            mainWindow.setResizable(true);
-        //            mainWindow.setEnabled(true);
-        //            mainWindow.setVisible(true);
-        //            //DEBUGGING
-        //            //tsd = new ToolSystemDebugger( chaptersController );
-        //        }
-
-        //        Controller.gc();
-
-        //        return createNewFile;
-        //    }
-
         private bool newAdventureFile(string fileName, int fileType)
         {
 
             bool fileCreated = false;
-
-            // Decide the directory of the temp file and give a name for it
-
-            // If there is a valid temp directory in the system, use it
-            //string tempDir = System.getenv( "TEMP" );
-            //string completeFilePath = "";
-
-            //isTempFile = true;
-            //if( tempDir != null ) {
-            //	completeFilePath = tempDir + "/" + TEMP_NAME;
-            //}
-
-            // If the temp directory is not valid, use the home directory
-            //else {
-
-            //	completeFilePath = FileSystemView.getFileSystemView( ).getHomeDirectory( ) + "/" + TEMP_NAME;
-            //}
+            
 
             bool create = false;
             DirectoryInfo selectedDir = null;
@@ -1086,7 +851,7 @@ namespace uAdventure.Editor
                         if (selectedFile != null && !selectedFile.Exists)
                             selectedFile.Create().Close();
                     }
-                    catch (IOException e)
+                    catch (IOException)
                     {
                     }
 
@@ -1102,15 +867,7 @@ namespace uAdventure.Editor
             {
                 ConfigData.fileLoaded(currentZipFile);
                 // Feedback
-                //mainWindow.showInformationDialog(TC.get("Operation.FileLoadedTitle"), TC.get("Operation.FileLoadedMessage"));
             }
-            //else {
-            //    // Feedback
-            //    mainWindow.showInformationDialog(TC.get("Operation.FileNotLoadedTitle"), TC.get("Operation.FileNotLoadedMessage"));
-            //}
-            //loadingScreen.setVisible(false);
-
-            //Controller.gc();
 
             return fileCreated;
 
@@ -1339,15 +1096,6 @@ namespace uAdventure.Editor
             return loadFile(null, true);
         }
 
-        //    public bool replaceSelectedChapter(Chapter newChapter)
-        //    {
-
-        //        chaptersController.replaceSelectedChapter(newChapter);
-        //        //mainWindow.updateTree();
-        //        mainWindow.reloadData();
-        //        return true;
-        //    }
-
         public NPC getNPC(string npcId)
         {
 
@@ -1358,105 +1106,13 @@ namespace uAdventure.Editor
         {
 
             bool fileLoaded = false;
-            bool hasIncedence = false;
+            //bool hasIncedence = false;
             try
             {
-                bool loadFile = true;
-                // If the data was not saved, ask for an action (save, discard changes...)
-                //if (dataModified_F)
-                //{
-                //    int option = mainWindow.showConfirmDialog(TC.get("Operation.LoadFileTitle"), TC.get("Operation.LoadFileMessage"));
-
-                //    // If the data must be saved, load the new file only if the save was succesful
-                //    if (option == JOptionPane.YES_OPTION)
-                //        loadFile = saveFile(false);
-
-                //    // If the data must not be saved, load the new data directly
-                //    else if (option == JOptionPane.NO_OPTION)
-                //    {
-                //        loadFile = true;
-                //        dataModified = false;
-                //        mainWindow.updateTitle();
-                //    }
-
-                //    // Cancel the action if selected
-                //    else if (option == JOptionPane.CANCEL_OPTION)
-                //    {
-                //        loadFile = false;
-                //    }
-
-                //}
-                //TODO: implement
-                //if (loadFile && completeFilePath == null)
-                //{
-                //    //TODO: implement
-                //    //this.stopAutoSave();
-                //    //ConfigData.loadFromXML(ReleaseFolders.configFileEditorRelativePath());
-                //    //ProjectConfigData.loadFromXML();
-
-                //    // Show dialog
-                //    // StartDialog start = new StartDialog( StartDialog.OPEN_TAB );
-                //   // FrameForInitialDialogs start = new FrameForInitialDialogs(StartDialog.OPEN_TAB);
-                //    //start.askForProject();
-                //    //mainWindow.setEnabled( false );
-                //    //mainWindow.setExtendedState(JFrame.ICONIFIED | mainWindow.getExtendedState());
-                //   // mainWindow.setVisible(false);
-
-                //    //int op = start.showOpenDialog( null );
-                //    int op = start.showStartDialog();
-                //    //start.end();
-                //    if (op == StartDialog.NEW_FILE_OPTION)
-                //    {
-                //        newFile(start.getFileType());
-                //    }
-                //    else if (op == StartDialog.OPEN_FILE_OPTION)
-                //    {
-                //        java.io.File selectedFile = start.getSelectedFile();
-                //        string absPath = selectedFile.getAbsolutePath().toLowerCase();
-                //        if (absPath.endsWith(".eap"))
-                //        {
-                //            string absolutePath = selectedFile.getPath();
-                //            loadFile(absolutePath.substring(0, absolutePath.length() - 4), true);
-                //        }
-                //        else if (selectedFile.isDirectory() && selectedFile.exists())
-                //            loadFile(start.getSelectedFile().getAbsolutePath(), true);
-                //        else
-                //            // importGame is the same method for .ead, .jar and .zip (LO) import
-                //            this.importGame(selectedFile.getAbsolutePath());
-
-                //    }
-                //    else if (op == StartDialog.RECENT_FILE_OPTION)
-                //    {
-                //        loadFile(start.getRecentFile().getAbsolutePath(), true);
-                //    }
-                //    else if (op == StartDialog.CANCEL_OPTION)
-                //    {
-                //        //exit( );
-                //    }
-
-                //    start.remove();
-
-                //    // if( currentZipFile == null ) {
-                //    //   mainWindow.reloadData( );
-                //    //}
-
-                //    mainWindow.setResizable(true);
-                //    mainWindow.setEnabled(true);
-                //    mainWindow.setVisible(true);
-
-                //    return true;
-                //}
-
                 //LoadingScreen loadingScreen = new LoadingScreen(TextConstants.getText( "Operation.LoadProject" ), getLoadingImage( ), mainWindow);
                 // If some file was selected
                 if (completeFilePath != null)
                 {
-                    //if (loadingImage)
-                    //{
-                    //    loadingScreen.setMessage(TC.get("Operation.LoadProject"));
-                    //    this.loadingScreen.setVisible(true);
-                    //    loadingImage = true;
-                    //}
                     // Create a file to extract the name and path
                     FileInfo newFile = new FileInfo(completeFilePath);
 
@@ -1594,110 +1250,11 @@ namespace uAdventure.Editor
 
         public bool saveFile(bool saveAs)
         {
-
             bool fileSaved = false;
             //try
             //{
             bool saveFile = true;
-
-            // Select a new file if it is a "Save as" action
-            //if (saveAs)
-            //{
-            //    //loadingScreen = new LoadingScreen(TextConstants.getText( "Operation.SaveProjectAs" ), getLoadingImage( ), mainWindow);
-            //    //loadingScreen.setVisible( true );
-            //    string completeFilePath = null;
-            //    //completeFilePath = mainWindow.showSaveDialog(getCurrentLoadFolder(), new FolderFileFilter(false, false, null));
-            //    //TODO: implementation
-            //    completeFilePath = "C:\\Users\\dijks\\Desktop\\Export" + "\\test1";
-            //    // If some file was selected set the new file
-            //    if (completeFilePath != null)
-            //    {
-            //        // Create a file to extract the name and path
-            //        DirectoryInfo newFolder;
-            //        FileInfo newFile;
-            //        if (completeFilePath.EndsWith(".eap"))
-            //        {
-            //            newFile = new FileInfo(completeFilePath);
-            //            newFolder = new DirectoryInfo(completeFilePath.Substring(0, completeFilePath.Length - 4));
-            //        }
-            //        else
-            //        {
-            //            newFile = new FileInfo(completeFilePath + ".eap");
-            //            newFolder = new DirectoryInfo(completeFilePath);
-            //        }
-            //        // Check the selectedFolder is not inside a forbidden one
-
-            //        if (isValidTargetProject(newFile))
-            //        {
-
-            //            // Debug.Log("TEST newFile" + this.currentZipFile + " " + newFolder.FullName + " " + newFile.FullName + " ");// + newFolder.GetFiles().Length);
-            //            //if (FolderFileFilter.checkCharacters(newFolder.getName()))
-            //            //{
-
-            //            // If the file doesn't exist, or if the user confirms the writing in the file and the file it is not the current path of the project
-            //if ((this.currentZipFile == null ||
-            //     !newFolder.FullName.ToLower().Equals(this.currentZipFile.ToLower())) &&
-            //    ((!newFile.Exists && !newFolder.Exists) || !newFolder.Exists ||
-            //     newFolder.GetFiles().Length == 0))
-            //                //|| mainWindow.showStrictConfirmDialog(TC.get("Operation.SaveFileTitle"), TC.get("Operation.NewProject.FolderNotEmptyMessage", newFolder.getName()))))
-            //            {
-            //                // If the file exists, delete it so it's clean in the first save
-            //                //if( newFile.exists( ) )
-            //                //	newFile.delete( );
-
-            //                Debug.Log("TEST newFile 2");
-            //                if (!newFile.Exists)
-            //                    newFile.Create();
-
-            //                // If this is a "Save as" operation, copy the assets from the old file to the new one
-            //                if (saveAs)
-            //                {
-            //                    //loadingScreen.setMessage(TC.get("Operation.SaveProjectAs"));
-            //                    //loadingScreen.setVisible(true);
-            //                    AssetsController.copyAssets(currentZipFile, newFolder.FullName);
-            //                }
-
-            //                // Set the new file and path
-            //                currentZipFile = newFolder.FullName;
-            //                currentZipPath = newFolder.Parent.FullName;
-            //                currentZipName = newFolder.Name;
-
-            //                AssetsController.createFolderStructure();
-            //            }
-
-            //            // If the file was not overwritten, don't save the data
-            //            else
-            //                saveFile = false;
-
-            //            // In case the selected folder is the same that the previous one, report an error
-            //            if (!saveFile && this.currentZipFile != null &&
-            //                newFolder.FullName.ToLower().Equals(this.currentZipFile.ToLower()))
-            //            {
-            //                this.showErrorDialog(TC.get("Operation.SaveProjectAs.TargetFolderInUse.Title"),
-            //                    TC.get("Operation.SaveProjectAs.TargetFolderInUse.Message"));
-            //            }
-            //            // }
-            //            else
-            //            {
-            //                Debug.Log("TEST newFile 3");
-            //                //this.showErrorDialog(TC.get("Error.Title"), TC.get("Error.ProjectFolderName", FolderFileFilter.getAllowedChars()));
-            //                saveFile = false;
-            //            }
-            //        }
-            //        else
-            //        {
-            //            Debug.Log("TEST newFile 4");
-            //            // Show error: The target dir cannot be contained 
-            //            // mainWindow.showErrorDialog(TC.get("Operation.NewProject.ForbiddenParent.Title"), TC.get("Operation.NewProject.ForbiddenParent.Message"));
-            //            saveFile = false;
-            //        }
-            //    }
-
-            //    // If no file was selected, don't save the data
-            //    else
-            //        saveFile = false;
-            //}
-
+            
             if (saveAs)
             {
                 //loadingScreen = new LoadingScreen(TextConstants.getText( "Operation.SaveProjectAs" ), getLoadingImage( ), mainWindow);
@@ -1726,21 +1283,6 @@ namespace uAdventure.Editor
                     // Check the selectedFolder is not inside a forbidden one
                     if (isValidTargetProject(newFile))
                     {
-                        Debug.Log("TEST0");
-                        //if (FolderFileFilter.checkCharacters(newFolder.getName()))
-                        //{
-
-                        // If the file doesn't exist, or if the user confirms the writing in the file and the file it is not the current path of the project
-                        //if ((this.currentZipFile == null ||
-                        //     !newFolder.FullName.ToLower().Equals(this.currentZipFile.ToLower())) &&
-                        //    ((!newFile.Exists && !newFolder.Exists) || !newFolder.Exists ||
-                        //     newFolder.GetFiles().Length == 0))
-                        //{
-                        Debug.Log("TEST1");
-                        // If the file exists, delete it so it's clean in the first save
-                        //if( newFile.exists( ) )
-                        //	newFile.delete( );
-
                         if (!newFile.Exists)
                             System.IO.File.Create(newFile.FullName).Close();
 
@@ -1751,27 +1293,10 @@ namespace uAdventure.Editor
                             //loadingScreen.setVisible(true);
                             AssetsController.copyAssets(new DirectoryInfo("Assets\\Resources").FullName, currentZipFile);
                             AssetsController.copyAssets(currentZipFile, newFolder.FullName);
-                            Debug.Log("TEST2");
                         }
 
                         // Set the new file and path
-                        //currentZipFile = newFolder.FullName;
-                        //currentZipPath = newFolder.Parent.FullName;
-                        //currentZipName = newFolder.Name;
-
                         AssetsController.createFolderStructure();
-                        //}
-
-                        // If the file was not overwritten, don't save the data
-                        //TODO: test if it is working
-                        //else
-                        //    saveFile = false;
-
-                        //}
-                        //else {
-                        //    //this.showErrorDialog(TC.get("Error.Title"), TC.get("Error.ProjectFolderName", FolderFileFilter.getAllowedChars()));
-                        //    saveFile = false;
-                        //}
                     }
                     else
                     {
@@ -1785,14 +1310,6 @@ namespace uAdventure.Editor
                 else
                     saveFile = false;
             }
-            else
-            {
-                //loadingScreen = new LoadingScreen(TextConstants.getText( "Operation.SaveProject" ), getLoadingImage( ), mainWindow);
-
-                //loadingScreen.setVisible( true );
-                //loadingScreen.setMessage(TC.get("Operation.SaveProject"));
-                //loadingScreen.setVisible(true);
-            }
 
             // If the data must be saved
             if (saveFile)
@@ -1800,16 +1317,7 @@ namespace uAdventure.Editor
                 //TODO: implement
                 ConfigData.storeToXML();
                 ProjectConfigData.storeToXML();
-
-
-
-                // If the zip was temp file, delete it
-                //if( isTempFile( ) ) {
-                //	File file = new File( oldZipFile );
-                //	file.deleteOnExit( );
-                //	isTempFile = false;
-                //}
-
+                
                 // Check the consistency of the chapters
                 bool valid = chaptersController.isValid(null, null);
 
@@ -1866,17 +1374,6 @@ namespace uAdventure.Editor
                     currentAdaptFolder.Delete();
                 }
             }
-            //}
-            //catch (Exception e)
-            //{
-            //    fileSaved = false;
-            //    Debug.LogError(TC.get("Operation.FileNotSavedTitle") + TC.get("Operation.FileNotSavedMessage"));
-
-            //}
-
-            //Controller.gc();
-
-            // loadingScreen.setVisible(false);
 
             return fileSaved;
         }
@@ -2164,41 +1661,7 @@ namespace uAdventure.Editor
         {
             return exportGame("Games\\" + currentZipName);
         }
-
-        //    /**
-        //     * When a game is imported from Jar or Zip, default GUI images like those for game menu are imported as well.
-        //     * This method deletes default images under gui/options.
-        //     * @param selectedDir
-        //     */
-        //    private void cleanImportedDefaultGUIImages(java.io.File selectedDir)
-        //    {
-        //        File options = null;
-        //        if (selectedDir.getAbsolutePath().endsWith("/") ||
-        //                selectedDir.getAbsolutePath().endsWith("\\"))
-        //        {
-        //            options = new File(selectedDir.getAbsolutePath() + "gui/options/");
-        //        }
-        //        else {
-        //            options = new File(selectedDir.getAbsolutePath() + "/gui/options/");
-        //        }
-        //        for (File subDir: options.listFiles())
-        //        {
-        //            if (subDir.isDirectory())
-        //            {
-        //                for (File image: subDir.listFiles())
-        //                {
-        //                    if (image.getAbsolutePath().toLowerCase().endsWith("png"))
-        //                        image.delete();
-        //                }
-        //                subDir.delete();
-        //            }
-        //            else if (subDir.getAbsolutePath().toLowerCase().endsWith("png"))
-        //            {
-        //                subDir.delete();
-        //            }
-        //        }
-
-        //    }
+        
 
         public bool exportGame(string targetFilePath)
         {
@@ -2283,437 +1746,8 @@ namespace uAdventure.Editor
 
             return exported;
         }
-
-        //    public bool createBackup(string targetFilePath)
-        //    {
-
-        //        bool fileSaved = false;
-        //        if (targetFilePath == null)
-        //            targetFilePath = currentZipFile + ".tmp";
-        //        File category = new File(currentZipFile, "backup");
-        //        try
-        //        {
-        //            bool valid = chaptersController.isValid(null, null);
-
-        //            category.create();
-
-        //            if (Writer.writeData(currentZipFile + File.separatorChar + "backup", adventureDataControl, valid))
-        //            {
-        //                fileSaved = true;
-        //            }
-
-        //            if (fileSaved)
-        //            {
-        //                string selectedPath = targetFilePath;
-
-        //                if (selectedPath != null)
-        //                {
-
-        //                    java.io.File destinyFile = new File(selectedPath);
-
-        //                    if (targetFilePath != null || isValidTargetFile(destinyFile))
-        //                    {
-        //                        if (!destinyFile.exists() || targetFilePath != null)
-        //                        {
-        //                            destinyFile.delete();
-        //                            if (Writer.export(getProjectFolder(), destinyFile.getAbsolutePath()))
-        //                                fileSaved = true;
-        //                        }
-        //                    }
-        //                    else
-        //                        fileSaved = false;
-        //                }
-        //            }
-        //        }
-        //        catch (Exception e)
-        //        {
-        //            fileSaved = false;
-        //        }
-
-        //        if (category.exists())
-        //        {
-        //            category.deleteAll();
-        //        }
-
-        //        return fileSaved;
-        //    }
-
-        //    public void exportStandaloneGame()
-        //    {
-
-        //        bool exportGame = true;
-        //        try
-        //        {
-        //            if (dataModified)
-        //            {
-        //                int option = mainWindow.showConfirmDialog(TC.get("Operation.SaveChangesTitle"), TC.get("Operation.SaveChangesMessage"));
-        //                // If the data must be saved, load the new file only if the save was succesful
-        //                if (option == JOptionPane.YES_OPTION)
-        //                    exportGame = saveFile(false);
-
-        //                // If the data must not be saved, load the new data directly
-        //                else if (option == JOptionPane.NO_OPTION)
-        //                    exportGame = true;
-
-        //                // Cancel the action if selected
-        //                else if (option == JOptionPane.CANCEL_OPTION)
-        //                    exportGame = false;
-
-        //            }
-
-        //            if (exportGame)
-        //            {
-        //                string completeFilePath = null;
-        //                completeFilePath = mainWindow.showSaveDialog(getCurrentExportSaveFolder(), new JARFileFilter());
-
-        //                if (completeFilePath != null)
-        //                {
-
-        //                    if (!completeFilePath.toLowerCase().endsWith(".jar"))
-        //                        completeFilePath = completeFilePath + ".jar";
-        //                    // If the file exists, ask to overwrite
-        //                    java.io.File destinyFile = new File(completeFilePath);
-
-        //                    // Check the destinyFile is not in the project folder
-        //                    if (isValidTargetFile(destinyFile))
-        //                    {
-
-        //                        if (!destinyFile.exists() || mainWindow.showStrictConfirmDialog(TC.get("Operation.SaveFileTitle"), TC.get("Operation.OverwriteExistingFile", destinyFile.getName())))
-        //                        {
-        //                            destinyFile.delete();
-
-        //                            // Finally, export it
-        //                            loadingScreen.setMessage(TC.get("Operation.ExportProject.AsJAR"));
-        //                            loadingScreen.setVisible(true);
-        //                            if (Writer.exportStandalone(getProjectFolder(), destinyFile.getAbsolutePath()))
-        //                            {
-        //                                mainWindow.showInformationDialog(TC.get("Operation.ExportT.Success.Title"), TC.get("Operation.ExportT.Success.Message"));
-        //                            }
-        //                            else {
-        //                                mainWindow.showInformationDialog(TC.get("Operation.ExportT.NotSuccess.Title"), TC.get("Operation.ExportT.NotSuccess.Message"));
-        //                            }
-        //                            loadingScreen.setVisible(false);
-
-        //                        }
-        //                    }
-        //                    else {
-        //                        // Show error: The target dir cannot be contained 
-        //                        mainWindow.showErrorDialog(TC.get("Operation.ExportT.TargetInProjectDir.Title"), TC.get("Operation.ExportT.TargetInProjectDir.Message"));
-        //                    }
-        //                }
-        //            }
-        //        }
-        //        catch (Exception e)
-        //        {
-        //            loadingScreen.setVisible(false);
-        //            mainWindow.showErrorDialog(TC.get("Operation.FileNotSavedTitle"), TC.get("Operation.FileNotSavedMessage"));
-        //        }
-
-        //    }
-
-        ////    public void exportToLOM()
-        ////    {
-
-        ////        bool exportFile = true;
-        ////        try
-        ////        {
-        ////            if (dataModified)
-        ////            {
-        ////                int option = mainWindow.showConfirmDialog(TC.get("Operation.SaveChangesTitle"), TC.get("Operation.SaveChangesMessage"));
-        ////                // If the data must be saved, load the new file only if the save was succesful
-        ////                if (option == JOptionPane.YES_OPTION)
-        ////                    exportFile = saveFile(false);
-
-        ////                // If the data must not be saved, load the new data directly
-        ////                else if (option == JOptionPane.NO_OPTION)
-        ////                    exportFile = true;
-
-        ////                // Cancel the action if selected
-        ////                else if (option == JOptionPane.CANCEL_OPTION)
-        ////                    exportFile = false;
-
-        ////            }
-
-        ////            if (exportFile)
-        ////            {
-        ////                // Ask the data of the Learning Object:
-        ////                ExportToLOMDialog dialog = new ExportToLOMDialog(TC.get("Operation.ExportToLOM.DefaultValue"));
-        ////                string loName = dialog.getLomName();
-        ////                string authorName = dialog.getAuthorName();
-        ////                string organization = dialog.getOrganizationName();
-        ////                bool windowed = dialog.getWindowed();
-        ////                int type = dialog.getType1();
-
-        ////                // For GAMETEL
-        ////                string testUserId = dialog.getTestUserID();
-        ////                string testReturnURI = dialog.getTestReturnURI();
-
-        ////                bool validated = dialog.isValidated();
-
-        ////                if ((type == 2 || type == 6) && !hasScormProfiles(SCORM12))
-        ////                {
-        ////                    // error situation: both profiles must be scorm 1.2 if they exist
-        ////                    mainWindow.showErrorDialog(TC.get("Operation.ExportSCORM12.BadProfiles.Title"), TC.get("Operation.ExportSCORM12.BadProfiles.Message"));
-        ////                }
-        ////                else if ((type == 3 || type == 7) && !hasScormProfiles(SCORM2004))
-        ////                {
-        ////                    // error situation: both profiles must be scorm 2004 if they exist
-        ////                    mainWindow.showErrorDialog(TC.get("Operation.ExportSCORM2004.BadProfiles.Title"), TC.get("Operation.ExportSCORM2004.BadProfiles.Message"));
-        ////                }
-        ////                else if (type == 4 && !hasScormProfiles(AGREGA))
-        ////                {
-        ////                    // error situation: both profiles must be scorm 2004 if they exist to export to AGREGA
-        ////                    mainWindow.showErrorDialog(TC.get("Operation.ExportSCORM2004AGREGA.BadProfiles.Title"), TC.get("Operation.ExportSCORM2004AGREGA.BadProfiles.Message"));
-        ////                }
-        ////                //TODO comprobaciones de perfiles
-        ////                // else if( type == 5 ) {
-        ////                // error situation: both profiles must be scorm 2004 if they exist to export to AGREGA
-        ////                //   mainWindow.showErrorDialog( TC.get( "Operation.ExportSCORM2004AGREGA.BadProfiles.Title" ), TC.get( "Operation.ExportSCORM2004AGREGA.BadProfiles.Message" ) );
-
-        ////                if (validated)
-        ////                {
-        ////                    //string loName = this.showInputDialog( TextConstants.getText( "Operation.ExportToLOM.Title" ), TextConstants.getText( "Operation.ExportToLOM.Message" ), TextConstants.getText( "Operation.ExportToLOM.DefaultValue" ));
-        ////                    if (loName != null && !loName.Equals("") && !loName.Contains(" ") && !loName.Contains("ďż˝") && !loName.Contains("ďż˝"))
-        ////                    {
-        ////                        //Check authorName & organization
-        ////                        if (authorName != null && authorName.length() > 5 && organization != null && organization.length() > 5)
-        ////                        {
-
-        ////                            //Ask for the name of the zip
-        ////                            string completeFilePath = null;
-        ////                            completeFilePath = mainWindow.showSaveDialog(getCurrentExportSaveFolder(), new FileFilter() {
-
-        ////                                @Override
-        ////                                public bool accept(java.io.File arg0)
-        ////    {
-
-        ////        return arg0.getAbsolutePath().toLowerCase().endsWith(".zip") || arg0.isDirectory();
-        ////    }
-
-        ////    @Override
-        ////                                public string getDescription()
-        ////    {
-
-        ////        return "Zip files (*.zip)";
-        ////    }
-        ////} );
-
-        ////                            // If some file was selected set the new file
-        ////                            if( completeFilePath != null ) {
-        ////                                // Add the ".zip" if it is not present in the name
-        ////                                if( !completeFilePath.toLowerCase( ).endsWith( ".zip" ) )
-        ////                                    completeFilePath += ".zip";
-
-        ////                                // Create a file to extract the name and path
-        ////                                File newFile = new File(completeFilePath);
-
-        ////                                // Check the selected file is contained in a valid folder
-        ////                                if( isValidTargetFile(newFile ) ) {
-
-        ////                                    // If the file doesn't exist, or if the user confirms the writing in the file
-        ////                                    if( !newFile.exists( ) || mainWindow.showStrictConfirmDialog( TC.get( "Operation.SaveFileTitle" ), TC.get( "Operation.OverwriteExistingFile", newFile.getName( ) ) ) ) {
-        ////                                        // If the file exists, delete it so it's clean in the first save
-
-        ////                                        try {
-        ////                                            if( newFile.exists( ) )
-        ////                                                newFile.delete( );
-
-        ////                                            //change the old animations to eaa animations, this method force to save game
-        ////                                            changeAllAnimationFormats();
-        ////                                            saveFile( false );
-
-        //////LoadingScreen loadingScreen = new LoadingScreen(TextConstants.getText( "Operation.ExportProject.AsJAR" ), getLoadingImage( ), mainWindow);
-        ////loadingScreen.setMessage( TC.get( "Operation.ExportProject.AsLO" ) );
-        ////                                            loadingScreen.setVisible( true );
-        ////                                            this.updateLOMLanguage( );
-
-        ////                                            if( type == 0 && Writer.exportAsLearningObject( completeFilePath, loName, authorName, organization, windowed, this.currentZipFile, adventureDataControl ) ) {
-        ////    mainWindow.showInformationDialog(TC.get("Operation.ExportT.Success.Title"), TC.get("Operation.ExportT.Success.Message"));
-        ////}
-        ////                                            else if( type == 1 && Writer.exportAsWebCTObject( completeFilePath, loName, authorName, organization, windowed, this.currentZipFile, adventureDataControl ) ) {
-        ////    mainWindow.showInformationDialog(TC.get("Operation.ExportT.Success.Title"), TC.get("Operation.ExportT.Success.Message"));
-        ////}
-        ////                                            else if( type == 2 && Writer.exportAsSCORM( completeFilePath, loName, authorName, organization, windowed, this.currentZipFile, adventureDataControl, false ) ) {
-        ////    mainWindow.showInformationDialog(TC.get("Operation.ExportT.Success.Title"), TC.get("Operation.ExportT.Success.Message"));
-
-        ////}
-        ////                                            else if( type == 3 && Writer.exportAsSCORM2004( completeFilePath, loName, authorName, organization, windowed, this.currentZipFile, adventureDataControl, false ) ) {
-        ////    mainWindow.showInformationDialog(TC.get("Operation.ExportT.Success.Title"), TC.get("Operation.ExportT.Success.Message"));
-        ////}
-        ////                                            else if( type == 4 && Writer.exportAsAGREGA( completeFilePath, loName, authorName, organization, windowed, this.currentZipFile, adventureDataControl ) ) {
-        ////    mainWindow.showInformationDialog(TC.get("Operation.ExportT.Success.Title"), TC.get("Operation.ExportT.Success.Message"));
-        ////}
-        ////                                            else if( type == 5 && Writer.exportAsLAMSLearningObject( completeFilePath, loName, authorName, organization, windowed, this.currentZipFile, adventureDataControl ) ) {
-        ////    mainWindow.showInformationDialog(TC.get("Operation.ExportT.Success.Title"), TC.get("Operation.ExportT.Success.Message"));
-        ////}
-        ////                                            else if( type == 8 && Writer.exportAsGAMETELLearningObject( completeFilePath, loName, authorName, organization, windowed, this.currentZipFile, testReturnURI, testUserId, adventureDataControl ) ) {
-        ////    mainWindow.showInformationDialog(TC.get("Operation.ExportT.Success.Title"), TC.get("Operation.ExportT.Success.Message"));
-        ////} else if( type == 6 && Writer.exportAsSCORM( completeFilePath, loName, authorName, organization, windowed, this.currentZipFile, adventureDataControl, true ) ) {
-        ////    mainWindow.showInformationDialog(TC.get("Operation.ExportT.Success.Title"), TC.get("Operation.ExportT.Success.Message"));
-        ////} else if( type == 7 && Writer.exportAsSCORM2004( completeFilePath, loName, authorName, organization, windowed, this.currentZipFile, adventureDataControl, true ) ) {
-        ////    mainWindow.showInformationDialog(TC.get("Operation.ExportT.Success.Title"), TC.get("Operation.ExportT.Success.Message"));
-        ////}
-        ////                                            else {
-        ////    mainWindow.showInformationDialog(TC.get("Operation.ExportT.NotSuccess.Title"), TC.get("Operation.ExportT.NotSuccess.Message"));
-        ////}
-
-        //////loadingScreen.close( );
-        ////loadingScreen.setVisible( false );
-
-        ////}
-        ////                                        catch( Exception e ) {
-        ////                                            this.showErrorDialog( TC.get( "Operation.ExportToLOM.LONameNotValid.Title" ), TC.get("Operation.ExportToLOM.LONameNotValid.Title") );
-        ////ReportDialog.GenerateErrorReport(e, true, TC.get("Operation.ExportToLOM.LONameNotValid.Title"));
-        ////hideLoadingScreen();
-        ////}
-
-        ////}
-        ////                                }
-        ////                                else {
-        ////                                    // Show error: The target dir cannot be contained 
-        ////                                    mainWindow.showErrorDialog( TC.get( "Operation.ExportT.TargetInProjectDir.Title" ), TC.get( "Operation.ExportT.TargetInProjectDir.Message" ) );
-        ////                                    hideLoadingScreen();
-        ////                                }
-
-        ////                            }
-        ////                        }
-        ////                        else {
-        ////                            this.showErrorDialog( TC.get( "Operation.ExportToLOM.AuthorNameOrganizationNotValid.Title" ), TC.get("Operation.ExportToLOM.AuthorNameOrganizationNotValid.Message") );
-        ////}
-        ////}
-        ////                    else {
-        ////                        this.showErrorDialog( TC.get( "Operation.ExportToLOM.LONameNotValid.Title" ), TC.get("Operation.ExportToLOM.LONameNotValid.Message") );
-        ////}
-        ////}
-        ////            }
-        ////        }
-        ////        catch( Exception e ) {
-        ////            loadingScreen.setVisible( false );
-        ////            mainWindow.showErrorDialog( "Operation.FileNotSavedTitle", "Operation.FileNotSavedMessage" );
-        ////        }
-
-        ////    }
-
-        //    /**
-        //     * Check if assessment and adaptation profiles are both scorm 1.2 or scorm
-        //     * 2004
-        //     * 
-        //     * @param scormType
-        //     *            the scorm type, 1.2 or 2004
-        //     * @return
-        //     */
-        //    private bool hasScormProfiles(int scormType)
-        //{
-
-        //    if (scormType == SCORM12)
-        //    {
-        //        // check that adaptation and assessment profiles are scorm 1.2 profiles
-        //        return chaptersController.hasScorm12Profiles(adventureDataControl);
-
-        //    }
-        //    else if (scormType == SCORM2004 || scormType == AGREGA)
-        //    {
-        //        // check that adaptation and assessment profiles are scorm 2004 profiles
-        //        return chaptersController.hasScorm2004Profiles(adventureDataControl);
-
-        //    }
-
-        //    return false;
-        //}
-
-        ///**
-        // * Executes the current project. Firstly, it checks that the game does not
-        // * present any consistency errors. Then exports the project to the web dir
-        // * as a temp .ead file and gets it running
-        // */
-        ////public void run()
-        ////{
-
-        ////    stopAutoSave();
-
-        ////    // Check adventure consistency
-        ////    if (checkAdventureConsistency(false))
-        ////    {
-        ////        this.getSelectedChapterDataControl().getConversationsList().resetAllConversationNodes();
-        ////        new Timer().schedule(new TimerTask() {
-
-        ////                @Override
-        ////                public void run()
-        ////{
-
-        ////    if (canBeRun())
-        ////    {
-        ////        mainWindow.setNormalRunAvailable(false);
-        ////        // First update flags
-        ////        chaptersController.updateVarsFlagsForRunning();
-        ////        EAdventureDebug.runOrDebug(Controller.getInstance().adventureDataControl.getAdventureData(), AssetsController.getInputStreamCreator(), buildRunAndDebugSettings(false));
-        ////        Controller.getInstance().startAutoSave(15);
-        ////        mainWindow.setNormalRunAvailable(true);
-        ////    }
-
-        ////}
-
-        ////            }, 1000 );
-        ////        }
-        ////    }
-
-        ////    /**
-        ////     * Executes the current project. Firstly, it checks that the game does not
-        ////     * present any consistency errors. Then exports the project to the web dir
-        ////     * as a temp .ead file and gets it running
-        ////     */
-        ////    public void debugRun()
-        ////{
-
-        ////    stopAutoSave();
-
-        ////    // Check adventure consistency
-        ////    if (checkAdventureConsistency(false))
-        ////    {
-        ////        this.getSelectedChapterDataControl().getConversationsList().resetAllConversationNodes();
-        ////        new Timer().schedule(new TimerTask() {
-
-        ////                @Override
-        ////                public void run()
-        ////{
-
-        ////    if (canBeRun())
-        ////    {
-        ////        mainWindow.setNormalRunAvailable(false);
-        ////        chaptersController.updateVarsFlagsForRunning();
-        ////        EAdventureDebug.runOrDebug(Controller.getInstance().adventureDataControl.getAdventureData(), AssetsController.getInputStreamCreator(), buildRunAndDebugSettings(true));
-        ////        Controller.getInstance().startAutoSave(15);
-        ////        mainWindow.setNormalRunAvailable(true);
-        ////    }
-        ////}
-
-        ////            }, 1000 );
-        ////        }
-        ////    }
-
-        ////    /**
-        ////     * Check if the current project is saved before run. If not, ask user to
-        ////     * save it.
-        ////     * 
-        ////     * @return if false is returned, the game will not be launched
-        ////     */
-        ////    private bool canBeRun()
-        ////{
-
-        ////    if (dataModified)
-        ////    {
-        ////        if (mainWindow.showStrictConfirmDialog(TC.get("Run.CanBeRun.Title"), TC.get("Run.CanBeRun.Text")))
-        ////        {
-        ////            this.saveFile(false);
-        ////            return true;
-        ////        }
-        ////        else
-        ////            return false;
-        ////    }
-        ////    else
-        ////        return true;
-        ////}
-
+        
+        
         /**
          * Determines if the target file of an exportation process is valid. The
          * file cannot be located neither inside the project folder, nor inside the
@@ -2765,90 +1799,7 @@ namespace uAdventure.Editor
             }
             return isValid;
         }
-
-        ///**
-        // * Confirm user that the conditions associated to description block will be
-        // * deleted
-        // * 
-        // * @return
-        // */
-        ////public bool askDeleteConditionsDescriptionSet()
-        ////{
-
-        ////    int option = mainWindow.showConfirmDialog(TC.get("DescriptionSet.deleteOnlyOneDescription.title"), TC.get("DescriptionSet.deleteOnlyOneDescription.message"));
-
-        ////    if (option == JOptionPane.YES_OPTION)
-        ////        return true;
-
-        ////    else if (option == JOptionPane.NO_OPTION || option == JOptionPane.CANCEL_OPTION)
-        ////        return false;
-
-        ////    return false;
-
-        ////}
-
-        ///**
-        // * Confirm user that the conditions associated to resource block will be
-        // * deleted
-        // * 
-        // * @return
-        // */
-        ////public bool askDeleteConditionsResourceBlock()
-        ////{
-
-        ////    int option = mainWindow.showConfirmDialog(TC.get("ResourceBlock.deleteOnlyOneBlock.title"), TC.get("ResourceBlock.deleteOnlyOneBlock.message"));
-
-        ////    if (option == JOptionPane.YES_OPTION)
-        ////        return true;
-
-        ////    else if (option == JOptionPane.NO_OPTION || option == JOptionPane.CANCEL_OPTION)
-        ////        return false;
-
-        ////    return false;
-
-        ////}
-
-        ///**
-        // * Exits from the aplication.
-        // */
-        ////public void exit()
-        ////{
-
-        ////    bool exit = true;
-
-        ////    // If the data was not saved, ask for an action (save, discard changes...)
-        ////    if (dataModified)
-        ////    {
-        ////        int option = mainWindow.showConfirmDialog(TC.get("Operation.ExitTitle"), TC.get("Operation.ExitMessage"));
-
-        ////        // If the data must be saved, lexit only if the save was succesful
-        ////        if (option == JOptionPane.YES_OPTION)
-        ////            exit = saveFile(false);
-
-        ////        // If the data must not be saved, exit directly
-        ////        else if (option == JOptionPane.NO_OPTION)
-        ////            exit = true;
-
-        ////        // Cancel the action if selected
-        ////        else if (option == JOptionPane.CANCEL_OPTION)
-        ////            exit = false;
-
-        ////        //if( isTempFile( ) ) {
-        ////        //	File file = new File( oldZipFile );
-        ////        //	file.deleteOnExit( );
-        ////        //	isTempFile = false;
-        ////        //}
-        ////    }
-
-        ////    // Exit the aplication
-        ////    if (exit)
-        ////    {
-        ////        ConfigData.storeToXML();
-        ////        ProjectConfigData.storeToXML();
-        ////        //AssetsController.cleanVideoCache( );
-        ////        System.exit(0);
-        ////    }
-        ////}
+        
 
         ///**
         // * Checks if the adventure is valid or not. It shows information to the
@@ -2882,11 +1833,7 @@ namespace uAdventure.Editor
 
         //    return valid;
         //}
-
-        //public void checkFileConsistency()
-        //{
-
-        //}
+        
 
         ///**
         // * Shows the adventure data dialog editor.
@@ -2896,36 +1843,7 @@ namespace uAdventure.Editor
 
         //    new AdventureDataDialog();
         //}
-
-        ///**
-        // * Shows the LOM data dialog editor.
-        // */
-        ////public void showLOMDataDialog()
-        ////{
-
-        ////    isLomEs = false;
-        ////    new LOMDialog(adventureDataControl.getLomController());
-        ////}
-
-        ///**
-        // * Shows the LOM for SCORM packages data dialog editor.
-        // */
-        ////public void showLOMSCORMDataDialog()
-        ////{
-
-        ////    isLomEs = false;
-        ////    new IMSDialog(adventureDataControl.getImsController());
-        ////}
-
-        ///**
-        // * Shows the LOMES for AGREGA packages data dialog editor.
-        // */
-        ////public void showLOMESDataDialog()
-        ////{
-
-        ////    isLomEs = true;
-        ////    new LOMESDialog(adventureDataControl.getLOMESController());
-        ////}
+        
 
         ///**
         // * Shows the GUI style selection dialog.
@@ -2946,165 +1864,7 @@ namespace uAdventure.Editor
         //    }
 
         //}
-
-        ///**
-        // * Asks for confirmation and then deletes all unreferenced assets. Checks
-        // * for animations indirectly referenced assets.
-        // */
-        ////public void deleteUnsuedAssets()
-        ////{
-
-        ////    if (!this.showStrictConfirmDialog(TC.get("DeleteUnusedAssets.Title"), TC.get("DeleteUnusedAssets.Warning")))
-        ////        return;
-
-        ////    int deletedAssetCount = 0;
-        ////    ArrayList<string> assets = new ArrayList<string>();
-        ////    for (string temp : AssetsController.getAssetsList(AssetsController.CATEGORY_IMAGE))
-        ////        if (!assets.Contains(temp))
-        ////            assets.add(temp);
-        ////    for (string temp : AssetsController.getAssetsList(AssetsController.CATEGORY_BACKGROUND))
-        ////        if (!assets.Contains(temp))
-        ////            assets.add(temp);
-        ////    for (string temp : AssetsController.getAssetsList(AssetsController.CATEGORY_VIDEO))
-        ////        if (!assets.Contains(temp))
-        ////            assets.add(temp);
-        ////    for (string temp : AssetsController.getAssetsList(AssetsController.CATEGORY_AUDIO))
-        ////        if (!assets.Contains(temp))
-        ////            assets.add(temp);
-        ////    for (string temp : AssetsController.getAssetsList(AssetsController.CATEGORY_CURSOR))
-        ////        if (!assets.Contains(temp))
-        ////            assets.add(temp);
-        ////    for (string temp : AssetsController.getAssetsList(AssetsController.CATEGORY_BUTTON))
-        ////        if (!assets.Contains(temp))
-        ////            assets.add(temp);
-        ////    for (string temp : AssetsController.getAssetsList(AssetsController.CATEGORY_ICON))
-        ////        if (!assets.Contains(temp))
-        ////            assets.add(temp);
-        ////    for (string temp : AssetsController.getAssetsList(AssetsController.CATEGORY_STYLED_TEXT))
-        ////        if (!assets.Contains(temp))
-        ////            assets.add(temp);
-        ////    for (string temp : AssetsController.getAssetsList(AssetsController.CATEGORY_ARROW_BOOK))
-        ////        if (!assets.Contains(temp))
-        ////            assets.add(temp);
-
-        ////    /*  assets.remove( "gui/cursors/arrow_left.png" );
-        ////      assets.remove( "gui/cursors/arrow_right.png" ); */
-
-        ////    for (string temp : assets)
-        ////    {
-        ////        int references = 0;
-        ////        references = countAssetReferences(temp);
-        ////        if (references == 0)
-        ////        {
-        ////            new File(Controller.getInstance().getProjectFolder(), temp).delete();
-        ////            deletedAssetCount++;
-        ////        }
-        ////    }
-
-        ////    assets.clear();
-        ////    for (string temp : AssetsController.getAssetsList(AssetsController.CATEGORY_ANIMATION_AUDIO))
-        ////        if (!assets.Contains(temp))
-        ////            assets.add(temp);
-        ////    for (string temp : AssetsController.getAssetsList(AssetsController.CATEGORY_ANIMATION_IMAGE))
-        ////        if (!assets.Contains(temp))
-        ////            assets.add(temp);
-        ////    for (string temp : AssetsController.getAssetsList(AssetsController.CATEGORY_ANIMATION))
-        ////        if (!assets.Contains(temp))
-        ////            assets.add(temp);
-
-        ////    int i = 0;
-        ////    while (i < assets.size())
-        ////    {
-        ////        string temp = assets.get(i);
-        ////        if (countAssetReferences(AssetsController.removeSuffix(temp)) != 0)
-        ////        {
-        ////            assets.remove(temp);
-        ////            if (temp.endsWith("eaa"))
-        ////            {
-        ////                Animation a = Loader.loadAnimation(AssetsController.getInputStreamCreator(), temp, new EditorImageLoader());
-        ////                for (Frame f : a.getFrames())
-        ////                {
-        ////                    if (f.getUri() != null && assets.Contains(f.getUri()))
-        ////                    {
-        ////                        for (int j = 0; j < assets.size(); j++)
-        ////                        {
-        ////                            if (assets.get(j).Equals(f.getUri()))
-        ////                            {
-        ////                                if (j < i)
-        ////                                    i--;
-        ////                                assets.remove(j);
-        ////                            }
-        ////                        }
-        ////                    }
-        ////                    if (f.getSoundUri() != null && assets.Contains(f.getSoundUri()))
-        ////                    {
-        ////                        for (int j = 0; j < assets.size(); j++)
-        ////                        {
-        ////                            if (assets.get(j).Equals(f.getSoundUri()))
-        ////                            {
-        ////                                if (j < i)
-        ////                                    i--;
-        ////                                assets.remove(j);
-        ////                            }
-        ////                        }
-        ////                    }
-        ////                }
-        ////            }
-        ////            else {
-        ////                int j = 0;
-        ////                while (j < assets.size())
-        ////                {
-        ////                    if (assets.get(j).startsWith(AssetsController.removeSuffix(temp)))
-        ////                    {
-        ////                        if (j < i)
-        ////                            i--;
-        ////                        assets.remove(j);
-        ////                    }
-        ////                    else
-        ////                        j++;
-        ////                }
-        ////            }
-        ////        }
-        ////        else {
-        ////            i++;
-        ////        }
-        ////    }
-
-        ////    for (string temp2 : assets)
-        ////    {
-        ////        new File(Controller.getInstance().getProjectFolder(), temp2).delete();
-        ////        deletedAssetCount++;
-        ////    }
-
-        ////    if (deletedAssetCount != 0)
-        ////        mainWindow.showInformationDialog(TC.get("DeleteUnusedAssets.Title"), TC.get("DeleteUnusedAssets.AssetsDeleted", new string[] { string.valueOf(deletedAssetCount) }));
-        ////    else
-        ////        mainWindow.showInformationDialog(TC.get("DeleteUnusedAssets.Title"), TC.get("DeleteUnusedAssets.NoUnsuedAssetsFound"));
-        ////}
-
-        ////public java.io.File selectXMLChapterFile()
-        ////{
-
-        ////    JFileChooser chooser = new JFileChooser();
-        ////    chooser.setFileFilter(new XMLFileFilter());
-        ////    chooser.setMultiSelectionEnabled(false);
-        ////    chooser.setCurrentDirectory(new File(getCurrentLoadFolder()));
-        ////    int option = chooser.showOpenDialog(mainWindow);
-        ////    if (option == JFileChooser.APPROVE_OPTION)
-        ////        return chooser.getSelectedFile();
-        ////    else
-        ////        return null;
-        ////}
-
-        /////**
-        //// * Shows the flags dialog.
-        //// */
-        ////public void showEditFlagDialog()
-        ////{
-
-        ////    new VarsFlagsDialog(new VarFlagsController(getVarFlagSummary()));
-        ////}
-
+        
         ///**
         //* Sets a new selected chapter with the given index.
         //* 
@@ -3199,11 +1959,6 @@ namespace uAdventure.Editor
         //    return adventureDataControl.getTitle();
         //}
 
-        //public string getVersionNumber()
-        //{
-        //    return adventureDataControl.getAdventureData().getVersionNumber();
-        //}
-
         ///**
         // * Returns the description of the adventure.
         // * 
@@ -3214,18 +1969,6 @@ namespace uAdventure.Editor
 
         //    return adventureDataControl.getDescription();
         //}
-
-        ///**
-        // * Returns the LOM controller.
-        // * 
-        // * @return Adventure LOM controller.
-        // * 
-        // */
-        ////public LOMDataControl getLOMDataControl()
-        ////{
-
-        ////    return adventureDataControl.getLomController();
-        ////}
 
         ///**
         // * Sets the new title of the adventure.
@@ -3460,37 +2203,7 @@ namespace uAdventure.Editor
 
             return (Player)getSelectedChapterDataControl().getPlayer().getContent();
         }
-
-        ///**
-        // * Change the player resources when the mode is changed.
-        // * 
-        // * @param assetNecessary
-        // * 
-        // */
-        ////public void changePlayerNecessaryResources(bool assetNecessary)
-        ////{
-
-        ////    int right, left;
-        ////    //TODO no se comprueba el caso en el que el player tenga uno de los dos.... al realizar 2 veces el cambio de 
-        ////    // tipo de juego, se setean ambos como necesarios y solo aparece uno...
-        ////    for (ResourcesDataControl rdc : getSelectedChapterDataControl().getPlayer().getResources())
-        ////    {
-        ////        for (int i = 0; i < rdc.getAssetsInformation().length; i++)
-        ////        {
-        ////            if (rdc.getAssetsInformation()[i].name.Equals("standleft"))
-        ////            {
-        ////                rdc.getAssetsInformation()[i].assetNecessary = assetNecessary;
-        ////                left = i;
-        ////            }
-        ////            else if (rdc.getAssetsInformation()[i].name.Equals("standright"))
-        ////            {
-        ////                rdc.getAssetsInformation()[i].assetNecessary = assetNecessary;
-        ////                right = i;
-        ////            }
-        ////        }
-
-        ////    }
-        ////}
+        
 
         /**
          * This method returns the absolute path of the default image of the given
@@ -3653,36 +2366,7 @@ namespace uAdventure.Editor
         //    }
 
         //}
-
-        ///**
-        // * ead1.4 - used to check references to images and sounds in eaa files
-        // */
-        //private void deleteAssetReferencesInEAA(string eaaFilePath, string assetPath)
-        //{
-        //    Animation animation = Loader.loadAnimation(AssetsController.getInputStreamCreator(), eaaFilePath, new EditorImageLoader());
-        //    bool changed = false;
-        //    for (int i = 0; i < animation.getFrames().size(); i++)
-        //    {
-        //        Frame frame = animation.getFrame(i);
-        //        if (frame != null)
-        //        {
-        //            if (frame.getSoundUri() != null && frame.getSoundUri().Equals(assetPath))
-        //            {
-        //                frame.setSoundUri(null);
-        //                changed = true;
-        //            }
-        //            if (frame.getUri() != null && frame.getUri().Equals(assetPath))
-        //            {
-        //                frame.setUri(null);
-        //                changed = true;
-        //            }
-        //        }
-        //    }
-        //    if (changed)
-        //    {
-        //        AnimationWriter.writeAnimation(eaaFilePath, animation);
-        //    }
-        //}
+        
 
 
         ///**
@@ -3771,65 +2455,7 @@ namespace uAdventure.Editor
 
         //    //mainWindow.reloadData();
         //}
-
-        ///**
-        // * Returns the last window opened by the application.
-        // * 
-        // * @return Last window opened
-        // */
-        ////public Window peekWindow()
-        ////{
-
-        ////    return mainWindow.peekWindow();
-        ////}
-
-        ///**
-        // * Pushes a new window in the windows stack.
-        // * 
-        // * @param window
-        // *            Window to push
-        // */
-        ////public void pushWindow(Window window)
-        ////{
-
-        ////    mainWindow.pushWindow(window);
-        ////}
-
-        ///**
-        // * Pops the last window pushed into the stack.
-        // */
-        ////public void popWindow()
-        ////{
-
-        ////    mainWindow.popWindow();
-        ////}
-
-        ///**
-        // * Shows a dialog showing information and with the button "Ok"
-        // * 
-        // * @param title
-        // *            Title of the dialog
-        // * @param message
-        // *            Message of the dialog
-        // */
-        //public void showInformationDialog(string title, string message)
-        //{
-
-        //    //mainWindow.showInformationDialog(title, message);
-        //}
-
-        ///**
-        // * Shows a load dialog to select multiple files.
-        // * 
-        // * @param filter
-        // *            File filter for the dialog
-        // * @return Full path of the selected files, null if no files were selected
-        // */
-        ////public string[] showMultipleSelectionLoadDialog(FileFilter filter)
-        ////{
-
-        ////    return mainWindow.showMultipleSelectionLoadDialog(currentZipPath, filter);
-        ////}
+        
 
         /**
          * Shows a dialog with the options "Yes" and "No", with the given title and
@@ -3930,43 +2556,6 @@ namespace uAdventure.Editor
             Debug.LogError(title + "\n" + message);
         }
 
-        ////public void showCustomizeGUIDialog()
-        ////{
-
-        ////    new CustomizeGUIDialog(this.adventureDataControl);
-        ////}
-
-        //public bool isFolderLoaded()
-        //{
-
-        //    return chaptersController.isAnyChapterSelected();
-        //}
-
-        //public string getEditorMinVersion()
-        //{
-
-        //    return "1.3";
-        //}
-
-        //public string getEditorVersion()
-        //{
-
-        //    return "1.3";
-        //}
-
-        //public void updateLOMLanguage()
-        //{
-
-        //    this.adventureDataControl.getLomController().updateLanguage();
-
-        //}
-
-        //public void updateIMSLanguage()
-        //{
-
-        //    this.adventureDataControl.getImsController().updateLanguage();
-        //}
-
         //public void showAboutDialog()
         //{
 
@@ -4000,31 +2589,6 @@ namespace uAdventure.Editor
         //    {
         //        ReportDialog.GenerateErrorReport(e, true, "UNKNOWERROR");
         //    }
-        //}
-
-        //public AssessmentProfilesDataControl getAssessmentController()
-        //{
-
-        //    return this.chaptersController.getSelectedChapterDataControl().getAssessmentProfilesDataControl();
-        //}
-
-        //public AdaptationProfilesDataControl getAdaptationController()
-        //{
-
-        //    return this.chaptersController.getSelectedChapterDataControl().getAdaptationProfilesDataControl();
-        //}
-
-        //public bool isCommentaries()
-        //{
-
-        //    return this.adventureDataControl.isCommentaries();
-        //}
-
-        //public void setCommentaries(bool b)
-        //{
-
-        //    this.adventureDataControl.setCommentaries(b);
-
         //}
 
         //public bool isKeepShowing()
@@ -4117,37 +2681,7 @@ namespace uAdventure.Editor
             //if (reloadData)
             //    mainWindow.reloadData();
         }
-
-        //public string getLoadingImage()
-        //{
-
-        //    return ConfigData.getLoadingImage();
-        //}
-
-        //public void showGraphicConfigDialog()
-        //{
-
-        //    // Show the dialog
-        //    //   GraphicConfigDialog guiStylesDialog = new GraphicConfigDialog( adventureDataControl.getGraphicConfig( ) );
-        //    new GraphicConfigDialog(adventureDataControl.getGraphicConfig());
-
-        //    // If the new GUI style is different from the current, and valid, change the value
-        //    /*    int optionSelected = guiStylesDialog.getOptionSelected( );
-        //        if( optionSelected != -1 && this.adventureDataControl.getGraphicConfig( ) != optionSelected ) {
-        //            adventureDataControl.setGraphicConfig( optionSelected );
-        //        }*/
-        //}
-
-        //public void changeToolGraphicConfig(int optionSelected)
-        //{
-
-        //    if (optionSelected != -1 && this.adventureDataControl.getGraphicConfig() != optionSelected)
-        //    {
-        //        //  this.grafhicDialog.cambiarCheckBox( );
-        //        adventureDataControl.setGraphicConfig(optionSelected);
-        //    }
-
-        //}
+        
 
         //// METHODS TO MANAGE UNDO/REDO
 
@@ -4172,18 +2706,6 @@ namespace uAdventure.Editor
             chaptersController.redoTool();
             //tsd.update();
         }
-
-        //public void pushLocalToolManager()
-        //{
-
-        //    chaptersController.pushLocalToolManager();
-        //}
-
-        //public void popLocalToolManager()
-        //{
-
-        //    chaptersController.popLocalToolManager();
-        //}
 
         //public void search()
         //{
@@ -4233,378 +2755,11 @@ namespace uAdventure.Editor
         //    return this.adventureDataControl.getGraphicConfig();
         //}
 
-        //public string getDefaultExitCursorPath()
-        //{
-
-        //    string temp = this.adventureDataControl.getCursorPath("exit");
-        //    if (temp != null && temp.length() > 0)
-        //        return temp;
-        //    else
-        //        return "gui/cursors/exit.png";
-        //}
-
         public AdvancedFeaturesDataControl getAdvancedFeaturesController()
         {
 
             return this.chaptersController.getSelectedChapterDataControl().getAdvancedFeaturesController();
         }
-
-        //public static Color generateColor(int i)
-        //{
-
-        //    int r = (i * 180) % 256;
-        //    int g = ((i + 4) * 130) % 256;
-        //    int b = ((i + 2) * 155) % 256;
-
-        //    if (r > 250 && g > 250 && b > 250)
-        //    {
-        //        r = 0;
-        //        g = 0;
-        //        b = 0;
-        //    }
-
-        //    return new Color(r, g, b);
-        //}
-
-        //private const Runnable gc = new Runnable()
-        //{
-
-        //        public void run()
-        //{
-
-        //    System.gc();
-        //}
-        //    };
-
-        //    /**
-        //     * Public method to perform garbage collection on a different thread.
-        //     */
-        //    public static void gc()
-        //{
-
-        //    new Thread(gc).start();
-        //}
-
-        //public static java.io.File createTempDirectory() throws IOException
-        //{
-
-        //    final java.io.File temp;
-
-        //    temp = java.io.File.createTempFile( "temp", Long.tostring( System.nanoTime( ) ) );
-
-        //        if( !( temp.delete( ) ) )
-        //            throw new IOException( "Could not delete temp file: " + temp.getAbsolutePath( ) );
-
-        //        if( !( temp.mkdir( ) ) )
-        //            throw new IOException( "Could not create temp directory: " + temp.getAbsolutePath( ) );
-
-        //        return ( temp );
-        //    }
-
-        //    public DefaultClickAction getDefaultCursorAction()
-        //{
-
-        //    return this.adventureDataControl.getDefaultClickAction();
-        //}
-
-        //public void setDefaultCursorAction(DefaultClickAction defaultClickAction)
-        //{
-
-        //    this.adventureDataControl.setDefaultClickAction(defaultClickAction);
-        //}
-
-        //public Perspective getPerspective()
-        //{
-
-        //    return this.adventureDataControl.getPerspective();
-        //}
-
-        //public void setPerspective(Perspective perspective)
-        //{
-
-        //    this.adventureDataControl.setPerspective(perspective);
-        //}
-
-        //public DragBehaviour getDragBehaviour()
-        //{
-
-        //    return this.adventureDataControl.getDragBehaviour();
-        //}
-
-        //public void setDragBehaviour(DragBehaviour dragBehaviour)
-        //{
-
-        //    this.adventureDataControl.setDragBehaviour(dragBehaviour);
-        //}
-
-        //public int getMainWindowWidth()
-        //{
-        //    return mainWindow.getWidth();
-        //}
-
-        //public int getMainWindowHeight()
-        //{
-        //    return mainWindow.getHeight();
-        //}
-
-        //public int getMainWindowX()
-        //{
-        //    return mainWindow.getX();
-        //}
-
-        //public int getMainWindowY()
-        //{
-        //    return mainWindow.getY();
-        //}
-
-        ///**
-        // * Change all animation old formats (name_01) for new formats (.eaa)
-        // */
-        //public void changeAllAnimationFormats()
-        //{
-
-        //    //Get all cutsecene data controls 
-        //    List<DataControlWithResources> dataControlList = new ArrayList<DataControlWithResources>();
-        //    dataControlList.addAll(chaptersController.getSelectedChapterDataControl().getCutscenesList().getAllCutsceneDataControls());
-        //    // change formats seting the option "slides animation" in the new .eaa created animations
-        //    changeFormats(true, dataControlList);
-        //    dataControlList.clear();
-
-        //    //Get all NPC and Player data controls 
-        //    dataControlList.addAll(chaptersController.getSelectedChapterDataControl().getNPCsList().getAllNPCDataControls());
-        //    dataControlList.add(chaptersController.getSelectedChapterDataControl().getPlayer());
-        //    // change formats seting the option "slides animation" in the new .eaa created animations
-        //    changeFormats(false, dataControlList);
-
-        //    loadingScreen.setMessage(TC.get("Operation.ExportProject.AsLO"));
-        //    loadingScreen.setVisible(true);
-
-        //} // end changeAllAnimationFormats
-
-        //private void changeFormats(bool isCutScene, List<DataControlWithResources> dataControlList)
-        //{
-
-        //    HashMap<string, string> cache = new HashMap<string, string>();
-
-        //    // Take the project folder to check if the .eaa animation has been previously created
-        //    File projectFolder = new File(Controller.getInstance().getProjectFolder());
-        //    for (DataControlWithResources dc : dataControlList)
-        //    {
-        //        // iterate the whole list of resourceDataControls looking for all animations
-        //        List<ResourcesDataControl> resourcesDataControl = dc.getResources();
-        //        for (ResourcesDataControl rdc : resourcesDataControl)
-        //        {
-        //            for (int i = 0; i < rdc.getAssetCount(); i++)
-        //            {
-        //                if (rdc.getAssetCategory(i) == AssetsConstants.CATEGORY_ANIMATION)
-        //                {
-        //                    string assetPath = rdc.getAssetPath(i);
-        //                    if ((assetPath == null || assetPath.Equals("")) /*&&  !assetPath.Equals( SpecialAssetPaths.ASSET_EMPTY_ANIMATION )*/)
-        //                    {
-        //                        assetPath = SpecialAssetPaths.ASSET_EMPTY_ANIMATION + ".eaa";
-        //                    }
-
-        //                    if (!assetPath.toLowerCase().endsWith(".eaa"))
-        //                    {
-        //                        string originalAssetPath = assetPath;
-        //                        string[] temp = assetPath.split("/");
-        //                        string animationName = temp[temp.length - 1];
-        //                        File animationFile = null;
-        //                        if (cache.ContainsKey(originalAssetPath))
-        //                        {
-        //                            assetPath = cache.get(originalAssetPath);
-        //                            animationFile = new File(projectFolder, originalAssetPath + ".eaa");
-        //                        }
-        //                        else {
-        //                            // string path;
-        //                            animationFile = new File(projectFolder, assetPath + ".eaa");
-        //                            //In win there are no differences between files with the same name but with different
-        //                            // case characteres. the first if check if there are exactly the same name file.
-        //                            //if (! animationFile.exists( )){
-        //                            Random r = new Random();
-        //                            while (animationFile.exists())
-        //                            {
-        //                                assetPath += Integer.tostring(r.nextInt(10));
-        //                                animationFile = new File(projectFolder, assetPath + ".eaa");
-        //                            }
-        //                            cache.put(originalAssetPath, assetPath);
-        //                        }
-        //                        /*if(! animationFile.existsSameFile( )) {
-        //                            //For win, if there are a file with the same name but different case characters, delete it
-        //                            File deleteFile = animationFile.existsIgnoreCase();
-        //                            if (deleteFile!=null)
-        //                                deleteFile.delete( );*/
-
-        //                        Animation animation = new Animation(animationName, new EditorImageLoader());
-        //                        // set the animation to cutsecene mode when was necessary
-        //                        animation.setSlides(isCutScene);
-        //                        animation.setDocumentation(rdc.getAssetDescription(i));
-        //                        // add the images of the old animation
-        //                        ResourcesDataControl.framesFromImages(animation, originalAssetPath, true);
-        //                        AnimationWriter.writeAnimation(animationFile.getAbsolutePath(), animation);
-        //                        // CAUTION!! adding resources without using tool
-        //                        if (rdc.getAssetPath(rdc.getAssetName(i)) != null)
-        //                        {
-        //                            rdc.deleteAssetReferences(rdc.getAssetName(i));
-        //                        }
-        //                        rdc.addAsset(rdc.getAssetName(i), assetPath + ".eaa");
-        //                        /*}
-        //                        else
-        //                            rdc.changeAssetPath( i, assetPath + ".eaa" );*/
-        //                    }
-        //                    else {
-        //                        // if the eaa animation for this old animation was previously created, change only the path (without using Tools, cause this operation
-        //                        // ask for user confirmation if animation path previously exist)
-        //                        rdc.changeAssetPath(i, assetPath);
-        //                    }
-
-        //                }
-        //            }
-        //        }// end resources  for
-        //    }// end main for
-        //}
-
-        ///**
-        // * Used to determine location of dialogs and frames on the screen.
-        // * @return
-        // */
-        //public bool isMainWindowBuilt()
-        //{
-        //    return mainWindow != null;
-        //}
-
-        ///**
-        // * Builds the settings to run the game. It takes debug options from ConfigData and also
-        // * calculates the graphic device where the game must be run, and the preferredBounds, if any.
-        // * @param debug Running mode. False if normal, True if debug
-        // * @return
-        // */
-        //private RunAndDebugSettings buildRunAndDebugSettings(bool debug)
-        //{
-        //    RunAndDebugSettings settings = null;
-
-        //    //Calculate bounding rectangle, if defined
-        //    Rectangle prefBounds = null;
-        //    if (debug && ConfigData.getDebugWindowHeight() != Integer.MAX_VALUE &&
-        //                ConfigData.getDebugWindowWidth() != Integer.MAX_VALUE &&
-        //                ConfigData.getDebugWindowX() != Integer.MAX_VALUE &&
-        //                ConfigData.getDebugWindowY() != Integer.MAX_VALUE)
-        //    {
-        //        prefBounds = new Rectangle(ConfigData.getDebugWindowX(), ConfigData.getDebugWindowY(),
-        //                ConfigData.getDebugWindowWidth(), ConfigData.getDebugWindowHeight());
-        //    }
-        //    else if (!debug && ConfigData.getEngineWindowHeight() != Integer.MAX_VALUE &&
-        //              ConfigData.getEngineWindowWidth() != Integer.MAX_VALUE &&
-        //              ConfigData.getEngineWindowX() != Integer.MAX_VALUE &&
-        //              ConfigData.getEngineWindowY() != Integer.MAX_VALUE)
-        //    {
-        //        prefBounds = new Rectangle(ConfigData.getEngineWindowX(), ConfigData.getEngineWindowY(),
-        //                ConfigData.getEngineWindowWidth(), ConfigData.getEngineWindowHeight());
-        //    };
-
-        //    // Calculate GraphicsDevice
-        //    GraphicsEnvironment environment = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        //    GraphicsDevice device = null;
-        //    if (prefBounds != null)
-        //    {
-        //        // Try to determine which device these bounds belong to
-        //        // If there are more than one device, pick one that is not the "default", as this one may be occupied with Editor's main window
-        //        device = MultiscreenTools.getDeviceContainer(prefBounds, true);
-        //    }
-
-        //    // IF device could not be determined using preferred Bounds, then use other device that is not occupied by mainWindow.
-        //    // Namely, the device selected is the one which interesction with the main window bounds has minimum area
-        //    if (device == null)
-        //    {
-        //        Rectangle mainWindowBounds = mainWindow.getBounds();
-        //        device = MultiscreenTools.getDeviceWithMinimumIntersection(mainWindowBounds);
-        //    }
-
-        //    // If device could not be calculated, then use default one
-        //    if (device == null)
-        //    {
-        //        device = environment.getDefaultScreenDevice();
-        //    }
-
-        //    // Finally, make the object
-        //    if (debug)
-        //    {
-        //        DebugSettings dSettings = ConfigData.getUserDefinedDebugSettings();
-        //        settings = new RunAndDebugSettings(dSettings.isPaintGrid(), dSettings.isPaintHotSpots(), dSettings.isPaintBoundingAreas(),
-        //                device, prefBounds, new GameWindowBoundsListenerImpl(debug));
-        //    }
-        //    else {
-        //        settings = new RunAndDebugSettings(device, prefBounds, new GameWindowBoundsListenerImpl(debug));
-        //    }
-
-        //    return settings;
-        //}
-
-
-        //private static class GameWindowBoundsListenerImpl implements GameWindowBoundsListener
-        //{
-
-        //        private bool debug;
-        //private Rectangle initialBounds;
-
-        //public GameWindowBoundsListenerImpl(bool debug)
-        //{
-        //    this.debug = debug;
-        //}
-
-        //public void componentResized(ComponentEvent e)
-        //{
-        //    update(e.getComponent().getBounds());
-        //}
-
-        //public void componentMoved(ComponentEvent e)
-        //{
-        //    update(e.getComponent().getBounds());
-        //}
-
-        //public void componentShown(ComponentEvent e)
-        //{
-        //}
-
-        //public void componentHidden(ComponentEvent e)
-        //{
-        //}
-
-        //private void update(Rectangle newBounds)
-        //{
-        //    if (initialBounds != null && newBounds.Equals(initialBounds))
-        //        return;
-        //    if (!debug)
-        //    {
-        //        ConfigData.setEngineWindowX(newBounds.x);
-        //        ConfigData.setEngineWindowY(newBounds.y);
-        //        ConfigData.setEngineWindowWidth(newBounds.width);
-        //        ConfigData.setEngineWindowHeight(newBounds.height);
-        //    }
-        //    else {
-        //        ConfigData.setDebugWindowX(newBounds.x);
-        //        ConfigData.setDebugWindowY(newBounds.y);
-        //        ConfigData.setDebugWindowWidth(newBounds.width);
-        //        ConfigData.setDebugWindowHeight(newBounds.height);
-        //    }
-        //}
-
-        //public void setInitialBounds(Rectangle bounds)
-        //{
-        //    this.initialBounds = bounds;
-        //}
-
-        //    }
-
-        //    public bool isCutscene(string cutsceneID)
-        //{
-
-        //    return this.chaptersController.getChapters().
-        //        get(this.getSelectedChapter()).getCutscenesList().existsCutscene(cutsceneID);
-
-
-
-        //}
 
         public void RefreshView()
         {
