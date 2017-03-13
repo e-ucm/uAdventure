@@ -17,6 +17,9 @@ namespace uAdventure.Core
         /// <returns>An object returned by a IDOMParser that can handle the node</returns>
         public static object DOMParse(XmlElement el, params object[] parameters)
         {
+			if (el == null)
+				return null;
+
             var parser = GetParserFor(el.Name);
             if (parser != null) return parser.DOMParse(el, parameters);
             else throw new Exception("Parser not found for the desired name: " + el.Name);

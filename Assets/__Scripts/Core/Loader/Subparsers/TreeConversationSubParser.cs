@@ -5,7 +5,7 @@ using System.Xml;
 
 namespace uAdventure.Core
 {
-    public class TreeConversationSubParser_ : Subparser_
+    public class TreeConversationSubParser : Subparser
     {
         /**
         * Stores the different conversations, in trees form
@@ -69,7 +69,7 @@ namespace uAdventure.Core
         private bool synthesizerVoice;
 
 
-        public TreeConversationSubParser_(Chapter chapter) : base(chapter)
+        public TreeConversationSubParser(Chapter chapter) : base(chapter)
         {
         }
 

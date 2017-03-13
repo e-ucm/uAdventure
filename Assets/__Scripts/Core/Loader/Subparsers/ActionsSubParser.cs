@@ -1,0 +1,90 @@
+﻿using UnityEngine;
+using System.Collections;
+using System.Xml;
+
+namespace uAdventure.Core
+{
+	[DOMParser("examine","grab","use","talk-to","use-with","give-to","drag-to","custom","custom-interact")]
+	[DOMParser(typeof(Action))]
+	public class ActionsSubParser : IDOMParser
+    {
+		public object DOMParse(XmlElement element, params object[] parameters)
+		{
+			Action currentAction = new Action(0);
+			Chapter chapter = parameters [0] as Chapter;
+            string tmpArgVal;
+			XmlElement tmpXmlEl;
+
+            //First we parse the elements every action haves:
+			bool currentNeedsGoTo = "yes".Equals (element.GetAttribute("needsGoTo"));
+			int currentKeepDistance = 0;
+			int.TryParse (element.GetAttribute ("keepDistance"), out currentKeepDistance);
+			bool activateNotEffects = "yes".Equals (element.GetAttribute("not-effects"));
+			bool activateClickEffects = "yes".Equals (element.GetAttribute("click-effects"));
+			string currentIdTarget = element.GetAttribute ("idTarget") ?? "";
+
+			Conditions conditions = DOMParserUtility.DOMParse ((XmlElement)element.SelectSingleNode("condition"), parameters) 	?? new Conditions();
+			Effects effects 	  = DOMParserUtility.DOMParse ((XmlElement)element.SelectSingleNode("effect"), parameters) 		?? new Effects();
+			Effects clickeffects  = DOMParserUtility.DOMParse ((XmlElement)element.SelectSingleNode("click-effect"), parameters) 	?? new Effects();
+			Effects noteffects 	  = DOMParserUtility.DOMParse ((XmlElement)element.SelectSingleNode("not-effect"), parameters) 	?? new Effects();
+
+            //Then we instantiate the correct action by name.
+            //We also parse the elements that are unique of that action.
+			switch (element.Name)
+            {
+				case "examine": 	currentAction = new Action(Action.EXAMINE, conditions, effects, noteffects); break;
+				case "grab": 		currentAction = new Action(Action.GRAB, conditions, effects, noteffects); break;
+				case "use": 		currentAction = new Action(Action.USE, conditions, effects, noteffects); break;
+				case "talk-to": 	currentAction = new Action(Action.TALK_TO, conditions, effects, noteffects); break;
+				case "use-with": 	currentAction = new Action(Action.USE_WITH, currentIdTarget, conditions, effects, noteffects, clickeffects); break;
+				case "give-to": 	currentAction = new Action(Action.GIVE_TO, currentIdTarget, conditions, effects, noteffects, clickeffects); break;
+				case "drag-to": 	currentAction = new Action(Action.DRAG_TO, currentIdTarget, conditions, effects, noteffects, clickeffects); break;
+                case "custom":
+                case "custom-interact":
+					CustomAction customAction = new CustomAction((element.Name == "custom") ? Action.CUSTOM : Action.CUSTOM_INTERACT);
+					customAction.setName(element.GetAttribute("name") ?? "");
+
+					tmpXmlEl = (XmlElement)element.SelectSingleNode("resources");
+                    if (tmpXmlEl != null) customAction.addResources(parseResources(tmpXmlEl, parameters));
+
+                    currentAction = customAction;
+                    break;
+            }
+
+            //Finally we set al the attributes to the action;
+			currentAction.setConditions(conditions);
+			currentAction.setEffects(effects);
+			currentAction.setNotEffects(noteffects);
+            currentAction.setKeepDistance(currentKeepDistance);
+            currentAction.setNeedsGoTo(currentNeedsGoTo);
+            currentAction.setActivatedNotEffects(activateNotEffects);
+			currentAction.setClickEffects(clickeffects);
+            currentAction.setActivatedClickEffects(activateClickEffects);
+
+			return currentAction;
+        }
+
+
+		private ResourcesUni parseResources(XmlElement resources, params object[] parameters)
+        {
+            XmlNodeList assets;
+
+            var currentResources = new ResourcesUni();
+
+            currentResources.setName(resources.GetAttribute("name") ?? "");
+
+            assets = resources.SelectNodes("asset");
+            foreach (XmlElement asset in assets)
+            {
+				string type = asset.GetAttribute("type") ?? "";
+				string path = asset.GetAttribute("uri") ?? "";
+
+                currentResources.addAsset(type, path);
+            }
+
+			currentResources.setConditions (DOMParserUtility.DOMParse (resources.SelectSingleNode("condition"), parameters) ?? new Conditions());
+
+            return currentResources;
+        }
+    }
+}

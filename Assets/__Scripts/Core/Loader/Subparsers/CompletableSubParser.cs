@@ -5,80 +5,61 @@ using System.Xml;
 
 namespace uAdventure.Core
 {
-    public class CompletableSubParser_ : Subparser_
+	[DOMParser("completable")]
+	[DOMParser(typeof(Completable))]
+	public class CompletableSubParser : IDOMParser
     {
-        /// <summary>
-        /// Completable object being parsed.
-        /// </summary>
-        private Completable completable;
-
-        private string currentstring;
-
-        public CompletableSubParser_(Chapter chapter) : base(chapter)
+		public object DOMParse(XmlElement element, params object[] parameters)
         {
-            this.chapter = chapter;
-        }
-
-        public override void ParseElement(XmlElement element)
-        {
-            string tmpArgVal;
             XmlElement tmpXmlElement;
 
-            completable = new Completable();
+            var completable = new Completable();
 
-            tmpArgVal = element.GetAttribute("id");
-            if (!string.IsNullOrEmpty(tmpArgVal))
-            {
-                completable.setId(tmpArgVal);
-            }
+			completable.setId(element.GetAttribute("id") ?? "");
 
-            tmpArgVal = element.GetAttribute("type");
-            if (!string.IsNullOrEmpty(tmpArgVal))
+            switch (element.GetAttribute("type") ?? "")
             {
-                switch (tmpArgVal)
-                {
-                    case "combat": completable.setType(Completable.TYPE_COMBAT); break;
-                    case "completable": completable.setType(Completable.TYPE_COMPLETABLE); break;
-                    case "game": completable.setType(Completable.TYPE_GAME); break;
-                    case "level": completable.setType(Completable.TYPE_LEVEL); break;
-                    case "quest": completable.setType(Completable.TYPE_QUEST); break;
-                    case "race": completable.setType(Completable.TYPE_RACE); break;
-                    case "session": completable.setType(Completable.TYPE_SESSION); break;
-                    case "stage": completable.setType(Completable.TYPE_STAGE); break;
-                    case "storynode": completable.setType(Completable.TYPE_STORYNODE); break;
-                    default: completable.setType(Completable.TYPE_COMPLETABLE); break;
-                }
+                case "combat": completable.setType(Completable.TYPE_COMBAT); break;
+                case "completable": completable.setType(Completable.TYPE_COMPLETABLE); break;
+                case "game": completable.setType(Completable.TYPE_GAME); break;
+                case "level": completable.setType(Completable.TYPE_LEVEL); break;
+                case "quest": completable.setType(Completable.TYPE_QUEST); break;
+                case "race": completable.setType(Completable.TYPE_RACE); break;
+                case "session": completable.setType(Completable.TYPE_SESSION); break;
+                case "stage": completable.setType(Completable.TYPE_STAGE); break;
+                case "storynode": completable.setType(Completable.TYPE_STORYNODE); break;
+                default: completable.setType(Completable.TYPE_COMPLETABLE); break;
             }
 
             tmpXmlElement = (XmlElement)element.SelectSingleNode("start-milestone");
             if (tmpXmlElement != null)
             {
-                completable.setStart(parseMilestone(tmpXmlElement));
+				completable.setStart(parseMilestone(tmpXmlElement, parameters));
             }
 
             tmpXmlElement = (XmlElement)element.SelectSingleNode("end-milestone");
             if (tmpXmlElement != null)
             {
-                completable.setEnd(parseMilestone(tmpXmlElement));
+				completable.setEnd(parseMilestone(tmpXmlElement, parameters));
             }
 
             tmpXmlElement = (XmlElement)element.SelectSingleNode("progress");
             if (tmpXmlElement != null)
             {
-                completable.setProgress(parseProgress(tmpXmlElement));
+				completable.setProgress(parseProgress(tmpXmlElement, parameters));
             }
 
             tmpXmlElement = (XmlElement)element.SelectSingleNode("score");
             if (tmpXmlElement != null)
             {
-                completable.setScore(parseScore(tmpXmlElement));
+				completable.setScore(parseScore(tmpXmlElement, parameters));
             }
 
-            chapter.addCompletable(completable);
+			return completable;
         }
 
 
-        private Completable.Milestone parseMilestone(XmlElement element)
+		private Completable.Milestone parseMilestone(XmlElement element, params object[] parameters)
         {
             Completable.Milestone milestone = new Completable.Milestone();
 
@@ -106,9 +87,7 @@ namespace uAdventure.Core
 
                 if (c != null)
                 {
-                    Conditions conditions = new Conditions();
-                    new ConditionSubParser_(conditions, chapter).ParseElement(c);
-                    milestone.setConditions(conditions);
+					milestone.setConditions(DOMParserUtility.DOMParse (c, parameters) as Conditions ?? new Conditions());
                 }
             }
 
@@ -121,7 +100,7 @@ namespace uAdventure.Core
             return milestone;
         }
 
-        private Completable.Progress parseProgress(XmlElement element)
+		private Completable.Progress parseProgress(XmlElement element, params object[] parameters)
         {
             Completable.Progress progress = new Completable.Progress();
 
@@ -135,13 +114,13 @@ namespace uAdventure.Core
 
             foreach (XmlElement milestone in element.ChildNodes)
             {
-                progress.addMilestone(parseMilestone(milestone));
+				progress.addMilestone(parseMilestone(milestone, parameters));
             }
 
             return progress;
         }
 
-        private Completable.Score parseScore(XmlElement element)
+		private Completable.Score parseScore(XmlElement element, params object[] parameters)
         {
             Completable.Score score = new Completable.Score();
 
@@ -174,7 +153,7 @@ namespace uAdventure.Core
                 if (subscores != null)
                     foreach (XmlElement subscore in subscores.ChildNodes)
                     {
-                        score.addSubScore(parseScore(subscore));
+						score.addSubScore(parseScore(subscore, parameters));
                     }
             }
 
