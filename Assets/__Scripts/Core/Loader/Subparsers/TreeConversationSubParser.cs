@@ -265,7 +265,7 @@ namespace uAdventure.Core
             foreach (XmlElement el in effects)
             {
                 currentEffects = new Effects();
-                new EffectSubParser_(currentEffects, chapter).ParseElement(el);
+                //new EffectSubParser_(currentEffects, chapter).ParseElement(el);
                 currentNode.setEffects(currentEffects);
             }
             {

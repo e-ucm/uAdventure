@@ -13,9 +13,9 @@ namespace uAdventure.Core
 			Description description = new Description ();
 
 			XmlElement
-			name = element.SelectNodes ("name"),
-			brief = element.SelectNodes ("brief"),
-			detailed = element.SelectNodes ("detailed");
+			name = element.SelectSingleNode ("name") as XmlElement,
+			brief = element.SelectSingleNode ("brief") as XmlElement,
+			detailed = element.SelectSingleNode ("detailed") as XmlElement;
 
 			if(name != null)
             {
@@ -39,6 +39,7 @@ namespace uAdventure.Core
             }
 
 			description.setConditions(DOMParserUtility.DOMParse (element.SelectSingleNode ("condition")) as Conditions ?? new Conditions());
+			return description;
         }
     }
 }

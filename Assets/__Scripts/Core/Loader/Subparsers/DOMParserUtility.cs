@@ -8,7 +8,19 @@ using System.Linq;
 namespace uAdventure.Core
 {
     public class DOMParserUtility
-    {
+	{
+		/// <summary>
+		/// Parses the element based on the avaliable parsers for the node name.
+		/// </summary>
+		/// <param name="el">Element to extract info from</param>
+		/// <returns>An object returned by a IDOMParser that can handle the node</returns>
+		public static object DOMParse(XmlNode el, params object[] parameters)
+		{
+			if (el is XmlElement)
+				return DOMParse (el as XmlElement, parameters);
+
+			return null;
+		}
 
         /// <summary>
         /// Parses the element based on the avaliable parsers for the node name.
@@ -40,14 +52,27 @@ namespace uAdventure.Core
             return parsed;
         }
 
+		/// <summary>
+		/// Parses the element based on the avaliable parsers for the node name.
+		/// </summary>
+		/// <param name="el">Element to extract info from</param>
+		/// <returns>An object returned by a IDOMParser that can handle the node</returns>
+		public static T DOMParse<T>(XmlNode el, params object[] parameters)
+		{
+			return DOMParse<T>(el as XmlElement, parameters);
+		}
+
         /// <summary>
         /// DOMParse by using only parsers of type T
         /// </summary>
         /// <typeparam name="T">Type of the desired output object and parser used</typeparam>
         /// <param name="el">node that contains the data to parse from</param>
         /// <returns>Parsed element</returns>
-        public static T DOMParse<T>(XmlElement el, params object[] parameters)
+		public static T DOMParse<T>(XmlElement el, params object[] parameters)
         {
+			if (el == null)
+				return default(T);
+			
             var parser = GetParserFor(typeof(T));
             if (parser != null) return (T)parser.DOMParse(el, parameters);
             else throw new Exception("Parser not found for the desired type: "+ typeof(T));

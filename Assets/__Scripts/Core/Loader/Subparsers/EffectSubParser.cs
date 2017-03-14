@@ -6,16 +6,19 @@ using System.Xml;
 
 namespace uAdventure.Core
 {
-	[DOMParser("effect", "not-effect", "post-effect")]
-	[DOMParser(typeof(Effects))]
+	[DOMParser("effect", "not-effect", "post-effect", "macro")]
+	[DOMParser(typeof(Effects), typeof(Macro))]
 	public class EffectSubParser : IDOMParser
     {
 
 		public object DOMParse(XmlElement element, params object[] parameters)
         {
 			var chapter = parameters [0] as Chapter;
-			var effects = new Effects ();
+			var effects = element.Name == "macro" ? new Macro (element.GetAttribute("id")) : new Effects ();
 
+			if(effects is Macro)
+				((Macro)effects).setDocumentation(element.InnerText);
+			
             string tmpArgVal;
             int x = 0;
             int y = 0;
@@ -24,7 +27,7 @@ namespace uAdventure.Core
             bool animated = false, addeffect = true;
             List<AbstractEffect> effectlist;
 
-			Effect currentEffect = null;
+			AbstractEffect currentEffect = null;
 
             foreach (XmlElement effect in element.ChildNodes)
             {
@@ -193,8 +196,10 @@ namespace uAdventure.Core
                 }
 
                 if (addeffect)
-                    effects.add(currentEffect);
+					effects.add(currentEffect);
             }
+
+			return effects;
         }
     }
 }

@@ -230,7 +230,7 @@ namespace uAdventure.Editor
 
         protected override void OnUpdateList(ReorderableList r)
         {
-            Elements = Controller.getInstance().getCharapterList().getSelectedChapterData().getCharacters().ConvertAll(s => s.getId());
+			Elements = Controller.getInstance().getCharapterList().getSelectedChapterDataControl().getNPCsList ().getNPCs().ConvertAll(s => s.getId());
         }
     }
 }

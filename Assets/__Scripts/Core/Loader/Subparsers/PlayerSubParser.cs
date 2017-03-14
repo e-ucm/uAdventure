@@ -59,6 +59,7 @@ namespace uAdventure.Core
 			// TODO ??????
 			var chapter = parameters [0] as Chapter;
             chapter.setPlayer(player);
+			return null;
         }
     }
 }

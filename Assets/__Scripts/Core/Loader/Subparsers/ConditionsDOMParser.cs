@@ -8,17 +8,20 @@ namespace uAdventure.Core
     /// <summary>
     /// This parser ir an adapter for the original subparser
     /// </summary>
-    [DOMParser("condition")]
-    [DOMParser(typeof(Conditions))]
+	[DOMParser("condition", "global-state")]
+	[DOMParser(typeof(Conditions), typeof(GlobalState))]
     public class ConditionsDOMParser : IDOMParser
 	{
         public object DOMParse(XmlElement element, params object[] parameters)
 		{
 			var chapter = parameters [0] as Chapter;
-			var conditions = new Conditions ();
+			Conditions conditions = element.Name == "global-state" ? new GlobalState (element.GetAttribute("id")) : new Conditions () ;
 
 			foreach (var child in element.ChildNodes)
-				ParseCondition (conditions, child, parameters);
+				ParseCondition (conditions, child as XmlElement, parameters);
+
+			if(conditions is GlobalState)
+				((GlobalState)conditions).setDocumentation(element.InnerText);
 
 			return conditions;
         }
@@ -51,7 +54,7 @@ namespace uAdventure.Core
 			var c = new Conditions ();
 
 			foreach (var child in element.ChildNodes) 
-				ParseCondition (c, child, parameters);
+				ParseCondition (c, child as XmlElement, parameters);
 
 			return c;
 		}

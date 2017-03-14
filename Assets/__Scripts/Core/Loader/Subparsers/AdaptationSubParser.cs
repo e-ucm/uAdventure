@@ -4,18 +4,12 @@ using System.Xml;
 
 namespace uAdventure.Core
 {
-    public class AdaptationSubParser_ : Subparser_
+	public class AdaptationSubParser : IDOMParser
     {
 
-        //private AdaptationProfile profile;
-
-        public AdaptationSubParser_(Chapter chapter) : base(chapter)
+		public object DOMParse(XmlElement element, params object[] parameters)
         {
-            //profile = new AdaptationProfile();
-        }
-
-        public override void ParseElement(XmlElement element)
-        {
+			return null;
         }
     }
 }

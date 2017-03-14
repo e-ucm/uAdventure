@@ -11,15 +11,6 @@ namespace uAdventure.Core
 	[DOMParser(typeof(Action))]
 	public class ActiveAreaSubParser : IDOMParser
     {
-		static string nAreas = 0;
-        /*public ActiveAreaSubParser_(Chapter chapter, Scene scene, int nAreas) : base(chapter)
-        {
-            this.nAreas = nAreas;
-            this.scene = scene;
-
-        }*/
-
-
         private string generateId()
         {
 			return "area_" + Guid.NewGuid ().ToString ("N");

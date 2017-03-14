@@ -4,86 +4,23 @@ using System.Xml;
 
 namespace uAdventure.Core
 {
-    public class TimerSubParser_ : Subparser_
-    {
-        /**
-         * Stores the current timer being parsed
-         */
-        private Timer timer;
-
-        /**
-         * Stores the current conditions being parsed
-         */
-        private Conditions currentConditions;
-
-        /**
-         * Stores the current effects being parsed
-         */
-        private Effects currentEffects;
-
-        public TimerSubParser_(Chapter chapter) : base(chapter)
+	[DOMParser("timer")]
+	[DOMParser(typeof(Timer))]
+	public class TimerSubParser : IDOMParser
+	{
+		public object DOMParse(XmlElement element, params object[] parameters)
         {
-        }
+			string time = element.GetAttribute("time") ?? "";
+			string displayName = element.GetAttribute("displayName") ?? "timer";
 
-        public override void ParseElement(XmlElement element)
-        {
-            XmlNodeList
-                initscondition = element.SelectNodes("init-condition"),
-                endscondition = element.SelectNodes("end-condition"),
-                effects = element.SelectNodes("effect"),
-                postseffect = element.SelectNodes("post-effect");
+			bool usesEndCondition = "yes".Equals(element.GetAttribute("usesEndCondition") ?? "yes");
+			bool runsInLoop 	  = "yes".Equals(element.GetAttribute("runsInLoop")       ?? "yes");
+			bool multipleStarts   = "yes".Equals(element.GetAttribute("multipleStarts")   ?? "yes");
+			bool showTime 		  = "yes".Equals(element.GetAttribute("showTime"));
+			bool countDown 		  = "yes".Equals(element.GetAttribute("countDown"));
+			bool showWhenStopped  = "yes".Equals(element.GetAttribute("showWhenStopped"));
 
-            string tmpArgVal;
-
-            string time = "";
-            bool usesEndCondition = true;
-            bool runsInLoop = true;
-            bool multipleStarts = true;
-            bool countDown = false, showWhenStopped = false, showTime = false;
-            string displayName = "timer";
-
-            tmpArgVal = element.GetAttribute("time");
-            if (!string.IsNullOrEmpty(tmpArgVal))
-            {
-                time = tmpArgVal;
-            }
-            tmpArgVal = element.GetAttribute("usesEndCondition");
-            if (!string.IsNullOrEmpty(tmpArgVal))
-            {
-                usesEndCondition = tmpArgVal.Equals("yes");
-            }
-            tmpArgVal = element.GetAttribute("runsInLoop");
-            if (!string.IsNullOrEmpty(tmpArgVal))
-            {
-                runsInLoop = tmpArgVal.Equals("yes");
-            }
-            tmpArgVal = element.GetAttribute("multipleStarts");
-            if (!string.IsNullOrEmpty(tmpArgVal))
-            {
-                multipleStarts = tmpArgVal.Equals("yes");
-            }
-            tmpArgVal = element.GetAttribute("showTime");
-            if (!string.IsNullOrEmpty(tmpArgVal))
-            {
-                showTime = tmpArgVal.Equals("yes");
-            }
-            tmpArgVal = element.GetAttribute("displayName");
-            if (!string.IsNullOrEmpty(tmpArgVal))
-            {
-                displayName = tmpArgVal;
-            }
-            tmpArgVal = element.GetAttribute("countDown");
-            if (!string.IsNullOrEmpty(tmpArgVal))
-            {
-                countDown = tmpArgVal.Equals("yes");
-            }
-            tmpArgVal = element.GetAttribute("showWhenStopped");
-            if (!string.IsNullOrEmpty(tmpArgVal))
-            {
-                showWhenStopped = tmpArgVal.Equals("yes");
-            }
-
-            timer = new Timer(long.Parse(time));
+			Timer timer = new Timer(long.Parse(time));
             timer.setRunsInLoop(runsInLoop);
             timer.setUsesEndCondition(usesEndCondition);
             timer.setMultipleStarts(multipleStarts);
@@ -95,35 +32,12 @@ namespace uAdventure.Core
             if (element.SelectSingleNode("documentation") != null)
                 timer.setDocumentation(element.SelectSingleNode("documentation").InnerText);
 
-            foreach (XmlElement el in initscondition)
-            {
-                currentConditions = new Conditions();
-                new ConditionSubParser_(currentConditions, chapter).ParseElement(el);
-                timer.setInitCond(currentConditions);
-            }
+			timer.setInitCond(DOMParserUtility.DOMParse<Conditions>(element.SelectSingleNode("init-condition")) ?? new Conditions());
+			timer.setEndCond(DOMParserUtility.DOMParse<Conditions>(element.SelectSingleNode("end-condition"))   ?? new Conditions());
+			timer.setEffects(DOMParserUtility.DOMParse<Effects>(element.SelectSingleNode("effect")) 			?? new Effects());
+			timer.setPostEffects(DOMParserUtility.DOMParse<Effects>(element.SelectSingleNode("post-effect")) 	?? new Effects());
 
-            foreach (XmlElement el in endscondition)
-            {
-                currentConditions = new Conditions();
-                new ConditionSubParser_(currentConditions, chapter).ParseElement(el);
-                timer.setEndCond(currentConditions);
-            }
-
-            foreach (XmlElement el in effects)
-            {
-                currentEffects = new Effects();
-                new EffectSubParser_(currentEffects, chapter).ParseElement(el);
-                timer.setEffects(currentEffects);
-            }
-
-            foreach (XmlElement el in postseffect)
-            {
-                currentEffects = new Effects();
-                new EffectSubParser_(currentEffects, chapter).ParseElement(el);
-                timer.setPostEffects(currentEffects);
-            }
-
-            chapter.addTimer(timer);
+            return timer;
         }
     }
 }

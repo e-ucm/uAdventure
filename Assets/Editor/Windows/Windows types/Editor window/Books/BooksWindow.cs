@@ -218,7 +218,7 @@ namespace uAdventure.Editor
 
         protected override void OnUpdateList(ReorderableList r)
         {
-            Elements = Controller.getInstance().getCharapterList().getSelectedChapterData().getBooks().ConvertAll(s => s.getId());
+			Elements = Controller.getInstance().getCharapterList().getSelectedChapterDataControl().getBooksList ().getBooks().ConvertAll(s => s.getId());
         }
     }
 }

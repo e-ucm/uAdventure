@@ -40,7 +40,7 @@ namespace uAdventure.Core
                     currentResources.addAsset(type, path);
                 }
 
-				currentResources.setConditions(DOMParserUtility.DOMParse<Condition>(el.SelectSingleNode("condition"), parameters) as Conditions ?? new Conditions());
+				currentResources.setConditions(DOMParserUtility.DOMParse<Conditions>(el.SelectSingleNode("condition"), parameters) ?? new Conditions());
                 atrezzo.addResources(currentResources);
             }
 

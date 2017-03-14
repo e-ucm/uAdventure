@@ -189,12 +189,12 @@ namespace uAdventure.Editor
                 //GUILayout.EndHorizontal();
 
                 for (int i = 0;
-                    i < Controller.getInstance().getCharapterList().getSelectedChapterData().getScenes().Count;
+					i < Controller.getInstance().getCharapterList().getSelectedChapterDataControl().getScenesList ().getScenes().Count;
                     i++)
                 {
                     GUILayout.BeginHorizontal();
                     GUILayout.Label(
-                        Controller.getInstance().getCharapterList().getSelectedChapterData().getScenes()[i].getId(),
+						Controller.getInstance().getCharapterList().getSelectedChapterDataControl().getScenesList ().getScenes()[i].getId(),
                         GUILayout.Width(m_Rect.width * 0.65f));
                     if (GUILayout.Button(TC.get("GeneralText.Edit"), GUILayout.MaxWidth(m_Rect.width * 0.3f)))
                     {
@@ -341,7 +341,7 @@ namespace uAdventure.Editor
 
         protected override void OnUpdateList(ReorderableList r)
         {
-            Elements = Controller.getInstance().getCharapterList().getSelectedChapterData().getScenes().ConvertAll(s => s.getId());
+			Elements = Controller.getInstance().getCharapterList().getSelectedChapterDataControl().getScenesList ().getScenes().ConvertAll(s => s.getId());
         }
     }
 }

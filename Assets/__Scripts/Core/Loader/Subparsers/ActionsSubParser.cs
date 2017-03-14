@@ -23,10 +23,10 @@ namespace uAdventure.Core
 			bool activateClickEffects = "yes".Equals (element.GetAttribute("click-effects"));
 			string currentIdTarget = element.GetAttribute ("idTarget") ?? "";
 
-			Conditions conditions = DOMParserUtility.DOMParse ((XmlElement)element.SelectSingleNode("condition"), parameters) 	?? new Conditions();
-			Effects effects 	  = DOMParserUtility.DOMParse ((XmlElement)element.SelectSingleNode("effect"), parameters) 		?? new Effects();
-			Effects clickeffects  = DOMParserUtility.DOMParse ((XmlElement)element.SelectSingleNode("click-effect"), parameters) 	?? new Effects();
-			Effects noteffects 	  = DOMParserUtility.DOMParse ((XmlElement)element.SelectSingleNode("not-effect"), parameters) 	?? new Effects();
+			Conditions conditions = DOMParserUtility.DOMParse<Conditions> ((XmlElement)element.SelectSingleNode("condition"), parameters) 	?? new Conditions();
+			Effects effects 	  = DOMParserUtility.DOMParse<Effects> ((XmlElement)element.SelectSingleNode("effect"), parameters) 		?? new Effects();
+			Effects clickeffects  = DOMParserUtility.DOMParse<Effects> ((XmlElement)element.SelectSingleNode("click-effect"), parameters) 	?? new Effects();
+			Effects noteffects 	  = DOMParserUtility.DOMParse<Effects> ((XmlElement)element.SelectSingleNode("not-effect"), parameters) 	?? new Effects();
 
             //Then we instantiate the correct action by name.
             //We also parse the elements that are unique of that action.
@@ -43,9 +43,8 @@ namespace uAdventure.Core
                 case "custom-interact":
 					CustomAction customAction = new CustomAction((element.Name == "custom") ? Action.CUSTOM : Action.CUSTOM_INTERACT);
 					customAction.setName(element.GetAttribute("name") ?? "");
-
-					tmpXmlEl = (XmlElement)element.SelectSingleNode("resources");
-                    if (tmpXmlEl != null) customAction.addResources(parseResources(tmpXmlEl, parameters));
+					customAction.addResources(
+						DOMParserUtility.DOMParse<ResourcesUni>((XmlElement)element.SelectSingleNode("resources"), parameters) ?? new ResourcesUni());
 
                     currentAction = customAction;
                     break;
@@ -82,7 +81,7 @@ namespace uAdventure.Core
                 currentResources.addAsset(type, path);
             }
 
-			currentResources.setConditions (DOMParserUtility.DOMParse (resources.SelectSingleNode("condition"), parameters) ?? new Conditions());
+			currentResources.setConditions (DOMParserUtility.DOMParse<Conditions> (resources.SelectSingleNode("condition"), parameters) ?? new Conditions());
 
             return currentResources;
         }

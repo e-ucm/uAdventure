@@ -5,114 +5,44 @@ using System.Globalization;
 
 namespace uAdventure.Core
 {
-    public class TrajectorySubParser_ : Subparser_
-    {
+	[DOMParser("trajectory")]
+	[DOMParser(typeof(Trajectory))]
+	public class TrajectorySubParser : IDOMParser
+	{
+		public object DOMParse(XmlElement element, params object[] parameters)
+		{
+			Trajectory trajectory = new Trajectory();
 
-        /**
-          * Trajectory being parsed.
-          */
-        private Trajectory trajectory;
+			foreach (XmlElement el in element.SelectNodes("node"))
+			{
+				string id = el.GetAttribute("id") ?? "";
+				int x = int.Parse(el.GetAttribute("x") ?? "0"),
+					y = int.Parse(el.GetAttribute("y") ?? "0");
+				float scale = float.Parse(el.GetAttribute("scale") ?? "1.0", CultureInfo.InvariantCulture);
 
-        /**
-         * Subparser for effects and conditions.
-         */
-        private SubParser subParser;
-
-        /**
-         * Scene to add the trajectory
-         */
-        private Scene scene;
-
-        public TrajectorySubParser_(Chapter chapter, Scene scene) : base(chapter)
-        {
-            this.trajectory = new Trajectory();
-            //scene.setTrajectory(trajectory);
-            this.scene = scene;
-        }
-
-        public override void ParseElement(XmlElement element)
-        {
-            XmlNodeList
-                nodes = element.SelectNodes("node"),
-                sides = element.SelectNodes("side"),
-                initialnodes = element.SelectNodes("initialnode");
-
-            string tmpArgVal;
-
-            foreach (XmlElement el in nodes)
-            {
-                int x = 0, y = 0;
-                float scale = 1.0f;
-
-                string id = "";
-
-                tmpArgVal = el.GetAttribute("x");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    x = int.Parse(tmpArgVal);
-                }
-                tmpArgVal = el.GetAttribute("y");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    y = int.Parse(tmpArgVal);
-                }
-                tmpArgVal = el.GetAttribute("id");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    id = tmpArgVal;
-                }
-                tmpArgVal = el.GetAttribute("scale");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    scale = float.Parse(tmpArgVal, CultureInfo.InvariantCulture);
-                }
                 trajectory.addNode(id, x, y, scale);
             }
 
-            foreach (XmlElement el in sides)
+			foreach (XmlElement el in element.SelectNodes("side"))
             {
-                string idStart = "";
-                string idEnd = "";
-                int length = -1;
-
-                tmpArgVal = el.GetAttribute("idStart");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    idStart = tmpArgVal;
-                }
-                tmpArgVal = el.GetAttribute("idEnd");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    idEnd = tmpArgVal;
-                }
-                tmpArgVal = el.GetAttribute("length");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    length = int.Parse(tmpArgVal);
-                }
+				string idStart = el.GetAttribute("idStart") ?? "";
+				string idEnd = el.GetAttribute("idEnd") ?? "";
+				int length = int.Parse(el.GetAttribute("length") ?? "-1");
 
                 trajectory.addSide(idStart, idEnd, length);
             }
 
-            foreach (XmlElement el in initialnodes)
-            {
-                string id = "";
-
-                tmpArgVal = el.GetAttribute("id");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    id = tmpArgVal;
-                }
-
-                trajectory.setInitial(id);
-            }
+			var initialNode = element.SelectSingleNode("initialnode");
+			if(initialNode != null)
+				trajectory.setInitial(element.GetAttribute("id") ?? "");
 
             if (trajectory.getNodes().Count != 0)
             {
                 trajectory.deleteUnconnectedNodes();
-                scene.setTrajectory(trajectory);
-
+				return trajectory;
             }
+
+			return null;
         }
     }
 }

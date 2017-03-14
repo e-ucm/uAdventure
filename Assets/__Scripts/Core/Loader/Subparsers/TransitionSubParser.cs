@@ -4,42 +4,21 @@ using System.Xml;
 
 namespace uAdventure.Core
 {
-    public class TransitionSubParser_ : Subparser_
-    {
-        private Animation animation;
+	public class TransitionSubParser : IDOMParser
+	{
+		public object DOMParse(XmlElement element, params object[] parameters)
+		{
+			Transition transition = new Transition();
 
-        private Transition transition;
+			switch(element.GetAttribute("type")){
+				case "none": 		transition.setType(Transition.TYPE_NONE); break;
+				case "fadein": 		transition.setType(Transition.TYPE_FADEIN); break;
+				case "vertical": 	transition.setType(Transition.TYPE_VERTICAL); break;
+				case "horizontal": 	transition.setType(Transition.TYPE_HORIZONTAL); break;
+			}
 
-        public TransitionSubParser_(Animation animation) : base(null)
-        {
-            this.animation = animation;
-            transition = new Transition();
-        }
-
-        public override void ParseElement(XmlElement element)
-        {
-            string tmpArgVal = "";
-
-            tmpArgVal = element.GetAttribute("type");
-            if (!string.IsNullOrEmpty(tmpArgVal))
-            {
-                if (tmpArgVal.Equals("none"))
-                    transition.setType(Transition.TYPE_NONE);
-                else if (tmpArgVal.Equals("fadein"))
-                    transition.setType(Transition.TYPE_FADEIN);
-                else if (tmpArgVal.Equals("vertical"))
-                    transition.setType(Transition.TYPE_VERTICAL);
-                else if (tmpArgVal.Equals("horizontal"))
-                    transition.setType(Transition.TYPE_HORIZONTAL);
-            }
-
-            tmpArgVal = element.GetAttribute("time");
-            if (!string.IsNullOrEmpty(tmpArgVal))
-            {
-                transition.setTime(long.Parse(tmpArgVal));
-            }
-
-            animation.getTransitions().Add(transition);
+			transition.setTime(ExParsers.ParseDefault (element.GetAttribute("time"), 0));
+            return transition;
         }
     }
 }

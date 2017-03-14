@@ -63,7 +63,13 @@ namespace uAdventure.Editor
         }
 
         public override void Draw(int aID)
-        {
+		{
+			if (GameRources.GetInstance().selectedSceneIndex >= 0)
+			{
+				currentIndex = GameRources.GetInstance().selectedSceneIndex;
+				currentScene = Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[currentIndex];
+			}
+
             if (currentScene == null)
                 if (GameRources.GetInstance().selectedSceneIndex >= 0 && currentIndex != GameRources.GetInstance().selectedSceneIndex)
                 {

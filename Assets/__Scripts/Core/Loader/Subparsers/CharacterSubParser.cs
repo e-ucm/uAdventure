@@ -47,7 +47,7 @@ namespace uAdventure.Core
 
 				var conversationReference = new ConversationReference(idTarget);
 				conversationReference.setConditions(
-					DOMParserUtility.DOMParse (conversation.SelectSingleNode("condition") as XmlElement, parameters) ?? new Conditions());
+					DOMParserUtility.DOMParse<Conditions> (conversation.SelectSingleNode("condition") as XmlElement, parameters) ?? new Conditions());
 				conversationReference.setDocumentation(conversation.SelectSingleNode("documentation").InnerText);
 
 				Action action = new Action(Action.TALK_TO);

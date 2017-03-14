@@ -5,12 +5,14 @@ using System.Collections.Generic;
 
 namespace uAdventure.Core
 {
-    public class GraphConversationSubParser_ : Subparser_
+	[DOMParser("graph-conversation")]
+	[DOMParser(typeof(GraphConversation))]
+	public class GraphConversationSubParser : IDOMParser
     {
         /**
        * Name of the conversation
        */
-        private string conversationName;
+		private string conversationName;
 
         /**
          * Stores the current node
@@ -56,7 +58,7 @@ namespace uAdventure.Core
         /**
          * Check if the previous line will be showed at options node
          */
-        private bool keepShowing;
+        private bool keepShowing = false;
 
         /**
          * Keep showing for each conversation line
@@ -74,11 +76,6 @@ namespace uAdventure.Core
         private bool preListening;
 
         /**
-         * The position to be painted the option nodes
-         */
-        private int x, y;
-
-        /**
          * v1.4 - Graphical Position of nodes in editor
          */
         private int editorX, editorY;
@@ -94,28 +91,13 @@ namespace uAdventure.Core
         private bool synthesizerVoice;
 
         /**
-         * Stores the current conditions being read
-         */
-        private Conditions currentConditions;
-
-        /**
          * Store the current conversation line
          */
         private ConversationLine conversationLine;
 
-        public GraphConversationSubParser_(Chapter chapter) : base(chapter)
+		public object DOMParse(XmlElement element, params object[] parameters)
         {
-            keepShowing = false;
-        }
-
-        public override void ParseElement(XmlElement element)
-        {
-            XmlNodeList effects;
-            /* speakschar,
-                speaksplayer,
-                childs,
-                conditions;*/
-
+            XmlNode effects;
             XmlNode end_conversation;
 
             string tmpArgVal;
@@ -132,61 +114,31 @@ namespace uAdventure.Core
             nodeLinks = new List<List<int>>();
 
             foreach (XmlElement el in element)
-            {
+			{
+				//If there is a "editor-x" and "editor-y" attributes     
+				editorX = Mathf.Max(-1, ExParsers.ParseDefault(element.GetAttribute("editor-x"), -1));
+				editorY = Mathf.Max(-1, ExParsers.ParseDefault(element.GetAttribute("editor-y"), -1));
+
+				//If there is a "waitUserInteraction" attribute, store if the lines will wait until user interacts
+				keepShowingDialogue = "yes".Equals (element.GetAttribute("keepShowing"));
+
+				// Node effects
+				end_conversation = el.SelectSingleNode("end-conversation");
+				if (end_conversation != null) effects = end_conversation.SelectSingleNode("effect");
+				else					      effects = el.SelectSingleNode("effect");
+
+				var parsedEffects = DOMParserUtility.DOMParse (effects, parameters) as Effects ?? new Effects ();
+
                 if (el.Name == "dialogue-node")
                 {
-                    // Create the node depending of the tag
-                    editorX = editorY = int.MinValue;
-
-                    //If there is a "waitUserInteraction" attribute, store if the lines will wait until user interacts
-                    tmpArgVal = element.GetAttribute("keepShowing");
-                    if (!string.IsNullOrEmpty(tmpArgVal))
-                    {
-                        if (tmpArgVal.Equals("yes"))
-                            keepShowingDialogue = true;
-                        else
-                            keepShowingDialogue = false;
-                    }
-
-                    //If there is a "editor-x" and "editor-y" attributes     
-                    tmpArgVal = element.GetAttribute("editor-x");
-                    if (!string.IsNullOrEmpty(tmpArgVal))
-                    {
-                        editorX = Mathf.Max(0, int.Parse(tmpArgVal));
-                    }
-
-                    tmpArgVal = element.GetAttribute("editor-y");
-                    if (!string.IsNullOrEmpty(tmpArgVal))
-                    {
-                        editorY = Mathf.Max(0, int.Parse(tmpArgVal));
-                    }
-
-                    currentNode = new DialogueConversationNode(keepShowingDialogue);
-                    if (editorX > int.MinValue)
-                    {
-                        currentNode.setEditorX(editorX);
-                    }
-                    if (editorY > int.MinValue)
-                    {
-                        currentNode.setEditorY(editorY);
-                    }
-
+					currentNode = new DialogueConversationNode(keepShowingDialogue);
+					currentNode.setEditorX(editorX);
+					currentNode.setEditorY(editorY);
                     // Create a new vector for the links of the current node
                     currentLinks = new List<int>();
-                    parseLines(currentNode, el);
+					parseLines(currentNode, el, parameters);
 
-                    end_conversation = el.SelectSingleNode("end-conversation");
-                    if (end_conversation != null)
-                        effects = end_conversation.SelectNodes("effect");
-                    else
-                        effects = el.SelectNodes("effect");
-
-                    foreach (XmlElement ell in effects)
-                    {
-                        currentEffects = new Effects();
-                        new EffectSubParser_(currentEffects, chapter).ParseElement(ell);
-                        currentNode.setEffects(currentEffects);
-                    }
+					currentNode.setEffects (parsedEffects);
 
                     // Add the current node to the node list, and the set of children references into the node links
                     graphNodes.Add(currentNode);
@@ -195,110 +147,19 @@ namespace uAdventure.Core
                 }
                 else if (el.Name == "option-node")
                 {
+					random = "yes".Equals (el.GetAttribute ("random"));
+					showUserOption = "yes".Equals (el.GetAttribute ("showUserOption"));
+					preListening = "yes".Equals (el.GetAttribute ("preListening")) || editorX >= 0 || editorY >= 0;
 
-                    editorX = editorY = int.MinValue;
+					currentNode = new OptionConversationNode(random, keepShowing, showUserOption, preListening, editorX, editorY);
 
-                    //If there is a "waitUserInteraction" attribute, store if the lines will wait until user interacts
-                    tmpArgVal = el.GetAttribute("keepShowing");
-                    if (!string.IsNullOrEmpty(tmpArgVal))
-                    {
-                        if (tmpArgVal.Equals("yes"))
-                            keepShowingDialogue = true;
-                        else
-                            keepShowingDialogue = false;
-                    }
-
-                    //If there is a "editor-x" and "editor-y" attributes     
-                    tmpArgVal = el.GetAttribute("editor-x");
-                    if (!string.IsNullOrEmpty(tmpArgVal))
-                    {
-                        editorX = Mathf.Max(0, int.Parse(tmpArgVal));
-                    }
-                    tmpArgVal = el.GetAttribute("editor-y");
-                    if (!string.IsNullOrEmpty(tmpArgVal))
-                    {
-                        editorY = Mathf.Max(0, int.Parse(tmpArgVal));
-                    }
-
-                    tmpArgVal = el.GetAttribute("random");
-                    if (!string.IsNullOrEmpty(tmpArgVal))
-                    {
-                        if (tmpArgVal.Equals("yes"))
-                            random = true;
-                        else
-                            random = false;
-                    }
-
-                    tmpArgVal = el.GetAttribute("showUserOption");
-                    if (!string.IsNullOrEmpty(tmpArgVal))
-                    {
-                        if (tmpArgVal.Equals("yes"))
-                            showUserOption = true;
-                        else
-                            showUserOption = false;
-                    }
-
-                    tmpArgVal = el.GetAttribute("preListening");
-                    if (!string.IsNullOrEmpty(tmpArgVal))
-                    {
-                        if (tmpArgVal.Equals("yes"))
-                            preListening = true;
-                        else
-                            preListening = false;
-                    }
-
-                    //If there is a "x" and "y" attributes with the position where the option node has to be painted
-                    tmpArgVal = el.GetAttribute("x");
-                    if (!string.IsNullOrEmpty(tmpArgVal))
-                    {
-                        if (tmpArgVal.Equals("yes"))
-                            preListening = true;
-                        else
-                            preListening = false;
-                    }
-                    tmpArgVal = el.GetAttribute("y");
-                    if (!string.IsNullOrEmpty(tmpArgVal))
-                    {
-                        if (tmpArgVal.Equals("yes"))
-                            preListening = true;
-                        else
-                            preListening = false;
-                    }
-
-                    currentNode = new OptionConversationNode(random, keepShowing, showUserOption, preListening, x, y);
-
-                    //XAPI ELEMENTS
-                    tmpArgVal = el.GetAttribute("question");
-                    if (!string.IsNullOrEmpty(tmpArgVal))
-                    {
-                        ((OptionConversationNode)currentNode).setXApiQuestion(tmpArgVal);
-                    }
+					//XAPI ELEMENTS
+					((OptionConversationNode)currentNode).setXApiQuestion(el.GetAttribute("question") ?? "");
                     //END OF XAPI
-
-                    if (editorX > int.MinValue)
-                    {
-                        x = editorX;
-                    }
-                    if (editorY > int.MinValue)
-                    {
-                        y = editorY;
-                    }
                     // Create a new vector for the links of the current node
                     currentLinks = new List<int>();
-                    parseLines(currentNode, el);
-
-                    end_conversation = el.SelectSingleNode("end-conversation");
-                    if (end_conversation != null)
-                        effects = end_conversation.SelectNodes("effect");
-                    else
-                        effects = el.SelectNodes("effect");
-
-                    foreach (XmlElement ell in effects)
-                    {
-                        currentEffects = new Effects();
-                        new EffectSubParser_(currentEffects, chapter).ParseElement(ell);
-                        currentNode.setEffects(currentEffects);
-                    }
+					parseLines(currentNode, el, parameters);
+					currentNode.setEffects (parsedEffects);
 
                     // Add the current node to the node list, and the set of children references into the node links
                     graphNodes.Add(currentNode);
@@ -307,7 +168,7 @@ namespace uAdventure.Core
             }
 
             setNodeLinks();
-            chapter.addConversation(new GraphConversation(conversationName, graphNodes[0]));
+            return new GraphConversation(conversationName, graphNodes[0]);
         }
 
         /**
@@ -330,7 +191,7 @@ namespace uAdventure.Core
             }
         }
 
-        private void parseLines(ConversationNode node, XmlElement lines)
+		private void parseLines(ConversationNode node, XmlElement lines, params object[] parameters)
         {
             string tmpArgVal = "";
             currentLinks = new List<int>();
@@ -338,119 +199,48 @@ namespace uAdventure.Core
 
             foreach (XmlElement ell in lines.ChildNodes)
             {
-                addline = true;
+				addline = true;
+
+				audioPath = ell.GetAttribute("uri");
+				// If there is a "synthesize" attribute, store its value
+				synthesizerVoice = "yes".Equals (ell.GetAttribute("synthesize"));
+				// If there is a "keepShowing" attribute, store its value
+				keepShowingLine = "yes".Equals (ell.GetAttribute("keepShowing"));
+
                 if (ell.Name == "speak-player")
                 {
-                    audioPath = "";
-
-                    tmpArgVal = ell.GetAttribute("uri");
-                    if (!string.IsNullOrEmpty(tmpArgVal))
-                    {
-                        audioPath = tmpArgVal;
-                    }
-
-                    // If there is a "synthesize" attribute, store its value
-                    tmpArgVal = ell.GetAttribute("synthesize");
-                    if (!string.IsNullOrEmpty(tmpArgVal))
-                    {
-                        string response = tmpArgVal;
-                        if (response.Equals("yes"))
-                            synthesizerVoice = true;
-                        else
-                            synthesizerVoice = false;
-                    }
-
-                    // If there is a "keepShowing" attribute, store its value
-                    tmpArgVal = ell.GetAttribute("keepShowing");
-                    if (!string.IsNullOrEmpty(tmpArgVal))
-                    {
-                        string response = tmpArgVal;
-                        if (response.Equals("yes"))
-                            keepShowingLine = true;
-                        else
-                            keepShowingLine = false;
-                    }
-
                     // Store the read string into the current node, and then delete the string. The trim is performed so we
                     // don't have to worry with indentations or leading/trailing spaces
                     conversationLine = new ConversationLine(ConversationLine.PLAYER, ell.InnerText);
-                    if (audioPath != null && !this.audioPath.Equals(""))
-                    {
-                        conversationLine.setAudioPath(audioPath);
-                    }
 
+					conversationLine.setAudioPath(audioPath);
                     conversationLine.setSynthesizerVoice(synthesizerVoice);
-
                     conversationLine.setKeepShowing(keepShowingLine);
 
                     //XAPI ELEMENTS
-                    tmpArgVal = ell.GetAttribute("correct");
-                    if (!string.IsNullOrEmpty(tmpArgVal))
-                    {
-                        conversationLine.setXApiCorrect(tmpArgVal == "true");
-                    }
+					conversationLine.setXApiCorrect("true".Equals (ell.GetAttribute("correct")));
                     //END OF XAPI
+
                 }
                 else if (ell.Name == "speak-char")
                 {
                     // If it is a non-player character line, store the character name and audio path (if present)
                     // Set default name to "NPC"
                     characterName = "NPC";
-                    audioPath = "";
-
-
                     // If there is a "idTarget" attribute, store it
-                    tmpArgVal = ell.GetAttribute("idTarget");
-                    if (!string.IsNullOrEmpty(tmpArgVal))
-                    {
-                        characterName = tmpArgVal;
-                    }
-
-                    tmpArgVal = ell.GetAttribute("uri");
-                    if (!string.IsNullOrEmpty(tmpArgVal))
-                    {
-                        audioPath = tmpArgVal;
-                    }
-
-                    // If there is a "synthesize" attribute, store its value
-                    tmpArgVal = ell.GetAttribute("synthesize");
-                    if (!string.IsNullOrEmpty(tmpArgVal))
-                    {
-                        string response = tmpArgVal;
-                        if (response.Equals("yes"))
-                            synthesizerVoice = true;
-                        else
-                            synthesizerVoice = false;
-                    }
-
-                    // If there is a "keepShowing" attribute, store its value
-                    tmpArgVal = ell.GetAttribute("keepShowing");
-                    if (!string.IsNullOrEmpty(tmpArgVal))
-                    {
-                        string response = tmpArgVal;
-                        if (response.Equals("yes"))
-                            keepShowingLine = true;
-                        else
-                            keepShowingLine = false;
-                    }
+					characterName = ell.GetAttribute("idTarget") ?? "";
 
                     // Store the read string into the current node, and then delete the string. The trim is performed so we
                     // don't have to worry with indentations or leading/trailing spaces
                     conversationLine = new ConversationLine(characterName, ell.InnerText);
-                    if (audioPath != null && !this.audioPath.Equals(""))
-                    {
-                        conversationLine.setAudioPath(audioPath);
-                    }
-
+					conversationLine.setAudioPath(audioPath);
                     conversationLine.setSynthesizerVoice(synthesizerVoice);
-
                     conversationLine.setKeepShowing(keepShowingLine);
                 }
                 else if (ell.Name == "condition")
                 {
                     addline = false;
-                    currentConditions = new Conditions();
-                    new ConditionSubParser_(currentConditions, chapter).ParseElement(ell);
+					var currentConditions = DOMParserUtility.DOMParse (ell, parameters) as Conditions ?? new Conditions ();
                     currentNode.getLine(currentNode.getLineCount() - 1).setConditions(currentConditions);
                 }
                 else if (ell.Name == "child")

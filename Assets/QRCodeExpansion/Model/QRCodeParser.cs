@@ -17,19 +17,8 @@ namespace uAdventure.QR
             qr.Documentation = element.SelectSingleNode("documentation").InnerText;
             qr.Documentation = element.SelectSingleNode("documentation").InnerText;
 
-            ConditionSubParser_ conditionsParser = new ConditionSubParser_(qr.Conditions, (Chapter)parameters[0]);
-            var conditions = element.SelectNodes("condition");
-            foreach (XmlElement cond in conditions)
-            {
-                conditionsParser.ParseElement(cond);
-            }
-
-            EffectSubParser_ effectsSubParser = new EffectSubParser_(qr.Effects, (Chapter)parameters[0]);
-            var effects = element.SelectNodes("effect");
-            foreach (XmlElement effect in effects)
-            {
-                effectsSubParser.ParseElement(effect);
-            }
+			qr.Conditions = DOMParserUtility.DOMParse (element.SelectSingleNode("condition"), parameters) as Conditions ?? new Conditions();
+			qr.Effects 	  = DOMParserUtility.DOMParse (element.SelectSingleNode("effect"), parameters) 	  as Effects ?? new Effects();
 
             return qr;
         }

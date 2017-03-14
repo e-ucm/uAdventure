@@ -5,298 +5,100 @@ using System.Xml;
 
 namespace uAdventure.Core
 {
-    public class AssessmentSubParser_ : Subparser_
+	public class AssessmentSubParser : IDOMParser
     {
-        /**
-         * Assessment rule currently being read
-         */
-        private AssessmentRule currentAssessmentRule;
+		public object DOMParse(XmlElement element, params object[] parameters)
+		{
+			AssessmentProfile profile = new AssessmentProfile ();
 
-        /**
-         * Set of conditions being read
-         */
-        private Conditions currentConditions;
+			profile.setShowReportAtEnd("yes".Equals (element.GetAttribute("show-report-at-end")));
 
-        /**
-         * Set of either conditions being read
-         */
-        private Conditions currentEitherCondition;
+			profile.setName(element.GetAttribute("name") ?? "");
+			profile.setEmail(element.GetAttribute ("send-to-email") ?? "");
+			profile.setSendByEmail(!string.IsNullOrEmpty(profile.getEmail ()));
+			profile.setScorm12("yes".Equals (element.GetAttribute("scorm12")));
+			profile.setScorm2004("yes".Equals (element.GetAttribute("scorm2004")));
 
-        /**
-         * The assessment profile
-         */
-        private AssessmentProfile profile;
-
-        public AssessmentSubParser_(Chapter chapter) : base(chapter)
-        {
-            profile = new AssessmentProfile();
-        }
-
-        public override void ParseElement(XmlElement element)
-        {
-
-            XmlNodeList
-                smtpsconfigs = element.SelectNodes("smtp-config"),
-                assessmentsrule = element.SelectNodes("assessment-rule"),
-                timedsssessmentsrule = element.SelectNodes("timed-assessment-rule"),
-                conditions,
-                initsconditions,
-                endsconditions,
-                //setproperties,
-                assessEffects;
-
-            string tmpArgVal;
-
-            tmpArgVal = element.GetAttribute("show-report-at-end");
-            if (!string.IsNullOrEmpty(tmpArgVal))
-            {
-                profile.setShowReportAtEnd(tmpArgVal.Equals("yes"));
+			var smtpConfig = element.SelectSingleNode("smtp-config") as XmlElement;
+			if(smtpConfig != null)
+			{
+				profile.setSmtpSSL("yes".Equals (smtpConfig.GetAttribute("smtp-ssl")));
+				profile.setSmtpServer(smtpConfig.GetAttribute("smtp-server"));
+				profile.setSmtpPort(smtpConfig.GetAttribute("smtp-port"));
+				profile.setSmtpUser(smtpConfig.GetAttribute("smtp-user"));
+				profile.setSmtpPwd(smtpConfig.GetAttribute("smtp-pwd"));
             }
 
-            tmpArgVal = element.GetAttribute("send-to-email");
-            if (!string.IsNullOrEmpty(tmpArgVal))
+			// NORMAL ASSESMENT RULES
+			foreach (XmlElement ell in element.SelectNodes("assessment-rule"))
             {
-                if (tmpArgVal == null || tmpArgVal.Length < 1)
-                {
-                    profile.setEmail("");
-                    profile.setSendByEmail(false);
-                }
-                else
-                {
-                    profile.setEmail(tmpArgVal);
-                    profile.setSendByEmail(true);
-                }
-            }
-
-            tmpArgVal = element.GetAttribute("scorm12");
-            if (!string.IsNullOrEmpty(tmpArgVal))
-            {
-                profile.setScorm12(tmpArgVal.Equals("yes"));
-            }
-
-            tmpArgVal = element.GetAttribute("scorm2004");
-            if (!string.IsNullOrEmpty(tmpArgVal))
-            {
-                profile.setScorm2004(tmpArgVal.Equals("yes"));
-            }
-
-            tmpArgVal = element.GetAttribute("name");
-            if (!string.IsNullOrEmpty(tmpArgVal))
-            {
-                profile.setName(tmpArgVal);
-            }
-
-            foreach (XmlElement ell in smtpsconfigs)
-            {
-                tmpArgVal = ell.GetAttribute("smtp-ssl");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    profile.setSmtpSSL(tmpArgVal.Equals("yes"));
-                }
-                tmpArgVal = ell.GetAttribute("smtp-server");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    profile.setSmtpServer(tmpArgVal);
-                }
-                tmpArgVal = ell.GetAttribute("smtp-port");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    profile.setSmtpPort(tmpArgVal);
-                }
-                tmpArgVal = ell.GetAttribute("smtp-user");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    profile.setSmtpUser(tmpArgVal);
-                }
-                tmpArgVal = ell.GetAttribute("smtp-pwd");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    profile.setSmtpPwd(tmpArgVal);
-                }
-            }
-
-            foreach (XmlElement ell in assessmentsrule)
-            {
-
-                string id = null;
-                int importance = 0;
-                bool repeatRule = false;
-
-                tmpArgVal = element.GetAttribute("id");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    id = tmpArgVal;
-                }
-                tmpArgVal = element.GetAttribute("importance");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    for (int j = 0; j < AssessmentRule.N_IMPORTANCE_VALUES; j++)
-                        if (tmpArgVal.Equals(AssessmentRule.IMPORTANCE_VALUES[j]))
-                            importance = j;
-                }
-                tmpArgVal = element.GetAttribute("repeatRule");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    repeatRule = tmpArgVal.Equals("yes");
-                }
-
-                currentAssessmentRule = new AssessmentRule(id, importance, repeatRule);
-
-                conditions = element.SelectNodes("condition");
-                foreach (XmlElement ell_ in conditions)
-                {
-                    currentConditions = new Conditions();
-                    new ConditionSubParser_(currentConditions, chapter).ParseElement(ell_);
-                    currentAssessmentRule.setConditions(currentConditions);
-                }
-
-                initsconditions = element.SelectNodes("init-condition");
-                foreach (XmlElement ell_ in initsconditions)
-                {
-                    currentConditions = new Conditions();
-                    new ConditionSubParser_(currentConditions, chapter).ParseElement(ell_);
-                    ((TimedAssessmentRule)currentAssessmentRule).setInitConditions(currentConditions);
-                }
-
-                endsconditions = element.SelectNodes("end-condition");
-                foreach (XmlElement ell_ in endsconditions)
-                {
-                    currentConditions = new Conditions();
-                    new ConditionSubParser_(currentConditions, chapter).ParseElement(ell_);
-                    ((TimedAssessmentRule)currentAssessmentRule).setEndConditions(currentConditions);
-                }
-
-                if (ell.SelectSingleNode("concept") != null)
-                    currentAssessmentRule.setConcept(ell.SelectSingleNode("concept").InnerText.ToString().Trim());
-                if (ell.SelectSingleNode("set-text") != null)
-                    currentAssessmentRule.setText(ell.SelectSingleNode("set-text").InnerText.ToString().Trim());
-
-                assessEffects = element.SelectNodes("assessEffect");
-                foreach (XmlElement ell_ in assessEffects)
-                {
-                    int timeMin = int.MinValue;
-                    int timeMax = int.MinValue;
-                    tmpArgVal = ell_.GetAttribute("time-min");
-                    if (!string.IsNullOrEmpty(tmpArgVal))
-                    {
-                        timeMin = int.Parse(tmpArgVal);
-                    }
-                    tmpArgVal = ell_.GetAttribute("time-max");
-                    if (!string.IsNullOrEmpty(tmpArgVal))
-                    {
-                        timeMax = int.Parse(tmpArgVal);
-                    }
-
-                    TimedAssessmentRule tRule = (TimedAssessmentRule)currentAssessmentRule;
-                    if (timeMin != int.MinValue && timeMax != int.MaxValue)
-                    {
-                        tRule.addEffect(timeMin, timeMax);
-                    }
-                    else
-                    {
-                        tRule.addEffect();
-                    }
-                }
-
+				var currentAssessmentRule = new AssessmentRule("", 0, false);
+				fillAssesmentRule (ell, currentAssessmentRule, parameters);
                 profile.addRule(currentAssessmentRule);
             }
 
-            foreach (XmlElement ell in timedsssessmentsrule)
+			// TIMED ASSESMENT RULES
+			foreach (XmlElement ell in element.SelectNodes("timed-assessment-rule"))
             {
-                string id = null;
-                int importance = 0;
-                bool usesEndConditions = false;
-                bool has = false;
-                bool repeatRule = false;
+				bool usesEndConditions = "yes".Equals (element.GetAttribute("usesEndConditions"));
 
-                tmpArgVal = element.GetAttribute("id");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    id = tmpArgVal;
-                }
-                tmpArgVal = element.GetAttribute("importance");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    for (int j = 0; j < AssessmentRule.N_IMPORTANCE_VALUES; j++)
-                        if (tmpArgVal.Equals(AssessmentRule.IMPORTANCE_VALUES[j]))
-                            importance = j;
-                }
-                tmpArgVal = element.GetAttribute("usesEndConditions");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    has = true;
-                    usesEndConditions = tmpArgVal.Equals("yes");
-                }
-                tmpArgVal = element.GetAttribute("repeatRule");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    has = true;
-                    repeatRule = tmpArgVal.Equals("yes");
-                }
-                currentAssessmentRule = new TimedAssessmentRule(id, importance, repeatRule);
-                if (has)
-                    ((TimedAssessmentRule)currentAssessmentRule).setUsesEndConditions(usesEndConditions);
+				var tRule = new TimedAssessmentRule("", 0, false);
+				fillAssesmentRule (ell, tRule, parameters);
 
-                conditions = element.SelectNodes("condition");
-                foreach (XmlElement ell_ in conditions)
-                {
-                    currentConditions = new Conditions();
-                    new ConditionSubParser_(currentConditions, chapter).ParseElement(ell_);
-                    currentAssessmentRule.setConditions(currentConditions);
-                }
+				if (usesEndConditions || tRule.isRepeatRule ())
+					tRule.setUsesEndConditions(usesEndConditions);
+				
+				tRule.setInitConditions(DOMParserUtility.DOMParse (element.SelectSingleNode("init-condition"), parameters) 			as Conditions ?? new Conditions());
+				tRule.setEndConditions(DOMParserUtility.DOMParse (element.SelectSingleNode("end-condition"), parameters)			as Conditions ?? new Conditions());
 
-                initsconditions = element.SelectNodes("init-condition");
-                foreach (XmlElement ell_ in initsconditions)
-                {
-                    currentConditions = new Conditions();
-                    new ConditionSubParser_(currentConditions, chapter).ParseElement(ell_);
-                    ((TimedAssessmentRule)currentAssessmentRule).setInitConditions(currentConditions);
-                }
+				foreach (XmlElement ell_ in element.SelectNodes("assessEffect"))
+				{
+					int timeMin = ExParsers.ParseDefault ( ell_.GetAttribute("time-min") , int.MinValue);
+					int timeMax = ExParsers.ParseDefault ( ell_.GetAttribute("time-max") , int.MinValue);
 
-                endsconditions = element.SelectNodes("end-condition");
-                foreach (XmlElement ell_ in endsconditions)
-                {
-                    currentConditions = new Conditions();
-                    new ConditionSubParser_(currentConditions, chapter).ParseElement(ell_);
-                    ((TimedAssessmentRule)currentAssessmentRule).setEndConditions(currentConditions);
-                }
-
-                if (ell.SelectSingleNode("concept") != null)
-                    currentAssessmentRule.setConcept(ell.SelectSingleNode("concept").InnerText.ToString().Trim());
-                if (ell.SelectSingleNode("set-text") != null)
-                    currentAssessmentRule.setText(ell.SelectSingleNode("set-text").InnerText.ToString().Trim());
-
-                assessEffects = element.SelectNodes("assessEffect");
-                foreach (XmlElement ell_ in assessEffects)
-                {
-                    int timeMin = int.MinValue;
-                    int timeMax = int.MinValue;
-                    tmpArgVal = ell_.GetAttribute("time-min");
-                    if (!string.IsNullOrEmpty(tmpArgVal))
-                    {
-                        timeMin = int.Parse(tmpArgVal);
-                    }
-                    tmpArgVal = ell_.GetAttribute("time-max");
-                    if (!string.IsNullOrEmpty(tmpArgVal))
-                    {
-                        timeMax = int.Parse(tmpArgVal);
-                    }
-
-                    TimedAssessmentRule tRule = (TimedAssessmentRule)currentAssessmentRule;
                     if (timeMin != int.MinValue && timeMax != int.MaxValue)
-                    {
-                        tRule.addEffect(timeMin, timeMax);
-                    }
+						tRule.addEffect(timeMin, timeMax);
                     else
-                    {
-                        tRule.addEffect();
-                    }
+						tRule.addEffect();
                 }
 
-                profile.addRule(currentAssessmentRule);
+				profile.addRule(tRule);
             }
 
-            chapter.addAssessmentProfile(profile);
+			return profile;
         }
+
+		/// <summary>
+		/// Fills the assesment rule.
+		/// </summary>
+		/// <param name="element">Element.</param>
+		/// <param name="rule">Rule.</param>
+		/// <param name="parameters">Parameters.</param>
+		private void fillAssesmentRule(XmlElement element, AssessmentRule rule, params object[] parameters){
+
+			string id = element.GetAttribute("id");
+			int importance = 0;
+			bool repeatRule = "yes".Equals (element.GetAttribute("repeatRule"));
+
+			var tmpArgVal = element.GetAttribute("importance");
+			if (!string.IsNullOrEmpty(tmpArgVal))
+			{
+				for (int j = 0; j < AssessmentRule.N_IMPORTANCE_VALUES; j++)
+					if (tmpArgVal.Equals(AssessmentRule.IMPORTANCE_VALUES[j]))
+						importance = j;
+			}
+
+			rule.setId (id);
+			rule.setImportance (importance);
+			rule.setRepeatRule (repeatRule);
+
+			rule.setConditions(DOMParserUtility.DOMParse (element.SelectSingleNode("condition"), parameters) 	as Conditions ?? new Conditions());
+
+			var concept = element.SelectSingleNode ("concept");
+			if (concept != null) rule.setConcept(concept.ToString().Trim());
+
+			var setText = element.SelectSingleNode("set-text");
+			if (setText != null) rule.setText(setText.InnerText.ToString().Trim());
+		}
     }
 }

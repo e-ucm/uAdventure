@@ -104,21 +104,21 @@ namespace uAdventure.Editor
 
             // Create the subcontrollers
             playerDataControl = new PlayerDataControl(chapter.getPlayer());
-            scenesListDataControl = new ScenesListDataControl(chapter.getScenes(), this.getPlayer().getPreviewImage());
-            cutscenesListDataControl = new CutscenesListDataControl(chapter.getCutscenes());
-            booksListDataControl = new BooksListDataControl(chapter.getBooks());
-            itemsListDataControl = new ItemsListDataControl(chapter.getItems());
-            atrezzoListDataControl = new AtrezzoListDataControl(chapter.getAtrezzo());
-            npcsListDataControl = new NPCsListDataControl(chapter.getCharacters());
-            conversationsListDataControl = new ConversationsListDataControl(chapter.getConversations());
-            TimersListDataControl timersListDataControl = new TimersListDataControl(chapter.getTimers());
-            GlobalStateListDataControl globalStatesListDataControl = new GlobalStateListDataControl(chapter.getGlobalStates());
-            MacroListDataControl macrosListDataControl = new MacroListDataControl(chapter.getMacros());
+			scenesListDataControl = new ScenesListDataControl(chapter.getObjects<Scene> (), this.getPlayer().getPreviewImage());
+			cutscenesListDataControl = new CutscenesListDataControl(chapter.getObjects<Cutscene> ());
+			booksListDataControl = new BooksListDataControl(chapter.getObjects<Book> ());
+			itemsListDataControl = new ItemsListDataControl(chapter.getObjects<Item> ());
+			atrezzoListDataControl = new AtrezzoListDataControl(chapter.getObjects<Atrezzo> ());
+			npcsListDataControl = new NPCsListDataControl(chapter.getObjects<NPC> ());
+			conversationsListDataControl = new ConversationsListDataControl(chapter.getObjects<Conversation> ());
+			TimersListDataControl timersListDataControl = new TimersListDataControl(chapter.getObjects<Timer> ());
+			GlobalStateListDataControl globalStatesListDataControl = new GlobalStateListDataControl(chapter.getObjects<GlobalState> ());
+			MacroListDataControl macrosListDataControl = new MacroListDataControl(chapter.getObjects<Macro> ());
             advancedFeaturesDataControl = new AdvancedFeaturesDataControl();
             advancedFeaturesDataControl.setTimerListDataControl(timersListDataControl);
             advancedFeaturesDataControl.setGlobalStatesListDataContorl(globalStatesListDataControl);
             advancedFeaturesDataControl.setMacrosListDataControl(macrosListDataControl);
-            this.completables = chapter.getCompletabes();
+            this.completables = chapter.getCompletabes(); 
             // assessmentProfilesDataControl = new AssessmentProfilesDataControl(chapter.getAssessmentProfiles());
             //adaptationProfilesDataControl = new AdaptationProfilesDataControl(chapter.getAdaptationProfiles());
         }

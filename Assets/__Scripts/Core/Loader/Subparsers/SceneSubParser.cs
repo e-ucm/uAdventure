@@ -1,22 +1,20 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Xml;
+using System.Linq;
 using System.Globalization;
 using System.Collections.Generic;
 
 namespace uAdventure.Core
 {
-    public class SceneSubParser_ : Subparser_
+	[DOMParser("scene")]
+	[DOMParser(typeof(Scene))]
+	public class SceneSubParser : IDOMParser
     {
         /**
          * Stores the element being parsed
          */
         private Scene scene;
-
-        /**
-         * Stores the current resources being parsed
-         */
-        private ResourcesUni currentResources;
 
         /**
          * Stores the current exit being used
@@ -40,241 +38,70 @@ namespace uAdventure.Core
          */
         private ElementReference currentElementReference;
 
-        /**
-         * Stores the current conditions being parsed
-         */
-        private Conditions currentConditions;
 
-        /**
-         * Stores the current effects being parsed
-         */
-        private Effects currentEffects;
-
-        public SceneSubParser_(Chapter chapter) : base(chapter)
+		public object DOMParse(XmlElement element, params object[] parameters)
         {
-        }
+			var chapter = parameters [0] as Chapter;
 
-        public override void ParseElement(XmlElement element)
-        {
-            XmlNodeList
-                resourcess = element.SelectNodes("resources"),
-                assets,
-                conditions,
-                effects,
-                postseffects,
-                notseffect,
-                defaultsinitialsposition = element.SelectNodes("default-initial-position"),
-                exits = element.SelectNodes("exits/exit"),
-                exitslook,
-                nextsscene = element.SelectNodes("next-scene"),
-                points,
-                objectsrefs = element.SelectNodes("objects/object-ref"),
-                charactersrefs = element.SelectNodes("characters/character-ref"),
-                atrezzosrefs = element.SelectNodes("atrezzo/atrezzo-ref"),
-                activesareas = element.SelectNodes("active-areas/active-area"),
-                barriers = element.SelectNodes("barrier"),
-                trajectorys = element.SelectNodes("trajectory");
-
-            string tmpArgVal;
-
-            string sceneId = "";
-            bool initialScene = false;
-            int playerLayer = -1;
-            float playerScale = 1.0f;
-
-            tmpArgVal = element.GetAttribute("id");
-            if (!string.IsNullOrEmpty(tmpArgVal))
-            {
-                sceneId = tmpArgVal;
-            }
-            tmpArgVal = element.GetAttribute("start");
-            if (!string.IsNullOrEmpty(tmpArgVal))
-            {
-                initialScene = tmpArgVal.Equals("yes");
-            }
-            tmpArgVal = element.GetAttribute("playerLayer");
-            if (!string.IsNullOrEmpty(tmpArgVal))
-            {
-                playerLayer = int.Parse(tmpArgVal);
-            }
-            tmpArgVal = element.GetAttribute("playerScale");
-            if (!string.IsNullOrEmpty(tmpArgVal))
-            {
-                playerScale = float.Parse(tmpArgVal, CultureInfo.InvariantCulture);
-            }
+			string sceneId = element.GetAttribute("id") ?? "";
+			bool initialScene = "yes".Equals (element.GetAttribute("start"));
+			int playerLayer = ExParsers.ParseDefault (element.GetAttribute("playerLayer"), -1);
+			float playerScale = ExParsers.ParseDefault (element.GetAttribute("playerScale"), CultureInfo.InvariantCulture, 1.0f);
 
             scene = new Scene(sceneId);
             scene.setPlayerLayer(playerLayer);
             scene.setPlayerScale(playerScale);
+
             if (initialScene)
                 chapter.setTargetId(sceneId);
 
-            if (element.SelectSingleNode("name") != null)
-                scene.setName(element.SelectSingleNode("name").InnerText);
-            if (element.SelectSingleNode("documentation") != null)
-                scene.setDocumentation(element.SelectSingleNode("documentation").InnerText);
+			var name = element.SelectSingleNode ("name");
+			if (name != null) scene.setName(name.InnerText);
 
-            //XAPI ELEMENTS
-            tmpArgVal = element.GetAttribute("class");
-            if (!string.IsNullOrEmpty(tmpArgVal))
-            {
-                scene.setXApiClass(tmpArgVal);
-            }
-            tmpArgVal = element.GetAttribute("type");
-            if (!string.IsNullOrEmpty(tmpArgVal))
-            {
-                scene.setXApiType(tmpArgVal);
-            }
+			var documentation = element.SelectSingleNode ("documentation");
+				if (documentation != null)
+				scene.setDocumentation(documentation.InnerText);
+
+			//XAPI ELEMENTS
+			scene.setXApiClass(element.GetAttribute("class") ?? "");
+			scene.setXApiType(element.GetAttribute("type") ?? "");
             //END OF XAPI
 
-            foreach (XmlElement el in resourcess)
+			foreach(var res in DOMParserUtility.DOMParse <ResourcesUni> (element.SelectNodes("resources"), parameters))
+				scene.addResources (res);
+
+			var defaultsinitialsposition = element.SelectSingleNode ("default-initial-position") as XmlElement;
+            if (defaultsinitialsposition != null)
             {
-                currentResources = new ResourcesUni();
-                tmpArgVal = el.GetAttribute("name");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    currentResources.setName(el.GetAttribute(tmpArgVal));
-                }
-
-                assets = el.SelectNodes("asset");
-                foreach (XmlElement ell in assets)
-                {
-                    string type = "";
-                    string path = "";
-
-                    tmpArgVal = ell.GetAttribute("type");
-                    if (!string.IsNullOrEmpty(tmpArgVal))
-                    {
-                        type = tmpArgVal;
-                    }
-                    tmpArgVal = ell.GetAttribute("uri");
-                    if (!string.IsNullOrEmpty(tmpArgVal))
-                    {
-                        path = tmpArgVal;
-                    }
-                    currentResources.addAsset(type, path);
-                }
-
-                conditions = el.SelectNodes("condition");
-                foreach (XmlElement ell in conditions)
-                {
-                    currentConditions = new Conditions();
-                    new ConditionSubParser_(currentConditions, chapter).ParseElement(ell);
-                    currentResources.setConditions(currentConditions);
-                }
-
-                scene.addResources(currentResources);
-            }
-
-            foreach (XmlElement el in defaultsinitialsposition)
-            {
-                int x = int.MinValue, y = int.MinValue;
-
-                tmpArgVal = el.GetAttribute("x");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    x = int.Parse(tmpArgVal);
-                }
-                tmpArgVal = el.GetAttribute("y");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    y = int.Parse(tmpArgVal);
-                }
+				int x = ExParsers.ParseDefault (defaultsinitialsposition.GetAttribute("x"), int.MinValue), 
+					y = ExParsers.ParseDefault (defaultsinitialsposition.GetAttribute("y"), int.MinValue);
 
                 scene.setDefaultPosition(x, y);
             }
 
-            foreach (XmlElement el in exits)
-            {
-                int x = 0, y = 0, width = 0, height = 0;
-                bool rectangular = true;
-                int influenceX = 0, influenceY = 0, influenceWidth = 0, influenceHeight = 0;
-                bool hasInfluence = false;
-                string idTarget = "";
-                int destinyX = int.MinValue, destinyY = int.MinValue;
-                int transitionType = 0, transitionTime = 0;
-                bool notEffects = false;
+			foreach (XmlElement el in  element.SelectNodes("exits/exit"))
+			{
+				int x 				= ExParsers.ParseDefault (el.GetAttribute("x"), 0), 
+					y 				= ExParsers.ParseDefault (el.GetAttribute("y"), 0), 
+					width 			= ExParsers.ParseDefault (el.GetAttribute("width"), 0), 
+					height 			= ExParsers.ParseDefault (el.GetAttribute("height"), 0);
 
-                tmpArgVal = el.GetAttribute("rectangular");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    rectangular = tmpArgVal.Equals("yes");
-                }
-                tmpArgVal = el.GetAttribute("x");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    x = int.Parse(tmpArgVal);
-                }
-                tmpArgVal = el.GetAttribute("y");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    y = int.Parse(tmpArgVal);
-                }
-                tmpArgVal = el.GetAttribute("width");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    width = int.Parse(tmpArgVal);
-                }
-                tmpArgVal = el.GetAttribute("height");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    height = int.Parse(tmpArgVal);
-                }
-                tmpArgVal = el.GetAttribute("hasInfluenceArea");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    hasInfluence = tmpArgVal.Equals("yes");
-                }
-                tmpArgVal = el.GetAttribute("influenceX");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    influenceX = int.Parse(tmpArgVal);
-                }
-                tmpArgVal = el.GetAttribute("influenceY");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    influenceY = int.Parse(tmpArgVal);
-                }
-                tmpArgVal = el.GetAttribute("influenceWidth");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    influenceWidth = int.Parse(tmpArgVal);
-                }
-                tmpArgVal = el.GetAttribute("influenceHeight");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    influenceHeight = int.Parse(tmpArgVal);
-                }
-                tmpArgVal = el.GetAttribute("idTarget");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    idTarget = tmpArgVal;
-                }
-                tmpArgVal = el.GetAttribute("destinyX");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    destinyX = int.Parse(tmpArgVal);
-                }
-                tmpArgVal = el.GetAttribute("destinyY");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    destinyY = int.Parse(tmpArgVal);
-                }
-                tmpArgVal = el.GetAttribute("transitionType");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    transitionType = int.Parse(tmpArgVal);
-                }
-                tmpArgVal = el.GetAttribute("transitionTime");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    transitionTime = int.Parse(tmpArgVal);
-                }
-                tmpArgVal = el.GetAttribute("not-effects");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    notEffects = tmpArgVal.Equals("yes");
-                }
+				bool rectangular 	= "yes".Equals (el.GetAttribute("rectangular") ?? "yes");
+				bool hasInfluence 	= "yes".Equals (el.GetAttribute("hasInfluenceArea"));
+
+				int influenceX 		= ExParsers.ParseDefault (el.GetAttribute("influenceX"), 0), 
+					influenceY 		= ExParsers.ParseDefault (el.GetAttribute("influenceY"), 0), 
+					influenceWidth 	= ExParsers.ParseDefault (el.GetAttribute("influenceWidth"), 0), 
+					influenceHeight = ExParsers.ParseDefault (el.GetAttribute("influenceHeight"), 0);
+
+				string idTarget 	= el.GetAttribute("idTarget") ?? "";
+				int destinyX 		= ExParsers.ParseDefault (el.GetAttribute ("destinyX"), int.MinValue), 
+					destinyY 		= ExParsers.ParseDefault (el.GetAttribute ("destinyY"), int.MinValue);
+
+				int transitionType 	= ExParsers.ParseDefault(el.GetAttribute("transitionType"), 0),
+					transitionTime 	= ExParsers.ParseDefault(el.GetAttribute("transitionTime"), 0);
+				bool notEffects 	= "yes".Equals (el.GetAttribute("not-effects"));
+
 
                 currentExit = new Exit(rectangular, x, y, width, height);
                 currentExit.setNextSceneId(idTarget);
@@ -283,107 +110,46 @@ namespace uAdventure.Core
                 currentExit.setTransitionTime(transitionTime);
                 currentExit.setTransitionType(transitionType);
                 currentExit.setHasNotEffects(notEffects);
+
                 if (hasInfluence)
                 {
                     InfluenceArea influenceArea = new InfluenceArea(influenceX, influenceY, influenceWidth, influenceHeight);
                     currentExit.setInfluenceArea(influenceArea);
                 }
 
-                exitslook = el.SelectNodes("exit-look");
-                foreach (XmlElement ell in exitslook)
+				foreach (XmlElement ell in el.SelectNodes("exit-look"))
                 {
                     currentExitLook = new ExitLook();
-                    string text = null;
-                    string cursorPath = null;
-                    string soundPath = null;
-
-                    tmpArgVal = ell.GetAttribute("text");
-                    if (!string.IsNullOrEmpty(tmpArgVal))
-                    {
-                        text = tmpArgVal;
-                    }
-                    tmpArgVal = ell.GetAttribute("cursor-path");
-                    if (!string.IsNullOrEmpty(tmpArgVal))
-                    {
-                        cursorPath = tmpArgVal;
-                    }
-                    tmpArgVal = ell.GetAttribute("sound-path");
-                    if (!string.IsNullOrEmpty(tmpArgVal))
-                    {
-                        soundPath = tmpArgVal;
-                    }
+					string text = ell.GetAttribute("text");
+					string cursorPath = ell.GetAttribute("cursor-path");
+					string soundPath = ell.GetAttribute("sound-path");
 
                     currentExitLook.setCursorPath(cursorPath);
                     currentExitLook.setExitText(text);
-                    if (soundPath != null)
-                    {
-                        currentExitLook.setSoundPath(soundPath);
-                    }
+					currentExitLook.setSoundPath(soundPath);
                     currentExit.setDefaultExitLook(currentExitLook);
                 }
 
                 if (el.SelectSingleNode("documentation") != null)
                     currentExit.setDocumentation(el.SelectSingleNode("documentation").InnerText);
 
-                points = el.SelectNodes("point");
-                foreach (XmlElement ell in points)
-                {
-                    int x_ = 0;
-                    int y_ = 0;
-
-                    tmpArgVal = ell.GetAttribute("x");
-                    if (!string.IsNullOrEmpty(tmpArgVal))
-                    {
-                        x_ = int.Parse(tmpArgVal);
-                    }
-                    tmpArgVal = ell.GetAttribute("y");
-                    if (!string.IsNullOrEmpty(tmpArgVal))
-                    {
-                        y_ = int.Parse(tmpArgVal);
-                    }
-                    currentPoint = new Vector2(x_, y_);
+				foreach (XmlElement ell in el.SelectNodes("point"))
+				{
+					currentPoint = new Vector2(
+						ExParsers.ParseDefault (ell.GetAttribute("x"), 0), 
+						ExParsers.ParseDefault (ell.GetAttribute("y"), 0));
                     currentExit.addPoint(currentPoint);
                 }
 
-                conditions = el.SelectNodes("condition");
-                foreach (XmlElement ell in conditions)
-                {
-                    currentConditions = new Conditions();
-                    new ConditionSubParser_(currentConditions, chapter).ParseElement(ell);
-                    currentExit.setConditions(currentConditions);
-                }
-
-
-                effects = el.SelectNodes("effect");
-                foreach (XmlElement ell in effects)
-                {
-                    currentEffects = new Effects();
-                    new EffectSubParser_(currentEffects, chapter).ParseElement(ell);
-                    currentExit.setEffects(currentEffects);
-                }
-
-                notseffect = el.SelectNodes("not-effect");
-                foreach (XmlElement ell in notseffect)
-                {
-                    currentEffects = new Effects();
-                    new EffectSubParser_(currentEffects, chapter).ParseElement(ell);
-                    currentExit.setNotEffects(currentEffects);
-                }
-
-                postseffects = el.SelectNodes("post-effect");
-                foreach (XmlElement ell in postseffects)
-                {
-                    currentEffects = new Effects();
-                    new EffectSubParser_(currentEffects, chapter).ParseElement(ell);
-                    currentExit.setPostEffects(currentEffects);
-                }
-
+				currentExit.setConditions(DOMParserUtility.DOMParse (el.SelectSingleNode("condition"), parameters) 	as Conditions ?? new Conditions());
+				currentExit.setEffects(DOMParserUtility.DOMParse (el.SelectSingleNode("effect"), parameters) 		as Effects ?? new Effects());
+				currentExit.setNotEffects(DOMParserUtility.DOMParse (el.SelectSingleNode("not-effect"), parameters) as Effects ?? new Effects());
+				currentExit.setPostEffects(DOMParserUtility.DOMParse (el.SelectSingleNode("post-effect"), parameters) as Effects ?? new Effects());
 
                 if (currentExit.getNextScenes().Count > 0)
                 {
                     foreach (NextScene nextScene in currentExit.getNextScenes())
                     {
-
                         Exit exit = (Exit)currentExit;
                         exit.setNextScenes(new List<NextScene>());
                         exit.setDestinyX(nextScene.getPositionX());
@@ -417,38 +183,13 @@ namespace uAdventure.Core
             }
 
 
-            foreach (XmlElement el in nextsscene)
+			foreach (XmlElement el in element.SelectNodes("next-scene"))
             {
-                string idTarget = "";
-                int x = int.MinValue, y = int.MinValue;
-                int transitionType = 0, transitionTime = 0;
-
-
-                tmpArgVal = el.GetAttribute("idTarget");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    idTarget = tmpArgVal;
-                }
-                tmpArgVal = el.GetAttribute("x");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    x = int.Parse(tmpArgVal);
-                }
-                tmpArgVal = el.GetAttribute("y");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    y = int.Parse(tmpArgVal);
-                }
-                tmpArgVal = el.GetAttribute("transitionType");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    transitionType = int.Parse(tmpArgVal);
-                }
-                tmpArgVal = el.GetAttribute("transitionTime");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    transitionTime = int.Parse(tmpArgVal);
-                }
+				string idTarget = el.GetAttribute("idTarget") ?? "";
+				int x 				= ExParsers.ParseDefault (el.GetAttribute ("x"), int.MinValue), 
+					y 				= ExParsers.ParseDefault (el.GetAttribute ("y"), int.MinValue),
+					transitionType 	= ExParsers.ParseDefault (el.GetAttribute ("transitionType"), 0), 
+					transitionTime 	= ExParsers.ParseDefault (el.GetAttribute ("transitionTime"), 0);
 
                 currentNextScene = new NextScene(idTarget, x, y);
                 currentNextScene.setTransitionType((NextSceneEnumTransitionType)transitionType);
@@ -456,338 +197,82 @@ namespace uAdventure.Core
 
                 currentNextScene.setExitLook(currentExitLook);
 
-
-                conditions = el.SelectNodes("condition");
-                foreach (XmlElement ell in conditions)
-                {
-                    currentConditions = new Conditions();
-                    new ConditionSubParser_(currentConditions, chapter).ParseElement(ell);
-                    currentNextScene.setConditions(currentConditions);
-                }
-
-                effects = el.SelectNodes("effect");
-                foreach (XmlElement ell in effects)
-                {
-                    currentEffects = new Effects();
-                    new EffectSubParser_(currentEffects, chapter).ParseElement(ell);
-                    currentNextScene.setEffects(currentEffects);
-                }
-                postseffects = el.SelectNodes("post-effect");
-                foreach (XmlElement ell in effects)
-                {
-                    currentEffects = new Effects();
-                    new EffectSubParser_(currentEffects, chapter).ParseElement(ell);
-                    currentNextScene.setPostEffects(currentEffects);
-                }
-
+				currentNextScene.setConditions(DOMParserUtility.DOMParse (el.SelectSingleNode("condition"), parameters) as Conditions ?? new Conditions());
+				currentNextScene.setEffects(DOMParserUtility.DOMParse (el.SelectSingleNode("effect"), parameters) 		as Effects ?? new Effects());
+				currentNextScene.setPostEffects(DOMParserUtility.DOMParse (el.SelectSingleNode("post-effect"), parameters) as Effects ?? new Effects());
             }
 
-
-            foreach (XmlElement el in objectsrefs)
-            {
-                string idTarget = "";
-                int x = 0, y = 0;
-                float scale = 0;
-                int layer = 0;
-                int influenceX = 0, influenceY = 0, influenceWidth = 0, influenceHeight = 0;
-                bool hasInfluence = false;
-
-                tmpArgVal = el.GetAttribute("idTarget");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    idTarget = tmpArgVal;
-                }
-                tmpArgVal = el.GetAttribute("x");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    x = int.Parse(tmpArgVal);
-                }
-                tmpArgVal = el.GetAttribute("y");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    y = int.Parse(tmpArgVal);
-                }
-                tmpArgVal = el.GetAttribute("scale");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    scale = float.Parse(tmpArgVal, CultureInfo.InvariantCulture);
-                }
-                tmpArgVal = el.GetAttribute("layer");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    layer = int.Parse(tmpArgVal);
-                }
-                tmpArgVal = el.GetAttribute("hasInfluenceArea");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    hasInfluence = tmpArgVal.Equals("yes");
-                }
-                tmpArgVal = el.GetAttribute("layer");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    layer = int.Parse(tmpArgVal);
-                }
-                tmpArgVal = el.GetAttribute("influenceX");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    influenceX = int.Parse(tmpArgVal);
-                }
-                tmpArgVal = el.GetAttribute("influenceY");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    influenceY = int.Parse(tmpArgVal);
-                }
-                tmpArgVal = el.GetAttribute("influenceWidth");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    influenceWidth = int.Parse(tmpArgVal);
-                }
-                tmpArgVal = el.GetAttribute("influenceHeight");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    influenceHeight = int.Parse(tmpArgVal);
-                }
-
-                // This is for maintain the back-compatibility: in previous dtd versions layer has -1 as default value and this is
-                // an erroneous value. This reason, if this value is -1, it will be changed to 0. Now in dtd there are not default value
-                // for layer
-                if (layer == -1)
-                    layer = 0;
-
-                currentElementReference = new ElementReference(idTarget, x, y, layer);
-                if (hasInfluence)
-                {
-                    InfluenceArea influenceArea = new InfluenceArea(influenceX, influenceY, influenceWidth, influenceHeight);
-                    currentElementReference.setInfluenceArea(influenceArea);
-                }
-                if (scale > 0.001 || scale < -0.001)
-                    currentElementReference.setScale(scale);
-
-                if (el.SelectSingleNode("documentation") != null)
-                    currentElementReference.setDocumentation(el.SelectSingleNode("documentation").InnerText);
-
-                conditions = el.SelectNodes("condition");
-                foreach (XmlElement ell in conditions)
-                {
-                    currentConditions = new Conditions();
-                    new ConditionSubParser_(currentConditions, chapter).ParseElement(ell);
-                    currentElementReference.setConditions(currentConditions);
-                }
-
+			foreach (XmlElement el in element.SelectNodes("objects/object-ref"))
+			{
+				currentElementReference = parseElementReference (el, parameters);
                 scene.addItemReference(currentElementReference);
             }
 
-            foreach (XmlElement el in charactersrefs)
+			foreach (XmlElement el in element.SelectNodes("characters/character-ref"))
             {
-                string idTarget = "";
-                int x = 0, y = 0;
-                float scale = 0;
-                int layer = 0;
-                int influenceX = 0, influenceY = 0, influenceWidth = 0, influenceHeight = 0;
-                bool hasInfluence = false;
-
-                tmpArgVal = el.GetAttribute("idTarget");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    idTarget = tmpArgVal;
-                }
-                tmpArgVal = el.GetAttribute("x");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    x = int.Parse(tmpArgVal);
-                }
-                tmpArgVal = el.GetAttribute("y");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    y = int.Parse(tmpArgVal);
-                }
-                tmpArgVal = el.GetAttribute("scale");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    scale = float.Parse(tmpArgVal, CultureInfo.InvariantCulture);
-                }
-                tmpArgVal = el.GetAttribute("layer");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    layer = int.Parse(tmpArgVal);
-                }
-                tmpArgVal = el.GetAttribute("hasInfluenceArea");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    hasInfluence = tmpArgVal.Equals("yes");
-                }
-                tmpArgVal = el.GetAttribute("layer");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    layer = int.Parse(tmpArgVal);
-                }
-                tmpArgVal = el.GetAttribute("influenceX");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    influenceX = int.Parse(tmpArgVal);
-                }
-                tmpArgVal = el.GetAttribute("influenceY");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    influenceY = int.Parse(tmpArgVal);
-                }
-                tmpArgVal = el.GetAttribute("influenceWidth");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    influenceWidth = int.Parse(tmpArgVal);
-                }
-                tmpArgVal = el.GetAttribute("influenceHeight");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    influenceHeight = int.Parse(tmpArgVal);
-                }
-
-                // This is for maintain the back-compatibility: in previous dtd versions layer has -1 as default value and this is
-                // an erroneous value. This reason, if this value is -1, it will be changed to 0. Now in dtd there are not default value
-                // for layer
-                if (layer == -1)
-                    layer = 0;
-
-                currentElementReference = new ElementReference(idTarget, x, y, layer);
-                if (hasInfluence)
-                {
-                    InfluenceArea influenceArea = new InfluenceArea(influenceX, influenceY, influenceWidth, influenceHeight);
-                    currentElementReference.setInfluenceArea(influenceArea);
-                }
-                if (scale > 0.001 || scale < -0.001)
-                    currentElementReference.setScale(scale);
-
-                if (el.SelectSingleNode("documentation") != null)
-                    currentElementReference.setDocumentation(el.SelectSingleNode("documentation").InnerText);
-
-                conditions = el.SelectNodes("condition");
-                foreach (XmlElement ell in conditions)
-                {
-                    currentConditions = new Conditions();
-                    new ConditionSubParser_(currentConditions, chapter).ParseElement(ell);
-                    currentElementReference.setConditions(currentConditions);
-                }
-
+				currentElementReference = parseElementReference (el, parameters);
                 scene.addCharacterReference(currentElementReference);
+				Debug.Log ("Character found");
             }
 
-            foreach (XmlElement el in atrezzosrefs)
-            {
-                string idTarget = "";
-                int x = 0, y = 0;
-                float scale = 0;
-                int layer = 0;
-                int influenceX = 0, influenceY = 0, influenceWidth = 0, influenceHeight = 0;
-                bool hasInfluence = false;
-
-                tmpArgVal = el.GetAttribute("idTarget");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    idTarget = tmpArgVal;
-                }
-                tmpArgVal = el.GetAttribute("x");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    x = int.Parse(tmpArgVal);
-                }
-                tmpArgVal = el.GetAttribute("y");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    y = int.Parse(tmpArgVal);
-                }
-                tmpArgVal = el.GetAttribute("scale");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    scale = float.Parse(tmpArgVal, CultureInfo.InvariantCulture);
-                }
-                tmpArgVal = el.GetAttribute("layer");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    layer = int.Parse(tmpArgVal);
-                }
-                tmpArgVal = el.GetAttribute("hasInfluenceArea");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    hasInfluence = tmpArgVal.Equals("yes");
-                }
-                tmpArgVal = el.GetAttribute("layer");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    layer = int.Parse(tmpArgVal);
-                }
-                tmpArgVal = el.GetAttribute("influenceX");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    influenceX = int.Parse(tmpArgVal);
-                }
-                tmpArgVal = el.GetAttribute("influenceY");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    influenceY = int.Parse(tmpArgVal);
-                }
-                tmpArgVal = el.GetAttribute("influenceWidth");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    influenceWidth = int.Parse(tmpArgVal);
-                }
-                tmpArgVal = el.GetAttribute("influenceHeight");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    influenceHeight = int.Parse(tmpArgVal);
-                }
-
-
-                // This is for maintain the back-compatibility: in previous dtd versions layer has -1 as default value and this is
-                // an erroneous value. This reason, if this value is -1, it will be changed to 0. Now in dtd there are not default value
-                // for layer
-                if (layer == -1)
-                    layer = 0;
-
-                currentElementReference = new ElementReference(idTarget, x, y, layer);
-                if (hasInfluence)
-                {
-                    InfluenceArea influenceArea = new InfluenceArea(influenceX, influenceY, influenceWidth, influenceHeight);
-                    currentElementReference.setInfluenceArea(influenceArea);
-                }
-                if (scale > 0.001 || scale < -0.001)
-                    currentElementReference.setScale(scale);
-
-                if (el.SelectSingleNode("documentation") != null)
-                    currentElementReference.setDocumentation(el.SelectSingleNode("documentation").InnerText);
-
-                conditions = el.SelectNodes("condition");
-                foreach (XmlElement ell in conditions)
-                {
-                    currentConditions = new Conditions();
-                    new ConditionSubParser_(currentConditions, chapter).ParseElement(ell);
-                    currentElementReference.setConditions(currentConditions);
-                }
-
+			foreach (XmlElement el in element.SelectNodes("atrezzo/atrezzo-ref"))
+			{
+				currentElementReference = parseElementReference (el, parameters);
                 scene.addAtrezzoReference(currentElementReference);
             }
 
-            foreach (XmlElement el in activesareas)
-            {
-                new ActiveAreaSubParser_(chapter, scene, scene.getActiveAreas().Count).ParseElement(el);
-            }
+			foreach(var activeArea in DOMParserUtility.DOMParse<ActiveArea>(element.SelectNodes("active-areas/active-area"), parameters).ToList())
+				scene.addActiveArea (activeArea);
+				
+			foreach(var barrier in DOMParserUtility.DOMParse<Barrier>(element.SelectNodes("barrier"), parameters).ToList())
+				scene.addBarrier (barrier);
 
-            foreach (XmlElement el in barriers)
-            {
-                new BarrierSubParser_(chapter, scene, scene.getBarriers().Count).ParseElement(el);
-            }
-
-            foreach (XmlElement el in trajectorys)
-            {
-                new TrajectorySubParser_(chapter, scene).ParseElement(el);
-            }
+			foreach(var trajectory in DOMParserUtility.DOMParse<Trajectory>(element.SelectNodes("trajectory"), parameters).ToList())
+				scene.setTrajectory (trajectory);
 
 
+            if (scene != null) TrajectoryFixer.fixTrajectory(scene);
 
-            if (scene != null)
-            {
-                TrajectoryFixer.fixTrajectory(scene);
-            }
-            chapter.addScene(scene);
+			return scene;
         }
+
+		private ElementReference parseElementReference(XmlElement element, params object[] parameters){
+			string idTarget = element.GetAttribute("idTarget") ?? "";	
+
+			int x = ExParsers.ParseDefault (element.GetAttribute ("x"), 0), 
+				y = ExParsers.ParseDefault (element.GetAttribute ("y"), 0);
+
+			float scale = ExParsers.ParseDefault (element.GetAttribute("scale"), NumberFormatInfo.CurrentInfo, 0f);
+			int layer = ExParsers.ParseDefault (element.GetAttribute("layer"), 0);
+
+			int influenceX 		= ExParsers.ParseDefault (element.GetAttribute("influenceX"), 0), 
+				influenceY 		= ExParsers.ParseDefault (element.GetAttribute("influenceY"), 0), 
+				influenceWidth 	= ExParsers.ParseDefault (element.GetAttribute("influenceWidth"), 0), 
+				influenceHeight = ExParsers.ParseDefault (element.GetAttribute("influenceHeight"), 0);
+
+			bool hasInfluence = "yes".Equals (element.GetAttribute("hasInfluenceArea"));
+
+			// This is for maintain the back-compatibility: in previous dtd versions layer has -1 as default value and this is
+			// an erroneous value. This reason, if this value is -1, it will be changed to 0. Now in dtd there are not default value
+			// for layer
+			if (layer == -1)
+				layer = 0;
+
+			var currentElementReference = new ElementReference(idTarget, x, y, layer);
+			if (hasInfluence)
+			{
+				InfluenceArea influenceArea = new InfluenceArea(influenceX, influenceY, influenceWidth, influenceHeight);
+				currentElementReference.setInfluenceArea(influenceArea);
+			}
+			if (scale > 0.001 || scale < -0.001)
+				currentElementReference.setScale(scale);
+
+			if (element.SelectSingleNode("documentation") != null)
+				currentElementReference.setDocumentation(element.SelectSingleNode("documentation").InnerText);
+
+			currentElementReference.setConditions(DOMParserUtility.DOMParse (element.SelectSingleNode("condition"), parameters) as Conditions ?? new Conditions());
+
+			return currentElementReference;
+		}
     }
 }

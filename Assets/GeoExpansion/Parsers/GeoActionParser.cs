@@ -49,32 +49,17 @@ namespace uAdventure.Geo
                     break;
             }
 
-            ParseBasic(element, r, parameters[0] as Chapter);
+            ParseBasic(element, r, parameters);
 
             return r;
         }
 
-        private void ParseBasic(XmlElement element, GeoAction action, Chapter chapter)
+		private void ParseBasic(XmlElement element, GeoAction action, params object[] parameters)
         {
-            Conditions conditions = new Conditions();
-            ConditionSubParser_ cp = new ConditionSubParser_(conditions, chapter);
-            var conditionsNode = element.SelectSingleNode("condition");
-            if(conditionsNode != null)
-            {
-                 cp.ParseElement(conditionsNode as XmlElement);
-            }
 
-            action.Conditions = conditions;
+			action.Conditions = DOMParserUtility.DOMParse (element.SelectSingleNode("condition"), parameters) as Conditions ?? new Conditions();
+			action.Effects = DOMParserUtility.DOMParse (element.SelectSingleNode("effect"), parameters) 	  as Effects ?? new Effects();
 
-            Effects effects = new Effects();
-            EffectSubParser_ ep = new EffectSubParser_(effects, chapter);
-            var effectsNode = element.SelectSingleNode("effect");
-            if(effectsNode != null)
-            {
-                ep.ParseElement(effectsNode as XmlElement);
-            }
-
-            action.Effects = effects;
         }
     }
 }

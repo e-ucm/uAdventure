@@ -35,6 +35,8 @@ namespace uAdventure.Core
 			if(!string.IsNullOrEmpty (maxsoundtime))frame.setMaxSoundTime(int.Parse(maxsoundtime));
 
 			frame.addResources(DOMParserUtility.DOMParse (element.SelectSingleNode("resources"), parameters) as ResourcesUni);
+
+			return frame;
         }
     }
 }

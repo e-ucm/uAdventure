@@ -22,7 +22,7 @@ namespace uAdventure.Core {
 					asset.GetAttribute("uri") ?? "");
 			}
 
-			r.setConditions(DOMParserUtility.DOMParse (element.SelectSingleNode("condition") as XmlElement, parameters) ?? new Conditions());
+			r.setConditions(DOMParserUtility.DOMParse<Conditions>(element.SelectSingleNode("condition"), parameters) ?? new Conditions());
 
 			return r;
 		}

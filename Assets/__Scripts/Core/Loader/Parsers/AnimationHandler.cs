@@ -7,16 +7,9 @@ namespace uAdventure.Core
     public class AnimationHandler_
     {
         /**
-         * Resources to store the current resources being read
-         */
-        ResourcesUni currentResources;
-        /**
          * Animation being read.
          */
         private Animation animation;
-
-        private Frame frame;
-        private Transition transition;
 
         private ImageLoaderFactory factory;
 
@@ -32,12 +25,6 @@ namespace uAdventure.Core
 
             XmlElement element = xmld.DocumentElement;
 
-            XmlNodeList
-                frames = element.SelectNodes("/animation/frame"),
-                transitions = element.SelectNodes("/animation/transition"),
-                resources = element.SelectNodes("/animation/resources"),
-                assets;
-
             string tmpArgVal;
 
             XmlNode animationNode = element.SelectSingleNode("/animation");
@@ -50,72 +37,29 @@ namespace uAdventure.Core
                 animation.getTransitions().Clear();
             }
 
-            tmpArgVal = animationNode.Attributes["slides"].Value;
-            if (!string.IsNullOrEmpty(tmpArgVal))
-            {
-                if (tmpArgVal.Equals("yes"))
-                    animation.setSlides(true);
-                else
-                    animation.setSlides(false);
-            }
-
-            tmpArgVal = animationNode.Attributes["usetransitions"].Value;
-            if (!string.IsNullOrEmpty(tmpArgVal))
-            {
-                if (tmpArgVal.Equals("yes"))
-                    animation.setUseTransitions(true);
-                else
-                    animation.setUseTransitions(false);
-            }
+			animation.setSlides("yes".Equals (animationNode.Attributes["slides"].Value));
+			animation.setUseTransitions("yes".Equals (animationNode.Attributes["usetransitions"].Value));
 
             if (element.SelectSingleNode("documentation") != null)
                 animation.setDocumentation(element.SelectSingleNode("documentation").InnerText);
 
-            foreach (XmlElement el in frames)
-            {
-                new FrameSubParser_(animation).ParseElement(el);
-            }
-            foreach (XmlElement el in transitions)
-            {
-                new TransitionSubParser_(animation).ParseElement(el);
-            }
+			// FRAMES
+			foreach (var frame in DOMParserUtility.DOMParse<Frame>(element.SelectNodes("/animation/frame")))
+				animation.addFrame (animation.getFrames ().Count - 1, frame);
 
-            foreach (XmlElement el in resources)
-            {
-                currentResources = new ResourcesUni();
-                tmpArgVal = el.GetAttribute("name");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    currentResources.setName(el.GetAttribute(tmpArgVal));
-                }
+			// TRANSITIONS
+			foreach (var transition in DOMParserUtility.DOMParse<Transition>(element.SelectNodes("/animation/transition")))
+				animation.getTransitions ().Add (transition);
 
-                assets = el.SelectNodes("asset");
-                foreach (XmlElement ell in assets)
-                {
-                    string type = "";
-                    string path = "";
 
-                    tmpArgVal = ell.GetAttribute("type");
-                    if (!string.IsNullOrEmpty(tmpArgVal))
-                    {
-                        type = tmpArgVal;
-                    }
-                    tmpArgVal = ell.GetAttribute("uri");
-                    if (!string.IsNullOrEmpty(tmpArgVal))
-                    {
-                        path = tmpArgVal;
-                    }
-                    currentResources.addAsset(type, path);
-                }
-
-                animation.addResources(currentResources);
-            }
+			// RESOURCES
+			foreach(var res in DOMParserUtility.DOMParse <ResourcesUni> (element.SelectNodes("/animation/resources")))
+				animation.addResources(res);
 
         }
 
         public Animation getAnimation()
         {
-
             return animation;
         }
     }

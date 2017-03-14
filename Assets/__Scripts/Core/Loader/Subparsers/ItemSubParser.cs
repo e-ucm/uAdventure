@@ -34,7 +34,7 @@ namespace uAdventure.Core
 			parsedObject.setDescriptions(DOMParserUtility.DOMParse<Description>(element.SelectNodes ("description")).ToList());
 
 			// ACTIONS
-			foreach(var res in DOMParserUtility.DOMParse <Action> (element.SelectNodes("actions"), parameters))
+			foreach(var res in DOMParserUtility.DOMParse <Action> (element.SelectSingleNode("actions").ChildNodes, parameters))
 				parsedObject.addAction (res);
 
 			return parsedObject;
