@@ -75,69 +75,44 @@ namespace uAdventure.Editor
         [MenuItem("eAdventure/Open eAdventure editor")]
         public static void Init()
         {
-            if (!Controller.getInstance().Initialized())
-            {
-                Controller.resetInstance();
-                Language.Initialize();
-                Controller.getInstance().init();
-            }
-
-
             thisWindowReference = EditorWindow.GetWindow<EditorWindowBase>();
-
-            redoTexture = (Texture2D)Resources.Load("EAdventureData/img/icons/redo", typeof(Texture2D));
-            undoTexture = (Texture2D)Resources.Load("EAdventureData/img/icons/undo", typeof(Texture2D));
-            
-            adaptationTexture = (Texture2D)Resources.Load("EAdventureData/img/icons/adaptationProfiles", typeof(Texture2D));
-
-            thisWindowReference.InitGUI();
             thisWindowReference.Show();
-
-            fileMenu = new FileMenu();
-            editMenu = new EditMenu();
-            adventureMenu = new AdventureMenu();
-            chaptersMenu = new ChaptersMenu();
-            runMenu = new RunMenu();
-            configurationMenu = new ConfigurationMenu();
-            aboutMenu = new AboutMenu();
         }
 
-        public void InitGUI()
-        {
-            zeroRect = new Rect(0, 0, 0, 0);
+        public void OnEnable()
+		{
+			if (!thisWindowReference)
+				thisWindowReference = this;
+			else
+				DestroyImmediate (thisWindowReference);
 
-            chapterWindow = new ChapterWindow(zeroRect, new GUIContent(TC.get("Element.Name0")), "Window");
+			if (!Controller.getInstance().Initialized())
+			{
+				Controller.resetInstance();
+				Language.Initialize();
+				Controller.getInstance().init();
+			}
 
-            // Extensions of the editor
-            extensions = EditorWindowBaseExtensionFactory.Instance.CreateAllExistingExtensions(zeroRect, "Window");
-            /*extensions.Add(new ScenesWindow(windowRect, new GUIContent(TC.get("Element.Name1")), "Window"));
-            extensions.Add(new CutscenesWindow(windowRect, new GUIContent(TC.get("Element.Name9")), "Window"));
-            extensions.Add(new BooksWindow(windowRect, new GUIContent(TC.get("Element.Name11")), "Window"));
-            extensions.Add(new ItemsWindow(windowRect, new GUIContent(TC.get("Element.Name18")), "Window"));
-            extensions.Add(new SetItemsWindow(windowRect, new GUIContent(TC.get("Element.Name59")), "Window"));
-            extensions.Add(new PlayerWindow(windowRect, new GUIContent(TC.get("Element.Name26")), "Window"));
-            extensions.Add(new CharactersWindow(windowRect, new GUIContent(TC.get("Element.Name27")), "Window"));
-            extensions.Add(new ConversationWindow(windowRect, new GUIContent(TC.get("Element.Name31")), "Window"));
-            extensions.Add(new AdvencedFeaturesWindow(windowRect, new GUIContent(TC.get("AdvancedFeatures.Title")), "Window"));
-            extensions.Add(new AssesmentProfileWindow(windowRect, new GUIContent(Language.GetText("ASSESMENT_PROFILES")), "Window"));
-            extensions.Add(new MapSceneWindow(windowRect, new GUIContent("MapSceneWindow"), "Window"));
-            extensions.Add(new GeoElementWindow(windowRect, new GUIContent("GeoElements"), "Window"));
-            extensions.Add(new QRCodeEditorWindow(windowRect, new GUIContent("QR Codes"), "Window"));*/
-
-            var ops = new GUILayoutOption[] {
-                    GUILayout.ExpandWidth(true),
-                    GUILayout.ExpandHeight(true)
-                };
-            foreach (var e in extensions)
-            {
-                e.Options = ops;
-                e.OnRequestMainView += (thisWindowReference as EditorWindowBase).RequestMainView;
-                e.OnRequestRepaint += thisWindowReference.Repaint;
-            }
-            //adapatationProfileWindow = new AdaptationProfileWindow(windowRect,
-            //    new GUIContent(Language.GetText("ADAPTATION_PROFILES")), "Window");
-            
+			if(!redoTexture)
+				redoTexture = (Texture2D)Resources.Load("EAdventureData/img/icons/redo", typeof(Texture2D));
+			if(!undoTexture)
+				undoTexture = (Texture2D)Resources.Load("EAdventureData/img/icons/undo", typeof(Texture2D));
+			if(!adaptationTexture)
+				adaptationTexture = (Texture2D)Resources.Load("EAdventureData/img/icons/adaptationProfiles", typeof(Texture2D));
+			
+			fileMenu = new FileMenu();
+			editMenu = new EditMenu();
+			adventureMenu = new AdventureMenu();
+			chaptersMenu = new ChaptersMenu();
+			runMenu = new RunMenu();
+			configurationMenu = new ConfigurationMenu();
+			aboutMenu = new AboutMenu();
+     
         }
+
+		public static void RefreshLanguage(){
+			thisWindowReference.OnEnable ();
+		}
 
         public static void RefreshChapter()
         {
@@ -145,8 +120,33 @@ namespace uAdventure.Editor
             thisWindowReference.openedWindow = EditorWindowType.Chapter;
         }
 
+		void InitWindows(){
+			if (chapterWindow == null) {
+				zeroRect = new Rect(0, 0, 0, 0);    
+				chapterWindow = new ChapterWindow(zeroRect, new GUIContent(TC.get("Element.Name0")), "Window");
+
+				// Extensions of the editor
+				extensions = EditorWindowBaseExtensionFactory.Instance.CreateAllExistingExtensions(zeroRect, "Window");
+
+				var ops = new GUILayoutOption[] {
+					GUILayout.ExpandWidth(true),
+					GUILayout.ExpandHeight(true)
+				};
+				foreach (var e in extensions)
+				{
+					e.Options = ops;
+					e.OnRequestMainView += (thisWindowReference as EditorWindowBase).RequestMainView;
+					e.OnRequestRepaint += thisWindowReference.Repaint;
+				}   
+			}
+		}
+
         void OnGUI()
-        {
+		{
+			if (!Controller.getInstance ().Initialized ())
+				this.OnEnable ();
+
+			InitWindows ();
             /**
             UPPER MENU
             */
@@ -276,7 +276,8 @@ namespace uAdventure.Editor
 
         internal static void LanguageChanged()
         {
-            thisWindowReference.InitGUI();
+			if(thisWindowReference)
+				thisWindowReference.OnEnable();
         }
     }
 }

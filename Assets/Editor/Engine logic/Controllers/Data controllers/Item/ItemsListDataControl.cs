@@ -163,14 +163,14 @@ namespace uAdventure.Editor
                 if (itemId == null || itemId.Equals(""))
                     itemId = controller.showInputDialog(TC.get("Operation.AddItemTitle"), TC.get("Operation.AddItemMessage"), TC.get("Operation.AddItemDefaultValue"));
 
-                if (itemId != null && controller.isElementIdValid(itemId))
-                {
-                    Item newItem = new Item(itemId);
-                    itemsList.Add(newItem);
-                    itemsDataControlList.Add(new ItemDataControl(newItem));
-                    controller.getIdentifierSummary().addItemId(itemId);
-                    elementAdded = true;
-                }
+				if (!controller.isElementIdValid(itemId))
+					itemId = controller.makeElementValid(itemId);
+				
+                Item newItem = new Item(itemId);
+                itemsList.Add(newItem);
+                itemsDataControlList.Add(new ItemDataControl(newItem));
+                controller.getIdentifierSummary().addItemId(itemId);
+                elementAdded = true;
             }
 
             return elementAdded;
@@ -186,12 +186,10 @@ namespace uAdventure.Editor
 
             Item newElement = (Item)(((Item)(dataControl.getContent())).Clone());
             string id = newElement.getId();
-            int i = 1;
-            do
-            {
-                id = newElement.getId() + i;
-                i++;
-            } while (!controller.isElementIdValid(id, false));
+
+			if (!controller.isElementIdValid(id))
+				id = controller.makeElementValid(id);
+			
             newElement.setId(id);
             itemsList.Add(newElement);
             itemsDataControlList.Add(new ItemDataControl(newElement));

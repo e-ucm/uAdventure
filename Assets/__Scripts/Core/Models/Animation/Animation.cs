@@ -224,6 +224,16 @@ namespace uAdventure.Core
             return frame;
         }
 
+		/// <summary>
+		/// Adds the frame in the end of the animation
+		/// </summary>
+		/// <returns>The frame.</returns>
+		/// <param name="frame">Frame.</param>
+		public Frame addFrame(Frame frame){
+			frames.Add ((Frame)frame.Clone());
+			return frame;
+		}
+
         /**
         * Adds a new frame after the one at the given index. If the index is
         * invalid it adds it at the end. If the frame is null it creates a new one.

@@ -281,5 +281,16 @@ namespace uAdventure.Editor
         }
 
         public abstract List<Searchable> getPathToDataControl(Searchable dataControl);
+
+		public virtual void MoveElement(DataControl element, int fromPos, int toPos){
+			var direction = fromPos > toPos ? -1 : 1;
+			if (fromPos != -1) {
+				while (fromPos != toPos) {
+					if (direction > 0) moveElementDown (element);
+					else moveElementUp (element);
+					fromPos += direction;
+				}
+			}
+		}
     }
 }

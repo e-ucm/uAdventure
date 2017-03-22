@@ -212,7 +212,6 @@ namespace uAdventure.Core
             {
 				currentElementReference = parseElementReference (el, parameters);
                 scene.addCharacterReference(currentElementReference);
-				Debug.Log ("Character found");
             }
 
 			foreach (XmlElement el in element.SelectNodes("atrezzo/atrezzo-ref"))

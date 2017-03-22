@@ -193,19 +193,16 @@ namespace uAdventure.Editor
 
         protected override void OnReorder(ReorderableList r)
         {
-            List<Item> previousList = Controller.getInstance()
-                              .getCharapterList()
-                              .getSelectedChapterData()
-                              .getItems();
+			var itemsListDataControl = Controller.getInstance ()
+				.getCharapterList ().getSelectedChapterDataControl ().getItemsList ();
 
-            List<Item> reordered = new List<Item>();
-            foreach (string name in r.list)
-                reordered.Add(previousList.Find(s => s.getId() == name));
+			var toPos = r.index;
+			var fromPos = itemsListDataControl.getItems ().FindIndex (i => i.getId () == r.list [r.index] as string);
+
+			itemsListDataControl.MoveElement (itemsListDataControl.getItems ()[fromPos], fromPos, toPos);
+		}
 
 
-            previousList.Clear();
-            previousList.AddRange(reordered);
-        }
 
         protected override void OnButton()
         {

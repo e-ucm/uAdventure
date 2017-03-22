@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace uAdventure.Editor
 {
-    public class EditorWindowBaseExtensionFactory : MonoBehaviour
+    public class EditorWindowBaseExtensionFactory 
     {
 
         private static EditorWindowBaseExtensionFactory instance;

@@ -30,10 +30,10 @@ namespace uAdventure.Editor
             var windowWidth = m_Rect.width;
 
             GUILayout.Space(30);
-            for (int i = 0; i < Controller.getInstance().getCharapterList().getSelectedChapterData().getConversations().Count; i++)
+			for (int i = 0; i < Controller.getInstance().getCharapterList().getSelectedChapterDataControl().getConversationsList ().getConversations().Count; i++)
             {
                 GUILayout.BeginHorizontal();
-                GUILayout.Box(Controller.getInstance().getCharapterList().getSelectedChapterData().getConversations()[i].getId(), GUILayout.Width(windowWidth * 0.65f));
+				GUILayout.Box(Controller.getInstance().getCharapterList().getSelectedChapterDataControl().getConversationsList ().getConversations()[i].getId(), GUILayout.Width(windowWidth * 0.65f));
                 if (GUILayout.Button("Edit conversation", GUILayout.MaxWidth(windowWidth * 0.3f)))
                     OpenConversationEditor(i);
 
@@ -45,10 +45,10 @@ namespace uAdventure.Editor
         public void OpenConversationEditor(int conversationIndex)
         {
             GameRources.GetInstance().selectedConversationIndex = conversationIndex;
-            if (conversationIndex < 0 || conversationIndex >= Controller.getInstance().getCharapterList().getSelectedChapterData().getConversations().Count)
+			if (conversationIndex < 0 || conversationIndex >= Controller.getInstance().getCharapterList().getSelectedChapterDataControl().getConversationsList ().getConversations().Count)
                 return;
 
-            var conversation = Controller.getInstance().getCharapterList().getSelectedChapterData().getConversations()[conversationIndex];
+			var conversation = Controller.getInstance().getCharapterList().getSelectedChapterDataControl().getConversationsList ().getConversations()[conversationIndex].getConversation ();
 
             if (conversationWindows.ContainsKey(conversation))
             {
@@ -58,6 +58,7 @@ namespace uAdventure.Editor
             {
                 ConversationEditorWindow convEditor = (ConversationEditorWindow)ScriptableObject.CreateInstance(typeof(ConversationEditorWindow));
                 convEditor.Init(conversation as GraphConversation);
+				conversationWindows.Add (conversation, convEditor);
             }
         }
 
@@ -124,18 +125,13 @@ namespace uAdventure.Editor
 
         protected override void OnReorder(ReorderableList r)
         {
-            List<Conversation> previousList = Controller.getInstance()
-                              .getCharapterList()
-                              .getSelectedChapterData()
-                              .getConversations();
+			var dataControlList = Controller.getInstance ()
+				.getCharapterList ().getSelectedChapterDataControl ().getConversationsList ();
 
-            List<Conversation> reordered = new List<Conversation>();
-            foreach (string name in r.list)
-                reordered.Add(previousList.Find(s => s.getId() == name));
+			var toPos = r.index;
+			var fromPos = dataControlList.getConversations ().FindIndex (i => i.getId () == r.list [r.index] as string);
 
-
-            previousList.Clear();
-            previousList.AddRange(reordered);
+			dataControlList.MoveElement (dataControlList.getConversations ()[fromPos], fromPos, toPos);
         }
 
         protected override void OnButton()

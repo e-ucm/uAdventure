@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 
 using uAdventure.Editor;
 using System;
@@ -195,8 +195,12 @@ namespace uAdventure.QR
         }
 
         protected override void OnReorder(ReorderableList r)
-        {
-            throw new NotImplementedException();
+		{
+			string idToMove = r.list [r.index] as string;
+			var temp = Controller.getInstance ().getSelectedChapterDataControl ().getObjects<QR> ();
+			QR toMove = temp.Find (qr => qr.getId () == idToMove);
+			temp.Remove (toMove);
+			temp.Insert (r.index, toMove);
         }
 
         protected override void OnSelect(ReorderableList r)
@@ -208,12 +212,7 @@ namespace uAdventure.QR
             }
 
             var newSelection = Controller.getInstance().getSelectedChapterDataControl().getObjects<QR>()[r.index];
-            if (selectedQR == newSelection)
-            {
-                selectedQR = null;
-                r.index = -1;
-            }
-            else if(newSelection != null)
+            if(newSelection != null && newSelection != selectedQR)
             {
                 selectedQR = newSelection;
                 RegenerateQR();

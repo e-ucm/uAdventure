@@ -163,16 +163,16 @@ namespace uAdventure.Editor
                     npcId = controller.showInputDialog(TC.get("Operation.AddNPCTitle"), TC.get("Operation.AddNPCMessage"), TC.get("Operation.AddNPCDefaultValue"));
 
                 // If some value was typed and the identifier is valid
-                if (npcId != null && controller.isElementIdValid(npcId))
-                {
-                    // Add thew new character
-                    NPC newNPC = new NPC(npcId);
-                    npcsList.Add(newNPC);
-                    npcsDataControlList.Add(new NPCDataControl(newNPC));
-                    controller.getIdentifierSummary().addNPCId(npcId);
-                    //controller.dataModified( );
-                    elementAdded = true;
-                }
+				if (!controller.isElementIdValid (npcId))
+					npcId = controller.makeElementValid (npcId);
+				
+                // Add thew new character
+                NPC newNPC = new NPC(npcId);
+                npcsList.Add(newNPC);
+                npcsDataControlList.Add(new NPCDataControl(newNPC));
+                controller.getIdentifierSummary().addNPCId(npcId);
+                //controller.dataModified( );
+                elementAdded = true;
             }
 
             return elementAdded;
@@ -187,13 +187,11 @@ namespace uAdventure.Editor
 
 
             NPC newElement = (NPC)(((NPC)(dataControl.getContent())).Clone());
-            string id = newElement.getId();
-            int i = 1;
-            do
-            {
-                id = newElement.getId() + i;
-                i++;
-            } while (!controller.isElementIdValid(id, false));
+			string id = newElement.getId();
+
+			if (!controller.isElementIdValid (id))
+				id = controller.makeElementValid (id);
+			
             newElement.setId(id);
             npcsList.Add(newElement);
             npcsDataControlList.Add(new NPCDataControl(newElement));

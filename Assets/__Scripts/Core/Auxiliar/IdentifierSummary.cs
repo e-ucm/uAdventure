@@ -205,7 +205,6 @@ namespace uAdventure.Core
          */
         public bool existsId(string id)
         {
-
             return globalIdentifiers.Contains(id);
         }
 

@@ -197,7 +197,14 @@ namespace uAdventure.Geo
             Controller.getInstance().getSelectedChapterDataControl().getObjects<MapScene>().RemoveAt(r.index);
         }
 
-        protected override void OnReorder(ReorderableList r) { }
+        protected override void OnReorder(ReorderableList r) 
+		{ 
+			string idToMove = r.list [r.index] as string;
+			var temp = Controller.getInstance ().getSelectedChapterDataControl ().getObjects<MapScene> ();
+			MapScene toMove = temp.Find (map => map.getId () == idToMove);
+			temp.Remove (toMove);
+			temp.Insert (r.index, toMove);
+		}
 
         protected override void OnSelect(ReorderableList r)
         {

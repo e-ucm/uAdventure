@@ -135,27 +135,27 @@ namespace uAdventure.Editor
                     if (bookId == null || bookId.Equals(""))
                         bookId = controller.showInputDialog(TC.get("Operation.AddBookTitle"), TC.get("Operation.AddBookMessage"), TC.get("Operation.AddBookDefaultValue"));
 
-                    // If some value was typed and the identifier is valid
-                    if (bookId != null && controller.isElementIdValid(bookId))
-                    {
+					// If some value was typed and the identifier is valid
+					if (!controller.isElementIdValid(bookId))
+						bookId = controller.makeElementValid(bookId);
+                    
                         // Add thew new book
-                        Book newBook = new Book(bookId);
-                        newBook.setType(bookType);
+                    Book newBook = new Book(bookId);
+                    newBook.setType(bookType);
 
-                        // Set default background
-                        ResourcesUni resources = new ResourcesUni();
-                        resources.addAsset("background", SpecialAssetPaths.ASSET_DEFAULT_BOOK_IMAGE);
-                        resources.addAsset("arrowLeftNormal", SpecialAssetPaths.ASSET_DEFAULT_ARROW_NORMAL);
-                        resources.addAsset("arrowLeftOver", SpecialAssetPaths.ASSET_DEFAULT_ARROW_OVER);
-                        newBook.addResources(resources);
+                    // Set default background
+                    ResourcesUni resources = new ResourcesUni();
+                    resources.addAsset("background", SpecialAssetPaths.ASSET_DEFAULT_BOOK_IMAGE);
+                    resources.addAsset("arrowLeftNormal", SpecialAssetPaths.ASSET_DEFAULT_ARROW_NORMAL);
+                    resources.addAsset("arrowLeftOver", SpecialAssetPaths.ASSET_DEFAULT_ARROW_OVER);
+                    newBook.addResources(resources);
 
-                        BookDataControl newDataControl = new BookDataControl(newBook);
-                        booksList.Add(newBook);
-                        booksDataControlList.Add(newDataControl);
-                        controller.getIdentifierSummary().addBookId(bookId);
-                        //controller.dataModified( );
-                        elementAdded = true;
-                    }
+                    BookDataControl newDataControl = new BookDataControl(newBook);
+                    booksList.Add(newBook);
+                    booksDataControlList.Add(newDataControl);
+                    controller.getIdentifierSummary().addBookId(bookId);
+                    //controller.dataModified( );
+                    elementAdded = true;
 
                 }
 
@@ -173,13 +173,11 @@ namespace uAdventure.Editor
 
 
             Book newElement = (Book)(((Book)(dataControl.getContent())).Clone());
-            string id = newElement.getId();
-            int i = 1;
-            do
-            {
-                id = newElement.getId() + i;
-                i++;
-            } while (!controller.isElementIdValid(id, false));
+			string id = newElement.getId();
+
+			if (!controller.isElementIdValid(id))
+				id = controller.makeElementValid(id);
+			
             newElement.setId(id);
             booksList.Add(newElement);
             booksDataControlList.Add(new BookDataControl(newElement));

@@ -117,17 +117,17 @@ namespace uAdventure.Editor
                 if (atrezzoId == null || atrezzoId.Equals(""))
                     atrezzoId = controller.showInputDialog(TC.get("Operation.AddAtrezzoTitle"), TC.get("Operation.AddAtrezzoMessage"), TC.get("Operation.AddAtrezzoDefaultValue"));
 
-                // If some value was typed and the identifier is valid
-                if (atrezzoId != null && controller.isElementIdValid(atrezzoId))
-                {
-                    // Add thew new item
-                    Atrezzo newAtrezzo = new Atrezzo(atrezzoId);
-                    atrezzoList.Add(newAtrezzo);
-                    atrezzoDataControlList.Add(new AtrezzoDataControl(newAtrezzo));
-                    controller.getIdentifierSummary().addAtrezzoId(atrezzoId);
-                    //controller.dataModified( );
-                    elementAdded = true;
-                }
+				// If some value was typed and the identifier is valid
+				if (!controller.isElementIdValid(atrezzoId))
+					atrezzoId = controller.makeElementValid(atrezzoId);
+				
+                // Add thew new item
+                Atrezzo newAtrezzo = new Atrezzo(atrezzoId);
+                atrezzoList.Add(newAtrezzo);
+                atrezzoDataControlList.Add(new AtrezzoDataControl(newAtrezzo));
+                controller.getIdentifierSummary().addAtrezzoId(atrezzoId);
+                //controller.dataModified( );
+                elementAdded = true;
             }
 
             return elementAdded;
@@ -141,13 +141,10 @@ namespace uAdventure.Editor
                 return false;
 
             Atrezzo newElement = (Atrezzo)(((Atrezzo)(dataControl.getContent())).Clone());
-            string id = newElement.getId();
-            int i = 1;
-            do
-            {
-                id = newElement.getId() + i;
-                i++;
-            } while (!controller.isElementIdValid(id, false));
+			string id = newElement.getId();
+			if (!controller.isElementIdValid(id))
+				id = controller.makeElementValid(id);
+			
             newElement.setId(id);
             atrezzoList.Add(newElement);
             atrezzoDataControlList.Add(new AtrezzoDataControl(newElement));

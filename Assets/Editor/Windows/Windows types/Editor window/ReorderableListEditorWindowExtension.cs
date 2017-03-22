@@ -136,6 +136,9 @@ namespace uAdventure.Editor
 
         protected virtual void DrawElement(Rect rect, int index, bool active, bool focused)
         {
+			if (index == -1)
+				return;
+
             var oldName = reorderableList.list[index] as string;
             if (active)
             {

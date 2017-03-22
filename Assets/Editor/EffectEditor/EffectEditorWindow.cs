@@ -117,8 +117,10 @@ namespace uAdventure.Editor
 
                 if (GUILayout.Button("-", collapseStyle, GUILayout.Width(15), GUILayout.Height(15)))
                     editor.Collapsed = true;
-                if (GUILayout.Button("X", closeStyle, GUILayout.Width(15), GUILayout.Height(15)))
-                    effects.getEffects().Remove(myEffect);
+				if (GUILayout.Button ("X", closeStyle, GUILayout.Width (15), GUILayout.Height (15))) {
+					effects.getEffects().Remove(myEffect);
+					return;
+				}
 
                 GUILayout.EndHorizontal();
 
@@ -135,7 +137,8 @@ namespace uAdventure.Editor
 
                     if (editors.ContainsKey(myEffect))
                     {
-                        editor.Window = editors[myEffect].Window;
+						editor.Window = editors[myEffect].Window;
+						editors.Remove(myEffect);
                     }
                     else
                     {
@@ -143,9 +146,8 @@ namespace uAdventure.Editor
 
                     }
 
-                    editor.Effect.setConditions(myEffect.getConditions());
-                    editors.Remove(myEffect);
-                    editors.Add(editor.Effect, editor);
+					editors.Add(editor.Effect, editor);
+					editor.Effect.setConditions(myEffect.getConditions());
                 }
 
                 //##################################################################################
@@ -196,16 +198,15 @@ namespace uAdventure.Editor
                 editor.draw();
 
                 this.effects.getEffects()[id] = editor.Effect;
-            }
 
-
-            if (Event.current.type != EventType.layout)
-            {
-                Rect lastRect = GUILayoutUtility.GetLastRect();
-                Rect myRect = editors[myEffect].Window;
-                myRect.height = lastRect.y + lastRect.height;
-                editors[myEffect].Window = myRect;
-                this.Repaint();
+				if (Event.current.type != EventType.layout)
+				{
+					Rect lastRect = GUILayoutUtility.GetLastRect();
+					Rect myRect = editor.Window;
+					myRect.height = lastRect.y + lastRect.height;
+					editor.Window = myRect;
+					this.Repaint();
+				}
             }
 
             GUI.DragWindow();
@@ -271,6 +272,11 @@ namespace uAdventure.Editor
 
         void OnGUI()
         {
+			if (effects == null) {
+				DestroyImmediate (this);
+				return;
+			}
+
             if (closeStyle == null)
             {
                 closeStyle = new GUIStyle(GUI.skin.button);

@@ -2095,7 +2095,7 @@ namespace uAdventure.Editor
                         if (elementId.Length > 0 && char.IsLetter(elementId[0]))
                         {
                             elementIdValid = isCharacterValid(elementId);
-                            if (!elementIdValid)
+							if (!elementIdValid && showError)
                                 mainWindow.showErrorDialog(TC.get("Operation.IdErrorTitle"), TC.get("Operation.IdErrorCharacter"));
                         }
                         //Show non-letter first character error

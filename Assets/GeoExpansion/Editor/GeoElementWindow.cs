@@ -281,7 +281,12 @@ namespace uAdventure.Geo
         }
 
         protected override void OnReorder(ReorderableList r)
-        {
+		{
+			string idToMove = r.list [r.index] as string;
+			var temp = Controller.getInstance ().getSelectedChapterDataControl ().getObjects<GeoElement> ();
+			GeoElement toMove = temp.Find (geoElem => geoElem.getId () == idToMove);
+			temp.Remove (toMove);
+			temp.Insert (r.index, toMove);
         }
 
         protected override void OnSelect(ReorderableList r)

@@ -44,8 +44,8 @@ namespace uAdventure.Core
                 animation.setDocumentation(element.SelectSingleNode("documentation").InnerText);
 
 			// FRAMES
-			foreach (var frame in DOMParserUtility.DOMParse<Frame>(element.SelectNodes("/animation/frame")))
-				animation.addFrame (animation.getFrames ().Count - 1, frame);
+			foreach (var frame in DOMParserUtility.DOMParse<Frame>(element.SelectNodes("/animation/frame"), animation.getImageLoaderFactory ()))
+				animation.addFrame (frame);
 
 			// TRANSITIONS
 			foreach (var transition in DOMParserUtility.DOMParse<Transition>(element.SelectNodes("/animation/transition")))

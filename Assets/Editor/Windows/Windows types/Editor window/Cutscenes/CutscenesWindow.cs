@@ -214,18 +214,13 @@ namespace uAdventure.Editor
 
         protected override void OnReorder(ReorderableList r)
         {
-            List<Cutscene> previousList = Controller.getInstance()
-                              .getCharapterList()
-                              .getSelectedChapterData()
-                              .getCutscenes();
+			var dataControlList = Controller.getInstance ()
+				.getCharapterList ().getSelectedChapterDataControl ().getCutscenesList ();
 
-            List<Cutscene> cutscenes = new List<Cutscene>();
-            foreach (string sceneName in r.list)
-                cutscenes.Add(previousList.Find(s => s.getId() == sceneName));
+			var toPos = r.index;
+			var fromPos = dataControlList.getCutscenes ().FindIndex (i => i.getId () == r.list [r.index] as string);
 
-
-            previousList.Clear();
-            previousList.AddRange(cutscenes);
+			dataControlList.MoveElement (dataControlList.getCutscenes ()[fromPos], fromPos, toPos);
         }
 
         protected override void OnButton()

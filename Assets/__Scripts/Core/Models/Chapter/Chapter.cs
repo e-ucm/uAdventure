@@ -14,10 +14,10 @@ namespace uAdventure.Core
     {
         public override string ToString()
         {
-            return "InitialScene:" + initialScene + "\nScenes: " + CollectionPrinter.PrintCollection(scenes) + "\nCutscenes: " + CollectionPrinter.PrintCollection(cutscenes) + "\nBooks: " +
+            return ""/*"InitialScene:" + initialScene + "\nScenes: " + CollectionPrinter.PrintCollection(scenes) + "\nCutscenes: " + CollectionPrinter.PrintCollection(cutscenes) + "\nBooks: " +
                    CollectionPrinter.PrintCollection(books) + "\nItems: " + CollectionPrinter.PrintCollection(items) + "\nAtrezzo: " + CollectionPrinter.PrintCollection(atrezzo) + "\n Player:" + player + "\nCharacters: " +
                    CollectionPrinter.PrintCollection(characters) + "\nConversations:" + CollectionPrinter.PrintCollection(conversations) + "\nTimers: " + CollectionPrinter.PrintCollection(timers) + "\nFlags: " + CollectionPrinter.PrintCollection(flags) + "\nVars " +
-                   CollectionPrinter.PrintCollection(vars) + "\nGlobalStates: " + CollectionPrinter.PrintCollection(globalStates) + "\nMacros: " + CollectionPrinter.PrintCollection(macros);
+                   CollectionPrinter.PrintCollection(vars) + "\nGlobalStates: " + CollectionPrinter.PrintCollection(globalStates) + "\nMacros: " + CollectionPrinter.PrintCollection(macros)*/;
         }
 
         /**
@@ -25,75 +25,12 @@ namespace uAdventure.Core
          */
         private string initialScene;
 
-        /**
-         * List of playable scenes.
-         */
-        private List<Scene> scenes;
+		private List<string> flags, vars;
 
-        /**
-         * List of cutscenes.
-         */
-        private List<Cutscene> cutscenes;
-
-        /**
-         * List of books.
-         */
-        private List<Book> books;
-
-        /**
-         * List of items (objects).
-         */
-        private List<Item> items;
-
-        /**
-         * List of atrezzo items (non interactive objects)
-         */
-        private List<Atrezzo> atrezzo;
-
-        /**
-         * The player.
-         */
-        private Player player;
-
-        /**
-         * List of characters.
-         */
-        private List<NPC> characters;
-
-        /**
-         * List of conversations.
-         */
-        private List<Conversation> conversations;
-
-        /**
-         * The list of timers (advanced options)
-         */
-        private List<Timer> timers;
-
-        /**
-         * List of the flags present in the game
-         */
-        private List<string> flags;
-
-        /**
-         * List of the vars present in the game
-         */
-        private List<string> vars;
-
-        /**
-         * List of global states
-         */
-        private List<GlobalState> globalStates;
-
-        /**
-         * List of macros
-         */
-        private List<Macro> macros;
-
-        /**
-         * List of completables
-         */
-        private List<Completable> completables;
+		/// <summary>
+		/// The player.
+		/// </summary>
+		private Player player;
 
         /**
          * Empty constructor. Sets values to null and creates empty lists.
@@ -108,23 +45,9 @@ namespace uAdventure.Core
 
         public Chapter() : base()
         {
-            // Create lists
-            scenes = new List<Scene>();
-            cutscenes = new List<Cutscene>();
-            books = new List<Book>();
-            items = new List<Item>();
-            atrezzo = new List<Atrezzo>();
-            player = new Player();
-            characters = new List<NPC>();
-            conversations = new List<Conversation>();
-            timers = new List<Timer>();
-            flags = new List<string>();
-            vars = new List<string>();
-            globalStates = new List<GlobalState>();
-            macros = new List<Macro>();
-            completables = new List<Completable>();
-
-            extensionObjects = new Dictionary<Type, IList>();
+			extensionObjects = new Dictionary<Type, IList>();
+			flags = new List<string> ();
+			vars = new List<string> ();
         }
 
         /**
@@ -140,26 +63,9 @@ namespace uAdventure.Core
         public Chapter(string title, string sceneId) : base(title)
         {
             initialScene = sceneId;
-
-            // Create lists
-            scenes = new List<Scene>();
-            cutscenes = new List<Cutscene>();
-            books = new List<Book>();
-            items = new List<Item>();
-            atrezzo = new List<Atrezzo>();
-            player = new Player();
-            characters = new List<NPC>();
-            conversations = new List<Conversation>();
-            timers = new List<Timer>();
-            // Add the scene
-            scenes.Add(new Scene(sceneId));
-            globalStates = new List<GlobalState>();
-            macros = new List<Macro>();
-            flags = new List<string>();
-            vars = new List<string>();
-            completables = new List<Completable>();
-
-            extensionObjects = new Dictionary<Type, IList>();
+			extensionObjects = new Dictionary<Type, IList>();
+			flags = new List<string> ();
+			vars = new List<string> ();
         }
 
         /**
@@ -170,7 +76,6 @@ namespace uAdventure.Core
 
         public string getTargetId()
         {
-
             return initialScene;
         }
 
@@ -226,7 +131,7 @@ namespace uAdventure.Core
         public List<Scene> getScenes()
         {
 
-            return scenes;
+			return getObjects<Scene> ();
         }
 
         /**
@@ -237,8 +142,7 @@ namespace uAdventure.Core
 
         public List<Cutscene> getCutscenes()
         {
-
-            return cutscenes;
+			return getObjects<Cutscene> ();
         }
 
         /**
@@ -248,9 +152,8 @@ namespace uAdventure.Core
          */
 
         public List<Book> getBooks()
-        {
-
-            return books;
+		{
+			return getObjects<Book> ();
         }
 
         /**
@@ -260,9 +163,8 @@ namespace uAdventure.Core
          */
 
         public List<Item> getItems()
-        {
-
-            return items;
+		{
+			return getObjects<Item> ();
         }
 
         /**
@@ -272,9 +174,8 @@ namespace uAdventure.Core
          */
 
         public List<Atrezzo> getAtrezzo()
-        {
-
-            return atrezzo;
+		{
+			return getObjects<Atrezzo> ();
         }
 
         /**
@@ -285,7 +186,6 @@ namespace uAdventure.Core
 
         public Player getPlayer()
         {
-
             return player;
         }
 
@@ -296,9 +196,8 @@ namespace uAdventure.Core
          */
 
         public List<NPC> getCharacters()
-        {
-
-            return characters;
+		{
+			return getObjects<NPC> ();
         }
 
         /**
@@ -308,9 +207,8 @@ namespace uAdventure.Core
          */
 
         public List<Conversation> getConversations()
-        {
-
-            return conversations;
+		{
+			return getObjects<Conversation> ();
         }
 
         /**
@@ -322,7 +220,6 @@ namespace uAdventure.Core
 
         public void setTargetId(string initialScene)
         {
-
             this.initialScene = initialScene;
         }
 
@@ -335,8 +232,7 @@ namespace uAdventure.Core
 
         public void addScene(Scene scene)
         {
-
-            scenes.Add(scene);
+			getScenes ().Add(scene);
         }
 
         /**
@@ -348,8 +244,7 @@ namespace uAdventure.Core
 
         public void addCutscene(Cutscene cutscene)
         {
-
-            cutscenes.Add(cutscene);
+			getCutscenes ().Add(cutscene);
         }
 
         /**
@@ -361,8 +256,7 @@ namespace uAdventure.Core
 
         public void addBook(Book book)
         {
-
-            books.Add(book);
+			getBooks ().Add (book);
         }
 
         /**
@@ -374,8 +268,7 @@ namespace uAdventure.Core
 
         public void addItem(Item item)
         {
-
-            items.Add(item);
+			getItems().Add (item);
         }
 
         /**
@@ -387,8 +280,7 @@ namespace uAdventure.Core
 
         public void addAtrezzo(Atrezzo atrezzo)
         {
-
-            this.atrezzo.Add(atrezzo);
+			getAtrezzo ().Add (atrezzo);
         }
 
         /**
@@ -399,9 +291,8 @@ namespace uAdventure.Core
          */
 
         public void addGlobalState(GlobalState globalState)
-        {
-
-            globalStates.Add(globalState);
+		{
+			getGlobalStates ().Add (globalState);
         }
 
         /**
@@ -412,9 +303,8 @@ namespace uAdventure.Core
          */
 
         public void addMacro(Macro macro)
-        {
-
-            macros.Add(macro);
+		{
+			getMacros ().Add (macro);
         }
 
         /**
@@ -438,9 +328,8 @@ namespace uAdventure.Core
          */
 
         public void addCharacter(NPC npc)
-        {
-
-            characters.Add(npc);
+		{
+			getCharacters ().Add (npc);
         }
 
         /**
@@ -451,9 +340,8 @@ namespace uAdventure.Core
          */
 
         public void addConversation(Conversation conversation)
-        {
-
-            conversations.Add(conversation);
+		{
+			getConversations ().Add (conversation);
         }
 
         /**
@@ -464,9 +352,8 @@ namespace uAdventure.Core
          */
 
         public void addTimer(Timer timer)
-        {
-
-            timers.Add(timer);
+		{
+			getTimers ().Add (timer);
         }
 
         /**
@@ -482,7 +369,7 @@ namespace uAdventure.Core
 
             Scene selectedScene = null;
 
-            foreach (Scene scene in scenes)
+			foreach (Scene scene in getScenes ())
                 if (scene.getId().Equals(sceneId))
                     selectedScene = scene;
 
@@ -502,7 +389,7 @@ namespace uAdventure.Core
 
             Cutscene selectedScene = null;
 
-            foreach (Cutscene scene in cutscenes)
+			foreach (Cutscene scene in getCutscenes())
                 if (scene.getId().Equals(sceneId))
                 {
                     selectedScene = scene;
@@ -525,7 +412,7 @@ namespace uAdventure.Core
 
             Item selectedItem = null;
 
-            foreach (Item item in items)
+			foreach (Item item in getItems ())
                 if (item.getId().Equals(itemId))
                     selectedItem = item;
 
@@ -545,7 +432,7 @@ namespace uAdventure.Core
 
             Atrezzo selectedAtrezzo = null;
 
-            foreach (Atrezzo at in atrezzo)
+			foreach (Atrezzo at in getObjects<Atrezzo> ())
                 if (at.getId().Equals(atrezzoId))
                     selectedAtrezzo = at;
 
@@ -565,7 +452,7 @@ namespace uAdventure.Core
 
             NPC selectedNPC = null;
 
-            foreach (NPC npc in characters)
+			foreach (NPC npc in getCharacters())
                 if (npc.getId().Equals(npcId))
                     selectedNPC = npc;
 
@@ -585,7 +472,7 @@ namespace uAdventure.Core
 
             GlobalState selectedGlobalState = null;
 
-            foreach (GlobalState gs in globalStates)
+			foreach (GlobalState gs in getGlobalStates ())
                 if (gs.getId().Equals(globalStateId))
                     selectedGlobalState = gs;
 
@@ -605,7 +492,7 @@ namespace uAdventure.Core
 
             Macro selectedMacro = null;
 
-            foreach (Macro m in macros)
+			foreach (Macro m in getMacros ())
                 if (m.getId().Equals(macroId))
                     selectedMacro = m;
 
@@ -621,8 +508,7 @@ namespace uAdventure.Core
 
         public List<Timer> getTimers()
         {
-
-            return timers;
+			return getObjects<Timer> ();
         }
 
         /**
@@ -635,8 +521,7 @@ namespace uAdventure.Core
 
         public void setTimers(List<Timer> timers)
         {
-
-            this.timers = timers;
+			this.extensionObjects [typeof(Timer)] = timers;
         }
 
         /**
@@ -647,7 +532,6 @@ namespace uAdventure.Core
 
         public List<string> getFlags()
         {
-
             return flags;
         }
 
@@ -659,7 +543,6 @@ namespace uAdventure.Core
 
         public List<string> getVars()
         {
-
             return vars;
         }
 
@@ -720,11 +603,11 @@ namespace uAdventure.Core
         {
 
             List<GeneralScene> generalScenes = new List<GeneralScene>();
-            foreach (Scene scene in scenes)
+			foreach (Scene scene in getScenes ())
             {
                 generalScenes.Add(scene);
             }
-            foreach (Cutscene cutscene in cutscenes)
+			foreach (Cutscene cutscene in getCutscenes ())
             {
                 generalScenes.Add(cutscene);
             }
@@ -744,7 +627,7 @@ namespace uAdventure.Core
 
             Book selectedbook = null;
 
-            foreach (Book book in books)
+			foreach (Book book in getBooks ())
                 if (book.getId().Equals(bookId))
                     selectedbook = book;
 
@@ -764,7 +647,7 @@ namespace uAdventure.Core
 
             Conversation selectedConversation = null;
 
-            foreach (Conversation conversation in conversations)
+			foreach (Conversation conversation in getConversations())
                 if (conversation.getId().Equals(conversationId))
                     selectedConversation = conversation;
 
@@ -786,9 +669,9 @@ namespace uAdventure.Core
          */
 
         public List<GlobalState> getGlobalStates()
-        {
+		{
 
-            return globalStates;
+			return getObjects<GlobalState> ();
         }
 
         /**
@@ -797,9 +680,8 @@ namespace uAdventure.Core
          */
 
         public void setGlobalStates(List<GlobalState> globalStates)
-        {
-
-            this.globalStates = globalStates;
+		{
+			this.extensionObjects [typeof(GlobalState)] = globalStates;
         }
 
         /**
@@ -809,7 +691,7 @@ namespace uAdventure.Core
         public List<Macro> getMacros()
         {
 
-            return macros;
+			return getObjects<Macro> ();
         }
 
         /**
@@ -818,9 +700,8 @@ namespace uAdventure.Core
          */
 
         public void setMacros(List<Macro> macros)
-        {
-
-            this.macros = macros;
+		{
+			this.extensionObjects [typeof(Macro)] = macros;
         }
 
         /**
@@ -828,8 +709,8 @@ namespace uAdventure.Core
          */
 
         public void setCompletabes(List<Completable> completables)
-        {
-            this.completables = completables;
+		{
+			this.extensionObjects [typeof(Completable)] = completables;
         }
 
         /**
@@ -839,7 +720,7 @@ namespace uAdventure.Core
 
         public List<Completable> getCompletabes()
         {
-            return this.completables;
+			return getObjects<Completable> ();
         }
 
         /**
@@ -853,7 +734,7 @@ namespace uAdventure.Core
         {
             Completable selectedCompletable = null;
 
-            foreach (Completable completable in completables)
+			foreach (Completable completable in getCompletabes ())
                 if (completable.getId().Equals(id))
                     selectedCompletable = completable;
 
@@ -868,8 +749,25 @@ namespace uAdventure.Core
 
         public void addCompletable(Completable completable)
         {
-            this.completables.Add(completable);
+			getCompletabes().Add(completable);
         }
+
+		public object findObject(string id){
+			/*return from o in getObjects ()
+			       where (o is HasId) && ((o as HasId).getId () == id)
+			       select o;*/
+
+			return getObjects ()
+				.FindAll (o => o is HasId)
+				.ConvertAll (o => o as HasId)
+				.Find (o => o.getId () == id);
+		}
+
+		public T findObject<T>(string id){
+			return getObjects<T> ()
+				.FindAll (o => o is HasId)
+				.Find (o => (o as HasId).getId () == id);
+		}
 
         /// <summary>
         /// Obtain extension objects by type
@@ -896,20 +794,9 @@ namespace uAdventure.Core
             // Let's return all the objects
             List<object> allObjects = new List<object>();
             
-            allObjects.AddRange(scenes.Cast<object>());
-            allObjects.AddRange(cutscenes.Cast<object>());
-            allObjects.AddRange(books.Cast<object>());
-            allObjects.AddRange(items.Cast<object>());
-            allObjects.AddRange(atrezzo.Cast<object>());
             allObjects.Add(player);
-            allObjects.AddRange(characters.Cast<object>());
-            allObjects.AddRange(conversations.Cast<object>());
-            allObjects.AddRange(timers.Cast<object>());
-            allObjects.AddRange(globalStates.Cast<object>());
-            allObjects.AddRange(macros.Cast<object>());
             allObjects.AddRange(flags.Cast<object>());
             allObjects.AddRange(vars.Cast<object>());
-            allObjects.AddRange(completables.Cast<object>());
 
             foreach (var kp in extensionObjects)
             {
@@ -938,74 +825,14 @@ namespace uAdventure.Core
         public override object Clone()
         {
             Chapter c = (Chapter)base.Clone();
-            if (atrezzo != null)
-            {
-                c.atrezzo = new List<Atrezzo>();
-                foreach (Atrezzo a in atrezzo)
-                    c.atrezzo.Add((Atrezzo)a.Clone());
-            }
-            if (books != null)
-            {
-                c.books = new List<Book>();
-                foreach (Book b in books)
-                    c.books.Add((Book)b.Clone());
-            }
-            if (characters != null)
-            {
-                c.characters = new List<NPC>();
-                foreach (NPC n in characters)
-                    c.characters.Add((NPC)n.Clone());
-            }
-            if (conversations != null)
-            {
-                c.conversations = new List<Conversation>();
-                foreach (Conversation cc in conversations)
-                    c.conversations.Add((Conversation)cc.Clone());
-            }
-            if (cutscenes != null)
-            {
-                c.cutscenes = new List<Cutscene>();
-                foreach (Cutscene cs in cutscenes)
-                    c.cutscenes.Add((Cutscene)cs.Clone());
-            }
             if (flags != null)
             {
                 c.flags = new List<string>();
                 foreach (string s in flags)
                     c.flags.Add(s);
             }
-            if (globalStates != null)
-            {
-                c.globalStates = new List<GlobalState>();
-                foreach (GlobalState gs in globalStates)
-                    c.globalStates.Add((GlobalState)gs.Clone());
-            }
             c.initialScene = (initialScene != null ? initialScene : null);
-            if (items != null)
-            {
-                c.items = new List<Item>();
-                foreach (Item i in items)
-                    c.items.Add((Item)i.Clone());
-            }
-            if (macros != null)
-            {
-                c.macros = new List<Macro>();
-                foreach (Macro m in macros)
-                    c.macros.Add((Macro)m.Clone());
-            }
             c.player = (player != null ? (Player)player.Clone() : null);
-            if (scenes != null)
-            {
-                c.scenes = new List<Scene>();
-                foreach (Scene s in scenes)
-                    c.scenes.Add((Scene)s.Clone());
-            }
-            if (timers != null)
-            {
-                c.timers = new List<Timer>();
-                foreach (Timer t in timers)
-                    c.timers.Add((Timer)t.Clone());
-            }
             if (vars != null)
             {
                 c.vars = new List<string>();

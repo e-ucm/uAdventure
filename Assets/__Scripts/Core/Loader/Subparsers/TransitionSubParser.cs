@@ -4,6 +4,8 @@ using System.Xml;
 
 namespace uAdventure.Core
 {
+	[DOMParser("transition")]
+	[DOMParser(typeof(Transition))]
 	public class TransitionSubParser : IDOMParser
 	{
 		public object DOMParse(XmlElement element, params object[] parameters)

@@ -193,14 +193,12 @@ namespace uAdventure.Editor
                 return false;
 
 
-            Scene newElement = (Scene)(((Scene)(dataControl.getContent())).Clone());
-            string id = newElement.getId();
-            int i = 1;
-            do
-            {
-                id = newElement.getId() + i;
-                i++;
-            } while (!controller.isElementIdValid(id, false));
+			Scene newElement = (Scene)(((Scene)(dataControl.getContent())).Clone());
+
+			string id = newElement.getId ();
+			if (!controller.isElementIdValid(id))
+				id = controller.makeElementValid(id);
+			
             newElement.setId(id);
             scenesList.Add(newElement);
             scenesDataControlList.Add(new SceneDataControl(newElement, controller.getPlayerImagePath()));

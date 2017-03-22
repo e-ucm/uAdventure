@@ -189,7 +189,7 @@ namespace uAdventure.Editor
                 Controller.getInstance()
                               .getCharapterList()
                               .getSelectedChapterDataControl()
-                              .getScenesList()
+							  .getNPCsList()
                               .deleteElement(
                                   Controller.getInstance()
                                       .getCharapterList()
@@ -207,19 +207,14 @@ namespace uAdventure.Editor
         }
 
         protected override void OnReorder(ReorderableList r)
-        {
-            List<NPC> previousList = Controller.getInstance()
-                              .getCharapterList()
-                              .getSelectedChapterData()
-                              .getCharacters();
+		{
+			var dataControlList = Controller.getInstance ()
+				.getCharapterList ().getSelectedChapterDataControl ().getNPCsList ();
 
-            List<NPC> reordered = new List<NPC>();
-            foreach (string name in r.list)
-                reordered.Add(previousList.Find(s => s.getId() == name));
+			var toPos = r.index;
+			var fromPos = dataControlList.getNPCs ().FindIndex (i => i.getId () == r.list [r.index] as string);
 
-
-            previousList.Clear();
-            previousList.AddRange(reordered);
+			dataControlList.MoveElement (dataControlList.getNPCs ()[fromPos], fromPos, toPos);
         }
 
         protected override void OnButton()

@@ -10,7 +10,7 @@ namespace uAdventure.Core
     {
 		public object DOMParse(XmlElement element, params object[] parameters)
         {
-			ImageLoaderFactory ilf = parameters [1] as ImageLoaderFactory;
+			ImageLoaderFactory ilf = parameters [0] as ImageLoaderFactory;
 			Frame frame = new Frame(ilf);
 
             XmlNodeList
@@ -34,7 +34,8 @@ namespace uAdventure.Core
 			var maxsoundtime = element.GetAttribute ("maxSoundTime");
 			if(!string.IsNullOrEmpty (maxsoundtime))frame.setMaxSoundTime(int.Parse(maxsoundtime));
 
-			frame.addResources(DOMParserUtility.DOMParse (element.SelectSingleNode("resources"), parameters) as ResourcesUni);
+			foreach (var resources in DOMParserUtility.DOMParse<ResourcesUni>(element.SelectNodes("resources"), parameters))
+				frame.addResources(resources);
 
 			return frame;
         }
