@@ -452,9 +452,7 @@ namespace uAdventure.Editor
 
         public void OnCliked()
         {
-            ChapterVarAndFlagsEditor falgsVarEditor =
-            (ChapterVarAndFlagsEditor)ScriptableObject.CreateInstance(typeof(ChapterVarAndFlagsEditor));
-            falgsVarEditor.Init(this);
+			ChapterVarAndFlagsEditor.Init ();
         }
 
         public void OnDialogOk(string message, object workingObject = null, object workingObjectSecond = null)

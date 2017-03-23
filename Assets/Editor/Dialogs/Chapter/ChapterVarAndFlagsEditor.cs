@@ -1,11 +1,12 @@
 ﻿using UnityEngine;
+using UnityEditor;
 using System.Collections;
 
 using uAdventure.Core;
 
 namespace uAdventure.Editor
 {
-    public class ChapterVarAndFlagsEditor : BaseCreatorPopup, DialogReceiverInterface
+	public class ChapterVarAndFlagsEditor : EditorWindow, DialogReceiverInterface
     {
         private enum WindowType
         {
@@ -31,26 +32,39 @@ namespace uAdventure.Editor
 
         private WindowType openedWindow;
 
-        public override void Init(DialogReceiverInterface e)
+		[MenuItem("eAdventure/Flags and variables")]
+		public static void Init()
+		{
+			var window = GetWindow<ChapterVarAndFlagsEditor> ();
+			window.Show();
+		}
+
+        public void OnEnable()
         {
-            flagsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/flag16", typeof(Texture2D));
-            varTex = (Texture2D)Resources.Load("EAdventureData/img/icons/vars", typeof(Texture2D));
+			if(!flagsTex)
+				flagsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/flag16", typeof(Texture2D));
+			if(!varTex)
+            	varTex = (Texture2D)Resources.Load("EAdventureData/img/icons/vars", typeof(Texture2D));
 
             flagContent = new GUIContent(TC.get("Flags.Title"), flagsTex);
             varContent = new GUIContent(TC.get("Vars.Title"), varTex);
 
-            selectedButtonSkin = (GUISkin)Resources.Load("Editor/ButtonSelected", typeof(GUISkin));
-            noBackgroundSkin = (GUISkin)Resources.Load("Editor/EditorNoBackgroundSkin", typeof(GUISkin));
-            selectedAreaSkin = (GUISkin)Resources.Load("Editor/EditorLeftMenuItemSkinConcreteOptions", typeof(GUISkin));
+			if(!selectedButtonSkin)
+				selectedButtonSkin = (GUISkin)Resources.Load("Editor/ButtonSelected", typeof(GUISkin));
+			if(!noBackgroundSkin)
+				noBackgroundSkin = (GUISkin)Resources.Load("Editor/EditorNoBackgroundSkin", typeof(GUISkin));
+			if(!selectedAreaSkin)
+            	selectedAreaSkin = (GUISkin)Resources.Load("Editor/EditorLeftMenuItemSkinConcreteOptions", typeof(GUISkin));
 
-            contentRect = new Rect(0f, 0.1f * windowHeight, windowWidth, 0.7f * windowHeight);
-            addDeleteButtonRect = new Rect(0f, 0.8f * windowHeight, windowWidth, 0.15f * windowHeight);
-
-            base.Init(e);
         }
 
         void OnGUI()
         {
+			var windowWidth = position.width;
+			var windowHeight = position.height;
+
+			contentRect = new Rect(0f, 0.1f * windowHeight, windowWidth, 0.7f * windowHeight);
+			addDeleteButtonRect = new Rect(0f, 0.8f * windowHeight, windowWidth, 0.15f * windowHeight);
             /*
             * Upper buttons
             */

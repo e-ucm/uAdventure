@@ -7,9 +7,6 @@ namespace uAdventure.Editor
 {
     public class ConversationEditorWindow : EditorWindow
     {
-
-        private ConversationEditorWindow editor;
-
         public Vector2 scrollPosition = Vector2.zero;
 
         GUIStyle buttonstyle;
@@ -35,9 +32,7 @@ namespace uAdventure.Editor
 
         public void Init(GraphConversation conversation)
         {
-            editor = EditorWindow.GetWindow<ConversationEditorWindow>();
-
-            editor.conversation = conversation;
+            this.conversation = conversation;
 
             ConversationNodeEditorFactory.Intance.ResetInstance();
 
@@ -46,9 +41,7 @@ namespace uAdventure.Editor
 
         public void Init(GraphConversationDataControl conversation)
         {
-            editor = EditorWindow.GetWindow<ConversationEditorWindow>();
-
-            editor.conversation = (GraphConversation)conversation.getConversation();
+			this.conversation = (GraphConversation)conversation.getConversation();
 
             ConversationNodeEditorFactory.Intance.ResetInstance();
 
@@ -63,7 +56,7 @@ namespace uAdventure.Editor
 
             loopCheck.Clear();
 
-            this.positioner = new NodePositioner(conversation.getAllNodes().Count - 1, editor.position);
+            this.positioner = new NodePositioner(conversation.getAllNodes().Count - 1, position);
             InitWindowsRecursive(current_node);
         }
 
@@ -396,7 +389,7 @@ namespace uAdventure.Editor
             l = new Color(0.3f, 0.7f, 0.4f),
             r = new Color(0.8f, 0.2f, 0.2f);
 
-        void OnGUI()
+        public void OnGUI()
         {
             this.wantsMouseMove = true;
 

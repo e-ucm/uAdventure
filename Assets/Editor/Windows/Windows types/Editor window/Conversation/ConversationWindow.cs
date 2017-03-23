@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 
 using uAdventure.Core;
+using UnityEditor;
 using UnityEditorInternal;
 using System.Collections.Generic;
 
@@ -27,39 +28,58 @@ namespace uAdventure.Editor
 
         public override void Draw(int aID)
         {
-            var windowWidth = m_Rect.width;
+			var windowWidth = m_Rect.width;
+			var editor = GetConversationEditor(GameRources.GetInstance ().selectedConversationIndex, false);
 
-            GUILayout.Space(30);
-			for (int i = 0; i < Controller.getInstance().getCharapterList().getSelectedChapterDataControl().getConversationsList ().getConversations().Count; i++)
-            {
-                GUILayout.BeginHorizontal();
-				GUILayout.Box(Controller.getInstance().getCharapterList().getSelectedChapterDataControl().getConversationsList ().getConversations()[i].getId(), GUILayout.Width(windowWidth * 0.65f));
-                if (GUILayout.Button("Edit conversation", GUILayout.MaxWidth(windowWidth * 0.3f)))
-                    OpenConversationEditor(i);
+			//if (editor == null) {
 
-                GUILayout.EndHorizontal();
+			GUILayout.Space (30);
+			for (int i = 0; i < Controller.getInstance ().getCharapterList ().getSelectedChapterDataControl ().getConversationsList ().getConversations ().Count; i++) {
+				GUILayout.BeginHorizontal ();
+				GUILayout.Box (Controller.getInstance ().getCharapterList ().getSelectedChapterDataControl ().getConversationsList ().getConversations () [i].getId (), GUILayout.Width (windowWidth * 0.65f));
+				if (GUILayout.Button ("Edit conversation", GUILayout.MaxWidth (windowWidth * 0.3f))) {
+					GameRources.GetInstance ().selectedConversationIndex = i;
+					GetConversationEditor (GameRources.GetInstance ().selectedConversationIndex, true);
+				}
 
-            }
+				GUILayout.EndHorizontal ();
+			}
+			//} else {
+				//editor.OnGUI ();
+			//}
+
         }
 
-        public void OpenConversationEditor(int conversationIndex)
+		public ConversationEditorWindow GetConversationEditor(int conversationIndex, bool createIfNotExists)
         {
             GameRources.GetInstance().selectedConversationIndex = conversationIndex;
-			if (conversationIndex < 0 || conversationIndex >= Controller.getInstance().getCharapterList().getSelectedChapterDataControl().getConversationsList ().getConversations().Count)
-                return;
+			if (conversationIndex < 0 
+				|| conversationIndex >= Controller.getInstance()
+					.getCharapterList()
+					.getSelectedChapterDataControl()
+					.getConversationsList ()
+					.getConversations().Count)
+                return null;
 
-			var conversation = Controller.getInstance().getCharapterList().getSelectedChapterDataControl().getConversationsList ().getConversations()[conversationIndex].getConversation ();
+			var conversation = Controller
+				.getInstance()
+				.getCharapterList()
+				.getSelectedChapterDataControl()
+				.getConversationsList ()
+				.getConversations()[conversationIndex]
+				.getConversation ();
 
-            if (conversationWindows.ContainsKey(conversation))
+			if (conversationWindows.ContainsKey (conversation) && conversationWindows [conversation] == null)
+				conversationWindows.Remove (conversation);
+
+			if (!conversationWindows.ContainsKey(conversation) && createIfNotExists)
             {
-                conversationWindows[conversation].Show();
-            }
-            else
-            {
-                ConversationEditorWindow convEditor = (ConversationEditorWindow)ScriptableObject.CreateInstance(typeof(ConversationEditorWindow));
-                convEditor.Init(conversation as GraphConversation);
+				ConversationEditorWindow convEditor = EditorWindow.GetWindow<ConversationEditorWindow>();
+				convEditor.Init(conversation as GraphConversation);
 				conversationWindows.Add (conversation, convEditor);
             }
+
+			return conversationWindows.ContainsKey(conversation) ? conversationWindows [conversation] : null;
         }
 
         ///////////////////////////////
@@ -119,8 +139,8 @@ namespace uAdventure.Editor
         }
 
         protected override void OnSelect(ReorderableList r)
-        {
-            OpenConversationEditor(r.index);
+		{
+			GameRources.GetInstance ().selectedConversationIndex = r.index;
         }
 
         protected override void OnReorder(ReorderableList r)

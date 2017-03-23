@@ -58,7 +58,7 @@ namespace uAdventure.Editor
 
             GUILayout.Label(TC.get("ImageAssets.Preview"));
 
-            if (pathToImg != "")
+			if (pathToImg != "" && atrezzoImg)
             {
                 GUI.DrawTexture(previewRect, atrezzoImg, ScaleMode.ScaleToFit);
             }

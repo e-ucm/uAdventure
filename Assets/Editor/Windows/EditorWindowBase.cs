@@ -233,10 +233,15 @@ namespace uAdventure.Editor
 
             if (m_Window != null)
             {
-                //leftMenuRect
+				//leftMenuRect
+				m_Window.OnGUI();
                 if(Event.current.type == EventType.repaint)
-                {
-                    m_Window.Rect = windowArea;
+				{
+					if (m_Window.Rect != windowArea) {
+						// We first draw it with the old size to make the window respond the size change
+						m_Window.OnGUI();
+						m_Window.Rect = windowArea;
+					}
                     extensions.ForEach(e => e.Rect = windowArea);
                 }
 
