@@ -34,11 +34,11 @@ namespace uAdventure.Editor
                 if(value == null || value.Count <= 1)
                 {
                     reorderableList.onAddDropdownCallback = null;
-                    reorderableList.onAddCallback += OnAdd;
+                    reorderableList.onAddCallback = OnAdd;
                 }
                 else
                 {
-                    reorderableList.onAddDropdownCallback += OnAddDropdown;
+                    reorderableList.onAddDropdownCallback = OnAddDropdown;
                     reorderableList.onAddCallback = null;
                 }
                 options = value;
@@ -85,7 +85,7 @@ namespace uAdventure.Editor
             reorderableList.drawElementCallback += DrawElement;
 
             reorderableList.onSelectCallback += OnSelect;
-            reorderableList.onRemoveCallback += OnRemove;
+			reorderableList.onRemoveCallback += removeCallback;
             reorderableList.onReorderCallback += OnReorder;
 
             Options = new List<string>();
@@ -142,7 +142,7 @@ namespace uAdventure.Editor
             var oldName = reorderableList.list[index] as string;
             if (active)
             {
-                var newName = GUI.TextField(rect, oldName);
+                var newName = EditorGUI.DelayedTextField(rect, oldName);
                 if (oldName != newName) OnElementNameChanged(reorderableList, index, newName);
             }
             else
@@ -166,7 +166,18 @@ namespace uAdventure.Editor
             menu.ShowAsContext();
         }
 
-        // Helper
+		// Helper
+		private void removeCallback(ReorderableList r){
+			OnRemove (r);
+			var tmp = r.index;
+			if (tmp < r.list.Count - 1) {
+				r.index = -1;
+				OnSelect (r);
+				r.index = tmp;
+				OnSelect (r);
+			}
+
+		}
         private void optionCallback(object option) { OnAddOption(reorderableList, (string)option); }
         #endregion
     }

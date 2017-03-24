@@ -417,8 +417,33 @@ namespace uAdventure.Editor
         public override bool canBeDuplicated()
         {
 
-            return false;
+            return true;
         }
+
+		public override bool duplicateElement (DataControl dataControl)
+		{
+			if (!(dataControl is CutsceneDataControl))
+				return false;
+
+			var cutscene = dataControl.getContent ();
+			Cutscene clone = null;
+			if (cutscene is Videoscene)
+				clone = (Videoscene)((Videoscene)cutscene).Clone ();
+			else if (cutscene is Slidescene)
+				clone = (Slidescene)((Slidescene)cutscene).Clone ();
+			else
+				return false;
+
+			string id = clone.getId ();
+			if (!controller.isElementIdValid(id))
+				id = controller.makeElementValid(id);
+
+			clone.setId(id);
+			cutscenesList.Add(clone);
+			cutscenesDataControlList.Add(new CutsceneDataControl(clone));
+			controller.getIdentifierSummary().addSceneId(id);
+			return true;
+		}
 
 
         public override void recursiveSearch()

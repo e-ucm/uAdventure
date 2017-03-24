@@ -171,11 +171,12 @@ namespace uAdventure.Editor
 
         protected override void OnAddOption(ReorderableList r, string option)
         {
-
             Controller.getInstance()
                 .getSelectedChapterDataControl()
                 .getCutscenesList()
-                .addElement(option == "Slides" ? Controller.CUTSCENE_SLIDES : Controller.CUTSCENE_VIDEO, "newCutscene");
+                .addElement(
+					option == "Slides" ? Controller.CUTSCENE_SLIDES : Controller.CUTSCENE_VIDEO, 
+					option == "Slides" ? "newSlidescene" : "newVideoscene");
         }
 
         protected override void OnRemove(ReorderableList r)
@@ -193,13 +194,14 @@ namespace uAdventure.Editor
                                       .getCutscenesList()
                                       .getCutscenes()[r.index], false);
 
-                ShowBaseWindowView();
-            }
+				ShowBaseWindowView();
+				this.Options = new List<string>() { "Video", "Slides" };
+			}
         }
 
         protected override void OnSelect(ReorderableList r)
         {
-            if (GameRources.GetInstance().selectedCutsceneIndex == r.index)
+			if (GameRources.GetInstance().selectedCutsceneIndex == r.index || r.index == -1)
             {
                 r.index = -1;
                 this.Options = new List<string>() { "Video", "Slides" };
@@ -226,7 +228,7 @@ namespace uAdventure.Editor
         protected override void OnButton()
         {
             ShowBaseWindowView();
-            reorderableList.index = -1;
+            reorderableList.index = -1; 
             this.Options = new List<string>() { "Video", "Slides" };
         }
 

@@ -2033,8 +2033,7 @@ namespace uAdventure.Editor
          */
         public bool isElementIdValid(string elementId)
         {
-
-            return isElementIdValid(elementId, true);
+            return isElementIdValid(elementId, false);
         }
 
         public string makeElementValid(string elementId)
