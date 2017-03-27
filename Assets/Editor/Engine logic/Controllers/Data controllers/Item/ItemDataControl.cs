@@ -265,7 +265,7 @@ namespace uAdventure.Editor
                     newItemId = controller.showInputDialog(TC.get("Operation.RenameItemTitle"), TC.get("Operation.RenameItemMessage"), oldItemId);
 
                 // If some value was typed and the identifiers are different
-				if (controller.isElementIdValid (newItemId))
+				if (!controller.isElementIdValid (newItemId))
 					newItemId = controller.makeElementValid (newItemId);
 				
                 item.setId(newItemId);

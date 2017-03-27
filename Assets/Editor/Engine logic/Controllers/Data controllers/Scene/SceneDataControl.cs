@@ -390,7 +390,7 @@ namespace uAdventure.Editor
                     newSceneId = controller.showInputDialog(TC.get("Operation.RenameSceneTitle"), TC.get("Operation.RenameSceneMessage"), oldSceneId);
 
                 // If some value was typed and the identifiers are different
-				if (controller.isElementIdValid (newSceneId))
+				if (!controller.isElementIdValid (newSceneId))
 					newSceneId = controller.makeElementValid (newSceneId);
 				
                 scene.setId(newSceneId);

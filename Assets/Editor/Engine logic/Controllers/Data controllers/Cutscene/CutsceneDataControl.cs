@@ -265,7 +265,7 @@ namespace uAdventure.Editor
                 //    newCutsceneId = controller.showInputDialog(Language.GetText("Operation.RenameCutsceneTitle"), Language.GetText("Operation.RenameCutsceneMessage"), oldCutsceneId);
 
                 // If some value was typed and the identifiers are different
-				if (controller.isElementIdValid (newCutsceneId))
+				if (!controller.isElementIdValid (newCutsceneId))
 					newCutsceneId = controller.makeElementValid (newCutsceneId);
 				
                 cutscene.setId(newCutsceneId);
