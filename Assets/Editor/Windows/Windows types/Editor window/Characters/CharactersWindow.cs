@@ -155,7 +155,7 @@ namespace uAdventure.Editor
 
         protected override void OnElementNameChanged(ReorderableList r, int index, string newName)
         {
-            Controller.getInstance().getCharapterList().getSelectedChapterData().getCharacters()[index].setId(newName);
+			Controller.getInstance().getCharapterList().getSelectedChapterDataControl().getNPCsList().getNPCs ()[index].renameElement(newName);
         }
 
         protected override void OnAdd(ReorderableList r)

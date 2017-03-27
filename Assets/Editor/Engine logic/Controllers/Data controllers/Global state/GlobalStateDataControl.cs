@@ -174,8 +174,6 @@ namespace uAdventure.Editor
 
         public override string renameElement(string name)
         {
-
-            bool elementRenamed = false;
             string oldItemId = getId();
             string references = Controller.getInstance().countIdentifierReferences(oldItemId).ToString();
 
@@ -189,21 +187,18 @@ namespace uAdventure.Editor
                     newItemId = Controller.getInstance().showInputDialog(TC.get("Operation.RenameGlobalStateTitle"), TC.get("Operation.RenameGlobalStateMessage"), oldItemId);
 
                 // If some value was typed and the identifiers are different
-                if (newItemId != null && !newItemId.Equals(oldItemId) && Controller.getInstance().isElementIdValid(newItemId))
-                {
-                    globalState.setId(newItemId);
-                    Controller.getInstance().replaceIdentifierReferences(oldItemId, newItemId);
-                    Controller.getInstance().getIdentifierSummary().deleteGlobalStateId(oldItemId);
-                    Controller.getInstance().getIdentifierSummary().addGlobalStateId(newItemId);
-                    //Controller.getInstance().dataModified( );
-                    elementRenamed = true;
-                }
+				if (Controller.getInstance ().isElementIdValid (newItemId))
+					newItemId = Controller.getInstance ().makeElementValid (newItemId);
+				
+                globalState.setId(newItemId);
+                Controller.getInstance().replaceIdentifierReferences(oldItemId, newItemId);
+                Controller.getInstance().getIdentifierSummary().deleteGlobalStateId(oldItemId);
+                Controller.getInstance().getIdentifierSummary().addGlobalStateId(newItemId);
+				//Controller.getInstance().dataModified( );
+				return newItemId;
             }
 
-            if (elementRenamed)
-                return oldItemId;
-            else
-                return null;
+			return null;
         }
 
 

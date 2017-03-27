@@ -252,8 +252,6 @@ namespace uAdventure.Editor
 
         public override string renameElement(string name)
         {
-
-            bool elementRenamed = false;
             string oldCutsceneId = cutscene.getId();
             string references = controller.countIdentifierReferences(oldCutsceneId).ToString();
 
@@ -267,21 +265,19 @@ namespace uAdventure.Editor
                 //    newCutsceneId = controller.showInputDialog(Language.GetText("Operation.RenameCutsceneTitle"), Language.GetText("Operation.RenameCutsceneMessage"), oldCutsceneId);
 
                 // If some value was typed and the identifiers are different
-                if (newCutsceneId != null && !newCutsceneId.Equals(oldCutsceneId) && controller.isElementIdValid(newCutsceneId))
-                {
-                    cutscene.setId(newCutsceneId);
-                    controller.replaceIdentifierReferences(oldCutsceneId, newCutsceneId);
-                    controller.getIdentifierSummary().deleteCutsceneId(oldCutsceneId);
-                    controller.getIdentifierSummary().addCutsceneId(newCutsceneId);
-                    //controller.dataModified( );
-                    elementRenamed = true;
-                }
-            }
+				if (controller.isElementIdValid (newCutsceneId))
+					newCutsceneId = controller.makeElementValid (newCutsceneId);
+				
+                cutscene.setId(newCutsceneId);
+                controller.replaceIdentifierReferences(oldCutsceneId, newCutsceneId);
+                controller.getIdentifierSummary().deleteCutsceneId(oldCutsceneId);
+                controller.getIdentifierSummary().addCutsceneId(newCutsceneId);
+                //controller.dataModified( );
 
-            if (elementRenamed)
-                return oldCutsceneId;
-            else
-                return null;
+				return newCutsceneId;
+            }
+                
+			return null;
         }
 
 

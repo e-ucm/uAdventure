@@ -341,8 +341,6 @@ namespace uAdventure.Editor
 
         public override string renameElement(string name)
         {
-
-            bool elementRenamed = false;
             string oldConversationId = graphConversation.getId();
             string references = controller.countIdentifierReferences(oldConversationId).ToString();
 
@@ -356,21 +354,19 @@ namespace uAdventure.Editor
                     newConversationId = controller.showInputDialog(TC.get("Operation.RenameConversationTitle"), TC.get("Operation.RenameConversationMessage"), oldConversationId);
 
                 // If some value was typed and the identifiers are different
-                if (newConversationId != null && !newConversationId.Equals(oldConversationId) && controller.isElementIdValid(newConversationId))
-                {
-                    graphConversation.setId(newConversationId);
-                    controller.replaceIdentifierReferences(oldConversationId, newConversationId);
-                    controller.getIdentifierSummary().deleteConversationId(oldConversationId);
-                    controller.getIdentifierSummary().addConversationId(newConversationId);
-                    //controller.dataModified( );
-                    elementRenamed = true;
-                }
+				if (!controller.isElementIdValid (newConversationId))
+					newConversationId = controller.makeElementValid (newConversationId);
+				
+                graphConversation.setId(newConversationId);
+                controller.replaceIdentifierReferences(oldConversationId, newConversationId);
+                controller.getIdentifierSummary().deleteConversationId(oldConversationId);
+                controller.getIdentifierSummary().addConversationId(newConversationId);
+                //controller.dataModified( );
+
+				return newConversationId;
             }
 
-            if (elementRenamed)
-                return oldConversationId;
-            else
-                return null;
+			return null;
         }
 
 

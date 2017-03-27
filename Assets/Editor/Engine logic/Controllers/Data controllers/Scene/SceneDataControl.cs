@@ -377,8 +377,6 @@ namespace uAdventure.Editor
 
         public override string renameElement(string name)
         {
-
-            bool elementRenamed = false;
             string oldSceneId = scene.getId();
             string references = controller.countIdentifierReferences(oldSceneId).ToString();
 
@@ -392,19 +390,18 @@ namespace uAdventure.Editor
                     newSceneId = controller.showInputDialog(TC.get("Operation.RenameSceneTitle"), TC.get("Operation.RenameSceneMessage"), oldSceneId);
 
                 // If some value was typed and the identifiers are different
-                if (newSceneId != null && !newSceneId.Equals(oldSceneId) && controller.isElementIdValid(newSceneId))
-                {
-                    scene.setId(newSceneId);
-                    controller.replaceIdentifierReferences(oldSceneId, newSceneId);
-                    controller.getIdentifierSummary().deleteSceneId(oldSceneId);
-                    controller.getIdentifierSummary().addSceneId(newSceneId);
-                    //controller.dataModified( );
-                    elementRenamed = true;
-                }
+				if (controller.isElementIdValid (newSceneId))
+					newSceneId = controller.makeElementValid (newSceneId);
+				
+                scene.setId(newSceneId);
+                controller.replaceIdentifierReferences(oldSceneId, newSceneId);
+                controller.getIdentifierSummary().deleteSceneId(oldSceneId);
+				controller.getIdentifierSummary().addSceneId(newSceneId);
+
+				return newSceneId;
+
             }
 
-            if (elementRenamed)
-                return oldSceneId;
             return null;
         }
 

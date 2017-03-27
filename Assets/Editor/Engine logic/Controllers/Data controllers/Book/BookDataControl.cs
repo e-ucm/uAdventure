@@ -354,8 +354,6 @@ namespace uAdventure.Editor
 
         public override string renameElement(string name)
         {
-
-            bool elementRenamed = false;
             string oldBookId = book.getId();
             string references = controller.countIdentifierReferences(oldBookId).ToString();
 
@@ -369,21 +367,18 @@ namespace uAdventure.Editor
                     newBookId = controller.showInputDialog(TC.get("Operation.RenameBookTitle"), TC.get("Operation.RenameBookMessage"), oldBookId);
 
                 // If some value was typed and the identifiers are different
-                if (newBookId != null && !newBookId.Equals(oldBookId) && controller.isElementIdValid(newBookId))
-                {
-                    book.setId(newBookId);
-                    controller.replaceIdentifierReferences(oldBookId, newBookId);
-                    controller.getIdentifierSummary().deleteBookId(oldBookId);
-                    controller.getIdentifierSummary().addBookId(newBookId);
-                    //controller.dataModified( );
-                    elementRenamed = true;
-                }
+				if (!controller.isElementIdValid (newBookId))
+					newBookId = controller.makeElementValid (newBookId);
+					
+				book.setId(newBookId);
+                controller.replaceIdentifierReferences(oldBookId, newBookId);
+                controller.getIdentifierSummary().deleteBookId(oldBookId);
+                controller.getIdentifierSummary().addBookId(newBookId);
+				//controller.dataModified( );
+				return newBookId;
             }
 
-            if (elementRenamed)
-                return oldBookId;
-            else
-                return null;
+            return null;
         }
 
 

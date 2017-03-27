@@ -356,8 +356,6 @@ namespace uAdventure.Editor
 
         public override string renameElement(string name)
         {
-
-            bool elementRenamed = false;
             string oldNPCId = npc.getId();
             string references = controller.countIdentifierReferences(oldNPCId).ToString();
 
@@ -371,21 +369,18 @@ namespace uAdventure.Editor
                     newNPCId = controller.showInputDialog(TC.get("Operation.RenameNPCTitle"), TC.get("Operation.RenameNPCMessage"), oldNPCId);
 
                 // If some value was typed and the identifiers are different
-                if (newNPCId != null && !newNPCId.Equals(oldNPCId) && controller.isElementIdValid(newNPCId))
-                {
-                    npc.setId(newNPCId);
-                    controller.replaceIdentifierReferences(oldNPCId, newNPCId);
-                    controller.getIdentifierSummary().deleteNPCId(oldNPCId);
-                    controller.getIdentifierSummary().addNPCId(newNPCId);
-                    //controller.dataModified( );
-                    elementRenamed = true;
-                }
+				if (!controller.isElementIdValid (newNPCId))
+					newNPCId = controller.makeElementValid (newNPCId);
+				
+                npc.setId(newNPCId);
+                controller.replaceIdentifierReferences(oldNPCId, newNPCId);
+                controller.getIdentifierSummary().deleteNPCId(oldNPCId);
+                controller.getIdentifierSummary().addNPCId(newNPCId);
+				//controller.dataModified( );
+				return newNPCId;
             }
 
-            if (elementRenamed)
-                return oldNPCId;
-            else
-                return null;
+            return null;
         }
 
 

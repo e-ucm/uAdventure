@@ -134,20 +134,40 @@ namespace uAdventure.Editor
         protected virtual void DrawHeader(Rect rect){}
         protected virtual void DrawFooter(Rect rect){}
 
+		int editingIndex = -1;
+		bool flushed = true;
+		string editingName;
         protected virtual void DrawElement(Rect rect, int index, bool active, bool focused)
         {
 			if (index == -1)
 				return;
 
-            var oldName = reorderableList.list[index] as string;
-            if (active)
-            {
-                var newName = EditorGUI.DelayedTextField(rect, oldName);
-                if (oldName != newName) OnElementNameChanged(reorderableList, index, newName);
+			// Backup for selection change
+			if (flushed && reorderableList.index == index) {
+				editingIndex = index;
+				flushed = false;
+				editingName = reorderableList.list [editingIndex] as string;
+			}
+			 
+			if (index == editingIndex)
+			{
+				GUI.SetNextControlName ("editingField");
+				editingName = EditorGUI.TextField(rect, editingName);
+				if (GUI.GetNameOfFocusedControl () == "editingField" 
+					&& !(Event.current.type == EventType.keyUp && Event.current.keyCode == KeyCode.Return)) {
+					// If the field is selected
+					flushed = false;
+				} else if (!flushed) {
+					// Name changing
+					flushed = true;
+					if(editingName != reorderableList.list [editingIndex])
+						OnElementNameChanged(reorderableList, editingIndex, editingName);
+					editingIndex = -1;
+				}
             }
             else
-            {
-                GUI.Label(rect, oldName);
+			{
+				GUI.Label(rect, reorderableList.list[index] as string);
             }
         }
         protected abstract void OnElementNameChanged(ReorderableList r, int index, string newName);
