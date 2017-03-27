@@ -154,42 +154,11 @@ namespace uAdventure.Editor
                 //############################### CONDITION HANDLING ###############################
                 //##################################################################################
 
-                foreach (List<Condition> cl in myEffect.getConditions().getConditionsList())
-                {
-                    if (cl.Count > 1)
-                        GUILayout.BeginVertical(eitherConditionStyle);
-                    for (int i = 0; i < cl.Count; i++)
-                    {
-
-                        GUILayout.BeginHorizontal();
-                        int preConEdiSel = ConditionEditorFactory.Intance.ConditionEditorIndex(cl[i]);
-                        int conEdiSel = EditorGUILayout.Popup(preConEdiSel,
-                            ConditionEditorFactory.Intance.CurrentConditionEditors);
-
-                        if (preConEdiSel != conEdiSel)
-                            cl[i] = ConditionEditorFactory.Intance.Editors[conEdiSel].InstanceManagedCondition();
-
-                        ConditionEditorFactory.Intance.getConditionEditorFor(cl[i]).draw(cl[i]);
-
-                        if (GUILayout.Button("+", collapseStyle, GUILayout.Width(15), GUILayout.Height(15)))
-                        {
-                            cl.Add(new FlagCondition(""));
-                        }
-
-                        if (GUILayout.Button("X", closeStyle, GUILayout.Width(15), GUILayout.Height(15)))
-                        {
-                            cl.Remove(cl[i]);
-
-                            if (cl.Count == 0)
-                                myEffect.getConditions().getConditionsList().Remove(cl);
-                        }
-
-                        GUILayout.EndHorizontal();
-                    }
-                    if (cl.Count > 1)
-                        GUILayout.EndVertical();
-                }
-
+				var toRemove = new List<Condition>();
+				var listsToRemove = new List<List<Condition>>();
+				var conditions = editor.Effect.getConditions ();
+				ConditionEditorWindow.LayoutConditionEditor (conditions);
+				
                 //##################################################################################
 
 

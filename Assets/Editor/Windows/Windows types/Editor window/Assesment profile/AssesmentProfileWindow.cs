@@ -7,11 +7,11 @@ using System;
 
 namespace uAdventure.Editor
 {
-    [EditorWindowExtension(100, typeof(Completable))]
+    [EditorWindowExtension(200, typeof(Completable))]
     public class AssesmentProfileWindow : DefaultButtonMenuEditorWindowExtension
     {
-        string[] endoptions = { "Final Scene is reached", "All levels completed" };
-        string[] progressoptions = { "Number of levels completed", "Manual progress..." };
+		string[] endoptions = { TC.get("Analytics.EndOptions.FinalScene"), TC.get("Analytics.EndOptions.AllLevels") };
+		string[] progressoptions = { TC.get("Analytics.ProgressOptions.NumberOfLevels"), TC.get("Analytics.ProgressOptions.Manual") };
         int end = 0;
         int progress = 0;
         int num_colums = 5;
@@ -33,11 +33,11 @@ namespace uAdventure.Editor
         private List<Completable> completables = new List<Completable>();
 
         public AssesmentProfileWindow(Rect aStartPos, GUIStyle aStyle, params GUILayoutOption[] aOptions)
-            : base(aStartPos, new GUIContent(TC.get("AssessmentFeatures.Title")), aStyle, aOptions)
+            : base(aStartPos, new GUIContent(TC.get("Analytics.Title")), aStyle, aOptions)
         {
             var buttonContent = new GUIContent();
             buttonContent.image = (Texture2D)Resources.Load("EAdventureData/img/icons/assessmentProfiles", typeof(Texture2D)); ;
-            buttonContent.text = TC.get("AssessmentFeatures.Title");
+			buttonContent.text = TC.get("Analytics.Title");
             ButtonContent = buttonContent;
 
             clearImg = (Texture2D)Resources.Load("EAdventureData/img/icons/deleteContent", typeof(Texture2D));
@@ -74,29 +74,29 @@ namespace uAdventure.Editor
             tableRect = new Rect(0f, 200, 0.8f * windowWidth, windowHeight * 0.33f);
             rightPanelRect = new Rect(0.85f * windowWidth, 0.1f * windowHeight, 0.08f * windowWidth, 0.33f * windowHeight);
 
-            GUILayout.Label("Game starts in " + Controller.getInstance().getSelectedChapterDataControl().getInitialScene());
-            GUILayout.Label("Ends when: ");
+			GUILayout.Label(TC.get("Analytics.GameStart") + Controller.getInstance().getSelectedChapterDataControl().getInitialScene());
+			GUILayout.Label(TC.get("Analytics.GameEnd"));
 
             end = EditorGUILayout.Popup(end, endoptions);
 
-            GUILayout.Label("Game progress: ");
+			GUILayout.Label(TC.get("Analytics.GameProgress"));
 
             progress = EditorGUILayout.Popup(progress, progressoptions);
 
             if (progress == 1)
             {
-                GUILayout.Button("Edit Progress");
+				GUILayout.Button(TC.get("Analytics.EditProgress"));
             }
 
             //GUILayout.BeginArea(tableRect);
             GUILayout.BeginHorizontal();
             GUILayout.BeginVertical(GUILayout.ExpandWidth(true));
             GUILayout.BeginHorizontal();
-            GUILayout.Box("ID", GUILayout.Width(windowWidth * col_width));
-            GUILayout.Box("Start", GUILayout.Width(windowWidth * col_width));
-            GUILayout.Box("End", GUILayout.Width(windowWidth * col_width));
-            GUILayout.Box("Progress", GUILayout.Width(windowWidth * col_width));
-            GUILayout.Box("Score", GUILayout.Width(windowWidth * col_width));
+			GUILayout.Box(TC.get("Analytics.Completable.Id"), GUILayout.Width(windowWidth * col_width));
+			GUILayout.Box(TC.get("Analytics.Completable.Start"), GUILayout.Width(windowWidth * col_width));
+			GUILayout.Box(TC.get("Analytics.Completable.End"), GUILayout.Width(windowWidth * col_width));
+			GUILayout.Box(TC.get("Analytics.Completable.Progress"), GUILayout.Width(windowWidth * col_width));
+			GUILayout.Box(TC.get("Analytics.Completable.Score"), GUILayout.Width(windowWidth * col_width));
             GUILayout.EndHorizontal();
 
             scrollPosition = GUILayout.BeginScrollView(scrollPosition);
@@ -117,7 +117,7 @@ namespace uAdventure.Editor
                     window.Init(completable.getEnd());
                 }
 
-                if (GUILayout.Button("Define progress", GUILayout.Width(windowWidth * col_width)))
+				if (GUILayout.Button(TC.get("Analytics.Completable.Define"), GUILayout.Width(windowWidth * col_width)))
                 {
                     ProgressEditorWindow window = ScriptableObject.CreateInstance<ProgressEditorWindow>();
                     window.Init(completable.getProgress());
@@ -171,8 +171,6 @@ namespace uAdventure.Editor
             }
             GUILayout.EndVertical();
             GUILayout.EndHorizontal();
-
-            //GUILayout.EndArea();
         }
 
         protected override void OnButton() {}

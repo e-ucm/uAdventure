@@ -28,6 +28,7 @@ namespace uAdventure.Core
 
         public static void loadstrings(string languageFile)
         {
+			Debug.Log (languageFile);
             guistrings = new Dictionary<string, string>();
             string serializedLangbase = "";
             try

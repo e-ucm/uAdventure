@@ -2112,4 +2112,22 @@ In the game you can define conditions based on the value of the variables.</entr
 <entry key="ConversationEditor.SetChild">Set child</entry>
 <entry key="ConversationEditor.Option">Option</entry>
 <entry key="ConversationEditor.AddOptionChild">Add Option / Add Child</entry>
+
+<!-- Analytics -->
+<entry key="Analytics.Title">Analytics</entry>
+<entry key="Analytics.GameStart">Game starts in </entry>
+<entry key="Analytics.GameEnd">Ends when:</entry>
+<entry key="Analytics.GameProgress">Game progress:</entry>
+<entry key="Analytics.EditProgress">Edit Progress</entry> 
+<entry key="Analytics.EndOptions.FinalScene">Final Scene is reached</entry> 
+<entry key="Analytics.EndOptions.AllLevels">All levels completed</entry> 
+<entry key="Analytics.ProgressOptions.NumberOfLevels">Number of levels completed</entry> 
+<entry key="Analytics.ProgressOptions.Manual">Manual progress...</entry> 
+<entry key="Analytics.Completable.Id">ID</entry> 
+<entry key="Analytics.Completable.Start">Start</entry> 
+<entry key="Analytics.Completable.End">End</entry> 
+<entry key="Analytics.Completable.Progress">Progress</entry> 
+<entry key="Analytics.Completable.Score">Score</entry>
+<entry key="Analytics.Completable.Define">Define progress</entry>
+
 </properties>
