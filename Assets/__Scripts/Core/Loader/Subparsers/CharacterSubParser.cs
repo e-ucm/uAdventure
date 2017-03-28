@@ -15,13 +15,6 @@ namespace uAdventure.Core
 			// PARAMETERS
 			Chapter chapter = parameters [0] as Chapter;
 
-			// XML extraction
-			XmlNodeList
-			resourcess = element.SelectNodes("resources"),
-			descriptionss = element.SelectNodes("description"),
-			conversationsref = element.SelectNodes("conversation-ref"),
-			actionss = element.SelectNodes("actions");
-
 			NPC npc = new NPC(element.GetAttribute("id"));
 
 			List<Description> descriptions = new List<Description>();
@@ -31,17 +24,17 @@ namespace uAdventure.Core
 			if (doc != null) npc.setDocumentation(doc.InnerText);
 			
 			// DESCRIPTIONS
-			npc.setDescriptions(DOMParserUtility.DOMParse <Description> (descriptionss, parameters).ToList ());
+			npc.setDescriptions(DOMParserUtility.DOMParse <Description> (element.SelectNodes("description"), parameters).ToList ());
 
 			// RESOURCES
 			foreach(var res in DOMParserUtility.DOMParse <ResourcesUni> (element.SelectNodes("resources"), parameters))
 				npc.addResources (res);
 
 			// ACTIONS
-			npc.setActions (DOMParserUtility.DOMParse<Action>(actionss, parameters).ToList());
+			npc.setActions (DOMParserUtility.DOMParse<Action>(element.SelectSingleNode("actions").ChildNodes, parameters).ToList());
 
 			// CONVERSATIONS
-			foreach (XmlElement conversation in conversationsref)
+			foreach (XmlElement conversation in element.SelectNodes("conversation-ref"))
 			{
 				string idTarget = conversation.GetAttribute("idTarget") ?? "";
 

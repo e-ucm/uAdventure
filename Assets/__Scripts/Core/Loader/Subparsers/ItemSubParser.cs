@@ -24,7 +24,7 @@ namespace uAdventure.Core
 			}
 
 			parsedObject.setReturnsWhenDragged("yes".Equals (element.GetAttribute("returnsWhenDragged") ?? "yes"));
-			parsedObject.setResourcesTransitionTime(long.Parse(element.GetAttribute("resources-transition-time") ?? "0"));
+			parsedObject.setResourcesTransitionTime(ExParsers.ParseDefault(element.GetAttribute("resources-transition-time"), 0L));
 
 			// RESOURCES
 			foreach(var res in DOMParserUtility.DOMParse <ResourcesUni> (element.SelectNodes("resources"), parameters))

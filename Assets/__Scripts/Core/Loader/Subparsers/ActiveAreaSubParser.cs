@@ -8,7 +8,7 @@ using System.Linq;
 namespace uAdventure.Core
 {
 	[DOMParser("examine","grab","use","talk-to","use-with","give-to","drag-to","custom","custom-interact")]
-	[DOMParser(typeof(Action))]
+	[DOMParser(typeof(ActiveArea))]
 	public class ActiveAreaSubParser : IDOMParser
     {
         private string generateId()
@@ -19,10 +19,10 @@ namespace uAdventure.Core
 		public object DOMParse(XmlElement element, params object[] parameters)
 		{
 			XmlNodeList
-				points = element.SelectNodes ("point"),
-				descriptions = element.SelectNodes ("description"),
-				actionss = element.SelectNodes ("actions");
-			XmlElement conditions = element.SelectSingleNode("condition") as XmlElement;
+			points = element.SelectNodes ("point"),
+			descriptions = element.SelectNodes ("description");
+			XmlElement conditions = element.SelectSingleNode("condition") as XmlElement,
+			actionss = element.SelectSingleNode ("actions") as XmlElement;
 
             string tmpArgVal;
 
@@ -33,17 +33,17 @@ namespace uAdventure.Core
             bool hasInfluence = false;
 
 			rectangular = (element.GetAttribute ("rectangular") ?? "yes").Equals ("yes");
-			x 		= int.Parse(element.GetAttribute("x") ?? "0");
-			y 		= int.Parse(element.GetAttribute("y") ?? "0");
-			width 	= int.Parse(element.GetAttribute("width") ?? "0");
-			height	= int.Parse(element.GetAttribute("height") ?? "0");
+			x 		= ExParsers.ParseDefault(element.GetAttribute("x"), 0);
+			y 		= ExParsers.ParseDefault(element.GetAttribute("y"), 0);
+			width 	= ExParsers.ParseDefault(element.GetAttribute("width"), 0);
+			height	= ExParsers.ParseDefault(element.GetAttribute("height"), 0);
 			id 		= element.GetAttribute("id") ?? "";
 
 			hasInfluence = "yes".Equals (element.GetAttribute ("hasInfluenceArea"));
-			influenceX = int.Parse(element.GetAttribute("influenceX") ?? "0");
-			influenceY = int.Parse(element.GetAttribute("influenceY") ?? "0");
-			influenceWidth = int.Parse(element.GetAttribute("influenceWidth") ?? "0");
-			influenceHeight = int.Parse(element.GetAttribute("influenceHeight") ?? "0");
+			influenceX = ExParsers.ParseDefault(element.GetAttribute("influenceX"), 0);
+			influenceY = ExParsers.ParseDefault(element.GetAttribute("influenceY"), 0);
+			influenceWidth = ExParsers.ParseDefault(element.GetAttribute("influenceWidth"), 0);
+			influenceHeight = ExParsers.ParseDefault(element.GetAttribute("influenceHeight"), 0);
 
             ActiveArea activeArea = new ActiveArea((id == null ? generateId() : id), rectangular, x, y, width, height);
             if (hasInfluence)
@@ -63,15 +63,15 @@ namespace uAdventure.Core
                 {
                     int x_ = 0, y_ = 0;
 
-					x_ 		= int.Parse(el.GetAttribute("x") ?? "0");
-					y_ 		= int.Parse(el.GetAttribute("y") ?? "0");
+					x_ 		= ExParsers.ParseDefault(el.GetAttribute("x"), 0);
+					y_ 		= ExParsers.ParseDefault(el.GetAttribute("y"), 0);
 
                     Vector2 point = new Vector2(x_, y_);
                     activeArea.addVector2(point);
                 }
             }
 
-			activeArea.setActions (DOMParserUtility.DOMParse <Action>(actionss, parameters).ToList ());
+			activeArea.setActions (DOMParserUtility.DOMParse <Action>(actionss.ChildNodes, parameters).ToList ());
 			activeArea.setConditions(DOMParserUtility.DOMParse (conditions, parameters) as Conditions ?? new Conditions ());
 
 			return activeArea;
