@@ -80,7 +80,18 @@ namespace uAdventure.Editor
 
             EditorGUILayout.BeginVertical();
 
-            EditorGUILayout.HelpBox(TC.get("ConversationEditor.AtLeastOne"), MessageType.None);
+			EditorGUILayout.HelpBox(TC.get("ConversationEditor.AtLeastOne"), MessageType.None);
+			GUILayout.BeginHorizontal ();
+			GUILayout.Label("Question ID: ");
+			//Controller.getInstance ().getIdentifierSummary ().add
+			myNode.setXApiQuestion(EditorGUILayout.TextField(myNode.getXApiQuestion()));
+			if (myNode.getXApiQuestion () == "") {
+				var lastRect = GUILayoutUtility.GetLastRect ();
+				var guistyle = new GUIStyle (GUI.skin.label);
+				guistyle.normal.textColor = Color.gray;
+				GUI.Label (lastRect, " Required for analytics", guistyle);
+			}
+			GUILayout.EndHorizontal ();
             bool infoShown = false;
             if (myNode.getLineCount() > 0)
             {
@@ -98,8 +109,10 @@ namespace uAdventure.Editor
 
                     bool showInfo = false;
 
-                    EditorGUIUtility.labelWidth = GUI.skin.label.CalcSize(new GUIContent(TC.get("ConversationEditor.Option") + " " + i + ": ")).x;
-                    myNode.getLine(i).setText(EditorGUILayout.TextField(TC.get("ConversationEditor.Option") + " " + i + ": ", myNode.getLine(i).getText(), GUILayout.Width(200)));
+					EditorGUIUtility.labelWidth = GUI.skin.label.CalcSize(new GUIContent((i+1) + ": ")).x;
+					myNode.getLine(i).setText(EditorGUILayout.TextField((i+1) + ": ", myNode.getLine(i).getText(), GUILayout.Width(200)));
+					myNode.getLine (i).setXApiCorrect (EditorGUILayout.Toggle(myNode.getLine (i).getXApiCorrect ()));
+					GUILayout.Space (5);
 
                     tmpTex = (myNode.getLine(i).getConditions().getConditionsList().Count > 0
                         ? conditionsTex
