@@ -1,82 +1,87 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class ChangePointValueTool : Tool
+using uAdventure.Core;
+
+namespace uAdventure.Editor
 {
-
-    private Vector2 point;
-
-    private int x;
-
-    private int y;
-
-    private int originalX;
-
-    private int originalY;
-
-    public ChangePointValueTool(Vector2 point, int x, int y)
+    public class ChangePointValueTool : Tool
     {
 
-        this.point = point;
-        this.x = x;
-        this.y = y;
-        this.originalX = (int) point.x;
-        this.originalY = (int) point.y;
-    }
+        private Vector2 point;
 
+        private int x;
 
-    public override bool canRedo()
-    {
+        private int y;
 
-        return true;
-    }
+        private int originalX;
 
+        private int originalY;
 
-    public override bool canUndo()
-    {
-
-        return true;
-    }
-
-
-    public override bool combine(Tool other)
-    {
-
-        if (other is ChangePointValueTool)
+        public ChangePointValueTool(Vector2 point, int x, int y)
         {
-            ChangePointValueTool cpvt = (ChangePointValueTool) other;
-            if (cpvt.point == point)
-            {
-                cpvt.x = x;
-                cpvt.y = y;
-                cpvt.timeStamp = timeStamp;
-                return true;
-            }
+
+            this.point = point;
+            this.x = x;
+            this.y = y;
+            this.originalX = (int)point.x;
+            this.originalY = (int)point.y;
         }
-        return false;
-    }
 
 
-    public override bool doTool()
-    {
+        public override bool canRedo()
+        {
 
-        point = new Vector2(x, y);
-        return true;
-    }
-
-
-    public override bool redoTool()
-    {
-        point = new Vector2(x, y);
-        Controller.getInstance().updatePanel();
-        return true;
-    }
+            return true;
+        }
 
 
-    public override bool undoTool()
-    {
-        point = new Vector2(originalX, originalY);
-        Controller.getInstance().updatePanel();
-        return true;
+        public override bool canUndo()
+        {
+
+            return true;
+        }
+
+
+        public override bool combine(Tool other)
+        {
+
+            if (other is ChangePointValueTool)
+            {
+                ChangePointValueTool cpvt = (ChangePointValueTool)other;
+                if (cpvt.point == point)
+                {
+                    cpvt.x = x;
+                    cpvt.y = y;
+                    cpvt.timeStamp = timeStamp;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+
+        public override bool doTool()
+        {
+
+            point = new Vector2(x, y);
+            return true;
+        }
+
+
+        public override bool redoTool()
+        {
+            point = new Vector2(x, y);
+            Controller.getInstance().updatePanel();
+            return true;
+        }
+
+
+        public override bool undoTool()
+        {
+            point = new Vector2(originalX, originalY);
+            Controller.getInstance().updatePanel();
+            return true;
+        }
     }
 }

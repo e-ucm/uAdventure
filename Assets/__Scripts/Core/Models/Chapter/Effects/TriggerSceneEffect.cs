@@ -1,140 +1,143 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-/**
- * An effect that triggers a scene
- */
-public class TriggerSceneEffect : AbstractEffect, HasTargetId
+namespace uAdventure.Core
 {
     /**
-     * Id of the cutscene to be played
+     * An effect that triggers a scene
      */
-    private string targetSceneId;
-
-    /**
-     * X position of the player in the scene.
-     */
-    private int x;
-
-    /**
-     * Y position of the player in the scene.
-     */
-    private int y;
-
-    /**
-     * Transition duration
-     */
-    private int transitionTime = 0;
-
-    /**
-     * Type of the transition
-     */
-    private int transitionType = 0;
-
-    /**
-     * Creates a new TriggerSceneEffect
-     * 
-     * @param targetSceneId
-     *            the id of the cutscene to be triggered
-     * @param x
-     *            X position of the player in the new scene
-     * @param y
-     *            Y position of the player in the new scene
-     */
-    public TriggerSceneEffect(string targetSceneId, int x, int y, int transitionTime = 0, int transitionType = 0):base()
+    public class TriggerSceneEffect : AbstractEffect, HasTargetId
     {
-        this.targetSceneId = targetSceneId;
-        this.x = x;
-        this.y = y;
-        this.transitionTime = transitionTime;
-        this.transitionType = transitionType;
-    }
+        /**
+         * Id of the cutscene to be played
+         */
+        private string targetSceneId;
 
-    public override EffectType getType()
-    {
+        /**
+         * X position of the player in the scene.
+         */
+        private int x;
 
-        return EffectType.TRIGGER_SCENE;
-    }
+        /**
+         * Y position of the player in the scene.
+         */
+        private int y;
 
-    /**
-     * Returns the targetSceneId
-     * 
-     * @return string containing the targetSceneId
-     */
-    public string getTargetId()
-    {
+        /**
+         * Transition duration
+         */
+        private int transitionTime = 0;
 
-        return targetSceneId;
-    }
+        /**
+         * Type of the transition
+         */
+        private int transitionType = 0;
 
-    /**
-     * Sets the new targetSceneId
-     * 
-     * @param targetSceneId
-     *            New targetSceneId
-     */
-    public void setTargetId(string targetSceneId)
-    {
+        /**
+         * Creates a new TriggerSceneEffect
+         * 
+         * @param targetSceneId
+         *            the id of the cutscene to be triggered
+         * @param x
+         *            X position of the player in the new scene
+         * @param y
+         *            Y position of the player in the new scene
+         */
+        public TriggerSceneEffect(string targetSceneId, int x, int y, int transitionTime = 0, int transitionType = 0) : base()
+        {
+            this.targetSceneId = targetSceneId;
+            this.x = x;
+            this.y = y;
+            this.transitionTime = transitionTime;
+            this.transitionType = transitionType;
+        }
 
-        this.targetSceneId = targetSceneId;
-    }
+        public override EffectType getType()
+        {
 
-    /**
-     * Returns the X destiny position of the player.
-     * 
-     * @return X destiny position
-     */
-    public int getX()
-    {
+            return EffectType.TRIGGER_SCENE;
+        }
 
-        return x;
-    }
+        /**
+         * Returns the targetSceneId
+         * 
+         * @return string containing the targetSceneId
+         */
+        public string getTargetId()
+        {
 
-    /**
-     * Returns the Y destiny position of the player.
-     * 
-     * @return Y destiny position
-     */
-    public int getY()
-    {
+            return targetSceneId;
+        }
 
-        return y;
-    }
+        /**
+         * Sets the new targetSceneId
+         * 
+         * @param targetSceneId
+         *            New targetSceneId
+         */
+        public void setTargetId(string targetSceneId)
+        {
 
-    /**
-     * Sets the new insertion position for the player
-     * 
-     * @param x
-     *            X coord of the position
-     * @param y
-     *            Y coord of the position
-     */
-    public void setPosition(int x, int y)
-    {
+            this.targetSceneId = targetSceneId;
+        }
 
-        this.x = x;
-        this.y = y;
-    }
-    /*
-    @Override
-    public Object clone() throws CloneNotSupportedException
-    {
+        /**
+         * Returns the X destiny position of the player.
+         * 
+         * @return X destiny position
+         */
+        public int getX()
+        {
 
-        TriggerSceneEffect tse = (TriggerSceneEffect) super.clone( );
-        tse.targetSceneId = ( targetSceneId != null ? new string(targetSceneId ) : null );
-        tse.x = x;
-        tse.y = y;
-        return tse;
-    }*/
+            return x;
+        }
 
-    public int getTransitionTime()
-    {
+        /**
+         * Returns the Y destiny position of the player.
+         * 
+         * @return Y destiny position
+         */
+        public int getY()
+        {
 
-        return transitionTime;
-    }
-    public int getTransitionType()
-    {
+            return y;
+        }
 
-        return transitionType;
+        /**
+         * Sets the new insertion position for the player
+         * 
+         * @param x
+         *            X coord of the position
+         * @param y
+         *            Y coord of the position
+         */
+        public void setPosition(int x, int y)
+        {
+
+            this.x = x;
+            this.y = y;
+        }
+        /*
+        @Override
+        public Object clone() throws CloneNotSupportedException
+        {
+
+            TriggerSceneEffect tse = (TriggerSceneEffect) super.clone( );
+            tse.targetSceneId = ( targetSceneId != null ? new string(targetSceneId ) : null );
+            tse.x = x;
+            tse.y = y;
+            return tse;
+        }*/
+
+        public int getTransitionTime()
+        {
+
+            return transitionTime;
+        }
+        public int getTransitionType()
+        {
+
+            return transitionType;
+        }
     }
 }

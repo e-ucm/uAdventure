@@ -2,70 +2,76 @@
 using UnityEngine;
 using System.Collections;
 
-public class RecentFile{
-    private string absolutePath;
+using uAdventure.Core;
 
-    private DateTime date;
-
-    /**
-     * @param absolutePath
-     * @param date
-     */
-    public RecentFile(string absolutePath, DateTime date)
+namespace uAdventure.Editor
+{
+    public class RecentFile
     {
+        private string absolutePath;
 
-        this.absolutePath = absolutePath;
-        this.date = date;
-    }
+        private DateTime date;
 
-    public RecentFile(string absolutePath)
-    {
+        /**
+         * @param absolutePath
+         * @param date
+         */
+        public RecentFile(string absolutePath, DateTime date)
+        {
 
-        this.absolutePath = absolutePath;
-        date = new DateTime();
-    }
+            this.absolutePath = absolutePath;
+            this.date = date;
+        }
 
-    public RecentFile(string absolutePath, string date)
-    {
-        this.absolutePath = absolutePath;
-        this.date = DateTime.Parse(date );
-    }
+        public RecentFile(string absolutePath)
+        {
 
-    /**
-     * @return the absolutePath
-     */
-    public string getAbsolutePath()
-    {
+            this.absolutePath = absolutePath;
+            date = new DateTime();
+        }
 
-        return absolutePath;
-    }
+        public RecentFile(string absolutePath, string date)
+        {
+            this.absolutePath = absolutePath;
+            this.date = DateTime.Parse(date);
+        }
 
-    /**
-     * @param absolutePath
-     *            the absolutePath to set
-     */
-    public void setAbsolutePath(string absolutePath)
-    {
+        /**
+         * @return the absolutePath
+         */
+        public string getAbsolutePath()
+        {
 
-        this.absolutePath = absolutePath;
-    }
+            return absolutePath;
+        }
 
-    /**
-     * @return the date
-     */
-    public DateTime getDate()
-    {
+        /**
+         * @param absolutePath
+         *            the absolutePath to set
+         */
+        public void setAbsolutePath(string absolutePath)
+        {
 
-        return date;
-    }
+            this.absolutePath = absolutePath;
+        }
 
-    /**
-     * @param date
-     *            the date to set
-     */
-    public void setDate(DateTime date)
-    {
+        /**
+         * @return the date
+         */
+        public DateTime getDate()
+        {
 
-        this.date = date;
+            return date;
+        }
+
+        /**
+         * @param date
+         *            the date to set
+         */
+        public void setDate(DateTime date)
+        {
+
+            this.date = date;
+        }
     }
 }

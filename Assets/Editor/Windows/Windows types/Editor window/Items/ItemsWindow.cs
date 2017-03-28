@@ -1,129 +1,218 @@
 ﻿using UnityEngine;
-using System.Collections;
 
-public class ItemsWindow : LayoutWindow
+using uAdventure.Core;
+using UnityEditorInternal;
+using System.Collections.Generic;
+
+namespace uAdventure.Editor
 {
-    private enum ItemsWindowType { Appearance, DescriptionConfig, Actions}
-
-    private static ItemsWindowType openedWindow = ItemsWindowType.Appearance;
-    private static ItemsWindowActions itemsWindowActions;
-    private static ItemsWindowAppearance itemsWindowAppearance;
-    private static ItemsWindowDescription itemsWindowDescription;
-
-    private static float windowWidth, windowHeight;
-
-    private static Rect thisRect;
-
-    // Flag determining visibility of concrete item information
-    private bool isConcreteItemVisible = false;
-
-    private static GUISkin selectedButtonSkin;
-    private static GUISkin defaultSkin;
-
-    public ItemsWindow(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
-        : base(aStartPos, aContent, aStyle, aOptions)
+    [EditorWindowExtension(30, typeof(Item))]
+    public class ItemsWindow : ReorderableListEditorWindowExtension
     {
-        itemsWindowActions = new ItemsWindowActions(aStartPos, new GUIContent(TC.get("Item.ActionsPanelTitle")), "Window");
-        itemsWindowAppearance = new ItemsWindowAppearance(aStartPos, new GUIContent(TC.get("Item.LookPanelTitle")), "Window");
-        itemsWindowDescription = new ItemsWindowDescription(aStartPos, new GUIContent(TC.get("Item.DocPanelTitle")), "Window");
+        private enum ItemsWindowType { Appearance, DescriptionConfig, Actions }
 
-        windowWidth = aStartPos.width;
-        windowHeight = aStartPos.height;
+        private static ItemsWindowType openedWindow = ItemsWindowType.Appearance;
+        private static ItemsWindowActions itemsWindowActions;
+        private static ItemsWindowAppearance itemsWindowAppearance;
+        private static ItemsWindowDescription itemsWindowDescription;
+        
+        // Flag determining visibility of concrete item information
+        private bool isConcreteItemVisible = false;
 
-        thisRect = aStartPos;
-        selectedButtonSkin = (GUISkin)Resources.Load("Editor/ButtonSelected", typeof(GUISkin));
-    }
+        private static GUISkin selectedButtonSkin;
+        private static GUISkin defaultSkin;
 
-
-    public override void Draw(int aID)
-    {
-        // Show information of concrete item
-        if (isConcreteItemVisible)
+        public ItemsWindow(Rect aStartPos, GUIStyle aStyle, params GUILayoutOption[] aOptions)
+            : base(aStartPos, new GUIContent(TC.get("Element.Name18")), aStyle, aOptions)
         {
-            /**
-            UPPER MENU
-            */
-            GUILayout.BeginHorizontal();
-            if (openedWindow == ItemsWindowType.Appearance)
-                GUI.skin = selectedButtonSkin;
-            if (GUILayout.Button(TC.get("Item.LookPanelTitle")))
-            {
-                OnWindowTypeChanged(ItemsWindowType.Appearance);
-            }
-            if (openedWindow == ItemsWindowType.Appearance)
-                GUI.skin = defaultSkin;
+            var c = new GUIContent();
+            c.image = (Texture2D)Resources.Load("EAdventureData/img/icons/items", typeof(Texture2D));
+            c.text = TC.get("Element.Name18");
+            this.ButtonContent = c;
 
-            if (openedWindow == ItemsWindowType.Actions)
-                GUI.skin = selectedButtonSkin;
-            if (GUILayout.Button(TC.get("Item.ActionsPanelTitle")))
-            {
-                OnWindowTypeChanged(ItemsWindowType.Actions);
-            }
-            if (openedWindow == ItemsWindowType.Actions)
-                GUI.skin = defaultSkin;
-
-            if (openedWindow == ItemsWindowType.DescriptionConfig)
-                GUI.skin = selectedButtonSkin;
-            if (GUILayout.Button(TC.get("Item.DocPanelTitle")))
-            {
-                OnWindowTypeChanged(ItemsWindowType.DescriptionConfig);
-            }
-            if (openedWindow == ItemsWindowType.DescriptionConfig)
-                GUI.skin = defaultSkin;
-
-            GUILayout.EndHorizontal();
-
-            switch (openedWindow)
-            {
-                case ItemsWindowType.Actions:
-                    itemsWindowActions.Draw(aID);
-                    break;
-                case ItemsWindowType.Appearance:
-                    itemsWindowAppearance.Draw(aID);
-                    break;
-                case ItemsWindowType.DescriptionConfig:
-                    itemsWindowDescription.Draw(aID);
-                    break;
-            }
+            itemsWindowActions = new ItemsWindowActions(aStartPos, new GUIContent(TC.get("Item.ActionsPanelTitle")), "Window");
+            itemsWindowAppearance = new ItemsWindowAppearance(aStartPos, new GUIContent(TC.get("Item.LookPanelTitle")), "Window");
+            itemsWindowDescription = new ItemsWindowDescription(aStartPos, new GUIContent(TC.get("Item.DocPanelTitle")), "Window");
+            
+            selectedButtonSkin = (GUISkin)Resources.Load("Editor/ButtonSelected", typeof(GUISkin));
         }
-        else
+
+
+        public override void Draw(int aID)
         {
-            GUILayout.Space(30);
-            for (int i = 0; i < Controller.getInstance().getCharapterList().getSelectedChapterData().getItems().Count; i++)
+            // Show information of concrete item
+            if (isConcreteItemVisible)
             {
+                /**
+                UPPER MENU
+                */
                 GUILayout.BeginHorizontal();
-                GUILayout.Box(Controller.getInstance().getCharapterList().getSelectedChapterData().getItems()[i].getId(), GUILayout.Width(windowWidth * 0.75f));
-                if (GUILayout.Button(TC.get("GeneralText.Edit"), GUILayout.MaxWidth(windowWidth * 0.2f)))
+                if (openedWindow == ItemsWindowType.Appearance)
+                    GUI.skin = selectedButtonSkin;
+                if (GUILayout.Button(TC.get("Item.LookPanelTitle")))
                 {
-                    ShowItemWindowView(i);
+                    OnWindowTypeChanged(ItemsWindowType.Appearance);
                 }
+                if (openedWindow == ItemsWindowType.Appearance)
+                    GUI.skin = defaultSkin;
+
+                if (openedWindow == ItemsWindowType.Actions)
+                    GUI.skin = selectedButtonSkin;
+                if (GUILayout.Button(TC.get("Item.ActionsPanelTitle")))
+                {
+                    OnWindowTypeChanged(ItemsWindowType.Actions);
+                }
+                if (openedWindow == ItemsWindowType.Actions)
+                    GUI.skin = defaultSkin;
+
+                if (openedWindow == ItemsWindowType.DescriptionConfig)
+                    GUI.skin = selectedButtonSkin;
+                if (GUILayout.Button(TC.get("Item.DocPanelTitle")))
+                {
+                    OnWindowTypeChanged(ItemsWindowType.DescriptionConfig);
+                }
+                if (openedWindow == ItemsWindowType.DescriptionConfig)
+                    GUI.skin = defaultSkin;
 
                 GUILayout.EndHorizontal();
 
+                switch (openedWindow)
+                {
+                    case ItemsWindowType.Actions:
+                        itemsWindowActions.Rect = Rect;
+                        itemsWindowActions.Draw(aID);
+                        break;
+                    case ItemsWindowType.Appearance:
+                        itemsWindowAppearance.Rect = Rect;
+                        itemsWindowAppearance.Draw(aID);
+                        break;
+                    case ItemsWindowType.DescriptionConfig:
+                        itemsWindowDescription.Rect = Rect;
+                        itemsWindowDescription.Draw(aID);
+                        break;
+                }
+            }
+            else
+            {
+                GUILayout.Space(30);
+                for (int i = 0; i < Controller.getInstance().getCharapterList().getSelectedChapterData().getItems().Count; i++)
+                {
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Box(Controller.getInstance().getCharapterList().getSelectedChapterData().getItems()[i].getId(), GUILayout.Width(m_Rect.width * 0.75f));
+                    if (GUILayout.Button(TC.get("GeneralText.Edit"), GUILayout.MaxWidth(m_Rect.width * 0.2f)))
+                    {
+                        ShowItemWindowView(i);
+                    }
+
+                    GUILayout.EndHorizontal();
+
+                }
             }
         }
-    }
 
-    // Two methods responsible for showing right window content 
-    // - concrete item info or base window view
-    public void ShowBaseWindowView()
-    {
-        isConcreteItemVisible = false;
-        GameRources.GetInstance().selectedItemIndex = -1;
-    }
+        // Two methods responsible for showing right window content 
+        // - concrete item info or base window view
+        public void ShowBaseWindowView()
+        {
+            isConcreteItemVisible = false;
+            GameRources.GetInstance().selectedItemIndex = -1;
+        }
 
-    public void ShowItemWindowView(int o)
-    {
-        isConcreteItemVisible = true;
-        GameRources.GetInstance().selectedItemIndex = o;
+        public void ShowItemWindowView(int o)
+        {
+            isConcreteItemVisible = true;
+            GameRources.GetInstance().selectedItemIndex = o;
 
-        itemsWindowActions = new ItemsWindowActions(thisRect, new GUIContent(TC.get("Item.ActionsPanelTitle")), "Window");
-        itemsWindowAppearance = new ItemsWindowAppearance(thisRect, new GUIContent(TC.get("Item.LookPanelTitle")), "Window");
-        itemsWindowDescription = new ItemsWindowDescription(thisRect, new GUIContent(TC.get("Item.DocPanelTitle")), "Window");
-    }
+            itemsWindowActions = new ItemsWindowActions(m_Rect, new GUIContent(TC.get("Item.ActionsPanelTitle")), "Window");
+            itemsWindowAppearance = new ItemsWindowAppearance(m_Rect, new GUIContent(TC.get("Item.LookPanelTitle")), "Window");
+            itemsWindowDescription = new ItemsWindowDescription(m_Rect, new GUIContent(TC.get("Item.DocPanelTitle")), "Window");
+        }
 
-    void OnWindowTypeChanged(ItemsWindowType type_)
-    {
-        openedWindow = type_;
+        void OnWindowTypeChanged(ItemsWindowType type_)
+        {
+            openedWindow = type_;
+        }
+        
+        //////////////////////////////////
+
+        protected override void OnElementNameChanged(ReorderableList r, int index, string newName)
+        {
+			Controller.getInstance().getCharapterList().getSelectedChapterDataControl().getItemsList().getItems ()[index].renameElement(newName);
+        }
+
+        protected override void OnAdd(ReorderableList r)
+        {
+            if (r.index != -1 && r.index < r.list.Count)
+            {
+                Controller.getInstance()
+                           .getCharapterList()
+                           .getSelectedChapterDataControl()
+                           .getItemsList()
+                           .duplicateElement(
+                               Controller.getInstance()
+                                   .getCharapterList()
+                                   .getSelectedChapterDataControl()
+                                   .getItemsList()
+                                   .getItems()[r.index]);
+            }
+            else
+            {
+                Controller.getInstance().getSelectedChapterDataControl().getItemsList().addElement(Controller.ITEM, "newItem");
+            }
+
+        }
+
+        protected override void OnAddOption(ReorderableList r, string option)
+        {
+            // No options
+        }
+
+        protected override void OnRemove(ReorderableList r)
+        {
+            if (r.index != -1)
+            {
+                Controller.getInstance()
+                              .getCharapterList()
+                              .getSelectedChapterDataControl()
+                              .getItemsList()
+                              .deleteElement(
+                                  Controller.getInstance()
+                                      .getCharapterList()
+                                      .getSelectedChapterDataControl()
+                                      .getItemsList()
+                                      .getItems()[r.index], false);
+
+                ShowBaseWindowView();
+            }
+        }
+
+        protected override void OnSelect(ReorderableList r)
+        {
+            ShowItemWindowView(r.index);
+        }
+
+        protected override void OnReorder(ReorderableList r)
+        {
+			var itemsListDataControl = Controller.getInstance ()
+				.getCharapterList ().getSelectedChapterDataControl ().getItemsList ();
+
+			var toPos = r.index;
+			var fromPos = itemsListDataControl.getItems ().FindIndex (i => i.getId () == r.list [r.index] as string);
+
+			itemsListDataControl.MoveElement (itemsListDataControl.getItems ()[fromPos], fromPos, toPos);
+		}
+
+
+
+        protected override void OnButton()
+        {
+            ShowBaseWindowView();
+            reorderableList.index = -1;
+        }
+
+        protected override void OnUpdateList(ReorderableList r)
+        {
+			Elements = Controller.getInstance().getCharapterList().getSelectedChapterDataControl().getItemsList ().getItems ().ConvertAll(s => s.getId());
+        }
     }
 }

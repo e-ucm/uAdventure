@@ -2,89 +2,94 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class AddResourcesBlockTool : Tool
+using uAdventure.Core;
+
+namespace uAdventure.Editor
 {
-
-    /**
-     * Arguments
-     */
-    private List<ResourcesUni> resourcesList;
-
-    private List<ResourcesDataControl> resourcesDataControlList;
-
-    private int resourcesType;
-
-    private DataControlWithResources parent;
-
-    /*
-     * Temporal data for undo/redo
-     */
-    private ResourcesUni newResources;
-
-    private ResourcesDataControl newResourcesDataControl;
-
-    public AddResourcesBlockTool(List<ResourcesUni> resourcesList, List<ResourcesDataControl> resourcesDataControlList, int resourcesType, DataControlWithResources parent)
+    public class AddResourcesBlockTool : Tool
     {
 
-        this.resourcesList = resourcesList;
-        this.resourcesDataControlList = resourcesDataControlList;
-        this.resourcesType = resourcesType;
-        this.parent = parent;
-    }
+        /**
+         * Arguments
+         */
+        private List<ResourcesUni> resourcesList;
 
-    public override bool canRedo()
-    {
+        private List<ResourcesDataControl> resourcesDataControlList;
 
-        return true;
-    }
+        private int resourcesType;
 
-   
-    public override bool canUndo()
-    {
+        private DataControlWithResources parent;
 
-        return true;
-    }
+        /*
+         * Temporal data for undo/redo
+         */
+        private ResourcesUni newResources;
 
-   
-    public override bool combine(Tool other)
-    {
+        private ResourcesDataControl newResourcesDataControl;
 
-        return false;
-    }
-
-   
-    public override bool doTool()
-    {
-
-        newResources = new ResourcesUni();
-        newResourcesDataControl = new ResourcesDataControl(newResources, resourcesType);
-        resourcesList.Add(newResources);
-        resourcesDataControlList.Add(newResourcesDataControl);
-        return true;
-    }
-
-   
-    public override bool redoTool()
-    {
-
-        resourcesList.Add(newResources);
-        resourcesDataControlList.Add(newResourcesDataControl);
-        parent.setSelectedResources(resourcesList.Count - 1);
-        Controller.getInstance().updatePanel();
-        return true;
-    }
-
-   
-    public override bool undoTool()
-    {
-
-        bool undone = resourcesList.Remove(newResources) && resourcesDataControlList.Remove(newResourcesDataControl);
-
-        if (undone)
+        public AddResourcesBlockTool(List<ResourcesUni> resourcesList, List<ResourcesDataControl> resourcesDataControlList, int resourcesType, DataControlWithResources parent)
         {
+
+            this.resourcesList = resourcesList;
+            this.resourcesDataControlList = resourcesDataControlList;
+            this.resourcesType = resourcesType;
+            this.parent = parent;
+        }
+
+        public override bool canRedo()
+        {
+
+            return true;
+        }
+
+
+        public override bool canUndo()
+        {
+
+            return true;
+        }
+
+
+        public override bool combine(Tool other)
+        {
+
+            return false;
+        }
+
+
+        public override bool doTool()
+        {
+
+            newResources = new ResourcesUni();
+            newResourcesDataControl = new ResourcesDataControl(newResources, resourcesType);
+            resourcesList.Add(newResources);
+            resourcesDataControlList.Add(newResourcesDataControl);
+            return true;
+        }
+
+
+        public override bool redoTool()
+        {
+
+            resourcesList.Add(newResources);
+            resourcesDataControlList.Add(newResourcesDataControl);
             parent.setSelectedResources(resourcesList.Count - 1);
             Controller.getInstance().updatePanel();
+            return true;
         }
-        return undone;
+
+
+        public override bool undoTool()
+        {
+
+            bool undone = resourcesList.Remove(newResources) && resourcesDataControlList.Remove(newResourcesDataControl);
+
+            if (undone)
+            {
+                parent.setSelectedResources(resourcesList.Count - 1);
+                Controller.getInstance().updatePanel();
+            }
+            return undone;
+        }
     }
 }

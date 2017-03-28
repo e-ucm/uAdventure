@@ -1,32 +1,37 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
-public class RunMenu : WindowMenuContainer
+using uAdventure.Core;
+
+namespace uAdventure.Editor
 {
-    private RunDebugMenuItem debug;
-    private RunNormalMenuItem normal;
-
-    public RunMenu()
+    public class RunMenu : WindowMenuContainer
     {
-        SetMenuItems();
-    }
+        private RunDebugMenuItem debug;
+        private RunNormalMenuItem normal;
 
-    protected override void Callback(object obj)
-    {
-        if ((obj as RunDebugMenuItem) != null)
-            debug.OnCliked();
-        else if ((obj as RunNormalMenuItem) != null)
-            normal.OnCliked();
-    }
+        public RunMenu()
+        {
+            SetMenuItems();
+        }
 
-    protected override void SetMenuItems()
-    {
-        menu = new GenericMenu();
+        protected override void Callback(object obj)
+        {
+            if ((obj as RunDebugMenuItem) != null)
+                debug.OnCliked();
+            else if ((obj as RunNormalMenuItem) != null)
+                normal.OnCliked();
+        }
 
-        debug = new RunDebugMenuItem("DEBUG");
-        normal = new RunNormalMenuItem("NORMAL");
+        protected override void SetMenuItems()
+        {
+            menu = new GenericMenu();
 
-        menu.AddItem(new GUIContent(Language.GetText(debug.Label)), false, Callback, debug);
-        menu.AddItem(new GUIContent(Language.GetText(normal.Label)), false, Callback, normal);
+            debug = new RunDebugMenuItem("DEBUG");
+            normal = new RunNormalMenuItem("NORMAL");
+
+            menu.AddItem(new GUIContent(Language.GetText(debug.Label)), false, Callback, debug);
+            menu.AddItem(new GUIContent(Language.GetText(normal.Label)), false, Callback, normal);
+        }
     }
 }

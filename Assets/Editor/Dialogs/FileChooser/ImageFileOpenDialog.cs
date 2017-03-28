@@ -1,24 +1,26 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.IO;
+﻿using System;
+using UnityEngine;
 
-public class ImageFileOpenDialog : BaseFileOpenDialog
+namespace uAdventure.Editor
 {
-    public virtual void Init(DialogReceiverInterface e, FileType fType)
+    public class ImageFileOpenDialog : BaseFileOpenDialog
     {
-        fileFilter = "image files (*.jpg, *.png, *.bmp)|*.jpg;*.png;*.bmp"; 
-        base.Init(e, fType);
-    }
+        public virtual void Init(DialogReceiverInterface e, FileType fType)
+        {
+            fileFilter = "image files (*.jpg, *.png, *.bmp)|*.jpg;*.png;*.bmp";
+            base.Init(e, fType);
+        }
 
-    protected override void ChoosedCorrectFile()
-    {
-        CopySelectedAssset();
-        reference.OnDialogOk(returnPath, fileType);
-    }
+        protected override void ChoosedCorrectFile()
+        {
+            CopySelectedAssset();
+            reference.OnDialogOk(returnPath, fileType);
+        }
 
-    protected override void FileSelectionNotPerfromed()
-    {
-        Debug.Log("NIc nie wybrałeś" );
-        reference.OnDialogCanceled();
+        protected override void FileSelectionNotPerfromed()
+        {
+            Debug.Log("NIc nie wybrałeś");
+            reference.OnDialogCanceled();
+        }
     }
 }

@@ -1,14 +1,20 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public interface EffectEditor {
-	void draw();
-    AbstractEffect Effect { get; set; }
-	string EffectName{ get; }
-	EffectEditor clone();
-	bool manages(AbstractEffect c);
+using uAdventure.Core;
 
-    bool Collapsed { get; set; }
+namespace uAdventure.Editor
+{
+    public interface EffectEditor
+    {
+        void draw();
+        AbstractEffect Effect { get; set; }
+        string EffectName { get; }
+        EffectEditor clone();
+        bool manages(AbstractEffect c);
 
-    Rect Window { get; set; }
+        bool Collapsed { get; set; }
+
+        Rect Window { get; set; }
+    }
 }

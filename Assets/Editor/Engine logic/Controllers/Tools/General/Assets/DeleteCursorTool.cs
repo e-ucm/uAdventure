@@ -1,61 +1,66 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class DeleteCursorTool : Tool
+using uAdventure.Core;
+
+namespace uAdventure.Editor
 {
-
-    private AdventureData adventureData;
-
-    private CustomCursor cursorDeleted;
-
-    private int index;
-
-    public DeleteCursorTool(AdventureData adventureData, int index)
+    public class DeleteCursorTool : Tool
     {
 
-        this.adventureData = adventureData;
-        this.index = index;
-    }
+        private AdventureData adventureData;
 
-    public override bool canRedo()
-    {
+        private CustomCursor cursorDeleted;
 
-        return true;
-    }
+        private int index;
 
-    public override bool canUndo()
-    {
+        public DeleteCursorTool(AdventureData adventureData, int index)
+        {
 
-        return true;
-    }
+            this.adventureData = adventureData;
+            this.index = index;
+        }
 
-    public override bool combine(Tool other)
-    {
+        public override bool canRedo()
+        {
 
-        return false;
-    }
+            return true;
+        }
 
-    public override bool doTool()
-    {
+        public override bool canUndo()
+        {
 
-        cursorDeleted = adventureData.getCursors()[index];
+            return true;
+        }
+
+        public override bool combine(Tool other)
+        {
+
+            return false;
+        }
+
+        public override bool doTool()
+        {
+
+            cursorDeleted = adventureData.getCursors()[index];
             adventureData.getCursors().RemoveAt(index);
-        return true;
-    }
+            return true;
+        }
 
-    public override bool redoTool()
-    {
+        public override bool redoTool()
+        {
 
-        cursorDeleted = adventureData.getCursors()[index];
-        adventureData.getCursors().RemoveAt(index);
-        Controller.getInstance().updatePanel();
-        return true;
-    }
+            cursorDeleted = adventureData.getCursors()[index];
+            adventureData.getCursors().RemoveAt(index);
+            Controller.getInstance().updatePanel();
+            return true;
+        }
 
-    public override bool undoTool()
-    {
-        adventureData.getCursors().Insert(index, cursorDeleted);
-        Controller.getInstance().updatePanel();
-        return true;
+        public override bool undoTool()
+        {
+            adventureData.getCursors().Insert(index, cursorDeleted);
+            Controller.getInstance().updatePanel();
+            return true;
+        }
     }
 }

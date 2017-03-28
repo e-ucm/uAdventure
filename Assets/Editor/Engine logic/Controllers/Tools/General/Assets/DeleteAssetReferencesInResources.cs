@@ -1,36 +1,41 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-/**
- * Edition tool for deleting the given asset path
- */
-public class DeleteAssetReferencesInResources : ResourcesTool
+using uAdventure.Core;
+
+namespace uAdventure.Editor
 {
-
     /**
-     * The assetPath to be deleted
+     * Edition tool for deleting the given asset path
      */
-    protected string assetPath;
-
-    public DeleteAssetReferencesInResources(ResourcesUni resources, string assetPath):base( resources, null, -1, -1 )
-    { 
-        this.assetPath = assetPath;
-    }
-
-    
-    public override bool doTool()
+    public class DeleteAssetReferencesInResources : ResourcesTool
     {
 
-        bool done = false;
-        // Search in the types of the resources
-        foreach (string type in resources.getAssetTypes())
+        /**
+         * The assetPath to be deleted
+         */
+        protected string assetPath;
+
+        public DeleteAssetReferencesInResources(ResourcesUni resources, string assetPath) : base(resources, null, -1, -1)
         {
-            if (resources.getAssetPath(type).Equals(assetPath))
-            {
-                resources.deleteAsset(type);
-                done = true;
-            }
+            this.assetPath = assetPath;
         }
-        return done;
+
+
+        public override bool doTool()
+        {
+
+            bool done = false;
+            // Search in the types of the resources
+            foreach (string type in resources.getAssetTypes())
+            {
+                if (resources.getAssetPath(type).Equals(assetPath))
+                {
+                    resources.deleteAsset(type);
+                    done = true;
+                }
+            }
+            return done;
+        }
     }
 }

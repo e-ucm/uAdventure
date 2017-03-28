@@ -1,15 +1,19 @@
 ﻿using UnityEngine;
 using System.Collections;
+using uAdventure.Core;
 
-public class EditorImageLoader : ImageLoaderFactory
+namespace uAdventure.Editor
 {
-    public Sprite getImageFromPath(string uri)
+    public class EditorImageLoader : ImageLoaderFactory
     {
-        return AssetsController.getImage(uri);
-    }
+        public Sprite getImageFromPath(string uri)
+        {
+            return AssetsController.getImage(uri);
+        }
 
-    public void showErrorDialog(string title, string message)
-    {
-        Controller.getInstance().showErrorDialog(title, message);
+        public void showErrorDialog(string title, string message)
+        {
+            Controller.getInstance().showErrorDialog(title, message);
+        }
     }
 }

@@ -2,25 +2,32 @@
 using UnityEngine.UI;
 using System.Collections;
 
-public class DotAnimater : MonoBehaviour {
-	string[] strings = { "...", " ..", ". .", ".. " };
+namespace uAdventure.GameSelector
+{
+    public class DotAnimater : MonoBehaviour
+    {
+        string[] strings = { "...", " ..", ". .", ".. " };
 
-	Text dots;
+        Text dots;
 
-	void Start () {
-		dots = this.GetComponent<Text> ();
-	}
-	
-	float time_since_last_change = 0;
-	int pos = 0;
-	void Update () {
+        void Start()
+        {
+            dots = this.GetComponent<Text>();
+        }
 
-		time_since_last_change += Time.deltaTime;
+        float time_since_last_change = 0;
+        int pos = 0;
+        void Update()
+        {
 
-		if (time_since_last_change > 0.5f) {
-			pos = (pos + 1) % 4;
-			time_since_last_change = 0;
-			dots.text = strings [pos];
-		}
-	}
+            time_since_last_change += Time.deltaTime;
+
+            if (time_since_last_change > 0.5f)
+            {
+                pos = (pos + 1) % 4;
+                time_since_last_change = 0;
+                dots.text = strings[pos];
+            }
+        }
+    }
 }

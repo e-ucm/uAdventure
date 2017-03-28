@@ -1,7 +1,9 @@
-﻿public interface Timed
+﻿namespace uAdventure.Core
 {
-    long getTime();
+    public interface Timed
+    {
+        long getTime();
 
-    void setTime(long newTime);
+        void setTime(long newTime);
+    }
 }
-

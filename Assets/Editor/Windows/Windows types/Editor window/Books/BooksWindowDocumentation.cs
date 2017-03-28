@@ -1,38 +1,40 @@
 ﻿using UnityEngine;
-using System.Collections;
 
-public class BooksWindowDocumentation : LayoutWindow
+using uAdventure.Core;
+
+namespace uAdventure.Editor
 {
-    private string documentation, documentationLast;
-    private float windowHeight;
-
-    public BooksWindowDocumentation(Rect aStartPos, GUIContent aContent, GUIStyle aStyle,
-        params GUILayoutOption[] aOptions)
-        : base(aStartPos, aContent, aStyle, aOptions)
+    public class BooksWindowDocumentation : LayoutWindow
     {
-        string doc = "";
+        private string documentation, documentationLast;
 
-        if (GameRources.GetInstance().selectedCutsceneIndex >= 0)
-            doc = Controller.getInstance().getCharapterList().getSelectedChapterData().getBooks()[
-                GameRources.GetInstance().selectedBookIndex].getDocumentation();
-        doc = (doc == null ? "" : doc);
-        documentation = documentationLast = doc;
-        windowHeight = aStartPos.height;
-    }
+        public BooksWindowDocumentation(Rect aStartPos, GUIContent aContent, GUIStyle aStyle,
+            params GUILayoutOption[] aOptions)
+            : base(aStartPos, aContent, aStyle, aOptions)
+        {
+            string doc = "";
 
-    public override void Draw(int aID)
-    {
-        GUILayout.Space(20);
-        GUILayout.Label(TC.get("Book.Documentation"));
-        GUILayout.Space(20);
-        documentation = GUILayout.TextArea(documentation, GUILayout.MinHeight(0.4f * windowHeight));
-        if (!documentation.Equals(documentationLast))
-            OnDocumentationChanged(documentation);
-    }
+            if (GameRources.GetInstance().selectedCutsceneIndex >= 0)
+                doc = Controller.getInstance().getCharapterList().getSelectedChapterData().getBooks()[
+                    GameRources.GetInstance().selectedBookIndex].getDocumentation();
+            doc = (doc == null ? "" : doc);
+            documentation = documentationLast = doc;
+        }
 
-    private void OnDocumentationChanged(string s)
-    {
-        Controller.getInstance().getCharapterList().getSelectedChapterData().getBooks()[GameRources.GetInstance().selectedBookIndex].setDocumentation(s);
-        documentationLast = s;
+        public override void Draw(int aID)
+        {
+            GUILayout.Space(20);
+            GUILayout.Label(TC.get("Book.Documentation"));
+            GUILayout.Space(20);
+            documentation = GUILayout.TextArea(documentation, GUILayout.MinHeight(0.4f * m_Rect.height));
+            if (!documentation.Equals(documentationLast))
+                OnDocumentationChanged(documentation);
+        }
+
+        private void OnDocumentationChanged(string s)
+        {
+            Controller.getInstance().getCharapterList().getSelectedChapterData().getBooks()[GameRources.GetInstance().selectedBookIndex].setDocumentation(s);
+            documentationLast = s;
+        }
     }
 }

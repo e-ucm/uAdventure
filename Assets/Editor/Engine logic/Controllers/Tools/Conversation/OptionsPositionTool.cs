@@ -1,70 +1,75 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class OptionsPositionTool : Tool
+using uAdventure.Core;
+
+namespace uAdventure.Editor
 {
-
-    private bool bottomPosition;
-
-    private OptionConversationNode optionNode;
-
-    public OptionsPositionTool(OptionConversationNode optionNode, bool bottomPosition)
-    {
-        this.optionNode = optionNode;
-        this.bottomPosition = bottomPosition;
-    }
-
-
-
-    public override bool canRedo()
+    public class OptionsPositionTool : Tool
     {
 
-        return true;
-    }
+        private bool bottomPosition;
+
+        private OptionConversationNode optionNode;
+
+        public OptionsPositionTool(OptionConversationNode optionNode, bool bottomPosition)
+        {
+            this.optionNode = optionNode;
+            this.bottomPosition = bottomPosition;
+        }
 
 
-    public override bool canUndo()
-    {
 
-        return true;
-    }
+        public override bool canRedo()
+        {
 
-
-    public override bool combine(Tool other)
-    {
-
-        return false;
-    }
+            return true;
+        }
 
 
-    public override bool doTool()
-    {
+        public override bool canUndo()
+        {
 
-        if (bottomPosition)
-            optionNode.setBottomPosition();
-        else
-            optionNode.setTopPosition();
-
-        Controller.getInstance().updatePanel();
-        return true;
-    }
+            return true;
+        }
 
 
-    public override bool redoTool()
-    {
+        public override bool combine(Tool other)
+        {
 
-        return doTool();
-    }
+            return false;
+        }
 
 
-    public override bool undoTool()
-    {
+        public override bool doTool()
+        {
 
-        if (bottomPosition)
-            optionNode.setTopPosition();
-        else
-            optionNode.setBottomPosition();
-        Controller.getInstance().updatePanel();
-        return true;
+            if (bottomPosition)
+                optionNode.setBottomPosition();
+            else
+                optionNode.setTopPosition();
+
+            Controller.getInstance().updatePanel();
+            return true;
+        }
+
+
+        public override bool redoTool()
+        {
+
+            return doTool();
+        }
+
+
+        public override bool undoTool()
+        {
+
+            if (bottomPosition)
+                optionNode.setTopPosition();
+            else
+                optionNode.setBottomPosition();
+            Controller.getInstance().updatePanel();
+            return true;
+        }
     }
 }

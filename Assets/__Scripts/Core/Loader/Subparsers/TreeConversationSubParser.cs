@@ -1,256 +1,250 @@
 ﻿using UnityEngine;
 using System.Collections;
-using System.Xml;
 using System.Collections.Generic;
+using System.Xml;
 
-/**
- * Class to subparse tree conversations
- */
-public class TreeConversationSubParser : SubParser
+namespace uAdventure.Core
 {
-
-    /* Attributes */
-
-    /**
-     * Constant for subparsing nothing
-     */
-    private const int SUBPARSING_NONE = 0;
-
-    /**
-     * Constant for subparsing effect tag
-     */
-    private const int SUBPARSING_EFFECT = 1;
-
-    /**
-     * Normal state
-     */
-    private const int STATE_NORMAL = 0;
-
-    /**
-     * Waiting for an option state
-     */
-    private const int STATE_WAITING_OPTION = 1;
-
-    /**
-     * Stores the current element being subparsed
-     */
-    private int subParsing = SUBPARSING_NONE;
-
-    /**
-     * State of the recognizer
-     */
-    private int state = STATE_NORMAL;
-
-    /**
-     * Stores the different conversations, in trees form
-     */
-    private Conversation conversation;
-
-    /**
-     * Stores the current node
-     */
-    private ConversationNode currentNode;
-
-    /**
-     * Stores the past optional nodes, for back tracking
-     */
-    private List<ConversationNode> pastOptionNodes;
-
-    /**
-     * Current effect (of the current node)
-     */
-    private Effects currentEffects;
-
-    /**
-     * The subparser for the effect
-     */
-    private SubParser effectSubParser;
-
-    /**
-     * Name of the last non-player character read, "NPC" is no name were found
-     */
-    private string characterName;
-
-    /**
-     * Path of the audio track for a conversation line
-     */
-    private string audioPath;
-
-    /**
-     * Check if the options in option node may be random
-     */
-    private bool random;
-
-    /**
-     * Check if the previous line will be showed at options node
-     */
-    private bool keepShowing;
-
-    /**
-     * Check if the user's response will be showed
-     */
-    private bool showUserOption;
-
-    /**
-     * Check if the option node allows the pre-listening of the options
-     */
-    private bool preListening;
-
-    /**
-     * The position to be painted the option nodes
-     */
-    private int x, y;
-
-    /**
-     * Check if a conversation line must be synthesize
-     */
-
-    private bool synthesizerVoice;
-
-    /* Methods */
-
-    /**
-     * Constructor
-     * 
-     * @param chapter
-     *            Chapter data to store the readed data
-     */
-    public TreeConversationSubParser(Chapter chapter) : base(chapter)
+    public class TreeConversationSubParser : Subparser
     {
-    }
+        /**
+        * Stores the different conversations, in trees form
+        */
+        private Conversation conversation;
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see conversationaleditor.xmlparser.ConversationParser#startElement(java.lang.string, java.lang.string,
-     *      java.lang.string, org.xml.sax.Attributes)
-     */
-    public override void startElement(string namespaceURI, string sName, string qName, Dictionary<string, string> attrs)
-    {
+        /**
+         * Stores the current node
+         */
+        private ConversationNode currentNode;
 
-        // If no element is being subparsed
-        if (subParsing == SUBPARSING_NONE)
+        /**
+         * Stores the past optional nodes, for back tracking
+         */
+        private List<ConversationNode> pastOptionNodes;
+
+        /**
+         * Current effect (of the current node)
+         */
+        private Effects currentEffects;
+
+        /**
+         * Name of the last non-player character read, "NPC" is no name were found
+         */
+        private string characterName;
+
+        /**
+         * Path of the audio track for a conversation line
+         */
+        private string audioPath;
+
+        /**
+         * Check if the options in option node may be random
+         */
+        private bool random;
+
+        /**
+         * Check if the previous line will be showed at options node
+         */
+        private bool keepShowing;
+
+        /**
+         * Check if the user's response will be showed
+         */
+        private bool showUserOption;
+
+        /**
+         * Check if the option node allows the pre-listening of the options
+         */
+        private bool preListening;
+
+        /**
+         * The position to be painted the option nodes
+         */
+        private int x, y;
+
+        /**
+         * Check if a conversation line must be synthesize
+         */
+
+        private bool synthesizerVoice;
+
+
+        public TreeConversationSubParser(Chapter chapter) : base(chapter)
         {
+        }
 
-            // If it is a "conversation" we pick the name, so we can build the tree later
-            if (qName.Equals("tree-conversation"))
+        public override void ParseElement(XmlElement element)
+        {
+            XmlNodeList
+                speakschar = element.SelectNodes("speak-char"),
+                speaksplayer = element.SelectNodes("speak-player"),
+                responses = element.SelectNodes("response"),
+                options = element.SelectNodes("option"),
+                effects = element.SelectNodes("effect"),
+                gosback = element.SelectNodes("go-back");
+
+
+            string tmpArgVal;
+
+            // Store the name
+            string conversationName = "";
+
+            tmpArgVal = element.GetAttribute("id");
+            if (!string.IsNullOrEmpty(tmpArgVal))
             {
-                // Store the name
-                string conversationName = "";
-                foreach (KeyValuePair<string, string> entry in attrs)
-                    if (entry.Key.Equals("id"))
-                        conversationName = entry.Value.ToString();
-
-                // Create a dialogue node (which will be the root node) and add it to a new tree
-                // The content of the tree will be built adding nodes directly to the root
-                currentNode = new DialogueConversationNode();
-                conversation = new TreeConversation(conversationName, currentNode);
-                pastOptionNodes = new List<ConversationNode>();
+                conversationName = tmpArgVal;
             }
 
-            // If it is a non-player character line, store the character name and audio path (if present)
-            else if (qName.Equals("speak-char"))
+            // Create a dialogue node (which will be the root node) and add it to a new tree
+            // The content of the tree will be built adding nodes directly to the root
+            currentNode = new DialogueConversationNode();
+            conversation = new TreeConversation(conversationName, currentNode);
+            pastOptionNodes = new List<ConversationNode>();
+
+            foreach (XmlElement el in speakschar)
             {
                 // Set default name to "NPC"
                 characterName = "NPC";
                 audioPath = "";
 
-                foreach (KeyValuePair<string, string> entry in attrs)
+                // If there is a "idTarget" attribute, store it
+                tmpArgVal = el.GetAttribute("idTarget");
+                if (!string.IsNullOrEmpty(tmpArgVal))
                 {
-                    // If there is a "idTarget" attribute, store it
-                    if (entry.Key.Equals("idTarget"))
-                        characterName = entry.Value.ToString();
-
-                    // If there is a "uri" attribute, store it as audio path
-                    if (entry.Key.Equals("uri"))
-                        audioPath = entry.Value.ToString();
-                    // If there is a "synthesize" attribute, store its value
-                    if (entry.Key.Equals("synthesize"))
-                    {
-                        string response = entry.Value.ToString();
-                        if (response.Equals("yes"))
-                            synthesizerVoice = true;
-                        else
-                            synthesizerVoice = false;
-                    }
+                    characterName = tmpArgVal;
                 }
+
+                // If there is a "uri" attribute, store it as audio path
+                tmpArgVal = el.GetAttribute("uri");
+                if (!string.IsNullOrEmpty(tmpArgVal))
+                {
+                    audioPath = tmpArgVal;
+                }
+
+                // If there is a "uri" attribute, store it as audio path
+                tmpArgVal = el.GetAttribute("synthesize");
+                if (!string.IsNullOrEmpty(tmpArgVal))
+                {
+                    string response = tmpArgVal;
+                    if (response.Equals("yes"))
+                        synthesizerVoice = true;
+                    else
+                        synthesizerVoice = false;
+                }
+
+                // Store the read string into the current node, and then delete the string. The trim is performed so we
+                // don't
+                // have to worry with indentations or leading/trailing spaces
+                ConversationLine line = new ConversationLine(characterName, el.InnerText);
+                if (audioPath != null && !this.audioPath.Equals(""))
+                {
+                    line.setAudioPath(audioPath);
+                }
+
+                line.setSynthesizerVoice(synthesizerVoice);
+                currentNode.addLine(line);
+
             }
 
-            // If it is a player character line, store the audio path (if present)
-            else if (qName.Equals("speak-player"))
+            foreach (XmlElement el in speaksplayer)
             {
                 audioPath = "";
 
-                foreach (KeyValuePair<string, string> entry in attrs)
+                // If there is a "uri" attribute, store it as audio path
+                tmpArgVal = el.GetAttribute("uri");
+                if (!string.IsNullOrEmpty(tmpArgVal))
                 {
-
-                    // If there is a "uri" attribute, store it as audio path
-                    if (entry.Key.Equals("uri"))
-                        audioPath = entry.Value.ToString();
-
-                    // If there is a "synthesize" attribute, store its value
-                    if (entry.Key.Equals("synthesize"))
-                    {
-                        string response = entry.Value.ToString();
-                        if (response.Equals("yes"))
-                            synthesizerVoice = true;
-                        else
-                            synthesizerVoice = false;
-                    }
+                    audioPath = tmpArgVal;
                 }
+                // If there is a "uri" attribute, store it as audio path
+                tmpArgVal = el.GetAttribute("synthesize");
+                if (!string.IsNullOrEmpty(tmpArgVal))
+                {
+                    string response = tmpArgVal;
+                    if (response.Equals("yes"))
+                        synthesizerVoice = true;
+                    else
+                        synthesizerVoice = false;
+                }
+
+                // Store the read string into the current node, and then delete the string. The trim is performed so we
+                // don't have to worry with indentations or leading/trailing spaces
+                ConversationLine line = new ConversationLine(ConversationLine.PLAYER, el.InnerText);
+                if (audioPath != null && !this.audioPath.Equals(""))
+                {
+                    line.setAudioPath(audioPath);
+                }
+                line.setSynthesizerVoice(synthesizerVoice);
+
+                currentNode.addLine(line);
             }
 
-            // If it is a point with a set of possible responses, create a new OptionNode
-            else if (qName.Equals("response"))
+            foreach (XmlElement el in responses)
             {
 
-                foreach (KeyValuePair<string, string> entry in attrs)
+                //If there is a "random" attribute, store is the options will be random
+                tmpArgVal = el.GetAttribute("random");
+                if (!string.IsNullOrEmpty(tmpArgVal))
                 {
-                    //If there is a "random" attribute, store is the options will be random
-                    if (entry.Key.Equals("random"))
-                    {
-                        if (entry.Value.ToString().Equals("yes"))
-                            random = true;
-                        else
-                            random = false;
-                    }
-                    //If there is a "keepShowing" attribute, keep the previous conversation line showing
-                    if (entry.Key.Equals("keepShowing"))
-                    {
-                        if (entry.Value.ToString().Equals("yes"))
-                            keepShowing = true;
-                        else
-                            keepShowing = false;
-                    }
-                    //If there is a "showUserOption" attribute, identify if show the user response at option node
-                    if (entry.Key.Equals("showUserOption"))
-                    {
-                        if (entry.Value.ToString().Equals("yes"))
-                            showUserOption = true;
-                        else
-                            showUserOption = false;
-                    }
-
-                    //If there is a "showUserOption" attribute, identify if show the user response at option node
-                    if (entry.Key.Equals("preListening"))
-                    {
-                        if (entry.Value.ToString().Equals("yes"))
-                            preListening = true;
-                        else
-                            preListening = false;
-                    }
-
-                    //If there is a "x" and "y" attributes with the position where the option node has to be painted,
-                    if (entry.Key.Equals("x"))
-                    {
-                        x = int.Parse(entry.Value.ToString());
-                    }
-
-                    if (entry.Key.Equals("y"))
-                    {
-                        y = int.Parse(entry.Value.ToString());
-                    }
+                    if (tmpArgVal.Equals("yes"))
+                        random = true;
+                    else
+                        random = false;
                 }
+
+                //If there is a "keepShowing" attribute, keep the previous conversation line showing
+                tmpArgVal = el.GetAttribute("keepShowing");
+                if (!string.IsNullOrEmpty(tmpArgVal))
+                {
+                    if (tmpArgVal.Equals("yes"))
+                        keepShowing = true;
+                    else
+                        keepShowing = false;
+                }
+
+                //If there is a "showUserOption" attribute, identify if show the user response at option node
+                tmpArgVal = el.GetAttribute("showUserOption");
+                if (!string.IsNullOrEmpty(tmpArgVal))
+                {
+                    if (tmpArgVal.Equals("yes"))
+                        showUserOption = true;
+                    else
+                        showUserOption = false;
+                }
+
+
+                //If there is a "showUserOption" attribute, identify if show the user response at option node
+                tmpArgVal = el.GetAttribute("preListening");
+                if (!string.IsNullOrEmpty(tmpArgVal))
+                {
+                    if (tmpArgVal.Equals("yes"))
+                        preListening = true;
+                    else
+                        preListening = false;
+                }
+
+                //If there is a "x" and "y" attributes with the position where the option node has to be painted,
+                tmpArgVal = el.GetAttribute("preListening");
+                if (!string.IsNullOrEmpty(tmpArgVal))
+                {
+                    if (tmpArgVal.Equals("yes"))
+                        preListening = true;
+                    else
+                        preListening = false;
+                }
+
+                //If there is a "x" and "y" attributes with the position where the option node has to be painted
+                tmpArgVal = el.GetAttribute("x");
+                if (!string.IsNullOrEmpty(tmpArgVal))
+                {
+                    x = int.Parse(tmpArgVal);
+                }
+                tmpArgVal = el.GetAttribute("y");
+                if (!string.IsNullOrEmpty(tmpArgVal))
+                {
+                    y = int.Parse(tmpArgVal);
+                }
+
                 // Create a new OptionNode, and link it to the current node
                 ConversationNode nuevoNodoOpcion = new OptionConversationNode(random, keepShowing, showUserOption, preListening, x, y);
                 currentNode.addChild(nuevoNodoOpcion);
@@ -258,149 +252,109 @@ public class TreeConversationSubParser : SubParser
                 // Change the actual node for the option node recently created
                 currentNode = nuevoNodoOpcion;
             }
-
-            // If we are about to read an option, change the state of the recognizer, so we can read the line of the
-            // option
-            else if (qName.Equals("option"))
+            
             {
-                state = STATE_WAITING_OPTION;
-
+                var iterator = options.GetEnumerator();
+                while (iterator.MoveNext())
+                {
+                    currentNode = pastOptionNodes[pastOptionNodes.Count - 1];
+                    pastOptionNodes.RemoveAt(pastOptionNodes.Count - 1);
+                }
             }
 
-            // If it is an effect tag, create new effect, new subparser and switch state
-            else if (qName.Equals("effect"))
+            foreach (XmlElement el in effects)
             {
                 currentEffects = new Effects();
-                effectSubParser = new EffectSubParser(currentEffects, chapter);
-                subParsing = SUBPARSING_EFFECT;
-            }
-
-            // If there is a go back, link the current node (which will be a DialogueNode) with the last OptionNode
-            // stored
-            else if (qName.Equals("go-back"))
-            {
-                currentNode.addChild(pastOptionNodes[pastOptionNodes.Count - 1]);
-            }
-        }
-
-        // If an effect element is being subparsed, spread the call
-        if (subParsing == SUBPARSING_EFFECT)
-        {
-            effectSubParser.startElement(namespaceURI, sName, qName, attrs);
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see conversationaleditor.xmlparser.ConversationParser#endElement(java.lang.string, java.lang.string,
-     *      java.lang.string)
-     */
-    public override void endElement(string namespaceURI, string sName, string qName)
-    {
-
-        // If no element is being subparsed
-        if (subParsing == SUBPARSING_NONE)
-        {
-            // If the conversation ends, store it in the game data
-            if (qName.Equals("tree-conversation"))
-            {
-                chapter.addConversation(new GraphConversation((TreeConversation)conversation));
-            }
-
-            // If the tag is a line said by the player, add it to the current node
-            else if (qName.Equals("speak-player"))
-            {
-                // Store the read string into the current node, and then delete the string. The trim is performed so we
-                // don't
-                // have to worry with indentations or leading/trailing spaces
-                ConversationLine line = new ConversationLine(ConversationLine.PLAYER, currentstring.Trim());
-                if (audioPath != null && !this.audioPath.Equals(""))
-                {
-                    line.setAudioPath(audioPath);
-                }
-                if (synthesizerVoice != null)
-                    line.setSynthesizerVoice(synthesizerVoice);
-
-                currentNode.addLine(line);
-
-                // If we were waiting an option, create a new DialogueNode
-                if (state == STATE_WAITING_OPTION)
-                {
-                    // Create a new DialogueNode, and link it to the current node (which will be a OptionNode)
-                    ConversationNode newDialogueNode = new DialogueConversationNode();
-                    currentNode.addChild(newDialogueNode);
-
-                    // Add the current node (OptionNode) in the list of past option nodes, and change the current node
-                    pastOptionNodes.Add(currentNode);
-                    currentNode = newDialogueNode;
-
-                    // Go back to the normal state
-                    state = STATE_NORMAL;
-                }
-
-            }
-
-            // If the tag is a line said by a non-player character, add it to the current node
-            else if (qName.Equals("speak-char"))
-            {
-                // Store the read string into the current node, and then delete the string. The trim is performed so we
-                // don't
-                // have to worry with indentations or leading/trailing spaces
-                ConversationLine line = new ConversationLine(characterName, currentstring.Trim());
-                if (audioPath != null && !this.audioPath.Equals(""))
-                {
-                    line.setAudioPath(audioPath);
-                }
-
-                if (synthesizerVoice != null)
-                    line.setSynthesizerVoice(synthesizerVoice);
-                currentNode.addLine(line);
-
-            }
-
-            // If an "option" tag ends, go back to keep working on the last OptionNode
-            else if (qName.Equals("option"))
-            {
-                // Se the current node to the last OptionNode stored
-                currentNode = pastOptionNodes[pastOptionNodes.Count - 1];
-                pastOptionNodes.RemoveAt(pastOptionNodes.Count - 1);
-            }
-
-            // Reset the current string
-            currentstring = string.Empty;
-        }
-
-        // If an effect tag is being subparsed
-        else if (subParsing == SUBPARSING_EFFECT)
-        {
-            // Spread the call
-            effectSubParser.endElement(namespaceURI, sName, qName);
-
-            // If the effect is being closed, insert the effect into the current node
-            if (qName.Equals("effect"))
-            {
-
+                //new EffectSubParser_(currentEffects, chapter).ParseElement(el);
                 currentNode.setEffects(currentEffects);
-                subParsing = SUBPARSING_NONE;
             }
+            {
+                var i = gosback.GetEnumerator();
+                while (i.MoveNext())
+                {
+                    currentNode.addChild(pastOptionNodes[pastOptionNodes.Count - 1]);
+                }
+            }
+
+            chapter.addConversation(new GraphConversation((TreeConversation)conversation));
         }
-    }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see es.eucm.eadventure.engine.loader.subparsers.SubParser#characters(char[], int, int)
-     */
-    public override void characters(char[] buf, int offset, int len)
-    {
+        //public override void startElement(string namespaceURI, string sName, string qName, Dictionary<string, string> attrs)
+        //{
 
-        // If no element is being subparsed
-        if (subParsing == SUBPARSING_NONE)
-            base.characters(buf, offset, len);
+        //    // If no element is being subparsed
+        //    if (subParsing == SUBPARSING_NONE)
+        //    {
 
-        // If an effect is being subparsed
-        else if (subParsing == SUBPARSING_EFFECT)
-            effectSubParser.characters(buf, offset, len);
+        //        // If we are about to read an option, change the state of the recognizer, so we can read the line of the
+        //        // option
+        //        else if (qName.Equals("option"))
+        //        {
+        //            state = STATE_WAITING_OPTION;
+
+        //        }
+
+
+        //    }
+
+        //    // If an effect element is being subparsed, spread the call
+        //    if (subParsing == SUBPARSING_EFFECT)
+        //    {
+        //        effectSubParser.startElement(namespaceURI, sName, qName, attrs);
+        //    }
+        //}
+
+        ///*
+        // * (non-Javadoc)
+        // * 
+        // * @see conversationaleditor.xmlparser.ConversationParser#endElement(java.lang.string, java.lang.string,
+        // *      java.lang.string)
+        // */
+        //public override void endElement(string namespaceURI, string sName, string qName)
+        //{
+
+        //    // If no element is being subparsed
+        //    if (subParsing == SUBPARSING_NONE)
+        //    {
+
+        //        // If the tag is a line said by the player, add it to the current node
+        //        else if (qName.Equals("speak-player"))
+        //        {
+
+
+        //            // If we were waiting an option, create a new DialogueNode
+        //            if (state == STATE_WAITING_OPTION)
+        //            {
+        //                // Create a new DialogueNode, and link it to the current node (which will be a OptionNode)
+        //                ConversationNode newDialogueNode = new DialogueConversationNode();
+        //                currentNode.addChild(newDialogueNode);
+
+        //                // Add the current node (OptionNode) in the list of past option nodes, and change the current node
+        //                pastOptionNodes.Add(currentNode);
+        //                currentNode = newDialogueNode;
+
+        //                // Go back to the normal state
+        //                state = STATE_NORMAL;
+        //            }
+
+        //        }
+
+        //    }
+
+        //    // If an effect tag is being subparsed
+        //    else if (subParsing == SUBPARSING_EFFECT)
+        //    {
+        //        // Spread the call
+        //        effectSubParser.endElement(namespaceURI, sName, qName);
+
+        //        // If the effect is being closed, insert the effect into the current node
+        //        if (qName.Equals("effect"))
+        //        {
+
+        //            currentNode.setEffects(currentEffects);
+        //            subParsing = SUBPARSING_NONE;
+        //        }
+        //    }
+        //}
     }
 }

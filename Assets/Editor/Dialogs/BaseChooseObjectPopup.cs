@@ -1,19 +1,22 @@
 ﻿using UnityEngine;
 using UnityEditor;
 
-public class BaseChooseObjectPopup : EditorWindow
+namespace uAdventure.Editor
 {
-
-    protected DialogReceiverInterface reference;
-    protected string[] elements;
-    protected string selectedElementID;
-
-    public virtual void Init(DialogReceiverInterface e)
+    public class BaseChooseObjectPopup : EditorWindow
     {
-        BaseChooseObjectPopup window = this;
-        reference = e;
-        window.position = new Rect(Screen.width / 2 - 50, Screen.height / 2 - 150, 500, 100);
-        window.Show();
-    }
 
+        protected DialogReceiverInterface reference;
+        protected string[] elements;
+        protected string selectedElementID;
+
+        public virtual void Init(DialogReceiverInterface e)
+        {
+            BaseChooseObjectPopup window = this;
+            reference = e;
+            window.position = new Rect(Screen.width / 2 - 50, Screen.height / 2 - 150, 500, 100);
+            window.Show();
+        }
+
+    }
 }

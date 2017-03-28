@@ -2,66 +2,72 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class DeleteBookPageTool : Tool {
+using uAdventure.Core;
 
-
-    private List<BookPage> bookPagesList;
-
-    private BookPage bookPage;
-
-    private int index;
-
-    public DeleteBookPageTool(List<BookPage> bookPagesList, BookPage page)
+namespace uAdventure.Editor
+{
+    public class DeleteBookPageTool : Tool
     {
 
-        this.bookPagesList = bookPagesList;
-        this.bookPage = page;
-        this.index = bookPagesList.IndexOf(bookPage);
-    }
 
-    
-    public override bool canRedo()
-    {
+        private List<BookPage> bookPagesList;
 
-        return true;
-    }
+        private BookPage bookPage;
 
-    
-    public override bool canUndo()
-    {
+        private int index;
 
-        return true;
-    }
+        public DeleteBookPageTool(List<BookPage> bookPagesList, BookPage page)
+        {
 
-    
-    public override bool combine(Tool other)
-    {
+            this.bookPagesList = bookPagesList;
+            this.bookPage = page;
+            this.index = bookPagesList.IndexOf(bookPage);
+        }
 
-        return false;
-    }
 
-    
-    public override bool doTool()
-    {
+        public override bool canRedo()
+        {
 
-        return bookPagesList.Remove(bookPage);
-    }
+            return true;
+        }
 
-    
-    public override bool redoTool()
-    {
 
-        bool temp = bookPagesList.Remove(bookPage);
-        Controller.getInstance().updatePanel();
-        return temp;
-    }
+        public override bool canUndo()
+        {
 
-    
-    public override bool undoTool()
-    {
+            return true;
+        }
 
-        bookPagesList.Insert(index, bookPage);
-        Controller.getInstance().updatePanel();
-        return true;
+
+        public override bool combine(Tool other)
+        {
+
+            return false;
+        }
+
+
+        public override bool doTool()
+        {
+
+            return bookPagesList.Remove(bookPage);
+        }
+
+
+        public override bool redoTool()
+        {
+
+            bool temp = bookPagesList.Remove(bookPage);
+            Controller.getInstance().updatePanel();
+            return temp;
+        }
+
+
+        public override bool undoTool()
+        {
+
+            bookPagesList.Insert(index, bookPage);
+            Controller.getInstance().updatePanel();
+            return true;
+        }
     }
 }

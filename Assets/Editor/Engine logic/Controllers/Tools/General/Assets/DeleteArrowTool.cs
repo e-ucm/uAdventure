@@ -1,62 +1,67 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class DeleteArrowTool : Tool
+using uAdventure.Core;
+
+namespace uAdventure.Editor
 {
-
-    private AdventureData adventureData;
-
-    private CustomArrow arrowDeleted;
-
-    private int index;
-
-    public DeleteArrowTool(AdventureData adventureData, int index)
+    public class DeleteArrowTool : Tool
     {
 
-        this.adventureData = adventureData;
-        this.index = index;
-    }
+        private AdventureData adventureData;
 
-    public override bool canRedo()
-    {
+        private CustomArrow arrowDeleted;
 
-        return true;
-    }
+        private int index;
 
-    public override bool canUndo()
-    {
+        public DeleteArrowTool(AdventureData adventureData, int index)
+        {
 
-        return true;
-    }
+            this.adventureData = adventureData;
+            this.index = index;
+        }
 
-    public override bool combine(Tool other)
-    {
+        public override bool canRedo()
+        {
 
-        return false;
-    }
+            return true;
+        }
 
-    public override bool doTool()
-    {
-        
-        arrowDeleted = adventureData.getArrows()[index];
-        adventureData.getArrows().RemoveAt(index);
-        return true;
-    }
+        public override bool canUndo()
+        {
 
-    public override bool redoTool()
-    {
+            return true;
+        }
 
-        arrowDeleted = adventureData.getArrows()[index];
+        public override bool combine(Tool other)
+        {
+
+            return false;
+        }
+
+        public override bool doTool()
+        {
+
+            arrowDeleted = adventureData.getArrows()[index];
             adventureData.getArrows().RemoveAt(index);
-        Controller.getInstance().updatePanel();
-        return true;
-    }
+            return true;
+        }
 
-    public override bool undoTool()
-    {
+        public override bool redoTool()
+        {
 
-        adventureData.getArrows().Insert(index, arrowDeleted);
-        Controller.getInstance().updatePanel();
-        return true;
+            arrowDeleted = adventureData.getArrows()[index];
+            adventureData.getArrows().RemoveAt(index);
+            Controller.getInstance().updatePanel();
+            return true;
+        }
+
+        public override bool undoTool()
+        {
+
+            adventureData.getArrows().Insert(index, arrowDeleted);
+            Controller.getInstance().updatePanel();
+            return true;
+        }
     }
 }

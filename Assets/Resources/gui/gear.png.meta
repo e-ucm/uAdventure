@@ -20,7 +20,7 @@ TextureImporter:
     externalNormalMap: 0
     heightScale: 0.25
     normalMapFilter: 0
-  isReadable: 1
+  isReadable: 0
   grayScaleToAlpha: 0
   generateCubemap: 0
   cubemapConvolution: 0
@@ -47,14 +47,11 @@ TextureImporter:
   spriteBorder: {x: 16, y: 16, z: 16, w: 16}
   spritePixelsToUnits: 100
   alphaIsTransparency: 1
-  spriteTessellationDetail: -1
-  textureType: 5
+  textureType: 8
   buildTargetSettings: []
   spriteSheet:
-    serializedVersion: 2
     sprites:
-    - serializedVersion: 2
-      name: gear_0
+    - name: gear_0
       rect:
         serializedVersion: 2
         x: 16
@@ -64,8 +61,19 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: -1
+      outline:
+      - - {x: 23, y: 48}
+        - {x: -24, y: 48}
+        - {x: -34, y: 44}
+        - {x: -47, y: 23}
+        - {x: -48, y: 17}
+        - {x: -48, y: -16}
+        - {x: -41, y: -32}
+        - {x: -32, y: -48}
+        - {x: 39, y: -48}
+        - {x: 48, y: -32}
+        - {x: 48, y: 17}
+        - {x: 36, y: 46}
     outline: []
   spritePackingTag: 
   userData: 

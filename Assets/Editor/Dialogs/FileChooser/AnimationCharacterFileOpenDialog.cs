@@ -1,19 +1,19 @@
-﻿using UnityEngine;
-using System.Collections;
-
-public class AnimationCharacterFileOpenDialog : AnimationFileOpenDialog
+﻿namespace uAdventure.Editor
 {
-
-    private CharactersWindowAppearance.CharacterAnimationType animType;
-    public void Init(DialogReceiverInterface e, FileType fType, CharactersWindowAppearance.CharacterAnimationType type)
+    public class AnimationCharacterFileOpenDialog : AnimationFileOpenDialog
     {
-        animType = type;
-        base.Init(e, fType);
-    }
 
-    protected override void ChoosedCorrectFile()
-    {
-        CopySelectedAssset();
-        reference.OnDialogOk(returnPath, fileType, animType);
+        private CharactersWindowAppearance.CharacterAnimationType animType;
+        public void Init(DialogReceiverInterface e, FileType fType, CharactersWindowAppearance.CharacterAnimationType type)
+        {
+            animType = type;
+            base.Init(e, fType);
+        }
+
+        protected override void ChoosedCorrectFile()
+        {
+            CopySelectedAssset();
+            reference.OnDialogOk(returnPath, fileType, animType);
+        }
     }
 }

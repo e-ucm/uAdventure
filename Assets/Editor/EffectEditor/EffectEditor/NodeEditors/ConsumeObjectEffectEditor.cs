@@ -3,52 +3,57 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections;
 
-public class ConsumeObjectEffectEditor : EffectEditor
+using uAdventure.Core;
+
+namespace uAdventure.Editor
 {
-    private bool collapsed = false;
-    public bool Collapsed { get { return collapsed; } set { collapsed = value; } }
-    private Rect window = new Rect(0, 0, 300, 0);
-    private string[] items;
-    public Rect Window
+    public class ConsumeObjectEffectEditor : EffectEditor
     {
-        get
+        private bool collapsed = false;
+        public bool Collapsed { get { return collapsed; } set { collapsed = value; } }
+        private Rect window = new Rect(0, 0, 300, 0);
+        private string[] items;
+        public Rect Window
         {
-            if (collapsed) return new Rect(window.x, window.y, 50, 30);
-            else return window;
+            get
+            {
+                if (collapsed) return new Rect(window.x, window.y, 50, 30);
+                else return window;
+            }
+            set
+            {
+                if (collapsed) window = new Rect(value.x, value.y, window.width, window.height);
+                else window = value;
+            }
         }
-        set
+
+        private ConsumeObjectEffect effect;
+
+        public ConsumeObjectEffectEditor()
         {
-            if (collapsed) window = new Rect(value.x, value.y, window.width, window.height);
-            else window = value;
+            items = Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItemsIDs();
+            this.effect = new ConsumeObjectEffect(items[0]);
         }
-    }
 
-    private ConsumeObjectEffect effect;
+        public void draw()
+        {
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField(TC.get("Element.Name19"));
 
-    public ConsumeObjectEffectEditor()
-    {
-        items = Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItemsIDs();
-        this.effect = new ConsumeObjectEffect(items[0]);
-    }
+            effect.setTargetId(items[EditorGUILayout.Popup(Array.IndexOf(items, effect.getTargetId()), items)]);
 
-    public void draw()
-    {
-        EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.LabelField(TC.get("Element.Name19"));
+            EditorGUILayout.EndHorizontal();
 
-        effect.setTargetId(items[EditorGUILayout.Popup(Array.IndexOf(items, effect.getTargetId()), items)]);
+            EditorGUILayout.HelpBox(TC.get("ConsumeObject.Description"), MessageType.Info);
+        }
 
-        EditorGUILayout.EndHorizontal();
+        public AbstractEffect Effect { get { return effect; } set { effect = value as ConsumeObjectEffect; } }
+        public string EffectName { get { return TC.get("Effect.ConsumeObject"); } }
+        public EffectEditor clone() { return new ConsumeObjectEffectEditor(); }
 
-        EditorGUILayout.HelpBox(TC.get("ConsumeObject.Description"), MessageType.Info);
-    }
-
-    public AbstractEffect Effect { get { return effect; } set { effect = value as ConsumeObjectEffect; } }
-    public string EffectName { get { return TC.get("Effect.ConsumeObject"); } }
-    public EffectEditor clone() { return new ConsumeObjectEffectEditor(); }
-
-    public bool manages(AbstractEffect c)
-    {
-        return c.GetType() == effect.GetType();
+        public bool manages(AbstractEffect c)
+        {
+            return c.GetType() == effect.GetType();
+        }
     }
 }

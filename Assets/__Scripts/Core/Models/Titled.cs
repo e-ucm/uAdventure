@@ -1,21 +1,24 @@
-﻿/**
- * The object has a title
- */
-public interface Titled
+﻿namespace uAdventure.Core
 {
-
     /**
-     * Set the objects title
-     * 
-     * @param title
-     *            The new title
+     * The object has a title
      */
-     void setTitle(string title);
+    public interface Titled
+    {
 
-    /**
-     * Get the objects title
-     * 
-     * @return The objects title
-     */
-     string getTitle();
+        /**
+         * Set the objects title
+         * 
+         * @param title
+         *            The new title
+         */
+        void setTitle(string title);
+
+        /**
+         * Get the objects title
+         * 
+         * @return The objects title
+         */
+        string getTitle();
+    }
 }

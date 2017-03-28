@@ -1,60 +1,64 @@
 ﻿using UnityEngine;
 using UnityEditor;
-using System;
 
-public class ShowTextEffectEditor : EffectEditor
+using uAdventure.Core;
+
+namespace uAdventure.Editor
 {
-    private bool collapsed = false;
-    public bool Collapsed { get { return collapsed; } set { collapsed = value; } }
-    private Rect window = new Rect(0, 0, 300, 0);
-    public Rect Window
+    public class ShowTextEffectEditor : EffectEditor
     {
-        get
+        private bool collapsed = false;
+        public bool Collapsed { get { return collapsed; } set { collapsed = value; } }
+        private Rect window = new Rect(0, 0, 300, 0);
+        public Rect Window
         {
-            if (collapsed) return new Rect(window.x, window.y, 50, 30);
-            else return window;
+            get
+            {
+                if (collapsed) return new Rect(window.x, window.y, 50, 30);
+                else return window;
+            }
+            set
+            {
+                if (collapsed) window = new Rect(value.x, value.y, window.width, window.height);
+                else window = value;
+            }
         }
-        set
+
+        private ShowTextEffect effect;
+
+        private int x = 300, y = 300;
+
+        public ShowTextEffectEditor()
         {
-            if (collapsed) window = new Rect(value.x, value.y, window.width, window.height);
-            else window = value;
+            this.effect = new ShowTextEffect("", x, y, ColorConverter.ColorToHex(Color.white), ColorConverter.ColorToHex(Color.black));
         }
-    }
 
-    private ShowTextEffect effect;
+        public void draw()
+        {
 
-    private int x = 300, y = 300;
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField(TC.get("ConversationEditor.Line"));
+            effect.setText(EditorGUILayout.TextField(effect.getText()));
+            EditorGUILayout.LabelField("X: ");
+            x = EditorGUILayout.IntField(effect.getX());
+            EditorGUILayout.LabelField("Y: ");
+            y = EditorGUILayout.IntField(effect.getY());
 
-    public ShowTextEffectEditor()
-    {
-        this.effect = new ShowTextEffect("", x, y, ColorConverter.ColorToHex(Color.white), ColorConverter.ColorToHex(Color.black));
-    }
+            effect.setTextPosition(x, y);
 
-    public void draw()
-    {
+            EditorGUILayout.EndHorizontal();
 
-        EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.LabelField(TC.get("ConversationEditor.Line"));
-        effect.setText(EditorGUILayout.TextField(effect.getText()));
-        EditorGUILayout.LabelField("X: ");
-        x = EditorGUILayout.IntField(effect.getX());
-        EditorGUILayout.LabelField("Y: ");
-        y = EditorGUILayout.IntField(effect.getY());
+            EditorGUILayout.HelpBox(TC.get("ShowTextEffect.Title"), MessageType.Info);
+        }
 
-        effect.setTextPosition(x,y);
+        public AbstractEffect Effect { get { return effect; } set { effect = value as ShowTextEffect; } }
+        public string EffectName { get { return TC.get("Effect.ShowText"); } }
+        public EffectEditor clone() { return new ShowTextEffectEditor(); }
 
-        EditorGUILayout.EndHorizontal();
+        public bool manages(AbstractEffect c)
+        {
 
-        EditorGUILayout.HelpBox(TC.get("ShowTextEffect.Title"), MessageType.Info);
-    }
-
-    public AbstractEffect Effect { get { return effect; } set { effect = value as ShowTextEffect; } }
-    public string EffectName { get { return TC.get("Effect.ShowText"); } }
-    public EffectEditor clone() { return new ShowTextEffectEditor(); }
-
-    public bool manages(AbstractEffect c)
-    {
-
-        return c.GetType() == effect.GetType();
+            return c.GetType() == effect.GetType();
+        }
     }
 }

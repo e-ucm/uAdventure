@@ -4,79 +4,83 @@ using System;
 using System.Collections;
 using System.Text.RegularExpressions;
 
+using uAdventure.Core;
 
-public class MovePlayerEffectEditor : EffectEditor
+namespace uAdventure.Editor
 {
-    private bool collapsed = false;
-
-    public bool Collapsed
+    public class MovePlayerEffectEditor : EffectEditor
     {
-        get { return collapsed; }
-        set { collapsed = value; }
-    }
+        private bool collapsed = false;
 
-    private Rect window = new Rect(0, 0, 300, 0);
-    private string xString = "", yString = "";
-
-    public Rect Window
-    {
-        get
+        public bool Collapsed
         {
-            if (collapsed) return new Rect(window.x, window.y, 50, 30);
-            else return window;
+            get { return collapsed; }
+            set { collapsed = value; }
         }
-        set
+
+        private Rect window = new Rect(0, 0, 300, 0);
+        private string xString = "", yString = "";
+
+        public Rect Window
         {
-            if (collapsed) window = new Rect(value.x, value.y, window.width, window.height);
-            else window = value;
+            get
+            {
+                if (collapsed) return new Rect(window.x, window.y, 50, 30);
+                else return window;
+            }
+            set
+            {
+                if (collapsed) window = new Rect(value.x, value.y, window.width, window.height);
+                else window = value;
+            }
         }
-    }
 
-    private MovePlayerEffect effect;
+        private MovePlayerEffect effect;
 
-    public MovePlayerEffectEditor()
-    {
-        this.effect = new MovePlayerEffect(300, 300);
-    }
+        public MovePlayerEffectEditor()
+        {
+            this.effect = new MovePlayerEffect(300, 300);
+        }
 
-    public void draw()
-    {
-        EditorGUILayout.BeginHorizontal();
+        public void draw()
+        {
+            EditorGUILayout.BeginHorizontal();
 
-        xString = effect.getX().ToString();
-        yString = effect.getY().ToString();
+            xString = effect.getX().ToString();
+            yString = effect.getY().ToString();
 
-        xString = EditorGUILayout.TextField(xString);
-        xString = Regex.Replace(xString, "[^0-9]", "");
+            xString = EditorGUILayout.TextField(xString);
+            xString = Regex.Replace(xString, "[^0-9]", "");
 
-        yString = EditorGUILayout.TextField(yString);
-        yString = Regex.Replace(xString, "[^0-9]", "");
+            yString = EditorGUILayout.TextField(yString);
+            yString = Regex.Replace(xString, "[^0-9]", "");
 
-        effect.setDestiny(int.Parse(xString), int.Parse(yString));
+            effect.setDestiny(int.Parse(xString), int.Parse(yString));
 
-        EditorGUILayout.EndHorizontal();
+            EditorGUILayout.EndHorizontal();
 
-        EditorGUILayout.HelpBox(TC.get("MovePlayerEffect.Description"), MessageType.Info);
-    }
+            EditorGUILayout.HelpBox(TC.get("MovePlayerEffect.Description"), MessageType.Info);
+        }
 
-    public AbstractEffect Effect
-    {
-        get { return effect; }
-        set { effect = value as MovePlayerEffect; }
-    }
+        public AbstractEffect Effect
+        {
+            get { return effect; }
+            set { effect = value as MovePlayerEffect; }
+        }
 
-    public string EffectName
-    {
-        get { return TC.get("MovePlayerEffect.Title"); }
-    }
+        public string EffectName
+        {
+            get { return TC.get("MovePlayerEffect.Title"); }
+        }
 
-    public EffectEditor clone()
-    {
-        return new MovePlayerEffectEditor();
-    }
+        public EffectEditor clone()
+        {
+            return new MovePlayerEffectEditor();
+        }
 
-    public bool manages(AbstractEffect c)
-    {
-        return c.GetType() == effect.GetType();
+        public bool manages(AbstractEffect c)
+        {
+            return c.GetType() == effect.GetType();
+        }
     }
 }

@@ -1,82 +1,87 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class DeleteButtonTool : Tool
+using uAdventure.Core;
+
+namespace uAdventure.Editor
 {
-
-    private AdventureData adventureData;
-
-    private CustomButton cursorDeleted;
-
-    private string action;
-
-    private string type;
-
-    private int index;
-
-    public DeleteButtonTool(AdventureData adventureData, string action, string type)
+    public class DeleteButtonTool : Tool
     {
 
-        this.adventureData = adventureData;
-        this.action = action;
-        this.type = type;
-    }
+        private AdventureData adventureData;
 
-    public override bool canRedo()
-    {
+        private CustomButton cursorDeleted;
 
-        return true;
-    }
+        private string action;
 
-    
-    public override bool canUndo()
-    {
+        private string type;
 
-        return cursorDeleted != null;
-    }
+        private int index;
 
-    
-    public override bool combine(Tool other)
-    {
-
-        return false;
-    }
-
-    
-    public override bool doTool()
-    {
-
-        bool deleted = false;
-        CustomButton button = new CustomButton(action, type, null);
-        for (int i = 0; i < adventureData.getButtons().Count; i++)
+        public DeleteButtonTool(AdventureData adventureData, string action, string type)
         {
-            CustomButton cb = adventureData.getButtons()[i];
-            if (cb.Equals(button))
-            {
-                cursorDeleted = adventureData.getButtons()[i];
-                adventureData.getButtons().RemoveAt(i);
-                index = i;
-                deleted = true;
-                break;
-            }
+
+            this.adventureData = adventureData;
+            this.action = action;
+            this.type = type;
         }
-        return deleted;
-    }
 
-    
-    public override bool redoTool()
-    {
+        public override bool canRedo()
+        {
 
-        adventureData.getButtons().RemoveAt(index);
-        Controller.getInstance().updatePanel();
-        return true;
-    }
+            return true;
+        }
 
-    
-    public override bool undoTool()
-    {
-        adventureData.getButtons().Insert(index, cursorDeleted);
-        Controller.getInstance().updatePanel();
-        return true;
+
+        public override bool canUndo()
+        {
+
+            return cursorDeleted != null;
+        }
+
+
+        public override bool combine(Tool other)
+        {
+
+            return false;
+        }
+
+
+        public override bool doTool()
+        {
+
+            bool deleted = false;
+            CustomButton button = new CustomButton(action, type, null);
+            for (int i = 0; i < adventureData.getButtons().Count; i++)
+            {
+                CustomButton cb = adventureData.getButtons()[i];
+                if (cb.Equals(button))
+                {
+                    cursorDeleted = adventureData.getButtons()[i];
+                    adventureData.getButtons().RemoveAt(i);
+                    index = i;
+                    deleted = true;
+                    break;
+                }
+            }
+            return deleted;
+        }
+
+
+        public override bool redoTool()
+        {
+
+            adventureData.getButtons().RemoveAt(index);
+            Controller.getInstance().updatePanel();
+            return true;
+        }
+
+
+        public override bool undoTool()
+        {
+            adventureData.getButtons().Insert(index, cursorDeleted);
+            Controller.getInstance().updatePanel();
+            return true;
+        }
     }
 }

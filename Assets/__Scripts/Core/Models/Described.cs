@@ -1,25 +1,28 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-/**
- * The object is described
- */
-public interface Described
+namespace uAdventure.Core
 {
-
     /**
-     * Get the description of the object
-     * 
-     * @return The description of the object
+     * The object is described
      */
-     string getDescription();
+    public interface Described
+    {
 
-    /**
-     * Set the description of the object
-     * 
-     * @param description
-     *            The new description
-     */
-     void setDescription(string description);
+        /**
+         * Get the description of the object
+         * 
+         * @return The description of the object
+         */
+        string getDescription();
 
+        /**
+         * Set the description of the object
+         * 
+         * @param description
+         *            The new description
+         */
+        void setDescription(string description);
+
+    }
 }

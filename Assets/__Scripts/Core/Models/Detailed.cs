@@ -1,22 +1,25 @@
-﻿/**
- * The object has a detailed description
- */
-public interface Detailed
+﻿namespace uAdventure.Core
 {
-
     /**
-     * Set the detailed description of the object
-     * 
-     * @param detailedDescription
-     *            The new detailed description
+     * The object has a detailed description
      */
-     void setDetailedDescription(string detailedDescription);
+    public interface Detailed
+    {
 
-    /**
-     * Get the detailed description of the object
-     * 
-     * @return The detailed description of the object
-     */
-     string getDetailedDescription();
+        /**
+         * Set the detailed description of the object
+         * 
+         * @param detailedDescription
+         *            The new detailed description
+         */
+        void setDetailedDescription(string detailedDescription);
 
+        /**
+         * Get the detailed description of the object
+         * 
+         * @return The detailed description of the object
+         */
+        string getDetailedDescription();
+
+    }
 }

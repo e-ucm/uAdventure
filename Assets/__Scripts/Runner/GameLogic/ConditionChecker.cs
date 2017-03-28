@@ -1,79 +1,93 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public static class ConditionChecker {
-    /*private static ConditionChecker instance;
-    public static ConditionChecker Instance {
-        get { 
-            if (this.instance == null)
-                this.instance = new ConditionChecker ();
-            return instance;
+using uAdventure.Core;
+
+namespace uAdventure.Runner
+{
+    public static class ConditionChecker
+    {
+        /*private static ConditionChecker instance;
+        public static ConditionChecker Instance {
+            get { 
+                if (this.instance == null)
+                    this.instance = new ConditionChecker ();
+                return instance;
+            }
+        }*/
+
+        public static bool check(Conditions conditions)
+        {
+            foreach (Condition c in conditions.getSimpleConditions())
+            {
+                if (!check(c))
+                    return false;
+            }
+
+            for (int i = 0; i < conditions.getEitherConditionsBlockCount(); i++)
+            {
+                bool block = false;
+                foreach (Condition c in conditions.getEitherConditions(i))
+                {
+                    block |= check(c);
+
+                    if (block)
+                        break;
+                }
+
+                if (!block)
+                    return false;
+            }
+
+            return true;
         }
-    }*/
 
-    public static bool check(Conditions conditions){
-        foreach(Condition c in conditions.getSimpleConditions ()){
-            if (!check (c))
-                return false;
+        public static int check(GlobalState globalstate)
+        {
+            if (check(globalstate as Conditions))
+                return GlobalStateCondition.GS_SATISFIED;
+            else
+                return GlobalStateCondition.GS_NOT_SATISFIED;
         }
 
-        for(int i = 0; i < conditions.getEitherConditionsBlockCount (); i++){
-            bool block = false;
-            foreach (Condition c in conditions.getEitherConditions(i)) {
-                block |= check (c);
+        public static bool check(Condition condition)
+        {
+            bool ret = true;
+            switch (condition.getType())
+            {
+                case Condition.FLAG_CONDITION:
+                    ret = Game.Instance.GameState.checkFlag(condition.getId()) == condition.getState();
+                    break;
+                case Condition.GLOBAL_STATE_CONDITION:
+                    ret = Game.Instance.GameState.checkGlobalState(condition.getId()) == condition.getState();
+                    break;
+                case Condition.NO_STATE: break;
+                case Condition.VAR_CONDITION:
+                    VarCondition c = (VarCondition)condition;
+                    int val = Game.Instance.GameState.getVariable(condition.getId());
 
-                if (block)
+                    switch (c.getState())
+                    {
+                        case VarCondition.VAR_EQUALS:
+                            ret = val == c.getValue();
+                            break;
+                        case VarCondition.VAR_GREATER_THAN:
+                            ret = val > c.getValue();
+                            break;
+                        case VarCondition.VAR_GREATER_EQUALS_THAN:
+                            ret = val >= c.getValue();
+                            break;
+                        case VarCondition.VAR_LESS_THAN:
+                            ret = val < c.getValue();
+                            break;
+                        case VarCondition.VAR_LESS_EQUALS_THAN:
+                            ret = val <= c.getValue();
+                            break;
+                    }
                     break;
             }
 
-            if (!block)
-                return false;
+            return ret;
         }
-
-        return true;
-    }
-
-    public static int check(GlobalState globalstate){
-        if (check (globalstate as Conditions))
-            return GlobalStateCondition.GS_SATISFIED;
-        else
-            return GlobalStateCondition.GS_NOT_SATISFIED;
-    }
-
-    public static bool check(Condition condition){
-        bool ret = true;
-        switch(condition.getType()){
-        case Condition.FLAG_CONDITION:
-			ret = Game.Instance.GameState.checkFlag (condition.getId ()) == condition.getState ();
-            break;
-        case Condition.GLOBAL_STATE_CONDITION:
-			ret = Game.Instance.GameState.checkGlobalState (condition.getId ()) == condition.getState();
-            break;
-        case Condition.NO_STATE:break;
-        case Condition.VAR_CONDITION:
-            VarCondition c = (VarCondition)condition;
-			int val = Game.Instance.GameState.getVariable (condition.getId ());
-
-            switch(c.getState()){
-            case VarCondition.VAR_EQUALS:
-                ret = val == c.getValue ();
-                break;
-            case VarCondition.VAR_GREATER_THAN:
-                ret = val > c.getValue ();
-                break;
-            case VarCondition.VAR_GREATER_EQUALS_THAN:
-                ret = val >= c.getValue ();
-                break;
-            case VarCondition.VAR_LESS_THAN:
-                ret = val < c.getValue ();
-                break;
-            case VarCondition.VAR_LESS_EQUALS_THAN:
-                ret = val <= c.getValue ();
-                break;
-            }
-            break;
-        }
-
-        return ret;
     }
 }

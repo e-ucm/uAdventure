@@ -4,133 +4,152 @@ using System.IO;
 using UnityEngine.UI;
 using System.Collections.Generic;
 
-public class PathShower : MonoBehaviour {
+using uAdventure.Runner;
 
-	public Sprite folderimage, gameimage;
+namespace uAdventure.GameSelector
+{
+    public class PathShower : MonoBehaviour
+    {
 
-	public GameObject itemPrefab;
-	private string path;
-	public string Path{
-		get { return path; }
-		set { 
-			path = value + System.IO.Path.DirectorySeparatorChar;
-			forceupdate = true;
-		}
-	}
+        public Sprite folderimage, gameimage;
 
-	string[] folders;
-	string[] files;
-	bool forceupdate = false;
+        public GameObject itemPrefab;
+        private string path;
+        public string Path
+        {
+            get { return path; }
+            set
+            {
+                path = value + System.IO.Path.DirectorySeparatorChar;
+                forceupdate = true;
+            }
+        }
 
-	public Color foldercolor, gamecolor, selectedgamecolor;
+        string[] folders;
+        string[] files;
+        bool forceupdate = false;
 
-	List<GameObject> games;
-	List<string> gamepaths;
-	GameObject selected;
-	Button addbutton;
-	// Use this for initialization
-	void Start () {
-		Path = ResourceManager.Instance.getStoragePath();
+        public Color foldercolor, gamecolor, selectedgamecolor;
 
-		if (folderimage == null) 
-			folderimage = Resources.Load ("GUI/folder") as Sprite;
+        List<GameObject> games;
+        List<string> gamepaths;
+        GameObject selected;
+        Button addbutton;
+        // Use this for initialization
+        void Start()
+        {
+            Path = ResourceManager.Instance.getStoragePath();
 
-		if (gameimage == null) 
-			gameimage = Resources.Load ("GUI/gamepad") as Sprite;
+            if (folderimage == null)
+                folderimage = Resources.Load("GUI/folder") as Sprite;
 
-		addbutton = GameObject.Find ("AddGame").GetComponent<Button> ();
+            if (gameimage == null)
+                gameimage = Resources.Load("GUI/gamepad") as Sprite;
 
-		games = new List<GameObject> ();
-		gamepaths = new List<string> ();
-	}
+            addbutton = GameObject.Find("AddGame").GetComponent<Button>();
 
-	public void levelUp(){
-		string[] splitted = path.Split (System.IO.Path.DirectorySeparatorChar);
-		string tmp = splitted[0];
-		for (int i = 1; i < splitted.Length -2; i++)
-			tmp += System.IO.Path.DirectorySeparatorChar + splitted[i];
-		Path = tmp;
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		if (forceupdate) {
-			forceupdate = false;
-			this.clear ();
+            games = new List<GameObject>();
+            gamepaths = new List<string>();
+        }
 
-			folders = Directory.GetDirectories (path);
-			files = Directory.GetFiles(path);
+        public void levelUp()
+        {
+            string[] splitted = path.Split(System.IO.Path.DirectorySeparatorChar);
+            string tmp = splitted[0];
+            for (int i = 1; i < splitted.Length - 2; i++)
+                tmp += System.IO.Path.DirectorySeparatorChar + splitted[i];
+            Path = tmp;
+        }
+
+        // Update is called once per frame
+        void Update()
+        {
+            if (forceupdate)
+            {
+                forceupdate = false;
+                this.clear();
+
+                folders = Directory.GetDirectories(path);
+                files = Directory.GetFiles(path);
 
 
-			foreach (string folder in folders)
-				addFolder (folder);
+                foreach (string folder in folders)
+                    addFolder(folder);
 
-			foreach (string game in files)
-				if(game.Contains(".jar"))
-					addGame (game);
-		}
-	}
+                foreach (string game in files)
+                    if (game.Contains(".jar"))
+                        addGame(game);
+            }
+        }
 
-	void clear(){
-		foreach (Transform t in this.transform) {
-			GameObject.Destroy (t.gameObject);
-		}
+        void clear()
+        {
+            foreach (Transform t in this.transform)
+            {
+                GameObject.Destroy(t.gameObject);
+            }
 
-		addbutton.interactable = false;
-		selected = null;
-		games = new List<GameObject> ();
-		gamepaths = new List<string> ();
-	}
+            addbutton.interactable = false;
+            selected = null;
+            games = new List<GameObject>();
+            gamepaths = new List<string>();
+        }
 
-	public void selectGame(int i){
-		selected = games [i];
+        public void selectGame(int i)
+        {
+            selected = games[i];
 
-		foreach (GameObject g in games) {
-			g.GetComponent<Image> ().color = gamecolor;
-		}
+            foreach (GameObject g in games)
+            {
+                g.GetComponent<Image>().color = gamecolor;
+            }
 
-		selected.GetComponent<Image> ().color = selectedgamecolor;
-		LoaderController.Instance.gamePath = gamepaths [i];
-		addbutton.interactable = true;
-	}
+            selected.GetComponent<Image>().color = selectedgamecolor;
+            LoaderController.Instance.gamePath = gamepaths[i];
+            addbutton.interactable = true;
+        }
 
-	Button.ButtonClickedEvent ev;
-	void addFolder(string path){
-		string[] splitted = path.Split (System.IO.Path.DirectorySeparatorChar);
-		Transform folder = addItem (splitted [splitted.Length - 1], folderimage, foldercolor);
+        Button.ButtonClickedEvent ev;
+        void addFolder(string path)
+        {
+            string[] splitted = path.Split(System.IO.Path.DirectorySeparatorChar);
+            Transform folder = addItem(splitted[splitted.Length - 1], folderimage, foldercolor);
 
-		ev = new Button.ButtonClickedEvent ();
-		ev.AddListener (delegate {Path = path;});
-			
-		folder.GetComponent<Button> ().onClick = ev;
-	}
+            ev = new Button.ButtonClickedEvent();
+            ev.AddListener(delegate { Path = path; });
 
-	void addGame(string path){
-		string[] splitted = path.Split (System.IO.Path.DirectorySeparatorChar);
-		Transform game = addItem (splitted [splitted.Length - 1], gameimage, gamecolor);
+            folder.GetComponent<Button>().onClick = ev;
+        }
 
-		ev = new Button.ButtonClickedEvent ();
-		int count = games.Count;
-		ev.AddListener (delegate {this.selectGame(count);});
+        void addGame(string path)
+        {
+            string[] splitted = path.Split(System.IO.Path.DirectorySeparatorChar);
+            Transform game = addItem(splitted[splitted.Length - 1], gameimage, gamecolor);
 
-		game.GetComponent<Button> ().onClick = ev;
+            ev = new Button.ButtonClickedEvent();
+            int count = games.Count;
+            ev.AddListener(delegate { this.selectGame(count); });
 
-		games.Add (game.gameObject);
-		gamepaths.Add (path);
-	}
+            game.GetComponent<Button>().onClick = ev;
 
-	Transform tmp, panel;
-	Transform addItem(string name, Sprite image, Color color){
-		tmp = GameObject.Instantiate (itemPrefab).transform;
-		tmp.parent = this.transform;
-		tmp.localScale = new Vector3 (1, 1, 1);
+            games.Add(game.gameObject);
+            gamepaths.Add(path);
+        }
 
-		tmp.GetComponent<Image> ().color = color;
+        Transform tmp, panel;
+        Transform addItem(string name, Sprite image, Color color)
+        {
+            tmp = GameObject.Instantiate(itemPrefab).transform;
+            tmp.parent = this.transform;
+            tmp.localScale = new Vector3(1, 1, 1);
 
-		panel = tmp.transform.FindChild ("Panel");
-		panel.FindChild ("Miniatura").GetComponent<Image> ().sprite = image;
-		panel.FindChild ("Titulo").GetComponent<Text> ().text = name;
+            tmp.GetComponent<Image>().color = color;
 
-		return tmp;
-	}
+            panel = tmp.transform.FindChild("Panel");
+            panel.FindChild("Miniatura").GetComponent<Image>().sprite = image;
+            panel.FindChild("Titulo").GetComponent<Text>().text = name;
+
+            return tmp;
+        }
+    }
 }

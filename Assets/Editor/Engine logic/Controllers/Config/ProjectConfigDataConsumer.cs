@@ -1,7 +1,7 @@
-﻿using UnityEngine;
-using System.Collections;
-
-public interface ProjectConfigDataConsumer
+﻿namespace uAdventure.Editor
 {
-    void updateData();
+    public interface ProjectConfigDataConsumer
+    {
+        void updateData();
+    }
 }

@@ -1,131 +1,219 @@
 ﻿using UnityEngine;
-using System.Collections;
 
-public class BooksWindow : LayoutWindow
+using uAdventure.Core;
+using System;
+using UnityEditorInternal;
+using System.Collections.Generic;
+
+namespace uAdventure.Editor
 {
-    private enum BookWindowType { Appearance, Content, Documentation}
-
-    private static BookWindowType openedWindow = BookWindowType.Appearance;
-    private static BooksWindowAppearance booksWindowAppearance;
-    private static BooksWindowContents booksWindowContents;
-    private static BooksWindowDocumentation booksWindowDocumentation;
-
-    private static float windowWidth, windowHeight;
-
-    private static Rect thisRect;
-
-    private static GUISkin selectedButtonSkin;
-    private static GUISkin defaultSkin;
-
-
-    // Flag determining visibility of concrete item information
-    private bool isConcreteItemVisible = false;
-
-    public BooksWindow(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
-        : base(aStartPos, aContent, aStyle, aOptions)
+    [EditorWindowExtension(80, typeof(Book))]
+    public class BooksWindow : ReorderableListEditorWindowExtension
     {
-        booksWindowAppearance = new BooksWindowAppearance(aStartPos, new GUIContent(TC.get("Book.App")), "Window");
-        booksWindowContents = new BooksWindowContents(aStartPos, new GUIContent(TC.get("Book.Contents")), "Window");
-        booksWindowDocumentation = new BooksWindowDocumentation(aStartPos, new GUIContent(TC.get("Book.Documentation")), "Window");
+        private enum BookWindowType { Appearance, Content, Documentation }
 
-        windowWidth = aStartPos.width;
-        windowHeight = aStartPos.height;
+        private static BookWindowType openedWindow = BookWindowType.Appearance;
+        private static BooksWindowAppearance booksWindowAppearance;
+        private static BooksWindowContents booksWindowContents;
+        private static BooksWindowDocumentation booksWindowDocumentation;
 
-        thisRect = aStartPos;
-        selectedButtonSkin = (GUISkin)Resources.Load("Editor/ButtonSelected", typeof(GUISkin));
-    }
+        private static GUISkin selectedButtonSkin;
+        private static GUISkin defaultSkin;
 
 
-    public override void Draw(int aID)
-    {
-        // Show information of concrete item
-        if (isConcreteItemVisible)
+        // Flag determining visibility of concrete item information
+        private bool isConcreteItemVisible = false;
+
+        public BooksWindow(Rect aStartPos, GUIStyle aStyle, params GUILayoutOption[] aOptions)
+            : base(aStartPos, new GUIContent(TC.get("Element.Name11")), aStyle, aOptions)
         {
-            /**
-            UPPER MENU
-            */
-            GUILayout.BeginHorizontal();
-            if (openedWindow == BookWindowType.Appearance)
-                GUI.skin = selectedButtonSkin;
-            if (GUILayout.Button(TC.get("Book.App")))
-            {
-                OnWindowTypeChanged(BookWindowType.Appearance);
-            }
-            if (openedWindow == BookWindowType.Appearance)
-                GUI.skin = defaultSkin;
+            var c = new GUIContent();
+            c = new GUIContent();
+            c.image = (Texture2D)Resources.Load("EAdventureData/img/icons/books", typeof(Texture2D)); ;
+            c.text = TC.get("Element.Name11");
 
-            if (openedWindow == BookWindowType.Documentation)
-                GUI.skin = selectedButtonSkin;
-            if (GUILayout.Button(TC.get("Book.Documentation")))
-            {
-                OnWindowTypeChanged(BookWindowType.Documentation);
-            }
-            if (openedWindow == BookWindowType.Documentation)
-                GUI.skin = defaultSkin;
+            ButtonContent = c;
 
-            if (openedWindow == BookWindowType.Content)
-                GUI.skin = selectedButtonSkin;
-            if (GUILayout.Button(TC.get("Book.Contents")))
-            {
-                OnWindowTypeChanged(BookWindowType.Content);
-            }
-            if (openedWindow == BookWindowType.Content)
-                GUI.skin = defaultSkin;
-
-            GUILayout.EndHorizontal();
-
-            switch (openedWindow)
-            {
-                case BookWindowType.Appearance:
-                    booksWindowAppearance.Draw(aID);
-                    break;
-                case BookWindowType.Documentation:
-                    booksWindowDocumentation.Draw(aID);
-                    break;
-                case BookWindowType.Content:
-                    booksWindowContents.Draw(aID);
-                    break;
-            }
+            booksWindowAppearance = new BooksWindowAppearance(aStartPos, new GUIContent(TC.get("Book.App")), "Window");
+            booksWindowContents = new BooksWindowContents(aStartPos, new GUIContent(TC.get("Book.Contents")), "Window");
+            booksWindowDocumentation = new BooksWindowDocumentation(aStartPos, new GUIContent(TC.get("Book.Documentation")), "Window");
+            
+            selectedButtonSkin = (GUISkin)Resources.Load("Editor/ButtonSelected", typeof(GUISkin));
         }
-        else
+
+
+        public override void Draw(int aID)
         {
-            GUILayout.Space(30);
-            for (int i = 0; i < Controller.getInstance().getCharapterList().getSelectedChapterData().getBooks().Count; i++)
+            // Show information of concrete item
+            if (isConcreteItemVisible)
             {
+                /**
+                UPPER MENU
+                */
                 GUILayout.BeginHorizontal();
-                GUILayout.Box(Controller.getInstance().getCharapterList().getSelectedChapterData().getBooks()[i].getId(), GUILayout.Width(windowWidth * 0.75f));
-                if (GUILayout.Button(TC.get("GeneralText.Edit"), GUILayout.MaxWidth(windowWidth * 0.2f)))
+                if (openedWindow == BookWindowType.Appearance)
+                    GUI.skin = selectedButtonSkin;
+                if (GUILayout.Button(TC.get("Book.App")))
                 {
-                    ShowItemWindowView(i);
+                    OnWindowTypeChanged(BookWindowType.Appearance);
                 }
+                if (openedWindow == BookWindowType.Appearance)
+                    GUI.skin = defaultSkin;
+
+                if (openedWindow == BookWindowType.Documentation)
+                    GUI.skin = selectedButtonSkin;
+                if (GUILayout.Button(TC.get("Book.Documentation")))
+                {
+                    OnWindowTypeChanged(BookWindowType.Documentation);
+                }
+                if (openedWindow == BookWindowType.Documentation)
+                    GUI.skin = defaultSkin;
+
+                if (openedWindow == BookWindowType.Content)
+                    GUI.skin = selectedButtonSkin;
+                if (GUILayout.Button(TC.get("Book.Contents")))
+                {
+                    OnWindowTypeChanged(BookWindowType.Content);
+                }
+                if (openedWindow == BookWindowType.Content)
+                    GUI.skin = defaultSkin;
 
                 GUILayout.EndHorizontal();
 
+                switch (openedWindow)
+                {
+                    case BookWindowType.Appearance:
+                        booksWindowAppearance.Rect = Rect;
+                        booksWindowAppearance.Draw(aID);
+                        break;
+                    case BookWindowType.Documentation:
+                        booksWindowDocumentation.Rect = Rect;
+                        booksWindowDocumentation.Draw(aID);
+                        break;
+                    case BookWindowType.Content:
+                        booksWindowContents.Rect = Rect;
+                        booksWindowContents.Draw(aID);
+                        break;
+                }
+            }
+            else
+            {
+                GUILayout.Space(30);
+                for (int i = 0; i < Controller.getInstance().getCharapterList().getSelectedChapterData().getBooks().Count; i++)
+                {
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Box(Controller.getInstance().getCharapterList().getSelectedChapterData().getBooks()[i].getId(), GUILayout.Width(m_Rect.width * 0.75f));
+                    if (GUILayout.Button(TC.get("GeneralText.Edit"), GUILayout.MaxWidth(m_Rect.width * 0.2f)))
+                    {
+                        ShowItemWindowView(i);
+                    }
+
+                    GUILayout.EndHorizontal();
+
+                }
             }
         }
-    }
 
-    void OnWindowTypeChanged(BookWindowType type_)
-    {
-        openedWindow = type_;
-    }
+        void OnWindowTypeChanged(BookWindowType type_)
+        {
+            openedWindow = type_;
+        }
 
-    // Two methods responsible for showing right window content 
-    // - concrete item info or base window view
-    public void ShowBaseWindowView()
-    {
-        isConcreteItemVisible = false;
-        GameRources.GetInstance().selectedBookIndex = -1;
-    }
+        // Two methods responsible for showing right window content 
+        // - concrete item info or base window view
+        public void ShowBaseWindowView()
+        {
+            isConcreteItemVisible = false;
+            GameRources.GetInstance().selectedBookIndex = -1;
+        }
 
-    public void ShowItemWindowView(int o)
-    {
-        isConcreteItemVisible = true;
-        GameRources.GetInstance().selectedBookIndex = o;
+        public void ShowItemWindowView(int o)
+        {
+            isConcreteItemVisible = true;
+            GameRources.GetInstance().selectedBookIndex = o;
 
-        // Reload windows for newly selected book
-        booksWindowAppearance = new BooksWindowAppearance(thisRect, new GUIContent(TC.get("Book.App")), "Window");
-        booksWindowContents = new BooksWindowContents(thisRect, new GUIContent(TC.get("Book.Contents")), "Window");
-        booksWindowDocumentation = new BooksWindowDocumentation(thisRect, new GUIContent(TC.get("Book.Documentation")), "Window");
+            // Reload windows for newly selected book
+            booksWindowAppearance = new BooksWindowAppearance(m_Rect, new GUIContent(TC.get("Book.App")), "Window");
+            booksWindowContents = new BooksWindowContents(m_Rect, new GUIContent(TC.get("Book.Contents")), "Window");
+            booksWindowDocumentation = new BooksWindowDocumentation(m_Rect, new GUIContent(TC.get("Book.Documentation")), "Window");
+        }
+
+        protected override void OnElementNameChanged(ReorderableList r, int index, string newName)
+        {
+			Controller.getInstance().getCharapterList().getSelectedChapterDataControl().getBooksList().getBooks ()[index].renameElement(newName);
+        }
+
+        protected override void OnAdd(ReorderableList r)
+        {
+            if (r.index != -1 && r.index < r.list.Count)
+            {
+                Controller.getInstance()
+                           .getCharapterList()
+                           .getSelectedChapterDataControl()
+                           .getBooksList()
+                           .duplicateElement(
+                               Controller.getInstance()
+                                   .getCharapterList()
+                                   .getSelectedChapterDataControl()
+                                   .getBooksList()
+                                   .getBooks()[r.index]);
+            }
+            else
+            {
+                Controller.getInstance().getSelectedChapterDataControl().getBooksList().addElement(Controller.BOOK, "newBook");
+            }
+
+        }
+
+        protected override void OnAddOption(ReorderableList r, string option)
+        {
+            // No options
+        }
+
+        protected override void OnRemove(ReorderableList r)
+        {
+            if (r.index != -1)
+            {
+                Controller.getInstance()
+                              .getCharapterList()
+                              .getSelectedChapterDataControl()
+                              .getBooksList()
+                              .deleteElement(
+                                  Controller.getInstance()
+                                      .getCharapterList()
+                                      .getSelectedChapterDataControl()
+                                      .getBooksList()
+                                      .getBooks()[r.index], false);
+
+                ShowBaseWindowView();
+            }
+        }
+
+        protected override void OnSelect(ReorderableList r)
+        {
+            ShowItemWindowView(r.index);
+        }
+
+        protected override void OnReorder(ReorderableList r)
+        {
+			var dataControlList = Controller.getInstance ()
+				.getCharapterList ().getSelectedChapterDataControl ().getBooksList ();
+
+			var toPos = r.index;
+			var fromPos = dataControlList.getBooks ().FindIndex (i => i.getId () == r.list [r.index] as string);
+
+			dataControlList.MoveElement (dataControlList.getBooks ()[fromPos], fromPos, toPos);
+        }
+
+        protected override void OnButton()
+        {
+            ShowBaseWindowView();
+            reorderableList.index = -1;
+        }
+
+        protected override void OnUpdateList(ReorderableList r)
+        {
+			Elements = Controller.getInstance().getCharapterList().getSelectedChapterDataControl().getBooksList ().getBooks().ConvertAll(s => s.getId());
+        }
     }
 }

@@ -1,68 +1,73 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class ChangeRectangularValueTool : Tool
+using uAdventure.Core;
+
+namespace uAdventure.Editor
 {
-
-    private Rectangle rectangle;
-
-    private bool rectangular;
-
-    public ChangeRectangularValueTool(Rectangle rectangle, bool rectangular)
+    public class ChangeRectangularValueTool : Tool
     {
 
-        this.rectangle = rectangle;
-        this.rectangular = rectangular;
-    }
+        private Rectangle rectangle;
 
-    
-    public override bool canRedo()
-    {
+        private bool rectangular;
 
-        return true;
-    }
-
-    
-    public override bool canUndo()
-    {
-
-        return true;
-    }
-
-    
-    public override bool combine(Tool other)
-    {
-
-        return false;
-    }
-
-    
-    public override bool doTool()
-    {
-
-        if (rectangle.isRectangular() != rectangular)
+        public ChangeRectangularValueTool(Rectangle rectangle, bool rectangular)
         {
-            rectangle.setRectangular(rectangular);
+
+            this.rectangle = rectangle;
+            this.rectangular = rectangular;
+        }
+
+
+        public override bool canRedo()
+        {
+
             return true;
         }
-        return false;
-    }
 
-    
-    public override bool redoTool()
-    {
 
-        rectangle.setRectangular(rectangular);
-        Controller.getInstance().updatePanel();
-        return true;
-    }
+        public override bool canUndo()
+        {
 
-    
-    public override bool undoTool()
-    {
+            return true;
+        }
 
-        rectangle.setRectangular(!rectangular);
-        Controller.getInstance().updatePanel();
-        return true;
+
+        public override bool combine(Tool other)
+        {
+
+            return false;
+        }
+
+
+        public override bool doTool()
+        {
+
+            if (rectangle.isRectangular() != rectangular)
+            {
+                rectangle.setRectangular(rectangular);
+                return true;
+            }
+            return false;
+        }
+
+
+        public override bool redoTool()
+        {
+
+            rectangle.setRectangular(rectangular);
+            Controller.getInstance().updatePanel();
+            return true;
+        }
+
+
+        public override bool undoTool()
+        {
+
+            rectangle.setRectangular(!rectangular);
+            Controller.getInstance().updatePanel();
+            return true;
+        }
     }
 }

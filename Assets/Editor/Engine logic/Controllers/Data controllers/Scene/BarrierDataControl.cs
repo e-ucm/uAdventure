@@ -2,379 +2,384 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class BarrierDataControl : DataControl
+using uAdventure.Core;
+
+namespace uAdventure.Editor
 {
-
-    /**
-    * Scene controller that contains this element reference (used to extract
-    * the id of the scene).
-    */
-    private SceneDataControl sceneDataControl;
-
-    /**
-     * Contained barrier.
-     */
-    private Barrier barrier;
-
-    /**
-     * Conditions controller.
-     */
-    private ConditionsController conditionsController;
-
-    /**
-     * Controller for descriptions
-     */
-    private DescriptionsController descriptionController;
-
-    /**
-     * Constructor.
-     * 
-     * @param sceneDataControl
-     *            Parent scene controller
-     * @param activeArea
-     *            Exit of the data control structure
-     */
-    public BarrierDataControl(SceneDataControl sceneDataControl, Barrier barrier)
+    public class BarrierDataControl : DataControl
     {
 
-        this.sceneDataControl = sceneDataControl;
-        this.barrier = barrier;
-
-        // Create subcontrollers
-        Dictionary<string, ConditionsController.ConditionContextProperty> context1 = new Dictionary<string, ConditionsController.ConditionContextProperty>();
-        ConditionsController.ConditionOwner parent = new ConditionsController.ConditionOwner(Controller.SCENE, sceneDataControl.getId());
-        ConditionsController.ConditionOwner owner = new ConditionsController.ConditionOwner(Controller.BARRIER, barrier.getId(), parent);
-
-        context1.Add(ConditionsController.CONDITION_OWNER, owner);
-
-        conditionsController = new ConditionsController(barrier.getConditions(), context1);
-
-        descriptionController = new DescriptionsController(barrier.getDescriptions());
-
-        //Barriers can only have name, and only one description, so we set selectedDEscription to 0
-        descriptionController.setSelectedDescription(0);
-
-    }
-
-    /**
-     * Returns the id of the scene that contains this element reference.
-     * 
-     * @return Parent scene id
-     */
-    public string getParentSceneId()
-    {
-
-        return sceneDataControl.getId();
-    }
-
-    /**
-     * Returns the id of the item.
-     * 
-     * @return Item's id
-     */
-    public string getId()
-    {
-
-        return barrier.getId();
-    }
-
-    /**
-     * Returns the documentation of the item.
-     * 
-     * @return Item's documentation
-     */
-    public string getDocumentation()
-    {
-
-        return barrier.getDocumentation();
-    }
-
-    /**
-     * Sets the new documentation of the item.
-     * 
-     * @param documentation
-     *            Documentation of the item
-     */
-    public void setDocumentation(string documentation)
-    {
-
-        controller.addTool(new ChangeDocumentationTool(barrier, documentation));
-    }
-
-    /**
-     * Sets the new name of the activeArea.
-     * 
-     * @param name
-     *            Name of the activeArea
-     */
-    public void setName(string name)
-    {
-
-        controller.addTool(new ChangeNameTool(descriptionController.getSelectedDescription(), name));
-    }
-
-    /**
-     * Sets the new brief description of the activeArea.
-     * 
-     * @param description
-     *            Description of the activeArea
-     */
-    public void setBriefDescription(string description)
-    {
-
-        controller.addTool(new ChangeDescriptionTool(descriptionController.getSelectedDescription(), description));
-    }
-
-    /**
-     * Sets the new detailed description of the activeArea.
-     * 
-     * @param detailedDescription
-     *            Detailed description of the activeArea
-     */
-    public void setDetailedDescription(string detailedDescription)
-    {
-
-        controller.addTool(new ChangeDetailedDescriptionTool(descriptionController.getSelectedDescription(), detailedDescription));
-    }
-
-    /**
-     * Returns the X coordinate of the upper left position of the exit.
-     * 
-     * @return X coordinate of the upper left point
-     */
-    public int getX()
-    {
+        /**
+        * Scene controller that contains this element reference (used to extract
+        * the id of the scene).
+        */
+        private SceneDataControl sceneDataControl;
+
+        /**
+         * Contained barrier.
+         */
+        private Barrier barrier;
+
+        /**
+         * Conditions controller.
+         */
+        private ConditionsController conditionsController;
+
+        /**
+         * Controller for descriptions
+         */
+        private DescriptionsController descriptionController;
+
+        /**
+         * Constructor.
+         * 
+         * @param sceneDataControl
+         *            Parent scene controller
+         * @param activeArea
+         *            Exit of the data control structure
+         */
+        public BarrierDataControl(SceneDataControl sceneDataControl, Barrier barrier)
+        {
+
+            this.sceneDataControl = sceneDataControl;
+            this.barrier = barrier;
+
+            // Create subcontrollers
+            Dictionary<string, ConditionsController.ConditionContextProperty> context1 = new Dictionary<string, ConditionsController.ConditionContextProperty>();
+            ConditionsController.ConditionOwner parent = new ConditionsController.ConditionOwner(Controller.SCENE, sceneDataControl.getId());
+            ConditionsController.ConditionOwner owner = new ConditionsController.ConditionOwner(Controller.BARRIER, barrier.getId(), parent);
+
+            context1.Add(ConditionsController.CONDITION_OWNER, owner);
+
+            conditionsController = new ConditionsController(barrier.getConditions(), context1);
+
+            descriptionController = new DescriptionsController(barrier.getDescriptions());
+
+            //Barriers can only have name, and only one description, so we set selectedDEscription to 0
+            descriptionController.setSelectedDescription(0);
+
+        }
+
+        /**
+         * Returns the id of the scene that contains this element reference.
+         * 
+         * @return Parent scene id
+         */
+        public string getParentSceneId()
+        {
+
+            return sceneDataControl.getId();
+        }
+
+        /**
+         * Returns the id of the item.
+         * 
+         * @return Item's id
+         */
+        public string getId()
+        {
+
+            return barrier.getId();
+        }
+
+        /**
+         * Returns the documentation of the item.
+         * 
+         * @return Item's documentation
+         */
+        public string getDocumentation()
+        {
+
+            return barrier.getDocumentation();
+        }
+
+        /**
+         * Sets the new documentation of the item.
+         * 
+         * @param documentation
+         *            Documentation of the item
+         */
+        public void setDocumentation(string documentation)
+        {
+
+            controller.addTool(new ChangeDocumentationTool(barrier, documentation));
+        }
+
+        /**
+         * Sets the new name of the activeArea.
+         * 
+         * @param name
+         *            Name of the activeArea
+         */
+        public void setName(string name)
+        {
+
+            controller.addTool(new ChangeNameTool(descriptionController.getSelectedDescription(), name));
+        }
+
+        /**
+         * Sets the new brief description of the activeArea.
+         * 
+         * @param description
+         *            Description of the activeArea
+         */
+        public void setBriefDescription(string description)
+        {
+
+            controller.addTool(new ChangeDescriptionTool(descriptionController.getSelectedDescription(), description));
+        }
+
+        /**
+         * Sets the new detailed description of the activeArea.
+         * 
+         * @param detailedDescription
+         *            Detailed description of the activeArea
+         */
+        public void setDetailedDescription(string detailedDescription)
+        {
+
+            controller.addTool(new ChangeDetailedDescriptionTool(descriptionController.getSelectedDescription(), detailedDescription));
+        }
+
+        /**
+         * Returns the X coordinate of the upper left position of the exit.
+         * 
+         * @return X coordinate of the upper left point
+         */
+        public int getX()
+        {
 
-        return barrier.getX();
-    }
+            return barrier.getX();
+        }
 
-    /**
-     * Returns the Y coordinate of the upper left position of the exit.
-     * 
-     * @return Y coordinate of the upper left point
-     */
-    public int getY()
-    {
+        /**
+         * Returns the Y coordinate of the upper left position of the exit.
+         * 
+         * @return Y coordinate of the upper left point
+         */
+        public int getY()
+        {
 
-        return barrier.getY();
-    }
+            return barrier.getY();
+        }
 
-    /**
-     * Returns the width of the exit.
-     * 
-     * @return Width of the exit
-     */
-    public int getWidth()
-    {
+        /**
+         * Returns the width of the exit.
+         * 
+         * @return Width of the exit
+         */
+        public int getWidth()
+        {
 
-        return barrier.getWidth();
-    }
+            return barrier.getWidth();
+        }
 
-    /**
-     * Returns the height of the exit.
-     * 
-     * @return Height of the exit
-     */
-    public int getHeight()
-    {
+        /**
+         * Returns the height of the exit.
+         * 
+         * @return Height of the exit
+         */
+        public int getHeight()
+        {
 
-        return barrier.getHeight();
-    }
+            return barrier.getHeight();
+        }
 
-    /**
-     * Sets the new values for the exit.
-     * 
-     * @param x
-     *            X coordinate of the upper left point
-     * @param y
-     *            Y coordinate of the upper left point
-     * @param width
-     *            Width of the exit area
-     * @param height
-     *            Height of the exit area
-     */
-    public void setBarrier(int x, int y, int width, int height)
-    {
+        /**
+         * Sets the new values for the exit.
+         * 
+         * @param x
+         *            X coordinate of the upper left point
+         * @param y
+         *            Y coordinate of the upper left point
+         * @param width
+         *            Width of the exit area
+         * @param height
+         *            Height of the exit area
+         */
+        public void setBarrier(int x, int y, int width, int height)
+        {
 
-        controller.addTool(new ChangeRectangleValueTool(barrier, x, y, width, height));
-    }
+            controller.addTool(new ChangeRectangleValueTool(barrier, x, y, width, height));
+        }
 
 
-    public override System.Object getContent()
-    {
+        public override System.Object getContent()
+        {
 
-        return barrier;
-    }
+            return barrier;
+        }
 
 
-    public override int[] getAddableElements()
-    {
+        public override int[] getAddableElements()
+        {
 
-        return new int[] { };
-    }
+            return new int[] { };
+        }
 
 
-    public override bool canAddElement(int type)
-    {
+        public override bool canAddElement(int type)
+        {
 
-        return false;
-    }
+            return false;
+        }
 
 
-    public override bool canBeDeleted()
-    {
+        public override bool canBeDeleted()
+        {
 
-        return true;
-    }
+            return true;
+        }
 
 
-    public override bool canBeMoved()
-    {
+        public override bool canBeMoved()
+        {
 
-        return true;
-    }
+            return true;
+        }
 
 
-    public override bool canBeRenamed()
-    {
+        public override bool canBeRenamed()
+        {
 
-        return false;
-    }
+            return false;
+        }
 
 
-    public override bool addElement(int type, string id)
-    {
+        public override bool addElement(int type, string id)
+        {
 
-        bool elementAdded = false;
-        return elementAdded;
-    }
+            bool elementAdded = false;
+            return elementAdded;
+        }
 
 
-    public override bool deleteElement(DataControl dataControl, bool askConfirmation)
-    {
+        public override bool deleteElement(DataControl dataControl, bool askConfirmation)
+        {
 
-        bool elementDeleted = false;
-        return elementDeleted;
-    }
+            bool elementDeleted = false;
+            return elementDeleted;
+        }
 
 
-    public override bool moveElementUp(DataControl dataControl)
-    {
+        public override bool moveElementUp(DataControl dataControl)
+        {
 
-        bool elementMoved = false;
-        return elementMoved;
-    }
+            bool elementMoved = false;
+            return elementMoved;
+        }
 
 
-    public override bool moveElementDown(DataControl dataControl)
-    {
+        public override bool moveElementDown(DataControl dataControl)
+        {
 
-        bool elementMoved = false;
-        return elementMoved;
-    }
+            bool elementMoved = false;
+            return elementMoved;
+        }
 
 
-    public override string renameElement(string name)
-    {
+        public override string renameElement(string name)
+        {
 
-        return null;
-    }
+            return null;
+        }
 
 
-    public override void updateVarFlagSummary(VarFlagSummary varFlagSummary)
-    {
+        public override void updateVarFlagSummary(VarFlagSummary varFlagSummary)
+        {
 
-        ConditionsController.updateVarFlagSummary(varFlagSummary, barrier.getConditions());
-    }
+            ConditionsController.updateVarFlagSummary(varFlagSummary, barrier.getConditions());
+        }
 
 
-    public override bool isValid(string currentPath, List<string> incidences)
-    {
+        public override bool isValid(string currentPath, List<string> incidences)
+        {
 
-        return true;
-    }
+            return true;
+        }
 
 
-    public override int countAssetReferences(string assetPath)
-    {
+        public override int countAssetReferences(string assetPath)
+        {
 
-        int count = 0;
+            int count = 0;
 
-        return count;
-    }
+            return count;
+        }
 
 
-    public override void getAssetReferences(List<string> assetPaths, List<int> assetTypes)
-    {
+        public override void getAssetReferences(List<string> assetPaths, List<int> assetTypes)
+        {
 
-        // DO nothing
-    }
+            // DO nothing
+        }
 
 
-    public override void deleteAssetReferences(string assetPath)
-    {
+        public override void deleteAssetReferences(string assetPath)
+        {
 
-        // Delete the references from the actions
-        // Do nothing
-    }
+            // Delete the references from the actions
+            // Do nothing
+        }
 
 
-    public override int countIdentifierReferences(string id)
-    {
+        public override int countIdentifierReferences(string id)
+        {
 
-        return conditionsController.countIdentifierReferences(id);
-    }
+            return conditionsController.countIdentifierReferences(id);
+        }
 
 
-    public override void replaceIdentifierReferences(string oldId, string newId)
-    {
+        public override void replaceIdentifierReferences(string oldId, string newId)
+        {
 
-        conditionsController.replaceIdentifierReferences(oldId, newId);
-    }
+            conditionsController.replaceIdentifierReferences(oldId, newId);
+        }
 
 
-    public override void deleteIdentifierReferences(string id)
-    {
+        public override void deleteIdentifierReferences(string id)
+        {
 
-        conditionsController.deleteIdentifierReferences(id);
-    }
+            conditionsController.deleteIdentifierReferences(id);
+        }
 
-    /**
-     * Returns the conditions of the element reference.
-     * 
-     * @return Conditions of the element reference
-     */
-    public ConditionsController getConditions()
-    {
+        /**
+         * Returns the conditions of the element reference.
+         * 
+         * @return Conditions of the element reference
+         */
+        public ConditionsController getConditions()
+        {
 
-        return conditionsController;
-    }
+            return conditionsController;
+        }
 
 
-    public override bool canBeDuplicated()
-    {
+        public override bool canBeDuplicated()
+        {
 
-        return true;
-    }
+            return true;
+        }
 
 
-    public override void recursiveSearch()
-    {
+        public override void recursiveSearch()
+        {
 
-        // barriers have no brief descriptions
-        // check( this.getBriefDescription( ), TC.get( "Search.BriefDescription" ) );
-        check(this.getConditions(), TC.get("Search.Conditions"));
-        // barriers have no detailed descriptions
-        //check( this.getDetailedDescription( ), TC.get( "Search.DetailedDescription" ) );
-        check(this.getDocumentation(), TC.get("Search.Documentation"));
-        // check( this.getId( ), "ID" );
-        //Barriers have no name
-        //check( this.getName( ), TC.get( "Search.Name" ) );
-    }
+            // barriers have no brief descriptions
+            // check( this.getBriefDescription( ), TC.get( "Search.BriefDescription" ) );
+            check(this.getConditions(), TC.get("Search.Conditions"));
+            // barriers have no detailed descriptions
+            //check( this.getDetailedDescription( ), TC.get( "Search.DetailedDescription" ) );
+            check(this.getDocumentation(), TC.get("Search.Documentation"));
+            // check( this.getId( ), "ID" );
+            //Barriers have no name
+            //check( this.getName( ), TC.get( "Search.Name" ) );
+        }
 
-    public override List<Searchable> getPathToDataControl(Searchable dataControl)
-    {
+        public override List<Searchable> getPathToDataControl(Searchable dataControl)
+        {
 
-        return null;
+            return null;
+        }
     }
 }

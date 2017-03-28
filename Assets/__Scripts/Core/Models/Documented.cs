@@ -1,22 +1,25 @@
-﻿/**
- * The object has documentation
- */
-public interface Documented
+﻿namespace uAdventure.Core
 {
-
     /**
-     * Set the documentation of the object
-     * 
-     * @param documentation
-     *            The new documentation
+     * The object has documentation
      */
-     void setDocumentation(string documentation);
+    public interface Documented
+    {
 
-    /**
-     * Get the documentation of the object
-     * 
-     * @return The documentation of the object
-     */
-     string getDocumentation();
+        /**
+         * Set the documentation of the object
+         * 
+         * @param documentation
+         *            The new documentation
+         */
+        void setDocumentation(string documentation);
 
+        /**
+         * Get the documentation of the object
+         * 
+         * @return The documentation of the object
+         */
+        string getDocumentation();
+
+    }
 }

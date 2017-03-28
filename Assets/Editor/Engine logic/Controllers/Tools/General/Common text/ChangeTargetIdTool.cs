@@ -1,121 +1,126 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-/**
- * Edition Tool for Changing a Target ID. Supports undo, redo but not combine
- */
-public class ChangeTargetIdTool : Tool  
+using uAdventure.Core;
+
+namespace uAdventure.Editor
 {
-
     /**
-     * The new id
+     * Edition Tool for Changing a Target ID. Supports undo, redo but not combine
      */
-    protected string id;
-
-    /**
-     * The old id (for undo/redo)
-     */
-    protected string oldId;
-
-    /**
-     * Tells if the tree must be reloaded after do/undo/redo
-     */
-    protected bool updateTree;
-
-    /**
-     * Tells if the panel must be reloaded after do/undo/redo
-     */
-    protected bool reloadPanel;
-
-    /**
-     * The main controller
-     */
-    protected Controller controller;
-
-    /**
-     * The element which contains the targetId
-     */
-    protected HasTargetId elementWithTargetId;
-
-    /**
-     * Default constructor. Does not update neither tree nor panel
-     * 
-     * @param elementWithTargetId
-     * @param newId
-     */
-    public ChangeTargetIdTool(HasTargetId elementWithTargetId, string newId):this(elementWithTargetId, newId, false, true)
-    { 
-    }
-
-    public ChangeTargetIdTool(HasTargetId elementWithTargetId, string newId, bool updateTree, bool reloadPanel)
+    public class ChangeTargetIdTool : Tool
     {
 
-        this.elementWithTargetId = elementWithTargetId;
-        this.id = newId;
-        this.oldId = elementWithTargetId.getTargetId();
-        this.updateTree = updateTree;
-        this.reloadPanel = reloadPanel;
-        this.controller = Controller.getInstance();
-    }
+        /**
+         * The new id
+         */
+        protected string id;
 
-    
-    public override bool canRedo()
-    {
+        /**
+         * The old id (for undo/redo)
+         */
+        protected string oldId;
 
-        return true;
-    }
+        /**
+         * Tells if the tree must be reloaded after do/undo/redo
+         */
+        protected bool updateTree;
 
-    
-    public override bool canUndo()
-    {
+        /**
+         * Tells if the panel must be reloaded after do/undo/redo
+         */
+        protected bool reloadPanel;
 
-        return true;
-    }
+        /**
+         * The main controller
+         */
+        protected Controller controller;
 
-    
-    public override bool combine(Tool other)
-    {
+        /**
+         * The element which contains the targetId
+         */
+        protected HasTargetId elementWithTargetId;
 
-        return false;
-    }
-
-    
-    public override bool doTool()
-    {
-
-        bool done = false;
-        if (elementWithTargetId.getTargetId() == null || !elementWithTargetId.getTargetId().Equals(id))
+        /**
+         * Default constructor. Does not update neither tree nor panel
+         * 
+         * @param elementWithTargetId
+         * @param newId
+         */
+        public ChangeTargetIdTool(HasTargetId elementWithTargetId, string newId) : this(elementWithTargetId, newId, false, true)
         {
-            elementWithTargetId.setTargetId(id);
-            done = true;
+        }
+
+        public ChangeTargetIdTool(HasTargetId elementWithTargetId, string newId, bool updateTree, bool reloadPanel)
+        {
+
+            this.elementWithTargetId = elementWithTargetId;
+            this.id = newId;
+            this.oldId = elementWithTargetId.getTargetId();
+            this.updateTree = updateTree;
+            this.reloadPanel = reloadPanel;
+            this.controller = Controller.getInstance();
+        }
+
+
+        public override bool canRedo()
+        {
+
+            return true;
+        }
+
+
+        public override bool canUndo()
+        {
+
+            return true;
+        }
+
+
+        public override bool combine(Tool other)
+        {
+
+            return false;
+        }
+
+
+        public override bool doTool()
+        {
+
+            bool done = false;
+            if (elementWithTargetId.getTargetId() == null || !elementWithTargetId.getTargetId().Equals(id))
+            {
+                elementWithTargetId.setTargetId(id);
+                done = true;
+                if (updateTree)
+                    controller.updateStructure();
+                if (reloadPanel)
+                    controller.updatePanel();
+            }
+            return done;
+        }
+
+
+        public override bool redoTool()
+        {
+
+            return undoTool();
+        }
+
+
+        public override bool undoTool()
+        {
+
+            elementWithTargetId.setTargetId(oldId);
+            string temp = oldId;
+            oldId = id;
+            id = temp;
             if (updateTree)
                 controller.updateStructure();
             if (reloadPanel)
                 controller.updatePanel();
+
+            return true;
         }
-        return done;
-    }
-
-    
-    public override bool redoTool()
-    {
-
-        return undoTool();
-    }
-
-    
-    public override bool undoTool()
-    {
-
-        elementWithTargetId.setTargetId(oldId);
-        string temp = oldId;
-        oldId = id;
-        id = temp;
-        if (updateTree)
-            controller.updateStructure();
-        if (reloadPanel)
-            controller.updatePanel();
-
-        return true;
     }
 }

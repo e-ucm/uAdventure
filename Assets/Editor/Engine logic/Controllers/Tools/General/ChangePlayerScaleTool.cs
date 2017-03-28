@@ -1,81 +1,86 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class ChangePlayerScaleTool : Tool
+using uAdventure.Core;
+
+namespace uAdventure.Editor
 {
-    private Scene scene;
-
-    private float scale;
-
-    private float oldScale;
-
-    public ChangePlayerScaleTool(Scene scene, float scale)
+    public class ChangePlayerScaleTool : Tool
     {
+        private Scene scene;
 
-        this.scene = scene;
-        this.scale = scale;
-        this.oldScale = scene.getPlayerScale();
-    }
+        private float scale;
 
-    
+        private float oldScale;
 
-    public override bool canRedo()
-    {
-
-        return true;
-    }
-
-    
-
-    public override bool canUndo()
-    {
-
-        return true;
-    }
-
-    
-
-    public override bool combine(Tool other)
-    {
-
-        if (other
-        is ChangePlayerScaleTool )
+        public ChangePlayerScaleTool(Scene scene, float scale)
         {
-            ChangePlayerScaleTool cpst = (ChangePlayerScaleTool) other;
-            if (cpst.scene == scene)
-            {
-                scale = cpst.scale;
-                timeStamp = cpst.timeStamp;
-                return true;
-            }
+
+            this.scene = scene;
+            this.scale = scale;
+            this.oldScale = scene.getPlayerScale();
         }
-        return false;
-    }
 
-    
 
-    public override bool doTool()
-    {
 
-        scene.setPlayerScale(scale);
-        return true;
-    }
+        public override bool canRedo()
+        {
 
-    
+            return true;
+        }
 
-    public override bool redoTool()
-    {
 
-        scene.setPlayerScale(scale);
-        Controller.getInstance().updatePanel();
-        return true;
-    }
 
-    public override bool undoTool()
-    {
+        public override bool canUndo()
+        {
 
-        scene.setPlayerScale(oldScale);
-        Controller.getInstance().updatePanel();
-        return true;
+            return true;
+        }
+
+
+
+        public override bool combine(Tool other)
+        {
+
+            if (other
+            is ChangePlayerScaleTool)
+            {
+                ChangePlayerScaleTool cpst = (ChangePlayerScaleTool)other;
+                if (cpst.scene == scene)
+                {
+                    scale = cpst.scale;
+                    timeStamp = cpst.timeStamp;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+
+
+        public override bool doTool()
+        {
+
+            scene.setPlayerScale(scale);
+            return true;
+        }
+
+
+
+        public override bool redoTool()
+        {
+
+            scene.setPlayerScale(scale);
+            Controller.getInstance().updatePanel();
+            return true;
+        }
+
+        public override bool undoTool()
+        {
+
+            scene.setPlayerScale(oldScale);
+            Controller.getInstance().updatePanel();
+            return true;
+        }
     }
 }

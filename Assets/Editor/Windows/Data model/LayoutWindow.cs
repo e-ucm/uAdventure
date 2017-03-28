@@ -1,17 +1,28 @@
 ﻿using UnityEngine;
-using UnityEditor;
-using System.Collections;
 
-public class LayoutWindow : BaseWindow
+namespace uAdventure.Editor
 {
-    protected GUILayoutOption[] m_Options;
-    public LayoutWindow(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
-        : base(aStartPos, aContent, aStyle)
+    public abstract class LayoutWindow : BaseWindow
     {
-        m_Options = aOptions;
-    }
-    public override void OnGUI()
-    {
-        m_Rect = GUILayout.Window(WindowID, m_Rect, Draw, m_Content, m_Style, m_Options);
+        public GUILayoutOption[] Options { get { return m_options; } set { m_options = value; } }
+        protected GUILayoutOption[] m_options;
+        public LayoutWindow(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options)
+            : base(rect, content, style)
+        {
+            Options = options;
+        }
+
+        public override void OnGUI()
+        {
+            //Options
+            Rect = GUILayout.Window(WindowID, Rect, AuxDraw, Content);
+        }
+
+        void AuxDraw(int id)
+        {
+            //GUILayout.BeginVertical(GUILayout.Width(Rect.width), GUILayout.Height(Rect.height));
+            Draw(id);
+            //GUILayout.EndVertical();
+        }
     }
 }

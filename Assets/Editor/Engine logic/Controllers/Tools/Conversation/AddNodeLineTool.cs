@@ -2,79 +2,85 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class AddNodeLineTool : Tool {
+using uAdventure.Core;
 
-
-    protected ConversationNode parent;
-
-    protected int lineIndex;
-
-    protected ConversationLine lineAdded;
-
-    protected string name;
-
-    protected List<ConditionsController> node;
-
-    public AddNodeLineTool(ConversationNodeView nodeView, int lineIndex, string name, List<ConditionsController> node):this((ConversationNode)nodeView, lineIndex, name, node)
-    {}
-
-    public AddNodeLineTool(ConversationNode parent, int lineIndex, string name, List<ConditionsController> node)
+namespace uAdventure.Editor
+{
+    public class AddNodeLineTool : Tool
     {
 
-        this.parent = parent;
-        this.lineIndex = lineIndex;
-        this.name = name;
-        this.node = node;
-    }
 
-    
-    public override bool canRedo()
-    {
+        protected ConversationNode parent;
 
-        return true;
-    }
+        protected int lineIndex;
 
-    
-    public override bool canUndo()
-    {
+        protected ConversationLine lineAdded;
 
-        return lineAdded != null;
-    }
+        protected string name;
 
-    
-    public override bool combine(Tool other)
-    {
+        protected List<ConditionsController> node;
 
-        return false;
-    }
+        public AddNodeLineTool(ConversationNodeView nodeView, int lineIndex, string name, List<ConditionsController> node) : this((ConversationNode)nodeView, lineIndex, name, node)
+        { }
 
-    
-    public override bool doTool()
-    {
+        public AddNodeLineTool(ConversationNode parent, int lineIndex, string name, List<ConditionsController> node)
+        {
 
-        lineAdded = new ConversationLine(name, TC.get("ConversationLine.DefaultText"));
-        parent.addLine(lineIndex, lineAdded);
-        node.Insert(lineIndex, new ConditionsController(lineAdded.getConditions(), Controller.CONVERSATION_OPTION_LINE, lineIndex.ToString()));
-        return true;
-    }
+            this.parent = parent;
+            this.lineIndex = lineIndex;
+            this.name = name;
+            this.node = node;
+        }
 
-    
-    public override bool redoTool()
-    {
 
-        parent.addLine(lineIndex, lineAdded);
-        node.Insert(lineIndex, new ConditionsController(lineAdded.getConditions(), Controller.CONVERSATION_OPTION_LINE, lineIndex.ToString()));
-        Controller.getInstance().updatePanel();
-        return true;
-    }
+        public override bool canRedo()
+        {
 
-    
-    public override bool undoTool()
-    {
+            return true;
+        }
 
-        parent.removeLine(lineIndex);
-        node.RemoveAt(lineIndex);
-        Controller.getInstance().updatePanel();
-        return true;
+
+        public override bool canUndo()
+        {
+
+            return lineAdded != null;
+        }
+
+
+        public override bool combine(Tool other)
+        {
+
+            return false;
+        }
+
+
+        public override bool doTool()
+        {
+
+            lineAdded = new ConversationLine(name, TC.get("ConversationLine.DefaultText"));
+            parent.addLine(lineIndex, lineAdded);
+            node.Insert(lineIndex, new ConditionsController(lineAdded.getConditions(), Controller.CONVERSATION_OPTION_LINE, lineIndex.ToString()));
+            return true;
+        }
+
+
+        public override bool redoTool()
+        {
+
+            parent.addLine(lineIndex, lineAdded);
+            node.Insert(lineIndex, new ConditionsController(lineAdded.getConditions(), Controller.CONVERSATION_OPTION_LINE, lineIndex.ToString()));
+            Controller.getInstance().updatePanel();
+            return true;
+        }
+
+
+        public override bool undoTool()
+        {
+
+            parent.removeLine(lineIndex);
+            node.RemoveAt(lineIndex);
+            Controller.getInstance().updatePanel();
+            return true;
+        }
     }
 }

@@ -3,147 +3,154 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-public abstract class Searchable {
+using uAdventure.Core;
 
-
-    protected static Dictionary<Searchable, List<string>> resultSet = new Dictionary<Searchable, List<string>>();
-
-    protected static string searchedText;
-
-    private static bool caseSensitive;
-
-    private static bool fullMatch;
-
-    public Dictionary<Searchable, List<string>> search(string text, bool caseSensitive, bool fullMatch)
+namespace uAdventure.Editor
+{
+    public abstract class Searchable
     {
 
-        resultSet.Clear();
-        if (caseSensitive)
-            Searchable.searchedText = text;
-        else
-            Searchable.searchedText = text.ToLower();
-        Searchable.caseSensitive = caseSensitive;
-        Searchable.fullMatch = fullMatch;
-        this.recursiveSearch();
-        return Searchable.resultSet;
-    }
 
-    public abstract void recursiveSearch();
+        protected static Dictionary<Searchable, List<string>> resultSet = new Dictionary<Searchable, List<string>>();
 
-    protected void addResult(string where)
-    {
+        protected static string searchedText;
 
-        List<string> places = resultSet[this];
-        if (places == null)
+        private static bool caseSensitive;
+
+        private static bool fullMatch;
+
+        public Dictionary<Searchable, List<string>> search(string text, bool caseSensitive, bool fullMatch)
         {
-            places = new List<string>();
-            resultSet.Add(this, places);
+
+            resultSet.Clear();
+            if (caseSensitive)
+                Searchable.searchedText = text;
+            else
+                Searchable.searchedText = text.ToLower();
+            Searchable.caseSensitive = caseSensitive;
+            Searchable.fullMatch = fullMatch;
+            this.recursiveSearch();
+            return Searchable.resultSet;
         }
-        if (!places.Contains(where))
-            places.Add(where);
-    }
 
-    protected void check(string value, string desc)
-    {
+        public abstract void recursiveSearch();
 
-        if (value != null)
+        protected void addResult(string where)
         {
-            if (!fullMatch)
+
+            List<string> places = resultSet[this];
+            if (places == null)
             {
-                if (!caseSensitive && value.ToLower().Contains(searchedText))
-                    addResult(desc);
-                else if (caseSensitive && value.Contains(searchedText))
-                    addResult(desc);
+                places = new List<string>();
+                resultSet.Add(this, places);
             }
-            else {
-                if (!caseSensitive && value.ToLower().Equals(searchedText))
-                    addResult(desc);
-                else if (caseSensitive && value.Equals(searchedText))
-                    addResult(desc);
-            }
+            if (!places.Contains(where))
+                places.Add(where);
         }
-    }
 
-    protected void check(ConditionsController conditions, string desc)
-    {
-
-        for (int i = 0; i < conditions.getBlocksCount(); i++)
+        protected void check(string value, string desc)
         {
-            for (int j = 0; j < conditions.getConditionCount(i); j++)
+
+            if (value != null)
             {
-                Dictionary<string, string> properties = conditions.getCondition(i, j);
-                if (properties.ContainsKey(ConditionsController.CONDITION_ID))
-                    check(properties[ConditionsController.CONDITION_ID], desc + " (ID)");
-                if (properties.ContainsKey(ConditionsController.CONDITION_STATE))
-                    // CHECK!!!
-                    check(properties[ConditionsController.CONDITION_STATE], desc + " ()");
-                if (properties.ContainsKey(ConditionsController.CONDITION_VALUE))
-                    // CHECK!!!
-                    check(properties[ConditionsController.CONDITION_VALUE], desc + " ()");
+                if (!fullMatch)
+                {
+                    if (!caseSensitive && value.ToLower().Contains(searchedText))
+                        addResult(desc);
+                    else if (caseSensitive && value.Contains(searchedText))
+                        addResult(desc);
+                }
+                else
+                {
+                    if (!caseSensitive && value.ToLower().Equals(searchedText))
+                        addResult(desc);
+                    else if (caseSensitive && value.Equals(searchedText))
+                        addResult(desc);
+                }
             }
         }
-    }
 
-    protected abstract List<Searchable> getPath(Searchable dataControl);
-
-    protected List<Searchable> getPathFromChild(Searchable dataControl, DataControl child)
-    {
-
-        if (child != null)
+        protected void check(ConditionsController conditions, string desc)
         {
-            List<Searchable> path = child.getPath(dataControl);
-            if (path != null)
+
+            for (int i = 0; i < conditions.getBlocksCount(); i++)
             {
-                path.Add(this);
-                return path;
+                for (int j = 0; j < conditions.getConditionCount(i); j++)
+                {
+                    Dictionary<string, string> properties = conditions.getCondition(i, j);
+                    if (properties.ContainsKey(ConditionsController.CONDITION_ID))
+                        check(properties[ConditionsController.CONDITION_ID], desc + " (ID)");
+                    if (properties.ContainsKey(ConditionsController.CONDITION_STATE))
+                        // CHECK!!!
+                        check(properties[ConditionsController.CONDITION_STATE], desc + " ()");
+                    if (properties.ContainsKey(ConditionsController.CONDITION_VALUE))
+                        // CHECK!!!
+                        check(properties[ConditionsController.CONDITION_VALUE], desc + " ()");
+                }
             }
         }
-        return null;
-    }
 
-    protected List<Searchable> getPathFromChild(Searchable dataControl, List<System.Object> list)
-    {
+        protected abstract List<Searchable> getPath(Searchable dataControl);
 
-        foreach (System.Object temp in list)
+        protected List<Searchable> getPathFromChild(Searchable dataControl, DataControl child)
         {
-            List<Searchable> path = ((Searchable)temp).getPath(dataControl);
-            if (path != null)
+
+            if (child != null)
             {
-                path.Add(this);
-                return path;
+                List<Searchable> path = child.getPath(dataControl);
+                if (path != null)
+                {
+                    path.Add(this);
+                    return path;
+                }
             }
+            return null;
         }
-        return null;
-    }
 
-    protected List<Searchable> getPathFromChild(Searchable dataControl, List<Searchable> list)
-    {
-
-        foreach (Searchable temp in list)
+        protected List<Searchable> getPathFromChild(Searchable dataControl, List<System.Object> list)
         {
-            List<Searchable> path = temp.getPath(dataControl);
-            if (path != null)
+
+            foreach (System.Object temp in list)
             {
-                path.Add(this);
-                return path;
+                List<Searchable> path = ((Searchable)temp).getPath(dataControl);
+                if (path != null)
+                {
+                    path.Add(this);
+                    return path;
+                }
             }
+            return null;
         }
-        return null;
-    }
 
-    protected List<Searchable> getPathFromSearchableChild(Searchable dataControl, Searchable child)
-    {
-
-        if (child != null)
+        protected List<Searchable> getPathFromChild(Searchable dataControl, List<Searchable> list)
         {
-            List<Searchable> path = child.getPath(dataControl);
-            if (path != null)
-            {
-                path.Add(this);
-                return path;
-            }
-        }
-        return null;
-    }
 
+            foreach (Searchable temp in list)
+            {
+                List<Searchable> path = temp.getPath(dataControl);
+                if (path != null)
+                {
+                    path.Add(this);
+                    return path;
+                }
+            }
+            return null;
+        }
+
+        protected List<Searchable> getPathFromSearchableChild(Searchable dataControl, Searchable child)
+        {
+
+            if (child != null)
+            {
+                List<Searchable> path = child.getPath(dataControl);
+                if (path != null)
+                {
+                    path.Add(this);
+                    return path;
+                }
+            }
+            return null;
+        }
+
+    }
 }

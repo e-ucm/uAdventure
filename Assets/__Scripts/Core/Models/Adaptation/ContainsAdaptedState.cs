@@ -1,20 +1,23 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-/**
- * This interface must be implemented both by AdaptationProfile and
- * AdaptationRule
- * 
- * @author Javier
- * 
- */
-
-public interface ContainsAdaptedState
+namespace uAdventure.Core
 {
+    /**
+     * This interface must be implemented both by AdaptationProfile and
+     * AdaptationRule
+     * 
+     * @author Javier
+     * 
+     */
 
-    AdaptedState getAdaptedState();
+    public interface ContainsAdaptedState
+    {
 
-    void setAdaptedState(AdaptedState adaptedState);
+        AdaptedState getAdaptedState();
+
+        void setAdaptedState(AdaptedState adaptedState);
 
 
+    }
 }

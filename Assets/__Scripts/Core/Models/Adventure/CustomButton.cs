@@ -2,139 +2,142 @@
 using UnityEngine;
 using System.Collections;
 
-public class CustomButton : HasSound, ICloneable
+namespace uAdventure.Core
 {
-
-    private string type;
-
-    private string path;
-
-    private string action;
-
-    /**
-     * @return the action
-     */
-
-    public string getAction()
+    public class CustomButton : HasSound, ICloneable
     {
 
-        return action;
-    }
+        private string type;
 
-    /**
-     * @param action
-     *            the action to set
-     */
+        private string path;
 
-    public void setAction(string action)
-    {
+        private string action;
 
-        this.action = action;
-    }
+        /**
+         * @return the action
+         */
 
-    /**
-     * @return the type
-     */
-
-    public string getType()
-    {
-
-        return type;
-    }
-
-    /**
-     * @param type
-     *            the type to set
-     */
-
-    public void setType(string type)
-    {
-
-        this.type = type;
-    }
-
-    /**
-     * @return the path
-     */
-
-    public string getPath()
-    {
-
-        return path;
-    }
-
-    /**
-     * @param path
-     *            the path to set
-     */
-
-    public void setPath(string path)
-    {
-
-        this.path = path;
-    }
-
-    /**
-     * @param type
-     * @param path
-     */
-
-    public CustomButton(string action, string type, string path)
-    {
-
-        this.action = action;
-        this.type = type;
-        this.path = path;
-    }
-
-
-    public override bool Equals(System.Object o)
-    {
-
-        if (o == null || !(o is CustomButton))
-            return false;
-        CustomButton button = (CustomButton) o;
-        if (button.action.Equals(action) && button.type.Equals(type))
+        public string getAction()
         {
-            return true;
+
+            return action;
         }
 
-        return false;
-    }
+        /**
+         * @param action
+         *            the action to set
+         */
 
-    public override int GetHashCode()
-    {
-        return base.GetHashCode();
-    }
+        public void setAction(string action)
+        {
 
-    /*
-    @Override
-    public Object clone() throws CloneNotSupportedException
-    {
+            this.action = action;
+        }
 
-        CustomButton cb = (CustomButton) super.clone( );
-        cb.action = ( action != null ? new string(action ) : null );
-        cb.path = ( path != null ? new string(path ) : null );
-        cb.type = ( type != null ? new string(type ) : null );
-        return cb;
-    }*/
+        /**
+         * @return the type
+         */
 
-    public string getSoundPath()
-    {
-        return path;
-    }
+        public string getType()
+        {
 
-    public void setSoundPath(string soundPath)
-    {
-        this.path = soundPath;
-    }
+            return type;
+        }
 
-    public object Clone()
-    {
-        CustomButton cb = (CustomButton) this.MemberwiseClone();
-        cb.action = (action != null ? action : null);
-        cb.path = (path != null ? path : null);
-        cb.type = (type != null ? type : null);
-        return cb;
+        /**
+         * @param type
+         *            the type to set
+         */
+
+        public void setType(string type)
+        {
+
+            this.type = type;
+        }
+
+        /**
+         * @return the path
+         */
+
+        public string getPath()
+        {
+
+            return path;
+        }
+
+        /**
+         * @param path
+         *            the path to set
+         */
+
+        public void setPath(string path)
+        {
+
+            this.path = path;
+        }
+
+        /**
+         * @param type
+         * @param path
+         */
+
+        public CustomButton(string action, string type, string path)
+        {
+
+            this.action = action;
+            this.type = type;
+            this.path = path;
+        }
+
+
+        public override bool Equals(System.Object o)
+        {
+
+            if (o == null || !(o is CustomButton))
+                return false;
+            CustomButton button = (CustomButton)o;
+            if (button.action.Equals(action) && button.type.Equals(type))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
+        /*
+        @Override
+        public Object clone() throws CloneNotSupportedException
+        {
+
+            CustomButton cb = (CustomButton) super.clone( );
+            cb.action = ( action != null ? new string(action ) : null );
+            cb.path = ( path != null ? new string(path ) : null );
+            cb.type = ( type != null ? new string(type ) : null );
+            return cb;
+        }*/
+
+        public string getSoundPath()
+        {
+            return path;
+        }
+
+        public void setSoundPath(string soundPath)
+        {
+            this.path = soundPath;
+        }
+
+        public object Clone()
+        {
+            CustomButton cb = (CustomButton)this.MemberwiseClone();
+            cb.action = (action != null ? action : null);
+            cb.path = (path != null ? path : null);
+            cb.type = (type != null ? type : null);
+            return cb;
+        }
     }
 }

@@ -1,52 +1,26 @@
 ﻿using UnityEngine;
 using System.Collections;
-using System.Collections.Generic;
 using System.Xml;
 
-public class TransitionSubParser : SubParser {
-    private Animation animation;
+namespace uAdventure.Core
+{
+	[DOMParser("transition")]
+	[DOMParser(typeof(Transition))]
+	public class TransitionSubParser : IDOMParser
+	{
+		public object DOMParse(XmlElement element, params object[] parameters)
+		{
+			Transition transition = new Transition();
 
-    private Transition transition;
+			switch(element.GetAttribute("type")){
+				case "none": 		transition.setType(Transition.TYPE_NONE); break;
+				case "fadein": 		transition.setType(Transition.TYPE_FADEIN); break;
+				case "vertical": 	transition.setType(Transition.TYPE_VERTICAL); break;
+				case "horizontal": 	transition.setType(Transition.TYPE_HORIZONTAL); break;
+			}
 
-    public TransitionSubParser(Animation animation):base(null)
-    {
-        this.animation = animation;
-        transition = new Transition();
-    }
-
-    public override void startElement(string namespaceURI, string sName, string qName, Dictionary<string, string> attrs)
-    {
-
-        if (qName.Equals("transition"))
-        {
-            foreach (KeyValuePair<string, string> entry in attrs)
-            {
-                if (entry.Key.Equals("type"))
-                {
-                    if (entry.Value.ToString().Equals("none"))
-                        transition.setType(Transition.TYPE_NONE);
-                    else if (entry.Value.ToString().Equals("fadein"))
-                        transition.setType(Transition.TYPE_FADEIN);
-                    else if (entry.Value.ToString().Equals("vertical"))
-                        transition.setType(Transition.TYPE_VERTICAL);
-                    else if (entry.Value.ToString().Equals("horizontal"))
-                        transition.setType(Transition.TYPE_HORIZONTAL);
-                }
-                else if (entry.Key.Equals("time"))
-                {
-                    transition.setTime(long.Parse(entry.Value.ToString()));
-                }
-            }
+			transition.setTime(ExParsers.ParseDefault (element.GetAttribute("time"), 0));
+            return transition;
         }
     }
-
-    public override void endElement(string namespaceURI, string sName, string qName)
-    {
-
-        if (qName.Equals("transition"))
-        {
-            animation.getTransitions().Add(transition);
-        }
-    }
-
 }

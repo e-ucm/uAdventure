@@ -1,57 +1,62 @@
-﻿using System;
+﻿
+using System;
 using UnityEngine;
 using System.Collections;
 using System.Xml;
 
-public class TrajectoryDOMWriter
+using uAdventure.Core;
+
+namespace uAdventure.Editor
 {
-
-    /**
-     * Private constructor.
-     */
-
-    private TrajectoryDOMWriter()
+    [DOMWriter(typeof(Trajectory))]
+    public class TrajectoryDOMWriter : ParametrizedDOMWriter
     {
 
-    }
+        /**
+         * Private constructor.
+         */
 
-    public static XmlNode buildDOM(Trajectory trajectory)
-    {
-
-        XmlElement itemElement = null;
-
-        // Create the necessary elements to create the DOM
-        XmlDocument doc = Writer.GetDoc();
-
-        // Create the root node
-        itemElement = doc.CreateElement("trajectory");
-
-        foreach (Trajectory.Node node in trajectory.getNodes())
+        public TrajectoryDOMWriter()
         {
-            XmlElement nodeElement = doc.CreateElement("node");
-            nodeElement.SetAttribute("id", node.getID());
-            nodeElement.SetAttribute("x", node.getX().ToString());
-            nodeElement.SetAttribute("y", node.getY().ToString());
-            nodeElement.SetAttribute("scale", node.getScale().ToString());
-            itemElement.AppendChild(nodeElement);
+
         }
 
-        if (trajectory.getInitial() != null)
+        protected override void FillNode(XmlNode xmlNode, object target, params IDOMWriterParam[] options)
         {
-            XmlElement initialNodeElement = doc.CreateElement("initialnode");
-            initialNodeElement.SetAttribute("id", trajectory.getInitial().getID());
-            itemElement.AppendChild(initialNodeElement);
+            var trajectory = target as Trajectory;
+
+            var doc = Writer.GetDoc();
+
+            foreach (Trajectory.Node node in trajectory.getNodes())
+            {
+                XmlElement nodeElement = doc.CreateElement("node");
+                nodeElement.SetAttribute("id", node.getID());
+                nodeElement.SetAttribute("x", node.getX().ToString());
+                nodeElement.SetAttribute("y", node.getY().ToString());
+                nodeElement.SetAttribute("scale", node.getScale().ToString());
+                xmlNode.AppendChild(nodeElement);
+            }
+
+            if (trajectory.getInitial() != null)
+            {
+                XmlElement initialNodeElement = doc.CreateElement("initialnode");
+                initialNodeElement.SetAttribute("id", trajectory.getInitial().getID());
+                xmlNode.AppendChild(initialNodeElement);
+            }
+
+            foreach (Trajectory.Side side in trajectory.getSides())
+            {
+                XmlElement sideElement = doc.CreateElement("side");
+                sideElement.SetAttribute("idStart", side.getIDStart());
+                sideElement.SetAttribute("idEnd", side.getIDEnd());
+                sideElement.SetAttribute("length", ((int)side.getLength()).ToString());
+                xmlNode.AppendChild(sideElement);
+            }
         }
 
-        foreach (Trajectory.Side side in trajectory.getSides())
+        protected override string GetElementNameFor(object target)
         {
-            XmlElement sideElement = doc.CreateElement("side");
-            sideElement.SetAttribute("idStart", side.getIDStart());
-            sideElement.SetAttribute("idEnd", side.getIDEnd());
-            sideElement.SetAttribute("length", ((int) side.getLength()).ToString());
-            itemElement.AppendChild(sideElement);
+            return "trajectory";
         }
-
-        return itemElement;
     }
 }

@@ -3,57 +3,62 @@ using UnityEditor;
 using System;
 using System.Collections.Generic;
 
-public class SetValueEffectEditor : EffectEditor
+using uAdventure.Core;
+
+namespace uAdventure.Editor
 {
-    private bool collapsed = false;
-    public bool Collapsed { get { return collapsed; } set { collapsed = value; } }
-    private Rect window = new Rect(0, 0, 300, 0);
-    public Rect Window
+    public class SetValueEffectEditor : EffectEditor
     {
-        get
+        private bool collapsed = false;
+        public bool Collapsed { get { return collapsed; } set { collapsed = value; } }
+        private Rect window = new Rect(0, 0, 300, 0);
+        public Rect Window
         {
-            if (collapsed) return new Rect(window.x, window.y, 50, 30);
-            else return window;
+            get
+            {
+                if (collapsed) return new Rect(window.x, window.y, 50, 30);
+                else return window;
+            }
+            set
+            {
+                if (collapsed) window = new Rect(value.x, value.y, window.width, window.height);
+                else window = value;
+            }
         }
-        set
+        private string[] vars;
+
+        private SetValueEffect effect;
+
+        public SetValueEffectEditor()
         {
-            if (collapsed) window = new Rect(value.x, value.y, window.width, window.height);
-            else window = value;
+            List<string> tmp = new List<string>();
+            tmp.Add("");
+            tmp.AddRange(Controller.getInstance().getVarFlagSummary().getVars());
+            vars = tmp.ToArray();
+
+            this.effect = new SetValueEffect(vars[0], 1);
         }
-    }
-    private string[] vars;
 
-    private SetValueEffect effect;
+        public void draw()
+        {
 
-    public SetValueEffectEditor()
-    {
-        List<string> tmp = new List<string> ();
-        tmp.Add ("");
-        tmp.AddRange(Controller.getInstance().getVarFlagSummary().getVars());
-        vars = tmp.ToArray ();
+            EditorGUILayout.BeginHorizontal();
 
-        this.effect = new SetValueEffect(vars[0], 1);
-    }
+            EditorGUILayout.LabelField(TC.get("Vars.Var"));
+            effect.setTargetId(vars[EditorGUILayout.Popup(Array.IndexOf(vars, effect.getTargetId()), vars)]);
+            effect.setValue(EditorGUILayout.IntField(effect.getValue()));
+            EditorGUILayout.EndHorizontal();
 
-    public void draw()
-    {
+            EditorGUILayout.HelpBox(TC.get("SetValueEffect.Description"), MessageType.Info);
+        }
 
-        EditorGUILayout.BeginHorizontal();
+        public AbstractEffect Effect { get { return effect; } set { effect = value as SetValueEffect; } }
+        public string EffectName { get { return TC.get("SetValueEffect.Title"); } }
+        public EffectEditor clone() { return new SetValueEffectEditor(); }
 
-        EditorGUILayout.LabelField(TC.get("Vars.Var"));
-        effect.setTargetId(vars[EditorGUILayout.Popup(Array.IndexOf(vars, effect.getTargetId()), vars)]);
-        effect.setValue(EditorGUILayout.IntField(effect.getValue()));
-        EditorGUILayout.EndHorizontal();
-
-        EditorGUILayout.HelpBox(TC.get("SetValueEffect.Description"), MessageType.Info);
-    }
-
-    public AbstractEffect Effect { get { return effect; } set { effect = value as SetValueEffect; } }
-    public string EffectName { get { return TC.get("SetValueEffect.Title"); } }
-    public EffectEditor clone() { return new SetValueEffectEditor(); }
-
-    public bool manages(AbstractEffect c)
-    {
-        return c.GetType() == effect.GetType();
+        public bool manages(AbstractEffect c)
+        {
+            return c.GetType() == effect.GetType();
+        }
     }
 }

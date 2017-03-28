@@ -2,15 +2,21 @@
 using System.Collections;
 using System;
 
-public class WindowMenuItem : MonoBehaviour, IMenuItem {
+using uAdventure.Core;
 
-    public string Label
+namespace uAdventure.Editor
+{
+    public class WindowMenuItem : MonoBehaviour, IMenuItem
     {
-        get; set;
-    }
 
-    public void OnCliked()
-    {
-        Debug.Log("MenuItem: " + Label);
+        public string Label
+        {
+            get; set;
+        }
+
+        public void OnCliked()
+        {
+            Debug.Log("MenuItem: " + Label);
+        }
     }
 }

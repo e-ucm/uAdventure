@@ -2,172 +2,178 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class DeleteEffectTool : Tool {
+using uAdventure.Core;
 
-
-    protected Effects effects;
-
-    protected AbstractEffect effectDeleted;
-
-    protected int index;
-
-    protected Controller controller;
-
-    protected List<ConditionsController> conditions;
-
-    protected ConditionsController condition;
-
-    public DeleteEffectTool(Effects effects, int index, List<ConditionsController> conditions)
-    {
-        this.effects = effects;
-        this.index = index;
-        this.conditions = conditions;
-        controller = Controller.getInstance();
-    }
-
-    public override bool canRedo()
+namespace uAdventure.Editor
+{
+    public class DeleteEffectTool : Tool
     {
 
-        return true;
-    }
 
-    public override bool canUndo()
-    {
+        protected Effects effects;
 
-        return true;
-    }
+        protected AbstractEffect effectDeleted;
 
-    public override bool combine(Tool other)
-    {
+        protected int index;
 
-        return false;
-    }
+        protected Controller controller;
 
-    public override bool doTool()
-    {
+        protected List<ConditionsController> conditions;
 
-        effectDeleted = effects.getEffects()[index];
-        effects.getEffects().RemoveAt(index);
-        condition = conditions[index];
-        conditions.RemoveAt(index);
-        updateVarFlagSummary((Effect)effectDeleted);
-        return true;
-    }
+        protected ConditionsController condition;
 
-    public override bool redoTool()
-    {
-
-        effects.getEffects().RemoveAt(index);
-        conditions.RemoveAt(index);
-        updateVarFlagSummary((Effect)effectDeleted);
-        Controller.getInstance().updatePanel();
-        return true;
-    }
-
-    public override bool undoTool()
-    {
-
-        effects.getEffects().Insert(index, effectDeleted);
-        conditions.Insert(index, condition);
-        undoUpdateVarFlagSummary((Effect)effectDeleted);
-        Controller.getInstance().updatePanel();
-        return true;
-    }
-
-    /**
-     * Updates the varFlag summary (the references to flags and variables if the
-     * effect given as argument has any)
-     * 
-     * @param effect
-     */
-    protected void updateVarFlagSummary(Effect effect)
-    {
-
-        if (effect.getType() == EffectType.ACTIVATE)
+        public DeleteEffectTool(Effects effects, int index, List<ConditionsController> conditions)
         {
-            ActivateEffect activateEffect = (ActivateEffect)effect;
-            controller.getVarFlagSummary().deleteReference(activateEffect.getTargetId());
+            this.effects = effects;
+            this.index = index;
+            this.conditions = conditions;
+            controller = Controller.getInstance();
         }
 
-        else if (effect.getType() == EffectType.DEACTIVATE)
+        public override bool canRedo()
         {
-            DeactivateEffect deactivateEffect = (DeactivateEffect)effect;
-            controller.getVarFlagSummary().deleteReference(deactivateEffect.getTargetId());
+
+            return true;
         }
 
-        else if (effect.getType() == EffectType.SET_VALUE)
+        public override bool canUndo()
         {
-            SetValueEffect setValueEffect = (SetValueEffect)effect;
-            controller.getVarFlagSummary().deleteReference(setValueEffect.getTargetId());
+
+            return true;
         }
 
-        else if (effect.getType() == EffectType.INCREMENT_VAR)
+        public override bool combine(Tool other)
         {
-            IncrementVarEffect setValueEffect = (IncrementVarEffect)effect;
-            controller.getVarFlagSummary().deleteReference(setValueEffect.getTargetId());
+
+            return false;
         }
 
-        else if (effect.getType() == EffectType.DECREMENT_VAR)
+        public override bool doTool()
         {
-            DecrementVarEffect setValueEffect = (DecrementVarEffect)effect;
-            controller.getVarFlagSummary().deleteReference(setValueEffect.getTargetId());
+
+            effectDeleted = effects.getEffects()[index];
+            effects.getEffects().RemoveAt(index);
+            condition = conditions[index];
+            conditions.RemoveAt(index);
+            updateVarFlagSummary((Effect)effectDeleted);
+            return true;
         }
 
-        else if (effect.getType() == EffectType.RANDOM_EFFECT)
+        public override bool redoTool()
         {
-            RandomEffect randomEffect = (RandomEffect)effect;
-            if (randomEffect.getPositiveEffect() != null)
-                updateVarFlagSummary((Effect)randomEffect.getPositiveEffect());
-            if (randomEffect.getNegativeEffect() != null)
-                updateVarFlagSummary((Effect)randomEffect.getNegativeEffect());
-        }
-    }
 
-    /**
-     * Undoes the actions performed in updateVarFlagSummary
-     * 
-     * @param effect
-     */
-    protected void undoUpdateVarFlagSummary(Effect effect)
-    {
-
-        if (effect.getType() == EffectType.ACTIVATE)
-        {
-            ActivateEffect activateEffect = (ActivateEffect)effect;
-            controller.getVarFlagSummary().addReference(activateEffect.getTargetId());
+            effects.getEffects().RemoveAt(index);
+            conditions.RemoveAt(index);
+            updateVarFlagSummary((Effect)effectDeleted);
+            Controller.getInstance().updatePanel();
+            return true;
         }
 
-        else if (effect.getType() == EffectType.DEACTIVATE)
+        public override bool undoTool()
         {
-            DeactivateEffect deactivateEffect = (DeactivateEffect)effect;
-            controller.getVarFlagSummary().addReference(deactivateEffect.getTargetId());
+
+            effects.getEffects().Insert(index, effectDeleted);
+            conditions.Insert(index, condition);
+            undoUpdateVarFlagSummary((Effect)effectDeleted);
+            Controller.getInstance().updatePanel();
+            return true;
         }
 
-        else if (effect.getType() == EffectType.SET_VALUE)
+        /**
+         * Updates the varFlag summary (the references to flags and variables if the
+         * effect given as argument has any)
+         * 
+         * @param effect
+         */
+        protected void updateVarFlagSummary(Effect effect)
         {
-            SetValueEffect setValueEffect = (SetValueEffect)effect;
-            controller.getVarFlagSummary().addReference(setValueEffect.getTargetId());
+
+            if (effect.getType() == EffectType.ACTIVATE)
+            {
+                ActivateEffect activateEffect = (ActivateEffect)effect;
+                controller.getVarFlagSummary().deleteReference(activateEffect.getTargetId());
+            }
+
+            else if (effect.getType() == EffectType.DEACTIVATE)
+            {
+                DeactivateEffect deactivateEffect = (DeactivateEffect)effect;
+                controller.getVarFlagSummary().deleteReference(deactivateEffect.getTargetId());
+            }
+
+            else if (effect.getType() == EffectType.SET_VALUE)
+            {
+                SetValueEffect setValueEffect = (SetValueEffect)effect;
+                controller.getVarFlagSummary().deleteReference(setValueEffect.getTargetId());
+            }
+
+            else if (effect.getType() == EffectType.INCREMENT_VAR)
+            {
+                IncrementVarEffect setValueEffect = (IncrementVarEffect)effect;
+                controller.getVarFlagSummary().deleteReference(setValueEffect.getTargetId());
+            }
+
+            else if (effect.getType() == EffectType.DECREMENT_VAR)
+            {
+                DecrementVarEffect setValueEffect = (DecrementVarEffect)effect;
+                controller.getVarFlagSummary().deleteReference(setValueEffect.getTargetId());
+            }
+
+            else if (effect.getType() == EffectType.RANDOM_EFFECT)
+            {
+                RandomEffect randomEffect = (RandomEffect)effect;
+                if (randomEffect.getPositiveEffect() != null)
+                    updateVarFlagSummary((Effect)randomEffect.getPositiveEffect());
+                if (randomEffect.getNegativeEffect() != null)
+                    updateVarFlagSummary((Effect)randomEffect.getNegativeEffect());
+            }
         }
 
-        else if (effect.getType() == EffectType.INCREMENT_VAR)
+        /**
+         * Undoes the actions performed in updateVarFlagSummary
+         * 
+         * @param effect
+         */
+        protected void undoUpdateVarFlagSummary(Effect effect)
         {
-            IncrementVarEffect setValueEffect = (IncrementVarEffect)effect;
-            controller.getVarFlagSummary().addReference(setValueEffect.getTargetId());
-        }
 
-        else if (effect.getType() == EffectType.DECREMENT_VAR)
-        {
-            DecrementVarEffect setValueEffect = (DecrementVarEffect)effect;
-            controller.getVarFlagSummary().addReference(setValueEffect.getTargetId());
-        }
+            if (effect.getType() == EffectType.ACTIVATE)
+            {
+                ActivateEffect activateEffect = (ActivateEffect)effect;
+                controller.getVarFlagSummary().addReference(activateEffect.getTargetId());
+            }
 
-        else if (effect.getType() == EffectType.RANDOM_EFFECT)
-        {
-            RandomEffect randomEffect = (RandomEffect)effect;
-            if (randomEffect.getPositiveEffect() != null)
-                undoUpdateVarFlagSummary((Effect)randomEffect.getPositiveEffect());
-            if (randomEffect.getNegativeEffect() != null)
-                undoUpdateVarFlagSummary((Effect)randomEffect.getNegativeEffect());
+            else if (effect.getType() == EffectType.DEACTIVATE)
+            {
+                DeactivateEffect deactivateEffect = (DeactivateEffect)effect;
+                controller.getVarFlagSummary().addReference(deactivateEffect.getTargetId());
+            }
+
+            else if (effect.getType() == EffectType.SET_VALUE)
+            {
+                SetValueEffect setValueEffect = (SetValueEffect)effect;
+                controller.getVarFlagSummary().addReference(setValueEffect.getTargetId());
+            }
+
+            else if (effect.getType() == EffectType.INCREMENT_VAR)
+            {
+                IncrementVarEffect setValueEffect = (IncrementVarEffect)effect;
+                controller.getVarFlagSummary().addReference(setValueEffect.getTargetId());
+            }
+
+            else if (effect.getType() == EffectType.DECREMENT_VAR)
+            {
+                DecrementVarEffect setValueEffect = (DecrementVarEffect)effect;
+                controller.getVarFlagSummary().addReference(setValueEffect.getTargetId());
+            }
+
+            else if (effect.getType() == EffectType.RANDOM_EFFECT)
+            {
+                RandomEffect randomEffect = (RandomEffect)effect;
+                if (randomEffect.getPositiveEffect() != null)
+                    undoUpdateVarFlagSummary((Effect)randomEffect.getPositiveEffect());
+                if (randomEffect.getNegativeEffect() != null)
+                    undoUpdateVarFlagSummary((Effect)randomEffect.getNegativeEffect());
+            }
         }
     }
 }

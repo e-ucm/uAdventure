@@ -1,112 +1,116 @@
 ﻿using UnityEngine;
 using UnityEditor;
-using System.Collections;
 
-public class PlayerWindowDialogConfiguration : LayoutWindow
+using uAdventure.Core;
+
+namespace uAdventure.Editor
 {
-    private Color fontFrontColor, fontBorderColor, bubbleBcgColor, bubbleBorderColor;
-    private Color fontFrontColorLast, fontBorderColorLast, bubbleBcgColorLast, bubbleBorderColorLast;
-
-    private bool shouldShowSpeachBubble, shouldShowSpeachBubbleLast;
-
-    private GUISkin skinDefault;
-    private GUIStyle previewTextStyle;
-
-    private Texture2D bckImage = null;
-
-    public PlayerWindowDialogConfiguration(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
-        : base(aStartPos, aContent, aStyle, aOptions)
+    public class PlayerWindowDialogConfiguration : LayoutWindow
     {
-        shouldShowSpeachBubble = shouldShowSpeachBubbleLast =
-            Controller.getInstance().getCharapterList().getSelectedChapterData().getPlayer().getShowsSpeechBubbles();
+        private Color fontFrontColor, fontBorderColor, bubbleBcgColor, bubbleBorderColor;
+        private Color fontFrontColorLast, fontBorderColorLast, bubbleBcgColorLast, bubbleBorderColorLast;
 
-        fontFrontColor = fontFrontColorLast = ColorConverter.HexToColor(Controller.getInstance().getCharapterList().getSelectedChapterData().getPlayer().getTextFrontColor());
-        fontBorderColor = fontBorderColorLast = ColorConverter.HexToColor(Controller.getInstance().getCharapterList().getSelectedChapterData().getPlayer().getTextBorderColor());
-        bubbleBcgColor = bubbleBcgColorLast = ColorConverter.HexToColor(Controller.getInstance().getCharapterList().getSelectedChapterData().getPlayer().getBubbleBkgColor());
-        bubbleBorderColor = fontFrontColorLast = ColorConverter.HexToColor(Controller.getInstance().getCharapterList().getSelectedChapterData().getPlayer().getBubbleBorderColor());
+        private bool shouldShowSpeachBubble, shouldShowSpeachBubbleLast;
 
-        bckImage = (Texture2D)Resources.Load("Editor/TextBubble", typeof(Texture2D));
-        previewTextStyle = new GUIStyle();
-        previewTextStyle.fontSize = 24;
-        previewTextStyle.normal.textColor = fontFrontColor;
-        //previewTextStyle.normal.background = bckImage;
-    }
+        private GUISkin skinDefault;
+        private GUIStyle previewTextStyle;
 
+        private Texture2D bckImage = null;
 
-    public override void Draw(int aID)
-    {
-        GUILayout.Label(TC.get("Player.TextColor"));
-
-        GUILayout.Space(20);
-        shouldShowSpeachBubble = GUILayout.Toggle(shouldShowSpeachBubble, TC.get("Player.ShowsSpeechBubble"));
-        if(shouldShowSpeachBubble != shouldShowSpeachBubbleLast)
-            OnShowBubbleChange();
-
-        GUILayout.Space(10);
-
-        GUILayout.Label(TC.get("GeneralText.PreviewText"), previewTextStyle);
-
-        GUILayout.Space(20);
-
-        fontFrontColor = EditorGUILayout.ColorField(TC.get("Player.FrontColor"), fontFrontColor);
-        if (fontFrontColor != fontFrontColorLast)
+        public PlayerWindowDialogConfiguration(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
+            : base(aStartPos, aContent, aStyle, aOptions)
         {
-            OnFontFrontChange(fontFrontColor);
+            shouldShowSpeachBubble = shouldShowSpeachBubbleLast =
+                Controller.getInstance().getCharapterList().getSelectedChapterData().getPlayer().getShowsSpeechBubbles();
+
+            fontFrontColor = fontFrontColorLast = ColorConverter.HexToColor(Controller.getInstance().getCharapterList().getSelectedChapterData().getPlayer().getTextFrontColor());
+            fontBorderColor = fontBorderColorLast = ColorConverter.HexToColor(Controller.getInstance().getCharapterList().getSelectedChapterData().getPlayer().getTextBorderColor());
+            bubbleBcgColor = bubbleBcgColorLast = ColorConverter.HexToColor(Controller.getInstance().getCharapterList().getSelectedChapterData().getPlayer().getBubbleBkgColor());
+            bubbleBorderColor = fontFrontColorLast = ColorConverter.HexToColor(Controller.getInstance().getCharapterList().getSelectedChapterData().getPlayer().getBubbleBorderColor());
+
+            bckImage = (Texture2D)Resources.Load("Editor/TextBubble", typeof(Texture2D));
+            previewTextStyle = new GUIStyle();
+            previewTextStyle.fontSize = 24;
+            previewTextStyle.normal.textColor = fontFrontColor;
+            //previewTextStyle.normal.background = bckImage;
         }
 
-        fontBorderColor = EditorGUILayout.ColorField(TC.get("Player.BorderColor"), fontBorderColor);
-        if (fontBorderColor != fontBorderColorLast)
+
+        public override void Draw(int aID)
         {
-            OnFontBorderChange(fontBorderColor);
+            GUILayout.Label(TC.get("Player.TextColor"));
+
+            GUILayout.Space(20);
+            shouldShowSpeachBubble = GUILayout.Toggle(shouldShowSpeachBubble, TC.get("Player.ShowsSpeechBubble"));
+            if (shouldShowSpeachBubble != shouldShowSpeachBubbleLast)
+                OnShowBubbleChange();
+
+            GUILayout.Space(10);
+
+            GUILayout.Label(TC.get("GeneralText.PreviewText"), previewTextStyle);
+
+            GUILayout.Space(20);
+
+            fontFrontColor = EditorGUILayout.ColorField(TC.get("Player.FrontColor"), fontFrontColor);
+            if (fontFrontColor != fontFrontColorLast)
+            {
+                OnFontFrontChange(fontFrontColor);
+            }
+
+            fontBorderColor = EditorGUILayout.ColorField(TC.get("Player.BorderColor"), fontBorderColor);
+            if (fontBorderColor != fontBorderColorLast)
+            {
+                OnFontBorderChange(fontBorderColor);
+            }
+
+            if (!shouldShowSpeachBubble)
+                GUI.enabled = false;
+
+            bubbleBcgColor = EditorGUILayout.ColorField(TC.get("Player.BubbleBkgColor"), bubbleBcgColor);
+            if (bubbleBcgColor != bubbleBcgColorLast)
+            {
+                OnBubbleBcgChange(bubbleBcgColor);
+            }
+
+            bubbleBorderColor = EditorGUILayout.ColorField(TC.get("Player.BubbleBorderColor"), bubbleBorderColor);
+            if (bubbleBorderColor != bubbleBorderColorLast)
+            {
+                OnBubbleBorderChange(bubbleBorderColor);
+            }
+
+            GUI.enabled = true;
         }
 
-        if (!shouldShowSpeachBubble)
-            GUI.enabled = false;
-
-        bubbleBcgColor = EditorGUILayout.ColorField(TC.get("Player.BubbleBkgColor"), bubbleBcgColor);
-        if (bubbleBcgColor != bubbleBcgColorLast)
+        void OnShowBubbleChange()
         {
-            OnBubbleBcgChange(bubbleBcgColor);
+            shouldShowSpeachBubbleLast = shouldShowSpeachBubble;
+            Controller.getInstance().getCharapterList().getSelectedChapterData().getPlayer().setShowsSpeechBubbles(shouldShowSpeachBubble);
         }
 
-        bubbleBorderColor = EditorGUILayout.ColorField(TC.get("Player.BubbleBorderColor"), bubbleBorderColor);
-        if (bubbleBorderColor != bubbleBorderColorLast)
+        void OnFontFrontChange(Color val)
         {
-            OnBubbleBorderChange(bubbleBorderColor);
+            fontFrontColorLast = val;
+            previewTextStyle.normal.textColor = fontFrontColor;
+            Controller.getInstance().getCharapterList().getSelectedChapterData().getPlayer().setTextFrontColor(ColorConverter.ColorToHex(val));
+            Debug.Log(ColorConverter.ColorToHex(val));
         }
 
-        GUI.enabled = true;
-    }
+        void OnFontBorderChange(Color val)
+        {
+            fontBorderColorLast = val;
+            Controller.getInstance().getCharapterList().getSelectedChapterData().getPlayer().setTextBorderColor(ColorConverter.ColorToHex(val));
+        }
 
-    void OnShowBubbleChange()
-    {
-        shouldShowSpeachBubbleLast = shouldShowSpeachBubble;
-        Controller.getInstance().getCharapterList().getSelectedChapterData().getPlayer().setShowsSpeechBubbles(shouldShowSpeachBubble);
-    }
+        void OnBubbleBcgChange(Color val)
+        {
+            bubbleBcgColorLast = val;
+            Controller.getInstance().getCharapterList().getSelectedChapterData().getPlayer().setBubbleBkgColor(ColorConverter.ColorToHex(val));
+        }
 
-    void OnFontFrontChange(Color val)
-    {
-        fontFrontColorLast = val;
-        previewTextStyle.normal.textColor = fontFrontColor;
-        Controller.getInstance().getCharapterList().getSelectedChapterData().getPlayer().setTextFrontColor(ColorConverter.ColorToHex(val));
-        Debug.Log(ColorConverter.ColorToHex(val));
-    }
-
-    void OnFontBorderChange(Color val)
-    {
-        fontBorderColorLast = val;
-        Controller.getInstance().getCharapterList().getSelectedChapterData().getPlayer().setTextBorderColor(ColorConverter.ColorToHex(val));
-    }
-
-    void OnBubbleBcgChange(Color val)
-    {
-        bubbleBcgColorLast = val;
-        Controller.getInstance().getCharapterList().getSelectedChapterData().getPlayer().setBubbleBkgColor(ColorConverter.ColorToHex(val));
-    }
-
-    void OnBubbleBorderChange(Color val)
-    {
-        bubbleBorderColorLast = val;
-        Controller.getInstance().getCharapterList().getSelectedChapterData().getPlayer().setBubbleBorderColor(ColorConverter.ColorToHex(val));
+        void OnBubbleBorderChange(Color val)
+        {
+            bubbleBorderColorLast = val;
+            Controller.getInstance().getCharapterList().getSelectedChapterData().getPlayer().setBubbleBorderColor(ColorConverter.ColorToHex(val));
+        }
     }
 }

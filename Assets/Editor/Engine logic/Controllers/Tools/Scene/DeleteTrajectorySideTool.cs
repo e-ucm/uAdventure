@@ -1,71 +1,76 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class DeleteTrajectorySideTool : Tool
+using uAdventure.Core;
+
+namespace uAdventure.Editor
 {
-
-    private SideDataControl sideDataControl;
-
-    private Trajectory trajectory;
-
-    private TrajectoryDataControl trajectoryDataControl;
-
-    public DeleteTrajectorySideTool(SideDataControl dataControl, Trajectory trajectory, TrajectoryDataControl trajectoryDataControl)
+    public class DeleteTrajectorySideTool : Tool
     {
 
-        this.sideDataControl = dataControl;
-        this.trajectory = trajectory;
-        this.trajectoryDataControl = trajectoryDataControl;
+        private SideDataControl sideDataControl;
+
+        private Trajectory trajectory;
+
+        private TrajectoryDataControl trajectoryDataControl;
+
+        public DeleteTrajectorySideTool(SideDataControl dataControl, Trajectory trajectory, TrajectoryDataControl trajectoryDataControl)
+        {
+
+            this.sideDataControl = dataControl;
+            this.trajectory = trajectory;
+            this.trajectoryDataControl = trajectoryDataControl;
+        }
+
+
+        public override bool canRedo()
+        {
+
+            return true;
+        }
+
+
+        public override bool canUndo()
+        {
+
+            return true;
+        }
+
+
+        public override bool combine(Tool other)
+        {
+
+            return false;
+        }
+
+
+        public override bool doTool()
+        {
+
+            trajectoryDataControl.getSides().Remove(sideDataControl);
+            trajectory.getSides().Remove((Trajectory.Side)sideDataControl.getContent());
+            return true;
+        }
+
+
+        public override bool redoTool()
+        {
+
+            trajectoryDataControl.getSides().Remove(sideDataControl);
+            trajectory.getSides().Remove((Trajectory.Side)sideDataControl.getContent());
+            Controller.getInstance().updatePanel();
+            return true;
+        }
+
+
+        public override bool undoTool()
+        {
+
+            trajectoryDataControl.getSides().Add(sideDataControl);
+            trajectory.getSides().Add((Trajectory.Side)sideDataControl.getContent());
+            Controller.getInstance().updatePanel();
+            return true;
+        }
+
     }
-
-    
-    public override bool canRedo()
-    {
-
-        return true;
-    }
-
-    
-    public override bool canUndo()
-    {
-
-        return true;
-    }
-
-    
-    public override bool combine(Tool other)
-    {
-
-        return false;
-    }
-
-    
-    public override bool doTool()
-    {
-
-        trajectoryDataControl.getSides().Remove(sideDataControl);
-        trajectory.getSides().Remove((Trajectory.Side)sideDataControl.getContent());
-        return true;
-    }
-
-    
-    public override bool redoTool()
-    {
-
-        trajectoryDataControl.getSides().Remove(sideDataControl);
-        trajectory.getSides().Remove((Trajectory.Side)sideDataControl.getContent());
-        Controller.getInstance().updatePanel();
-        return true;
-    }
-
-    
-    public override bool undoTool()
-    {
-
-        trajectoryDataControl.getSides().Add(sideDataControl);
-        trajectory.getSides().Add((Trajectory.Side)sideDataControl.getContent());
-        Controller.getInstance().updatePanel();
-        return true;
-    }
-
 }

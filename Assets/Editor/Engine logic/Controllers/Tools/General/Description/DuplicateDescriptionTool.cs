@@ -1,47 +1,51 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class DuplicateDescriptionTool : Tool
+using uAdventure.Core;
+
+namespace uAdventure.Editor
 {
-    private DescriptionsController descriptionsController;
-
-    private DescriptionController descriptionController;
-
-    private Description description;
-
-
-    public DuplicateDescriptionTool(DescriptionsController descriptionsController)
+    public class DuplicateDescriptionTool : Tool
     {
+        private DescriptionsController descriptionsController;
 
-        this.descriptionsController = descriptionsController;
+        private DescriptionController descriptionController;
+
+        private Description description;
 
 
-    }
-    
-    public override bool canRedo()
-    {
+        public DuplicateDescriptionTool(DescriptionsController descriptionsController)
+        {
 
-        return true;
-    }
+            this.descriptionsController = descriptionsController;
 
-    public override bool canUndo()
-    {
 
-        return true;
-    }
+        }
 
-    
-    public override bool combine(Tool other)
-    {
+        public override bool canRedo()
+        {
 
-        return false;
-    }
+            return true;
+        }
 
-    
-    public override bool doTool()
-    {
+        public override bool canUndo()
+        {
 
-      
+            return true;
+        }
+
+
+        public override bool combine(Tool other)
+        {
+
+            return false;
+        }
+
+
+        public override bool doTool()
+        {
+
+
             description = (Description)descriptionsController.getSelectedDescription();
             descriptionsController.addDescription(description);
             descriptionController = new DescriptionController(description);
@@ -49,30 +53,31 @@ public class DuplicateDescriptionTool : Tool
             descriptionsController.setSelectedDescription(descriptionsController.getDescriptionCount() - 1);
             return true;
 
-    }
+        }
 
-    
-    public override bool redoTool()
-    {
 
-        descriptionsController.addDescription(description);
-        descriptionsController.addDescriptionController(descriptionController);
-        descriptionsController.setSelectedDescription(descriptionsController.getDescriptionCount() - 1);
-        Controller.getInstance().updatePanel();
-        return false;
-    }
-
-    
-    public override bool undoTool()
-    {
-
-        bool undone = descriptionsController.removeDescription(description) && descriptionsController.removeDescriptionController(descriptionController);
-        if (undone)
+        public override bool redoTool()
         {
+
+            descriptionsController.addDescription(description);
+            descriptionsController.addDescriptionController(descriptionController);
             descriptionsController.setSelectedDescription(descriptionsController.getDescriptionCount() - 1);
             Controller.getInstance().updatePanel();
-            return true;
+            return false;
         }
-        return false;
+
+
+        public override bool undoTool()
+        {
+
+            bool undone = descriptionsController.removeDescription(description) && descriptionsController.removeDescriptionController(descriptionController);
+            if (undone)
+            {
+                descriptionsController.setSelectedDescription(descriptionsController.getDescriptionCount() - 1);
+                Controller.getInstance().updatePanel();
+                return true;
+            }
+            return false;
+        }
     }
 }

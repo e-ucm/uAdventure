@@ -1,24 +1,27 @@
 ﻿using UnityEngine;
 
-public interface IMenuItem
+namespace uAdventure.Editor
 {
-    string Label
+    public interface IMenuItem
     {
-        get; set;
+        string Label
+        {
+            get; set;
+        }
+
+        void OnCliked();
     }
 
-    void OnCliked();
-}
+    public interface IMenuConcreteViewItem
+    {
+        // Two methods responsible for showing right window content 
+        // - concrete item info or base window view
+        void ShowBaseWindowView();
 
-public interface IMenuConcreteViewItem
-{
-    // Two methods responsible for showing right window content 
-    // - concrete item info or base window view
-    void ShowBaseWindowView();
+        // TODO - change Object to adequate class
+        void ShowItemWindowView(Object o);
 
-    // TODO - change Object to adequate class
-    void ShowItemWindowView(Object o);
-
-    // Flag determining visibility of concrete item information
-    bool isConcreteItemVisible { get; }
+        // Flag determining visibility of concrete item information
+        bool isConcreteItemVisible { get; }
+    }
 }

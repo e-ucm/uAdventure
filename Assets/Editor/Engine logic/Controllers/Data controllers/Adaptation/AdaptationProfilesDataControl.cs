@@ -1,16 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class AdaptationProfilesDataControl// : DataControl
-{
+using uAdventure.Core;
 
-	// Use this for initialization
-	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+namespace uAdventure.Editor
+{
+    public class AdaptationProfilesDataControl// : DataControl
+    {
+    }
 }

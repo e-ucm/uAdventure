@@ -1,89 +1,43 @@
 ﻿using UnityEngine;
 using System.Collections;
-using System.Collections.Generic;
 using System.Xml;
 
-public class FrameSubParser : SubParser {
-    private Animation animation;
-
-    private Frame frame;
-
-    private ResourcesUni currentResources;
-
-    public FrameSubParser(Animation animation):base(null)
+namespace uAdventure.Core
+{
+	[DOMParser("frame")]
+	[DOMParser(typeof(Frame))]
+	public class FrameSubParser : IDOMParser
     {
-        this.animation = animation;
-        frame = new Frame(animation.getImageLoaderFactory());
-        animation.getFrames().Add(frame);
-    } 
-
-    public override void startElement(string namespaceURI, string sName, string qName, Dictionary<string, string> attrs)
-    {
-
-        if (qName.Equals("frame"))
+		public object DOMParse(XmlElement element, params object[] parameters)
         {
-            foreach (KeyValuePair<string, string> entry in attrs)
-            {
-                if (entry.Key.Equals("uri"))
-                    frame.setUri(entry.Value.ToString());
-                if (entry.Key.Equals("type"))
-                {
-                    if (entry.Value.ToString().Equals("image"))
-                        frame.setType(Frame.TYPE_IMAGE);
-                    if (entry.Value.ToString().Equals("video"))
-                        frame.setType(Frame.TYPE_VIDEO);
-                }
-                if (entry.Key.Equals("time"))
-                {
-                    frame.setTime(long.Parse(entry.Value.ToString()));
-                }
-                if (entry.Key.Equals("waitforclick"))
-                    frame.setWaitforclick(entry.Value.ToString().Equals("yes"));
-                if (entry.Key.Equals("soundUri"))
-                    frame.setSoundUri(entry.Value.ToString());
-                if (entry.Key.Equals("maxSoundTime"))
-                    frame.setMaxSoundTime(int.Parse(entry.Value.ToString()));
-            }
+			ImageLoaderFactory ilf = parameters [0] as ImageLoaderFactory;
+			Frame frame = new Frame(ilf);
+
+            XmlNodeList
+                assets = element.SelectNodes("next-scene");
+
+			switch(element.GetAttribute("type")){
+			case "image":
+				frame.setType (Frame.TYPE_IMAGE);
+				break;
+			case "video":
+				frame.setType (Frame.TYPE_VIDEO);
+				break;
+			}
+
+			frame.setUri(element.GetAttribute("uri") ?? "");
+			frame.setWaitforclick ("yes".Equals (element.GetAttribute ("waitforclick")));
+			frame.setSoundUri(element.GetAttribute("soundUri") ?? "");
+
+			var time = element.GetAttribute ("time");
+			if(!string.IsNullOrEmpty (time)) frame.setTime(long.Parse(time));
+			var maxsoundtime = element.GetAttribute ("maxSoundTime");
+			if(!string.IsNullOrEmpty (maxsoundtime))frame.setMaxSoundTime(int.Parse(maxsoundtime));
+
+			foreach (var resources in DOMParserUtility.DOMParse<ResourcesUni>(element.SelectNodes("resources"), parameters))
+				frame.addResources(resources);
+
+			return frame;
         }
-
-        if (qName.Equals("resources"))
-        {
-            currentResources = new ResourcesUni();
-
-            foreach (KeyValuePair<string, string> entry in attrs)
-            {
-                if (entry.Key.Equals("name"))
-                    currentResources.setName(entry.Value.ToString());
-            }
-
-        }
-
-        if (qName.Equals("asset"))
-        {
-            string type = "";
-            string path = "";
-
-            foreach (KeyValuePair<string, string> entry in attrs)
-            {
-                if (entry.Key.Equals("type"))
-                    type = entry.Value.ToString();
-                if (entry.Key.Equals("uri"))
-                    path = entry.Value.ToString();
-            }
-
-            // If the asset is not an special one
-            //if( !AssetsController.isAssetSpecial( path ) )
-            currentResources.addAsset(type, path);
-        }
-    }
-
-    public override void endElement(string namespaceURI, string sName, string qName)
-    {
-
-        if (qName.Equals("resources"))
-        {
-            frame.addResources(currentResources);
-        }
-
     }
 }

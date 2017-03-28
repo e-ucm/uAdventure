@@ -2,249 +2,252 @@
 using UnityEngine;
 using System.Collections;
 
-/**
- * Abstract class that comprises all the possible nodes for a conversation.
- * Initially, two classes implement this interface: DialogueNode and OptionNode
- */
-public abstract class ConversationNode : ConversationNodeView, ICloneable
+namespace uAdventure.Core
 {
-    private int xEditor;
-
-    private int yEditor;
-
-    public ConversationNode()
-    {
-        this.xEditor = -1;
-        this.yEditor = -1;
-    }
-
     /**
-     * Returns the child in the specified position
-     * 
-     * @param index
-     *            Index for extraction
-     * @return The child conversation node selected
+     * Abstract class that comprises all the possible nodes for a conversation.
+     * Initially, two classes implement this interface: DialogueNode and OptionNode
      */
-    public abstract ConversationNode getChild(int index);
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see es.eucm.eadventure.common.data.chapterdata.conversation.node.ConversationNodeView#getChildView(int)
-     */
-    public ConversationNodeView getChildView(int index)
+    public abstract class ConversationNode : ConversationNodeView, ICloneable
     {
-        return getChild(index);
-    }
+        private int xEditor;
 
-    /**
-     * Adds a new child to the node, in the last position
-     * 
-     * @param child
-     *            Node for insertion
-     */
-    public abstract void addChild(ConversationNode child);
+        private int yEditor;
 
-    /**
-     * Adds a new child to the node, in the specified position
-     * 
-     * @param index
-     *            Index for insertion
-     * @param child
-     *            Node for insertion
-     */
-    public abstract void addChild(int index, ConversationNode child);
+        public ConversationNode()
+        {
+            this.xEditor = -1;
+            this.yEditor = -1;
+        }
 
-    /**
-     * Removes the child in the specified position
-     * 
-     * @param index
-     *            Index for removal
-     * @return Reference to the removed child
-     */
-    public abstract ConversationNode removeChild(int index);
+        /**
+         * Returns the child in the specified position
+         * 
+         * @param index
+         *            Index for extraction
+         * @return The child conversation node selected
+         */
+        public abstract ConversationNode getChild(int index);
 
-    /**
-     * Returns the line in the specified position.
-     * 
-     * @param index
-     *            Index for extraction
-     * @return The conversation line selected
-     */
-    public abstract ConversationLine getLine(int index);
+        /*
+         * (non-Javadoc)
+         * 
+         * @see es.eucm.eadventure.common.data.chapterdata.conversation.node.ConversationNodeView#getChildView(int)
+         */
+        public ConversationNodeView getChildView(int index)
+        {
+            return getChild(index);
+        }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see es.eucm.eadventure.common.data.chapterdata.conversation.node.ConversationNodeView#isPlayerLine(int)
-     */
-    public bool isPlayerLine(int index)
-    {
+        /**
+         * Adds a new child to the node, in the last position
+         * 
+         * @param child
+         *            Node for insertion
+         */
+        public abstract void addChild(ConversationNode child);
 
-        return getLine(index).isPlayerLine();
-    }
+        /**
+         * Adds a new child to the node, in the specified position
+         * 
+         * @param index
+         *            Index for insertion
+         * @param child
+         *            Node for insertion
+         */
+        public abstract void addChild(int index, ConversationNode child);
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see es.eucm.eadventure.common.data.chapterdata.conversation.node.ConversationNodeView#getLineName(int)
-     */
-    public string getLineName(int index)
-    {
+        /**
+         * Removes the child in the specified position
+         * 
+         * @param index
+         *            Index for removal
+         * @return Reference to the removed child
+         */
+        public abstract ConversationNode removeChild(int index);
 
-        return getLine(index).getName();
-    }
+        /**
+         * Returns the line in the specified position.
+         * 
+         * @param index
+         *            Index for extraction
+         * @return The conversation line selected
+         */
+        public abstract ConversationLine getLine(int index);
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see es.eucm.eadventure.common.data.chapterdata.conversation.node.ConversationNodeView#getLineText(int)
-     */
-    public string getLineText(int index)
-    {
+        /*
+         * (non-Javadoc)
+         * 
+         * @see es.eucm.eadventure.common.data.chapterdata.conversation.node.ConversationNodeView#isPlayerLine(int)
+         */
+        public bool isPlayerLine(int index)
+        {
 
-        return getLine(index).getText();
-    }
+            return getLine(index).isPlayerLine();
+        }
 
-    public string getAudioPath(int index)
-    {
+        /*
+         * (non-Javadoc)
+         * 
+         * @see es.eucm.eadventure.common.data.chapterdata.conversation.node.ConversationNodeView#getLineName(int)
+         */
+        public string getLineName(int index)
+        {
 
-        return getLine(index).getAudioPath();
-    }
+            return getLine(index).getName();
+        }
 
-    public bool hasAudioPath(int index)
-    {
+        /*
+         * (non-Javadoc)
+         * 
+         * @see es.eucm.eadventure.common.data.chapterdata.conversation.node.ConversationNodeView#getLineText(int)
+         */
+        public string getLineText(int index)
+        {
 
-        return getLine(index).isValidAudio();
-    }
+            return getLine(index).getText();
+        }
 
-    /**
-     * Adds a new line to the node, in the last position
-     * 
-     * @param line
-     *            Line for insertion
-     */
-    public abstract void addLine(ConversationLine line);
+        public string getAudioPath(int index)
+        {
 
-    /**
-     * Adds a new line to the node, in the specified position
-     * 
-     * @param index
-     *            Index for insertion
-     * @param line
-     *            Line for insertion
-     */
-    public abstract void addLine(int index, ConversationLine line);
+            return getLine(index).getAudioPath();
+        }
 
-    /**
-     * Removes the line in the specified position
-     * 
-     * @param index
-     *            Index for removal
-     * @return Reference to the removed line
-     */
-    public abstract ConversationLine removeLine(int index);
+        public bool hasAudioPath(int index)
+        {
 
-    /**
-     * Sets the effects triggered when the conversation is finished (only
-     * terminal nodes accept effects)
-     * 
-     * @param effects
-     *            New effects
-     */
-    public abstract void setEffects(Effects effects);
+            return getLine(index).isValidAudio();
+        }
 
-    /**
-     * Returns the effect triggered when the conversation is finished
-     * 
-     * @return The effect held by the node if it is terminal, null otherwise
-     */
-    public abstract Effects getEffects();
+        /**
+         * Adds a new line to the node, in the last position
+         * 
+         * @param line
+         *            Line for insertion
+         */
+        public abstract void addLine(ConversationLine line);
 
-    /**
-     * Returns if the node has a valid effect set
-     * 
-     * @return True if the node has an effect (even if empty), false otherwise
-     */
-    public abstract bool hasValidEffect();
+        /**
+         * Adds a new line to the node, in the specified position
+         * 
+         * @param index
+         *            Index for insertion
+         * @param line
+         *            Line for insertion
+         */
+        public abstract void addLine(int index, ConversationLine line);
 
-    public abstract void consumeEffect();
+        /**
+         * Removes the line in the specified position
+         * 
+         * @param index
+         *            Index for removal
+         * @return Reference to the removed line
+         */
+        public abstract ConversationLine removeLine(int index);
 
-    public abstract void resetEffect();
+        /**
+         * Sets the effects triggered when the conversation is finished (only
+         * terminal nodes accept effects)
+         * 
+         * @param effects
+         *            New effects
+         */
+        public abstract void setEffects(Effects effects);
 
-    public abstract bool isEffectConsumed();
+        /**
+         * Returns the effect triggered when the conversation is finished
+         * 
+         * @return The effect held by the node if it is terminal, null otherwise
+         */
+        public abstract Effects getEffects();
 
-    /**
-     * Set the voice for synthesize the specified line
-     * 
-     */
-    public void setSynthesizerVoice(bool synthesize, int line)
-    {
+        /**
+         * Returns if the node has a valid effect set
+         * 
+         * @return True if the node has an effect (even if empty), false otherwise
+         */
+        public abstract bool hasValidEffect();
 
-        getLine(line).setSynthesizerVoice(synthesize);
-    }
+        public abstract void consumeEffect();
 
-    /**
-     * Get the voice for the specified line
-     */
-    public bool getSynthesizerVoice(int line)
-    {
+        public abstract void resetEffect();
 
-        return getLine(line).getSynthesizerVoice();
-    }
+        public abstract bool isEffectConsumed();
 
-    /**
-     * This method is only used in OptionConversationNode. Make the options to
-     * appear randomly
-     */
-    //public abstract void doRandom();
-    /*@Override
-    public Object clone() throws CloneNotSupportedException
-    {
+        /**
+         * Set the voice for synthesize the specified line
+         * 
+         */
+        public void setSynthesizerVoice(bool synthesize, int line)
+        {
 
-        ConversationNode cn = (ConversationNode) super.clone( );
-        return cn;
-    }*/
+            getLine(line).setSynthesizerVoice(synthesize);
+        }
 
+        /**
+         * Get the voice for the specified line
+         */
+        public bool getSynthesizerVoice(int line)
+        {
 
-    public int getEditorX()
-    {
+            return getLine(line).getSynthesizerVoice();
+        }
 
-        return xEditor;
-    }
+        /**
+         * This method is only used in OptionConversationNode. Make the options to
+         * appear randomly
+         */
+        //public abstract void doRandom();
+        /*@Override
+        public Object clone() throws CloneNotSupportedException
+        {
 
-
-    public void setEditorX(int xEditor)
-    {
-
-        this.xEditor = xEditor;
-    }
-
-
-    public int getEditorY()
-    {
-
-        return yEditor;
-    }
+            ConversationNode cn = (ConversationNode) super.clone( );
+            return cn;
+        }*/
 
 
-    public void setEditorY(int yEditor)
-    {
+        public int getEditorX()
+        {
 
-        this.yEditor = yEditor;
-    }
+            return xEditor;
+        }
 
-    public abstract ConversationNodeViewEnum getType();
-    public abstract bool isTerminal();
-    public abstract int getChildCount();
-    public abstract int getLineCount();
-    public abstract bool hasEffects();
-    public abstract Conditions getLineConditions(int index);
-    public abstract ConversationLine getConversationLine(int index);
 
-    public virtual object Clone()
-    {
-        ConversationNode cn = (ConversationNode)this.MemberwiseClone();
-        return cn;
+        public void setEditorX(int xEditor)
+        {
+
+            this.xEditor = xEditor;
+        }
+
+
+        public int getEditorY()
+        {
+
+            return yEditor;
+        }
+
+
+        public void setEditorY(int yEditor)
+        {
+
+            this.yEditor = yEditor;
+        }
+
+        public abstract ConversationNodeViewEnum getType();
+        public abstract bool isTerminal();
+        public abstract int getChildCount();
+        public abstract int getLineCount();
+        public abstract bool hasEffects();
+        public abstract Conditions getLineConditions(int index);
+        public abstract ConversationLine getConversationLine(int index);
+
+        public virtual object Clone()
+        {
+            ConversationNode cn = (ConversationNode)this.MemberwiseClone();
+            return cn;
+        }
     }
 }

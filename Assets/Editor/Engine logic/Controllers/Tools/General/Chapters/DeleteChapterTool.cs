@@ -1,64 +1,69 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class DeleteChapterTool : Tool
+using uAdventure.Core;
+
+namespace uAdventure.Editor
 {
-    private Controller controller;
-
-    private ChapterListDataControl chaptersController;
-
-    // Removed data
-    private Chapter chapterRemoved;
-
-    private int index;
-
-    private string chapterTitle;
-
-    public DeleteChapterTool(ChapterListDataControl chaptersController)
+    public class DeleteChapterTool : Tool
     {
-        this.chaptersController = chaptersController;
-        controller = Controller.getInstance();
-    }
+        private Controller controller;
 
-    public override bool canRedo()
-    {
+        private ChapterListDataControl chaptersController;
 
-        return false;
-    }
+        // Removed data
+        private Chapter chapterRemoved;
 
-    public override bool canUndo()
-    {
+        private int index;
 
-        return false;
-    }
+        private string chapterTitle;
 
-    public override bool combine(Tool other)
-    {
+        public DeleteChapterTool(ChapterListDataControl chaptersController)
+        {
+            this.chaptersController = chaptersController;
+            controller = Controller.getInstance();
+        }
 
-        return false;
-    }
+        public override bool canRedo()
+        {
 
-    public override bool doTool()
-    {
-        // Delete the chapter and the controller
-        index = chaptersController.getSelectedChapter();
-        chapterRemoved = ((Chapter)chaptersController.removeChapterDataControl().getContent());
+            return false;
+        }
 
-        return true;
-    }
+        public override bool canUndo()
+        {
 
-    public override bool redoTool()
-    {
-        chaptersController.removeChapterDataControl(index);
-        //controller.reloadData();
-        return true;
-    }
+            return false;
+        }
 
-    public override bool undoTool()
-    {
-        chaptersController.addChapterDataControl(index, chapterRemoved);
+        public override bool combine(Tool other)
+        {
 
-        //controller.reloadData();
-        return true;
+            return false;
+        }
+
+        public override bool doTool()
+        {
+            // Delete the chapter and the controller
+            index = chaptersController.getSelectedChapter();
+            chapterRemoved = ((Chapter)chaptersController.removeChapterDataControl().getContent());
+
+            return true;
+        }
+
+        public override bool redoTool()
+        {
+            chaptersController.removeChapterDataControl(index);
+            //controller.reloadData();
+            return true;
+        }
+
+        public override bool undoTool()
+        {
+            chaptersController.addChapterDataControl(index, chapterRemoved);
+
+            //controller.reloadData();
+            return true;
+        }
     }
 }

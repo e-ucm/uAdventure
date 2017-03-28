@@ -2,49 +2,52 @@
 using UnityEngine;
 using System.Collections;
 
-/**
- * This class is used for adaptation sent by LMS, using SCORM data model
- * 
- */
-public class AdaptationObjetive : AdaptedState, ICloneable
+namespace uAdventure.Core
 {
-
-    private string objetiveId;
-
-    public AdaptationObjetive() : base()
-    {
-        objetiveId = string.Empty;
-    }
-
-    public AdaptationObjetive(string id) : base()
-    {
-        objetiveId = string.Empty;
-    }
-
-    public string getObjetiveId()
+    /**
+     * This class is used for adaptation sent by LMS, using SCORM data model
+     * 
+     */
+    public class AdaptationObjetive : AdaptedState, ICloneable
     {
 
-        return objetiveId;
-    }
+        private string objetiveId;
 
-    public void setObjetiveId(string objetiveId)
-    {
+        public AdaptationObjetive() : base()
+        {
+            objetiveId = string.Empty;
+        }
 
-        this.objetiveId = objetiveId;
-    }
-    /*
-    @Override
-    public Object clone() throws CloneNotSupportedException
-    {
+        public AdaptationObjetive(string id) : base()
+        {
+            objetiveId = string.Empty;
+        }
 
-        AdaptationObjetive ao = (AdaptationObjetive) super.clone( );
-        ao.objetiveId = ( objetiveId != null ? new string(objetiveId ) : null );
-        return ao;
-    }*/
-    public object Clone()
-    {
-        AdaptationObjetive ao = (AdaptationObjetive)this.MemberwiseClone();
-        ao.objetiveId = (objetiveId != null ? objetiveId : null);
-        return ao;
+        public string getObjetiveId()
+        {
+
+            return objetiveId;
+        }
+
+        public void setObjetiveId(string objetiveId)
+        {
+
+            this.objetiveId = objetiveId;
+        }
+        /*
+        @Override
+        public Object clone() throws CloneNotSupportedException
+        {
+
+            AdaptationObjetive ao = (AdaptationObjetive) super.clone( );
+            ao.objetiveId = ( objetiveId != null ? new string(objetiveId ) : null );
+            return ao;
+        }*/
+        public override object Clone()
+        {
+            AdaptationObjetive ao = (AdaptationObjetive)this.MemberwiseClone();
+            ao.objetiveId = (objetiveId != null ? objetiveId : null);
+            return ao;
+        }
     }
 }

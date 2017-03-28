@@ -1,68 +1,75 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class InvalidExitCursorTool : Tool {
-    protected string oldCursorPath;
+using uAdventure.Core;
 
-    protected ExitLook exitLook;
-
-    public InvalidExitCursorTool(ExitLook exitLook)
+namespace uAdventure.Editor
+{
+    public class InvalidExitCursorTool : Tool
     {
+        protected string oldCursorPath;
 
-        this.exitLook = exitLook;
-        this.oldCursorPath = exitLook.getCursorPath();
-    }
+        protected ExitLook exitLook;
 
-    
-    public override bool canRedo()
-    {
-
-        return true;
-    }
-
-    
-    public override bool canUndo()
-    {
-
-        return true;
-    }
-
-    
-    public override bool combine(Tool other)
-    {
-
-        return false;
-    }
-
-    
-    public override bool doTool()
-    {
-
-        if (exitLook.getCursorPath() != null)
+        public InvalidExitCursorTool(ExitLook exitLook)
         {
-            exitLook.setCursorPath(null);
+
+            this.exitLook = exitLook;
+            this.oldCursorPath = exitLook.getCursorPath();
+        }
+
+
+        public override bool canRedo()
+        {
+
             return true;
         }
-        else {
+
+
+        public override bool canUndo()
+        {
+
+            return true;
+        }
+
+
+        public override bool combine(Tool other)
+        {
+
             return false;
         }
-    }
 
-    
-    public override bool redoTool()
-    {
 
-        exitLook.setCursorPath(null);
-        Controller.getInstance().reloadPanel();
-        return true;
-    }
+        public override bool doTool()
+        {
 
-    
-    public override bool undoTool()
-    {
+            if (exitLook.getCursorPath() != null)
+            {
+                exitLook.setCursorPath(null);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
 
-        exitLook.setCursorPath(oldCursorPath);
-        Controller.getInstance().reloadPanel();
-        return true;
+
+        public override bool redoTool()
+        {
+
+            exitLook.setCursorPath(null);
+            Controller.getInstance().reloadPanel();
+            return true;
+        }
+
+
+        public override bool undoTool()
+        {
+
+            exitLook.setCursorPath(oldCursorPath);
+            Controller.getInstance().reloadPanel();
+            return true;
+        }
     }
 }

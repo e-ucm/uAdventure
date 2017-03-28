@@ -1,17 +1,18 @@
 ﻿using UnityEngine;
 using UnityEditor;
-using System;
 
-
-public class BaseAreaEditablePopup : EditorWindow
+namespace uAdventure.Editor
 {
-    protected DialogReceiverInterface reference;
-
-    public virtual void Init(DialogReceiverInterface e, float width, float height)
+    public class BaseAreaEditablePopup : EditorWindow
     {
-        BaseAreaEditablePopup window = this;
-        reference = e;
-        window.position = new Rect(0, 0, width, height * 1.2f);
-        window.Show();
+        protected DialogReceiverInterface reference;
+
+        public virtual void Init(DialogReceiverInterface e, float width, float height)
+        {
+            BaseAreaEditablePopup window = this;
+            reference = e;
+            window.position = new Rect(0, 0, width, height * 1.2f);
+            window.Show();
+        }
     }
 }

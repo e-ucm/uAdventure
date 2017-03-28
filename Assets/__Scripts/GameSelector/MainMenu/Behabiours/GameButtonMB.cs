@@ -4,54 +4,65 @@ using UnityEngine.UI;
 using System.Xml;
 using UnityEngine.SceneManagement;
 
-public class GameButtonMB : MonoBehaviour {
+using uAdventure.Runner;
 
-	string path, imagepath, gamename;
+namespace uAdventure.GameSelector
+{
+    public class GameButtonMB : MonoBehaviour
+    {
 
-	public string Path{
-		get { return path; }
-		set { 
-			string[] tmp = value.Split (System.IO.Path.DirectorySeparatorChar);
-			gamename = tmp [tmp.Length - 1];
-			path = value + System.IO.Path.DirectorySeparatorChar; 
-			imagepath = path + System.IO.Path.DirectorySeparatorChar + "gui" + System.IO.Path.DirectorySeparatorChar;
-		}
-	}
+        string path, imagepath, gamename;
 
-	Image image;
-	Text text;
-	// Use this for initialization
-	void Start () {
-		Transform panel = this.transform.FindChild ("Panel");
-		image = panel.FindChild ("Miniatura").GetComponent<Image>();
-		text = panel.FindChild ("Titulo").GetComponent<Text>();
+        public string Path
+        {
+            get { return path; }
+            set
+            {
+                string[] tmp = value.Split(System.IO.Path.DirectorySeparatorChar);
+                gamename = tmp[tmp.Length - 1];
+                path = value + System.IO.Path.DirectorySeparatorChar;
+                imagepath = path + System.IO.Path.DirectorySeparatorChar + "gui" + System.IO.Path.DirectorySeparatorChar;
+            }
+        }
 
-		Texture2D tx;
-		if(System.IO.File.Exists(imagepath + "standalone_game_icon.png"))
-			tx = ResourceManager.Instance.getImage (imagepath + "standalone_game_icon.png");
-		else
-			tx = ResourceManager.Instance.getImage (imagepath + "Icono-Motor-128x128.png");
-		
-		image.sprite = Sprite.Create (tx, new Rect (0, 0, tx.width, tx.height), new Vector2 (0.5f, 0.5f));
+        Image image;
+        Text text;
+        // Use this for initialization
+        void Start()
+        {
+            Transform panel = this.transform.FindChild("Panel");
+            image = panel.FindChild("Miniatura").GetComponent<Image>();
+            text = panel.FindChild("Titulo").GetComponent<Text>();
 
-		XmlDocument doc = new XmlDocument();
-		doc.Load (path + "descriptor.xml");
+            Texture2D tx;
+            if (System.IO.File.Exists(imagepath + "standalone_game_icon.png"))
+                tx = ResourceManager.Instance.getImage(imagepath + "standalone_game_icon.png");
+            else
+                tx = ResourceManager.Instance.getImage(imagepath + "Icono-Motor-128x128.png");
 
-		text.text = doc.SelectSingleNode ("/game-descriptor/title").InnerText;
+            image.sprite = Sprite.Create(tx, new Rect(0, 0, tx.width, tx.height), new Vector2(0.5f, 0.5f));
 
-		Button.ButtonClickedEvent ev = new Button.ButtonClickedEvent ();
-		ev.AddListener (delegate {startGame();});
+            XmlDocument doc = new XmlDocument();
+            doc.Load(path + "descriptor.xml");
 
-		this.GetComponent<Button> ().onClick = ev;
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+            text.text = doc.SelectSingleNode("/game-descriptor/title").InnerText;
 
-	void startGame(){
-		Game.GameToLoad = gamename;
-		SceneManager.LoadScene ("_Scene1");
-	}
+            Button.ButtonClickedEvent ev = new Button.ButtonClickedEvent();
+            ev.AddListener(delegate { startGame(); });
+
+            this.GetComponent<Button>().onClick = ev;
+        }
+
+        // Update is called once per frame
+        void Update()
+        {
+
+        }
+
+        void startGame()
+        {
+            Game.GameToLoad = gamename;
+            SceneManager.LoadScene("_Scene1");
+        }
+    }
 }
