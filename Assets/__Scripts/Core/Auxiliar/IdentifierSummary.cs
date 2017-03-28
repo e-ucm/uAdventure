@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace uAdventure.Core
 {
@@ -11,51 +12,9 @@ namespace uAdventure.Core
     public class IdentifierSummary
     {
 
-        /**
-             * List of all identifiers in the script.
-             */
-        private List<string> globalIdentifiers;
 
-        /**
-         * List of all scene identifiers in the chapter (including playable scenes
-         * and cutscenes).
-         */
-        private List<string> generalSceneIdentifiers;
-
-        /**
-         * List of all ccutscene identifiers in the script.
-         */
-        private List<string> sceneIdentifiers;
-
-        /**
-         * List of all identifiers of cutscenes in the script.
-         */
-        private List<string> cutsceneIdentifiers;
-
-        /**
-         * List of all book identifiers in the script.
-         */
-        private List<string> bookIdentifiers;
-
-        /**
-         * List of all item identifiers in the script.
-         */
-        private List<string> itemIdentifiers;
-
-        /**
-         * List of all atrezzo item identifiers in the script.
-         */
-        private List<string> atrezzoIdentifiers;
-
-        /**
-         * List of all NPC identifiers in the script.
-         */
-        private List<string> npcIdentifiers;
-
-        /**
-         * List of all conversation identifiers in the script.
-         */
-        private List<string> conversationIdentifiers;
+		private Dictionary<string, System.Type> globalIdentifiers;
+		private Dictionary<System.Type, List<string>> typeGroups;
 
         /**
          * List of all assessment profile identifiers in the script and its associated assessment rules. 
@@ -68,18 +27,6 @@ namespace uAdventure.Core
         private Dictionary<string, List<string>> adaptationIdentifiers;
 
         /**
-         * List of all global states identifiers in the script.
-         */
-        private List<string> globalStateIdentifiers;
-
-        /**
-         * List of all macro identifiers in the script.
-         */
-        private List<string> macroIdentifiers;
-
-        private List<string> activeAreaIdentifiers;
-
-        /**
          * Constructor.
          * 
          * @param chapter
@@ -87,22 +34,12 @@ namespace uAdventure.Core
          */
         public IdentifierSummary(Chapter chapter)
         {
-
             // Create the lists
-            globalIdentifiers = new List<string>();
-            generalSceneIdentifiers = new List<string>();
-            sceneIdentifiers = new List<string>();
-            cutsceneIdentifiers = new List<string>();
-            bookIdentifiers = new List<string>();
-            itemIdentifiers = new List<string>();
-            atrezzoIdentifiers = new List<string>();
-            npcIdentifiers = new List<string>();
-            conversationIdentifiers = new List<string>();
-            assessmentIdentifiers = new Dictionary<string, List<string>>();
-            adaptationIdentifiers = new Dictionary<string, List<string>>();
-            globalStateIdentifiers = new List<string>();
-            macroIdentifiers = new List<string>();
-            activeAreaIdentifiers = new List<string>();
+			globalIdentifiers = new Dictionary<string, System.Type>();
+			typeGroups = new Dictionary<System.Type, List<string>>();
+
+			assessmentIdentifiers = new Dictionary<string, List<string>> ();
+			adaptationIdentifiers = new Dictionary<string, List<string>> ();
 
             // Fill all the lists
             loadIdentifiers(chapter);
@@ -116,20 +53,9 @@ namespace uAdventure.Core
          */
         public void loadIdentifiers(Chapter chapter)
         {
-
             // Clear the lists
             globalIdentifiers.Clear();
-            generalSceneIdentifiers.Clear();
-            sceneIdentifiers.Clear();
-            cutsceneIdentifiers.Clear();
-            bookIdentifiers.Clear();
-            itemIdentifiers.Clear();
-            atrezzoIdentifiers.Clear();
-            npcIdentifiers.Clear();
-            conversationIdentifiers.Clear();
-            globalStateIdentifiers.Clear();
-            macroIdentifiers.Clear();
-            activeAreaIdentifiers.Clear();
+
             assessmentIdentifiers.Clear();
             adaptationIdentifiers.Clear();
 
@@ -144,37 +70,11 @@ namespace uAdventure.Core
                 }
             }
 
-            // Add cutscene IDs
-            foreach (Cutscene cutscene in chapter.getCutscenes())
-                addCutsceneId(cutscene.getId());
+			foreach (var o in chapter.getObjects().FindAll (t => t is HasId)) {
+				var h = o as HasId;
+				addId(o.GetType (), h.getId ());
+			}
 
-            // Add book IDs
-            foreach (Book book in chapter.getBooks())
-                addBookId(book.getId());
-
-            // Add item IDs
-            foreach (Item item in chapter.getItems())
-                addItemId(item.getId());
-
-            // Add atrezzo items IDs
-            foreach (Atrezzo atrezzo in chapter.getAtrezzo())
-                addAtrezzoId(atrezzo.getId());
-
-            // Add NPC IDs
-            foreach (NPC npc in chapter.getCharacters())
-                addNPCId(npc.getId());
-
-            // Add conversation IDs
-            foreach (Conversation conversation in chapter.getConversations())
-                addConversationId(conversation.getId());
-
-            // Add global state IDs
-            foreach (GlobalState globalState in chapter.getGlobalStates())
-                addGlobalStateId(globalState.getId());
-
-            // Add macro IDs
-            foreach (Macro macro in chapter.getMacros())
-                addMacroId(macro.getId());
 
             // Add assessment rules ids and asssessmnet profiles ids
             foreach (AssessmentProfile profile in chapter.getAssessmentProfiles())
@@ -205,8 +105,47 @@ namespace uAdventure.Core
          */
         public bool existsId(string id)
         {
-            return globalIdentifiers.Contains(id);
+			return globalIdentifiers.ContainsKey(id);
         }
+
+		public bool isType<T>(string id){
+
+			return globalIdentifiers.ContainsKey (id) && globalIdentifiers [id] == typeof(T);
+		}
+
+
+		public void addId(System.Type t, string id){
+			if(!globalIdentifiers.ContainsKey (id))
+				globalIdentifiers.Add(id, t);
+
+			if (!typeGroups.ContainsKey (t))
+				typeGroups.Add (t, new List<string> ());
+
+			if (!typeGroups [t].Contains (id))
+				typeGroups [t].Add (id);
+		}
+
+		public void addId<T>(string id){
+			addId (typeof(T), id);
+		}
+
+		public string[] getIds<T>(){
+			var t = typeof(T);
+
+			if (typeGroups.ContainsKey (t))
+				return typeGroups [t].ToArray ();
+
+			return null;
+		}
+
+		public void deleteId<T>(string id){
+			if (globalIdentifiers.ContainsKey (id))
+				globalIdentifiers.Remove (id);
+
+			var t = typeof(T);
+			if (typeGroups.ContainsKey (t) && typeGroups [t].Contains (id))
+				typeGroups [t].Remove (id);
+		}
 
         /**
          * Returns whether the given identifier is a scene or not.
@@ -215,10 +154,10 @@ namespace uAdventure.Core
          *            Scene identifier
          * @return True if the identifier belongs to a scene, false otherwise
          */
+		[Obsolete("Use isType<T> instead")]
         public bool isScene(string sceneId)
         {
-
-            return sceneIdentifiers.Contains(sceneId);
+			return isType<Scene>(sceneId);
         }
 
         /**
@@ -228,21 +167,10 @@ namespace uAdventure.Core
          *            Scene identifier
          * @return True if the identifier belongs to a scene, false otherwise
          */
+		[Obsolete("Use isType<T> instead")]
         public bool isConversation(string convId)
-        {
-
-            return conversationIdentifiers.Contains(convId);
-        }
-
-        /**
-         * Returns an array of general scene identifiers.
-         * 
-         * @return Array of general scene identifiers
-         */
-        public string[] getGeneralSceneIds()
-        {
-
-            return generalSceneIdentifiers.ToArray();
+		{
+			return isType<Conversation>(convId);
         }
 
         /**
@@ -250,10 +178,10 @@ namespace uAdventure.Core
          * 
          * @return Array of scene identifiers
          */
+		[Obsolete("Use getIds<T> instead")]
         public string[] getSceneIds()
         {
-
-            return sceneIdentifiers.ToArray();
+			return getIds<Scene> ();
         }
 
         /**
@@ -261,10 +189,10 @@ namespace uAdventure.Core
          * 
          * @return Array of cutscene identifiers
          */
+		[Obsolete("Use getIds<T> instead")]
         public string[] getCutsceneIds()
-        {
-
-            return cutsceneIdentifiers.ToArray();
+		{
+			return groupIds<Cutscene> ();
         }
 
         /**
@@ -274,9 +202,8 @@ namespace uAdventure.Core
          */
         public string[] getAllSceneIds()
         {
-
-            List<string> allScenes = new List<string>(cutsceneIdentifiers);
-            allScenes.AddRange(new List<string>(sceneIdentifiers));
+			List<string> allScenes = new List<string>(getIds<Cutscene> ());
+			allScenes.AddRange(new List<string>(getIds<Scene>()));
             return allScenes.ToArray();
         }
 
@@ -285,10 +212,10 @@ namespace uAdventure.Core
          * 
          * @return Array of book identifiers
          */
+		[Obsolete("Use getIds<T> instead")]
         public string[] getBookIds()
-        {
-
-            return bookIdentifiers.ToArray();
+		{
+			return getIds<Book> ();
         }
 
         /**
@@ -296,10 +223,10 @@ namespace uAdventure.Core
          * 
          * @return Array of item identifiers
          */
+		[Obsolete("Use getIds<T> instead")]
         public string[] getItemIds()
-        {
-
-            return itemIdentifiers.ToArray();
+		{
+			return getIds<Item> ();
         }
 
         /**
@@ -307,10 +234,10 @@ namespace uAdventure.Core
          * 
          * @return Array of atrezzo item identifiers
          */
+		[Obsolete("Use getIds<T> instead")]
         public string[] getAtrezzoIds()
-        {
-
-            return atrezzoIdentifiers.ToArray();
+		{
+			return getIds<Atrezzo> ();
         }
 
         /**
@@ -318,10 +245,10 @@ namespace uAdventure.Core
          * 
          * @return Array of NPC identifiers
          */
+		[Obsolete("Use getIds<T> instead")]
         public string[] getNPCIds()
-        {
-
-            return npcIdentifiers.ToArray();
+		{
+			return getIds<NPC> ();
         }
 
         /**
@@ -329,10 +256,10 @@ namespace uAdventure.Core
          * 
          * @return Array of conversation identifiers
          */
+		[Obsolete("Use getIds<T> instead")]
         public string[] getConversationsIds()
-        {
-
-            return conversationIdentifiers.ToArray();
+		{
+			return getIds<Conversation> ();
         }
 
         /**
@@ -340,10 +267,10 @@ namespace uAdventure.Core
          * 
          * @return Array of global state identifiers
          */
+		[Obsolete("Use getIds<T> instead")]
         public string[] getGlobalStatesIds()
-        {
-
-            return globalStateIdentifiers.ToArray();
+		{
+			return getIds<GlobalState> ();
         }
 
         /**
@@ -351,10 +278,10 @@ namespace uAdventure.Core
          * 
          * @return Array of macro identifiers
          */
+		[Obsolete("Use getIds<T> instead")]
         public string[] getMacroIds()
-        {
-
-            return macroIdentifiers.ToArray();
+		{
+			return getIds<Macro> ();
         }
 
         /**
@@ -366,7 +293,7 @@ namespace uAdventure.Core
         {
 
             List<string> globalStateIds = new List<string>();
-            foreach (string id in this.globalStateIdentifiers)
+			foreach (string id in getIds<GlobalState> ())
             {
                 bool found = false;
                 foreach (string exception in exceptions)
@@ -394,7 +321,7 @@ namespace uAdventure.Core
         {
 
             List<string> macroIds = new List<string>();
-            foreach (string id in this.macroIdentifiers)
+			foreach (string id in getIds<Macro> ())
             {
                 if (!id.Equals(exception))
                     macroIds.Add(id);
@@ -408,12 +335,10 @@ namespace uAdventure.Core
          * @param sceneId
          *            New scene id
          */
+		[Obsolete("Use addId<T> instead")]
         public void addSceneId(string sceneId)
         {
-
-            globalIdentifiers.Add(sceneId);
-            generalSceneIdentifiers.Add(sceneId);
-            sceneIdentifiers.Add(sceneId);
+			addId<Scene> (sceneId);
         }
 
         /**
@@ -422,12 +347,10 @@ namespace uAdventure.Core
          * @param cutsceneId
          *            New cutscene id
          */
+		[Obsolete("Use addId<T> instead")]
         public void addCutsceneId(string cutsceneId)
-        {
-
-            globalIdentifiers.Add(cutsceneId);
-            generalSceneIdentifiers.Add(cutsceneId);
-            cutsceneIdentifiers.Add(cutsceneId);
+		{
+			addId<Cutscene> (cutsceneId);
         }
 
         /**
@@ -436,11 +359,10 @@ namespace uAdventure.Core
          * @param bookId
          *            New book id
          */
+		[Obsolete("Use addId<T> instead")]
         public void addBookId(string bookId)
-        {
-
-            globalIdentifiers.Add(bookId);
-            bookIdentifiers.Add(bookId);
+		{
+			addId<Book> (bookId);
         }
 
         /**
@@ -449,11 +371,10 @@ namespace uAdventure.Core
          * @param itemId
          *            New item id
          */
+		[Obsolete("Use addId<T> instead")]
         public void addItemId(string itemId)
-        {
-
-            globalIdentifiers.Add(itemId);
-            itemIdentifiers.Add(itemId);
+		{
+			addId<Item> (itemId);
         }
 
         /**
@@ -462,11 +383,10 @@ namespace uAdventure.Core
          * @param atrezzoId
          *            New atrezzo item id
          */
+		[Obsolete("Use addId<T> instead")]
         public void addAtrezzoId(string atrezzoId)
-        {
-
-            globalIdentifiers.Add(atrezzoId);
-            atrezzoIdentifiers.Add(atrezzoId);
+		{
+			addId<Atrezzo> (atrezzoId);
         }
 
         /**
@@ -475,11 +395,10 @@ namespace uAdventure.Core
          * @param npcId
          *            New NPC id
          */
+		[Obsolete("Use addId<T> instead")]
         public void addNPCId(string npcId)
-        {
-
-            globalIdentifiers.Add(npcId);
-            npcIdentifiers.Add(npcId);
+		{
+			addId<NPC> (npcId);
         }
 
         /**
@@ -488,11 +407,10 @@ namespace uAdventure.Core
          * @param conversationId
          *            New conversation id
          */
+		[Obsolete("Use addId<T> instead")]
         public void addConversationId(string conversationId)
-        {
-
-            globalIdentifiers.Add(conversationId);
-            conversationIdentifiers.Add(conversationId);
+		{
+			addId<Conversation> (conversationId);
         }
 
         /**
@@ -501,11 +419,10 @@ namespace uAdventure.Core
          * @param globalStateId
          *            New conversation id
          */
+		[Obsolete("Use addId<T> instead")]
         public void addGlobalStateId(string globalStateId)
-        {
-
-            globalIdentifiers.Add(globalStateId);
-            globalStateIdentifiers.Add(globalStateId);
+		{
+			addId<GlobalState> (globalStateId);
         }
 
         /**
@@ -514,11 +431,10 @@ namespace uAdventure.Core
          * @param macroId
          *            New macro id
          */
+		[Obsolete("Use addId<T> instead")]
         public void addMacroId(string macroId)
-        {
-
-            globalIdentifiers.Add(macroId);
-            macroIdentifiers.Add(macroId);
+		{
+			addId<Macro> (macroId);
         }
 
         /**
@@ -531,9 +447,8 @@ namespace uAdventure.Core
          *            The name of profile which contains the rule
          */
         public void addAssessmentRuleId(string assRuleId, string profile)
-        {
-
-            globalIdentifiers.Add(profile + "." + assRuleId);
+		{
+			addId<AssessmentRule> (profile + "." + assRuleId);
             this.assessmentIdentifiers[profile].Add(assRuleId);
         }
 
@@ -549,8 +464,7 @@ namespace uAdventure.Core
          */
         public void addAdaptationRuleId(string adpRuleId, string profile)
         {
-
-            globalIdentifiers.Add(profile + "." + adpRuleId);
+			addId<AdaptationRule> (profile + "." + adpRuleId);
             this.adaptationIdentifiers[profile].Add(adpRuleId);
         }
 
@@ -561,9 +475,8 @@ namespace uAdventure.Core
          *            New assessment profile id
          */
         public void addAssessmentProfileId(string assProfileId)
-        {
-
-            globalIdentifiers.Add(assProfileId);
+		{
+			addId<AssessmentProfile> (assProfileId);
             this.assessmentIdentifiers.Add(assProfileId, new List<string>());
         }
 
@@ -575,8 +488,7 @@ namespace uAdventure.Core
          */
         public void addAdaptationProfileId(string adaptProfileId)
         {
-
-            globalIdentifiers.Add(adaptProfileId);
+			addId<AdaptationProfile> (adaptProfileId);
             this.adaptationIdentifiers.Add(adaptProfileId, new List<string>());
         }
 
@@ -586,12 +498,10 @@ namespace uAdventure.Core
          * @param sceneId
          *            Scene id to be deleted
          */
+		[Obsolete("Use deleteId<T> instead")]
         public void deleteSceneId(string sceneId)
         {
-
-            globalIdentifiers.Remove(sceneId);
-            generalSceneIdentifiers.Remove(sceneId);
-            sceneIdentifiers.Remove(sceneId);
+			deleteId<Scene> (sceneId);
         }
 
         /**
@@ -600,12 +510,10 @@ namespace uAdventure.Core
          * @param cutsceneId
          *            Cutscene id to be deleted
          */
+		[Obsolete("Use deleteId<T> instead")]
         public void deleteCutsceneId(string cutsceneId)
-        {
-
-            globalIdentifiers.Remove(cutsceneId);
-            generalSceneIdentifiers.Remove(cutsceneId);
-            cutsceneIdentifiers.Remove(cutsceneId);
+		{
+			deleteId<Cutscene> (cutsceneId);
         }
 
         /**
@@ -614,11 +522,10 @@ namespace uAdventure.Core
          * @param bookId
          *            Book id to be deleted
          */
+		[Obsolete("Use deleteId<T> instead")]
         public void deleteBookId(string bookId)
-        {
-
-            globalIdentifiers.Remove(bookId);
-            bookIdentifiers.Remove(bookId);
+		{
+			deleteId<Book> (bookId);
         }
 
         /**
@@ -627,11 +534,10 @@ namespace uAdventure.Core
          * @param itemId
          *            Item id to be deleted
          */
+		[Obsolete("Use deleteId<T> instead")]
         public void deleteItemId(string itemId)
-        {
-
-            globalIdentifiers.Remove(itemId);
-            itemIdentifiers.Remove(itemId);
+		{
+			deleteId<Item> (itemId);
         }
 
         /**
@@ -640,11 +546,10 @@ namespace uAdventure.Core
          * @param atrezzoId
          *            atrezzo item id to be deleted
          */
+		[Obsolete("Use deleteId<T> instead")]
         public void deleteAtrezzoId(string atrezzoId)
-        {
-
-            globalIdentifiers.Remove(atrezzoId);
-            atrezzoIdentifiers.Remove(atrezzoId);
+		{
+			deleteId<Atrezzo> (atrezzoId);
         }
 
         /**
@@ -653,11 +558,10 @@ namespace uAdventure.Core
          * @param npcId
          *            NPC id to be deleted
          */
+		[Obsolete("Use deleteId<T> instead")]
         public void deleteNPCId(string npcId)
-        {
-
-            globalIdentifiers.Remove(npcId);
-            npcIdentifiers.Remove(npcId);
+		{
+			deleteId<NPC> (npcId);
         }
 
         /**
@@ -666,11 +570,10 @@ namespace uAdventure.Core
          * @param conversationId
          *            Conversation id to be deleted
          */
+		[Obsolete("Use deleteId<T> instead")]
         public void deleteConversationId(string conversationId)
-        {
-
-            globalIdentifiers.Remove(conversationId);
-            conversationIdentifiers.Remove(conversationId);
+		{
+			deleteId<Conversation> (conversationId);
         }
 
         /**
@@ -679,11 +582,10 @@ namespace uAdventure.Core
          * @param globalStateId
          *            Conversation id to be deleted
          */
+		[Obsolete("Use deleteId<T> instead")]
         public void deleteGlobalStateId(string globalStateId)
-        {
-
-            globalIdentifiers.Remove(globalStateId);
-            globalStateIdentifiers.Remove(globalStateId);
+		{
+			deleteId<GlobalState> (globalStateId);
         }
 
         /**
@@ -692,11 +594,10 @@ namespace uAdventure.Core
          * @param macroId
          *            Macro id to be deleted
          */
+		[Obsolete("Use deleteId<T> instead")]
         public void deleteMacroId(string macroId)
-        {
-
-            globalIdentifiers.Remove(macroId);
-            macroIdentifiers.Remove(macroId);
+		{
+			deleteId<Macro> (macroId);
         }
 
         /**
@@ -707,8 +608,7 @@ namespace uAdventure.Core
          */
         public void deleteAssessmentRuleId(string id, string profile)
         {
-
-            globalIdentifiers.Remove(profile + "." + id);
+			deleteId<AssessmentRule> (profile + "." + id);
             assessmentIdentifiers[profile].Remove(id);
         }
 
@@ -719,9 +619,8 @@ namespace uAdventure.Core
          *            adaptation rule id to be deleted
          */
         public void deleteAdaptationRuleId(string id, string profile)
-        {
-
-            globalIdentifiers.Remove(profile + "." + id);
+		{
+			deleteId<AdaptationRule> (profile + "." + id);
             adaptationIdentifiers[profile].Remove(id);
         }
 
@@ -732,9 +631,8 @@ namespace uAdventure.Core
          *            Assessment profile id to be deleted
          */
         public void deleteAssessmentProfileId(string id)
-        {
-
-            globalIdentifiers.Remove(id);
+		{
+			deleteId<AssessmentProfile> (id);
             assessmentIdentifiers.Remove(id);
         }
 
@@ -745,9 +643,8 @@ namespace uAdventure.Core
          *            adaptation profile id to be deleted
          */
         public void deleteAdaptationProfileId(string id)
-        {
-
-            globalIdentifiers.Remove(id);
+		{
+			deleteId<AdaptationProfile> (id);
             adaptationIdentifiers.Remove(id);
 
         }
@@ -830,33 +727,28 @@ namespace uAdventure.Core
             return this.assessmentIdentifiers[profile].Contains(id);
         }
 
+		[Obsolete("Use idType<T> instead")]
         public bool isGlobalStateId(string id)
-        {
-
-            return globalStateIdentifiers.Contains(id);
+		{
+			return isType<GlobalState> (id);
         }
 
+		[Obsolete("Use idType<T> instead")]
         public bool isMacroId(string id)
-        {
-
-            return macroIdentifiers.Contains(id);
+		{
+			return isType<Macro> (id);
         }
 
+		[Obsolete("Use addId<T> instead")]
         public void addActiveAreaId(string id)
         {
-
-            globalIdentifiers.Add(id);
-            activeAreaIdentifiers.Add(id);
+			addId<ActiveArea> (id);
         }
 
+		[Obsolete("Use deleteId<T> instead")]
         public void deleteActiveAreaId(string id)
-        {
-
-            if (activeAreaIdentifiers.Contains(id))
-            {
-                globalIdentifiers.Remove(id);
-                activeAreaIdentifiers.Remove(id);
-            }
+		{
+			deleteId<ActiveArea> (id);
         }
 
         /**
@@ -864,10 +756,11 @@ namespace uAdventure.Core
          * 
          * @return ids of the items and activeAreas
          */
+		[Obsolete("Use getIds<T> instead")]
         public string[] getItemAndActiveAreaIds()
         {
-            List<string> set = new List<string>(itemIdentifiers);
-            set.AddRange(activeAreaIdentifiers);
+			List<string> set = new List<string>(getIds<Item> ());
+			set.AddRange(getIds<ActiveArea> ());
             return set.ToArray();
         }
 
@@ -876,12 +769,27 @@ namespace uAdventure.Core
          * 
          * @return ids of the items, activeAreas and npcs
          */
+		[Obsolete("Use getIds<T> instead")]
         public string[] getItemActiveAreaNPCIds()
-        {
-            List<string> set = new List<string>(itemIdentifiers);
-            set.AddRange(activeAreaIdentifiers);
-            set.AddRange(npcIdentifiers);
+		{
+			List<string> set = new List<string>(getIds<Item> ());
+			set.AddRange(getIds<ActiveArea> ());
+			set.AddRange(getIds<NPC>());
             return set.ToArray();
         }
+
+		public string[] groupIds<T>() 
+		{
+			return groupIds (typeof(T));
+		}
+
+		public string[] groupIds(System.Type t){
+			var complete = new List<string> ();
+			foreach (var kv in typeGroups)
+				if (t.IsAssignableFrom (kv.Key))
+					complete.AddRange (kv.Value);
+
+			return complete.ToArray ();
+		}
     }
 }

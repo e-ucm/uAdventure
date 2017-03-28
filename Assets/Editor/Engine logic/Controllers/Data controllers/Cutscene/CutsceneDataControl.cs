@@ -471,22 +471,23 @@ namespace uAdventure.Editor
 
         public void setNext(int next)
         {
-
+			var chapterTargets = controller.getIdentifierSummary ().groupIds<IChapterTarget> ();
             Controller.getInstance().addTool(new ChangeIntegerValueTool(cutscene, next, "getNext", "setNext"));
             if (cutscene.getTargetId() == null || cutscene.getTargetId().Equals(""))
-            {
-                cutscene.setTargetId(Controller.getInstance().getIdentifierSummary().getGeneralSceneIds()[0]);
+			{
+				if(chapterTargets.Length > 0)
+					cutscene.setTargetId(chapterTargets[0]);
             }
             else
             {
                 bool exists = false;
-                for (int i = 0; i < Controller.getInstance().getIdentifierSummary().getGeneralSceneIds().Length; i++)
+				for (int i = 0; i < chapterTargets.Length; i++)
                 {
-                    if (Controller.getInstance().getIdentifierSummary().getGeneralSceneIds()[i].Equals(cutscene.getTargetId()))
+					if (chapterTargets[i].Equals(cutscene.getTargetId()))
                         exists = true;
                 }
                 if (!exists)
-                    cutscene.setTargetId(Controller.getInstance().getIdentifierSummary().getGeneralSceneIds()[0]);
+					cutscene.setTargetId(chapterTargets[0]);
             }
         }
 

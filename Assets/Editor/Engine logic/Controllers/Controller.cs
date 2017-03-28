@@ -609,7 +609,6 @@ namespace uAdventure.Editor
          */
         public IdentifierSummary getIdentifierSummary()
         {
-
             return chaptersController.getIdentifierSummary();
         }
 

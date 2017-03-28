@@ -241,7 +241,7 @@ namespace uAdventure.Editor
             bool elementDeleted = false;
 
             // Take the number of general scenes in the chapter
-            int generalScenesCount = controller.getIdentifierSummary().getGeneralSceneIds().Length;
+			int generalScenesCount = controller.getIdentifierSummary().groupIds<IChapterTarget> ().Length;
 
             // If there are at least two scenes, this one can be deleted
             if (generalScenesCount > 1)
