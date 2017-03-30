@@ -1,11 +1,8 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
-using System.Xml;
-using System.Linq;
-namespace uAdventure.Core {
+﻿using System.Xml;
+namespace uAdventure.Core
+{
 
-	[DOMParser("resources")]
+    [DOMParser("resources")]
 	[DOMParser(typeof(ResourcesUni))]
 	public class ResourcesUniSubParser : IDOMParser 
 	{

@@ -18,32 +18,25 @@ namespace uAdventure.Core
 
 		public object DOMParse(XmlElement element, params object[] parameters)
 		{
-			XmlNodeList
-			points = element.SelectNodes ("point"),
+			XmlNodeList points = element.SelectNodes ("point"),
 			descriptions = element.SelectNodes ("description");
-			XmlElement conditions = element.SelectSingleNode("condition") as XmlElement,
-			actionss = element.SelectSingleNode ("actions") as XmlElement;
+            XmlElement conditions = element.SelectSingleNode("condition") as XmlElement,
+            actionss = element.SelectSingleNode("actions") as XmlElement,
+            documentation = element.SelectSingleNode("documentation") as XmlElement;
 
-            string tmpArgVal;
+            string id = element.GetAttribute("id") ?? null;
+            bool rectangular = (element.GetAttribute ("rectangular") ?? "yes").Equals ("yes");
 
-            int x = 0, y = 0, width = 0, height = 0;
-            string id = null;
-            bool rectangular = true;
-            int influenceX = 0, influenceY = 0, influenceWidth = 0, influenceHeight = 0;
-            bool hasInfluence = false;
+			int x 		= ExParsers.ParseDefault(element.GetAttribute("x"), 0),
+			    y 		= ExParsers.ParseDefault(element.GetAttribute("y"), 0),
+			    width 	= ExParsers.ParseDefault(element.GetAttribute("width"), 0),
+			    height	= ExParsers.ParseDefault(element.GetAttribute("height"), 0);
 
-			rectangular = (element.GetAttribute ("rectangular") ?? "yes").Equals ("yes");
-			x 		= ExParsers.ParseDefault(element.GetAttribute("x"), 0);
-			y 		= ExParsers.ParseDefault(element.GetAttribute("y"), 0);
-			width 	= ExParsers.ParseDefault(element.GetAttribute("width"), 0);
-			height	= ExParsers.ParseDefault(element.GetAttribute("height"), 0);
-			id 		= element.GetAttribute("id") ?? "";
-
-			hasInfluence = "yes".Equals (element.GetAttribute ("hasInfluenceArea"));
-			influenceX = ExParsers.ParseDefault(element.GetAttribute("influenceX"), 0);
-			influenceY = ExParsers.ParseDefault(element.GetAttribute("influenceY"), 0);
-			influenceWidth = ExParsers.ParseDefault(element.GetAttribute("influenceWidth"), 0);
-			influenceHeight = ExParsers.ParseDefault(element.GetAttribute("influenceHeight"), 0);
+			bool hasInfluence = "yes".Equals (element.GetAttribute ("hasInfluenceArea"));
+			int influenceX = ExParsers.ParseDefault(element.GetAttribute("influenceX"), 0),
+			    influenceY = ExParsers.ParseDefault(element.GetAttribute("influenceY"), 0),
+			    influenceWidth = ExParsers.ParseDefault(element.GetAttribute("influenceWidth"), 0),
+			    influenceHeight = ExParsers.ParseDefault(element.GetAttribute("influenceHeight"), 0);
 
             ActiveArea activeArea = new ActiveArea((id == null ? generateId() : id), rectangular, x, y, width, height);
             if (hasInfluence)
@@ -52,8 +45,8 @@ namespace uAdventure.Core
                 activeArea.setInfluenceArea(influenceArea);
             }
 
-            if (element.SelectSingleNode("documentation") != null)
-                activeArea.setDocumentation(element.SelectSingleNode("documentation").InnerText);
+            if (documentation != null)
+                activeArea.setDocumentation(documentation.InnerText);
 
 			activeArea.setDescriptions(DOMParserUtility.DOMParse<Description> (descriptions, parameters).ToList());
 
@@ -61,18 +54,15 @@ namespace uAdventure.Core
             {
                 if (activeArea != null)
                 {
-                    int x_ = 0, y_ = 0;
-
-					x_ 		= ExParsers.ParseDefault(el.GetAttribute("x"), 0);
-					y_ 		= ExParsers.ParseDefault(el.GetAttribute("y"), 0);
-
-                    Vector2 point = new Vector2(x_, y_);
-                    activeArea.addVector2(point);
+                    activeArea.addVector2(
+                        new Vector2(ExParsers.ParseDefault(el.GetAttribute("x"), 0),
+                                    ExParsers.ParseDefault(el.GetAttribute("y"), 0)));
                 }
             }
-
-			activeArea.setActions (DOMParserUtility.DOMParse <Action>(actionss.ChildNodes, parameters).ToList ());
-			activeArea.setConditions(DOMParserUtility.DOMParse (conditions, parameters) as Conditions ?? new Conditions ());
+			if(actionss!=null)
+				activeArea.setActions (DOMParserUtility.DOMParse <Action>(actionss.ChildNodes, parameters).ToList ());
+			if(conditions!=null)
+				activeArea.setConditions(DOMParserUtility.DOMParse (conditions, parameters) as Conditions ?? new Conditions ());
 
 			return activeArea;
         }

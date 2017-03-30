@@ -148,16 +148,10 @@ namespace uAdventure.Runner
         {
             BubbleData bubble = new BubbleData(text, new Vector2(40, 60), new Vector2(40, 45));
 
-            Color textColor, textOutline, background, border;
-            ColorUtility.TryParseHtmlString(cha.getTextFrontColor(), out textColor);
-            ColorUtility.TryParseHtmlString(cha.getTextBorderColor(), out textOutline);
-            ColorUtility.TryParseHtmlString(cha.getBubbleBkgColor(), out background);
-            ColorUtility.TryParseHtmlString(cha.getBubbleBorderColor(), out border);
-
-            bubble.TextColor = textColor;
-            bubble.TextOutlineColor = textOutline;
-            bubble.BaseColor = background;
-            bubble.OutlineColor = border;
+            bubble.TextColor = cha.getTextFrontColor();
+            bubble.TextOutlineColor = cha.getTextBorderColor();
+            bubble.BaseColor = cha.getBubbleBkgColor();
+            bubble.OutlineColor = cha.getBubbleBorderColor();
 
             if (talker != null)
             {

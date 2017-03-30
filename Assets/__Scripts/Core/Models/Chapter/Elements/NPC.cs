@@ -71,16 +71,16 @@ namespace uAdventure.Core
         /**
          * The front color of the text of the character
          */
-        protected string textFrontColor;
+        protected Color textFrontColor;
 
         /**
          * The border color of the text of the character
          */
-        protected string textBorderColor;
+        protected Color textBorderColor;
 
-        protected string bubbleBkgColor;
+        protected Color bubbleBkgColor;
 
-        protected string bubbleBorderColor;
+        protected Color bubbleBorderColor;
 
         protected bool showsSpeechBubbles;
 
@@ -103,11 +103,11 @@ namespace uAdventure.Core
         public NPC(string id) : base(id)
         {
             // Default colors are white for the front color, and black for the border color
-            textFrontColor = "#FFFFFF";
-            textBorderColor = "#000000";
+            textFrontColor = Color.white;
+            textBorderColor = Color.black;
             showsSpeechBubbles = false;
-            bubbleBkgColor = "#FFFFFF";
-            bubbleBorderColor = "#00000";
+            bubbleBkgColor = Color.white;
+            bubbleBorderColor = Color.black;
         }
 
         /**
@@ -115,9 +115,8 @@ namespace uAdventure.Core
          * 
          * @return string with the color, in format "#RRGGBB"
          */
-        public string getTextFrontColor()
+        public Color getTextFrontColor()
         {
-
             return textFrontColor;
         }
 
@@ -126,19 +125,19 @@ namespace uAdventure.Core
          * 
          * @return string with the color, in format "#RRGGBB"
          */
-        public string getTextBorderColor()
+        public Color getTextBorderColor()
         {
 
             return textBorderColor;
         }
 
-        public string getBubbleBorderColor()
+        public Color getBubbleBorderColor()
         {
 
             return bubbleBorderColor;
         }
 
-        public string getBubbleBkgColor()
+        public Color getBubbleBkgColor()
         {
 
             return bubbleBkgColor;
@@ -162,7 +161,7 @@ namespace uAdventure.Core
          * @param textFrontColor
          *            string with the color, in format "#RRGGBB"
          */
-        public void setTextFrontColor(string textFrontColor)
+        public void setTextFrontColor(Color textFrontColor)
         {
 
             this.textFrontColor = textFrontColor;
@@ -174,19 +173,19 @@ namespace uAdventure.Core
          * @param textBorderColor
          *            string with the color, in format "#RRGGBB"
          */
-        public void setTextBorderColor(string textBorderColor)
+        public void setTextBorderColor(Color textBorderColor)
         {
 
             this.textBorderColor = textBorderColor;
         }
 
-        public void setBubbleBorderColor(string bubbleBorderColor)
+        public void setBubbleBorderColor(Color bubbleBorderColor)
         {
 
             this.bubbleBorderColor = bubbleBorderColor;
         }
 
-        public void setBubbleBkgColor(string bubbleBkgColor)
+        public void setBubbleBkgColor(Color bubbleBkgColor)
         {
 
             this.bubbleBkgColor = bubbleBkgColor;
@@ -256,26 +255,14 @@ namespace uAdventure.Core
 
             this.alwaysSynthesizer = alwaysSynthesizer;
         }
-        /*
-        @Override
-        public Object clone() throws CloneNotSupportedException
-        {
-
-            NPC n = (NPC) super.clone( );
-            n.alwaysSynthesizer = alwaysSynthesizer;
-            n.textBorderColor = ( textBorderColor != null ? new string(textBorderColor ) : null );
-            n.textFrontColor = ( textFrontColor != null ? new string(textFrontColor ) : null );
-            n.voice = ( voice != null ? new string(voice ) : null );
-            return n;
-        }*/
 
         public override object Clone()
         {
             NPC n = (NPC)base.Clone();
             n.alwaysSynthesizer = alwaysSynthesizer;
-            n.textBorderColor = (textBorderColor != null ? textBorderColor : null);
-            n.textFrontColor = (textFrontColor != null ? textFrontColor : null);
-            n.voice = (voice != null ? voice : null);
+            n.textBorderColor = textBorderColor;
+            n.textFrontColor = textFrontColor;
+            n.voice = voice;
             return n;
         }
     }

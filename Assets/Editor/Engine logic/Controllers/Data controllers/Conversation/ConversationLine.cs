@@ -34,7 +34,6 @@ namespace uAdventure.Editor
 
         public override void recursiveSearch()
         {
-
             check(searchableNode.getConversationNodeView().getLineName(line), TC.get("Search.LineName"));
             check(searchableNode.getConversationNodeView().getLineText(line), TC.get("Search.LineText"));
         }

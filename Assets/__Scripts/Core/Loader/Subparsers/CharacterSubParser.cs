@@ -31,7 +31,9 @@ namespace uAdventure.Core
 				npc.addResources (res);
 
 			// ACTIONS
-			npc.setActions (DOMParserUtility.DOMParse<Action>(element.SelectSingleNode("actions").ChildNodes, parameters).ToList());
+			var actionsNode = element.SelectSingleNode("actions");
+			if(actionsNode != null)
+				npc.setActions (DOMParserUtility.DOMParse<Action>(actionsNode.ChildNodes, parameters).ToList());
 
 			// CONVERSATIONS
 			foreach (XmlElement conversation in element.SelectNodes("conversation-ref"))
@@ -51,30 +53,40 @@ namespace uAdventure.Core
 				npc.addAction(action);
 			}
 
-			// CONVERSATION COLORS
-			var textcolor = element.SelectSingleNode ("textcolor") as XmlElement;
-			if(textcolor != null)
-			{
-				npc.setShowsSpeechBubbles("yes".Equals(textcolor.GetAttribute("showsSpeechBubble")));
-				npc.setBubbleBkgColor(textcolor.GetAttribute("bubbleBkgColor") ?? npc.getBubbleBkgColor ());
-				npc.setBubbleBorderColor(textcolor.GetAttribute("bubbleBorderColor") ?? npc.getBubbleBorderColor ());
+            // CONVERSATION COLORS
+            ParseConversationColors(npc, element);
 
-				var frontcolor = textcolor.SelectSingleNode("frontcolor") as XmlElement;
-				if (frontcolor != null) npc.setTextFrontColor(frontcolor.GetAttribute("color") ?? "");
-
-				var bordercolor = textcolor.SelectSingleNode("bordercolor") as XmlElement;
-				if (bordercolor != null) npc.setTextBorderColor(bordercolor.GetAttribute("color") ?? "");
-			}
-
-			// VOICE
-			var voice = element.SelectSingleNode("voice") as XmlElement;
-			if (voice != null)
-			{
-				npc.setAlwaysSynthesizer("yes".Equals (voice.GetAttribute("synthesizeAlways")));
-				npc.setVoice(voice.GetAttribute("name") ?? "");
-			}
+            // VOICE
+            ParseVoice(npc, element);
 
 			return npc;
 		}
+
+        public static void ParseConversationColors(NPC npc, XmlElement element)
+        { 
+            var textcolor = element.SelectSingleNode("textcolor") as XmlElement;
+            if (textcolor != null)
+            {
+                npc.setShowsSpeechBubbles(ExString.EqualsDefault(textcolor.GetAttribute("showsSpeechBubble"), "yes", npc.getShowsSpeechBubbles()));
+                npc.setBubbleBkgColor(ExParsers.ParseDefault(textcolor.GetAttribute("bubbleBkgColor"), npc.getBubbleBkgColor()));
+                npc.setBubbleBorderColor(ExParsers.ParseDefault(textcolor.GetAttribute("bubbleBorderColor"), npc.getBubbleBorderColor()));
+
+                var frontcolor = textcolor.SelectSingleNode("frontcolor/@color") as XmlElement;
+                if (frontcolor != null) npc.setTextFrontColor(ExParsers.ParseDefault(frontcolor.GetAttribute("color"), npc.getTextFrontColor()));
+
+                var bordercolor = textcolor.SelectSingleNode("bordercolor/@color") as XmlElement;
+                if (bordercolor != null) npc.setTextBorderColor(ExParsers.ParseDefault(bordercolor.GetAttribute("color"), npc.getTextBorderColor()));
+            }
+        }
+
+        public static void ParseVoice(NPC npc, XmlElement element)
+        {
+            var voice = element.SelectSingleNode("voice") as XmlElement;
+            if (voice != null)
+            {
+                npc.setAlwaysSynthesizer(ExString.EqualsDefault(voice.GetAttribute("synthesizeAlways"), "yes", npc.isAlwaysSynthesizer()));
+                npc.setVoice(voice.GetAttribute("name") ?? "");
+            }
+        }
     }
 }

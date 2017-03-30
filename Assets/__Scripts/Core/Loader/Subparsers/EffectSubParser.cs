@@ -48,7 +48,7 @@ namespace uAdventure.Core
                     case "increment":
                     case "decrement":
 						string var = effect.GetAttribute("var");
-						int value = int.Parse(effect.GetAttribute("value") ?? "0");
+						int value = ExParsers.ParseDefault(effect.GetAttribute("value"), 0);
 
                         if (effect.Name == "set-value")
                             currentEffect = new SetValueEffect(var, value);
@@ -89,34 +89,34 @@ namespace uAdventure.Core
 					case "trigger-cutscene": 	currentEffect = new TriggerCutsceneEffect(effect.GetAttribute("idTarget") ?? ""); break;
                     case "trigger-scene":
 					
-						x = int.Parse(effect.GetAttribute("x") ?? "0");
-						y = int.Parse(effect.GetAttribute("y") ?? "0");
+						x = ExParsers.ParseDefault(effect.GetAttribute("x"), 0);
+						y = ExParsers.ParseDefault(effect.GetAttribute("y"), 0);
 						string scene = effect.GetAttribute("idTarget") ?? "";
                         currentEffect = new TriggerSceneEffect(scene, x, y);
                         break;
 					case "play-animation":
-						x = int.Parse(effect.GetAttribute("x") ?? "0");
-						y = int.Parse(effect.GetAttribute("y") ?? "0");
+						x = ExParsers.ParseDefault(effect.GetAttribute("x"), 0);
+						y = ExParsers.ParseDefault(effect.GetAttribute("y"), 0);
 						path = effect.GetAttribute("uri") ?? "";
                         // Add the new play sound effect
                         currentEffect = new PlayAnimationEffect(path, x, y);
                         break;
 					case "move-player":
-						x = int.Parse(effect.GetAttribute("x") ?? "0");
-						y = int.Parse(effect.GetAttribute("y") ?? "0");
+						x = ExParsers.ParseDefault(effect.GetAttribute("x"), 0);
+						y = ExParsers.ParseDefault(effect.GetAttribute("y"), 0);
                         // Add the new move player effect
                         currentEffect = new MovePlayerEffect(x, y);
                         break;
 					case "move-npc":
-						x = int.Parse(effect.GetAttribute("x") ?? "0");
-						y = int.Parse(effect.GetAttribute("y") ?? "0");
+						x = ExParsers.ParseDefault(effect.GetAttribute("x"), 0);
+						y = ExParsers.ParseDefault(effect.GetAttribute("y"), 0);
 						string npcTarget = effect.GetAttribute("idTarget") ?? "";
                         // Add the new move NPC effect
                         currentEffect = new MoveNPCEffect(npcTarget, x, y);
                         break;
 					case "random-effect":
 	                    // Add the new random effect
-						var randomEffect = new RandomEffect (int.Parse (effect.GetAttribute ("probability") ?? "0"));
+						var randomEffect = new RandomEffect (ExParsers.ParseDefault (effect.GetAttribute ("probability"), 0));
 
 						Effects randomEffectList = DOMParserUtility.DOMParse<Effects> (effect, parameters);
 
@@ -127,11 +127,11 @@ namespace uAdventure.Core
                         break;
                     case "wait-time":
                         // Add the new move NPC effect
-						currentEffect = new WaitTimeEffect(int.Parse (effect.GetAttribute("time") ?? "0"));
+						currentEffect = new WaitTimeEffect(ExParsers.ParseDefault (effect.GetAttribute("time"), 0));
                         break;
 					case "show-text":
-						x = int.Parse(effect.GetAttribute("x") ?? "0");
-						y = int.Parse(effect.GetAttribute("y") ?? "0");
+						x = ExParsers.ParseDefault(effect.GetAttribute("x"), 0);
+						y = ExParsers.ParseDefault(effect.GetAttribute("y"), 0);
 						var frontColor = effect.GetAttribute("frontColor") ?? "";
 						var borderColor = effect.GetAttribute("borderColor") ?? "";
 
@@ -162,14 +162,14 @@ namespace uAdventure.Core
                         break;
 					case "move-object":
 
-						x = int.Parse (effect.GetAttribute ("x") ?? "0");
-						y = int.Parse (effect.GetAttribute ("y") ?? "0");
+						x = ExParsers.ParseDefault (effect.GetAttribute ("x"), 0);
+						y = ExParsers.ParseDefault (effect.GetAttribute ("y"), 0);
 
 						id = effect.GetAttribute ("idTarget") ?? "";
 						animated = "yes".Equals (effect.GetAttribute ("animated"));
-						float scale = float.Parse (effect.GetAttribute ("scale") ?? "1.0", CultureInfo.InvariantCulture);
-						int translateSpeed = int.Parse(effect.GetAttribute("translateSpeed") ?? "20");
-						int scaleSpeed = int.Parse(effect.GetAttribute("scaleSpeed") ?? "20");
+						float scale = ExParsers.ParseDefault (effect.GetAttribute ("scale"), CultureInfo.InvariantCulture, 1.0f);
+						int translateSpeed = ExParsers.ParseDefault(effect.GetAttribute("translateSpeed"), 20);
+						int scaleSpeed = ExParsers.ParseDefault(effect.GetAttribute("scaleSpeed"), 20);
 
                         currentEffect = new MoveObjectEffect(id, x, y, scale, animated, translateSpeed, scaleSpeed);
                         break;

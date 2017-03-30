@@ -64,9 +64,7 @@ namespace uAdventure.Core
             Completable.Milestone milestone = new Completable.Milestone();
 
             string tmpString = "";
-
-
-
+            
             tmpString = element.GetAttribute("type");
             if (!string.IsNullOrEmpty(tmpString))
             {

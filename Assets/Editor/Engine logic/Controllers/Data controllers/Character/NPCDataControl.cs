@@ -156,7 +156,7 @@ namespace uAdventure.Editor
          * 
          * @return Text front color
          */
-        public string getTextFrontColor()
+        public Color getTextFrontColor()
         {
             return npc.getTextFrontColor();
         }
@@ -166,7 +166,7 @@ namespace uAdventure.Editor
          * 
          * @return Text front color
          */
-        public string getTextBorderColor()
+        public Color getTextBorderColor()
         {
             return npc.getTextBorderColor();
         }
@@ -188,7 +188,7 @@ namespace uAdventure.Editor
          * @param textFrontColor
          *            New text front color
          */
-        public void setTextFrontColor(string textFrontColor)
+        public void setTextFrontColor(Color textFrontColor)
         {
             npc.setTextFrontColor(textFrontColor);
         }
@@ -199,18 +199,18 @@ namespace uAdventure.Editor
          * @param textBorderColor
          *            New text border color
          */
-        public void setTextBorderColor(string textBorderColor)
+        public void setTextBorderColor(Color textBorderColor)
         {
 
             npc.setTextBorderColor(textBorderColor);
         }
 
-        public void setBubbleBkgColor(string bubbleBkgColor)
+        public void setBubbleBkgColor(Color bubbleBkgColor)
         {
             npc.setBubbleBkgColor(bubbleBkgColor);
         }
 
-        public void setBubbleBorderColor(string bubbleBorderColor)
+        public void setBubbleBorderColor(Color bubbleBorderColor)
         {
             npc.setBubbleBorderColor(bubbleBorderColor);
         }
@@ -560,12 +560,12 @@ namespace uAdventure.Editor
             return previewImagePath;
         }
 
-        public string getBubbleBorderColor()
+        public Color getBubbleBorderColor()
         {
             return npc.getBubbleBorderColor();
         }
 
-        public string getBubbleBkgColor()
+        public Color getBubbleBkgColor()
         {
             return npc.getBubbleBkgColor();
         }

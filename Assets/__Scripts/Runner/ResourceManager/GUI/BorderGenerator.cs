@@ -15,13 +15,11 @@ namespace uAdventure.Runner
             if (npc.getShowsSpeechBubbles())
             {
                 ret = new Texture2D(32, 32);
-                Color background = Color.white;
-                Color border = Color.black;
+                //Color background = Color.white;
+                // TODO use background
+                //ColorUtility.TryParseHtmlString(npc.getBubbleBkgColor(), out background);
 
-                ColorUtility.TryParseHtmlString(npc.getBubbleBkgColor(), out background);
-                ColorUtility.TryParseHtmlString(npc.getBubbleBorderColor(), out background);
-
-                BorderGenerator.Circle(ret, 16, 16, 15, border);
+                BorderGenerator.Circle(ret, 16, 16, 15, npc.getBubbleBorderColor());
             }
             else
             {

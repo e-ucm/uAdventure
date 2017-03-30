@@ -4,8 +4,8 @@ using System.Xml;
 
 namespace uAdventure.Core
 {
-	[DOMParser("cutscene")]
-	[DOMParser(typeof(Cutscene))]
+	[DOMParser("cutscene", "slidescene", "videoscene")]
+	[DOMParser(typeof(Cutscene), typeof(Slidescene), typeof(Videoscene))]
 	public class CutsceneSubParser : IDOMParser
     {
 
@@ -35,17 +35,17 @@ namespace uAdventure.Core
             //END OF XAPI
 
 			cutscene.setTargetId(element.GetAttribute("idTarget") ?? "");
-			cutscene.setPositionX(int.Parse(element.GetAttribute("destinyX") ?? "" + int.MinValue));
-			cutscene.setPositionY(int.Parse(element.GetAttribute("destinyY") ?? "" + int.MinValue));
-			cutscene.setTransitionType((NextSceneEnumTransitionType)int.Parse(element.GetAttribute("transitionType") ?? "0"));
-			cutscene.setTransitionTime(int.Parse(element.GetAttribute("transitionTime") ?? "0"));
+			cutscene.setPositionX(ExParsers.ParseDefault(element.GetAttribute("destinyX"), int.MinValue));
+			cutscene.setPositionY(ExParsers.ParseDefault(element.GetAttribute("destinyY"), int.MinValue));
+			cutscene.setTransitionType((NextSceneEnumTransitionType)ExParsers.ParseDefault(element.GetAttribute("transitionType"),  0));
+			cutscene.setTransitionTime(ExParsers.ParseDefault(element.GetAttribute("transitionTime"), 0));
 
             if (element.SelectSingleNode("name") != null)
                 cutscene.setName(element.SelectSingleNode("name").InnerText);
             if (element.SelectSingleNode("documentation") != null)
                 cutscene.setDocumentation(element.SelectSingleNode("documentation").InnerText);
 
-			cutscene.setEffects(DOMParserUtility.DOMParse (element.SelectSingleNode("effect")) as Effects ?? new Effects());
+			cutscene.setEffects(DOMParserUtility.DOMParse (element.SelectSingleNode("effect"), parameters) as Effects ?? new Effects());
 
             if (cutscene is Videoscene)
 				((Videoscene)cutscene).setCanSkip("yes".Equals (element.GetAttribute("canSkip") ?? "yes"));
@@ -67,14 +67,14 @@ namespace uAdventure.Core
             foreach (XmlElement el in nextsscene)
             {
 				var currentNextScene = new NextScene(el.GetAttribute("idTarget") ?? "", 
-					int.Parse(element.GetAttribute("destinyX") ?? "" + int.MinValue),
-					int.Parse(element.GetAttribute("destinyY") ?? "" + int.MinValue));
+					ExParsers.ParseDefault(element.GetAttribute("destinyX"), int.MinValue),
+					ExParsers.ParseDefault(element.GetAttribute("destinyY"), int.MinValue));
 				
-				currentNextScene.setTransitionType((NextSceneEnumTransitionType)int.Parse(element.GetAttribute("transitionType") ?? "0"));
-				currentNextScene.setTransitionTime(int.Parse(element.GetAttribute("transitionTime") ?? "0"));
-				currentNextScene.setConditions(DOMParserUtility.DOMParse (el.SelectSingleNode ("condition")) as Conditions ?? new Conditions());
-				currentNextScene.setEffects(DOMParserUtility.DOMParse (el.SelectSingleNode ("effect")) as Effects ?? new Effects());
-				currentNextScene.setPostEffects(DOMParserUtility.DOMParse (el.SelectSingleNode ("post-effect")) as Effects ?? new Effects());
+				currentNextScene.setTransitionType((NextSceneEnumTransitionType)ExParsers.ParseDefault(element.GetAttribute("transitionType"), 0));
+				currentNextScene.setTransitionTime(ExParsers.ParseDefault(element.GetAttribute("transitionTime"), 0));
+				currentNextScene.setConditions(DOMParserUtility.DOMParse (el.SelectSingleNode ("condition"), parameters) as Conditions ?? new Conditions());
+				currentNextScene.setEffects(DOMParserUtility.DOMParse (el.SelectSingleNode ("effect"), parameters) as Effects ?? new Effects());
+				currentNextScene.setPostEffects(DOMParserUtility.DOMParse (el.SelectSingleNode ("post-effect"), parameters) as Effects ?? new Effects());
 
                 cutscene.addNextScene(currentNextScene);
             }
