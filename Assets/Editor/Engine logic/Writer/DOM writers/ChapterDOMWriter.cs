@@ -74,7 +74,7 @@ namespace uAdventure.Editor
             }
 
             var targetParam = ChapterTargetID(chapter.getTargetId());
-
+            /*
             // Append the scene elements
             foreach (Scene scene in chapter.getScenes())
             {
@@ -99,8 +99,6 @@ namespace uAdventure.Editor
                 DOMWriterUtility.DOMWrite(chapterNode, item, targetParam);
             }
 
-            // Append the player element
-            DOMWriterUtility.DOMWrite(chapterNode, chapter.getPlayer(), targetParam);
 
             // Append the character element
             foreach (NPC character in chapter.getCharacters())
@@ -143,13 +141,15 @@ namespace uAdventure.Editor
             {
                 DOMWriterUtility.DOMWrite(chapterNode, completable, targetParam);
             }
-
+            */
             /*} catch( ParserConfigurationException e ) {
                 ReportDialog.GenerateErrorReport(e, true, "UNKNOWERROR");
             }*/
 
-            
-            foreach(var type in chapter.getObjectTypes())
+            // Append the player element
+            DOMWriterUtility.DOMWrite(chapterNode, chapter.getPlayer(), targetParam);
+
+            foreach (var type in chapter.getObjectTypes())
             {
                 foreach(var tosave in chapter.getObjects(type))
                 {

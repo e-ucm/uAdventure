@@ -39,7 +39,8 @@ namespace uAdventure.Core
 			case "greater-than":
 			case "greater-equals-than":
 			case "less-than":
-			case "equals":
+            case "less-equals-than":
+            case "equals":
 			case "not-equals":
 				c.add(parseVar (element, parameters));
 				break;
@@ -86,13 +87,16 @@ namespace uAdventure.Core
 			case "greater-than":
 				state = VarCondition.VAR_GREATER_THAN;
 				break;
-			case "greater-equals-than":
-				state = VarCondition.VAR_GREATER_EQUALS_THAN;
-				break;
-			case "less-than":
-				state = VarCondition.VAR_LESS_THAN;
-				break;
-			case "equals":
+            case "greater-equals-than":
+                state = VarCondition.VAR_GREATER_EQUALS_THAN;
+                break;
+            case "less-than":
+			    state = VarCondition.VAR_LESS_THAN;
+			    break;
+            case "less-equals-than":
+                state = VarCondition.VAR_LESS_EQUALS_THAN;
+                break; 
+            case "equals":
 				state = VarCondition.VAR_EQUALS;
 				break;
 			case "not-equals":

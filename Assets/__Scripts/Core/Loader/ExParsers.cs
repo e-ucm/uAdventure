@@ -7,7 +7,7 @@ namespace uAdventure.Core
 
 		public static long ParseDefault(string toParse, long def){
             long toReturn;
-            if (string.IsNullOrEmpty(toParse) && long.TryParse(toParse, out toReturn))
+            if (!string.IsNullOrEmpty(toParse) && long.TryParse(toParse, out toReturn))
                 return toReturn;
             else
                 return def;
@@ -16,7 +16,7 @@ namespace uAdventure.Core
 		public static int ParseDefault(string toParse, int def)
         {
             int toReturn;
-            if (string.IsNullOrEmpty(toParse) && int.TryParse(toParse, out toReturn))
+            if (!string.IsNullOrEmpty(toParse) && int.TryParse(toParse, out toReturn))
                 return toReturn;
             else
                 return def;
@@ -36,7 +36,7 @@ namespace uAdventure.Core
 		public static float ParseDefault(string toParse, float def)
         {
             float toReturn;
-            if (string.IsNullOrEmpty(toParse) && float.TryParse(toParse, out toReturn))
+            if (!string.IsNullOrEmpty(toParse) && float.TryParse(toParse, out toReturn))
                 return toReturn;
             else
                 return def;
@@ -45,7 +45,7 @@ namespace uAdventure.Core
 		public static double ParseDefault(string toParse, double def)
         {
             double toReturn;
-            if (string.IsNullOrEmpty(toParse) && double.TryParse(toParse, out toReturn))
+            if (!string.IsNullOrEmpty(toParse) && double.TryParse(toParse, out toReturn))
                 return toReturn;
             else
                 return def;
