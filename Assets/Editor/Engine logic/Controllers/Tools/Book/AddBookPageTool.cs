@@ -70,7 +70,7 @@ namespace uAdventure.Editor
             {
                 bookPagesList.Add(newBookPage);
             }
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
 
@@ -79,7 +79,7 @@ namespace uAdventure.Editor
         {
 
             bookPagesList.Remove(newBookPage);
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
     }

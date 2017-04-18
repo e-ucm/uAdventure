@@ -41,7 +41,7 @@ namespace uAdventure.Editor
 
             if (GameRources.GetInstance().selectedSceneIndex >= 0)
                 backgroundPath =
-                    Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                    Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                         GameRources.GetInstance().selectedSceneIndex].getPreviewBackground();
             if (backgroundPath != null && !backgroundPath.Equals(""))
                 backgroundPreviewTex = AssetsController.getImage(backgroundPath).texture;
@@ -73,7 +73,7 @@ namespace uAdventure.Editor
             scrollPosition = GUILayout.BeginScrollView(scrollPosition);
             for (int i = 0;
                 i <
-                Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                     GameRources.GetInstance().selectedSceneIndex].getBarriersList().getBarriersList().Count;
                 i++)
             {
@@ -82,7 +82,7 @@ namespace uAdventure.Editor
 
                 GUILayout.BeginHorizontal();
 
-                if (GUILayout.Button(Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                if (GUILayout.Button(Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                     GameRources.GetInstance().selectedSceneIndex].getBarriersList().getBarriersList()[i].getId(),
                     GUILayout.Width(windowWidth * 0.44f)))
                 {
@@ -94,7 +94,7 @@ namespace uAdventure.Editor
                     selectedArea = i;
                     ConditionEditorWindow window =
                          (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
-                    window.Init(Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                    window.Init(Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                     GameRources.GetInstance().selectedSceneIndex].getBarriersList().getBarriersList()[i].getConditions());
                 }
 
@@ -119,30 +119,30 @@ namespace uAdventure.Editor
             }
             if (GUILayout.Button(duplicateImg, GUILayout.MaxWidth(0.08f * windowWidth)))
             {
-                Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                     GameRources.GetInstance().selectedSceneIndex].getBarriersList()
-                    .duplicateElement(Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                    .duplicateElement(Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                         GameRources.GetInstance().selectedSceneIndex].getBarriersList().getBarriers()[selectedArea]);
             }
             if (GUILayout.Button(moveUp, GUILayout.MaxWidth(0.08f * windowWidth)))
             {
-                Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                     GameRources.GetInstance().selectedSceneIndex].getBarriersList()
-                    .moveElementUp(Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                    .moveElementUp(Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                         GameRources.GetInstance().selectedSceneIndex].getBarriersList().getBarriers()[selectedArea]);
             }
             if (GUILayout.Button(moveDown, GUILayout.MaxWidth(0.08f * windowWidth)))
             {
-                Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                     GameRources.GetInstance().selectedSceneIndex].getBarriersList()
-                    .moveElementDown(Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                    .moveElementDown(Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                         GameRources.GetInstance().selectedSceneIndex].getBarriersList().getBarriers()[selectedArea]);
             }
             if (GUILayout.Button(clearImg, GUILayout.MaxWidth(0.08f * windowWidth)))
             {
-                Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                     GameRources.GetInstance().selectedSceneIndex].getBarriersList()
-                    .deleteElement(Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                    .deleteElement(Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                         GameRources.GetInstance().selectedSceneIndex].getBarriersList().getBarriers()[selectedArea],
                         false);
             }
@@ -160,7 +160,7 @@ namespace uAdventure.Editor
                     //
                     BarrierEditor window =
                         (BarrierEditor)ScriptableObject.CreateInstance(typeof(BarrierEditor));
-                    window.Init(this, Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                    window.Init(this, Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                         GameRources.GetInstance().selectedSceneIndex], selectedArea);
                 }
                 GUILayout.EndArea();
@@ -180,7 +180,7 @@ namespace uAdventure.Editor
             Debug.Log("Apply");
             if (workingObject is BarrierNewName)
             {
-                Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                     GameRources.GetInstance().selectedSceneIndex].getBarriersList()
                     .addElement(Controller.BARRIER, message);
             }

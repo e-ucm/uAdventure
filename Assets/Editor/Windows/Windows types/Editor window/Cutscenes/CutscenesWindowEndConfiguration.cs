@@ -37,8 +37,8 @@ namespace uAdventure.Editor
             transitionTypes = new string[]
             {TC.get("NextScene.NoTransition"),TC.get("NextScene.TopToBottom"),  TC.get("NextScene.BottomToTop"), TC.get("NextScene.LeftToRight"), TC.get("NextScene.RightToLeft"), TC.get("NextScene.FadeIn")};
 
-            scenesNextNames = Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenesIDs();
-            cutscenesNextNames = Controller.getInstance().getSelectedChapterDataControl().getCutscenesList().getCutscenesIDs();
+            scenesNextNames = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenesIDs();
+            cutscenesNextNames = Controller.Instance.SelectedChapterDataControl.getCutscenesList().getCutscenesIDs();
             // Both scenes and cutscenes are necessary for next scene popup
             joinedNextScenesList = new string[scenesNextNames.Length + cutscenesNextNames.Length];
             scenesNextNames.CopyTo(joinedNextScenesList, 0);
@@ -52,34 +52,30 @@ namespace uAdventure.Editor
             {
                 selectedOption =
                     selectedOptionLast =
-                        Controller.getInstance().getSelectedChapterDataControl().getCutscenesList().getCutscenes()[
+                        Controller.Instance.SelectedChapterDataControl.getCutscenesList().getCutscenes()[
                             GameRources.GetInstance().selectedCutsceneIndex].getNext();
 
-                timeInt = Controller.getInstance().getSelectedChapterDataControl().getCutscenesList().getCutscenes()[
+                timeInt = Controller.Instance.SelectedChapterDataControl.getCutscenesList().getCutscenes()[
                     GameRources.GetInstance().selectedCutsceneIndex].getTransitionTime();
 
                 selectedTransitionType = selectedTransitionTypeLast =
-                    Controller.getInstance().getSelectedChapterDataControl().getCutscenesList().getCutscenes()[
+                    Controller.Instance.SelectedChapterDataControl.getCutscenesList().getCutscenes()[
                         GameRources.GetInstance().selectedCutsceneIndex].getTransitionType();
 
                 string nextSceneID =
-                    Controller.getInstance().getSelectedChapterDataControl().getCutscenesList().getCutscenes()[
+                    Controller.Instance.SelectedChapterDataControl.getCutscenesList().getCutscenes()[
                         GameRources.GetInstance().selectedCutsceneIndex].getNextSceneId();
 
                 selectedSceneNext =
                     selectedSceneNextLast =
-                        Controller.getInstance()
-                            .getSelectedChapterDataControl()
-                            .getScenesList()
+                        Controller.Instance                            .SelectedChapterDataControl                            .getScenesList()
                             .getSceneIndexByID(nextSceneID);
                 // if next scene is not a scene, but a cutscene...
                 if (selectedSceneNext == -1)
                 {
                     selectedSceneNext =
                      selectedSceneNextLast =
-                     Controller.getInstance()
-                         .getSelectedChapterDataControl()
-                         .getCutscenesList()
+                     Controller.Instance                         .SelectedChapterDataControl                         .getCutscenesList()
                          .getCutsceneIndexByID(nextSceneID) + scenesNextNames.Length;
                 }
             }
@@ -119,7 +115,7 @@ namespace uAdventure.Editor
                 {
                     EffectEditorWindow window =
                             (EffectEditorWindow)ScriptableObject.CreateInstance(typeof(EffectEditorWindow));
-                    window.Init(Controller.getInstance().getSelectedChapterDataControl().getCutscenesList().getCutscenes()[
+                    window.Init(Controller.Instance.SelectedChapterDataControl.getCutscenesList().getCutscenes()[
                             GameRources.GetInstance().selectedCutsceneIndex].getEffects());
                 }
                 GUILayout.EndHorizontal();
@@ -145,7 +141,7 @@ namespace uAdventure.Editor
         private void ChangeSelectedOption(int i)
         {
             selectedOptionLast = i;
-            Controller.getInstance().getSelectedChapterDataControl().getCutscenesList().getCutscenes()[
+            Controller.Instance.SelectedChapterDataControl.getCutscenesList().getCutscenes()[
                       GameRources.GetInstance().selectedCutsceneIndex].setNext(i);
             Debug.Log("ChangeSelectedOption");
         }
@@ -153,7 +149,7 @@ namespace uAdventure.Editor
         private void ChangeSelectedTransitionType(int i)
         {
             selectedTransitionTypeLast = i;
-            Controller.getInstance().getSelectedChapterDataControl().getCutscenesList().getCutscenes()[
+            Controller.Instance.SelectedChapterDataControl.getCutscenesList().getCutscenes()[
                       GameRources.GetInstance().selectedCutsceneIndex].setTransitionType(i);
             Debug.Log("ChangeSelectedTransitionType");
         }
@@ -161,7 +157,7 @@ namespace uAdventure.Editor
         private void ChangeSelectedTransitionTime(string t)
         {
             timeStringLast = t;
-            Controller.getInstance().getSelectedChapterDataControl().getCutscenesList().getCutscenes()[
+            Controller.Instance.SelectedChapterDataControl.getCutscenesList().getCutscenes()[
                       GameRources.GetInstance().selectedCutsceneIndex].setTransitionTime(int.Parse(t));
             Debug.Log("ChangeSelectedTransitionTime");
         }
@@ -171,10 +167,10 @@ namespace uAdventure.Editor
             selectedSceneNextLast = i;
             // Scene was choosed
             if (i < scenesNextNames.Length)
-                Controller.getInstance().getSelectedChapterDataControl().getCutscenesList().getCutscenes()[
+                Controller.Instance.SelectedChapterDataControl.getCutscenesList().getCutscenes()[
                     GameRources.GetInstance().selectedCutsceneIndex].setNextSceneId(scenesNextNames[i]);
             else
-                Controller.getInstance().getSelectedChapterDataControl().getCutscenesList().getCutscenes()[
+                Controller.Instance.SelectedChapterDataControl.getCutscenesList().getCutscenes()[
                     GameRources.GetInstance().selectedCutsceneIndex].setNextSceneId(cutscenesNextNames[i - scenesNextNames.Length]);
             Debug.Log("ChangeSelectedNextScene");
         }

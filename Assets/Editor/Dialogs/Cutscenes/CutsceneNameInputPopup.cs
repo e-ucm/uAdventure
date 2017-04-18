@@ -33,7 +33,7 @@ namespace uAdventure.Editor
 
             GUILayout.Space(30);
 
-            if (!Controller.getInstance().isElementIdValid(textContent, false))
+            if (!Controller.Instance.isElementIdValid(textContent, false))
             {
                 GUI.enabled = false;
             }

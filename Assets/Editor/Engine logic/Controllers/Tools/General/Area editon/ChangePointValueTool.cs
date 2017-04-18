@@ -72,7 +72,7 @@ namespace uAdventure.Editor
         public override bool redoTool()
         {
             point = new Vector2(x, y);
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
 
@@ -80,7 +80,7 @@ namespace uAdventure.Editor
         public override bool undoTool()
         {
             point = new Vector2(originalX, originalY);
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
     }

@@ -14,7 +14,7 @@ namespace uAdventure.Editor
             string doc = "";
 
             if (GameRources.GetInstance().selectedSetItemIndex >= 0)
-                doc = Controller.getInstance().getCharapterList().getSelectedChapterData().getAtrezzo()[
+                doc = Controller.Instance.ChapterList.getSelectedChapterData().getAtrezzo()[
                     GameRources.GetInstance().selectedSetItemIndex].getDocumentation();
             doc = (doc == null ? "" : doc);
             documentation = documentationLast = doc;
@@ -33,7 +33,7 @@ namespace uAdventure.Editor
 
         private void OnDocumentationChanged(string s)
         {
-            Controller.getInstance().getCharapterList().getSelectedChapterData().getAtrezzo()[GameRources.GetInstance().selectedSetItemIndex].setDocumentation(s);
+            Controller.Instance.ChapterList.getSelectedChapterData().getAtrezzo()[GameRources.GetInstance().selectedSetItemIndex].setDocumentation(s);
             documentationLast = s;
         }
     }

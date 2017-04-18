@@ -211,15 +211,15 @@ namespace uAdventure.Editor
             string[] elements = null;
 
             if (action.getType() == Action.USE_WITH)
-                elements = controller.getIdentifierSummary().getItemAndActiveAreaIds();
+                elements = controller.IdentifierSummary.getItemAndActiveAreaIds();
             else if (action.getType() == Action.GIVE_TO)
-                elements = controller.getIdentifierSummary().getNPCIds();
+                elements = controller.IdentifierSummary.getNPCIds();
             else if (action.getType() == Action.DRAG_TO)
-                elements = controller.getIdentifierSummary().getItemActiveAreaNPCIds();
+                elements = controller.IdentifierSummary.getItemActiveAreaNPCIds();
             else if (action.getType() == Action.CUSTOM_INTERACT)
             {
-                string[] temp1 = controller.getIdentifierSummary().getNPCIds();
-                string[] temp2 = controller.getIdentifierSummary().getItemAndActiveAreaIds();
+                string[] temp1 = controller.IdentifierSummary.getNPCIds();
+                string[] temp2 = controller.IdentifierSummary.getItemAndActiveAreaIds();
                 elements = new string[temp1.Length + temp2.Length];
                 for (int i = 0; i < elements.Length; i++)
                 {

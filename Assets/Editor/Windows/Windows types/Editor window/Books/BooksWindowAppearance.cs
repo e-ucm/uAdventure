@@ -27,22 +27,22 @@ namespace uAdventure.Editor
             if (GameRources.GetInstance().selectedBookIndex >= 0)
             {
                 backgroundPath =
-                    Controller.getInstance().getSelectedChapterDataControl().getBooksList().getBooks()[
+                    Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
                         GameRources.GetInstance().selectedBookIndex].getPreviewImage();
 
-                leftNormalArrowPath = Controller.getInstance().getSelectedChapterDataControl().getBooksList().getBooks()[
+                leftNormalArrowPath = Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
                     GameRources.GetInstance().selectedBookIndex].getArrowImagePath(BookDataControl.ARROW_LEFT,
                         BookDataControl.ARROW_NORMAL);
 
-                rightNormalArrowPath = Controller.getInstance().getSelectedChapterDataControl().getBooksList().getBooks()[
+                rightNormalArrowPath = Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
                     GameRources.GetInstance().selectedBookIndex].getArrowImagePath(BookDataControl.ARROW_RIGHT,
                         BookDataControl.ARROW_NORMAL);
 
-                leftOverArrowPath = Controller.getInstance().getSelectedChapterDataControl().getBooksList().getBooks()[
+                leftOverArrowPath = Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
                     GameRources.GetInstance().selectedBookIndex].getArrowImagePath(BookDataControl.ARROW_LEFT,
                         BookDataControl.ARROW_OVER);
 
-                rightOverArrowPath = Controller.getInstance().getSelectedChapterDataControl().getBooksList().getBooks()[
+                rightOverArrowPath = Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
                     GameRources.GetInstance().selectedBookIndex].getArrowImagePath(BookDataControl.ARROW_RIGHT,
                         BookDataControl.ARROW_OVER);
             }
@@ -163,7 +163,7 @@ namespace uAdventure.Editor
                 {
                     BooksAppearanceEditor window =
                       (BooksAppearanceEditor)ScriptableObject.CreateInstance(typeof(BooksAppearanceEditor));
-                    window.Init(this, Controller.getInstance().getSelectedChapterDataControl().getBooksList().getBooks()[
+                    window.Init(this, Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
                     GameRources.GetInstance().selectedBookIndex]);
                 }
                 GUILayout.EndArea();
@@ -219,7 +219,7 @@ namespace uAdventure.Editor
         private void OnBackgroundChange(string val)
         {
             backgroundPath = val;
-            Controller.getInstance().getSelectedChapterDataControl().getBooksList().getBooks()[
+            Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
                     GameRources.GetInstance().selectedBookIndex].setPreviewImage(val);
             if (backgroundPath != null && !backgroundPath.Equals(""))
                 backgroundPreview =
@@ -228,7 +228,7 @@ namespace uAdventure.Editor
         private void OnArrowLeftNormalChange(string val)
         {
             leftNormalArrowPath = val;
-            Controller.getInstance().getSelectedChapterDataControl().getBooksList().getBooks()[
+            Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
                    GameRources.GetInstance().selectedBookIndex].setArrowImagePath(BookDataControl.ARROW_LEFT,
                        BookDataControl.ARROW_NORMAL, val);
 
@@ -236,21 +236,21 @@ namespace uAdventure.Editor
         private void OnArrowRightNormalChange(string val)
         {
             rightNormalArrowPath = val;
-            Controller.getInstance().getSelectedChapterDataControl().getBooksList().getBooks()[
+            Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
                    GameRources.GetInstance().selectedBookIndex].setArrowImagePath(BookDataControl.ARROW_RIGHT,
                        BookDataControl.ARROW_NORMAL, val);
         }
         private void OnArrowLeftOverChange(string val)
         {
             leftOverArrowPath = val;
-            Controller.getInstance().getSelectedChapterDataControl().getBooksList().getBooks()[
+            Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
                    GameRources.GetInstance().selectedBookIndex].setArrowImagePath(BookDataControl.ARROW_LEFT,
                        BookDataControl.ARROW_OVER, val);
         }
         private void OnArrowRightOverChange(string val)
         {
             rightOverArrowPath = val;
-            Controller.getInstance().getSelectedChapterDataControl().getBooksList().getBooks()[
+            Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
                    GameRources.GetInstance().selectedBookIndex].setArrowImagePath(BookDataControl.ARROW_RIGHT,
                        BookDataControl.ARROW_OVER, val);
         }

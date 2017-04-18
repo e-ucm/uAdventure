@@ -32,7 +32,7 @@ namespace uAdventure.Editor
             sceneRef = scene;
             calledItemIndexRef = areaIndex;
 
-            string backgroundPath = Controller.getInstance().getSelectedChapterDataControl().getScenesList()
+            string backgroundPath = Controller.Instance.SelectedChapterDataControl.getScenesList()
                 .getScenes()[GameRources.GetInstance().selectedSceneIndex].getPreviewBackground();
 
             backgroundPreviewTex = AssetsController.getImage(backgroundPath).texture;
@@ -44,7 +44,7 @@ namespace uAdventure.Editor
             objectsTex = new List<Sprite>();
             foreach (
                 ElementContainer element in
-                    Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                    Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                         GameRources.GetInstance().selectedSceneIndex].getReferencesList().getAllReferencesDataControl())
             {
                 Debug.Log(element.getImage());

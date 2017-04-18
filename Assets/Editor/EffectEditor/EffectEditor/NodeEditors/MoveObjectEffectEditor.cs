@@ -8,38 +8,21 @@ using uAdventure.Core;
 
 namespace uAdventure.Editor
 {
-    public class MoveObjectEffectEditor : EffectEditor
+    public class MoveObjectEffectEditor : AbstractItemEffectEditor
     {
-        private bool collapsed = false;
-        public bool Collapsed { get { return collapsed; } set { collapsed = value; } }
-        private Rect window = new Rect(0, 0, 300, 0);
         private string[] items;
         private string xString = "", yString = "", translateSpeed = "", scaleSpeed = "";
         private float floatScale;
-
-        public Rect Window
-        {
-            get
-            {
-                if (collapsed) return new Rect(window.x, window.y, 50, 30);
-                else return window;
-            }
-            set
-            {
-                if (collapsed) window = new Rect(value.x, value.y, window.width, window.height);
-                else window = value;
-            }
-        }
 
         private MoveObjectEffect effect;
 
         public MoveObjectEffectEditor()
         {
-            items = Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItemsIDs();
-            this.effect = new MoveObjectEffect(items[0], 300, 300, 1.0f, false, 1, 1);
+            items = Controller.Instance.SelectedChapterDataControl.getItemsList().getItemsIDs();
+            this.effect = new MoveObjectEffect(items.Length > 0 ? items[0] : "", 300, 300, 1.0f, false, 1, 1);
         }
 
-        public void draw()
+        public override void draw()
         {
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(TC.get("Element.Name19"));
@@ -75,11 +58,11 @@ namespace uAdventure.Editor
             EditorGUILayout.HelpBox(TC.get("MoveObjectEffect.Title"), MessageType.Info);
         }
 
-        public AbstractEffect Effect { get { return effect; } set { effect = value as MoveObjectEffect; } }
-        public string EffectName { get { return TC.get("Effect.MoveObject"); } }
-        public EffectEditor clone() { return new MoveObjectEffectEditor(); }
+        public override AbstractEffect Effect { get { return effect; } set { effect = value as MoveObjectEffect; } }
+        public override string EffectName { get { return TC.get("Effect.MoveObject"); } }
+        public override EffectEditor clone() { return new MoveObjectEffectEditor(); }
 
-        public bool manages(AbstractEffect c)
+        public override bool manages(AbstractEffect c)
         {
             return c.GetType() == effect.GetType();
         }

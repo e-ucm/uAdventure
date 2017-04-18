@@ -48,9 +48,9 @@ namespace uAdventure.Editor
 
             col_width = 0.8f / num_colums;
 
-            variables = Controller.getInstance().getVarFlagSummary().getVars();
+            variables = Controller.Instance.VarFlagSummary.getVars();
 
-            this.completables = Controller.getInstance().getSelectedChapterDataControl().getCompletables();
+            this.completables = Controller.Instance.SelectedChapterDataControl.getCompletables();
 
             foreach (Completable c in completables)
             {
@@ -74,7 +74,7 @@ namespace uAdventure.Editor
             tableRect = new Rect(0f, 200, 0.8f * windowWidth, windowHeight * 0.33f);
             rightPanelRect = new Rect(0.85f * windowWidth, 0.1f * windowHeight, 0.08f * windowWidth, 0.33f * windowHeight);
 
-			GUILayout.Label(TC.get("Analytics.GameStart") + Controller.getInstance().getSelectedChapterDataControl().getInitialScene());
+			GUILayout.Label(TC.get("Analytics.GameStart") + Controller.Instance.SelectedChapterDataControl.getInitialScene());
 			GUILayout.Label(TC.get("Analytics.GameEnd"));
 
             end = EditorGUILayout.Popup(end, endoptions);

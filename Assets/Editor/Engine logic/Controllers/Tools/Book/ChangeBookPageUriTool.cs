@@ -70,7 +70,7 @@ namespace uAdventure.Editor
         {
 
             bookPage.setUri(newURI);
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
 
@@ -79,7 +79,7 @@ namespace uAdventure.Editor
         {
 
             bookPage.setUri(oldURI);
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
     }

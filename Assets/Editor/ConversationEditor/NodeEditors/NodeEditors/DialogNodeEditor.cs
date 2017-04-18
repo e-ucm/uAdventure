@@ -42,8 +42,8 @@ namespace uAdventure.Editor
             myNode = new DialogueConversationNode();
             npc = new List<string>();
             npc.Add("Player");
-            if (Controller.getInstance().getSelectedChapterDataControl() != null)
-                npc.AddRange(Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCsIDs());
+            if (Controller.Instance.SelectedChapterDataControl!= null)
+                npc.AddRange(Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCsIDs());
 
             conditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/conditions-24x24", typeof(Texture2D));
             noConditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/no-conditions-24x24", typeof(Texture2D));

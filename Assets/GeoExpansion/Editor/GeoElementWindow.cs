@@ -164,7 +164,7 @@ namespace uAdventure.Geo
                 return;
             }
 
-            element = Controller.getInstance().getSelectedChapterDataControl().getObjects<GeoElement>()[selectedElement];
+            element = Controller.Instance.SelectedChapterDataControl.getObjects<GeoElement>()[selectedElement];
 
 
             actionsList.list = element.Actions;
@@ -260,7 +260,7 @@ namespace uAdventure.Geo
 
         protected override void OnAdd(ReorderableList r)
         {
-            Controller.getInstance().getSelectedChapterDataControl().getObjects<GeoElement>().Add(new GeoElement("newGeoElement"));
+            Controller.Instance.SelectedChapterDataControl.getObjects<GeoElement>().Add(new GeoElement("newGeoElement"));
         }
 
         protected override void OnAddOption(ReorderableList r, string option) { }
@@ -272,18 +272,18 @@ namespace uAdventure.Geo
 
         protected override void OnElementNameChanged(ReorderableList r, int index, string newName)
         {
-            Controller.getInstance().getSelectedChapterDataControl().getObjects<GeoElement>()[index].Id = newName;
+            Controller.Instance.SelectedChapterDataControl.getObjects<GeoElement>()[index].Id = newName;
         }
 
         protected override void OnRemove(ReorderableList r)
         {
-            Controller.getInstance().getSelectedChapterDataControl().getObjects<GeoElement>().RemoveAt(r.index);
+            Controller.Instance.SelectedChapterDataControl.getObjects<GeoElement>().RemoveAt(r.index);
         }
 
         protected override void OnReorder(ReorderableList r)
 		{
 			string idToMove = r.list [r.index] as string;
-			var temp = Controller.getInstance ().getSelectedChapterDataControl ().getObjects<GeoElement> ();
+			var temp = Controller.Instance .SelectedChapterDataControl .getObjects<GeoElement> ();
 			GeoElement toMove = temp.Find (geoElem => geoElem.getId () == idToMove);
 			temp.Remove (toMove);
 			temp.Insert (r.index, toMove);
@@ -293,12 +293,12 @@ namespace uAdventure.Geo
         {
             selectedElement = r.index;
             if(r.index >= 0 )
-                Center(Controller.getInstance().getSelectedChapterDataControl().getObjects<GeoElement>()[selectedElement]);
+                Center(Controller.Instance.SelectedChapterDataControl.getObjects<GeoElement>()[selectedElement]);
         }
 
         protected override void OnUpdateList(ReorderableList r)
         {
-            r.list = Controller.getInstance().getSelectedChapterDataControl().getObjects<GeoElement>().ConvertAll(s => s.Id);
+            r.list = Controller.Instance.SelectedChapterDataControl.getObjects<GeoElement>().ConvertAll(s => s.Id);
         }
 
         private void Center(GeoElement element)
@@ -338,7 +338,7 @@ namespace uAdventure.Geo
             {
                 case BaseFileOpenDialog.FileType.ITEM_IMAGE:
                     element.Image = message;
-                    Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                    Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                        GameRources.GetInstance().selectedSceneIndex].setPreviewBackground(message);
                     if (element.Image != null && !element.Image.Equals(""))
                         imagePreview = AssetsController.getImage(element.Image).texture;

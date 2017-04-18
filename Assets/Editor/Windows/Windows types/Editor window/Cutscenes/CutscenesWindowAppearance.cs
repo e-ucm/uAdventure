@@ -35,18 +35,18 @@ namespace uAdventure.Editor
             if (GameRources.GetInstance().selectedCutsceneIndex >= 0)
             {
                 slidesPath =
-                    Controller.getInstance().getSelectedChapterDataControl().getCutscenesList().getCutscenes()[
+                    Controller.Instance.SelectedChapterDataControl.getCutscenesList().getCutscenes()[
                         GameRources.GetInstance().selectedCutsceneIndex].getPathToSlides();
                 slidesPathPreview =
-                    Controller.getInstance().getSelectedChapterDataControl().getCutscenesList().getCutscenes()[
+                    Controller.Instance.SelectedChapterDataControl.getCutscenesList().getCutscenes()[
                         GameRources.GetInstance().selectedCutsceneIndex].getPreviewImage();
                 canSkipVideo =
                     canSkipVideoLast =
-                        Controller.getInstance().getSelectedChapterDataControl().getCutscenesList().getCutscenes()[
+                        Controller.Instance.SelectedChapterDataControl.getCutscenesList().getCutscenes()[
                             GameRources.GetInstance().selectedCutsceneIndex].getCanSkip();
                 // Get videopath
                 videoscenePath =
-                    Controller.getInstance().getSelectedChapterDataControl().getCutscenesList().getCutscenes()[
+                    Controller.Instance.SelectedChapterDataControl.getCutscenesList().getCutscenes()[
                         GameRources.GetInstance().selectedCutsceneIndex].getPathToVideo();
             }
 
@@ -71,7 +71,7 @@ namespace uAdventure.Editor
             /*
             * View for videoscene
             */
-            if (Controller.getInstance().getSelectedChapterDataControl().getCutscenesList().getCutscenes()[
+            if (Controller.Instance.SelectedChapterDataControl.getCutscenesList().getCutscenes()[
                 GameRources.GetInstance().selectedCutsceneIndex].isVideoscene())
             {
                 // Background chooser
@@ -146,7 +146,7 @@ namespace uAdventure.Editor
             GUILayout.Space(30);
 
             GUILayout.Label(TC.get("ImageAssets.Preview"));
-            if (Controller.getInstance().getSelectedChapterDataControl().getCutscenesList().getCutscenes()[
+            if (Controller.Instance.SelectedChapterDataControl.getCutscenesList().getCutscenes()[
                 GameRources.GetInstance().selectedCutsceneIndex].isVideoscene())
             {
                 if (slidePreviewMovie != null)
@@ -190,7 +190,7 @@ namespace uAdventure.Editor
             if (workingObject is CutsceneNameInputPopup)
             {
                 OnSlidesceneCreated(message);
-                Controller.getInstance().getSelectedChapterDataControl().getCutscenesList().getCutscenes()[
+                Controller.Instance.SelectedChapterDataControl.getCutscenesList().getCutscenes()[
                     GameRources.GetInstance().selectedCutsceneIndex].setPathToSlides(message);
                 EditCutscene();
                 return;
@@ -225,10 +225,10 @@ namespace uAdventure.Editor
         void OnSlidesceneChanged(string val)
         {
             slidesPath = val;
-            Controller.getInstance().getSelectedChapterDataControl().getCutscenesList().getCutscenes()[
+            Controller.Instance.SelectedChapterDataControl.getCutscenesList().getCutscenes()[
                 GameRources.GetInstance().selectedCutsceneIndex].setPathToSlides(val);
             slidesPathPreview =
-                Controller.getInstance().getSelectedChapterDataControl().getCutscenesList().getCutscenes()[
+                Controller.Instance.SelectedChapterDataControl.getCutscenesList().getCutscenes()[
                     GameRources.GetInstance().selectedCutsceneIndex].getPreviewImage();
             slidesPreview = AssetsController.getImage(slidesPathPreview).texture;
 
@@ -237,7 +237,7 @@ namespace uAdventure.Editor
         void OnVideosceneChanged(string val)
         {
             videoscenePath = val;
-            Controller.getInstance().getSelectedChapterDataControl().getCutscenesList().getCutscenes()[
+            Controller.Instance.SelectedChapterDataControl.getCutscenesList().getCutscenes()[
                 GameRources.GetInstance().selectedCutsceneIndex].setPathToVideo(val);
         }
 
@@ -255,7 +255,7 @@ namespace uAdventure.Editor
         void OnVideosceneCanSkipVideoChanged(bool val)
         {
             canSkipVideoLast = val;
-            Controller.getInstance().getSelectedChapterDataControl().getCutscenesList().getCutscenes()[
+            Controller.Instance.SelectedChapterDataControl.getCutscenesList().getCutscenes()[
                 GameRources.GetInstance().selectedCutsceneIndex].setCanSkip(val);
         }
 
@@ -263,7 +263,7 @@ namespace uAdventure.Editor
         {
             CutsceneSlidesEditor slidesEditor =
                 (CutsceneSlidesEditor)ScriptableObject.CreateInstance(typeof(CutsceneSlidesEditor));
-            slidesEditor.Init(this, Controller.getInstance().getSelectedChapterDataControl().getCutscenesList().getCutscenes()[
+            slidesEditor.Init(this, Controller.Instance.SelectedChapterDataControl.getCutscenesList().getCutscenes()[
                 GameRources.GetInstance().selectedCutsceneIndex].getPathToSlides());
         }
     }

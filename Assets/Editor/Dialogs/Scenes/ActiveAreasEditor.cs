@@ -31,7 +31,7 @@ namespace uAdventure.Editor
             calledAreaIndexRef = areaIndex;
 
             string backgroundPath =
-                Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                     GameRources.GetInstance().selectedSceneIndex].getPreviewBackground();
 
             backgroundPreviewTex = AssetsController.getImage(backgroundPath).texture;

@@ -72,7 +72,7 @@ namespace uAdventure.Editor
         {
 
             adventureData.getButtons().RemoveAt(index);
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
 
@@ -80,7 +80,7 @@ namespace uAdventure.Editor
         public override bool undoTool()
         {
             adventureData.getButtons().Insert(index, cursorDeleted);
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
     }

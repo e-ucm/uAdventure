@@ -48,7 +48,7 @@ namespace uAdventure.Editor
             
             if (GameRources.GetInstance().selectedSceneIndex >= 0)
                 backgroundPath =
-                    Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                    Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                         GameRources.GetInstance().selectedSceneIndex].getPreviewBackground();
             if (backgroundPath != null && !backgroundPath.Equals(""))
                 backgroundPreviewTex = AssetsController.getImage(backgroundPath).texture;
@@ -84,7 +84,7 @@ namespace uAdventure.Editor
             scrollPosition = GUILayout.BeginScrollView(scrollPosition);
             for (int i = 0;
                 i <
-                Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                     GameRources.GetInstance().selectedSceneIndex].getActiveAreasList().getActiveAreasList().Count;
                 i++)
             {
@@ -93,7 +93,7 @@ namespace uAdventure.Editor
 
                 GUILayout.BeginHorizontal();
 
-                if (GUILayout.Button(Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                if (GUILayout.Button(Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                     GameRources.GetInstance().selectedSceneIndex].getActiveAreasList().getActiveAreasList()[i].getId(),
                     GUILayout.Width(windowWidth * 0.54f)))
                 {
@@ -106,7 +106,7 @@ namespace uAdventure.Editor
 
                     ConditionEditorWindow window =
                         (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
-                    window.Init(Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                    window.Init(Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                         GameRources.GetInstance().selectedSceneIndex].getActiveAreasList().getActiveAreasList()[i]
                         .getConditions());
                 }
@@ -136,30 +136,30 @@ namespace uAdventure.Editor
             }
             if (GUILayout.Button(duplicateImg, GUILayout.MaxWidth(0.08f * windowWidth)))
             {
-                Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                     GameRources.GetInstance().selectedSceneIndex].getActiveAreasList()
-                    .duplicateElement(Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                    .duplicateElement(Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                         GameRources.GetInstance().selectedSceneIndex].getActiveAreasList().getActiveAreas()[selectedArea]);
             }
             if (GUILayout.Button(moveUp, GUILayout.MaxWidth(0.08f * windowWidth)))
             {
-                Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                     GameRources.GetInstance().selectedSceneIndex].getActiveAreasList()
-                    .moveElementUp(Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                    .moveElementUp(Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                         GameRources.GetInstance().selectedSceneIndex].getActiveAreasList().getActiveAreas()[selectedArea]);
             }
             if (GUILayout.Button(moveDown, GUILayout.MaxWidth(0.08f * windowWidth)))
             {
-                Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                     GameRources.GetInstance().selectedSceneIndex].getActiveAreasList()
-                    .moveElementDown(Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                    .moveElementDown(Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                         GameRources.GetInstance().selectedSceneIndex].getActiveAreasList().getActiveAreas()[selectedArea]);
             }
             if (GUILayout.Button(clearImg, GUILayout.MaxWidth(0.08f * windowWidth)))
             {
-                Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                     GameRources.GetInstance().selectedSceneIndex].getActiveAreasList()
-                    .deleteElement(Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                    .deleteElement(Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                         GameRources.GetInstance().selectedSceneIndex].getActiveAreasList().getActiveAreas()[selectedArea],
                         false);
                 if (selectedArea >= 0)
@@ -184,7 +184,7 @@ namespace uAdventure.Editor
             {
                 // Action table
                 for (int i = 0;
-                    i < Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                    i < Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                         GameRources.GetInstance().selectedSceneIndex].getActiveAreasList().getActiveAreas()[selectedArea]
                         .getActionsList().getActions().Count;
                     i++)
@@ -199,12 +199,12 @@ namespace uAdventure.Editor
                     {
 
                         GUILayout.Label(
-                            Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                            Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                                 GameRources.GetInstance().selectedSceneIndex].getActiveAreasList().getActiveAreas()[
                                     selectedArea
                                 ].getActionsList().getActions()[i].getTypeName(),
                             GUILayout.Width(windowWidth * 0.39f));
-                        if (Controller.getInstance().playerMode() == Controller.FILE_ADVENTURE_1STPERSON_PLAYER)
+                        if (Controller.Instance.playerMode() == Controller.FILE_ADVENTURE_1STPERSON_PLAYER)
                         {
                             if (GUILayout.Button(TC.get("ActionsList.NotRelevant"), GUILayout.Width(windowWidth * 0.39f)))
                             {
@@ -214,24 +214,20 @@ namespace uAdventure.Editor
                         else
                         {
                             GUILayout.BeginHorizontal(GUILayout.Width(windowWidth * 0.39f));
-                            Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                            Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                                 GameRources.GetInstance().selectedSceneIndex].getActiveAreasList().getActiveAreas()[
                                     selectedArea].getActionsList().getActions()[i].setNeedsGoTo(
                                         GUILayout.Toggle(
-                                            Controller.getInstance()
-                                                .getSelectedChapterDataControl()
-                                                .getScenesList()
+                                            Controller.Instance                                                .SelectedChapterDataControl                                                .getScenesList()
                                                 .getScenes()[
                                                     GameRources.GetInstance().selectedSceneIndex].getActiveAreasList()
                                                 .getActiveAreas()[selectedArea].getActionsList().getActions()[i]
                                                 .getNeedsGoTo(), ""));
-                            Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                            Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                                 GameRources.GetInstance().selectedSceneIndex].getActiveAreasList().getActiveAreas()[
                                     selectedArea].getActionsList().getActions()[i].setKeepDistance(
                                         EditorGUILayout.IntField(
-                                            Controller.getInstance()
-                                                .getSelectedChapterDataControl()
-                                                .getScenesList()
+                                            Controller.Instance                                                .SelectedChapterDataControl                                                .getScenesList()
                                                 .getScenes()[
                                                     GameRources.GetInstance().selectedSceneIndex].getActiveAreasList()
                                                 .getActiveAreas()[selectedArea].getActionsList().getActions()[i]
@@ -247,7 +243,7 @@ namespace uAdventure.Editor
                             ConditionEditorWindow window =
                                 (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
                             window.Init(
-                                Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                                Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                                     GameRources.GetInstance().selectedSceneIndex].getActiveAreasList().getActiveAreas()[
                                         selectedArea
                                     ].getActionsList().getActions()[i].getConditions());
@@ -257,7 +253,7 @@ namespace uAdventure.Editor
                             EffectEditorWindow window =
                                 (EffectEditorWindow)ScriptableObject.CreateInstance(typeof(EffectEditorWindow));
                             window.Init(
-                                Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                                Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                                     GameRources.GetInstance().selectedSceneIndex].getActiveAreasList().getActiveAreas()[
                                         selectedArea
                                     ].getActionsList().getActions()[i].getEffects());
@@ -267,7 +263,7 @@ namespace uAdventure.Editor
                             EffectEditorWindow window =
                                 (EffectEditorWindow)ScriptableObject.CreateInstance(typeof(EffectEditorWindow));
                             window.Init(
-                                Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                                Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                                     GameRources.GetInstance().selectedSceneIndex].getActiveAreasList().getActiveAreas()[
                                         selectedArea
                                     ].getActionsList().getActions()[i].getNotEffectsController());
@@ -278,7 +274,7 @@ namespace uAdventure.Editor
                     {
                         if (
                             GUILayout.Button(
-                                Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                                Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                                     GameRources.GetInstance().selectedSceneIndex].getActiveAreasList().getActiveAreas()[
                                         selectedArea].getActionsList().getActions()[i].getTypeName(),
                                 GUILayout.Width(windowWidth * 0.39f)))
@@ -286,7 +282,7 @@ namespace uAdventure.Editor
                             selectedAction = i;
                         }
 
-                        if (Controller.getInstance().playerMode() == Controller.FILE_ADVENTURE_1STPERSON_PLAYER)
+                        if (Controller.Instance.playerMode() == Controller.FILE_ADVENTURE_1STPERSON_PLAYER)
                         {
                             if (GUILayout.Button(TC.get("ActionsList.NotRelevant"), GUILayout.Width(windowWidth * 0.39f)))
                             {
@@ -297,7 +293,7 @@ namespace uAdventure.Editor
                         {
                             if (
                                 GUILayout.Button(
-                                    Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                                    Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                                         GameRources.GetInstance().selectedSceneIndex].getActiveAreasList().getActiveAreas()[
                                             selectedArea].getActionsList().getActions()[i].getNeedsGoTo().ToString(),
                                     GUILayout.Width(windowWidth * 0.39f)))
@@ -325,19 +321,19 @@ namespace uAdventure.Editor
             }
             if (GUILayout.Button(duplicateImg, GUILayout.MaxWidth(0.08f * windowWidth)))
             {
-                Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                     GameRources.GetInstance().selectedSceneIndex].getActiveAreasList().getActiveAreas()[selectedArea]
                     .getActionsList()
-                    .duplicateElement(Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                    .duplicateElement(Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                         GameRources.GetInstance().selectedSceneIndex].getActiveAreasList().getActiveAreas()[selectedArea]
                         .getActionsList().getActions()[selectedAction]);
             }
             if (GUILayout.Button(clearImg, GUILayout.MaxWidth(0.08f * windowWidth)))
             {
-                Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                     GameRources.GetInstance().selectedSceneIndex].getActiveAreasList().getActiveAreas()[selectedArea]
                     .getActionsList()
-                    .deleteElement(Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                    .deleteElement(Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                         GameRources.GetInstance().selectedSceneIndex].getActiveAreasList().getActiveAreas()[selectedArea]
                         .getActionsList().getActions()[selectedAction], false);
                 if (selectedAction >= 0)
@@ -359,7 +355,7 @@ namespace uAdventure.Editor
                 {
                     ActiveAreasEditor window =
                         (ActiveAreasEditor)ScriptableObject.CreateInstance(typeof(ActiveAreasEditor));
-                    window.Init(this, Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                    window.Init(this, Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                         GameRources.GetInstance().selectedSceneIndex], selectedArea);
                 }
                 GUILayout.EndArea();
@@ -385,7 +381,7 @@ namespace uAdventure.Editor
         {
             if (workingObject is ActiveAreaNewName)
             {
-                Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                     GameRources.GetInstance().selectedSceneIndex].getActiveAreasList()
                     .addElement(Controller.ACTIVE_AREA, message);
             }
@@ -457,7 +453,7 @@ namespace uAdventure.Editor
 
             public void OnCliked()
             {
-                Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                     GameRources.GetInstance().selectedSceneIndex].getActiveAreasList().getActiveAreas()[
                         AddItemActionMenu.GetSelectedActiveArea()].getActionsList().addElement(Controller.ACTION_USE, "");
             }
@@ -474,7 +470,7 @@ namespace uAdventure.Editor
 
             public void OnCliked()
             {
-                Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                     GameRources.GetInstance().selectedSceneIndex].getActiveAreasList().getActiveAreas()[
                         AddItemActionMenu.GetSelectedActiveArea()].getActionsList()
                     .addElement(Controller.ACTION_EXAMINE, "");
@@ -492,7 +488,7 @@ namespace uAdventure.Editor
 
             public void OnCliked()
             {
-                Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                     GameRources.GetInstance().selectedSceneIndex].getActiveAreasList().getActiveAreas()[
                         AddItemActionMenu.GetSelectedActiveArea()].getActionsList().addElement(Controller.ACTION_GRAB, "");
             }
@@ -510,7 +506,7 @@ namespace uAdventure.Editor
             public void OnCliked()
             {
 
-                Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                     GameRources.GetInstance().selectedSceneIndex].getActiveAreasList().getActiveAreas()[
                         AddItemActionMenu.GetSelectedActiveArea()].getActionsList().addElement(Controller.ACTION_CUSTOM, "");
             }

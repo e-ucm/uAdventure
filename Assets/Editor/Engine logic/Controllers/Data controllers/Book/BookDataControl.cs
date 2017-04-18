@@ -301,7 +301,7 @@ namespace uAdventure.Editor
 
             if (type == Controller.RESOURCES)
             {
-                elementAdded = Controller.getInstance().addTool(new AddResourcesBlockTool(resourcesList, resourcesDataControlList, Controller.BOOK, this));
+                elementAdded = Controller.Instance.addTool(new AddResourcesBlockTool(resourcesList, resourcesDataControlList, Controller.BOOK, this));
             }
 
             return elementAdded;
@@ -372,8 +372,8 @@ namespace uAdventure.Editor
 					
 				book.setId(newBookId);
                 controller.replaceIdentifierReferences(oldBookId, newBookId);
-                controller.getIdentifierSummary().deleteBookId(oldBookId);
-                controller.getIdentifierSummary().addBookId(newBookId);
+                controller.IdentifierSummary.deleteBookId(oldBookId);
+                controller.IdentifierSummary.addBookId(newBookId);
 				//controller.dataModified( );
 				return newBookId;
             }

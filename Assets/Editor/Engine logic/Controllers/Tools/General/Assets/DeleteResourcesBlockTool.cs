@@ -87,7 +87,7 @@ namespace uAdventure.Editor
 
             // If it was the last one, show an error message
             else
-                Controller.getInstance().showErrorDialog(TC.get("Operation.DeleteResourcesTitle"), TC.get("Operation.DeleteResourcesErrorLastResources"));
+                Controller.Instance.showErrorDialog(TC.get("Operation.DeleteResourcesTitle"), TC.get("Operation.DeleteResourcesErrorLastResources"));
 
             return elementDeleted;
         }
@@ -98,7 +98,7 @@ namespace uAdventure.Editor
 
             bool redone = doTool();
             if (redone)
-                Controller.getInstance().updatePanel();
+                Controller.Instance.updatePanel();
             return redone;
         }
 
@@ -110,7 +110,7 @@ namespace uAdventure.Editor
             resourcesList.Insert(resourcesIndex, (ResourcesUni)dataControl.getContent());
             resourcesDataControlList.Insert(resourcesIndex, (ResourcesDataControl)dataControl);
             parentDataControl.setSelectedResources(lastSelectedResources);
-            Controller.getInstance().reloadPanel();
+            Controller.Instance.reloadPanel();
             return true;
         }
     }

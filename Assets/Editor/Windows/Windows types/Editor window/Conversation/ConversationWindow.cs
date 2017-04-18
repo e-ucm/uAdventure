@@ -34,9 +34,9 @@ namespace uAdventure.Editor
 			//if (editor == null) {
 
 			GUILayout.Space (30);
-			for (int i = 0; i < Controller.getInstance ().getCharapterList ().getSelectedChapterDataControl ().getConversationsList ().getConversations ().Count; i++) {
+			for (int i = 0; i < Controller.Instance .ChapterList .getSelectedChapterDataControl ().getConversationsList ().getConversations ().Count; i++) {
 				GUILayout.BeginHorizontal ();
-				GUILayout.Box (Controller.getInstance ().getCharapterList ().getSelectedChapterDataControl ().getConversationsList ().getConversations () [i].getId (), GUILayout.Width (windowWidth * 0.65f));
+				GUILayout.Box (Controller.Instance .ChapterList .getSelectedChapterDataControl ().getConversationsList ().getConversations () [i].getId (), GUILayout.Width (windowWidth * 0.65f));
 				if (GUILayout.Button ("Edit conversation", GUILayout.MaxWidth (windowWidth * 0.3f))) {
 					GameRources.GetInstance ().selectedConversationIndex = i;
 					GetConversationEditor (GameRources.GetInstance ().selectedConversationIndex, true);
@@ -54,17 +54,13 @@ namespace uAdventure.Editor
         {
             GameRources.GetInstance().selectedConversationIndex = conversationIndex;
 			if (conversationIndex < 0 
-				|| conversationIndex >= Controller.getInstance()
-					.getCharapterList()
-					.getSelectedChapterDataControl()
+				|| conversationIndex >= Controller.Instance					.ChapterList					.getSelectedChapterDataControl()
 					.getConversationsList ()
 					.getConversations().Count)
                 return null;
 
 			var conversation = Controller
-				.getInstance()
-				.getCharapterList()
-				.getSelectedChapterDataControl()
+				.Instance				.ChapterList				.getSelectedChapterDataControl()
 				.getConversationsList ()
 				.getConversations()[conversationIndex]
 				.getConversation ();
@@ -86,27 +82,23 @@ namespace uAdventure.Editor
 
         protected override void OnElementNameChanged(ReorderableList r, int index, string newName)
         {
-			Controller.getInstance().getCharapterList().getSelectedChapterDataControl().getConversationsList().getConversations ()[index].renameElement(newName);
+			Controller.Instance.ChapterList.getSelectedChapterDataControl().getConversationsList().getConversations ()[index].renameElement(newName);
         }
 
         protected override void OnAdd(ReorderableList r)
         {
             if (r.index != -1 && r.index < r.list.Count)
             {
-                Controller.getInstance()
-                           .getCharapterList()
-                           .getSelectedChapterDataControl()
+                Controller.Instance                           .ChapterList                           .getSelectedChapterDataControl()
                            .getConversationsList()
                            .duplicateElement(
-                               Controller.getInstance()
-                                   .getCharapterList()
-                                   .getSelectedChapterDataControl()
+                               Controller.Instance                                   .ChapterList                                   .getSelectedChapterDataControl()
                                    .getConversationsList()
                                    .getConversations()[r.index]);
             }
             else
             {
-                Controller.getInstance().getSelectedChapterDataControl().getConversationsList().addElement(Controller.CONVERSATION_GRAPH, "newConversation");
+                Controller.Instance.SelectedChapterDataControl.getConversationsList().addElement(Controller.CONVERSATION_GRAPH, "newConversation");
             }
 
         }
@@ -117,9 +109,7 @@ namespace uAdventure.Editor
         {
             if (r.index != -1)
             {
-                var conv = Controller.getInstance()
-                                      .getCharapterList()
-                                      .getSelectedChapterDataControl()
+                var conv = Controller.Instance                                      .ChapterList                                      .getSelectedChapterDataControl()
                                       .getConversationsList()
                                       .getConversations()[r.index];
 
@@ -129,9 +119,7 @@ namespace uAdventure.Editor
                     conversationWindows.Remove(conv.getConversation());
                 }
 
-                Controller.getInstance()
-                              .getCharapterList()
-                              .getSelectedChapterDataControl()
+                Controller.Instance                              .ChapterList                              .getSelectedChapterDataControl()
                               .getConversationsList()
                               .deleteElement(conv, false);
                 
@@ -145,8 +133,7 @@ namespace uAdventure.Editor
 
         protected override void OnReorder(ReorderableList r)
         {
-			var dataControlList = Controller.getInstance ()
-				.getCharapterList ().getSelectedChapterDataControl ().getConversationsList ();
+			var dataControlList = Controller.Instance 				.ChapterList .getSelectedChapterDataControl ().getConversationsList ();
 
 			var toPos = r.index;
 			var fromPos = dataControlList.getConversations ().FindIndex (i => i.getId () == r.list [r.index] as string);
@@ -161,7 +148,7 @@ namespace uAdventure.Editor
 
         protected override void OnUpdateList(ReorderableList r)
         {
-			Elements = Controller.getInstance().getCharapterList().getSelectedChapterDataControl().getConversationsList ().getConversations().ConvertAll(s => s.getId());
+			Elements = Controller.Instance.ChapterList.getSelectedChapterDataControl().getConversationsList ().getConversations().ConvertAll(s => s.getId());
         }
     }
 }

@@ -152,9 +152,9 @@ namespace uAdventure.Editor
             //{
             set.Invoke(data, new object[] { newValue });
             if (updateTree)
-                Controller.getInstance().updateStructure();
+                Controller.Instance.updateStructure();
             if (updatePanel)
-                Controller.getInstance().updatePanel();
+                Controller.Instance.updatePanel();
             done = true;
             //}
             //catch (Exception e)
@@ -172,9 +172,9 @@ namespace uAdventure.Editor
             //{
             set.Invoke(data, new object[] { oldValue });
             if (updateTree)
-                Controller.getInstance().updateStructure();
+                Controller.Instance.updateStructure();
             if (updatePanel)
-                Controller.getInstance().updatePanel();
+                Controller.Instance.updatePanel();
             done = true;
             //}
             //catch (Exception e)

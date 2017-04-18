@@ -55,7 +55,7 @@ namespace uAdventure.Editor
             this.resources = resources;
             this.assetsInformation = assetsInformation;
             this.resourcesType = resourcesType;
-            this.controller = Controller.getInstance();
+            this.controller = Controller.Instance;
             this.index = index;
             this.oldResourcesUni = resources;
         }

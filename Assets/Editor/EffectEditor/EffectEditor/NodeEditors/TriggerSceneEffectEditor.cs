@@ -32,8 +32,7 @@ namespace uAdventure.Editor
 
         public TriggerSceneEffectEditor()
         {
-            scenes = Controller.getInstance().getSelectedChapterDataControl()
-                .getObjects()
+            scenes = Controller.Instance.SelectedChapterDataControl.getObjects()
                 .FindAll(o => o is IChapterTarget)
                 .ConvertAll(t => (t as IChapterTarget).getId())
                 .ToArray();
@@ -66,5 +65,6 @@ namespace uAdventure.Editor
         {
             return c.GetType() == effect.GetType();
         }
+        public virtual bool Usable { get { return true; } }
     }
 }

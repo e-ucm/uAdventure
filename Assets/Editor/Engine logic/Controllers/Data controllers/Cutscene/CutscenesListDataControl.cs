@@ -193,7 +193,7 @@ namespace uAdventure.Editor
                 // Add the new cutscene
                 cutscenesList.Add(newCutscene);
                 cutscenesDataControlList.Add(new CutsceneDataControl(newCutscene));
-                controller.getIdentifierSummary().addCutsceneId(cutsceneId);
+                controller.IdentifierSummary.addCutsceneId(cutsceneId);
                 //controller.dataModified( );
                 elementAdded = true;
             }
@@ -218,7 +218,7 @@ namespace uAdventure.Editor
                 // Add the new cutscene
                 cutscenesList.Add(newCutscene);
                 cutscenesDataControlList.Add(new CutsceneDataControl(newCutscene));
-                controller.getIdentifierSummary().addCutsceneId(cutsceneId);
+                controller.IdentifierSummary.addCutsceneId(cutsceneId);
                 //controller.dataModified( );
                 elementAdded = true;
             }
@@ -241,7 +241,7 @@ namespace uAdventure.Editor
             bool elementDeleted = false;
 
             // Take the number of general scenes in the chapter
-			int generalScenesCount = controller.getIdentifierSummary().groupIds<IChapterTarget> ().Length;
+			int generalScenesCount = controller.IdentifierSummary.groupIds<IChapterTarget> ().Length;
 
             // If there are at least two scenes, this one can be deleted
             if (generalScenesCount > 1)
@@ -258,7 +258,7 @@ namespace uAdventure.Editor
                     {
                         cutscenesDataControlList.Remove((CutsceneDataControl)dataControl);
                         controller.deleteIdentifierReferences(cutsceneId);
-                        controller.getIdentifierSummary().deleteCutsceneId(cutsceneId);
+                        controller.IdentifierSummary.deleteCutsceneId(cutsceneId);
                         //controller.dataModified( );
                         elementDeleted = true;
                     }
@@ -441,7 +441,7 @@ namespace uAdventure.Editor
 			clone.setId(id);
 			cutscenesList.Add(clone);
 			cutscenesDataControlList.Add(new CutsceneDataControl(clone));
-			controller.getIdentifierSummary().addSceneId(id);
+			controller.IdentifierSummary.addSceneId(id);
 			return true;
 		}
 

@@ -30,9 +30,9 @@ namespace uAdventure.Editor
 
         public TriggerConversationEffectEditor()
         {
-            conversations = Controller.getInstance().getSelectedChapterDataControl().getConversationsList().getConversationsIDs();
+            conversations = Controller.Instance.SelectedChapterDataControl.getConversationsList().getConversationsIDs();
             Debug.Log(conversations.Length);
-            this.effect = new TriggerConversationEffect(conversations[0]);
+            this.effect = new TriggerConversationEffect(conversations.Length > 0 ? conversations[0] : "");
         }
 
         public void draw()
@@ -50,6 +50,15 @@ namespace uAdventure.Editor
 
         public AbstractEffect Effect { get { return effect; } set { effect = value as TriggerConversationEffect; } }
         public string EffectName { get { return TC.get("TriggerConversationEffect.Title"); } }
+
+        public bool Usable
+        {
+            get
+            {
+                return Controller.Instance.SelectedChapterDataControl.getConversationsList().getConversationsIDs().Length > 0;
+            }
+        }
+
         public EffectEditor clone() { return new TriggerConversationEffectEditor(); }
 
         public bool manages(AbstractEffect c)

@@ -22,7 +22,7 @@ namespace uAdventure.Editor
 
             this.detailed = described;
             this.description = description;
-            this.controller = Controller.getInstance();
+            this.controller = Controller.Instance;
         }
 
 

@@ -58,7 +58,7 @@ namespace uAdventure.Editor
 
             BookPage newBookPage = new BookPage("", defaultType, defaultMargin, defaultScrollable);
 
-            Controller.getInstance().addTool(new AddBookPageTool(bookPagesList, newBookPage, selectedPage));
+            Controller.Instance.addTool(new AddBookPageTool(bookPagesList, newBookPage, selectedPage));
 
             selectedPage = bookPagesList.IndexOf(newBookPage);
 
@@ -68,21 +68,21 @@ namespace uAdventure.Editor
         public bool deletePage(BookPage page)
         {
 
-            Controller.getInstance().addTool(new DeleteBookPageTool(bookPagesList, page));
+            Controller.Instance.addTool(new DeleteBookPageTool(bookPagesList, page));
             return true;
         }
 
         public bool movePageUp(BookPage page)
         {
 
-            Controller.getInstance().addTool(new MoveBookPageUpTool(bookPagesList, page));
+            Controller.Instance.addTool(new MoveBookPageUpTool(bookPagesList, page));
             return true;
         }
 
         public bool movePageDown(BookPage page)
         {
 
-            Controller.getInstance().addTool(new MoveBookPageDownTool(bookPagesList, page));
+            Controller.Instance.addTool(new MoveBookPageDownTool(bookPagesList, page));
             return true;
         }
 
@@ -273,7 +273,7 @@ namespace uAdventure.Editor
 
             if (selectedPage >= 0 && selectedPage < bookPagesList.Count && bookPagesList[selectedPage].getType() == BookPage.TYPE_URL)
             {
-                Controller.getInstance().addTool(new ChangeBookPageUriTool(bookPagesList[selectedPage], newURL));
+                Controller.Instance.addTool(new ChangeBookPageUriTool(bookPagesList[selectedPage], newURL));
                 return true;
             }
             return false;
@@ -285,7 +285,7 @@ namespace uAdventure.Editor
             bool typeSet = false;
             if (selectedPage >= 0 && selectedPage < bookPagesList.Count && newType != bookPagesList[selectedPage].getType())
             {
-                Controller.getInstance().addTool(new ChangeBookPageTypeTool(bookPagesList[selectedPage], newType));
+                Controller.Instance.addTool(new ChangeBookPageTypeTool(bookPagesList[selectedPage], newType));
                 typeSet = true;
             }
             return typeSet;
@@ -296,7 +296,7 @@ namespace uAdventure.Editor
 
             if (selectedPage >= 0 && selectedPage < bookPagesList.Count)
             {
-                Controller.getInstance().addTool(new ChangeBookPageMarginsTool(bookPagesList[selectedPage], newMargin, newMarginTop, newMarginBottom, newMarginEnd));
+                Controller.Instance.addTool(new ChangeBookPageMarginsTool(bookPagesList[selectedPage], newMargin, newMarginTop, newMarginBottom, newMarginEnd));
             }
         }
 
@@ -305,7 +305,7 @@ namespace uAdventure.Editor
 
             if (selectedPage >= 0 && selectedPage < bookPagesList.Count)
             {
-                Controller.getInstance().addTool(new ChangeBookPageScrollableTool(bookPagesList[selectedPage], scrollable));
+                Controller.Instance.addTool(new ChangeBookPageScrollableTool(bookPagesList[selectedPage], scrollable));
             }
         }
 

@@ -81,7 +81,7 @@ namespace uAdventure.Editor
             resourcesList.Add(newElement);
             resourcesDataControlList.Add(newDataControl);
             parent.setSelectedResources(resourcesList.Count - 1);
-            Controller.getInstance().reloadPanel();
+            Controller.Instance.reloadPanel();
             return true;
         }
 
@@ -93,7 +93,7 @@ namespace uAdventure.Editor
             if (undone)
             {
                 parent.setSelectedResources(resourcesList.Count - 1);
-                Controller.getInstance().reloadPanel();
+                Controller.Instance.reloadPanel();
             }
             return undone;
         }

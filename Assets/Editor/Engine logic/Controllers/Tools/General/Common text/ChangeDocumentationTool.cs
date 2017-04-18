@@ -20,7 +20,7 @@ namespace uAdventure.Editor
 
             this.documented = documented;
             this.documentation = documentation;
-            this.controller = Controller.getInstance();
+            this.controller = Controller.Instance;
         }
 
         public override bool canRedo()

@@ -167,11 +167,11 @@ namespace uAdventure.Core
             try
             {
                 Properties newstrings = new Properties(languageFile);
-                foreach (string key in newstrings.getKeyset())
+                foreach (string key in newstrings.KeySet)
                 {
                     if (guistrings.ContainsKey(key))
                         guistrings.Remove(key);
-                    guistrings.Add(key, newstrings.getProperty(key));
+                    guistrings.Add(key, newstrings.GetProperty(key));
                 }
             }
 

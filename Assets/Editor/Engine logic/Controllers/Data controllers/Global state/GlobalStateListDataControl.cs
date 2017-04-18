@@ -81,7 +81,7 @@ namespace uAdventure.Editor
             {
                 GlobalState globalState = globalStatesList[i];
                 globalStatesInfo[i][0] = globalState.getId();
-                globalStatesInfo[i][1] = Controller.getInstance().countIdentifierReferences(globalState.getId()).ToString();
+                globalStatesInfo[i][1] = Controller.Instance.countIdentifierReferences(globalState.getId()).ToString();
             }
 
             return globalStatesInfo;
@@ -166,7 +166,7 @@ namespace uAdventure.Editor
                     GlobalState newGlobalState = new GlobalState(globalStateId);
                     globalStatesList.Add(newGlobalState);
                     globalStatesDataControlList.Add(new GlobalStateDataControl(newGlobalState));
-                    controller.getIdentifierSummary().addGlobalStateId(globalStateId);
+                    controller.IdentifierSummary.addGlobalStateId(globalStateId);
                     //controller.dataModified( );
                     elementAdded = true;
                 }
@@ -193,7 +193,7 @@ namespace uAdventure.Editor
             newElement.setId(id);
             globalStatesList.Add(newElement);
             globalStatesDataControlList.Add(new GlobalStateDataControl(newElement));
-            controller.getIdentifierSummary().addGlobalStateId(id);
+            controller.IdentifierSummary.addGlobalStateId(id);
             return true;
         }
 
@@ -219,7 +219,7 @@ namespace uAdventure.Editor
                 {
                     globalStatesDataControlList.Remove((GlobalStateDataControl)dataControl);
                     controller.deleteIdentifierReferences(globalStateId);
-                    controller.getIdentifierSummary().deleteGlobalStateId(globalStateId);
+                    controller.IdentifierSummary.deleteGlobalStateId(globalStateId);
                     //controller.dataModified( );
                     elementDeleted = true;
                 }

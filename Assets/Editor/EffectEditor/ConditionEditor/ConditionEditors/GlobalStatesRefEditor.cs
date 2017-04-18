@@ -16,7 +16,7 @@ namespace uAdventure.Editor
 
         public GlobalStatesRefEditor()
         {
-            states = Controller.getInstance().getSelectedChapterDataControl().getGlobalStatesListDataControl().getGlobalStatesIds();
+            states = Controller.Instance.SelectedChapterDataControl.getGlobalStatesListDataControl().getGlobalStatesIds();
             if (states == null || states.Length == 0)
             {
                 Avaiable = false;

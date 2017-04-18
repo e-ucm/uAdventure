@@ -58,7 +58,7 @@ namespace uAdventure.Editor
         {
 
             bookPage.setScrollable(newScrollable);
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
 
@@ -67,7 +67,7 @@ namespace uAdventure.Editor
         {
 
             bookPage.setScrollable(oldScrollable);
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
     }

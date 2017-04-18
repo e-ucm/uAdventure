@@ -13,7 +13,7 @@ namespace uAdventure.Editor
 
         public void showErrorDialog(string title, string message)
         {
-            Controller.getInstance().showErrorDialog(title, message);
+            Controller.Instance.showErrorDialog(title, message);
         }
     }
 }

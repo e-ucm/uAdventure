@@ -164,7 +164,7 @@ namespace uAdventure.Geo
 
         private GeoElement FindGeoElem(string id)
         {
-            return Controller.getInstance().getSelectedChapterDataControl().getObjects<GeoElement>().Find(e => e.Id == id);
+            return Controller.Instance.SelectedChapterDataControl.getObjects<GeoElement>().Find(e => e.Id == id);
         }
 
         private DataControlWithResources FindExtElem(string id)
@@ -177,7 +177,7 @@ namespace uAdventure.Geo
         // -----------------------------
         protected override void OnAdd(ReorderableList r)
         {
-            Controller.getInstance().getSelectedChapterDataControl().getObjects<MapScene>().Add(new MapScene("newMapscene"));
+            Controller.Instance.SelectedChapterDataControl.getObjects<MapScene>().Add(new MapScene("newMapscene"));
         }
 
         protected override void OnAddOption(ReorderableList r, string option) { }
@@ -189,18 +189,18 @@ namespace uAdventure.Geo
 
         protected override void OnElementNameChanged(ReorderableList r, int index, string newName)
         {
-            Controller.getInstance().getSelectedChapterDataControl().getObjects<MapScene>()[index].Id = newName;
+            Controller.Instance.SelectedChapterDataControl.getObjects<MapScene>()[index].Id = newName;
         }
 
         protected override void OnRemove(ReorderableList r)
         {
-            Controller.getInstance().getSelectedChapterDataControl().getObjects<MapScene>().RemoveAt(r.index);
+            Controller.Instance.SelectedChapterDataControl.getObjects<MapScene>().RemoveAt(r.index);
         }
 
         protected override void OnReorder(ReorderableList r) 
 		{ 
 			string idToMove = r.list [r.index] as string;
-			var temp = Controller.getInstance ().getSelectedChapterDataControl ().getObjects<MapScene> ();
+			var temp = Controller.Instance .SelectedChapterDataControl .getObjects<MapScene> ();
 			MapScene toMove = temp.Find (map => map.getId () == idToMove);
 			temp.Remove (toMove);
 			temp.Insert (r.index, toMove);
@@ -212,7 +212,7 @@ namespace uAdventure.Geo
 
             if (selectedElement != -1)
             {
-                mapScene = Controller.getInstance().getSelectedChapterDataControl().getObjects<MapScene>()[selectedElement];
+                mapScene = Controller.Instance.SelectedChapterDataControl.getObjects<MapScene>()[selectedElement];
                 // Set geometries list reference
                 mapElementReorderableList.list = mapScene.Elements;
                 // Update map resources
@@ -222,7 +222,7 @@ namespace uAdventure.Geo
 
         protected override void OnUpdateList(ReorderableList r)
         {
-            r.list = Controller.getInstance().getSelectedChapterDataControl().getObjects<MapScene>().ConvertAll(s => s.Id);
+            r.list = Controller.Instance.SelectedChapterDataControl.getObjects<MapScene>().ConvertAll(s => s.Id);
         }
 
 
@@ -265,7 +265,7 @@ namespace uAdventure.Geo
             if (mapElement is GeoReference)
             {
                 var geoReference = mapElement as GeoReference;
-                var geoElement = Controller.getInstance().getSelectedChapterDataControl().getObjects<GeoElement>().Find(e => e.Id == geoReference.getTargetId());
+                var geoElement = Controller.Instance.SelectedChapterDataControl.getObjects<GeoElement>().Find(e => e.Id == geoReference.getTargetId());
                 if (geoElement != null && geoElement.Geometry.Points.Count > 0)
                 {
                     center = geoElement.Geometry.Center;
@@ -325,15 +325,15 @@ namespace uAdventure.Geo
         private object findExternalReferenceById(string id)
         {
             // TODO extend here
-            var item = Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems().Find(i => i.getId() == id);
+            var item = Controller.Instance.SelectedChapterDataControl.getItemsList().getItems().Find(i => i.getId() == id);
             if (item != null)
                 return item;
 
-            var atrezzo = Controller.getInstance().getSelectedChapterDataControl().getAtrezzoList().getAtrezzoList().Find(a => a.getId() == id);
+            var atrezzo = Controller.Instance.SelectedChapterDataControl.getAtrezzoList().getAtrezzoList().Find(a => a.getId() == id);
             if (atrezzo != null)
                 return atrezzo;
 
-            var npc = Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPC(id);
+            var npc = Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPC(id);
             if (npc != null)
                 return npc;
 
@@ -344,9 +344,9 @@ namespace uAdventure.Geo
         {
             var all = new List<DataControlWithResources>();
 
-            all.AddRange(Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems().ConvertAll(i => i as DataControlWithResources));
-            all.AddRange(Controller.getInstance().getSelectedChapterDataControl().getAtrezzoList().getAtrezzoList().ConvertAll(i => i as DataControlWithResources));
-            all.AddRange(Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs().ConvertAll(i => i as DataControlWithResources));
+            all.AddRange(Controller.Instance.SelectedChapterDataControl.getItemsList().getItems().ConvertAll(i => i as DataControlWithResources));
+            all.AddRange(Controller.Instance.SelectedChapterDataControl.getAtrezzoList().getAtrezzoList().ConvertAll(i => i as DataControlWithResources));
+            all.AddRange(Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs().ConvertAll(i => i as DataControlWithResources));
 
             return all;
         }
@@ -355,9 +355,9 @@ namespace uAdventure.Geo
         {
             Dictionary<string, string> objects = new Dictionary<string, string>();
             // TODO extend here
-            Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems().ForEach(i => objects.Add("Item/" + i.getId(), i.getId()));
-            Controller.getInstance().getSelectedChapterDataControl().getAtrezzoList().getAtrezzoList().ForEach(a => objects.Add("Atrezzo/" + a.getId(), a.getId()));
-            Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs().ForEach(npc => objects.Add("Character/" + npc.getId(), npc.getId()));
+            Controller.Instance.SelectedChapterDataControl.getItemsList().getItems().ForEach(i => objects.Add("Item/" + i.getId(), i.getId()));
+            Controller.Instance.SelectedChapterDataControl.getAtrezzoList().getAtrezzoList().ForEach(a => objects.Add("Atrezzo/" + a.getId(), a.getId()));
+            Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs().ForEach(npc => objects.Add("Character/" + npc.getId(), npc.getId()));
 
             return objects;
         }
@@ -366,7 +366,7 @@ namespace uAdventure.Geo
         {
             var menu = new GenericMenu();
 
-            var mapElements = Controller.getInstance().getSelectedChapterDataControl().getObjects<GeoElement>();
+            var mapElements = Controller.Instance.SelectedChapterDataControl.getObjects<GeoElement>();
             mapElements.ForEach(me =>
             {
                 menu.AddItem(new GUIContent("GeoElement/" + me.Id), false, (id) =>

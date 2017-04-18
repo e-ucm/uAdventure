@@ -19,17 +19,17 @@ namespace uAdventure.Editor
         public ChapterWindow(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
         {
-            Chapter chapter = Controller.getInstance().getCharapterList().getSelectedChapterData();
+            Chapter chapter = Controller.Instance.ChapterList.getSelectedChapterData();
             chapterName = chapterNameLast = chapter.getTitle();
             descriptionOfGame = descriptionOfGameLast = chapter.getDescription();
 
             selInitialScene = selInitialSceneLast = 0;
 
-            int amountOfScenes = Controller.getInstance().getCharapterList().getSelectedChapterData().getScenes().Count;
+            int amountOfScenes = Controller.Instance.ChapterList.getSelectedChapterData().getScenes().Count;
             selStringsInitialScene = new string[amountOfScenes];
 
             var names = getSceneNames();
-            var selName = Controller.getInstance().getCharapterList().getSelectedChapterDataControl().getInitialScene();
+            var selName = Controller.Instance.ChapterList.getSelectedChapterDataControl().getInitialScene();
 
             selStringsInitialScene = names.ToArray();
             selInitialScene = names.FindIndex(s => s == selName);
@@ -75,28 +75,26 @@ namespace uAdventure.Editor
 
         private void ChangeTitle(string s)
         {
-            Controller.getInstance().getCharapterList().getSelectedChapterDataControl().setTitle(s);
+            Controller.Instance.ChapterList.getSelectedChapterDataControl().setTitle(s);
             chapterNameLast = s;
         }
 
         private void ChangeDescription(string s)
         {
-            Controller.getInstance().getCharapterList().getSelectedChapterDataControl().setDescription(s);
+            Controller.Instance.ChapterList.getSelectedChapterDataControl().setDescription(s);
             descriptionOfGameLast = s;
         }
 
         private void ChangeSelectedInitialScene(int i)
         {
             selInitialSceneLast = i;
-            Controller.getInstance()
-                .getCharapterList()
-                .getSelectedChapterDataControl()
+            Controller.Instance                .ChapterList                .getSelectedChapterDataControl()
                 .setInitialScene(getSceneNames()[i]);
         }
 
         private List<string> getSceneNames()
         {
-            var all = Controller.getInstance().getCharapterList().getSelectedChapterData().getObjects();
+            var all = Controller.Instance.ChapterList.getSelectedChapterData().getObjects();
 
             var names = new List<object>();
             foreach (var e in all) names.Add(e);

@@ -81,106 +81,106 @@ namespace uAdventure.Editor
             if (GameRources.GetInstance().selectedCharacterIndex >= 0)
             {
                 slidesPathLookUp =
-                    Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                    Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                         GameRources.GetInstance().selectedCharacterIndex].getAnimationPath(NPC.RESOURCE_TYPE_STAND_UP);
                 slidesPathLookDown =
-                    Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                    Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                         GameRources.GetInstance().selectedCharacterIndex].getAnimationPath(NPC.RESOURCE_TYPE_STAND_DOWN);
                 slidesPathLookRight =
-                    Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                    Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                         GameRources.GetInstance().selectedCharacterIndex].getAnimationPath(NPC.RESOURCE_TYPE_STAND_RIGHT);
                 slidesPathLookLeft =
-                    Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                    Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                         GameRources.GetInstance().selectedCharacterIndex].getAnimationPath(NPC.RESOURCE_TYPE_STAND_RIGHT);
                 slidesPathLookUpPreview =
-                    Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                    Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                         GameRources.GetInstance().selectedCharacterIndex].getAnimationPathPreview(NPC.RESOURCE_TYPE_STAND_UP);
                 slidesPathLookDownPreview =
-                    Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                    Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                         GameRources.GetInstance().selectedCharacterIndex].getAnimationPathPreview(
                             NPC.RESOURCE_TYPE_STAND_DOWN);
                 slidesPathLookRightPreview =
-                    Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                    Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                         GameRources.GetInstance().selectedCharacterIndex].getAnimationPathPreview(
                             NPC.RESOURCE_TYPE_STAND_RIGHT);
                 slidesPathLookLeftPreview =
-                    Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                    Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                         GameRources.GetInstance().selectedCharacterIndex].getAnimationPathPreview(
                             NPC.RESOURCE_TYPE_STAND_RIGHT);
 
 
 
                 slidesPathTalkUp =
-                    Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                    Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                         GameRources.GetInstance().selectedCharacterIndex].getAnimationPath(NPC.RESOURCE_TYPE_SPEAK_UP);
                 slidesPathTalkDown =
-                    Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                    Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                         GameRources.GetInstance().selectedCharacterIndex].getAnimationPath(NPC.RESOURCE_TYPE_SPEAK_DOWN);
                 slidesPathTalkRight =
-                    Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                    Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                         GameRources.GetInstance().selectedCharacterIndex].getAnimationPath(NPC.RESOURCE_TYPE_SPEAK_RIGHT);
                 slidesPathTalkLeft =
-                    Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                    Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                         GameRources.GetInstance().selectedCharacterIndex].getAnimationPath(NPC.RESOURCE_TYPE_SPEAK_LEFT);
                 slidesPathTalkUpPreview =
-                    Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                    Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                         GameRources.GetInstance().selectedCharacterIndex].getAnimationPathPreview(NPC.RESOURCE_TYPE_SPEAK_UP);
                 slidesPathTalkDownPreview =
-                    Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                    Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                         GameRources.GetInstance().selectedCharacterIndex].getAnimationPathPreview(
                             NPC.RESOURCE_TYPE_SPEAK_DOWN);
                 slidesPathTalkRightPreview =
-                    Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                    Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                         GameRources.GetInstance().selectedCharacterIndex].getAnimationPathPreview(
                             NPC.RESOURCE_TYPE_SPEAK_RIGHT);
                 slidesPathTalkLeftPreview =
-                    Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                    Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                         GameRources.GetInstance().selectedCharacterIndex].getAnimationPathPreview(
                             NPC.RESOURCE_TYPE_SPEAK_LEFT);
 
 
 
                 slidesPathUseRight =
-                    Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                    Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                         GameRources.GetInstance().selectedCharacterIndex].getAnimationPath(NPC.RESOURCE_TYPE_USE_RIGHT);
                 slidesPathUseLeft =
-                    Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                    Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                         GameRources.GetInstance().selectedCharacterIndex].getAnimationPath(NPC.RESOURCE_TYPE_USE_LEFT);
                 slidesPathUseRightPreview =
-                    Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                    Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                         GameRources.GetInstance().selectedCharacterIndex].getAnimationPathPreview(
                             NPC.RESOURCE_TYPE_USE_RIGHT);
                 slidesPathUseLeftPreview =
-                    Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                    Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                         GameRources.GetInstance().selectedCharacterIndex].getAnimationPathPreview(NPC.RESOURCE_TYPE_USE_LEFT);
 
 
 
                 slidesPathWalkUp =
-                    Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                    Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                         GameRources.GetInstance().selectedCharacterIndex].getAnimationPath(NPC.RESOURCE_TYPE_WALK_UP);
                 slidesPathWalkDown =
-                    Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                    Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                         GameRources.GetInstance().selectedCharacterIndex].getAnimationPath(NPC.RESOURCE_TYPE_WALK_DOWN);
                 slidesPathWalkRight =
-                    Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                    Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                         GameRources.GetInstance().selectedCharacterIndex].getAnimationPath(NPC.RESOURCE_TYPE_WALK_RIGHT);
                 slidesPathWalkLeft =
-                    Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                    Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                         GameRources.GetInstance().selectedCharacterIndex].getAnimationPath(NPC.RESOURCE_TYPE_WALK_LEFT);
                 slidesPathWalkUpPreview =
-                    Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                    Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                         GameRources.GetInstance().selectedCharacterIndex].getAnimationPathPreview(NPC.RESOURCE_TYPE_WALK_UP);
                 slidesPathWalkDownPreview =
-                    Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                    Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                         GameRources.GetInstance().selectedCharacterIndex].getAnimationPathPreview(
                             NPC.RESOURCE_TYPE_WALK_DOWN);
                 slidesPathWalkRightPreview =
-                    Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                    Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                         GameRources.GetInstance().selectedCharacterIndex].getAnimationPathPreview(
                             NPC.RESOURCE_TYPE_WALK_RIGHT);
                 slidesPathWalkLeftPreview =
-                    Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                    Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                         GameRources.GetInstance().selectedCharacterIndex].getAnimationPathPreview(
                             NPC.RESOURCE_TYPE_WALK_LEFT);
 
@@ -926,11 +926,11 @@ namespace uAdventure.Editor
         {
             slidesPathWalkLeft = v;
 
-            Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+            Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                 GameRources.GetInstance().selectedCharacterIndex].addAnimationPath(NPC.RESOURCE_TYPE_WALK_LEFT, v);
 
             slidesPathWalkLeftPreview =
-                Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                     GameRources.GetInstance().selectedCharacterIndex].getAnimationPathPreview(NPC.RESOURCE_TYPE_WALK_LEFT);
 
             if (!string.IsNullOrEmpty(slidesPathWalkLeftPreview))
@@ -941,11 +941,11 @@ namespace uAdventure.Editor
         {
             slidesPathWalkRight = v;
 
-            Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+            Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                 GameRources.GetInstance().selectedCharacterIndex].addAnimationPath(NPC.RESOURCE_TYPE_WALK_RIGHT, v);
 
             slidesPathWalkRightPreview =
-                Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                     GameRources.GetInstance().selectedCharacterIndex].getAnimationPathPreview(NPC.RESOURCE_TYPE_WALK_RIGHT);
 
             if (!string.IsNullOrEmpty(slidesPathWalkRightPreview))
@@ -956,11 +956,11 @@ namespace uAdventure.Editor
         {
             slidesPathWalkDown = v;
 
-            Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+            Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                 GameRources.GetInstance().selectedCharacterIndex].addAnimationPath(NPC.RESOURCE_TYPE_WALK_DOWN, v);
 
             slidesPathWalkDownPreview =
-                Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                     GameRources.GetInstance().selectedCharacterIndex].getAnimationPathPreview(NPC.RESOURCE_TYPE_WALK_DOWN);
 
             if (!string.IsNullOrEmpty(slidesPathWalkDownPreview))
@@ -971,11 +971,11 @@ namespace uAdventure.Editor
         {
             slidesPathWalkUp = v;
 
-            Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+            Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                 GameRources.GetInstance().selectedCharacterIndex].addAnimationPath(NPC.RESOURCE_TYPE_WALK_UP, v);
 
             slidesPathWalkUpPreview =
-                Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                     GameRources.GetInstance().selectedCharacterIndex].getAnimationPathPreview(NPC.RESOURCE_TYPE_WALK_UP);
 
             if (!string.IsNullOrEmpty(slidesPathWalkUpPreview))
@@ -988,11 +988,11 @@ namespace uAdventure.Editor
         {
             slidesPathUseLeft = v;
 
-            Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+            Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                 GameRources.GetInstance().selectedCharacterIndex].addAnimationPath(NPC.RESOURCE_TYPE_USE_LEFT, v);
 
             slidesPathUseLeftPreview =
-                Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                     GameRources.GetInstance().selectedCharacterIndex].getAnimationPathPreview(NPC.RESOURCE_TYPE_USE_LEFT);
 
             if (!string.IsNullOrEmpty(slidesPathUseLeftPreview))
@@ -1003,11 +1003,11 @@ namespace uAdventure.Editor
         {
             slidesPathUseRight = v;
 
-            Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+            Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                 GameRources.GetInstance().selectedCharacterIndex].addAnimationPath(NPC.RESOURCE_TYPE_USE_RIGHT, v);
 
             slidesPathUseRightPreview =
-                Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                     GameRources.GetInstance().selectedCharacterIndex].getAnimationPathPreview(NPC.RESOURCE_TYPE_USE_RIGHT);
 
             if (!string.IsNullOrEmpty(slidesPathUseRightPreview))
@@ -1020,11 +1020,11 @@ namespace uAdventure.Editor
         {
             slidesPathTalkLeft = v;
 
-            Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+            Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                 GameRources.GetInstance().selectedCharacterIndex].addAnimationPath(NPC.RESOURCE_TYPE_SPEAK_LEFT, v);
 
             slidesPathTalkLeftPreview =
-                Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                     GameRources.GetInstance().selectedCharacterIndex].getAnimationPathPreview(NPC.RESOURCE_TYPE_SPEAK_LEFT);
 
             if (!string.IsNullOrEmpty(slidesPathTalkLeftPreview))
@@ -1035,11 +1035,11 @@ namespace uAdventure.Editor
         {
             slidesPathTalkRight = v;
 
-            Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+            Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                 GameRources.GetInstance().selectedCharacterIndex].addAnimationPath(NPC.RESOURCE_TYPE_SPEAK_RIGHT, v);
 
             slidesPathTalkRightPreview =
-                Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                     GameRources.GetInstance().selectedCharacterIndex].getAnimationPathPreview(NPC.RESOURCE_TYPE_SPEAK_RIGHT);
 
             if (!string.IsNullOrEmpty(slidesPathTalkRightPreview))
@@ -1050,11 +1050,11 @@ namespace uAdventure.Editor
         {
             slidesPathTalkDown = v;
 
-            Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+            Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                 GameRources.GetInstance().selectedCharacterIndex].addAnimationPath(NPC.RESOURCE_TYPE_SPEAK_DOWN, v);
 
             slidesPathTalkDownPreview =
-                Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                     GameRources.GetInstance().selectedCharacterIndex].getAnimationPathPreview(NPC.RESOURCE_TYPE_SPEAK_DOWN);
 
             if (!string.IsNullOrEmpty(slidesPathTalkDownPreview))
@@ -1065,11 +1065,11 @@ namespace uAdventure.Editor
         {
             slidesPathTalkUp = v;
 
-            Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+            Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                 GameRources.GetInstance().selectedCharacterIndex].addAnimationPath(NPC.RESOURCE_TYPE_SPEAK_UP, v);
 
             slidesPathTalkUpPreview =
-                Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                     GameRources.GetInstance().selectedCharacterIndex].getAnimationPathPreview(NPC.RESOURCE_TYPE_SPEAK_UP);
 
             if (!string.IsNullOrEmpty(slidesPathTalkUpPreview))
@@ -1082,11 +1082,11 @@ namespace uAdventure.Editor
         {
             slidesPathLookLeft = v;
 
-            Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+            Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                 GameRources.GetInstance().selectedCharacterIndex].addAnimationPath(NPC.RESOURCE_TYPE_STAND_LEFT, v);
 
             slidesPathLookLeftPreview =
-                Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                     GameRources.GetInstance().selectedCharacterIndex].getAnimationPathPreview(NPC.RESOURCE_TYPE_STAND_LEFT);
 
             if (!string.IsNullOrEmpty(slidesPathLookLeftPreview))
@@ -1097,11 +1097,11 @@ namespace uAdventure.Editor
         {
             slidesPathLookRight = v;
 
-            Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+            Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                 GameRources.GetInstance().selectedCharacterIndex].addAnimationPath(NPC.RESOURCE_TYPE_STAND_RIGHT, v);
 
             slidesPathLookRightPreview =
-                Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                     GameRources.GetInstance().selectedCharacterIndex].getAnimationPathPreview(NPC.RESOURCE_TYPE_STAND_RIGHT);
 
             if (!string.IsNullOrEmpty(slidesPathLookRightPreview))
@@ -1112,11 +1112,11 @@ namespace uAdventure.Editor
         {
             slidesPathLookDown = v;
 
-            Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+            Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                 GameRources.GetInstance().selectedCharacterIndex].addAnimationPath(NPC.RESOURCE_TYPE_STAND_DOWN, v);
 
             slidesPathLookDownPreview =
-                Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                     GameRources.GetInstance().selectedCharacterIndex].getAnimationPathPreview(NPC.RESOURCE_TYPE_STAND_DOWN);
 
             if (!string.IsNullOrEmpty(slidesPathLookDownPreview))
@@ -1127,11 +1127,11 @@ namespace uAdventure.Editor
         {
             slidesPathLookUp = v;
 
-            Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+            Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                 GameRources.GetInstance().selectedCharacterIndex].addAnimationPath(NPC.RESOURCE_TYPE_STAND_UP, v);
 
             slidesPathLookUpPreview =
-                Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                     GameRources.GetInstance().selectedCharacterIndex].getAnimationPathPreview(NPC.RESOURCE_TYPE_STAND_UP);
 
             if (!string.IsNullOrEmpty(slidesPathLookUpPreview))

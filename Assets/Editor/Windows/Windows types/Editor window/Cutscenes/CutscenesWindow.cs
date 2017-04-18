@@ -105,10 +105,10 @@ namespace uAdventure.Editor
             else
             {
                 GUILayout.Space(30);
-                for (int i = 0; i < Controller.getInstance().getCharapterList().getSelectedChapterData().getCutscenes().Count; i++)
+                for (int i = 0; i < Controller.Instance.ChapterList.getSelectedChapterData().getCutscenes().Count; i++)
                 {
                     GUILayout.BeginHorizontal();
-                    GUILayout.Box(Controller.getInstance().getCharapterList().getSelectedChapterData().getCutscenes()[i].getId(), GUILayout.Width(windowWidth * 0.75f));
+                    GUILayout.Box(Controller.Instance.ChapterList.getSelectedChapterData().getCutscenes()[i].getId(), GUILayout.Width(windowWidth * 0.75f));
                     if (GUILayout.Button(TC.get("GeneralText.Edit"), GUILayout.MaxWidth(windowWidth * 0.2f)))
                     {
                         ShowItemWindowView(i);
@@ -148,21 +148,17 @@ namespace uAdventure.Editor
 
         protected override void OnElementNameChanged(ReorderableList r, int index, string newName)
         {
-			Controller.getInstance().getCharapterList().getSelectedChapterDataControl().getCutscenesList().getCutscenes ()[index].renameElement(newName);
+			Controller.Instance.ChapterList.getSelectedChapterDataControl().getCutscenesList().getCutscenes ()[index].renameElement(newName);
         }
 
         protected override void OnAdd(ReorderableList r)
         {
             if (r.index != -1 && r.index < r.list.Count)
             {
-                Controller.getInstance()
-                           .getCharapterList()
-                           .getSelectedChapterDataControl()
+                Controller.Instance                           .ChapterList                           .getSelectedChapterDataControl()
                            .getCutscenesList()
                            .duplicateElement(
-                               Controller.getInstance()
-                                   .getCharapterList()
-                                   .getSelectedChapterDataControl()
+                               Controller.Instance                                   .ChapterList                                   .getSelectedChapterDataControl()
                                    .getCutscenesList()
                                    .getCutscenes()[r.index]);
             }
@@ -171,9 +167,7 @@ namespace uAdventure.Editor
 
         protected override void OnAddOption(ReorderableList r, string option)
         {
-            Controller.getInstance()
-                .getSelectedChapterDataControl()
-                .getCutscenesList()
+            Controller.Instance                .SelectedChapterDataControl                .getCutscenesList()
                 .addElement(
 					option == "Slides" ? Controller.CUTSCENE_SLIDES : Controller.CUTSCENE_VIDEO, 
 					option == "Slides" ? "newSlidescene" : "newVideoscene");
@@ -183,14 +177,10 @@ namespace uAdventure.Editor
         {
             if (r.index != -1)
             {
-                Controller.getInstance()
-                              .getCharapterList()
-                              .getSelectedChapterDataControl()
+                Controller.Instance                              .ChapterList                              .getSelectedChapterDataControl()
                               .getCutscenesList()
                               .deleteElement(
-                                  Controller.getInstance()
-                                      .getCharapterList()
-                                      .getSelectedChapterDataControl()
+                                  Controller.Instance                                      .ChapterList                                      .getSelectedChapterDataControl()
                                       .getCutscenesList()
                                       .getCutscenes()[r.index], false);
 
@@ -216,8 +206,7 @@ namespace uAdventure.Editor
 
         protected override void OnReorder(ReorderableList r)
         {
-			var dataControlList = Controller.getInstance ()
-				.getCharapterList ().getSelectedChapterDataControl ().getCutscenesList ();
+			var dataControlList = Controller.Instance 				.ChapterList .getSelectedChapterDataControl ().getCutscenesList ();
 
 			var toPos = r.index;
 			var fromPos = dataControlList.getCutscenes ().FindIndex (i => i.getId () == r.list [r.index] as string);
@@ -234,7 +223,7 @@ namespace uAdventure.Editor
 
         protected override void OnUpdateList(ReorderableList r)
         {
-			Elements = Controller.getInstance().getCharapterList().getSelectedChapterDataControl().getCutscenesList ().getCutscenes ().ConvertAll(s => s.getId());
+			Elements = Controller.Instance.ChapterList.getSelectedChapterDataControl().getCutscenesList ().getCutscenes ().ConvertAll(s => s.getId());
         }
     }
 }

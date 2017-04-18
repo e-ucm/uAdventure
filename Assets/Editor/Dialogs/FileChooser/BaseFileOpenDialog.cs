@@ -150,7 +150,7 @@ namespace uAdventure.Editor
                     break;
             }
 
-            string file = Controller.getInstance().getProjectFolder();
+            string file = Controller.Instance.ProjectFolder;
 
             DirectoryInfo path = new DirectoryInfo(DIR_PREFIX + "/" + assetTypeDir);
             if (!Directory.Exists(path.FullName))

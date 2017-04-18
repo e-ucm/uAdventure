@@ -67,7 +67,7 @@ namespace uAdventure.Editor
             {
                 fullCharacterDescription =
                     fullCharacterDescriptionLast =
-                        Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                        Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                             GameRources.GetInstance().selectedCharacterIndex].getDocumentation();
                 if (fullCharacterDescription == null)
                     fullCharacterDescription =
@@ -107,7 +107,7 @@ namespace uAdventure.Editor
 
             for (int i = 0;
                 i <
-                Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                     GameRources.GetInstance().selectedCharacterIndex].getDescriptionController().getDescriptionCount();
                 i++)
             {
@@ -116,7 +116,7 @@ namespace uAdventure.Editor
                 else
                     GUI.skin = noBackgroundSkin;
 
-                tmpTex = (Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                tmpTex = (Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                     GameRources.GetInstance().selectedCharacterIndex].getDescriptionController()
                     .getDescriptionController(i)
                     .getConditionsController()
@@ -128,7 +128,7 @@ namespace uAdventure.Editor
 
                 if (i == selectedDescription)
                 {
-                    if (GUILayout.Button(Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                    if (GUILayout.Button(Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                         GameRources.GetInstance().selectedCharacterIndex].getDescriptionController()
                         .getDescriptionController(i)
                         .getName(), GUILayout.Width(windowWidth * 0.44f)))
@@ -142,7 +142,7 @@ namespace uAdventure.Editor
                 }
                 else
                 {
-                    if (GUILayout.Button(Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                    if (GUILayout.Button(Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                         GameRources.GetInstance().selectedCharacterIndex].getDescriptionController()
                         .getDescriptionController(i)
                         .getName(), GUILayout.Width(windowWidth * 0.44f)))
@@ -169,17 +169,17 @@ namespace uAdventure.Editor
             GUI.skin = noBackgroundSkin;
             if (GUILayout.Button(addTex, GUILayout.MaxWidth(0.08f * windowWidth)))
             {
-                Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                     GameRources.GetInstance().selectedCharacterIndex].getDescriptionController().addElement();
             }
             if (GUILayout.Button(duplicateTex, GUILayout.MaxWidth(0.08f * windowWidth)))
             {
-                Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                     GameRources.GetInstance().selectedCharacterIndex].getDescriptionController().duplicateElement();
             }
             if (GUILayout.Button(clearTex, GUILayout.MaxWidth(0.08f * windowWidth)))
             {
-                Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                     GameRources.GetInstance().selectedCharacterIndex].getDescriptionController().deleteElement();
             }
             GUI.skin = defaultSkin;
@@ -263,7 +263,7 @@ namespace uAdventure.Editor
         private void OnCharacterDescriptionChanged(string val)
         {
             fullCharacterDescriptionLast = val;
-            Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+            Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                 GameRources.GetInstance().selectedCharacterIndex].setDocumentation(val);
         }
 
@@ -271,7 +271,7 @@ namespace uAdventure.Editor
         private void OnDescriptionNameChanged(string val)
         {
             descriptionNameLast = val;
-            Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+            Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                 GameRources.GetInstance().selectedCharacterIndex].getDescriptionController()
                 .getSelectedDescriptionController()
                 .getDescriptionData()
@@ -281,7 +281,7 @@ namespace uAdventure.Editor
         private void OnBriefDescriptionChanged(string val)
         {
             briefDescriptionLast = val;
-            Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+            Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                 GameRources.GetInstance().selectedCharacterIndex].getDescriptionController()
                 .getSelectedDescriptionController()
                 .getDescriptionData()
@@ -291,7 +291,7 @@ namespace uAdventure.Editor
         private void OnDetailedDescriptionChanged(string val)
         {
             detailedDescriptionLast = val;
-            Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+            Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                 GameRources.GetInstance().selectedCharacterIndex].getDescriptionController()
                 .getSelectedDescriptionController()
                 .getDescriptionData()
@@ -307,7 +307,7 @@ namespace uAdventure.Editor
         private void OnDescriptorNameSoundChange(string val)
         {
             descriptionSound = val;
-            Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+            Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                 GameRources.GetInstance().selectedCharacterIndex].getDescriptionController()
                 .getSelectedDescriptionController().getDescriptionData().setNameSoundPath(val);
         }
@@ -315,7 +315,7 @@ namespace uAdventure.Editor
         private void OnDescriptorBriefSoundChange(string val)
         {
             briefDescriptionSound = val;
-            Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+            Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                 GameRources.GetInstance().selectedCharacterIndex].getDescriptionController()
                 .getSelectedDescriptionController()
                 .getDescriptionData()
@@ -325,7 +325,7 @@ namespace uAdventure.Editor
         private void OnDescriptorDetailedSoundChange(string val)
         {
             detailedDescriptionSound = val;
-            Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+            Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                 GameRources.GetInstance().selectedCharacterIndex].getDescriptionController()
                 .getSelectedDescriptionController()
                 .getDescriptionData()
@@ -334,43 +334,43 @@ namespace uAdventure.Editor
 
         private void RefreshDescriptionInformation()
         {
-            Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+            Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                 GameRources.GetInstance().selectedCharacterIndex].getDescriptionController()
                 .setSelectedDescription(selectedDescription);
 
             descriptionName =
-                descriptionNameLast = Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                descriptionNameLast = Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                     GameRources.GetInstance().selectedCharacterIndex].getDescriptionController()
                     .getSelectedDescriptionController()
                     .getDescriptionData()
                     .getName();
 
-            descriptionSound = Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+            descriptionSound = Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                 GameRources.GetInstance().selectedCharacterIndex].getDescriptionController()
                 .getSelectedDescriptionController()
                 .getDescriptionData().getNameSoundPath();
 
             briefDescription =
-                briefDescriptionLast = Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                briefDescriptionLast = Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                     GameRources.GetInstance().selectedCharacterIndex].getDescriptionController()
                     .getSelectedDescriptionController()
                     .getDescriptionData()
                     .getDescription();
 
-            briefDescriptionSound = Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+            briefDescriptionSound = Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                 GameRources.GetInstance().selectedCharacterIndex].getDescriptionController()
                 .getSelectedDescriptionController()
                 .getDescriptionData().getDescriptionSoundPath();
 
             detailedDescription =
                 detailedDescriptionLast =
-                    Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                    Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                         GameRources.GetInstance().selectedCharacterIndex].getDescriptionController()
                         .getSelectedDescriptionController()
                         .getDescriptionData()
                         .getDetailedDescription();
 
-            detailedDescriptionSound = Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+            detailedDescriptionSound = Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                 GameRources.GetInstance().selectedCharacterIndex].getDescriptionController()
                 .getSelectedDescriptionController()
                 .getDescriptionData().getDetailedDescriptionSoundPath();

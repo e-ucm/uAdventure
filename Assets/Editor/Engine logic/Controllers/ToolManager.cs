@@ -51,7 +51,7 @@ namespace uAdventure.Editor
                 }
                 redoList.Clear();
                 if (notifyController)
-                    Controller.getInstance().dataModified();
+                    Controller.Instance.DataModified();
 
                 if (!tool.canUndo())
                 {

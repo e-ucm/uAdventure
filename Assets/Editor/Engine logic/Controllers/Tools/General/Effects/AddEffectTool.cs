@@ -62,8 +62,8 @@ namespace uAdventure.Editor
             bool done = doTool();
             if (done)
             {
-                Controller.getInstance().updateVarFlagSummary();
-                Controller.getInstance().updatePanel();
+                Controller.Instance.updateVarFlagSummary();
+                Controller.Instance.updatePanel();
             }
             return done;
         }
@@ -76,8 +76,8 @@ namespace uAdventure.Editor
             {
                 conditions.Remove(condition);
             }
-            Controller.getInstance().updateVarFlagSummary();
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updateVarFlagSummary();
+            Controller.Instance.updatePanel();
             return true;
         }
 

@@ -66,13 +66,13 @@ namespace uAdventure.Editor
             sceneRef = scene;
 
             string backgroundPath =
-                Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                     GameRources.GetInstance().selectedSceneIndex].getPreviewBackground();
             backgroundPreviewTex =
                 (Texture2D)Resources.Load(backgroundPath.Substring(0, backgroundPath.LastIndexOf(".")), typeof(Texture2D));
 
             string playerPath =
-                Controller.getInstance().getSelectedChapterDataControl().getPlayer().getPreviewImage();
+                Controller.Instance.SelectedChapterDataControl.getPlayer().getPreviewImage();
             playerTex = (Texture2D)Resources.Load(playerPath.Substring(0, playerPath.LastIndexOf(".")), typeof(Texture2D));
 
             selectedPlayerTex = (Texture2D)Resources.Load("Editor/SelectedArea", typeof(Texture2D));

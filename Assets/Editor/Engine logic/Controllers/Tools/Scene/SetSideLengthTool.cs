@@ -59,7 +59,7 @@ namespace uAdventure.Editor
         public override bool redoTool()
         {
             side.setLenght(value);
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
 
@@ -67,7 +67,7 @@ namespace uAdventure.Editor
         public override bool undoTool()
         {
             side.setLenght(oldLength);
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
     }

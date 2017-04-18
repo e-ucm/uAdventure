@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,25 +13,37 @@ namespace uAdventure.Core
 
         public Properties(string file)
         {
-            reload(file);
+            Reload(file);
         }
 
-        public string getProperty(string field, string defValue)
+        public string this[string field]
         {
-            return (getProperty(field) == null) ? (defValue) : (getProperty(field));
+            get
+            {
+                return (list.ContainsKey(field)) ? (list[field]) : (null);
+            }
+            set
+            {
+                if (!list.ContainsKey(field))
+                    list.Add(field, value);
+                else
+                    list[field] = value;
+            }
         }
 
-        public string getProperty(string field)
+        public string GetProperty(string field, string defValue)
         {
-            return (list.ContainsKey(field)) ? (list[field]) : (null);
+            return GetProperty(field) ?? defValue;
         }
 
-        public void setProperty(string field, System.Object value)
+        public string GetProperty(string field)
         {
-            if (!list.ContainsKey(field))
-                list.Add(field, value.ToString());
-            else
-                list[field] = value.ToString();
+            return this[field];
+        }
+
+        public void SetProperty(string field, System.Object value)
+        {
+            this[field] = value.ToString();
         }
 
         public void Save()
@@ -44,7 +55,7 @@ namespace uAdventure.Core
         {
             Debug.Log("Saving properties to: " + new FileInfo(filename).FullName);
             this.filename = filename;
-
+            
             if (!System.IO.File.Exists(filename))
                 System.IO.File.Create(filename).Close();
 
@@ -59,22 +70,22 @@ namespace uAdventure.Core
             file.Close();
         }
 
-        public void reload()
+        public void Reload()
         {
-            reload(this.filename);
+            Reload(this.filename);
         }
 
-        public void reload(string filename)
+        public void Reload(string filename)
         {
             this.filename = filename;
             list = new Dictionary<string, string>();
             if (System.IO.File.Exists(filename))
-                loadFromFile(filename);
+                LoadFromFile(filename);
             else
                 System.IO.File.Create(filename).Close();
         }
 
-        private void loadFromFile(string file)
+        private void LoadFromFile(string file)
         {
             string key = "", value = "";
             XmlTextReader reader = new XmlTextReader(file);
@@ -105,9 +116,9 @@ namespace uAdventure.Core
             }
             reader.Close();
         }
-        public Dictionary<string, string>.KeyCollection getKeyset()
+        public Dictionary<string, string>.KeyCollection KeySet
         {
-            return list.Keys;
+            get { return list.Keys; }
         }
     }
 }

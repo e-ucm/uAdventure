@@ -31,8 +31,8 @@ namespace uAdventure.Editor
 
         public SpeakCharEffectEditor()
         {
-            npc = Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCsIDs();
-            this.effect = new SpeakCharEffect(npc[0], "");
+            npc = Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCsIDs();
+            this.effect = new SpeakCharEffect(npc.Length > 0 ? npc[0] : "", "");
         }
 
         public void draw()
@@ -56,6 +56,14 @@ namespace uAdventure.Editor
         {
 
             return c.GetType() == effect.GetType();
+        }
+
+        public bool Usable
+        {
+            get
+            {
+                return Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCsIDs().Length > 0;
+            }
         }
     }
 }

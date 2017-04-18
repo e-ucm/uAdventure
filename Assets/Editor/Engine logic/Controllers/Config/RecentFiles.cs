@@ -30,11 +30,11 @@ namespace uAdventure.Editor
         {
 
             nFiles = 0;
-            if (properties.getProperty("RecentFiles") != null)
+            if (properties.GetProperty("RecentFiles") != null)
             {
                 try
                 {
-                    nFiles = int.Parse(properties.getProperty("RecentFiles"));
+                    nFiles = int.Parse(properties.GetProperty("RecentFiles"));
                 }
                 catch (Exception e)
                 {
@@ -46,12 +46,12 @@ namespace uAdventure.Editor
             for (int i = 0; i < nFiles; i++)
             {
                 string pathKey = "RecentFile." + i + ".FilePath";
-                string path = properties.getProperty(pathKey);
+                string path = properties.GetProperty(pathKey);
                 FileInfo file = new FileInfo(path);
                 if (file.Exists)
                 {
                     string dateKey = "RecentFile." + i + ".DateOpened";
-                    string date = properties.getProperty(dateKey);
+                    string date = properties.GetProperty(dateKey);
 
                     RecentFile recentFile = new RecentFile(path, date);
                     recentFiles[i] = recentFile;
@@ -89,15 +89,15 @@ namespace uAdventure.Editor
                     break;
                 string pathKey = "RecentFile." + i + ".FilePath";
                 string path = file.getAbsolutePath();
-                properties.setProperty(pathKey, path);
+                properties.SetProperty(pathKey, path);
                 string dateKey = "RecentFile." + i + ".DateOpened";
                 string date = file.ToString();
-                properties.setProperty(dateKey, date);
+                properties.SetProperty(dateKey, date);
                 i++;
             }
             string nFilesKey = "RecentFiles";
             string nFilesS = this.nFiles.ToString();
-            properties.setProperty(nFilesKey, nFilesS);
+            properties.SetProperty(nFilesKey, nFilesS);
 
         }
 

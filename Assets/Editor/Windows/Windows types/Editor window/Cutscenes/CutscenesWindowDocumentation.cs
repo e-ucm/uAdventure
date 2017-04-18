@@ -19,7 +19,7 @@ namespace uAdventure.Editor
 
             if (GameRources.GetInstance().selectedCutsceneIndex >= 0)
             {
-                current = Controller.getInstance().getCharapterList().getSelectedChapterData().getCutscenes()[GameRources.GetInstance().selectedCutsceneIndex];
+                current = Controller.Instance.ChapterList.getSelectedChapterData().getCutscenes()[GameRources.GetInstance().selectedCutsceneIndex];
 
                 doc = current.getDocumentation();
                 name = current.getName();
@@ -63,25 +63,25 @@ namespace uAdventure.Editor
 
         private void ChangeClass(string s)
         {
-            Controller.getInstance().getCharapterList().getSelectedChapterData().getCutscenes()[GameRources.GetInstance().selectedCutsceneIndex].setXApiClass(s);
+            Controller.Instance.ChapterList.getSelectedChapterData().getCutscenes()[GameRources.GetInstance().selectedCutsceneIndex].setXApiClass(s);
             sceneclasslast = s;
         }
 
         private void ChangeType(string s)
         {
-            Controller.getInstance().getCharapterList().getSelectedChapterData().getCutscenes()[GameRources.GetInstance().selectedCutsceneIndex].setXApiType(s);
+            Controller.Instance.ChapterList.getSelectedChapterData().getCutscenes()[GameRources.GetInstance().selectedCutsceneIndex].setXApiType(s);
             scenetypelast = s;
         }
 
         private void ChangeName(string s)
         {
-            Controller.getInstance().getCharapterList().getSelectedChapterData().getCutscenes()[GameRources.GetInstance().selectedCutsceneIndex].setName(s);
+            Controller.Instance.ChapterList.getSelectedChapterData().getCutscenes()[GameRources.GetInstance().selectedCutsceneIndex].setName(s);
             nameOfCutsceneLast = s;
         }
 
         private void ChangeDocumentation(string s)
         {
-            Controller.getInstance().getCharapterList().getSelectedChapterData().getCutscenes()[GameRources.GetInstance().selectedCutsceneIndex].setDocumentation(s);
+            Controller.Instance.ChapterList.getSelectedChapterData().getCutscenes()[GameRources.GetInstance().selectedCutsceneIndex].setDocumentation(s);
             descriptionOfCutsceneLast = s;
         }
     }

@@ -74,7 +74,7 @@ namespace uAdventure.Editor
             resourcesList.Add(newResources);
             resourcesDataControlList.Add(newResourcesDataControl);
             parent.setSelectedResources(resourcesList.Count - 1);
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
 
@@ -87,7 +87,7 @@ namespace uAdventure.Editor
             if (undone)
             {
                 parent.setSelectedResources(resourcesList.Count - 1);
-                Controller.getInstance().updatePanel();
+                Controller.Instance.updatePanel();
             }
             return undone;
         }

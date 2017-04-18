@@ -26,10 +26,10 @@ namespace uAdventure.Geo
             effect = new NavigationControlEffect();
             possibleReferences = new List<string>();
             
-            Controller.getInstance().getSelectedChapterDataControl().getObjects<GeoElement>().ForEach(g => possibleReferences.Add(g.getId()));
-            Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems().ForEach(i => possibleReferences.Add(i.getId()));
-            Controller.getInstance().getSelectedChapterDataControl().getAtrezzoList().getAtrezzoList().ForEach(a => possibleReferences.Add(a.getId()));
-            Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs().ForEach(npc => possibleReferences.Add(npc.getId()));
+            Controller.Instance.SelectedChapterDataControl.getObjects<GeoElement>().ForEach(g => possibleReferences.Add(g.getId()));
+            Controller.Instance.SelectedChapterDataControl.getItemsList().getItems().ForEach(i => possibleReferences.Add(i.getId()));
+            Controller.Instance.SelectedChapterDataControl.getAtrezzoList().getAtrezzoList().ForEach(a => possibleReferences.Add(a.getId()));
+            Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs().ForEach(npc => possibleReferences.Add(npc.getId()));
 
         }
 
@@ -105,5 +105,6 @@ namespace uAdventure.Geo
                     break;
             }
         }
+        public bool Usable { get { return true; } }
     }
 }

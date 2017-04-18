@@ -12,9 +12,8 @@ namespace uAdventure.Editor
         string EffectName { get; }
         EffectEditor clone();
         bool manages(AbstractEffect c);
-
         bool Collapsed { get; set; }
-
         Rect Window { get; set; }
+        bool Usable { get; }
     }
 }

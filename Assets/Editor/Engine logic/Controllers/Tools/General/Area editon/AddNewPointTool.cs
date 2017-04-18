@@ -107,7 +107,7 @@ namespace uAdventure.Editor
                 aa.setInfluenceArea(newInfluenceArea);
                 iadc.setInfluenceArea(newInfluenceArea);
             }
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
 
@@ -122,7 +122,7 @@ namespace uAdventure.Editor
                 aa.setInfluenceArea(oldInfluenceArea);
                 iadc.setInfluenceArea(oldInfluenceArea);
             }
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
     }

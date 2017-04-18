@@ -49,9 +49,9 @@ namespace uAdventure.Editor
                 variablesFlags.OnCliked();
             else if ((obj is int))
             {
-                if ((int)obj != Controller.getInstance().getCharapterList().getSelectedChapter())
+                if ((int)obj != Controller.Instance.ChapterList.getSelectedChapter())
                 {
-                    Controller.getInstance().getCharapterList().setSelectedChapterInternal((int)obj);
+                    Controller.Instance.ChapterList.setSelectedChapterInternal((int)obj);
                     SetMenuItems();
                     EditorWindowBase.RefreshChapter();
                 }
@@ -71,7 +71,7 @@ namespace uAdventure.Editor
 
             menu.AddItem(new GUIContent(add.Label), false, Callback, add);
             //Delte button is only visible for more than 1 chapter
-            if (Controller.getInstance().getCharapterList().getChaptersCount() > 1)
+            if (Controller.Instance.ChapterList.getChaptersCount() > 1)
                 menu.AddItem(new GUIContent(delete.Label), false, Callback, delete);
             menu.AddItem(new GUIContent(import.Label), false, Callback, import);
             menu.AddSeparator("");
@@ -79,11 +79,11 @@ namespace uAdventure.Editor
             menu.AddItem(new GUIContent(moveDown.Label), false, Callback, moveDown);
             menu.AddSeparator("");
             menu.AddItem(new GUIContent(variablesFlags.Label), false, Callback, variablesFlags);
-            for (int i = 0; i < Controller.getInstance().getCharapterList().getChaptersCount(); i++)
+            for (int i = 0; i < Controller.Instance.ChapterList.getChaptersCount(); i++)
             {
-                bool selected = (Controller.getInstance().getCharapterList().getSelectedChapter() == i);
+                bool selected = (Controller.Instance.ChapterList.getSelectedChapter() == i);
 
-                menu.AddItem(new GUIContent(Controller.getInstance().getCharapterList().getChapterTitles()[i]), selected, Callback, i);
+                menu.AddItem(new GUIContent(Controller.Instance.ChapterList.getChapterTitles()[i]), selected, Callback, i);
             }
         }
     }

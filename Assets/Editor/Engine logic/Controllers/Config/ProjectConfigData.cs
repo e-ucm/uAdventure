@@ -19,7 +19,7 @@ namespace uAdventure.Editor
         {
 
             consumers = new List<ProjectConfigDataConsumer>();
-            properties = new Properties(Controller.getInstance().getProjectFolder() + "/" + FILE_NAME);
+            properties = new Properties(Controller.Instance.ProjectFolder+ "/" + FILE_NAME);
             storeToXML();
         }
 
@@ -28,10 +28,10 @@ namespace uAdventure.Editor
             consumers.Add(consumer);
         }
 
-        public static void loadFromXML()
+        public static void LoadFromXML()
         {
 
-            properties = new Properties(Controller.getInstance().getProjectFolder() + "/" + FILE_NAME);
+            properties = new Properties(Controller.Instance.ProjectFolder+ "/" + FILE_NAME);
             foreach (ProjectConfigDataConsumer consumer in consumers)
             {
                 consumer.updateData();
@@ -39,28 +39,19 @@ namespace uAdventure.Editor
             //LOMConfigData.loadData();
         }
 
-        public static void loadFromXML(string folder)
-        {
-            properties = new Properties("Assets\\Resources\\CurrentGame\\" + FILE_NAME);
-            foreach (ProjectConfigDataConsumer consumer in consumers)
-            {
-                consumer.updateData();
-            }
-        }
-
         public static void storeToXML()
         {
             if (properties == null)
-                properties = new Properties(Controller.getInstance().getProjectFolder() + "/" + FILE_NAME);
+                properties = new Properties(Controller.Instance.ProjectFolder+ "/" + FILE_NAME);
             properties.Save();
         }
 
         public static string getProperty(string key)
         {
 
-            if (properties.getProperty(key) != null)
+            if (properties.GetProperty(key) != null)
             {
-                return properties.getProperty(key);
+                return properties.GetProperty(key);
             }
             else
                 return null;
@@ -69,12 +60,12 @@ namespace uAdventure.Editor
         public static void setProperty(string key, string value)
         {
 
-            properties.setProperty(key, value);
+            properties.SetProperty(key, value);
         }
 
         public static bool existsKey(string key)
         {
-            bool exists = (properties.getProperty(key) != null);
+            bool exists = (properties.GetProperty(key) != null);
             return exists;
         }
 

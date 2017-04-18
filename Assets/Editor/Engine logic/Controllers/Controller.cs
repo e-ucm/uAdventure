@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -406,11 +407,6 @@ namespace uAdventure.Editor
         private string currentZipFile = "";
 
         /**
-         * The path to the folder that holds the open file.
-         */
-        private string currentZipPath;
-
-        /**
          * The name of the file that is being currently edited. Used only to display
          * info.
          */
@@ -449,11 +445,8 @@ namespace uAdventure.Editor
 
         private ChapterListDataControl chaptersController = new ChapterListDataControl();
 
-        private MainWindowWrapper mainWindow;
-
         private Controller()
         {
-
             chaptersController = new ChapterListDataControl();
         }
 
@@ -467,7 +460,6 @@ namespace uAdventure.Editor
         // ABSOLUTE?
         public string getCurrentLoadFolder()
         {
-
             return ReleaseFolders.PROJECTS_FOLDER;
         }
 
@@ -477,16 +469,21 @@ namespace uAdventure.Editor
          * @return The instance of the controller
          */
 
-        public static Controller getInstance()
+        public static Controller Instance
         {
+            get
+            {
+                if (controllerInstance == null)
+                {
+                    controllerInstance = new Controller();
+                    controllerInstance.Init();
+                }
 
-            if (controllerInstance == null)
-                controllerInstance = new Controller();
-
-            return controllerInstance;
+                return controllerInstance;
+            }
         }
 
-        public static void resetInstance()
+        public static void ResetInstance()
         {
             controllerInstance = null;
             GameRources.GetInstance().Reset();
@@ -494,21 +491,24 @@ namespace uAdventure.Editor
 
         public int playerMode()
         {
-
             return adventureDataControl.getPlayerMode();
         }
 
         /**
         * Initializing function.
         */
-        public void init(string loadProjectPath = null)
+        public void Init(string loadProjectPath = null)
         {
-            ConfigData.loadFromXML(ReleaseFolders.configFileEditorRelativePath());
+            if (this.Initialized)
+                return;
+
+            Debug.Log("Controller init"); 
+            ConfigData.LoadFromXML(ReleaseFolders.configFileEditorRelativePath());
             // Load the configuration
             //ProjectConfigData.init();
             //SCORMConfigData.init();
 
-            // Create necessary folders if no created befor
+            // Create necessary folders if no created before
             DirectoryInfo projectsFolder = new DirectoryInfo(ReleaseFolders.PROJECTS_FOLDER);
             if (!projectsFolder.Exists)
             {
@@ -533,14 +533,12 @@ namespace uAdventure.Editor
 
             // Inits the controller with empty data
             currentZipFile = null;
-            currentZipPath = null;
             currentZipName = null;
             currentProjectName = null;
 
             dataModified_F = false;
 
-            ////Create main window and hide it
-            mainWindow = new MainWindowWrapper();
+            Initialized = true;
 
             if (loadProjectPath != null)
             {
@@ -550,22 +548,29 @@ namespace uAdventure.Editor
                     if (projectFile.FullName.ToLower().EndsWith(".eap"))
                     {
                         string absolutePath = projectFile.FullName;
-                        loadFile(absolutePath.Substring(0, absolutePath.Length - 4), true);
+                        LoadFile(absolutePath.Substring(0, absolutePath.Length - 4));
                     }
                     else if (projectFile.Exists)
-                        loadFile(projectFile.FullName, true);
+                        LoadFile(projectFile.FullName);
                 }
             }
             else
             {
-                loadFile();
+                if (!Directory.Exists("Assets\\Resources\\CurrentGame"))
+                {
+                    Debug.Log("No current game found, creating a 1st person view game...");
+                    NewAdventure(DescriptorData.MODE_PLAYER_1STPERSON);
+                }
+                else
+                {
+                    LoadFile();
+                }
             }
         }
 
-        public bool Initialized()
-        {
-            return adventureDataControl != null;
-        }
+        public bool Initialized { get; private set; }
+
+        public bool Loaded { get; private set; }
 
         /**
          * Returns the complete path to the currently open Project.
@@ -573,9 +578,12 @@ namespace uAdventure.Editor
          * @return The complete path to the ZIP file, null if none is open
          */
 
-        public string getProjectFolder()
+        public string ProjectFolder
         {
-            return currentZipFile;
+            get
+            {
+                return currentZipFile;
+            }
         }
 
         /**
@@ -584,22 +592,26 @@ namespace uAdventure.Editor
          * @return The complete path to the ZIP file, null if none is open
          */
 
-        public FileInfo getProjectFolderFile()
+        public FileInfo ProjectFolderFile
         {
-
-            return new FileInfo(currentZipFile);
+            get
+            {
+                return new FileInfo(currentZipFile);
+            }
         }
-        
+
         /**
          * Returns the selected chapter data controller.
          * 
          * @return The selected chapter data controller
          */
 
-        public ChapterDataControl getSelectedChapterDataControl()
+        public ChapterDataControl SelectedChapterDataControl
         {
-
-            return chaptersController.getSelectedChapterDataControl();
+            get
+            {
+                return chaptersController.getSelectedChapterDataControl();
+            }
         }
 
         /**
@@ -607,9 +619,12 @@ namespace uAdventure.Editor
          * 
          * @return The identifier summary
          */
-        public IdentifierSummary getIdentifierSummary()
+        public IdentifierSummary IdentifierSummary
         {
-            return chaptersController.getIdentifierSummary();
+            get
+            {
+                return chaptersController.getIdentifierSummary();
+            }
         }
 
         /**
@@ -617,16 +632,20 @@ namespace uAdventure.Editor
          * 
          * @return The varFlag summary
          */
-        public VarFlagSummary getVarFlagSummary()
+        public VarFlagSummary VarFlagSummary
         {
-
-            return chaptersController.getVarFlagSummary();
+            get
+            {
+                return chaptersController.getVarFlagSummary();
+            }
         }
 
-        public ChapterListDataControl getCharapterList()
+        public ChapterListDataControl ChapterList
         {
-
-            return chaptersController;
+            get
+            {
+                return chaptersController;
+            }
         }
 
         /**
@@ -634,17 +653,18 @@ namespace uAdventure.Editor
          * 
          * @return True if the data has been modified, false otherwise
          */
-
-        public bool isDataModified()
+        public bool IsDataModified
         {
-
-            return dataModified_F;
+            get
+            {
+                return dataModified_F;
+            }
         }
 
         /**
          * Called when the data has been modified, it sets the value to true.
          */
-        public void dataModified()
+        public void DataModified()
         {
 
             // If the data were not modified, change the value and set the new title of the window
@@ -655,15 +675,17 @@ namespace uAdventure.Editor
             }
         }
 
-        public bool isPlayTransparent()
+        public bool PlayTransparent
         {
-
-            if (adventureDataControl == null)
+            get
             {
-                return false;
-            }
-            return adventureDataControl.getPlayerMode() == DescriptorData.MODE_PLAYER_1STPERSON;
+                if (adventureDataControl == null)
+                {
+                    return false;
+                }
+                return adventureDataControl.getPlayerMode() == DescriptorData.MODE_PLAYER_1STPERSON;
 
+            }
         }
 
         // TODO enable this
@@ -681,10 +703,12 @@ namespace uAdventure.Editor
          * @return True if the new data was created successfully, false otherwise
          */
 
+
+
         public bool newFile(string gamePath, int fileType)
         {
 
-            ConfigData.loadFromXML(ReleaseFolders.configFileEditorRelativePath());
+            ConfigData.LoadFromXML(ReleaseFolders.configFileEditorRelativePath());
 
             bool fileCreated = false;
 
@@ -706,100 +730,82 @@ namespace uAdventure.Editor
             return fileCreated;
         }
 
-        public void save()
-        {
-            Writer.writeData("Assets\\Resources\\CurrentGame", adventureDataControl, true);
-            UnityEditor.AssetDatabase.Refresh();
-        }
 
         private bool newAdventureFile(string fileName, int fileType)
         {
-
             bool fileCreated = false;
-            
-
             bool create = false;
             DirectoryInfo selectedDir = null;
             FileInfo selectedFile = null;
-            // Prompt main folder of the project
-            //ProjectFolderChooser folderSelector = new ProjectFolderChooser( false, false );
-            //FrameForInitialDialogs start = new FrameForInitialDialogs(false);
-            //int op = start.showStartDialog();
-            // If some folder is selected, check all characters are correct  
             
+            DirectoryInfo selectedFolder = new DirectoryInfo(fileName);
+            selectedFile = new FileInfo(fileName);
+            if (selectedFile.FullName.EndsWith(".eap"))
             {
-                DirectoryInfo selectedFolder = new DirectoryInfo(fileName);
-                selectedFile = new FileInfo(fileName);
-                if (selectedFile.FullName.EndsWith(".eap"))
+                string absolutePath = selectedFolder.FullName;
+                selectedFolder = new DirectoryInfo(absolutePath.Substring(0, absolutePath.Length - 4));
+            }
+            else
+            {
+                selectedFile = new FileInfo(selectedFile.FullName + ".eap");
+            }
+            selectedDir = selectedFolder;
+
+            // Check the parent folder is not forbidden
+            if (isValidTargetProject(selectedFile))
+            {
+                // Folder can be created/used
+                // Does the folder exist?
+                if (selectedFolder.Exists)
                 {
-                    string absolutePath = selectedFolder.FullName;
-                    selectedFolder = new DirectoryInfo(absolutePath.Substring(0, absolutePath.Length - 4));
+                    //Is the folder empty?
+                    if (selectedFolder.GetFiles().Length > 0)
+                    {
+                        // Delete content?
+                        if (this.showStrictConfirmDialog(TC.get("Operation.NewProject.FolderNotEmptyTitle"),
+                            TC.get("Operation.NewProject.FolderNotEmptyMessage")))
+                        {
+                            DirectoryInfo directory = new DirectoryInfo(selectedFolder.FullName);
+                            directory.Delete(true);
+                        }
+                    }
+                    create = true;
                 }
                 else
                 {
-                    selectedFile = new FileInfo(selectedFile.FullName + ".eap");
-                }
-                selectedDir = selectedFolder;
-
-                // Check the parent folder is not forbidden
-                if (isValidTargetProject(selectedFile))
-                {
-
-                    //if (FolderFileFilter.checkCharacters(selectedFolder.getName()))
-                    //{
-                    // Folder can be created/used
-                    // Does the folder exist?
-                    if (selectedFolder.Exists)
+                    // Create new folder?
+                    if (this.showStrictConfirmDialog(TC.get("Operation.NewProject.FolderNotCreatedTitle"),
+                        TC.get("Operation.NewProject.FolderNotCreatedMessage")))
                     {
-                        //Is the folder empty?
-                        if (selectedFolder.GetFiles().Length > 0)
+                        DirectoryInfo directory = new DirectoryInfo(selectedFolder.FullName);
+                        directory.Create();
+                        if (directory.Exists)
                         {
-                            // Delete content?
-                            if (this.showStrictConfirmDialog(TC.get("Operation.NewProject.FolderNotEmptyTitle"),
-                                TC.get("Operation.NewProject.FolderNotEmptyMessage")))
-                            {
-                                DirectoryInfo directory = new DirectoryInfo(selectedFolder.FullName);
-                                directory.Delete(true);
-                            }
-                        }
-                        create = true;
-                    }
-                    else
-                    {
-                        // Create new folder?
-                        if (this.showStrictConfirmDialog(TC.get("Operation.NewProject.FolderNotCreatedTitle"),
-                            TC.get("Operation.NewProject.FolderNotCreatedMessage")))
-                        {
-                            DirectoryInfo directory = new DirectoryInfo(selectedFolder.FullName);
-                            directory.Create();
-                            if (directory.Exists)
-                            {
-                                create = true;
-                            }
-                            else
-                            {
-                                this.showStrictConfirmDialog(TC.get("Error.Title"), TC.get("Error.CreatingFolder"));
-                            }
-
+                            create = true;
                         }
                         else
                         {
-                            create = false;
+                            this.showStrictConfirmDialog(TC.get("Error.Title"), TC.get("Error.CreatingFolder"));
                         }
+
                     }
-                    //}
-                    //else {
-                    //    // Display error message
-                    //    this.showErrorDialog(TC.get("Error.Title"), TC.get("Error.ProjectFolderName", FolderFileFilter.getAllowedChars()));
-                    //}
+                    else
+                    {
+                        create = false;
+                    }
                 }
-                else
-                {
-                    // Show error: The target dir cannot be contained 
-                    Debug.LogError(TC.get("Operation.NewProject.ForbiddenParent.Title") + " \n " +
-                                    TC.get("Operation.NewProject.ForbiddenParent.Message"));
-                    create = false;
-                }
+                //}
+                //else {
+                //    // Display error message
+                //    this.showErrorDialog(TC.get("Error.Title"), TC.get("Error.ProjectFolderName", FolderFileFilter.getAllowedChars()));
+                //}
+            }
+            else
+            {
+                // Show error: The target dir cannot be contained 
+                Debug.LogError(TC.get("Operation.NewProject.ForbiddenParent.Title") + " \n " +
+                                TC.get("Operation.NewProject.ForbiddenParent.Message"));
+                create = false;
             }
 
             // Create the new project?
@@ -807,28 +813,23 @@ namespace uAdventure.Editor
 
             if (create)
             {
-                //loadingScreen.setVisible( true );
-                //loadingScreen.setMessage(TC.get("Operation.CreateProject"));
-                //loadingScreen.setVisible(true);
-
                 // Set the new file, path and create the new adventure
                 currentZipFile = selectedDir.FullName;
-                currentZipPath = selectedDir.Parent.FullName;
                 currentZipName = selectedDir.Name;
+
                 int playerMode = -1;
                 if (fileType == FILE_ADVENTURE_3RDPERSON_PLAYER)
                     playerMode = DescriptorData.MODE_PLAYER_3RDPERSON;
                 else if (fileType == FILE_ADVENTURE_1STPERSON_PLAYER)
                     playerMode = DescriptorData.MODE_PLAYER_1STPERSON;
-                //adventureDataControl = new AdventureDataControl(TC.get("DefaultValue.AdventureTitle"),
-                //    TC.get("DefaultValue.ChapterTitle"), TC.get("DefaultValue.SceneId"), playerMode);
+
+
                 adventureDataControl = new AdventureDataControl(TC.get("DefaultValue.AdventureTitle"), "ChapterTitle", TC.get("DefaultValue.SceneId"), playerMode);
                 // Clear the list of data controllers and refill it
                 chaptersController = new ChapterListDataControl(adventureDataControl.getChapters());
 
                 // Init project properties (empty)
                 ProjectConfigData.init();
-                //SCORMConfigData.init();
 
                 AssetsController.createFolderStructure();
                 AssetsController.addSpecialAssets();
@@ -870,6 +871,94 @@ namespace uAdventure.Editor
 
             return fileCreated;
 
+        }
+
+        public void Save()
+        {
+            Writer.writeData("Assets\\Resources\\CurrentGame", adventureDataControl, true);
+            UnityEditor.AssetDatabase.Refresh();
+        }
+
+        public bool NewAdventure(int fileType)
+        {
+            string currentGamePath = "Assets\\Resources\\CurrentGame";
+            bool fileCreated = false;
+            bool create = false;
+
+            FileInfo selectedFile = new FileInfo(currentGamePath + ".eap");
+            ConfigData.LoadFromXML(ReleaseFolders.configFileEditorRelativePath());
+
+            // Check the parent folder is not forbidden
+            if (isValidTargetProject(selectedFile))
+            {
+                // Folder can be created/used
+                // Does the folder exist?
+                if (Directory.Exists(currentGamePath))
+                {
+                    // Clean the CurrentGame directory
+                    Directory.Delete(currentGamePath, true);
+                }
+                Directory.CreateDirectory(currentGamePath);
+                create = true;
+            }
+            else
+            {
+                // Show error: The target dir cannot be contained 
+                Debug.LogError(TC.get("Operation.NewProject.ForbiddenParent.Title") + " \n " +
+                                TC.get("Operation.NewProject.ForbiddenParent.Message"));
+                create = false;
+            }
+
+            if (create)
+            {
+                DirectoryInfo selectedDir = new DirectoryInfo(currentGamePath);
+                // Set the new file, path and create the new adventure
+                currentZipFile = currentGamePath;
+                currentZipName = selectedDir.Name;
+
+                int playerMode = -1;
+                if (fileType == FILE_ADVENTURE_3RDPERSON_PLAYER)
+                    playerMode = DescriptorData.MODE_PLAYER_3RDPERSON;
+                else if (fileType == FILE_ADVENTURE_1STPERSON_PLAYER) 
+                    playerMode = DescriptorData.MODE_PLAYER_1STPERSON;
+
+
+                adventureDataControl = new AdventureDataControl(TC.get("DefaultValue.AdventureTitle"), "ChapterTitle", TC.get("DefaultValue.SceneId"), playerMode);
+                // Clear the list of data controllers and refill it
+                chaptersController = new ChapterListDataControl(adventureDataControl.getChapters());
+
+                // Init project properties (empty)
+                ProjectConfigData.init();
+
+                // Create the folders and add the assets
+                AssetsController.createFolderStructure();
+                AssetsController.addSpecialAssets();
+
+                // Check the consistency of the chapters
+                bool valid = chaptersController.isValid(null, null);
+
+                // Save the data
+                if (Writer.writeData(currentZipFile, adventureDataControl, valid))
+                {
+                    // Set modified to false and update the window title
+                    dataModified_F = false;
+
+                    Thread.Sleep(1);
+
+                    if (selectedFile != null && !selectedFile.Exists)
+                        selectedFile.Create().Close();
+
+                    ConfigData.fileLoaded(currentZipFile);
+                    AssetsController.resetCache();
+                    // The file was saved
+                    fileCreated = true;
+                    Loaded = true;
+                }
+                else
+                    fileCreated = false;
+            }
+
+            return fileCreated;
         }
 
         //    //public void showLoadingScreen(string message)
@@ -1083,117 +1172,88 @@ namespace uAdventure.Editor
         //        return abort;
         //    }
 
+
         /**
          * Called when the user wants to load data from a file.
          * 
          * @return True if a file was loaded successfully, false otherwise
          */
-
-        public bool loadFile()
+        private bool LoadFile(string path = null)
         {
-
-            return loadFile(null, true);
-        }
-
-        public NPC getNPC(string npcId)
-        {
-
-            return this.getSelectedChapterDataControl().getNPCsList().getNPC(npcId);
-        }
-
-        private bool loadFile(string completeFilePath, bool loadingImage)
-        {
-
-            bool fileLoaded = false;
+            bool fileLoaded = false; 
+            bool localLoaded = path == null;
             //bool hasIncedence = false;
             try
-            {
+            { 
                 //LoadingScreen loadingScreen = new LoadingScreen(TextConstants.getText( "Operation.LoadProject" ), getLoadingImage( ), mainWindow);
                 // If some file was selected
-                if (completeFilePath != null)
+                
+                AdventureData loadedAdventureData = null;
+                DirectoryInfo directory = null;
+
+                List<Incidence> incidences = new List<Incidence>();
+
+                // LOCAL FILE PATH
+                if (string.IsNullOrEmpty(path))
                 {
-                    // Create a file to extract the name and path
-                    FileInfo newFile = new FileInfo(completeFilePath);
+                    path = "Assets\\Resources\\CurrentGame";
+                    localLoaded = true;
+                }
+                else 
+                {
+                    path = path.RemoveFromEnd(".eap");
+                }
 
+                // VOY A CARGAR
+                // Create a file to extract the name and path
+                directory = new DirectoryInfo(path);
+
+                if (directory.Exists)
+                {
                     // Load the data from the file, and update the info
-                    List<Incidence> incidences = new List<Incidence>();
-                    //ls.start( );
-                    /*AdventureData loadedAdventureData = Loader.loadAdventureData( AssetsController.getInputStreamCreator(completeFilePath), 
-                            AssetsController.getCategoryFolder(AssetsController.CATEGORY_ASSESSMENT),
-                            AssetsController.getCategoryFolder(AssetsController.CATEGORY_ADAPTATION),incidences );
-                     */
-                    AdventureData loadedAdventureData = Loader.loadAdventureData(completeFilePath, incidences);
+                    loadedAdventureData = Loader.loadAdventureData(path, incidences);
+                }
 
-                    //mainWindow.setNormalState( );
+                // SI LO CARGO HAGO COSAS
+                if (loadedAdventureData != null)
+                {
+                    // Update the values of the controller
+                    currentZipFile = path;
+                    currentZipName = directory.Name;
 
-                    // If the adventure was loaded without problems, update the data
-                    if (loadedAdventureData != null)
+                    System.IO.File.WriteAllText("Assets\\Resources\\CurrentGame.eap", path);
+                    loadedAdventureData.setProjectName(currentZipName);
+
+                    if (!localLoaded)
                     {
-                        // Update the values of the controller
-                        currentZipFile = newFile.FullName;
-                        currentZipPath = newFile.DirectoryName;
-                        currentZipName = newFile.Name;
-                        System.IO.File.WriteAllText("Assets\\Resources\\CurrentGame.eap", completeFilePath);
-                        loadedAdventureData.setProjectName(currentZipName);
-                        AssetsController.copyAllFiles(currentZipFile, new DirectoryInfo("Assets\\Resources\\CurrentGame\\").FullName);
-                        adventureDataControl = new AdventureDataControl(loadedAdventureData);
-                        chaptersController = new ChapterListDataControl(adventureDataControl.getChapters());
-
-                        // Check asset files
-                        AssetsController.checkAssetFilesConsistency(incidences);
-                        Incidence.sortIncidences(incidences);
-                        //TODO: implement
-                        // If there is any incidence
-                        //if (incidences.size() > 0)
-                        //{
-                        //    bool abort = fixIncidences(incidences);
-                        //    if (abort)
-                        //    {
-                        //        mainWindow.showInformationDialog(TC.get("Error.LoadAborted.Title"), TC.get("Error.LoadAborted.Message"));
-                        //        hasIncedence = true;
-                        //    }
-                        //}
-
-                        ProjectConfigData.loadFromXML();
+                        // Import the proyect
                         AssetsController.createFolderStructure();
                         AssetsController.addSpecialAssets();
-
-                        dataModified_F = false;
-
-                        // The file was loaded
-                        fileLoaded = true;
-
-                        // Reloads the view of the window
-                        //mainWindow.reloadData();
-                    }
-                }
-                else if (System.IO.File.Exists("Assets\\Resources\\CurrentGame.eap"))
-                {
-                    completeFilePath = System.IO.File.ReadAllText("Assets\\Resources\\CurrentGame.eap");
-                    FileInfo newFile = new FileInfo(completeFilePath);
-                    List<Incidence> incidences = new List<Incidence>();
-                    AdventureData loadedAdventureData = Loader.loadAdventureData("Assets\\Resources\\CurrentGame", incidences);
-                    if (loadedAdventureData != null)
-                    {
-                        currentZipFile = newFile.FullName;
-                        currentZipPath = newFile.DirectoryName;
-                        currentZipName = newFile.Name;
-
-                        System.IO.File.WriteAllText("Assets\\Resources\\CurrentGame.eap", completeFilePath);
-                        loadedAdventureData.setProjectName(currentZipName);
-
-                        adventureDataControl = new AdventureDataControl(loadedAdventureData);
-                        chaptersController = new ChapterListDataControl(adventureDataControl.getChapters());
-                        ProjectConfigData.loadFromXML("Assets\\Resources\\CurrentGame");
-                        /*AssetsController.checkAssetFilesConsistency(incidences);
+                        AssetsController.copyAllFiles(currentZipFile, new DirectoryInfo("Assets\\Resources\\CurrentGame\\").FullName);
+                        AssetsController.checkAssetFilesConsistency(incidences);
                         Incidence.sortIncidences(incidences);
 
-                        AssetsController.createFolderStructure();
-                        AssetsController.addSpecialAssets();*/
-
-                        dataModified_F = false;
-                        fileLoaded = true;
+                        //TODO: implement If there is any incidence
+                        {/*if (incidences.size() > 0)
+                        {
+                            bool abort = fixIncidences(incidences);
+                            if (abort)
+                            {
+                                mainWindow.showInformationDialog(TC.get("Error.LoadAborted.Title"), TC.get("Error.LoadAborted.Message"));
+                                hasIncedence = true;
+                            }
+                        }*/
+                        }
                     }
+                    
+                    // PARSING
+                    adventureDataControl = new AdventureDataControl(loadedAdventureData);
+                    chaptersController = new ChapterListDataControl(adventureDataControl.getChapters());
+                    ProjectConfigData.LoadFromXML();
+
+                    dataModified_F = false;
+                    fileLoaded = true;
+
                 }
 
                 //TODO: implement
@@ -1202,8 +1262,7 @@ namespace uAdventure.Editor
                 {
                     ConfigData.fileLoaded(currentZipFile);
                     AssetsController.resetCache();
-                    // Load project config file
-                    //ProjectConfigData.loadFromXML();
+                    Loaded = true;
 
                     //startAutoSave(15);
 
@@ -1314,7 +1373,7 @@ namespace uAdventure.Editor
             if (saveFile)
             {
                 //TODO: implement
-                ConfigData.storeToXML();
+                ConfigData.StoreToXML();
                 ProjectConfigData.storeToXML();
                 
                 // Check the consistency of the chapters
@@ -1717,7 +1776,7 @@ namespace uAdventure.Editor
                             //    loadingScreen.setMessage(TC.get("Operation.ExportProject.AsEAD"));
                             //    loadingScreen.setVisible(true);
                             //}
-                            if (Writer.export(getProjectFolder(), destinyFile.FullName))
+                            if (Writer.export(ProjectFolder, destinyFile.FullName))
                             {
                                 exported = true;
                                 if (targetFilePath == null)
@@ -2046,7 +2105,7 @@ namespace uAdventure.Editor
             if (clean.Equals(Player.IDENTIFIER) || clean.Equals(TC.get("ConversationLine.PlayerName")))
                 clean = "new";
             
-            while (getIdentifierSummary().existsId(clean))
+            while (IdentifierSummary.existsId(clean))
             {
                 int lastN = 0;
                 for (Match match = Regex.Match(clean, @"\d+$"); match.Success; match = match.NextMatch())
@@ -2082,7 +2141,7 @@ namespace uAdventure.Editor
             {
 
                 //If the identifier doesn't exist already
-                if (!getIdentifierSummary().existsId(elementId))
+                if (!IdentifierSummary.existsId(elementId))
                 {
 
                     //If the identifier is not a reserved identifier
@@ -2093,27 +2152,27 @@ namespace uAdventure.Editor
                         if (elementId.Length > 0 && char.IsLetter(elementId[0]))
                         {
                             elementIdValid = isCharacterValid(elementId);
-							if (!elementIdValid && showError)
-                                mainWindow.showErrorDialog(TC.get("Operation.IdErrorTitle"), TC.get("Operation.IdErrorCharacter"));
+							/*if (!elementIdValid && showError)
+                                mainWindow.showErrorDialog(TC.get("Operation.IdErrorTitle"), TC.get("Operation.IdErrorCharacter"));*/
                         }
                         //Show non-letter first character error
-                        else if (showError)
-                            mainWindow.showErrorDialog(TC.get("Operation.IdErrorTitle"), TC.get("Operation.IdErrorFirstCharacter"));
+                        /*else if (showError)
+                            mainWindow.showErrorDialog(TC.get("Operation.IdErrorTitle"), TC.get("Operation.IdErrorFirstCharacter"));*/
                     }
 
                     //Show invalid identifier error
-                    else if (showError)
-                        mainWindow.showErrorDialog(TC.get("Operation.IdErrorTitle"), TC.get("Operation.IdErrorReservedIdentifier", elementId));
+                   /* else if (showError)
+                        mainWindow.showErrorDialog(TC.get("Operation.IdErrorTitle"), TC.get("Operation.IdErrorReservedIdentifier", elementId));*/
                 }
 
                 // Show repeated identifier error
-                else if (showError)
-                    mainWindow.showErrorDialog(TC.get("Operation.IdErrorTitle"), TC.get("Operation.IdErrorAlreadyUsed"));
+                /*else if (showError)
+                    mainWindow.showErrorDialog(TC.get("Operation.IdErrorTitle"), TC.get("Operation.IdErrorAlreadyUsed"));*/
             }
 
             //Show blank spaces error
-            else if (showError)
-                mainWindow.showErrorDialog(TC.get("Operation.IdErrorTitle"), TC.get("Operation.IdErrorBlankSpaces"));
+            /*else if (showError)
+                mainWindow.showErrorDialog(TC.get("Operation.IdErrorTitle"), TC.get("Operation.IdErrorBlankSpaces"));*/
 
             return elementIdValid;
         }
@@ -2152,7 +2211,7 @@ namespace uAdventure.Editor
             string sceneImagePath = null;
 
             // Search for the image in the list, comparing the identifiers
-            foreach (SceneDataControl scene in getSelectedChapterDataControl().getScenesList().getScenes())
+            foreach (SceneDataControl scene in SelectedChapterDataControl.getScenesList().getScenes())
                 if (sceneId.Equals(scene.getId()))
                     sceneImagePath = scene.getPreviewBackground();
 
@@ -2172,7 +2231,7 @@ namespace uAdventure.Editor
             Trajectory trajectory = null;
 
             // Search for the image in the list, comparing the identifiers
-            foreach (SceneDataControl scene in getSelectedChapterDataControl().getScenesList().getScenes())
+            foreach (SceneDataControl scene in SelectedChapterDataControl.getScenesList().getScenes())
                 if (sceneId.Equals(scene.getId()) && scene.getTrajectory().hasTrajectory())
                     trajectory = (Trajectory)scene.getTrajectory().getContent();
 
@@ -2187,21 +2246,11 @@ namespace uAdventure.Editor
         public string getPlayerImagePath()
         {
 
-            if (getSelectedChapterDataControl() != null)
-                return getSelectedChapterDataControl().getPlayer().getPreviewImage();
+            if (SelectedChapterDataControl!= null)
+                return SelectedChapterDataControl.getPlayer().getPreviewImage();
             else
                 return null;
         }
-
-        /**
-         * Returns the player
-         */
-        public Player getPlayer()
-        {
-
-            return (Player)getSelectedChapterDataControl().getPlayer().getContent();
-        }
-        
 
         /**
          * This method returns the absolute path of the default image of the given
@@ -2217,16 +2266,16 @@ namespace uAdventure.Editor
             string elementImage = null;
 
             // Search for the image in the items, comparing the identifiers
-            foreach (ItemDataControl item in getSelectedChapterDataControl().getItemsList().getItems())
+            foreach (ItemDataControl item in SelectedChapterDataControl.getItemsList().getItems())
                 if (elementId.Equals(item.getId()))
                     elementImage = item.getPreviewImage();
 
             // Search for the image in the characters, comparing the identifiers
-            foreach (NPCDataControl npc in getSelectedChapterDataControl().getNPCsList().getNPCs())
+            foreach (NPCDataControl npc in SelectedChapterDataControl.getNPCsList().getNPCs())
                 if (elementId.Equals(npc.getId()))
                     elementImage = npc.getPreviewImage();
             // Search for the image in the items, comparing the identifiers
-            foreach (AtrezzoDataControl atrezzo in getSelectedChapterDataControl().getAtrezzoList().getAtrezzoList())
+            foreach (AtrezzoDataControl atrezzo in SelectedChapterDataControl.getAtrezzoList().getAtrezzoList())
                 if (elementId.Equals(atrezzo.getId()))
                     elementImage = atrezzo.getPreviewImage();
 
@@ -2377,7 +2426,7 @@ namespace uAdventure.Editor
         public int countIdentifierReferences(string id)
         {
 
-            return getSelectedChapterDataControl().countIdentifierReferences(id);
+            return SelectedChapterDataControl.countIdentifierReferences(id);
         }
 
         /**
@@ -2404,8 +2453,7 @@ namespace uAdventure.Editor
         // */
         public void replaceIdentifierReferences(string oldId, string newId)
         {
-
-            getSelectedChapterDataControl().replaceIdentifierReferences(oldId, newId);
+            SelectedChapterDataControl.replaceIdentifierReferences(oldId, newId);
         }
 
         //// ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2632,7 +2680,7 @@ namespace uAdventure.Editor
          * automatically updates the about, language strings, and loading image
          * parameters.
          * 
-         * The method will reload the main window always
+         * The method will Reload the main window always
          * 
          * @param language
          */
@@ -2649,7 +2697,7 @@ namespace uAdventure.Editor
          * automatically updates the about, language strings, and loading image
          * parameters.
          * 
-         * The method will reload the main window if reloadData is true
+         * The method will Reload the main window if reloadData is true
          * 
          * @param language
          */
@@ -2763,5 +2811,35 @@ namespace uAdventure.Editor
         {
             EditorWindowBase.RefreshChapter();
         }
+
+        #region Windows
+        [UnityEditor.MenuItem("eAdventure/Open eAdventure welcome screen")]
+        public static void OpenWelcomeWindow()
+        {
+            if (!Controller.Instance.Initialized)
+                Controller.Instance.Init();
+
+            if (!Language.Initialized)
+                Language.Initialize();
+
+            var window = EditorWindow.GetWindow(typeof(WelcomeWindow));
+            window.Show();
+        }
+
+
+        [UnityEditor.MenuItem("eAdventure/Open eAdventure editor")]
+        public static void OpenEditorWindow()
+        {
+            if (!Controller.Instance.Initialized)
+                Controller.Instance.Init();
+
+            if(!Language.Initialized)
+                Language.Initialize();
+
+            var window = EditorWindow.GetWindow(typeof(EditorWindowBase));
+            window.Show();
+        }
+
+        #endregion
     }
 }

@@ -438,7 +438,7 @@ namespace uAdventure.Editor
             switch (type)
             {
                 case Controller.ATREZZO_REFERENCE:
-                    AtrezzoListDataControl aldc = Controller.getInstance().getSelectedChapterDataControl().getAtrezzoList();
+                    AtrezzoListDataControl aldc = Controller.Instance.SelectedChapterDataControl.getAtrezzoList();
                     foreach (AtrezzoDataControl adc in aldc.getAtrezzoList())
                     {
                         if (adc.getId().Equals(this.getElementId()))
@@ -448,7 +448,7 @@ namespace uAdventure.Editor
                     }
                     break;
                 case Controller.NPC_REFERENCE:
-                    NPCsListDataControl nldc = Controller.getInstance().getSelectedChapterDataControl().getNPCsList();
+                    NPCsListDataControl nldc = Controller.Instance.SelectedChapterDataControl.getNPCsList();
                     foreach (NPCDataControl ndc in nldc.getNPCs())
                     {
                         if (ndc.getId().Equals(this.getElementId()))
@@ -458,7 +458,7 @@ namespace uAdventure.Editor
                     }
                     break;
                 case Controller.ITEM_REFERENCE:
-                    ItemsListDataControl ildc = Controller.getInstance().getSelectedChapterDataControl().getItemsList();
+                    ItemsListDataControl ildc = Controller.Instance.SelectedChapterDataControl.getItemsList();
                     foreach (ItemDataControl idc in ildc.getItems())
                     {
                         if (idc.getId().Equals(this.getElementId()))

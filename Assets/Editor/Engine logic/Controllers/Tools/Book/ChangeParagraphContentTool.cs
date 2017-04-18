@@ -69,7 +69,7 @@ namespace uAdventure.Editor
         {
 
             bookParagraph.setContent(newContent);
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
 
@@ -78,7 +78,7 @@ namespace uAdventure.Editor
         {
 
             bookParagraph.setContent(oldContent);
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
     }

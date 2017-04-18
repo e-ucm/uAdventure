@@ -129,5 +129,8 @@ namespace uAdventure.Editor
                 (CutsceneSlidesEditor)ScriptableObject.CreateInstance(typeof(CutsceneSlidesEditor));
             slidesEditor.Init(this, effect.getPath());
         }
+
+
+        public bool Usable { get { return true; } }
     }
 }

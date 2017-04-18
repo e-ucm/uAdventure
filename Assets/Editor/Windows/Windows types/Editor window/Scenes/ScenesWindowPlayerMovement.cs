@@ -17,7 +17,7 @@ namespace uAdventure.Editor
         {
             if (GameRources.GetInstance().selectedSceneIndex >= 0)
                 backgroundPath =
-                    Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                    Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                         GameRources.GetInstance().selectedSceneIndex].getPreviewBackground();
             if (backgroundPath != null && !backgroundPath.Equals(""))
                 backgroundPreviewTex = AssetsController.getImage(backgroundPath).texture;
@@ -34,7 +34,7 @@ namespace uAdventure.Editor
             {
                 PlayerMovementEditor window =
                     (PlayerMovementEditor)ScriptableObject.CreateInstance(typeof(PlayerMovementEditor));
-                window.Init(this, Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                window.Init(this, Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                     GameRources.GetInstance().selectedSceneIndex]);
             }
             GUI.DrawTexture(previewRect, backgroundPreviewTex, ScaleMode.ScaleToFit);

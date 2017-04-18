@@ -83,7 +83,7 @@ namespace uAdventure.Editor
             scrollPosition = GUILayout.BeginScrollView(scrollPosition);
             for (int i = 0;
                 i <
-                Controller.getInstance().getSelectedChapterDataControl().getBooksList().getBooks()[
+                Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
                     GameRources.GetInstance().selectedBookIndex].getBookParagraphsList().getBookParagraphs().Count;
                 i++)
             {
@@ -92,7 +92,7 @@ namespace uAdventure.Editor
                     GUI.skin = selectedElementSkin;
 
                 GUILayout.BeginHorizontal();
-                tmpType = Controller.getInstance().getSelectedChapterDataControl().getBooksList().getBooks()[
+                tmpType = Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
                     GameRources.GetInstance().selectedBookIndex].getBookParagraphsList().getBookParagraphs()[
                         i].getType();
                 switch (tmpType)
@@ -126,7 +126,7 @@ namespace uAdventure.Editor
 
                     if (
                         GUILayout.Button(
-                            Controller.getInstance().getSelectedChapterDataControl().getBooksList().getBooks()[
+                            Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
                                 GameRources.GetInstance().selectedBookIndex].getBookParagraphsList().getBookParagraphs()
                                 [
                                     i].getParagraphContent(),
@@ -148,18 +148,18 @@ namespace uAdventure.Editor
                                 (ImageFileOpenDialog)ScriptableObject.CreateInstance(typeof(ImageFileOpenDialog));
                             imageDialog.Init(this, BaseFileOpenDialog.FileType.BOOK_IMAGE_PARAGRAPH);
                         }
-                        GUILayout.Box(Controller.getInstance().getSelectedChapterDataControl().getBooksList().getBooks()[
+                        GUILayout.Box(Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
                             GameRources.GetInstance().selectedBookIndex].getBookParagraphsList().getBookParagraphs()[
                                 i].getParagraphContent(), GUILayout.MaxWidth(0.4f * windowWidth));
                     }
                     else
                     {
                         editableFieldContent =
-                            Controller.getInstance().getSelectedChapterDataControl().getBooksList().getBooks()[
+                            Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
                                 GameRources.GetInstance().selectedBookIndex].getBookParagraphsList().getBookParagraphs()[
                                     i].getParagraphContent();
                         editableFieldContent = GUILayout.TextField(editableFieldContent, GUILayout.Width(0.69f * windowWidth));
-                        Controller.getInstance().getSelectedChapterDataControl().getBooksList().getBooks()[
+                        Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
                             GameRources.GetInstance().selectedBookIndex].getBookParagraphsList().getBookParagraphs()[
                                 i].setParagraphTextContent(editableFieldContent);
                     }
@@ -183,25 +183,25 @@ namespace uAdventure.Editor
             }
             if (GUILayout.Button(moveUpTex, GUILayout.MaxWidth(0.08f * windowWidth)))
             {
-                Controller.getInstance().getSelectedChapterDataControl().getBooksList().getBooks()[
+                Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
                     GameRources.GetInstance().selectedBookIndex].getBookParagraphsList().moveElementUp(
-                        Controller.getInstance().getSelectedChapterDataControl().getBooksList().getBooks()[
+                        Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
                             GameRources.GetInstance().selectedBookIndex].getBookParagraphsList().getBookParagraphs()[
                                 selectedElement]);
             }
             if (GUILayout.Button(moveDownTex, GUILayout.MaxWidth(0.08f * windowWidth)))
             {
-                Controller.getInstance().getSelectedChapterDataControl().getBooksList().getBooks()[
+                Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
                     GameRources.GetInstance().selectedBookIndex].getBookParagraphsList().moveElementDown(
-                        Controller.getInstance().getSelectedChapterDataControl().getBooksList().getBooks()[
+                        Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
                             GameRources.GetInstance().selectedBookIndex].getBookParagraphsList().getBookParagraphs()[
                                 selectedElement]);
             }
             if (GUILayout.Button(clearTex, GUILayout.MaxWidth(0.08f * windowWidth)))
             {
-                Controller.getInstance().getSelectedChapterDataControl().getBooksList().getBooks()[
+                Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
                     GameRources.GetInstance().selectedBookIndex].getBookParagraphsList().deleteElement(
-                        Controller.getInstance().getSelectedChapterDataControl().getBooksList().getBooks()[
+                        Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
                             GameRources.GetInstance().selectedBookIndex].getBookParagraphsList().getBookParagraphs()[
                                 selectedElement], false);
             }
@@ -216,10 +216,9 @@ namespace uAdventure.Editor
                 switch ((BaseFileOpenDialog.FileType)workingObject)
                 {
                     case BaseFileOpenDialog.FileType.BOOK_IMAGE_PARAGRAPH:
-                        Controller.getInstance()
-                            .addTool(
+                        Controller.Instance                            .addTool(
                                 new ChangeParagraphContentTool(
-                                    Controller.getInstance().getSelectedChapterDataControl().getBooksList().getBooks()[
+                                    Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
                                         GameRources.GetInstance().selectedBookIndex].getBookParagraphsList()
                                         .getBookParagraphsList()[selectedElement], message));
                         break;
@@ -288,7 +287,7 @@ namespace uAdventure.Editor
 
         public void OnCliked()
         {
-            Controller.getInstance().getSelectedChapterDataControl().getBooksList().getBooks()[
+            Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
                 GameRources.GetInstance().selectedBookIndex].getBookParagraphsList()
                 .addElement(Controller.BOOK_TITLE_PARAGRAPH, String.Empty);
         }
@@ -308,7 +307,7 @@ namespace uAdventure.Editor
 
         public void OnCliked()
         {
-            Controller.getInstance().getSelectedChapterDataControl().getBooksList().getBooks()[
+            Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
                 GameRources.GetInstance().selectedBookIndex].getBookParagraphsList()
                 .addElement(Controller.BOOK_BULLET_PARAGRAPH, String.Empty);
         }
@@ -328,7 +327,7 @@ namespace uAdventure.Editor
 
         public void OnCliked()
         {
-            Controller.getInstance().getSelectedChapterDataControl().getBooksList().getBooks()[
+            Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
                 GameRources.GetInstance().selectedBookIndex].getBookParagraphsList()
                 .addElement(Controller.BOOK_TEXT_PARAGRAPH, String.Empty);
         }
@@ -345,7 +344,7 @@ namespace uAdventure.Editor
 
         public void OnCliked()
         {
-            Controller.getInstance().getSelectedChapterDataControl().getBooksList().getBooks()[
+            Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
                 GameRources.GetInstance().selectedBookIndex].getBookParagraphsList()
                 .addElement(Controller.BOOK_IMAGE_PARAGRAPH, String.Empty);
         }

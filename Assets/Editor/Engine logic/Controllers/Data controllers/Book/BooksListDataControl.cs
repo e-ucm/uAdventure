@@ -153,7 +153,7 @@ namespace uAdventure.Editor
                     BookDataControl newDataControl = new BookDataControl(newBook);
                     booksList.Add(newBook);
                     booksDataControlList.Add(newDataControl);
-                    controller.getIdentifierSummary().addBookId(bookId);
+                    controller.IdentifierSummary.addBookId(bookId);
                     //controller.dataModified( );
                     elementAdded = true;
 
@@ -181,7 +181,7 @@ namespace uAdventure.Editor
             newElement.setId(id);
             booksList.Add(newElement);
             booksDataControlList.Add(new BookDataControl(newElement));
-            controller.getIdentifierSummary().addBookId(id);
+            controller.IdentifierSummary.addBookId(id);
             return true;
 
         }
@@ -208,7 +208,7 @@ namespace uAdventure.Editor
                 {
                     booksDataControlList.Remove((BookDataControl)dataControl);
                     controller.deleteIdentifierReferences(bookId);
-                    controller.getIdentifierSummary().deleteBookId(bookId);
+                    controller.IdentifierSummary.deleteBookId(bookId);
                     //controller.dataModified( );
                     elementDeleted = true;
                 }

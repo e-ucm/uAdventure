@@ -16,7 +16,7 @@ namespace uAdventure.Editor
 
         public FlagConditionEditor()
         {
-            flags = Controller.getInstance().getVarFlagSummary().getFlags();
+            flags = Controller.Instance.VarFlagSummary.getFlags();
             if (flags == null || flags.Length == 0)
             {
                 Avaiable = false;

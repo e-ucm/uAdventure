@@ -67,7 +67,7 @@ namespace uAdventure.Editor
 
             parent.removeLine(lineIndex);
             node.RemoveAt(lineIndex);
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
 
@@ -77,7 +77,7 @@ namespace uAdventure.Editor
 
             parent.addLine(lineIndex, lineDeleted);
             node.Insert(lineIndex, conditionDeleted);
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
     }

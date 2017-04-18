@@ -129,7 +129,7 @@ namespace uAdventure.Editor
 
             if (type == Controller.EXIT)
             {
-				string[] generalScenes = controller.getIdentifierSummary().groupIds<IChapterTarget> ();
+				string[] generalScenes = controller.IdentifierSummary.groupIds<IChapterTarget> ();
 
                 if (generalScenes.Length > 0)
                 {

@@ -21,7 +21,7 @@ namespace uAdventure.Editor
             if (GameRources.GetInstance().selectedSetItemIndex >= 0)
             {
                 pathToImg =
-                    Controller.getInstance().getSelectedChapterDataControl().getAtrezzoList().getAtrezzoList()[
+                    Controller.Instance.SelectedChapterDataControl.getAtrezzoList().getAtrezzoList()[
                         GameRources.GetInstance().selectedSetItemIndex].getPreviewImage();
             }
 
@@ -67,10 +67,10 @@ namespace uAdventure.Editor
 
         void OnImageChanged(string val)
         {
-            Debug.Log("PATH: " + val + "\n " + Controller.getInstance().getSelectedChapterDataControl().getAtrezzoList().getAtrezzoList()[
+            Debug.Log("PATH: " + val + "\n " + Controller.Instance.SelectedChapterDataControl.getAtrezzoList().getAtrezzoList()[
                 GameRources.GetInstance().selectedSetItemIndex].getPreviewImage());
             pathToImg = val;
-            Controller.getInstance().getSelectedChapterDataControl().getAtrezzoList().getAtrezzoList()[
+            Controller.Instance.SelectedChapterDataControl.getAtrezzoList().getAtrezzoList()[
                 GameRources.GetInstance().selectedSetItemIndex].setImage(val);
             if (pathToImg != null && !pathToImg.Equals(""))
                 atrezzoImg = AssetsController.getImage(pathToImg).texture;

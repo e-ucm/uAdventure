@@ -48,6 +48,8 @@ namespace uAdventure.Core
 			extensionObjects = new Dictionary<Type, IList>();
 			flags = new List<string> ();
 			vars = new List<string> ();
+            getObjects<NPC>();
+            player = new Player();
         }
 
         /**
@@ -66,6 +68,8 @@ namespace uAdventure.Core
 			extensionObjects = new Dictionary<Type, IList>();
 			flags = new List<string> ();
 			vars = new List<string> ();
+            getObjects<NPC>();
+            player = new Player();
         }
 
         /**

@@ -187,7 +187,7 @@ namespace uAdventure.Editor
             // If the element is a resources block
             if (type == Controller.RESOURCES)
             {
-                elementAdded = Controller.getInstance().addTool(new AddResourcesBlockTool(resourcesList, resourcesDataControlList, cutsceneType, this));
+                elementAdded = Controller.Instance.addTool(new AddResourcesBlockTool(resourcesList, resourcesDataControlList, cutsceneType, this));
             }
 
             return elementAdded;
@@ -270,8 +270,8 @@ namespace uAdventure.Editor
 				
                 cutscene.setId(newCutsceneId);
                 controller.replaceIdentifierReferences(oldCutsceneId, newCutsceneId);
-                controller.getIdentifierSummary().deleteCutsceneId(oldCutsceneId);
-                controller.getIdentifierSummary().addCutsceneId(newCutsceneId);
+                controller.IdentifierSummary.deleteCutsceneId(oldCutsceneId);
+                controller.IdentifierSummary.addCutsceneId(newCutsceneId);
                 //controller.dataModified( );
 
 				return newCutsceneId;
@@ -471,8 +471,8 @@ namespace uAdventure.Editor
 
         public void setNext(int next)
         {
-			var chapterTargets = controller.getIdentifierSummary ().groupIds<IChapterTarget> ();
-            Controller.getInstance().addTool(new ChangeIntegerValueTool(cutscene, next, "getNext", "setNext"));
+			var chapterTargets = controller.IdentifierSummary .groupIds<IChapterTarget> ();
+            Controller.Instance.addTool(new ChangeIntegerValueTool(cutscene, next, "getNext", "setNext"));
             if (cutscene.getTargetId() == null || cutscene.getTargetId().Equals(""))
 			{
 				if(chapterTargets.Length > 0)
@@ -524,13 +524,13 @@ namespace uAdventure.Editor
         public void setTransitionTime(int value)
         {
 
-            Controller.getInstance().addTool(new ChangeIntegerValueTool(cutscene, value, "getTransitionTime", "setTransitionTime"));
+            Controller.Instance.addTool(new ChangeIntegerValueTool(cutscene, value, "getTransitionTime", "setTransitionTime"));
         }
 
         public void setTransitionType(int value)
         {
 
-            Controller.getInstance().addTool(new ChangeIntegerValueTool(cutscene, value, "getTransitionType", "setTransitionType"));
+            Controller.Instance.addTool(new ChangeIntegerValueTool(cutscene, value, "getTransitionType", "setTransitionType"));
         }
 
         /**

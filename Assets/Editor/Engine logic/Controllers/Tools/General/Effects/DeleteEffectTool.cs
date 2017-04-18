@@ -27,7 +27,7 @@ namespace uAdventure.Editor
             this.effects = effects;
             this.index = index;
             this.conditions = conditions;
-            controller = Controller.getInstance();
+            controller = Controller.Instance;
         }
 
         public override bool canRedo()
@@ -65,7 +65,7 @@ namespace uAdventure.Editor
             effects.getEffects().RemoveAt(index);
             conditions.RemoveAt(index);
             updateVarFlagSummary((Effect)effectDeleted);
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
 
@@ -75,7 +75,7 @@ namespace uAdventure.Editor
             effects.getEffects().Insert(index, effectDeleted);
             conditions.Insert(index, condition);
             undoUpdateVarFlagSummary((Effect)effectDeleted);
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
 
@@ -91,31 +91,31 @@ namespace uAdventure.Editor
             if (effect.getType() == EffectType.ACTIVATE)
             {
                 ActivateEffect activateEffect = (ActivateEffect)effect;
-                controller.getVarFlagSummary().deleteReference(activateEffect.getTargetId());
+                controller.VarFlagSummary.deleteReference(activateEffect.getTargetId());
             }
 
             else if (effect.getType() == EffectType.DEACTIVATE)
             {
                 DeactivateEffect deactivateEffect = (DeactivateEffect)effect;
-                controller.getVarFlagSummary().deleteReference(deactivateEffect.getTargetId());
+                controller.VarFlagSummary.deleteReference(deactivateEffect.getTargetId());
             }
 
             else if (effect.getType() == EffectType.SET_VALUE)
             {
                 SetValueEffect setValueEffect = (SetValueEffect)effect;
-                controller.getVarFlagSummary().deleteReference(setValueEffect.getTargetId());
+                controller.VarFlagSummary.deleteReference(setValueEffect.getTargetId());
             }
 
             else if (effect.getType() == EffectType.INCREMENT_VAR)
             {
                 IncrementVarEffect setValueEffect = (IncrementVarEffect)effect;
-                controller.getVarFlagSummary().deleteReference(setValueEffect.getTargetId());
+                controller.VarFlagSummary.deleteReference(setValueEffect.getTargetId());
             }
 
             else if (effect.getType() == EffectType.DECREMENT_VAR)
             {
                 DecrementVarEffect setValueEffect = (DecrementVarEffect)effect;
-                controller.getVarFlagSummary().deleteReference(setValueEffect.getTargetId());
+                controller.VarFlagSummary.deleteReference(setValueEffect.getTargetId());
             }
 
             else if (effect.getType() == EffectType.RANDOM_EFFECT)
@@ -139,31 +139,31 @@ namespace uAdventure.Editor
             if (effect.getType() == EffectType.ACTIVATE)
             {
                 ActivateEffect activateEffect = (ActivateEffect)effect;
-                controller.getVarFlagSummary().addReference(activateEffect.getTargetId());
+                controller.VarFlagSummary.addReference(activateEffect.getTargetId());
             }
 
             else if (effect.getType() == EffectType.DEACTIVATE)
             {
                 DeactivateEffect deactivateEffect = (DeactivateEffect)effect;
-                controller.getVarFlagSummary().addReference(deactivateEffect.getTargetId());
+                controller.VarFlagSummary.addReference(deactivateEffect.getTargetId());
             }
 
             else if (effect.getType() == EffectType.SET_VALUE)
             {
                 SetValueEffect setValueEffect = (SetValueEffect)effect;
-                controller.getVarFlagSummary().addReference(setValueEffect.getTargetId());
+                controller.VarFlagSummary.addReference(setValueEffect.getTargetId());
             }
 
             else if (effect.getType() == EffectType.INCREMENT_VAR)
             {
                 IncrementVarEffect setValueEffect = (IncrementVarEffect)effect;
-                controller.getVarFlagSummary().addReference(setValueEffect.getTargetId());
+                controller.VarFlagSummary.addReference(setValueEffect.getTargetId());
             }
 
             else if (effect.getType() == EffectType.DECREMENT_VAR)
             {
                 DecrementVarEffect setValueEffect = (DecrementVarEffect)effect;
-                controller.getVarFlagSummary().addReference(setValueEffect.getTargetId());
+                controller.VarFlagSummary.addReference(setValueEffect.getTargetId());
             }
 
             else if (effect.getType() == EffectType.RANDOM_EFFECT)

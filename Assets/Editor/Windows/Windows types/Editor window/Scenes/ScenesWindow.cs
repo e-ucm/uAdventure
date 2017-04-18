@@ -123,7 +123,7 @@ namespace uAdventure.Editor
                 if (openedWindow == ScenesWindowType.Exits)
                     GUI.skin = defaultSkin;
                 // Only visible for 3rd person
-                if (Controller.getInstance().playerMode() == DescriptorData.MODE_PLAYER_3RDPERSON)
+                if (Controller.Instance.playerMode() == DescriptorData.MODE_PLAYER_3RDPERSON)
                 {
                     if (openedWindow == ScenesWindowType.Barriers)
                         GUI.skin = selectedButtonSkin;
@@ -189,12 +189,12 @@ namespace uAdventure.Editor
                 //GUILayout.EndHorizontal();
 
                 for (int i = 0;
-					i < Controller.getInstance().getCharapterList().getSelectedChapterDataControl().getScenesList ().getScenes().Count;
+					i < Controller.Instance.ChapterList.getSelectedChapterDataControl().getScenesList ().getScenes().Count;
                     i++)
                 {
                     GUILayout.BeginHorizontal();
                     GUILayout.Label(
-						Controller.getInstance().getCharapterList().getSelectedChapterDataControl().getScenesList ().getScenes()[i].getId(),
+						Controller.Instance.ChapterList.getSelectedChapterDataControl().getScenesList ().getScenes()[i].getId(),
                         GUILayout.Width(m_Rect.width * 0.65f));
                     if (GUILayout.Button(TC.get("GeneralText.Edit"), GUILayout.MaxWidth(m_Rect.width * 0.3f)))
                     {
@@ -242,7 +242,7 @@ namespace uAdventure.Editor
             scenesWindowExits = new ScenesWindowExits(m_Rect, new GUIContent(TC.get("Element.Name3")), "Window");
 
             // Only visible for 3rd person
-            if (Controller.getInstance().playerMode() == DescriptorData.MODE_PLAYER_3RDPERSON)
+            if (Controller.Instance.playerMode() == DescriptorData.MODE_PLAYER_3RDPERSON)
             {
                 scenesWindowBarriers = new ScenesWindowBarriers(m_Rect, new GUIContent(TC.get("BarriersList.Title")), "Window");
                 scenesWindowPlayerMovement = new ScenesWindowPlayerMovement(m_Rect, new GUIContent(TC.get("Trajectory.Title")), "Window");
@@ -252,8 +252,8 @@ namespace uAdventure.Editor
         void GenerateToggleList()
         {
             toggleList =
-                new List<bool>(Controller.getInstance().getCharapterList().getSelectedChapterData().getScenes().Count);
-            for (int i = 0; i < Controller.getInstance().getCharapterList().getSelectedChapterData().getScenes().Count; i++)
+                new List<bool>(Controller.Instance.ChapterList.getSelectedChapterData().getScenes().Count);
+            for (int i = 0; i < Controller.Instance.ChapterList.getSelectedChapterData().getScenes().Count; i++)
                 toggleList.Add(true);
         }
 
@@ -263,27 +263,23 @@ namespace uAdventure.Editor
 
         protected override void OnElementNameChanged(ReorderableList r, int index, string newName)
         {
-			Controller.getInstance().getCharapterList().getSelectedChapterDataControl().getScenesList().getScenes ()[index].renameElement(newName);
+			Controller.Instance.ChapterList.getSelectedChapterDataControl().getScenesList().getScenes ()[index].renameElement(newName);
         }
 
         protected override void OnAdd(ReorderableList r)
         {
             if(r.index != -1 && r.index < r.list.Count)
             {
-                Controller.getInstance()
-                           .getCharapterList()
-                           .getSelectedChapterDataControl()
+                Controller.Instance                           .ChapterList                           .getSelectedChapterDataControl()
                            .getScenesList()
                            .duplicateElement(
-                               Controller.getInstance()
-                                   .getCharapterList()
-                                   .getSelectedChapterDataControl()
+                               Controller.Instance                                   .ChapterList                                   .getSelectedChapterDataControl()
                                    .getScenesList()
                                    .getScenes()[r.index]);
             }
             else
             {
-                Controller.getInstance().getSelectedChapterDataControl().getScenesList().addElement(Controller.SCENE, "newScene");
+                Controller.Instance.SelectedChapterDataControl.getScenesList().addElement(Controller.SCENE, "newScene");
             }
             
         }
@@ -297,14 +293,10 @@ namespace uAdventure.Editor
         {
             if(r.index != -1)
             {
-                Controller.getInstance()
-                              .getCharapterList()
-                              .getSelectedChapterDataControl()
+                Controller.Instance                              .ChapterList                              .getSelectedChapterDataControl()
                               .getScenesList()
                               .deleteElement(
-                                  Controller.getInstance()
-                                      .getCharapterList()
-                                      .getSelectedChapterDataControl()
+                                  Controller.Instance                                      .ChapterList                                      .getSelectedChapterDataControl()
                                       .getScenesList()
                                       .getScenes()[r.index], false);
 
@@ -319,8 +311,7 @@ namespace uAdventure.Editor
 
         protected override void OnReorder(ReorderableList r)
         {
-			var dataControlList = Controller.getInstance ()
-				.getCharapterList ().getSelectedChapterDataControl ().getScenesList ();
+			var dataControlList = Controller.Instance 				.ChapterList .getSelectedChapterDataControl ().getScenesList ();
 
 			var toPos = r.index;
 			var fromPos = dataControlList.getScenes ().FindIndex (i => i.getId () == r.list [r.index] as string);
@@ -336,7 +327,7 @@ namespace uAdventure.Editor
 
         protected override void OnUpdateList(ReorderableList r)
         {
-			Elements = Controller.getInstance().getCharapterList().getSelectedChapterDataControl().getScenesList ().getScenes().ConvertAll(s => s.getId());
+			Elements = Controller.Instance.ChapterList.getSelectedChapterDataControl().getScenesList ().getScenes().ConvertAll(s => s.getId());
         }
     }
 }

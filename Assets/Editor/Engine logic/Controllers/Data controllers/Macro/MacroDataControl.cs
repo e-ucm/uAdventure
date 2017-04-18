@@ -22,7 +22,7 @@ namespace uAdventure.Editor
         public void setDocumentation(string doc)
         {
 
-            Controller.getInstance().addTool(new ChangeDocumentationTool(macro, doc));
+            Controller.Instance.addTool(new ChangeDocumentationTool(macro, doc));
         }
 
         public string getDocumentation()
@@ -70,7 +70,7 @@ namespace uAdventure.Editor
         {
 
             // Check if no references are made to this global state
-            int references = Controller.getInstance().countIdentifierReferences(getId());
+            int references = Controller.Instance.countIdentifierReferences(getId());
             return (references == 0);
         }
 
@@ -178,30 +178,28 @@ namespace uAdventure.Editor
 
             bool elementRenamed = false;
             string oldItemId = getId();
-            string references = Controller.getInstance().countIdentifierReferences(oldItemId).ToString();
+            string references = Controller.Instance.countIdentifierReferences(oldItemId).ToString();
 
             // Ask for confirmation
             if (name != null ||
-                Controller.getInstance()
-                    .showStrictConfirmDialog(TC.get("Operation.RenameMacroTitle"),
+                Controller.Instance                    .showStrictConfirmDialog(TC.get("Operation.RenameMacroTitle"),
                         TC.get("Operation.RenameElementWarning", new string[] { oldItemId, references })))
             {
 
                 // Show a dialog asking for the new item id
                 string newItemId = name;
                 if (name == null)
-                    newItemId = Controller.getInstance()
-                        .showInputDialog(TC.get("Operation.RenameMacroTitle"), TC.get("Operation.RenameMacroMessage"),
+                    newItemId = Controller.Instance                        .showInputDialog(TC.get("Operation.RenameMacroTitle"), TC.get("Operation.RenameMacroMessage"),
                             oldItemId);
 
                 // If some value was typed and the identifiers are different
                 if (newItemId != null && !newItemId.Equals(oldItemId) &&
-                    Controller.getInstance().isElementIdValid(newItemId))
+                    Controller.Instance.isElementIdValid(newItemId))
                 {
                     macro.setId(newItemId);
-                    Controller.getInstance().replaceIdentifierReferences(oldItemId, newItemId);
-                    Controller.getInstance().getIdentifierSummary().deleteMacroId(oldItemId);
-                    Controller.getInstance().getIdentifierSummary().addMacroId(newItemId);
+                    Controller.Instance.replaceIdentifierReferences(oldItemId, newItemId);
+                    Controller.Instance.IdentifierSummary.deleteMacroId(oldItemId);
+                    Controller.Instance.IdentifierSummary.addMacroId(newItemId);
                     //Controller.getInstance().dataModified( );
                     elementRenamed = true;
                 }

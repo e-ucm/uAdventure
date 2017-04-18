@@ -34,10 +34,10 @@ namespace uAdventure.Editor
         {
             List<string> tmp = new List<string>();
             tmp.Add("");
-            tmp.AddRange(Controller.getInstance().getVarFlagSummary().getVars());
+            tmp.AddRange(Controller.Instance.VarFlagSummary.getVars());
             vars = tmp.ToArray();
 
-            this.effect = new IncrementVarEffect(vars[0], 1);
+            this.effect = new IncrementVarEffect(vars.Length > 0 ? vars[0] : "", 1);
         }
 
         public void draw()
@@ -56,6 +56,15 @@ namespace uAdventure.Editor
 
         public AbstractEffect Effect { get { return effect; } set { effect = value as IncrementVarEffect; } }
         public string EffectName { get { return TC.get("IncrementVarEffect.Title"); } }
+
+        public bool Usable
+        {
+            get
+            {
+                return Controller.Instance.VarFlagSummary.getVarCount() > 0;
+            }
+        }
+
         public EffectEditor clone() { return new IncrementVarEffectEditor(); }
 
         public bool manages(AbstractEffect c)

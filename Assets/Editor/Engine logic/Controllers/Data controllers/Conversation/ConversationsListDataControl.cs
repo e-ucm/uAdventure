@@ -135,7 +135,7 @@ namespace uAdventure.Editor
                     // Add the new conversation
                     conversationsList.Add(newConversation);
                     conversationsDataControlList.Add(newConversationDataControl);
-                    controller.getIdentifierSummary().addConversationId(conversationId);
+                    controller.IdentifierSummary.addConversationId(conversationId);
                     //controller.dataModified( );
                     elementAdded = true;
                 }
@@ -164,7 +164,7 @@ namespace uAdventure.Editor
             newElement.setId(id);
             conversationsList.Add(newElement);
             conversationsDataControlList.Add(new GraphConversationDataControl(newElement));
-            controller.getIdentifierSummary().addConversationId(id);
+            controller.IdentifierSummary.addConversationId(id);
 
             string oldId = ((GraphConversation)(dataControl.getContent())).getId();
             /*bool posConfigured = ConversationConfigData.isConversationConfig( oldId );
@@ -213,7 +213,7 @@ namespace uAdventure.Editor
                 {
                     conversationsDataControlList.Remove((ConversationDataControl)dataControl);
                     controller.deleteIdentifierReferences(conversationId);
-                    controller.getIdentifierSummary().deleteConversationId(conversationId);
+                    controller.IdentifierSummary.deleteConversationId(conversationId);
                     //controller.dataModified( );
                     elementDeleted = true;
                 }

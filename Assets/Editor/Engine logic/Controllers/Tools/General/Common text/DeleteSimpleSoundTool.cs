@@ -22,7 +22,7 @@ namespace uAdventure.Editor
         public override bool doTool()
         {
             objectWithSound.setSoundPath(null);
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
 
@@ -30,7 +30,7 @@ namespace uAdventure.Editor
         public override bool redoTool()
         {
             objectWithSound.setSoundPath(null);
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
 
@@ -38,7 +38,7 @@ namespace uAdventure.Editor
         public override bool undoTool()
         {
             objectWithSound.setSoundPath(oldPath);
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
 

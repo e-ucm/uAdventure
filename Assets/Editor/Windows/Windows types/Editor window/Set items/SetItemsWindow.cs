@@ -83,10 +83,10 @@ namespace uAdventure.Editor
             else
             {
                 GUILayout.Space(30);
-                for (int i = 0; i < Controller.getInstance().getCharapterList().getSelectedChapterData().getAtrezzo().Count; i++)
+                for (int i = 0; i < Controller.Instance.ChapterList.getSelectedChapterData().getAtrezzo().Count; i++)
                 {
                     GUILayout.BeginHorizontal();
-                    GUILayout.Box(Controller.getInstance().getCharapterList().getSelectedChapterData().getAtrezzo()[i].getId(), GUILayout.Width(windowWidth * 0.75f));
+                    GUILayout.Box(Controller.Instance.ChapterList.getSelectedChapterData().getAtrezzo()[i].getId(), GUILayout.Width(windowWidth * 0.75f));
                     if (GUILayout.Button(TC.get("GeneralText.Edit"), GUILayout.MaxWidth(windowWidth * 0.2f)))
                     {
                         ShowItemWindowView(i);
@@ -123,27 +123,23 @@ namespace uAdventure.Editor
 
         protected override void OnElementNameChanged(ReorderableList r, int index, string newName)
         {
-			Controller.getInstance().getCharapterList().getSelectedChapterDataControl().getAtrezzoList().getAtrezzoList ()[index].renameElement(newName);
+			Controller.Instance.ChapterList.getSelectedChapterDataControl().getAtrezzoList().getAtrezzoList ()[index].renameElement(newName);
         }
 
         protected override void OnAdd(ReorderableList r)
         {
             if (r.index != -1 && r.index < r.list.Count)
             {
-                Controller.getInstance()
-                           .getCharapterList()
-                           .getSelectedChapterDataControl()
+                Controller.Instance                           .ChapterList                           .getSelectedChapterDataControl()
                            .getAtrezzoList()
                            .duplicateElement(
-                               Controller.getInstance()
-                                   .getCharapterList()
-                                   .getSelectedChapterDataControl()
+                               Controller.Instance                                   .ChapterList                                   .getSelectedChapterDataControl()
                                    .getAtrezzoList()
                                    .getAtrezzoList()[r.index]);
             }
             else
             {
-                Controller.getInstance().getSelectedChapterDataControl().getAtrezzoList().addElement(Controller.ATREZZO, "newAtrezzo");
+                Controller.Instance.SelectedChapterDataControl.getAtrezzoList().addElement(Controller.ATREZZO, "newAtrezzo");
             }
 
         }
@@ -157,14 +153,10 @@ namespace uAdventure.Editor
         {
             if (r.index != -1)
             {
-                Controller.getInstance()
-                              .getCharapterList()
-                              .getSelectedChapterDataControl()
+                Controller.Instance                              .ChapterList                              .getSelectedChapterDataControl()
                               .getAtrezzoList()
                               .deleteElement(
-                                  Controller.getInstance()
-                                      .getCharapterList()
-                                      .getSelectedChapterDataControl()
+                                  Controller.Instance                                      .ChapterList                                      .getSelectedChapterDataControl()
                                       .getAtrezzoList()
                                       .getAtrezzoList()[r.index], false);
 
@@ -179,8 +171,7 @@ namespace uAdventure.Editor
 
         protected override void OnReorder(ReorderableList r)
         {
-			var dataControlList = Controller.getInstance ()
-				.getCharapterList ().getSelectedChapterDataControl ().getAtrezzoList ();
+			var dataControlList = Controller.Instance 				.ChapterList .getSelectedChapterDataControl ().getAtrezzoList ();
 
 			var toPos = r.index;
 			var fromPos = dataControlList.getAtrezzoList ().FindIndex (i => i.getId () == r.list [r.index] as string);
@@ -196,7 +187,7 @@ namespace uAdventure.Editor
 
         protected override void OnUpdateList(ReorderableList r)
         {
-			Elements = Controller.getInstance().getCharapterList().getSelectedChapterDataControl().getAtrezzoList ().getAtrezzoList().ConvertAll(s => s.getId());
+			Elements = Controller.Instance.ChapterList.getSelectedChapterDataControl().getAtrezzoList ().getAtrezzoList().ConvertAll(s => s.getId());
         }
     }
 }

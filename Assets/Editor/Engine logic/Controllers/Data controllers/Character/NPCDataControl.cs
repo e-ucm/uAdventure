@@ -303,7 +303,7 @@ namespace uAdventure.Editor
 
             if (type == Controller.RESOURCES)
             {
-                elementAdded = Controller.getInstance().addTool(new AddResourcesBlockTool(resourcesList, resourcesDataControlList, Controller.NPC, this));
+                elementAdded = Controller.Instance.addTool(new AddResourcesBlockTool(resourcesList, resourcesDataControlList, Controller.NPC, this));
             }
 
             return elementAdded;
@@ -374,8 +374,8 @@ namespace uAdventure.Editor
 				
                 npc.setId(newNPCId);
                 controller.replaceIdentifierReferences(oldNPCId, newNPCId);
-                controller.getIdentifierSummary().deleteNPCId(oldNPCId);
-                controller.getIdentifierSummary().addNPCId(newNPCId);
+                controller.IdentifierSummary.deleteNPCId(oldNPCId);
+                controller.IdentifierSummary.addNPCId(newNPCId);
 				//controller.dataModified( );
 				return newNPCId;
             }

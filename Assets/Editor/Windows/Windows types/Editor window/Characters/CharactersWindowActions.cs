@@ -49,8 +49,8 @@ namespace uAdventure.Editor
             moveUp = (Texture2D)Resources.Load("EAdventureData/img/icons/moveNodeUp", typeof(Texture2D));
             moveDown = (Texture2D)Resources.Load("EAdventureData/img/icons/moveNodeDown", typeof(Texture2D));
 
-            itemsNames = Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItemsIDs();
-            charactersNames = Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCsIDs();
+            itemsNames = Controller.Instance.SelectedChapterDataControl.getItemsList().getItemsIDs();
+            charactersNames = Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCsIDs();
             // Both scenes and cutscenes are necessary for next scene popup
             joinedNamesList = new string[itemsNames.Length + charactersNames.Length + 1];
             joinedNamesList[0] = "none";
@@ -88,7 +88,7 @@ namespace uAdventure.Editor
             // Action table
             for (int i = 0;
                 i <
-                Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                     GameRources.GetInstance().selectedCharacterIndex].getActionsList().getActions().Count;
                 i++)
             {
@@ -97,7 +97,7 @@ namespace uAdventure.Editor
                 else
                     GUI.skin = noBackgroundSkin;
 
-                tmpTex = (Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                tmpTex = (Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                     GameRources.GetInstance().selectedCharacterIndex].getActionsList().getActions()[i].getConditions()
                     .getBlocksCount() > 0
                     ? conditionsTex
@@ -106,14 +106,14 @@ namespace uAdventure.Editor
                 GUILayout.BeginHorizontal();
                 if (i == selectedAction)
                 {
-                    int t = Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                    int t = Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                         GameRources.GetInstance().selectedCharacterIndex].getActionsList().getActions()[i].getType();
 
                     if (t == Controller.ACTION_USE_WITH || t == Controller.ACTION_GIVE_TO || t == Controller.ACTION_DRAG_TO)
                     {
                         selectedTarget =
                             EditorGUILayout.Popup(
-                                Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                                Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                                     GameRources.GetInstance().selectedCharacterIndex].getActionsList().getActions()[i]
                                     .getTypeName(),
                                 selectedTarget, joinedNamesList,
@@ -124,12 +124,12 @@ namespace uAdventure.Editor
                     else
                     {
                         GUILayout.Label(
-                            Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                            Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                                 GameRources.GetInstance().selectedCharacterIndex].getActionsList().getActions()[i]
                                 .getTypeName(), GUILayout.Width(windowWidth * 0.39f));
                     }
 
-                    if (Controller.getInstance().playerMode() == Controller.FILE_ADVENTURE_1STPERSON_PLAYER)
+                    if (Controller.Instance.playerMode() == Controller.FILE_ADVENTURE_1STPERSON_PLAYER)
                     {
                         if (GUILayout.Button(TC.get("ActionsList.NotRelevant"), GUILayout.Width(windowWidth * 0.39f)))
                         {
@@ -140,17 +140,17 @@ namespace uAdventure.Editor
                     {
                         GUILayout.BeginHorizontal(GUILayout.Width(windowWidth * 0.39f));
 
-                        Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                        Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                             GameRources.GetInstance().selectedCharacterIndex].getActionsList().getActions()[i].setNeedsGoTo(
                                 GUILayout.Toggle(
-                                    Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                                    Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                                         GameRources.GetInstance().selectedCharacterIndex].getActionsList().getActions()[i]
                                         .getNeedsGoTo(), ""));
-                        Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                        Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                             GameRources.GetInstance().selectedCharacterIndex].getActionsList().getActions()[i]
                             .setKeepDistance(
                                 EditorGUILayout.IntField(
-                                    Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                                    Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                                         GameRources.GetInstance().selectedCharacterIndex].getActionsList().getActions()[i]
                                         .getKeepDistance()));
 
@@ -161,21 +161,21 @@ namespace uAdventure.Editor
                     {
                         ConditionEditorWindow window =
                             (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
-                        window.Init(Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                        window.Init(Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                             GameRources.GetInstance().selectedCharacterIndex].getActionsList().getActions()[i].getConditions
                             ());
                     }
                 }
                 else
                 {
-                    if (GUILayout.Button(Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                    if (GUILayout.Button(Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                         GameRources.GetInstance().selectedCharacterIndex].getActionsList().getActions()[i].getTypeName(),
                         GUILayout.Width(windowWidth * 0.39f)))
                     {
                         OnActionSelectionChange(i);
                     }
 
-                    if (Controller.getInstance().playerMode() == Controller.FILE_ADVENTURE_1STPERSON_PLAYER)
+                    if (Controller.Instance.playerMode() == Controller.FILE_ADVENTURE_1STPERSON_PLAYER)
                     {
                         if (GUILayout.Button(TC.get("ActionsList.NotRelevant"), GUILayout.Width(windowWidth * 0.39f)))
                         {
@@ -186,7 +186,7 @@ namespace uAdventure.Editor
                     {
                         if (
                             GUILayout.Button(
-                                Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                                Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                                     GameRources.GetInstance().selectedCharacterIndex].getActionsList().getActions()[i].getNeedsGoTo().ToString(), GUILayout.Width(windowWidth * 0.39f)))
                         {
                             OnActionSelectionChange(i);
@@ -214,9 +214,9 @@ namespace uAdventure.Editor
             }
             if (GUILayout.Button(duplicateTex, GUILayout.MaxWidth(0.08f * windowWidth)))
             {
-                Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                     GameRources.GetInstance().selectedCharacterIndex].getActionsList()
-                    .duplicateElement(Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                    .duplicateElement(Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                         GameRources.GetInstance().selectedCharacterIndex].getActionsList().getActions()[selectedAction]);
             }
             //if (GUILayout.Button(moveUp, GUILayout.MaxWidth(0.08f * windowWidth)))
@@ -233,9 +233,9 @@ namespace uAdventure.Editor
             //}
             if (GUILayout.Button(clearTex, GUILayout.MaxWidth(0.08f * windowWidth)))
             {
-                Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                     GameRources.GetInstance().selectedCharacterIndex].getActionsList()
-                    .deleteElement(Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                    .deleteElement(Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                         GameRources.GetInstance().selectedCharacterIndex].getActionsList().getActions()[selectedAction],
                         false);
                 if (selectedAction >= 0)
@@ -259,7 +259,7 @@ namespace uAdventure.Editor
             {
                 EffectEditorWindow window =
                     (EffectEditorWindow)ScriptableObject.CreateInstance(typeof(EffectEditorWindow));
-                window.Init(Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                window.Init(Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                     GameRources.GetInstance().selectedCharacterIndex].getActionsList().getActions()[selectedAction]
                     .getEffects());
             }
@@ -271,7 +271,7 @@ namespace uAdventure.Editor
         {
             selectedAction = i;
             // Refresh docs
-            string doc = Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+            string doc = Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                 GameRources.GetInstance().selectedCharacterIndex].getActionsList().getActions()[selectedAction]
                 .getDocumentation();
             if (!string.IsNullOrEmpty(doc))
@@ -285,23 +285,19 @@ namespace uAdventure.Editor
             }
 
             // Refresh target info
-            string targetID = Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+            string targetID = Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                 GameRources.GetInstance().selectedCharacterIndex].getActionsList().getActions()[selectedAction].getIdTarget();
 
             selectedTarget =
                 selectedTargetLast =
-                    Controller.getInstance()
-                        .getSelectedChapterDataControl()
-                        .getItemsList()
+                    Controller.Instance                        .SelectedChapterDataControl                        .getItemsList()
                         .getItemIndexByID(targetID);
             // if target is not an item, but a npc...
             if (selectedTarget == -1)
             {
                 selectedTarget =
                     selectedTargetLast =
-                        Controller.getInstance()
-                            .getSelectedChapterDataControl()
-                            .getNPCsList()
+                        Controller.Instance                            .SelectedChapterDataControl                            .getNPCsList()
                             .getNPCIndexByID(targetID);
 
                 if (selectedTarget == -1)
@@ -318,11 +314,11 @@ namespace uAdventure.Editor
 
         private void OnDocumentationChanged(string s)
         {
-            if (selectedAction >= 0 && Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+            if (selectedAction >= 0 && Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                 GameRources.GetInstance().selectedCharacterIndex].getActionsList().getActions()[selectedAction] != null)
             {
                 documentationLast = s;
-                Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                     GameRources.GetInstance().selectedCharacterIndex].getActionsList().getActions()[selectedAction]
                     .setDocumentation(s);
             }
@@ -334,12 +330,12 @@ namespace uAdventure.Editor
             // Scene was choosed
             if (i < itemsNames.Length)
 
-                Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                     GameRources.GetInstance().selectedCharacterIndex].getActionsList().getActions()[selectedAction]
                     .setIdTarget(
                         itemsNames[i]);
             else
-                Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                     GameRources.GetInstance().selectedCharacterIndex].getActionsList().getActions()[selectedAction]
                     .setIdTarget(
                         charactersNames[i - itemsNames.Length]);
@@ -403,7 +399,7 @@ namespace uAdventure.Editor
 
             public void OnCliked()
             {
-                Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                     GameRources.GetInstance().selectedCharacterIndex].getActionsList().addElement(Controller.ACTION_USE, "");
             }
         }
@@ -419,7 +415,7 @@ namespace uAdventure.Editor
 
             public void OnCliked()
             {
-                Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                     GameRources.GetInstance().selectedCharacterIndex].getActionsList()
                     .addElement(Controller.ACTION_EXAMINE, "");
             }
@@ -436,7 +432,7 @@ namespace uAdventure.Editor
 
             public void OnCliked()
             {
-                Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                     GameRources.GetInstance().selectedCharacterIndex].getActionsList()
                     .addElement(Controller.ACTION_CUSTOM, "");
             }
@@ -453,7 +449,7 @@ namespace uAdventure.Editor
 
             public void OnCliked()
             {
-                Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                     GameRources.GetInstance().selectedCharacterIndex].getActionsList()
                     .addElement(Controller.ACTION_TALK_TO, "");
             }
@@ -470,7 +466,7 @@ namespace uAdventure.Editor
 
             public void OnCliked()
             {
-                Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                     GameRources.GetInstance().selectedCharacterIndex].getActionsList()
                     .addElement(Controller.ACTION_DRAG_TO, "");
             }

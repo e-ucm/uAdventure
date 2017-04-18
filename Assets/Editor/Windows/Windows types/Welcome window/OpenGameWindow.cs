@@ -48,9 +48,7 @@ namespace uAdventure.Editor
                         // Insert code to read the stream here.
                         selectedGameProjectPath = ofd.FileName;
                         GameRources.LoadGameProject(selectedGameProjectPath);
-                        EditorWindowBase.Init();
-                        EditorWindowBase window = (EditorWindowBase)EditorWindow.GetWindow(typeof(EditorWindowBase));
-                        window.Show();
+                        Controller.OpenEditorWindow();
                     }
                     myStream.Dispose();
                 }

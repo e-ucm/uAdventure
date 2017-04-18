@@ -78,7 +78,7 @@ namespace uAdventure.Editor
             {
                 Macro macro = macrosList[i];
                 macrosInfo[i][0] = macro.getId();
-                macrosInfo[i][1] = Controller.getInstance().countIdentifierReferences(macro.getId()).ToString();
+                macrosInfo[i][1] = Controller.Instance.countIdentifierReferences(macro.getId()).ToString();
             }
 
             return macrosInfo;
@@ -164,7 +164,7 @@ namespace uAdventure.Editor
                     Macro newMacro = new Macro(macroId);
                     macrosList.Add(newMacro);
                     macrosDataControlList.Add(new MacroDataControl(newMacro));
-                    controller.getIdentifierSummary().addMacroId(macroId);
+                    controller.IdentifierSummary.addMacroId(macroId);
                     //controller.dataModified( );
                     elementAdded = true;
                 }
@@ -191,7 +191,7 @@ namespace uAdventure.Editor
             newElement.setId(id);
             macrosList.Add(newElement);
             macrosDataControlList.Add(new MacroDataControl(newElement));
-            controller.getIdentifierSummary().addMacroId(id);
+            controller.IdentifierSummary.addMacroId(id);
             return true;
 
         }
@@ -218,7 +218,7 @@ namespace uAdventure.Editor
                 {
                     macrosDataControlList.Remove((MacroDataControl)dataControl);
                     controller.deleteIdentifierReferences(macroId);
-                    controller.getIdentifierSummary().deleteMacroId(macroId);
+                    controller.IdentifierSummary.deleteMacroId(macroId);
                     //controller.dataModified( );
                     elementDeleted = true;
                 }

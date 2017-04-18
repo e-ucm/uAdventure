@@ -128,7 +128,7 @@ namespace uAdventure.Editor
                 allConditions[parent].Add(new ConditionsController(new Conditions(), Controller.CONVERSATION_OPTION_LINE,
                     "0"));
             }
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
 
@@ -144,7 +144,7 @@ namespace uAdventure.Editor
                 allConditions[parent].RemoveAt(index);
 
             }
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
     }

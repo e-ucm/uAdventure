@@ -14,8 +14,8 @@ namespace uAdventure.Geo
 
         public TriggerZonedSceneEffectEditor() : base()
         {
-            this.zones = Controller.getInstance().getSelectedChapterDataControl().getObjects<GeoElement>().ConvertAll(g => g.getId());
-            this.effect = subeffect = new TriggerZonedSceneEffect(effect.getTargetId(), zones[0], effect.getX(), effect.getY());
+            this.zones = Controller.Instance.SelectedChapterDataControl.getObjects<GeoElement>().ConvertAll(g => g.getId());
+            this.effect = subeffect = new TriggerZonedSceneEffect(effect.getTargetId(), "", effect.getX(), effect.getY());
         }
         protected TriggerZonedSceneEffect subeffect;
         public override void draw()
@@ -37,5 +37,15 @@ namespace uAdventure.Geo
         {
             return new TriggerZonedSceneEffectEditor();
         }
+
+        public override bool Usable
+        {
+            get
+            {
+                return zones.Count > 0;
+            }
+        }
+
+
     }
 }

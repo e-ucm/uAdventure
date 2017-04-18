@@ -174,7 +174,7 @@ namespace uAdventure.QR
 
         protected override void OnAdd(ReorderableList r)
         {
-            Controller.getInstance().getSelectedChapterDataControl().getObjects<QR>().Add(new QR("newQRCode"));
+            Controller.Instance.SelectedChapterDataControl.getObjects<QR>().Add(new QR("newQRCode"));
         }
 
         protected override void OnAddOption(ReorderableList r, string option){}
@@ -186,18 +186,18 @@ namespace uAdventure.QR
 
         protected override void OnElementNameChanged(ReorderableList r, int index, string newName)
         {
-            Controller.getInstance().getSelectedChapterDataControl().getObjects<QR>()[index].Id = newName;
+            Controller.Instance.SelectedChapterDataControl.getObjects<QR>()[index].Id = newName;
         }
 
         protected override void OnRemove(ReorderableList r)
         {
-            Controller.getInstance().getSelectedChapterDataControl().getObjects<QR>().RemoveAt(r.index);
+            Controller.Instance.SelectedChapterDataControl.getObjects<QR>().RemoveAt(r.index);
         }
 
         protected override void OnReorder(ReorderableList r)
 		{
 			string idToMove = r.list [r.index] as string;
-			var temp = Controller.getInstance ().getSelectedChapterDataControl ().getObjects<QR> ();
+			var temp = Controller.Instance .SelectedChapterDataControl .getObjects<QR> ();
 			QR toMove = temp.Find (qr => qr.getId () == idToMove);
 			temp.Remove (toMove);
 			temp.Insert (r.index, toMove);
@@ -211,7 +211,7 @@ namespace uAdventure.QR
                 return;
             }
 
-            var newSelection = Controller.getInstance().getSelectedChapterDataControl().getObjects<QR>()[r.index];
+            var newSelection = Controller.Instance.SelectedChapterDataControl.getObjects<QR>()[r.index];
             if(newSelection != null && newSelection != selectedQR)
             {
                 selectedQR = newSelection;
@@ -221,7 +221,7 @@ namespace uAdventure.QR
 
         protected override void OnUpdateList(ReorderableList r)
         {
-            r.list = Controller.getInstance().getSelectedChapterDataControl().getObjects<QR>().ConvertAll(qr => qr.Id);
+            r.list = Controller.Instance.SelectedChapterDataControl.getObjects<QR>().ConvertAll(qr => qr.Id);
         }
     }
 }

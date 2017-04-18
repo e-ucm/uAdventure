@@ -359,8 +359,8 @@ namespace uAdventure.Editor
 				
                 graphConversation.setId(newConversationId);
                 controller.replaceIdentifierReferences(oldConversationId, newConversationId);
-                controller.getIdentifierSummary().deleteConversationId(oldConversationId);
-                controller.getIdentifierSummary().addConversationId(newConversationId);
+                controller.IdentifierSummary.deleteConversationId(oldConversationId);
+                controller.IdentifierSummary.addConversationId(newConversationId);
                 //controller.dataModified( );
 
 				return newConversationId;

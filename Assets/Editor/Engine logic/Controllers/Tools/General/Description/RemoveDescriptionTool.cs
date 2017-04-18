@@ -66,7 +66,7 @@ namespace uAdventure.Editor
             // If it was the last one, show an error message
             else
                 //TODO cambiar cadenas
-                Controller.getInstance().showErrorDialog(TC.get("Operation.DeleteResourcesTitle"), TC.get("Operation.DeleteResourcesErrorLastResources"));
+                Controller.Instance.showErrorDialog(TC.get("Operation.DeleteResourcesTitle"), TC.get("Operation.DeleteResourcesErrorLastResources"));
 
             return elementDeleted;
 
@@ -78,7 +78,7 @@ namespace uAdventure.Editor
 
             bool redone = doTool();
             if (redone)
-                Controller.getInstance().updatePanel();
+                Controller.Instance.updatePanel();
             return redone;
         }
 
@@ -89,7 +89,7 @@ namespace uAdventure.Editor
             descriptionsController.addDescriptionController(deletedDescriptionController, lastSelectedDescription);
             descriptionsController.addDescription(deletedDescriptionController.getDescriptionData(), lastSelectedDescription);
             descriptionsController.setSelectedDescription(lastSelectedDescription);
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
 

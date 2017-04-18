@@ -83,7 +83,7 @@ namespace uAdventure.Editor
         {
 
             rectangle.setValues(x, y, width, height);
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
 
@@ -92,7 +92,7 @@ namespace uAdventure.Editor
         {
 
             rectangle.setValues(oldX, oldY, oldWidth, oldHeight);
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
 

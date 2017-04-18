@@ -148,7 +148,7 @@ namespace uAdventure.Editor
                     ActiveAreaDataControl newActiveAreaDataControl = new ActiveAreaDataControl(sceneDataControl,
                         newActiveArea);
                     activeAreasDataControlList.Add(newActiveAreaDataControl);
-                    controller.getIdentifierSummary().addActiveAreaId(itemId);
+                    controller.IdentifierSummary.addActiveAreaId(itemId);
                     //controller.dataModified( );
                     elementAdded = true;
                 }
@@ -183,7 +183,7 @@ namespace uAdventure.Editor
             newElement.setId(id);
             activeAreasList.Add(newElement);
             activeAreasDataControlList.Add(new ActiveAreaDataControl(sceneDataControl, newElement));
-            controller.getIdentifierSummary().addActiveAreaId(id);
+            controller.IdentifierSummary.addActiveAreaId(id);
             return true;
 
         }
@@ -204,7 +204,7 @@ namespace uAdventure.Editor
                 {
                     activeAreasDataControlList.Remove((ActiveAreaDataControl)dataControl);
                     controller.deleteIdentifierReferences(id);
-                    controller.getIdentifierSummary().deleteActiveAreaId(((ActiveArea)dataControl.getContent()).getId());
+                    controller.IdentifierSummary.deleteActiveAreaId(((ActiveArea)dataControl.getContent()).getId());
                     elementDeleted = true;
                 }
             }

@@ -36,12 +36,12 @@ namespace uAdventure.Editor
 
             editor.Milestone = mil;
 
-            scenes = Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenesIDs();
-            characters = Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCsIDs();
-            items = Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItemsIDs();
+            scenes = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenesIDs();
+            characters = Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCsIDs();
+            items = Controller.Instance.SelectedChapterDataControl.getItemsList().getItemsIDs();
 
             List<string> tmplist = new List<string>();
-            foreach (Completable c in Controller.getInstance().getSelectedChapterDataControl().getCompletables())
+            foreach (Completable c in Controller.Instance.SelectedChapterDataControl.getCompletables())
                 tmplist.Add(c.getId());
             completables = tmplist.ToArray();
 

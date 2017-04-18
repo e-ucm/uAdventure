@@ -112,9 +112,10 @@ namespace uAdventure.QR
 
         private void UpdateQRIds()
         {
-            var controllerQRList = Controller.getInstance().getSelectedChapterDataControl().getObjects<QR>();
+            var controllerQRList = Controller.Instance.SelectedChapterDataControl.getObjects<QR>();
             qrIds = controllerQRList.ConvertAll(qr => qr.Id);
             qrIds.Sort();
         }
+        public bool Usable { get { return qrIds.Count > 0; } }
     }
 }

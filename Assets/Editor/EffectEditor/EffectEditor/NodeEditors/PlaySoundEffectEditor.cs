@@ -105,5 +105,8 @@ namespace uAdventure.Editor
         {
             Debug.Log("Wiadomość nie OK");
         }
+
+
+        public bool Usable { get { return true; } }
     }
 }
