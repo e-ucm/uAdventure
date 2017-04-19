@@ -318,21 +318,25 @@ namespace uAdventure.Editor
                 // If the node is a option node
                 if (node is OptionConversationNode)
                 {
-
+                    var ocn = node as OptionConversationNode;
                     // Create the node element and set the nodeindex
                     nodeElement = doc.CreateElement("option-node");
                     nodeElement.SetAttribute("nodeindex", i.ToString());
+
+                    if(!string.IsNullOrEmpty(ocn.getXApiQuestion()))
+                        nodeElement.SetAttribute("question", ocn.getXApiQuestion());
+
                     // Adds a random attribute if "random" is activate in conversation node data
-                    if (((OptionConversationNode)node).isRandom())
+                    if (ocn.isRandom())
                         nodeElement.SetAttribute("random", "yes");
                     // Adds a random attribute if "keepShowing" is activate in conversation node data
-                    if (((OptionConversationNode)node).isKeepShowing())
+                    if (ocn.isKeepShowing())
                         nodeElement.SetAttribute("keepShowing", "yes");
                     // Adds a random attribute if "showUserOption" is activate in conversation node data
-                    if (((OptionConversationNode)node).isShowUserOption())
+                    if (ocn.isShowUserOption())
                         nodeElement.SetAttribute("showUserOption", "yes");
                     // Adds a random attribute if "preListening" is activate in conversation node data
-                    if (((OptionConversationNode)node).isPreListening())
+                    if (ocn.isPreListening())
                         nodeElement.SetAttribute("preListening", "yes");
                     if (node.getEditorX() != -1)
                     {
@@ -363,10 +367,14 @@ namespace uAdventure.Editor
                         //If there is a synthesizer valid voice, store it as attribute
                         if (line.getSynthesizerVoice())
                             lineElement.SetAttribute("synthesize", "yes");
-                        
+
+                        if (line.getXApiCorrect() == true)
+                            lineElement.SetAttribute("correct", line.getXApiCorrect().ToString().ToLower());
+
                         // Create a child tag, and set it the index of the child
                         XmlElement childElement = doc.CreateElement("child");
                         childElement.SetAttribute("nodeindex", nodes.IndexOf(node.getChild(j)).ToString());
+
 
                         // Insert the text line in the option node
                         nodeElement.AppendChild(lineElement);
@@ -375,6 +383,22 @@ namespace uAdventure.Editor
                         // Insert child tag
                         nodeElement.AppendChild(childElement);
                     }
+
+                    if(ocn.Timeout >= 0)
+                    {
+                        // Timeout
+                        XmlElement timeoutElement = doc.CreateElement("timeout");
+                        timeoutElement.InnerText = ocn.Timeout.ToString();
+                        nodeElement.AppendChild(timeoutElement);
+                        // Timeout conditions
+                        DOMWriterUtility.DOMWrite(nodeElement, ocn.TimeoutConditions);
+
+                        // Create a child tag, and set it the index of the child
+                        XmlElement timeoutchildElement = doc.CreateElement("child");
+                        timeoutchildElement.SetAttribute("nodeindex", nodes.IndexOf(node.getChild(node.getChildCount() - 1)).ToString());
+                        nodeElement.AppendChild(timeoutchildElement);
+                    }
+
                     // If node has an effect, include it into the DOM
                     if (node.hasEffects())
                     {

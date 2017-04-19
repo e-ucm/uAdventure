@@ -85,8 +85,11 @@ namespace uAdventure.Runner
         {
             this.child = option;
             OptionConversationNode onode = ((OptionConversationNode)node);
-            Tracker.T.alternative.Selected(onode.getXApiQuestion(), onode.getLine(option).getText().Replace(",", " "), onode.getLine(option).getXApiCorrect(), AlternativeTracker.Alternative.Question);
-            Tracker.T.RequestFlush();
+            if (!string.IsNullOrEmpty(onode.getXApiQuestion()))
+            {
+                Tracker.T.alternative.Selected(onode.getXApiQuestion(), onode.getLine(option).getText().Replace(",", " "), onode.getLine(option).getXApiCorrect(), AlternativeTracker.Alternative.Question);
+                Tracker.T.RequestFlush();
+            }
         }
 
         public ConversationNodeHolder getChild()

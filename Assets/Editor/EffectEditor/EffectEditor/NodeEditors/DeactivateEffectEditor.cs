@@ -55,7 +55,7 @@ namespace uAdventure.Editor
         {
             get
             {
-                return Controller.Instance.VarFlagSummary.getVarCount() > 0;
+                return Controller.Instance.VarFlagSummary.getFlagCount() > 0;
             }
         }
 
