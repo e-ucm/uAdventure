@@ -31,6 +31,7 @@ namespace uAdventure.Editor
         private string[] variables;
 
         private List<Completable> completables = new List<Completable>();
+		private bool Available { get; set; }
 
         public AssesmentProfileWindow(Rect aStartPos, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, new GUIContent(TC.get("Analytics.Title")), aStyle, aOptions)
@@ -47,8 +48,6 @@ namespace uAdventure.Editor
 
 
             col_width = 0.8f / num_colums;
-
-            variables = Controller.Instance.VarFlagSummary.getVars();
 
             this.completables = Controller.Instance.SelectedChapterDataControl.getCompletables();
 
@@ -67,7 +66,11 @@ namespace uAdventure.Editor
         }
 
         public override void Draw(int aID)
-        {
+		{
+
+			variables = Controller.Instance.VarFlagSummary.getVars();
+			Available = variables != null && variables.Length > 0;
+
             var windowWidth = Rect.width;
             var windowHeight = Rect.height;
 
@@ -122,9 +125,18 @@ namespace uAdventure.Editor
                     ProgressEditorWindow window = ScriptableObject.CreateInstance<ProgressEditorWindow>();
                     window.Init(completable.getProgress());
                 }
-                selected_variable[completable] = EditorGUILayout.Popup(selected_variable[completable], variables, GUILayout.Width(windowWidth * col_width));
-                completable.getScore().setId(variables[selected_variable[completable]]);
 
+				if (Available)
+				{
+
+					selected_variable[completable] = EditorGUILayout.Popup(selected_variable[completable], variables, GUILayout.Width(windowWidth * col_width));
+					completable.getScore().setId(variables[selected_variable[completable]]);
+
+				}
+				else
+				{
+					EditorGUILayout.HelpBox(TC.get("Condition.Var.Warning"), MessageType.Error);
+				}
                 GUILayout.EndHorizontal();
             }
             GUILayout.EndScrollView();
