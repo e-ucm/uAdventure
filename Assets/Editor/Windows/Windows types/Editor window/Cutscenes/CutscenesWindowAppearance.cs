@@ -2,6 +2,7 @@
 using System.Collections;
 
 using uAdventure.Core;
+using System.Linq;
 
 namespace uAdventure.Editor
 {
@@ -32,23 +33,6 @@ namespace uAdventure.Editor
         {
             clearImg = (Texture2D)Resources.Load("EAdventureData/img/icons/deleteContent", typeof(Texture2D));
             
-            if (GameRources.GetInstance().selectedCutsceneIndex >= 0)
-            {
-                slidesPath =
-                    Controller.Instance.SelectedChapterDataControl.getCutscenesList().getCutscenes()[
-                        GameRources.GetInstance().selectedCutsceneIndex].getPathToSlides();
-                slidesPathPreview =
-                    Controller.Instance.SelectedChapterDataControl.getCutscenesList().getCutscenes()[
-                        GameRources.GetInstance().selectedCutsceneIndex].getPreviewImage();
-                canSkipVideo =
-                    canSkipVideoLast =
-                        Controller.Instance.SelectedChapterDataControl.getCutscenesList().getCutscenes()[
-                            GameRources.GetInstance().selectedCutsceneIndex].getCanSkip();
-                // Get videopath
-                videoscenePath =
-                    Controller.Instance.SelectedChapterDataControl.getCutscenesList().getCutscenes()[
-                        GameRources.GetInstance().selectedCutsceneIndex].getPathToVideo();
-            }
 
             //musicPath =
             //    Controller.getInstance().getSelectedChapterDataControl().getCutscenesList().getCutscenes()[
@@ -68,12 +52,24 @@ namespace uAdventure.Editor
             var windowHeight = m_Rect.height;
             previewRect = new Rect(0f, 0.5f * windowHeight, windowWidth, windowHeight * 0.45f);
 
+
             /*
             * View for videoscene
             */
             if (Controller.Instance.SelectedChapterDataControl.getCutscenesList().getCutscenes()[
                 GameRources.GetInstance().selectedCutsceneIndex].isVideoscene())
             {
+                // Get videopath
+                videoscenePath =
+                    Controller.Instance.SelectedChapterDataControl.getCutscenesList().getCutscenes()[
+                        GameRources.GetInstance().selectedCutsceneIndex].getPathToVideo();
+
+                // Can skip video
+                canSkipVideo =
+                    canSkipVideoLast =
+                        Controller.Instance.SelectedChapterDataControl.getCutscenesList().getCutscenes()[
+                            GameRources.GetInstance().selectedCutsceneIndex].getCanSkip();
+
                 // Background chooser
                 GUILayout.Label(TC.get("Resources.DescriptionVideoscenes"));
                 GUILayout.BeginHorizontal();
@@ -94,12 +90,27 @@ namespace uAdventure.Editor
                 canSkipVideo = GUILayout.Toggle(canSkipVideo, new GUIContent(TC.get("Videoscene.Skip.label")));
                 if (canSkipVideo != canSkipVideoLast)
                     OnVideosceneCanSkipVideoChanged(canSkipVideo);
+                
+                GUILayout.Space(30);
+
+                GUILayout.Label(TC.get("ImageAssets.Preview"));
+
+                if (slidePreviewMovie != null)
+                    GUI.DrawTexture(previewRect, slidePreviewMovie, ScaleMode.ScaleToFit);
             }
             /*
             * View for slidescene
             */
             else
             {
+
+                slidesPath =
+                    Controller.Instance.SelectedChapterDataControl.getCutscenesList().getCutscenes()[
+                        GameRources.GetInstance().selectedCutsceneIndex].getPathToSlides();
+                slidesPathPreview =
+                    Controller.Instance.SelectedChapterDataControl.getCutscenesList().getCutscenes()[
+                        GameRources.GetInstance().selectedCutsceneIndex].getPreviewImage();
+
                 // Background chooser
                 GUILayout.Label(TC.get("Resources.DescriptionSlidesceneSlides"));
                 GUILayout.BeginHorizontal();
@@ -141,23 +152,13 @@ namespace uAdventure.Editor
                     ShowAssetChooser(AssetType.MUSIC);
                 }
                 GUILayout.EndHorizontal();
-            }
+                
+                GUILayout.Space(30);
 
-            GUILayout.Space(30);
+                GUILayout.Label(TC.get("ImageAssets.Preview"));
 
-            GUILayout.Label(TC.get("ImageAssets.Preview"));
-            if (Controller.Instance.SelectedChapterDataControl.getCutscenesList().getCutscenes()[
-                GameRources.GetInstance().selectedCutsceneIndex].isVideoscene())
-            {
-                if (slidePreviewMovie != null)
-                    GUI.DrawTexture(previewRect, slidePreviewMovie, ScaleMode.ScaleToFit);
-            }
-            else
-            {
                 if (slidesPath != "" && slidesPreview != null)
-                {
                     GUI.DrawTexture(previewRect, slidesPreview, ScaleMode.ScaleToFit);
-                }
             }
         }
 
@@ -230,6 +231,7 @@ namespace uAdventure.Editor
             slidesPathPreview =
                 Controller.Instance.SelectedChapterDataControl.getCutscenesList().getCutscenes()[
                     GameRources.GetInstance().selectedCutsceneIndex].getPreviewImage();
+            
             slidesPreview = AssetsController.getImage(slidesPathPreview).texture;
 
         }
@@ -248,7 +250,10 @@ namespace uAdventure.Editor
 
         void OnSlidesceneCreated(string val)
         {
+            Core.Animation newAnim = new Core.Animation(val.Split('/').Last(), new EditorImageLoader());
+            newAnim.getFrame(0).setUri("assets/special/EmptyAnimation_01.png");
 
+            AnimationWriter.writeAnimation(val, newAnim);
             OnSlidesceneChanged(val);
         }
 

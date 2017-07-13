@@ -30,9 +30,9 @@ namespace uAdventure.GameSelector
         // Use this for initialization
         void Start()
         {
-            Transform panel = this.transform.FindChild("Panel");
-            image = panel.FindChild("Miniatura").GetComponent<Image>();
-            text = panel.FindChild("Titulo").GetComponent<Text>();
+            Transform panel = this.transform.Find("Panel");
+            image = panel.Find("Miniatura").GetComponent<Image>();
+            text = panel.Find("Titulo").GetComponent<Text>();
 
             Texture2D tx;
             if (System.IO.File.Exists(imagepath + "standalone_game_icon.png"))

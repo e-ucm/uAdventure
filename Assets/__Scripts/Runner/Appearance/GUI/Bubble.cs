@@ -24,7 +24,7 @@ namespace uAdventure.Runner
         void Start()
         {
             //resize ();
-            text = this.transform.FindChild("Text");
+            text = this.transform.Find("Text");
             text.GetComponent<Text>().text = data.Line;
             bubblePos = this.GetComponent<RectTransform>();
 

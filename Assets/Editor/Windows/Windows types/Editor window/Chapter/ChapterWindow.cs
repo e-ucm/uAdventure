@@ -88,7 +88,7 @@ namespace uAdventure.Editor
         private void ChangeSelectedInitialScene(int i)
         {
             selInitialSceneLast = i;
-            Controller.Instance                .ChapterList                .getSelectedChapterDataControl()
+            Controller.Instance.ChapterList.getSelectedChapterDataControl()
                 .setInitialScene(getSceneNames()[i]);
         }
 
@@ -98,7 +98,7 @@ namespace uAdventure.Editor
 
             var names = new List<object>();
             foreach (var e in all) names.Add(e);
-            
+
             return names.FindAll(o => o is IChapterTarget).ConvertAll(o => (o as IChapterTarget).getId());
         }
     }

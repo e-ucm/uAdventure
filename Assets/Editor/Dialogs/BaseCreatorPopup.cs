@@ -7,7 +7,7 @@ namespace uAdventure.Editor
     {
 
         protected DialogReceiverInterface reference;
-        protected const float windowWidth = 500, windowHeight = 600;
+        protected float windowWidth = 500, windowHeight = 600;
 
         public virtual void Init(DialogReceiverInterface e)
         {

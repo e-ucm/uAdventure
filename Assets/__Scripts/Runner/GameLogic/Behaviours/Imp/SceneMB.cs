@@ -93,11 +93,11 @@ namespace uAdventure.Runner
 
         private void loadParents()
         {
-            this.Exits = this.transform.FindChild("Exits");
-            this.ActiveAreas = this.transform.FindChild("ActiveAreas");
-            this.Characters = this.transform.FindChild("Characters");
-            this.Objects = this.transform.FindChild("Objects");
-            this.Atrezzos = this.transform.FindChild("Atrezzos");
+            this.Exits = this.transform.Find("Exits");
+            this.ActiveAreas = this.transform.Find("ActiveAreas");
+            this.Characters = this.transform.Find("Characters");
+            this.Objects = this.transform.Find("Objects");
+            this.Atrezzos = this.transform.Find("Atrezzos");
         }
 
         private eAnim slides;
@@ -111,7 +111,7 @@ namespace uAdventure.Runner
                 case GeneralScene.GeneralSceneSceneType.VIDEOSCENE:
                     movie = ResourceManager.Instance.getVideo(((Videoscene)sd).getResources()[0].getAssetPath(Videoscene.RESOURCE_TYPE_VIDEO));
                     movieplayer = MovieState.LOADING;
-                    this.transform.FindChild("Background").localPosition = new Vector3(40, 30, 20);
+                    this.transform.Find("Background").localPosition = new Vector3(40, 30, 20);
                     break;
                 case GeneralScene.GeneralSceneSceneType.SCENE:
 
@@ -124,7 +124,7 @@ namespace uAdventure.Runner
                         {
                             Texture2D tmp = ResourceManager.Instance.getImage(sr.getAssetPath(Scene.RESOURCE_TYPE_BACKGROUND));
 
-                            Transform background = this.transform.FindChild("Background");
+                            Transform background = this.transform.Find("Background");
                             background.GetComponent<Renderer>().material.mainTexture = tmp;
                             float scale = (tmp.width / (tmp.height / 600f)) / 800f;
 
@@ -194,7 +194,7 @@ namespace uAdventure.Runner
                         if (ConditionChecker.check(r.getConditions()))
                         {
                             this.slides = ResourceManager.Instance.getAnimation(r.getAssetPath(Slidescene.RESOURCE_TYPE_SLIDES));
-                            this.transform.FindChild("Background").GetComponent<Renderer>().material.mainTexture = this.slides.frames[0].Image;
+                            this.transform.Find("Background").GetComponent<Renderer>().material.mainTexture = this.slides.frames[0].Image;
                             this.transform.position = new Vector3(40, 30, 20);
                             break;
                         }
@@ -324,7 +324,7 @@ namespace uAdventure.Runner
                     if (current_slide + 1 < this.slides.frames.Count)
                     {
                         current_slide++;
-                        this.transform.FindChild("Background").GetComponent<Renderer>().material.mainTexture = this.slides.frames[current_slide].Image;
+                        this.transform.Find("Background").GetComponent<Renderer>().material.mainTexture = this.slides.frames[current_slide].Image;
                         res = InteractuableResult.REQUIRES_MORE_INTERACTION;
                     }
                     else
@@ -399,8 +399,8 @@ namespace uAdventure.Runner
         {
             //this.transform.FindChild ("Background").GetComponent<Renderer>().material.mainTexture =;
 
-            this.transform.FindChild("Background").GetComponent<MeshRenderer>().material = new Material(Shader.Find("Diffuse"));
-            this.transform.FindChild("Background").GetComponent<MeshRenderer>().material.mainTexture = movie.Movie;
+            this.transform.Find("Background").GetComponent<MeshRenderer>().material = new Material(Shader.Find("Diffuse"));
+            this.transform.Find("Background").GetComponent<MeshRenderer>().material.mainTexture = movie.Movie;
             //sound.clip = movie.audioClip;
         }
     }

@@ -23,11 +23,6 @@ namespace uAdventure.Editor
 
     public class Controller
     {
-        [DllImport("user32.dll")]
-        private static extern void SaveFileDialog();
-
-        private System.Windows.Forms.SaveFileDialog sfd = new System.Windows.Forms.SaveFileDialog();
-
         /**
          * Id for the complete chapter data element.
          */
@@ -499,7 +494,7 @@ namespace uAdventure.Editor
         */
         public void Init(string loadProjectPath = null)
         {
-            if (this.Initialized)
+			if (this.Initialized && loadProjectPath == null)
                 return;
 
             Debug.Log("Controller init"); 
@@ -556,7 +551,7 @@ namespace uAdventure.Editor
             }
             else
             {
-                if (!Directory.Exists("Assets\\Resources\\CurrentGame"))
+                if (!Directory.Exists("Assets/Resources/CurrentGame"))
                 {
                     Debug.Log("No current game found, creating a 1st person view game...");
                     NewAdventure(DescriptorData.MODE_PLAYER_1STPERSON);
@@ -833,7 +828,7 @@ namespace uAdventure.Editor
 
                 AssetsController.createFolderStructure();
                 AssetsController.addSpecialAssets();
-                AssetsController.copyAssets(currentZipFile, new DirectoryInfo("Assets\\Resources").FullName);
+                AssetsController.copyAssets(currentZipFile, new DirectoryInfo("Assets/Resources").FullName);
 
                 // Check the consistency of the chapters
                 bool valid = chaptersController.isValid(null, null);
@@ -875,13 +870,13 @@ namespace uAdventure.Editor
 
         public void Save()
         {
-            Writer.writeData("Assets\\Resources\\CurrentGame", adventureDataControl, true);
+            Writer.writeData("Assets/Resources/CurrentGame", adventureDataControl, true);
             UnityEditor.AssetDatabase.Refresh();
         }
 
         public bool NewAdventure(int fileType)
         {
-            string currentGamePath = "Assets\\Resources\\CurrentGame";
+            string currentGamePath = "Assets/Resources/CurrentGame";
             bool fileCreated = false;
             bool create = false;
 
@@ -1180,6 +1175,7 @@ namespace uAdventure.Editor
          */
         private bool LoadFile(string path = null)
         {
+			Debug.Log ("Loading file");
             bool fileLoaded = false; 
             bool localLoaded = path == null;
             //bool hasIncedence = false;
@@ -1196,7 +1192,7 @@ namespace uAdventure.Editor
                 // LOCAL FILE PATH
                 if (string.IsNullOrEmpty(path))
                 {
-                    path = "Assets\\Resources\\CurrentGame";
+                    path = "Assets/Resources/CurrentGame";
                     localLoaded = true;
                 }
                 else 
@@ -1221,7 +1217,7 @@ namespace uAdventure.Editor
                     currentZipFile = path;
                     currentZipName = directory.Name;
 
-                    System.IO.File.WriteAllText("Assets\\Resources\\CurrentGame.eap", path);
+                    System.IO.File.WriteAllText("Assets/Resources/CurrentGame.eap", path);
                     loadedAdventureData.setProjectName(currentZipName);
 
                     if (!localLoaded)
@@ -1229,7 +1225,7 @@ namespace uAdventure.Editor
                         // Import the proyect
                         AssetsController.createFolderStructure();
                         AssetsController.addSpecialAssets();
-                        AssetsController.copyAllFiles(currentZipFile, new DirectoryInfo("Assets\\Resources\\CurrentGame\\").FullName);
+                        AssetsController.copyAllFiles(currentZipFile, new DirectoryInfo("Assets/Resources/CurrentGame/").FullName);
                         AssetsController.checkAssetFilesConsistency(incidences);
                         Incidence.sortIncidences(incidences);
 
@@ -1349,7 +1345,7 @@ namespace uAdventure.Editor
                         {
                             //loadingScreen.setMessage(TC.get("Operation.SaveProjectAs"));
                             //loadingScreen.setVisible(true);
-                            AssetsController.copyAssets(new DirectoryInfo("Assets\\Resources").FullName, currentZipFile);
+                            AssetsController.copyAssets(new DirectoryInfo("Assets/Resources").FullName, currentZipFile);
                             AssetsController.copyAssets(currentZipFile, newFolder.FullName);
                         }
 
@@ -1717,7 +1713,7 @@ namespace uAdventure.Editor
 
         public bool exportGame()
         {
-            return exportGame("Games\\" + currentZipName);
+            return exportGame("Games/" + currentZipName);
         }
         
 
@@ -2838,7 +2834,7 @@ namespace uAdventure.Editor
 
             var window = EditorWindow.GetWindow(typeof(EditorWindowBase));
             window.Show();
-        }
+        }  
 
         #endregion
     }

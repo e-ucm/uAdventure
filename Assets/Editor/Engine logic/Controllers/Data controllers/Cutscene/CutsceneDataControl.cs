@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using uAdventure.Core;
+using System;
 
 namespace uAdventure.Editor
 {
@@ -431,7 +432,9 @@ namespace uAdventure.Editor
                     previewImagePath += "_01.jpg";
                 else if (previewImagePath != null)
                 {
-                    return Loader.loadAnimation(AssetsController.InputStreamCreatorEditor.getInputStreamCreator(), previewImagePath, new EditorImageLoader()).getFrame(0).getUri();
+                    var animation = Loader.loadAnimation(AssetsController.InputStreamCreatorEditor.getInputStreamCreator(), previewImagePath, new EditorImageLoader());
+
+                    return animation != null && animation.getFrames().Count > 0 ? animation.getFrame(0).getUri() : null;
                 }
 
                 return previewImagePath;
@@ -626,6 +629,18 @@ namespace uAdventure.Editor
         public string getXApiType()
         {
             return cutscene.getXApiType();
+        }
+
+
+
+        public void setXApiClass(string sceneclass)
+        {
+            cutscene.setXApiClass(sceneclass);
+        }
+
+        public void setXApiType(string scenetype)
+        {
+            cutscene.setXApiType(scenetype);
         }
     }
 }

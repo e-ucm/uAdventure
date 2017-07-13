@@ -52,7 +52,7 @@ namespace uAdventure.Core
                 xml = System.IO.File.ReadAllText(path);
 
                 FileInfo fi = new FileInfo(path);
-                directory = fi.DirectoryName + "\\";
+                directory = fi.DirectoryName + "/";
             }
             else
 #endif

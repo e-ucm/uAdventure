@@ -131,7 +131,7 @@ namespace uAdventure.Core
                     if (parsed is ITypeGroupable)
                         t = (parsed as ITypeGroupable).GetGroupType();
 
-                    chapter.getObjects(parsed.GetType()).Add(parsed);
+                    chapter.getObjects(t).Add(parsed);
                 }
             }
 

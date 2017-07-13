@@ -6,7 +6,7 @@ namespace uAdventure.Editor
     {
         public virtual void Init(DialogReceiverInterface e, FileType fType)
         {
-            fileFilter = "JPG set of slides (*.eaa)|*.eaa";
+            fileFilter = "eaa,xml";
             base.Init(e, fType);
         }
 
@@ -18,7 +18,7 @@ namespace uAdventure.Editor
 
         protected override void FileSelectionNotPerfromed()
         {
-            Debug.Log("NIc nie wybrałeś");
+            Debug.Log("No animation selected");
             reference.OnDialogCanceled();
         }
     }

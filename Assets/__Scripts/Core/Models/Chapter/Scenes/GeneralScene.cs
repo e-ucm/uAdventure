@@ -87,8 +87,7 @@ namespace uAdventure.Core
          */
         public string getXApiClass()
         {
-
-            return xapiClass;
+            return xapiClass == null ? "" : xapiClass;
         }
         /**
          * Returns the xapi type of the scene.
@@ -97,8 +96,7 @@ namespace uAdventure.Core
          */
         public string getXApiType()
         {
-
-            return xapiType;
+            return xapiType == null ? "" : xapiType;
         }
 
         /**
@@ -119,8 +117,8 @@ namespace uAdventure.Core
          */
         public string getId()
         {
-
-            return id;
+            
+            return id == null ? "" : id;
         }
 
         /**
@@ -131,7 +129,7 @@ namespace uAdventure.Core
         public string getName()
         {
 
-            return name;
+            return name == null ? "" : name;
         }
 
         /**
@@ -142,7 +140,7 @@ namespace uAdventure.Core
         public string getDocumentation()
         {
 
-            return documentation;
+            return documentation == null ? "" : documentation;
         }
 
         /**

@@ -6,7 +6,7 @@ namespace uAdventure.Editor
     {
         public virtual void Init(DialogReceiverInterface e, FileType fType)
         {
-            fileFilter = "music files (*.mp3)|*.mp3";
+            fileFilter = "mp3";
             base.Init(e, fType);
         }
 

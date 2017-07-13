@@ -145,9 +145,9 @@ namespace uAdventure.GameSelector
 
             tmp.GetComponent<Image>().color = color;
 
-            panel = tmp.transform.FindChild("Panel");
-            panel.FindChild("Miniatura").GetComponent<Image>().sprite = image;
-            panel.FindChild("Titulo").GetComponent<Text>().text = name;
+            panel = tmp.transform.Find("Panel");
+            panel.Find("Miniatura").GetComponent<Image>().sprite = image;
+            panel.Find("Titulo").GetComponent<Text>().text = name;
 
             return tmp;
         }

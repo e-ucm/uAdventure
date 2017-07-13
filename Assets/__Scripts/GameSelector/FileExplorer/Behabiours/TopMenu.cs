@@ -13,7 +13,7 @@ namespace uAdventure.GameSelector
 
         void Start()
         {
-            currentpath = this.transform.FindChild("Path").GetComponent<Text>();
+            currentpath = this.transform.Find("Path").GetComponent<Text>();
             //addgame = this.transform.FindChild("Panel").FindChild("AddGame").GetComponent<Button>();
             shower = GameObject.FindObjectOfType<PathShower>();
         }

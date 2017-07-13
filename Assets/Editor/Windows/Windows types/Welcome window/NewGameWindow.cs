@@ -16,7 +16,6 @@ namespace uAdventure.Editor
             TPS = 1
         };
 
-        private System.Windows.Forms.SaveFileDialog sfd;
         private string selectedGameProjectPath = "";
         
         public NewGameWindow(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
@@ -30,8 +29,6 @@ namespace uAdventure.Editor
             newGameScreenFPSImage =
                 (Texture2D)Resources.Load("EAdventureData/help/common_img/fireProtocol", typeof(Texture2D));
             newGameScreenTPSImage = (Texture2D)Resources.Load("EAdventureData/help/common_img/1492", typeof(Texture2D));
-
-            sfd = new System.Windows.Forms.SaveFileDialog();
         }
 
         public Vector2 scrollPositionButtons;
@@ -140,28 +137,20 @@ namespace uAdventure.Editor
                 case GameType.TPS: type = Controller.FILE_ADVENTURE_3RDPERSON_PLAYER; break;
             }
             
-            Stream myStream = null;
-            sfd.InitialDirectory = "c:\\";
-            sfd.Filter = "ead files (*.ead) | *.ead |eap files (*.eap) | *.eap | All files(*.*) | *.* ";
-            sfd.FilterIndex = 2;
-            sfd.RestoreDirectory = true;
+			var result = EditorUtility.SaveFilePanel ("Select project file", "C:\\", "New project", "ead");
 
-            if (sfd.ShowDialog() == DialogResult.OK)
+			if (result != "")
             {
-
-                if ((myStream = sfd.OpenFile()) != null)
+				FileInfo fileInfo = new FileInfo(result);
+				if (fileInfo.Exists)
                 {
-                    using (myStream)
+                    // Insert code to read the stream here.
+					selectedGameProjectPath = fileInfo.DirectoryName;
+                    if(GameRources.CreateGameProject(selectedGameProjectPath, type))
                     {
-                        // Insert code to read the stream here.
-                        selectedGameProjectPath = sfd.FileName;
-                        if(GameRources.CreateGameProject(selectedGameProjectPath, type))
-                        {
-                            GameRources.LoadGameProject(selectedGameProjectPath);
-                            Controller.OpenEditorWindow();
-                        }
+                        GameRources.LoadGameProject(selectedGameProjectPath);
+                        Controller.OpenEditorWindow();
                     }
-                    myStream.Dispose();
                 }
 
             }

@@ -3,11 +3,13 @@ using System.Text.RegularExpressions;
 
 using uAdventure.Core;
 using Animation = uAdventure.Core.Animation;
+using UnityEditor;
 
 namespace uAdventure.Editor
 {
     public class CutsceneSlidesEditor : BaseCreatorPopup, DialogReceiverInterface
     {
+        private GUIStyle titleStyle;
 
         private Texture2D backgroundPreviewTex = null;
 
@@ -20,17 +22,12 @@ namespace uAdventure.Editor
         private static GUISkin noBackgroundSkin;
         private static GUISkin selectedFrameSkin;
 
-        private Rect animInfoRect;
-        private Rect timelineRect;
-        private Rect timelineButtonsRect;
-        private Rect frameInfoRect;
-        private Rect buttonRect;
-
         private bool useTransitonFlag, slidesAnimationFlag, useTransitonFlagLast, slidesAnimationFlagLast;
 
         private string documentationTextContent = "";
-        private string animationDurationString = "40", animationDurationStringLast = "40", transitionDurationString = "0", transitionDurationStringLast = "0";
         private string imagePath = "", soundPath = "";
+
+        private long animationDuration = 40, transitionDuration = 0;
 
         private Animation workingAnimation;
 
@@ -39,20 +36,25 @@ namespace uAdventure.Editor
         private Vector2 scrollPosition;
 
         private string cutscenePath;
+
+        private void OnEnable()
+        {
+            titleStyle = new GUIStyle();
+            titleStyle.fontStyle = FontStyle.Bold;
+            titleStyle.margin = new RectOffset(0, 0, 5, 5);
+        }
+
         public void Init(DialogReceiverInterface e, string cutsceneFilePath)
         {
+            windowWidth = 800;
+            windowHeight = 1000;
+
             cutscenePath = cutsceneFilePath;
             clearImg = (Texture2D)Resources.Load("EAdventureData/img/icons/deleteContent", typeof(Texture2D));
             addTexture = (Texture2D)Resources.Load("EAdventureData/img/icons/addNode", typeof(Texture2D));
             moveLeft = (Texture2D)Resources.Load("EAdventureData/img/icons/moveNodeLeft", typeof(Texture2D));
             moveRight = (Texture2D)Resources.Load("EAdventureData/img/icons/moveNodeRight", typeof(Texture2D));
             duplicateImg = (Texture2D)Resources.Load("EAdventureData/img/icons/duplicateNode", typeof(Texture2D));
-
-            animInfoRect = new Rect(0f, 0.05f * windowHeight, windowWidth, 0.15f * windowHeight);
-            timelineRect = new Rect(0f, 0.25f * windowHeight, windowWidth, 0.3f * windowHeight);
-            timelineButtonsRect = new Rect(0f, 0.50f * windowHeight, windowWidth, 0.1f * windowHeight);
-            frameInfoRect = new Rect(0f, 0.65f * windowHeight, windowWidth, 0.25f * windowHeight);
-            buttonRect = new Rect(0f, 0.9f * windowHeight, windowWidth, 0.1f * windowHeight);
 
             noBackgroundSkin = (GUISkin)Resources.Load("Editor/EditorNoBackgroundSkin", typeof(GUISkin));
             selectedFrameSkin = (GUISkin)Resources.Load("Editor/EditorLeftMenuItemSkinConcreteOptions", typeof(GUISkin));
@@ -68,164 +70,138 @@ namespace uAdventure.Editor
                 workingAnimation = new Animation(cutsceneFilePath, 40, new EditorImageLoader());
 
             // Initalize
-            selectedFrame = 0;
-            documentationTextContent = workingAnimation.getFrames()[selectedFrame].getDocumentation();
-            imagePath = workingAnimation.getFrames()[selectedFrame].getUri();
-            soundPath = workingAnimation.getFrames()[selectedFrame].getSoundUri();
-            animationDurationString =
-                animationDurationStringLast = workingAnimation.getFrames()[selectedFrame].getTime().ToString();
-            transitionDurationString =
-                transitionDurationStringLast = workingAnimation.getTransitions()[selectedFrame + 1].getTime().ToString();
-            useTransitonFlag = useTransitonFlagLast = workingAnimation.isUseTransitions();
-            slidesAnimationFlag = slidesAnimationFlagLast = workingAnimation.isSlides();
+            selectedFrame = -1;
+            OnFrameSelectionChanged(selectedFrame);
 
             base.Init(e);
         }
 
         void OnGUI()
         {
-            /*
-             * Documentation area
-             */
-            GUILayout.BeginArea(animInfoRect);
+            EditorGUILayout.PrefixLabel(TC.get("Animation.GeneralInfo"), GUIStyle.none, titleStyle);
+            documentationTextContent = EditorGUILayout.TextField(TC.get("Animation.Documentation"), documentationTextContent);
 
-            GUILayout.BeginVertical();
-            GUILayout.Label(TC.get("Animation.Documentation"));
-            GUILayout.Space(5);
-            documentationTextContent = GUILayout.TextField(documentationTextContent);
-            GUILayout.EndVertical();
-
-            GUILayout.BeginVertical();
-            useTransitonFlag = GUILayout.Toggle(useTransitonFlag, TC.get("Animation.UseTransitions"));
+            useTransitonFlag = EditorGUILayout.Toggle(TC.get("Animation.UseTransitions"), useTransitonFlag);
             if (useTransitonFlag != useTransitonFlagLast)
                 OnUseTransitonFlagLastChanged(useTransitonFlag);
-            slidesAnimationFlag = GUILayout.Toggle(slidesAnimationFlag, TC.get("Animation.Slides"));
+
+            slidesAnimationFlag = EditorGUILayout.Toggle(TC.get("Animation.Slides"), slidesAnimationFlag);
             if (slidesAnimationFlag != slidesAnimationFlagLast)
                 OnSlidesAnimationFlagLastChanged(slidesAnimationFlag);
-            GUILayout.EndVertical();
-
-            GUILayout.EndArea();
 
             /*
              * Transition panel
              */
-            GUILayout.BeginArea(timelineRect);
-            scrollPosition = GUILayout.BeginScrollView(scrollPosition, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(false), GUILayout.MaxHeight(0.25f * windowWidth));
+            EditorGUILayout.PrefixLabel(TC.get("Animation.Timeline"), GUIStyle.none, titleStyle);
+            scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition, true, false, GUILayout.Height(125));
+            EditorGUILayout.BeginHorizontal();
             GUI.skin = noBackgroundSkin;
-            GUILayout.BeginHorizontal();
             for (int i = 0; i < workingAnimation.getFrames().Count; i++)
             {
-                GUILayout.BeginHorizontal();
                 if (selectedFrame == i)
                     GUI.skin = selectedFrameSkin;
 
                 if (
                     GUILayout.Button(
-                        workingAnimation.getFrames()[i].getImage(false, false, global::uAdventure.Core.Animation.ENGINE).texture, GUILayout.MaxHeight(0.2f * windowHeight), GUILayout.MaxWidth(0.2f * windowWidth)))
+                        workingAnimation.getFrames()[i].getImage(false, false, global::uAdventure.Core.Animation.ENGINE).texture, GUILayout.Height(100), GUILayout.Width(80)))
                 {
                     OnFrameSelectionChanged(i);
                 }
                 GUI.skin = noBackgroundSkin;
-                GUILayout.EndHorizontal();
             }
             GUI.skin = defaultSkin;
-            GUILayout.EndHorizontal();
-            GUILayout.EndScrollView();
-            GUILayout.EndArea();
+            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.EndScrollView();
 
 
             /*
               * Transition button panel
               */
-            GUILayout.BeginArea(timelineButtonsRect);
-            GUILayout.BeginHorizontal();
+            EditorGUILayout.BeginHorizontal();
             GUI.skin = noBackgroundSkin;
+            GUILayout.FlexibleSpace();
+
+            GUI.enabled = selectedFrame > 0;
             if (GUILayout.Button(moveLeft))
             {
                 workingAnimation.moveLeft(selectedFrame);
+                selectedFrame--;
             }
+
+            GUI.enabled = selectedFrame >= 0;
             if (GUILayout.Button(clearImg))
             {
-                if (selectedFrame >= 0)
-                {
-                    workingAnimation.removeFrame(selectedFrame);
-                    selectedFrame--;
-                }
+                workingAnimation.removeFrame(selectedFrame);
             }
+
+            GUI.enabled = true;
             if (GUILayout.Button(addTexture))
             {
                 workingAnimation.addFrame(selectedFrame, null);
             }
+
+            GUI.enabled = selectedFrame >= 0;
             if (GUILayout.Button(duplicateImg))
             {
                 workingAnimation.addFrame(selectedFrame, workingAnimation.getFrame(selectedFrame));
 
             }
+            GUI.enabled = selectedFrame < workingAnimation.getFrames().Count - 1;
             if (GUILayout.Button(moveRight))
             {
                 workingAnimation.moveRight(selectedFrame);
+                selectedFrame++;
             }
+
             GUI.skin = defaultSkin;
-            GUILayout.EndHorizontal();
-            GUILayout.EndArea();
+            GUILayout.FlexibleSpace();
+            EditorGUILayout.EndHorizontal();
 
 
+            GUI.enabled = selectedFrame != -1;
             /*
              * Frame info panel
              */
-            GUILayout.BeginArea(frameInfoRect);
+            EditorGUILayout.PrefixLabel(TC.get("Animation.Details"), GUIStyle.none, titleStyle);
 
-            GUILayout.BeginHorizontal();
-            GUILayout.Label(TC.get("Animation.Duration"));
-            animationDurationString = GUILayout.TextField(animationDurationString);
-            animationDurationString = (Regex.Match(animationDurationString, "^[0-9]{1,4}$").Success
-                ? animationDurationString
-                : animationDurationStringLast);
-            if (!animationDurationString.Equals(animationDurationStringLast))
-                OnFrameDurationChanged(animationDurationString);
-            GUILayout.Space(5);
-            GUILayout.EndHorizontal();
-
-            GUILayout.BeginHorizontal();
-            GUILayout.Label(TC.get("Animation.Image"));
-            GUILayout.Box(imagePath, GUILayout.MinWidth(0.3f * windowWidth));
-            if (GUILayout.Button(TC.get("Buttons.Select")))
+            EditorGUI.BeginChangeCheck();
+            animationDuration = EditorGUILayout.LongField(TC.get("Animation.Duration"), animationDuration);
+            if (EditorGUI.EndChangeCheck()) OnFrameDurationChanged(animationDuration);
+            
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.PrefixLabel(TC.get("Animation.Image"));
+            if (GUILayout.Button(clearImg, GUILayout.Width(clearImg.width + 20)))
+            {
+            }
+            GUILayout.Box(imagePath, GUILayout.ExpandWidth(true));
+            if (GUILayout.Button(TC.get("Buttons.Select"), GUILayout.Width(GUI.skin.label.CalcSize(new GUIContent(TC.get("Buttons.Select"))).x + 20)))
             {
                 ImageFileOpenDialog imageDialog =
                     (ImageFileOpenDialog)ScriptableObject.CreateInstance(typeof(ImageFileOpenDialog));
                 imageDialog.Init(this, BaseFileOpenDialog.FileType.FRAME_IMAGE);
             }
-            GUILayout.EndHorizontal();
-
-            GUILayout.BeginHorizontal();
-            GUILayout.Label(TC.get("Animation.Sound"));
-            GUILayout.Space(5);
-            if (GUILayout.Button(clearImg))
+            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.PrefixLabel(TC.get("Animation.Sound"));
+            if (GUILayout.Button(clearImg, GUILayout.Width(clearImg.width + 20)))
             {
             }
-            GUILayout.Box(soundPath, GUILayout.MinWidth(0.3f * windowWidth));
-            if (GUILayout.Button(TC.get("Buttons.Select")))
+            GUILayout.Box(soundPath, GUILayout.ExpandWidth(true));
+            if (GUILayout.Button(TC.get("Buttons.Select"), GUILayout.Width(GUI.skin.label.CalcSize(new GUIContent(TC.get("Buttons.Select"))).x + 20)))
             {
                 MusicFileOpenDialog musicDialog =
                     (MusicFileOpenDialog)ScriptableObject.CreateInstance(typeof(MusicFileOpenDialog));
                 musicDialog.Init(this, BaseFileOpenDialog.FileType.FRAME_MUSIC);
             }
-            GUILayout.EndHorizontal();
-            GUILayout.Space(20);
-            GUILayout.BeginHorizontal();
-            GUILayout.Label(TC.get("NextScene.Transition") + " " + TC.get("Animation.Duration"));
-            transitionDurationString = GUILayout.TextField(transitionDurationString);
-            transitionDurationString = (Regex.Match(transitionDurationString, "^[0-9]{1,4}$").Success
-                ? transitionDurationString
-                : transitionDurationStringLast);
-            if (!transitionDurationString.Equals(transitionDurationStringLast))
-                OnTransitionDurationChanged(transitionDurationString);
-            GUILayout.EndHorizontal();
-            GUILayout.EndArea();
+            EditorGUILayout.EndHorizontal();
 
+            EditorGUI.BeginChangeCheck();
+            transitionDuration = EditorGUILayout.LongField(TC.get("NextScene.Transition") + " " + TC.get("Animation.Duration"), transitionDuration);
+            if (EditorGUI.EndChangeCheck()) OnTransitionDurationChanged(transitionDuration);
 
-            GUILayout.BeginArea(buttonRect);
-            GUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+
+            EditorGUILayout.BeginHorizontal();
             if (GUILayout.Button("OK"))
             {
                 AnimationWriter.writeAnimation(cutscenePath, workingAnimation);
@@ -237,24 +213,29 @@ namespace uAdventure.Editor
                 reference.OnDialogCanceled();
                 this.Close();
             }
-            GUILayout.EndHorizontal();
-            GUILayout.EndArea();
+            EditorGUILayout.EndHorizontal();
         }
 
         private void OnFrameSelectionChanged(int i)
         {
-            selectedFrame = i;
-            imagePath = workingAnimation.getFrames()[i].getUri();
-            soundPath = workingAnimation.getFrames()[i].getSoundUri();
+            selectedFrame = (i == selectedFrame) ? -1 : i;
 
-            animationDurationString = animationDurationStringLast = workingAnimation.getFrames()[i].getTime().ToString();
+            if (selectedFrame != -1)
+            {
+                imagePath = workingAnimation.getFrames()[selectedFrame].getUri();
+                soundPath = workingAnimation.getFrames()[selectedFrame].getSoundUri();
+                
+                documentationTextContent = workingAnimation.getFrames()[selectedFrame].getDocumentation();
 
-            documentationTextContent = animationDurationStringLast = workingAnimation.getFrames()[i].getDocumentation();
+                animationDuration = workingAnimation.getFrames()[selectedFrame].getTime();
+                transitionDuration = workingAnimation.getTransitions()[selectedFrame + 1].getTime();
+            }
+            else
+            {
+                imagePath = soundPath = documentationTextContent = string.Empty;
+                animationDuration = transitionDuration = 0;
+            }
 
-            animationDurationString =
-                animationDurationStringLast = workingAnimation.getFrames()[selectedFrame].getTime().ToString();
-            transitionDurationString =
-                transitionDurationStringLast = workingAnimation.getTransitions()[selectedFrame + 1].getTime().ToString();
         }
 
         private void OnSlidesAnimationFlagLastChanged(bool val)
@@ -269,16 +250,14 @@ namespace uAdventure.Editor
             workingAnimation.setUseTransitions(val);
         }
 
-        private void OnFrameDurationChanged(string dur)
+        private void OnFrameDurationChanged(long dur)
         {
-            animationDurationStringLast = dur;
-            workingAnimation.getFrame(selectedFrame).setTime(long.Parse(dur));
+            workingAnimation.getFrame(selectedFrame).setTime(dur);
         }
 
-        private void OnTransitionDurationChanged(string dur)
+        private void OnTransitionDurationChanged(long dur)
         {
-            transitionDurationStringLast = dur;
-            workingAnimation.getTransitions()[selectedFrame + 1].setTime(long.Parse(dur));
+            workingAnimation.getTransitions()[selectedFrame + 1].setTime(dur);
         }
 
 
