@@ -118,6 +118,10 @@ namespace uAdventure.Editor
 
             element.SetAttribute("maxSoundTime", f.getMaxSoundTime().ToString());
 
+            var documentation = doc.CreateElement("documentation");
+            documentation.InnerText = f.getDocumentation();
+            element.AppendChild(documentation);
+
             return element;
         }
     }
