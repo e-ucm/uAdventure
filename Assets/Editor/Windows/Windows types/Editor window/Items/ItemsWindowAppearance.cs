@@ -2,6 +2,8 @@
 using System.Collections;
 
 using uAdventure.Core;
+using UnityEditor;
+using System.Collections.Generic;
 
 namespace uAdventure.Editor
 {
@@ -37,9 +39,11 @@ namespace uAdventure.Editor
         private string inventoryIconPath = "";
         private string imageWhenOverPath = "";
 
-        private int selectedAppearance;
+        private ItemDataControl workingItem;
+        private ScrollableList appearanceList;
 
         private string apperanceName = "", apperanceNameLast = "";
+        private static List<ResourcesDataControl> emptyList;
 
         public ItemsWindowAppearance(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
@@ -70,12 +74,162 @@ namespace uAdventure.Editor
             noBackgroundSkin = (GUISkin)Resources.Load("Editor/EditorNoBackgroundSkin", typeof(GUISkin));
             selectedAreaSkin = (GUISkin)Resources.Load("Editor/EditorLeftMenuItemSkinConcreteOptions", typeof(GUISkin));
 
-            selectedAppearance = -1;
+            appearanceList = new ScrollableList(emptyList = new List<ResourcesDataControl>(), typeof(ResourcesDataControl));
+
+            appearanceList.headerHeight = 20;
+            appearanceList.footerHeight = 20;
+
+            appearanceList.drawHeaderCallback += (rect) =>
+            {
+                EditorGUI.LabelField(new Rect(rect.x, rect.y, rect.width / 2f, rect.height), TC.get("Item.LookPanelTitle"));
+                EditorGUI.LabelField(new Rect(rect.x + rect.width / 2f, rect.y, rect.width / 2f, rect.height), TC.get("Conditions.Title"));
+            };
+
+            appearanceList.drawFooterCallback += (rect) =>
+            {
+                float xMax = rect.xMax;
+                float num = xMax - 83f;
+
+                rect = new Rect(num, rect.y, xMax - num, rect.height);
+                Rect addRect = new Rect(num + 4f, rect.y - 1f, 22f, 13f);
+                Rect dupRect = new Rect(addRect.x + addRect.width + 4f, rect.y - 1f, 22f, 13f);
+                Rect delRect = new Rect(dupRect.x + dupRect.width + 4f, rect.y - 1f, 22f, 13f);
+
+                if (Event.current.type == EventType.Repaint)
+                {
+                    ScrollableList.defaultBehaviours.footerBackground.Draw(rect, false, false, false, false);
+                }
+
+                var buttonStyle = new GUIStyle(EditorGUIUtility.GetBuiltinSkin(EditorSkin.Inspector).button);
+                buttonStyle.margin = new RectOffset(3, 0, 0, 0);
+                buttonStyle.padding = new RectOffset(3, 0, 0, 0);
+                buttonStyle.normal.background = buttonStyle.onNormal.background = null;
+                buttonStyle.active.background = buttonStyle.onActive.background = null;
+                buttonStyle.focused.background = buttonStyle.onFocused.background = null;
+                buttonStyle.hover.background = buttonStyle.onHover.background = null;
+
+                // Add
+                if (GUI.Button(addRect, addTex, buttonStyle))
+                {
+                    if (appearanceList.onAddCallback == null)
+                    {
+                        ScrollableList.defaultBehaviours.DoAddButton(appearanceList.reorderableList);
+                    }
+                    else
+                    {
+                        appearanceList.onAddCallback(appearanceList.reorderableList);
+                    }
+                    if (appearanceList.onChangedCallback != null)
+                    {
+                        appearanceList.onChangedCallback(appearanceList.reorderableList);
+                    }
+                }
+
+                // Duplicate
+                using (new EditorGUI.DisabledScope(appearanceList.index < 0))
+                {
+                    if (GUI.Button(dupRect, duplicateTex, buttonStyle))
+                    {
+                        if (appearanceList.onRemoveCallback == null)
+                        {
+                            ScrollableList.defaultBehaviours.DoRemoveButton(appearanceList.reorderableList);
+                        }
+                        else
+                        {
+                            appearanceList.onRemoveCallback(appearanceList.reorderableList);
+                        }
+                        if (appearanceList.onChangedCallback != null)
+                        {
+                            appearanceList.onChangedCallback(appearanceList.reorderableList);
+                        }
+                    }
+                }
+
+                // Remove
+                using (new EditorGUI.DisabledScope(appearanceList.index < 0 || appearanceList.index >= appearanceList.count || (appearanceList.onCanRemoveCallback != null && !appearanceList.onCanRemoveCallback(appearanceList.reorderableList))))
+                {
+                    if (GUI.Button(delRect, clearTex, buttonStyle))
+                    {
+                        if (appearanceList.onRemoveCallback == null)
+                        {
+                            ScrollableList.defaultBehaviours.DoRemoveButton(appearanceList.reorderableList);
+                        }
+                        else
+                        {
+                            appearanceList.onRemoveCallback(appearanceList.reorderableList);
+                        }
+                        if (appearanceList.onChangedCallback != null)
+                        {
+                            appearanceList.onChangedCallback(appearanceList.reorderableList);
+                        }
+                    }
+                }
+
+                /*GUI.skin = noBackgroundSkin;
+                if (GUI.Button(new Rect(rect.x, rect.y, rect.width / 2f, rect.height), addTex))
+                {
+                }
+                if (GUI.Button(new Rect(rect.x + rect.width / 3f, rect.y, rect.width / 3f, rect.height), duplicateTex))
+                {
+                    workingItem.duplicateElement(workingItem.getResources()[appearanceList.index]);
+                }
+                if (GUI.Button(new Rect(rect.x + 2f * rect.width / 3f, rect.y, rect.width / 3f, rect.height), clearTex))
+                {
+                }
+                GUI.skin = defaultSkin;*/
+            };
+
+            appearanceList.onAddCallback += (list) =>
+            {
+                workingItem.addElement(Controller.RESOURCES, "");
+            };
+            
+            appearanceList.onRemoveCallback += (list) =>
+            {
+                workingItem.deleteElement(workingItem.getResources()[list.index], false);
+            };
+
+            appearanceList.drawElementCallback += (rect, index, isActive, isFocused) =>
+            {
+                var resources = workingItem.getResources()[index];
+                var leftRect = new Rect(rect.x, rect.y, rect.width / 2f, rect.height);
+                var rightRect = new Rect(rect.x + rect.width / 2f, rect.y, rect.width / 2f, rect.height);
+
+                GUILayout.BeginHorizontal(); 
+                if (index == appearanceList.index)
+                {
+                    resources.renameElement(EditorGUI.TextField(leftRect, resources.getName()));
+                }
+                else
+                {
+                    EditorGUI.LabelField(leftRect, resources.getName());
+                }
+
+                if (GUI.Button(rightRect, resources.getConditions().getBlocksCount() > 0 ? conditionsTex : noConditionsTex))
+                {
+                    ConditionEditorWindow window =
+                         (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
+                    window.Init(resources.getConditions());
+                }
+                GUILayout.EndHorizontal();
+            };
         }
 
 
         public override void Draw(int aID)
         {
+            workingItem = Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[GameRources.GetInstance().selectedItemIndex];
+            if (workingItem == null)
+            {
+                appearanceList.list = emptyList;
+                return;
+            }
+            else
+            {
+                appearanceList.list = workingItem.getResources();
+            }
+
+
             var windowWidth = m_Rect.width;
             var windowHeight = m_Rect.height;
 
@@ -83,83 +237,26 @@ namespace uAdventure.Editor
             rightPanelRect = new Rect(0.9f * windowWidth, 0.1f * windowHeight, 0.08f * windowWidth, 0.2f * windowHeight);
             propertiesTable = new Rect(0f, 0.3f * windowHeight, 0.95f * windowWidth, 0.3f * windowHeight);
             previewRect = new Rect(0f, 0.6f * windowHeight, windowWidth, windowHeight * 0.35f);
-
-            GUILayout.BeginArea(appearanceTableRect);
-            GUILayout.BeginHorizontal();
-            GUILayout.Box(TC.get("Item.LookPanelTitle"), GUILayout.Width(windowWidth * 0.44f));
-            GUILayout.Box(TC.get("Conditions.Title"), GUILayout.Width(windowWidth * 0.44f));
-            GUILayout.EndHorizontal();
-            scrollPosition = GUILayout.BeginScrollView(scrollPosition);
+            
             // Appearance table
-            for (int i = 0; i < Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[GameRources.GetInstance().selectedItemIndex].getResourcesCount(); i++)
+            appearanceList.DoList(200f);
+
+
+            /*for (int i = 0; i < selectedItem.getResourcesCount(); i++)
             {
                 if (i == selectedAppearance)
                     GUI.skin = selectedAreaSkin;
                 else
                     GUI.skin = noBackgroundSkin;
 
-                tmpTex = (Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
-                         GameRources.GetInstance().selectedItemIndex].getResources()[i].getConditions().getBlocksCount() > 0 ? conditionsTex : noConditionsTex);
+                tmpTex = (selectedItem.getConditions().getBlocksCount() > 0 ? conditionsTex : noConditionsTex);
 
-                GUILayout.BeginHorizontal();
-
-                if (i == selectedAppearance)
-                {
-                    if (GUILayout.Button(Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
-                     GameRources.GetInstance().selectedItemIndex].getResources()[i].getName(), GUILayout.Width(windowWidth * 0.44f)))
-                    {
-                        OnAppearanceSelectionChange(i);
-                    }
-                    if (GUILayout.Button(tmpTex, GUILayout.Width(windowWidth * 0.44f)))
-                    {
-                        ConditionEditorWindow window =
-                             (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
-                        window.Init(Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
-                   GameRources.GetInstance().selectedItemIndex].getResources()[i].getConditions());
-                    }
-                }
-                else
-                {
-                    if (GUILayout.Button(Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
-                   GameRources.GetInstance().selectedItemIndex].getResources()[i].getName(), GUILayout.Width(windowWidth * 0.44f)))
-                    {
-                        OnAppearanceSelectionChange(i);
-                    }
-                    if (GUILayout.Button(tmpTex, GUILayout.Width(windowWidth * 0.44f)))
-                    {
-                        OnAppearanceSelectionChange(i);
-                    }
-                }
-                GUILayout.EndHorizontal();
-                GUI.skin = defaultSkin;
-            }
-            GUILayout.EndScrollView();
-            GUILayout.EndArea();
+                GUI.skin = defaultSkin; 
+            }*/
 
             /*
             * Right panel
             */
-            GUILayout.BeginArea(rightPanelRect);
-            GUI.skin = noBackgroundSkin;
-            if (GUILayout.Button(addTex, GUILayout.MaxWidth(0.08f * windowWidth)))
-            {
-                Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
-                      GameRources.GetInstance().selectedItemIndex].addElement(Controller.RESOURCES, "");
-            }
-            if (GUILayout.Button(duplicateTex, GUILayout.MaxWidth(0.08f * windowWidth)))
-            {
-                Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
-                  GameRources.GetInstance().selectedItemIndex].duplicateElement(Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
-                      GameRources.GetInstance().selectedItemIndex].getResources()[selectedAppearance]);
-            }
-            if (GUILayout.Button(clearTex, GUILayout.MaxWidth(0.08f * windowWidth)))
-            {
-                Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
-                  GameRources.GetInstance().selectedItemIndex].deleteElement(Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
-                      GameRources.GetInstance().selectedItemIndex].getResources()[selectedAppearance], false);
-            }
-            GUI.skin = defaultSkin;
-            GUILayout.EndArea();
 
 
             GUILayout.Space(30);
@@ -241,24 +338,24 @@ namespace uAdventure.Editor
 
         public void OnDialogOk(string message, object workingObject = null, object workingObjectSecond = null)
         {
+            var selectedItem = Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
+                            GameRources.GetInstance().selectedItemIndex];
+
             if (workingObject is BaseFileOpenDialog.FileType)
             {
                 switch ((BaseFileOpenDialog.FileType)workingObject)
                 {
                     case BaseFileOpenDialog.FileType.ITEM_IMAGE:
                         imagePath = message;
-                        Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
-                            GameRources.GetInstance().selectedItemIndex].setPreviewImage(imagePath);
+                        selectedItem.setPreviewImage(imagePath);
                         break;
                     case BaseFileOpenDialog.FileType.ITEM_ICON:
                         inventoryIconPath = message;
-                        Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
-                            GameRources.GetInstance().selectedItemIndex].setIconImage(inventoryIconPath);
+                        selectedItem.setIconImage(inventoryIconPath);
                         break;
                     case BaseFileOpenDialog.FileType.ITEM_IMAGE_OVER:
                         imageWhenOverPath = message;
-                        Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
-                            GameRources.GetInstance().selectedItemIndex].setMouseOverImage(imageWhenOverPath);
+                        selectedItem.setMouseOverImage(imageWhenOverPath);
                         break;
                     default:
                         break;
@@ -281,17 +378,16 @@ namespace uAdventure.Editor
 
         private void OnAppearanceSelectionChange(int i)
         {
-            selectedAppearance = i;
             apperanceName =
                 apperanceNameLast = Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
-                    GameRources.GetInstance().selectedItemIndex].getResources()[selectedAppearance].getName();
+                    GameRources.GetInstance().selectedItemIndex].getResources()[appearanceList.index].getName();
             RefreshPathInformation();
         }
 
         private void RefreshPathInformation()
         {
             Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
-                      GameRources.GetInstance().selectedItemIndex].setSelectedResources(selectedAppearance);
+                      GameRources.GetInstance().selectedItemIndex].setSelectedResources(appearanceList.index);
 
             imagePath =
                   Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
