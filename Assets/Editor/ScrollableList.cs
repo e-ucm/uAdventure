@@ -15,7 +15,6 @@ public class ScrollableList
 
     public HeaderCallbackDelegate drawHeaderCallback;
     public ChangedCallbackDelegate onChangedCallback;
-    public CanRemoveCallbackDelegate onCanRemoveCallback;
     public SelectCallbackDelegate onMouseUpCallback;
     public bool displayRemove;
     public AddDropdownCallbackDelegate onAddDropdownCallback;
@@ -72,7 +71,7 @@ public class ScrollableList
 
         reorderableList.drawFooterCallback = null;
         reorderableList.drawElementCallback = OnElementCallback;
-        reorderableList.onCanRemoveCallback = OnCanRemoveCallback;
+        reorderableList.onCanRemoveCallback = null;
         reorderableList.onReorderCallback = OnReorderCallback;
         reorderableList.onSelectCallback = OnSelectCallback;
         reorderableList.onAddCallback = null;
@@ -85,9 +84,6 @@ public class ScrollableList
 
     private void UpdateCallbacks(ReorderableList reorderableList)
     {
-        if (onCanRemoveCallback != null) reorderableList.onCanRemoveCallback = OnCanRemoveCallback;
-        else reorderableList.onCanRemoveCallback = null;
-
         if (onReorderCallback != null) reorderableList.onReorderCallback = OnReorderCallback;
         else reorderableList.onReorderCallback = null;
 
@@ -108,6 +104,7 @@ public class ScrollableList
     }
 
     #endregion
+    
 
     public float elementHeight { get { return reorderableList.elementHeight; } set { reorderableList.elementHeight = value; } }
     public static ReorderableList.Defaults defaultBehaviours { get { return ReorderableList.defaultBehaviours; } }
@@ -207,7 +204,6 @@ public class ScrollableList
 
     public delegate void FooterCallbackDelegate(Rect rect);
     public delegate void ElementCallbackDelegate(Rect rect, int index, bool isActive, bool isFocused);
-    public delegate bool CanRemoveCallbackDelegate(ReorderableList list);
     public delegate void ReorderCallbackDelegate(ReorderableList list);
     public delegate void SelectCallbackDelegate(ReorderableList list);
     public delegate void AddCallbackDelegate(ReorderableList list);
@@ -217,9 +213,9 @@ public class ScrollableList
     public delegate void HeaderCallbackDelegate(Rect rect);
     public delegate float ElementHeightCallbackDelegate(int index);
 
+
     private void OnFooterCallback(Rect rect) { drawFooterCallback(rect); }
     private void OnElementCallback(Rect rect, int index, bool isActive, bool isFocused) { drawElementCallback(rect, index, isActive, isFocused); }
-    private bool OnCanRemoveCallback(ReorderableList list) { return onCanRemoveCallback(list); }
     private void OnReorderCallback(ReorderableList list) { onReorderCallback(list); }
     private void OnSelectCallback(ReorderableList list) { onSelectCallback(list); }
     private void OnAddCallback(ReorderableList list) { onAddCallback(list); }
