@@ -38,7 +38,7 @@ public class ButtonList : ScrollableList
     public List<Button> buttons = new List<Button>();
 
     public delegate bool ButtonEnabledDeletate(ReorderableList list);
-    public delegate bool ButtonPressedDelegate(ReorderableList list);
+    public delegate void ButtonPressedDelegate(Rect rect, ReorderableList list);
 
     private void OnDrawFooter(Rect rect)
     {
@@ -71,7 +71,7 @@ public class ButtonList : ScrollableList
                 {
                     if (button.onButtonPressedCallback != null)
                     {
-                        button.onButtonPressedCallback(reorderableList);
+                        button.onButtonPressedCallback(buttonRect, reorderableList);
                     }
                     if (onChangedCallback != null)
                     {
