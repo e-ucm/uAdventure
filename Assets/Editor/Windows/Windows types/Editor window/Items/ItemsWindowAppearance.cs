@@ -40,7 +40,7 @@ namespace uAdventure.Editor
         private string imageWhenOverPath = "";
 
         private ItemDataControl workingItem;
-        private ScrollableList appearanceList;
+        private DataControlList appearanceList;
 
         private string apperanceName = "", apperanceNameLast = "";
         private static List<ResourcesDataControl> emptyList;
@@ -48,9 +48,6 @@ namespace uAdventure.Editor
         public ItemsWindowAppearance(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
         {
-            clearTex = (Texture2D)Resources.Load("EAdventureData/img/icons/deleteContent", typeof(Texture2D));
-            addTex = (Texture2D)Resources.Load("EAdventureData/img/icons/addNode", typeof(Texture2D));
-            duplicateTex = (Texture2D)Resources.Load("EAdventureData/img/icons/duplicateNode", typeof(Texture2D));
 
             conditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/conditions-24x24", typeof(Texture2D));
             noConditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/no-conditions-24x24", typeof(Texture2D));
@@ -74,35 +71,17 @@ namespace uAdventure.Editor
             noBackgroundSkin = (GUISkin)Resources.Load("Editor/EditorNoBackgroundSkin", typeof(GUISkin));
             selectedAreaSkin = (GUISkin)Resources.Load("Editor/EditorLeftMenuItemSkinConcreteOptions", typeof(GUISkin));
 
-            appearanceList = new ScrollableList(emptyList = new List<ResourcesDataControl>(), typeof(ResourcesDataControl));
-
-            appearanceList.headerHeight = 20;
-            appearanceList.footerHeight = 20;
-
+            appearanceList = new DataControlList()
+            {
+                headerHeight = 20,
+                footerHeight = 20
+            };
             appearanceList.drawHeaderCallback += (rect) =>
             {
                 EditorGUI.LabelField(new Rect(rect.x, rect.y, rect.width / 2f, rect.height), TC.get("Item.LookPanelTitle"));
                 EditorGUI.LabelField(new Rect(rect.x + rect.width / 2f, rect.y, rect.width / 2f, rect.height), TC.get("Conditions.Title"));
             };
-
-            appearanceList.drawFooterCallback += (rect) =>
-            {
-               
-
-                /*GUI.skin = noBackgroundSkin;
-                if (GUI.Button(new Rect(rect.x, rect.y, rect.width / 2f, rect.height), addTex))
-                {
-                }
-                if (GUI.Button(new Rect(rect.x + rect.width / 3f, rect.y, rect.width / 3f, rect.height), duplicateTex))
-                {
-                    workingItem.duplicateElement(workingItem.getResources()[appearanceList.index]);
-                }
-                if (GUI.Button(new Rect(rect.x + 2f * rect.width / 3f, rect.y, rect.width / 3f, rect.height), clearTex))
-                {
-                }
-                GUI.skin = defaultSkin;*/
-            };
-
+            /*
             appearanceList.onAddCallback += (list) =>
             {
                 workingItem.addElement(Controller.RESOURCES, "");
@@ -112,7 +91,7 @@ namespace uAdventure.Editor
             {
                 workingItem.deleteElement(workingItem.getResources()[list.index], false);
             };
-
+            */
             appearanceList.drawElementCallback += (rect, index, isActive, isFocused) =>
             {
                 var resources = workingItem.getResources()[index];
@@ -143,6 +122,8 @@ namespace uAdventure.Editor
         public override void Draw(int aID)
         {
             workingItem = Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[GameRources.GetInstance().selectedItemIndex];
+            appearanceList.SetData(workingItem, (data) => (data as DataControlWithResources).getResources().ConvertAll(r => (DataControl)r));
+
             if (workingItem == null)
             {
                 appearanceList.list = emptyList;

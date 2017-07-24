@@ -8,28 +8,38 @@ using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 
-public class DataControlList {
+public class DataControlList : ButtonList {
 
-    private DataControl control;
-    private List<DataControl> childs;
-
-    private ButtonList buttonList;
+    private DataControl dataControl;
     private GetNestedElements getChilds;
+    private List<DataControl> childs;
 
     public delegate List<DataControl> GetNestedElements(DataControl datacontrol);
 
-    public DataControlList(DataControl control, GetNestedElements getChilds)
-    {
-        this.control = control;
-        this.getChilds = getChilds;
-        childs = getChilds(control);
+    public DataControl DataControl { get { return dataControl; } }
+    public GetNestedElements GetChilds { get { return getChilds; } }
 
+    /// <summary>
+    /// Data setting and nested childs accessor delegate.
+    /// </summary>
+    /// <param name="dataControl">DataControl to to manipulate in the list.</param>
+    /// <param name="getChilds">Child accessor.</param>
+    public void SetData(DataControl dataControl, GetNestedElements getChilds)
+    {
+        this.dataControl = dataControl;
+        this.getChilds = getChilds;
+        this.childs = getChilds(dataControl);
+
+        this.list = this.childs;
+    }
+
+    public DataControlList() : base(new List<DataControl>(), typeof(DataControl), true, true)
+    {
         // ----------------
         // List config
         // ----------------
-        buttonList = new ButtonList(childs, typeof(DataControl), true, true);
-        buttonList.onSelectCallback += OnSelect;
-        buttonList.onReorderCallback += OnReorder;
+        onSelectCallback += OnSelect;
+        onReorderCallback += OnReorder;
 
         // ----------------
         // Add button
@@ -38,11 +48,11 @@ public class DataControlList {
         var addTex = (Texture2D)Resources.Load("EAdventureData/img/icons/addNode", typeof(Texture2D));
         buttonAdd.content = new GUIContent(addTex);
         // Can add
-        buttonAdd.onButtonEnabledCallback = (list) => control.canAddElements() && control.getAddableElements().ToList().Any(e => control.canAddElement(e));
+        buttonAdd.onButtonEnabledCallback = (list) => dataControl != null && dataControl.canAddElements() && dataControl.getAddableElements().ToList().Any(e => dataControl.canAddElement(e));
         // Do add
         buttonAdd.onButtonPressedCallback = (rect, list) =>
         {
-            var addable = control.getAddableElements().ToList().FindAll(e => control.canAddElement(e));
+            var addable = dataControl.getAddableElements().ToList().FindAll(e => dataControl.canAddElement(e));
 
             if (addable.Count == 1)
             {
@@ -56,7 +66,7 @@ public class DataControlList {
             }
         };
 
-        buttonList.buttons.Add(buttonAdd);
+        buttons.Add(buttonAdd);
 
         // ----------------
         // Remove button
@@ -65,11 +75,11 @@ public class DataControlList {
         var delTex = (Texture2D)Resources.Load("EAdventureData/img/icons/deleteContent", typeof(Texture2D));
         buttonDel.content = new GUIContent(delTex);
         // Can remove
-        buttonDel.onButtonEnabledCallback = (list) => list.index > 0 && childs[list.index].canBeDeleted();
+        buttonDel.onButtonEnabledCallback = (list) => dataControl != null && list.index >= 0 && childs[list.index].canBeDeleted();
         // DoRemove
-        buttonDel.onButtonPressedCallback = (rect, list) => control.deleteElement(childs[list.index], false);
+        buttonDel.onButtonPressedCallback = (rect, list) => OnRemove();
 
-        buttonList.buttons.Add(buttonDel);
+        buttons.Add(buttonDel);
 
         // ----------------
         // Duplicate button
@@ -78,20 +88,29 @@ public class DataControlList {
         var dupTex = (Texture2D)Resources.Load("EAdventureData/img/icons/duplicateNode", typeof(Texture2D));
         buttonDup.content = new GUIContent(dupTex);
         // Can duplicate
-        buttonDup.onButtonEnabledCallback = (list) => list.index > 0 && childs[list.index].canBeDuplicated();
+        buttonDup.onButtonEnabledCallback = (list) => dataControl != null && list.index >= 0 && childs[list.index].canBeDuplicated();
         // Do Duplicate
-        buttonDup.onButtonPressedCallback = (rect, list) => control.duplicateElement(childs[list.index]);
+        buttonDup.onButtonPressedCallback = (rect, list) => dataControl.duplicateElement(childs[list.index]);
+        buttons.Add(buttonDup);
     }
 
     protected void OnAdd(object type)
     {
-        control.addElement((int)type, control.getDefaultId((int)type));
-        OnChanged(buttonList.reorderableList);
+        dataControl.addElement((int)type, dataControl.getDefaultId((int)type));
+        OnChanged(reorderableList);
+    }
+
+    protected void OnRemove()
+    {
+        dataControl.deleteElement(childs[index], false);
+        OnChanged(reorderableList);
     }
 
     protected void OnChanged(ReorderableList list)
     {
-        buttonList.list = childs = getChilds(control);
+        this.list = childs = getChilds(dataControl);
+        while (this.index >= this.list.Count)
+            this.index--;
     }
 
     int previousSelection = -1;
@@ -105,12 +124,12 @@ public class DataControlList {
 
     protected void OnReorder(ReorderableList r)
     {
-        var list = getChilds(control);
+        var list = getChilds(dataControl);
 
         var toPos = r.index;
         var fromPos = list.FindIndex(i => i == r.list[r.index]);
 
-        control.MoveElement(list[fromPos], fromPos, toPos);
+        dataControl.MoveElement(list[fromPos], fromPos, toPos);
     }
 
 }

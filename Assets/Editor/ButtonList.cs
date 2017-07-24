@@ -43,7 +43,7 @@ public class ButtonList : ScrollableList
     private void OnDrawFooter(Rect rect)
     {
         float xMax = rect.xMax;
-        float num = xMax - buttonWidth * buttons.Count;
+        float num = xMax - (buttonWidth + defaults.buttonLeftMargin) * buttons.Count;
         
         rect = new Rect(num, rect.y, xMax - num, rect.height);
         
@@ -85,17 +85,21 @@ public class ButtonList : ScrollableList
 
     public ButtonList(SerializedObject serializedObject, SerializedProperty elements) : base(serializedObject, elements)
     {
+        this.drawFooterCallback = OnDrawFooter;
     }
 
     public ButtonList(IList elements, Type elementType) : base(elements, elementType)
     {
+        this.drawFooterCallback = OnDrawFooter;
     }
 
     public ButtonList(SerializedObject serializedObject, SerializedProperty elements, bool draggable, bool displayHeader) : base(serializedObject, elements, draggable, displayHeader, false, false)
     {
+        this.drawFooterCallback = OnDrawFooter;
     }
 
     public ButtonList(IList elements, Type elementType, bool draggable, bool displayHeader) : base(elements, elementType, draggable, displayHeader, false, false)
     {
+        this.drawFooterCallback = OnDrawFooter;
     }
 }
