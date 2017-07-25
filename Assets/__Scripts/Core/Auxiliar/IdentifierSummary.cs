@@ -135,7 +135,7 @@ namespace uAdventure.Core
 			if (typeGroups.ContainsKey (t))
 				return typeGroups [t].ToArray ();
 
-			return null;
+			return new string[0];
 		}
 
 		public void deleteId<T>(string id){
