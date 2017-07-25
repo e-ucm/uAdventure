@@ -398,7 +398,7 @@ namespace uAdventure.Editor
             }
             else
             {
-                newElement = (Action)(((Action)(dataControl.getContent())));
+                newElement = (Action)(((Action)(dataControl.getContent())).Clone());
                 adc = new ActionDataControl(newElement);
             }
             actionsList.Add(newElement);
