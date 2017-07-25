@@ -30,7 +30,7 @@ public class TextWithSoundField : FileChooser {
 
     protected void drawAudioPath()
     {
-        GUI.DrawTexture(GUILayoutUtility.GetRect(0, 0, GUILayout.ExpandHeight(true), GUILayout.Width(audioTex.width)), string.IsNullOrEmpty(Path) ? noAudioTex : audioTex);
+        GUI.DrawTexture(GUILayoutUtility.GetRect(0, 0, GUILayout.Height(audioTex.height), GUILayout.Width(audioTex.width)), string.IsNullOrEmpty(Path) ? noAudioTex : audioTex);
         EditorGUILayout.LabelField(string.IsNullOrEmpty(Path) ? TC.get("Conversations.NoAudio") : Path, GUILayout.Width(120));
     }
 }

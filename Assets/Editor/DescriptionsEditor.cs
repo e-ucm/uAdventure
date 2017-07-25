@@ -25,6 +25,8 @@ public class DescriptionsEditor : Editor {
         {
             descriptions = value;
             descriptionsList.SetData(descriptions, (data) => (data as DescriptionsController).getDescriptions().Cast<DataControl>().ToList());
+            descriptionsList.index = descriptions.getSelectedDescriptionNumber();
+            description = descriptions.getSelectedDescriptionController();
         }
     }
 
@@ -62,7 +64,8 @@ public class DescriptionsEditor : Editor {
             },
             onSelectCallback = (list) =>
             {
-                description = descriptions.getDescriptions()[list.index];
+                descriptions.setSelectedDescription(list.index);
+                description = descriptions.getSelectedDescriptionController();
             }
         };
 
@@ -101,6 +104,8 @@ public class DescriptionsEditor : Editor {
         string prevContent = string.Empty, prevPath = string.Empty;
 
         var descriptionData = description.getDescriptionData();
+
+        GUILayout.Space(20);
 
         // Name field
         prevContent = nameField.Content = descriptionData.getName();

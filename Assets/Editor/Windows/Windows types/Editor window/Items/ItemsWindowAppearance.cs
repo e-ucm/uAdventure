@@ -58,8 +58,7 @@ namespace uAdventure.Editor
                 var resources = workingItem.getResources()[index];
                 var leftRect = new Rect(rect.x, rect.y, rect.width / 2f, rect.height);
                 var rightRect = new Rect(rect.x + rect.width / 2f, rect.y, rect.width / 2f, rect.height);
-
-                GUILayout.BeginHorizontal(); 
+                
                 if (index == appearanceList.index)
                 {
                     resources.renameElement(EditorGUI.TextField(leftRect, resources.getName()));
@@ -75,7 +74,6 @@ namespace uAdventure.Editor
                          (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
                     window.Init(resources.getConditions());
                 }
-                GUILayout.EndHorizontal();
             };
 
             // File selectors
