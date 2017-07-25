@@ -30,33 +30,46 @@ public class FileChooser : DialogReceiverInterface
         Label = "";
     }
 
-    public void DoLayout(params GUILayoutOption[] options)
+    public virtual void DoLayout(params GUILayoutOption[] options)
     {
         var rect = EditorGUILayout.BeginHorizontal(options);
         {
-            EditorGUILayout.LabelField(Label, GUILayout.MaxWidth(250));
-            using (new EditorGUI.DisabledScope(!AllowEditingPath))
-            {
-                Path = EditorGUILayout.TextField(Path, GUILayout.ExpandWidth(true));
-            }
-            
-            if (GUILayout.Button(TC.get("Buttons.Select"), GUILayout.Width(GUI.skin.button.CalcSize(new GUIContent(TC.get("Buttons.Select"))).x)))
-            {
-                ShowAssetChooser(FileType);
-            }
+            drawPath();
+            drawSelect();
+            drawClear();
+        }
+        EditorGUILayout.EndHorizontal();
+    }
 
-            if (ShowClear)
+    protected void drawPath()
+    {
+        EditorGUILayout.LabelField(Label, GUILayout.MaxWidth(250));
+        using (new EditorGUI.DisabledScope(!AllowEditingPath))
+        {
+            Path = EditorGUILayout.TextField(Path, GUILayout.ExpandWidth(true));
+        }
+    }
+
+    protected void drawSelect()
+    {
+        if (GUILayout.Button(TC.get("Buttons.Select"), GUILayout.Width(GUI.skin.button.CalcSize(new GUIContent(TC.get("Buttons.Select"))).x)))
+        {
+            ShowAssetChooser(FileType);
+        }
+    }
+
+    protected void drawClear()
+    {
+        if (ShowClear)
+        {
+            using (new EditorGUI.DisabledScope(string.IsNullOrEmpty(Path)))
             {
-                using (new EditorGUI.DisabledScope(string.IsNullOrEmpty(Path)))
+                if (GUILayout.Button(delTex, GUILayout.Width(delTex.width + 10f)))
                 {
-                    if (GUILayout.Button(delTex, GUILayout.Width(delTex.width + 10f)))
-                    {
-                        Path = string.Empty;
-                    }
+                    Path = string.Empty;
                 }
             }
         }
-        EditorGUILayout.EndHorizontal();
     }
 
     void ShowAssetChooser(BaseFileOpenDialog.FileType type)

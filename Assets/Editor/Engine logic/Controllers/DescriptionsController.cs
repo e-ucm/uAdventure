@@ -39,6 +39,10 @@ namespace uAdventure.Editor
 
         }
 
+        public List<DescriptionController> getDescriptions()
+        {
+            return descriptionsController;
+        }
 
         public int getDescriptionCount()
         {
