@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace uAdventure.Editor
 {
-    public class ItemsWindowAppearance : LayoutWindow, DialogReceiverInterface
+    public class ItemsWindowAppearance : LayoutWindow
     {
 
         private enum AssetType
@@ -39,6 +39,8 @@ namespace uAdventure.Editor
         private string inventoryIconPath = "";
         private string imageWhenOverPath = "";
 
+        private FileChooser image, icon, image_over;
+
         private ItemDataControl workingItem;
         private DataControlList appearanceList;
 
@@ -51,26 +53,11 @@ namespace uAdventure.Editor
 
             conditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/conditions-24x24", typeof(Texture2D));
             noConditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/no-conditions-24x24", typeof(Texture2D));
-
-            if (GameRources.GetInstance().selectedItemIndex >= 0)
-            {
-                imagePath =
-                    Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
-                        GameRources.GetInstance().selectedItemIndex].getPreviewImage();
-                inventoryIconPath =
-                    Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
-                        GameRources.GetInstance().selectedItemIndex].getIconImage();
-                imageWhenOverPath =
-                    Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
-                        GameRources.GetInstance().selectedItemIndex].getMouseOverImage();
-            }
-
-            if (imagePath != null && !imagePath.Equals(""))
-                imageTex = AssetsController.getImage(imagePath).texture;
+            
 
             noBackgroundSkin = (GUISkin)Resources.Load("Editor/EditorNoBackgroundSkin", typeof(GUISkin));
             selectedAreaSkin = (GUISkin)Resources.Load("Editor/EditorLeftMenuItemSkinConcreteOptions", typeof(GUISkin));
-
+            
             appearanceList = new DataControlList()
             {
                 headerHeight = 20,
@@ -81,17 +68,7 @@ namespace uAdventure.Editor
                 EditorGUI.LabelField(new Rect(rect.x, rect.y, rect.width / 2f, rect.height), TC.get("Item.LookPanelTitle"));
                 EditorGUI.LabelField(new Rect(rect.x + rect.width / 2f, rect.y, rect.width / 2f, rect.height), TC.get("Conditions.Title"));
             };
-            /*
-            appearanceList.onAddCallback += (list) =>
-            {
-                workingItem.addElement(Controller.RESOURCES, "");
-            };
-            
-            appearanceList.onRemoveCallback += (list) =>
-            {
-                workingItem.deleteElement(workingItem.getResources()[list.index], false);
-            };
-            */
+
             appearanceList.drawElementCallback += (rect, index, isActive, isFocused) =>
             {
                 var resources = workingItem.getResources()[index];
@@ -116,6 +93,26 @@ namespace uAdventure.Editor
                 }
                 GUILayout.EndHorizontal();
             };
+
+            // File selectors
+
+            image = new FileChooser()
+            {
+                Label = TC.get("Resources.DescriptionItemImage"),
+                FileType = BaseFileOpenDialog.FileType.ITEM_IMAGE
+            };
+
+            icon = new FileChooser()
+            {
+                Label = TC.get("Resources.DescriptionItemIcon"),
+                FileType = BaseFileOpenDialog.FileType.ITEM_ICON
+            };
+
+            image_over = new FileChooser()
+            {
+                Label = TC.get("Resources.DescriptionItemImageOver"),
+                FileType = BaseFileOpenDialog.FileType.ITEM_IMAGE_OVER
+            };
         }
 
 
@@ -137,148 +134,41 @@ namespace uAdventure.Editor
 
             var windowWidth = m_Rect.width;
             var windowHeight = m_Rect.height;
-
-            appearanceTableRect = new Rect(0f, 0.1f * windowHeight, 0.9f * windowWidth, 0.2f * windowHeight);
-            rightPanelRect = new Rect(0.9f * windowWidth, 0.1f * windowHeight, 0.08f * windowWidth, 0.2f * windowHeight);
-            propertiesTable = new Rect(0f, 0.3f * windowHeight, 0.95f * windowWidth, 0.3f * windowHeight);
-            previewRect = new Rect(0f, 0.6f * windowHeight, windowWidth, windowHeight * 0.35f);
             
             // Appearance table
             appearanceList.DoList(200f);
 
+            GUILayout.Space(10);
 
-            /*for (int i = 0; i < selectedItem.getResourcesCount(); i++)
+            string previousValue = image.Path = workingItem.getPreviewImage();
+            image.DoLayout(GUILayout.ExpandWidth(true));
+            if(previousValue != image.Path) workingItem.setPreviewImage(image.Path);
+
+            previousValue = icon.Path = workingItem.getIconImage();
+            icon.DoLayout(GUILayout.ExpandWidth(true));
+            if (previousValue != icon.Path) workingItem.setIconImage(icon.Path);
+
+            previousValue = image_over.Path = workingItem.getMouseOverImage();
+            image_over.DoLayout(GUILayout.ExpandWidth(true));
+            if (previousValue != image_over.Path) workingItem.setMouseOverImage(image_over.Path);
+
+            GUILayout.Space(10);
+
+            var rect = EditorGUILayout.BeginVertical("preBackground", GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
             {
-                if (i == selectedAppearance)
-                    GUI.skin = selectedAreaSkin;
-                else
-                    GUI.skin = noBackgroundSkin;
-
-                tmpTex = (selectedItem.getConditions().getBlocksCount() > 0 ? conditionsTex : noConditionsTex);
-
-                GUI.skin = defaultSkin; 
-            }*/
-
-            /*
-            * Right panel
-            */
-
-
-            GUILayout.Space(30);
-
-
-            GUILayout.BeginArea(propertiesTable);
-            // Background chooser
-            GUILayout.Label(TC.get("Resources.DescriptionItemImage"));
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button(clearTex, GUILayout.Width(0.05f * windowWidth)))
-            {
-                imagePath = "";
+                GUILayout.BeginHorizontal();
+                {
+                    GUI.DrawTexture(previewRect, imageTex, ScaleMode.ScaleToFit);
+                }
+                GUILayout.EndHorizontal();
             }
-            GUILayout.Box(imagePath, GUILayout.Width(0.7f * windowWidth));
-            if (GUILayout.Button(TC.get("Buttons.Select"), GUILayout.Width(0.19f * windowWidth)))
-            {
-                ShowAssetChooser(AssetType.ITEM);
-            }
-            GUILayout.EndHorizontal();
 
-            // Icon chooser
-            GUILayout.Label(TC.get("Resources.DescriptionItemIcon"));
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button(clearTex, GUILayout.Width(0.05f * windowWidth)))
-            {
-                inventoryIconPath = "";
-            }
-            GUILayout.Box(inventoryIconPath, GUILayout.Width(0.7f * windowWidth));
-            if (GUILayout.Button(TC.get("Buttons.Select"), GUILayout.Width(0.19f * windowWidth)))
-            {
-                ShowAssetChooser(AssetType.ICON);
-            }
-            GUILayout.EndHorizontal();
-
-            // Image over chooser
-            GUILayout.Label(TC.get("Resources.DescriptionItemImageOver"));
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button(clearTex, GUILayout.Width(0.05f * windowWidth)))
-            {
-                imageWhenOverPath = "";
-            }
-            GUILayout.Box(imageWhenOverPath, GUILayout.Width(0.7f * windowWidth));
-            if (GUILayout.Button(TC.get("Buttons.Select"), GUILayout.Width(0.19f * windowWidth)))
-            {
-                ShowAssetChooser(AssetType.ITEM_OVER);
-            }
-            GUILayout.EndHorizontal();
-
-            GUILayout.EndArea();
+            EditorGUILayout.EndVertical();
 
             if (imagePath != "")
             {
-                GUI.DrawTexture(previewRect, imageTex, ScaleMode.ScaleToFit);
             }
         }
-
-        void ShowAssetChooser(AssetType type)
-        {
-            switch (type)
-            {
-                case AssetType.ITEM:
-                    ImageFileOpenDialog itemDialog =
-                    (ImageFileOpenDialog)ScriptableObject.CreateInstance(typeof(ImageFileOpenDialog));
-                    itemDialog.Init(this, BaseFileOpenDialog.FileType.ITEM_IMAGE);
-                    break;
-                case AssetType.ICON:
-                    ImageFileOpenDialog iconDialog =
-                    (ImageFileOpenDialog)ScriptableObject.CreateInstance(typeof(ImageFileOpenDialog));
-                    iconDialog.Init(this, BaseFileOpenDialog.FileType.ITEM_ICON);
-                    break;
-                case AssetType.ITEM_OVER:
-                    ImageFileOpenDialog itemOverDialog =
-                    (ImageFileOpenDialog)ScriptableObject.CreateInstance(typeof(ImageFileOpenDialog));
-                    itemOverDialog.Init(this, BaseFileOpenDialog.FileType.ITEM_IMAGE_OVER);
-                    break;
-            }
-
-        }
-
-        public void OnDialogOk(string message, object workingObject = null, object workingObjectSecond = null)
-        {
-            var selectedItem = Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
-                            GameRources.GetInstance().selectedItemIndex];
-
-            if (workingObject is BaseFileOpenDialog.FileType)
-            {
-                switch ((BaseFileOpenDialog.FileType)workingObject)
-                {
-                    case BaseFileOpenDialog.FileType.ITEM_IMAGE:
-                        imagePath = message;
-                        selectedItem.setPreviewImage(imagePath);
-                        break;
-                    case BaseFileOpenDialog.FileType.ITEM_ICON:
-                        inventoryIconPath = message;
-                        selectedItem.setIconImage(inventoryIconPath);
-                        break;
-                    case BaseFileOpenDialog.FileType.ITEM_IMAGE_OVER:
-                        imageWhenOverPath = message;
-                        selectedItem.setMouseOverImage(imageWhenOverPath);
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-
-        public void OnDialogCanceled(object workingObject = null)
-        {
-            Debug.Log("Wiadomość nie OK");
-        }
-
-        //private void OnAppearanceNameChange(string val)
-        //{
-        //    apperanceNameLast = val;
-        //    Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
-        //            GameRources.GetInstance().selectedItemIndex].getResources()[selectedAppearance].
-        //}
 
 
         private void OnAppearanceSelectionChange(int i)
