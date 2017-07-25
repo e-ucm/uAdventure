@@ -57,8 +57,8 @@ namespace uAdventure.Runner
         public float camZ; // The desired Z pos of the camera
         void Awake()
         {
-            this.button = transform.FindChild("Button");
-            this.line = transform.FindChild("Line");
+            this.button = transform.Find("Button");
+            this.line = transform.Find("Line");
             camZ = this.transform.position.z;
         }
         

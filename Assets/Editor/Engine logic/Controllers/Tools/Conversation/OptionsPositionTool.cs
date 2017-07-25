@@ -49,7 +49,7 @@ namespace uAdventure.Editor
             else
                 optionNode.setTopPosition();
 
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
 
@@ -68,7 +68,7 @@ namespace uAdventure.Editor
                 optionNode.setTopPosition();
             else
                 optionNode.setBottomPosition();
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
     }

@@ -13,7 +13,7 @@ namespace uAdventure.Editor
 
         //  private string oldName;
 
-        private Controller controller = Controller.getInstance();
+        private Controller controller = Controller.Instance;
 
         protected static AssetInformation[] createAssetInfoArray()
         {

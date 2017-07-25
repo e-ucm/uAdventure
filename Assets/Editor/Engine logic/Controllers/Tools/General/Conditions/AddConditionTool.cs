@@ -125,8 +125,8 @@ namespace uAdventure.Editor
                     indexAdded = conditions.size() - 1;
                     blockAdded = newBlock;
                 }
-                Controller.getInstance().updateVarFlagSummary();
-                Controller.getInstance().updatePanel();
+                Controller.Instance.updateVarFlagSummary();
+                Controller.Instance.updatePanel();
                 return true;
             }
             return false;
@@ -138,15 +138,15 @@ namespace uAdventure.Editor
             if (blockAdded != null)
             {
                 conditions.add(indexAdded, blockAdded);
-                Controller.getInstance().updateVarFlagSummary();
-                Controller.getInstance().updatePanel();
+                Controller.Instance.updateVarFlagSummary();
+                Controller.Instance.updatePanel();
                 return true;
             }
             else if (conditionAdded != null)
             {
                 conditions.get(index1).Insert(indexAdded, conditionAdded);
-                Controller.getInstance().updateVarFlagSummary();
-                Controller.getInstance().updatePanel();
+                Controller.Instance.updateVarFlagSummary();
+                Controller.Instance.updatePanel();
                 return true;
             }
 
@@ -159,15 +159,15 @@ namespace uAdventure.Editor
             if (blockAdded != null)
             {
                 conditions.delete(indexAdded);
-                Controller.getInstance().updateVarFlagSummary();
-                Controller.getInstance().updatePanel();
+                Controller.Instance.updateVarFlagSummary();
+                Controller.Instance.updatePanel();
                 return true;
             }
             else if (conditionAdded != null)
             {
                 conditions.get(index1).RemoveAt(indexAdded);
-                Controller.getInstance().updateVarFlagSummary();
-                Controller.getInstance().updatePanel();
+                Controller.Instance.updateVarFlagSummary();
+                Controller.Instance.updatePanel();
                 return true;
             }
 

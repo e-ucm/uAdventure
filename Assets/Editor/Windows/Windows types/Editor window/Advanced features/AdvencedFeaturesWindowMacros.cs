@@ -56,7 +56,7 @@ namespace uAdventure.Editor
             scrollPosition = GUILayout.BeginScrollView(scrollPosition);
             for (int i = 0;
                 i <
-                Controller.getInstance().getSelectedChapterDataControl().getMacrosListDataControl().getMacros().Count;
+                Controller.Instance.SelectedChapterDataControl.getMacrosListDataControl().getMacros().Count;
                 i++)
             {
                 if (i != selectedMacro)
@@ -65,7 +65,7 @@ namespace uAdventure.Editor
 
                     if (
                         GUILayout.Button(
-                            Controller.getInstance().getSelectedChapterDataControl().getMacrosListDataControl().getMacros()[
+                            Controller.Instance.SelectedChapterDataControl.getMacrosListDataControl().getMacros()[
                                 i].getId(), GUILayout.Width(0.85f * windowWidth)))
                     {
                         OnSelectedMacroChanged(i);
@@ -91,18 +91,18 @@ namespace uAdventure.Editor
             GUI.skin = noBackgroundSkin;
             if (GUILayout.Button(addTex, GUILayout.MaxWidth(0.08f * windowWidth)))
             {
-                Controller.getInstance().getSelectedChapterDataControl().getMacrosListDataControl()
+                Controller.Instance.SelectedChapterDataControl.getMacrosListDataControl()
                     .addElement(Controller.MACRO, "Macro" + Random.Range(0, 10000).ToString());
             }
             if (GUILayout.Button(duplicateTex, GUILayout.MaxWidth(0.08f * windowWidth)))
             {
-                Controller.getInstance().getSelectedChapterDataControl().getMacrosListDataControl()
-                    .duplicateElement(Controller.getInstance().getSelectedChapterDataControl().getMacrosListDataControl().getMacros()[selectedMacro]);
+                Controller.Instance.SelectedChapterDataControl.getMacrosListDataControl()
+                    .duplicateElement(Controller.Instance.SelectedChapterDataControl.getMacrosListDataControl().getMacros()[selectedMacro]);
             }
             if (GUILayout.Button(clearTex, GUILayout.MaxWidth(0.08f * windowWidth)))
             {
-                Controller.getInstance().getSelectedChapterDataControl().getMacrosListDataControl()
-                    .deleteElement(Controller.getInstance().getSelectedChapterDataControl().getMacrosListDataControl().getMacros()[selectedMacro], false);
+                Controller.Instance.SelectedChapterDataControl.getMacrosListDataControl()
+                    .deleteElement(Controller.Instance.SelectedChapterDataControl.getMacrosListDataControl().getMacros()[selectedMacro], false);
                 selectedMacro = -1;
             }
             GUI.skin = defaultSkin;
@@ -124,9 +124,7 @@ namespace uAdventure.Editor
                 {
                     EffectEditorWindow window =
                     (EffectEditorWindow)ScriptableObject.CreateInstance(typeof(EffectEditorWindow));
-                    window.Init(Controller.getInstance()
-                        .getSelectedChapterDataControl()
-                        .getMacrosListDataControl().getMacros()[selectedMacro].getController());
+                    window.Init(Controller.Instance                        .SelectedChapterDataControl                        .getMacrosListDataControl().getMacros()[selectedMacro].getController());
                 }
                 GUILayout.EndArea();
             }
@@ -138,7 +136,7 @@ namespace uAdventure.Editor
 
             macroName =
                 macroNameLast =
-                    Controller.getInstance().getSelectedChapterDataControl().getMacrosListDataControl().getMacros()[
+                    Controller.Instance.SelectedChapterDataControl.getMacrosListDataControl().getMacros()[
                         selectedMacro].getId();
 
             if (macroName == null)
@@ -146,7 +144,7 @@ namespace uAdventure.Editor
                     macroNameLast = "";
 
             macroDocumentation = macroDocumentationLast =
-                    Controller.getInstance().getSelectedChapterDataControl().getMacrosListDataControl().getMacros()[
+                    Controller.Instance.SelectedChapterDataControl.getMacrosListDataControl().getMacros()[
                         selectedMacro].getDocumentation();
 
             if (macroDocumentation == null)
@@ -156,17 +154,17 @@ namespace uAdventure.Editor
 
         private void OnMacroNameChanged(string val)
         {
-            if (Controller.getInstance().isElementIdValid(val, false))
+            if (Controller.Instance.isElementIdValid(val, false))
             {
                 macroNameLast = val;
-                Controller.getInstance().getSelectedChapterDataControl().getMacrosListDataControl().getMacros()[selectedMacro].setId(val);
+                Controller.Instance.SelectedChapterDataControl.getMacrosListDataControl().getMacros()[selectedMacro].setId(val);
             }
         }
 
         private void OnMacroDocumentationChanged(string val)
         {
             macroDocumentationLast = val;
-            Controller.getInstance().getSelectedChapterDataControl().getMacrosListDataControl().getMacros()[selectedMacro].setDocumentation(val);
+            Controller.Instance.SelectedChapterDataControl.getMacrosListDataControl().getMacros()[selectedMacro].setDocumentation(val);
         }
 
     }

@@ -84,19 +84,19 @@ namespace uAdventure.Editor
             {
                 fullItemDescription =
                     fullItemDescriptionLast =
-                        Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
+                        Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
                             GameRources.GetInstance().selectedItemIndex].getDocumentation();
                 if (fullItemDescription == null)
                     fullItemDescription =
                         fullItemDescriptionLast = "";
                 dragdropToogle = dragdropToogleLast =
-                    Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
+                    Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
                         GameRources.GetInstance().selectedItemIndex].isReturnsWhenDragged();
                 selectedBehaviourType = selectedBehaviourTypeLast =
-                    (int)Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
+                    (int)Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
                         GameRources.GetInstance().selectedItemIndex].getBehaviour();
                 transitionTime = transitionTimeLast =
-                    Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
+                    Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
                         GameRources.GetInstance().selectedItemIndex].getResourcesTransitionTime().ToString();
             }
             selectedDescription = -1;
@@ -133,7 +133,7 @@ namespace uAdventure.Editor
 
             for (int i = 0;
                 i <
-                Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
+                Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
                     GameRources.GetInstance().selectedItemIndex].getDescriptionController().getDescriptionCount();
                 i++)
             {
@@ -142,7 +142,7 @@ namespace uAdventure.Editor
                 else
                     GUI.skin = noBackgroundSkin;
 
-                tmpTex = (Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
+                tmpTex = (Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
                     GameRources.GetInstance().selectedItemIndex].getDescriptionController()
                     .getDescriptionController(i)
                     .getConditionsController()
@@ -154,7 +154,7 @@ namespace uAdventure.Editor
 
                 if (i == selectedDescription)
                 {
-                    if (GUILayout.Button(Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
+                    if (GUILayout.Button(Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
                         GameRources.GetInstance().selectedItemIndex].getDescriptionController()
                         .getDescriptionController(i)
                         .getName(), GUILayout.Width(windowWidth * 0.44f)))
@@ -166,7 +166,7 @@ namespace uAdventure.Editor
                         ConditionEditorWindow window =
                             (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
                         window.Init(
-                            Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
+                            Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
                                 GameRources.GetInstance().selectedItemIndex].getDescriptionController()
                                 .getDescriptionController(i)
                                 .getConditionsController());
@@ -174,7 +174,7 @@ namespace uAdventure.Editor
                 }
                 else
                 {
-                    if (GUILayout.Button(Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
+                    if (GUILayout.Button(Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
                         GameRources.GetInstance().selectedItemIndex].getDescriptionController()
                         .getDescriptionController(i)
                         .getName(), GUILayout.Width(windowWidth * 0.44f)))
@@ -201,17 +201,17 @@ namespace uAdventure.Editor
             GUI.skin = noBackgroundSkin;
             if (GUILayout.Button(addTex, GUILayout.MaxWidth(0.08f * windowWidth)))
             {
-                Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
+                Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
                     GameRources.GetInstance().selectedItemIndex].getDescriptionController().addElement();
             }
             if (GUILayout.Button(duplicateTex, GUILayout.MaxWidth(0.08f * windowWidth)))
             {
-                Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
+                Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
                     GameRources.GetInstance().selectedItemIndex].getDescriptionController().duplicateElement();
             }
             if (GUILayout.Button(clearTex, GUILayout.MaxWidth(0.08f * windowWidth)))
             {
-                Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
+                Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
                     GameRources.GetInstance().selectedItemIndex].getDescriptionController().deleteElement();
             }
             GUI.skin = defaultSkin;
@@ -324,7 +324,7 @@ namespace uAdventure.Editor
         private void OnItemDescriptionChanged(string val)
         {
             fullItemDescriptionLast = val;
-            Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
+            Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
                 GameRources.GetInstance().selectedItemIndex].setDocumentation(fullItemDescription);
         }
 
@@ -332,7 +332,7 @@ namespace uAdventure.Editor
         private void OnDescriptionNameChanged(string val)
         {
             descriptionNameLast = val;
-            Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
+            Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
                 GameRources.GetInstance().selectedItemIndex].getDescriptionController()
                 .getSelectedDescriptionController()
                 .getDescriptionData()
@@ -342,7 +342,7 @@ namespace uAdventure.Editor
         private void OnBriefDescriptionChanged(string val)
         {
             briefDescriptionLast = val;
-            Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
+            Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
                 GameRources.GetInstance().selectedItemIndex].getDescriptionController()
                 .getSelectedDescriptionController()
                 .getDescriptionData()
@@ -352,7 +352,7 @@ namespace uAdventure.Editor
         private void OnDetailedDescriptionChanged(string val)
         {
             detailedDescriptionLast = val;
-            Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
+            Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
                 GameRources.GetInstance().selectedItemIndex].getDescriptionController()
                 .getSelectedDescriptionController()
                 .getDescriptionData()
@@ -368,7 +368,7 @@ namespace uAdventure.Editor
         private void OnDragAndDropToogleValueChange(bool val)
         {
             dragdropToogleLast = val;
-            Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
+            Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
                 GameRources.GetInstance().selectedItemIndex].setReturnsWhenDragged(val);
         }
 
@@ -377,14 +377,14 @@ namespace uAdventure.Editor
             selectedBehaviourTypeLast = val;
 
             Item.BehaviourType type = (val == 0 ? Item.BehaviourType.NORMAL : Item.BehaviourType.FIRST_ACTION);
-            Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
+            Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
                 GameRources.GetInstance().selectedItemIndex].setBehaviour(type);
         }
 
         private void OnDescriptorNameSoundChange(string val)
         {
             descriptionSound = val;
-            Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
+            Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
                 GameRources.GetInstance().selectedItemIndex].getDescriptionController()
                 .getSelectedDescriptionController().getDescriptionData().setNameSoundPath(val);
         }
@@ -392,7 +392,7 @@ namespace uAdventure.Editor
         private void OnDescriptorBriefSoundChange(string val)
         {
             briefDescriptionSound = val;
-            Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
+            Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
                 GameRources.GetInstance().selectedItemIndex].getDescriptionController()
                 .getSelectedDescriptionController()
                 .getDescriptionData()
@@ -402,7 +402,7 @@ namespace uAdventure.Editor
         private void OnDescriptorDetailedSoundChange(string val)
         {
             detailedDescriptionSound = val;
-            Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
+            Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
                 GameRources.GetInstance().selectedItemIndex].getDescriptionController()
                 .getSelectedDescriptionController()
                 .getDescriptionData()
@@ -412,49 +412,49 @@ namespace uAdventure.Editor
         private void OnTransitionTimeChange(string val)
         {
             transitionTimeLast = val;
-            Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
+            Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
                 GameRources.GetInstance().selectedItemIndex].setResourcesTransitionTime(int.Parse(val));
         }
 
         private void RefreshDescriptionInformation()
         {
-            Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
+            Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
                 GameRources.GetInstance().selectedItemIndex].getDescriptionController()
                 .setSelectedDescription(selectedDescription);
 
             descriptionName =
-                descriptionNameLast = Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
+                descriptionNameLast = Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
                     GameRources.GetInstance().selectedItemIndex].getDescriptionController()
                     .getSelectedDescriptionController()
                     .getDescriptionData()
                     .getName();
 
-            descriptionSound = Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
+            descriptionSound = Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
                 GameRources.GetInstance().selectedItemIndex].getDescriptionController()
                 .getSelectedDescriptionController()
                 .getDescriptionData().getNameSoundPath();
 
             briefDescription =
-                briefDescriptionLast = Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
+                briefDescriptionLast = Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
                     GameRources.GetInstance().selectedItemIndex].getDescriptionController()
                     .getSelectedDescriptionController()
                     .getDescriptionData()
                     .getDescription();
 
-            briefDescriptionSound = Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
+            briefDescriptionSound = Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
                 GameRources.GetInstance().selectedItemIndex].getDescriptionController()
                 .getSelectedDescriptionController()
                 .getDescriptionData().getDescriptionSoundPath();
 
             detailedDescription =
                 detailedDescriptionLast =
-                    Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
+                    Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
                         GameRources.GetInstance().selectedItemIndex].getDescriptionController()
                         .getSelectedDescriptionController()
                         .getDescriptionData()
                         .getDetailedDescription();
 
-            detailedDescriptionSound = Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
+            detailedDescriptionSound = Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
                 GameRources.GetInstance().selectedItemIndex].getDescriptionController()
                 .getSelectedDescriptionController()
                 .getDescriptionData().getDetailedDescriptionSoundPath();

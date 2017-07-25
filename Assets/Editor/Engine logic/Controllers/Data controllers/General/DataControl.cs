@@ -27,7 +27,7 @@ namespace uAdventure.Editor
         protected DataControl()
         {
 
-            controller = Controller.getInstance();
+            controller = Controller.Instance;
         }
 
         /**

@@ -324,7 +324,7 @@ namespace uAdventure.Editor
 
             if (type == Controller.RESOURCES)
             {
-                elementAdded = Controller.getInstance().addTool(new AddResourcesBlockTool(resourcesList, resourcesDataControlList, Controller.SCENE, this));
+                elementAdded = Controller.Instance.addTool(new AddResourcesBlockTool(resourcesList, resourcesDataControlList, Controller.SCENE, this));
             }
 
             return elementAdded;
@@ -395,8 +395,8 @@ namespace uAdventure.Editor
 				
                 scene.setId(newSceneId);
                 controller.replaceIdentifierReferences(oldSceneId, newSceneId);
-                controller.getIdentifierSummary().deleteSceneId(oldSceneId);
-				controller.getIdentifierSummary().addSceneId(newSceneId);
+                controller.IdentifierSummary.deleteSceneId(oldSceneId);
+				controller.IdentifierSummary.addSceneId(newSceneId);
 
 				return newSceneId;
 
@@ -594,7 +594,7 @@ namespace uAdventure.Editor
         public void changeAllowPlayerLayer(bool isAllowPlayerLayer /*, ScenePreviewEditionPanel scenePreviewEditionPanel^*/ )
         {
 
-            Controller.getInstance().addTool(new ChangeForcePlayerInSceneTool(isAllowPlayerLayer, /*scenePreviewEditionPanel,*/ this));
+            Controller.Instance.addTool(new ChangeForcePlayerInSceneTool(isAllowPlayerLayer, /*scenePreviewEditionPanel,*/ this));
         }
 
         // this method is only used in SwapPlayerModeTool
@@ -611,7 +611,7 @@ namespace uAdventure.Editor
         {
 
             //scene.setPlayerScale(scale);
-            Controller.getInstance().addTool(new ChangePlayerScaleTool(scene, scale));
+            Controller.Instance.addTool(new ChangePlayerScaleTool(scene, scale));
         }
 
         public float getPlayerScale()

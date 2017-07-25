@@ -21,7 +21,7 @@ namespace uAdventure.Editor
 
             if (GameRources.GetInstance().selectedSceneIndex >= 0)
             {
-                current = Controller.getInstance().getCharapterList().getSelectedChapterData().getScenes()[GameRources.GetInstance().selectedSceneIndex];
+                current = Controller.Instance.ChapterList.getSelectedChapterData().getScenes()[GameRources.GetInstance().selectedSceneIndex];
 
                 doc = current.getDocumentation();
                 name = current.getName();
@@ -64,25 +64,25 @@ namespace uAdventure.Editor
 
         private void ChangeClass(string s)
         {
-            Controller.getInstance().getCharapterList().getSelectedChapterData().getScenes()[GameRources.GetInstance().selectedSceneIndex].setXApiClass(s);
+            Controller.Instance.ChapterList.getSelectedChapterData().getScenes()[GameRources.GetInstance().selectedSceneIndex].setXApiClass(s);
             sceneclasslast = s;
         }
 
         private void ChangeType(string s)
         {
-            Controller.getInstance().getCharapterList().getSelectedChapterData().getScenes()[GameRources.GetInstance().selectedSceneIndex].setXApiType(s);
+            Controller.Instance.ChapterList.getSelectedChapterData().getScenes()[GameRources.GetInstance().selectedSceneIndex].setXApiType(s);
             scenetypelast = s;
         }
 
         private void ChangeName(string s)
         {
-            Controller.getInstance().getCharapterList().getSelectedChapterData().getScenes()[GameRources.GetInstance().selectedSceneIndex].setName(s);
+            Controller.Instance.ChapterList.getSelectedChapterData().getScenes()[GameRources.GetInstance().selectedSceneIndex].setName(s);
             nameOfSceneLast = s;
         }
 
         private void ChangeDocumentation(string s)
         {
-            Controller.getInstance().getCharapterList().getSelectedChapterData().getScenes()[GameRources.GetInstance().selectedSceneIndex].setDocumentation(s);
+            Controller.Instance.ChapterList.getSelectedChapterData().getScenes()[GameRources.GetInstance().selectedSceneIndex].setDocumentation(s);
             descriptionOfSceneLast = s;
         }
     }

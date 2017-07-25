@@ -157,8 +157,7 @@ namespace uAdventure.Editor
         public override int[] getAddableElements()
         {
 
-            //return new int[] { Controller.RESOURCES };
-            return new int[] { };
+            return new int[] { Controller.RESOURCES };
         }
 
 
@@ -166,8 +165,7 @@ namespace uAdventure.Editor
         {
 
             // It can always add new resources
-            //return type == Controller.RESOURCES;
-            return false;
+            return type == Controller.RESOURCES;
         }
 
 
@@ -199,7 +197,7 @@ namespace uAdventure.Editor
 
             if (type == Controller.RESOURCES)
             {
-                elementAdded = Controller.getInstance().addTool(new AddResourcesBlockTool(resourcesList, resourcesDataControlList, Controller.ITEM, this));
+                elementAdded = Controller.Instance.addTool(new AddResourcesBlockTool(resourcesList, resourcesDataControlList, Controller.ITEM, this));
             }
 
             return elementAdded;
@@ -270,8 +268,8 @@ namespace uAdventure.Editor
 				
                 item.setId(newItemId);
                 controller.replaceIdentifierReferences(oldItemId, newItemId);
-                controller.getIdentifierSummary().deleteItemId(oldItemId);
-                controller.getIdentifierSummary().addItemId(newItemId);
+                controller.IdentifierSummary.deleteItemId(oldItemId);
+                controller.IdentifierSummary.addItemId(newItemId);
                 //controller.dataModified( );
 
 				return newItemId;
@@ -439,7 +437,7 @@ namespace uAdventure.Editor
         {
             if (behaviour != item.getBehaviour())
             {
-                Controller.getInstance().addTool(new ChangeIntegerValueTool(item, (int)behaviour, "getBehaviourInteger", "setBehaviourInteger"));
+                Controller.Instance.addTool(new ChangeIntegerValueTool(item, (int)behaviour, "getBehaviourInteger", "setBehaviourInteger"));
                 //item.setBehaviour( behaviour );
                 //Controller.getInstance( ).dataModified( );
             }
@@ -459,7 +457,7 @@ namespace uAdventure.Editor
         {
             if (resourcesTransitionTime != item.getResourcesTransitionTime())
             {
-                Controller.getInstance().addTool(new ChangeLongValueTool(item, resourcesTransitionTime, "getResourcesTransitionTime", "setResourcesTransitionTime"));
+                Controller.Instance.addTool(new ChangeLongValueTool(item, resourcesTransitionTime, "getResourcesTransitionTime", "setResourcesTransitionTime"));
                 //item.setResourcesTransitionTime( resourcesTransitionTime );
                 //Controller.getInstance( ).dataModified( );
             }

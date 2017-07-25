@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System.Xml;
 using System.Linq;
 using System.Globalization;
@@ -7,7 +6,7 @@ using System.Collections.Generic;
 
 namespace uAdventure.Core
 {
-	[DOMParser("scene")]
+    [DOMParser("scene")]
 	[DOMParser(typeof(Scene))]
 	public class SceneSubParser : IDOMParser
     {

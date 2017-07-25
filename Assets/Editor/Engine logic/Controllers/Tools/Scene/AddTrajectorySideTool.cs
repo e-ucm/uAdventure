@@ -72,7 +72,7 @@ namespace uAdventure.Editor
 
             trajectory.getSides().Add(newSide);
             trajectoryDataControl.getSides().Add(newSideDataControl);
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
 
@@ -82,7 +82,7 @@ namespace uAdventure.Editor
 
             trajectory.getSides().Remove(newSide);
             trajectoryDataControl.getSides().Remove(newSideDataControl);
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
     }

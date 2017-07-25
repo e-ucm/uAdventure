@@ -176,7 +176,7 @@ namespace uAdventure.Editor
         {
 
             this.effects = effects;
-            controller = Controller.getInstance();
+            controller = Controller.Instance;
             conditionsList = new List<ConditionsController>();
             // create the list of effects controllers
             foreach (AbstractEffect effect in
@@ -609,23 +609,23 @@ namespace uAdventure.Editor
             {
                 case EffectType.ACTIVATE:
                     newEffect = new ActivateEffect(target);
-                    controller.getVarFlagSummary().addFlagReference(target);
+                    controller.VarFlagSummary.addFlagReference(target);
                     break;
                 case EffectType.DEACTIVATE:
                     newEffect = new DeactivateEffect(target);
-                    controller.getVarFlagSummary().addFlagReference(target);
+                    controller.VarFlagSummary.addFlagReference(target);
                     break;
                 case EffectType.SET_VALUE:
                     newEffect = new SetValueEffect(target, value);
-                    controller.getVarFlagSummary().addVarReference(target);
+                    controller.VarFlagSummary.addVarReference(target);
                     break;
                 case EffectType.INCREMENT_VAR:
                     newEffect = new IncrementVarEffect(target, value);
-                    controller.getVarFlagSummary().addVarReference(target);
+                    controller.VarFlagSummary.addVarReference(target);
                     break;
                 case EffectType.DECREMENT_VAR:
                     newEffect = new DecrementVarEffect(target, value);
-                    controller.getVarFlagSummary().addVarReference(target);
+                    controller.VarFlagSummary.addVarReference(target);
                     break;
                 case EffectType.MACRO_REF:
                     newEffect = new MacroReferenceEffect(target);

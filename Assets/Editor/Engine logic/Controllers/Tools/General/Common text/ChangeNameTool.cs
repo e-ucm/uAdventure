@@ -21,7 +21,7 @@ namespace uAdventure.Editor
 
             this.named = scene;
             this.name = name;
-            this.controller = Controller.getInstance();
+            this.controller = Controller.Instance;
         }
 
         public override bool canRedo()

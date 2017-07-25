@@ -19,7 +19,7 @@ namespace uAdventure.Editor
         public ChangeForcePlayerInSceneTool(bool isAllow, /*ScenePreviewEditionPanel scenePreviewEditionPanel,*/ SceneDataControl scene)
         {
 
-            controller = Controller.getInstance();
+            controller = Controller.Instance;
             this.isAllow = isAllow;
             //this.scenePreviewEditionPanel = scenePreviewEditionPanel;
             this.scene = scene;

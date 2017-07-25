@@ -57,7 +57,7 @@ namespace uAdventure.Editor
         {
 
             rectangle.setRectangular(rectangular);
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
 
@@ -66,7 +66,7 @@ namespace uAdventure.Editor
         {
 
             rectangle.setRectangular(!rectangular);
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
     }

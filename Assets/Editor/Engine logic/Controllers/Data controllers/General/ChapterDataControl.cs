@@ -331,7 +331,7 @@ namespace uAdventure.Editor
         public void setInitialScene(string initialScene)
         {
 
-            Controller.getInstance().addTool(new ChangeTargetIdTool(chapter, initialScene));
+            Controller.Instance.addTool(new ChangeTargetIdTool(chapter, initialScene));
         }
 
         /**
@@ -588,9 +588,11 @@ namespace uAdventure.Editor
         {
 
             // If the initial scene has been deleted, change the value to the first one in the scenes list
-            if (chapter.getTargetId().Equals(id))
-                chapter.setTargetId(controller.getIdentifierSummary().getGeneralSceneIds()[0]);
-
+			if (chapter.getTargetId ().Equals (id)) {
+				var newTarget = (IChapterTarget)controller.SelectedChapterDataControl .getObjects ().Find (o => o is IChapterTarget);
+				if(newTarget!= null)
+					chapter.setTargetId(newTarget.getId ());
+			}
             // Spread the call to the rest of the elements
             scenesListDataControl.deleteIdentifierReferences(id);
             cutscenesListDataControl.deleteIdentifierReferences(id);

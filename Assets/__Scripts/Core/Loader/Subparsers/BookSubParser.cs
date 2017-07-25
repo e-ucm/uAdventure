@@ -6,6 +6,8 @@ using System.Xml;
 
 namespace uAdventure.Core
 {
+	[DOMParser(typeof(Book))]
+	[DOMParser("book")]
 	public class BookSubParser : IDOMParser
     {
 
@@ -16,14 +18,10 @@ namespace uAdventure.Core
                 documentations = element.SelectNodes("documentations"),
                 texts = element.SelectNodes("text"),
                 pagess = element.SelectNodes("pages"),
-                conditions,
-                assets,
                 pages,
                 titles,
                 bullets,
                 imgs;
-
-            string tmpArgVal;
 
             string bookId = "";
             string xPrevious = "", xNext = "", yPrevious = "", yNext = "";
@@ -44,7 +42,7 @@ namespace uAdventure.Core
                     int y = int.Parse(yPrevious);
                     book.setPreviousPageVector2(new Vector2(x, y));
                 }
-                catch (Exception)
+                catch
                 {
                     // Number in XML is wrong -> Do nothing
                 }
@@ -57,35 +55,18 @@ namespace uAdventure.Core
                     int y = int.Parse(yNext);
                     book.setNextPageVector2(new Vector2(x, y));
                 }
-                catch (Exception)
+                catch
                 {
                     // Number in XML is wrong -> Do nothing
                 }
             }
 
-            foreach (XmlElement el in resourcess)
-            {
-				ResourcesUni currentResources = new ResourcesUni();
 
-                tmpArgVal = el.GetAttribute("name");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    currentResources.setName(tmpArgVal);
-                }
+            // RESOURCES
+            foreach (var res in DOMParserUtility.DOMParse<ResourcesUni>(resourcess, parameters))
+                book.addResources(res);
 
-                assets = el.SelectNodes("asset");
-                foreach (XmlElement ell in assets)
-                {
-					string type = ell.GetAttribute("type") ?? "";
-					string path = ell.GetAttribute("uri") ?? "";
 
-                    currentResources.addAsset(type, path);
-                }
-
-				currentResources.setConditions(DOMParserUtility.DOMParse (el.SelectSingleNode("condition"), parameters) as Conditions ?? new Conditions());
-
-                book.addResources(currentResources);
-            }
             foreach (XmlElement el in documentations)
             {
                 string currentstring = el.InnerText;
@@ -164,10 +145,10 @@ namespace uAdventure.Core
 					}
 
 					scrollable = "yes".Equals (ell.GetAttribute("scrollable"));
-					margin = int.Parse(ell.GetAttribute("margin") ?? "0");
-					marginEnd = int.Parse(ell.GetAttribute("marginEnd") ?? "0");
-					marginTop = int.Parse(ell.GetAttribute("marginTop") ?? "0");
-					marginBottom = int.Parse(ell.GetAttribute("marginBottom") ?? "0");
+					margin = ExParsers.ParseDefault(ell.GetAttribute("margin"), 0);
+					marginEnd = ExParsers.ParseDefault(ell.GetAttribute("marginEnd"), 0);
+					marginTop = ExParsers.ParseDefault(ell.GetAttribute("marginTop"), 0);
+					marginBottom = ExParsers.ParseDefault(ell.GetAttribute("marginBottom"), 0);
 
                     book.addPage(uri, type, margin, marginEnd, marginTop, marginBottom, scrollable);
                 }

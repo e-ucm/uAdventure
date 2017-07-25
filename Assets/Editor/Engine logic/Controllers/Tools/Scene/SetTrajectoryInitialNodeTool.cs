@@ -81,7 +81,7 @@ namespace uAdventure.Editor
             trajectoryDataControl.initialNode = nodeDataControl;
             trajectoryDataControl.initialNode.setInitial(true);
 
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
 
             return true;
         }
@@ -103,7 +103,7 @@ namespace uAdventure.Editor
                 trajectory.setInitial("");
             }
 
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
     }

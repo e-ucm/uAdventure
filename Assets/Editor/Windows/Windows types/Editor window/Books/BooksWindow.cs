@@ -99,10 +99,10 @@ namespace uAdventure.Editor
             else
             {
                 GUILayout.Space(30);
-                for (int i = 0; i < Controller.getInstance().getCharapterList().getSelectedChapterData().getBooks().Count; i++)
+                for (int i = 0; i < Controller.Instance.ChapterList.getSelectedChapterData().getBooks().Count; i++)
                 {
                     GUILayout.BeginHorizontal();
-                    GUILayout.Box(Controller.getInstance().getCharapterList().getSelectedChapterData().getBooks()[i].getId(), GUILayout.Width(m_Rect.width * 0.75f));
+                    GUILayout.Box(Controller.Instance.ChapterList.getSelectedChapterData().getBooks()[i].getId(), GUILayout.Width(m_Rect.width * 0.75f));
                     if (GUILayout.Button(TC.get("GeneralText.Edit"), GUILayout.MaxWidth(m_Rect.width * 0.2f)))
                     {
                         ShowItemWindowView(i);
@@ -140,27 +140,23 @@ namespace uAdventure.Editor
 
         protected override void OnElementNameChanged(ReorderableList r, int index, string newName)
         {
-			Controller.getInstance().getCharapterList().getSelectedChapterDataControl().getBooksList().getBooks ()[index].renameElement(newName);
+			Controller.Instance.ChapterList.getSelectedChapterDataControl().getBooksList().getBooks ()[index].renameElement(newName);
         }
 
         protected override void OnAdd(ReorderableList r)
         {
             if (r.index != -1 && r.index < r.list.Count)
             {
-                Controller.getInstance()
-                           .getCharapterList()
-                           .getSelectedChapterDataControl()
+                Controller.Instance                           .ChapterList                           .getSelectedChapterDataControl()
                            .getBooksList()
                            .duplicateElement(
-                               Controller.getInstance()
-                                   .getCharapterList()
-                                   .getSelectedChapterDataControl()
+                               Controller.Instance                                   .ChapterList                                   .getSelectedChapterDataControl()
                                    .getBooksList()
                                    .getBooks()[r.index]);
             }
             else
             {
-                Controller.getInstance().getSelectedChapterDataControl().getBooksList().addElement(Controller.BOOK, "newBook");
+                Controller.Instance.SelectedChapterDataControl.getBooksList().addElement(Controller.BOOK, "newBook");
             }
 
         }
@@ -174,14 +170,10 @@ namespace uAdventure.Editor
         {
             if (r.index != -1)
             {
-                Controller.getInstance()
-                              .getCharapterList()
-                              .getSelectedChapterDataControl()
+                Controller.Instance                              .ChapterList                              .getSelectedChapterDataControl()
                               .getBooksList()
                               .deleteElement(
-                                  Controller.getInstance()
-                                      .getCharapterList()
-                                      .getSelectedChapterDataControl()
+                                  Controller.Instance                                      .ChapterList                                      .getSelectedChapterDataControl()
                                       .getBooksList()
                                       .getBooks()[r.index], false);
 
@@ -196,8 +188,7 @@ namespace uAdventure.Editor
 
         protected override void OnReorder(ReorderableList r)
         {
-			var dataControlList = Controller.getInstance ()
-				.getCharapterList ().getSelectedChapterDataControl ().getBooksList ();
+			var dataControlList = Controller.Instance 				.ChapterList .getSelectedChapterDataControl ().getBooksList ();
 
 			var toPos = r.index;
 			var fromPos = dataControlList.getBooks ().FindIndex (i => i.getId () == r.list [r.index] as string);
@@ -213,7 +204,7 @@ namespace uAdventure.Editor
 
         protected override void OnUpdateList(ReorderableList r)
         {
-			Elements = Controller.getInstance().getCharapterList().getSelectedChapterDataControl().getBooksList ().getBooks().ConvertAll(s => s.getId());
+			Elements = Controller.Instance.ChapterList.getSelectedChapterDataControl().getBooksList ().getBooks().ConvertAll(s => s.getId());
         }
     }
 }

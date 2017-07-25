@@ -12,6 +12,8 @@ namespace uAdventure.Core
     public class Language : MonoBehaviour
     {
 
+        public static bool Initialized { get; private set; }
+
         #region Zmienne publiczne
 
         // Lista nazw dostępnych języków
@@ -93,9 +95,14 @@ namespace uAdventure.Core
 
         public static void Initialize()
         {
+            if (Initialized)
+                return;
+
             LanguageNames = new List<string>();
             LanguageTexts = new Dictionary<string, string>();
             Reload();
+
+            Initialized = true;
         }
 
         #endregion

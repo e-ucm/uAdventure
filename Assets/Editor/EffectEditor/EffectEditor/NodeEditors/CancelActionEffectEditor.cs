@@ -3,6 +3,7 @@ using UnityEditor;
 using System.Collections;
 
 using uAdventure.Core;
+using System;
 
 namespace uAdventure.Editor
 {
@@ -39,6 +40,9 @@ namespace uAdventure.Editor
 
         public AbstractEffect Effect { get { return effect; } set { effect = value as CancelActionEffect; } }
         public string EffectName { get { return TC.get("Effect.CancelAction"); } }
+
+        public bool Usable { get { return true; } }
+
         public EffectEditor clone() { return new CancelActionEffectEditor(); }
 
         public bool manages(AbstractEffect c)

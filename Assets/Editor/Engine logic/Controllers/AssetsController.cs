@@ -153,7 +153,7 @@ namespace uAdventure.Editor
 
         public static void createFolderStructure()
         {
-            DirectoryInfo projectDir = new DirectoryInfo(Controller.getInstance().getProjectFolder());
+            DirectoryInfo projectDir = new DirectoryInfo(Controller.Instance.ProjectFolder);
             Debug.Log("CREATE: " + projectDir.FullName);
             string[] folders = categoryFolders();
             for (int i = 0; i < folders.Length; i++)
@@ -171,8 +171,7 @@ namespace uAdventure.Editor
             }
             else
             {
-                Controller.getInstance()
-                    .showErrorDialog("Error.DTD.NotFound.Title", "Error.DTD.NotFound.Message" + " descriptor.dtd");
+                Controller.Instance.showErrorDialog("Error.DTD.NotFound.Title", "Error.DTD.NotFound.Message" + " descriptor.dtd");
             }
 
             // eadventure.dtd
@@ -184,8 +183,7 @@ namespace uAdventure.Editor
             }
             else
             {
-                Controller.getInstance()
-                    .showErrorDialog("Error.DTD.NotFound.Title", "Error.DTD.NotFound.Message" + " eadventure.dtd");
+                Controller.Instance.showErrorDialog("Error.DTD.NotFound.Title", "Error.DTD.NotFound.Message" + " eadventure.dtd");
             }
 
             // assessment.dtd
@@ -197,8 +195,7 @@ namespace uAdventure.Editor
             }
             else
             {
-                Controller.getInstance()
-                    .showErrorDialog("Error.DTD.NotFound.Title", "Error.DTD.NotFound.Message" + " assessment.dtd");
+                Controller.Instance.showErrorDialog("Error.DTD.NotFound.Title", "Error.DTD.NotFound.Message" + " assessment.dtd");
             }
 
 
@@ -211,8 +208,7 @@ namespace uAdventure.Editor
             }
             else
             {
-                Controller.getInstance()
-                    .showErrorDialog("Error.DTD.NotFound.Title", "Error.DTD.NotFound.Message" + " adaptation.dtd");
+                Controller.Instance.showErrorDialog("Error.DTD.NotFound.Title", "Error.DTD.NotFound.Message" + " adaptation.dtd");
             }
 
             // animation.dtd
@@ -224,8 +220,7 @@ namespace uAdventure.Editor
             }
             else
             {
-                Controller.getInstance()
-                    .showErrorDialog("Error.DTD.NotFound.Title", "Error.DTD.NotFound.Message" + " animation.dtd");
+                Controller.Instance.showErrorDialog("Error.DTD.NotFound.Title", "Error.DTD.NotFound.Message" + " animation.dtd");
             }
         }
 
@@ -262,7 +257,7 @@ namespace uAdventure.Editor
 
             // Take the category folder, from the ZIP file name
             DirectoryInfo categoryFolder =
-                new DirectoryInfo(Path.Combine(Controller.getInstance().getProjectFolder(),
+                new DirectoryInfo(Path.Combine(Controller.Instance.ProjectFolder,
                     getCategoryFolder(assetsCategory)));
 
             // Take the file list and create the array
@@ -335,7 +330,7 @@ namespace uAdventure.Editor
 
             // Take the category folder, from the ZIP file name
             DirectoryInfo categoryFolder =
-                new DirectoryInfo(Path.Combine(Controller.getInstance().getProjectFolder(),
+                new DirectoryInfo(Path.Combine(Controller.Instance.ProjectFolder,
                     getCategoryFolder(assetsCategory)));
 
             // Take the file list and create the array
@@ -929,7 +924,7 @@ namespace uAdventure.Editor
         {
 
             // Get the zip file
-            string zipFile = Controller.getInstance().getProjectFolder();
+            string zipFile = Controller.Instance.ProjectFolder;
 
             // Add the defaultBook
             FileInfo sourceFile = new FileInfo("Assets/Resources/" + SpecialAssetPaths.FILE_DEFAULT_BOOK_IMAGE);
@@ -937,8 +932,7 @@ namespace uAdventure.Editor
                 sourceFile.CopyTo(Path.Combine(zipFile, SpecialAssetPaths.ASSET_DEFAULT_BOOK_IMAGE), true);
             // If the source file doesn't exist, show an error message
             else
-                Controller.getInstance()
-                    .showErrorDialog(TC.get("Error.Title"),
+                Controller.Instance                    .showErrorDialog(TC.get("Error.Title"),
                         TC.get("Error.SpecialAssetNotFound", "img/assets/DefaultBook.jpg"));
 
             sourceFile = new FileInfo("Assets/Resources/" + SpecialAssetPaths.FILE_DEFAULT_ARROW_NORMAL);
@@ -946,8 +940,7 @@ namespace uAdventure.Editor
                 sourceFile.CopyTo(Path.Combine(zipFile, SpecialAssetPaths.ASSET_DEFAULT_ARROW_NORMAL), true);
             // If the source file doesn't exist, show an error message
             else
-                Controller.getInstance()
-                    .showErrorDialog(TC.get("Error.Title"),
+                Controller.Instance                    .showErrorDialog(TC.get("Error.Title"),
                         TC.get("Error.SpecialAssetNotFound", "img/assets/DefaultLeftNormalArrow.png"));
 
             sourceFile = new FileInfo("Assets/Resources/" + SpecialAssetPaths.FILE_DEFAULT_ARROW_OVER);
@@ -955,8 +948,7 @@ namespace uAdventure.Editor
                 sourceFile.CopyTo(Path.Combine(zipFile, SpecialAssetPaths.ASSET_DEFAULT_ARROW_OVER), true);
             // If the source file doesn't exist, show an error message
             else
-                Controller.getInstance()
-                    .showErrorDialog(TC.get("Error.Title"),
+                Controller.Instance                    .showErrorDialog(TC.get("Error.Title"),
                         TC.get("Error.SpecialAssetNotFound", "img/assets/DefaultLeftOverArrow.png"));
 
             // Add the empty image
@@ -971,8 +963,7 @@ namespace uAdventure.Editor
 
             // If the source file doesn't exist, show an error message
             else
-                Controller.getInstance()
-                    .showErrorDialog(TC.get("Error.Title"),
+                Controller.Instance                    .showErrorDialog(TC.get("Error.Title"),
                         TC.get("Error.SpecialAssetNotFound", "img/assets/EmptyImage.png"));
 
             // Add the empty icon
@@ -982,8 +973,7 @@ namespace uAdventure.Editor
 
             // If the source file doesn't exist, show an error message
             else
-                Controller.getInstance()
-                    .showErrorDialog(TC.get("Error.Title"), TC.get("Error.SpecialAssetNotFound", "img/assets/EmptyIcon.png"));
+                Controller.Instance                    .showErrorDialog(TC.get("Error.Title"), TC.get("Error.SpecialAssetNotFound", "img/assets/EmptyIcon.png"));
 
             // Add the empty animation
             sourceFile = new FileInfo("Assets/Resources/" + SpecialAssetPaths.FILE_EMPTY_ANIMATION);
@@ -992,8 +982,7 @@ namespace uAdventure.Editor
 
             // If the source file doesn't exist, show an error message
             else
-                Controller.getInstance()
-                    .showErrorDialog(TC.get("Error.Title"),
+                Controller.Instance                    .showErrorDialog(TC.get("Error.Title"),
                         TC.get("Error.SpecialAssetNotFound", "img/assets/EmptyAnimation_01.png"));
         }
 
@@ -1161,7 +1150,7 @@ namespace uAdventure.Editor
 
             List<string> assetPaths = new List<string>();
             List<int> assetTypes = new List<int>();
-            Controller controller = Controller.getInstance();
+            Controller controller = Controller.Instance;
             controller.getAssetReferences(assetPaths, assetTypes);
 
             for (int i = 0; i < assetPaths.Count; i++)
@@ -1173,18 +1162,18 @@ namespace uAdventure.Editor
                 bool notPresent = true;
 
                 // Take the instance of the controller, and the filename of the asset
-                FileInfo file = new FileInfo(Path.Combine(controller.getProjectFolder(), assetPath));
+                FileInfo file = new FileInfo(Path.Combine(controller.ProjectFolder, assetPath));
                 //Debug.Log(controller.getProjectFolder() + " | " + assetPath + " | " + file.FullName);
                 if (assetCategory == AssetsConstants.CATEGORY_ANIMATION)
                 {
-                    file = new FileInfo(Path.Combine(controller.getProjectFolder(), assetPath + "_01.png"));
+                    file = new FileInfo(Path.Combine(controller.ProjectFolder, assetPath + "_01.png"));
                     if (!file.Exists)
                     {
-                        file = new FileInfo(Path.Combine(controller.getProjectFolder(), assetPath + "_01.jpg"));
+                        file = new FileInfo(Path.Combine(controller.ProjectFolder, assetPath + "_01.jpg"));
                     }
                     if (!file.Exists)
                     {
-                        file = new FileInfo(Path.Combine(controller.getProjectFolder(), assetPath));
+                        file = new FileInfo(Path.Combine(controller.ProjectFolder, assetPath));
                     }
                 }
                 assetValid = file.Exists && file.Length > 0;

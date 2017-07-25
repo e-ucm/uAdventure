@@ -176,7 +176,7 @@ namespace uAdventure.Editor
                 Scene newScene = new Scene(sceneId);
                 scenesList.Add(newScene);
                 scenesDataControlList.Add(new SceneDataControl(newScene, controller.getPlayerImagePath()));
-                controller.getIdentifierSummary().addSceneId(sceneId);
+                controller.IdentifierSummary.addSceneId(sceneId);
                 //controller.dataModified( );
                 elementAdded = true;
                 
@@ -202,7 +202,7 @@ namespace uAdventure.Editor
             newElement.setId(id);
             scenesList.Add(newElement);
             scenesDataControlList.Add(new SceneDataControl(newElement, controller.getPlayerImagePath()));
-            controller.getIdentifierSummary().addSceneId(id);
+            controller.IdentifierSummary.addSceneId(id);
             return true;
 
         }
@@ -220,7 +220,7 @@ namespace uAdventure.Editor
             bool elementDeleted = false;
 
             // Take the number of general scenes in the chapter
-            int generalScenesCount = controller.getIdentifierSummary().getGeneralSceneIds().Length;
+			int generalScenesCount = controller.IdentifierSummary.groupIds<IChapterTarget> ().Length;
 
             // If there are at least two scenes, this one can be deleted
             if (generalScenesCount > 1)
@@ -235,7 +235,7 @@ namespace uAdventure.Editor
                     {
                         scenesList.Remove((Scene)dataControl.getContent());
                         controller.deleteIdentifierReferences(sceneId);
-                        controller.getIdentifierSummary().deleteSceneId(sceneId);
+                        controller.IdentifierSummary.deleteSceneId(sceneId);
                         //controller.dataModified( );
                         elementDeleted = true;
                     }

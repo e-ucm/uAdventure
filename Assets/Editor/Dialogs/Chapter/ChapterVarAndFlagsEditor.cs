@@ -106,7 +106,7 @@ namespace uAdventure.Editor
                 GUILayout.EndHorizontal();
 
                 scrollPosition = GUILayout.BeginScrollView(scrollPosition);
-                for (int i = 0; i < Controller.getInstance().getVarFlagSummary().getFlagCount(); i++)
+                for (int i = 0; i < Controller.Instance.VarFlagSummary.getFlagCount(); i++)
                 {
                     GUILayout.BeginHorizontal();
                     if (selectedObject == i)
@@ -114,13 +114,13 @@ namespace uAdventure.Editor
                     else
                         GUI.skin = noBackgroundSkin;
 
-                    if (GUILayout.Button(Controller.getInstance().getVarFlagSummary().getFlag(i),
+                    if (GUILayout.Button(Controller.Instance.VarFlagSummary.getFlag(i),
                         GUILayout.Width(0.7f * windowWidth)))
                     {
                         OnSelectedObjectChange(i);
                     }
 
-                    if (GUILayout.Button(Controller.getInstance().getVarFlagSummary().getFlagReferences(i).ToString(),
+                    if (GUILayout.Button(Controller.Instance.VarFlagSummary.getFlagReferences(i).ToString(),
                         GUILayout.Width(0.25f * windowWidth)))
                     {
                         OnSelectedObjectChange(i);
@@ -139,7 +139,7 @@ namespace uAdventure.Editor
                 GUILayout.EndHorizontal();
 
                 scrollPosition = GUILayout.BeginScrollView(scrollPosition);
-                for (int i = 0; i < Controller.getInstance().getVarFlagSummary().getVarCount(); i++)
+                for (int i = 0; i < Controller.Instance.VarFlagSummary.getVarCount(); i++)
                 {
                     GUILayout.BeginHorizontal();
                     if (selectedObject == i)
@@ -147,13 +147,13 @@ namespace uAdventure.Editor
                     else
                         GUI.skin = noBackgroundSkin;
 
-                    if (GUILayout.Button(Controller.getInstance().getVarFlagSummary().getVar(i),
+                    if (GUILayout.Button(Controller.Instance.VarFlagSummary.getVar(i),
                         GUILayout.Width(0.7f * windowWidth)))
                     {
                         OnSelectedObjectChange(i);
                     }
 
-                    if (GUILayout.Button(Controller.getInstance().getVarFlagSummary().getVarReferences(i).ToString(),
+                    if (GUILayout.Button(Controller.Instance.VarFlagSummary.getVarReferences(i).ToString(),
                         GUILayout.Width(0.25f * windowWidth)))
                     {
                         OnSelectedObjectChange(i);
@@ -235,15 +235,11 @@ namespace uAdventure.Editor
             {
                 if (openedWindow == WindowType.FLAGS)
                 {
-                    Controller.getInstance()
-                        .getVarFlagSummary()
-                        .deleteFlag(Controller.getInstance().getVarFlagSummary().getFlag(selectedObject));
+                    Controller.Instance                        .VarFlagSummary                        .deleteFlag(Controller.Instance.VarFlagSummary.getFlag(selectedObject));
                 }
                 else
                 {
-                    Controller.getInstance()
-                        .getVarFlagSummary()
-                        .deleteVar(Controller.getInstance().getVarFlagSummary().getVar(selectedObject));
+                    Controller.Instance                        .VarFlagSummary                        .deleteVar(Controller.Instance.VarFlagSummary.getVar(selectedObject));
                 }
                 selectedObject = -1;
             }
@@ -252,12 +248,10 @@ namespace uAdventure.Editor
         public void OnDialogOk(string message, object workingObject = null, object workingObjectSecond = null)
         {
             if (workingObject is ChapterFlagNameInputPopup)
-                Controller.getInstance()
-                    .getVarFlagSummary().addFlag(message);
+                Controller.Instance                    .VarFlagSummary.addFlag(message);
 
             else if (workingObject is ChapterVarNameInputPopup)
-                Controller.getInstance()
-                    .getVarFlagSummary().addVar(message);
+                Controller.Instance                    .VarFlagSummary.addVar(message);
         }
 
         public void OnDialogCanceled(object workingObject = null)

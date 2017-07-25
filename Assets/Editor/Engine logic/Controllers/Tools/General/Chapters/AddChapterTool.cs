@@ -21,7 +21,7 @@ namespace uAdventure.Editor
         {
             this.chapterTitle = chapterName;
             this.chaptersController = chaptersController;
-            this.controller = Controller.getInstance();
+            this.controller = Controller.Instance;
         }
 
         public override bool canRedo()

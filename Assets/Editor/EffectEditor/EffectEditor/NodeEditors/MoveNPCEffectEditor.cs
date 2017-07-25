@@ -34,8 +34,8 @@ namespace uAdventure.Editor
 
         public MoveNPCEffectEditor()
         {
-            npc = Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCsIDs();
-            this.effect = new MoveNPCEffect(npc[0], 300, 300);
+            npc = Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCsIDs();
+            this.effect = new MoveNPCEffect(npc.Length> 0 ? npc[0] : "", 300, 300);
         }
 
         public void draw()
@@ -60,6 +60,15 @@ namespace uAdventure.Editor
 
         public AbstractEffect Effect { get { return effect; } set { effect = value as MoveNPCEffect; } }
         public string EffectName { get { return TC.get("MoveNPCEffect.Title"); } }
+
+        public bool Usable
+        {
+            get
+            {
+                return Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCsIDs().Length > 0;
+            }
+        }
+
         public EffectEditor clone() { return new MoveNPCEffectEditor(); }
 
         public bool manages(AbstractEffect c)

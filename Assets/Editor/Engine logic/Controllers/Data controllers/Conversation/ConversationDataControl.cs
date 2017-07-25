@@ -604,7 +604,7 @@ namespace uAdventure.Editor
             if (x != node.getEditorX())
             {
                 node.setEditorX(x);
-                Controller.getInstance().dataModified();
+                Controller.Instance.DataModified();
             }
 
         }
@@ -615,7 +615,7 @@ namespace uAdventure.Editor
             if (y != node.getEditorY())
             {
                 node.setEditorY(y);
-                Controller.getInstance().dataModified();
+                Controller.Instance.DataModified();
             }
         }
 

@@ -54,7 +54,7 @@ namespace uAdventure.Editor
             scrollPosition = GUILayout.BeginScrollView(scrollPosition);
             for (int i = 0;
                 i <
-                Controller.getInstance().getSelectedChapterDataControl().getGlobalStatesListDataControl().getGlobalStates().Count;
+                Controller.Instance.SelectedChapterDataControl.getGlobalStatesListDataControl().getGlobalStates().Count;
                 i++)
             {
                 if (i != selectedGlobalState)
@@ -63,7 +63,7 @@ namespace uAdventure.Editor
 
                     if (
                         GUILayout.Button(
-                            Controller.getInstance().getSelectedChapterDataControl().getGlobalStatesListDataControl().getGlobalStates()[
+                            Controller.Instance.SelectedChapterDataControl.getGlobalStatesListDataControl().getGlobalStates()[
                                 i].getId(), GUILayout.Width(0.85f * windowWidth)))
                     {
                         OnSelectedGlobalStateChanged(i);
@@ -89,18 +89,18 @@ namespace uAdventure.Editor
             GUI.skin = noBackgroundSkin;
             if (GUILayout.Button(addTex, GUILayout.MaxWidth(0.08f * windowWidth)))
             {
-                Controller.getInstance().getSelectedChapterDataControl().getGlobalStatesListDataControl()
+                Controller.Instance.SelectedChapterDataControl.getGlobalStatesListDataControl()
                     .addElement(Controller.GLOBAL_STATE, "GlobalState" + Random.Range(0, 10000).ToString());
             }
             if (GUILayout.Button(duplicateTex, GUILayout.MaxWidth(0.08f * windowWidth)))
             {
-                Controller.getInstance().getSelectedChapterDataControl().getGlobalStatesListDataControl()
-                    .duplicateElement(Controller.getInstance().getSelectedChapterDataControl().getGlobalStatesListDataControl().getGlobalStates()[selectedGlobalState]);
+                Controller.Instance.SelectedChapterDataControl.getGlobalStatesListDataControl()
+                    .duplicateElement(Controller.Instance.SelectedChapterDataControl.getGlobalStatesListDataControl().getGlobalStates()[selectedGlobalState]);
             }
             if (GUILayout.Button(clearTex, GUILayout.MaxWidth(0.08f * windowWidth)))
             {
-                Controller.getInstance().getSelectedChapterDataControl().getGlobalStatesListDataControl()
-                    .deleteElement(Controller.getInstance().getSelectedChapterDataControl().getGlobalStatesListDataControl().getGlobalStates()[selectedGlobalState], false);
+                Controller.Instance.SelectedChapterDataControl.getGlobalStatesListDataControl()
+                    .deleteElement(Controller.Instance.SelectedChapterDataControl.getGlobalStatesListDataControl().getGlobalStates()[selectedGlobalState], false);
                 selectedGlobalState = -1;
             }
             GUI.skin = defaultSkin;
@@ -122,9 +122,7 @@ namespace uAdventure.Editor
                 {
                     ConditionEditorWindow window =
                             (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
-                    window.Init(Controller.getInstance()
-                        .getSelectedChapterDataControl()
-                        .getGlobalStatesListDataControl().getGlobalStates()[selectedGlobalState].getController());
+                    window.Init(Controller.Instance                        .SelectedChapterDataControl                        .getGlobalStatesListDataControl().getGlobalStates()[selectedGlobalState].getController());
                 }
                 GUILayout.EndArea();
             }
@@ -136,7 +134,7 @@ namespace uAdventure.Editor
 
             globalStateName =
                 globalStateNameLast =
-                    Controller.getInstance().getSelectedChapterDataControl().getGlobalStatesListDataControl().getGlobalStates()[
+                    Controller.Instance.SelectedChapterDataControl.getGlobalStatesListDataControl().getGlobalStates()[
                         selectedGlobalState].getId();
 
             if (globalStateName == null)
@@ -144,7 +142,7 @@ namespace uAdventure.Editor
                     globalStateNameLast = "";
 
             globalStateDocumentation = globalStateDocumentationLast =
-                    Controller.getInstance().getSelectedChapterDataControl().getGlobalStatesListDataControl().getGlobalStates()[
+                    Controller.Instance.SelectedChapterDataControl.getGlobalStatesListDataControl().getGlobalStates()[
                         selectedGlobalState].getDocumentation();
 
             if (globalStateDocumentation == null)
@@ -154,17 +152,17 @@ namespace uAdventure.Editor
 
         private void OnGlobalStateNameChanged(string val)
         {
-            if (Controller.getInstance().isElementIdValid(val, false))
+            if (Controller.Instance.isElementIdValid(val, false))
             {
                 globalStateNameLast = val;
-                Controller.getInstance().getSelectedChapterDataControl().getGlobalStatesListDataControl().getGlobalStates()[selectedGlobalState].setId(val);
+                Controller.Instance.SelectedChapterDataControl.getGlobalStatesListDataControl().getGlobalStates()[selectedGlobalState].setId(val);
             }
         }
 
         private void OnGlobalStateDocumentationChanged(string val)
         {
             globalStateDocumentationLast = val;
-            Controller.getInstance().getSelectedChapterDataControl().getGlobalStatesListDataControl().getGlobalStates()[selectedGlobalState].setDocumentation(val);
+            Controller.Instance.SelectedChapterDataControl.getGlobalStatesListDataControl().getGlobalStates()[selectedGlobalState].setDocumentation(val);
         }
     }
 }

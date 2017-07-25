@@ -65,7 +65,7 @@ namespace uAdventure.Editor
                     }
                     //if is not art necessary and is 3rd person game, look for "standleft", if this asset is 
                     // not necessary, set "standright as necessary"
-                    else if (!Controller.getInstance().isPlayTransparent())
+                    else if (!Controller.Instance.PlayTransparent)
                     {
                         for (int i = 0; i < assetsInformation.Length; i++)
                         {
@@ -88,7 +88,7 @@ namespace uAdventure.Editor
                         }
                     } //if is not art necessary and is 3rd person game, look for "standright", if this asset is 
                       // not necessary, set "standright as necessary"
-                    else if (!Controller.getInstance().isPlayTransparent())
+                    else if (!Controller.Instance.PlayTransparent)
                     {
                         for (int i = 0; i < assetsInformation.Length; i++)
                         {

@@ -59,7 +59,7 @@ namespace uAdventure.Editor
         {
 
             exitLook.setCursorPath(null);
-            Controller.getInstance().reloadPanel();
+            Controller.Instance.reloadPanel();
             return true;
         }
 
@@ -68,7 +68,7 @@ namespace uAdventure.Editor
         {
 
             exitLook.setCursorPath(oldCursorPath);
-            Controller.getInstance().reloadPanel();
+            Controller.Instance.reloadPanel();
             return true;
         }
     }

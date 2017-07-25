@@ -23,9 +23,12 @@ namespace uAdventure.Core
 			case "video":
 				frame.setType (Frame.TYPE_VIDEO);
 				break;
-			}
+            }
 
-			frame.setUri(element.GetAttribute("uri") ?? "");
+            if (element.SelectSingleNode("documentation") != null)
+                frame.setDocumentation(element.SelectSingleNode("documentation").InnerText);
+
+            frame.setUri(element.GetAttribute("uri") ?? "");
 			frame.setWaitforclick ("yes".Equals (element.GetAttribute ("waitforclick")));
 			frame.setSoundUri(element.GetAttribute("soundUri") ?? "");
 

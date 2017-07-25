@@ -112,7 +112,7 @@ namespace uAdventure.Editor
                         side.setRealLength((float)Mathf.Sqrt(Mathf.Pow(x, 2) + Mathf.Pow(y, 2)));
                     }
                 }
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
 
@@ -138,7 +138,7 @@ namespace uAdventure.Editor
                         side.setLenght(temp);
                 }
 
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
     }

@@ -80,7 +80,18 @@ namespace uAdventure.Editor
 
             EditorGUILayout.BeginVertical();
 
-            EditorGUILayout.HelpBox(TC.get("ConversationEditor.AtLeastOne"), MessageType.None);
+			EditorGUILayout.HelpBox(TC.get("ConversationEditor.AtLeastOne"), MessageType.None);
+			GUILayout.BeginHorizontal ();
+			GUILayout.Label("Question ID: ");
+			//Controller.getInstance ().getIdentifierSummary ().add
+			myNode.setXApiQuestion(EditorGUILayout.TextField(myNode.getXApiQuestion()));
+			if (myNode.getXApiQuestion () == "") {
+				var lastRect = GUILayoutUtility.GetLastRect ();
+				var guistyle = new GUIStyle (GUI.skin.label);
+				guistyle.normal.textColor = Color.gray;
+				GUI.Label (lastRect, " Required for analytics", guistyle);
+			}
+			GUILayout.EndHorizontal ();
             bool infoShown = false;
             if (myNode.getLineCount() > 0)
             {
@@ -98,8 +109,10 @@ namespace uAdventure.Editor
 
                     bool showInfo = false;
 
-                    EditorGUIUtility.labelWidth = GUI.skin.label.CalcSize(new GUIContent(TC.get("ConversationEditor.Option") + " " + i + ": ")).x;
-                    myNode.getLine(i).setText(EditorGUILayout.TextField(TC.get("ConversationEditor.Option") + " " + i + ": ", myNode.getLine(i).getText(), GUILayout.Width(200)));
+					EditorGUIUtility.labelWidth = GUI.skin.label.CalcSize(new GUIContent((i+1) + ": ")).x;
+					myNode.getLine(i).setText(EditorGUILayout.TextField((i+1) + ": ", myNode.getLine(i).getText(), GUILayout.Width(200)));
+					myNode.getLine (i).setXApiCorrect (EditorGUILayout.Toggle(myNode.getLine (i).getXApiCorrect ()));
+					GUILayout.Space (5);
 
                     tmpTex = (myNode.getLine(i).getConditions().getConditionsList().Count > 0
                         ? conditionsTex
@@ -125,6 +138,46 @@ namespace uAdventure.Editor
                     EditorGUILayout.EndHorizontal();
 
                 }
+
+                // Timer
+
+                EditorGUILayout.BeginHorizontal();
+
+                if (EditorGUILayout.Toggle("Timeout: ", myNode.Timeout >= 0))
+                {
+                    if(myNode.Timeout < 0)
+                        parent.addChild(this.myNode, new DialogueConversationNode());
+
+                    myNode.Timeout = Mathf.Clamp(EditorGUILayout.FloatField(myNode.Timeout), 0, float.MaxValue);
+
+                    GUILayout.Space(5);
+
+                    tmpTex = (myNode.TimeoutConditions.getConditionsList().Count > 0
+                        ? conditionsTex
+                        : noConditionsTex);
+                    
+                    if (GUILayout.Button(tmpTex, noBackgroundSkin.button, GUILayout.Width(15), GUILayout.Height(15)))
+                    {
+                        ConditionEditorWindow window = (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
+                        window.Init(myNode.TimeoutConditions);
+                    }
+
+                    if (GUILayout.Button(linkTex, noBackgroundSkin.button, GUILayout.Width(15), GUILayout.Height(15)))
+                    {
+                        parent.startSetChild(this.myNode, myNode.getLineCount());
+                    }
+
+                    if (GUILayout.Button("X", closeStyle, GUILayout.Width(15), GUILayout.Height(15)))
+                    {
+                        myNode.Timeout = -1f;
+                        myNode.removeChild(myNode.getChildCount());
+                    };
+                }
+                else
+                    myNode.Timeout = -1f;
+                
+                EditorGUILayout.EndHorizontal();
+                
                 if (isScrolling)
                     EditorGUILayout.EndScrollView();
             }

@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System.Xml;
 using System.Collections.Generic;
 
@@ -196,6 +195,7 @@ namespace uAdventure.Core
             string tmpArgVal = "";
             currentLinks = new List<int>();
             bool addline = true;
+            bool timeoutConditions = false;
 
             foreach (XmlElement ell in lines.ChildNodes)
             {
@@ -241,7 +241,13 @@ namespace uAdventure.Core
                 {
                     addline = false;
 					var currentConditions = DOMParserUtility.DOMParse (ell, parameters) as Conditions ?? new Conditions ();
-                    currentNode.getLine(currentNode.getLineCount() - 1).setConditions(currentConditions);
+
+                    if (timeoutConditions)
+                    {
+                        ((OptionConversationNode)currentNode).TimeoutConditions = currentConditions;
+                    }
+                    else
+                        currentNode.getLine(currentNode.getLineCount() - 1).setConditions(currentConditions);
                 }
                 else if (ell.Name == "child")
                 {
@@ -253,6 +259,12 @@ namespace uAdventure.Core
                         int childIndex = int.Parse(tmpArgVal);
                         currentLinks.Add(childIndex);
                     }
+                }
+                else if(ell.Name == "timeout")
+                {
+                    ((OptionConversationNode)currentNode).Timeout = ExParsers.ParseDefault(ell.InnerText, 10f);
+                    timeoutConditions = true;
+                    addline = false;
                 }
                 else
                     addline = false;

@@ -13,17 +13,12 @@ namespace uAdventure.Editor
 {
     public class OpenGameWindow : LayoutWindow
     {
-        private System.Windows.Forms.OpenFileDialog ofd;
         private string selectedGameProjectPath = "";
 
         public OpenGameWindow(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
         {
-            ofd = new System.Windows.Forms.OpenFileDialog();
         }
-
-        [DllImport("user32.dll")]
-        private static extern void SaveFileDialog(); //in your case : OpenFileDialog
 
         public override void Draw(int aID)
         {
@@ -33,26 +28,21 @@ namespace uAdventure.Editor
         public void OpenFileDialog()
         {
             Stream myStream = null;
-            ofd.InitialDirectory = "c:\\";
-            ofd.Filter = "ead files (*.ead) | *.ead |eap files (*.eap) | *.eap | All files(*.*) | *.* ";
-            ofd.FilterIndex = 2;
-            ofd.RestoreDirectory = true;
 
-            if (ofd.ShowDialog() == DialogResult.OK)
-            {
+			var fileFilter = "eap";
+			var result = EditorUtility.OpenFilePanel ("Select file", "C://", fileFilter);
 
-                if ((myStream = ofd.OpenFile()) != null)
-                {
-                    using (myStream)
-                    {
-                        // Insert code to read the stream here.
-                        selectedGameProjectPath = ofd.FileName;
-                        GameRources.LoadGameProject(selectedGameProjectPath);
-                        EditorWindowBase.Init();
-                        EditorWindowBase window = (EditorWindowBase)EditorWindow.GetWindow(typeof(EditorWindowBase));
-                        window.Show();
-                    }
-                    myStream.Dispose();
+			if (result != "")
+			{
+				FileInfo file = new FileInfo (result);
+
+				if (file.Exists)
+				{
+                    // Insert code to read the stream here.
+					Debug.Log("Opening project");
+					selectedGameProjectPath = file.FullName;
+                    GameRources.LoadGameProject(selectedGameProjectPath);
+                    Controller.OpenEditorWindow();
                 }
 
             }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using uAdventure.Core;
+using System;
 
 namespace uAdventure.Editor
 {
@@ -187,7 +188,7 @@ namespace uAdventure.Editor
             // If the element is a resources block
             if (type == Controller.RESOURCES)
             {
-                elementAdded = Controller.getInstance().addTool(new AddResourcesBlockTool(resourcesList, resourcesDataControlList, cutsceneType, this));
+                elementAdded = Controller.Instance.addTool(new AddResourcesBlockTool(resourcesList, resourcesDataControlList, cutsceneType, this));
             }
 
             return elementAdded;
@@ -270,8 +271,8 @@ namespace uAdventure.Editor
 				
                 cutscene.setId(newCutsceneId);
                 controller.replaceIdentifierReferences(oldCutsceneId, newCutsceneId);
-                controller.getIdentifierSummary().deleteCutsceneId(oldCutsceneId);
-                controller.getIdentifierSummary().addCutsceneId(newCutsceneId);
+                controller.IdentifierSummary.deleteCutsceneId(oldCutsceneId);
+                controller.IdentifierSummary.addCutsceneId(newCutsceneId);
                 //controller.dataModified( );
 
 				return newCutsceneId;
@@ -431,7 +432,9 @@ namespace uAdventure.Editor
                     previewImagePath += "_01.jpg";
                 else if (previewImagePath != null)
                 {
-                    return Loader.loadAnimation(AssetsController.InputStreamCreatorEditor.getInputStreamCreator(), previewImagePath, new EditorImageLoader()).getFrame(0).getUri();
+                    var animation = Loader.loadAnimation(AssetsController.InputStreamCreatorEditor.getInputStreamCreator(), previewImagePath, new EditorImageLoader());
+
+                    return animation != null && animation.getFrames().Count > 0 ? animation.getFrame(0).getUri() : null;
                 }
 
                 return previewImagePath;
@@ -471,22 +474,23 @@ namespace uAdventure.Editor
 
         public void setNext(int next)
         {
-
-            Controller.getInstance().addTool(new ChangeIntegerValueTool(cutscene, next, "getNext", "setNext"));
+			var chapterTargets = controller.IdentifierSummary .groupIds<IChapterTarget> ();
+            Controller.Instance.addTool(new ChangeIntegerValueTool(cutscene, next, "getNext", "setNext"));
             if (cutscene.getTargetId() == null || cutscene.getTargetId().Equals(""))
-            {
-                cutscene.setTargetId(Controller.getInstance().getIdentifierSummary().getGeneralSceneIds()[0]);
+			{
+				if(chapterTargets.Length > 0)
+					cutscene.setTargetId(chapterTargets[0]);
             }
             else
             {
                 bool exists = false;
-                for (int i = 0; i < Controller.getInstance().getIdentifierSummary().getGeneralSceneIds().Length; i++)
+				for (int i = 0; i < chapterTargets.Length; i++)
                 {
-                    if (Controller.getInstance().getIdentifierSummary().getGeneralSceneIds()[i].Equals(cutscene.getTargetId()))
+					if (chapterTargets[i].Equals(cutscene.getTargetId()))
                         exists = true;
                 }
                 if (!exists)
-                    cutscene.setTargetId(Controller.getInstance().getIdentifierSummary().getGeneralSceneIds()[0]);
+					cutscene.setTargetId(chapterTargets[0]);
             }
         }
 
@@ -523,13 +527,13 @@ namespace uAdventure.Editor
         public void setTransitionTime(int value)
         {
 
-            Controller.getInstance().addTool(new ChangeIntegerValueTool(cutscene, value, "getTransitionTime", "setTransitionTime"));
+            Controller.Instance.addTool(new ChangeIntegerValueTool(cutscene, value, "getTransitionTime", "setTransitionTime"));
         }
 
         public void setTransitionType(int value)
         {
 
-            Controller.getInstance().addTool(new ChangeIntegerValueTool(cutscene, value, "getTransitionType", "setTransitionType"));
+            Controller.Instance.addTool(new ChangeIntegerValueTool(cutscene, value, "getTransitionType", "setTransitionType"));
         }
 
         /**
@@ -625,6 +629,18 @@ namespace uAdventure.Editor
         public string getXApiType()
         {
             return cutscene.getXApiType();
+        }
+
+
+
+        public void setXApiClass(string sceneclass)
+        {
+            cutscene.setXApiClass(sceneclass);
+        }
+
+        public void setXApiType(string scenetype)
+        {
+            cutscene.setXApiType(scenetype);
         }
     }
 }

@@ -33,7 +33,7 @@ namespace uAdventure.Editor
             string preview = getPreviewImage();
             if (preview != null)
             {
-                foreach (SceneDataControl scene in Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes())
+                foreach (SceneDataControl scene in Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes())
                 {
                     scene.imageChangeNotify(preview);
                 }
@@ -88,7 +88,7 @@ namespace uAdventure.Editor
 
             bool elementAdded = false;
 
-            if (type == Controller.RESOURCES && !Controller.getInstance().isPlayTransparent())
+            if (type == Controller.RESOURCES && !Controller.Instance.PlayTransparent)
             {
                 return base.addElement(type, id);
             }
@@ -100,7 +100,7 @@ namespace uAdventure.Editor
         public override bool buildResourcesTab()
         {
 
-            return !Controller.getInstance().isPlayTransparent();
+            return !Controller.Instance.PlayTransparent;
         }
 
 

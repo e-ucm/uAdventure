@@ -47,7 +47,7 @@ namespace uAdventure.Editor
         {
 
             GUILayout.BeginHorizontal();
-            if (Controller.getInstance().playerMode() == Controller.FILE_ADVENTURE_3RDPERSON_PLAYER)
+            if (Controller.Instance.playerMode() == Controller.FILE_ADVENTURE_3RDPERSON_PLAYER)
             {
                 if (openedWindow == PlayerWindowType.Appearance)
                     GUI.skin = selectedButtonSkin;

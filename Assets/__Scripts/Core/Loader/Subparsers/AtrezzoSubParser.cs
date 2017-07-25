@@ -6,45 +6,29 @@ using System.Linq;
 
 namespace uAdventure.Core
 {
-	[DOMParser("atrezzo")]
+	[DOMParser("atrezzo", "atrezzoobject")]
 	[DOMParser(typeof(Atrezzo))]
 	public class AtrezzoSubParser : IDOMParser
 	{
 		public object DOMParse(XmlElement element, params object[] parameters)
 		{
-			XmlNodeList
-				resourcess = element.SelectNodes ("resources"),
-				descriptions = element.SelectNodes ("description"),
-				assets,
-				conditions;
+            XmlNodeList
+                resourcess = element.SelectNodes("resources"),
+                descriptions = element.SelectNodes("description");
+            XmlElement documentation = element.SelectSingleNode("documentation") as XmlElement;
 
-            string tmpArgVal;
+            Atrezzo atrezzo = new Atrezzo(element.GetAttribute("id") ?? "");
 
-            string atrezzoId = element.GetAttribute("id");
-            Atrezzo atrezzo = new Atrezzo(atrezzoId);
+            // DOCUMENTATION
+            if (documentation != null)
+                atrezzo.setDocumentation(documentation.InnerText);
 
-            if (element.SelectSingleNode("documentation") != null)
-                atrezzo.setDocumentation(element.SelectSingleNode("documentation").InnerText);
+            // RESOURCES
+            foreach (var res in DOMParserUtility.DOMParse<ResourcesUni>(resourcess, parameters))
+                atrezzo.addResources(res);
 
-            foreach (XmlElement el in resourcess)
-            {
-				ResourcesUni currentResources = new ResourcesUni();
-                currentResources.setName(el.GetAttribute("name") ?? "");
-
-                assets = el.SelectNodes("asset");
-                foreach (XmlElement ell in assets)
-                {
-					string type = ell.GetAttribute("type") ?? "";
-					string path = ell.GetAttribute("uri") ?? "";
-
-                    currentResources.addAsset(type, path);
-                }
-
-				currentResources.setConditions(DOMParserUtility.DOMParse<Conditions>(el.SelectSingleNode("condition"), parameters) ?? new Conditions());
-                atrezzo.addResources(currentResources);
-            }
-
-			atrezzo.setDescriptions(DOMParserUtility.DOMParse<Description>(descriptions, parameters).ToList());
+            // DESCRIPTIONS
+            atrezzo.setDescriptions(DOMParserUtility.DOMParse<Description>(descriptions, parameters).ToList());
 
             return atrezzo;
         }

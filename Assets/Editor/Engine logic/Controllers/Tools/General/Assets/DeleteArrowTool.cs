@@ -52,7 +52,7 @@ namespace uAdventure.Editor
 
             arrowDeleted = adventureData.getArrows()[index];
             adventureData.getArrows().RemoveAt(index);
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
 
@@ -60,7 +60,7 @@ namespace uAdventure.Editor
         {
 
             adventureData.getArrows().Insert(index, arrowDeleted);
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
     }

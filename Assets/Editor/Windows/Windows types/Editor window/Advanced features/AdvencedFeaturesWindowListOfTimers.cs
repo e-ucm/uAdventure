@@ -67,7 +67,7 @@ namespace uAdventure.Editor
 
             scrollPosition = GUILayout.BeginScrollView(scrollPosition);
             for (int i = 0;
-                i < Controller.getInstance().getSelectedChapterDataControl().getTimersList().getTimers().Count;
+                i < Controller.Instance.SelectedChapterDataControl.getTimersList().getTimers().Count;
                 i++)
             {
                 if (i == selectedTimer)
@@ -89,9 +89,9 @@ namespace uAdventure.Editor
                     if (timerTime != timerTimeLast)
                         OnTimerTime(timerTime);
 
-                    Controller.getInstance().getSelectedChapterDataControl().getTimersList().getTimers()[i].setShowTime(GUILayout
+                    Controller.Instance.SelectedChapterDataControl.getTimersList().getTimers()[i].setShowTime(GUILayout
                         .Toggle(
-                            Controller.getInstance().getSelectedChapterDataControl().getTimersList().getTimers()[i]
+                            Controller.Instance.SelectedChapterDataControl.getTimersList().getTimers()[i]
                                 .isShowTime(),
                             "", GUILayout.MaxWidth(windowWidth * 0.3f)));
                 }
@@ -103,14 +103,14 @@ namespace uAdventure.Editor
                     }
                     if (
                         GUILayout.Button(
-                            Controller.getInstance().getSelectedChapterDataControl().getTimersList().getTimers()[i].getTime()
+                            Controller.Instance.SelectedChapterDataControl.getTimersList().getTimers()[i].getTime()
                                 .ToString(), GUILayout.MaxWidth(windowWidth * 0.3f)))
                     {
                         OnTimerSelectedChange(i);
                     }
                     if (
                         GUILayout.Button(
-                        Controller.getInstance().getSelectedChapterDataControl().getTimersList().getTimers()[i].isShowTime().ToString(), GUILayout.MaxWidth(windowWidth * 0.3f)))
+                        Controller.Instance.SelectedChapterDataControl.getTimersList().getTimers()[i].isShowTime().ToString(), GUILayout.MaxWidth(windowWidth * 0.3f)))
                     {
                         OnTimerSelectedChange(i);
                     }
@@ -130,23 +130,19 @@ namespace uAdventure.Editor
             GUI.skin = noBackgroundSkin;
             if (GUILayout.Button(addTex, GUILayout.MaxWidth(0.08f * windowWidth)))
             {
-                Controller.getInstance().getSelectedChapterDataControl().getTimersList().addElement(Controller.TIMER, "");
+                Controller.Instance.SelectedChapterDataControl.getTimersList().addElement(Controller.TIMER, "");
             }
             if (GUILayout.Button(duplicateTex, GUILayout.MaxWidth(0.08f * windowWidth)))
             {
-                Controller.getInstance()
-                    .getSelectedChapterDataControl()
-                    .getTimersList()
+                Controller.Instance                    .SelectedChapterDataControl                    .getTimersList()
                     .duplicateElement(
-                        Controller.getInstance().getSelectedChapterDataControl().getTimersList().getTimers()[selectedTimer]);
+                        Controller.Instance.SelectedChapterDataControl.getTimersList().getTimers()[selectedTimer]);
             }
             if (GUILayout.Button(clearTex, GUILayout.MaxWidth(0.08f * windowWidth)))
             {
-                Controller.getInstance()
-                    .getSelectedChapterDataControl()
-                    .getTimersList()
+                Controller.Instance                    .SelectedChapterDataControl                    .getTimersList()
                     .deleteElement(
-                        Controller.getInstance().getSelectedChapterDataControl().getTimersList().getTimers()[selectedTimer],
+                        Controller.Instance.SelectedChapterDataControl.getTimersList().getTimers()[selectedTimer],
                         false);
             }
             GUI.skin = defaultSkin;
@@ -157,7 +153,7 @@ namespace uAdventure.Editor
             */
 
             if (selectedTimer != -1 &&
-                Controller.getInstance().getSelectedChapterDataControl().getTimersList().getTimers()[selectedTimer] != null)
+                Controller.Instance.SelectedChapterDataControl.getTimersList().getTimers()[selectedTimer] != null)
             {
                 GUILayout.BeginArea(settingsTable);
 
@@ -174,7 +170,7 @@ namespace uAdventure.Editor
 
                 GUILayout.BeginHorizontal();
                 if (
-                    !Controller.getInstance().getSelectedChapterDataControl().getTimersList().getTimers()[selectedTimer]
+                    !Controller.Instance.SelectedChapterDataControl.getTimersList().getTimers()[selectedTimer]
                         .isShowTime())
                     GUI.enabled = false;
                 GUILayout.Label(TC.get("Timer.DisplayName"));
@@ -182,17 +178,9 @@ namespace uAdventure.Editor
                 if (displayName != displayNameLast)
                     OnTimerDisplayNameChanged(displayName);
 
-                Controller.getInstance()
-                    .getSelectedChapterDataControl()
-                    .getTimersList().getTimers()[selectedTimer].setCountDown(GUILayout.Toggle(Controller.getInstance()
-                        .getSelectedChapterDataControl()
-                        .getTimersList().getTimers()[selectedTimer].isCountDown(), TC.get("Timer.CountDown")));
+                Controller.Instance                    .SelectedChapterDataControl                    .getTimersList().getTimers()[selectedTimer].setCountDown(GUILayout.Toggle(Controller.Instance                        .SelectedChapterDataControl                        .getTimersList().getTimers()[selectedTimer].isCountDown(), TC.get("Timer.CountDown")));
 
-                Controller.getInstance()
-                    .getSelectedChapterDataControl()
-                    .getTimersList().getTimers()[selectedTimer].setShowWhenStopped(GUILayout.Toggle(Controller.getInstance()
-                        .getSelectedChapterDataControl()
-                        .getTimersList().getTimers()[selectedTimer].isShowWhenStopped(), TC.get("Timer.ShowWhenStopped")));
+                Controller.Instance                    .SelectedChapterDataControl                    .getTimersList().getTimers()[selectedTimer].setShowWhenStopped(GUILayout.Toggle(Controller.Instance                        .SelectedChapterDataControl                        .getTimersList().getTimers()[selectedTimer].isShowWhenStopped(), TC.get("Timer.ShowWhenStopped")));
                 GUI.enabled = true;
                 GUILayout.EndHorizontal();
 
@@ -201,17 +189,9 @@ namespace uAdventure.Editor
 
 
                 GUILayout.Label(TC.get("Timer.LoopControl"));
-                Controller.getInstance()
-                    .getSelectedChapterDataControl()
-                    .getTimersList().getTimers()[selectedTimer].setMultipleStarts(GUILayout.Toggle(Controller.getInstance()
-                        .getSelectedChapterDataControl()
-                        .getTimersList().getTimers()[selectedTimer].isMultipleStarts(), TC.get("Timer.MultipleStarts")));
+                Controller.Instance                    .SelectedChapterDataControl                    .getTimersList().getTimers()[selectedTimer].setMultipleStarts(GUILayout.Toggle(Controller.Instance                        .SelectedChapterDataControl                        .getTimersList().getTimers()[selectedTimer].isMultipleStarts(), TC.get("Timer.MultipleStarts")));
                 GUILayout.Label(TC.get("Timer.MultipleStartsDesc"), smallFontStyle);
-                Controller.getInstance()
-                    .getSelectedChapterDataControl()
-                    .getTimersList().getTimers()[selectedTimer].setRunsInLoop(GUILayout.Toggle(Controller.getInstance()
-                        .getSelectedChapterDataControl()
-                        .getTimersList().getTimers()[selectedTimer].isRunsInLoop(), TC.get("Timer.RunsInLoop")));
+                Controller.Instance                    .SelectedChapterDataControl                    .getTimersList().getTimers()[selectedTimer].setRunsInLoop(GUILayout.Toggle(Controller.Instance                        .SelectedChapterDataControl                        .getTimersList().getTimers()[selectedTimer].isRunsInLoop(), TC.get("Timer.RunsInLoop")));
                 GUILayout.Label(
                      TC.get("Timer.RunsInLoopDesc"), smallFontStyle);
 
@@ -224,9 +204,7 @@ namespace uAdventure.Editor
                 {
                     ConditionEditorWindow window =
                            (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
-                    window.Init(Controller.getInstance()
-                        .getSelectedChapterDataControl()
-                        .getTimersList().getTimers()[selectedTimer].getInitConditions());
+                    window.Init(Controller.Instance                        .SelectedChapterDataControl                        .getTimersList().getTimers()[selectedTimer].getInitConditions());
                 }
 
 
@@ -234,24 +212,18 @@ namespace uAdventure.Editor
 
 
                 GUILayout.Label(TC.get("Timer.EndConditions"));
-                Controller.getInstance()
-                    .getSelectedChapterDataControl()
-                    .getTimersList().getTimers()[selectedTimer].setUsesEndCondition(
-                        GUILayout.Toggle(Controller.getInstance()
-                            .getSelectedChapterDataControl()
-                            .getTimersList().getTimers()[selectedTimer].isUsesEndCondition(),
+                Controller.Instance                    .SelectedChapterDataControl                    .getTimersList().getTimers()[selectedTimer].setUsesEndCondition(
+                        GUILayout.Toggle(Controller.Instance                            .SelectedChapterDataControl                            .getTimersList().getTimers()[selectedTimer].isUsesEndCondition(),
                             TC.get("Timer.UsesEndConditionShort")));
                 if (
-                    !Controller.getInstance().getSelectedChapterDataControl().getTimersList().getTimers()[selectedTimer]
+                    !Controller.Instance.SelectedChapterDataControl.getTimersList().getTimers()[selectedTimer]
                         .isUsesEndCondition())
                     GUI.enabled = false;
                 if (GUILayout.Button(TC.get("GeneralText.EditEndConditions")))
                 {
                     ConditionEditorWindow window =
                            (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
-                    window.Init(Controller.getInstance()
-                        .getSelectedChapterDataControl()
-                        .getTimersList().getTimers()[selectedTimer].getEndConditions());
+                    window.Init(Controller.Instance                        .SelectedChapterDataControl                        .getTimersList().getTimers()[selectedTimer].getEndConditions());
 
                 }
                 GUI.enabled = true;
@@ -269,17 +241,13 @@ namespace uAdventure.Editor
                 {
                     EffectEditorWindow window =
                     (EffectEditorWindow)ScriptableObject.CreateInstance(typeof(EffectEditorWindow));
-                    window.Init(Controller.getInstance()
-                        .getSelectedChapterDataControl()
-                        .getTimersList().getTimers()[selectedTimer].getEffects());
+                    window.Init(Controller.Instance                        .SelectedChapterDataControl                        .getTimersList().getTimers()[selectedTimer].getEffects());
                 }
                 if (GUILayout.Button(TC.get("GeneralText.EditPostEffects"), GUILayout.Width(0.45f * windowWidth)))
                 {
                     EffectEditorWindow window =
                     (EffectEditorWindow)ScriptableObject.CreateInstance(typeof(EffectEditorWindow));
-                    window.Init(Controller.getInstance()
-                        .getSelectedChapterDataControl()
-                        .getTimersList().getTimers()[selectedTimer].getPostEffects());
+                    window.Init(Controller.Instance                        .SelectedChapterDataControl                        .getTimersList().getTimers()[selectedTimer].getPostEffects());
                 }
                 GUILayout.EndHorizontal();
 
@@ -293,23 +261,17 @@ namespace uAdventure.Editor
             selectedTimer = i;
 
             fullTimerDescription = fullTimerDescriptionLast =
-                Controller.getInstance()
-                    .getSelectedChapterDataControl()
-                    .getTimersList().getTimers()[selectedTimer].getDocumentation();
+                Controller.Instance                    .SelectedChapterDataControl                    .getTimersList().getTimers()[selectedTimer].getDocumentation();
             if (fullTimerDescription == null)
                 fullTimerDescription = fullTimerDescriptionLast = "";
 
 
-            displayName = displayNameLast = Controller.getInstance()
-                .getSelectedChapterDataControl()
-                .getTimersList().getTimers()[selectedTimer].getDisplayName();
+            displayName = displayNameLast = Controller.Instance                .SelectedChapterDataControl                .getTimersList().getTimers()[selectedTimer].getDisplayName();
             if (displayName == null)
                 displayName = displayNameLast = "";
 
 
-            timerTime = timerTimeLast = Controller.getInstance()
-                .getSelectedChapterDataControl()
-                .getTimersList().getTimers()[selectedTimer].getTime().ToString();
+            timerTime = timerTimeLast = Controller.Instance                .SelectedChapterDataControl                .getTimersList().getTimers()[selectedTimer].getTime().ToString();
             if (timerTime == null)
                 timerTime = timerTime = "0";
         }
@@ -317,25 +279,19 @@ namespace uAdventure.Editor
         void OnTimerDocumentationChanged(string val)
         {
             fullTimerDescriptionLast = val;
-            Controller.getInstance()
-                .getSelectedChapterDataControl()
-                .getTimersList().getTimers()[selectedTimer].setDocumentation(val);
+            Controller.Instance                .SelectedChapterDataControl                .getTimersList().getTimers()[selectedTimer].setDocumentation(val);
         }
 
         void OnTimerDisplayNameChanged(string val)
         {
             displayNameLast = val;
-            Controller.getInstance()
-                .getSelectedChapterDataControl()
-                .getTimersList().getTimers()[selectedTimer].setDisplayName(val);
+            Controller.Instance                .SelectedChapterDataControl                .getTimersList().getTimers()[selectedTimer].setDisplayName(val);
         }
 
         void OnTimerTime(string val)
         {
             timerTimeLast = val;
-            Controller.getInstance()
-                .getSelectedChapterDataControl()
-                .getTimersList().getTimers()[selectedTimer].setTime(long.Parse(val));
+            Controller.Instance                .SelectedChapterDataControl                .getTimersList().getTimers()[selectedTimer].setTime(long.Parse(val));
         }
     }
 }

@@ -45,5 +45,6 @@ namespace uAdventure.Editor
         {
             return c.GetType() == effect.GetType();
         }
+        public bool Usable { get { return true; } }
     }
 }

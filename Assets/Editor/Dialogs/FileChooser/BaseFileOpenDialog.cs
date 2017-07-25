@@ -46,7 +46,6 @@ namespace uAdventure.Editor
         protected DialogReceiverInterface reference;
         protected FileType fileType;
 
-        private System.Windows.Forms.OpenFileDialog ofd;
         protected string selectedAssetPath = "";
 
         protected string fileFilter;
@@ -58,30 +57,23 @@ namespace uAdventure.Editor
         {
             reference = e;
             fileType = fType;
-            ofd = new System.Windows.Forms.OpenFileDialog();
 
             OpenFileDialog();
         }
 
         public void OpenFileDialog()
         {
-            Stream myStream = null;
-            ofd.Filter = fileFilter;
-            ofd.FilterIndex = 2;
-            ofd.RestoreDirectory = true;
+			var result = EditorUtility.OpenFilePanel ("Select file", "Assets/", fileFilter);
 
-            if (ofd.ShowDialog() == DialogResult.OK)
+			if (result != "")
             {
+				FileInfo file = new FileInfo (result);
 
-                if ((myStream = ofd.OpenFile()) != null)
+				if (file.Exists)
                 {
-                    using (myStream)
-                    {
-                        // Insert code to read the stream here.
-                        selectedAssetPath = ofd.FileName;
-                        ChoosedCorrectFile();
-                    }
-                    myStream.Dispose();
+                    // Insert code to read the stream here.
+					selectedAssetPath = file.FullName;
+                    ChoosedCorrectFile();
                 }
             }
             else
@@ -150,7 +142,7 @@ namespace uAdventure.Editor
                     break;
             }
 
-            string file = Controller.getInstance().getProjectFolder();
+            string file = Controller.Instance.ProjectFolder;
 
             DirectoryInfo path = new DirectoryInfo(DIR_PREFIX + "/" + assetTypeDir);
             if (!Directory.Exists(path.FullName))

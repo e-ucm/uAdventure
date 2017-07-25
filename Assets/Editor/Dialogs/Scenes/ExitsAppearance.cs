@@ -22,19 +22,19 @@ namespace uAdventure.Editor
         {
             currentExitIndex = exitIndex;
 
-            exitText = exitTextLast = Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+            exitText = exitTextLast = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                 GameRources.GetInstance().selectedSceneIndex].getExitsList().getExitsList()[currentExitIndex]
                 .getDefaultExitLook()
                 .getExitText();
 
             exitIconPath =
-                exitIconPathLast = Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                exitIconPathLast = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                     GameRources.GetInstance().selectedSceneIndex].getExitsList().getExitsList()[currentExitIndex]
                     .getDefaultExitLook()
                     .getCursorPath();
 
             audioPath =
-                audioPathLast = Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                audioPathLast = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                     GameRources.GetInstance().selectedSceneIndex].getExitsList().getExitsList()[currentExitIndex]
                     .getDefaultExitLook()
                     .getSoundPath();
@@ -131,7 +131,7 @@ namespace uAdventure.Editor
         {
             exitTextLast = val;
             // Udpate controller
-            Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+            Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                 GameRources.GetInstance().selectedSceneIndex].getExitsList().getExitsList()[currentExitIndex]
                 .getDefaultExitLook().setExitText(exitText);
         }
@@ -143,7 +143,7 @@ namespace uAdventure.Editor
             exitTexture =
                 (Texture2D)Resources.Load(exitIconPath.Substring(0, exitIconPath.LastIndexOf(".")), typeof(Texture2D));
             // Udpate controller
-            Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+            Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                 GameRources.GetInstance().selectedSceneIndex].getExitsList().getExitsList()[currentExitIndex]
                 .getDefaultExitLook().setCursorPath(exitIconPath);
         }
@@ -153,7 +153,7 @@ namespace uAdventure.Editor
         {
             audioPathLast = val;
             // Udpate controller
-            Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+            Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                 GameRources.GetInstance().selectedSceneIndex].getExitsList().getExitsList()[currentExitIndex]
                 .getDefaultExitLook().setSoundPath(audioPath);
         }

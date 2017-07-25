@@ -129,7 +129,7 @@ namespace uAdventure.Editor
 
             if (type == Controller.RESOURCES)
             {
-                elementAdded = Controller.getInstance().addTool(new AddResourcesBlockTool(resourcesList, resourcesDataControlList, Controller.ATREZZO, this));
+                elementAdded = Controller.Instance.addTool(new AddResourcesBlockTool(resourcesList, resourcesDataControlList, Controller.ATREZZO, this));
             }
 
             return elementAdded;
@@ -200,8 +200,8 @@ namespace uAdventure.Editor
 				
                 atrezzo.setId(newAtrezzoId);
                 controller.replaceIdentifierReferences(oldAtrezzoId, newAtrezzoId);
-                controller.getIdentifierSummary().deleteAtrezzoId(oldAtrezzoId);
-                controller.getIdentifierSummary().addAtrezzoId(newAtrezzoId);
+                controller.IdentifierSummary.deleteAtrezzoId(oldAtrezzoId);
+                controller.IdentifierSummary.addAtrezzoId(newAtrezzoId);
 				//controller.dataModified( );
 				return newAtrezzoId;
             }

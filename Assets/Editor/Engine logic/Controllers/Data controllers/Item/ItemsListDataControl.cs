@@ -169,7 +169,7 @@ namespace uAdventure.Editor
                 Item newItem = new Item(itemId);
                 itemsList.Add(newItem);
                 itemsDataControlList.Add(new ItemDataControl(newItem));
-                controller.getIdentifierSummary().addItemId(itemId);
+                controller.IdentifierSummary.addItemId(itemId);
                 elementAdded = true;
             }
 
@@ -193,7 +193,7 @@ namespace uAdventure.Editor
             newElement.setId(id);
             itemsList.Add(newElement);
             itemsDataControlList.Add(new ItemDataControl(newElement));
-            controller.getIdentifierSummary().addItemId(id);
+            controller.IdentifierSummary.addItemId(id);
             return true;
         }
 
@@ -219,7 +219,7 @@ namespace uAdventure.Editor
                 {
                     itemsDataControlList.Remove((ItemDataControl)dataControl);
                     controller.deleteIdentifierReferences(itemId);
-                    controller.getIdentifierSummary().deleteItemId(itemId);
+                    controller.IdentifierSummary.deleteItemId(itemId);
                     //controller.dataModified( );
                     elementDeleted = true;
                 }

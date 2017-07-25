@@ -20,7 +20,7 @@ namespace uAdventure.Editor
 
             GUILayout.BeginHorizontal();
             // Disable button ok if name is not valid
-            if (!Controller.getInstance().isElementIdValid(textContent, false))
+            if (!Controller.Instance.isElementIdValid(textContent, false))
             {
                 GUI.enabled = false;
             }

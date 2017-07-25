@@ -1,6 +1,7 @@
 ﻿using System.Xml;
 
 using uAdventure.Core;
+using UnityEngine;
 using Animation = uAdventure.Core.Animation;
 
 namespace uAdventure.Editor
@@ -16,63 +17,64 @@ namespace uAdventure.Editor
 
         public static bool writeAnimation(string filename, Animation animation)
         {
-
             bool dataSaved = false;
             XmlDocument doc = doc = new XmlDocument();
+            
+            // Declaration, encoding, version, etc
             XmlDeclaration declaration = doc.CreateXmlDeclaration("1.0", "UTF-8", "no");
-            XmlDocumentType typeDescriptor = doc.CreateDocumentType("animation", "SYSTEM", "animation.dtd", null);
             doc.AppendChild(declaration);
+
+            // DTD
+            XmlDocumentType typeDescriptor = doc.CreateDocumentType("animation", "SYSTEM", "animation.dtd", null);
             doc.AppendChild(typeDescriptor);
+
+            // Main animation node
             XmlElement mainNode = doc.CreateElement("animation");
-            //mainNode.AppendChild(doc.createAttribute("id").setNodeValue(animation.getId()));
             mainNode.SetAttribute("id", animation.getId());
             mainNode.SetAttribute("usetransitions", animation.isUseTransitions() ? "yes" : "no");
             mainNode.SetAttribute("slides", animation.isSlides() ? "yes" : "no");
+
+            // Documentation node
             XmlElement documentation = doc.CreateElement("documentation");
             if (animation.getDocumentation() != null && animation.getDocumentation().Length > 0)
                 documentation.InnerText = animation.getDocumentation();
             mainNode.AppendChild(documentation);
 
+            // Resources in this animation
             foreach (ResourcesUni resources in animation.getResources())
             {
+                // TODO update to domwriter resource
                 XmlNode resourcesNode = ResourcesDOMWriter.buildDOM(resources, ResourcesDOMWriter.RESOURCES_ANIMATION);
                 doc.ImportNode(resourcesNode, true);
                 mainNode.AppendChild(resourcesNode);
             }
-
+            
+            // Frames and transitions 
+            // TODO update to DOMWriter
             for (int i = 0; i < animation.getFrames().Count; i++)
             {
                 mainNode.AppendChild(createTransitionElement(animation.getTransitions()[i], doc));
                 mainNode.AppendChild(createFrameElement(animation.getFrames()[i], doc));
             }
             mainNode.AppendChild(createTransitionElement(animation.getEndTransition(), doc));
-
             doc.ImportNode(mainNode, true);
             doc.AppendChild(mainNode);
+
+            // File saving
             string name = "Assets/Resources/CurrentGame/" + filename;
             if (!name.EndsWith(".eaa"))
                 name += ".eaa";
-            doc.Save(name);
-            System.IO.File.Copy(name, name.Substring(0, name.LastIndexOf(".")) + ".xml", true);
-            //TODO: implementation?
-            //transformer = tf.newTransformer();
-            //transformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, "animation.dtd");
-
-            //try
-            //{
-            //    fout = new FileOutputStream(filename);
-            //}
-            //catch (FileNotFoundException e)
-            //{
-            //    fout = new FileOutputStream(Controller.getInstance().getProjectFolder() + "/" + filename);
-            //}
-
-            //writeFile = new OutputStreamWriter(fout, "UTF-8");
-            //transformer.transform(new DOMSource(doc), new StreamResult(writeFile));
-            //writeFile.close();
-            //fout.close();
-
-            dataSaved = true;
+            
+            try
+            {
+                // Save
+                doc.Save(name);
+                dataSaved = true;
+            }
+            catch(System.Exception ex)
+            {
+                Debug.Log("Couldn't save Animation file \"" + name + "\": "+ ex.Message);
+            }
 
             return dataSaved;
         }
@@ -115,6 +117,10 @@ namespace uAdventure.Editor
             element.SetAttribute("soundUri", (f.getSoundUri() != null ? f.getSoundUri() : ""));
 
             element.SetAttribute("maxSoundTime", f.getMaxSoundTime().ToString());
+
+            var documentation = doc.CreateElement("documentation");
+            documentation.InnerText = f.getDocumentation();
+            element.AppendChild(documentation);
 
             return element;
         }

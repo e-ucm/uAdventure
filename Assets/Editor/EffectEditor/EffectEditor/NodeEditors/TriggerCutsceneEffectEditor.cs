@@ -30,8 +30,8 @@ namespace uAdventure.Editor
 
         public TriggerCutsceneEffectEditor()
         {
-            cutscenes = Controller.getInstance().getSelectedChapterDataControl().getCutscenesList().getCutscenesIDs();
-            this.effect = new TriggerConversationEffect(cutscenes[0]);
+            cutscenes = Controller.Instance.SelectedChapterDataControl.getCutscenesList().getCutscenesIDs();
+            this.effect = new TriggerConversationEffect(cutscenes.Length> 0 ? cutscenes[0] : "");
         }
 
         public void draw()
@@ -48,6 +48,15 @@ namespace uAdventure.Editor
 
         public AbstractEffect Effect { get { return effect; } set { effect = value as TriggerConversationEffect; } }
         public string EffectName { get { return TC.get("TriggerCutsceneEffect.Title"); } }
+
+        public bool Usable
+        {
+            get
+            {
+                return Controller.Instance.SelectedChapterDataControl.getCutscenesList().getCutscenesIDs().Length > 0;
+            }
+        }
+
         public EffectEditor clone() { return new TriggerCutsceneEffectEditor(); }
 
         public bool manages(AbstractEffect c)

@@ -70,30 +70,30 @@ namespace uAdventure.Editor
                     case EffectType.ACTIVATE:
                         ActivateEffect activateEffect = (ActivateEffect)effect;
                         activateEffect.setTargetId((string)newProperties[EffectsController.EFFECT_PROPERTY_TARGET]);
-                        Controller.getInstance().updateVarFlagSummary();
+                        Controller.Instance.updateVarFlagSummary();
                         break;
                     case EffectType.DEACTIVATE:
                         DeactivateEffect deactivateEffect = (DeactivateEffect)effect;
                         deactivateEffect.setTargetId((string)newProperties[EffectsController.EFFECT_PROPERTY_TARGET]);
-                        Controller.getInstance().updateVarFlagSummary();
+                        Controller.Instance.updateVarFlagSummary();
                         break;
                     case EffectType.SET_VALUE:
                         SetValueEffect setValueEffect = (SetValueEffect)effect;
                         setValueEffect.setTargetId((string)newProperties[EffectsController.EFFECT_PROPERTY_TARGET]);
                         setValueEffect.setValue(int.Parse((string)newProperties[EffectsController.EFFECT_PROPERTY_VALUE]));
-                        Controller.getInstance().updateVarFlagSummary();
+                        Controller.Instance.updateVarFlagSummary();
                         break;
                     case EffectType.INCREMENT_VAR:
                         IncrementVarEffect incrementVarEffect = (IncrementVarEffect)effect;
                         incrementVarEffect.setTargetId((string)newProperties[EffectsController.EFFECT_PROPERTY_TARGET]);
                         incrementVarEffect.setIncrement(int.Parse((string)newProperties[EffectsController.EFFECT_PROPERTY_VALUE]));
-                        Controller.getInstance().updateVarFlagSummary();
+                        Controller.Instance.updateVarFlagSummary();
                         break;
                     case EffectType.DECREMENT_VAR:
                         DecrementVarEffect decrementVarEffect = (DecrementVarEffect)effect;
                         decrementVarEffect.setTargetId((string)newProperties[EffectsController.EFFECT_PROPERTY_TARGET]);
                         decrementVarEffect.setDecrement(int.Parse((string)newProperties[EffectsController.EFFECT_PROPERTY_VALUE]));
-                        Controller.getInstance().updateVarFlagSummary();
+                        Controller.Instance.updateVarFlagSummary();
                         break;
                     case EffectType.MACRO_REF:
                         MacroReferenceEffect macroEffect = (MacroReferenceEffect)effect;
@@ -190,7 +190,7 @@ namespace uAdventure.Editor
                         break;
                 }
                 effectEdited = true;
-                Controller.getInstance().updatePanel();
+                Controller.Instance.updatePanel();
             }
 
             return effectEdited;
@@ -201,8 +201,8 @@ namespace uAdventure.Editor
             int index = effects.getEffects().IndexOf(oldEffect);
             effects.getEffects().Remove(oldEffect);
             effects.getEffects().Insert(index, effect);
-            Controller.getInstance().updateVarFlagSummary();
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updateVarFlagSummary();
+            Controller.Instance.updatePanel();
             return true;
         }
 
@@ -211,8 +211,8 @@ namespace uAdventure.Editor
             int index = effects.getEffects().IndexOf(effect);
             effects.getEffects().Remove(effect);
             effects.getEffects().Insert(index, oldEffect);
-            Controller.getInstance().updateVarFlagSummary();
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updateVarFlagSummary();
+            Controller.Instance.updatePanel();
             return true;
         }
 

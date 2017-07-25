@@ -127,7 +127,7 @@ namespace uAdventure.Editor
             bookPage.setMarginBottom(newMarginBottom);
             bookPage.setMarginEnd(newMarginEnd);
             bookPage.setMarginTop(newMarginTop);
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
 
@@ -139,7 +139,7 @@ namespace uAdventure.Editor
             bookPage.setMarginBottom(oldMarginBottom);
             bookPage.setMarginEnd(oldMarginEnd);
             bookPage.setMarginTop(oldMarginTop);
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
 

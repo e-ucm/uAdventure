@@ -81,7 +81,7 @@ namespace uAdventure.Editor
                     }
                 }
                 controller.updatePanel();
-                controller.dataModified();
+                controller.DataModified();
                 return true;
             }
 

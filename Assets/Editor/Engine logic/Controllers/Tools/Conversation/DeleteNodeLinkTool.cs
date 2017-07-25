@@ -57,7 +57,7 @@ namespace uAdventure.Editor
         {
 
             // Ask for confirmation
-            if (Controller.getInstance().showStrictConfirmDialog(confirmTitle, confirmText))
+            if (Controller.Instance.showStrictConfirmDialog(confirmTitle, confirmText))
             {
                 linkDeleted = parent.removeChild(linkIndex);
                 return true;
@@ -70,7 +70,7 @@ namespace uAdventure.Editor
         {
 
             parent.removeChild(linkIndex);
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
 
@@ -79,7 +79,7 @@ namespace uAdventure.Editor
         {
 
             parent.addChild(linkIndex, linkDeleted);
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
     }

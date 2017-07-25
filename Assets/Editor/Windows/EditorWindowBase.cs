@@ -72,25 +72,23 @@ namespace uAdventure.Editor
         private static Rect zeroRect;
         private Rect windowArea;
 
-        [MenuItem("eAdventure/Open eAdventure editor")]
-        public static void Init()
-        {
-            thisWindowReference = EditorWindow.GetWindow<EditorWindowBase>();
-            thisWindowReference.Show();
-        }
-
         public void OnEnable()
 		{
 			if (!thisWindowReference)
 				thisWindowReference = this;
-			else
-				DestroyImmediate (thisWindowReference);
+            else
+            {
+                DestroyImmediate(thisWindowReference);
+                return;
+            }
 
-			if (!Controller.getInstance().Initialized())
+            if (!Language.Initialized)
+                Language.Initialize();
+
+            if (!Controller.Instance.Initialized)
 			{
-				Controller.resetInstance();
-				Language.Initialize();
-				Controller.getInstance().init();
+				Controller.ResetInstance();
+				Controller.Instance.Init();
 			}
 
 			if(!redoTexture)
@@ -107,7 +105,6 @@ namespace uAdventure.Editor
 			runMenu = new RunMenu();
 			configurationMenu = new ConfigurationMenu();
 			aboutMenu = new AboutMenu();
-     
         }
 
 		public static void RefreshLanguage(){
@@ -143,9 +140,6 @@ namespace uAdventure.Editor
 
         void OnGUI()
 		{
-			if (!Controller.getInstance ().Initialized ())
-				this.OnEnable ();
-
 			InitWindows ();
             /**
             UPPER MENU
@@ -216,38 +210,59 @@ namespace uAdventure.Editor
                 Debug.Log(Event.current.type + " " + windowArea);
             }*/
             //GUI.BeginGroup(windowArea);
-            GUILayout.Label("Here should be windows");
-            BeginWindows();
-            //extensionSelected.OnGUI();
-            
-            switch (openedWindow)
+            if (Controller.Instance.Loaded)
             {
-                case EditorWindowType.Chapter:
-                    m_Window = chapterWindow;
-                    break;
-                default:
-                    if (extensionSelected != null)
-                        m_Window = extensionSelected;
-                    break;
-            }
+                BeginWindows();
+                //extensionSelected.OnGUI();
 
-            if (m_Window != null)
-            {
-				//leftMenuRect
-				m_Window.OnGUI();
-                if(Event.current.type == EventType.repaint)
-				{
-					if (m_Window.Rect != windowArea) {
-						// We first draw it with the old size to make the window respond the size change
-						m_Window.OnGUI();
-						m_Window.Rect = windowArea;
-					}
-                    extensions.ForEach(e => e.Rect = windowArea);
+                switch (openedWindow)
+                {
+                    case EditorWindowType.Chapter:
+                        m_Window = chapterWindow;
+                        break;
+                    default:
+                        if (extensionSelected != null)
+                            m_Window = extensionSelected;
+                        break;
                 }
 
-                m_Window.OnGUI();
+                if (m_Window != null)
+                {
+                    //leftMenuRect
+                    m_Window.OnGUI();
+                    if (Event.current.type == EventType.repaint)
+                    {
+                        if (m_Window.Rect != windowArea)
+                        {
+                            // We first draw it with the old size to make the window respond the size change
+                            m_Window.OnGUI();
+                            m_Window.Rect = windowArea;
+                        }
+                        extensions.ForEach(e => e.Rect = windowArea);
+                    }
+
+                    m_Window.OnGUI();
+                }
+                EndWindows();
             }
-            EndWindows();
+            else
+            {
+                GUILayout.Label("Adventure not loaded.");
+                if (GUILayout.Button("Open Welcome Window"))
+                {
+                    Controller.OpenWelcomeWindow();
+                }
+                if (GUILayout.Button("Reload"))
+                {
+                    Controller.ResetInstance();
+                    Controller.Instance.Init();
+                }
+                if (GUILayout.Button("New"))
+                {
+                    Controller.Instance.NewAdventure(0);
+                }
+            }
+            
             //GUI.EndGroup();
             EditorGUILayout.EndVertical();
             EditorGUILayout.EndHorizontal();
@@ -261,13 +276,13 @@ namespace uAdventure.Editor
         void RedoAction()
         {
             Debug.Log("redo clicked");
-            Controller.getInstance().redoTool();
+            Controller.Instance.redoTool();
         }
 
         void UndoAction()
         {
             Debug.Log("undo clicked");
-            Controller.getInstance().undoTool();
+            Controller.Instance.undoTool();
         }
 
         // Request

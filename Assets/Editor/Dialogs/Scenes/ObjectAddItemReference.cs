@@ -12,7 +12,7 @@ namespace uAdventure.Editor
 
         public override void Init(DialogReceiverInterface e)
         {
-            elements = Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItemsIDs();
+            elements = Controller.Instance.SelectedChapterDataControl.getItemsList().getItemsIDs();
 
             if (elements == null)
             {

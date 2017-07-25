@@ -34,7 +34,7 @@ namespace uAdventure.Editor
             bool done = base.undoTool();
             if (done)
             {
-                Controller.getInstance().updatePanel();
+                Controller.Instance.updatePanel();
             }
             return done;
         }
@@ -46,7 +46,7 @@ namespace uAdventure.Editor
             bool done = base.redoTool();
             if (done)
             {
-                Controller.getInstance().updatePanel();
+                Controller.Instance.updatePanel();
             }
             return done;
         }

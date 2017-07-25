@@ -50,8 +50,8 @@ namespace uAdventure.Editor
             if (conditions != null)
             {
                 conditions.getConditionsList().Clear();
-                Controller.getInstance().updateVarFlagSummary();
-                Controller.getInstance().updatePanel();
+                Controller.Instance.updateVarFlagSummary();
+                Controller.Instance.updatePanel();
                 return true;
             }
             else
@@ -70,8 +70,8 @@ namespace uAdventure.Editor
             if (conditionsOld != null)
             {
                 conditions = (Conditions)conditionsOld;
-                Controller.getInstance().updateVarFlagSummary();
-                Controller.getInstance().updatePanel();
+                Controller.Instance.updateVarFlagSummary();
+                Controller.Instance.updatePanel();
             }
             else
                 return false;

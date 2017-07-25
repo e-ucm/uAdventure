@@ -43,59 +43,15 @@ namespace uAdventure.Editor
 
             if (types == null)
             {
-                types = System.AppDomain.CurrentDomain.GetAssemblies().SelectMany(s => s.GetTypes()).Where(p => typeof(EffectEditor).IsAssignableFrom(p)).ToList();
+                types = System.AppDomain.CurrentDomain.GetAssemblies().SelectMany(s => s.GetTypes()).Where(p => typeof(EffectEditor).IsAssignableFrom(p) && !p.IsAbstract).ToList();
                 types.Remove(typeof(EffectEditor));
             }
 
             foreach (System.Type t in types)
             {
-                if (t == typeof(ActivateEffectEditor) || t == typeof(DeactivateEffectEditor))
-                {
-                    if (Controller.getInstance().getVarFlagSummary().getVarCount() > 0)
-                        this.effectEditors.Add((EffectEditor)System.Activator.CreateInstance(t));
-                }
-                else if (t == typeof(ConsumeObjectEffectEditor) || t == typeof(GenerateObjectEffectEditor) ||
-                         t == typeof(HighlightItemEffectEditor) || t == typeof(MoveObjectEffectEditor))
-                {
-                    if (Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItemsIDs().Length > 0)
-                        this.effectEditors.Add((EffectEditor)System.Activator.CreateInstance(t));
-                }
-                else if (t == typeof(IncrementVarEffectEditor) || t == typeof(DecrementVarEffectEditor) ||
-                         t == typeof(SetValueEffectEditor))
-                {
-                    if (Controller.getInstance().getVarFlagSummary().getFlagCount() > 0)
-                        this.effectEditors.Add((EffectEditor)System.Activator.CreateInstance(t));
-                }
-                else if (t == typeof(MacroReferenceEffectEditor))
-                {
-                    if (Controller.getInstance().getAdvancedFeaturesController().getMacrosListDataControl().getMacrosIDs().Length > 0)
-                        this.effectEditors.Add((EffectEditor)System.Activator.CreateInstance(t));
-
-                }
-                else if (t == typeof(MoveNPCEffectEditor) || t == typeof(SpeakCharEffectEditor))
-                {
-                    if (Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCsIDs().Length > 0)
-                        this.effectEditors.Add((EffectEditor)System.Activator.CreateInstance(t));
-                }
-                else if (t == typeof(TriggerBookEffectEditor))
-                {
-                    if (Controller.getInstance().getSelectedChapterDataControl().getBooksList().getBooksIDs().Length > 0)
-                        this.effectEditors.Add((EffectEditor)System.Activator.CreateInstance(t));
-                }
-                else if (t == typeof(TriggerConversationEffectEditor))
-                {
-                    if (Controller.getInstance().getSelectedChapterDataControl().getConversationsList().getConversationsIDs().Length > 0)
-                        this.effectEditors.Add((EffectEditor)System.Activator.CreateInstance(t));
-                }
-                else if (t == typeof(TriggerCutsceneEffectEditor))
-                {
-                    if (Controller.getInstance().getSelectedChapterDataControl().getCutscenesList().getCutscenesIDs().Length > 0)
-                        this.effectEditors.Add((EffectEditor)System.Activator.CreateInstance(t));
-                }
-                else
-                {
-                    this.effectEditors.Add((EffectEditor)System.Activator.CreateInstance(t));
-                }
+                var instance = (EffectEditor)System.Activator.CreateInstance(t);
+                if(instance.Usable)
+                    this.effectEditors.Add(instance);
             }
         }
 

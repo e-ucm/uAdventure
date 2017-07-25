@@ -81,7 +81,7 @@ namespace uAdventure.Editor
             }
 
             if (moved)
-                Controller.getInstance().updatePanel();
+                Controller.Instance.updatePanel();
             return moved;
         }
 
@@ -100,7 +100,7 @@ namespace uAdventure.Editor
             }
 
             if (moved)
-                Controller.getInstance().updatePanel();
+                Controller.Instance.updatePanel();
             return moved;
 
         }

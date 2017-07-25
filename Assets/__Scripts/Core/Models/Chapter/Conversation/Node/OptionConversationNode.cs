@@ -71,6 +71,12 @@ namespace uAdventure.Core
 
         private const int DEFAULT_OPTION_NODE__BOTTOM_POSITION_Y = 480;
 
+        private float timeout = -1f;
+
+        private Conditions timeoutConditions;
+
+        private ConversationNode timerChild;
+
         /* Methods */
 
         public bool isRandom()
@@ -98,6 +104,8 @@ namespace uAdventure.Core
             this.keepShowing = keepShowing;
             this.showUserOption = showUserOption;
             this.preListening = preHearing;
+            this.timeout = -1f;
+            this.timeoutConditions = new Conditions();
             // the position of the option has been set, use it
             if (x > 0 && y > 0)
             {
@@ -164,32 +172,50 @@ namespace uAdventure.Core
         public override int getChildCount()
         {
 
-            return optionNodes.Count;
+            return optionNodes.Count + (timeout >= 0 ? 1: 0);
         }
 
         public override ConversationNode getChild(int index)
         {
-
-            return optionNodes[index];
+            return index == optionNodes.Count ? timerChild : optionNodes[index];
         }
 
         public override void addChild(ConversationNode child)
         {
-
-            optionNodes.Add(child);
+            if (getLineCount() > optionNodes.Count)
+                optionNodes.Add(child);
+            else
+            {
+                timerChild = child;
+            }
         }
 
         public override void addChild(int index, ConversationNode child)
         {
-
-            optionNodes.Insert(index, child);
+            if(getLineCount() > optionNodes.Count)
+            {
+                optionNodes.Insert(index, child);
+            }
+            else
+            {
+                timerChild = child;
+            }
         }
 
         public override ConversationNode removeChild(int index)
         {
-            ConversationNode item = optionNodes[index];
-            optionNodes.RemoveAt(index);
-            return item;
+            if(optionNodes.Count == index)
+            {
+                var tmp = timerChild;
+                timerChild = null;
+                return timerChild;
+            }
+            else
+            {
+                ConversationNode item = optionNodes[index];
+                optionNodes.RemoveAt(index);
+                return item;
+            }
         }
 
         /*
@@ -200,13 +226,11 @@ namespace uAdventure.Core
 
         public override int getLineCount()
         {
-
             return options.Count;
         }
 
         public override ConversationLine getLine(int index)
         {
-
             return options[index];
         }
 
@@ -310,6 +334,9 @@ namespace uAdventure.Core
                 optionNodes = opNode;
             }
         }
+
+        public float Timeout { get { return timeout; } set { timeout = value; } }
+        public Conditions TimeoutConditions { get { return timeoutConditions; } set { timeoutConditions = value; } }
 
         /*
         @Override

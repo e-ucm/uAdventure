@@ -6,7 +6,7 @@ namespace uAdventure.Editor
     {
         public virtual void Init(DialogReceiverInterface e, FileType fType)
         {
-            fileFilter = "video files (*.mpg)|*.mpg";
+            fileFilter = "mpg";
             base.Init(e, fType);
         }
 

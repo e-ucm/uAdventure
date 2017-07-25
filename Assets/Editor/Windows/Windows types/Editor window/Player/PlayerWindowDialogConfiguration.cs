@@ -21,12 +21,12 @@ namespace uAdventure.Editor
             : base(aStartPos, aContent, aStyle, aOptions)
         {
             shouldShowSpeachBubble = shouldShowSpeachBubbleLast =
-                Controller.getInstance().getCharapterList().getSelectedChapterData().getPlayer().getShowsSpeechBubbles();
+                Controller.Instance.ChapterList.getSelectedChapterData().getPlayer().getShowsSpeechBubbles();
 
-            fontFrontColor = fontFrontColorLast = ColorConverter.HexToColor(Controller.getInstance().getCharapterList().getSelectedChapterData().getPlayer().getTextFrontColor());
-            fontBorderColor = fontBorderColorLast = ColorConverter.HexToColor(Controller.getInstance().getCharapterList().getSelectedChapterData().getPlayer().getTextBorderColor());
-            bubbleBcgColor = bubbleBcgColorLast = ColorConverter.HexToColor(Controller.getInstance().getCharapterList().getSelectedChapterData().getPlayer().getBubbleBkgColor());
-            bubbleBorderColor = fontFrontColorLast = ColorConverter.HexToColor(Controller.getInstance().getCharapterList().getSelectedChapterData().getPlayer().getBubbleBorderColor());
+            fontFrontColor = fontFrontColorLast = Controller.Instance.ChapterList.getSelectedChapterData().getPlayer().getTextFrontColor();
+            fontBorderColor = fontBorderColorLast = Controller.Instance.ChapterList.getSelectedChapterData().getPlayer().getTextBorderColor();
+            bubbleBcgColor = bubbleBcgColorLast = Controller.Instance.ChapterList.getSelectedChapterData().getPlayer().getBubbleBkgColor();
+            bubbleBorderColor = fontFrontColorLast = Controller.Instance.ChapterList.getSelectedChapterData().getPlayer().getBubbleBorderColor();
 
             bckImage = (Texture2D)Resources.Load("Editor/TextBubble", typeof(Texture2D));
             previewTextStyle = new GUIStyle();
@@ -84,33 +84,32 @@ namespace uAdventure.Editor
         void OnShowBubbleChange()
         {
             shouldShowSpeachBubbleLast = shouldShowSpeachBubble;
-            Controller.getInstance().getCharapterList().getSelectedChapterData().getPlayer().setShowsSpeechBubbles(shouldShowSpeachBubble);
+            Controller.Instance.ChapterList.getSelectedChapterData().getPlayer().setShowsSpeechBubbles(shouldShowSpeachBubble);
         }
 
         void OnFontFrontChange(Color val)
         {
             fontFrontColorLast = val;
             previewTextStyle.normal.textColor = fontFrontColor;
-            Controller.getInstance().getCharapterList().getSelectedChapterData().getPlayer().setTextFrontColor(ColorConverter.ColorToHex(val));
-            Debug.Log(ColorConverter.ColorToHex(val));
+            Controller.Instance.ChapterList.getSelectedChapterData().getPlayer().setTextFrontColor(val);
         }
 
         void OnFontBorderChange(Color val)
         {
             fontBorderColorLast = val;
-            Controller.getInstance().getCharapterList().getSelectedChapterData().getPlayer().setTextBorderColor(ColorConverter.ColorToHex(val));
+            Controller.Instance.ChapterList.getSelectedChapterData().getPlayer().setTextBorderColor(val);
         }
 
         void OnBubbleBcgChange(Color val)
         {
             bubbleBcgColorLast = val;
-            Controller.getInstance().getCharapterList().getSelectedChapterData().getPlayer().setBubbleBkgColor(ColorConverter.ColorToHex(val));
+            Controller.Instance.ChapterList.getSelectedChapterData().getPlayer().setBubbleBkgColor(val);
         }
 
         void OnBubbleBorderChange(Color val)
         {
             bubbleBorderColorLast = val;
-            Controller.getInstance().getCharapterList().getSelectedChapterData().getPlayer().setBubbleBorderColor(ColorConverter.ColorToHex(val));
+            Controller.Instance.ChapterList.getSelectedChapterData().getPlayer().setBubbleBorderColor(val);
         }
     }
 }

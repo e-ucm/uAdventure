@@ -90,7 +90,7 @@ namespace uAdventure.Editor
                 done = moveDown() != -1;
 
             if (done)
-                Controller.getInstance().updatePanel();
+                Controller.Instance.updatePanel();
             return done;
         }
 
@@ -115,7 +115,7 @@ namespace uAdventure.Editor
             }
 
             if (done)
-                Controller.getInstance().updatePanel();
+                Controller.Instance.updatePanel();
             return done;
 
         }

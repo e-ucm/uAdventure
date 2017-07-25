@@ -24,17 +24,17 @@ namespace uAdventure.Editor
             if (GameRources.GetInstance().selectedCharacterIndex >= 0)
             {
                 shouldShowSpeachBubble = shouldShowSpeachBubbleLast =
-                        Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+                        Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                         GameRources.GetInstance().selectedCharacterIndex].getShowsSpeechBubbles();
 
-                fontFrontColor = fontFrontColorLast = ColorConverter.HexToColor(Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
-                        GameRources.GetInstance().selectedCharacterIndex].getTextFrontColor());
-                fontBorderColor = fontBorderColorLast = ColorConverter.HexToColor(Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
-                        GameRources.GetInstance().selectedCharacterIndex].getTextBorderColor());
-                bubbleBcgColor = bubbleBcgColorLast = ColorConverter.HexToColor(Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
-                        GameRources.GetInstance().selectedCharacterIndex].getBubbleBkgColor());
-                bubbleBorderColor = fontFrontColorLast = ColorConverter.HexToColor(Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
-                        GameRources.GetInstance().selectedCharacterIndex].getBubbleBorderColor());
+                fontFrontColor = fontFrontColorLast = Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
+                        GameRources.GetInstance().selectedCharacterIndex].getTextFrontColor();
+                fontBorderColor = fontBorderColorLast = Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
+                        GameRources.GetInstance().selectedCharacterIndex].getTextBorderColor();
+                bubbleBcgColor = bubbleBcgColorLast = Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
+                        GameRources.GetInstance().selectedCharacterIndex].getBubbleBkgColor();
+                bubbleBorderColor = fontFrontColorLast = Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
+                        GameRources.GetInstance().selectedCharacterIndex].getBubbleBorderColor();
             }
 
             bckImage = (Texture2D)Resources.Load("Editor/TextBubble", typeof(Texture2D));
@@ -92,7 +92,7 @@ namespace uAdventure.Editor
         void OnShowBubbleChange()
         {
             shouldShowSpeachBubbleLast = shouldShowSpeachBubble;
-            Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
+            Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                    GameRources.GetInstance().selectedCharacterIndex].setShowsSpeechBubbles(shouldShowSpeachBubble);
         }
 
@@ -100,29 +100,29 @@ namespace uAdventure.Editor
         {
             fontFrontColorLast = val;
             previewTextStyle.normal.textColor = fontFrontColor;
-            Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
-                   GameRources.GetInstance().selectedCharacterIndex].setTextFrontColor(ColorConverter.ColorToHex(val));
+            Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
+                   GameRources.GetInstance().selectedCharacterIndex].setTextFrontColor(val);
         }
 
         void OnFontBorderChange(Color val)
         {
             fontBorderColorLast = val;
-            Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
-                   GameRources.GetInstance().selectedCharacterIndex].setTextBorderColor(ColorConverter.ColorToHex(val));
+            Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
+                   GameRources.GetInstance().selectedCharacterIndex].setTextBorderColor(val);
         }
 
         void OnBubbleBcgChange(Color val)
         {
             bubbleBcgColorLast = val;
-            Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
-                   GameRources.GetInstance().selectedCharacterIndex].setBubbleBkgColor(ColorConverter.ColorToHex(val));
+            Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
+                   GameRources.GetInstance().selectedCharacterIndex].setBubbleBkgColor(val);
         }
 
         void OnBubbleBorderChange(Color val)
         {
             bubbleBorderColorLast = val;
-            Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
-                   GameRources.GetInstance().selectedCharacterIndex].setBubbleBorderColor(ColorConverter.ColorToHex(val));
+            Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
+                   GameRources.GetInstance().selectedCharacterIndex].setBubbleBorderColor(val);
         }
     }
 }

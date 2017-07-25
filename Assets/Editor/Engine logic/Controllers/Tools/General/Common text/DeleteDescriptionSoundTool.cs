@@ -59,7 +59,7 @@ namespace uAdventure.Editor
 
             }
 
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
 
             return true;
         }
@@ -84,7 +84,7 @@ namespace uAdventure.Editor
 
             }
 
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
 
 
             return true;
@@ -110,7 +110,7 @@ namespace uAdventure.Editor
 
             }
 
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
 
             return true;
         }

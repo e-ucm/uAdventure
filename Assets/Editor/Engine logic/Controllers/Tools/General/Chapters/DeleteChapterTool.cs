@@ -21,7 +21,7 @@ namespace uAdventure.Editor
         public DeleteChapterTool(ChapterListDataControl chaptersController)
         {
             this.chaptersController = chaptersController;
-            controller = Controller.getInstance();
+            controller = Controller.Instance;
         }
 
         public override bool canRedo()

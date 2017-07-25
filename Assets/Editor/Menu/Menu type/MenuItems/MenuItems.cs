@@ -56,7 +56,7 @@ namespace uAdventure.Editor
 
         public void OnCliked()
         {
-            Controller.getInstance().save();
+            Controller.Instance.Save();
             Debug.Log("saved2");
         }
     }
@@ -165,7 +165,7 @@ namespace uAdventure.Editor
 
         public void OnCliked()
         {
-            Controller.getInstance().exportGame();
+            Controller.Instance.exportGame();
         }
     }
 
@@ -336,7 +336,7 @@ namespace uAdventure.Editor
         {
             if (workingObject is ChapterNewNameInputPopup)
             {
-                Controller.getInstance().addChapter(message);
+                Controller.Instance.addChapter(message);
             }
         }
 
@@ -360,15 +360,15 @@ namespace uAdventure.Editor
         public void OnCliked()
         {
             ConfirmationDialog window = (ConfirmationDialog)ScriptableObject.CreateInstance(typeof(ConfirmationDialog));
-            window.Init(this, "Delete chapter: " + Controller.getInstance().getCharapterList().getChapterTitles()[Controller.getInstance().getCharapterList().getSelectedChapter()]);
+            window.Init(this, "Delete chapter: " + Controller.Instance.ChapterList.getChapterTitles()[Controller.Instance.ChapterList.getSelectedChapter()]);
         }
 
         public void OnDialogOk(string message, object workingObject = null, object workingObjectSecond = null)
         {
             if (workingObject is ConfirmationDialog)
             {
-                Controller.getInstance().deleteChapter();
-                Controller.getInstance().RefreshView();
+                Controller.Instance.deleteChapter();
+                Controller.Instance.RefreshView();
                 ChaptersMenu.getInstance().RefreshMenuItems();
             }
         }
@@ -392,9 +392,7 @@ namespace uAdventure.Editor
 
         public void OnCliked()
         {
-            Controller.getInstance()
-                .getCharapterList()
-                .moveChapterUp(Controller.getInstance().getCharapterList().getSelectedChapter());
+            Controller.Instance                .ChapterList                .moveChapterUp(Controller.Instance.ChapterList.getSelectedChapter());
             ChaptersMenu.getInstance().RefreshMenuItems();
         }
     }
@@ -413,9 +411,7 @@ namespace uAdventure.Editor
 
         public void OnCliked()
         {
-            Controller.getInstance()
-                .getCharapterList()
-                .moveChapterDown(Controller.getInstance().getCharapterList().getSelectedChapter());
+            Controller.Instance                .ChapterList                .moveChapterDown(Controller.Instance.ChapterList.getSelectedChapter());
             ChaptersMenu.getInstance().RefreshMenuItems();
         }
     }

@@ -57,7 +57,7 @@ namespace uAdventure.Editor
         {
 
             bool temp = bookPagesList.Remove(bookPage);
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return temp;
         }
 
@@ -66,7 +66,7 @@ namespace uAdventure.Editor
         {
 
             bookPagesList.Insert(index, bookPage);
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
     }

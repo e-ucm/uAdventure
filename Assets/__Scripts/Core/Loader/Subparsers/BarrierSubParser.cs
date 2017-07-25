@@ -11,12 +11,10 @@ namespace uAdventure.Core
     {
 		public object DOMParse(XmlElement element, params object[] parameters)
 		{
-            int x = 0, y = 0, width = 0, height = 0;
-
-			x 		= int.Parse(element.GetAttribute("x") ?? "0");
-			y 		= int.Parse(element.GetAttribute("y") ?? "0");
-			width 	= int.Parse(element.GetAttribute("width") ?? "0");
-			height	= int.Parse(element.GetAttribute("height") ?? "0");
+            int x 		= ExParsers.ParseDefault(element.GetAttribute("x"), 0),
+			    y 		= ExParsers.ParseDefault(element.GetAttribute("y"), 0),
+			    width 	= ExParsers.ParseDefault(element.GetAttribute("width"), 0),
+			    height	= ExParsers.ParseDefault(element.GetAttribute("height"), 0);
 
             Barrier barrier = new Barrier(generateId(), x, y, width, height);
 

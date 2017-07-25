@@ -191,7 +191,7 @@ namespace uAdventure.Editor
 
             else if (type == Controller.ACTION_TALK_TO)
             {
-                string[] conversations = controller.getIdentifierSummary().getConversationsIds();
+                string[] conversations = controller.IdentifierSummary.getConversationsIds();
                 if (conversations.Length > 0)
                 {
                     string selectedElement = controller.showInputDialog(TC.get("Action.OperationAddAction"), TC.get("TalkToAction.MessageSelectConversation"), conversations);
@@ -292,7 +292,7 @@ namespace uAdventure.Editor
             else if (type == Controller.ACTION_USE_WITH)
             {
                 // Take the list of the items
-                string[] items = controller.getIdentifierSummary().getItemAndActiveAreaIds();
+                string[] items = controller.IdentifierSummary.getItemAndActiveAreaIds();
 
                 // If the list has elements, show the dialog with the options
                 if (items.Length > 0)
@@ -313,7 +313,7 @@ namespace uAdventure.Editor
             else if (type == Controller.ACTION_DRAG_TO)
             {
                 // Take the list of the items
-                string[] items = controller.getIdentifierSummary().getItemActiveAreaNPCIds();
+                string[] items = controller.IdentifierSummary.getItemActiveAreaNPCIds();
 
                 // If the list has elements, show the dialog with the options
                 if (items.Length > 0)
@@ -334,7 +334,7 @@ namespace uAdventure.Editor
             else if (type == Controller.ACTION_GIVE_TO)
             {
                 // Take the list of the characters
-                string[] npcs = controller.getIdentifierSummary().getNPCIds();
+                string[] npcs = controller.IdentifierSummary.getNPCIds();
 
                 // If the list has elements, show the dialog with the options
                 if (npcs.Length > 0)
@@ -421,7 +421,7 @@ namespace uAdventure.Editor
                 actionsDataControlList.RemoveAt(elementIndex);
                 actionsList.Insert(elementIndex - 1, e);
                 actionsDataControlList.Insert(elementIndex - 1, c);
-                controller.dataModified();
+                controller.DataModified();
                 elementMoved = true;
 
             }
@@ -443,7 +443,7 @@ namespace uAdventure.Editor
                 actionsDataControlList.RemoveAt(elementIndex);
                 actionsList.Insert(elementIndex + 1, e);
                 actionsDataControlList.Insert(elementIndex + 1, c);
-                controller.dataModified();
+                controller.DataModified();
                 elementMoved = true;
             }
 

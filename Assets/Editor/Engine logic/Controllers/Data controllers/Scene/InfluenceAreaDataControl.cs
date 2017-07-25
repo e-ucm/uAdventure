@@ -281,7 +281,7 @@ namespace uAdventure.Editor
 
             if (influenceArea.isExists())
             {
-                controller.dataModified();
+                controller.DataModified();
                 influenceArea.setWidth(influenceArea.getWidth() + incrementX);
                 influenceArea.setHeight(influenceArea.getHeight() + incrementY);
             }

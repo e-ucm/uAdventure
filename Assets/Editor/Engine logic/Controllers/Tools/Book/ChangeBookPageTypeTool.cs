@@ -75,7 +75,7 @@ namespace uAdventure.Editor
                 bookPage.setUri("");
             else
                 bookPage.setUri("http://www.");
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
 
@@ -85,7 +85,7 @@ namespace uAdventure.Editor
 
             bookPage.setType(oldType);
             bookPage.setUri(oldUri);
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
     }

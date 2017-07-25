@@ -24,21 +24,28 @@ namespace uAdventure.Editor
         //private static RecentGameWindow recentGameWindow;
 
         // Add menu item 
-        [MenuItem("eAdventure/Open eAdventure welcome screen")]
-        static void Init()
+        private void OnEnable()
         {
-            Controller.resetInstance();
+            if(!thisWindowReference)
+                thisWindowReference = this;
+            else
+            {
+                DestroyImmediate(this);
+                return;
+            }
+
+            if (!Language.Initialized)
+                Language.Initialize();
+
+            if (!Controller.Instance.Initialized)
+            {
+                Controller.ResetInstance();
+                Controller.Instance.Init();
+            }
+
             openedWindow = WelcomeWindowType.New;
 
-            Language.Initialize();
-            thisWindowReference = EditorWindow.GetWindow(typeof(WelcomeWindow));
-            windowWidth = EditorWindow.focusedWindow.position.width;
-            windowHeight = EditorWindow.focusedWindow.position.height;
             logo = (Texture2D)Resources.Load("EAdventureData/img/logo-editor", typeof(Texture2D));
-
-            logoRect = new Rect(0.01f * windowWidth, 0.01f * windowHeight, windowWidth * 0.98f, windowHeight * 0.25f);
-            buttonsRect = new Rect(0.01f * windowWidth, 0.27f * windowHeight, windowWidth * 0.98f, windowHeight * 0.28f);
-            windowRect = new Rect(0.01f * windowWidth, 0.32f * windowHeight, 0.98f * windowWidth, 0.67f * windowHeight);
 
             //newGameWindow = new NewGameWindow(windowRect, new GUIContent(TC.get("GeneralText.New")), "Window");
             //openGameWindow = new OpenGameWindow(windowRect, new GUIContent(TC.get("GeneralText.Open")), "Window");
@@ -49,6 +56,13 @@ namespace uAdventure.Editor
 
         public void OnGUI()
         {
+            windowWidth = position.width;
+            windowHeight = position.height;
+            
+            logoRect = new Rect(0.01f * windowWidth, 0.01f * windowHeight, windowWidth * 0.98f, windowHeight * 0.25f);
+            buttonsRect = new Rect(0.01f * windowWidth, 0.27f * windowHeight, windowWidth * 0.98f, windowHeight * 0.28f);
+            windowRect = new Rect(0.01f * windowWidth, 0.32f * windowHeight, 0.98f * windowWidth, 0.67f * windowHeight);
+
             GUI.DrawTexture(logoRect, logo);
 
             GUILayout.BeginArea(buttonsRect);
@@ -90,7 +104,10 @@ namespace uAdventure.Editor
             }
 
             if (m_Window1 != null)
+            {
+                m_Window1.Rect = windowRect;
                 m_Window1.OnGUI();
+            }
             EndWindows();
         }
 

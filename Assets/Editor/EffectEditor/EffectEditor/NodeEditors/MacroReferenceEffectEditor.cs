@@ -32,8 +32,8 @@ namespace uAdventure.Editor
 
         public MacroReferenceEffectEditor()
         {
-            macros = Controller.getInstance().getAdvancedFeaturesController().getMacrosListDataControl().getMacrosIDs();
-            this.effect = new MacroReferenceEffect(macros[0]);
+            macros = Controller.Instance.getAdvancedFeaturesController().getMacrosListDataControl().getMacrosIDs();
+            this.effect = new MacroReferenceEffect(macros.Length > 0 ? macros[0] : "");
         }
 
         public void draw()
@@ -48,6 +48,15 @@ namespace uAdventure.Editor
 
         public AbstractEffect Effect { get { return effect; } set { effect = value as MacroReferenceEffect; } }
         public string EffectName { get { return TC.get("MacroReferenceEffect.Title"); } }
+
+        public bool Usable
+        {
+            get
+            {
+                return Controller.Instance.getAdvancedFeaturesController().getMacrosListDataControl().getMacrosIDs().Length > 0;
+            }
+        }
+
         public EffectEditor clone() { return new MacroReferenceEffectEditor(); }
 
         public bool manages(AbstractEffect c)

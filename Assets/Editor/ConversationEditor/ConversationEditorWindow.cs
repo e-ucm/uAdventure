@@ -221,7 +221,7 @@ namespace uAdventure.Editor
                 if (lookingChildNode != null)
                 {
                     // link creation between nodes
-                    if (lookingChildNode.getChildCount() > 0)
+                    if (lookingChildNode.getChildCount() > lookingChildSlot)
                         lookingChildNode.removeChild(lookingChildSlot);
                     lookingChildNode.addChild(lookingChildSlot, myNode);
                     // finishing search

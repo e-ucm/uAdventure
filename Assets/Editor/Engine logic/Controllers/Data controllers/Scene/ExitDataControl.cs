@@ -472,7 +472,7 @@ namespace uAdventure.Editor
         public void setNextSceneId(string value)
         {
 
-            Controller.getInstance().addTool(new ChangeStringValueTool(exit, value, "getNextSceneId", "setNextSceneId"));
+            Controller.Instance.addTool(new ChangeStringValueTool(exit, value, "getNextSceneId", "setNextSceneId"));
         }
 
         public int getDestinyPositionX()
@@ -540,13 +540,13 @@ namespace uAdventure.Editor
         public void setTransitionTime(int value)
         {
 
-            Controller.getInstance().addTool(new ChangeIntegerValueTool(exit, value, "getTransitionTime", "setTransitionTime"));
+            Controller.Instance.addTool(new ChangeIntegerValueTool(exit, value, "getTransitionTime", "setTransitionTime"));
         }
 
         public void setTransitionType(int selectedIndex)
         {
 
-            Controller.getInstance().addTool(new ChangeIntegerValueTool(exit, selectedIndex, "getTransitionType", "setTransitionType"));
+            Controller.Instance.addTool(new ChangeIntegerValueTool(exit, selectedIndex, "getTransitionType", "setTransitionType"));
         }
 
         public bool isHasNotEffects()
@@ -558,7 +558,7 @@ namespace uAdventure.Editor
         public void setHasNotEffects(bool selected)
         {
 
-            Controller.getInstance().addTool(new ChangeBooleanValueTool(exit, selected, "isHasNotEffects", "setHasNotEffects"));
+            Controller.Instance.addTool(new ChangeBooleanValueTool(exit, selected, "isHasNotEffects", "setHasNotEffects"));
         }
 
         public EffectsController getEffects()

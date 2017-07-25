@@ -12,13 +12,10 @@ namespace uAdventure.Core
 		{
 			Action currentAction = new Action(0);
 			Chapter chapter = parameters [0] as Chapter;
-            string tmpArgVal;
-			XmlElement tmpXmlEl;
 
             //First we parse the elements every action haves:
 			bool currentNeedsGoTo = "yes".Equals (element.GetAttribute("needsGoTo"));
-			int currentKeepDistance = 0;
-			int.TryParse (element.GetAttribute ("keepDistance"), out currentKeepDistance);
+			int currentKeepDistance = ExParsers.ParseDefault(element.GetAttribute ("keepDistance"), 0);
 			bool activateNotEffects = "yes".Equals (element.GetAttribute("not-effects"));
 			bool activateClickEffects = "yes".Equals (element.GetAttribute("click-effects"));
 			string currentIdTarget = element.GetAttribute ("idTarget") ?? "";

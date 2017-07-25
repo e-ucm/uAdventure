@@ -63,7 +63,7 @@ namespace uAdventure.Editor
             descriptionsController.addDescription(description);
             descriptionsController.addDescriptionController(descriptionController);
             descriptionsController.setSelectedDescription(descriptionsController.getDescriptionCount() - 1);
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return false;
         }
 
@@ -75,7 +75,7 @@ namespace uAdventure.Editor
             if (undone)
             {
                 descriptionsController.setSelectedDescription(descriptionsController.getDescriptionCount() - 1);
-                Controller.getInstance().updatePanel();
+                Controller.Instance.updatePanel();
                 return true;
             }
             return false;

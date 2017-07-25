@@ -22,7 +22,7 @@ namespace uAdventure.Editor
             this.fatherView = _fatherView;
             this.childView = _childView;
             this.dataControl = _dataControl;
-            this.controller = Controller.getInstance();
+            this.controller = Controller.Instance;
         }
 
 

@@ -7,7 +7,7 @@ namespace uAdventure.Editor
     {
         public virtual void Init(DialogReceiverInterface e, FileType fType)
         {
-            fileFilter = "image files (*.jpg, *.png, *.bmp)|*.jpg;*.png;*.bmp";
+            fileFilter = "jpg,png,bmp";
             base.Init(e, fType);
         }
 

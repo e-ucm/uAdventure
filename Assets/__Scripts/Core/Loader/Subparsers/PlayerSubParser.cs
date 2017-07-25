@@ -12,8 +12,6 @@ namespace uAdventure.Core
 	{
 		public object DOMParse(XmlElement element, params object[] parameters)
         {
-            string tmpArgVal;
-
             Player player = new Player();
 
             if (element.SelectSingleNode("documentation") != null)
@@ -23,40 +21,16 @@ namespace uAdventure.Core
 			foreach(var res in DOMParserUtility.DOMParse <ResourcesUni> (element.SelectNodes("resources"), parameters))
 				player.addResources (res);
 
-			var textcolor = element.SelectSingleNode("textcolor") as XmlElement;
-			if(textcolor != null)
-            {
-				tmpArgVal = textcolor.GetAttribute("showsSpeechBubble");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-					player.setShowsSpeechBubbles(tmpArgVal.Equals("yes"));
+            // TEXT COLORS
+            CharacterSubParser.ParseConversationColors(player, element);
 
-				tmpArgVal = textcolor.GetAttribute("bubbleBkgColor");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                    player.setBubbleBkgColor(tmpArgVal);
+            // VOICE
+            CharacterSubParser.ParseVoice(player, element);
 
-				tmpArgVal = textcolor.GetAttribute("bubbleBorderColor");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                    player.setBubbleBorderColor(tmpArgVal);
-
-				var frontcolor = textcolor.SelectSingleNode("frontcolor") as XmlElement;
-				if(frontcolor != null)
-					player.setTextFrontColor(frontcolor.GetAttribute("color") ?? "");
-
-				var bordercolor = textcolor.SelectSingleNode("bordercolor") as XmlElement;
-				if(bordercolor != null) 
-					player.setTextBorderColor(bordercolor.GetAttribute("color") ?? "");
-            }
-
-			var voice = element.SelectSingleNode("voice") as XmlElement;
-			if (voice != null)
-            {
-				player.setAlwaysSynthesizer("yes".Equals (voice.GetAttribute("synthesizeAlways")));
-				player.setVoice(voice.GetAttribute("name") ?? "");
-            }
-
+            // DESCRIPTIONS
 			player.setDescriptions(DOMParserUtility.DOMParse<Description>(element.SelectNodes ("description")).ToList());
 
-			// TODO ??????
+			// TODO Find a way to set this
 			var chapter = parameters [0] as Chapter;
             chapter.setPlayer(player);
 			return null;

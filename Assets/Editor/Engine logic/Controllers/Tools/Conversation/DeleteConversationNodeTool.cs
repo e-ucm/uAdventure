@@ -52,7 +52,7 @@ namespace uAdventure.Editor
 
             this.mode = mode;
             this.showConfirmation = (mode == MODE_TREE);
-            this.controller = Controller.getInstance();
+            this.controller = Controller.Instance;
             this.nodeView = _nodeView;
             this.conversation = conversation;
             this.rootNode = conversation.getRootNode();

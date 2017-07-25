@@ -113,7 +113,7 @@ namespace uAdventure.Editor
                     aa.setInfluenceArea(newInfluenceArea);
                     iadc.setInfluenceArea(newInfluenceArea);
                 }
-                Controller.getInstance().reloadPanel();
+                Controller.Instance.reloadPanel();
                 return true;
             }
             return false;
@@ -130,7 +130,7 @@ namespace uAdventure.Editor
                 aa.setInfluenceArea(oldInfluenceArea);
                 iadc.setInfluenceArea(oldInfluenceArea);
             }
-            Controller.getInstance().reloadPanel();
+            Controller.Instance.reloadPanel();
             return true;
         }
     }

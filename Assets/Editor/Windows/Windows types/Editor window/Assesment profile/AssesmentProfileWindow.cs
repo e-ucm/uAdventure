@@ -31,6 +31,7 @@ namespace uAdventure.Editor
         private string[] variables;
 
         private List<Completable> completables = new List<Completable>();
+		private bool Available { get; set; }
 
         public AssesmentProfileWindow(Rect aStartPos, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, new GUIContent(TC.get("Analytics.Title")), aStyle, aOptions)
@@ -48,9 +49,7 @@ namespace uAdventure.Editor
 
             col_width = 0.8f / num_colums;
 
-            variables = Controller.getInstance().getVarFlagSummary().getVars();
-
-            this.completables = Controller.getInstance().getSelectedChapterDataControl().getCompletables();
+            this.completables = Controller.Instance.SelectedChapterDataControl.getCompletables();
 
             foreach (Completable c in completables)
             {
@@ -67,14 +66,18 @@ namespace uAdventure.Editor
         }
 
         public override void Draw(int aID)
-        {
+		{
+
+			variables = Controller.Instance.VarFlagSummary.getVars();
+			Available = variables != null && variables.Length > 0;
+
             var windowWidth = Rect.width;
             var windowHeight = Rect.height;
 
             tableRect = new Rect(0f, 200, 0.8f * windowWidth, windowHeight * 0.33f);
             rightPanelRect = new Rect(0.85f * windowWidth, 0.1f * windowHeight, 0.08f * windowWidth, 0.33f * windowHeight);
 
-			GUILayout.Label(TC.get("Analytics.GameStart") + Controller.getInstance().getSelectedChapterDataControl().getInitialScene());
+			GUILayout.Label(TC.get("Analytics.GameStart") + Controller.Instance.SelectedChapterDataControl.getInitialScene());
 			GUILayout.Label(TC.get("Analytics.GameEnd"));
 
             end = EditorGUILayout.Popup(end, endoptions);
@@ -122,9 +125,18 @@ namespace uAdventure.Editor
                     ProgressEditorWindow window = ScriptableObject.CreateInstance<ProgressEditorWindow>();
                     window.Init(completable.getProgress());
                 }
-                selected_variable[completable] = EditorGUILayout.Popup(selected_variable[completable], variables, GUILayout.Width(windowWidth * col_width));
-                completable.getScore().setId(variables[selected_variable[completable]]);
 
+				if (Available)
+				{
+
+					selected_variable[completable] = EditorGUILayout.Popup(selected_variable[completable], variables, GUILayout.Width(windowWidth * col_width));
+					completable.getScore().setId(variables[selected_variable[completable]]);
+
+				}
+				else
+				{
+					EditorGUILayout.HelpBox(TC.get("Condition.Var.Warning"), MessageType.Error);
+				}
                 GUILayout.EndHorizontal();
             }
             GUILayout.EndScrollView();

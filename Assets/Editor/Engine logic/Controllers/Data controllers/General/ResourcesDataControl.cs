@@ -85,8 +85,8 @@ namespace uAdventure.Editor
                     assetsInformation = new AssetInformation[] { new AssetInformation( "Resources.DescriptionCharacterAnimationStandUp" , "standup", false, AssetsConstants.CATEGORY_ANIMATION, AssetsController.FILTER_PNG ),
                         new AssetInformation( "Resources.DescriptionCharacterAnimationStandDown" , "standdown", false, AssetsConstants.CATEGORY_ANIMATION, AssetsController.FILTER_PNG ), 
                         //check if is 3rd or 1st person game to set the asset as necessary
-                        new AssetInformation( "Resources.DescriptionCharacterAnimationStandRight" , "standright", Controller.getInstance( ).isPlayTransparent( )?false:true, AssetsConstants.CATEGORY_ANIMATION, AssetsController.FILTER_PNG ),
-                        new AssetInformation( "Resources.DescriptionCharacterAnimationStandLeft" , "standleft", Controller.getInstance( ).isPlayTransparent( )?false:true, AssetsConstants.CATEGORY_ANIMATION, AssetsController.FILTER_PNG ),
+                        new AssetInformation( "Resources.DescriptionCharacterAnimationStandRight" , "standright", Controller.Instance.PlayTransparent?false:true, AssetsConstants.CATEGORY_ANIMATION, AssetsController.FILTER_PNG ),
+                        new AssetInformation( "Resources.DescriptionCharacterAnimationStandLeft" , "standleft", Controller.Instance.PlayTransparent?false:true, AssetsConstants.CATEGORY_ANIMATION, AssetsController.FILTER_PNG ),
 
                         new AssetInformation( "Resources.DescriptionCharacterAnimationSpeakUp", "speakup", false, AssetsConstants.CATEGORY_ANIMATION, AssetsController.FILTER_PNG ),
                         new AssetInformation( "Resources.DescriptionCharacterAnimationSpeakDown" , "speakdown", false, AssetsConstants.CATEGORY_ANIMATION, AssetsController.FILTER_PNG ),

@@ -74,19 +74,19 @@ namespace uAdventure.Editor
         public void setExitText(string text)
         {
 
-            Controller.getInstance().addTool(new ChangeStringValueTool(exitLook, text, "getExitText", "setExitText"));
+            Controller.Instance.addTool(new ChangeStringValueTool(exitLook, text, "getExitText", "setExitText"));
             //this.exitLook.setExitText( text );
         }
 
         public void editCursorPath()
         {
-            Controller.getInstance().addTool(new SelectExitCursorPathTool(exitLook));
+            Controller.Instance.addTool(new SelectExitCursorPathTool(exitLook));
         }
 
         public void invalidCursor()
         {
 
-            Controller.getInstance().addTool(new InvalidExitCursorTool(exitLook));
+            Controller.Instance.addTool(new InvalidExitCursorTool(exitLook));
         }
 
         public void getAssetReferences(List<string> assetPaths, List<int> assetTypes)

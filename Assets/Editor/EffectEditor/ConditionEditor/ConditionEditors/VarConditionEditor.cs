@@ -16,7 +16,7 @@ namespace uAdventure.Editor
 
         public VarConditionEditor()
         {
-            vars = Controller.getInstance().getVarFlagSummary().getVars();
+            vars = Controller.Instance.VarFlagSummary.getVars();
             if (vars == null || vars.Length == 0)
             {
                 Avaiable = false;

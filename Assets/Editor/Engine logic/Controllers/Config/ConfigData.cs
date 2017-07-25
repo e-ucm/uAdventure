@@ -354,51 +354,51 @@ namespace uAdventure.Editor
         }
 
 
-        public static void loadFromXML(string configFile)
+        public static void LoadFromXML(string configFile)
         {
             instance = new ConfigData(configFile);
         }
 
-        public static void storeToXML()
+        public static void StoreToXML()
         {
-
             // Load the current configuration
             Properties configuration = new Properties(instance.configFile);
 
-            configuration.setProperty("EditorWindowX", instance.editorWindowX.ToString());
-            configuration.setProperty("EditorWindowY", instance.editorWindowY.ToString());
-            configuration.setProperty("EditorWindowWidth", instance.editorWindowW.ToString());
-            configuration.setProperty("EditorWindowHeight", instance.editorWindowH.ToString());
+            configuration.SetProperty("EditorWindowX", instance.editorWindowX.ToString());
+            configuration.SetProperty("EditorWindowY", instance.editorWindowY.ToString());
+            configuration.SetProperty("EditorWindowWidth", instance.editorWindowW.ToString());
+            configuration.SetProperty("EditorWindowHeight", instance.editorWindowH.ToString());
 
-            configuration.setProperty("EngineWindowX", instance.engineWindowX.ToString());
-            configuration.setProperty("EngineWindowY", instance.engineWindowY.ToString());
-            configuration.setProperty("EngineWindowWidth", instance.engineWindowW.ToString());
-            configuration.setProperty("EngineWindowHeight", instance.engineWindowH.ToString());
+            configuration.SetProperty("EngineWindowX", instance.engineWindowX.ToString());
+            configuration.SetProperty("EngineWindowY", instance.engineWindowY.ToString());
+            configuration.SetProperty("EngineWindowWidth", instance.engineWindowW.ToString());
+            configuration.SetProperty("EngineWindowHeight", instance.engineWindowH.ToString());
 
-            configuration.setProperty("DebugWindowX", instance.debugWindowX.ToString());
-            configuration.setProperty("DebugWindowY", instance.debugWindowY.ToString());
-            configuration.setProperty("DebugWindowWidth", instance.debugWindowW.ToString());
-            configuration.setProperty("DebugWindowHeight", instance.debugWindowH.ToString());
+            configuration.SetProperty("DebugWindowX", instance.debugWindowX.ToString());
+            configuration.SetProperty("DebugWindowY", instance.debugWindowY.ToString());
+            configuration.SetProperty("DebugWindowWidth", instance.debugWindowW.ToString());
+            configuration.SetProperty("DebugWindowHeight", instance.debugWindowH.ToString());
 
-            configuration.setProperty("PaintGrid", instance.debugOptions.isPaintGrid().ToString());
-            configuration.setProperty("PaintHotSpots", instance.debugOptions.isPaintHotSpots().ToString());
-            configuration.setProperty("PaintBoundingAreas", instance.debugOptions.isPaintBoundingAreas().ToString());
+            configuration.SetProperty("PaintGrid", instance.debugOptions.isPaintGrid().ToString());
+            configuration.SetProperty("PaintHotSpots", instance.debugOptions.isPaintHotSpots().ToString());
+            configuration.SetProperty("PaintBoundingAreas", instance.debugOptions.isPaintBoundingAreas().ToString());
 
-            configuration.setProperty("ShowItemReferences", instance.showItemReferences_F.ToString());
-            configuration.setProperty("ShowNPCReferences", instance.showNPCReferences_F.ToString());
-            configuration.setProperty("ShowAtrezzoReferences", instance.showAtrezzoReferences_F.ToString());
-            configuration.setProperty("ShowStartDialog", instance.showStartDialog_F.ToString());
-            configuration.setProperty("LanguageFile", instance.languageFile);
-            configuration.setProperty("AboutFile", instance.aboutFile);
-            configuration.setProperty("LoadingImage", instance.loadingImage);
+            configuration.SetProperty("ShowItemReferences", instance.showItemReferences_F.ToString());
+            configuration.SetProperty("ShowNPCReferences", instance.showNPCReferences_F.ToString());
+            configuration.SetProperty("ShowAtrezzoReferences", instance.showAtrezzoReferences_F.ToString());
+            configuration.SetProperty("ShowStartDialog", instance.showStartDialog_F.ToString());
+            configuration.SetProperty("LanguageFile", instance.languageFile);
+            configuration.SetProperty("AboutFile", instance.aboutFile);
+            configuration.SetProperty("LoadingImage", instance.loadingImage);
+            
             if (instance.exportsPath != null)
-                configuration.setProperty("ExportsDirectory", instance.exportsPath);
+                configuration.SetProperty("ExportsDirectory", instance.exportsPath);
             if (instance.reportsPath != null)
-                configuration.setProperty("ReportsDirectory", instance.reportsPath);
+                configuration.SetProperty("ReportsDirectory", instance.reportsPath);
             if (instance.projectsPath != null)
-                configuration.setProperty("ProjectsDirectory", instance.projectsPath);
+                configuration.SetProperty("ProjectsDirectory", instance.projectsPath);
             if (instance.projectsPath != null)
-                configuration.setProperty("EffectSelectorTab", instance.effectSelectorTab.ToString());
+                configuration.SetProperty("EffectSelectorTab", instance.effectSelectorTab.ToString());
 
             instance.recentFiles.fillProperties(configuration);
 
@@ -407,195 +407,63 @@ namespace uAdventure.Editor
             {
                 configuration.Save();
             }
-            catch (FileNotFoundException)
+            catch (Exception ex)
             {
-            }
-            catch (IOException)
-            {
+                Debug.Log(ex.StackTrace);
             }
 
         }
 
         private ConfigData(string fileName)
         {
+            Debug.Log("Loading config data at: " + fileName);
             this.configFile = fileName;
             Properties configuration = new Properties(fileName);
             try
             {
-                configuration.reload(fileName);
-                languageFile = configuration.getProperty("LanguageFile");
-                aboutFile = configuration.getProperty("AboutFile");
-                loadingImage = configuration.getProperty("LoadingImage");
+                configuration.Reload(fileName);
+                languageFile = configuration.GetProperty("LanguageFile");
+                aboutFile = configuration.GetProperty("AboutFile");
+                loadingImage = configuration.GetProperty("LoadingImage");
 
                 // Editor
-                try
-                {
-                    editorWindowX = int.Parse(configuration.getProperty("EditorWindowX"));
-                    /*if (editorWindowX<0 || editorWindowX>size.width){
-                        editorWindowX=int.MaxValue;
-                    }*/
-                }
-                catch (FormatException)
-                {
-                    editorWindowX = int.MaxValue;
-                }
-                try
-                {
-                    editorWindowY = int.Parse(configuration.getProperty("EditorWindowY"));
-                    /*if (editorWindowY<0 || editorWindowY>size.height){
-                        editorWindowY=int.MaxValue;
-                    }*/
-                }
-                catch (FormatException)
-                {
-                    editorWindowY = int.MaxValue;
-                }
-                try
-                {
-                    editorWindowW = int.Parse(configuration.getProperty("EditorWindowWidth"));
-                    /*if (editorWindowW<0 || editorWindowW>size.width){
-                        editorWindowW=int.MaxValue;
-                    }*/
-                }
-                catch (FormatException)
-                {
-                    editorWindowW = int.MaxValue;
-                }
-                try
-                {
-                    editorWindowH = int.Parse(configuration.getProperty("EditorWindowHeight"));
-                    /*if (editorWindowH<0 || editorWindowH>size.height){
-                        editorWindowH=int.MaxValue;
-                    }*/
-                }
-                catch (FormatException)
-                {
-                    editorWindowH = int.MaxValue;
-                }
-
-                // Engine
-                try
-                {
-                    engineWindowX = int.Parse(configuration.getProperty("EngineWindowX"));
-                    /*if (engineWindowX<0 || engineWindowX>size.width){
-                        engineWindowX=int.MaxValue;
-                    }*/
-                }
-                catch (FormatException)
-                {
-                    engineWindowX = int.MaxValue;
-                }
-                try
-                {
-                    engineWindowY = int.Parse(configuration.getProperty("EngineWindowY"));
-                    /*if (engineWindowY<0 || engineWindowY>size.height){
-                        engineWindowY=int.MaxValue;
-                    }*/
-                }
-                catch (FormatException)
-                {
-                    engineWindowY = int.MaxValue;
-                }
-                try
-                {
-                    engineWindowW = int.Parse(configuration.getProperty("EngineWindowWidth"));
-                    /*if (engineWindowW<0 || engineWindowW>size.width){
-                        engineWindowW=int.MaxValue;
-                    }*/
-                }
-                catch (FormatException)
-                {
-                    engineWindowW = int.MaxValue;
-                }
-                try
-                {
-                    engineWindowH = int.Parse(configuration.getProperty("EngineWindowHeight"));
-                    /*if (engineWindowH<0 || engineWindowH>size.height){
-                        engineWindowH=int.MaxValue;
-                    }*/
-                }
-                catch (FormatException)
-                {
-                    engineWindowH = int.MaxValue;
-                }
-
-                // Debug
-                try
-                {
-                    debugWindowX = int.Parse(configuration.getProperty("DebugWindowX"));
-                    /*if (debugWindowX<0 || debugWindowX>size.width){
-                        debugWindowX=int.MaxValue;
-                    }*/
-                }
-                catch (FormatException)
-                {
-                    debugWindowX = int.MaxValue;
-                }
-                try
-                {
-                    debugWindowY = int.Parse(configuration.getProperty("DebugWindowY"));
-                    /*if (debugWindowY<0 || debugWindowY>size.height){
-                        debugWindowY=int.MaxValue;
-                    }*/
-                }
-                catch (FormatException)
-                {
-                    debugWindowY = int.MaxValue;
-                }
-                try
-                {
-                    debugWindowW = int.Parse(configuration.getProperty("DebugWindowWidth"));
-                    /*if (debugWindowW<0 || debugWindowW>size.width){
-                        debugWindowW=int.MaxValue;
-                    }*/
-                }
-                catch (FormatException)
-                {
-                    debugWindowW = int.MaxValue;
-                }
-                try
-                {
-                    debugWindowH = int.Parse(configuration.getProperty("DebugWindowHeight"));
-                    /*if (debugWindowH<0 || debugWindowH>size.height){
-                        debugWindowH=int.MaxValue;
-                    }*/
-                }
-                catch (FormatException)
-                {
-                    debugWindowH = int.MaxValue;
-                }
+                editorWindowX = ExParsers.ParseDefault(configuration.GetProperty("EditorWindowX"), int.MaxValue);
+                editorWindowY = ExParsers.ParseDefault(configuration.GetProperty("EditorWindowY"), int.MaxValue);
+                editorWindowW = ExParsers.ParseDefault(configuration.GetProperty("EditorWindowWidth"), int.MaxValue);
+                editorWindowH = ExParsers.ParseDefault(configuration.GetProperty("EditorWindowHeight"), int.MaxValue);
+                engineWindowX = ExParsers.ParseDefault(configuration.GetProperty("EngineWindowX"), int.MaxValue);
+                engineWindowY = ExParsers.ParseDefault(configuration.GetProperty("EngineWindowY"), int.MaxValue);
+                engineWindowW = ExParsers.ParseDefault(configuration.GetProperty("EngineWindowWidth"), int.MaxValue);
+                engineWindowH = ExParsers.ParseDefault(configuration.GetProperty("EngineWindowHeight"), int.MaxValue);
+                debugWindowX = ExParsers.ParseDefault(configuration.GetProperty("DebugWindowX"), int.MaxValue);
+                debugWindowY = ExParsers.ParseDefault(configuration.GetProperty("DebugWindowY"), int.MaxValue);
+                debugWindowW = ExParsers.ParseDefault(configuration.GetProperty("DebugWindowWidth"), int.MaxValue);
+                debugWindowH = ExParsers.ParseDefault(configuration.GetProperty("DebugWindowHeight"), int.MaxValue);
 
 
-                showItemReferences_F = bool.Parse(configuration.getProperty("ShowItemReferences"));
-                showNPCReferences_F = bool.Parse(configuration.getProperty("ShowNPCReferences"));
-                showStartDialog_F = bool.Parse(configuration.getProperty("ShowStartDialog"));
+                showItemReferences_F = bool.Parse(configuration.GetProperty("ShowItemReferences"));
+                showNPCReferences_F = bool.Parse(configuration.GetProperty("ShowNPCReferences"));
+                showStartDialog_F = bool.Parse(configuration.GetProperty("ShowStartDialog"));
 
                 debugOptions = new DebugSettings();
-                if (configuration.getProperty("PaintBoundingAreas") != null)
-                    debugOptions.setPaintBoundingAreas(bool.Parse(configuration.getProperty("PaintBoundingAreas")));
-                if (configuration.getProperty("PaintGrid") != null)
-                    debugOptions.setPaintGrid(bool.Parse(configuration.getProperty("PaintGrid")));
-                if (configuration.getProperty("PaintHotSpots") != null)
-                    debugOptions.setPaintHotSpots(bool.Parse(configuration.getProperty("PaintHotSpots")));
+                if (configuration.GetProperty("PaintBoundingAreas") != null)
+                    debugOptions.setPaintBoundingAreas(bool.Parse(configuration.GetProperty("PaintBoundingAreas")));
+                if (configuration.GetProperty("PaintGrid") != null)
+                    debugOptions.setPaintGrid(bool.Parse(configuration.GetProperty("PaintGrid")));
+                if (configuration.GetProperty("PaintHotSpots") != null)
+                    debugOptions.setPaintHotSpots(bool.Parse(configuration.GetProperty("PaintHotSpots")));
 
-                exportsPath = configuration.getProperty("ExportsDirectory");
+                exportsPath = configuration.GetProperty("ExportsDirectory");
                 if (exportsPath != null)
                     ReleaseFolders.setExportsPath(exportsPath);
-                reportsPath = configuration.getProperty("ReportsDirectory");
+                reportsPath = configuration.GetProperty("ReportsDirectory");
                 if (reportsPath != null)
                     ReleaseFolders.setReportsPath(reportsPath);
-                projectsPath = configuration.getProperty("ProjectsDirectory");
+                projectsPath = configuration.GetProperty("ProjectsDirectory");
                 if (projectsPath != null)
                     ReleaseFolders.setProjectsPath(projectsPath);
-                try
-                {
-                    effectSelectorTab = int.Parse(configuration.getProperty("EffectSelectorTab"));
-                }
-                catch (Exception)
-                {
-                    effectSelectorTab = 0;
-                }
 
+                effectSelectorTab = ExParsers.ParseDefault(configuration.GetProperty("EffectSelectorTab"), 0);
                 recentFiles = new RecentFiles(configuration);
             }
             catch (FileNotFoundException)
@@ -629,7 +497,7 @@ namespace uAdventure.Editor
             }
             if (loadingImage == null)
             {
-                loadingImage = "Assets/Resources/" + ReleaseFolders.IMAGE_LOADING_DIR + " / " + Controller.getInstance().getDefaultLanguage() + "/Editor2D-Loading.png";
+                loadingImage = "Assets/Resources/" + ReleaseFolders.IMAGE_LOADING_DIR + " / " + Controller.Instance.getDefaultLanguage() + "/Editor2D-Loading.png";
             }
             if (exportsPath == null)
             {
@@ -652,19 +520,16 @@ namespace uAdventure.Editor
 
         public static void fileLoaded(string file)
         {
-
             instance.recentFiles.fileLoaded(file);
         }
 
         public static string[][] getRecentFilesInfo(int r)
         {
-
             return instance.recentFiles.getRecentFilesInfo(r);
         }
 
         public static string[][] getRecentFilesInfo(int l, int r)
         {
-
             return instance.recentFiles.getRecentFilesInfo(l, r);
         }
 

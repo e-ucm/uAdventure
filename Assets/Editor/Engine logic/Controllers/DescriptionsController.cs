@@ -138,19 +138,19 @@ namespace uAdventure.Editor
         public bool deleteElement()
         {
 
-            return Controller.getInstance().addTool(new RemoveDescriptionTool(this));
+            return Controller.Instance.addTool(new RemoveDescriptionTool(this));
         }
 
         public bool duplicateElement()
         {
 
-            return Controller.getInstance().addTool(new DuplicateDescriptionTool(this));
+            return Controller.Instance.addTool(new DuplicateDescriptionTool(this));
         }
 
         public bool addElement()
         {
 
-            return Controller.getInstance().addTool(new AddDescriptionTool(this));
+            return Controller.Instance.addTool(new AddDescriptionTool(this));
         }
 
 

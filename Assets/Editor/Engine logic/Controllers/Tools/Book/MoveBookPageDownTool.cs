@@ -77,7 +77,7 @@ namespace uAdventure.Editor
             BookPage b = bookPagesList[oldElementIndex];
             bookPagesList.RemoveAt(oldElementIndex);
             bookPagesList.Insert(newElementIndex, b);
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
 
@@ -87,7 +87,7 @@ namespace uAdventure.Editor
             BookPage b = bookPagesList[newElementIndex];
             bookPagesList.RemoveAt(newElementIndex);
             bookPagesList.Insert(oldElementIndex, b);
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
     }

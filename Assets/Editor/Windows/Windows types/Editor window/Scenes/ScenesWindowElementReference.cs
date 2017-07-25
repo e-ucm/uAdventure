@@ -46,7 +46,7 @@ namespace uAdventure.Editor
             if (GameRources.GetInstance().selectedSceneIndex >= 0)
             {
                 currentIndex = GameRources.GetInstance().selectedSceneIndex;
-                currentScene = Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[currentIndex];
+                currentScene = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[currentIndex];
                 backgroundPath = currentScene.getPreviewBackground();
             }
             if (backgroundPath != null && !backgroundPath.Equals(""))
@@ -67,14 +67,14 @@ namespace uAdventure.Editor
 			if (GameRources.GetInstance().selectedSceneIndex >= 0)
 			{
 				currentIndex = GameRources.GetInstance().selectedSceneIndex;
-				currentScene = Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[currentIndex];
+				currentScene = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[currentIndex];
 			}
 
             if (currentScene == null)
                 if (GameRources.GetInstance().selectedSceneIndex >= 0 && currentIndex != GameRources.GetInstance().selectedSceneIndex)
                 {
                     currentIndex = GameRources.GetInstance().selectedSceneIndex;
-                    currentScene = Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[currentIndex];
+                    currentScene = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[currentIndex];
                 }
                 else
                     return;
@@ -258,7 +258,7 @@ namespace uAdventure.Editor
             {
                 if (workingObject is ObjectAddItemReference)
                 {
-                    Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                    Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                         GameRources.GetInstance().selectedSceneIndex].getReferencesList()
                         .addElement(Controller.ITEM_REFERENCE, message);
                 }
@@ -290,7 +290,7 @@ namespace uAdventure.Editor
             {
                 if (workingObject is ObjectAddSetItemReference)
                 {
-                    Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                    Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                         GameRources.GetInstance().selectedSceneIndex].getReferencesList()
                         .addElement(Controller.ATREZZO_REFERENCE, message);
                 }
@@ -322,7 +322,7 @@ namespace uAdventure.Editor
             {
                 if (workingObject is ObjectAddNPCReference)
                 {
-                    Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                    Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                         GameRources.GetInstance().selectedSceneIndex].getReferencesList()
                         .addElement(Controller.NPC_REFERENCE, message);
                 }

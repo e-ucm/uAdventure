@@ -30,8 +30,8 @@ namespace uAdventure.Editor
 
         public TriggerBookEffectEditor()
         {
-            books = Controller.getInstance().getSelectedChapterDataControl().getBooksList().getBooksIDs();
-            this.effect = new TriggerBookEffect(books[0]);
+            books = Controller.Instance.SelectedChapterDataControl.getBooksList().getBooksIDs();
+            this.effect = new TriggerBookEffect(books.Length > 0 ? books[0] : "");
         }
 
         public void draw()
@@ -48,6 +48,15 @@ namespace uAdventure.Editor
 
         public AbstractEffect Effect { get { return effect; } set { effect = value as TriggerBookEffect; } }
         public string EffectName { get { return TC.get("TriggerBookEffect.Title"); } }
+
+        public bool Usable
+        {
+            get
+            {
+                return Controller.Instance.SelectedChapterDataControl.getBooksList().getBooksIDs().Length > 0;
+            }
+        }
+
         public EffectEditor clone() { return new TriggerBookEffectEditor(); }
 
         public bool manages(AbstractEffect c)

@@ -117,7 +117,7 @@ namespace uAdventure.Editor
             {
                 elementReference.setPosition(x, y);
             }
-            Controller.getInstance().reloadPanel();
+            Controller.Instance.reloadPanel();
             return true;
         }
 
@@ -133,7 +133,7 @@ namespace uAdventure.Editor
             {
                 elementReference.setPosition(oldX, oldY);
             }
-            Controller.getInstance().reloadPanel();
+            Controller.Instance.reloadPanel();
             return true;
         }
     }

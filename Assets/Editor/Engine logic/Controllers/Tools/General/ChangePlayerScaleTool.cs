@@ -71,7 +71,7 @@ namespace uAdventure.Editor
         {
 
             scene.setPlayerScale(scale);
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
 
@@ -79,7 +79,7 @@ namespace uAdventure.Editor
         {
 
             scene.setPlayerScale(oldScale);
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
     }

@@ -2,6 +2,8 @@
 using System.Collections;
 
 using uAdventure.Core;
+using UnityEditor;
+using System.Collections.Generic;
 
 namespace uAdventure.Editor
 {
@@ -37,16 +39,15 @@ namespace uAdventure.Editor
         private string inventoryIconPath = "";
         private string imageWhenOverPath = "";
 
-        private int selectedAppearance;
+        private ItemDataControl workingItem;
+        private DataControlList appearanceList;
 
         private string apperanceName = "", apperanceNameLast = "";
+        private static List<ResourcesDataControl> emptyList;
 
         public ItemsWindowAppearance(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
         {
-            clearTex = (Texture2D)Resources.Load("EAdventureData/img/icons/deleteContent", typeof(Texture2D));
-            addTex = (Texture2D)Resources.Load("EAdventureData/img/icons/addNode", typeof(Texture2D));
-            duplicateTex = (Texture2D)Resources.Load("EAdventureData/img/icons/duplicateNode", typeof(Texture2D));
 
             conditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/conditions-24x24", typeof(Texture2D));
             noConditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/no-conditions-24x24", typeof(Texture2D));
@@ -54,13 +55,13 @@ namespace uAdventure.Editor
             if (GameRources.GetInstance().selectedItemIndex >= 0)
             {
                 imagePath =
-                    Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
+                    Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
                         GameRources.GetInstance().selectedItemIndex].getPreviewImage();
                 inventoryIconPath =
-                    Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
+                    Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
                         GameRources.GetInstance().selectedItemIndex].getIconImage();
                 imageWhenOverPath =
-                    Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
+                    Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
                         GameRources.GetInstance().selectedItemIndex].getMouseOverImage();
             }
 
@@ -70,12 +71,70 @@ namespace uAdventure.Editor
             noBackgroundSkin = (GUISkin)Resources.Load("Editor/EditorNoBackgroundSkin", typeof(GUISkin));
             selectedAreaSkin = (GUISkin)Resources.Load("Editor/EditorLeftMenuItemSkinConcreteOptions", typeof(GUISkin));
 
-            selectedAppearance = -1;
+            appearanceList = new DataControlList()
+            {
+                headerHeight = 20,
+                footerHeight = 20
+            };
+            appearanceList.drawHeaderCallback += (rect) =>
+            {
+                EditorGUI.LabelField(new Rect(rect.x, rect.y, rect.width / 2f, rect.height), TC.get("Item.LookPanelTitle"));
+                EditorGUI.LabelField(new Rect(rect.x + rect.width / 2f, rect.y, rect.width / 2f, rect.height), TC.get("Conditions.Title"));
+            };
+            /*
+            appearanceList.onAddCallback += (list) =>
+            {
+                workingItem.addElement(Controller.RESOURCES, "");
+            };
+            
+            appearanceList.onRemoveCallback += (list) =>
+            {
+                workingItem.deleteElement(workingItem.getResources()[list.index], false);
+            };
+            */
+            appearanceList.drawElementCallback += (rect, index, isActive, isFocused) =>
+            {
+                var resources = workingItem.getResources()[index];
+                var leftRect = new Rect(rect.x, rect.y, rect.width / 2f, rect.height);
+                var rightRect = new Rect(rect.x + rect.width / 2f, rect.y, rect.width / 2f, rect.height);
+
+                GUILayout.BeginHorizontal(); 
+                if (index == appearanceList.index)
+                {
+                    resources.renameElement(EditorGUI.TextField(leftRect, resources.getName()));
+                }
+                else
+                {
+                    EditorGUI.LabelField(leftRect, resources.getName());
+                }
+
+                if (GUI.Button(rightRect, resources.getConditions().getBlocksCount() > 0 ? conditionsTex : noConditionsTex))
+                {
+                    ConditionEditorWindow window =
+                         (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
+                    window.Init(resources.getConditions());
+                }
+                GUILayout.EndHorizontal();
+            };
         }
 
 
         public override void Draw(int aID)
         {
+            workingItem = Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[GameRources.GetInstance().selectedItemIndex];
+            appearanceList.SetData(workingItem, (data) => (data as DataControlWithResources).getResources().ConvertAll(r => (DataControl)r));
+
+            if (workingItem == null)
+            {
+                appearanceList.list = emptyList;
+                return;
+            }
+            else
+            {
+                appearanceList.list = workingItem.getResources();
+            }
+
+
             var windowWidth = m_Rect.width;
             var windowHeight = m_Rect.height;
 
@@ -83,83 +142,26 @@ namespace uAdventure.Editor
             rightPanelRect = new Rect(0.9f * windowWidth, 0.1f * windowHeight, 0.08f * windowWidth, 0.2f * windowHeight);
             propertiesTable = new Rect(0f, 0.3f * windowHeight, 0.95f * windowWidth, 0.3f * windowHeight);
             previewRect = new Rect(0f, 0.6f * windowHeight, windowWidth, windowHeight * 0.35f);
-
-            GUILayout.BeginArea(appearanceTableRect);
-            GUILayout.BeginHorizontal();
-            GUILayout.Box(TC.get("Item.LookPanelTitle"), GUILayout.Width(windowWidth * 0.44f));
-            GUILayout.Box(TC.get("Conditions.Title"), GUILayout.Width(windowWidth * 0.44f));
-            GUILayout.EndHorizontal();
-            scrollPosition = GUILayout.BeginScrollView(scrollPosition);
+            
             // Appearance table
-            for (int i = 0; i < Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[GameRources.GetInstance().selectedItemIndex].getResourcesCount(); i++)
+            appearanceList.DoList(200f);
+
+
+            /*for (int i = 0; i < selectedItem.getResourcesCount(); i++)
             {
                 if (i == selectedAppearance)
                     GUI.skin = selectedAreaSkin;
                 else
                     GUI.skin = noBackgroundSkin;
 
-                tmpTex = (Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
-                         GameRources.GetInstance().selectedItemIndex].getResources()[i].getConditions().getBlocksCount() > 0 ? conditionsTex : noConditionsTex);
+                tmpTex = (selectedItem.getConditions().getBlocksCount() > 0 ? conditionsTex : noConditionsTex);
 
-                GUILayout.BeginHorizontal();
-
-                if (i == selectedAppearance)
-                {
-                    if (GUILayout.Button(Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
-                     GameRources.GetInstance().selectedItemIndex].getResources()[i].getName(), GUILayout.Width(windowWidth * 0.44f)))
-                    {
-                        OnAppearanceSelectionChange(i);
-                    }
-                    if (GUILayout.Button(tmpTex, GUILayout.Width(windowWidth * 0.44f)))
-                    {
-                        ConditionEditorWindow window =
-                             (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
-                        window.Init(Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
-                   GameRources.GetInstance().selectedItemIndex].getResources()[i].getConditions());
-                    }
-                }
-                else
-                {
-                    if (GUILayout.Button(Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
-                   GameRources.GetInstance().selectedItemIndex].getResources()[i].getName(), GUILayout.Width(windowWidth * 0.44f)))
-                    {
-                        OnAppearanceSelectionChange(i);
-                    }
-                    if (GUILayout.Button(tmpTex, GUILayout.Width(windowWidth * 0.44f)))
-                    {
-                        OnAppearanceSelectionChange(i);
-                    }
-                }
-                GUILayout.EndHorizontal();
-                GUI.skin = defaultSkin;
-            }
-            GUILayout.EndScrollView();
-            GUILayout.EndArea();
+                GUI.skin = defaultSkin; 
+            }*/
 
             /*
             * Right panel
             */
-            GUILayout.BeginArea(rightPanelRect);
-            GUI.skin = noBackgroundSkin;
-            if (GUILayout.Button(addTex, GUILayout.MaxWidth(0.08f * windowWidth)))
-            {
-                Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
-                      GameRources.GetInstance().selectedItemIndex].addElement(Controller.RESOURCES, "");
-            }
-            if (GUILayout.Button(duplicateTex, GUILayout.MaxWidth(0.08f * windowWidth)))
-            {
-                Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
-                  GameRources.GetInstance().selectedItemIndex].duplicateElement(Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
-                      GameRources.GetInstance().selectedItemIndex].getResources()[selectedAppearance]);
-            }
-            if (GUILayout.Button(clearTex, GUILayout.MaxWidth(0.08f * windowWidth)))
-            {
-                Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
-                  GameRources.GetInstance().selectedItemIndex].deleteElement(Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
-                      GameRources.GetInstance().selectedItemIndex].getResources()[selectedAppearance], false);
-            }
-            GUI.skin = defaultSkin;
-            GUILayout.EndArea();
 
 
             GUILayout.Space(30);
@@ -241,24 +243,24 @@ namespace uAdventure.Editor
 
         public void OnDialogOk(string message, object workingObject = null, object workingObjectSecond = null)
         {
+            var selectedItem = Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
+                            GameRources.GetInstance().selectedItemIndex];
+
             if (workingObject is BaseFileOpenDialog.FileType)
             {
                 switch ((BaseFileOpenDialog.FileType)workingObject)
                 {
                     case BaseFileOpenDialog.FileType.ITEM_IMAGE:
                         imagePath = message;
-                        Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
-                            GameRources.GetInstance().selectedItemIndex].setPreviewImage(imagePath);
+                        selectedItem.setPreviewImage(imagePath);
                         break;
                     case BaseFileOpenDialog.FileType.ITEM_ICON:
                         inventoryIconPath = message;
-                        Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
-                            GameRources.GetInstance().selectedItemIndex].setIconImage(inventoryIconPath);
+                        selectedItem.setIconImage(inventoryIconPath);
                         break;
                     case BaseFileOpenDialog.FileType.ITEM_IMAGE_OVER:
                         imageWhenOverPath = message;
-                        Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
-                            GameRources.GetInstance().selectedItemIndex].setMouseOverImage(imageWhenOverPath);
+                        selectedItem.setMouseOverImage(imageWhenOverPath);
                         break;
                     default:
                         break;
@@ -281,26 +283,25 @@ namespace uAdventure.Editor
 
         private void OnAppearanceSelectionChange(int i)
         {
-            selectedAppearance = i;
             apperanceName =
-                apperanceNameLast = Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
-                    GameRources.GetInstance().selectedItemIndex].getResources()[selectedAppearance].getName();
+                apperanceNameLast = Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
+                    GameRources.GetInstance().selectedItemIndex].getResources()[appearanceList.index].getName();
             RefreshPathInformation();
         }
 
         private void RefreshPathInformation()
         {
-            Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
-                      GameRources.GetInstance().selectedItemIndex].setSelectedResources(selectedAppearance);
+            Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
+                      GameRources.GetInstance().selectedItemIndex].setSelectedResources(appearanceList.index);
 
             imagePath =
-                  Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
+                  Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
                       GameRources.GetInstance().selectedItemIndex].getPreviewImage();
             inventoryIconPath =
-                Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
+                Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
                     GameRources.GetInstance().selectedItemIndex].getIconImage();
             imageWhenOverPath =
-                Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
+                Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
                     GameRources.GetInstance().selectedItemIndex].getMouseOverImage();
         }
     }

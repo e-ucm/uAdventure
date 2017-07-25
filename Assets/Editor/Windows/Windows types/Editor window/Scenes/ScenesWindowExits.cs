@@ -57,7 +57,7 @@ namespace uAdventure.Editor
             {
 
                 backgroundPath =
-                    Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                    Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                         GameRources.GetInstance().selectedSceneIndex].getPreviewBackground();
             }
 
@@ -95,7 +95,7 @@ namespace uAdventure.Editor
             scrollPosition = GUILayout.BeginScrollView(scrollPosition);
             for (int i = 0;
                 i <
-                Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                     GameRources.GetInstance().selectedSceneIndex].getExitsList().getExitsList().Count;
                 i++)
             {
@@ -105,7 +105,7 @@ namespace uAdventure.Editor
                     GUI.skin = noBackgroundSkin;
 
                 GUILayout.BeginHorizontal();
-                if (GUILayout.Button(Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                if (GUILayout.Button(Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                     GameRources.GetInstance().selectedSceneIndex].getExitsList().getExitsList()[i].getNextSceneId(),
                     GUILayout.Width(windowWidth * 0.24f)))
                 {
@@ -150,28 +150,28 @@ namespace uAdventure.Editor
                     {
                         ConditionEditorWindow window =
                             (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
-                        window.Init(Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                        window.Init(Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                             GameRources.GetInstance().selectedSceneIndex].getExitsList().getExitsList()[i].getConditions());
                     }
                     if (GUILayout.Button(TC.get("GeneralText.EditEffects"), GUILayout.Width(windowWidth * 0.14f)))
                     {
                         EffectEditorWindow window =
                             (EffectEditorWindow)ScriptableObject.CreateInstance(typeof(EffectEditorWindow));
-                        window.Init(Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                        window.Init(Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                             GameRources.GetInstance().selectedSceneIndex].getExitsList().getExitsList()[i].getEffects());
                     }
                     if (GUILayout.Button(TC.get("Exit.EditPostEffects"), GUILayout.Width(windowWidth * 0.14f)))
                     {
                         EffectEditorWindow window =
                             (EffectEditorWindow)ScriptableObject.CreateInstance(typeof(EffectEditorWindow));
-                        window.Init(Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                        window.Init(Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                             GameRources.GetInstance().selectedSceneIndex].getExitsList().getExitsList()[i].getPostEffects());
                     }
                     if (GUILayout.Button(TC.get("Exit.EditNotEffects"), GUILayout.Width(windowWidth * 0.14f)))
                     {
                         EffectEditorWindow window =
                             (EffectEditorWindow)ScriptableObject.CreateInstance(typeof(EffectEditorWindow));
-                        window.Init(Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                        window.Init(Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                             GameRources.GetInstance().selectedSceneIndex].getExitsList().getExitsList()[i].getNotEffects());
                     }
                     GUILayout.EndVertical();
@@ -206,30 +206,30 @@ namespace uAdventure.Editor
             }
             if (GUILayout.Button(duplicateImg, GUILayout.MaxWidth(0.08f * windowWidth)))
             {
-                Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                     GameRources.GetInstance().selectedSceneIndex].getExitsList()
-                    .duplicateElement(Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                    .duplicateElement(Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                         GameRources.GetInstance().selectedSceneIndex].getExitsList().getExits()[selectedExit]);
             }
             if (GUILayout.Button(moveUp, GUILayout.MaxWidth(0.08f * windowWidth)))
             {
-                Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                     GameRources.GetInstance().selectedSceneIndex].getExitsList()
-                    .moveElementUp(Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                    .moveElementUp(Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                         GameRources.GetInstance().selectedSceneIndex].getExitsList().getExits()[selectedExit]);
             }
             if (GUILayout.Button(moveDown, GUILayout.MaxWidth(0.08f * windowWidth)))
             {
-                Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                     GameRources.GetInstance().selectedSceneIndex].getExitsList()
-                    .moveElementDown(Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                    .moveElementDown(Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                         GameRources.GetInstance().selectedSceneIndex].getExitsList().getExits()[selectedExit]);
             }
             if (GUILayout.Button(clearImg, GUILayout.MaxWidth(0.08f * windowWidth)))
             {
-                Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                     GameRources.GetInstance().selectedSceneIndex].getExitsList()
-                    .deleteElement(Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                    .deleteElement(Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                         GameRources.GetInstance().selectedSceneIndex].getExitsList().getExits()[selectedExit], false);
             }
             GUI.skin = defaultSkin;
@@ -245,7 +245,7 @@ namespace uAdventure.Editor
                 {
                     ExitsEditor window =
                         (ExitsEditor)ScriptableObject.CreateInstance(typeof(ExitsEditor));
-                    window.Init(this, Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                    window.Init(this, Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                         GameRources.GetInstance().selectedSceneIndex], selectedExit);
                 }
                 GUILayout.EndArea();
@@ -264,7 +264,7 @@ namespace uAdventure.Editor
         {
             if (workingObject is ExitNewLinkTo)
             {
-                Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                     GameRources.GetInstance().selectedSceneIndex].getExitsList()
                     .addElement(Controller.EXIT, message);
             }
@@ -281,10 +281,10 @@ namespace uAdventure.Editor
             selectedExit = i;
             selectedTransitionType =
                 selectedTransitionTypeLast =
-                    Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                    Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                         GameRources.GetInstance().selectedSceneIndex].getExitsList().getExitsList()[selectedExit]
                         .getTransitionType();
-            transitionTimeInt = Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+            transitionTimeInt = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                 GameRources.GetInstance().selectedSceneIndex].getExitsList().getExitsList()[selectedExit].getTransitionTime();
             transitionTimeString = transitionTimeStringLast = transitionTimeInt.ToString();
         }
@@ -292,7 +292,7 @@ namespace uAdventure.Editor
         private void ChangeSelectedTransitionType(int i)
         {
             selectedTransitionTypeLast = i;
-            Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+            Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                 GameRources.GetInstance().selectedSceneIndex].getExitsList().getExitsList()[selectedExit]
                 .setTransitionType(i);
         }
@@ -300,7 +300,7 @@ namespace uAdventure.Editor
         private void ChangeSelectedTransitionTime(string t)
         {
             transitionTimeStringLast = t;
-            Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+            Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                 GameRources.GetInstance().selectedSceneIndex].getExitsList().getExitsList()[selectedExit]
                 .setTransitionTime(int.Parse(t));
         }

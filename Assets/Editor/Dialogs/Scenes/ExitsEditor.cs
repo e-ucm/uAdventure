@@ -38,7 +38,7 @@ namespace uAdventure.Editor
             calledExitIndexRef = exitIndex;
 
             string backgroundPath =
-                Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                     GameRources.GetInstance().selectedSceneIndex].getPreviewBackground();
 
             backgroundPreviewTex = AssetsController.getImage(backgroundPath).texture;

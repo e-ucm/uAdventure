@@ -170,7 +170,7 @@ namespace uAdventure.Editor
                 NPC newNPC = new NPC(npcId);
                 npcsList.Add(newNPC);
                 npcsDataControlList.Add(new NPCDataControl(newNPC));
-                controller.getIdentifierSummary().addNPCId(npcId);
+                controller.IdentifierSummary.addNPCId(npcId);
                 //controller.dataModified( );
                 elementAdded = true;
             }
@@ -195,7 +195,7 @@ namespace uAdventure.Editor
             newElement.setId(id);
             npcsList.Add(newElement);
             npcsDataControlList.Add(new NPCDataControl(newElement));
-            controller.getIdentifierSummary().addNPCId(id);
+            controller.IdentifierSummary.addNPCId(id);
             return true;
         }
 
@@ -221,7 +221,7 @@ namespace uAdventure.Editor
                 {
                     npcsDataControlList.Remove((NPCDataControl)dataControl);
                     controller.deleteIdentifierReferences(npcId);
-                    controller.getIdentifierSummary().deleteNPCId(npcId);
+                    controller.IdentifierSummary.deleteNPCId(npcId);
                     //controller.dataModified( );
                     elementDeleted = true;
                 }

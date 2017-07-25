@@ -16,9 +16,8 @@ namespace uAdventure.Editor
             TPS = 1
         };
 
-        private System.Windows.Forms.SaveFileDialog sfd;
         private string selectedGameProjectPath = "";
-
+        
         public NewGameWindow(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
         {
@@ -30,10 +29,6 @@ namespace uAdventure.Editor
             newGameScreenFPSImage =
                 (Texture2D)Resources.Load("EAdventureData/help/common_img/fireProtocol", typeof(Texture2D));
             newGameScreenTPSImage = (Texture2D)Resources.Load("EAdventureData/help/common_img/1492", typeof(Texture2D));
-
-            screenRect = new Rect(0.01f * m_Rect.width, 0.5f * m_Rect.height, 0.98f * m_Rect.width, 0.4f * m_Rect.height);
-            bottomButtonRect = new Rect(0.8f * m_Rect.width, 0.9f * m_Rect.height, 0.15f * m_Rect.width, 0.1f * m_Rect.height);
-            sfd = new System.Windows.Forms.SaveFileDialog();
         }
 
         public Vector2 scrollPositionButtons;
@@ -57,10 +52,16 @@ namespace uAdventure.Editor
 
         public override void Draw(int aID)
         {
+            var windowWidth = Rect.width;
+            var windowHeight = Rect.height;
+
+            screenRect = new Rect(0.01f * windowWidth, 0.5f * windowHeight, 0.98f * windowWidth, 0.4f * windowHeight);
+            bottomButtonRect = new Rect(0.8f * windowWidth, 0.9f * windowHeight, 0.15f * windowWidth, 0.1f * windowHeight);
+
             GUILayout.BeginHorizontal();
             {
-                scrollPositionButtons = GUILayout.BeginScrollView(scrollPositionButtons, GUILayout.Width(m_Rect.width * 0.3f),
-                    GUILayout.Height(0.8f * m_Rect.height));
+                scrollPositionButtons = GUILayout.BeginScrollView(scrollPositionButtons, GUILayout.Width(windowWidth * 0.3f),
+                    GUILayout.Height(0.8f * windowHeight));
                 if (GUILayout.Button(newGameButtonFPSImage))
                 {
                     selectedGameType = GameType.FPS;
@@ -71,8 +72,8 @@ namespace uAdventure.Editor
                 }
                 GUILayout.EndScrollView();
 
-                scrollPositionInfo = GUILayout.BeginScrollView(scrollPositionInfo, GUILayout.Width(m_Rect.width * 0.68f),
-                    GUILayout.Height(0.8f * m_Rect.height));
+                scrollPositionInfo = GUILayout.BeginScrollView(scrollPositionInfo, GUILayout.Width(windowWidth * 0.68f),
+                    GUILayout.Height(0.8f * windowHeight));
                 if (selectedGameType == GameType.FPS)
                 {
                     //GUILayout.Label(infoFPS);
@@ -103,17 +104,14 @@ namespace uAdventure.Editor
                 //window.Init(this, "Game");
                 startNewGame();
             }
-            //if (GUILayout.Button(TC.get("GeneralText.Cancel")))
-            if (GUILayout.Button("Cancel"))
-            {
-                Debug.Log(TC.get("GeneralText.Cancel") + selectedGameType);
-            }
+
             GUILayout.EndHorizontal();
             GUILayout.EndArea();
         }
 
         private void startNewGame()
         {
+
             int type = -1;
             switch (selectedGameType)
             {
@@ -122,46 +120,40 @@ namespace uAdventure.Editor
                 case GameType.TPS: type = Controller.FILE_ADVENTURE_3RDPERSON_PLAYER; break;
             }
 
-            Stream myStream = null;
-            sfd.InitialDirectory = "c:\\";
-            sfd.Filter = "ead files (*.ead) | *.ead |eap files (*.eap) | *.eap | All files(*.*) | *.* ";
-            sfd.FilterIndex = 2;
-            sfd.RestoreDirectory = true;
-
-            if (sfd.ShowDialog() == DialogResult.OK)
+            if (EditorUtility.DisplayDialog("Seguro?", "Crear una nueva aventura borrará todos los archivos antiguos sin vuelta atrás. Seguro que deseas continuar?", "Sí", "Cancelar"))
             {
+                Controller.Instance.NewAdventure(type);
+                Controller.OpenEditorWindow();
+            }
+        }
 
-                if ((myStream = sfd.OpenFile()) != null)
+        private void old_startNewGame()
+        {
+            int type = -1;
+            switch (selectedGameType)
+            {
+                default:
+                case GameType.FPS: type = Controller.FILE_ADVENTURE_1STPERSON_PLAYER; break;
+                case GameType.TPS: type = Controller.FILE_ADVENTURE_3RDPERSON_PLAYER; break;
+            }
+            
+			var result = EditorUtility.SaveFilePanel ("Select project file", "C:\\", "New project", "ead");
+
+			if (result != "")
+            {
+				FileInfo fileInfo = new FileInfo(result);
+				if (fileInfo.Exists)
                 {
-                    using (myStream)
+                    // Insert code to read the stream here.
+					selectedGameProjectPath = fileInfo.DirectoryName;
+                    if(GameRources.CreateGameProject(selectedGameProjectPath, type))
                     {
-                        // Insert code to read the stream here.
-                        selectedGameProjectPath = sfd.FileName;
-                        if(GameRources.CreateGameProject(selectedGameProjectPath, type))
-                        {
-                            GameRources.LoadGameProject(selectedGameProjectPath);
-                            EditorWindowBase.Init();
-                            EditorWindowBase window = (EditorWindowBase)EditorWindow.GetWindow(typeof(EditorWindowBase));
-                            window.Show();
-                        }
+                        GameRources.LoadGameProject(selectedGameProjectPath);
+                        Controller.OpenEditorWindow();
                     }
-                    myStream.Dispose();
                 }
 
             }
         }
-
-        //public void OnDialogOk(string message, object workingObject = null, object workingObjectSecond = null)
-        //{
-        //    if (workingObject is NewGameInputPopup)
-        //    {
-        //        newGameName = message;
-        //        startNewGame();
-        //    }
-        //}
-
-        //public void OnDialogCanceled(object workingObject = null)
-        //{
-        //}
     }
 }

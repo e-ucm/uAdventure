@@ -258,8 +258,8 @@ namespace uAdventure.Editor
                 {
                     activeArea.setId(newSceneId);
                     controller.replaceIdentifierReferences(oldSceneId, newSceneId);
-                    controller.getIdentifierSummary().deleteActiveAreaId(oldSceneId);
-                    controller.getIdentifierSummary().addActiveAreaId(newSceneId);
+                    controller.IdentifierSummary.deleteActiveAreaId(oldSceneId);
+                    controller.IdentifierSummary.addActiveAreaId(newSceneId);
                     //controller.dataModified( );
                     elementRenamed = true;
                 }

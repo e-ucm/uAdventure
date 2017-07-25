@@ -20,19 +20,12 @@ namespace uAdventure.Core
         public Player() : base(IDENTIFIER)
         {
         }
+
         public override object Clone()
         {
 
             Player p = (Player)base.Clone();
             return p;
         }
-        /*
-        @Override
-        public Object clone() throws CloneNotSupportedException
-        {
-
-            Player p = (Player) super.clone( );
-            return p;
-        }*/
     }
 }

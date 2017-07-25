@@ -98,10 +98,10 @@ namespace uAdventure.Geo
             Dictionary<string, string> objects = new Dictionary<string, string>();
             // TODO extend here
 
-            Controller.getInstance().getSelectedChapterDataControl().getObjects<GeoElement>().ForEach(g => objects.Add("GeoElement/" + g.getId(), g.getId()));
-            Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems().ForEach(i => objects.Add("Item/" + i.getId(), i.getId()));
-            Controller.getInstance().getSelectedChapterDataControl().getAtrezzoList().getAtrezzoList().ForEach(a => objects.Add("Atrezzo/" + a.getId(), a.getId()));
-            Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs().ForEach(npc => objects.Add("Character/" + npc.getId(), npc.getId()));
+            Controller.Instance.SelectedChapterDataControl.getObjects<GeoElement>().ForEach(g => objects.Add("GeoElement/" + g.getId(), g.getId()));
+            Controller.Instance.SelectedChapterDataControl.getItemsList().getItems().ForEach(i => objects.Add("Item/" + i.getId(), i.getId()));
+            Controller.Instance.SelectedChapterDataControl.getAtrezzoList().getAtrezzoList().ForEach(a => objects.Add("Atrezzo/" + a.getId(), a.getId()));
+            Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs().ForEach(npc => objects.Add("Character/" + npc.getId(), npc.getId()));
 
             return objects;
         }
@@ -116,6 +116,7 @@ namespace uAdventure.Geo
             mapElementsReorderableList.list = effect.Steps;
             mapElementsReorderableList.DoLayoutList();
         }
+        public bool Usable { get { return true; } }
 
 
     }

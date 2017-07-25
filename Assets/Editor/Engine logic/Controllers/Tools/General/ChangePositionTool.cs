@@ -129,7 +129,7 @@ namespace uAdventure.Editor
             {
                 l.positionUpdated(oldX, oldY);
             }
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
 

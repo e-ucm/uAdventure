@@ -10,7 +10,7 @@ namespace uAdventure.Editor
         public PlayerWindowDocumentation(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
         {
-            documentation = documentationLast = Controller.getInstance().getCharapterList().getSelectedChapterData().getPlayer().getDocumentation();
+            documentation = documentationLast = Controller.Instance.ChapterList.getSelectedChapterData().getPlayer().getDocumentation();
             if (documentation == null)
                 documentation = documentationLast = "";
         }
@@ -28,7 +28,7 @@ namespace uAdventure.Editor
 
         private void OnDocumentationChanged(string s)
         {
-            Controller.getInstance().getCharapterList().getSelectedChapterData().getPlayer().setDocumentation(s);
+            Controller.Instance.ChapterList.getSelectedChapterData().getPlayer().setDocumentation(s);
             documentationLast = s;
         }
 

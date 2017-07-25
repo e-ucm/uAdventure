@@ -40,15 +40,15 @@ namespace uAdventure.Editor
             if (GameRources.GetInstance().selectedSceneIndex >= 0)
             {
                 backgroundPath =
-                    Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                    Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                         GameRources.GetInstance().selectedSceneIndex].getPreviewBackground();
 
                 foregroundMaskPath =
-                    Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                    Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                         GameRources.GetInstance().selectedSceneIndex].getPreviewForeground();
 
                 musicPath =
-                    Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                    Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                         GameRources.GetInstance().selectedSceneIndex].getPreviewMusic();
             }
 
@@ -81,12 +81,12 @@ namespace uAdventure.Editor
             GUILayout.EndHorizontal();
             scrollPosition = GUILayout.BeginScrollView(scrollPosition);
             // Appearance table
-            for (int i = 0; i < Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[GameRources.GetInstance().selectedSceneIndex].getActiveAreasList().getActiveAreasList().Count; i++)
+            for (int i = 0; i < Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[GameRources.GetInstance().selectedSceneIndex].getActiveAreasList().getActiveAreasList().Count; i++)
             {
                 GUILayout.BeginHorizontal();
-                GUILayout.Label(Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                GUILayout.Label(Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                     GameRources.GetInstance().selectedSceneIndex].getActiveAreasList().getActiveAreasList()[i].getId(), GUILayout.Width(windowWidth * 0.44f));
-                GUILayout.Label(Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[GameRources.GetInstance().selectedSceneIndex].getActiveAreasList().getActiveAreasList()[i].getConditions
+                GUILayout.Label(Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[GameRources.GetInstance().selectedSceneIndex].getActiveAreasList().getActiveAreasList()[i].getConditions
                     ().size().ToString(), GUILayout.Width(windowWidth * 0.44f));
                 GUILayout.EndHorizontal();
             }
@@ -195,19 +195,19 @@ namespace uAdventure.Editor
             {
                 case BaseFileOpenDialog.FileType.SCENE_BACKGROUND:
                     backgroundPath = message;
-                    Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                    Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                        GameRources.GetInstance().selectedSceneIndex].setPreviewBackground(message);
                     if (backgroundPath != null && !backgroundPath.Equals(""))
                         backgroundPreview = AssetsController.getImage(backgroundPath).texture;
                     break;
                 case BaseFileOpenDialog.FileType.SCENE_FOREGROUND:
                     foregroundMaskPath = message;
-                    Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                    Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                        GameRources.GetInstance().selectedSceneIndex].setPreviewForeground(message);
                     break;
                 case BaseFileOpenDialog.FileType.SCENE_MUSIC:
                     musicPath = message;
-                    Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[
+                    Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                        GameRources.GetInstance().selectedSceneIndex].setPreviewMusic(message);
                     break;
                 default:

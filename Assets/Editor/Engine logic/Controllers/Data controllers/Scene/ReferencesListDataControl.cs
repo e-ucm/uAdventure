@@ -111,7 +111,7 @@ namespace uAdventure.Editor
 
             // insert player
             // by default, if player don´t have layer, we give it to him.
-            if (playerImagePath != null && (!Controller.getInstance().isPlayTransparent()) && sceneDataControl.isForcedPlayerLayer())
+            if (playerImagePath != null && (!Controller.Instance.PlayTransparent) && sceneDataControl.isForcedPlayerLayer())
             {
                 int layer;
                 if (sceneDataControl.getPlayerLayer() == Scene.PLAYER_WITHOUT_LAYER)
@@ -175,7 +175,7 @@ namespace uAdventure.Editor
         {
 
             //CHANGE: Now, the image of the player must be taken from
-            return AssetsController.getImage(Controller.getInstance().getPlayerImagePath());
+            return AssetsController.getImage(Controller.Instance.getPlayerImagePath());
             /*if (playerPositionInAllReferences==NO_PLAYER)
             return AssetsController.getImage(Controller.getInstance().getPlayerImagePath());
             else{
@@ -392,7 +392,7 @@ namespace uAdventure.Editor
             if (type == Controller.ITEM_REFERENCE)
             {
                 // Take the list of the items
-                string[] items = controller.getIdentifierSummary().getItemIds();
+                string[] items = controller.IdentifierSummary.getItemIds();
                 // If the list has elements, show the dialog with the options
                 if (items.Length > 0)
                 {
@@ -416,7 +416,7 @@ namespace uAdventure.Editor
 
             if (type == Controller.ATREZZO_REFERENCE)
             {
-                string[] items = controller.getIdentifierSummary().getAtrezzoIds();
+                string[] items = controller.IdentifierSummary.getAtrezzoIds();
 
                 // If the list has elements, show the dialog with the options
                 if (items.Length > 0)
@@ -439,7 +439,7 @@ namespace uAdventure.Editor
 
             if (type == Controller.NPC_REFERENCE)
             {
-                string[] items = controller.getIdentifierSummary().getNPCIds();
+                string[] items = controller.IdentifierSummary.getNPCIds();
                 if (items.Length > 0)
                 {
                     if (selectedItem != null)
@@ -856,7 +856,7 @@ namespace uAdventure.Editor
 
             if (sceneDataControl.isForcedPlayerLayer())
             {
-                playerImagePath = Controller.getInstance().getPlayerImagePath();
+                playerImagePath = Controller.Instance.getPlayerImagePath();
                 ElementContainer ec = new ElementContainer(null, 0, AssetsController.getImage(this.playerImagePath));
                 int layer = insertInOrder(ec, true);
                 reassignLayerAllReferencesDataControl(layer);

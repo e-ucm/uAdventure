@@ -4,7 +4,7 @@ using System.Collections;
 
 namespace uAdventure.Core
 {
-    public abstract class Cutscene : GeneralScene, HasTargetId, Positioned, ICloneable
+    public abstract class Cutscene : GeneralScene, HasTargetId, Positioned, ICloneable, ITypeGroupable
     {
         /**
             * The tag for the video
@@ -290,6 +290,11 @@ namespace uAdventure.Core
             c.effects = (effects != null ? (Effects)effects.Clone() : null);
             c.idTarget = (idTarget != null ? idTarget : null);
             return c; ;
+        }
+
+        public Type GetGroupType()
+        {
+            return typeof(Cutscene);
         }
     }
 }

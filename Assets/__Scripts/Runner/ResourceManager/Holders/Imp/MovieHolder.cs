@@ -154,9 +154,9 @@ namespace uAdventure.Runner
             }
             else
             {
-                MovieTexture video = www.movie as MovieTexture;
+                MovieTexture video = www.GetMovieTexture() as MovieTexture;
                 Debug.Log("Movie loaded");
-                Debug.Log(www.movie);
+                Debug.Log(www.GetMovieTexture());
                 loaded = true;
                 Movie = video;
             }

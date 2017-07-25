@@ -52,17 +52,17 @@ namespace uAdventure.Editor
             // Create the textcolor
             XmlElement textColorNode = doc.CreateElement("textcolor");
             textColorNode.SetAttribute("showsSpeechBubble", (character.getShowsSpeechBubbles() ? "yes" : "no"));
-            textColorNode.SetAttribute("bubbleBkgColor", character.getBubbleBkgColor());
-            textColorNode.SetAttribute("bubbleBorderColor", character.getBubbleBorderColor());
+            textColorNode.SetAttribute("bubbleBkgColor", ColorConverter.ColorToHex(character.getBubbleBkgColor()));
+            textColorNode.SetAttribute("bubbleBorderColor", ColorConverter.ColorToHex(character.getBubbleBorderColor()));
 
             // Create and append the frontcolor
             XmlElement frontColorElement = doc.CreateElement("frontcolor");
-            frontColorElement.SetAttribute("color", character.getTextFrontColor());
+            frontColorElement.SetAttribute("color", ColorConverter.ColorToHex(character.getTextFrontColor()));
             textColorNode.AppendChild(frontColorElement);
 
             // Create and append the bordercolor
             XmlElement borderColoElement = doc.CreateElement("bordercolor");
-            borderColoElement.SetAttribute("color", character.getTextBorderColor());
+            borderColoElement.SetAttribute("color", ColorConverter.ColorToHex(character.getTextBorderColor()));
             textColorNode.AppendChild(borderColoElement);
 
             // Append the textcolor

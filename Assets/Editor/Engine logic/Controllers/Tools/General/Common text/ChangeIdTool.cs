@@ -59,7 +59,7 @@ namespace uAdventure.Editor
             this.oldId = elementWithTargetId.getId();
             this.updateTree = updateTree;
             this.reloadPanel = reloadPanel;
-            this.controller = Controller.getInstance();
+            this.controller = Controller.Instance;
         }
 
 

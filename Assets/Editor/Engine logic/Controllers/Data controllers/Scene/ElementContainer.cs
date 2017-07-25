@@ -52,7 +52,7 @@ namespace uAdventure.Editor
         public void setImage(Sprite image)
         {
 
-            Controller.getInstance().dataModified();
+            Controller.Instance.DataModified();
             this.image = image;
         }
 
@@ -93,7 +93,7 @@ namespace uAdventure.Editor
         public void setLayer(int layer)
         {
 
-            Controller.getInstance().dataModified();
+            Controller.Instance.DataModified();
             if (erdc == null)
                 playerLayer = layer;
             else
@@ -132,24 +132,18 @@ namespace uAdventure.Editor
 
                 if (type == Controller.ITEM_REFERENCE)
                     imagePath =
-                        Controller.getInstance().getSelectedChapterDataControl().getItemsList().getItems()[
-                            Controller.getInstance()
-                                .getSelectedChapterDataControl()
-                                .getItemsList()
+                        Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
+                            Controller.Instance                                .SelectedChapterDataControl                                .getItemsList()
                                 .getItemIndexByID(erdc.getElementId())].getPreviewImage();
                 else if (type == Controller.ATREZZO_REFERENCE)
                     imagePath =
-                        Controller.getInstance().getSelectedChapterDataControl().getAtrezzoList().getAtrezzoList()[
-                            Controller.getInstance()
-                                .getSelectedChapterDataControl()
-                                .getAtrezzoList()
+                        Controller.Instance.SelectedChapterDataControl.getAtrezzoList().getAtrezzoList()[
+                            Controller.Instance                                .SelectedChapterDataControl                                .getAtrezzoList()
                                 .getAtrezzoIndexByID(erdc.getElementId())].getPreviewImage();
                 else if (type == Controller.NPC_REFERENCE)
                     imagePath =
-                        Controller.getInstance().getSelectedChapterDataControl().getNPCsList().getNPCs()[
-                            Controller.getInstance()
-                                .getSelectedChapterDataControl()
-                                .getNPCsList()
+                        Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
+                            Controller.Instance                                .SelectedChapterDataControl                                .getNPCsList()
                                 .getNPCIndexByID(erdc.getElementId())].getPreviewImage();
 
                 if (!string.IsNullOrEmpty(imagePath))
@@ -173,7 +167,7 @@ namespace uAdventure.Editor
 
             if (erdc != null)
             {
-                Controller.getInstance().dataModified();
+                Controller.Instance.DataModified();
                 this.erdc.setVisible(visible);
             }
         }

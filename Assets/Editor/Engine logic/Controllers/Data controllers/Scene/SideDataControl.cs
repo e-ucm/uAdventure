@@ -238,7 +238,7 @@ namespace uAdventure.Editor
 
         public void setLength(int value)
         {
-            Controller.getInstance().addTool(new SetSideLengthTool(side, value));
+            Controller.Instance.addTool(new SetSideLengthTool(side, value));
         }
     }
 }

@@ -31,8 +31,8 @@ namespace uAdventure.Editor
 
         public DeactivateEffectEditor()
         {
-            flags = Controller.getInstance().getVarFlagSummary().getFlags();
-            this.effect = new DeactivateEffect(flags[0]);
+            flags = Controller.Instance.VarFlagSummary.getFlags();
+            this.effect = new DeactivateEffect(flags.Length > 0 ? flags[0] : "");
         }
 
         public void draw()
@@ -50,6 +50,15 @@ namespace uAdventure.Editor
 
         public AbstractEffect Effect { get { return effect; } set { effect = value as DeactivateEffect; } }
         public string EffectName { get { return TC.get("DeactivateEffect.Title"); } }
+
+        public bool Usable
+        {
+            get
+            {
+                return Controller.Instance.VarFlagSummary.getFlagCount() > 0;
+            }
+        }
+
         public EffectEditor clone() { return new DeactivateEffectEditor(); }
 
         public bool manages(AbstractEffect c)

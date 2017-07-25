@@ -52,14 +52,14 @@ namespace uAdventure.Editor
 
             cursorDeleted = adventureData.getCursors()[index];
             adventureData.getCursors().RemoveAt(index);
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
 
         public override bool undoTool()
         {
             adventureData.getCursors().Insert(index, cursorDeleted);
-            Controller.getInstance().updatePanel();
+            Controller.Instance.updatePanel();
             return true;
         }
     }
