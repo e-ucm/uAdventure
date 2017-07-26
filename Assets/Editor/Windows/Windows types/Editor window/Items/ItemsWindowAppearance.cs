@@ -34,63 +34,60 @@ namespace uAdventure.Editor
 
             conditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/conditions-24x24", typeof(Texture2D));
             noConditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/no-conditions-24x24", typeof(Texture2D));
-            
+
             appearanceList = new DataControlList()
             {
                 headerHeight = 20,
-                footerHeight = 20
-            };
-
-            appearanceList.onSelectCallback += (list) =>
-            {
-                if (list.index == -1) list.index = 0;
-                OnAppearanceSelectionChange(list.index);
-            };
-
-            appearanceList.Columns = new List<ColumnList.Column>()
-            {
-                new ColumnList.Column(){
-                    Text = TC.get("Item.LookPanelTitle"),
-                    SizeOptions = new GUILayoutOption[]
-                    {
-                        GUILayout.ExpandWidth(true)
+                footerHeight = 20,
+                Columns = new List<ColumnList.Column>()
+                {
+                    new ColumnList.Column(){
+                        Text = TC.get("Item.LookPanelTitle"),
+                        SizeOptions = new GUILayoutOption[]
+                        {
+                            GUILayout.ExpandWidth(true)
+                        }
+                    },
+                    new ColumnList.Column(){
+                        Text = TC.get("Conditions.Title"),
+                        SizeOptions = new GUILayoutOption[]
+                        {
+                            GUILayout.ExpandWidth(true)
+                        }
                     }
                 },
-                new ColumnList.Column(){
-                    Text = TC.get("Conditions.Title"),
-                    SizeOptions = new GUILayoutOption[]
-                    {
-                        GUILayout.ExpandWidth(true)
-                    }
-                }
-            };
-
-            appearanceList.drawCell += (rect, index, col, isActive, isFocused) =>
-            {
-                var resources = workingItem.getResources()[index];
-                switch (col)
+                drawCell = (rect, index, col, isActive, isFocused) =>
                 {
-                    case 0:
-                        if (index == appearanceList.index)
-                        {
-                            resources.renameElement(EditorGUI.TextField(rect, resources.getName()));
-                        }
-                        else
-                        {
-                            EditorGUI.LabelField(rect, resources.getName());
-                        }
-                        break;
-                    case 1:
-                        if (GUI.Button(rect, resources.getConditions().getBlocksCount() > 0 ? conditionsTex : noConditionsTex))
-                        {
-                            ConditionEditorWindow window =
-                                 (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
-                            window.Init(resources.getConditions());
-                        }
-                        break;
+                    var resources = workingItem.getResources()[index];
+                    switch (col)
+                    {
+                        case 0:
+                            if (index == appearanceList.index)
+                            {
+                                resources.renameElement(EditorGUI.TextField(rect, resources.getName()));
+                            }
+                            else
+                            {
+                                EditorGUI.LabelField(rect, resources.getName());
+                            }
+                            break;
+                        case 1:
+                            if (GUI.Button(rect, resources.getConditions().getBlocksCount() > 0 ? conditionsTex : noConditionsTex))
+                            {
+                                ConditionEditorWindow window =
+                                     (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
+                                window.Init(resources.getConditions());
+                            }
+                            break;
+                    }
+                },
+                onSelectCallback = (list) =>
+                {
+                    if (list.index == -1) list.index = 0;
+                    workingItem.setSelectedResources(list.index);
+                    RefreshPathInformation();
                 }
             };
-
             // File selectors
 
             image = new FileChooser()
@@ -121,8 +118,8 @@ namespace uAdventure.Editor
             if (previousWorkingItem != workingItem)
             {
                 appearanceList.SetData(workingItem, (data) => (data as DataControlWithResources).getResources().ConvertAll(r => (DataControl)r));
-                appearanceList.index = 0;
-                OnAppearanceSelectionChange(0);
+                appearanceList.index = workingItem.getSelectedResources();
+                RefreshPathInformation();
             }
 
             if (workingItem == null)
@@ -176,12 +173,6 @@ namespace uAdventure.Editor
             }
 
             EditorGUILayout.EndVertical();
-        }
-
-
-        private void OnAppearanceSelectionChange(int i)
-        {
-            RefreshPathInformation();
         }
 
         private void RefreshPathInformation()

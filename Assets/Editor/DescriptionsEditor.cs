@@ -39,7 +39,7 @@ public class DescriptionsEditor : Editor {
 
         descriptionsList = new DataControlList()
         {
-            elementHeight = 25,
+            elementHeight = 20,
             Columns = new List<ColumnList.Column>()
             {
                 new ColumnList.Column()

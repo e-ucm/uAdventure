@@ -4,6 +4,7 @@ using uAdventure.Core;
 using System;
 using UnityEditorInternal;
 using System.Collections.Generic;
+using UnityEditor;
 
 namespace uAdventure.Editor
 {
@@ -48,26 +49,17 @@ namespace uAdventure.Editor
                 /**
                  UPPER MENU
                 */
+                List<KeyValuePair<string, SetItemsWindowType>> tabs = new List<KeyValuePair<string, SetItemsWindowType>>()
+                {
+                    new KeyValuePair<string, SetItemsWindowType>(TC.get("Atrezzo.LookPanelTitle"), SetItemsWindowType.Appearance),
+                    new KeyValuePair<string, SetItemsWindowType>(TC.get("Atrezzo.DocPanelTitle"), SetItemsWindowType.Documentation),
+                };
+
                 GUILayout.BeginHorizontal();
-                if (openedWindow == SetItemsWindowType.Appearance)
-                    GUI.skin = selectedButtonSkin;
-                if (GUILayout.Button(TC.get("Atrezzo.LookPanelTitle")))
-                {
-                    OnWindowTypeChanged(SetItemsWindowType.Appearance);
-                }
-                if (openedWindow == SetItemsWindowType.Appearance)
-                    GUI.skin = defaultSkin;
-
-                if (openedWindow == SetItemsWindowType.Documentation)
-                    GUI.skin = selectedButtonSkin;
-                if (GUILayout.Button(TC.get("Atrezzo.DocPanelTitle")))
-                {
-                    OnWindowTypeChanged(SetItemsWindowType.Documentation);
-                }
-                if (openedWindow == SetItemsWindowType.Documentation)
-                    GUI.skin = defaultSkin;
+                GUILayout.FlexibleSpace();
+                openedWindow = tabs[GUILayout.Toolbar(tabs.FindIndex(t => t.Value == openedWindow), tabs.ConvertAll(t => t.Key).ToArray(), GUILayout.ExpandWidth(false))].Value;
+                GUILayout.FlexibleSpace();
                 GUILayout.EndHorizontal();
-
                 switch (openedWindow)
                 {
                     case SetItemsWindowType.Appearance:
