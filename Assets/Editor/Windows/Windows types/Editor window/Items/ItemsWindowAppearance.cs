@@ -47,32 +47,47 @@ namespace uAdventure.Editor
                 OnAppearanceSelectionChange(list.index);
             };
 
-            appearanceList.drawHeaderCallback += (rect) =>
+            appearanceList.Columns = new List<ColumnList.Column>()
             {
-                EditorGUI.LabelField(new Rect(rect.x, rect.y, rect.width / 2f, rect.height), TC.get("Item.LookPanelTitle"));
-                EditorGUI.LabelField(new Rect(rect.x + rect.width / 2f, rect.y, rect.width / 2f, rect.height), TC.get("Conditions.Title"));
+                new ColumnList.Column(){
+                    Text = TC.get("Item.LookPanelTitle"),
+                    SizeOptions = new GUILayoutOption[]
+                    {
+                        GUILayout.ExpandWidth(true)
+                    }
+                },
+                new ColumnList.Column(){
+                    Text = TC.get("Conditions.Title"),
+                    SizeOptions = new GUILayoutOption[]
+                    {
+                        GUILayout.ExpandWidth(true)
+                    }
+                }
             };
 
-            appearanceList.drawElementCallback += (rect, index, isActive, isFocused) =>
+            appearanceList.drawCell += (rect, index, col, isActive, isFocused) =>
             {
                 var resources = workingItem.getResources()[index];
-                var leftRect = new Rect(rect.x, rect.y, rect.width / 2f, rect.height);
-                var rightRect = new Rect(rect.x + rect.width / 2f, rect.y, rect.width / 2f, rect.height);
-                
-                if (index == appearanceList.index)
+                switch (col)
                 {
-                    resources.renameElement(EditorGUI.TextField(leftRect, resources.getName()));
-                }
-                else
-                {
-                    EditorGUI.LabelField(leftRect, resources.getName());
-                }
-
-                if (GUI.Button(rightRect, resources.getConditions().getBlocksCount() > 0 ? conditionsTex : noConditionsTex))
-                {
-                    ConditionEditorWindow window =
-                         (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
-                    window.Init(resources.getConditions());
+                    case 0:
+                        if (index == appearanceList.index)
+                        {
+                            resources.renameElement(EditorGUI.TextField(rect, resources.getName()));
+                        }
+                        else
+                        {
+                            EditorGUI.LabelField(rect, resources.getName());
+                        }
+                        break;
+                    case 1:
+                        if (GUI.Button(rect, resources.getConditions().getBlocksCount() > 0 ? conditionsTex : noConditionsTex))
+                        {
+                            ConditionEditorWindow window =
+                                 (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
+                            window.Init(resources.getConditions());
+                        }
+                        break;
                 }
             };
 

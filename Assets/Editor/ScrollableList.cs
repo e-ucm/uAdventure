@@ -116,7 +116,7 @@ public class ScrollableList
 
     private Vector2 scrollPos;
 
-    public void DoList(float height)
+    public virtual void DoList(float height)
     {
         UpdateCallbacks(reorderableList);
 

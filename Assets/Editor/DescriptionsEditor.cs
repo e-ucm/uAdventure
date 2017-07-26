@@ -40,26 +40,40 @@ public class DescriptionsEditor : Editor {
         descriptionsList = new DataControlList()
         {
             elementHeight = 25,
-            drawElementCallback = (rect, index, isActive, isFocused) =>
+            Columns = new List<ColumnList.Column>()
             {
-                var leftRect = new Rect(rect.x, rect.y, rect.width / 2f, rect.height);
-                var rightRect = new Rect(rect.x + rect.width / 2f, rect.y, rect.width / 2f, rect.height);
-
+                new ColumnList.Column()
+                {
+                    Text = TC.get("Item.Name")
+                },
+                new ColumnList.Column()
+                {
+                    Text = TC.get("Conditions.Title")
+                }
+            },
+            drawCell = (rect, index, column, isActive, isFocused) =>
+            {
                 var description = descriptions.getDescriptionController(index);
-                if (index == descriptionsList.index)
+                switch (column)
                 {
-                    description.renameElement(EditorGUI.TextField(leftRect, description.getName()));
-                }
-                else
-                {
-                    EditorGUI.LabelField(leftRect, description.getName());
-                }
-
-                if (GUI.Button(rightRect, description.getConditionsController().getBlocksCount() > 0 ? conditionsTex : noConditionsTex))
-                {
-                    ConditionEditorWindow window =
-                         (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
-                    window.Init(description.getConditionsController());
+                    case 0:
+                        if (index == descriptionsList.index)
+                        {
+                            description.renameElement(EditorGUI.TextField(rect, description.getName()));
+                        }
+                        else
+                        {
+                            EditorGUI.LabelField(rect, description.getName());
+                        }
+                        break;
+                    case 1:
+                        if (GUI.Button(rect, description.getConditionsController().getBlocksCount() > 0 ? conditionsTex : noConditionsTex))
+                        {
+                            ConditionEditorWindow window =
+                                 (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
+                            window.Init(description.getConditionsController());
+                        }
+                        break;
                 }
             },
             onSelectCallback = (list) =>
