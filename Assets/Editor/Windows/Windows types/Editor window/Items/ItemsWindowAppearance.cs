@@ -24,9 +24,7 @@ namespace uAdventure.Editor
         private FileChooser image, icon, image_over;
 
         private ItemDataControl workingItem;
-        private DataControlList appearanceList;
-        
-        private static List<ResourcesDataControl> emptyList;
+        private AppearanceEditor appearanceEditor;
 
         public ItemsWindowAppearance(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
@@ -35,59 +33,9 @@ namespace uAdventure.Editor
             conditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/conditions-24x24", typeof(Texture2D));
             noConditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/no-conditions-24x24", typeof(Texture2D));
 
-            appearanceList = new DataControlList()
-            {
-                headerHeight = 20,
-                footerHeight = 20,
-                Columns = new List<ColumnList.Column>()
-                {
-                    new ColumnList.Column(){
-                        Text = TC.get("Item.LookPanelTitle"),
-                        SizeOptions = new GUILayoutOption[]
-                        {
-                            GUILayout.ExpandWidth(true)
-                        }
-                    },
-                    new ColumnList.Column(){
-                        Text = TC.get("Conditions.Title"),
-                        SizeOptions = new GUILayoutOption[]
-                        {
-                            GUILayout.ExpandWidth(true)
-                        }
-                    }
-                },
-                drawCell = (rect, index, col, isActive, isFocused) =>
-                {
-                    var resources = workingItem.getResources()[index];
-                    switch (col)
-                    {
-                        case 0:
-                            if (index == appearanceList.index)
-                            {
-                                resources.renameElement(EditorGUI.TextField(rect, resources.getName()));
-                            }
-                            else
-                            {
-                                EditorGUI.LabelField(rect, resources.getName());
-                            }
-                            break;
-                        case 1:
-                            if (GUI.Button(rect, resources.getConditions().getBlocksCount() > 0 ? conditionsTex : noConditionsTex))
-                            {
-                                ConditionEditorWindow window =
-                                     (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
-                                window.Init(resources.getConditions());
-                            }
-                            break;
-                    }
-                },
-                onSelectCallback = (list) =>
-                {
-                    if (list.index == -1) list.index = 0;
-                    workingItem.setSelectedResources(list.index);
-                    RefreshPathInformation();
-                }
-            };
+            appearanceEditor = ScriptableObject.CreateInstance<AppearanceEditor>();
+            appearanceEditor.height = 160;
+            appearanceEditor.onAppearanceSelected = RefreshPathInformation;
             // File selectors
 
             image = new FileChooser()
@@ -114,26 +62,10 @@ namespace uAdventure.Editor
         {
             var previousWorkingItem = workingItem;
             workingItem = Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[GameRources.GetInstance().selectedItemIndex];
-            
-            if (previousWorkingItem != workingItem)
-            {
-                appearanceList.SetData(workingItem, (data) => (data as DataControlWithResources).getResources().ConvertAll(r => (DataControl)r));
-                appearanceList.index = workingItem.getSelectedResources();
-                RefreshPathInformation();
-            }
 
-            if (workingItem == null)
-            {
-                appearanceList.list = emptyList;
-                return;
-            }
-            else
-            {
-                appearanceList.list = workingItem.getResources();
-            }
-            
             // Appearance table
-            appearanceList.DoList(200f);
+            appearanceEditor.Data = workingItem;
+            appearanceEditor.OnInspectorGUI();
 
             GUILayout.Space(10);
 
@@ -153,11 +85,12 @@ namespace uAdventure.Editor
 
             if (EditorGUI.EndChangeCheck())
             {
-                RefreshPathInformation();
+                RefreshPathInformation(workingItem);
             }
 
             GUILayout.Space(10);
 
+            GUILayout.Label(TC.get("ImageAssets.Preview"), "preToolbar", GUILayout.ExpandWidth(true));
             var rect = EditorGUILayout.BeginVertical("preBackground", GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
             {
                 GUILayout.BeginHorizontal();
@@ -175,28 +108,17 @@ namespace uAdventure.Editor
             EditorGUILayout.EndVertical();
         }
 
-        private void RefreshPathInformation()
+        private void RefreshPathInformation(DataControlWithResources dataControl)
         {
-            Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
-                      GameRources.GetInstance().selectedItemIndex].setSelectedResources(appearanceList.index);
+            var item = dataControl as ItemDataControl;
 
-            imagePath =
-                  Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
-                      GameRources.GetInstance().selectedItemIndex].getPreviewImage();
+            imagePath           = item.getPreviewImage();
+            inventoryIconPath   = item.getIconImage();
+            imageWhenOverPath   = item.getMouseOverImage();
 
-            imageTex = string.IsNullOrEmpty(imagePath) ? null : AssetsController.getImage(imagePath).texture;
-
-            inventoryIconPath =
-                Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
-                    GameRources.GetInstance().selectedItemIndex].getIconImage();
-
-            iconTex = string.IsNullOrEmpty(inventoryIconPath) ? null :AssetsController.getImage(inventoryIconPath).texture;
-
-            imageWhenOverPath =
-                Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
-                    GameRources.GetInstance().selectedItemIndex].getMouseOverImage();
-            
-            imageOverTex = string.IsNullOrEmpty(imageWhenOverPath) ? null : AssetsController.getImage(imageWhenOverPath).texture;
+            imageTex        = string.IsNullOrEmpty(imagePath) ? null : AssetsController.getImage(imagePath).texture;
+            iconTex         = string.IsNullOrEmpty(inventoryIconPath) ? null :AssetsController.getImage(inventoryIconPath).texture;
+            imageOverTex    = string.IsNullOrEmpty(imageWhenOverPath) ? null : AssetsController.getImage(imageWhenOverPath).texture;
         }
     }
 }

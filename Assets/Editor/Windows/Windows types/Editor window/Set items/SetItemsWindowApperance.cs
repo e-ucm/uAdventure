@@ -20,7 +20,7 @@ namespace uAdventure.Editor
         private FileChooser image;
 
         private AtrezzoDataControl workingAtrezzo;
-        private DataControlList appearanceList;
+        private AppearanceEditor appearanceEditor;
 
         private static List<ResourcesDataControl> emptyList;
 
@@ -31,59 +31,10 @@ namespace uAdventure.Editor
             conditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/conditions-24x24", typeof(Texture2D));
             noConditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/no-conditions-24x24", typeof(Texture2D));
 
-            appearanceList = new DataControlList()
-            {
-                headerHeight = 20,
-                footerHeight = 20,
-                Columns = new List<ColumnList.Column>()
-                {
-                    new ColumnList.Column(){
-                        Text = TC.get("Item.LookPanelTitle"),
-                        SizeOptions = new GUILayoutOption[]
-                        {
-                            GUILayout.ExpandWidth(true)
-                        }
-                    },
-                    new ColumnList.Column(){
-                        Text = TC.get("Conditions.Title"),
-                        SizeOptions = new GUILayoutOption[]
-                        {
-                            GUILayout.ExpandWidth(true)
-                        }
-                    }
-                },
-                drawCell = (rect, index, col, isActive, isFocused) =>
-                {
-                    var resources = workingAtrezzo.getResources()[index];
-                    switch (col)
-                    {
-                        case 0:
-                            if (index == appearanceList.index)
-                            {
-                                resources.renameElement(EditorGUI.TextField(rect, resources.getName()));
-                            }
-                            else
-                            {
-                                EditorGUI.LabelField(rect, resources.getName());
-                            }
-                            break;
-                        case 1:
-                            if (GUI.Button(rect, resources.getConditions().getBlocksCount() > 0 ? conditionsTex : noConditionsTex))
-                            {
-                                ConditionEditorWindow window =
-                                     (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
-                                window.Init(resources.getConditions());
-                            }
-                            break;
-                    }
-                },
-                onSelectCallback = (list) =>
-                {
-                    if (list.index == -1) list.index = 0;
-                    workingAtrezzo.setSelectedResources(list.index);
-                    RefreshPathInformation();
-                }
-            };
+            appearanceEditor = ScriptableObject.CreateInstance<AppearanceEditor>();
+            appearanceEditor.height = 160;
+            appearanceEditor.onAppearanceSelected = RefreshPathInformation;
+
             // File selectors
 
             image = new FileChooser()
@@ -99,25 +50,9 @@ namespace uAdventure.Editor
             var previousWorkingItem = workingAtrezzo;
             workingAtrezzo = Controller.Instance.SelectedChapterDataControl.getAtrezzoList().getAtrezzoList()[GameRources.GetInstance().selectedSetItemIndex];
 
-            if (previousWorkingItem != workingAtrezzo)
-            {
-                appearanceList.SetData(workingAtrezzo, (data) => (data as DataControlWithResources).getResources().ConvertAll(r => (DataControl)r));
-                appearanceList.index = workingAtrezzo.getSelectedResources();
-                RefreshPathInformation();
-            }
-
-            if (workingAtrezzo == null)
-            {
-                appearanceList.list = emptyList;
-                return;
-            }
-            else
-            {
-                appearanceList.list = workingAtrezzo.getResources();
-            }
-
             // Appearance table
-            appearanceList.DoList(200f);
+            appearanceEditor.Data = workingAtrezzo;
+            appearanceEditor.OnInspectorGUI();
 
             GUILayout.Space(10);
 
@@ -130,12 +65,11 @@ namespace uAdventure.Editor
 
             if (EditorGUI.EndChangeCheck())
             {
-                RefreshPathInformation();
+                RefreshPathInformation(workingAtrezzo);
             }
 
             GUILayout.Space(10);
-
-            GUILayout.Label(TC.get("ImageAssets.Preview"));
+            GUILayout.Label(TC.get("ImageAssets.Preview"), "preToolbar", GUILayout.ExpandWidth(true));
             var rect = EditorGUILayout.BeginVertical("preBackground", GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
             {
                 GUILayout.BeginHorizontal();
@@ -151,9 +85,9 @@ namespace uAdventure.Editor
             EditorGUILayout.EndVertical();
         }
 
-        private void RefreshPathInformation()
+        private void RefreshPathInformation(DataControlWithResources data)
         {
-            var imagePath = workingAtrezzo.getPreviewImage();
+            var imagePath = (data as AtrezzoDataControl).getPreviewImage();
             imageTex = string.IsNullOrEmpty(imagePath) ? null : AssetsController.getImage(imagePath).texture;
         }
     }
