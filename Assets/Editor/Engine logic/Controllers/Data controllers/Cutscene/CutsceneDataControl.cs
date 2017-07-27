@@ -165,7 +165,6 @@ namespace uAdventure.Editor
             return true;
         }
 
-
         public override bool canBeMoved()
         {
 
@@ -463,6 +462,16 @@ namespace uAdventure.Editor
         public void setPathToVideo(string path)
         {
             resourcesDataControlList[selectedResources].addAsset("video", path.Substring(0, path.LastIndexOf(".mpg")));
+        }
+
+        internal string getPathToMusic()
+        {
+            return resourcesDataControlList[selectedResources].getAssetPath("music");
+        }
+
+        public void setPathToMusic(string path)
+        {
+            resourcesDataControlList[selectedResources].addAsset("music", path);
         }
 
 
