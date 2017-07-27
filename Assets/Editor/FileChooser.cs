@@ -131,8 +131,8 @@ public class FileChooser : DialogReceiverInterface
 
     }
 
-    public void OnDialogOk(string message, object workingObject = null, object workingObjectSecond = null)
+    public virtual void OnDialogOk(string message, object workingObject = null, object workingObjectSecond = null)
     {
-        Path = message;
+        Path = message;        
     }
 }
