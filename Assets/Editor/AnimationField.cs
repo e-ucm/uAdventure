@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using uAdventure.Core;
 using uAdventure.Editor;
 using UnityEditor;
@@ -10,14 +8,21 @@ public class AnimationField : FileChooser {
 
     public override void DoLayout(params GUILayoutOption[] options)
     {
+        var initialPath = Path;
         var rect = EditorGUILayout.BeginHorizontal(options);
         {
+            if (!string.IsNullOrEmpty(newFilePath))
+            {
+                Path = newFilePath;
+                newFilePath = string.Empty;
+            }
             drawPath();
             drawSelect();
             drawView();
             drawClear();
         }
         EditorGUILayout.EndHorizontal();
+        GUI.changed = initialPath != Path;
     }
 
     protected void drawView()
@@ -37,11 +42,25 @@ public class AnimationField : FileChooser {
         }
     }
 
+    string newFilePath = string.Empty;
     public override void OnDialogOk(string message, object workingObject = null, object workingObjectSecond = null)
     {
-        base.OnDialogOk(message, workingObject, workingObjectSecond);
-        OnSlidesceneCreated(message);
-        EditCutscene();
+
+        if(workingObject is CutsceneNameInputPopup)
+        {
+            newFilePath = message;
+            OnSlidesceneCreated(message);
+            EditCutscene();
+        }
+        else if(workingObject is CutsceneSlidesEditor)
+        {
+
+        }
+        else
+        {
+            base.OnDialogOk(message, workingObject, workingObjectSecond);
+            EditCutscene();
+        }
     }
 
     void OnSlidesceneCreated(string val)
@@ -49,6 +68,7 @@ public class AnimationField : FileChooser {
         uAdventure.Core.Animation newAnim = new uAdventure.Core.Animation(val.Split('/').Last(), new EditorImageLoader());
         newAnim.getFrame(0).setUri("assets/special/EmptyAnimation_01.png");
         AnimationWriter.writeAnimation(val, newAnim);
+        Path = val;
     }
 
     void EditCutscene()

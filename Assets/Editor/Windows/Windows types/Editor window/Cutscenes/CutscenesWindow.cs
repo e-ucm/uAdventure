@@ -56,37 +56,20 @@ namespace uAdventure.Editor
             if (isConcreteItemVisible)
             {
                 /**
-                UPPER MENU
+                 UPPER MENU
                 */
+                List<KeyValuePair<string, CutscenesWindowType>> tabs = new List<KeyValuePair<string, CutscenesWindowType>>()
+                {
+                    new KeyValuePair<string, CutscenesWindowType>(TC.get("Cutscene.App"), CutscenesWindowType.Appearance),
+                    new KeyValuePair<string, CutscenesWindowType>(TC.get("Cutscene.Doc"), CutscenesWindowType.Documentation),
+                    new KeyValuePair<string, CutscenesWindowType>(TC.get("Cutscene.CutsceneEnd"), CutscenesWindowType.EndConfiguration)
+                };
+
                 GUILayout.BeginHorizontal();
-                if (openedWindow == CutscenesWindowType.Appearance)
-                    GUI.skin = selectedButtonSkin;
-                if (GUILayout.Button(TC.get("Cutscene.App")))
-                {
-                    OnWindowTypeChanged(CutscenesWindowType.Appearance);
-                }
-                if (openedWindow == CutscenesWindowType.Appearance)
-                    GUI.skin = defaultSkin;
-
-                if (openedWindow == CutscenesWindowType.Documentation)
-                    GUI.skin = selectedButtonSkin;
-                if (GUILayout.Button(TC.get("Cutscene.Doc")))
-                {
-                    OnWindowTypeChanged(CutscenesWindowType.Documentation);
-                }
-                if (openedWindow == CutscenesWindowType.Documentation)
-                    GUI.skin = defaultSkin;
-
-                if (openedWindow == CutscenesWindowType.EndConfiguration)
-                    GUI.skin = selectedButtonSkin;
-                if (GUILayout.Button(TC.get("Cutscene.CutsceneEnd")))
-                {
-                    OnWindowTypeChanged(CutscenesWindowType.EndConfiguration);
-                }
-                if (openedWindow == CutscenesWindowType.EndConfiguration)
-                    GUI.skin = defaultSkin;
+                GUILayout.FlexibleSpace();
+                openedWindow = tabs[GUILayout.Toolbar(tabs.FindIndex(t => t.Value == openedWindow), tabs.ConvertAll(t => t.Key).ToArray(), GUILayout.ExpandWidth(false))].Value;
+                GUILayout.FlexibleSpace();
                 GUILayout.EndHorizontal();
-
                 switch (openedWindow)
                 {
                     case CutscenesWindowType.Appearance:

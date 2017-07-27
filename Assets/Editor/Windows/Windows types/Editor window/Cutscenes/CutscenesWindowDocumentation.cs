@@ -9,50 +9,39 @@ namespace uAdventure.Editor
 {
     public class CutscenesWindowDocumentation : LayoutWindow
     {
-        private string descriptionOfCutscene, nameOfCutscene, descriptionOfCutsceneLast, nameOfCutsceneLast, sceneclass = "", sceneclasslast, scenetype = "", scenetypelast;
         private CutsceneDataControl current;
 
         public CutscenesWindowDocumentation(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
         {
-            string doc = "", name = "", sclass = "", stype = "";
-
-            
-            descriptionOfCutscene = descriptionOfCutsceneLast = doc;
-            nameOfCutscene = nameOfCutsceneLast = name;
-            sceneclass = sceneclasslast = sclass;
-            scenetype = scenetypelast = stype;
-            
         }
 
 
         public override void Draw(int aID)
         {
             current = Controller.Instance.ChapterList.getSelectedChapterDataControl().getCutscenesList().getCutscenes()[GameRources.GetInstance().selectedCutsceneIndex];
-
-            sceneclasslast = current.getXApiClass();
-            sceneclass = EditorGUILayout.TextField(new GUIContent("xAPI Class"), sceneclasslast);
-            if (!sceneclass.Equals(sceneclasslast))
+            
+            EditorGUI.BeginChangeCheck();
+            var sceneclass = EditorGUILayout.TextField(new GUIContent("xAPI Class"), current.getXApiClass());
+            if (EditorGUI.EndChangeCheck())
                 current.setXApiClass(sceneclass);
-
-            scenetypelast = current.getXApiType();
-            scenetype = EditorGUILayout.TextField(new GUIContent("xAPI Type"), scenetypelast);
-            if (!scenetype.Equals(scenetypelast))
+            
+            EditorGUI.BeginChangeCheck();
+            var scenetype = EditorGUILayout.TextField(new GUIContent("xAPI Type"), current.getXApiType());
+            if (EditorGUI.EndChangeCheck())
                 current.setXApiType(scenetype);
 
-            GUILayout.Label(TC.get("Cutscene.Documentation"));
-            descriptionOfCutsceneLast = current.getDocumentation();
-            descriptionOfCutscene = GUILayout.TextArea(descriptionOfCutsceneLast, GUILayout.MinHeight(0.4f * m_Rect.height));
-            if (!descriptionOfCutscene.Equals(descriptionOfCutsceneLast))
-                current.setDocumentation(descriptionOfCutscene);
-
-            GUILayout.Space(30);
-
-            GUILayout.Label(TC.get("Cutscene.Name"));
-            nameOfCutsceneLast = current.getName();
-            nameOfCutscene = GUILayout.TextField(nameOfCutsceneLast);
-            if (!nameOfCutscene.Equals(nameOfCutsceneLast))
+            EditorGUI.BeginChangeCheck();
+            var nameOfCutscene = EditorGUILayout.TextField(TC.get("Cutscene.Name"), current.getName());
+            if (EditorGUI.EndChangeCheck())
                 current.setName(nameOfCutscene);
+
+            EditorGUI.BeginChangeCheck();
+            EditorGUILayout.PrefixLabel(TC.get("Cutscene.Documentation"));
+            var description = EditorGUILayout.TextArea(current.getDocumentation(), GUILayout.ExpandHeight(true));
+            if(EditorGUI.EndChangeCheck())
+                current.setDocumentation(description);
+
         }
     }
 }
