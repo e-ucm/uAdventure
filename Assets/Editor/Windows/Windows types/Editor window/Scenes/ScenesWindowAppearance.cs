@@ -1,223 +1,124 @@
 ﻿using UnityEngine;
 
 using uAdventure.Core;
+using UnityEditor;
+using System;
+using System.Linq;
 
 namespace uAdventure.Editor
 {
-    public class ScenesWindowAppearance : LayoutWindow, DialogReceiverInterface
+    public class ScenesWindowAppearance : LayoutWindow
     {
-        private enum AssetType
-        {
-            BACKGROUND,
-            FOREGROUND,
-            MUSIC
-        };
+        private SceneDataControl workingScene;
 
-        private Texture2D addTexture = null;
-        private Texture2D duplicateImg = null;
-        private Texture2D clearImg = null;
+        private Texture2D backgroundPreview = null, foregroundPreview = null;
 
-        private Texture2D backgroundPreview = null;
-        private static Rect previewRect, appearanceTableRect, propertiesTable, rightPanelRect;
-
-        private static GUISkin defaultSkin;
-        private static GUISkin noBackgroundSkin;
-
-        private Vector2 scrollPosition;
-
-        private string backgroundPath = "";
-        private string foregroundMaskPath = "";
-        private string musicPath = "";
+        private AppearanceEditor appearanceEditor;
+        private FileChooser background, foreground, music;
 
         public ScenesWindowAppearance(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
         {
-            clearImg = (Texture2D)Resources.Load("EAdventureData/img/icons/deleteContent", typeof(Texture2D));
-            addTexture = (Texture2D)Resources.Load("EAdventureData/img/icons/addNode", typeof(Texture2D));
-            duplicateImg = (Texture2D)Resources.Load("EAdventureData/img/icons/duplicateNode", typeof(Texture2D));
-            
+            appearanceEditor = ScriptableObject.CreateInstance<AppearanceEditor>();
+            appearanceEditor.height = 160;
+            appearanceEditor.onAppearanceSelected = RefreshResources;
 
-            if (GameRources.GetInstance().selectedSceneIndex >= 0)
+            // Fields
+            background = new FileChooser()
             {
-                backgroundPath =
-                    Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                        GameRources.GetInstance().selectedSceneIndex].getPreviewBackground();
+                Label = TC.get("Resources.DescriptionSceneBackground"),
+                FileType = BaseFileOpenDialog.FileType.SCENE_BACKGROUND
+            };
 
-                foregroundMaskPath =
-                    Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                        GameRources.GetInstance().selectedSceneIndex].getPreviewForeground();
-
-                musicPath =
-                    Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                        GameRources.GetInstance().selectedSceneIndex].getPreviewMusic();
-            }
-
-            //foregroundMaskPath = Controller.getInstance().getSelectedChapterDataControl().getScenesList().getScenes()[GameRources.GetInstance().selectedSceneIndex].
-            //musicPath = "";
-            if (backgroundPath != null && !backgroundPath.Equals(""))
+            foreground = new FileChooser()
             {
-                backgroundPreview = AssetsController.getImage(backgroundPath).texture;
-            }
+                Label = TC.get("Resources.DescriptionSceneForeground"),
+                FileType = BaseFileOpenDialog.FileType.SCENE_FOREGROUND
+            };
 
-            noBackgroundSkin = (GUISkin)Resources.Load("Editor/EditorNoBackgroundSkin", typeof(GUISkin));
-
+            music = new FileChooser()
+            {
+                Label = TC.get("Resources.DescriptionSceneMusic"),
+                FileType = BaseFileOpenDialog.FileType.SCENE_MUSIC
+            };
         }
 
 
         public override void Draw(int aID)
         {
-            var windowWidth = m_Rect.width;
-            var windowHeight = m_Rect.height;
 
-            appearanceTableRect = new Rect(0f, 0.1f * windowHeight, 0.9f * windowWidth, 0.15f * windowHeight);
-            rightPanelRect = new Rect(0.9f * windowWidth, 0.1f * windowHeight, 0.08f * windowWidth, 0.15f * windowHeight);
-            propertiesTable = new Rect(0f, 0.25f * windowHeight, windowWidth, 0.25f * windowHeight);
-            previewRect = new Rect(0f, 0.5f * windowHeight, windowWidth, windowHeight * 0.45f);
+            var previousWorkingItem = workingScene;
+            workingScene = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[GameRources.GetInstance().selectedSceneIndex];
 
-            GUILayout.BeginArea(appearanceTableRect);
-            GUILayout.BeginHorizontal();
-            GUILayout.Box(TC.get("Scene.LookPanelTitle"), GUILayout.Width(windowWidth * 0.44f));
-            GUILayout.Box(TC.get("Conditions.Title"), GUILayout.Width(windowWidth * 0.44f));
-            GUILayout.EndHorizontal();
-            scrollPosition = GUILayout.BeginScrollView(scrollPosition);
             // Appearance table
-            for (int i = 0; i < Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[GameRources.GetInstance().selectedSceneIndex].getActiveAreasList().getActiveAreasList().Count; i++)
+            appearanceEditor.Data = workingScene;
+            appearanceEditor.OnInspectorGUI();
+
+            GUILayout.Space(10);
+
+            EditorGUI.BeginChangeCheck();
+            background.Path = workingScene.getPreviewBackground();
+            background.DoLayout();
+            if (EditorGUI.EndChangeCheck())
+            {
+                workingScene.setPreviewBackground(background.Path);
+                RefreshResources(workingScene);
+            }
+
+            EditorGUI.BeginChangeCheck();
+            foreground.Path = workingScene.getPreviewForeground();
+            foreground.DoLayout();
+            if (EditorGUI.EndChangeCheck())
+            {
+                workingScene.setPreviewForeground(foreground.Path);
+                RefreshResources(workingScene);
+            }
+
+            EditorGUI.BeginChangeCheck();
+            music.Path = workingScene.getPreviewMusic();
+            music.DoLayout();
+            if (EditorGUI.EndChangeCheck())
+                workingScene.setPreviewMusic(music.Path);
+
+            GUILayout.Space(10);
+            GUILayout.Label(TC.get("ImageAssets.Preview"), "preToolbar", GUILayout.ExpandWidth(true));
+            var rect = EditorGUILayout.BeginVertical("preBackground", GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
             {
                 GUILayout.BeginHorizontal();
-                GUILayout.Label(Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                    GameRources.GetInstance().selectedSceneIndex].getActiveAreasList().getActiveAreasList()[i].getId(), GUILayout.Width(windowWidth * 0.44f));
-                GUILayout.Label(Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[GameRources.GetInstance().selectedSceneIndex].getActiveAreasList().getActiveAreasList()[i].getConditions
-                    ().size().ToString(), GUILayout.Width(windowWidth * 0.44f));
+                {
+                    rect.x += 30; rect.width -= 60;
+                    rect.y += 30; rect.height -= 60;
+
+                    if (backgroundPreview)
+                        GUI.DrawTexture(rect, backgroundPreview, ScaleMode.ScaleToFit);
+                    if (foregroundPreview)
+                        GUI.DrawTexture(rect, foregroundPreview, ScaleMode.ScaleToFit);
+                }
                 GUILayout.EndHorizontal();
             }
-            GUILayout.EndScrollView();
-            GUILayout.EndArea();
 
-            /*
-            * Right panel
-            */
-            GUILayout.BeginArea(rightPanelRect);
-            GUI.skin = noBackgroundSkin;
-            if (GUILayout.Button(addTexture, GUILayout.MaxWidth(0.08f * windowWidth)))
-            {
-                Debug.Log("ADD");
-            }
-            if (GUILayout.Button(duplicateImg, GUILayout.MaxWidth(0.08f * windowWidth)))
-            {
-                Debug.Log("Duplicate");
-            }
-            if (GUILayout.Button(clearImg, GUILayout.MaxWidth(0.08f * windowWidth)))
-            {
-                Debug.Log("Clear");
-            }
-            GUI.skin = defaultSkin;
-            GUILayout.EndArea();
-
-            GUILayout.Space(30);
-
-            GUILayout.BeginArea(propertiesTable);
-            // Background chooser
-            GUILayout.Label(TC.get("Background image of the scene"));
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button(clearImg, GUILayout.Width(0.1f * windowWidth)))
-            {
-                backgroundPath = "";
-            }
-            GUILayout.Box(backgroundPath, GUILayout.Width(0.7f * windowWidth));
-            if (GUILayout.Button(TC.get("Buttons.Select"), GUILayout.Width(0.19f * windowWidth)))
-            {
-                ShowAssetChooser(AssetType.BACKGROUND);
-            }
-            GUILayout.EndHorizontal();
-
-            // Foreground chooser
-            GUILayout.Label(TC.get("Resources.DescriptionSceneForeground"));
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button(clearImg, GUILayout.Width(0.1f * windowWidth)))
-            {
-                foregroundMaskPath = "";
-            }
-            GUILayout.Box(foregroundMaskPath, GUILayout.Width(0.7f * windowWidth));
-            if (GUILayout.Button(TC.get("Buttons.Select"), GUILayout.Width(0.19f * windowWidth)))
-            {
-                ShowAssetChooser(AssetType.FOREGROUND);
-            }
-            GUILayout.EndHorizontal();
-
-            // Music chooser
-            GUILayout.Label(TC.get("Resources.DescriptionSceneMusic"));
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button(clearImg, GUILayout.Width(0.1f * windowWidth)))
-            {
-                musicPath = "";
-            }
-            GUILayout.Box(musicPath, GUILayout.Width(0.7f * windowWidth));
-            if (GUILayout.Button(TC.get("Buttons.Select"), GUILayout.Width(0.19f * windowWidth)))
-            {
-                ShowAssetChooser(AssetType.MUSIC);
-            }
-            GUILayout.EndHorizontal();
-
-            GUILayout.EndArea();
-
-            if (backgroundPath != "")
-            {
-                GUI.DrawTexture(previewRect, backgroundPreview, ScaleMode.ScaleToFit);
-            }
+            EditorGUILayout.EndVertical();
         }
 
-        void ShowAssetChooser(AssetType type)
+        private void RefreshResources(DataControlWithResources resources)
         {
-            switch (type)
-            {
-                case AssetType.BACKGROUND:
-                    ImageFileOpenDialog backgroundDialog =
-                    (ImageFileOpenDialog)ScriptableObject.CreateInstance(typeof(ImageFileOpenDialog));
-                    backgroundDialog.Init(this, BaseFileOpenDialog.FileType.SCENE_BACKGROUND);
-                    break;
-                case AssetType.FOREGROUND:
-                    ImageFileOpenDialog foregroundDialgo =
-                    (ImageFileOpenDialog)ScriptableObject.CreateInstance(typeof(ImageFileOpenDialog));
-                    foregroundDialgo.Init(this, BaseFileOpenDialog.FileType.SCENE_FOREGROUND);
-                    break;
-                case AssetType.MUSIC:
-                    MusicFileOpenDialog musicDialog =
-                    (MusicFileOpenDialog)ScriptableObject.CreateInstance(typeof(MusicFileOpenDialog));
-                    musicDialog.Init(this, BaseFileOpenDialog.FileType.SCENE_MUSIC);
-                    break;
-            }
+            var back = workingScene.getPreviewBackground();
+            var fore = workingScene.getPreviewForeground();
 
+            backgroundPreview = string.IsNullOrEmpty(back) ? null : AssetsController.getImage(back).texture;
+            foregroundPreview = string.IsNullOrEmpty(fore) ? null : AssetsController.getImage(fore).texture;
+
+            if (backgroundPreview && foregroundPreview)
+                foregroundPreview = CreateMask(backgroundPreview, foregroundPreview);
         }
 
-        public void OnDialogOk(string message, object workingObject = null, object workingObjectSecond = null)
+        private Texture2D CreateMask(Texture2D background, Texture2D foreground)
         {
-            switch ((BaseFileOpenDialog.FileType)workingObject)
-            {
-                case BaseFileOpenDialog.FileType.SCENE_BACKGROUND:
-                    backgroundPath = message;
-                    Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                       GameRources.GetInstance().selectedSceneIndex].setPreviewBackground(message);
-                    if (backgroundPath != null && !backgroundPath.Equals(""))
-                        backgroundPreview = AssetsController.getImage(backgroundPath).texture;
-                    break;
-                case BaseFileOpenDialog.FileType.SCENE_FOREGROUND:
-                    foregroundMaskPath = message;
-                    Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                       GameRources.GetInstance().selectedSceneIndex].setPreviewForeground(message);
-                    break;
-                case BaseFileOpenDialog.FileType.SCENE_MUSIC:
-                    musicPath = message;
-                    Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                       GameRources.GetInstance().selectedSceneIndex].setPreviewMusic(message);
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        public void OnDialogCanceled(object workingObject = null)
-        {
-            Debug.Log("Wiadomość nie OK");
+            Texture2D toReturn = new Texture2D(background.width, background.height, background.format, false);
+            var foregroundPixels = foreground.GetPixels();
+            toReturn.SetPixels(background.GetPixels().Select((color, i) => new Color(color.r, color.g, color.b, foregroundPixels[i].r)).ToArray());
+            toReturn.Apply();
+            return toReturn;
         }
     }
 }
