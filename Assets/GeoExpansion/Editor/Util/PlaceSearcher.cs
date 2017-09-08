@@ -99,7 +99,7 @@ namespace uAdventure.Geo
             if (Value != null && Value.Trim() != "" && lastSearch != Value)
             {
                 place.namePlace = Value;
-                place.SearchInMapzen();
+                place.SearchInOSM();
                 lastSearch = Value;
             }
         }

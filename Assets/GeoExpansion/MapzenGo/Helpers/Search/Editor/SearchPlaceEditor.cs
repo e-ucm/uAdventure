@@ -123,7 +123,7 @@ namespace MapzenGo.Helpers.Search.Editor
                 }
                 else
                 {
-                    place.SearchInMapzen();
+                    place.SearchInOSM();
                 }
 
                 if (place.DataStructure.dataChache != null)

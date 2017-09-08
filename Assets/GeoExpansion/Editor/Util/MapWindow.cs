@@ -233,7 +233,7 @@ public class MapWindow : EditorWindow {
         if (address != null && address.Trim() != "" && lastSearch != address)
         {
             place.namePlace = address;
-            place.SearchInMapzen();
+            place.SearchInOSM();
             lastSearch = address;
         }
     }
