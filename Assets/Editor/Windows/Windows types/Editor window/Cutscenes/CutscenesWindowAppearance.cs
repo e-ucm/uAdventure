@@ -8,7 +8,7 @@ using UnityEditor;
 
 namespace uAdventure.Editor
 {
-    public class CutscenesWindowAppearance : LayoutWindow
+    public class CutscenesWindowAppearance : PreviewLayoutWindow
     {
         private enum AssetType
         {
@@ -59,7 +59,7 @@ namespace uAdventure.Editor
             };
         }
 
-        public override void Draw(int aID)
+        protected override void DrawInspector()
         {
             var windowWidth = m_Rect.width;
             var windowHeight = m_Rect.height;
@@ -105,25 +105,11 @@ namespace uAdventure.Editor
                 if (EditorGUI.EndChangeCheck())
                     workingCutscene.setPathToMusic(music.Path);
             }
+        }
 
-            GUILayout.Space(10);
-            
-            GUILayout.Label(TC.get("ImageAssets.Preview"), "preToolbar", GUILayout.ExpandWidth(true));
-            var rect = EditorGUILayout.BeginVertical("preBackground", GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
-            {
-                GUILayout.BeginHorizontal();
-                {
-                    rect.x += 30;
-                    rect.width -= 60;
-                    rect.y += 30;
-                    rect.height -= 60;
-
-                    GUI.DrawTexture(rect, slidesPreview, ScaleMode.ScaleToFit);
-                }
-                GUILayout.EndHorizontal();
-            }
-
-            EditorGUILayout.EndVertical();
+        protected override void DrawPreview(Rect rect)
+        {
+            GUI.DrawTexture(rect, slidesPreview, ScaleMode.ScaleToFit);
         }
 
         private void RefreshPathInformation(DataControlWithResources dataControl)

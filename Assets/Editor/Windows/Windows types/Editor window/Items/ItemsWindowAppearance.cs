@@ -4,10 +4,11 @@ using System.Collections;
 using uAdventure.Core;
 using UnityEditor;
 using System.Collections.Generic;
+using System;
 
 namespace uAdventure.Editor
 {
-    public class ItemsWindowAppearance : LayoutWindow
+    public class ItemsWindowAppearance : PreviewLayoutWindow
     {
 
         private Texture2D imageTex = null;
@@ -57,8 +58,7 @@ namespace uAdventure.Editor
             };
         }
 
-        
-        public override void Draw(int aID)
+        protected override void DrawInspector()
         {
             var previousWorkingItem = workingItem;
             workingItem = Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[GameRources.GetInstance().selectedItemIndex];
@@ -73,7 +73,7 @@ namespace uAdventure.Editor
 
             string previousValue = image.Path = workingItem.getPreviewImage();
             image.DoLayout(GUILayout.ExpandWidth(true));
-            if(previousValue != image.Path) workingItem.setPreviewImage(image.Path);
+            if (previousValue != image.Path) workingItem.setPreviewImage(image.Path);
 
             previousValue = icon.Path = workingItem.getIconImage();
             icon.DoLayout(GUILayout.ExpandWidth(true));
@@ -87,25 +87,11 @@ namespace uAdventure.Editor
             {
                 RefreshPathInformation(workingItem);
             }
+        }
 
-            GUILayout.Space(10);
-
-            GUILayout.Label(TC.get("ImageAssets.Preview"), "preToolbar", GUILayout.ExpandWidth(true));
-            var rect = EditorGUILayout.BeginVertical("preBackground", GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
-            {
-                GUILayout.BeginHorizontal();
-                {
-                    rect.x += 30;
-                    rect.width -= 60;
-                    rect.y += 30;
-                    rect.height -= 60;
-
-                    GUI.DrawTexture(rect, rect.Contains(Event.current.mousePosition) && imageOverTex ? imageOverTex : imageTex, ScaleMode.ScaleToFit);
-                }
-                GUILayout.EndHorizontal();
-            }
-
-            EditorGUILayout.EndVertical();
+        protected override void DrawPreview(Rect rect)
+        {
+            GUI.DrawTexture(rect, rect.Contains(Event.current.mousePosition) && imageOverTex ? imageOverTex : imageTex, ScaleMode.ScaleToFit);
         }
 
         private void RefreshPathInformation(DataControlWithResources dataControl)
