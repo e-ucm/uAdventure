@@ -47,46 +47,20 @@ namespace uAdventure.Editor
             if (isConcreteItemVisible)
             {
                 /**
-                UPPER MENU
+                 UPPER MENU
                 */
+                List<KeyValuePair<string, CharactersWindowType>> tabs = new List<KeyValuePair<string, CharactersWindowType>>()
+                {
+                    new KeyValuePair<string, CharactersWindowType>(TC.get("NPC.LookPanelTitle"), CharactersWindowType.Appearance),
+                    new KeyValuePair<string, CharactersWindowType>(TC.get("NPC.Documentation"), CharactersWindowType.Documentation),
+                    new KeyValuePair<string, CharactersWindowType>(TC.get("NPC.DialogPanelTitle"), CharactersWindowType.DialogConfiguration),
+                    new KeyValuePair<string, CharactersWindowType>(TC.get("NPC.ActionsPanelTitle"), CharactersWindowType.Action),
+                };
+
                 GUILayout.BeginHorizontal();
-
-                if (openedWindow == CharactersWindowType.Appearance)
-                    GUI.skin = selectedButtonSkin;
-                if (GUILayout.Button(TC.get("NPC.LookPanelTitle")))
-                {
-                    OnWindowTypeChanged(CharactersWindowType.Appearance);
-                }
-                if (openedWindow == CharactersWindowType.Appearance)
-                    GUI.skin = defaultSkin;
-
-
-                if (openedWindow == CharactersWindowType.Documentation)
-                    GUI.skin = selectedButtonSkin;
-                if (GUILayout.Button(TC.get("NPC.Documentation")))
-                {
-                    OnWindowTypeChanged(CharactersWindowType.Documentation);
-                }
-                if (openedWindow == CharactersWindowType.Documentation)
-                    GUI.skin = defaultSkin;
-
-                if (openedWindow == CharactersWindowType.DialogConfiguration)
-                    GUI.skin = selectedButtonSkin;
-                if (GUILayout.Button(TC.get("NPC.DialogPanelTitle")))
-                {
-                    OnWindowTypeChanged(CharactersWindowType.DialogConfiguration);
-                }
-                if (openedWindow == CharactersWindowType.DialogConfiguration)
-                    GUI.skin = defaultSkin;
-
-                if (openedWindow == CharactersWindowType.Action)
-                    GUI.skin = selectedButtonSkin;
-                if (GUILayout.Button(TC.get("NPC.ActionsPanelTitle")))
-                {
-                    OnWindowTypeChanged(CharactersWindowType.Action);
-                }
-                if (openedWindow == CharactersWindowType.Action)
-                    GUI.skin = defaultSkin;
+                GUILayout.FlexibleSpace();
+                openedWindow = tabs[GUILayout.Toolbar(tabs.FindIndex(t => t.Value == openedWindow), tabs.ConvertAll(t => t.Key).ToArray(), GUILayout.ExpandWidth(false))].Value;
+                GUILayout.FlexibleSpace();
                 GUILayout.EndHorizontal();
 
                 switch (openedWindow)
