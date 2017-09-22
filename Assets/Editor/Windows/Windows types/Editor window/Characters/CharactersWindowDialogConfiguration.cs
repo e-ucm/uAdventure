@@ -3,10 +3,11 @@ using System.Collections;
 using UnityEditor;
 
 using uAdventure.Core;
+using System;
 
 namespace uAdventure.Editor
 {
-    public class CharactersWindowDialogConfiguration : LayoutWindow
+    public class CharactersWindowDialogConfiguration : PreviewLayoutWindow
     {
         private NPCDataControl workingCharacter;
 
@@ -31,7 +32,7 @@ namespace uAdventure.Editor
             previewTextStyle.padding = new RectOffset(32, 32, 32, 32);
         }
 
-        public override void Draw(int aID)
+        protected override void DrawInspector()
         {
             workingCharacter = Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[GameRources.GetInstance().selectedCharacterIndex];
 
@@ -44,13 +45,7 @@ namespace uAdventure.Editor
             shouldShowSpeechBubble = GUILayout.Toggle(shouldShowSpeechBubble, TC.get("Player.ShowsSpeechBubble"));
             if (EditorGUI.EndChangeCheck())
                 workingCharacter.setShowsSpeechBubbles(shouldShowSpeechBubble);
-
-            // Preview
-            GUILayout.Space(10);
-            GUILayout.BeginHorizontal(); GUILayout.FlexibleSpace();
-            DrawPreview(new GUIContent(TC.get("GeneralText.PreviewText")), shouldShowSpeechBubble, bckImage, bubbleBcgColor, bubbleBorderColor, fontFrontColor, fontBorderColor, previewTextStyle);
-            GUILayout.FlexibleSpace(); GUILayout.EndHorizontal();
-            GUILayout.Space(20);
+            
 
             // Font Color
             EditorGUI.BeginChangeCheck();
@@ -166,6 +161,17 @@ namespace uAdventure.Editor
             {
                 style.Draw(rect, content, false, false, false, false);
             }
+        }
+
+        protected override void DrawPreview(Rect rect)
+        {
+            GUILayout.BeginVertical();
+            GUILayout.FlexibleSpace();
+            GUILayout.BeginHorizontal(); GUILayout.FlexibleSpace();
+            DrawPreview(new GUIContent(TC.get("GeneralText.PreviewText")), shouldShowSpeechBubble, bckImage, bubbleBcgColor, bubbleBorderColor, fontFrontColor, fontBorderColor, previewTextStyle);
+            GUILayout.FlexibleSpace(); GUILayout.EndHorizontal();
+            GUILayout.FlexibleSpace();
+            GUILayout.EndVertical();
         }
     }
 }
