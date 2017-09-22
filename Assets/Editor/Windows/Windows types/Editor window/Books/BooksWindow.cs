@@ -114,6 +114,22 @@ namespace uAdventure.Editor
             }
         }
 
+        public override void OnDrawMoreWindows()
+        {
+            switch (openedWindow)
+            {
+                case BookWindowType.Appearance:
+                    booksWindowAppearance.OnDrawMoreWindows();
+                    break;
+                case BookWindowType.Documentation:
+                    booksWindowDocumentation.OnDrawMoreWindows();
+                    break;
+                case BookWindowType.Content:
+                    booksWindowContents.OnDrawMoreWindows();
+                    break;
+            }
+        }
+
         void OnWindowTypeChanged(BookWindowType type_)
         {
             openedWindow = type_;

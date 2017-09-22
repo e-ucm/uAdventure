@@ -9,8 +9,37 @@ namespace uAdventure.Editor
 {
     public abstract class PreviewLayoutWindow : LayoutWindow
     {
+        private GUISkin skin;
+
         public PreviewLayoutWindow(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
         {
+            skin = EditorGUIUtility.GetBuiltinSkin(EditorSkin.Scene);
+        }
+
+        private Rect windowRect;
+        private Rect previewRect;
+
+        public override void OnDrawMoreWindows()
+        {
+
+            if (HasToDrawPreviewInspector())
+            {
+                var prevSkin = GUI.skin;
+                GUI.skin = skin;
+
+                windowRect = GUILayout.Window(9999, windowRect, (i) =>
+                {
+                    //GUI.DragWindow();
+                    DrawPreviewInspector();
+                }, "Properties", skin.window);
+
+                GUI.BringWindowToFront(9999);
+                
+                windowRect.center = previewRect.position + previewRect.size - (windowRect.size/2f) - (Vector2.one * 10);
+
+                GUI.skin = prevSkin;
+            }
+
         }
 
         public override void Draw(int aID)
@@ -18,20 +47,27 @@ namespace uAdventure.Editor
             DrawInspector();
 
             DrawPreviewHeader();
-            var rect = EditorGUILayout.BeginVertical("preBackground", GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+            var auxRect = EditorGUILayout.BeginVertical("preBackground", GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
             {
                 GUILayout.BeginHorizontal();
                 {
-                    rect.x += 30; rect.width -= 60;
-                    rect.y += 30; rect.height -= 60;
+                    previewRect.x += 30; previewRect.width -= 60;
+                    previewRect.y += 30; previewRect.height -= 60;
 
-                    DrawPreview(rect);
+                    DrawPreview(auxRect);
                 }
                 GUILayout.EndHorizontal();
             }
 
+            if (auxRect.x != 0)
+            {
+                previewRect = auxRect;
+                previewRect.center += m_Rect.position;
+            }
+
             EditorGUILayout.EndVertical();
         }
+
 
         protected abstract void DrawInspector();
 
@@ -45,5 +81,12 @@ namespace uAdventure.Editor
         {
 
         }
+
+        protected virtual bool HasToDrawPreviewInspector()
+        {
+            return false;
+        }
+
+        protected virtual void DrawPreviewInspector() { }
     }
 }

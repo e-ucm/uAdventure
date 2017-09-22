@@ -242,6 +242,7 @@ namespace uAdventure.Editor
                     }
 
                     m_Window.OnGUI();
+                    m_Window.OnDrawMoreWindows();
                 }
                 EndWindows();
             }

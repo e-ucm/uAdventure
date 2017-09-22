@@ -33,6 +33,8 @@ namespace uAdventure.Editor
             m_Rect = GUI.Window(WindowID, m_Rect, Draw, Content, Style);
         }
 
+        public virtual void OnDrawMoreWindows() { }
+
         public abstract void Draw(int aID);
 
     }
