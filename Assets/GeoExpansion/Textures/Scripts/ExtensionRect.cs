@@ -6,6 +6,49 @@
 public static class ExtensionRect
 {
     /// <summary>
+    /// Traps a rect inside another rect. If its ouside it moves it to the closest point inside
+    /// </summary>
+    /// <param name="rect"></param>
+    /// <param name="other"></param>
+    /// <returns></returns>
+    public static Rect TrapInside(this Rect rect, Rect other)
+    {
+        return new Rect(
+            Mathf.Clamp(rect.x, other.x, other.x + other.width - rect.width),
+            Mathf.Clamp(rect.y, other.y, other.y + other.height - rect.height),
+            rect.width, rect.height);
+    }
+
+
+    public static Rect AdjustToRatio(this Rect rect, float width, float height)
+    {
+        return rect.AdjustToRatio(width / height);
+    }
+
+    public static Rect AdjustToRatio(this Rect rect, float ratio)
+    {
+        var r = new Rect(rect);
+        var originalCenter = r.center;
+
+        var myRatio = r.width / r.height;
+        if(myRatio > ratio) r.width = r.height * ratio;
+        else r.height = r.width / ratio;
+
+        r.center = originalCenter;
+        return r;
+    }
+
+    public static Rect AdjustToViewport(this Rect rect, float originalWidth, float originalHeight, Rect viewport)
+    {
+        return new Rect(
+            (rect.x / originalWidth) * viewport.width + viewport.x,
+            (rect.y / originalHeight) * viewport.height + viewport.y,
+            (rect.width / originalWidth) * viewport.width,
+            (rect.height / originalHeight) * viewport.height
+            );
+    }
+
+    /// <summary>
     /// Performs the intersection of two Rects.
     /// </summary>
     /// <param name="rect">First rect</param>

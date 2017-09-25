@@ -37,7 +37,12 @@ namespace uAdventure.Editor
             booksWindowAppearance = new BooksWindowAppearance(aStartPos, new GUIContent(TC.get("Book.App")), "Window");
             booksWindowContents = new BooksWindowContents(aStartPos, new GUIContent(TC.get("Book.Contents")), "Window");
             booksWindowDocumentation = new BooksWindowDocumentation(aStartPos, new GUIContent(TC.get("Book.Documentation")), "Window");
-            
+
+            RequestRepaint requestRepaint = () => OnRequestRepaint();
+            booksWindowAppearance.OnRequestRepaint += requestRepaint;
+            booksWindowContents.OnRequestRepaint += requestRepaint;
+            booksWindowDocumentation.OnRequestRepaint += requestRepaint;
+
             selectedButtonSkin = (GUISkin)Resources.Load("Editor/ButtonSelected", typeof(GUISkin));
         }
 
@@ -116,17 +121,20 @@ namespace uAdventure.Editor
 
         public override void OnDrawMoreWindows()
         {
-            switch (openedWindow)
+            if (isConcreteItemVisible)
             {
-                case BookWindowType.Appearance:
-                    booksWindowAppearance.OnDrawMoreWindows();
-                    break;
-                case BookWindowType.Documentation:
-                    booksWindowDocumentation.OnDrawMoreWindows();
-                    break;
-                case BookWindowType.Content:
-                    booksWindowContents.OnDrawMoreWindows();
-                    break;
+                switch (openedWindow)
+                {
+                    case BookWindowType.Appearance:
+                        booksWindowAppearance.OnDrawMoreWindows();
+                        break;
+                    case BookWindowType.Documentation:
+                        booksWindowDocumentation.OnDrawMoreWindows();
+                        break;
+                    case BookWindowType.Content:
+                        booksWindowContents.OnDrawMoreWindows();
+                        break;
+                }
             }
         }
 
@@ -147,11 +155,6 @@ namespace uAdventure.Editor
         {
             isConcreteItemVisible = true;
             GameRources.GetInstance().selectedBookIndex = o;
-
-            // Reload windows for newly selected book
-            booksWindowAppearance = new BooksWindowAppearance(m_Rect, new GUIContent(TC.get("Book.App")), "Window");
-            booksWindowContents = new BooksWindowContents(m_Rect, new GUIContent(TC.get("Book.Contents")), "Window");
-            booksWindowDocumentation = new BooksWindowDocumentation(m_Rect, new GUIContent(TC.get("Book.Documentation")), "Window");
         }
 
         protected override void OnElementNameChanged(ReorderableList r, int index, string newName)

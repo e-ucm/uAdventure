@@ -123,19 +123,113 @@ namespace uAdventure.Editor
             GUILayout.EndHorizontal();
         }
 
+        private int SelectedArrow = -1;
+
+        private Vector2 offset;
+
         protected override void DrawPreview(Rect rect)
         {
-            GUI.DrawTexture(rect, backgroundPreview, ScaleMode.ScaleToFit);
+            // We first fix the ratio of the rect
+            var viewport = rect.AdjustToRatio(800f / 600f);
+            GUI.DrawTexture(viewport, backgroundPreview, ScaleMode.ScaleToFit);
+
+            Rect leftArrowRect = Rect.zero, rightArrowRect = Rect.zero;
+
+            // Draw the left arrow
+            if (leftNormalArrow)
+            {
+                leftArrowRect = new Rect(workingBook.getPreviousPagePosition(), new Vector2(leftNormalArrow.width, leftNormalArrow.height)).AdjustToViewport(800f, 600f, viewport);
+                GUI.DrawTexture(leftArrowRect, leftNormalArrow, ScaleMode.ScaleToFit);
+            }
+
+            // Draw the right arrow
+            if (rightNormalArrow)
+            {
+                rightArrowRect = new Rect(workingBook.getNextPagePosition(), new Vector2(rightNormalArrow.width, rightNormalArrow.height)).AdjustToViewport(800f, 600f, viewport);
+                GUI.DrawTexture(rightArrowRect, rightNormalArrow, ScaleMode.ScaleToFit);
+            }
+
+            switch (Event.current.type)
+            {
+                case EventType.MouseDown:
+                    if (leftArrowRect.Contains(Event.current.mousePosition))
+                    {
+                        GUIUtility.hotControl = leftNormalArrow.GetInstanceID();
+                        SelectedArrow = BookDataControl.ARROW_LEFT;
+
+                    }else if (rightArrowRect.Contains(Event.current.mousePosition))
+                    {
+                        GUIUtility.hotControl = rightNormalArrow.GetInstanceID();
+                        SelectedArrow = BookDataControl.ARROW_RIGHT;
+                    }
+                    else
+                    {
+                        SelectedArrow = -1;
+                    }
+                    break;
+
+                case EventType.mouseUp:
+                    if (GUIUtility.hotControl == leftNormalArrow.GetInstanceID())
+                    {
+                        GUIUtility.hotControl = 0;
+                    }
+                    if (rightNormalArrow && GUIUtility.hotControl == rightNormalArrow.GetInstanceID())
+                    {
+                        GUIUtility.hotControl = 0;
+                    }
+                    break;
+
+                case EventType.mouseDrag:
+                    if (GUIUtility.hotControl == leftNormalArrow.GetInstanceID())
+                    {
+                        leftArrowRect.position += Event.current.delta;
+                        workingBook.setPreviousPagePosition(new Vector2(
+                            ((leftArrowRect.x - viewport.x) / viewport.width) * 800f,
+                            ((leftArrowRect.y - viewport.y) / viewport.height) * 600f
+                            ));
+                    }
+                    if (rightNormalArrow && GUIUtility.hotControl == rightNormalArrow.GetInstanceID())
+                    {
+                        leftArrowRect.position += Event.current.delta;
+                    }
+                    break;
+            }
+
+
         }
 
         protected override bool HasToDrawPreviewInspector()
         {
-            return true;
+            return SelectedArrow != -1;
         }
 
         protected override void DrawPreviewInspector()
         {
-            GUILayout.Label("Hola mundo");
+            switch (SelectedArrow)
+            {
+                case BookDataControl.ARROW_LEFT:
+                    {
+                        GUILayout.Label("Left arrow properties");
+                        EditorGUI.BeginChangeCheck();
+                        var newPos = EditorGUILayout.Vector2Field("Position", workingBook.getPreviousPagePosition());
+                        if (EditorGUI.EndChangeCheck())
+                        {
+                            workingBook.setPreviousPagePosition(newPos);
+                        }
+                    }
+                    break;
+                case BookDataControl.ARROW_RIGHT:
+                    {
+                        GUILayout.Label("Right arrow properties");
+                        EditorGUI.BeginChangeCheck();
+                        var newPos = EditorGUILayout.Vector2Field("Position", workingBook.getNextPagePosition());
+                        if (EditorGUI.EndChangeCheck())
+                        {
+                            workingBook.setNextPagePosition(newPos);
+                        }
+                    }
+                    break;
+            }
         }
     }
 }
