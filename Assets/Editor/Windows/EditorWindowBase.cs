@@ -111,6 +111,38 @@ namespace uAdventure.Editor
 			thisWindowReference.OnEnable ();
 		}
 
+        private static Dictionary<Type, List<EditorComponent>> knownComponents;
+        public static Dictionary<Type, List<EditorComponent>> Components
+        {
+            get { return knownComponents; }
+        }
+
+        public static void RegisterComponent<T>(EditorComponent component) { RegisterComponent(typeof(T), component); }
+
+        public static void RegisterComponent(Type t, EditorComponent component)
+        {
+            if (knownComponents == null)
+            {
+                knownComponents = new Dictionary<Type, List<EditorComponent>>();
+            }
+
+            if (!knownComponents.ContainsKey(t))
+            {
+                knownComponents.Add(t, new List<EditorComponent>());
+            }
+
+            knownComponents[t].Add(component);
+            knownComponents[t].Sort((c1, c2) => CompareComponents(c1, c2));
+        }
+
+        private static int CompareComponents(EditorComponent c1, EditorComponent c2)
+        {
+            var c1Attr = c1.GetType().GetCustomAttributes(typeof(EditorComponentAttribute), true)[0] as EditorComponentAttribute;
+            var c2Attr = c2.GetType().GetCustomAttributes(typeof(EditorComponentAttribute), true)[0] as EditorComponentAttribute;
+
+            return c1Attr.Order.CompareTo(c2Attr.Order);
+        } 
+
         public static void RefreshChapter()
         {
             thisWindowReference.chapterWindow = new ChapterWindow(zeroRect, new GUIContent(TC.get("Element.Name0")), "Window");

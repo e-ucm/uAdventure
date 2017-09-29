@@ -7,6 +7,8 @@ using UnityEngine;
 /// </summary>
 public interface EditorComponent
 {
+    EditorComponentAttribute Attribute { get; }
+
     DataControl Target { get; set; }
 
 

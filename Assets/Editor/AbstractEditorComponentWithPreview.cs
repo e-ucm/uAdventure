@@ -4,8 +4,27 @@ namespace uAdventure.Editor
 {
     public class AbstractEditorComponentWithPreview : PreviewLayoutWindow, EditorComponent
     {
+        public EditorComponentAttribute Attribute
+        {
+            get
+            {
+                var attrs = GetType().GetCustomAttributes(typeof(EditorComponentAttribute), true);
+                if (attrs.Length > 0)
+                {
+                    var componentAttr = attrs[0] as EditorComponentAttribute;
+                    return componentAttr;
+                }
+                return null;
+            }
+        }
+
         public AbstractEditorComponentWithPreview(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
         {
+            var attr = Attribute;
+            if (attr != null)
+            {
+                EditorWindowBase.RegisterComponent(attr.Type, this);
+            }
         }
 
         public DataControl Target { get; set; }

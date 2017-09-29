@@ -4,8 +4,32 @@ namespace uAdventure.Editor
 {
     public abstract class AbstractEditorComponent : LayoutWindow, EditorComponent
     {
+        /*
+        public AbstractEditorComponent() :
+            base(Rect.zero, new GUIContent(""), "")
+        {
+        }*/
+
+        public EditorComponentAttribute Attribute {
+            get
+            {
+                var attrs = GetType().GetCustomAttributes(typeof(EditorComponentAttribute), true);
+                if (attrs.Length > 0)
+                {
+                    var componentAttr = attrs[0] as EditorComponentAttribute;
+                    return componentAttr;
+                }
+                return null;
+            }
+        }
+
         public AbstractEditorComponent(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
         {
+            var attr = Attribute;
+            if(attr != null)
+            {
+                EditorWindowBase.RegisterComponent(attr.Type, this);
+            }
         }
         public bool Collapsed { get; set; }
 
