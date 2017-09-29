@@ -6,13 +6,13 @@ using uAdventure.Core;
 namespace uAdventure.Editor
 {
 
-    public class ScenesWindowDocumentation : LayoutWindow
+    public class ScenesWindowDocumentation : SceneEditorWindow
     {
         private string descriptionOfScene, nameOfScene, descriptionOfSceneLast, nameOfSceneLast, sceneclass = "", sceneclasslast, scenetype = "", scenetypelast;
         private Scene current;
 
-        public ScenesWindowDocumentation(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
-            : base(aStartPos, aContent, aStyle, aOptions)
+        public ScenesWindowDocumentation(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, SceneEditor sceneEditor, params GUILayoutOption[] aOptions)
+            : base(aStartPos, aContent, aStyle, sceneEditor, aOptions)
         {
             string doc = "";
             string name = "";

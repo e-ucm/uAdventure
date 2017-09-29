@@ -6,7 +6,7 @@ using uAdventure.Core;
 
 namespace uAdventure.Editor
 {
-    public class ScenesWindowExits : LayoutWindow, DialogReceiverInterface
+    public class ScenesWindowExits : SceneEditorWindow, DialogReceiverInterface
     {
         private Texture2D backgroundPreviewTex = null;
 
@@ -35,9 +35,9 @@ namespace uAdventure.Editor
 
         private int selectedExit;
 
-        public ScenesWindowExits(Rect aStartPos, GUIContent aContent, GUIStyle aStyle,
+        public ScenesWindowExits(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, SceneEditor sceneEditor,
             params GUILayoutOption[] aOptions)
-            : base(aStartPos, aContent, aStyle, aOptions)
+            : base(aStartPos, aContent, aStyle, sceneEditor, aOptions)
         {
 
             clearImg = (Texture2D)Resources.Load("EAdventureData/img/icons/deleteContent", typeof(Texture2D));

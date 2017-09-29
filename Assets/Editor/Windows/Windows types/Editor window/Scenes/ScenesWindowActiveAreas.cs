@@ -5,7 +5,7 @@ using uAdventure.Core;
 
 namespace uAdventure.Editor
 {
-    public class ScenesWindowActiveAreas : LayoutWindow, DialogReceiverInterface
+    public class ScenesWindowActiveAreas : SceneEditorWindow, DialogReceiverInterface
     {
 
         private Texture2D backgroundPreviewTex = null;
@@ -36,9 +36,9 @@ namespace uAdventure.Editor
         private int selectedAction;
         private AddItemActionMenu addMenu;
 
-        public ScenesWindowActiveAreas(Rect aStartPos, GUIContent aContent, GUIStyle aStyle,
+        public ScenesWindowActiveAreas(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, SceneEditor sceneEditor,
             params GUILayoutOption[] aOptions)
-            : base(aStartPos, aContent, aStyle, aOptions)
+            : base(aStartPos, aContent, aStyle, sceneEditor, aOptions)
         {
             clearImg = (Texture2D)Resources.Load("EAdventureData/img/icons/deleteContent", typeof(Texture2D));
             addTexture = (Texture2D)Resources.Load("EAdventureData/img/icons/addNode", typeof(Texture2D));
@@ -58,6 +58,10 @@ namespace uAdventure.Editor
             selectedAreaSkin = (GUISkin)Resources.Load("Editor/EditorLeftMenuItemSkinConcreteOptions", typeof(GUISkin));
             noBackgroundSkin = (GUISkin)Resources.Load("Editor/EditorNoBackgroundSkin", typeof(GUISkin));
 
+            sceneEditor.onSelectElement += (e) =>
+            {
+
+            };
 
             selectedArea = -1;
             selectedAction = -1;

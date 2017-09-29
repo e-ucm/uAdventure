@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using uAdventure.Core;
 using System;
 using UnityEditorInternal;
+using UnityEditor;
 
 namespace uAdventure.Editor
 {
@@ -38,6 +39,8 @@ namespace uAdventure.Editor
         private static GUISkin selectedButtonSkin;
         private static GUISkin defaultSkin;
 
+        private SceneEditor sceneEditor;
+
         public ScenesWindow(Rect rect, GUIStyle style, params GUILayoutOption[] options)
             : base(rect, new GUIContent(TC.get("Element.Name1")), style, options)
         {
@@ -48,24 +51,27 @@ namespace uAdventure.Editor
             content.text = TC.get("Element.Name1");
             ButtonContent = content;
 
+            sceneEditor = new SceneEditor();
+
             // Windows
             scenesWindowActiveAreas = new ScenesWindowActiveAreas(rect,
-                new GUIContent(TC.get("ActiveAreasList.Title")), "Window");
+                new GUIContent(TC.get("ActiveAreasList.Title")), "Window", sceneEditor);
             scenesWindowAppearance = new ScenesWindowAppearance(rect, new GUIContent(TC.get("Scene.LookPanelTitle")),
-                "Window");
+                "Window", sceneEditor);
             scenesWindowDocumentation = new ScenesWindowDocumentation(rect,
-                new GUIContent(TC.get("Scene.DocPanelTitle")), "Window");
+                new GUIContent(TC.get("Scene.DocPanelTitle")), "Window", sceneEditor);
             scenesWindowElementReference = new ScenesWindowElementReference(rect,
-                new GUIContent(TC.get("ItemReferencesList.Title")), "Window");
-            scenesWindowExits = new ScenesWindowExits(rect, new GUIContent(TC.get("Element.Name3")), "Window");
+                new GUIContent(TC.get("ItemReferencesList.Title")), "Window", sceneEditor);
+            scenesWindowExits = new ScenesWindowExits(rect, new GUIContent(TC.get("Element.Name3")), "Window", sceneEditor);
 
-            scenesWindowBarriers = new ScenesWindowBarriers(rect, new GUIContent(TC.get("BarriersList.Title")), "Window");
-            scenesWindowPlayerMovement = new ScenesWindowPlayerMovement(rect, new GUIContent(TC.get("Trajectory.Title")), "Window");
+            //scenesWindowBarriers = new ScenesWindowBarriers(rect, new GUIContent(TC.get("BarriersList.Title")), "Window", sceneEditor);
+            //scenesWindowPlayerMovement = new ScenesWindowPlayerMovement(rect, new GUIContent(TC.get("Trajectory.Title")), "Window", sceneEditor);
             
 
             selectedButtonSkin = (GUISkin)Resources.Load("Editor/ButtonSelected", typeof(GUISkin));
 
             GenerateToggleList();
+            
         }
 
 
@@ -75,74 +81,25 @@ namespace uAdventure.Editor
             if (isConcreteItemVisible)
             {
                 /**
-                UPPER MENU
+                 UPPER MENU
                 */
-                GUILayout.BeginHorizontal();
-                if (openedWindow == ScenesWindowType.Appearance)
-                    GUI.skin = selectedButtonSkin;
-                if (GUILayout.Button(TC.get("Scene.LookPanelTitle")))
+                List<KeyValuePair<string, ScenesWindowType>> tabs = new List<KeyValuePair<string, ScenesWindowType>>()
                 {
-                    OnWindowTypeChanged(ScenesWindowType.Appearance);
-                }
-                if (openedWindow == ScenesWindowType.Appearance)
-                    GUI.skin = defaultSkin;
-
-                if (openedWindow == ScenesWindowType.Documentation)
-                    GUI.skin = selectedButtonSkin;
-                if (GUILayout.Button(TC.get("Scene.DocPanelTitle")))
-                {
-                    OnWindowTypeChanged(ScenesWindowType.Documentation);
-                }
-                if (openedWindow == ScenesWindowType.Documentation)
-                    GUI.skin = defaultSkin;
-
-                if (openedWindow == ScenesWindowType.ElementRefrence)
-                    GUI.skin = selectedButtonSkin;
-                if (GUILayout.Button(TC.get("ItemReferencesList.Title")))
-                {
-                    OnWindowTypeChanged(ScenesWindowType.ElementRefrence);
-                }
-                if (openedWindow == ScenesWindowType.ElementRefrence)
-                    GUI.skin = defaultSkin;
-
-                if (openedWindow == ScenesWindowType.ActiveAreas)
-                    GUI.skin = selectedButtonSkin;
-                if (GUILayout.Button(TC.get("ActiveAreasList.Title")))
-                {
-                    OnWindowTypeChanged(ScenesWindowType.ActiveAreas);
-                }
-                if (openedWindow == ScenesWindowType.ActiveAreas)
-                    GUI.skin = defaultSkin;
-
-                if (openedWindow == ScenesWindowType.Exits)
-                    GUI.skin = selectedButtonSkin;
-                if (GUILayout.Button(TC.get("Element.Name3")))
-                {
-                    OnWindowTypeChanged(ScenesWindowType.Exits);
-                }
-                if (openedWindow == ScenesWindowType.Exits)
-                    GUI.skin = defaultSkin;
-                // Only visible for 3rd person
+                    new KeyValuePair<string, ScenesWindowType>(TC.get("Scene.LookPanelTitle"),      ScenesWindowType.Appearance),
+                    new KeyValuePair<string, ScenesWindowType>(TC.get("Scene.DocPanelTitle"),       ScenesWindowType.Documentation),
+                    new KeyValuePair<string, ScenesWindowType>(TC.get("ItemReferencesList.Title"),  ScenesWindowType.ElementRefrence),
+                    new KeyValuePair<string, ScenesWindowType>(TC.get("ActiveAreasList.Title"),     ScenesWindowType.ActiveAreas),
+                    new KeyValuePair<string, ScenesWindowType>(TC.get("Element.Name3"),             ScenesWindowType.Exits)
+                };
                 if (Controller.Instance.playerMode() == DescriptorData.MODE_PLAYER_3RDPERSON)
                 {
-                    if (openedWindow == ScenesWindowType.Barriers)
-                        GUI.skin = selectedButtonSkin;
-                    if (GUILayout.Button(TC.get("BarriersList.Title")))
-                    {
-                        OnWindowTypeChanged(ScenesWindowType.Barriers);
-                    }
-                    if (openedWindow == ScenesWindowType.Barriers)
-                        GUI.skin = defaultSkin;
-
-                    if (openedWindow == ScenesWindowType.PlayerMovement)
-                        GUI.skin = selectedButtonSkin;
-                    if (GUILayout.Button(TC.get("Trajectory.Title")))
-                    {
-                        OnWindowTypeChanged(ScenesWindowType.PlayerMovement);
-                    }
-                    if (openedWindow == ScenesWindowType.PlayerMovement)
-                        GUI.skin = defaultSkin;
+                    tabs.Add(new KeyValuePair<string, ScenesWindowType>(TC.get("BarriersList.Title"), ScenesWindowType.Barriers));
+                    tabs.Add(new KeyValuePair<string, ScenesWindowType>(TC.get("Trajectory.Title"), ScenesWindowType.PlayerMovement));
                 }
+                GUILayout.BeginHorizontal();
+                GUILayout.FlexibleSpace();
+                openedWindow = tabs[GUILayout.Toolbar(tabs.FindIndex(t => t.Value == openedWindow), tabs.ConvertAll(t => t.Key).ToArray(), GUILayout.ExpandWidth(false))].Value;
+                GUILayout.FlexibleSpace();
                 GUILayout.EndHorizontal();
 
                 switch (openedWindow)
@@ -180,14 +137,6 @@ namespace uAdventure.Editor
             // Show information of whole scenes (global-scene view)
             else
             {
-                //GUILayout.Label(TC.get("SCENES"));
-
-                //GUILayout.BeginHorizontal();
-                //GUILayout.Box(TC.get("SHOW_?"), GUILayout.MaxWidth(windowWidth*0.2f));
-                //GUILayout.Box(TC.get("SCENE_ID"), GUILayout.Width(windowWidth*0.55f));
-                //GUILayout.Box(TC.get("GeneralText.Edit"), GUILayout.MaxWidth(windowWidth*0.2f));
-                //GUILayout.EndHorizontal();
-
                 for (int i = 0;
 					i < Controller.Instance.ChapterList.getSelectedChapterDataControl().getScenesList ().getScenes().Count;
                     i++)
@@ -200,7 +149,6 @@ namespace uAdventure.Editor
                     {
                         ShowItemWindowView(i);
                     }
-
                     GUILayout.EndHorizontal();
 
                 }
@@ -229,24 +177,6 @@ namespace uAdventure.Editor
             isConcreteItemVisible = true;
             // Generate new toogle list - maybe user already created new scenes?
             GenerateToggleList();
-
-            // Reload windows for newly selected scene
-            scenesWindowActiveAreas = new ScenesWindowActiveAreas(m_Rect, new GUIContent(TC.get("ActiveAreasList.Title")),
-                "Window");
-            scenesWindowAppearance = new ScenesWindowAppearance(m_Rect, new GUIContent(TC.get("Scene.LookPanelTitle")),
-                "Window");
-            scenesWindowDocumentation = new ScenesWindowDocumentation(m_Rect,
-                new GUIContent(TC.get("Scene.DocPanelTitle")), "Window");
-            scenesWindowElementReference = new ScenesWindowElementReference(m_Rect,
-                new GUIContent(TC.get("ItemReferencesList.Title")), "Window");
-            scenesWindowExits = new ScenesWindowExits(m_Rect, new GUIContent(TC.get("Element.Name3")), "Window");
-
-            // Only visible for 3rd person
-            if (Controller.Instance.playerMode() == DescriptorData.MODE_PLAYER_3RDPERSON)
-            {
-                scenesWindowBarriers = new ScenesWindowBarriers(m_Rect, new GUIContent(TC.get("BarriersList.Title")), "Window");
-                scenesWindowPlayerMovement = new ScenesWindowPlayerMovement(m_Rect, new GUIContent(TC.get("Trajectory.Title")), "Window");
-            }
         }
 
         void GenerateToggleList()
