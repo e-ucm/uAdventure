@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using uAdventure.Core;
 using UnityEditor;
 using UnityEngine;
 
@@ -20,8 +21,6 @@ namespace uAdventure.Editor
                 selectedElement = s;
             };
 
-            LoadComponents();
-
             sceneEditor.Components = knownComponents;
         }
 
@@ -29,6 +28,7 @@ namespace uAdventure.Editor
 
         protected override void DrawPreview(Rect rect)
         {
+            LoadComponents();
             sceneEditor.Draw(rect);
         }
 
@@ -51,7 +51,7 @@ namespace uAdventure.Editor
                 {
                     var oldTarget = component.Target;
                     component.Target = referencedElement;
-                    component.Collapsed = EditorGUILayout.BeginToggleGroup(component.GetType().ToString(), component.Collapsed);
+                    component.Collapsed = !EditorGUILayout.BeginToggleGroup((component.Attribute.Name), !component.Collapsed);
                     component.DrawInspector();
                     EditorGUILayout.EndToggleGroup();
                     component.Target = oldTarget;
@@ -66,7 +66,9 @@ namespace uAdventure.Editor
             {
                 var oldTarget = component.Target;
                 component.Target = referencedElement;
+                component.Collapsed = !EditorGUILayout.BeginToggleGroup(TC.get(component.Attribute.Name), !component.Collapsed);
                 component.DrawInspector();
+                EditorGUILayout.EndToggleGroup();
                 component.Target = oldTarget;
             }
         }
@@ -77,8 +79,7 @@ namespace uAdventure.Editor
         {
             if (knownComponents == null)
             {
-                knownComponents = new Dictionary<Type, List<EditorComponent>>();
-                // Load from assembly
+                knownComponents = sceneEditor.Components;
             }
         }
     }

@@ -13,6 +13,14 @@ public class SceneEditor {
     public delegate void OnSelectElementDeletage(DataControl selectedElement);
     public OnSelectElementDeletage onSelectElement;
 
+    public SceneEditor()
+    {
+        Disabled = false;
+        EnabledTypes = new List<Type>();
+        matrices = new Stack<Matrix4x4>();
+        matrices.Push(Matrix4x4.identity);
+    }
+
     public Matrix4x4 Matrix
     {
         get
@@ -36,6 +44,8 @@ public class SceneEditor {
     public Dictionary<Type, List<EditorComponent>> Components { get; internal set; }
     public List<Type> EnabledTypes { get; set; }
     public bool Disabled { get; private set; }
+    public Rect Viewport { get; private set; }
+
     public DataControl SelectedElement {
         get
         {
@@ -54,6 +64,11 @@ public class SceneEditor {
 
     public void DoCallForElement(DataControl element, Action<EditorComponent> call)
     {
+        if (!Components.ContainsKey(element.GetType()))
+        {
+            return;
+        }
+
         foreach (var component in Components[element.GetType()])
         {
             var oldTarget = component.Target;
@@ -91,7 +106,7 @@ public class SceneEditor {
 
     public void Draw(Rect rect)
     {
-        var viewport = rect.AdjustToRatio(800f / 600f);
+        Viewport = rect.AdjustToRatio(800f / 600f);
 
         var previousWorkingItem = workingScene;
         workingScene = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[GameRources.GetInstance().selectedSceneIndex];
@@ -102,29 +117,29 @@ public class SceneEditor {
 
         // Background
         if (backgroundPreview)
-            GUI.DrawTexture(viewport, backgroundPreview, ScaleMode.ScaleToFit);
+            GUI.DrawTexture(Viewport, backgroundPreview, ScaleMode.ScaleToFit);
 
         Current = this;
         foreach (var element in elements)
         {
             Disabled = EnabledTypes.Count == 0 || EnabledTypes.Contains(element.GetType());
 
-            DoCallForElement(element, (c) => { if (c.Update()) SelectedElement = element; });
-            DoCallForElement(element, (c) => c.OnPreRender());
-            DoCallForElement(element, (c) => c.OnRender(viewport));
-            DoCallForElement(element, (c) => c.OnPostRender());
+            DoCallForWholeElement(element, (c) => c.OnPreRender());
+            DoCallForWholeElement(element, (c) => { if (c.Update()) SelectedElement = element; });
+            DoCallForWholeElement(element, (c) => c.OnRender(Viewport));
 
-            DoCallForElement(element, (c) => c.OnDrawingGizmos());
+            DoCallForWholeElement(element, (c) => c.OnDrawingGizmos());
             if (SelectedElement == element)
             {
-                DoCallForElement(element, (c) => c.OnDrawingGizmosSelected());
+                DoCallForWholeElement(element, (c) => c.OnDrawingGizmosSelected());
             }
+            DoCallForWholeElement(element, (c) => c.OnPostRender());
 
         }
         Current = null;
 
         if (foregroundPreview)
-            GUI.DrawTexture(viewport, foregroundPreview, ScaleMode.ScaleToFit);
+            GUI.DrawTexture(Viewport, foregroundPreview, ScaleMode.ScaleToFit);
     }
 
     public void RefreshSceneResources(DataControlWithResources resources)
