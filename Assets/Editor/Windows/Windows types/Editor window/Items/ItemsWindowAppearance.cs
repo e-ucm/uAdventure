@@ -8,7 +8,7 @@ using System;
 
 namespace uAdventure.Editor
 {
-    public class ItemsWindowAppearance : PreviewLayoutWindow
+    public class ItemsWindowAppearance : AbstractEditorComponentWithPreview
     {
 
         private Texture2D imageTex = null;
@@ -106,5 +106,26 @@ namespace uAdventure.Editor
             iconTex         = string.IsNullOrEmpty(inventoryIconPath) ? null :AssetsController.getImage(inventoryIconPath).texture;
             imageOverTex    = string.IsNullOrEmpty(imageWhenOverPath) ? null : AssetsController.getImage(imageWhenOverPath).texture;
         }
+
+        public override void OnRender(Rect viewport)
+        {
+            var item = Target as ItemDataControl;
+            var imageTex = string.IsNullOrEmpty(imagePath) ? null : AssetsController.getImage(imagePath).texture;
+            var iconTex = string.IsNullOrEmpty(imagePath) ? null : AssetsController.getImage(imagePath).texture;
+            var imageOverTex = string.IsNullOrEmpty(imagePath) ? null : AssetsController.getImage(imagePath).texture;
+
+            if (imageTex == null)
+                return;
+
+
+            var myPos = SceneEditor.Current.Matrix.MultiplyPoint(Vector2.zero);
+            var mySize = SceneEditor.Current.Matrix.MultiplyVector(new Vector3(imageTex.width, imageTex.height));
+            var rect = new Rect(myPos, mySize).AdjustToViewport(800, 600, viewport);
+            
+            GUI.DrawTexture(rect, rect.Contains(Event.current.mousePosition) && imageOverTex ? imageOverTex : imageTex, ScaleMode.ScaleToFit);
+            
+        }
+
+
     }
 }
