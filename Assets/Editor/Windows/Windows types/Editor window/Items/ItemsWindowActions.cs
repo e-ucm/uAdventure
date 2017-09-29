@@ -8,7 +8,8 @@ using System.Collections.Generic;
 
 namespace uAdventure.Editor
 {
-    public class ItemsWindowActions : LayoutWindow
+    [EditorComponent(typeof(ItemDataControl), Name = "Item.ActionsPanelTitle", Order = 10)]
+    public class ItemsWindowActions : AbstractEditorComponent
     {
         private Texture2D conditionsTex = null;
         private Texture2D noConditionsTex = null;
@@ -181,8 +182,9 @@ namespace uAdventure.Editor
             var windowWidth = m_Rect.width;
             var windowHeight = m_Rect.height;
 
-            var workingItem = Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
+            var workingItem = Target != null ? Target as ItemDataControl : Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
                     GameRources.GetInstance().selectedItemIndex];
+            if (Target != null) windowHeight = 300;
 
             activeAreas = Controller.Instance.IdentifierSummary.getIds<ActiveArea>();
             characters  = Controller.Instance.IdentifierSummary.getIds<NPC>();

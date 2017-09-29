@@ -122,10 +122,6 @@ namespace uAdventure.Editor
         {
             isConcreteItemVisible = true;
             GameRources.GetInstance().selectedItemIndex = o;
-
-            itemsWindowActions = new ItemsWindowActions(m_Rect, new GUIContent(TC.get("Item.ActionsPanelTitle")), "Window");
-            itemsWindowAppearance = new ItemsWindowAppearance(m_Rect, new GUIContent(TC.get("Item.LookPanelTitle")), "Window");
-            itemsWindowDescription = new ItemsWindowDescription(m_Rect, new GUIContent(TC.get("Item.DocPanelTitle")), "Window");
         }
 
         void OnWindowTypeChanged(ItemsWindowType type_)

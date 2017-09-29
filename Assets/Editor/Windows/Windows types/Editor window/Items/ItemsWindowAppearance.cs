@@ -8,6 +8,7 @@ using System;
 
 namespace uAdventure.Editor
 {
+    [EditorComponent(typeof(ItemDataControl), Name = "Item.LookPanelTitle", Order = 5)]
     public class ItemsWindowAppearance : AbstractEditorComponentWithPreview
     {
 
@@ -110,8 +111,11 @@ namespace uAdventure.Editor
         public override void OnRender(Rect viewport)
         {
             var item = Target as ItemDataControl;
+            imagePath = item.getPreviewImage();
             var imageTex = string.IsNullOrEmpty(imagePath) ? null : AssetsController.getImage(imagePath).texture;
+            imagePath = item.getIconImage();
             var iconTex = string.IsNullOrEmpty(imagePath) ? null : AssetsController.getImage(imagePath).texture;
+            imagePath = item.getMouseOverImage();
             var imageOverTex = string.IsNullOrEmpty(imagePath) ? null : AssetsController.getImage(imagePath).texture;
 
             if (imageTex == null)

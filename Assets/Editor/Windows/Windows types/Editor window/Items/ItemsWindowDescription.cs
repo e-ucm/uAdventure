@@ -8,7 +8,8 @@ using System;
 
 namespace uAdventure.Editor
 {
-    public class ItemsWindowDescription : LayoutWindow
+    [EditorComponent(typeof(ItemDataControl), Name = "Item.DocPanelTitle", Order = 20)]
+    public class ItemsWindowDescription : AbstractEditorComponent
     {
 
         private ItemDataControl workingItem;
@@ -46,7 +47,7 @@ namespace uAdventure.Editor
 
         public override void Draw(int aID)
         {
-            workingItem = Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[GameRources.GetInstance().selectedItemIndex];
+            workingItem = Target != null ? Target as ItemDataControl : Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[GameRources.GetInstance().selectedItemIndex];
 
 
             // -------------
