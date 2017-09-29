@@ -2,6 +2,7 @@
 using UnityEditor;
 using uAdventure.Core;
 using System.Collections.Generic;
+using System;
 
 namespace uAdventure.Editor
 {
@@ -20,6 +21,7 @@ namespace uAdventure.Editor
             params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, sceneEditor, aOptions)
         {
+            new ReferenceComponent(Rect.zero, new GUIContent(""), "");
 
             conditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/conditions-24x24", typeof(Texture2D));
             noConditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/no-conditions-24x24", typeof(Texture2D));
@@ -82,13 +84,111 @@ namespace uAdventure.Editor
             workingScene = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[GameRources.GetInstance().selectedSceneIndex];
             if(workingScene != prevWorkingScene)
             {
-                referenceList.SetData(workingScene.getReferencesList(), 
+                referenceList.SetData(workingScene.getReferencesList(),
+                    (dc) => (dc as ReferencesListDataControl).getAllReferencesDataControl().ConvertAll(ec => ec.getErdc() as DataControl));
+            }
+
+            if(referenceList.count != workingScene.getReferencesList().getAllReferencesDataControl().Count)
+            {
+                referenceList.SetData(workingScene.getReferencesList(),
                     (dc) => (dc as ReferencesListDataControl).getAllReferencesDataControl().ConvertAll(ec => ec.getErdc() as DataControl));
             }
 
             referenceList.DoList(160);
             GUILayout.Space(20);
         }
-        
+
+        [EditorComponent(typeof(ElementReferenceDataControl), Name = "Transform", Order = 0)]
+        private class ReferenceComponent : AbstractEditorComponent
+        {
+            public ReferenceComponent(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
+            {
+            }
+
+            public override void OnPreRender()
+            {
+                var reference = Target as ElementReferenceDataControl;
+                SceneEditor.Current.PushMatrix();
+                var matrix = SceneEditor.Current.Matrix;
+                SceneEditor.Current.Matrix = matrix * Matrix4x4.TRS(new Vector3(reference.getElementX(), reference.getElementY(), 0), Quaternion.identity, Vector3.one * reference.getElementScale());
+            }
+
+            public override void Draw(int aID)
+            {
+                var reference = Target as ElementReferenceDataControl;
+
+                var oldPos = new Vector2(reference.getElementX(), reference.getElementY());
+                EditorGUI.BeginChangeCheck();
+                var newPos = EditorGUILayout.Vector2Field("Position", oldPos);
+                if (EditorGUI.EndChangeCheck()) { reference.setElementPosition((int) newPos.x, (int) newPos.y); }
+                
+                EditorGUI.BeginChangeCheck();
+                var newScale = EditorGUILayout.FloatField("Position", reference.getElementScale());
+                if (EditorGUI.EndChangeCheck()) { reference.setElementScale(newScale); }
+
+            }
+            
+
+            public override bool Update()
+            {
+                var elemRef = Target as ElementReferenceDataControl;
+
+                Vector2 size = Vector2.zero;
+
+                var referencedElement = elemRef.getReferencedElementDataControl() as DataControlWithResources;
+                Texture2D preview = null;
+                if (referencedElement is ItemDataControl) {
+                    preview = AssetsController.getImage((referencedElement as ItemDataControl).getPreviewImage()).texture;
+                }
+                else if (referencedElement is NPCDataControl)
+                {
+                    preview = AssetsController.getImage((referencedElement as NPCDataControl).getPreviewImage()).texture;
+                }
+                else if (referencedElement is AtrezzoDataControl)
+                {
+                    preview = AssetsController.getImage((referencedElement as AtrezzoDataControl).getPreviewImage()).texture;
+                }
+
+                var myPos = SceneEditor.Current.Matrix.MultiplyPoint(Vector2.zero);
+                var mySize = SceneEditor.Current.Matrix.MultiplyVector(new Vector3(preview.width, preview.height));
+                var rect = new Rect(myPos, mySize).AdjustToViewport(800, 600, SceneEditor.Current.Viewport);
+
+                switch (Event.current.type)
+                {
+                    case EventType.MouseDown:
+                        if (rect.Contains(Event.current.mousePosition) && GUIUtility.hotControl == 0)
+                        {
+                            GUIUtility.hotControl = elemRef.getElementId().GetHashCode();
+                            return true;
+                        }
+                        break;
+                    case EventType.MouseUp:
+                        if (GUIUtility.hotControl == elemRef.getElementId().GetHashCode())
+                        {
+                            GUIUtility.hotControl = 0;
+                        }
+                        break;
+                    case EventType.MouseMove:
+                    case EventType.MouseDrag:
+
+                        if (GUIUtility.hotControl == elemRef.getElementId().GetHashCode())
+                        {
+                            rect = rect.Move(Event.current.delta);
+                            var original = rect.ViewportToScreen(800f, 600f, SceneEditor.Current.Viewport);
+                            elemRef.setElementPosition(Mathf.RoundToInt(original.x), Mathf.RoundToInt(original.y));
+                        }
+                        break;
+                }
+
+
+                return false;
+            }
+
+            public override void OnPostRender()
+            {
+                SceneEditor.Current.PopMatrix();
+            }
+        }
+
     }
 }

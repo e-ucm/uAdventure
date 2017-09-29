@@ -53,20 +53,27 @@ namespace uAdventure.Editor
 
             sceneEditor = new SceneEditor();
 
+            RequestRepaint repaint = () => Repaint();
+
             // Windows
             scenesWindowActiveAreas = new ScenesWindowActiveAreas(rect,
                 new GUIContent(TC.get("ActiveAreasList.Title")), "Window", sceneEditor);
+            scenesWindowActiveAreas.OnRequestRepaint = repaint;
             scenesWindowAppearance = new ScenesWindowAppearance(rect, new GUIContent(TC.get("Scene.LookPanelTitle")),
                 "Window", sceneEditor);
+            scenesWindowAppearance.OnRequestRepaint = repaint;
             scenesWindowDocumentation = new ScenesWindowDocumentation(rect,
                 new GUIContent(TC.get("Scene.DocPanelTitle")), "Window", sceneEditor);
+            scenesWindowDocumentation.OnRequestRepaint = repaint;
             scenesWindowElementReference = new ScenesWindowElementReference(rect,
                 new GUIContent(TC.get("ItemReferencesList.Title")), "Window", sceneEditor);
+            scenesWindowElementReference.OnRequestRepaint = repaint;
             scenesWindowExits = new ScenesWindowExits(rect, new GUIContent(TC.get("Element.Name3")), "Window", sceneEditor);
+            scenesWindowExits.OnRequestRepaint = repaint;
 
             //scenesWindowBarriers = new ScenesWindowBarriers(rect, new GUIContent(TC.get("BarriersList.Title")), "Window", sceneEditor);
             //scenesWindowPlayerMovement = new ScenesWindowPlayerMovement(rect, new GUIContent(TC.get("Trajectory.Title")), "Window", sceneEditor);
-            
+
 
             selectedButtonSkin = (GUISkin)Resources.Load("Editor/ButtonSelected", typeof(GUISkin));
 
@@ -80,6 +87,11 @@ namespace uAdventure.Editor
             // Show information of concrete item
             if (isConcreteItemVisible)
             {
+                var scene = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[GameRources.GetInstance().selectedSceneIndex];
+
+                sceneEditor.Components = EditorWindowBase.Components;
+                sceneEditor.elements = scene.getReferencesList().getAllReferencesDataControl().ConvertAll(elem => elem.getErdc() as DataControl);
+
                 /**
                  UPPER MENU
                 */
@@ -154,6 +166,38 @@ namespace uAdventure.Editor
                 }
 
             }
+        }
+
+        public override void OnDrawMoreWindows()
+        {
+            if (isConcreteItemVisible)
+            {
+                switch (openedWindow)
+                {
+                    case ScenesWindowType.ActiveAreas:
+                        scenesWindowActiveAreas.OnDrawMoreWindows();
+                        break;
+                    case ScenesWindowType.Appearance:
+                        scenesWindowAppearance.OnDrawMoreWindows();
+                        break;
+                    case ScenesWindowType.Documentation:
+                        scenesWindowDocumentation.OnDrawMoreWindows();
+                        break;
+                    case ScenesWindowType.ElementRefrence:
+                        scenesWindowElementReference.OnDrawMoreWindows();
+                        break;
+                    case ScenesWindowType.Exits:
+                        scenesWindowExits.OnDrawMoreWindows();
+                        break;
+                    case ScenesWindowType.Barriers:
+                        scenesWindowBarriers.OnDrawMoreWindows();
+                        break;
+                    case ScenesWindowType.PlayerMovement:
+                        scenesWindowPlayerMovement.OnDrawMoreWindows();
+                        break;
+                }
+            }
+
         }
 
         void OnWindowTypeChanged(ScenesWindowType type_)
