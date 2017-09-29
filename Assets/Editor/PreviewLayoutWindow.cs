@@ -130,7 +130,34 @@ namespace uAdventure.Editor
                     auxRect.x += 30; auxRect.width -= 60;
                     auxRect.y += 30; auxRect.height -= 60;
 
-                    DrawPreview(auxRect);
+                    var viewport = new Rect(auxRect);
+
+                    if (HasToDrawPreviewInspector())
+                    {
+                        var corner = GetDesiredCorner(windowRect, previewRect);
+                        switch (corner.Key)
+                        {
+                            case Corner.BottomLeft:
+                            case Corner.TopLeft:
+                                {
+                                    var reduction = windowRect.width * Mathf.Clamp01(1f - (Vector2.Distance(windowRect.position, corner.Value) / (previewRect.width / 3f)));
+
+                                    viewport.x += reduction;
+                                    viewport.width -= reduction;
+                                }
+                                break;
+
+                            case Corner.BottomRight:
+                            case Corner.TopRight:
+                                {
+                                    var reduction = windowRect.width * Mathf.Clamp01(1f - (Vector2.Distance(windowRect.position, corner.Value) / (previewRect.width / 3f)));
+                                    viewport.width -= reduction;
+                                }
+                                break;
+                        }
+                    }
+
+                    DrawPreview(viewport);
                 }
                 GUILayout.EndHorizontal();
             }
@@ -152,6 +179,8 @@ namespace uAdventure.Editor
             EditorGUILayout.EndVertical();
         }
 
+        private Vector2 scroll;
+
         /** Called when the EditorWindowBase allows for the creation of more windows => Used to draw the preview inspector */
         public override void OnDrawMoreWindows()
         {
@@ -163,10 +192,16 @@ namespace uAdventure.Editor
                 GUI.skin = sceneSkin;
 
                 var prevType = Event.current.type;
-                
+
+                windowRect.height = Mathf.Clamp(windowRect.height, 0, previewRect.height * 0.9f);
                 // Create the preview inspector window
                 var newWindowRect = GUILayout.Window(9999, windowRect, (i) =>
                 {
+                    if(windowRect.height >= previewRect.height * 0.9f)
+                    {
+                        scroll = EditorGUILayout.BeginScrollView(scroll, GUILayout.Height(previewRect.height * 0.9f));
+                    }
+
                     if (Dragging && Event.current.type == EventType.mouseUp)
                     {
                         Dragging = false;
@@ -177,6 +212,12 @@ namespace uAdventure.Editor
                         GUI.DragWindow();
                     }
                     DrawPreviewInspector();
+
+                    if (windowRect.height >= previewRect.height * 0.9f)
+                    {
+                        EditorGUILayout.EndScrollView();
+                    }
+
                 }, "Properties", sceneSkin.window)
                 .TrapInside(previewRect);
                 if (windowRect.position != newWindowRect.position)
