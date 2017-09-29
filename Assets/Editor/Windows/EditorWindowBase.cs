@@ -121,9 +121,10 @@ namespace uAdventure.Editor
 			if (chapterWindow == null) {
 				zeroRect = new Rect(0, 0, 0, 0);    
 				chapterWindow = new ChapterWindow(zeroRect, new GUIContent(TC.get("Element.Name0")), "Window");
+                thisWindowReference.openedWindow = EditorWindowType.Chapter;
 
-				// Extensions of the editor
-				extensions = EditorWindowBaseExtensionFactory.Instance.CreateAllExistingExtensions(zeroRect, "Window");
+                // Extensions of the editor
+                extensions = EditorWindowBaseExtensionFactory.Instance.CreateAllExistingExtensions(zeroRect, "Window");
 
 				var ops = new GUILayoutOption[] {
 					GUILayout.ExpandWidth(true),

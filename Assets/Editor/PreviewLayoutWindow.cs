@@ -72,7 +72,7 @@ namespace uAdventure.Editor
                     if (value)
                     {
                         // Register the update
-                        callback = new EditorApplication.CallbackFunction(this.Update);
+                        callback = new EditorApplication.CallbackFunction(this.ApplicationUpdate);
                         EditorApplication.update = (EditorApplication.CallbackFunction)Delegate.Combine(EditorApplication.update, callback);
                     }
                     else
@@ -97,7 +97,7 @@ namespace uAdventure.Editor
         // ######################## MAIN FUNCTIONS ########################
 
         /** Update is called from the UnityEditor and is used to move (animating) the preview inspector inside of the window */
-        protected virtual void Update()
+        protected virtual void ApplicationUpdate()
         {
             if (Vector3.Distance(PreviewInspectorPosition, TargetPreviewInspectorPosition) > 1.5f)
             {
