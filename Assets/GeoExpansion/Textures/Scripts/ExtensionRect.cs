@@ -41,10 +41,20 @@ public static class ExtensionRect
     public static Rect AdjustToViewport(this Rect rect, float originalWidth, float originalHeight, Rect viewport)
     {
         return new Rect(
-            (rect.x / originalWidth) * viewport.width + viewport.x,
-            (rect.y / originalHeight) * viewport.height + viewport.y,
-            (rect.width / originalWidth) * viewport.width,
-            (rect.height / originalHeight) * viewport.height
+                (rect.x / originalWidth) * viewport.width + viewport.x,
+                (rect.y / originalHeight) * viewport.height + viewport.y,
+                (rect.width / originalWidth) * viewport.width,
+                (rect.height / originalHeight) * viewport.height
+            );
+    }
+
+    public static Rect ViewportToScreen(this Rect rect, float screenWidth, float screenHeight, Rect viewport)
+    {
+        return new Rect(
+                ((rect.x - viewport.x) / viewport.width) * screenWidth,
+                ((rect.y - viewport.y) / viewport.height) * screenHeight,
+                (rect.width / viewport.width) * screenWidth,
+                (rect.height / viewport.height) * screenHeight
             );
     }
 
