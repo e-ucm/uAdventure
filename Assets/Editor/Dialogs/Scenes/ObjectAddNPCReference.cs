@@ -28,6 +28,7 @@ namespace uAdventure.Editor
 
         void OnGUI()
         {
+            EditorWindow.FocusWindowIfItsOpen<ObjectAddNPCReference>();
             EditorGUILayout.LabelField(TC.get("Operation.AddNPCReferenceMessage"), EditorStyles.boldLabel);
 
             GUILayout.Space(20);

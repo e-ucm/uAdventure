@@ -28,6 +28,7 @@ namespace uAdventure.Editor
 
         void OnGUI()
         {
+            EditorWindow.FocusWindowIfItsOpen<ObjectAddItemReference>();
             EditorGUILayout.LabelField(TC.get("Operation.AddItemReferenceMessage"), EditorStyles.boldLabel);
 
             GUILayout.Space(20);
