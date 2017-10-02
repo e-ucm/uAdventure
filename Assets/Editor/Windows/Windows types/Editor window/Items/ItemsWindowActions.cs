@@ -15,35 +15,17 @@ namespace uAdventure.Editor
         private Texture2D noConditionsTex = null;
 
         private Vector2 scrollPosition;
-
-        private int selectedAction;
+        
         private DataControlList actionsList;
 
         private string documentation = "", documentationLast = "";
-
-        private string[] itemsNames;
-        private string[] charactersNames;
-        private string[] joinedNamesList;
-        private int selectedTarget, selectedTargetLast;
 
         public ItemsWindowActions(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
         {
             conditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/conditions-24x24", typeof(Texture2D));
             noConditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/no-conditions-24x24", typeof(Texture2D));
-
-            itemsNames = Controller.Instance.SelectedChapterDataControl.getItemsList().getItemsIDs();
-            charactersNames = Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCsIDs();
-
-            // Both scenes and cutscenes are necessary for next scene popup
-            joinedNamesList = new string[itemsNames.Length + charactersNames.Length + 1];
-            joinedNamesList[0] = "none";
-            itemsNames.CopyTo(joinedNamesList, 1);
-            charactersNames.CopyTo(joinedNamesList, itemsNames.Length + 1);
-
-            selectedTarget = selectedTargetLast = 0;
-            selectedAction = -1;
-
+            
             actionsList = new DataControlList()
             {
                 elementHeight = 40,

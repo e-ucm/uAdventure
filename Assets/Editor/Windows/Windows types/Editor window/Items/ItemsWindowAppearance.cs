@@ -62,7 +62,7 @@ namespace uAdventure.Editor
         protected override void DrawInspector()
         {
             var previousWorkingItem = workingItem;
-            workingItem = Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[GameRources.GetInstance().selectedItemIndex];
+            workingItem = Target != null ? Target as ItemDataControl : Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[GameRources.GetInstance().selectedItemIndex];
 
             // Appearance table
             appearanceEditor.Data = workingItem;
@@ -120,14 +120,9 @@ namespace uAdventure.Editor
 
             if (imageTex == null)
                 return;
-
-
-            var myPos = SceneEditor.Current.Matrix.MultiplyPoint(Vector2.zero);
-            var mySize = SceneEditor.Current.Matrix.MultiplyVector(new Vector3(imageTex.width, imageTex.height));
-            var rect = new Rect(myPos, mySize).AdjustToViewport(800, 600, viewport);
             
+            var rect = GetViewportRect(new Rect(Vector2.zero, new Vector2(imageTex.width, imageTex.height)), SceneEditor.Current.Viewport);
             GUI.DrawTexture(rect, rect.Contains(Event.current.mousePosition) && imageOverTex ? imageOverTex : imageTex, ScaleMode.ScaleToFit);
-            
         }
 
 
