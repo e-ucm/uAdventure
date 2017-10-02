@@ -20,7 +20,7 @@ namespace uAdventure.Editor
         /** Constructor */
         public PreviewLayoutWindow(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
         {
-            sceneSkin = EditorGUIUtility.GetBuiltinSkin(EditorSkin.Scene);
+            sceneSkin = EditorGUIUtility.GetBuiltinSkin(EditorSkin.Inspector);
 
             DoUpdate = false;
         }
@@ -140,7 +140,7 @@ namespace uAdventure.Editor
                             case Corner.BottomLeft:
                             case Corner.TopLeft:
                                 {
-                                    var reduction = windowRect.width * Mathf.Clamp01(1f - (Vector2.Distance(windowRect.position, corner.Value) / (previewRect.width / 3f)));
+                                    var reduction = (windowRect.width + 10) * Mathf.Clamp01(1f - (Vector2.Distance(windowRect.position, corner.Value) / (previewRect.width / 3f)));
 
                                     viewport.x += reduction;
                                     viewport.width -= reduction;
@@ -150,7 +150,7 @@ namespace uAdventure.Editor
                             case Corner.BottomRight:
                             case Corner.TopRight:
                                 {
-                                    var reduction = windowRect.width * Mathf.Clamp01(1f - (Vector2.Distance(windowRect.position, corner.Value) / (previewRect.width / 3f)));
+                                    var reduction = (windowRect.width + 10) * Mathf.Clamp01(1f - (Vector2.Distance(windowRect.position, corner.Value) / (previewRect.width / 3f)));
                                     viewport.width -= reduction;
                                 }
                                 break;
@@ -181,6 +181,8 @@ namespace uAdventure.Editor
 
         private Vector2 scroll;
 
+        private bool useScroll = false;
+
         /** Called when the EditorWindowBase allows for the creation of more windows => Used to draw the preview inspector */
         public override void OnDrawMoreWindows()
         {
@@ -193,13 +195,15 @@ namespace uAdventure.Editor
 
                 var prevType = Event.current.type;
 
-                windowRect.height = Mathf.Clamp(windowRect.height, 0, previewRect.height * 0.9f);
+                windowRect.height = Mathf.Clamp(windowRect.height, 0, 500f);
                 // Create the preview inspector window
                 var newWindowRect = GUILayout.Window(9999, windowRect, (i) =>
                 {
-                    if(windowRect.height >= previewRect.height * 0.9f)
+                    if (Event.current.type == EventType.layout) useScroll = windowRect.height >= 500f;
+
+                    if(useScroll)
                     {
-                        scroll = EditorGUILayout.BeginScrollView(scroll, GUILayout.Height(previewRect.height * 0.9f));
+                        scroll = EditorGUILayout.BeginScrollView(scroll, GUILayout.Height(500f));
                     }
 
                     if (Dragging && Event.current.type == EventType.mouseUp)
@@ -207,31 +211,26 @@ namespace uAdventure.Editor
                         Dragging = false;
                         DoUpdate = true;
                     }
-                    if (!DoUpdate)
-                    {
-                        GUI.DragWindow();
-                    }
                     DrawPreviewInspector();
-
-                    if (windowRect.height >= previewRect.height * 0.9f)
+                    if (useScroll)
                     {
                         EditorGUILayout.EndScrollView();
                     }
 
+                    if (!DoUpdate)
+                    {
+                        GUI.DragWindow();
+                    }
+
                 }, "Properties", sceneSkin.window)
                 .TrapInside(previewRect);
+                // If the position has moved, it has been moved by the user
                 if (windowRect.position != newWindowRect.position)
                 {
                     if(Event.current.type != EventType.Layout && Event.current.type != EventType.Repaint)
                     {
-                        Debug.Log("Type " + Event.current.type + "; RawType " + Event.current.rawType + "; Prev " + prevType);
                         Dragging = true;
                     }
-                }
-                // If the position has moved, it has been moved by the user
-                if (windowRect.position != newWindowRect.position && Event.current.rawType == EventType.MouseDrag)
-                {
-                    Dragging = true;
                 }
 
 
@@ -286,6 +285,13 @@ namespace uAdventure.Editor
 
         // ######################## AUX FUNCTIONS ########################
 
+
+        protected void DrawSplitLine(float y)
+        {
+            Rect position = new Rect(-5f, y, windowRect.width + 6f, 1f);
+            Rect texCoords = new Rect(0f, 1f, 1f, 1f - 1f / (float)GUI.skin.FindStyle("IN title").normal.background.height);
+            GUI.DrawTextureWithTexCoords(position, GUI.skin.FindStyle("IN title").normal.background, texCoords);
+        }
 
         private Dictionary<Corner, Vector3> GetCorners(Rect windowRect, Rect holderRect)
         {

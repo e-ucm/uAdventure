@@ -51,12 +51,19 @@ namespace uAdventure.Editor
                 {
                     var oldTarget = component.Target;
                     component.Target = referencedElement;
-                    component.Collapsed = !EditorGUILayout.BeginToggleGroup((component.Attribute.Name), !component.Collapsed);
-                    component.DrawInspector();
-                    EditorGUILayout.EndToggleGroup();
+                    component.Collapsed = !EditorGUILayout.Foldout(!component.Collapsed, (component.Attribute.Name), true);
+                    if (!component.Collapsed)
+                    {
+                        EditorGUI.indentLevel++;
+                        component.DrawInspector();
+                        GUILayout.Space(5);
+                        EditorGUI.indentLevel--;
+                    }
+                    //
+                    DrawSplitLine(GUILayoutUtility.GetLastRect().max.y);
                     component.Target = oldTarget;
                 }
-
+                 
                 // And then we set it up to be able to draw the referenced element components
                 referencedElement = elemRef.getReferencedElementDataControl();
             }
@@ -66,9 +73,15 @@ namespace uAdventure.Editor
             {
                 var oldTarget = component.Target;
                 component.Target = referencedElement;
-                component.Collapsed = !EditorGUILayout.BeginToggleGroup(TC.get(component.Attribute.Name), !component.Collapsed);
-                component.DrawInspector();
-                EditorGUILayout.EndToggleGroup();
+                component.Collapsed = !EditorGUILayout.Foldout(!component.Collapsed, TC.get(component.Attribute.Name), true);
+                if (!component.Collapsed)
+                {
+                    EditorGUI.indentLevel++;
+                    component.DrawInspector();
+                    GUILayout.Space(5);
+                    EditorGUI.indentLevel--;
+                }
+                DrawSplitLine(GUILayoutUtility.GetLastRect().max.y);
                 component.Target = oldTarget;
             }
         }
