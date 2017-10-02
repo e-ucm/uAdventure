@@ -60,6 +60,8 @@ namespace uAdventure.Core
             Loader.adventureData = adventureData;
         }
 
+        private static Dictionary<string, Animation> animationLoadCache;
+
         /**
          * Loads an animation from a filename
          * 
@@ -69,6 +71,10 @@ namespace uAdventure.Core
          */
         public static Animation loadAnimation(InputStreamCreator isCreator, string filename, ImageLoaderFactory imageloader)
         {
+            if (animationLoadCache == null) animationLoadCache = new Dictionary<string, Animation>();
+
+            if (animationLoadCache.ContainsKey(filename))
+                return animationLoadCache[filename];
 
             AnimationHandler_ animationHandler = new AnimationHandler_(isCreator, imageloader);
             
@@ -85,10 +91,14 @@ namespace uAdventure.Core
             }
             catch (Exception e) { Debug.LogError(e); }
 
+            Animation anim = null;
             if (animationHandler.getAnimation() != null)
-                return animationHandler.getAnimation();
+                anim = animationHandler.getAnimation();
             else
-                return new Animation("anim" + (new System.Random()).Next(1000), imageloader);
+                anim = new Animation("anim" + (new System.Random()).Next(1000), imageloader);
+
+            animationLoadCache.Add(filename, anim);
+            return anim;
         }
 
         /**
