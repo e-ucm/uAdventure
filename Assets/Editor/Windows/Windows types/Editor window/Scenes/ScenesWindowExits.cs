@@ -5,6 +5,7 @@ using UnityEditor;
 using uAdventure.Core;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace uAdventure.Editor
 {
@@ -21,8 +22,6 @@ namespace uAdventure.Editor
 
         private string[] sceneNames;
 
-        private string[] transitionTypes;
-
         private DataControlList exitsList;
         private Texture2D conditionsTex, noConditionsTex;
         private SceneDataControl workingScene;
@@ -32,13 +31,9 @@ namespace uAdventure.Editor
             : base(aStartPos, aContent, aStyle, sceneEditor, aOptions)
         {
 
-
-            transitionTypes = new string[]
-            { TC.get("Exit.NoTransition"), TC.get("Exit.TopToBottom"), TC.get("Exit.BottomToTop"), TC.get("Exit.LeftToRight"), TC.get("Exit.RightToLeft"), TC.get("Exit.FadeIn") };
-
-
-            //new ActiveAreaActionsComponent(Rect.zero, new GUIContent(""), "");
-            //new ActiveAreaDescriptionsComponent(Rect.zero, new GUIContent(""), "");
+            new ExitTransitionComponent(Rect.zero, new GUIContent(""), "");
+            new ExitAppearanceComponent(Rect.zero, new GUIContent(""), "");
+            new ExitConditionsAndEffectsComponent(Rect.zero, new GUIContent(""), "");
 
             conditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/conditions-24x24", typeof(Texture2D));
             noConditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/no-conditions-24x24", typeof(Texture2D));
@@ -109,5 +104,140 @@ namespace uAdventure.Editor
             exitsList.DoList(160);
             GUILayout.Space(20);
         }
+
+        [EditorComponent(typeof(ExitDataControl), Name = "ExitsList.Transition", Order = 5)]
+        public class ExitTransitionComponent : AbstractEditorComponent
+        {
+
+            private string[] transitionTypes;
+            public ExitTransitionComponent(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
+            {
+                transitionTypes = new string[]
+                { TC.get("Exit.NoTransition"), TC.get("Exit.TopToBottom"), TC.get("Exit.BottomToTop"), TC.get("Exit.LeftToRight"), TC.get("Exit.RightToLeft"), TC.get("Exit.FadeIn") };
+            }
+
+            public override void Draw(int aID)
+            {
+                var exit = Target as ExitDataControl;
+
+                // Transition type
+                EditorGUI.BeginChangeCheck();
+                var newtype = EditorGUILayout.Popup(TC.get("NextScene.Transition"), exit.getTransitionType(), transitionTypes);
+                if (EditorGUI.EndChangeCheck()) exit.setTransitionType(newtype);
+
+                // Transition time
+                EditorGUI.BeginChangeCheck();
+                var newtime = EditorGUILayout.IntField(TC.get("NextScene.TransitionTime"), exit.getTransitionTime());
+                if (EditorGUI.EndChangeCheck()) exit.setTransitionTime(newtime);
+            }
+        }
+
+
+        [EditorComponent(typeof(ExitDataControl), Name = "ExitsList.Appearance", Order = 10)]
+        public class ExitAppearanceComponent : AbstractEditorComponent
+        {
+            private TextWithSoundField displayField;
+            private FileChooser cursorField;
+
+            public ExitAppearanceComponent(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
+            {
+                displayField = new TextWithSoundField()
+                {
+                    Label = TC.get("Exit.ExitText"),
+                    FileType = BaseFileOpenDialog.FileType.EXIT_MUSIC
+                };
+                
+                cursorField = new FileChooser()
+                {
+                    Label = TC.get("Cursor.exit.Description"),
+                    FileType = BaseFileOpenDialog.FileType.EXIT_ICON
+                };
+            }
+
+            public override void Draw(int aID)
+            {
+                var exitLook = (Target as ExitDataControl).getExitLookDataControl();
+
+                // Text and sound
+                EditorGUI.BeginChangeCheck();
+                displayField.Content = exitLook.getCustomizedText();
+                displayField.Path = exitLook.getSoundPath();
+                displayField.DoLayout();
+                if (EditorGUI.EndChangeCheck())
+                {
+                    exitLook.setExitText(displayField.Content);
+                    exitLook.setSoundPath(displayField.Path);
+                }
+
+                // Cursor
+                EditorGUI.BeginChangeCheck();
+                cursorField.Path = exitLook.getCustomizedCursor();
+                cursorField.DoLayout();
+                if (EditorGUI.EndChangeCheck())
+                {
+                    exitLook.setCursorPath(cursorField.Path);
+                }
+            }
+        }
+
+        [EditorComponent(typeof(ExitDataControl), Name = "ExitsList.ConditionsAndEffects", Order = 15)]
+        public class ExitConditionsAndEffectsComponent : AbstractEditorComponent
+        {
+            private Texture2D conditionsTex, noConditionsTex;
+
+            public ExitConditionsAndEffectsComponent(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
+            {
+                conditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/conditions-24x24", typeof(Texture2D));
+                noConditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/no-conditions-24x24", typeof(Texture2D));
+            }
+
+            public override void Draw(int aID)
+            {
+                var exit = Target as ExitDataControl;
+
+
+                // Conditions
+                GUILayout.Label(TC.get("Exit.EditConditions"));
+                if (GUILayout.Button(exit.getConditions().getBlocksCount() > 0 ? conditionsTex : noConditionsTex))
+                {
+                    ConditionEditorWindow window =
+                         (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
+                    window.Init(exit.getConditions());
+                }
+
+                GUILayout.Label(TC.get("Exit.ConditionsActive"));
+                // Effects
+                if (GUILayout.Button(TC.get("GeneralText.EditEffects")))
+                {
+                    EffectEditorWindow window = ScriptableObject.CreateInstance<EffectEditorWindow>();
+                    window.Init(exit.getEffects());
+                }
+
+                // Post Effects
+                if (GUILayout.Button(TC.get("Exit.EditPostEffects")))
+                {
+                    EffectEditorWindow window = ScriptableObject.CreateInstance<EffectEditorWindow>();
+                    window.Init(exit.getPostEffects());
+                }
+
+                GUILayout.Label(TC.get("Exit.ConditionsInactive"));
+                // HasNotEffets
+                EditorGUI.BeginChangeCheck();
+                var hasNotEffects = EditorGUILayout.BeginToggleGroup(TC.get("Exit.ActiveWhenConditionsArent"), exit.isHasNotEffects());
+                if (EditorGUI.EndChangeCheck()) exit.setHasNotEffects(hasNotEffects);
+
+                // Not Effects
+                if (GUILayout.Button(TC.get("Exit.EditNotEffects")))
+                {
+                    EffectEditorWindow window = ScriptableObject.CreateInstance<EffectEditorWindow>();
+                    window.Init(exit.getNotEffects());
+                }
+
+                EditorGUILayout.EndToggleGroup();
+
+            }
+        }
     }
+
+
 }
