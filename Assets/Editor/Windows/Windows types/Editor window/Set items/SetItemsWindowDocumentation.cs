@@ -5,9 +5,9 @@ using UnityEditor;
 
 namespace uAdventure.Editor
 {
-    public class SetItemsWindowDocumentation : LayoutWindow
+    [EditorComponent(typeof(AtrezzoDataControl), Name = "Atrezzo.DocPanelTitle", Order = 20)]
+    public class SetItemsWindowDocumentation : AbstractEditorComponent
     {
-        private AtrezzoDataControl workingAtrezzo;
 
         public SetItemsWindowDocumentation(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
@@ -17,7 +17,7 @@ namespace uAdventure.Editor
 
         public override void Draw(int aID)
         {
-            var workingAtrezzo = Controller.Instance.ChapterList.getSelectedChapterData().getAtrezzo()[GameRources.GetInstance().selectedSetItemIndex];
+            var workingAtrezzo = Target != null ? Target as AtrezzoDataControl : Controller.Instance.SelectedChapterDataControl.getAtrezzoList().getAtrezzoList()[GameRources.GetInstance().selectedSetItemIndex];
 
             EditorGUILayout.LabelField(TC.get("Atrezzo.DocPanelTitle"));
             EditorGUI.BeginChangeCheck();

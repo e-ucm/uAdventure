@@ -106,9 +106,6 @@ namespace uAdventure.Editor
         {
             isConcreteItemVisible = true;
             GameRources.GetInstance().selectedSetItemIndex = o;
-
-            setItemsWindowApperance = new SetItemsWindowApperance(m_Rect, new GUIContent(TC.get("Atrezzo.LookPanelTitle")), "Window");
-            setItemsWindowDocumentation = new SetItemsWindowDocumentation(m_Rect, new GUIContent(TC.get("Atrezzo.DocPanelTitle")), "Window");
         }
 
         /////////////////////

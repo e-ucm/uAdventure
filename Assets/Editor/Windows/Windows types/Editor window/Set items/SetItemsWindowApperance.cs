@@ -8,14 +8,14 @@ using System;
 
 namespace uAdventure.Editor
 {
-    public class SetItemsWindowApperance : PreviewLayoutWindow
+    [EditorComponent(typeof(AtrezzoDataControl), Name = "Atrezzo.LookPanelTitle", Order = 10)]
+    public class SetItemsWindowApperance : AbstractEditorComponentWithPreview
     {
 
         private Texture2D imageTex = null;
 
         private FileChooser image;
-
-        private AtrezzoDataControl workingAtrezzo;
+        
         private AppearanceEditor appearanceEditor;
 
         private static List<ResourcesDataControl> emptyList;
@@ -39,7 +39,7 @@ namespace uAdventure.Editor
 
         protected override void DrawInspector()
         {
-            workingAtrezzo = Controller.Instance.SelectedChapterDataControl.getAtrezzoList().getAtrezzoList()[GameRources.GetInstance().selectedSetItemIndex];
+            var workingAtrezzo = Target != null ? Target as AtrezzoDataControl : Controller.Instance.SelectedChapterDataControl.getAtrezzoList().getAtrezzoList()[GameRources.GetInstance().selectedSetItemIndex];
 
             // Appearance table
             appearanceEditor.Data = workingAtrezzo;
@@ -62,6 +62,15 @@ namespace uAdventure.Editor
 
         protected override void DrawPreview(Rect rect)
         {
+            GUI.DrawTexture(rect, imageTex, ScaleMode.ScaleToFit);
+        }
+
+        public override void OnRender(Rect viewport)
+        {
+            var imagePath = (Target as AtrezzoDataControl).getPreviewImage();
+            var imageTex = string.IsNullOrEmpty(imagePath) ? null : AssetsController.getImage(imagePath).texture;
+
+            var rect = GetViewportRect(new Rect(Vector2.zero, new Vector2(imageTex.width, imageTex.height)), viewport);
             GUI.DrawTexture(rect, imageTex, ScaleMode.ScaleToFit);
         }
 
