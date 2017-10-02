@@ -7,7 +7,8 @@ using System;
 
 namespace uAdventure.Editor
 {
-    public class CharactersWindowDialogConfiguration : PreviewLayoutWindow
+    [EditorComponent(typeof(NPCDataControl), Name = "NPC.DialogPanelTitle", Order = 15)]
+    public class CharactersWindowDialogConfiguration : AbstractEditorComponentWithPreview
     {
         private NPCDataControl workingCharacter;
 
@@ -34,7 +35,7 @@ namespace uAdventure.Editor
 
         protected override void DrawInspector()
         {
-            workingCharacter = Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[GameRources.GetInstance().selectedCharacterIndex];
+            workingCharacter = Target != null ? Target as NPCDataControl : Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[GameRources.GetInstance().selectedCharacterIndex];
 
             GUILayout.Label(TC.get("Player.TextColor"));
 

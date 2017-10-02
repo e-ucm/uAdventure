@@ -7,7 +7,8 @@ using uAdventure.Core;
 
 namespace uAdventure.Editor
 {
-    public class CharactersWindowAppearance : PreviewLayoutWindow
+    [EditorComponent(typeof(NPCDataControl), Name = "NPC.LookPanelTitle", Order = 5)]
+    public class CharactersWindowAppearance : AbstractEditorComponentWithPreview
     {
         public enum CharacterAnimationType
         {
@@ -203,7 +204,7 @@ namespace uAdventure.Editor
 
         protected override void DrawInspector()
         {
-            workingCharacter = Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[GameRources.GetInstance().selectedCharacterIndex];
+            workingCharacter = Target != null ? Target as NPCDataControl : Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[GameRources.GetInstance().selectedCharacterIndex];
 
             // Appearance table
             appearanceEditor.Data = workingCharacter;
@@ -287,6 +288,15 @@ namespace uAdventure.Editor
                     break;
             }
             GUILayout.EndHorizontal();
+        }
+
+        public override void OnRender(Rect viewport)
+        {
+            var npc = Target as NPCDataControl;
+
+            var preview = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_STAND_DOWN);
+            var rect = GetViewportRect(new Rect(Vector2.zero, new Vector2(preview.width, preview.height)), viewport);
+            if (preview) GUI.DrawTexture(rect, preview, ScaleMode.ScaleToFit);
         }
     }
 }

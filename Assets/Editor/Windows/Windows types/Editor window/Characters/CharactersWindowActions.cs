@@ -8,7 +8,8 @@ using System.Linq;
 
 namespace uAdventure.Editor
 {
-    public class CharactersWindowActions : LayoutWindow
+    [EditorComponent(typeof(NPCDataControl), Name = "NPC.ActionsPanelTitle", Order = 10)]
+    public class CharactersWindowActions : AbstractEditorComponent
     {
         private Texture2D conditionsTex = null;
         private Texture2D noConditionsTex = null;
@@ -169,7 +170,7 @@ namespace uAdventure.Editor
             var windowWidth = m_Rect.width;
             var windowHeight = m_Rect.height;
 
-            var workingCharacter = Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
+            var workingCharacter = Target != null ? Target as NPCDataControl : Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                     GameRources.GetInstance().selectedCharacterIndex];
 
             activeAreas = Controller.Instance.IdentifierSummary.getIds<ActiveArea>();
@@ -177,7 +178,7 @@ namespace uAdventure.Editor
             items = Controller.Instance.IdentifierSummary.getIds<Item>();
 
             actionsList.SetData(workingCharacter.getActionsList(), (data) => (data as ActionsListDataControl).getActions().Cast<DataControl>().ToList());
-            actionsList.DoList(windowHeight - 60f);
+            actionsList.DoList(Target != null ? 160 : windowHeight - 60f);
         }
         
     }

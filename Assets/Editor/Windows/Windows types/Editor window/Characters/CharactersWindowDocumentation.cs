@@ -6,7 +6,8 @@ using UnityEditor;
 
 namespace uAdventure.Editor
 {
-    public class CharactersWindowDocumentation : LayoutWindow
+    [EditorComponent(typeof(NPCDataControl), Name = "NPC.Documentation", Order = 20)]
+    public class CharactersWindowDocumentation : AbstractEditorComponent
     {
 
         private NPCDataControl workingCharacter;
@@ -20,10 +21,9 @@ namespace uAdventure.Editor
             
         }
 
-
         public override void Draw(int aID)
         {
-            workingCharacter = Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[GameRources.GetInstance().selectedCharacterIndex];
+            workingCharacter = Target != null ? Target as NPCDataControl : Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[GameRources.GetInstance().selectedCharacterIndex];
 
 
             // -------------

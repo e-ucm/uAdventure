@@ -118,11 +118,6 @@ namespace uAdventure.Editor
         {
             isConcreteItemVisible = true;
             GameRources.GetInstance().selectedCharacterIndex = o;
-
-            charactersWindowActions = new CharactersWindowActions(m_Rect, new GUIContent(TC.get("NPC.ActionsPanelTitle")), "Window");
-            charactersWindowAppearance = new CharactersWindowAppearance(m_Rect, new GUIContent(TC.get("NPC.LookPanelTitle")), "Window");
-            charactersWindowDialogConfiguration = new CharactersWindowDialogConfiguration(m_Rect, new GUIContent(TC.get("NPC.DialogPanelTitle")), "Window");
-            charactersWindowDocumentation = new CharactersWindowDocumentation(m_Rect, new GUIContent(TC.get("NPC.Documentation")), "Window");
         }
         
         ///////////////////////////////
