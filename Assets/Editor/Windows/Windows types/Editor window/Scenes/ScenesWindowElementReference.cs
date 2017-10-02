@@ -123,7 +123,7 @@ namespace uAdventure.Editor
                 if (EditorGUI.EndChangeCheck()) { reference.setElementPosition((int) newPos.x, (int) newPos.y); }
                 
                 EditorGUI.BeginChangeCheck();
-                var newScale = EditorGUILayout.FloatField("Position", reference.getElementScale());
+                var newScale = EditorGUILayout.FloatField("Scale", reference.getElementScale());
                 if (EditorGUI.EndChangeCheck()) { reference.setElementScale(newScale); }
 
             }
