@@ -200,27 +200,20 @@ namespace uAdventure.Editor
                 var newWindowRect = GUILayout.Window(9999, windowRect, (i) =>
                 {
                     if (Event.current.type == EventType.layout) useScroll = windowRect.height >= 500f;
-
-                    if(useScroll)
-                    {
-                        scroll = EditorGUILayout.BeginScrollView(scroll, GUILayout.Height(500f));
-                    }
-
+                    
                     if (Dragging && Event.current.type == EventType.mouseUp)
                     {
                         Dragging = false;
                         DoUpdate = true;
                     }
-                    DrawPreviewInspector();
-                    if (useScroll)
-                    {
-                        EditorGUILayout.EndScrollView();
-                    }
 
-                    if (!DoUpdate)
-                    {
-                        GUI.DragWindow();
-                    }
+                    if (useScroll) scroll = EditorGUILayout.BeginScrollView(scroll, GUILayout.Height(500f));
+
+                    DrawPreviewInspector();
+
+                    if (useScroll) EditorGUILayout.EndScrollView();
+
+                    if (!DoUpdate) GUI.DragWindow();
 
                 }, "Properties", sceneSkin.window)
                 .TrapInside(previewRect);
