@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using uAdventure.Core;
+using System;
 
 namespace uAdventure.Editor
 {
@@ -37,6 +38,11 @@ namespace uAdventure.Editor
             foreach (ResourcesUni resources in resourcesList)
                 resourcesDataControlList.Add(new ResourcesDataControl(resources, Controller.ATREZZO));
 
+        }
+
+        public void setDocumentation(string documentation)
+        {
+            atrezzo.setDocumentation(documentation);
         }
 
         /**
