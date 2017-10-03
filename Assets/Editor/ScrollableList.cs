@@ -138,9 +138,26 @@ public class ScrollableList
         }
 
         // Scroll List
+        var wasType = Event.current.type;
         scrollPos = GUI.BeginScrollView(scrollRect, scrollPos, insideRect);
         reorderableList.DoList(insideRect);
         GUI.EndScrollView();
+
+        if(wasType == EventType.scrollWheel && Event.current.type == EventType.Used)
+        {
+            bool hasScrolled = true;
+
+            // Detect if scroll has happened
+            if (scrollRect.height >= insideRect.height)
+                hasScrolled = false;
+            else if (scrollPos.y == insideRect.height - scrollRect.height && Event.current.delta.y > 0)
+                hasScrolled = false;
+            else if (scrollPos.y == 0 && Event.current.delta.y < 0)
+                hasScrolled = false;
+
+            // If no real scroll has been performed, we release the event
+            if(!hasScrolled) { Event.current.type = wasType; }
+        }
 
         // Background correction
         if (Event.current.type == EventType.Repaint && desiredHeight <= scrollRect.height)
