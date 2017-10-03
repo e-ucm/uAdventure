@@ -69,7 +69,20 @@ public class SceneEditor {
             return;
         }
 
-        foreach (var component in Components[element.GetType()])
+        // Component gathering
+        var components = new List<EditorComponent>();
+        // Basic
+        components.AddRange(Components[element.GetType()]);
+        // Interface
+        foreach (var inter in element.GetType().GetInterfaces())
+            if (Components.ContainsKey(inter))
+                components.AddRange(Components[inter]);
+
+        // Sorting the components by order
+        components.Sort((c1, c2) => c1.Attribute.Order.CompareTo(c2.Attribute.Order));
+
+        // Calling
+        foreach (var component in components)
         {
             var oldTarget = component.Target;
             component.Target = element;
@@ -126,7 +139,9 @@ public class SceneEditor {
 
             DoCallForWholeElement(element, (c) => c.OnPreRender());
             DoCallForWholeElement(element, (c) => { if (c.Update()) SelectedElement = element; });
-            DoCallForWholeElement(element, (c) => c.OnRender(Viewport));
+
+            if(Event.current.type == EventType.Repaint)
+                DoCallForWholeElement(element, (c) => c.OnRender(Viewport));
 
             DoCallForWholeElement(element, (c) => c.OnDrawingGizmos());
             if (SelectedElement == element)

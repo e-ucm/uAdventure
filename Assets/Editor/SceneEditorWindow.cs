@@ -38,6 +38,43 @@ namespace uAdventure.Editor
             return selectedElement != null && knownComponents.ContainsKey(selectedElement.GetType());
         }
 
+
+
+        public void DoCallForElement(DataControl element)
+        {
+            if (!knownComponents.ContainsKey(element.GetType())) return;
+
+            // Component gathering
+            var components = new List<EditorComponent>();
+            // Basic
+            components.AddRange(knownComponents[element.GetType()]);
+            // Interface
+            foreach (var inter in element.GetType().GetInterfaces())
+                if (knownComponents.ContainsKey(inter))
+                    components.AddRange(knownComponents[inter]);
+
+            // Sorting the components by order
+            components.Sort((c1, c2) => c1.Attribute.Order.CompareTo(c2.Attribute.Order));
+
+            // Calling
+            foreach (var component in components)
+            {
+                var oldTarget = component.Target;
+                component.Target = element;
+                component.Collapsed = !EditorGUILayout.Foldout(!component.Collapsed, (component.Attribute.Name), true);
+                if (!component.Collapsed)
+                {
+                    EditorGUI.indentLevel++;
+                    component.DrawInspector();
+                    GUILayout.Space(5);
+                    EditorGUI.indentLevel--;
+                }
+                //
+                DrawSplitLine(GUILayoutUtility.GetLastRect().max.y);
+                component.Target = oldTarget;
+            }
+        }
+
         protected override void DrawPreviewInspector()
         {
             var referencedElement = selectedElement;
@@ -47,43 +84,14 @@ namespace uAdventure.Editor
             {
                 // First we draw the special components for the element reference
                 var elemRef = referencedElement as ElementReferenceDataControl;
-                foreach (var component in knownComponents[referencedElement.GetType()])
-                {
-                    var oldTarget = component.Target;
-                    component.Target = referencedElement;
-                    component.Collapsed = !EditorGUILayout.Foldout(!component.Collapsed, (component.Attribute.Name), true);
-                    if (!component.Collapsed)
-                    {
-                        EditorGUI.indentLevel++;
-                        component.DrawInspector();
-                        GUILayout.Space(5);
-                        EditorGUI.indentLevel--;
-                    }
-                    //
-                    DrawSplitLine(GUILayoutUtility.GetLastRect().max.y);
-                    component.Target = oldTarget;
-                }
-                 
+                DoCallForElement(elemRef);
+
                 // And then we set it up to be able to draw the referenced element components
                 referencedElement = elemRef.getReferencedElementDataControl();
             }
 
             // Component drawing
-            foreach (var component in knownComponents[referencedElement.GetType()])
-            {
-                var oldTarget = component.Target;
-                component.Target = referencedElement;
-                component.Collapsed = !EditorGUILayout.Foldout(!component.Collapsed, TC.get(component.Attribute.Name), true);
-                if (!component.Collapsed)
-                {
-                    EditorGUI.indentLevel++;
-                    component.DrawInspector();
-                    GUILayout.Space(5);
-                    EditorGUI.indentLevel--;
-                }
-                DrawSplitLine(GUILayoutUtility.GetLastRect().max.y);
-                component.Target = oldTarget;
-            }
+            DoCallForElement(referencedElement);
         }
 
         // ##################### AUX FUNCTIONS #######################
