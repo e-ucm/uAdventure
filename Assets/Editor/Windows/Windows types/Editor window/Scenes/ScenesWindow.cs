@@ -5,6 +5,7 @@ using uAdventure.Core;
 using System;
 using UnityEditorInternal;
 using UnityEditor;
+using System.Linq;
 
 namespace uAdventure.Editor
 {
@@ -45,6 +46,8 @@ namespace uAdventure.Editor
             : base(rect, new GUIContent(TC.get("Element.Name1")), style, options)
         {
             var content = new GUIContent();
+
+            new RectangleComponentEditor(Rect.zero, new GUIContent(""), "");
 
             // Button
             content.image = (Texture2D) Resources.Load("EAdventureData/img/icons/scenes", typeof(Texture2D));
@@ -90,7 +93,12 @@ namespace uAdventure.Editor
                 var scene = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[GameRources.GetInstance().selectedSceneIndex];
 
                 sceneEditor.Components = EditorWindowBase.Components;
-                sceneEditor.elements = scene.getReferencesList().getAllReferencesDataControl().ConvertAll(elem => elem.getErdc() as DataControl);
+                var allElements = new List<DataControl>();
+                allElements.AddRange(scene.getReferencesList().getAllReferencesDataControl().ConvertAll(elem => elem.getErdc() as DataControl));
+                allElements.AddRange(scene.getActiveAreasList().getActiveAreas().Cast<DataControl>());
+                allElements.AddRange(scene.getExitsList().getExits().Cast<DataControl>());
+                allElements.AddRange(scene.getBarriersList().getBarriers().Cast<DataControl>());
+                sceneEditor.elements = allElements;
 
                 /**
                  UPPER MENU
