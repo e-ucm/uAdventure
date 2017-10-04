@@ -68,8 +68,6 @@ namespace uAdventure.Editor
             appearanceEditor.Data = workingItem;
             appearanceEditor.OnInspectorGUI();
 
-            GUILayout.Space(10);
-
             EditorGUI.BeginChangeCheck();
 
             string previousValue = image.Path = workingItem.getPreviewImage();

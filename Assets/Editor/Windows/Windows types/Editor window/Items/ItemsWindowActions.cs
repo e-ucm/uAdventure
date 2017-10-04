@@ -25,9 +25,10 @@ namespace uAdventure.Editor
         {
             conditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/conditions-24x24", typeof(Texture2D));
             noConditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/no-conditions-24x24", typeof(Texture2D));
-            
+
             actionsList = new DataControlList()
             {
+                footerHeight = 25,
                 elementHeight = 40,
                 Columns = new System.Collections.Generic.List<ColumnList.Column>()
                 {
