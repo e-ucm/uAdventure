@@ -131,6 +131,11 @@ namespace uAdventure.Editor
                 knownComponents.Add(t, new List<EditorComponent>());
             }
 
+            if(component is BaseWindow)
+            {
+                (component as BaseWindow).OnRequestRepaint = () => thisWindowReference.Repaint();
+            }
+
             knownComponents[t].Add(component);
             knownComponents[t].Sort((c1, c2) => CompareComponents(c1, c2));
         }

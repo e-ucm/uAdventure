@@ -125,6 +125,8 @@ namespace uAdventure.Editor
             DrawPreviewHeader();
             var auxRect = EditorGUILayout.BeginVertical("preBackground", GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
             {
+                GUI.BeginGroup(auxRect);
+                auxRect.position = Vector2.zero;
                 GUILayout.BeginHorizontal();
                 {
                     auxRect.x += 30; auxRect.width -= 60;
@@ -160,6 +162,7 @@ namespace uAdventure.Editor
                     DrawPreview(viewport);
                 }
                 GUILayout.EndHorizontal();
+                GUI.EndGroup();
             }
 
             if(Event.current.type != EventType.Layout)
@@ -186,7 +189,6 @@ namespace uAdventure.Editor
         /** Called when the EditorWindowBase allows for the creation of more windows => Used to draw the preview inspector */
         public override void OnDrawMoreWindows()
         {
-
             if (HasToDrawPreviewInspector())
             {
                 // Change the skin to the scene skin to draw it black
@@ -213,7 +215,7 @@ namespace uAdventure.Editor
 
                     if (useScroll) EditorGUILayout.EndScrollView();
 
-                    if (!DoUpdate) GUI.DragWindow();
+                    //if (!DoUpdate) GUI.DragWindow();
 
                 }, "Properties", sceneSkin.window)
                 .TrapInside(previewRect);

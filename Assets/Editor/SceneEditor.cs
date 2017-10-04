@@ -62,27 +62,32 @@ public class SceneEditor {
         }
     }
 
+    private Dictionary<DataControl, List<EditorComponent>> cachedComponents = new Dictionary<DataControl, List<EditorComponent>>();
+
+
     public void DoCallForElement(DataControl element, Action<EditorComponent> call)
     {
-        if (!Components.ContainsKey(element.GetType()))
+        List<EditorComponent> components;
+        if (!cachedComponents.ContainsKey(element))
         {
-            return;
+            if (!Components.ContainsKey(element.GetType())) return;
+
+            // Component gathering
+            components = new List<EditorComponent>();
+            // Basic
+            components.AddRange(Components[element.GetType()]);
+            // Interface
+            foreach (var inter in element.GetType().GetInterfaces())
+                if (Components.ContainsKey(inter))
+                    components.AddRange(Components[inter]);
+
+            // Sorting the components by order
+            components.Sort((c1, c2) => c1.Attribute.Order.CompareTo(c2.Attribute.Order));
+            cachedComponents.Add(element, components);
         }
 
-        // Component gathering
-        var components = new List<EditorComponent>();
-        // Basic
-        components.AddRange(Components[element.GetType()]);
-        // Interface
-        foreach (var inter in element.GetType().GetInterfaces())
-            if (Components.ContainsKey(inter))
-                components.AddRange(Components[inter]);
-
-        // Sorting the components by order
-        components.Sort((c1, c2) => c1.Attribute.Order.CompareTo(c2.Attribute.Order));
-
         // Calling
-        foreach (var component in components)
+        foreach (var component in cachedComponents[element])
         {
             var oldTarget = component.Target;
             component.Target = element;

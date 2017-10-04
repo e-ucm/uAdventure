@@ -41,8 +41,15 @@ namespace uAdventure.Editor
 
         public virtual void OnRender(Rect viewport) {}
 
-        void EditorComponent.DrawInspector(){}
+        void EditorComponent.DrawInspector(){ DrawInspector();  }
 
         public virtual bool Update() { return false; }
+
+        protected Rect GetViewportRect(Rect rect, Rect viewport)
+        {
+            var myPos = SceneEditor.Current.Matrix.MultiplyPoint(rect.position);
+            var mySize = SceneEditor.Current.Matrix.MultiplyVector(rect.size);
+            return new Rect(myPos, mySize).AdjustToViewport(800, 600, viewport);
+        }
     }
 }

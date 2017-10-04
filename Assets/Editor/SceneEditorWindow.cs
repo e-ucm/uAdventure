@@ -38,26 +38,33 @@ namespace uAdventure.Editor
             return selectedElement != null && knownComponents.ContainsKey(selectedElement.GetType());
         }
 
+        private Dictionary<DataControl, List<EditorComponent>> cachedComponents = new Dictionary<DataControl, List<EditorComponent>>();
 
 
         public void DoCallForElement(DataControl element)
         {
-            if (!knownComponents.ContainsKey(element.GetType())) return;
+            List<EditorComponent> components;
+            if (!cachedComponents.ContainsKey(element))
+            {
 
-            // Component gathering
-            var components = new List<EditorComponent>();
-            // Basic
-            components.AddRange(knownComponents[element.GetType()]);
-            // Interface
-            foreach (var inter in element.GetType().GetInterfaces())
-                if (knownComponents.ContainsKey(inter))
-                    components.AddRange(knownComponents[inter]);
+                if (!knownComponents.ContainsKey(element.GetType())) return;
 
-            // Sorting the components by order
-            components.Sort((c1, c2) => c1.Attribute.Order.CompareTo(c2.Attribute.Order));
+                // Component gathering
+                components = new List<EditorComponent>();
+                // Basic
+                components.AddRange(knownComponents[element.GetType()]);
+                // Interface
+                foreach (var inter in element.GetType().GetInterfaces())
+                    if (knownComponents.ContainsKey(inter))
+                        components.AddRange(knownComponents[inter]);
+
+                // Sorting the components by order
+                components.Sort((c1, c2) => c1.Attribute.Order.CompareTo(c2.Attribute.Order));
+                cachedComponents.Add(element, components);
+            }
 
             // Calling
-            foreach (var component in components)
+            foreach (var component in cachedComponents[element])
             {
                 var oldTarget = component.Target;
                 component.Target = element;
