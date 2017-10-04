@@ -13,7 +13,7 @@ namespace uAdventure.Editor
         private string[] types;
         private GUIContent[] actions;
 
-        private int ActionSelected;
+        private int ActionSelected = 0;
 
         public RectangleComponentEditor(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
         {
@@ -25,11 +25,36 @@ namespace uAdventure.Editor
         {
             var rectangleArea = Target as RectangleArea;
 
+            EditorGUI.BeginChangeCheck();
             var selected = GUILayout.Toolbar(rectangleArea.isRectangular() ? 0 : 1, types);
+
+            // If we change the area type
+            if (EditorGUI.EndChangeCheck())
+            {
+                if (!rectangleArea.isRectangular())
+                {
+                    // If it becomes rectangular, we turn the area into the circunscribed rectangle
+                    var surroundingRectangle = GetRect(rectangleArea.getPoints().ToArray());
+                    rectangleArea.getRectangle().setValues(
+                        Mathf.RoundToInt(surroundingRectangle.x),
+                        Mathf.RoundToInt(surroundingRectangle.y),
+                        Mathf.RoundToInt(surroundingRectangle.width),
+                        Mathf.RoundToInt(surroundingRectangle.height));
+                    rectangleArea.setRectangular(true);
+                    ActionSelected = 0;
+                }
+                else
+                {
+                    // If it becomes an area, we turn the rectangle into its separated points
+                    var rectanglePoints = GetPoints(GetRect(rectangleArea.getRectangle()));
+                    rectangleArea.getPoints().Clear();
+                    rectangleArea.getPoints().AddRange(rectanglePoints);
+                    rectangleArea.setRectangular(false);
+                }
+            }
 
             if (selected == 0) // Rectangular
             {
-                if (!rectangleArea.isRectangular()) rectangleArea.setRectangular(true);
                 var rectangle = rectangleArea.getRectangle();
 
                 EditorGUI.BeginChangeCheck();
@@ -49,15 +74,21 @@ namespace uAdventure.Editor
             }
             else // Area
             {
-                if (rectangleArea.isRectangular()) rectangleArea.setRectangular(false);
-                if (rectangleArea.getPoints().Count == 0)
-                {
-                    rectangleArea.addPoint(400, 300);
-                }
                 GUILayout.Label("Points: " + rectangleArea.getPoints().Count);
-
                 ActionSelected = GUILayout.Toolbar(ActionSelected, actions);
             }
+        }
+
+        public override bool Update()
+        {
+            if(Event.current.type == EventType.MouseDown)
+            {
+                var rectangleArea = Target as RectangleArea;
+                var points = WorldToViewport(GetPoints(rectangleArea), SceneEditor.Current.Viewport, 800f, 600f);
+                return Inside(points, Event.current.mousePosition);
+            }
+
+            return false;
         }
 
         public override void OnDrawingGizmos()
@@ -110,7 +141,7 @@ namespace uAdventure.Editor
             {
                 switch (Event.current.type)
                 {
-                    case EventType.Repaint: DrawPoint(point, Color.blue, Color.black); break;
+                    case EventType.Repaint: if (rectangleArea.isRectangular()) DrawSquare(point, Color.yellow, Color.black); else DrawPoint(point, Color.cyan, Color.black); break;
                     case EventType.MouseDown:
                         switch (ActionSelected)
                         {
@@ -165,8 +196,13 @@ namespace uAdventure.Editor
                             }
                             break;
                         case 1:
-                            var point = ViewportToWorld(Event.current.mousePosition, SceneEditor.Current.Viewport, new Vector2(800f, 600f));
-                            rectangleArea.addPoint(Mathf.RoundToInt(point.x), Mathf.RoundToInt(point.y));
+                            var point = Event.current.mousePosition; //ViewportToWorld(Event.current.mousePosition, SceneEditor.Current.Viewport, new Vector2(800f, 600f));
+                            
+                            var pointlist = points.ToList();
+                            pointlist.Insert(FindInsertPos(points, point), point);
+                            points = pointlist.ToArray();
+
+                            pointsChanged = true;
                             Event.current.Use();
                             break;
                     }
@@ -186,11 +222,21 @@ namespace uAdventure.Editor
                         Event.current.Use();
                     }
                     break;
+                case EventType.repaint:
+                    if(ActionSelected == 1)
+                    {
+                        var pos = FindInsertPos(points, Event.current.mousePosition);
+                        Handles.DrawLine(points[(points.Length + pos - 1) % points.Length], Event.current.mousePosition);
+                        Handles.DrawLine(Event.current.mousePosition, points[pos % points.Length]);
+                    }
+
+                    break;
             }
 
 
             if (pointsChanged)
             {
+                this.Repaint();
                 // Update points in the selection
                 if (rectangleArea.isRectangular())
                 {
@@ -217,6 +263,22 @@ namespace uAdventure.Editor
             }
 
             Handles.EndGUI();
+        }
+
+        private int FindInsertPos(Vector2[] points, Vector2 point)
+        {
+            var insertIn = 0;
+            var min = float.MaxValue;
+            for (int i = 0; i < points.Length; i++)
+            {
+                var dist = HandleUtility.DistancePointToLineSegment(point, points[i], points[(i + 1) % points.Length]);
+                if (dist < min)
+                {
+                    min = dist;
+                    insertIn = i;
+                }
+            }
+            return insertIn + 1;
         }
 
         private bool Inside(Vector2[] points, Vector2 mousePosition)
@@ -284,10 +346,16 @@ namespace uAdventure.Editor
             DrawPolyLine(points, true, lineColor, 5f);
         }
 
+        private void DrawSquare(Vector2 position, Color innerColor, Color outerColor)
+        {
+            Handles.color = innerColor;
+            Handles.DrawSolidRectangleWithOutline(new Rect(position.x - 5, position.y - 5, 10, 10), innerColor, outerColor);
+        }
+
         private void DrawPoint(Vector2 position, Color innerColor, Color outerColor)
         {
             Handles.color = outerColor;
-            Handles.DrawSolidDisc(position, Vector3.forward, 5f);
+            Handles.DrawSolidDisc(position, Vector3.forward, 5.5f);
             Handles.color = innerColor;
             Handles.DrawSolidDisc(position, Vector3.forward, 4.5f);
         }
