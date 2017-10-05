@@ -1,36 +1,29 @@
 ﻿using UnityEngine;
 using uAdventure.Core;
+using UnityEditor;
 
 namespace uAdventure.Editor
 {
-    public class PlayerWindowDocumentation : LayoutWindow
+    [EditorComponent(typeof(PlayerDataControl), Name = "Atrezzo.DocPanelTitle", Order = 20)]
+    public class PlayerWindowDocumentation : AbstractEditorComponent
     {
         private string documentation, documentationLast;
 
         public PlayerWindowDocumentation(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
         {
-            documentation = documentationLast = Controller.Instance.ChapterList.getSelectedChapterData().getPlayer().getDocumentation();
-            if (documentation == null)
-                documentation = documentationLast = "";
         }
 
 
         public override void Draw(int aID)
         {
-            GUILayout.Space(20);
-            GUILayout.Label(TC.get("NPC.Documentation"));
-            GUILayout.Space(20);
-            documentation = GUILayout.TextArea(documentation, GUILayout.MinHeight(0.4f * m_Rect.height));
-            if (!documentation.Equals(documentationLast))
-                OnDocumentationChanged(documentation);
-        }
+            var workingPlayer = Target as PlayerDataControl;
 
-        private void OnDocumentationChanged(string s)
-        {
-            Controller.Instance.ChapterList.getSelectedChapterData().getPlayer().setDocumentation(s);
-            documentationLast = s;
+            EditorGUILayout.LabelField(TC.get("Atrezzo.DocPanelTitle"));
+            EditorGUI.BeginChangeCheck();
+            var documentation = GUILayout.TextArea(workingPlayer.getDocumentation() ?? string.Empty, GUILayout.ExpandHeight(true));
+            if (EditorGUI.EndChangeCheck())
+                workingPlayer.setDocumentation(documentation);
         }
-
     }
 }
