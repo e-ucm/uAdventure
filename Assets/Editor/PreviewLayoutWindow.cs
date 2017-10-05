@@ -117,17 +117,19 @@ namespace uAdventure.Editor
             base.OnGUI();
         }
 
+        private Rect areaRect;
+
         /** Called to draw the main Extension window content */
         public override void Draw(int aID)
         {
             DrawInspector();
 
             DrawPreviewHeader();
-            Vector2 originalAuxRectPos = Vector2.zero;
+            Rect promptedRect = Rect.zero;
             var auxRect = EditorGUILayout.BeginVertical("preBackground", GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
             {
-                GUI.BeginGroup(auxRect);
-                originalAuxRectPos = auxRect.position;
+                GUILayout.BeginArea(areaRect);
+                promptedRect = auxRect;
                 auxRect.position = Vector2.zero;
                 GUILayout.BeginHorizontal();
                 {
@@ -164,13 +166,14 @@ namespace uAdventure.Editor
                     DrawPreview(viewport);
                 }
                 GUILayout.EndHorizontal();
-                GUI.EndGroup();
+                GUILayout.EndArea();
             }
 
             if(Event.current.type == EventType.Repaint)
             {
+                areaRect = promptedRect;
                 previewRect = auxRect;
-                previewRect.position += m_Rect.position + originalAuxRectPos;
+                previewRect.position += m_Rect.position + promptedRect.position;
 
                 if (!windowInited)
                 {
