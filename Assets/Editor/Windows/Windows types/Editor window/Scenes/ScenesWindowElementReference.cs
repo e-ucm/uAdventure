@@ -148,8 +148,8 @@ namespace uAdventure.Editor
                 {
                     preview = AssetsController.getImage((referencedElement as AtrezzoDataControl).getPreviewImage()).texture;
                 }
-
-                var myPos = SceneEditor.Current.Matrix.MultiplyPoint(Vector2.zero);
+                 
+                var myPos = SceneEditor.Current.Matrix.MultiplyPoint(new Vector2(-0.5f * preview.width, -preview.height));
                 var mySize = SceneEditor.Current.Matrix.MultiplyVector(new Vector3(preview.width, preview.height));
                 var rect = new Rect(myPos, mySize).AdjustToViewport(800, 600, SceneEditor.Current.Viewport);
 
@@ -175,7 +175,7 @@ namespace uAdventure.Editor
                         {
                             rect = rect.Move(Event.current.delta);
                             var original = rect.ViewportToScreen(800f, 600f, SceneEditor.Current.Viewport);
-                            elemRef.setElementPosition(Mathf.RoundToInt(original.x), Mathf.RoundToInt(original.y));
+                            elemRef.setElementPosition(Mathf.RoundToInt(original.x + 0.5f * original.width), Mathf.RoundToInt(original.y + original.height));
                         }
                         break;
                 }

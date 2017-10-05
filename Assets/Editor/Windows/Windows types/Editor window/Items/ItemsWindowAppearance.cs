@@ -119,7 +119,7 @@ namespace uAdventure.Editor
             if (imageTex == null)
                 return;
             
-            var rect = GetViewportRect(new Rect(Vector2.zero, new Vector2(imageTex.width, imageTex.height)), SceneEditor.Current.Viewport);
+            var rect = GetViewportRect(new Rect(new Vector2(-0.5f * imageTex.width, -imageTex.height), new Vector2(imageTex.width, imageTex.height)), SceneEditor.Current.Viewport);
             GUI.DrawTexture(rect, rect.Contains(Event.current.mousePosition) && imageOverTex ? imageOverTex : imageTex, ScaleMode.ScaleToFit);
         }
 

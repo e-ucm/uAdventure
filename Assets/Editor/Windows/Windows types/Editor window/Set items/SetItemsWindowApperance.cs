@@ -70,7 +70,7 @@ namespace uAdventure.Editor
             var imagePath = (Target as AtrezzoDataControl).getPreviewImage();
             var imageTex = string.IsNullOrEmpty(imagePath) ? null : AssetsController.getImage(imagePath).texture;
 
-            var rect = GetViewportRect(new Rect(Vector2.zero, new Vector2(imageTex.width, imageTex.height)), viewport);
+            var rect = GetViewportRect(new Rect(new Vector2(-0.5f * imageTex.width, -imageTex.height), new Vector2(imageTex.width, imageTex.height)), viewport);
             GUI.DrawTexture(rect, imageTex, ScaleMode.ScaleToFit);
         }
 
