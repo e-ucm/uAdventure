@@ -1563,7 +1563,7 @@ namespace uAdventure.Editor
                 //}
 
                 //return iss;
-                Debug.Log(absolutePath + "\n" + filePath);
+                //Debug.Log(absolutePath + "\n" + filePath);
                 return Path.Combine(absolutePath, filePath);
             }
 
