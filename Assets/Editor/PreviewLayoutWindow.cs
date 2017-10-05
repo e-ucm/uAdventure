@@ -123,9 +123,11 @@ namespace uAdventure.Editor
             DrawInspector();
 
             DrawPreviewHeader();
+            Vector2 originalAuxRectPos = Vector2.zero;
             var auxRect = EditorGUILayout.BeginVertical("preBackground", GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
             {
                 GUI.BeginGroup(auxRect);
+                originalAuxRectPos = auxRect.position;
                 auxRect.position = Vector2.zero;
                 GUILayout.BeginHorizontal();
                 {
@@ -165,11 +167,10 @@ namespace uAdventure.Editor
                 GUI.EndGroup();
             }
 
-            if(Event.current.type != EventType.Layout)
+            if(Event.current.type == EventType.Repaint)
             {
                 previewRect = auxRect;
-                previewRect.center += m_Rect.position;
-
+                previewRect.position += m_Rect.position + originalAuxRectPos;
 
                 if (!windowInited)
                 {
@@ -215,7 +216,7 @@ namespace uAdventure.Editor
 
                     if (useScroll) EditorGUILayout.EndScrollView();
 
-                    //if (!DoUpdate) GUI.DragWindow();
+                    if (!DoUpdate) GUI.DragWindow();
 
                 }, "Properties", sceneSkin.window)
                 .TrapInside(previewRect);
