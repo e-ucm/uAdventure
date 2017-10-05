@@ -42,6 +42,8 @@ namespace uAdventure.Editor
 
         private SceneEditor sceneEditor;
 
+        private List<KeyValuePair<string, ScenesWindowType>> tabs;
+
         public ScenesWindow(Rect rect, GUIStyle style, params GUILayoutOption[] options)
             : base(rect, new GUIContent(TC.get("Element.Name1")), style, options)
         {
@@ -77,6 +79,19 @@ namespace uAdventure.Editor
             //scenesWindowBarriers = new ScenesWindowBarriers(rect, new GUIContent(TC.get("BarriersList.Title")), "Window", sceneEditor);
             //scenesWindowPlayerMovement = new ScenesWindowPlayerMovement(rect, new GUIContent(TC.get("Trajectory.Title")), "Window", sceneEditor);
 
+            tabs = new List<KeyValuePair<string, ScenesWindowType>>()
+                {
+                    new KeyValuePair<string, ScenesWindowType>(TC.get("Scene.LookPanelTitle"),      ScenesWindowType.Appearance),
+                    new KeyValuePair<string, ScenesWindowType>(TC.get("Scene.DocPanelTitle"),       ScenesWindowType.Documentation),
+                    new KeyValuePair<string, ScenesWindowType>(TC.get("ItemReferencesList.Title"),  ScenesWindowType.ElementRefrence),
+                    new KeyValuePair<string, ScenesWindowType>(TC.get("ActiveAreasList.Title"),     ScenesWindowType.ActiveAreas),
+                    new KeyValuePair<string, ScenesWindowType>(TC.get("Element.Name3"),             ScenesWindowType.Exits)
+                };
+            if (Controller.Instance.playerMode() == DescriptorData.MODE_PLAYER_3RDPERSON)
+            {
+                tabs.Add(new KeyValuePair<string, ScenesWindowType>(TC.get("BarriersList.Title"), ScenesWindowType.Barriers));
+                tabs.Add(new KeyValuePair<string, ScenesWindowType>(TC.get("Trajectory.Title"), ScenesWindowType.PlayerMovement));
+            }
 
             selectedButtonSkin = (GUISkin)Resources.Load("Editor/ButtonSelected", typeof(GUISkin));
 
@@ -103,19 +118,6 @@ namespace uAdventure.Editor
                 /**
                  UPPER MENU
                 */
-                List<KeyValuePair<string, ScenesWindowType>> tabs = new List<KeyValuePair<string, ScenesWindowType>>()
-                {
-                    new KeyValuePair<string, ScenesWindowType>(TC.get("Scene.LookPanelTitle"),      ScenesWindowType.Appearance),
-                    new KeyValuePair<string, ScenesWindowType>(TC.get("Scene.DocPanelTitle"),       ScenesWindowType.Documentation),
-                    new KeyValuePair<string, ScenesWindowType>(TC.get("ItemReferencesList.Title"),  ScenesWindowType.ElementRefrence),
-                    new KeyValuePair<string, ScenesWindowType>(TC.get("ActiveAreasList.Title"),     ScenesWindowType.ActiveAreas),
-                    new KeyValuePair<string, ScenesWindowType>(TC.get("Element.Name3"),             ScenesWindowType.Exits)
-                };
-                if (Controller.Instance.playerMode() == DescriptorData.MODE_PLAYER_3RDPERSON)
-                {
-                    tabs.Add(new KeyValuePair<string, ScenesWindowType>(TC.get("BarriersList.Title"), ScenesWindowType.Barriers));
-                    tabs.Add(new KeyValuePair<string, ScenesWindowType>(TC.get("Trajectory.Title"), ScenesWindowType.PlayerMovement));
-                }
                 GUILayout.BeginHorizontal();
                 GUILayout.FlexibleSpace();
                 openedWindow = tabs[GUILayout.Toolbar(tabs.FindIndex(t => t.Value == openedWindow), tabs.ConvertAll(t => t.Key).ToArray(), GUILayout.ExpandWidth(false))].Value;

@@ -6,84 +6,43 @@ using uAdventure.Core;
 namespace uAdventure.Editor
 {
 
-    public class ScenesWindowDocumentation : SceneEditorWindow
+    public class ScenesWindowDocumentation : LayoutWindow
     {
-        private string descriptionOfScene, nameOfScene, descriptionOfSceneLast, nameOfSceneLast, sceneclass = "", sceneclasslast, scenetype = "", scenetypelast;
-        private Scene current;
-
         public ScenesWindowDocumentation(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, SceneEditor sceneEditor, params GUILayoutOption[] aOptions)
-            : base(aStartPos, aContent, aStyle, sceneEditor, aOptions)
+            : base(aStartPos, aContent, aStyle, aOptions)
         {
-            string doc = "";
-            string name = "";
-            string sclass = "";
-            string stype = "";
-
-            if (GameRources.GetInstance().selectedSceneIndex >= 0)
-            {
-                current = Controller.Instance.ChapterList.getSelectedChapterData().getScenes()[GameRources.GetInstance().selectedSceneIndex];
-
-                doc = current.getDocumentation();
-                name = current.getName();
-                sclass = current.getXApiClass();
-                stype = current.getXApiType();
-            }
-
-            doc = (doc == null ? "" : doc);
-            name = (name == null ? "" : name);
-            sclass = (sclass == null ? "" : sclass);
-            stype = (stype == null ? "" : stype);
-
-            descriptionOfScene = descriptionOfSceneLast = doc;
-            nameOfScene = nameOfSceneLast = name;
-            sceneclass = sceneclasslast = sclass;
-            scenetype = scenetypelast = stype;
-            
         }
 
         public override void Draw(int aID)
         {
-            sceneclass = EditorGUILayout.TextField(new GUIContent("xAPI Class"), sceneclass);
-            if (!sceneclass.Equals(sceneclasslast)) ChangeClass(sceneclass);
+            var workingScene = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[GameRources.GetInstance().selectedSceneIndex];
+            var sceneObject = ((Scene)workingScene.getContent());
 
-            scenetype = EditorGUILayout.TextField(new GUIContent("xAPI Type"), scenetype);
-            if (!scenetype.Equals(scenetypelast)) ChangeType(scenetype);
+            //XApi class
+            EditorGUI.BeginChangeCheck();
+            var newClass = EditorGUILayout.TextField(new GUIContent("xAPI Class"), sceneObject.getXApiClass());
+            if (EditorGUI.EndChangeCheck())
+                sceneObject.setXApiClass(newClass);
 
-            GUILayout.Label(TC.get("Scene.Documentation"));
-            descriptionOfScene = GUILayout.TextArea(descriptionOfScene, GUILayout.MinHeight(0.4f * m_Rect.height));
-            if (!descriptionOfScene.Equals(descriptionOfSceneLast))
-                ChangeDocumentation(descriptionOfScene);
+            // Xapi Type
+            EditorGUI.BeginChangeCheck();
+            var newType = EditorGUILayout.TextField(new GUIContent("xAPI Type"), sceneObject.getXApiType());
+            if (EditorGUI.EndChangeCheck())
+                sceneObject.setXApiType(newType);
 
-            GUILayout.Space(30);
 
-            GUILayout.Label(TC.get("Scene.Name"));
-            nameOfScene = GUILayout.TextField(nameOfScene);
-            if (!nameOfScene.Equals(nameOfSceneLast))
-                ChangeName(nameOfScene);
-        }
+            // Name
+            EditorGUI.BeginChangeCheck();
+            var newName = EditorGUILayout.TextField(TC.get("Scene.Name"), workingScene.getName());
+            if (EditorGUI.EndChangeCheck())
+                workingScene.setName(newName);
 
-        private void ChangeClass(string s)
-        {
-            Controller.Instance.ChapterList.getSelectedChapterData().getScenes()[GameRources.GetInstance().selectedSceneIndex].setXApiClass(s);
-            sceneclasslast = s;
-        }
-
-        private void ChangeType(string s)
-        {
-            Controller.Instance.ChapterList.getSelectedChapterData().getScenes()[GameRources.GetInstance().selectedSceneIndex].setXApiType(s);
-            scenetypelast = s;
-        }
-
-        private void ChangeName(string s)
-        {
-            Controller.Instance.ChapterList.getSelectedChapterData().getScenes()[GameRources.GetInstance().selectedSceneIndex].setName(s);
-            nameOfSceneLast = s;
-        }
-
-        private void ChangeDocumentation(string s)
-        {
-            Controller.Instance.ChapterList.getSelectedChapterData().getScenes()[GameRources.GetInstance().selectedSceneIndex].setDocumentation(s);
-            descriptionOfSceneLast = s;
+            // Documentation
+            EditorGUI.BeginChangeCheck();
+            EditorGUILayout.LabelField(TC.get("Scene.Documentation"));
+            var newDescription = EditorGUILayout.TextArea(workingScene.getDocumentation(), GUILayout.ExpandHeight(true));
+            if (EditorGUI.EndChangeCheck())
+                workingScene.setDocumentation(newDescription);
         }
     }
 }
