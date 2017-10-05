@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using uAdventure.Core;
 using uAdventure.QR;
 using System;
+using System.Linq;
 
 namespace uAdventure.Editor
 {
@@ -135,6 +136,10 @@ namespace uAdventure.Editor
             {
                 (component as BaseWindow).OnRequestRepaint = () => thisWindowReference.Repaint();
             }
+
+            // if there's a component of the same tipe already registered we ignore it
+            if (knownComponents[t].Any(c => c.GetType() == component.GetType()))
+                return;
 
             knownComponents[t].Add(component);
             knownComponents[t].Sort((c1, c2) => CompareComponents(c1, c2));
