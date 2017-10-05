@@ -3,6 +3,7 @@ using UnityEditor;
 using uAdventure.Core;
 using System.Collections.Generic;
 using System;
+using System.Linq;
 
 namespace uAdventure.Editor
 {
@@ -98,6 +99,10 @@ namespace uAdventure.Editor
             GUILayout.Space(20);
         }
 
+        // ################################################################################################################################################
+        // ########################################################### REFERENCE COMPONENT  ###############################################################
+        // ################################################################################################################################################
+
         [EditorComponent(typeof(ElementReferenceDataControl), Name = "Transform", Order = 0)]
         private class ReferenceComponent : AbstractEditorComponent
         {
@@ -127,17 +132,13 @@ namespace uAdventure.Editor
                 if (EditorGUI.EndChangeCheck()) { reference.setElementScale(newScale); }
 
             }
-            
 
-            public override bool Update()
+            private Rect GetUnscaledRect(ElementReferenceDataControl elem)
             {
-                var elemRef = Target as ElementReferenceDataControl;
-
-                Vector2 size = Vector2.zero;
-
-                var referencedElement = elemRef.getReferencedElementDataControl() as DataControlWithResources;
+                var referencedElement = elem.getReferencedElementDataControl() as DataControlWithResources;
                 Texture2D preview = null;
-                if (referencedElement is ItemDataControl) {
+                if (referencedElement is ItemDataControl)
+                {
                     preview = AssetsController.getImage((referencedElement as ItemDataControl).getPreviewImage()).texture;
                 }
                 else if (referencedElement is NPCDataControl)
@@ -148,40 +149,109 @@ namespace uAdventure.Editor
                 {
                     preview = AssetsController.getImage((referencedElement as AtrezzoDataControl).getPreviewImage()).texture;
                 }
-                 
-                var myPos = SceneEditor.Current.Matrix.MultiplyPoint(new Vector2(-0.5f * preview.width, -preview.height));
-                var mySize = SceneEditor.Current.Matrix.MultiplyVector(new Vector3(preview.width, preview.height));
+                return new Rect(Vector2.zero, new Vector2(preview.width, preview.height));
+            }
+            
+            private Rect GetElementRect(ElementReferenceDataControl element)
+            {
+                var unscaled = GetUnscaledRect(element);
+
+                var myPos = SceneEditor.Current.Matrix.MultiplyPoint(new Vector2(-0.5f * unscaled.width, -unscaled.height));
+                var mySize = SceneEditor.Current.Matrix.MultiplyVector(new Vector3(unscaled.width, unscaled.height));
                 var rect = new Rect(myPos, mySize).AdjustToViewport(800, 600, SceneEditor.Current.Viewport);
 
+                return rect;
+            }
+
+            public override bool Update()
+            {
+                var elemRef = Target as ElementReferenceDataControl;
+
+                bool selected = false;
                 switch (Event.current.type)
                 {
                     case EventType.MouseDown:
-                        if (rect.Contains(Event.current.mousePosition) && GUIUtility.hotControl == 0)
-                        {
-                            GUIUtility.hotControl = elemRef.getElementId().GetHashCode();
-                            return true;
-                        }
-                        break;
-                    case EventType.MouseUp:
-                        if (GUIUtility.hotControl == elemRef.getElementId().GetHashCode())
-                        {
-                            GUIUtility.hotControl = 0;
-                        }
-                        break;
-                    case EventType.MouseMove:
-                    case EventType.MouseDrag:
-
-                        if (GUIUtility.hotControl == elemRef.getElementId().GetHashCode())
-                        {
-                            rect = rect.Move(Event.current.delta);
-                            var original = rect.ViewportToScreen(800f, 600f, SceneEditor.Current.Viewport);
-                            elemRef.setElementPosition(Mathf.RoundToInt(original.x + 0.5f * original.width), Mathf.RoundToInt(original.y + original.height));
-                        }
+                        if (GetElementRect(elemRef).Contains(Event.current.mousePosition) && GUIUtility.hotControl == 0) selected = true;
                         break;
                 }
 
+                return selected;
+            }
 
-                return false;
+            public override void OnDrawingGizmos()
+            {
+                var elemRef = Target as ElementReferenceDataControl;
+                var rect = GetElementRect(elemRef);
+
+            }
+
+            public override void OnDrawingGizmosSelected()
+            {
+                var elemRef = Target as ElementReferenceDataControl;
+                var rect = GetElementRect(elemRef);
+                var points = rect.ToPoints();
+
+                HandleUtil.DrawPolyLine(points, true, Color.red);
+                
+                int pointChanged = -1;
+                Vector2 oldPointValue = Vector2.zero;
+                for(int i = 0; i < points.Length; i++)
+                {
+                    EditorGUI.BeginChangeCheck();
+                    var aux = points[i];
+                    points[i] = HandleUtil.HandlePointMovement(elemRef.GetHashCode() + i + 1, points[i], 10f, p => HandleUtil.DrawPoint(p, 4.5f, Color.blue, Color.black));
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        oldPointValue = aux;
+                        points[i] = Event.current.mousePosition;
+                        pointChanged = i;
+                    }
+                }
+
+                if (pointChanged != -1)
+                {
+                    var diff = points[pointChanged] - oldPointValue;
+                    // Fix the change
+                    switch (pointChanged)
+                    {
+                        case 0: points[3].x += diff.x; points[1].y += diff.y; break;
+                        case 1: points[2].x += diff.x; points[0].y += diff.y; break;
+                        case 2: points[1].x += diff.x; points[3].y += diff.y; break;
+                        case 3: points[0].x += diff.x; points[2].y += diff.y; break;
+                    }
+                    
+                    //First we calculate the new original screen rect
+                    var original = points.ToRect().ViewportToScreen(800f, 600f, SceneEditor.Current.Viewport);
+                    var newRatio = original.width / original.height;
+                    // Then we obtain the unscaled rect to calculate the new scale
+                    var unscaled = GetUnscaledRect(elemRef);
+                    var unscaledRatio = unscaled.width / unscaled.height;
+                    // And calculate the scale
+                    if(newRatio > unscaledRatio)
+                    {
+                        original.height = original.width / unscaledRatio;
+                    }
+                    else
+                    {
+                        original.width = original.height * unscaledRatio;
+                    }
+                    // And then we rip the position
+                    var position = original.center + new Vector2(0, original.height/2f);
+                    var scale = original.size.magnitude / unscaled.size.magnitude;
+
+                    // And then we set the values in the reference
+                    elemRef.setElementPosition(Mathf.RoundToInt(position.x), Mathf.RoundToInt(position.y));
+                    elemRef.setElementScale(scale);
+
+                }
+
+                EditorGUI.BeginChangeCheck();
+                rect = HandleUtil.HandleRectMovement(elemRef.GetHashCode(), rect);
+                if(EditorGUI.EndChangeCheck())
+                {
+                    var original = rect.ViewportToScreen(800f, 600f, SceneEditor.Current.Viewport);
+                    elemRef.setElementPosition(Mathf.RoundToInt(original.x + 0.5f * original.width), Mathf.RoundToInt(original.y + original.height));
+                }
             }
 
             public override void OnPostRender()
