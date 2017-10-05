@@ -43,37 +43,21 @@ namespace uAdventure.Editor
             // Show information of concrete item
             if (isConcreteItemVisible)
             {
+
                 /**
-                UPPER MENU
+                 UPPER MENU
                 */
+                List<KeyValuePair<string, ItemsWindowType>> tabs = new List<KeyValuePair<string, ItemsWindowType>>()
+                {
+                    new KeyValuePair<string, ItemsWindowType>(TC.get("Item.LookPanelTitle"), ItemsWindowType.Appearance),
+                    new KeyValuePair<string, ItemsWindowType>(TC.get("Item.ActionsPanelTitle"), ItemsWindowType.Actions),
+                    new KeyValuePair<string, ItemsWindowType>(TC.get("Item.DocPanelTitle"), ItemsWindowType.DescriptionConfig)
+                };
+
                 GUILayout.BeginHorizontal();
-                if (openedWindow == ItemsWindowType.Appearance)
-                    GUI.skin = selectedButtonSkin;
-                if (GUILayout.Button(TC.get("Item.LookPanelTitle")))
-                {
-                    OnWindowTypeChanged(ItemsWindowType.Appearance);
-                }
-                if (openedWindow == ItemsWindowType.Appearance)
-                    GUI.skin = defaultSkin;
-
-                if (openedWindow == ItemsWindowType.Actions)
-                    GUI.skin = selectedButtonSkin;
-                if (GUILayout.Button(TC.get("Item.ActionsPanelTitle")))
-                {
-                    OnWindowTypeChanged(ItemsWindowType.Actions);
-                }
-                if (openedWindow == ItemsWindowType.Actions)
-                    GUI.skin = defaultSkin;
-
-                if (openedWindow == ItemsWindowType.DescriptionConfig)
-                    GUI.skin = selectedButtonSkin;
-                if (GUILayout.Button(TC.get("Item.DocPanelTitle")))
-                {
-                    OnWindowTypeChanged(ItemsWindowType.DescriptionConfig);
-                }
-                if (openedWindow == ItemsWindowType.DescriptionConfig)
-                    GUI.skin = defaultSkin;
-
+                GUILayout.FlexibleSpace();
+                openedWindow = tabs[GUILayout.Toolbar(tabs.FindIndex(t => t.Value == openedWindow), tabs.ConvertAll(t => t.Key).ToArray(), GUILayout.ExpandWidth(false))].Value;
+                GUILayout.FlexibleSpace();
                 GUILayout.EndHorizontal();
 
                 switch (openedWindow)
