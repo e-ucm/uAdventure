@@ -34,7 +34,7 @@ namespace uAdventure.Editor
                 if (!rectangleArea.isRectangular())
                 {
                     // If it becomes rectangular, we turn the area into the circunscribed rectangle
-                    var surroundingRectangle = GetRect(rectangleArea.getPoints().ToArray());
+                    var surroundingRectangle = rectangleArea.getPoints().ToArray().ToRect();
                     rectangleArea.getRectangle().setValues(
                         Mathf.RoundToInt(surroundingRectangle.x),
                         Mathf.RoundToInt(surroundingRectangle.y),
@@ -46,7 +46,7 @@ namespace uAdventure.Editor
                 else
                 {
                     // If it becomes an area, we turn the rectangle into its separated points
-                    var rectanglePoints = GetPoints(GetRect(rectangleArea.getRectangle()));
+                    var rectanglePoints = GetRect(rectangleArea.getRectangle()).ToPoints();
                     rectangleArea.getPoints().Clear();
                     rectangleArea.getPoints().AddRange(rectanglePoints);
                     rectangleArea.setRectangular(false);
@@ -130,7 +130,7 @@ namespace uAdventure.Editor
 
             switch (Event.current.type)
             {
-                case EventType.Repaint: DrawPolyLine(points, true, lineColor, 5f); break;
+                case EventType.Repaint: HandleUtil.DrawPolyLine(points, true, lineColor, 5f); break;
             }
 
             bool pointsChanged = false;
@@ -141,7 +141,7 @@ namespace uAdventure.Editor
             {
                 switch (Event.current.type)
                 {
-                    case EventType.Repaint: if (rectangleArea.isRectangular()) DrawSquare(point, Color.yellow, Color.black); else DrawPoint(point, Color.cyan, Color.black); break;
+                    case EventType.Repaint: if (rectangleArea.isRectangular()) HandleUtil.DrawSquare(point, 10f, Color.yellow, Color.black); else HandleUtil.DrawPoint(point, 4.5f, Color.cyan, Color.black); break;
                     case EventType.MouseDown:
                         switch (ActionSelected)
                         {
@@ -248,7 +248,7 @@ namespace uAdventure.Editor
                         case 3: points[0].x += Event.current.delta.x; points[2].y += Event.current.delta.y; break;
                     }
 
-                    var rect = GetRect(ViewportToWorld(points, SceneEditor.Current.Viewport, 800f, 600f));
+                    var rect = ViewportToWorld(points, SceneEditor.Current.Viewport, 800f, 600f).ToRect();
                     rectangleArea.getRectangle().setValues(
                         Mathf.RoundToInt(rect.x),
                         Mathf.RoundToInt(rect.y),
@@ -301,7 +301,7 @@ namespace uAdventure.Editor
             if (rectangleArea.isRectangular())
             {
                 Rect rect = GetRect(rectangleArea.getRectangle());
-                points = GetPoints(rect);
+                points = rect.ToPoints();
             }
             else
             {
@@ -311,25 +311,6 @@ namespace uAdventure.Editor
             return points;
         }
 
-        private Vector2[] GetPoints(Rect rect)
-        {
-            return new Vector2[] {
-                rect.position,
-                rect.position + new Vector2(rect.width, 0),
-                rect.position + rect.size,
-                rect.position + new Vector2(0, rect.height)};
-        }
-
-        private Rect GetRect(Vector2[] points)
-        {
-            var minX = points.Min(p => p.x);
-            var minY = points.Min(p => p.y);
-            var maxX = points.Max(p => p.x);
-            var maxY = points.Max(p => p.y);
-
-            return new Rect(minX, minY, maxX - minX, maxY - minY);
-        }
-
         private Rect GetRect(Rectangle rectangle)
         {
             return new Rect(new Vector2(rectangle.getX(), rectangle.getY()), new Vector2(rectangle.getWidth(), rectangle.getHeight()));
@@ -337,56 +318,13 @@ namespace uAdventure.Editor
 
         private void DrawArea(Vector2[] points, Color lineColor, Color backgroundColor)
         {
-            DrawPolyLine(points, true, lineColor);
-            DrawPolygon(points, backgroundColor);
+            HandleUtil.DrawPolyLine(points, true, lineColor);
+            HandleUtil.DrawPolygon(points, backgroundColor);
         }
 
         private void DrawSelectedArea(Vector2[] points, Color lineColor, Color backgroundColor)
         {
-            DrawPolyLine(points, true, lineColor, 5f);
-        }
-
-        private void DrawSquare(Vector2 position, Color innerColor, Color outerColor)
-        {
-            Handles.color = innerColor;
-            Handles.DrawSolidRectangleWithOutline(new Rect(position.x - 5, position.y - 5, 10, 10), innerColor, outerColor);
-        }
-
-        private void DrawPoint(Vector2 position, Color innerColor, Color outerColor)
-        {
-            Handles.color = outerColor;
-            Handles.DrawSolidDisc(position, Vector3.forward, 5.5f);
-            Handles.color = innerColor;
-            Handles.DrawSolidDisc(position, Vector3.forward, 4.5f);
-        }
-
-        private void DrawPolyLine(Vector2[] points, bool closed, Color color, float width = 2f)
-        {
-            Handles.color = color;
-            Handles.DrawAAPolyLine(width, V2ToV3(points));
-            if (closed)
-                Handles.DrawAAPolyLine(width, V2ToV3(new Vector2[] { points[0], points[points.Length - 1] }));
-        }
-
-        private void DrawPolygon(Vector2[] points, Color color)
-        {
-            Triangulator2 tr = new Triangulator2(points);
-            Handles.color = color;
-            int[] indices = tr.Triangulate();
-            Vector3[] triangle = new Vector3[3];
-            var v3p = V2ToV3(points);
-            for (int i = 2; i < indices.Length; i += 3)
-            {
-                triangle[0] = v3p[indices[i - 2]];
-                triangle[1] = v3p[indices[i - 1]];
-                triangle[2] = v3p[indices[i]];
-                Handles.DrawAAConvexPolygon(triangle);
-            }
-        }
-
-        private Vector3[] V2ToV3(Vector2[] points)
-        {
-            return points.Select(p => new Vector3(p.x, p.y, 0f)).ToArray();
+            HandleUtil.DrawPolyLine(points, true, lineColor, 5f);
         }
 
         

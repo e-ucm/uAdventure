@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
 
 /// <summary>
 /// The ExtensionRect class hods up multiple util operations for rectangles.
@@ -19,6 +20,25 @@ public static class ExtensionRect
             rect.width, rect.height);
     }
 
+
+    public static Vector2[] ToPoints(this Rect rect)
+    {
+        return new Vector2[] {
+                rect.position,
+                rect.position + new Vector2(rect.width, 0),
+                rect.position + rect.size,
+                rect.position + new Vector2(0, rect.height)};
+    }
+
+    public static Rect ToRect(this Vector2[] points)
+    {
+        var minX = points.Min(p => p.x);
+        var minY = points.Min(p => p.y);
+        var maxX = points.Max(p => p.x);
+        var maxY = points.Max(p => p.y);
+
+        return new Rect(minX, minY, maxX - minX, maxY - minY);
+    }
 
     public static Rect AdjustToRatio(this Rect rect, float width, float height)
     {
