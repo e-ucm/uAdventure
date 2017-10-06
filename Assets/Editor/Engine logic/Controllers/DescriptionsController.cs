@@ -139,22 +139,10 @@ namespace uAdventure.Editor
             return descriptionsController[index];
         }
 
-        public bool deleteElement()
-        {
-
-            return Controller.Instance.addTool(new RemoveDescriptionTool(this));
-        }
-
-        public bool duplicateElement()
+        public override bool duplicateElement(DataControl dataControl)
         {
 
             return Controller.Instance.addTool(new DuplicateDescriptionTool(this));
-        }
-
-        public bool addElement()
-        {
-
-            return Controller.Instance.addTool(new AddDescriptionTool(this));
         }
 
 
@@ -168,14 +156,14 @@ namespace uAdventure.Editor
 
         public override int[] getAddableElements()
         {
-            return new int[] { };
+            return new int[] { 999 };
         }
 
 
 
         public override bool canAddElement(int type)
         {
-            return false;
+            return type == 999;
         }
 
 
@@ -210,6 +198,12 @@ namespace uAdventure.Editor
 
         public override bool addElement(int type, string id)
         {
+            if(type == 999)
+            {
+                controller.addTool(new AddDescriptionTool(this));
+                return true;
+            }
+
             return false;
         }
 
@@ -217,21 +211,57 @@ namespace uAdventure.Editor
 
         public override bool deleteElement(DataControl dataControl, bool askConfirmation)
         {
+            if (this.getDescriptions().Contains(dataControl as DescriptionController))
+            {
+                controller.addTool(new RemoveDescriptionTool(this));
+                return true;
+            }
+            
             return false;
         }
+
 
 
 
         public override bool moveElementUp(DataControl dataControl)
         {
-            return false;
-        }
 
+            bool elementMoved = false;
+            int elementIndex = descriptions.IndexOf((Description)dataControl.getContent());
+
+            if (elementIndex > 0)
+            {
+                Description e = descriptions[elementIndex];
+                DescriptionController c = descriptionsController[elementIndex];
+                descriptions.RemoveAt(elementIndex);
+                descriptionsController.RemoveAt(elementIndex);
+                descriptions.Insert(elementIndex - 1, e);
+                descriptionsController.Insert(elementIndex - 1, c);
+                elementMoved = true;
+            }
+
+            return elementMoved;
+        }
 
 
         public override bool moveElementDown(DataControl dataControl)
         {
-            return false;
+
+            bool elementMoved = false;
+            int elementIndex = descriptions.IndexOf((Description)dataControl.getContent());
+
+            if (elementIndex < descriptions.Count - 1)
+            {
+                Description e = descriptions[elementIndex];
+                DescriptionController c = descriptionsController[elementIndex];
+                descriptions.RemoveAt(elementIndex);
+                descriptionsController.RemoveAt(elementIndex);
+                descriptions.Insert(elementIndex + 1, e);
+                descriptionsController.Insert(elementIndex + 1, c);
+                elementMoved = true;
+            }
+
+            return elementMoved;
         }
 
 
