@@ -126,7 +126,7 @@ namespace uAdventure.Editor
         public override int[] getAddableElements()
         {
 
-            return new int[] { Controller.CUTSCENE };
+            return new int[] { Controller.CUTSCENE_SLIDES, Controller.CUTSCENE_VIDEO };
         }
 
 
@@ -134,7 +134,7 @@ namespace uAdventure.Editor
         {
 
             // It can always add new cutscenes
-            return type == Controller.CUTSCENE;
+            return type == Controller.CUTSCENE_SLIDES || type == Controller.CUTSCENE_VIDEO;
         }
 
 

@@ -386,7 +386,7 @@ namespace uAdventure.Editor
         public override bool canBeDuplicated()
         {
 
-            return false;
+            return true;
         }
 
 
