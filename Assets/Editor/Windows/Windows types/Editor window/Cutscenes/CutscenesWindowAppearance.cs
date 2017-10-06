@@ -30,6 +30,8 @@ namespace uAdventure.Editor
         private FileChooser video, music;
         private AnimationField slides;
 
+        public DataControl Target { get; set; }
+
         public CutscenesWindowAppearance(Rect aStartPos, GUIContent aContent, GUIStyle aStyle,
             params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
@@ -107,8 +109,21 @@ namespace uAdventure.Editor
             }
         }
 
-        protected override void DrawPreview(Rect rect)
+        public override void DrawPreview(Rect rect)
         {
+            var slidesPreview = this.slidesPreview;
+            if(Target != null)
+            {
+                var cutscene = Target as CutsceneDataControl;
+
+                if (cutscene.isVideoscene()) slidesPreview = slidePreviewMovie;
+                else
+                {
+                    var pathPreview = cutscene.getPreviewImage();
+                    slidesPreview = pathPreview == null ? null : AssetsController.getImage(pathPreview).texture;
+                }
+            }
+
             GUI.DrawTexture(rect, slidesPreview, ScaleMode.ScaleToFit);
         }
 

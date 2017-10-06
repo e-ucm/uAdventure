@@ -60,8 +60,12 @@ namespace uAdventure.Editor
             }
         }
 
-        protected override void DrawPreview(Rect rect)
+        public override void DrawPreview(Rect rect)
         {
+            var elem = Target != null ? Target as AtrezzoDataControl : Controller.Instance.SelectedChapterDataControl.getAtrezzoList().getAtrezzoList()[GameRources.GetInstance().selectedSetItemIndex];
+            var imagePath = elem.getPreviewImage();
+            var imageTex = string.IsNullOrEmpty(imagePath) ? null : AssetsController.getImage(imagePath).texture;
+
             GUI.DrawTexture(rect, imageTex, ScaleMode.ScaleToFit);
         }
 

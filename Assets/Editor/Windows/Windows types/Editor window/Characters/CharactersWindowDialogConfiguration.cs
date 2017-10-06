@@ -164,7 +164,7 @@ namespace uAdventure.Editor
             }
         }
 
-        protected override void DrawPreview(Rect rect)
+        public override void DrawPreview(Rect rect)
         {
             GUILayout.BeginVertical();
             GUILayout.FlexibleSpace();

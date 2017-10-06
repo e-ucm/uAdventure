@@ -45,14 +45,14 @@ namespace uAdventure.Editor
             }
 
         } 
-        public float ElementHeith { get
+        public float ElementHeight { get
             {
                 return reorderableList.elementHeight;
             }
             set
             {
                 reorderableList.elementHeight = value;
-                this.MenuHeight = ElementHeith * reorderableList.list.Count;
+                this.MenuHeight = ElementHeight * reorderableList.list.Count;
             }
         }
 
