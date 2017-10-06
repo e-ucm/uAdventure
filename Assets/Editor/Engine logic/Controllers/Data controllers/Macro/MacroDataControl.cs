@@ -8,7 +8,7 @@ namespace uAdventure.Editor
 {
     public class MacroDataControl : DataControl
     {
-        private EffectsController controller;
+        private EffectsController effectsController;
 
         private Macro macro;
 
@@ -16,7 +16,7 @@ namespace uAdventure.Editor
         {
 
             macro = conditions;
-            controller = new EffectsController(macro);
+            effectsController = new EffectsController(macro);
         }
 
         public void setDocumentation(string doc)
@@ -39,7 +39,17 @@ namespace uAdventure.Editor
 
         public void setId(string val)
         {
-            macro.setId(val);
+            if(val != macro.getId())
+            {
+                var oldId = macro.getId();
+                if (!controller.isElementIdValid(val))
+                    val = controller.makeElementValid(val);
+                macro.setId(val);
+
+                controller.replaceIdentifierReferences(oldId, val);
+                controller.IdentifierSummary.deleteId<Macro>(oldId);
+                controller.IdentifierSummary.addId<Macro>(val);
+            }
         }
         /**
          * @return the controller
@@ -48,7 +58,7 @@ namespace uAdventure.Editor
         public EffectsController getController()
         {
 
-            return controller;
+            return effectsController;
         }
 
 
