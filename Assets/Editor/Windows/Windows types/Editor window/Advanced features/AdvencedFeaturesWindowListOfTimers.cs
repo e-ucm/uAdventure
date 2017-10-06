@@ -1,297 +1,211 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System.Text.RegularExpressions;
 
 using uAdventure.Core;
+using UnityEditor;
+using System.Linq;
 
 namespace uAdventure.Editor
 {
     public class AdvencedFeaturesWindowListOfTimers : LayoutWindow
     {
-        private Texture2D addTex = null;
-        private Texture2D duplicateTex = null;
-        private Texture2D clearTex = null;
         
-        private static Rect timerTableRect, rightPanelRect, settingsTable;
-
-        private static GUISkin defaultSkin;
-        private static GUISkin noBackgroundSkin;
-        private static GUISkin selectedAreaSkin;
-
-        private int selectedTimer;
-
-        private string timerTime, timerTimeLast;
-        private string fullTimerDescription = "", fullTimerDescriptionLast = "";
-        private string displayName = "", displayNameLast = "";
-
-        private Vector2 scrollPosition;
-
         private GUIStyle smallFontStyle;
+        private DataControlList timerList;
 
         public AdvencedFeaturesWindowListOfTimers(Rect aStartPos, GUIContent aContent, GUIStyle aStyle,
             params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
         {
-            clearTex = (Texture2D)Resources.Load("EAdventureData/img/icons/deleteContent", typeof(Texture2D));
-            addTex = (Texture2D)Resources.Load("EAdventureData/img/icons/addNode", typeof(Texture2D));
-            duplicateTex = (Texture2D)Resources.Load("EAdventureData/img/icons/duplicateNode", typeof(Texture2D));
-            
-            noBackgroundSkin = (GUISkin)Resources.Load("Editor/EditorNoBackgroundSkin", typeof(GUISkin));
-            selectedAreaSkin = (GUISkin)Resources.Load("Editor/EditorLeftMenuItemSkinConcreteOptions", typeof(GUISkin));
       
             smallFontStyle = new GUIStyle();
             smallFontStyle.fontSize = 8;
 
-            selectedTimer = -1;
+
+            timerList = new DataControlList()
+            {
+                footerHeight = 25,
+                elementHeight = 25,
+                Columns = new System.Collections.Generic.List<ColumnList.Column>()
+                {
+                    new ColumnList.Column()
+                    {
+                        Text = TC.get("TimersList.Timer"),
+                        SizeOptions = new GUILayoutOption[] { GUILayout.ExpandWidth(true) }
+                    },
+                    new ColumnList.Column()
+                    {
+                        Text = TC.get("TimersList.Time"),
+                        SizeOptions = new GUILayoutOption[] { GUILayout.ExpandWidth(true) }
+                    },
+                    new ColumnList.Column()
+                    {
+                        Text = TC.get("TimersList.Display"),
+                        SizeOptions = new GUILayoutOption[] { GUILayout.ExpandWidth(true) }
+                    }
+                },
+                drawCell = (rect, index, column, isActive, isFocused) =>
+                {
+                    var timer = timerList.list[index] as TimerDataControl;
+                    switch (column)
+                    {
+                        case 0:
+                            EditorGUI.BeginChangeCheck();
+                            var id = EditorGUI.DelayedTextField(rect, timer.getDisplayName());
+                            if (EditorGUI.EndChangeCheck()) timer.setDisplayName(id);
+                            break;
+                        case 1:
+                            EditorGUI.BeginChangeCheck();
+                            var time = System.Math.Max(0, EditorGUI.LongField(rect, timer.getTime()));
+                            if (EditorGUI.EndChangeCheck()) timer.setTime(time);
+                            break;
+                        case 2:
+                            EditorGUI.BeginChangeCheck();
+                            var showTime = EditorGUI.Toggle(rect, timer.isShowTime());
+                            if (EditorGUI.EndChangeCheck()) timer.setShowTime(showTime);
+                            break;
+
+                    }
+                }
+            };
         }
 
         public override void Draw(int aID)
         {
-            var windowWidth = m_Rect.width;
-            var windowHeight = m_Rect.height;
+            var workingTimerList = Controller.Instance.SelectedChapterDataControl.getTimersList();
 
-            timerTableRect = new Rect(0f, 0.1f * windowHeight, 0.9f * windowWidth, 0.2f * windowHeight);
-            rightPanelRect = new Rect(0.9f * windowWidth, 0.1f * windowHeight, 0.08f * windowWidth, 0.2f * windowHeight);
-            settingsTable = new Rect(0f, 0.3f * windowHeight, windowWidth, windowHeight * 0.65f);
+            timerList.SetData(workingTimerList, (data) => (data as TimersListDataControl).getTimers().Cast<DataControl>().ToList());
+            timerList.DoList(220);
 
-            /*
-            * Timer table
-            */
-            GUILayout.BeginArea(timerTableRect);
-
-            GUILayout.BeginHorizontal();
-            GUILayout.Box(TC.get("TimersList.Timer"), GUILayout.MaxWidth(windowWidth * 0.3f));
-            GUILayout.Box(TC.get("TimersList.Time"), GUILayout.MaxWidth(windowWidth * 0.3f));
-            GUILayout.Box(TC.get("TimersList.Display"), GUILayout.MaxWidth(windowWidth * 0.3f));
-            GUILayout.EndHorizontal();
-
-            scrollPosition = GUILayout.BeginScrollView(scrollPosition);
-            for (int i = 0;
-                i < Controller.Instance.SelectedChapterDataControl.getTimersList().getTimers().Count;
-                i++)
+            using (new EditorGUI.DisabledScope(timerList.index < 0 || timerList.index >= workingTimerList.getTimers().Count))
             {
-                if (i == selectedTimer)
-                    GUI.skin = selectedAreaSkin;
-                else
-                    GUI.skin = noBackgroundSkin;
+                var workingTimer = timerList.index >= 0 ? workingTimerList.getTimers()[timerList.index] : new TimerDataControl(new Timer());
 
-                GUILayout.BeginHorizontal();
+                // ################
+                // ### Time section
+                // ################
 
-                if (i == selectedTimer)
+                EditorGUI.BeginChangeCheck();
+                var showTime = EditorGUILayout.BeginToggleGroup(TC.get("TimersList.Time"), workingTimer.isShowTime());
+                if (EditorGUI.EndChangeCheck()) workingTimer.setShowTime(showTime);
                 {
-                    if (GUILayout.Button("Timer #" + i, GUILayout.MaxWidth(windowWidth * 0.3f)))
-                    {
-                        OnTimerSelectedChange(i);
-                    }
+                    EditorGUI.indentLevel++;
 
-                    timerTime = GUILayout.TextField(timerTime, GUILayout.MaxWidth(windowWidth * 0.3f));
-                    timerTime = (Regex.Match(timerTime, "^[0-9]{1,4}$").Success ? timerTime : timerTimeLast);
-                    if (timerTime != timerTimeLast)
-                        OnTimerTime(timerTime);
+                    // Display name
+                    EditorGUI.BeginChangeCheck();
+                    var id = EditorGUILayout.TextField(workingTimer.getDisplayName());
+                    if (EditorGUI.EndChangeCheck()) workingTimer.setDisplayName(id);
 
-                    Controller.Instance.SelectedChapterDataControl.getTimersList().getTimers()[i].setShowTime(GUILayout
-                        .Toggle(
-                            Controller.Instance.SelectedChapterDataControl.getTimersList().getTimers()[i]
-                                .isShowTime(),
-                            "", GUILayout.MaxWidth(windowWidth * 0.3f)));
+                    // CountDown
+                    EditorGUI.BeginChangeCheck();
+                    var countDown = EditorGUILayout.ToggleLeft(TC.get("Timer.CountDown"), workingTimer.isCountDown());
+                    if (EditorGUI.EndChangeCheck()) workingTimer.setCountDown(countDown);
+
+                    // Show when stopped
+                    EditorGUI.BeginChangeCheck();
+                    var shownWhenStopped = EditorGUILayout.ToggleLeft(TC.get("Timer.ShowWhenStopped"), workingTimer.isShowWhenStopped());
+                    if (EditorGUI.EndChangeCheck()) workingTimer.setShowWhenStopped(shownWhenStopped);
+
+                    EditorGUI.indentLevel--;
                 }
-                else
-                {
-                    if (GUILayout.Button("Timer #" + i, GUILayout.MaxWidth(windowWidth * 0.3f)))
-                    {
-                        OnTimerSelectedChange(i);
-                    }
-                    if (
-                        GUILayout.Button(
-                            Controller.Instance.SelectedChapterDataControl.getTimersList().getTimers()[i].getTime()
-                                .ToString(), GUILayout.MaxWidth(windowWidth * 0.3f)))
-                    {
-                        OnTimerSelectedChange(i);
-                    }
-                    if (
-                        GUILayout.Button(
-                        Controller.Instance.SelectedChapterDataControl.getTimersList().getTimers()[i].isShowTime().ToString(), GUILayout.MaxWidth(windowWidth * 0.3f)))
-                    {
-                        OnTimerSelectedChange(i);
-                    }
-                }
-                GUILayout.EndHorizontal();
-                GUI.skin = defaultSkin;
-            }
+                EditorGUILayout.EndToggleGroup();
 
-            GUILayout.EndScrollView();
-
-            GUILayout.EndArea();
-
-            /*
-           * Right panel
-           */
-            GUILayout.BeginArea(rightPanelRect);
-            GUI.skin = noBackgroundSkin;
-            if (GUILayout.Button(addTex, GUILayout.MaxWidth(0.08f * windowWidth)))
-            {
-                Controller.Instance.SelectedChapterDataControl.getTimersList().addElement(Controller.TIMER, "");
-            }
-            if (GUILayout.Button(duplicateTex, GUILayout.MaxWidth(0.08f * windowWidth)))
-            {
-                Controller.Instance                    .SelectedChapterDataControl                    .getTimersList()
-                    .duplicateElement(
-                        Controller.Instance.SelectedChapterDataControl.getTimersList().getTimers()[selectedTimer]);
-            }
-            if (GUILayout.Button(clearTex, GUILayout.MaxWidth(0.08f * windowWidth)))
-            {
-                Controller.Instance                    .SelectedChapterDataControl                    .getTimersList()
-                    .deleteElement(
-                        Controller.Instance.SelectedChapterDataControl.getTimersList().getTimers()[selectedTimer],
-                        false);
-            }
-            GUI.skin = defaultSkin;
-            GUILayout.EndArea();
-
-            /*
-            *Properties panel
-            */
-
-            if (selectedTimer != -1 &&
-                Controller.Instance.SelectedChapterDataControl.getTimersList().getTimers()[selectedTimer] != null)
-            {
-                GUILayout.BeginArea(settingsTable);
-
-                GUILayout.Label(TC.get("Timer.Documentation"));
-                fullTimerDescription = GUILayout.TextArea(fullTimerDescription, GUILayout.MinHeight(0.1f * windowHeight));
-                if (fullTimerDescription != fullTimerDescriptionLast)
-                    OnTimerDocumentationChanged(fullTimerDescription);
-
-
-                GUILayout.FlexibleSpace();
-
-
-                GUILayout.Label(TC.get("TimersList.Time"));
-
-                GUILayout.BeginHorizontal();
-                if (
-                    !Controller.Instance.SelectedChapterDataControl.getTimersList().getTimers()[selectedTimer]
-                        .isShowTime())
-                    GUI.enabled = false;
-                GUILayout.Label(TC.get("Timer.DisplayName"));
-                displayName = GUILayout.TextField(displayName);
-                if (displayName != displayNameLast)
-                    OnTimerDisplayNameChanged(displayName);
-
-                Controller.Instance                    .SelectedChapterDataControl                    .getTimersList().getTimers()[selectedTimer].setCountDown(GUILayout.Toggle(Controller.Instance                        .SelectedChapterDataControl                        .getTimersList().getTimers()[selectedTimer].isCountDown(), TC.get("Timer.CountDown")));
-
-                Controller.Instance                    .SelectedChapterDataControl                    .getTimersList().getTimers()[selectedTimer].setShowWhenStopped(GUILayout.Toggle(Controller.Instance                        .SelectedChapterDataControl                        .getTimersList().getTimers()[selectedTimer].isShowWhenStopped(), TC.get("Timer.ShowWhenStopped")));
-                GUI.enabled = true;
-                GUILayout.EndHorizontal();
-
-
-                GUILayout.FlexibleSpace();
-
+                // ################
+                // ### Loop Control
+                // ################
 
                 GUILayout.Label(TC.get("Timer.LoopControl"));
-                Controller.Instance                    .SelectedChapterDataControl                    .getTimersList().getTimers()[selectedTimer].setMultipleStarts(GUILayout.Toggle(Controller.Instance                        .SelectedChapterDataControl                        .getTimersList().getTimers()[selectedTimer].isMultipleStarts(), TC.get("Timer.MultipleStarts")));
-                GUILayout.Label(TC.get("Timer.MultipleStartsDesc"), smallFontStyle);
-                Controller.Instance                    .SelectedChapterDataControl                    .getTimersList().getTimers()[selectedTimer].setRunsInLoop(GUILayout.Toggle(Controller.Instance                        .SelectedChapterDataControl                        .getTimersList().getTimers()[selectedTimer].isRunsInLoop(), TC.get("Timer.RunsInLoop")));
-                GUILayout.Label(
-                     TC.get("Timer.RunsInLoopDesc"), smallFontStyle);
+                {
+                    EditorGUI.indentLevel++;
 
+                    // Show when stopped
+                    EditorGUI.BeginChangeCheck();
+                    var multipleStarts = EditorGUILayout.ToggleLeft(TC.get("Timer.MultipleStarts"), workingTimer.isMultipleStarts());
+                    if (EditorGUI.EndChangeCheck()) workingTimer.setMultipleStarts(multipleStarts);
 
-                GUILayout.FlexibleSpace();
+                    EditorGUILayout.HelpBox(TC.get("Timer.MultipleStartsDesc"), MessageType.Info);
 
+                    // Show when stopped
+                    EditorGUI.BeginChangeCheck();
+                    var runsInLoop = EditorGUILayout.ToggleLeft(TC.get("Timer.RunsInLoop"), workingTimer.isRunsInLoop());
+                    if (EditorGUI.EndChangeCheck()) workingTimer.setRunsInLoop(runsInLoop);
 
+                    EditorGUILayout.HelpBox(TC.get("Timer.RunsInLoopDesc"), MessageType.Info);
+
+                    EditorGUI.indentLevel--;
+                }
+
+                // ################
+                // ### Conditions
+                // ################
+
+                // Init conditions
                 GUILayout.Label(TC.get("Timer.InitConditions"));
-                if (GUILayout.Button(TC.get("GeneralText.EditInitConditions")))
                 {
-                    ConditionEditorWindow window =
-                           (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
-                    window.Init(Controller.Instance                        .SelectedChapterDataControl                        .getTimersList().getTimers()[selectedTimer].getInitConditions());
+                    EditorGUI.indentLevel++;
+
+                    if (GUILayout.Button(TC.get("GeneralText.EditInitConditions")))
+                    {
+                        ConditionEditorWindow window = (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
+                        window.Init(workingTimer.getInitConditions());
+                    }
+
+                    EditorGUI.indentLevel--;
                 }
 
-
-                GUILayout.FlexibleSpace();
-
-
+                // End conditions
                 GUILayout.Label(TC.get("Timer.EndConditions"));
-                Controller.Instance                    .SelectedChapterDataControl                    .getTimersList().getTimers()[selectedTimer].setUsesEndCondition(
-                        GUILayout.Toggle(Controller.Instance                            .SelectedChapterDataControl                            .getTimersList().getTimers()[selectedTimer].isUsesEndCondition(),
-                            TC.get("Timer.UsesEndConditionShort")));
-                if (
-                    !Controller.Instance.SelectedChapterDataControl.getTimersList().getTimers()[selectedTimer]
-                        .isUsesEndCondition())
-                    GUI.enabled = false;
-                if (GUILayout.Button(TC.get("GeneralText.EditEndConditions")))
                 {
-                    ConditionEditorWindow window =
-                           (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
-                    window.Init(Controller.Instance                        .SelectedChapterDataControl                        .getTimersList().getTimers()[selectedTimer].getEndConditions());
+                    EditorGUI.indentLevel++;
 
+                    EditorGUI.BeginChangeCheck();
+                    var usesEndCondition = EditorGUILayout.BeginToggleGroup(TC.get("TimersList.UsesEndConditionShort"), workingTimer.isUsesEndCondition());
+                    if (EditorGUI.EndChangeCheck()) workingTimer.setUsesEndCondition(usesEndCondition);
+
+                    if (GUILayout.Button(TC.get("GeneralText.EditEndConditions")))
+                    {
+                        ConditionEditorWindow window = (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
+                        window.Init(workingTimer.getEndConditions());
+                    }
+
+                    EditorGUILayout.EndToggleGroup();
+                    EditorGUI.indentLevel--;
                 }
-                GUI.enabled = true;
 
+                // ################
+                // ### Effects
+                // ################
 
+                // Header
+                GUILayout.BeginHorizontal();
                 GUILayout.FlexibleSpace();
-
-
-                GUILayout.BeginHorizontal();
-                GUILayout.Label(TC.get("Timer.Effects"), GUILayout.Width(0.45f * windowWidth));
-                GUILayout.Label(TC.get("Timer.PostEffects"), GUILayout.Width(0.45f * windowWidth));
+                GUILayout.Label(TC.get("Timer.Effects"));
+                GUILayout.FlexibleSpace();
+                GUILayout.Label(TC.get("Timer.PostEffects"));
+                GUILayout.FlexibleSpace();
                 GUILayout.EndHorizontal();
+                // Buttons
                 GUILayout.BeginHorizontal();
-                if (GUILayout.Button(TC.get("GeneralText.EditEffects"), GUILayout.Width(0.45f * windowWidth)))
+                if (GUILayout.Button(TC.get("GeneralText.EditEffects")))
                 {
                     EffectEditorWindow window =
                     (EffectEditorWindow)ScriptableObject.CreateInstance(typeof(EffectEditorWindow));
-                    window.Init(Controller.Instance                        .SelectedChapterDataControl                        .getTimersList().getTimers()[selectedTimer].getEffects());
+                    window.Init(workingTimer.getEffects());
                 }
-                if (GUILayout.Button(TC.get("GeneralText.EditPostEffects"), GUILayout.Width(0.45f * windowWidth)))
+                if (GUILayout.Button(TC.get("GeneralText.EditPostEffects")))
                 {
                     EffectEditorWindow window =
                     (EffectEditorWindow)ScriptableObject.CreateInstance(typeof(EffectEditorWindow));
-                    window.Init(Controller.Instance                        .SelectedChapterDataControl                        .getTimersList().getTimers()[selectedTimer].getPostEffects());
+                    window.Init(workingTimer.getPostEffects());
                 }
                 GUILayout.EndHorizontal();
 
-                GUILayout.EndArea();
+
+                GUILayout.Label(TC.get("Timer.Documentation"));
+                EditorGUI.BeginChangeCheck();
+                var newDocumentation= GUILayout.TextArea(workingTimer.getDocumentation() ?? string.Empty, GUILayout.ExpandHeight(true));
+                if (EditorGUI.EndChangeCheck())
+                    workingTimer.setDocumentation(newDocumentation);
             }
-
-        }
-
-        void OnTimerSelectedChange(int i)
-        {
-            selectedTimer = i;
-
-            fullTimerDescription = fullTimerDescriptionLast =
-                Controller.Instance                    .SelectedChapterDataControl                    .getTimersList().getTimers()[selectedTimer].getDocumentation();
-            if (fullTimerDescription == null)
-                fullTimerDescription = fullTimerDescriptionLast = "";
-
-
-            displayName = displayNameLast = Controller.Instance                .SelectedChapterDataControl                .getTimersList().getTimers()[selectedTimer].getDisplayName();
-            if (displayName == null)
-                displayName = displayNameLast = "";
-
-
-            timerTime = timerTimeLast = Controller.Instance                .SelectedChapterDataControl                .getTimersList().getTimers()[selectedTimer].getTime().ToString();
-            if (timerTime == null)
-                timerTime = timerTime = "0";
-        }
-
-        void OnTimerDocumentationChanged(string val)
-        {
-            fullTimerDescriptionLast = val;
-            Controller.Instance                .SelectedChapterDataControl                .getTimersList().getTimers()[selectedTimer].setDocumentation(val);
-        }
-
-        void OnTimerDisplayNameChanged(string val)
-        {
-            displayNameLast = val;
-            Controller.Instance                .SelectedChapterDataControl                .getTimersList().getTimers()[selectedTimer].setDisplayName(val);
-        }
-
-        void OnTimerTime(string val)
-        {
-            timerTimeLast = val;
-            Controller.Instance                .SelectedChapterDataControl                .getTimersList().getTimers()[selectedTimer].setTime(long.Parse(val));
         }
     }
 }
