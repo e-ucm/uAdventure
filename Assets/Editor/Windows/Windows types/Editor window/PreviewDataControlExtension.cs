@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using uAdventure.Core;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
@@ -120,6 +121,8 @@ namespace uAdventure.Editor
 
                 float columnWidth = Mathf.RoundToInt(rect.width / (float)columns);
                 float columnHeight = 25f;
+                
+
                 for (int index = 0; index < dataControlList.list.Count; index++)
                 {
                     if(index % columns == 0) EditorGUILayout.BeginHorizontal();
@@ -127,9 +130,8 @@ namespace uAdventure.Editor
                         if (preview)
                         {
                             columnHeight = previewHeight / columns + 25f;
-                            EditorGUILayout.BeginVertical(GUILayout.MaxWidth(columnWidth));
-                            GUILayout.Label(GetElementName(index), "preToolbar", GUILayout.ExpandWidth(true));
-                            EditorGUILayout.BeginVertical(GUILayout.MaxWidth(columnWidth));
+                            EditorGUILayout.BeginVertical(GUILayout.Width(columnWidth));
+                            GUILayout.Label(GetElementName(index), "preToolbar", GUILayout.Width(columnWidth));
                             var previewRect = GUILayoutUtility.GetRect(columnWidth, columnHeight - 25, "preBackground", GUILayout.MaxWidth(columnWidth));
                             // If its an repaint event we store the rect
                             previewRect.height += 25f;
@@ -137,29 +139,27 @@ namespace uAdventure.Editor
                             previewRect = GetPreviewRect(index);
                             GUILayout.BeginArea(previewRect, new GUIStyle("preBackground"));
                             {
-                                var viewPort = previewRect;
-                                viewPort.height -= 25f;
+                                var viewPort = new Rect(previewRect);
+                                viewPort.position = new Vector2(0, 5f);
+                                viewPort.height -= 30f;
                                 OnDrawMainPreview(viewPort, index);
                             }
                             GUILayout.EndArea();
-                            if (GUILayout.Button("Edit"))
+                            if (GUILayout.Button("Edit", EditorGUIUtility.GetBuiltinSkin(EditorSkin.Scene).button))
                             {
                                 dataControlList.index = index;
                                 OnSelect(dataControlList.reorderableList);
                             }
                             EditorGUILayout.EndVertical();
-                            EditorGUILayout.EndVertical();
                         }
                         else
                         {
-                            EditorGUILayout.BeginHorizontal();
                             GUILayout.Box(GetElementName(index), GUILayout.ExpandWidth(true));
                             if (GUILayout.Button("Edit", GUILayout.Width(150)))
                             {
                                 dataControlList.index = index;
                                 OnSelect(dataControlList.reorderableList);
                             }
-                            EditorGUILayout.EndHorizontal();
                         }
                     }
                     if (index % columns == columns - 1 || index == dataControlList.count - 1)
@@ -167,13 +167,19 @@ namespace uAdventure.Editor
                         EditorGUILayout.EndHorizontal();
                     }
                 }
+
             }
             EditorGUILayout.EndVertical();
         }
 
         private string GetElementName(int index)
         {
-            return "Placeholder";
+            var element = dataControlList.list[index] as DataControl;
+            var content = element.getContent() as HasId;
+            if (content == null)
+                return "---";
+
+            return content.getId();
         }
 
         public override void OnDrawMoreWindows()
