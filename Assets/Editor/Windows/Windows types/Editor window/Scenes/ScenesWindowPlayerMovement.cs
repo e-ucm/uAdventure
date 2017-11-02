@@ -127,20 +127,30 @@ namespace uAdventure.Editor
                 }
 
             }
-            public override void OnPreRender()
+            public static void PutTransform(DataControl target)
             {
                 SceneEditor.Current.PushMatrix();
                 var matrix = SceneEditor.Current.Matrix;
-                if(Target is PlayerDataControl)
+                if (target is PlayerDataControl)
                 {
                     var workingScene = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[GameRources.GetInstance().selectedSceneIndex];
                     SceneEditor.Current.Matrix = matrix * Matrix4x4.TRS(new Vector3(workingScene.getDefaultInitialPositionX(), workingScene.getDefaultInitialPositionY(), 0), Quaternion.identity, Vector3.one * workingScene.getPlayerScale());
                 }
-                else if(Target is NodeDataControl)
+                else if (target is NodeDataControl)
                 {
-                    var node = Target as NodeDataControl;
+                    var node = target as NodeDataControl;
                     SceneEditor.Current.Matrix = matrix * Matrix4x4.TRS(new Vector3(node.getX(), node.getY(), 0), Quaternion.identity, Vector3.one * node.getScale());
                 }
+            }
+
+            public static void RemoveTransform(DataControl target)
+            {
+                SceneEditor.Current.PopMatrix();
+            }
+
+            public override void OnPreRender()
+            {
+                PutTransform(Target);
             }
 
             public override bool Update()
@@ -216,7 +226,7 @@ namespace uAdventure.Editor
             }
             public override void OnPostRender()
             {
-                SceneEditor.Current.PopMatrix();
+                RemoveTransform(Target);
             }
         }
 
@@ -257,7 +267,8 @@ namespace uAdventure.Editor
                                 trajectory.setInitialNode(selected);
                                 break;
                             case 3:
-                                trajectory.deleteElement(selected, false);
+                                if(trajectory.deleteElement(selected, false))
+                                    SceneEditor.Current.SelectedElement = null;
                                 break;
                         }
                     }
@@ -278,16 +289,36 @@ namespace uAdventure.Editor
             public override void OnDrawingGizmos()
             {
                 var trajectory = Target as TrajectoryDataControl;
+                foreach(var node in trajectory.getNodes())
+                {
+                    PlayerInitialPositionComponent.PutTransform(node);
+                    var rect = ScenesWindowElementReference.ReferenceComponent.GetElementRect(node);
+                    PlayerInitialPositionComponent.RemoveTransform(node);
+
+                    var color = Color.blue;
+                    HandleUtil.DrawPoint(rect.center, 10f, node.isInitial() ? Color.red : Color.blue, Color.black);
+                }
+
                 foreach(var connection in trajectory.getSides())
                 {
+                    var distance = (new Vector2(connection.getStart().getX(), connection.getStart().getY()) - new Vector2(connection.getEnd().getX(), connection.getEnd().getY())).magnitude;
+
+                    PlayerInitialPositionComponent.PutTransform(connection.getStart());
                     var p1 = ScenesWindowElementReference.ReferenceComponent.GetElementRect(connection.getStart());
-                    var p2 = ScenesWindowElementReference.ReferenceComponent.GetElementRect(connection.getStart());
+                    PlayerInitialPositionComponent.RemoveTransform(connection.getStart());
+                    PlayerInitialPositionComponent.PutTransform(connection.getEnd());
+                    var p2 = ScenesWindowElementReference.ReferenceComponent.GetElementRect(connection.getEnd());
+                    PlayerInitialPositionComponent.RemoveTransform(connection.getEnd());
 
-                    HandleUtil.DrawPolyLine(new Vector2[] { p1.center, p2.center }, false, Color.white);
-
-                    var distance = new GUIContent(Mathf.RoundToInt((p1.center - p2.center).magnitude) + "");
+                    HandleUtil.DrawPolyLine(new Vector2[] { p1.center, p2.center }, false, Color.black, 5f);
+                    HandleUtil.DrawPolyLine(new Vector2[] { p1.center, p2.center }, false, Color.white, 3f);
                     
-                    EditorGUI.DropShadowLabel(new Rect((p1.center + p2.center / 2f), new Vector2(200, 30)), distance);
+                    EditorGUI.DropShadowLabel(new Rect((p1.center + p2.center) / 2f, new Vector2(200, 30)), new GUIContent(Mathf.RoundToInt(distance) + ""));
+                }
+
+                if(pairing != null)
+                {
+
                 }
             }
         }
