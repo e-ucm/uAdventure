@@ -3,6 +3,7 @@ using UnityEditor;
 using System.Collections;
 
 using uAdventure.Core;
+using System;
 
 namespace uAdventure.Editor
 {
@@ -32,7 +33,39 @@ namespace uAdventure.Editor
 
         private WindowType openedWindow;
 
-		[MenuItem("eAdventure/Flags and variables")]
+        public static ChapterVarAndFlagsEditor s_DrawerParametersMenu;
+        private static long s_LastClosedTime;
+
+        internal static bool ShowAtPosition(Rect buttonRect)
+        {
+            long num = DateTime.Now.Ticks / 10000L;
+            if (num >= ChapterVarAndFlagsEditor.s_LastClosedTime + 50L)
+            {
+                if (Event.current != null)
+                {
+                    Event.current.Use();
+                }
+                if (ChapterVarAndFlagsEditor.s_DrawerParametersMenu == null)
+                {
+                    ChapterVarAndFlagsEditor.s_DrawerParametersMenu = ScriptableObject.CreateInstance<ChapterVarAndFlagsEditor>();
+                }
+                ChapterVarAndFlagsEditor.s_DrawerParametersMenu.Init(buttonRect);
+
+                return true;
+            }
+            return false;
+        }
+
+        private void Init(Rect buttonRect)
+        {
+            buttonRect.position = GUIUtility.GUIToScreenPoint(buttonRect.position);
+            float y = 305f;
+            Vector2 windowSize = new Vector2(300f, y);
+            base.ShowAsDropDown(buttonRect, windowSize);
+        }
+
+
+        [MenuItem("eAdventure/Flags and variables")]
 		public static void Init()
 		{
 			var window = GetWindow<ChapterVarAndFlagsEditor> ();

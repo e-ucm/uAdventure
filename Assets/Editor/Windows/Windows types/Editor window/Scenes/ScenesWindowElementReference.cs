@@ -104,7 +104,7 @@ namespace uAdventure.Editor
         // ################################################################################################################################################
 
         [EditorComponent(typeof(ElementReferenceDataControl), Name = "Transform", Order = 0)]
-        private class ReferenceComponent : AbstractEditorComponent
+        public class ReferenceComponent : AbstractEditorComponent
         {
             public ReferenceComponent(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
             {
@@ -125,7 +125,7 @@ namespace uAdventure.Editor
                 var oldPos = new Vector2(reference.getElementX(), reference.getElementY());
                 EditorGUI.BeginChangeCheck();
                 var newPos = EditorGUILayout.Vector2Field("Position", oldPos);
-                if (EditorGUI.EndChangeCheck()) { reference.setElementPosition((int) newPos.x, (int) newPos.y); }
+                if (EditorGUI.EndChangeCheck()) { reference.setElementPosition(Mathf.RoundToInt(newPos.x), Mathf.RoundToInt(newPos.y)); }
                 
                 EditorGUI.BeginChangeCheck();
                 var newScale = EditorGUILayout.FloatField("Scale", reference.getElementScale());
@@ -133,26 +133,38 @@ namespace uAdventure.Editor
 
             }
 
-            private Rect GetUnscaledRect(ElementReferenceDataControl elem)
+            public static Rect GetUnscaledRect(DataControl elem)
             {
-                var referencedElement = elem.getReferencedElementDataControl() as DataControlWithResources;
                 Texture2D preview = null;
-                if (referencedElement is ItemDataControl)
+                if (elem is PlayerDataControl)
                 {
-                    preview = AssetsController.getImage((referencedElement as ItemDataControl).getPreviewImage()).texture;
+                    preview = AssetsController.getImage((elem as PlayerDataControl).getPreviewImage()).texture;
                 }
-                else if (referencedElement is NPCDataControl)
+                else if(elem is NodeDataControl)
                 {
-                    preview = AssetsController.getImage((referencedElement as NPCDataControl).getPreviewImage()).texture;
+                    preview = AssetsController.getImage((elem as NodeDataControl).getPlayerImagePath()).texture;
                 }
-                else if (referencedElement is AtrezzoDataControl)
+                else if(elem is ElementReferenceDataControl)
                 {
-                    preview = AssetsController.getImage((referencedElement as AtrezzoDataControl).getPreviewImage()).texture;
+                    var referencedElement = (elem as ElementReferenceDataControl).getReferencedElementDataControl();
+                    if (referencedElement is ItemDataControl)
+                    {
+                        preview = AssetsController.getImage((referencedElement as ItemDataControl).getPreviewImage()).texture;
+                    }
+                    else if (referencedElement is NPCDataControl)
+                    {
+                        preview = AssetsController.getImage((referencedElement as NPCDataControl).getPreviewImage()).texture;
+                    }
+                    else if (referencedElement is AtrezzoDataControl)
+                    {
+                        preview = AssetsController.getImage((referencedElement as AtrezzoDataControl).getPreviewImage()).texture;
+                    }
                 }
+               
                 return new Rect(Vector2.zero, new Vector2(preview.width, preview.height));
             }
-            
-            private Rect GetElementRect(ElementReferenceDataControl element)
+
+            public static Rect GetElementRect(DataControl element)
             {
                 var unscaled = GetUnscaledRect(element);
 
@@ -178,71 +190,26 @@ namespace uAdventure.Editor
                 return selected;
             }
 
-            public override void OnDrawingGizmos()
-            {
-                var elemRef = Target as ElementReferenceDataControl;
-                var rect = GetElementRect(elemRef);
-
-            }
-
             public override void OnDrawingGizmosSelected()
             {
                 var elemRef = Target as ElementReferenceDataControl;
                 var rect = GetElementRect(elemRef);
-                var points = rect.ToPoints();
 
-                HandleUtil.DrawPolyLine(points, true, Color.red);
-                
-                int pointChanged = -1;
-                Vector2 oldPointValue = Vector2.zero;
-                for(int i = 0; i < points.Length; i++)
-                {
-                    EditorGUI.BeginChangeCheck();
-                    var aux = points[i];
-                    points[i] = HandleUtil.HandlePointMovement(elemRef.GetHashCode() + i + 1, points[i], 10f, p => HandleUtil.DrawPoint(p, 4.5f, Color.blue, Color.black));
-                    if (EditorGUI.EndChangeCheck())
-                    {
-                        oldPointValue = aux;
-                        points[i] = Event.current.mousePosition;
-                        pointChanged = i;
-                    }
-                }
+                var newRect = HandleUtil.HandleFixedRatioRect(elemRef.GetHashCode() + 1, rect, rect.width / rect.height, 10f,
+                    polygon => HandleUtil.DrawPolyLine(polygon, true, Color.red),
+                    point => HandleUtil.DrawPoint(point, 4.5f, Color.blue, Color.black));
 
-                if (pointChanged != -1)
+                if (newRect != rect)
                 {
-                    var diff = points[pointChanged] - oldPointValue;
-                    // Fix the change
-                    switch (pointChanged)
-                    {
-                        case 0: points[3].x += diff.x; points[1].y += diff.y; break;
-                        case 1: points[2].x += diff.x; points[0].y += diff.y; break;
-                        case 2: points[1].x += diff.x; points[3].y += diff.y; break;
-                        case 3: points[0].x += diff.x; points[2].y += diff.y; break;
-                    }
-                    
-                    //First we calculate the new original screen rect
-                    var original = points.ToRect().ViewportToScreen(800f, 600f, SceneEditor.Current.Viewport);
-                    var newRatio = original.width / original.height;
-                    // Then we obtain the unscaled rect to calculate the new scale
-                    var unscaled = GetUnscaledRect(elemRef);
-                    var unscaledRatio = unscaled.width / unscaled.height;
-                    // And calculate the scale
-                    if(newRatio > unscaledRatio)
-                    {
-                        original.height = original.width / unscaledRatio;
-                    }
-                    else
-                    {
-                        original.width = original.height * unscaledRatio;
-                    }
+                    var original = newRect.ViewportToScreen(800f, 600f, SceneEditor.Current.Viewport);
+                    var unscaled = ScenesWindowElementReference.ReferenceComponent.GetUnscaledRect(Target);
                     // And then we rip the position
-                    var position = original.center + new Vector2(0, original.height/2f);
+                    var position = original.center + new Vector2(0, original.height / 2f);
                     var scale = original.size.magnitude / unscaled.size.magnitude;
 
                     // And then we set the values in the reference
                     elemRef.setElementPosition(Mathf.RoundToInt(position.x), Mathf.RoundToInt(position.y));
                     elemRef.setElementScale(scale);
-
                 }
 
                 EditorGUI.BeginChangeCheck();

@@ -7,7 +7,7 @@ using uAdventure.Core;
 
 namespace uAdventure.Editor
 {
-    [EditorComponent(typeof(NPCDataControl), Name = "NPC.LookPanelTitle", Order = 5)]
+    [EditorComponent(typeof(NPCDataControl), typeof(PlayerDataControl), typeof(NodeDataControl), Name = "NPC.LookPanelTitle", Order = 5)]
     public class CharactersWindowAppearance : AbstractEditorComponentWithPreview
     {
         public enum CharacterAnimationType
@@ -204,6 +204,9 @@ namespace uAdventure.Editor
 
         protected override void DrawInspector()
         {
+            if (Target is NodeDataControl)
+                Target = Controller.Instance.SelectedChapterDataControl.getPlayer();
+
             workingCharacter = Target != null ? Target as NPCDataControl : Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[GameRources.GetInstance().selectedCharacterIndex];
 
             // Appearance table
@@ -261,9 +264,12 @@ namespace uAdventure.Editor
         {
             if(Target != null)
             {
-                var npc = Target as NPCDataControl;
-                var preview = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_STAND_DOWN);
-                if (preview) GUI.DrawTexture(rect, preview, ScaleMode.ScaleToFit);
+                if(Event.current.type == EventType.repaint)
+                {
+                    var npc = Target as NPCDataControl;
+                    var preview = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_STAND_DOWN);
+                    if (preview) GUI.DrawTexture(rect, preview, ScaleMode.ScaleToFit);
+                }
             }
             else
             {
@@ -297,12 +303,13 @@ namespace uAdventure.Editor
                 }
                 GUILayout.EndHorizontal();
             }
-
-            
         }
 
         public override void OnRender(Rect viewport)
         {
+            if(Target is NodeDataControl)
+                Target = Controller.Instance.SelectedChapterDataControl.getPlayer();
+            
             var npc = Target as NPCDataControl;
 
             var preview = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_STAND_DOWN);

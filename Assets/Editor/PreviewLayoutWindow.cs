@@ -270,7 +270,7 @@ namespace uAdventure.Editor
         }
 
         /** Called to draw the preview content */
-        protected virtual void DrawPreview(Rect rect) { }
+        public virtual void DrawPreview(Rect rect) { }
 
         /** If false the inspector preview wont be shown */
         protected virtual bool HasToDrawPreviewInspector()

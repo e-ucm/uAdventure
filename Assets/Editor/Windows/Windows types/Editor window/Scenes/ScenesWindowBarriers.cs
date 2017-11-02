@@ -1,194 +1,80 @@
 ﻿using UnityEngine;
 using uAdventure.Core;
+using System.Collections.Generic;
+using UnityEditor;
+using System.Linq;
 
 namespace uAdventure.Editor
 {
 
-    public class ScenesWindowBarriers : LayoutWindow, DialogReceiverInterface
+    public class ScenesWindowBarriers : SceneEditorWindow
     {
-        private Texture2D backgroundPreviewTex = null;
-        private Texture2D conditionTex = null;
 
-        private Texture2D addTexture = null;
-        private Texture2D moveUp, moveDown = null;
-        private Texture2D clearImg = null;
-        private Texture2D duplicateImg = null;
+        private DataControlList barriersList;
+        private Texture2D conditionsTex, noConditionsTex;
+        private SceneDataControl workingScene;
 
-        private string backgroundPath = "";
-        
-        private static Rect tableRect;
-        private static Rect previewRect;
-        private static Rect infoPreviewRect;
-        private Rect rightPanelRect;
-
-        private static Vector2 scrollPosition;
-
-        private static GUISkin selectedAreaSkin;
-        private static GUISkin defaultSkin;
-        private static GUISkin noBackgroundSkin;
-
-        private int selectedArea;
-
-        public ScenesWindowBarriers(Rect aStartPos, GUIContent aContent, GUIStyle aStyle,
+        public ScenesWindowBarriers(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, SceneEditor sceneEditor,
            params GUILayoutOption[] aOptions)
-            : base(aStartPos, aContent, aStyle, aOptions)
+            : base(aStartPos, aContent, aStyle, sceneEditor, aOptions)
         {
-            clearImg = (Texture2D)Resources.Load("EAdventureData/img/icons/deleteContent", typeof(Texture2D));
-            addTexture = (Texture2D)Resources.Load("EAdventureData/img/icons/addNode", typeof(Texture2D));
-            moveUp = (Texture2D)Resources.Load("EAdventureData/img/icons/moveNodeUp", typeof(Texture2D));
-            moveDown = (Texture2D)Resources.Load("EAdventureData/img/icons/moveNodeDown", typeof(Texture2D));
-            duplicateImg = (Texture2D)Resources.Load("EAdventureData/img/icons/duplicateNode", typeof(Texture2D));
 
-            if (GameRources.GetInstance().selectedSceneIndex >= 0)
-                backgroundPath =
-                    Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                        GameRources.GetInstance().selectedSceneIndex].getPreviewBackground();
-            if (backgroundPath != null && !backgroundPath.Equals(""))
-                backgroundPreviewTex = AssetsController.getImage(backgroundPath).texture;
+            conditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/conditions-24x24", typeof(Texture2D));
+            noConditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/no-conditions-24x24", typeof(Texture2D));
 
-            conditionTex = (Texture2D)Resources.Load("EAdventureData/img/icons/no-conditions-24x24", typeof(Texture2D));
-
-            selectedAreaSkin = (GUISkin)Resources.Load("Editor/EditorLeftMenuItemSkinConcreteOptions", typeof(GUISkin));
-            noBackgroundSkin = (GUISkin)Resources.Load("Editor/EditorNoBackgroundSkin", typeof(GUISkin));
-
-
-            selectedArea = 0;
-        }
-
-        public override void Draw(int aID)
-        {
-            var windowWidth = m_Rect.width;
-            var windowHeight = m_Rect.height;
-
-            tableRect = new Rect(0f, 0.1f * windowHeight, 0.9f * windowWidth, windowHeight * 0.33f);
-            rightPanelRect = new Rect(0.9f * windowWidth, 0.1f * windowHeight, 0.08f * windowWidth, 0.33f * windowHeight);
-            infoPreviewRect = new Rect(0f, 0.45f * windowHeight, windowWidth, windowHeight * 0.05f);
-            previewRect = new Rect(0f, 0.5f * windowHeight, windowWidth, windowHeight * 0.45f);
-
-            GUILayout.BeginArea(tableRect);
-            GUILayout.BeginHorizontal();
-            GUILayout.Box(TC.get("Barrier.Title"), GUILayout.Width(windowWidth * 0.45f));
-            GUILayout.Box(TC.get("Conditions.Title"), GUILayout.Width(windowWidth * 0.45f));
-            GUILayout.EndHorizontal();
-            scrollPosition = GUILayout.BeginScrollView(scrollPosition);
-            for (int i = 0;
-                i <
-                Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                    GameRources.GetInstance().selectedSceneIndex].getBarriersList().getBarriersList().Count;
-                i++)
+            barriersList = new DataControlList()
             {
-                if (i == selectedArea)
-                    GUI.skin = selectedAreaSkin;
-
-                GUILayout.BeginHorizontal();
-
-                if (GUILayout.Button(Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                    GameRources.GetInstance().selectedSceneIndex].getBarriersList().getBarriersList()[i].getId(),
-                    GUILayout.Width(windowWidth * 0.44f)))
+                elementHeight = 20,
+                Columns = new List<ColumnList.Column>()
                 {
-                    selectedArea = i;
-                }
-
-                if (GUILayout.Button(conditionTex, GUILayout.Width(windowWidth * 0.44f)))
+                    new ColumnList.Column() // Layer column
+                    {
+                        Text = TC.get("Barriers.Name"),
+                        SizeOptions = new GUILayoutOption[]{ GUILayout.ExpandWidth(true) }
+                    },
+                    new ColumnList.Column() // Enabled Column
+                    {
+                        Text = TC.get("Conditions.Title"),
+                        SizeOptions = new GUILayoutOption[]{ GUILayout.ExpandWidth(true) }
+                    }
+                },
+                drawCell = (columnRect, row, column, isActive, isFocused) =>
                 {
-                    selectedArea = i;
-                    ConditionEditorWindow window =
-                         (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
-                    window.Init(Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                    GameRources.GetInstance().selectedSceneIndex].getBarriersList().getBarriersList()[i].getConditions());
-                }
-
-                GUILayout.EndHorizontal();
-                GUI.skin = defaultSkin;
-            }
-            GUILayout.EndScrollView();
-            GUILayout.EndArea();
-
-
-
-            /*
-            * Right panel
-            */
-            GUILayout.BeginArea(rightPanelRect);
-            GUI.skin = noBackgroundSkin;
-            if (GUILayout.Button(addTexture, GUILayout.MaxWidth(0.08f * windowWidth)))
-            {
-                BarrierNewName window =
-                      (BarrierNewName)ScriptableObject.CreateInstance(typeof(BarrierNewName));
-                window.Init(this, "IdBarrier");
-            }
-            if (GUILayout.Button(duplicateImg, GUILayout.MaxWidth(0.08f * windowWidth)))
-            {
-                Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                    GameRources.GetInstance().selectedSceneIndex].getBarriersList()
-                    .duplicateElement(Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                        GameRources.GetInstance().selectedSceneIndex].getBarriersList().getBarriers()[selectedArea]);
-            }
-            if (GUILayout.Button(moveUp, GUILayout.MaxWidth(0.08f * windowWidth)))
-            {
-                Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                    GameRources.GetInstance().selectedSceneIndex].getBarriersList()
-                    .moveElementUp(Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                        GameRources.GetInstance().selectedSceneIndex].getBarriersList().getBarriers()[selectedArea]);
-            }
-            if (GUILayout.Button(moveDown, GUILayout.MaxWidth(0.08f * windowWidth)))
-            {
-                Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                    GameRources.GetInstance().selectedSceneIndex].getBarriersList()
-                    .moveElementDown(Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                        GameRources.GetInstance().selectedSceneIndex].getBarriersList().getBarriers()[selectedArea]);
-            }
-            if (GUILayout.Button(clearImg, GUILayout.MaxWidth(0.08f * windowWidth)))
-            {
-                Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                    GameRources.GetInstance().selectedSceneIndex].getBarriersList()
-                    .deleteElement(Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                        GameRources.GetInstance().selectedSceneIndex].getBarriersList().getBarriers()[selectedArea],
-                        false);
-            }
-            GUI.skin = defaultSkin;
-            GUILayout.EndArea();
-
-
-            if (backgroundPath != "")
-            {
-
-                GUILayout.BeginArea(infoPreviewRect);
-                // Show preview dialog
-                if (GUILayout.Button(TC.get("DefaultClickAction.ShowDetails") + "/" + TC.get("GeneralText.Edit")))
+                    var element = barriersList.list[row] as BarrierDataControl;
+                    switch (column)
+                    {
+                        case 0:
+                            EditorGUI.LabelField(columnRect, "Barrier: " + (row + 1));
+                            break;
+                        case 1:
+                            if (GUI.Button(columnRect, element.getConditions().getBlocksCount() > 0 ? conditionsTex : noConditionsTex))
+                            {
+                                ConditionEditorWindow window =
+                                     (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
+                                window.Init(element.getConditions());
+                            }
+                            break;
+                    }
+                },
+                onSelectCallback = (list) =>
                 {
-                    //
-                    BarrierEditor window =
-                        (BarrierEditor)ScriptableObject.CreateInstance(typeof(BarrierEditor));
-                    window.Init(this, Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                        GameRources.GetInstance().selectedSceneIndex], selectedArea);
+                    sceneEditor.SelectedElement = barriersList.list[list.index] as BarrierDataControl;
                 }
-                GUILayout.EndArea();
-                GUI.DrawTexture(previewRect, backgroundPreviewTex, ScaleMode.ScaleToFit);
-
-            }
-            else
-            {
-                GUILayout.BeginArea(infoPreviewRect);
-                GUILayout.Button("No background!");
-                GUILayout.EndArea();
-            }
+            };
         }
-
-        public void OnDialogOk(string message, object workingObject = null, object workingObjectSecond = null)
+        
+        protected override void DrawInspector()
         {
-            Debug.Log("Apply");
-            if (workingObject is BarrierNewName)
+            var prevWorkingScene = workingScene;
+            workingScene = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[GameRources.GetInstance().selectedSceneIndex];
+            if (workingScene != prevWorkingScene)
             {
-                Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                    GameRources.GetInstance().selectedSceneIndex].getBarriersList()
-                    .addElement(Controller.BARRIER, message);
+                barriersList.SetData(workingScene.getBarriersList(),
+                    (dc) => (dc as BarriersListDataControl).getBarriers().Cast<DataControl>().ToList());
             }
-        }
 
-        public void OnDialogCanceled(object workingObject = null)
-        {
-            Debug.Log(TC.get("GeneralText.Cancel"));
+            barriersList.DoList(160);
+            GUILayout.Space(20);
         }
     }
 }

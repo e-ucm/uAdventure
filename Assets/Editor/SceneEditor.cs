@@ -70,20 +70,24 @@ public class SceneEditor {
         List<EditorComponent> components;
         if (!cachedComponents.ContainsKey(element))
         {
-            if (!Components.ContainsKey(element.GetType())) return;
+            //if (!Components.ContainsKey(element.GetType())) return;
 
             // Component gathering
             components = new List<EditorComponent>();
             // Basic
-            components.AddRange(Components[element.GetType()]);
+            if (Components.ContainsKey(element.GetType()))
+                components.AddRange(Components[element.GetType()]);
             // Interface
             foreach (var inter in element.GetType().GetInterfaces())
                 if (Components.ContainsKey(inter))
                     components.AddRange(Components[inter]);
 
             // Sorting the components by order
-            components.Sort((c1, c2) => c1.Attribute.Order.CompareTo(c2.Attribute.Order));
-            cachedComponents.Add(element, components);
+            if(components.Count > 0)
+            {
+                components.Sort((c1, c2) => c1.Attribute.Order.CompareTo(c2.Attribute.Order));
+                cachedComponents.Add(element, components);
+            }
         }
 
         // Calling
@@ -98,6 +102,7 @@ public class SceneEditor {
 
     public void DoCallForWholeElement(DataControl element, Action<EditorComponent> call)
     {
+        var elem = element;
         // If its a reference
         if (element is ElementReferenceDataControl)
         {
@@ -122,9 +127,23 @@ public class SceneEditor {
         matrices.Pop();
     }
 
+    public void CallAll(List<DataControl> elements, Action<DataControl> call)
+    {
+        foreach (var element in elements)
+        {
+            Disabled = EnabledTypes.Count == 0 || EnabledTypes.Contains(element.GetType());
+            call(element);
+        }
+    }
+
     public void Draw(Rect rect)
     {
         Viewport = rect.AdjustToRatio(800f / 600f);
+
+        if(Event.current.type == EventType.MouseDown && Viewport.Contains(Event.current.mousePosition))
+        {
+            SelectedElement = null;
+        }
 
         var previousWorkingItem = workingScene;
         workingScene = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[GameRources.GetInstance().selectedSceneIndex];
@@ -138,24 +157,30 @@ public class SceneEditor {
             GUI.DrawTexture(Viewport, backgroundPreview, ScaleMode.ScaleToFit);
 
         Current = this;
-        foreach (var element in elements)
-        {
-            Disabled = EnabledTypes.Count == 0 || EnabledTypes.Contains(element.GetType());
 
-            DoCallForWholeElement(element, (c) => c.OnPreRender());
-            DoCallForWholeElement(element, (c) => { if (c.Update()) SelectedElement = element; });
-
-            if(Event.current.type == EventType.Repaint)
-                DoCallForWholeElement(element, (c) => c.OnRender(Viewport));
-
-            DoCallForWholeElement(element, (c) => c.OnDrawingGizmos());
-            if (SelectedElement == element)
+        CallAll(elements, 
+            (elem) =>
             {
-                DoCallForWholeElement(element, (c) => c.OnDrawingGizmosSelected());
-            }
-            DoCallForWholeElement(element, (c) => c.OnPostRender());
+                DoCallForWholeElement(elem, c => c.OnPreRender());
+                DoCallForWholeElement(elem, c => { if (c.Update()) SelectedElement = elem; });
+                if (Event.current.type == EventType.Repaint)
+                    DoCallForWholeElement(elem, c => c.OnRender(Viewport));
+                DoCallForWholeElement(elem, c => c.OnDrawingGizmos());
+                DoCallForWholeElement(elem, c => c.OnPostRender());
+            });
 
-        }
+
+        CallAll(elements,
+            (elem) =>
+            {
+                if (elem == SelectedElement)
+                {
+                    DoCallForWholeElement(elem, c => c.OnPreRender());
+                    DoCallForWholeElement(elem, c => c.OnDrawingGizmosSelected());
+                    DoCallForWholeElement(elem, c => c.OnPostRender());
+                }
+            });
+
         Current = null;
 
         if (foregroundPreview)

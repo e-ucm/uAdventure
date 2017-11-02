@@ -10,7 +10,7 @@ using System.Linq;
 namespace uAdventure.Editor
 {
     [EditorWindowExtension(10, typeof(Scene))]
-    public class ScenesWindow : ReorderableListEditorWindowExtension
+    public class ScenesWindow : DataControlListEditorWindowExtension
     {
         private enum ScenesWindowType
         {
@@ -76,8 +76,8 @@ namespace uAdventure.Editor
             scenesWindowExits = new ScenesWindowExits(rect, new GUIContent(TC.get("Element.Name3")), "Window", sceneEditor);
             scenesWindowExits.OnRequestRepaint = repaint;
 
-            //scenesWindowBarriers = new ScenesWindowBarriers(rect, new GUIContent(TC.get("BarriersList.Title")), "Window", sceneEditor);
-            //scenesWindowPlayerMovement = new ScenesWindowPlayerMovement(rect, new GUIContent(TC.get("Trajectory.Title")), "Window", sceneEditor);
+            scenesWindowBarriers = new ScenesWindowBarriers(rect, new GUIContent(TC.get("BarriersList.Title")), "Window", sceneEditor);
+            scenesWindowPlayerMovement = new ScenesWindowPlayerMovement(rect, new GUIContent(TC.get("Trajectory.Title")), "Window", sceneEditor);
 
             tabs = new List<KeyValuePair<string, ScenesWindowType>>()
                 {
@@ -94,9 +94,6 @@ namespace uAdventure.Editor
             }
 
             selectedButtonSkin = (GUISkin)Resources.Load("Editor/ButtonSelected", typeof(GUISkin));
-
-            GenerateToggleList();
-            
         }
 
 
@@ -112,7 +109,20 @@ namespace uAdventure.Editor
                 allElements.AddRange(scene.getReferencesList().getAllReferencesDataControl().ConvertAll(elem => elem.getErdc() as DataControl));
                 allElements.AddRange(scene.getActiveAreasList().getActiveAreas().Cast<DataControl>());
                 allElements.AddRange(scene.getExitsList().getExits().Cast<DataControl>());
-                allElements.AddRange(scene.getBarriersList().getBarriers().Cast<DataControl>());
+
+                if (Controller.Instance.playerMode() == DescriptorData.MODE_PLAYER_3RDPERSON)
+                {
+                    allElements.AddRange(scene.getBarriersList().getBarriers().Cast<DataControl>());
+                    var hasTrajectory = scene.getTrajectory().hasTrajectory();
+                    if (hasTrajectory)
+                    {
+                        allElements.AddRange(scene.getTrajectory().getNodes().Cast<DataControl>());
+                        allElements.Add(scene.getTrajectory());
+                    }
+                    else
+                        allElements.Add(Controller.Instance.SelectedChapterDataControl.getPlayer());
+
+                }
                 sceneEditor.elements = allElements;
 
                 /**
@@ -222,96 +232,29 @@ namespace uAdventure.Editor
         {
             isConcreteItemVisible = false;
             GameRources.GetInstance().selectedSceneIndex = -1;
-            GenerateToggleList();
         }
 
         public void ShowItemWindowView(int s)
         {
             GameRources.GetInstance().selectedSceneIndex = s;
             isConcreteItemVisible = true;
-            // Generate new toogle list - maybe user already created new scenes?
-            GenerateToggleList();
-        }
-
-        void GenerateToggleList()
-        {
-            toggleList =
-                new List<bool>(Controller.Instance.ChapterList.getSelectedChapterData().getScenes().Count);
-            for (int i = 0; i < Controller.Instance.ChapterList.getSelectedChapterData().getScenes().Count; i++)
-                toggleList.Add(true);
         }
 
         // ---------------------------------------------
         //         Reorderable List Handlers
         // ---------------------------------------------
 
-        protected override void OnElementNameChanged(ReorderableList r, int index, string newName)
-        {
-			Controller.Instance.ChapterList.getSelectedChapterDataControl().getScenesList().getScenes ()[index].renameElement(newName);
-        }
-
-        protected override void OnAdd(ReorderableList r)
-        {
-            if(r.index != -1 && r.index < r.list.Count)
-            {
-                Controller.Instance                           .ChapterList                           .getSelectedChapterDataControl()
-                           .getScenesList()
-                           .duplicateElement(
-                               Controller.Instance                                   .ChapterList                                   .getSelectedChapterDataControl()
-                                   .getScenesList()
-                                   .getScenes()[r.index]);
-            }
-            else
-            {
-                Controller.Instance.SelectedChapterDataControl.getScenesList().addElement(Controller.SCENE, "newScene");
-            }
-            
-        }
-
-        protected override void OnAddOption(ReorderableList r, string option)
-        {
-            // No options
-        }
-
-        protected override void OnRemove(ReorderableList r)
-        {
-            if(r.index != -1)
-            {
-                Controller.Instance                              .ChapterList                              .getSelectedChapterDataControl()
-                              .getScenesList()
-                              .deleteElement(
-                                  Controller.Instance                                      .ChapterList                                      .getSelectedChapterDataControl()
-                                      .getScenesList()
-                                      .getScenes()[r.index], false);
-
-                ShowBaseWindowView();
-            }
-        }
-
         protected override void OnSelect(ReorderableList r)
         {
             ShowItemWindowView(r.index);
         }
 
-        protected override void OnReorder(ReorderableList r)
-        {
-			var dataControlList = Controller.Instance 				.ChapterList .getSelectedChapterDataControl ().getScenesList ();
-
-			var toPos = r.index;
-			var fromPos = dataControlList.getScenes ().FindIndex (i => i.getId () == r.list [r.index] as string);
-
-			dataControlList.MoveElement (dataControlList.getScenes ()[fromPos], fromPos, toPos);
-        }
-
         protected override void OnButton()
         {
             ShowBaseWindowView();
-            reorderableList.index = -1;
-        }
 
-        protected override void OnUpdateList(ReorderableList r)
-        {
-			Elements = Controller.Instance.ChapterList.getSelectedChapterDataControl().getScenesList ().getScenes().ConvertAll(s => s.getId());
+            dataControlList.SetData(Controller.Instance.SelectedChapterDataControl.getScenesList(),
+                sceneList => (sceneList as ScenesListDataControl).getScenes().Cast<DataControl>().ToList());
         }
     }
 }

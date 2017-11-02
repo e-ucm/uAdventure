@@ -926,7 +926,20 @@ namespace uAdventure.Editor
             ElementReference newElementReference = new ElementReference(message, 50, 50);
             int counter = count(newElementReference);
             ElementReferenceDataControl erdc = new ElementReferenceDataControl(sceneDataControl, newElementReference, objectType, counter);
-            atrezzoReferencesList.Add(newElementReference);
+
+            if (type == typeof(ObjectAddItemReference))
+            {
+                itemReferencesList.Add(newElementReference);
+            }
+            else if (type == typeof(ObjectAddNPCReference))
+            {
+                npcReferencesList.Add(newElementReference);
+            }
+            else if (type == typeof(ObjectAddSetItemReference))
+            {
+                atrezzoReferencesList.Add(newElementReference);
+            }
+
             ElementContainer ec = new ElementContainer(erdc, -1, null);
             lastElementContainer = ec;
             reassignLayerAllReferencesDataControl(insertInOrder(ec, false));

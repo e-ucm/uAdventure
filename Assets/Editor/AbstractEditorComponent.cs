@@ -28,7 +28,8 @@ namespace uAdventure.Editor
             var attr = Attribute;
             if(attr != null)
             {
-                EditorWindowBase.RegisterComponent(attr.Type, this);
+                foreach(var t in attr.Types)
+                    EditorWindowBase.RegisterComponent(t, this);
             }
         }
         public bool Collapsed { get; set; }

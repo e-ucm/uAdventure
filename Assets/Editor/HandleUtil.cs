@@ -5,6 +5,60 @@ using UnityEngine;
 
 public static class HandleUtil {
 
+    public static Rect HandleFixedRatioRect(int handleId, Rect rect, float ratio, float maxPointDistance, Action<Vector2[]> drawPolygon, Action<Vector2> drawPoint)
+    {
+        var points = rect.ToPoints();
+        int pointChanged = -1;
+        Vector2 oldPointValue = Vector2.zero;
+
+        if (Event.current.type == EventType.repaint)
+            drawPolygon(points);
+
+        for (int i = 0; i < points.Length; i++)
+        {
+            EditorGUI.BeginChangeCheck();
+            var aux = points[i];
+            points[i] = HandleUtil.HandlePointMovement(handleId + i + 1, points[i], 10f, p => drawPoint(p));
+            if (EditorGUI.EndChangeCheck())
+            {
+                oldPointValue = aux;
+                points[i] = Event.current.mousePosition;
+                pointChanged = i;
+            }
+        }
+
+        if (pointChanged != -1)
+        {
+            GUI.changed = true;
+            var diff = points[pointChanged] - oldPointValue;
+            // Fix the change
+            switch (pointChanged)
+            {
+                case 0: points[3].x += diff.x; points[1].y += diff.y; break;
+                case 1: points[2].x += diff.x; points[0].y += diff.y; break;
+                case 2: points[1].x += diff.x; points[3].y += diff.y; break;
+                case 3: points[0].x += diff.x; points[2].y += diff.y; break;
+            }
+
+            //First we calculate the new original screen rect
+            var original = points.ToRect();
+            var newRatio = original.width / original.height;
+            // Then we obtain the unscaled rect to calculate the new scale
+            // And calculate the scale
+            if (newRatio > ratio)
+            {
+                original.height = original.width / ratio;
+            }
+            else
+            {
+                original.width = original.height * ratio;
+            }
+
+            rect = original;
+        }
+
+        return rect;
+    }
 
     public static Vector2 HandlePointMovement(int controlId, Vector2 point, object maxDistance, Action<Vector2> draw)
     {
@@ -150,4 +204,5 @@ public static class HandleUtil {
     {
         return points.Select(p => new Vector3(p.x, p.y, 0f)).ToArray();
     }
+
 }

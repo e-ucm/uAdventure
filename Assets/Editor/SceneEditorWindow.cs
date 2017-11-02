@@ -26,7 +26,7 @@ namespace uAdventure.Editor
 
         private DataControl selectedElement;
 
-        protected override void DrawPreview(Rect rect)
+        public override void DrawPreview(Rect rect)
         {
             LoadComponents();
             sceneEditor.Draw(rect);

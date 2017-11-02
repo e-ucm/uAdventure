@@ -90,8 +90,8 @@ public class DataControlList : ButtonList {
         // Can duplicate
         buttonDup.onButtonEnabledCallback = (list) => dataControl != null && list.index >= 0 && childs[list.index].canBeDuplicated();
         // Do Duplicate
-        buttonDup.onButtonPressedCallback = (rect, list) => dataControl.duplicateElement(childs[list.index]);
-        buttons.Add(buttonDup);
+        buttonDup.onButtonPressedCallback = (rect, list) => OnDuplicate();
+        buttons.Add(buttonDup); 
     }
 
     protected void OnAdd(object type)
@@ -103,6 +103,12 @@ public class DataControlList : ButtonList {
     protected void OnRemove()
     {
         dataControl.deleteElement(childs[index], false);
+        OnChanged(reorderableList);
+    }
+
+    protected void OnDuplicate()
+    {
+        dataControl.duplicateElement(childs[index]);
         OnChanged(reorderableList);
     }
 

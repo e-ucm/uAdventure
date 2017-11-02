@@ -5,10 +5,10 @@ namespace uAdventure.Editor
 {
     public class EditorComponentAttribute : Attribute
     {
-        public Type Type { get; private set; }
-        public EditorComponentAttribute(Type t)
+        public Type[] Types { get; private set; }
+        public EditorComponentAttribute(params Type[] t)
         {
-            Type = t;
+            Types = t;
         }
         public String Name { get; set; }
         public int Order { get; set; }

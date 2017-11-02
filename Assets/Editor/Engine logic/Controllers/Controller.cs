@@ -874,6 +874,27 @@ namespace uAdventure.Editor
             UnityEditor.AssetDatabase.Refresh();
         }
 
+        public void DeleteDirectory(string targetDir)
+        {
+            File.SetAttributes(targetDir, FileAttributes.Normal);
+
+            string[] files = Directory.GetFiles(targetDir);
+            string[] dirs = Directory.GetDirectories(targetDir);
+
+            foreach (string file in files)
+            {
+                File.SetAttributes(file, FileAttributes.Normal);
+                File.Delete(file);
+            }
+
+            foreach (string dir in dirs)
+            {
+                DeleteDirectory(dir);
+            }
+
+            Directory.Delete(targetDir, false);
+        }
+
         public bool NewAdventure(int fileType)
         {
             string currentGamePath = "Assets/Resources/CurrentGame";
@@ -891,7 +912,7 @@ namespace uAdventure.Editor
                 if (Directory.Exists(currentGamePath))
                 {
                     // Clean the CurrentGame directory
-                    Directory.Delete(currentGamePath, true);
+                    DeleteDirectory(currentGamePath);
                 }
                 Directory.CreateDirectory(currentGamePath);
                 create = true;
