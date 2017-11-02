@@ -313,12 +313,16 @@ namespace uAdventure.Editor
                     HandleUtil.DrawPolyLine(new Vector2[] { p1.center, p2.center }, false, Color.black, 5f);
                     HandleUtil.DrawPolyLine(new Vector2[] { p1.center, p2.center }, false, Color.white, 3f);
                     
-                    EditorGUI.DropShadowLabel(new Rect((p1.center + p2.center) / 2f, new Vector2(200, 30)), new GUIContent(Mathf.RoundToInt(distance) + ""));
+                    EditorGUI.DropShadowLabel(new Rect(((p1.center + p2.center) / 2f) - new Vector2(100f, 25f), new Vector2(200, 30)), new GUIContent(Mathf.RoundToInt(distance) + ""));
                 }
 
                 if(pairing != null)
                 {
-
+                    PlayerInitialPositionComponent.PutTransform(pairing);
+                    var p1 = ScenesWindowElementReference.ReferenceComponent.GetElementRect(pairing);
+                    PlayerInitialPositionComponent.RemoveTransform(pairing);
+                    
+                    HandleUtil.DrawPolyLine(new Vector2[] { p1.center, Event.current.mousePosition }, false, Color.white, 3f);
                 }
             }
         }
