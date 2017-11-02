@@ -27,9 +27,9 @@ namespace uAdventure.Core
             {
 				string idStart = el.GetAttribute("idStart") ?? "";
 				string idEnd = el.GetAttribute("idEnd") ?? "";
-				int length = int.Parse(el.GetAttribute("length") ?? "-1");
+				//int length = int.Parse(el.GetAttribute("length") ?? "-1");
 
-                trajectory.addSide(idStart, idEnd, length);
+                trajectory.addSide(idStart, idEnd, -1);
             }
 
 			var initialNode = element.SelectSingleNode("initialnode");
