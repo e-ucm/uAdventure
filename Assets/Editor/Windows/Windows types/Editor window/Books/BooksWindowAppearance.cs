@@ -127,7 +127,7 @@ namespace uAdventure.Editor
 
         private Vector2 offset;
 
-        protected override void DrawPreview(Rect rect)
+        public override void DrawPreview(Rect rect)
         {
             // We first fix the ratio of the rect
             var viewport = rect.AdjustToRatio(800f / 600f);
@@ -183,10 +183,7 @@ namespace uAdventure.Editor
                     if (GUIUtility.hotControl == leftNormalArrow.GetInstanceID())
                     {
                         leftArrowRect.position += Event.current.delta;
-                        workingBook.setPreviousPagePosition(new Vector2(
-                            ((leftArrowRect.x - viewport.x) / viewport.width) * 800f,
-                            ((leftArrowRect.y - viewport.y) / viewport.height) * 600f
-                            ));
+                        workingBook.setPreviousPagePosition(rect.ViewportToScreen(800f, 600f, SceneEditor.Current.Viewport).position);
                     }
                     if (rightNormalArrow && GUIUtility.hotControl == rightNormalArrow.GetInstanceID())
                     {
