@@ -84,7 +84,7 @@ namespace uAdventure.Editor
             if(Event.current.type == EventType.MouseDown)
             {
                 var rectangleArea = Target as RectangleArea;
-                var points = WorldToViewport(GetPoints(rectangleArea), SceneEditor.Current.Viewport, 800f, 600f);
+                var points = WorldToViewport(GetPoints(rectangleArea), SceneEditor.Current.Viewport, SceneEditor.Current.Size.x, SceneEditor.Current.Size.y);
                 return Inside(points, Event.current.mousePosition);
             }
 
@@ -115,7 +115,7 @@ namespace uAdventure.Editor
             var rectangleArea = Target as RectangleArea;
             if (Event.current.type == EventType.Repaint)
             {
-                DrawArea(WorldToViewport(GetPoints(rectangleArea), SceneEditor.Current.Viewport, 800f, 600f), lineColor, backgroundColor);
+                DrawArea(WorldToViewport(GetPoints(rectangleArea), SceneEditor.Current.Viewport, SceneEditor.Current.Size.x, SceneEditor.Current.Size.y), lineColor, backgroundColor);
             }
             Handles.EndGUI();
         }
@@ -126,7 +126,7 @@ namespace uAdventure.Editor
 
             Color lineColor = Color.red;
             var rectangleArea = Target as RectangleArea;
-            var points = WorldToViewport(GetPoints(rectangleArea), SceneEditor.Current.Viewport, 800f, 600f);
+            var points = WorldToViewport(GetPoints(rectangleArea), SceneEditor.Current.Viewport, SceneEditor.Current.Size.x, SceneEditor.Current.Size.y);
 
             switch (Event.current.type)
             {
@@ -248,7 +248,7 @@ namespace uAdventure.Editor
                         case 3: points[0].x += Event.current.delta.x; points[2].y += Event.current.delta.y; break;
                     }
 
-                    var rect = ViewportToWorld(points, SceneEditor.Current.Viewport, 800f, 600f).ToRect();
+                    var rect = ViewportToWorld(points, SceneEditor.Current.Viewport, SceneEditor.Current.Size.x, SceneEditor.Current.Size.y).ToRect();
                     rectangleArea.getRectangle().setValues(
                         Mathf.RoundToInt(rect.x),
                         Mathf.RoundToInt(rect.y),
@@ -258,7 +258,7 @@ namespace uAdventure.Editor
                 else
                 {
                     rectangleArea.getPoints().Clear();
-                    rectangleArea.getPoints().AddRange(ViewportToWorld(points, SceneEditor.Current.Viewport, 800f, 600f));
+                    rectangleArea.getPoints().AddRange(ViewportToWorld(points, SceneEditor.Current.Viewport, SceneEditor.Current.Size.x, SceneEditor.Current.Size.y));
                 }
             }
 

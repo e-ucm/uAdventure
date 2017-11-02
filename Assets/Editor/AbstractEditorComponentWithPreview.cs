@@ -50,7 +50,7 @@ namespace uAdventure.Editor
         {
             var myPos = SceneEditor.Current.Matrix.MultiplyPoint(rect.position);
             var mySize = SceneEditor.Current.Matrix.MultiplyVector(rect.size);
-            return new Rect(myPos, mySize).AdjustToViewport(800, 600, viewport);
+            return new Rect(myPos, mySize).AdjustToViewport(SceneEditor.Current.Size.x, SceneEditor.Current.Size.y, viewport);
         }
     }
 }

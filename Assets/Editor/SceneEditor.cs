@@ -41,6 +41,14 @@ public class SceneEditor {
     private Texture2D foregroundPreview;
     private int lastSelectedResources = -1;
 
+    public Vector2 Size
+    {
+        get
+        {
+            return backgroundPreview ? new Vector2(backgroundPreview.width, backgroundPreview.height) : new Vector2(800f, 600f);
+        }
+    }
+
     public Dictionary<Type, List<EditorComponent>> Components { get; internal set; }
     public List<Type> EnabledTypes { get; set; }
     public bool Disabled { get; private set; }
@@ -138,7 +146,7 @@ public class SceneEditor {
 
     public void Draw(Rect rect)
     {
-        Viewport = rect.AdjustToRatio(800f / 600f);
+        Viewport = rect.AdjustToRatio(Size.x / Size.y);
 
         if(Event.current.type == EventType.MouseDown && Viewport.Contains(Event.current.mousePosition))
         {

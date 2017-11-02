@@ -178,7 +178,7 @@ namespace uAdventure.Editor
                     point =>   HandleUtil.DrawPoint(point, 4.5f, Color.blue, Color.black));
                 if (EditorGUI.EndChangeCheck())
                 {
-                    var original = newRect.ViewportToScreen(800f, 600f, SceneEditor.Current.Viewport);
+                    var original = newRect.ViewportToScreen(SceneEditor.Current.Size.x, SceneEditor.Current.Size.y, SceneEditor.Current.Viewport);
                     var unscaled = ScenesWindowElementReference.ReferenceComponent.GetUnscaledRect(Target);
                     // And then we rip the position
                     var position = original.center + new Vector2(0, original.height / 2f);
@@ -204,7 +204,7 @@ namespace uAdventure.Editor
                 rect = HandleUtil.HandleRectMovement(Target.GetHashCode(), rect);
                 if (EditorGUI.EndChangeCheck())
                 {
-                    var original = rect.ViewportToScreen(800f, 600f, SceneEditor.Current.Viewport);
+                    var original = rect.ViewportToScreen(SceneEditor.Current.Size.x, SceneEditor.Current.Size.y, SceneEditor.Current.Viewport);
                     if (Target is PlayerDataControl)
                     {
                         var workingScene = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[GameRources.GetInstance().selectedSceneIndex];
@@ -222,7 +222,7 @@ namespace uAdventure.Editor
             {
                 var myPos = SceneEditor.Current.Matrix.MultiplyPoint(rect.position);
                 var mySize = SceneEditor.Current.Matrix.MultiplyVector(rect.size);
-                return new Rect(myPos, mySize).AdjustToViewport(800, 600, viewport);
+                return new Rect(myPos, mySize).AdjustToViewport(SceneEditor.Current.Size.x, SceneEditor.Current.Size.y, viewport);
             }
             public override void OnPostRender()
             {
@@ -275,8 +275,8 @@ namespace uAdventure.Editor
                     else if(SceneEditor.Current.SelectedElement == null && Action == 0)
                     {
                         var pos = (Event.current.mousePosition - SceneEditor.Current.Viewport.position);
-                        pos.x = (pos.x / SceneEditor.Current.Viewport.size.x) * 800f;
-                        pos.y = (pos.y / SceneEditor.Current.Viewport.size.y) * 600f;
+                        pos.x = (pos.x / SceneEditor.Current.Viewport.size.x) * SceneEditor.Current.Size.x;
+                        pos.y = (pos.y / SceneEditor.Current.Viewport.size.y) * SceneEditor.Current.Size.y;
                         trajectory.addNode(Mathf.RoundToInt(pos.x), Mathf.RoundToInt(pos.y));
                     }
                 }
