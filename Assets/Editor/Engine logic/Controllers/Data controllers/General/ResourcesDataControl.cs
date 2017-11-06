@@ -54,15 +54,30 @@ namespace uAdventure.Editor
             {
                 case Controller.SCENE:
                     assetsInformation = new AssetInformation[] { new AssetInformation("Resources.DescriptionSceneBackground", "background", true, AssetsConstants.CATEGORY_BACKGROUND, AssetsController.FILTER_JPG), new AssetInformation("Resources.DescriptionSceneForeground", "foreground", false, AssetsConstants.CATEGORY_BACKGROUND, AssetsController.FILTER_PNG), /*new AssetInformation( TextConstants.getText( "Resources.DescriptionSceneHardMap" ), "hardmap", false, AssetsController.CATEGORY_BACKGROUND, AssetsController.FILTER_PNG ), */new AssetInformation("Resources.DescriptionSceneMusic", "bgmusic", false, AssetsConstants.CATEGORY_AUDIO, AssetsController.FILTER_NONE) };
+
+                    if (!resources.existAsset("background"))
+                        resources.addAsset("background", SpecialAssetPaths.ASSET_EMPTY_BACKGROUND);
                     break;
                 case Controller.CUTSCENE_SLIDES:
                     assetsInformation = new AssetInformation[] { new AssetInformation("Resources.DescriptionSlidesceneSlides", "slides", true, AssetsConstants.CATEGORY_ANIMATION, AssetsController.FILTER_JPG), new AssetInformation("Resources.DescriptionSceneMusic", "bgmusic", false, AssetsConstants.CATEGORY_AUDIO, AssetsController.FILTER_NONE) };
+
+                    if (!resources.existAsset("slides"))
+                        resources.addAsset("slides", SpecialAssetPaths.ASSET_EMPTY_ANIMATION);
                     break;
                 case Controller.ACTION_CUSTOM:
                 case Controller.ACTION_CUSTOM_INTERACT:
                     assetsInformation = new AssetInformation[] { new AssetInformation("Resources.DescriptionButtonNormal", "buttonNormal", true, AssetsConstants.CATEGORY_BUTTON, AssetsController.FILTER_PNG), new AssetInformation("Resources.DescriptionButtonOver", "buttonOver", true, AssetsConstants.CATEGORY_BUTTON, AssetsController.FILTER_PNG), new AssetInformation("Resources.DescriptionButtonSound", "buttonSound", false, AssetsConstants.CATEGORY_AUDIO, AssetsController.FILTER_NONE)/*, new AssetInformation( "Resources.DescriptionButtonPressed" , "buttonPressed", true, AssetsConstants.CATEGORY_BUTTON, AssetsController.FILTER_PNG )*/, new AssetInformation("Resources.DescriptionActionAnimation", "actionAnimation", false, AssetsConstants.CATEGORY_ANIMATION, AssetsController.FILTER_NONE), new AssetInformation("Resources.DescriptionActionAnimationLeft", "actionAnimationLeft", false, AssetsConstants.CATEGORY_ANIMATION, AssetsController.FILTER_NONE) };
                     assetsGroups = new int[][] { new int[] { 0, 1, 2 }, new int[] { 3, 4 } };
                     groupsInfo = new string[] { "Resources.Button", "Resources.Animations" };
+
+                    // For each asset, if it has not been declared attach the empty animation
+                    string[] assets = new string[] { "buttonNormal", "buttonOver", "buttonPressed" };
+                    foreach (string asset in assets)
+                    {
+                        if (!resources.existAsset(asset))
+                            resources.addAsset(asset, SpecialAssetPaths.ASSET_EMPTY_ANIMATION);
+                    }
+
                     break;
                 case Controller.CUTSCENE_VIDEO:
                     assetsInformation = new AssetInformation[] { new AssetInformation("Resources.DescriptionVideoscenes", "video", true, AssetsConstants.CATEGORY_VIDEO, AssetsController.FILTER_NONE) };
@@ -73,12 +88,19 @@ namespace uAdventure.Editor
                         new AssetInformation( "Resources.ArrowRightNormal", "arrowRightNormal", false, AssetsConstants.CATEGORY_ARROW_BOOK, AssetsController.FILTER_PNG),
                         new AssetInformation( "Resources.ArrowLeftOver", "arrowLeftOver", false, AssetsConstants.CATEGORY_ARROW_BOOK, AssetsController.FILTER_PNG),
                         new AssetInformation( "Resources.ArrowRightOver", "arrowRightOver", false, AssetsConstants.CATEGORY_ARROW_BOOK, AssetsController.FILTER_PNG) };
+
+                    if (!resources.existAsset("background"))
+                        resources.addAsset("background", SpecialAssetPaths.ASSET_EMPTY_BACKGROUND);
                     break;
                 case Controller.ITEM:
                     assetsInformation = new AssetInformation[] { new AssetInformation(  "Resources.DescriptionItemImage" , "image", true, AssetsConstants.CATEGORY_IMAGE, AssetsController.FILTER_NONE ), new AssetInformation( "Resources.DescriptionItemIcon" , "icon", false, AssetsConstants.CATEGORY_ICON, AssetsController.FILTER_NONE )
                                                             ,  new AssetInformation( "Resources.DescriptionItemImageOver" , "imageover", false, AssetsConstants.CATEGORY_IMAGE, AssetsController.FILTER_NONE )};
                     imageIconMap = new Dictionary<string, string>();
                     imageIconMap.Add("icon", "image");
+                    if(!resources.existAsset("image"))
+                        resources.addAsset("image", SpecialAssetPaths.ASSET_EMPTY_IMAGE);
+                    if (!resources.existAsset("icon"))
+                        resources.addAsset("icon", SpecialAssetPaths.ASSET_EMPTY_ICON);
                     break;
                 case Controller.PLAYER:
                 case Controller.NPC:
@@ -100,9 +122,22 @@ namespace uAdventure.Editor
                         new AssetInformation( "Resources.DescriptionCharacterAnimationWalkLeft" , "walkleft", false, AssetsConstants.CATEGORY_ANIMATION, AssetsController.FILTER_PNG ) };
                     assetsGroups = new int[][] { new int[] { 0, 1, 2, 3 }, new int[] { 4, 5, 6, 7 }, new int[] { 8, 9 }, new int[] { 10, 11, 12, 13 } };
                     groupsInfo = new string[] { "Resources.StandingAnimations", "Resources.SpeakingAnimations", "Resources.UsingAnimations", "Resources.WalkingAnimations" };
+                    
+                    foreach (string asset in new string[]
+                    {
+                        "standup", "standdown", "standright", "standleft", "speakup", "speakdown", "speakright", "speakleft",
+                        "useright", "useleft", "walkup", "walkdown", "walkright", "walkleft"
+                    })
+                    {
+                        if (!resources.existAsset(asset))
+                            resources.addAsset(asset, SpecialAssetPaths.ASSET_EMPTY_ANIMATION);
+                    }
+
                     break;
                 case Controller.ATREZZO:
                     assetsInformation = new AssetInformation[] { new AssetInformation("Resources.DescriptionItemImage", "image", true, AssetsConstants.CATEGORY_IMAGE, AssetsController.FILTER_NONE) };
+                    if (!resources.existAsset("image"))
+                        resources.addAsset("image", SpecialAssetPaths.ASSET_EMPTY_IMAGE);
                     break;
             }
 
