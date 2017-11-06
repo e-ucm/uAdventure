@@ -49,13 +49,17 @@ namespace uAdventure.Editor
 
             //newGameWindow = new NewGameWindow(windowRect, new GUIContent(TC.get("GeneralText.New")), "Window");
             //openGameWindow = new OpenGameWindow(windowRect, new GUIContent(TC.get("GeneralText.Open")), "Window");
-            newGameWindow = new NewGameWindow(windowRect, new GUIContent("New"), "Window");
-            openGameWindow = new OpenGameWindow(windowRect, new GUIContent("Open"), "Window");
             //recentGameWindow = new RecentGameWindow(windowRect, new GUIContent(Language.GetText("RECENT_GAME")), "Window");
         }
 
         public void OnGUI()
         {
+            if(newGameWindow == null || openGameWindow == null)
+            {
+                newGameWindow = new NewGameWindow(windowRect, new GUIContent("New"), "Window");
+                openGameWindow = new OpenGameWindow(windowRect, new GUIContent("Open"), "Window");
+            }
+
             windowWidth = position.width;
             windowHeight = position.height;
             
