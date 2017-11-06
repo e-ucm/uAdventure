@@ -151,7 +151,13 @@ namespace uAdventure.Editor
             string nameOnly = Path.GetFileName(selectedAssetPath);
             if(selectedAssetPath != Path.Combine(path.FullName, nameOnly)) // Avoid to copy the same origin to same destination files
             {
-                File.Copy(selectedAssetPath, Path.Combine(path.FullName, nameOnly), true);
+                var destination = Path.Combine(path.FullName, nameOnly);
+                File.Copy(selectedAssetPath, destination, true); 
+
+                if(destination.ToLowerInvariant().EndsWith(".png") || destination.ToLowerInvariant().EndsWith(".jpg"))
+                {
+                    AssetsController.InitImporterConfig(destination);
+                }
 
                 if (fileType == FileType.CUTSCENE_SLIDES || fileType == FileType.CHARACTER_ANIM || fileType == FileType.PLAY_ANIMATION_EFFECT)
                     AssetsController.copyAllFiles(Path.GetDirectoryName(selectedAssetPath), path.FullName);
