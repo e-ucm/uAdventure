@@ -23,6 +23,10 @@ namespace uAdventure.Editor
             : base(aStartPos, aContent, aStyle, sceneEditor, aOptions)
         {
             new ReferenceComponent(Rect.zero, new GUIContent(""), "");
+            if (Controller.Instance.playerMode() == DescriptorData.MODE_PLAYER_3RDPERSON)
+            {
+                new InfluenceComponent(Rect.zero, new GUIContent(""), "");
+            }
 
             conditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/conditions-24x24", typeof(Texture2D));
             noConditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/no-conditions-24x24", typeof(Texture2D));
@@ -186,7 +190,9 @@ namespace uAdventure.Editor
                 switch (Event.current.type)
                 {
                     case EventType.MouseDown:
-                        if (GetElementRect(elemRef).Contains(Event.current.mousePosition) && GUIUtility.hotControl == 0) selected = true;
+                        var rect = GetElementRect(elemRef);
+                        if (GUIUtility.hotControl == 0)
+                            selected = rect.Contains(Event.current.mousePosition) || rect.ToPoints().ToList().FindIndex(p => (p - Event.current.mousePosition).magnitude <= 10f) != -1;
                         break;
                 }
 
@@ -230,5 +236,166 @@ namespace uAdventure.Editor
             }
         }
 
+
+
+        // ################################################################################################################################################
+        // ########################################################### INFLUENCE COMPONENT  ###############################################################
+        // ################################################################################################################################################
+
+        [EditorComponent(typeof(ElementReferenceDataControl), typeof(ActiveAreaDataControl), typeof(ExitDataControl), Name = "Influence Area", Order = 1)]
+        public class InfluenceComponent : AbstractEditorComponent
+        {
+            private static InfluenceAreaDataControl getIngluenceArea(DataControl target)
+            {
+                if(target is ElementReferenceDataControl)
+                {
+                    var elemRef = target as ElementReferenceDataControl;
+                    if(elemRef.getType() == Controller.ATREZZO) return null;
+                    return elemRef.getInfluenceArea();
+                }
+                else if(target is ActiveAreaDataControl)
+                {
+                    return (target as ActiveAreaDataControl).getInfluenceArea();
+                }
+                else if(target is ExitDataControl)
+                {
+                    return (target as ExitDataControl).getInfluenceArea();
+                }
+
+                return null;
+            }
+
+            private static Rect getElementBoundaries(DataControl target)
+            {
+
+                if (target is ElementReferenceDataControl)
+                {
+                    var elemRef = target as ElementReferenceDataControl;
+                    var size = ReferenceComponent.GetUnscaledRect(target).size * elemRef.getElementScale();
+                    return new Rect(elemRef.getElementX() - (size.x/2f), elemRef.getElementY() - (size.y), size.x, size.y);
+                }
+                else if (target is RectangleArea)
+                { 
+                    var rectangle = (target as RectangleArea).getRectangle();
+                    if (rectangle.isRectangular())
+                    {
+                        return new Rect(rectangle.getX(), rectangle.getY(), rectangle.getWidth(), rectangle.getHeight());
+                    }
+                    else
+                    {
+                        return rectangle.getPoints().ToArray().ToRect();
+                    }
+                }
+
+                return Rect.zero;
+            }
+
+            private static Rect fixToBoundaries(Vector2 oldSize, Rect rect, Rect boundaries)
+            {
+                var oldpos = rect.position;
+                var otherCorner = new Vector2(rect.x + rect.width + boundaries.x, rect.y + rect.height + boundaries.y);
+
+                // This works for the top left corner
+                rect.x = Mathf.Min(rect.x + boundaries.x, boundaries.x + boundaries.width);
+                rect.y = Mathf.Min(rect.y + boundaries.y, boundaries.y + boundaries.height);
+
+                // This works for the bottom right corner
+                otherCorner.x = Mathf.Max(otherCorner.x, boundaries.x);
+                otherCorner.y = Mathf.Max(otherCorner.y, boundaries.y);
+
+                var newSize = new Vector2(otherCorner.x - rect.x, otherCorner.y - rect.y);
+
+                return new Rect(rect.position, newSize);
+            }
+
+            public InfluenceComponent(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
+            {
+            }
+
+            public override void Draw(int aID)
+            {
+                var influence = getIngluenceArea(Target);
+
+                if(influence != null)
+                {
+                    var boundaries = getElementBoundaries(Target);
+
+                    var oldPos = new Vector2(boundaries.x + influence.getX(), boundaries.y + influence.getY());
+                    var oldSize = new Vector2(influence.getWidth(), influence.getHeight());
+                    EditorGUI.BeginChangeCheck();
+                    var newPos = EditorGUILayout.Vector2Field("Position", oldPos);
+                    var newSize = EditorGUILayout.Vector2Field("Size", oldSize);
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        var fixedRect = fixToBoundaries(oldSize, new Rect(newPos, newSize), boundaries);
+                        influence.setInfluenceArea(Mathf.RoundToInt(fixedRect.x - boundaries.x), Mathf.RoundToInt(fixedRect.y - boundaries.y), Mathf.RoundToInt(fixedRect.width), Mathf.RoundToInt(fixedRect.height));
+                    }
+                }
+                else
+                {
+                    EditorGUILayout.LabelField("This element has no influence area");
+                }
+            }
+
+            private DataControl wasSelected = null;
+
+            public override bool Update()
+            {
+                bool selected = false;
+                switch (Event.current.type)
+                {
+                    case EventType.MouseDown:
+                        // Calculate the influenceAreaRect
+                        var influenceArea = getIngluenceArea(Target);
+                        if (influenceArea == null)
+                            return false;
+                        var boundaries = getElementBoundaries(Target);
+
+                        var rect = new Rect(influenceArea.getX() + boundaries.x, influenceArea.getY() + boundaries.y, influenceArea.getWidth(), influenceArea.getHeight());
+                        rect = rect.AdjustToViewport(SceneEditor.Current.Size.x, SceneEditor.Current.Size.y, SceneEditor.Current.Viewport);
+
+                        // See if its selected (only if it was previously selected)
+                        if (GUIUtility.hotControl == 0)
+                            selected = (wasSelected == Target) && (rect.Contains(Event.current.mousePosition) || rect.ToPoints().ToList().FindIndex(p => (p - Event.current.mousePosition).magnitude <= 10f) != -1);
+
+                        if(wasSelected == Target)
+                            wasSelected = null;
+
+                        break;
+                }
+
+                return selected;
+            }
+
+            public override void OnDrawingGizmosSelected()
+            {
+                wasSelected = Target;
+                var boundaries = getElementBoundaries(Target);
+                var influenceArea = getIngluenceArea(Target);
+                var rect = new Rect(boundaries.x + influenceArea.getX(), boundaries.y + influenceArea.getY(), influenceArea.getWidth(), influenceArea.getHeight());
+                var originalSize = rect.size;
+                rect = rect.AdjustToViewport(SceneEditor.Current.Size.x, SceneEditor.Current.Size.y, SceneEditor.Current.Viewport);
+
+                EditorGUI.BeginChangeCheck();
+                var newRect = HandleUtil.HandleRect(influenceArea.GetHashCode() + 1, rect, 10f,
+                    polygon =>
+                    {
+                        HandleUtil.DrawPolyLine(polygon, true, Color.blue);
+                        HandleUtil.DrawPolygon(polygon, new Color(0,0,1f,0.3f));
+                    },
+                    point => HandleUtil.DrawSquare(point, 6.5f, Color.yellow, Color.black));
+
+                newRect = HandleUtil.HandleRectMovement(influenceArea.GetHashCode(), newRect);
+                
+                if (EditorGUI.EndChangeCheck())
+                {
+                    var original = newRect.ViewportToScreen(SceneEditor.Current.Size.x, SceneEditor.Current.Size.y, SceneEditor.Current.Viewport);
+
+                    original = fixToBoundaries(originalSize, original, boundaries);
+                    // And then we set the values in the reference
+                    influenceArea.setInfluenceArea(Mathf.RoundToInt(original.x - boundaries.x), Mathf.RoundToInt(original.y - boundaries.y), Mathf.RoundToInt(original.width), Mathf.RoundToInt(original.height));
+                }
+            }
+        }
     }
 }
