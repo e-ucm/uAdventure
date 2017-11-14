@@ -179,7 +179,8 @@ namespace uAdventure.Editor
         private Texture2D LoadCharacterTexturePreview(NPCDataControl data, string animation)
         {
             var auxPath = data.getAnimationPathPreview(animation);
-            return string.IsNullOrEmpty(auxPath) ? null : AssetsController.getImage(auxPath).texture;
+            var image = string.IsNullOrEmpty(auxPath) ? null : AssetsController.getImage(auxPath);
+            return image != null ? image.texture : null;
         }
 
         private void RefreshPathInformation(DataControlWithResources data)
@@ -307,14 +308,20 @@ namespace uAdventure.Editor
 
         public override void OnRender(Rect viewport)
         {
-            if(Target is NodeDataControl)
+            if (Target is NodeDataControl)
+            {
                 Target = Controller.Instance.SelectedChapterDataControl.getPlayer();
+            }
             
             var npc = Target as NPCDataControl;
 
             var preview = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_STAND_DOWN);
-            var rect = GetViewportRect(new Rect(new Vector2(-0.5f * preview.width, -preview.height), new Vector2(preview.width, preview.height)), viewport);
-            if (preview) GUI.DrawTexture(rect, preview, ScaleMode.ScaleToFit);
+            if (preview)
+            {
+                var rect = GetViewportRect(new Rect(new Vector2(-0.5f * preview.width, -preview.height), new Vector2(preview.width, preview.height)), viewport);
+                
+                GUI.DrawTexture(rect, preview, ScaleMode.ScaleToFit);
+            }
         }
     }
 }
