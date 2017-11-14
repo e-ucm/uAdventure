@@ -222,7 +222,7 @@ namespace uAdventure.Core
 			foreach(var activeArea in DOMParserUtility.DOMParse<ActiveArea>(element.SelectNodes("active-areas/active-area"), parameters).ToList())
 				scene.addActiveArea (activeArea);
 				
-			foreach(var barrier in DOMParserUtility.DOMParse<Barrier>(element.SelectNodes("barrier"), parameters).ToList())
+			foreach(var barrier in DOMParserUtility.DOMParse<Barrier>(element.SelectNodes("barriers/barrier"), parameters).ToList())
 				scene.addBarrier (barrier);
 
 			foreach(var trajectory in DOMParserUtility.DOMParse<Trajectory>(element.SelectNodes("trajectory"), parameters).ToList())

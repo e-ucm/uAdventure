@@ -71,10 +71,10 @@ namespace uAdventure.Core
                 npc.setBubbleBkgColor(ExParsers.ParseDefault(textcolor.GetAttribute("bubbleBkgColor"), npc.getBubbleBkgColor()));
                 npc.setBubbleBorderColor(ExParsers.ParseDefault(textcolor.GetAttribute("bubbleBorderColor"), npc.getBubbleBorderColor()));
 
-                var frontcolor = textcolor.SelectSingleNode("frontcolor/@color") as XmlElement;
+                var frontcolor = textcolor.SelectSingleNode("frontcolor") as XmlElement;
                 if (frontcolor != null) npc.setTextFrontColor(ExParsers.ParseDefault(frontcolor.GetAttribute("color"), npc.getTextFrontColor()));
 
-                var bordercolor = textcolor.SelectSingleNode("bordercolor/@color") as XmlElement;
+                var bordercolor = textcolor.SelectSingleNode("bordercolor") as XmlElement;
                 if (bordercolor != null) npc.setTextBorderColor(ExParsers.ParseDefault(bordercolor.GetAttribute("color"), npc.getTextBorderColor()));
             }
         }
