@@ -292,18 +292,17 @@ namespace uAdventure.Editor
 
             private static Rect fixToBoundaries(Vector2 oldSize, Rect rect, Rect boundaries)
             {
-                var oldpos = rect.position;
-                var otherCorner = new Vector2(rect.x + rect.width + boundaries.x, rect.y + rect.height + boundaries.y);
+                var otherCorner = rect.position + rect.size;
 
                 // This works for the top left corner
-                rect.x = Mathf.Min(rect.x + boundaries.x, boundaries.x + boundaries.width);
-                rect.y = Mathf.Min(rect.y + boundaries.y, boundaries.y + boundaries.height);
+                rect.x = Mathf.Min(rect.x, boundaries.width);
+                rect.y = Mathf.Min(rect.y, boundaries.height);
 
                 // This works for the bottom right corner
-                otherCorner.x = Mathf.Max(otherCorner.x, boundaries.x);
-                otherCorner.y = Mathf.Max(otherCorner.y, boundaries.y);
+                otherCorner.x = Mathf.Max(otherCorner.x, 0);
+                otherCorner.y = Mathf.Max(otherCorner.y, 0);
 
-                var newSize = new Vector2(otherCorner.x - rect.x, otherCorner.y - rect.y);
+                var newSize = otherCorner - rect.position;
 
                 return new Rect(rect.position, newSize);
             }
@@ -319,16 +318,15 @@ namespace uAdventure.Editor
                 if(influence != null)
                 {
                     var boundaries = getElementBoundaries(Target);
-
-                    var oldPos = new Vector2(boundaries.x + influence.getX(), boundaries.y + influence.getY());
-                    var oldSize = new Vector2(influence.getWidth(), influence.getHeight());
+                    
                     EditorGUI.BeginChangeCheck();
-                    var newPos = EditorGUILayout.Vector2Field("Position", oldPos);
-                    var newSize = EditorGUILayout.Vector2Field("Size", oldSize);
+                    var rect = influence.ScreenRect(boundaries);
+                    rect.position -= boundaries.position;
+                    var newRect = EditorGUILayout.RectField("Influence", rect);
                     if (EditorGUI.EndChangeCheck())
                     {
-                        var fixedRect = fixToBoundaries(oldSize, new Rect(newPos, newSize), boundaries);
-                        influence.setInfluenceArea(Mathf.RoundToInt(fixedRect.x - boundaries.x), Mathf.RoundToInt(fixedRect.y - boundaries.y), Mathf.RoundToInt(fixedRect.width), Mathf.RoundToInt(fixedRect.height));
+                        var fixedRect = fixToBoundaries(rect.size, newRect, boundaries);
+                        influence.setInfluenceArea(Mathf.RoundToInt(fixedRect.x), Mathf.RoundToInt(fixedRect.y), Mathf.RoundToInt(fixedRect.width), Mathf.RoundToInt(fixedRect.height));
                     }
                 }
                 else
@@ -350,9 +348,9 @@ namespace uAdventure.Editor
                         if (influenceArea == null)
                             return false;
                         var boundaries = getElementBoundaries(Target);
-
-                        var rect = new Rect(influenceArea.getX() + boundaries.x, influenceArea.getY() + boundaries.y, influenceArea.getWidth(), influenceArea.getHeight());
-                        rect = rect.AdjustToViewport(SceneEditor.Current.Size.x, SceneEditor.Current.Size.y, SceneEditor.Current.Viewport);
+                        
+                        var rect = influenceArea.ScreenRect(boundaries)
+                            .AdjustToViewport(SceneEditor.Current.Size.x, SceneEditor.Current.Size.y, SceneEditor.Current.Viewport);
 
                         // See if its selected (only if it was previously selected)
                         if (GUIUtility.hotControl == 0)
@@ -370,9 +368,12 @@ namespace uAdventure.Editor
             public override void OnDrawingGizmosSelected()
             {
                 wasSelected = Target;
-                var boundaries = getElementBoundaries(Target);
                 var influenceArea = getIngluenceArea(Target);
-                var rect = new Rect(boundaries.x + influenceArea.getX(), boundaries.y + influenceArea.getY(), influenceArea.getWidth(), influenceArea.getHeight());
+                if (influenceArea == null)
+                    return;
+
+                var boundaries = getElementBoundaries(Target);
+                var rect = influenceArea.ScreenRect(boundaries);
                 var originalSize = rect.size;
                 rect = rect.AdjustToViewport(SceneEditor.Current.Size.x, SceneEditor.Current.Size.y, SceneEditor.Current.Viewport);
 
@@ -391,11 +392,19 @@ namespace uAdventure.Editor
                 {
                     var original = newRect.ViewportToScreen(SceneEditor.Current.Size.x, SceneEditor.Current.Size.y, SceneEditor.Current.Viewport);
 
+                    original.position -= boundaries.position;
                     original = fixToBoundaries(originalSize, original, boundaries);
                     // And then we set the values in the reference
-                    influenceArea.setInfluenceArea(Mathf.RoundToInt(original.x - boundaries.x), Mathf.RoundToInt(original.y - boundaries.y), Mathf.RoundToInt(original.width), Mathf.RoundToInt(original.height));
+                    influenceArea.setInfluenceArea(Mathf.RoundToInt(original.x), Mathf.RoundToInt(original.y), Mathf.RoundToInt(original.width), Mathf.RoundToInt(original.height));
                 }
             }
+        }
+    }
+    internal static class ExInfluences
+    {
+        public static Rect ScreenRect(this InfluenceAreaDataControl influence, Rect boundaries)
+        {
+            return new Rect(boundaries.x + influence.getX(), boundaries.y + influence.getY(), influence.getWidth(), influence.getHeight());
         }
     }
 }
