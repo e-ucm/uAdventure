@@ -1675,7 +1675,15 @@ namespace uAdventure.Editor
                 // In case of image importing
                 if(file.Extension.ToLowerInvariant() == ".png" || file.Extension.ToLowerInvariant() == ".jpg")
                 {
-                    InitImporterConfig(temppath);
+                    ///InitImporterConfig(temppath);
+                }
+
+                // In case of animation
+                if (file.Extension.ToLowerInvariant() == ".xml")
+                {
+                    string text = File.ReadAllText(temppath);
+                    text = text.Replace(".eaa", ".eaa.xml");
+                    File.WriteAllText(temppath, text);
                 }
 
                 // In case of animation
