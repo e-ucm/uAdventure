@@ -3,18 +3,17 @@
 using uAdventure.Core;
 using UnityEditor;
 using System;
+using System.Linq;
 
 namespace uAdventure.Editor
 {
     public class ScenesWindowPlayerMovement : SceneEditorWindow
     {
-
-        private string backgroundPath = "";
-        private Texture2D backgroundPreviewTex = null;
         private GUIContent[] tools;
         private static Rect previewRect;
         private SceneDataControl workingScene;
         private static TrajectoryComponent trajectoryComponent;
+        private int action = 0;
 
         public ScenesWindowPlayerMovement(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, SceneEditor sceneEditor,
             params GUILayoutOption[] aOptions)
@@ -22,13 +21,11 @@ namespace uAdventure.Editor
         {
             new PlayerInitialPositionComponent(Rect.zero, new GUIContent(), null);
             trajectoryComponent = new TrajectoryComponent(Rect.zero, new GUIContent(), null);
+            trajectoryComponent.Action = -1;
 
-            if (GameRources.GetInstance().selectedSceneIndex >= 0)
-                backgroundPath =
-                    Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                        GameRources.GetInstance().selectedSceneIndex].getPreviewBackground();
-            if (backgroundPath != null && !backgroundPath.Equals(""))
-                backgroundPreviewTex = AssetsController.getImage(backgroundPath).texture;
+            sceneEditor.TypeEnabling[typeof(Player)] = false;
+            sceneEditor.TypeEnabling[typeof(TrajectoryDataControl)] = false;
+            sceneEditor.TypeEnabling[typeof(NodeDataControl)] = false;
 
             tools = new GUIContent[]
             {
@@ -59,12 +56,25 @@ namespace uAdventure.Editor
                     break;
                 case 1: // Trajectory
                     {
-                        trajectoryComponent.Action = GUILayout.Toolbar(trajectoryComponent.Action, tools);
+                        trajectoryComponent.Action = GUILayout.Toolbar(action, tools);
                     }
                     break;
             }
+        }
 
-            GUI.DrawTexture(previewRect, backgroundPreviewTex, ScaleMode.ScaleToFit);
+        public override void Draw(int aID)
+        {
+            sceneEditor.TypeEnabling[typeof(Player)] = true;
+            sceneEditor.TypeEnabling[typeof(TrajectoryDataControl)] = true;
+            sceneEditor.TypeEnabling[typeof(NodeDataControl)] = true;
+
+            base.Draw(aID);
+            action = trajectoryComponent.Action;
+            trajectoryComponent.Action = -1;
+
+            sceneEditor.TypeEnabling[typeof(Player)] = false;
+            sceneEditor.TypeEnabling[typeof(TrajectoryDataControl)] = false;
+            sceneEditor.TypeEnabling[typeof(NodeDataControl)] = false;
         }
 
 
@@ -160,7 +170,8 @@ namespace uAdventure.Editor
                 {
                     case EventType.MouseDown:
                         var rect = ScenesWindowElementReference.ReferenceComponent.GetElementRect(Target);
-                        if (rect.Contains(Event.current.mousePosition) && GUIUtility.hotControl == 0) selected = true;
+                        if (GUIUtility.hotControl == 0)
+                            selected = rect.Contains(Event.current.mousePosition) || (rect.ToPoints().ToList().FindIndex(p => (p - Event.current.mousePosition).magnitude <= 10f) != -1);
                         break;
                 }
 
@@ -170,12 +181,12 @@ namespace uAdventure.Editor
             public override void OnDrawingGizmosSelected()
             {
                 var rect = ScenesWindowElementReference.ReferenceComponent.GetElementRect(Target);
-
+                
                 // Rect resizing
                 EditorGUI.BeginChangeCheck();
                 var newRect = HandleUtil.HandleFixedRatioRect(Target.GetHashCode() + 1, rect, rect.width / rect.height, 10f, 
-                    polygon => HandleUtil.DrawPolyLine(polygon, true, Color.red),
-                    point =>   HandleUtil.DrawPoint(point, 4.5f, Color.blue, Color.black));
+                    polygon => HandleUtil.DrawPolyLine(polygon, true, SceneEditor.GetColor(Color.red)),
+                    point =>   HandleUtil.DrawPoint(point, 4.5f, SceneEditor.GetColor(Color.blue), SceneEditor.GetColor(Color.black)));
                 if (EditorGUI.EndChangeCheck())
                 {
                     var original = newRect.ViewportToScreen(SceneEditor.Current.Size.x, SceneEditor.Current.Size.y, SceneEditor.Current.Viewport);
@@ -286,43 +297,38 @@ namespace uAdventure.Editor
 
             public override void Draw(int aID) {}
 
+            private static Vector2 GetPivot(DataControl dataControl)
+            {
+                PlayerInitialPositionComponent.PutTransform(dataControl);
+                var rect = ScenesWindowElementReference.ReferenceComponent.GetElementRect(dataControl);
+                PlayerInitialPositionComponent.RemoveTransform(dataControl);
+
+                return rect.center + new Vector2(0, rect.height / 2f);
+            }
+
             public override void OnDrawingGizmos()
             {
                 var trajectory = Target as TrajectoryDataControl;
                 foreach(var node in trajectory.getNodes())
-                {
-                    PlayerInitialPositionComponent.PutTransform(node);
-                    var rect = ScenesWindowElementReference.ReferenceComponent.GetElementRect(node);
-                    PlayerInitialPositionComponent.RemoveTransform(node);
-
-                    var color = Color.blue;
-                    HandleUtil.DrawPoint(rect.center, 10f, node.isInitial() ? Color.red : Color.blue, Color.black);
+                {    
+                    HandleUtil.DrawPoint(GetPivot(node), 10f, SceneEditor.GetColor(node.isInitial() ? Color.red : Color.blue), SceneEditor.GetColor(Color.black));
                 }
 
                 foreach(var connection in trajectory.getSides())
                 {
-                    var distance = (new Vector2(connection.getStart().getX(), connection.getStart().getY()) - new Vector2(connection.getEnd().getX(), connection.getEnd().getY())).magnitude;
+                    var p1 = GetPivot(connection.getStart());
+                    var p2 = GetPivot(connection.getEnd());
+                    var distance = (p1 - p2).magnitude;
 
-                    PlayerInitialPositionComponent.PutTransform(connection.getStart());
-                    var p1 = ScenesWindowElementReference.ReferenceComponent.GetElementRect(connection.getStart());
-                    PlayerInitialPositionComponent.RemoveTransform(connection.getStart());
-                    PlayerInitialPositionComponent.PutTransform(connection.getEnd());
-                    var p2 = ScenesWindowElementReference.ReferenceComponent.GetElementRect(connection.getEnd());
-                    PlayerInitialPositionComponent.RemoveTransform(connection.getEnd());
-
-                    HandleUtil.DrawPolyLine(new Vector2[] { p1.center, p2.center }, false, Color.black, 5f);
-                    HandleUtil.DrawPolyLine(new Vector2[] { p1.center, p2.center }, false, Color.white, 3f);
+                    HandleUtil.DrawPolyLine(new Vector2[] { p1, p2 }, false, SceneEditor.GetColor(Color.black), 5f);
+                    HandleUtil.DrawPolyLine(new Vector2[] { p1, p2 }, false, SceneEditor.GetColor(Color.white), 3f);
                     
-                    EditorGUI.DropShadowLabel(new Rect(((p1.center + p2.center) / 2f) - new Vector2(100f, 25f), new Vector2(200, 30)), new GUIContent(Mathf.RoundToInt(distance) + ""));
+                    EditorGUI.DropShadowLabel(new Rect(((p1 + p2) / 2f) - new Vector2(100f, 25f), new Vector2(200, 30)), new GUIContent(Mathf.RoundToInt(distance) + ""));
                 }
 
                 if(pairing != null)
                 {
-                    PlayerInitialPositionComponent.PutTransform(pairing);
-                    var p1 = ScenesWindowElementReference.ReferenceComponent.GetElementRect(pairing);
-                    PlayerInitialPositionComponent.RemoveTransform(pairing);
-                    
-                    HandleUtil.DrawPolyLine(new Vector2[] { p1.center, Event.current.mousePosition }, false, Color.white, 3f);
+                    HandleUtil.DrawPolyLine(new Vector2[] { GetPivot(pairing), Event.current.mousePosition }, false, SceneEditor.GetColor(Color.white), 3f);
                 }
             }
         }

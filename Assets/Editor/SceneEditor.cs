@@ -16,7 +16,7 @@ public class SceneEditor {
     public SceneEditor()
     {
         Disabled = false;
-        EnabledTypes = new List<Type>();
+        TypeEnabling = new Dictionary<Type, bool>();
         matrices = new Stack<Matrix4x4>();
         matrices.Push(Matrix4x4.identity);
     }
@@ -35,6 +35,14 @@ public class SceneEditor {
     }
     private Stack<Matrix4x4> matrices;
 
+    public static Color GetColor(Color original)
+    {
+        if (Current.Disabled)
+            original.a = original.a * 0.5f;
+
+        return original;
+    }
+
     public List<DataControl> elements = new List<DataControl>();
     private SceneDataControl workingScene;
     private Texture2D backgroundPreview;
@@ -50,7 +58,7 @@ public class SceneEditor {
     }
 
     public Dictionary<Type, List<EditorComponent>> Components { get; internal set; }
-    public List<Type> EnabledTypes { get; set; }
+    public Dictionary<Type, bool> TypeEnabling { get; set; }
     public bool Disabled { get; private set; }
     public Rect Viewport { get; private set; }
 
@@ -139,7 +147,10 @@ public class SceneEditor {
     {
         foreach (var element in elements)
         {
-            Disabled = EnabledTypes.Count == 0 || EnabledTypes.Contains(element.GetType());
+            if (!TypeEnabling.ContainsKey(element.GetType()))
+                TypeEnabling[element.GetType()] = true;
+
+            Disabled = !TypeEnabling[element.GetType()];
             call(element);
         }
     }
@@ -170,9 +181,15 @@ public class SceneEditor {
             (elem) =>
             {
                 DoCallForWholeElement(elem, c => c.OnPreRender());
-                DoCallForWholeElement(elem, c => { if (c.Update()) SelectedElement = elem; });
+                DoCallForWholeElement(elem, c => { if (c.Update() && !Disabled) SelectedElement = elem; });
                 if (Event.current.type == EventType.Repaint)
+                {
+                    var oldColor = GUI.color;
+                    if (Disabled)
+                        GUI.color = new Color(1, 1, 1, 0.5f);
                     DoCallForWholeElement(elem, c => c.OnRender(Viewport));
+                    GUI.color = oldColor;
+                }
                 DoCallForWholeElement(elem, c => c.OnDrawingGizmos());
                 DoCallForWholeElement(elem, c => c.OnPostRender());
             });
