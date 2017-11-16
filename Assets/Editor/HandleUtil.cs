@@ -5,7 +5,7 @@ using UnityEngine;
 
 public static class HandleUtil {
 
-    public static Rect HandleFixedRatioRect(int handleId, Rect rect, float ratio, float maxPointDistance, Action<Vector2[]> drawPolygon, Action<Vector2> drawPoint)
+    public static Rect HandleRect(int handleId, Rect rect, float maxPointDistance, Action<Vector2[]> drawPolygon, Action<Vector2> drawPoint)
     {
         var points = rect.ToPoints();
         int pointChanged = -1;
@@ -42,22 +42,35 @@ public static class HandleUtil {
 
             //First we calculate the new original screen rect
             var original = points.ToRect();
-            var newRatio = original.width / original.height;
-            // Then we obtain the unscaled rect to calculate the new scale
-            // And calculate the scale
-            if (newRatio > ratio)
-            {
-                original.height = original.width / ratio;
-            }
-            else
-            {
-                original.width = original.height * ratio;
-            }
 
             rect = original;
         }
 
         return rect;
+    }
+
+    public static Rect HandleFixedRatioRect(int handleId, Rect rect, float ratio, float maxPointDistance, Action<Vector2[]> drawPolygon, Action<Vector2> drawPoint)
+    {
+        EditorGUI.BeginChangeCheck();
+        // Use the handle for normal rects
+        var newRect = HandleRect(handleId, rect, maxPointDistance, drawPolygon, drawPoint);
+        // And if changed, adjust the ratio
+        if (EditorGUI.EndChangeCheck())
+        {
+            GUI.changed = true;
+            var newRatio = newRect.width / newRect.height;
+            // Then we obtain the unscaled rect to calculate the new scale
+            // And calculate the scale
+            if (newRatio > ratio)
+            {
+                newRect.height = newRect.width / ratio;
+            }
+            else
+            {
+                newRect.width = newRect.height * ratio;
+            }
+        }
+        return newRect;
     }
 
     public static Vector2 HandlePointMovement(int controlId, Vector2 point, object maxDistance, Action<Vector2> draw)
