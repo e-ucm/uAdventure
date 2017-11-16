@@ -215,7 +215,8 @@ public class SceneEditor {
     {
         Texture2D toReturn = new Texture2D(background.width, background.height, background.format, false);
         var foregroundPixels = foreground.GetPixels();
-        toReturn.SetPixels(background.GetPixels().Select((color, i) => new Color(color.r, color.g, color.b, foregroundPixels[i].r)).ToArray());
+        //TODO: FIX THIS
+        //toReturn.SetPixels(background.GetPixels().Select((color, i) => new Color(color.r, color.g, color.b, foregroundPixels[i].r)).ToArray());
         toReturn.Apply();
         return toReturn;
     }

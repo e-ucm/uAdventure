@@ -18,6 +18,11 @@ namespace uAdventure.Runner
         private ResourcesUni resource;
         private float deformation;
 
+        public static Vector2 TransformPoint(Vector2 point)
+        {
+            return new Vector2(point.x / DIVISOR, 60 - (point.y / DIVISOR));
+        }
+
         public Element Element
         {
             get { return element; }

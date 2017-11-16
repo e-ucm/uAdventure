@@ -313,6 +313,10 @@ namespace uAdventure.Editor
             var npc = Target as NPCDataControl;
 
             var preview = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_STAND_DOWN);
+
+            if (preview == null)
+                return;
+
             var rect = GetViewportRect(new Rect(new Vector2(-0.5f * preview.width, -preview.height), new Vector2(preview.width, preview.height)), viewport);
             if (preview) GUI.DrawTexture(rect, preview, ScaleMode.ScaleToFit);
         }
