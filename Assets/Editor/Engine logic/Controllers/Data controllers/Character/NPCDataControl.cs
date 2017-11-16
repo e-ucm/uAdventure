@@ -550,7 +550,7 @@ namespace uAdventure.Editor
             string previewImagePath = resourcesDataControlList[selectedResources].getAssetPath(animation);
 
             // Add the extension of the frame
-            if (previewImagePath != null && !previewImagePath.ToLower().EndsWith(".eaa"))
+            if (previewImagePath != null && !previewImagePath.ToLower().EndsWith(".eaa.xml"))
                 previewImagePath += "_01.jpg";
             else if (previewImagePath != null)
             {

@@ -40,7 +40,7 @@ namespace uAdventure.Editor
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("OK"))
             {
-                textContent = "assets/animation/" + textContent + ".eaa";
+                textContent = "assets/animation/" + textContent + ".eaa.xml";
                 if (isCharacterCutscene)
                     reference.OnDialogOk(textContent, this, type);
                 else

@@ -83,11 +83,13 @@ namespace uAdventure.Core
                 string descriptorIS = null;
 
                 descriptorIS = isCreator.buildInputStream("Assets/Resources/CurrentGame/" + filename);
-                if (!descriptorIS.EndsWith(".eaa"))
-                    descriptorIS += ".eaa";
+
+                if (descriptorIS.EndsWith(".eaa"))
+                    descriptorIS += ".xml";
+                else if (!descriptorIS.EndsWith(".eaa.xml"))
+                    descriptorIS += ".eaa.xml";
+
                 animationHandler.Parse(descriptorIS);
-
-
             }
             catch (Exception e) { Debug.LogError(e); }
 

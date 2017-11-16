@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 
 using uAdventure.Core;
+using UnityEditor;
 
 namespace uAdventure.Editor
 {
@@ -1621,6 +1622,27 @@ namespace uAdventure.Editor
             }
         }
 
+        public static void InitImporterConfig(string path)
+        {
+
+            string currentDir = Directory.GetCurrentDirectory();
+            var unityLikePath = path.Replace(currentDir, "").Replace("\\", "/").Remove(0, 1);
+            var importer = AssetImporter.GetAtPath(unityLikePath) as TextureImporter;
+            if(importer == null)
+            {
+                // Refresh
+                AssetDatabase.ImportAsset(unityLikePath);
+                importer = AssetImporter.GetAtPath(unityLikePath) as TextureImporter;
+            }
+
+            if (importer)
+            {
+                importer.isReadable = true;
+                importer.npotScale = TextureImporterNPOTScale.None;
+                importer.SaveAndReimport();
+            }
+        }
+
         private static void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs)
         {
             //Debug.Log(sourceDirName + " ||| " + destDirName);
@@ -1649,6 +1671,26 @@ namespace uAdventure.Editor
                 string temppath = Path.Combine(destDirName, file.Name);
                 //Debug.Log("CopyTo: " + temppath);
                 file.CopyTo(temppath, false);
+
+                // In case of image importing
+                if(file.Extension.ToLowerInvariant() == ".png" || file.Extension.ToLowerInvariant() == ".jpg")
+                {
+                    ///InitImporterConfig(temppath);
+                }
+
+                // In case of animation
+                if (file.Extension.ToLowerInvariant() == ".xml")
+                {
+                    string text = File.ReadAllText(temppath);
+                    text = text.Replace(".eaa", ".eaa.xml");
+                    File.WriteAllText(temppath, text);
+                }
+
+                // In case of animation
+                if (file.Extension.ToLowerInvariant() == ".eaa")
+                {
+                    File.Move(temppath, temppath + ".xml");
+                }
             }
 
             // If copying subdirectories, copy them and their contents to new location.
