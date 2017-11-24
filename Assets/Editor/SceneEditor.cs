@@ -180,9 +180,14 @@ public class SceneEditor {
             DoCallForWholeElement(elem, c => c.OnPostRender());
         }
 
-        var previousWorkingItem = workingScene;
+        var previousWorkingScene = workingScene;
         workingScene = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[GameRources.GetInstance().selectedSceneIndex];
-        if(workingScene.getSelectedResources() != lastSelectedResources)
+        if(previousWorkingScene != workingScene)
+        {
+            SelectedElement = null;
+        }
+
+        if(previousWorkingScene != workingScene || workingScene.getSelectedResources() != lastSelectedResources)
         {
             RefreshSceneResources(workingScene);
         }
