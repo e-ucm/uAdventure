@@ -48,8 +48,12 @@ namespace uAdventure.Editor
             titleStyle.margin = new RectOffset(0, 0, 5, 5);
         }
 
+        private DialogReceiverInterface parent;
+
         public void Init(DialogReceiverInterface e, string cutsceneFilePath)
         {
+            parent = e;
+
             windowWidth = 800;
             windowHeight = 1000;
 
@@ -310,6 +314,9 @@ namespace uAdventure.Editor
         {
             imagePath = val;
             workingAnimation.getFrame(selectedFrame).setUri(val);
+            if(selectedFrame == 0)
+                parent.OnDialogOk("Image changed", workingAnimation);
+            
         }
 
         private void OnFrameMusicChanged(string val)
