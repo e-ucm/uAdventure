@@ -64,7 +64,10 @@ namespace uAdventure.Editor
 
         public override void Draw(int aID)
         {
-            sceneEditor.TypeEnabling[typeof(Player)] = true;
+            foreach (var elem in sceneEditor.elements)
+                sceneEditor.TypeEnabling[elem.GetType()] = false;
+
+            sceneEditor.TypeEnabling[typeof(PlayerDataControl)] = true;
             sceneEditor.TypeEnabling[typeof(TrajectoryDataControl)] = true;
             sceneEditor.TypeEnabling[typeof(NodeDataControl)] = true;
 
@@ -72,7 +75,10 @@ namespace uAdventure.Editor
             action = trajectoryComponent.Action;
             trajectoryComponent.Action = -1;
 
-            sceneEditor.TypeEnabling[typeof(Player)] = false;
+            foreach (var elem in sceneEditor.elements)
+                sceneEditor.TypeEnabling[elem.GetType()] = true;
+
+            sceneEditor.TypeEnabling[typeof(PlayerDataControl)] = false;
             sceneEditor.TypeEnabling[typeof(TrajectoryDataControl)] = false;
             sceneEditor.TypeEnabling[typeof(NodeDataControl)] = false;
         }
