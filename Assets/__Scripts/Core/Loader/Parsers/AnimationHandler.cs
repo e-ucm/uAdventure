@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Xml;
+using System;
 
 namespace uAdventure.Core
 {
@@ -21,6 +22,12 @@ namespace uAdventure.Core
         public void Parse(string path_)
         {
             XmlDocument xmld = new XmlDocument();
+
+            if (path_.EndsWith(".eaa"))
+                path_ += ".xml";
+            else if (!path_.EndsWith(".eaa.xml"))
+                path_ += ".eaa.xml";
+
             xmld.Load(path_);
 
             XmlElement element = xmld.DocumentElement;

@@ -62,8 +62,8 @@ namespace uAdventure.Editor
 
             // File saving
             string name = "Assets/Resources/CurrentGame/" + filename;
-            if (!name.EndsWith(".eaa"))
-                name += ".eaa";
+            if (!name.EndsWith(".eaa.xml"))
+                name += ".eaa.xml";
             
             try
             {
