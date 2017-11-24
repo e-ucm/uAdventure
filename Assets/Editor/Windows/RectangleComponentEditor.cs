@@ -82,10 +82,14 @@ namespace uAdventure.Editor
         public override bool Update()
         {
             if(Event.current.type == EventType.MouseDown)
-            {
+            { 
                 var rectangleArea = Target as RectangleArea;
+                if (!rectangleArea.isRectangular() && ActionSelected == 1)
+                {
+                    return true;
+                }
                 var points = WorldToViewport(GetPoints(rectangleArea), SceneEditor.Current.Viewport, SceneEditor.Current.Size.x, SceneEditor.Current.Size.y);
-                return Inside(points, Event.current.mousePosition);
+                return Inside(points, Event.current.mousePosition) || points.ToList().FindIndex(p => (p - Event.current.mousePosition).magnitude <= 10f) != -1;
             }
 
             return false;
@@ -181,7 +185,6 @@ namespace uAdventure.Editor
                 }
                 index++;
             }
-
 
             switch (Event.current.type)
             {

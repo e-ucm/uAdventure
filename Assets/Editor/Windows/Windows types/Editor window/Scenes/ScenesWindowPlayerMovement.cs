@@ -258,7 +258,15 @@ namespace uAdventure.Editor
                 if(Event.current.type == EventType.MouseDown)
                 {
                     var trajectory = Target as TrajectoryDataControl;
+
+                    var edge = trajectory.getSides().Find(s => DistanceToPoint(s, Event.current.mousePosition) < 8);
+                    if (edge != null)
+                    {
+                        trajectory.deleteElement(edge, false);
+                        SceneEditor.Current.SelectedElement = null;
+                    }
                     var selected = SceneEditor.Current.SelectedElement as NodeDataControl;
+
                     if (selected != null && trajectory.getNodes().Contains(selected))
                     {
                         switch (Action)
@@ -278,8 +286,10 @@ namespace uAdventure.Editor
                                 trajectory.setInitialNode(selected);
                                 break;
                             case 3:
-                                if(trajectory.deleteElement(selected, false))
+
+                                if (trajectory.deleteElement(selected, false))
                                     SceneEditor.Current.SelectedElement = null;
+
                                 break;
                         }
                     }
@@ -293,6 +303,14 @@ namespace uAdventure.Editor
                 }
 
                 return false;
+            }
+
+            private float DistanceToPoint(SideDataControl s, Vector2 point)
+            {
+                var p1 = GetPivot(s.getStart());
+                var p2 = GetPivot(s.getEnd());
+
+                return HandleUtility.DistancePointToLineSegment(point, p1, p2);
             }
 
             public override void Draw(int aID) {}

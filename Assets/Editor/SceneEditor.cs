@@ -143,14 +143,18 @@ public class SceneEditor {
         matrices.Pop();
     }
 
+    private void SetDisabled(DataControl element)
+    {
+        if (!TypeEnabling.ContainsKey(element.GetType()))
+            TypeEnabling[element.GetType()] = true;
+        Disabled = !TypeEnabling[element.GetType()];
+    }
+
     public void CallAll(List<DataControl> elements, Action<DataControl> call)
     {
         foreach (var element in elements)
         {
-            if (!TypeEnabling.ContainsKey(element.GetType()))
-                TypeEnabling[element.GetType()] = true;
-
-            Disabled = !TypeEnabling[element.GetType()];
+            SetDisabled(element);
             call(element);
         }
     }
@@ -159,9 +163,21 @@ public class SceneEditor {
     {
         Viewport = rect.AdjustToRatio(Size.x / Size.y);
 
-        if(Event.current.type == EventType.MouseDown && Viewport.Contains(Event.current.mousePosition))
+        Current = this;
+
+        if (Event.current.type == EventType.MouseDown && rect.Contains(Event.current.mousePosition) && SelectedElement != null)
         {
-            SelectedElement = null;
+            var elem = SelectedElement;
+            DoCallForWholeElement(elem, c => c.OnPreRender());
+            bool any = false;
+            DoCallForWholeElement(elem, c =>
+            {
+                SetDisabled(elem);
+                if (c.Update() && !Disabled) any = true;
+            });
+            if (!any)
+                SelectedElement = null;
+            DoCallForWholeElement(elem, c => c.OnPostRender());
         }
 
         var previousWorkingItem = workingScene;
@@ -175,13 +191,14 @@ public class SceneEditor {
         if (backgroundPreview)
             GUI.DrawTexture(Viewport, backgroundPreview, ScaleMode.ScaleToFit);
 
-        Current = this;
+        var somethingWasSelected = SelectedElement != null;
 
         CallAll(elements, 
             (elem) =>
             {
                 DoCallForWholeElement(elem, c => c.OnPreRender());
-                DoCallForWholeElement(elem, c => { if (c.Update() && !Disabled) SelectedElement = elem; });
+                if (!somethingWasSelected)
+                    DoCallForWholeElement(elem, c => { if (c.Update() && !Disabled) SelectedElement = elem; });
                 if (Event.current.type == EventType.Repaint)
                 {
                     var oldColor = GUI.color;

@@ -231,7 +231,7 @@ namespace uAdventure.Editor
         public override bool deleteElement(DataControl dataControl, bool askConfirmation)
         {
 
-            if (nodeDataControlList.Contains((NodeDataControl)dataControl))
+            if (dataControl is NodeDataControl && nodeDataControlList.Contains((NodeDataControl)dataControl))
             {
                 if (nodeDataControlList.Count > 1)
                 {
@@ -241,7 +241,7 @@ namespace uAdventure.Editor
                 else
                     return false;
             }
-            if (sideDataControlList.Contains((SideDataControl)dataControl))
+            if (dataControl is SideDataControl && sideDataControlList.Contains((SideDataControl)dataControl))
             {
                 Controller.Instance.addTool(new DeleteTrajectorySideTool((SideDataControl)dataControl, trajectory, this));
                 trajectory.getSides().Remove((Side)dataControl.getContent());
