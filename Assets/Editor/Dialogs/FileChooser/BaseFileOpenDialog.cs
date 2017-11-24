@@ -152,9 +152,10 @@ namespace uAdventure.Editor
             if(selectedAssetPath != Path.Combine(path.FullName, nameOnly)) // Avoid to copy the same origin to same destination files
             {
                 var destination = Path.Combine(path.FullName, nameOnly);
-                File.Copy(selectedAssetPath, destination, true); 
+                File.Copy(selectedAssetPath, destination, true);
+                File.SetAttributes(selectedAssetPath, FileAttributes.Normal);
 
-                if(destination.ToLowerInvariant().EndsWith(".png") || destination.ToLowerInvariant().EndsWith(".jpg"))
+                if (destination.ToLowerInvariant().EndsWith(".png") || destination.ToLowerInvariant().EndsWith(".jpg"))
                 {
                     AssetsController.InitImporterConfig(destination);
                 }
