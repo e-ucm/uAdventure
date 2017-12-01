@@ -49,6 +49,7 @@ namespace uAdventure.Editor
         protected string selectedAssetPath = "";
 
         protected string fileFilter;
+        protected string basePath = "Assets/";
 
         // Return string (for engine purpose)
         protected string returnPath;
@@ -63,7 +64,7 @@ namespace uAdventure.Editor
 
         public void OpenFileDialog()
         {
-			var result = EditorUtility.OpenFilePanel ("Select file", "Assets/", fileFilter);
+			var result = EditorUtility.OpenFilePanel ("Select file", basePath, fileFilter);
 
 			if (result != "")
             {

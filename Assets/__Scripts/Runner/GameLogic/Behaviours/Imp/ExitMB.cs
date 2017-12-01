@@ -33,6 +33,13 @@ namespace uAdventure.Runner
         public void exit()
         {
             //Game.Instance.hideMenu ();
+            if (!Game.Instance.GameState.isFirstPerson())
+            { 
+                // move player to influence area
+            }
+
+
+
             if (ConditionChecker.check(ed.getConditions()))
             {
                 EffectHolder effect = new EffectHolder(ed.getEffects());

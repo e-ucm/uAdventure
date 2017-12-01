@@ -44,7 +44,9 @@ namespace uAdventure.Runner
 #endif
                         break;
                     case ResourceManager.LoadingType.RESOURCES_LOAD:
-                        if (path.Contains(".eaa"))
+                        if (path.Contains(".eaa.xml"))
+                            path = path.Substring(0, path.Length - 8);
+                        else if (path.Contains(".eaa"))
                             path = path.Substring(0, path.Length - 4);
 
                         TextAsset ta = Resources.Load(path) as TextAsset;

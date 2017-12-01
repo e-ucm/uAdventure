@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 using uAdventure.Core;
+using Dijkstras;
 
 namespace uAdventure.Runner
 {
@@ -10,11 +11,14 @@ namespace uAdventure.Runner
     {
 
         private List<LineHandler> lines = new List<LineHandler>();
+        private Trajectory trajectory;
 
         public TrajectoryHandler(Trajectory trajectory)
         {
             if (trajectory == null)
                 return;
+
+            this.trajectory = trajectory;
 
             lines = new List<LineHandler>();
             foreach (Trajectory.Side side in trajectory.getSides())
@@ -75,6 +79,11 @@ namespace uAdventure.Runner
             return lines[lines.Count - 1].end;
         }
 
+        public Trajectory.Node getInitialNode()
+        {
+            return trajectory.getInitial();
+        }
+
         public KeyValuePair<Vector2, float>[] route(Vector2 origin, Vector2 destiny)
         {
             List<KeyValuePair<Vector2, float>> ret = new List<KeyValuePair<Vector2, float>>();
@@ -122,10 +131,12 @@ namespace uAdventure.Runner
                 }
                 else
                 {
-                    List<KeyValuePair<Vector2, float>> tmpRoute = new List<KeyValuePair<Vector2, float>>(reach(origin_line, destiny_line));
+                    /*List<KeyValuePair<Vector2, float>> tmpRoute = new List<KeyValuePair<Vector2, float>>(reach(origin_line, destiny_line));
                     //tmpRoute.Reverse ();
                     ret.AddRange(tmpRoute);
-                    ret.Add(new KeyValuePair<Vector2, float>(destiny, destiny_line.getScaleFor(destiny)));
+                    ret.Add(new KeyValuePair<Vector2, float>(destiny, destiny_line.getScaleFor(destiny)));*/
+
+                    ret = route_d(origin, destiny, origin_line, destiny_line);
                 }
             }
 
@@ -272,6 +283,59 @@ namespace uAdventure.Runner
 
             return ret;
 
+        }
+
+        public List<KeyValuePair<Vector2, float>> route_d(Vector2 origin, Vector2 destiny, LineHandler originline, LineHandler destinyline)
+        {
+            Graph<string> g = new Graph<string>();
+
+            Dictionary<string, Dictionary<string, float>> d = new Dictionary<string, Dictionary<string, float>>();
+            foreach (Trajectory.Node n in this.trajectory.getNodes())
+            {
+                d.Add(n.getID(), new Dictionary<string, float>());
+            }
+
+            foreach (Trajectory.Side s in this.trajectory.getSides())
+            {
+                d[s.getIDStart()].Add(s.getIDEnd(), s.getLength());
+                d[s.getIDEnd()].Add(s.getIDStart(), s.getLength());
+            }
+
+            Trajectory.Node no = new Trajectory.Node("origin", Mathd.RoundToInt(origin.x * LineHandler.DIVISOR), Mathd.RoundToInt(60f - (origin.y * LineHandler.DIVISOR)), 1f);
+            Trajectory.Node nd = new Trajectory.Node("destiny", Mathd.RoundToInt(destiny.x * LineHandler.DIVISOR), Mathd.RoundToInt(60f - (destiny.y * LineHandler.DIVISOR)), 1f);
+
+            float od1 = Vector2.Distance(origin, LineHandler.nodeToVector2(originline.start)) * 10f;
+            float od2 = Vector2.Distance(origin, LineHandler.nodeToVector2(originline.end)) * 10f;
+            d[originline.start.getID()].Add(no.getID(), od1);
+            d[originline.end.getID()].Add(no.getID(), od2);
+            d.Add("origin", new Dictionary<string, float>() { { originline.start.getID(), od1 }, { originline.end.getID(), od2 } });
+
+            float dd1 = Vector2.Distance(destiny, LineHandler.nodeToVector2(destinyline.start)) * 10f;
+            float dd2 = Vector2.Distance(destiny, LineHandler.nodeToVector2(destinyline.end)) * 10f;
+            d[destinyline.start.getID()].Add(nd.getID(), dd1);
+            d[destinyline.end.getID()].Add(nd.getID(), dd2);
+            d.Add("destiny", new Dictionary<string, float>() { { destinyline.start.getID(), dd1 }, { destinyline.end.getID(), dd2 } });
+
+            g.set_vertices(d);
+
+            List<string> l = g.shortest_path("origin", "destiny");
+
+            List<KeyValuePair<Vector2, float>> ret = new List<KeyValuePair<Vector2, float>>();
+
+            foreach(string n in l)
+            {
+                if (n == "destiny")
+                    ret.Add(new KeyValuePair<Vector2, float>(destiny, 1f));
+                else
+                {
+                    Trajectory.Node tmp = trajectory.getNodeForId(n);
+                    ret.Add(new KeyValuePair<Vector2, float>(LineHandler.nodeToVector2(tmp), tmp.getScale()));
+                }
+            }
+
+            ret.Reverse();
+
+            return ret;
         }
     }
 }
