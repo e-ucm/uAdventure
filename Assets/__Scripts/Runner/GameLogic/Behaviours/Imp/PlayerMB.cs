@@ -38,7 +38,8 @@ namespace uAdventure.Runner
                     {
                         rl.Sort((x, y) => x.Context.getLayer() - y.Context.getLayer());
 
-                        sorting_layer.Add(rl[0].Context.getLayer(), rl[0].transform.localPosition.y);
+                        sorting_layer.Add(-1, 60);
+                        sorting_layer.Add(rl[0].Context.getLayer(), rl[0].getPosition().y);
                         rl.Remove(rl[0]);
 
                         foreach (Representable r in rl)
@@ -50,8 +51,8 @@ namespace uAdventure.Runner
                             while (sorting_layer.ContainsKey(prelayer) && prelayer > 0)
                                 prelayer--;
 
-                            if (sorting_layer[prelayer] > r.transform.localPosition.y)
-                                sorting_layer.Add(c.getLayer(), r.transform.localPosition.y);
+                            if (sorting_layer[prelayer] > r.getPosition().y)
+                                sorting_layer.Add(c.getLayer(), r.getPosition().y);
                             else
                                 sorting_layer.Add(c.getLayer(), sorting_layer[prelayer]);
 
@@ -78,6 +79,7 @@ namespace uAdventure.Runner
             this.gameObject.name = base.Element.getId();
             base.Start();
             base.setAnimation(NPC.RESOURCE_TYPE_STAND_UP);
+            this.deformation = -0.3f;
         }
 
         protected override void Update()
@@ -162,10 +164,10 @@ namespace uAdventure.Runner
         void sortZ()
         {
             Vector2 currentpos = base.getPosition();
-            for (int i = max_layer; i >= 0; i--)
+            for (int i = max_layer; i >= -1; i--)
             {
                 if(SortingLayer.ContainsKey(i) && SortingLayer[i] > currentpos.y){
-                    this.transform.localPosition = new Vector3(this.transform.localPosition.x, this.transform.localPosition.y, -0.5f - i);
+                    this.transform.localPosition = new Vector3(this.transform.localPosition.x, this.transform.localPosition.y, -0.3f - i);
                     this.Context.setLayer(i);
                     break;
                 }

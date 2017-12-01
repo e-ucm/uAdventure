@@ -16,7 +16,7 @@ namespace uAdventure.Runner
         private Renderer rend;
         private ElementReference context;
         private ResourcesUni resource;
-        private float deformation;
+        protected float deformation;
 
         public static Vector2 TransformPoint(Vector2 point)
         {
@@ -29,7 +29,7 @@ namespace uAdventure.Runner
             set
             {
                 element = value;
-                deformation = -0.01f * FindObjectsOfType(this.GetType()).Length;
+                //deformation = -0.01f * FindObjectsOfType(this.GetType()).Length;
             }
         }
         public ElementReference Context
@@ -171,7 +171,15 @@ namespace uAdventure.Runner
 
         public Vector2 getPosition()
         {
-            return new Vector2(this.transform.localPosition.x, this.transform.localPosition.y - (anim.frames[current_frame].Image.height / DIVISOR) / 2);
+            Vector2 ret = new Vector2();
+
+            if(this.anim != null)
+                ret = new Vector2(this.transform.localPosition.x, this.transform.localPosition.y - (anim.frames[current_frame].Image.height * this.Context.getScale() / DIVISOR) / 2);
+            else
+                ret = new Vector2(this.transform.localPosition.x, this.transform.localPosition.y - (this.texture.height * this.Context.getScale() / DIVISOR) / 2);
+
+
+            return ret;
         }
 
         public void Move(Vector2 position)
