@@ -51,9 +51,6 @@ namespace uAdventure.Runner
 
                     if (this.fileData == null)
                     {
-                        Regex pattern = new Regex("[óñ]");
-                        this.path = pattern.Replace(this.path, "+¦");
-
                         this.fileData = LoadBytes(this.path);
 
                         if (this.fileData == null)
@@ -82,7 +79,6 @@ namespace uAdventure.Runner
             {
                 case ResourceManager.LoadingType.RESOURCES_LOAD:
                     tex = Resources.Load(this.path.Split('.')[0]) as Texture2D;
-
                     if (tex == null)
                     {
                         loaded = false;
