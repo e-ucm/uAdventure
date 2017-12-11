@@ -208,7 +208,11 @@ namespace uAdventure.Editor
             if (Target is NodeDataControl)
                 Target = Controller.Instance.SelectedChapterDataControl.getPlayer();
 
+            var prevWorkingChar = workingCharacter;
             workingCharacter = Target != null ? Target as NPCDataControl : Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[GameRources.GetInstance().selectedCharacterIndex];
+            if (workingCharacter != prevWorkingChar)
+                RefreshPathInformation(workingCharacter);
+
 
             // Appearance table
             appearanceEditor.Data = workingCharacter;
@@ -222,27 +226,27 @@ namespace uAdventure.Editor
                 case LOOK_GROUP:
                     DoAnimationSelector(standingUp, NPC.RESOURCE_TYPE_STAND_UP);
                     DoAnimationSelector(standingDown, NPC.RESOURCE_TYPE_STAND_DOWN);
-                    DoAnimationSelector(standingRight, NPC.RESOURCE_TYPE_STAND_RIGHT);
                     DoAnimationSelector(standingLeft, NPC.RESOURCE_TYPE_STAND_LEFT);
+                    DoAnimationSelector(standingRight, NPC.RESOURCE_TYPE_STAND_RIGHT);
                     break;
 
                 case TALK_GROUP:
                     DoAnimationSelector(talkingUp, NPC.RESOURCE_TYPE_SPEAK_UP);
                     DoAnimationSelector(talkingDown, NPC.RESOURCE_TYPE_SPEAK_DOWN);
-                    DoAnimationSelector(talkingLeft, NPC.RESOURCE_TYPE_SPEAK_RIGHT);
-                    DoAnimationSelector(talkingRight, NPC.RESOURCE_TYPE_SPEAK_LEFT);
+                    DoAnimationSelector(talkingLeft, NPC.RESOURCE_TYPE_SPEAK_LEFT);
+                    DoAnimationSelector(talkingRight, NPC.RESOURCE_TYPE_SPEAK_RIGHT);
                     break;
 
                 case USE_GROUP:
-                    DoAnimationSelector(usingLeft, NPC.RESOURCE_TYPE_USE_RIGHT);
-                    DoAnimationSelector(usingRight, NPC.RESOURCE_TYPE_USE_LEFT);
+                    DoAnimationSelector(usingLeft, NPC.RESOURCE_TYPE_USE_LEFT);
+                    DoAnimationSelector(usingRight, NPC.RESOURCE_TYPE_USE_RIGHT);
                     break;
 
                 case WALK_GROUP:
                     DoAnimationSelector(walkingUp, NPC.RESOURCE_TYPE_WALK_UP);
                     DoAnimationSelector(walkingDown, NPC.RESOURCE_TYPE_WALK_DOWN);
-                    DoAnimationSelector(walkingLeft, NPC.RESOURCE_TYPE_WALK_RIGHT);
-                    DoAnimationSelector(walkingRight, NPC.RESOURCE_TYPE_WALK_LEFT);
+                    DoAnimationSelector(walkingLeft, NPC.RESOURCE_TYPE_WALK_LEFT);
+                    DoAnimationSelector(walkingRight, NPC.RESOURCE_TYPE_WALK_RIGHT);
                     break;
             }
         }
@@ -263,47 +267,35 @@ namespace uAdventure.Editor
 
         public override void DrawPreview(Rect rect)
         {
-            if(Target != null)
+            GUILayout.BeginHorizontal();
+            switch (selectedAnimationGroup)
             {
-                if(Event.current.type == EventType.repaint)
-                {
-                    var npc = Target as NPCDataControl;
-                    var preview = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_STAND_DOWN);
-                    if (preview) GUI.DrawTexture(rect, preview, ScaleMode.ScaleToFit);
-                }
-            }
-            else
-            {
-                GUILayout.BeginHorizontal();
-                switch (selectedAnimationGroup)
-                {
-                    case LOOK_GROUP:
-                        DrawSinglePreview(TC.get("Resources.DescriptionCharacterAnimationStandUp"), standingUpTex);
-                        DrawSinglePreview(TC.get("Resources.DescriptionCharacterAnimationStandLeft"), standingLeftTex);
-                        DrawSinglePreview(TC.get("Resources.DescriptionCharacterAnimationStandRight"), standingRightTex);
-                        DrawSinglePreview(TC.get("Resources.DescriptionCharacterAnimationStandDown"), standingDownTex);
-                        break;
+                case LOOK_GROUP:
+                    DrawSinglePreview(TC.get("Resources.DescriptionCharacterAnimationStandUp"), standingUpTex);
+                    DrawSinglePreview(TC.get("Resources.DescriptionCharacterAnimationStandLeft"), standingLeftTex);
+                    DrawSinglePreview(TC.get("Resources.DescriptionCharacterAnimationStandRight"), standingRightTex);
+                    DrawSinglePreview(TC.get("Resources.DescriptionCharacterAnimationStandDown"), standingDownTex);
+                    break;
 
-                    case TALK_GROUP:
-                        DrawSinglePreview(TC.get("Resources.DescriptionCharacterAnimationSpeakUp"), talkingUpTex);
-                        DrawSinglePreview(TC.get("Resources.DescriptionCharacterAnimationSpeakLeft"), talkingLeftTex);
-                        DrawSinglePreview(TC.get("Resources.DescriptionCharacterAnimationSpeakRight"), talkingRightTex);
-                        DrawSinglePreview(TC.get("Resources.DescriptionCharacterAnimationSpeakDown"), talkingDownTex);
-                        break;
+                case TALK_GROUP:
+                    DrawSinglePreview(TC.get("Resources.DescriptionCharacterAnimationSpeakUp"), talkingUpTex);
+                    DrawSinglePreview(TC.get("Resources.DescriptionCharacterAnimationSpeakLeft"), talkingLeftTex);
+                    DrawSinglePreview(TC.get("Resources.DescriptionCharacterAnimationSpeakRight"), talkingRightTex);
+                    DrawSinglePreview(TC.get("Resources.DescriptionCharacterAnimationSpeakDown"), talkingDownTex);
+                    break;
 
-                    case USE_GROUP:
-                        DrawSinglePreview(TC.get("Resources.DescriptionCharacterAnimationUseLeft"), usingLeftTex);
-                        DrawSinglePreview(TC.get("Resources.DescriptionCharacterAnimationUseRight"), usingRightTex);
-                        break;
-                    case WALK_GROUP:
-                        DrawSinglePreview(TC.get("Resources.DescriptionCharacterAnimationWalkUp"), walkingUpTex);
-                        DrawSinglePreview(TC.get("Resources.DescriptionCharacterAnimationWalkLeft"), walkingLeftTex);
-                        DrawSinglePreview(TC.get("Resources.DescriptionCharacterAnimationWalkRight"), walkingRightTex);
-                        DrawSinglePreview(TC.get("Resources.DescriptionCharacterAnimationWalkDown"), walkingDownTex);
-                        break;
-                }
-                GUILayout.EndHorizontal();
+                case USE_GROUP:
+                    DrawSinglePreview(TC.get("Resources.DescriptionCharacterAnimationUseLeft"), usingLeftTex);
+                    DrawSinglePreview(TC.get("Resources.DescriptionCharacterAnimationUseRight"), usingRightTex);
+                    break;
+                case WALK_GROUP:
+                    DrawSinglePreview(TC.get("Resources.DescriptionCharacterAnimationWalkUp"), walkingUpTex);
+                    DrawSinglePreview(TC.get("Resources.DescriptionCharacterAnimationWalkLeft"), walkingLeftTex);
+                    DrawSinglePreview(TC.get("Resources.DescriptionCharacterAnimationWalkRight"), walkingRightTex);
+                    DrawSinglePreview(TC.get("Resources.DescriptionCharacterAnimationWalkDown"), walkingDownTex);
+                    break;
             }
+            GUILayout.EndHorizontal();
         }
 
         public override void OnRender(Rect viewport)

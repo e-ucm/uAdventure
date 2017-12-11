@@ -16,7 +16,7 @@ namespace uAdventure.Editor
             Documentation
         }
 
-        private static PlayerWindowType openedWindow = PlayerWindowType.DialogConfiguration;
+        private static PlayerWindowType openedWindow;
         private static CharactersWindowAppearance playerWindowAppearance;
         private static CharactersWindowDialogConfiguration playerWindowDialogConfiguration;
         private static PlayerWindowDocumentation playerWindowDocumentation;
@@ -44,8 +44,12 @@ namespace uAdventure.Editor
                 new GUIContent(TC.get("NPC.Documentation")), "Window");
             selectedButtonSkin = (GUISkin)Resources.Load("Editor/ButtonSelected", typeof(GUISkin));
 
+            openedWindow = PlayerWindowType.DialogConfiguration;
+
             tabs = new List<KeyValuePair<string, PlayerWindowType>>();
-            if (Controller.Instance.playerMode() == Controller.FILE_ADVENTURE_3RDPERSON_PLAYER){
+            if (Controller.Instance.playerMode() == Controller.FILE_ADVENTURE_3RDPERSON_PLAYER)
+            {
+                openedWindow = PlayerWindowType.Appearance;
                 tabs.Add(new KeyValuePair<string, PlayerWindowType>(TC.get("NPC.LookPanelTitle"), PlayerWindowType.Appearance));
             }
             tabs.Add(new KeyValuePair<string, PlayerWindowType>(TC.get("NPC.DialogPanelTitle"), PlayerWindowType.DialogConfiguration));

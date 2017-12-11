@@ -117,11 +117,7 @@ namespace uAdventure.Editor
                 var cutscene = Target as CutsceneDataControl;
 
                 if (cutscene.isVideoscene()) slidesPreview = slidePreviewMovie;
-                else
-                {
-                    var pathPreview = cutscene.getPreviewImage();
-                    slidesPreview = pathPreview == null ? null : AssetsController.getImage(pathPreview).texture;
-                }
+                else slidesPreview = AssetsController.getImageTexture(cutscene.getPreviewImage());
             }
 
             GUI.DrawTexture(rect, slidesPreview, ScaleMode.ScaleToFit);
@@ -130,16 +126,8 @@ namespace uAdventure.Editor
         private void RefreshPathInformation(DataControlWithResources dataControl)
         {
             var cutscene = dataControl as CutsceneDataControl;
-            
-            if (cutscene.isVideoscene())
-            {
-                slidesPreview = slidePreviewMovie;
-            }
-            else
-            {
-                var pathPreview = cutscene.getPreviewImage();
-                slidesPreview = pathPreview == null ? null : AssetsController.getImage(pathPreview).texture;
-            }
+            if (cutscene.isVideoscene()) slidesPreview = slidePreviewMovie;
+            else slidesPreview = AssetsController.getImageTexture(cutscene.getPreviewImage());
         }
     }
 }

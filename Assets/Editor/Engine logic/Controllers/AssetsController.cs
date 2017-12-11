@@ -371,90 +371,6 @@ namespace uAdventure.Editor
         }
 
         /**
-         * Returns an input stream corresponding to the given file path (relative to
-         * the ZIP).
-         * 
-         * @param assetPath
-         *            Path of the file, relative to the ZIP file
-         * @return Input stream for the given file
-         */
-        ////    public static InputStream getInputStream(string assetPath)
-        ////    {
-
-        ////        InputStream inputStream = null;
-
-        ////        if (assetPath == null)
-        ////            return inputStream;
-
-        ////        try
-        ////        {
-        ////            // Load the input stream from the file (if it exists)
-        ////            File temp = new File(assetPath);
-        ////            if (temp.Exists && !temp.isDirectory())
-        ////                inputStream = new FileInputStream(assetPath);
-        ////            else if (new File(Controller.getInstance().getProjectFolder(), assetPath).Exists)
-        ////                inputStream = new FileInputStream(Controller.getInstance().getProjectFolder() + "/" + assetPath);
-
-        ////        }
-        ////        catch (FileNotFoundException e)
-        ////        {
-        ////            ReportDialog.GenerateErrorReport(e, true, "UNKNOWERROR");
-        ////        }
-
-        ////        return inputStream;
-        ////    }
-
-        ////    /*public static MediaLocator getVideo( string assetPath ) {
-        ////    	return videoCache.fetchVideo( assetPath );
-        ////    }*/
-
-        ////    public static MediaLocator getVideo(string assetPath)
-        ////    {
-
-        ////        string absolutePath = null;
-
-        ////        string[] assetsList = AssetsController.getAssetsList(CATEGORY_VIDEO);
-        ////        int position = -1;
-        ////        //If it is in the zip
-        ////        for (int i = 0; i < assetsList.length; i++)
-        ////        {
-        ////            if (assetsList[i].Equals(assetPath))
-        ////            {
-        ////                position = i;
-        ////            }
-        ////        }
-        ////        if (position != -1)
-        ////        {
-        ////            absolutePath = new File(Controller.getInstance().getProjectFolder(), assetPath).getAbsolutePath();
-        ////        }
-
-        ////        File destinyFile = new File(absolutePath);
-        ////        try
-        ////        {
-        ////            return new MediaLocator(destinyFile.toURI().toURL());
-        ////        }
-        ////        catch (MalformedURLException e)
-        ////        {
-        ////            ReportDialog.GenerateErrorReport(e, true, "UNKNOWERROR");
-        ////            return null;
-        ////        }
-
-        ////    }
-
-        ////    public static URL getResourceAsURLFromZip(string path)
-        ////    {
-
-        ////        try
-        ////        {
-        ////            return es.eucm.eadventure.common.auxiliar.zipurl.ZipURL.createAssetURL(Controller.getInstance().getProjectFolder(), path);
-        ////        }
-        ////        catch (MalformedURLException e)
-        ////        {
-        ////            return null;
-        ////        }
-        ////    }
-
-        /**
          * Returns an image corresponding to the given file path (relative to the
          * ZIP).
          * 
@@ -473,85 +389,25 @@ namespace uAdventure.Editor
             return image;
         }
 
-        //image = (Sprite)Resources.Load(path, typeof(Sprite));
+        /**
+         * Returns an image corresponding to the given file path (relative to the
+         * ZIP).
+         * 
+         * @param imagePath
+         *            Path to the image, relative to the ZIP file
+         * @return Image for the given file
+         */
 
-        ////    /**
-        ////     * Returns an array of images, corresponding to the given animation path
-        ////     * (relative to the ZIP).
-        ////     * 
-        ////     * @param animationPath
-        ////     *            Animation path relative to the ZIP, including suffix
-        ////     *            ("_01.png" or "_01.jpg")
-        ////     * @return Array of images, each one containing a frame of the animation
-        ////     */
-        ////    public static Image[] getAnimation(string animationPath)
-        ////    {
+        public static Texture2D getImageTexture(string imagePath)
+        {
+            Sprite image = null;
 
-        ////        // Create a list of images
-        ////        List<Image> framesList = new List<Image>();
+            if (!string.IsNullOrEmpty(imagePath))
+                image = (Sprite)Resources.Load(BASE_DIR + imagePath.Substring(0, imagePath.LastIndexOf('.')), typeof(Sprite));
 
-        ////        // Prepare the root of the animation path and the extension
-        ////        string extension = getExtension(animationPath);
-        ////        animationPath = removeSuffix(animationPath);
+            return image != null ? image.texture : null;
+        }
 
-        ////        // While the last image has not been read
-        ////        bool end = false;
-        ////        for (int i = 1; i < 100 && !end; i++)
-        ////        {
-
-        ////            // Load the current image file
-        ////            Image frame = AssetsController.getImage(animationPath + string.format("_%02d.", i) + extension);
-
-        ////            // If it exists, add it to the list
-        ////            if (frame != null)
-        ////                framesList.add(frame);
-
-        ////            // If it doesn't exist, exit the bucle
-        ////            else
-        ////                end = true;
-        ////        }
-
-        ////        return framesList.toArray(new Image[] { });
-        ////    }
-
-        ////    /**
-        ////     * Shows a dialog to the user for selecting files which will be added into
-        ////     * the given category.
-        ////     * 
-        ////     * @param assetsCategory
-        ////     *            Destiny asset category
-        ////     * @return True if some asset was added, false otherwise
-        ////     */
-        ////    public static bool addAssets(int assetsCategory)
-        ////    {
-
-        ////        bool assetsAdded = false;
-
-        ////        // Ask the user for the files to include
-        ////        string[] selectedFiles = Controller.getInstance().showMultipleSelectionLoadDialog(getAssetsFileFilter(assetsCategory, FILTER_NONE));
-
-        ////        // If the set is not empty
-        ////        if (selectedFiles != null)
-        ////        {
-        ////            //try {
-
-        ////            assetsAdded = true;
-
-        ////            // For each asset
-        ////            for (string assetPath : selectedFiles)
-        ////            {
-        ////                assetsAdded &= addSingleAsset(assetsCategory, assetPath);
-        ////            }
-
-        ////            // Umount the ZIP files
-        ////            //File.umount( );
-        ////            //} catch( ArchiveException e ) {
-        ////            //	e.printStackTrace( );
-        ////            //}
-        ////        }
-
-        ////        return assetsAdded;
-        ////    }
 
         public static bool addSingleAsset(int assetsCategory, string assetPath)
         {
