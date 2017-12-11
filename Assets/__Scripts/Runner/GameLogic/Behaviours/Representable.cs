@@ -17,6 +17,7 @@ namespace uAdventure.Runner
         private ElementReference context;
         private ResourcesUni resource;
         protected float deformation;
+        protected bool mirror;
 
         public static Vector2 TransformPoint(Vector2 point)
         {
@@ -59,7 +60,7 @@ namespace uAdventure.Runner
         protected void Adaptate()
         {
             rend.material.mainTexture = texture;
-            this.transform.localScale = new Vector3(texture.width / DIVISOR, texture.height / DIVISOR, 1) * context.getScale();
+            this.transform.localScale = new Vector3((mirror ? -1f : 1f) * texture.width / DIVISOR, texture.height / DIVISOR, 1) * context.getScale();
         }
 
         protected void Positionate()
@@ -132,9 +133,43 @@ namespace uAdventure.Runner
             set { anim = value; }
         }
 
+        private string getMirrorUri(string uri)
+        {
+            string mirror = null;
+            switch (uri)
+            {
+                // STAND
+                case NPC.RESOURCE_TYPE_STAND_LEFT:  mirror = NPC.RESOURCE_TYPE_STAND_RIGHT; break;
+                case NPC.RESOURCE_TYPE_STAND_RIGHT: mirror = NPC.RESOURCE_TYPE_STAND_LEFT;  break;
+                // WALK
+                case NPC.RESOURCE_TYPE_WALK_LEFT:   mirror = NPC.RESOURCE_TYPE_WALK_RIGHT;  break;
+                case NPC.RESOURCE_TYPE_WALK_RIGHT:  mirror = NPC.RESOURCE_TYPE_WALK_LEFT;   break;
+                // USING
+                case NPC.RESOURCE_TYPE_USE_LEFT:    mirror = NPC.RESOURCE_TYPE_USE_RIGHT;   break;
+                case NPC.RESOURCE_TYPE_USE_RIGHT:   mirror = NPC.RESOURCE_TYPE_USE_LEFT;    break;
+                // SPEAK
+                case NPC.RESOURCE_TYPE_SPEAK_LEFT:  mirror = NPC.RESOURCE_TYPE_SPEAK_RIGHT; break;
+                case NPC.RESOURCE_TYPE_SPEAK_RIGHT: mirror = NPC.RESOURCE_TYPE_SPEAK_LEFT;  break;
+            }
+
+            return mirror;
+        }
+
+        private bool isMirrorable(string uri)
+        {
+            return getMirrorUri(uri) != null;
+        }
+
         protected void LoadAnimation(string uri)
         {
             anim = ResourceManager.Instance.getAnimation(resource.getAssetPath(uri));
+            mirror = false;
+            
+            if((anim == null || anim.Animation == null || anim.Animation.isEmptyAnimation()) && isMirrorable(uri))
+            {
+                anim = ResourceManager.Instance.getAnimation(resource.getAssetPath(getMirrorUri(uri)));
+                mirror = true;
+            }
         }
 
         protected void setAnimation(string uri)

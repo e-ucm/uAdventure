@@ -182,7 +182,7 @@ namespace uAdventure.Runner
 
             if (angle >= 45 && angle < 135)
             {
-                o = Orientation.N;
+                o = Orientation.S;
             }
             else if (angle >= 135 && angle < 225)
             {
@@ -190,7 +190,7 @@ namespace uAdventure.Runner
             }
             else if (angle >= 225 && angle < 315)
             {
-                o = Orientation.S;
+                o = Orientation.N;
             }
             else if (angle >= 315 || angle < 45)
             {

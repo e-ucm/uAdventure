@@ -19,6 +19,9 @@ public class PlayerFollower : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+        if (!PlayerMB.Instance)
+            return;
+
         if (!init)
         {
             init = true;
