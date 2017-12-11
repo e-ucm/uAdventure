@@ -78,8 +78,7 @@ namespace uAdventure.Editor
             };
             Debug.Log(cutsceneFilePath);
 
-            workingAnimation = Loader.loadAnimation(AssetsController.InputStreamCreatorEditor.getInputStreamCreator(),
-                cutsceneFilePath, new EditorImageLoader());
+            workingAnimation = Loader.loadAnimation(cutsceneFilePath, new EditorImageLoader());
 
             Debug.Log(workingAnimation.getAboslutePath() + " " + workingAnimation.getFrames().Count + " " + workingAnimation.isSlides() + " " + workingAnimation.getId());
             if (workingAnimation == null)
@@ -124,7 +123,8 @@ namespace uAdventure.Editor
                     GUI.skin = selectedFrameSkin;
 
                 var frame = workingAnimation.getFrame(i);
-                var frameContent = new GUIContent(frame.getTime().ToString(), frame.getImage(false, false, global::uAdventure.Core.Animation.ENGINE).texture);
+                var image = AssetsController.getImageTexture(frame.getUri());
+                var frameContent = new GUIContent(frame.getTime().ToString(), image);
                 if (GUILayout.Button(frameContent, GUILayout.Height(100), GUILayout.Width(80)))
                 {
                     OnFrameSelectionChanged(i);
