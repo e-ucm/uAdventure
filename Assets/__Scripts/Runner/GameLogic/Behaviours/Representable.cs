@@ -190,7 +190,7 @@ namespace uAdventure.Runner
 
         private void nextFrame()
         {
-            current_time = 0;
+            current_time -= update_ratio;
             setFrame(current_frame + 1);
         }
 

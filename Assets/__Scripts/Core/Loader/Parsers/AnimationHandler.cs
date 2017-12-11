@@ -110,7 +110,7 @@ namespace uAdventure.Core
                                 ruta = ruta.Substring("Resources/".Length);
                         }
 
-                        var newFrame = new Frame(animation.getImageLoaderFactory(), ruta, 1000, false);
+                        var newFrame = new Frame(animation.getImageLoaderFactory(), ruta, 100, false);
                         animation.addFrame(newFrame);
                         num++;
                     }

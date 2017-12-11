@@ -17,7 +17,7 @@ namespace uAdventure.Runner
         static PlayerMB instance;
         Vector2 start_pos, end_pos;
         float progress = 0.0f;
-        float player_speed = 0.5f;
+        float player_speed = 0.25f;
         float speed = 0f;
         Orientation orientation = Orientation.S;
 
