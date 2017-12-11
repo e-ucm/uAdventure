@@ -69,22 +69,30 @@ namespace uAdventure.Core
          *            The xml descriptor for the animation
          * @return the loaded Animation
          */
+
+        [Obsolete]
         public static Animation loadAnimation(InputStreamCreator isCreator, string filename, ImageLoaderFactory imageloader)
+        {
+            return loadAnimation(filename, imageloader);
+
+        }
+
+        public static Animation loadAnimation(string filename, ImageLoaderFactory imageloader)
         {
             if (animationLoadCache == null) animationLoadCache = new Dictionary<string, Animation>();
 
             if (animationLoadCache.ContainsKey(filename))
                 return animationLoadCache[filename];
 
-            AnimationHandler_ animationHandler = new AnimationHandler_(isCreator, imageloader);
+            AnimationHandler_ animationHandler = new AnimationHandler_(imageloader);
             
             try
             {
-                string descriptorIS = null;
-
-                descriptorIS = isCreator.buildInputStream("Assets/Resources/CurrentGame/" + filename);
-
-                animationHandler.Parse(descriptorIS);
+                if(Application.isEditor && !Application.isPlaying)
+                {
+                    uAdventure.Runner.ResourceManager.Instance.Path = "Assets/Resources/CurrentGame/";
+                }
+                animationHandler.Parse(filename);
             }
             catch (Exception e) { Debug.LogWarning(e); }
 
