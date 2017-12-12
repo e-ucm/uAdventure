@@ -22,10 +22,10 @@ namespace uAdventure.Editor
             params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, sceneEditor, aOptions)
         {
-            new ReferenceComponent(Rect.zero, new GUIContent(""), "");
+            new ReferenceComponent(Rect.zero, new GUIContent(""), aStyle);
             if (Controller.Instance.playerMode() == DescriptorData.MODE_PLAYER_3RDPERSON)
             {
-                new InfluenceComponent(Rect.zero, new GUIContent(""), "");
+                new InfluenceComponent(Rect.zero, new GUIContent(""), aStyle);
             }
 
             conditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/conditions-24x24", typeof(Texture2D));

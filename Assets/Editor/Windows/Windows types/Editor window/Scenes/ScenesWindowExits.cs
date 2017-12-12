@@ -31,9 +31,9 @@ namespace uAdventure.Editor
             : base(aStartPos, aContent, aStyle, sceneEditor, aOptions)
         {
 
-            new ExitTransitionComponent(Rect.zero, new GUIContent(""), "");
-            new ExitAppearanceComponent(Rect.zero, new GUIContent(""), "");
-            new ExitConditionsAndEffectsComponent(Rect.zero, new GUIContent(""), "");
+            new ExitTransitionComponent(Rect.zero, new GUIContent(""), aStyle);
+            new ExitAppearanceComponent(Rect.zero, new GUIContent(""), aStyle);
+            new ExitConditionsAndEffectsComponent(Rect.zero, new GUIContent(""), aStyle);
 
             conditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/conditions-24x24", typeof(Texture2D));
             noConditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/no-conditions-24x24", typeof(Texture2D));

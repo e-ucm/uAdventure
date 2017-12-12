@@ -49,7 +49,7 @@ namespace uAdventure.Editor
         {
             var content = new GUIContent();
 
-            new RectangleComponentEditor(Rect.zero, new GUIContent(""), "");
+            new RectangleComponentEditor(Rect.zero, new GUIContent(""), style);
 
             // Button
             content.image = (Texture2D) Resources.Load("EAdventureData/img/icons/scenes", typeof(Texture2D));

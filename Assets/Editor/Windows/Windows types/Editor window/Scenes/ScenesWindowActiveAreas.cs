@@ -20,8 +20,8 @@ namespace uAdventure.Editor
             params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, sceneEditor, aOptions)
         {
-            new ActiveAreaActionsComponent(Rect.zero, new GUIContent(""), "");
-            new ActiveAreaDescriptionsComponent(Rect.zero, new GUIContent(""), "");
+            new ActiveAreaActionsComponent(Rect.zero, new GUIContent(""), aStyle);
+            new ActiveAreaDescriptionsComponent(Rect.zero, new GUIContent(""), aStyle);
 
             conditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/conditions-24x24", typeof(Texture2D));
             noConditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/no-conditions-24x24", typeof(Texture2D));
