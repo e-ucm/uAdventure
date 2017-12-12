@@ -6,6 +6,7 @@ using uAdventure.Core;
 using uAdventure.QR;
 using System;
 using System.Linq;
+using UnityEditor.SceneManagement;
 
 namespace uAdventure.Editor
 {
@@ -92,7 +93,19 @@ namespace uAdventure.Editor
 				Controller.Instance.Init();
 			}
 
-			if(!redoTexture)
+            var initialScene = AssetDatabase.LoadAssetAtPath<SceneAsset>("Assets/Scenes/_Scene1.unity");
+
+            if (initialScene)
+            {
+                EditorSceneManager.playModeStartScene = initialScene;
+            }
+            else
+            {
+                EditorUtility.DisplayDialog("Main scene not found!", "Main Scene was not found! Please open \"_Scene1\" in scenes folder before playing the game.", "Understood!");
+            }
+
+
+            if (!redoTexture)
 				redoTexture = (Texture2D)Resources.Load("EAdventureData/img/icons/redo", typeof(Texture2D));
 			if(!undoTexture)
 				undoTexture = (Texture2D)Resources.Load("EAdventureData/img/icons/undo", typeof(Texture2D));
