@@ -2833,9 +2833,6 @@ namespace uAdventure.Editor
         [UnityEditor.MenuItem("eAdventure/Open eAdventure welcome screen")]
         public static void OpenWelcomeWindow()
         {
-            if (!Controller.Instance.Initialized)
-                Controller.Instance.Init();
-
             if (!Language.Initialized)
                 Language.Initialize();
 
@@ -2847,9 +2844,6 @@ namespace uAdventure.Editor
         [UnityEditor.MenuItem("eAdventure/Open eAdventure editor")]
         public static void OpenEditorWindow()
         {
-            if (!Controller.Instance.Initialized)
-                Controller.Instance.Init();
-
             if(!Language.Initialized)
                 Language.Initialize();
 

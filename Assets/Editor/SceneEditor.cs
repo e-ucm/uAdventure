@@ -145,6 +145,9 @@ public class SceneEditor {
 
     private void SetDisabled(DataControl element)
     {
+        if (element == null)
+            return;
+
         if (!TypeEnabling.ContainsKey(element.GetType()))
             TypeEnabling[element.GetType()] = true;
         Disabled = !TypeEnabling[element.GetType()];

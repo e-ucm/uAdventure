@@ -182,8 +182,9 @@ namespace uAdventure.Runner
 
         public IChapterTarget getInitialChapterTarget()
         {
-            if (PlayerPrefs.HasKey("target")) return data.getChapters()[current_chapter].getObjects<IChapterTarget>().Find(t => t.getId() == PlayerPrefs.GetString("target"));
-            else return data.getChapters()[current_chapter].getInitialChapterTarget();
+            /*if (PlayerPrefs.HasKey("target")) return data.getChapters()[current_chapter].getObjects<IChapterTarget>().Find(t => t.getId() == PlayerPrefs.GetString("target"));
+            else*/
+            return data.getChapters()[current_chapter].getInitialChapterTarget();
         }
 
         public GeneralScene getLastScene()

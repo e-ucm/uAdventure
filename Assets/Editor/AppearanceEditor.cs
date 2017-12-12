@@ -68,23 +68,26 @@ public class AppearanceEditor : Editor {
             drawCell = (rect, index, col, isActive, isFocused) =>
             {
                 var resources = dataControl.getResources()[index];
-                switch (col)
+                switch (col) 
                 {
                     case 0:
-                        if (index == appearanceList.index)
+                        EditorGUI.LabelField(rect, "Resources " + (index + 1));
+                        /*if (index == appearanceList.index)
                         {
-                            resources.renameElement(EditorGUI.TextField(rect, resources.getName()));
+                            EditorGUI.BeginChangeCheck();
+                            var newname = EditorGUI.TextField(rect, resources.getName());
+                            if(EditorGUI.EndChangeCheck())
+                                resources.renameElement(newname);
                         }
                         else
                         {
                             EditorGUI.LabelField(rect, resources.getName());
-                        }
+                        }*/
                         break;
                     case 1:
                         if (GUI.Button(rect, resources.getConditions().getBlocksCount() > 0 ? conditionsTex : noConditionsTex))
                         {
-                            ConditionEditorWindow window =
-                                 (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
+                            ConditionEditorWindow window = CreateInstance<ConditionEditorWindow>();
                             window.Init(resources.getConditions());
                         }
                         break;

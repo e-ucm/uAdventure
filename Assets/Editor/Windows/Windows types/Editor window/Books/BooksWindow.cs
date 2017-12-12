@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace uAdventure.Editor
 {
-    [EditorWindowExtension(80, typeof(Book))]
+    //[EditorWindowExtension(80, typeof(Book))]
     public class BooksWindow : ReorderableListEditorWindowExtension
     {
         private enum BookWindowType { Appearance, Content, Documentation }
