@@ -79,13 +79,13 @@ namespace uAdventure.Editor
 
             string previewImagePath = getExistingPreviewImagePath();
             // Add the extension of the frame
-            if (previewImagePath != null && !previewImagePath.ToLower().EndsWith(".eaa")
+            if (previewImagePath != null && !previewImagePath.ToLower().EndsWith(".eaa.xml")
                 //HACK?
                 && previewImagePath.Equals(EMPTY_ANIMATION))
                 previewImagePath += "_01.png";
             else if (previewImagePath != null)
             {
-                return Loader.loadAnimation(AssetsController.InputStreamCreatorEditor.getInputStreamCreator(), previewImagePath, new EditorImageLoader()).getFrame(0).getUri();
+                return Loader.loadAnimation(previewImagePath, new EditorImageLoader()).getFrame(0).getUri();
             }
             return previewImagePath;
         }
