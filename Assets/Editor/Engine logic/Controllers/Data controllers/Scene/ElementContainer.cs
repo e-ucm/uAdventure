@@ -2,10 +2,12 @@
 using System.Collections;
 
 using uAdventure.Core;
+using System;
+using System.Collections.Generic;
 
 namespace uAdventure.Editor
 {
-    public class ElementContainer
+    public class ElementContainer : DataControl
     {
 
 
@@ -170,6 +172,156 @@ namespace uAdventure.Editor
                 Controller.Instance.DataModified();
                 this.erdc.setVisible(visible);
             }
+        }
+
+
+        // Embebbed erdc
+        public override object getContent()
+        {
+            if (erdc != null)
+                return erdc.getContent();
+            return null;
+        }
+
+        public override int[] getAddableElements()
+        {
+            if (erdc != null)
+                return erdc.getAddableElements();
+            return null;
+        }
+
+        public override bool canAddElement(int type)
+        {
+            if (erdc != null)
+                return erdc.canAddElement(type);
+            return false;
+        }
+
+        public override bool canBeDeleted()
+        {
+            if (erdc != null)
+                return erdc.canBeDeleted();
+            return false;
+        }
+
+        public override bool canBeDuplicated()
+        {
+            if (erdc != null)
+                return erdc.canBeDuplicated();
+            return false;
+        }
+
+        public override bool canBeMoved()
+        {
+            if (erdc != null)
+                return erdc.canBeMoved();
+            return false;
+        }
+
+        public override bool canBeRenamed()
+        {
+            if (erdc != null)
+                return erdc.canBeRenamed();
+            return false;
+        }
+
+        public override bool addElement(int type, string id)
+        {
+            if (erdc != null)
+                return erdc.addElement(type, id);
+            return false;
+        }
+
+        public override bool deleteElement(DataControl dataControl, bool askConfirmation)
+        {
+            if (erdc != null)
+                return erdc.deleteElement(dataControl, askConfirmation);
+            return false;
+        }
+
+        public override bool moveElementUp(DataControl dataControl)
+        {
+            if (erdc != null)
+                return erdc.moveElementUp(dataControl);
+            return false;
+        }
+
+        public override bool moveElementDown(DataControl dataControl)
+        {
+            if (erdc != null)
+                return erdc.moveElementDown(dataControl);
+            return false;
+        }
+
+        public override string renameElement(string newName)
+        {
+            if (erdc != null)
+                return erdc.renameElement(newName);
+            return string.Empty;
+        }
+
+        public override void updateVarFlagSummary(VarFlagSummary varFlagSummary)
+        {
+            if (erdc != null)
+                erdc.updateVarFlagSummary(varFlagSummary);
+        }
+
+        public override bool isValid(string currentPath, List<string> incidences)
+        {
+            if (erdc != null)
+                return erdc.isValid(currentPath, incidences);
+            return true;
+        }
+
+        public override int countAssetReferences(string assetPath)
+        {
+            if (erdc != null)
+                return erdc.countAssetReferences(assetPath);
+            return 0;
+        }
+
+        public override void getAssetReferences(List<string> assetPaths, List<int> assetTypes)
+        {
+            if (erdc != null)
+                erdc.getAssetReferences(assetPaths, assetTypes);
+        }
+
+        public override void deleteAssetReferences(string assetPath)
+        {
+            if (erdc != null)
+                erdc.deleteAssetReferences(assetPath);
+        }
+
+        public override int countIdentifierReferences(string id)
+        {
+            if (erdc != null)
+                return erdc.countIdentifierReferences(id);
+            return 0;
+        }
+
+        public override void replaceIdentifierReferences(string oldId, string newId)
+        {
+            if (erdc != null)
+                erdc.replaceIdentifierReferences(oldId, newId);
+        }
+
+        public override void deleteIdentifierReferences(string id)
+        {
+            if (erdc != null)
+                erdc.deleteIdentifierReferences(id);
+        }
+
+        public override List<Searchable> getPathToDataControl(Searchable dataControl)
+        {
+            if (erdc != null)
+                return erdc.getPathToDataControl(dataControl);
+            return null;
+        }
+
+        public override void recursiveSearch()
+        {
+            if (erdc != null)
+                erdc.recursiveSearch();
         }
     }
 }

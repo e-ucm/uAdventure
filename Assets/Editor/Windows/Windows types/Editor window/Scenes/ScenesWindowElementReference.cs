@@ -18,6 +18,8 @@ namespace uAdventure.Editor
         private DataControlList referenceList;
         private SceneDataControl workingScene;
 
+        private Dictionary<Type, Texture2D> icons;
+             
         public ScenesWindowElementReference(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, SceneEditor sceneEditor,
             params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, sceneEditor, aOptions)
@@ -28,8 +30,16 @@ namespace uAdventure.Editor
                 new InfluenceComponent(Rect.zero, new GUIContent(""), aStyle);
             }
 
-            conditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/conditions-24x24", typeof(Texture2D));
-            noConditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/no-conditions-24x24", typeof(Texture2D));
+            conditionsTex = Resources.Load<Texture2D>("EAdventureData/img/icons/conditions-24x24");
+            noConditionsTex = Resources.Load<Texture2D>("EAdventureData/img/icons/no-conditions-24x24");
+
+            icons = new Dictionary<Type, Texture2D>()
+            {
+                { typeof(PlayerDataControl),    Resources.Load<Texture2D>("EAdventureData/img/icons/player-old") },
+                { typeof(ItemDataControl),      Resources.Load<Texture2D>("EAdventureData/img/icons/item") },
+                { typeof(AtrezzoDataControl),   Resources.Load<Texture2D>("EAdventureData/img/icons/atrezzo-1") },
+                { typeof(NPCDataControl),       Resources.Load<Texture2D>("EAdventureData/img/icons/npc") }
+            };
 
             referenceList = new DataControlList()
             {
@@ -59,18 +69,44 @@ namespace uAdventure.Editor
                 },
                 drawCell = (columnRect, row, column, isActive, isFocused) =>
                 {
-                    var element = referenceList.list[row] as ElementReferenceDataControl;
+                    var element = referenceList.list[row] as ElementContainer;
+                    var erdc = element.getErdc(); 
+
                     switch (column)
                     {
                         case 0: GUI.Label(columnRect, row.ToString()); break;
                         case 1: /* TODO */ break;
-                        case 2: GUI.Label(columnRect, element.getElementId()); break;
-                        case 3:
-                            if (GUI.Button(columnRect, element.getConditions().getBlocksCount() > 0 ? conditionsTex : noConditionsTex))
+                        case 2:
+                            var iconSpace = new Rect(columnRect);
+                            var nameSpace = new Rect(columnRect);
+                            iconSpace.size = new Vector2(16, nameSpace.size.y);
+                            nameSpace.position += new Vector2(16, 0);
+                            nameSpace.size += new Vector2(-16, 0);
+
+                            if (erdc == null)
                             {
-                                ConditionEditorWindow window =
-                                     (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
-                                window.Init(element.getConditions());
+                                GUI.Label(iconSpace, icons[typeof(PlayerDataControl)]);
+                                GUI.Label(nameSpace, TC.get("Element.Name26"));
+                            }
+                            else
+                            {
+                                Texture2D icon = null;
+                                var type = erdc.getReferencedElementDataControl().GetType();
+                                if (icons.ContainsKey(type)) icon = icons[type];
+                                if(icon != null)
+                                    GUI.Label(iconSpace, icons[type]);
+                                GUI.Label(icon != null ? nameSpace : columnRect, erdc.getElementId());
+                            }
+                            break;
+                        case 3:
+                            using (new EditorGUI.DisabledScope(erdc == null))
+                            {
+                                if (GUI.Button(columnRect, erdc == null ? noConditionsTex : erdc.getConditions().getBlocksCount() > 0 ? conditionsTex : noConditionsTex))
+                                {
+                                    ConditionEditorWindow window =
+                                            (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
+                                    window.Init(erdc.getConditions());
+                                }
                             }
                             break;
                     }
@@ -90,13 +126,13 @@ namespace uAdventure.Editor
             if(workingScene != prevWorkingScene)
             {
                 referenceList.SetData(workingScene.getReferencesList(),
-                    (dc) => (dc as ReferencesListDataControl).getAllReferencesDataControl().ConvertAll(ec => ec.getErdc() as DataControl));
+                    (dc) => (dc as ReferencesListDataControl).getAllReferencesDataControl().Cast<DataControl>().ToList());
             }
 
             if(referenceList.count != workingScene.getReferencesList().getAllReferencesDataControl().Count)
             {
                 referenceList.SetData(workingScene.getReferencesList(),
-                    (dc) => (dc as ReferencesListDataControl).getAllReferencesDataControl().ConvertAll(ec => ec.getErdc() as DataControl));
+                    (dc) => (dc as ReferencesListDataControl).getAllReferencesDataControl().Cast<DataControl>().ToList());
             }
 
             referenceList.DoList(160);
