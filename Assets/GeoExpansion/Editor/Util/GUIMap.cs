@@ -83,7 +83,7 @@ public class GUIMap
         var mousePos = Event.current.mousePosition.ToVector2d();
         var delta = new Vector2d(Event.current.delta.x, Event.current.delta.y);
 
-        if(Event.current.type != EventType.layout)
+        if(Event.current.type != EventType.Layout)
             GeoMousePosition = GM.MetersToLatLon(GM.PixelsToMeters(RelativeToAbsolute(mousePos), Zoom));
 
         switch (Event.current.type)
@@ -143,7 +143,7 @@ public class GUIMap
                 break;
 
 
-            case EventType.mouseDrag:
+            case EventType.MouseDrag:
                 {
                     // MoveLatLon or center var 
                     if (area.Contains(Event.current.mousePosition))
@@ -170,7 +170,7 @@ public class GUIMap
                     }
                 }
                 break;
-            case EventType.mouseDown:
+            case EventType.MouseDown:
                 {
                     selectedGeometry = Geometries.Find(g => 
                     {

@@ -650,7 +650,7 @@ namespace uAdventure.Editor
                 }
 
                 editors[node].Window = GUILayout.Window(node.GetHashCode(), rect, NodeWindow, node.getType().ToString(), GUILayout.MinWidth(150));
-                if(editors[node].Window.width != rect.width && !editors[node].Collapsed && Event.current.type == EventType.repaint)
+                if(editors[node].Window.width != rect.width && !editors[node].Collapsed && Event.current.type == EventType.Repaint)
                 {
                     node.setEditorWidth(Mathf.RoundToInt(editors[node].Window.width));
                 }

@@ -113,7 +113,7 @@ namespace uAdventure.Editor
             //    GUI.DrawTexture(playerRect, selectedPlayerTex);
             GUILayout.EndScrollView();
 
-            if (Event.current.type == EventType.mouseDrag)
+            if (Event.current.type == EventType.MouseDrag)
             {
                 if (!useTrajectory)
                 {
@@ -140,7 +140,7 @@ namespace uAdventure.Editor
                 currentPos = Event.current.mousePosition;
             }
 
-            if (Event.current.type == EventType.mouseUp)
+            if (Event.current.type == EventType.MouseUp)
             {
                 dragging = false;
             }
@@ -200,7 +200,7 @@ namespace uAdventure.Editor
             else
             {
                 // EVENTS
-                if (Event.current.type == EventType.mouseDown && imageBackgroundRect.Contains(Event.current.mousePosition))
+                if (Event.current.type == EventType.MouseDown && imageBackgroundRect.Contains(Event.current.mousePosition))
                 {
                     int clickedIndex = -1;
 

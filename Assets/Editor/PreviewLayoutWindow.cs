@@ -205,9 +205,9 @@ namespace uAdventure.Editor
                 // Create the preview inspector window
                 var newWindowRect = GUILayout.Window(9999, windowRect, (i) =>
                 {
-                    if (Event.current.type == EventType.layout) useScroll = windowRect.height >= 500f;
+                    if (Event.current.type == EventType.Layout) useScroll = windowRect.height >= 500f;
                     
-                    if (Dragging && Event.current.type == EventType.mouseUp)
+                    if (Dragging && Event.current.type == EventType.MouseUp)
                     {
                         Dragging = false;
                         DoUpdate = true;

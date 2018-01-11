@@ -168,7 +168,7 @@ namespace uAdventure.Editor
                     }
                     break;
 
-                case EventType.mouseUp:
+                case EventType.MouseUp:
                     if (GUIUtility.hotControl == leftNormalArrow.GetInstanceID())
                     {
                         GUIUtility.hotControl = 0;
@@ -179,7 +179,7 @@ namespace uAdventure.Editor
                     }
                     break;
 
-                case EventType.mouseDrag:
+                case EventType.MouseDrag:
                     if (GUIUtility.hotControl == leftNormalArrow.GetInstanceID())
                     {
                         leftArrowRect.position += Event.current.delta;

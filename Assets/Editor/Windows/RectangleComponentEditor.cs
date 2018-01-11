@@ -175,7 +175,7 @@ namespace uAdventure.Editor
                             Event.current.Use();
                         }
                         break;
-                    case EventType.mouseUp:
+                    case EventType.MouseUp:
                         if (GUIUtility.hotControl == rectangleArea.GetHashCode() + index)
                         {
                             GUIUtility.hotControl = 0;
@@ -218,14 +218,14 @@ namespace uAdventure.Editor
                         Event.current.Use();
                     }
                     break;
-                case EventType.mouseUp:
+                case EventType.MouseUp:
                     if (GUIUtility.hotControl == rectangleArea.GetHashCode())
                     {
                         GUIUtility.hotControl = 0;
                         Event.current.Use();
                     }
                     break;
-                case EventType.repaint:
+                case EventType.Repaint:
                     if(ActionSelected == 1)
                     {
                         var pos = FindInsertPos(points, Event.current.mousePosition);

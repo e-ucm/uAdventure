@@ -11,7 +11,7 @@ public static class HandleUtil {
         int pointChanged = -1;
         Vector2 oldPointValue = Vector2.zero;
 
-        if (Event.current.type == EventType.repaint)
+        if (Event.current.type == EventType.Repaint)
             drawPolygon(points);
 
         for (int i = 0; i < points.Length; i++)
@@ -94,7 +94,7 @@ public static class HandleUtil {
                     Event.current.Use();
                 }
                 break;
-            case EventType.mouseUp:
+            case EventType.MouseUp:
                 if (GUIUtility.hotControl == controlId)
                 {
                     GUIUtility.hotControl = 0;

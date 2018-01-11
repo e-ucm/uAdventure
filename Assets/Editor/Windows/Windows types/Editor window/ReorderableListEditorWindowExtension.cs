@@ -154,7 +154,7 @@ namespace uAdventure.Editor
 				GUI.SetNextControlName ("editingField");
 				editingName = EditorGUI.TextField(rect, editingName);
 				if (GUI.GetNameOfFocusedControl () == "editingField" 
-					&& !(Event.current.type == EventType.keyUp && Event.current.keyCode == KeyCode.Return)) {
+					&& !(Event.current.type == EventType.KeyUp && Event.current.keyCode == KeyCode.Return)) {
 					// If the field is selected
 					flushed = false;
 				} else if (!flushed) {

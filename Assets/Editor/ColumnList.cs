@@ -52,7 +52,7 @@ public class ColumnList : ScrollableList
 
         drawHeaderCallback = (rect) =>
         {
-            if(Event.current.type == EventType.repaint)
+            if(Event.current.type == EventType.Repaint)
             {
                 headerRect = rect;
             }
@@ -102,14 +102,14 @@ public class ColumnList : ScrollableList
                 columnRect = GUILayoutUtility.GetLastRect();
             }
 
-            if(Event.current.type == EventType.repaint)
+            if(Event.current.type == EventType.Repaint)
             {
                 columnPercent[i] = columnRect.width / rect.width;
             }
             i++;
         }
 
-        if (Event.current.type == EventType.repaint)
+        if (Event.current.type == EventType.Repaint)
         {
             var missing = 1f - columnPercent.ToList().Sum();
             columnPercent = columnPercent.ToList().ConvertAll(c => c + missing * c).ToArray();

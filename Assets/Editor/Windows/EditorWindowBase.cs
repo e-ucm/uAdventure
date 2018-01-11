@@ -286,7 +286,7 @@ namespace uAdventure.Editor
                 {
                     //leftMenuRect
                     m_Window.OnGUI();
-                    if (Event.current.type == EventType.repaint)
+                    if (Event.current.type == EventType.Repaint)
                     {
                         if (m_Window.Rect != windowArea)
                         {

@@ -143,7 +143,7 @@ public class ScrollableList
         reorderableList.DoList(insideRect);
         GUI.EndScrollView();
 
-        if(wasType == EventType.scrollWheel && Event.current.type == EventType.Used)
+        if(wasType == EventType.ScrollWheel && Event.current.type == EventType.Used)
         {
             bool hasScrolled = true;
 
