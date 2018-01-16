@@ -188,19 +188,19 @@ namespace uAdventure.Editor
             var npc = data as NPCDataControl;
 
             standingUpTex        = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_STAND_UP);
-            standingLeftTex      = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_STAND_DOWN);
+            standingDownTex      = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_STAND_DOWN);
             standingRightTex     = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_STAND_RIGHT);
-            standingDownTex      = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_STAND_LEFT);
+            standingLeftTex      = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_STAND_LEFT);
             talkingUpTex         = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_SPEAK_UP);
-            talkingLeftTex       = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_SPEAK_DOWN);
+            talkingDownTex       = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_SPEAK_DOWN);
             talkingRightTex      = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_SPEAK_RIGHT);
-            talkingDownTex       = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_SPEAK_LEFT);
-            usingLeftTex         = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_USE_RIGHT);
-            usingRightTex        = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_USE_LEFT);
+            talkingLeftTex       = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_SPEAK_LEFT);
+            usingRightTex        = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_USE_RIGHT);
+            usingLeftTex         = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_USE_LEFT);
             walkingUpTex         = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_WALK_UP);
-            walkingLeftTex       = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_WALK_DOWN);
+            walkingLeftTex       = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_WALK_LEFT);
             walkingRightTex      = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_WALK_RIGHT);
-            walkingDownTex       = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_WALK_LEFT);
+            walkingDownTex       = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_WALK_DOWN);
         }
 
         protected override void DrawInspector()
