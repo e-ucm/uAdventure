@@ -78,6 +78,18 @@ namespace uAdventure.Editor
                     sceneEditor.SelectedElement = activeAreasList.list[list.index] as ActiveAreaDataControl;
                 }
             };
+
+            sceneEditor.onSelectElement += (element) =>
+            {
+                if (element is ActiveAreaDataControl)
+                {
+                    activeAreasList.index = activeAreasList.list.IndexOf(element as ActiveAreaDataControl);
+                }
+                else
+                {
+                    activeAreasList.index = -1;
+                }
+            };
         }
 
         protected override void DrawInspector()

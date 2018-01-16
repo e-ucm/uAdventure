@@ -61,6 +61,18 @@ namespace uAdventure.Editor
                     sceneEditor.SelectedElement = barriersList.list[list.index] as BarrierDataControl;
                 }
             };
+
+            sceneEditor.onSelectElement += (element) =>
+            {
+                if (element is BarrierDataControl)
+                {
+                    barriersList.index = barriersList.list.IndexOf(element as BarrierDataControl);
+                }
+                else
+                {
+                    barriersList.index = -1;
+                }
+            };
         }
         
         protected override void DrawInspector()

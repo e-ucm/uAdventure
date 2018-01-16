@@ -70,7 +70,7 @@ namespace uAdventure.Editor
                 drawCell = (columnRect, row, column, isActive, isFocused) =>
                 {
                     var element = referenceList.list[row] as ElementContainer;
-                    var erdc = element.getErdc(); 
+                    var erdc = element.getErdc();
 
                     switch (column)
                     {
@@ -93,7 +93,7 @@ namespace uAdventure.Editor
                                 Texture2D icon = null;
                                 var type = erdc.getReferencedElementDataControl().GetType();
                                 if (icons.ContainsKey(type)) icon = icons[type];
-                                if(icon != null)
+                                if (icon != null)
                                     GUI.Label(iconSpace, icons[type]);
                                 GUI.Label(icon != null ? nameSpace : columnRect, erdc.getElementId());
                             }
@@ -113,7 +113,20 @@ namespace uAdventure.Editor
                 },
                 onSelectCallback = (list) =>
                 {
-                    sceneEditor.SelectedElement = referenceList.list[list.index] as ElementReferenceDataControl;
+                    sceneEditor.SelectedElement = (referenceList.list[list.index] as ElementContainer).getErdc();
+                }
+            };
+
+            sceneEditor.onSelectElement += (element) =>
+            {
+                if (element is ElementReferenceDataControl)
+                {
+                    var erdc = element as ElementReferenceDataControl;
+                    referenceList.index = referenceList.list.Cast<ElementContainer>().Select(e => e.getErdc()).ToList().IndexOf(erdc);
+                }
+                else
+                {
+                    referenceList.index = -1;
                 }
             };
 

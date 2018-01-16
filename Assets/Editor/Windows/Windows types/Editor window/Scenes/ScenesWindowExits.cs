@@ -84,6 +84,18 @@ namespace uAdventure.Editor
                     sceneEditor.SelectedElement = exitsList.list[list.index] as ExitDataControl;
                 }
             };
+
+            sceneEditor.onSelectElement += (element) =>
+            {
+                if (element is ExitDataControl)
+                {
+                    exitsList.index = exitsList.list.IndexOf(element as ExitDataControl);
+                }
+                else
+                {
+                    exitsList.index = -1;
+                }
+            };
         }
 
         protected override void DrawInspector()
