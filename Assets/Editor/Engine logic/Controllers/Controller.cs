@@ -1247,6 +1247,7 @@ namespace uAdventure.Editor
                         AssetsController.createFolderStructure();
                         AssetsController.addSpecialAssets();
                         AssetsController.copyAllFiles(currentZipFile, new DirectoryInfo("Assets/Resources/CurrentGame/").FullName);
+                        AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
                         AssetsController.checkAssetFilesConsistency(incidences);
                         Incidence.sortIncidences(incidences);
 

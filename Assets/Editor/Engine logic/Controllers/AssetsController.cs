@@ -1479,7 +1479,7 @@ namespace uAdventure.Editor
         }
 
         public static void InitImporterConfig(string path)
-        {
+        { 
 
             string currentDir = Directory.GetCurrentDirectory();
             var unityLikePath = path.Replace(currentDir, "").Replace("\\", "/").Remove(0, 1);
@@ -1531,7 +1531,7 @@ namespace uAdventure.Editor
                 // In case of image importing
                 if(file.Extension.ToLowerInvariant() == ".png" || file.Extension.ToLowerInvariant() == ".jpg")
                 {
-                    ///InitImporterConfig(temppath);
+                    InitImporterConfig(temppath);
                 }
 
                 // In case of animation
