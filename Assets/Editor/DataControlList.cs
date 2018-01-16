@@ -31,6 +31,8 @@ public class DataControlList : ButtonList {
         this.childs = getChilds(dataControl);
 
         this.list = this.childs;
+        if (this.list.Count <= this.index)
+            this.index = -1;
     }
 
     public DataControlList() : base(new List<DataControl>(), typeof(DataControl), true, true)

@@ -420,7 +420,13 @@ namespace uAdventure.Editor
                 c = new Color(c.r, c.g, c.b, 0.8f);
                 HandleUtil.DrawPolygon(polygon, c);
                 var scenes = Controller.Instance.SelectedChapterDataControl.getScenesList();
-                var nextScene = scenes.getScenes()[scenes.getSceneIndexByID(exit.getNextSceneId())];
+                var index = scenes.getSceneIndexByID(exit.getNextSceneId());
+
+                // If the exit points to a cutscene it normally is out of the array
+                if (index < 0 || index >= scenes.getScenes().Count)
+                    return;
+
+                var nextScene = scenes.getScenes()[index];
                 var sceneRect = AdaptToViewport(GetSceneRect(nextScene), space);
                 
                 Vector2 origin = Center(polygon), destination = Vector2.zero;
@@ -625,7 +631,14 @@ namespace uAdventure.Editor
                         var node = sceneToNode[scene];
                         foreach (var exit in scene.getExitsList().getExits())
                         {
-                            var nextScene = scenes.getScenes()[scenes.getSceneIndexByID(exit.getNextSceneId())];
+                            var index = scenes.getSceneIndexByID(exit.getNextSceneId());
+
+                            // If the exit points to a cutscene it normally is out of the array
+                            if (index < 0 || index >= scenes.getScenes().Count)
+                                continue;
+
+                            var nextScene = scenes.getScenes()[index];
+
                             var t = new Tuple<Node, Node>(node, sceneToNode[nextScene]);
                             if (!present.ContainsKey(t))
                             {
