@@ -32,9 +32,9 @@ namespace uAdventure.Editor
             cutscenesWindowDocumentation = new CutscenesWindowDocumentation(aStartPos, new GUIContent(TC.get("Cutscene.Doc")), "Window");
             cutscenesWindowEndConfiguration = new CutscenesWindowEndConfiguration(aStartPos, new GUIContent(TC.get("Cutscene.CutsceneEnd")), "Window");
 
-            AddTab(TC.get("Cutscene.LookPanelTitle"), CutscenesWindowType.Appearance, cutscenesWindowAppearance);
-            AddTab(TC.get("Cutscene.Documentation"), CutscenesWindowType.Documentation, cutscenesWindowDocumentation);
-            AddTab(TC.get("Cutscene.DialogPanelTitle"), CutscenesWindowType.EndConfiguration, cutscenesWindowEndConfiguration);
+            AddTab(TC.get("Cutscene.App"), CutscenesWindowType.Appearance, cutscenesWindowAppearance);
+            AddTab(TC.get("Cutscene.Doc"), CutscenesWindowType.Documentation, cutscenesWindowDocumentation);
+            AddTab(TC.get("Cutscene.CutsceneEnd"), CutscenesWindowType.EndConfiguration, cutscenesWindowEndConfiguration);
         }
 
         // Two methods responsible for showing right window content 
