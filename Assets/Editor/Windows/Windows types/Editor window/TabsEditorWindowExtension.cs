@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using uAdventure.Core;
-using UnityEditor;
-using UnityEditorInternal;
 using UnityEngine;
 
 namespace uAdventure.Editor
@@ -71,8 +67,6 @@ namespace uAdventure.Editor
             dataControlList.index = -1;
             OpenedWindow = DefaultOpenedWindow != null ? DefaultOpenedWindow : Tabs[0].Value;
         }
-
-        protected override void OnSelect(ReorderableList r) { }
 
         protected abstract void OnDrawMainView(int aID);
     }

@@ -86,8 +86,9 @@ namespace uAdventure.Editor
             /*dataControlList.SetData(Controller.Instance.SelectedChapterDataControl.getScenesList(),
                 sceneList => (sceneList as ScenesListDataControl).getScenes().Cast<DataControl>().ToList());*/
 
+            dataControlList.index = GameRources.GetInstance().selectedSceneIndex;
             // SceneEditor population
-            if(GameRources.GetInstance().selectedSceneIndex != -1)
+            if (GameRources.GetInstance().selectedSceneIndex != -1)
             {
                 var scene = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[GameRources.GetInstance().selectedSceneIndex];
 
@@ -141,7 +142,6 @@ namespace uAdventure.Editor
 
         protected override void OnSelect(ReorderableList r)
         {
-            base.OnSelect(r);
             ShowItemWindowView(r.index);
         }
 
