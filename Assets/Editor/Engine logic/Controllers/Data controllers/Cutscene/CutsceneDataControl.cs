@@ -145,17 +145,18 @@ namespace uAdventure.Editor
         public override int[] getAddableElements()
         {
 
-            //return new int[] { Controller.RESOURCES, Controller.NEXT_SCENE, Controller.END_SCENE };
-            return new int[] { Controller.NEXT_SCENE, Controller.END_SCENE };
+            return new int[] { Controller.RESOURCES, Controller.NEXT_SCENE, Controller.END_SCENE };
         }
 
 
         public override bool canAddElement(int type)
         {
+            switch (type)
+            {
+                case Controller.RESOURCES: return true;
+            }
 
-            bool canAddElement = false;
-
-            return canAddElement;
+            return false;
         }
 
 

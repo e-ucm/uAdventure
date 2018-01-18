@@ -93,17 +93,14 @@ namespace uAdventure.Editor
 
         public override int[] getAddableElements()
         {
-
-            //return new int[] { Controller.RESOURCES };
-            return new int[] { };
+            return new int[] { Controller.RESOURCES };
         }
 
 
         public override bool canAddElement(int type)
         {
-
             // It can always add new resources
-            return false;
+            return type == Controller.RESOURCES;
         }
 
 
