@@ -47,6 +47,11 @@ namespace uAdventure.Editor
             return r;
         }
 
+        protected override void OnButton()
+        {
+            dataControlList.index = -1;
+        }
+
         public override void DrawMenu(Rect rect, GUIStyle style)
         {
             dataControlList.DoList(rect.height);

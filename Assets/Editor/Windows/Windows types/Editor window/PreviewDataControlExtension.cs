@@ -8,14 +8,8 @@ using UnityEngine;
 
 namespace uAdventure.Editor
 {
-    public abstract class PreviewDataControlExtension : DataControlListEditorWindowExtension {
-
-        protected List<KeyValuePair<string, Enum>> Tabs;
-        protected Dictionary<Enum, LayoutWindow> Childs;
-
-        protected Enum OpenedWindow;
-
-        protected Enum DefaultOpenedWindow;
+    public abstract class PreviewDataControlExtension : TabsEditorWindowExtension
+    {
 
         private GUIContent[] displayModes;
         private static int selectedDisplayMode = 0;
@@ -23,12 +17,6 @@ namespace uAdventure.Editor
         private Vector2 scroll;
 
         private GUIStyle scrollBackground;
-        
-        protected void AddTab(string name, Enum identifier, LayoutWindow window)
-        {
-            Tabs.Add(new KeyValuePair<string, Enum> (name, identifier));
-            Childs.Add(identifier, window);
-        }
 
         public PreviewDataControlExtension(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
         {
@@ -42,53 +30,34 @@ namespace uAdventure.Editor
             Childs = new Dictionary<Enum, LayoutWindow>();
 
             scrollBackground = new GUIStyle(GUI.skin.box);
-            //scrollBackground.normal.background.
-            //scrollBackground.normal.background = new Texture2D(1,1);
-            //scrollBackground.normal.background.SetPixel(0, 0, Color.black);
         }
 
-        public override void Draw(int aID)
+        protected override void OnDrawMainView(int aID)
         {
-            if (dataControlList.index < 0)
-            {
-                GUILayout.Space(10);
-                // Tabs menu
-                GUILayout.BeginHorizontal();
-                GUILayout.FlexibleSpace();
-                selectedDisplayMode = GUILayout.Toolbar(selectedDisplayMode, displayModes);
-                GUILayout.FlexibleSpace();
-                GUILayout.EndHorizontal();
+            GUILayout.Space(10);
+            // Tabs menu
+            GUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+            selectedDisplayMode = GUILayout.Toolbar(selectedDisplayMode, displayModes);
+            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
 
-                GUILayout.Space(10);
-                var oldBackgroundColor = GUI.backgroundColor;
-                GUI.backgroundColor = new Color(0.5f,0.5f,0.5f);
-                scroll = EditorGUILayout.BeginScrollView(scroll, scrollBackground, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
-                GUI.backgroundColor = oldBackgroundColor;
-                switch (selectedDisplayMode)
-                {
-                    case 0: Display(1, false); break;
-                    case 1: Display(4, true); break;
-                    case 2: Display(2, true); break;
-                };
-                GUI.backgroundColor = new Color(0.5f, 0.5f, 0.5f);
-                EditorGUILayout.EndScrollView();
-                GUI.backgroundColor = oldBackgroundColor;
-            }
-            else
+            GUILayout.Space(10);
+            var oldBackgroundColor = GUI.backgroundColor;
+            GUI.backgroundColor = new Color(0.5f, 0.5f, 0.5f);
+            scroll = EditorGUILayout.BeginScrollView(scroll, scrollBackground, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+            GUI.backgroundColor = oldBackgroundColor;
+            switch (selectedDisplayMode)
             {
-                // Tabs menu
-                GUILayout.BeginHorizontal();
-                GUILayout.FlexibleSpace();
-                OpenedWindow = Tabs[GUILayout.Toolbar(Tabs.FindIndex(t => t.Value == OpenedWindow), Tabs.ConvertAll(t => t.Key).ToArray(), GUILayout.ExpandWidth(false))].Value;
-                GUILayout.FlexibleSpace();
-                GUILayout.EndHorizontal();
-
-                // Display Window
-                var window = Childs[OpenedWindow];
-                window.Rect = this.Rect;
-                window.Draw(aID);
-            }
+                case 0: Display(1, false); break;
+                case 1: Display(4, true); break;
+                case 2: Display(2, true); break;
+            };
+            GUI.backgroundColor = new Color(0.5f, 0.5f, 0.5f);
+            EditorGUILayout.EndScrollView();
+            GUI.backgroundColor = oldBackgroundColor;
         }
+        
 
         private Dictionary<int, Rect> rects;
 
@@ -191,16 +160,6 @@ namespace uAdventure.Editor
                 window.Rect = this.Rect;
                 window.OnDrawMoreWindows();
             }
-        }
-
-        protected override void OnButton()
-        {
-            dataControlList.index = -1;
-            OpenedWindow = DefaultOpenedWindow != null ? DefaultOpenedWindow : Tabs[0].Value;
-        }
-
-        protected override void OnSelect(ReorderableList r)
-        {
         }
 
         protected abstract void OnDrawMainPreview(Rect rect, int index);

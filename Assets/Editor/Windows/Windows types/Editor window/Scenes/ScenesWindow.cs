@@ -14,7 +14,7 @@ using Microsoft.Msagl.Core.Geometry;
 namespace uAdventure.Editor
 {
     [EditorWindowExtension(10, typeof(Scene))]
-    public class ScenesWindow : DataControlListEditorWindowExtension
+    public class ScenesWindow : TabsEditorWindowExtension
     {
         private enum ScenesWindowType
         {
@@ -27,32 +27,22 @@ namespace uAdventure.Editor
             PlayerMovement
         }
 
-        private static ScenesWindowType openedWindow = ScenesWindowType.Appearance;
-        private static ScenesWindowActiveAreas scenesWindowActiveAreas;
-        private static ScenesWindowAppearance scenesWindowAppearance;
-        private static ScenesWindowDocumentation scenesWindowDocumentation;
-        private static ScenesWindowElementReference scenesWindowElementReference;
-        private static ScenesWindowExits scenesWindowExits;
-        private static ScenesWindowBarriers scenesWindowBarriers;
-        private static ScenesWindowPlayerMovement scenesWindowPlayerMovement;
-
         private static ChapterPreview chapterPreview;
-
-        private static List<bool> toggleList;
-
-        private static GUISkin selectedButtonSkin;
-        private static GUISkin defaultSkin;
 
         private SceneEditor sceneEditor;
 
-        private List<KeyValuePair<string, ScenesWindowType>> tabs;
-
         DataControlList sceneList;
+
+        private void CreateSceneEditorTab<T>(Rect rect, GUIContent title, GUIStyle style, Enum identifier, SceneEditor sceneEditor) where T : LayoutWindow
+        {
+            var sceneEditorTab = (T) Activator.CreateInstance(typeof(T), rect, title, style, sceneEditor, new GUILayoutOption[0]);
+            sceneEditorTab.OnRequestRepaint = () => Repaint();
+            AddTab(title.text, identifier, sceneEditorTab);
+        }
 
         public ScenesWindow(Rect rect, GUIStyle style, params GUILayoutOption[] options)
             : base(rect, new GUIContent(TC.get("Element.Name1")), style, options)
         {
-
             var content = new GUIContent();
 
             new RectangleComponentEditor(Rect.zero, new GUIContent(""), style);
@@ -64,63 +54,42 @@ namespace uAdventure.Editor
 
             sceneEditor = new SceneEditor();
 
-            RequestRepaint repaint = () => Repaint();
-
-            // Windows
-            scenesWindowActiveAreas = new ScenesWindowActiveAreas(rect,
-                new GUIContent(TC.get("ActiveAreasList.Title")), "Window", sceneEditor);
-            scenesWindowActiveAreas.OnRequestRepaint = repaint;
-            scenesWindowAppearance = new ScenesWindowAppearance(rect, new GUIContent(TC.get("Scene.LookPanelTitle")),
-                "Window", sceneEditor);
-            scenesWindowAppearance.OnRequestRepaint = repaint;
-            scenesWindowDocumentation = new ScenesWindowDocumentation(rect,
-                new GUIContent(TC.get("Scene.DocPanelTitle")), "Window", sceneEditor);
-            scenesWindowDocumentation.OnRequestRepaint = repaint;
-            scenesWindowElementReference = new ScenesWindowElementReference(rect,
-                new GUIContent(TC.get("ItemReferencesList.Title")), "Window", sceneEditor);
-            scenesWindowElementReference.OnRequestRepaint = repaint;
-            scenesWindowExits = new ScenesWindowExits(rect, new GUIContent(TC.get("Element.Name3")), "Window", sceneEditor);
-            scenesWindowExits.OnRequestRepaint = repaint;
-
+            // Chapter preview subwindow
             chapterPreview = new ChapterPreview(rect, new GUIContent(""), "Window");
-            chapterPreview.OnRequestRepaint = repaint;
+            chapterPreview.OnRequestRepaint = () => Repaint();
             chapterPreview.OnSelectElement += (scene) =>
             {
                 var index = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes().FindIndex(s => s == scene as SceneDataControl);
                 ShowItemWindowView(index);
             };
 
-            scenesWindowBarriers = new ScenesWindowBarriers(rect, new GUIContent(TC.get("BarriersList.Title")), "Window", sceneEditor);
-            scenesWindowPlayerMovement = new ScenesWindowPlayerMovement(rect, new GUIContent(TC.get("Trajectory.Title")), "Window", sceneEditor);
-
-            tabs = new List<KeyValuePair<string, ScenesWindowType>>()
-                {
-                    new KeyValuePair<string, ScenesWindowType>(TC.get("Scene.LookPanelTitle"),      ScenesWindowType.Appearance),
-                    new KeyValuePair<string, ScenesWindowType>(TC.get("Scene.DocPanelTitle"),       ScenesWindowType.Documentation),
-                    new KeyValuePair<string, ScenesWindowType>(TC.get("ItemReferencesList.Title"),  ScenesWindowType.ElementRefrence),
-                    new KeyValuePair<string, ScenesWindowType>(TC.get("ActiveAreasList.Title"),     ScenesWindowType.ActiveAreas),
-                    new KeyValuePair<string, ScenesWindowType>(TC.get("Element.Name3"),             ScenesWindowType.Exits)
-                };
+            // Windows
+            CreateSceneEditorTab<ScenesWindowAppearance>(rect, new GUIContent(TC.get("Scene.LookPanelTitle")), "Window", ScenesWindowType.Appearance, sceneEditor);
+            CreateSceneEditorTab<ScenesWindowDocumentation>(rect, new GUIContent(TC.get("Scene.DocPanelTitle")), "Window", ScenesWindowType.Documentation, sceneEditor);
+            CreateSceneEditorTab<ScenesWindowElementReference>(rect, new GUIContent(TC.get("ItemReferencesList.Title")), "Window", ScenesWindowType.ElementRefrence, sceneEditor);
+            CreateSceneEditorTab<ScenesWindowActiveAreas>(rect, new GUIContent(TC.get("ActiveAreasList.Title")), "Window", ScenesWindowType.ActiveAreas, sceneEditor);
+            CreateSceneEditorTab<ScenesWindowExits>(rect, new GUIContent(TC.get("Element.Name3")), "Window", ScenesWindowType.Exits, sceneEditor);
+            
             if (Controller.Instance.playerMode() == DescriptorData.MODE_PLAYER_3RDPERSON)
             {
-                tabs.Add(new KeyValuePair<string, ScenesWindowType>(TC.get("BarriersList.Title"), ScenesWindowType.Barriers));
-                tabs.Add(new KeyValuePair<string, ScenesWindowType>(TC.get("Trajectory.Title"), ScenesWindowType.PlayerMovement));
+                CreateSceneEditorTab<ScenesWindowBarriers>(rect, new GUIContent(TC.get("BarriersList.Title")), "Window", ScenesWindowType.Barriers, sceneEditor);
+                CreateSceneEditorTab<ScenesWindowPlayerMovement>(rect, new GUIContent(TC.get("ActiveAreasList.Title")), "Window", ScenesWindowType.PlayerMovement, sceneEditor);
             }
 
-            selectedButtonSkin = (GUISkin)Resources.Load("Editor/ButtonSelected", typeof(GUISkin));
+            DefaultOpenedWindow = ScenesWindowType.Appearance;
+            OpenedWindow = ScenesWindowType.Appearance;
         }
 
 
         public override void Draw(int aID)
         {
-            dataControlList.SetData(Controller.Instance.SelectedChapterDataControl.getScenesList(),
-                sceneList => (sceneList as ScenesListDataControl).getScenes().Cast<DataControl>().ToList());
+            /*dataControlList.SetData(Controller.Instance.SelectedChapterDataControl.getScenesList(),
+                sceneList => (sceneList as ScenesListDataControl).getScenes().Cast<DataControl>().ToList());*/
 
-            // Show information of concrete item
-            if (GameRources.GetInstance().selectedSceneIndex != -1)
+            // SceneEditor population
+            if(GameRources.GetInstance().selectedSceneIndex != -1)
             {
                 var scene = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[GameRources.GetInstance().selectedSceneIndex];
-               
 
                 sceneEditor.Components = EditorWindowBase.Components;
                 var allElements = new List<DataControl>();
@@ -142,97 +111,17 @@ namespace uAdventure.Editor
 
                 }
                 sceneEditor.elements = allElements;
-
-                /**
-                 UPPER MENU
-                */
-                GUILayout.BeginHorizontal();
-                GUILayout.FlexibleSpace();
-                openedWindow = tabs[GUILayout.Toolbar(tabs.FindIndex(t => t.Value == openedWindow), tabs.ConvertAll(t => t.Key).ToArray(), GUILayout.ExpandWidth(false))].Value;
-                GUILayout.FlexibleSpace();
-                GUILayout.EndHorizontal();
-
-                switch (openedWindow)
-                {
-                    case ScenesWindowType.ActiveAreas:
-                        scenesWindowActiveAreas.Rect = this.Rect;
-                        scenesWindowActiveAreas.Draw(aID);
-                        break;
-                    case ScenesWindowType.Appearance:
-                        scenesWindowAppearance.Rect = this.Rect;
-                        scenesWindowAppearance.Draw(aID);
-                        break;
-                    case ScenesWindowType.Documentation:
-                        scenesWindowDocumentation.Rect = this.Rect;
-                        scenesWindowDocumentation.Draw(aID);
-                        break;
-                    case ScenesWindowType.ElementRefrence:
-                        scenesWindowElementReference.Rect = this.Rect;
-                        scenesWindowElementReference.Draw(aID);
-                        break;
-                    case ScenesWindowType.Exits:
-                        scenesWindowExits.Rect = this.Rect;
-                        scenesWindowExits.Draw(aID);
-                        break;
-                    case ScenesWindowType.Barriers:
-                        scenesWindowBarriers.Rect = this.Rect;
-                        scenesWindowBarriers.Draw(aID);
-                        break;
-                    case ScenesWindowType.PlayerMovement:
-                        scenesWindowPlayerMovement.Rect = this.Rect;
-                        scenesWindowPlayerMovement.Draw(aID);
-                        break;
-                }
             }
-            // Show information of whole scenes (global-scene view)
-            else
-            {
-                chapterPreview.Rect = this.Rect;
-                chapterPreview.Draw(aID);
-            }
+
+            // Send the callback back
+            base.Draw(aID);
         }
-
-        public override void OnDrawMoreWindows()
+        
+        protected override void OnDrawMainView(int aID)
         {
-            if (GameRources.GetInstance().selectedSceneIndex != -1)
-            {
-                switch (openedWindow)
-                {
-                    case ScenesWindowType.ActiveAreas:
-                        scenesWindowActiveAreas.OnDrawMoreWindows();
-                        break;
-                    case ScenesWindowType.Appearance:
-                        scenesWindowAppearance.OnDrawMoreWindows();
-                        break;
-                    case ScenesWindowType.Documentation:
-                        scenesWindowDocumentation.OnDrawMoreWindows();
-                        break;
-                    case ScenesWindowType.ElementRefrence:
-                        scenesWindowElementReference.OnDrawMoreWindows();
-                        break;
-                    case ScenesWindowType.Exits:
-                        scenesWindowExits.OnDrawMoreWindows();
-                        break;
-                    case ScenesWindowType.Barriers:
-                        scenesWindowBarriers.OnDrawMoreWindows();
-                        break;
-                    case ScenesWindowType.PlayerMovement:
-                        scenesWindowPlayerMovement.OnDrawMoreWindows();
-                        break;
-                }
-            }
-            else
-            {
-                chapterPreview.OnDrawMoreWindows();
-            }
-
+            chapterPreview.Rect = this.Rect;
+            chapterPreview.Draw(aID);
         }
-
-        void OnWindowTypeChanged(ScenesWindowType type_)
-        {
-            openedWindow = type_;
-        }
-
 
         // Two methods responsible for showing right window content 
         // - concrete item info or base window view
@@ -252,11 +141,13 @@ namespace uAdventure.Editor
 
         protected override void OnSelect(ReorderableList r)
         {
+            base.OnSelect(r);
             ShowItemWindowView(r.index);
         }
 
         protected override void OnButton()
         {
+            base.OnButton();
             ShowBaseWindowView();
 
             dataControlList.SetData(Controller.Instance.SelectedChapterDataControl.getScenesList(),
