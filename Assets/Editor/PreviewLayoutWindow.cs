@@ -39,8 +39,8 @@ namespace uAdventure.Editor
         /** Callback delegate for the update */
         private EditorApplication.CallbackFunction callback = null;
         
-        private Rect windowRect;
-        private Rect previewRect;
+        private static Rect windowRect; 
+        private static Rect previewRect;
 
         private Vector3 velocity;
         private float time = 1f;
@@ -97,16 +97,28 @@ namespace uAdventure.Editor
         // ######################## MAIN FUNCTIONS ########################
 
         /** Update is called from the UnityEditor and is used to move (animating) the preview inspector inside of the window */
+        private int checkMouse = 0;
         protected virtual void ApplicationUpdate()
         {
-            if (Vector3.Distance(PreviewInspectorPosition, TargetPreviewInspectorPosition) > 1.5f)
+            if (Dragging)
             {
-                PreviewInspectorPosition = Vector3.SmoothDamp(PreviewInspectorPosition, TargetPreviewInspectorPosition, ref velocity, time, 50f, Time.deltaTime);
+                // Fix for releasing mouse button outside of the window
+                if (GUIUtility.hotControl == 0)
+                {
+                    Dragging = false;
+                }
             }
             else
             {
-                DoUpdate = false;
-                velocity = Vector3.zero;
+                if (Vector3.Distance(PreviewInspectorPosition, TargetPreviewInspectorPosition) > 1.5f)
+                {
+                    PreviewInspectorPosition = Vector3.SmoothDamp(PreviewInspectorPosition, TargetPreviewInspectorPosition, ref velocity, time, 50f, Time.deltaTime);
+                }
+                else
+                {
+                    DoUpdate = false;
+                    velocity = Vector3.zero;
+                }
             }
         }
 
@@ -125,18 +137,35 @@ namespace uAdventure.Editor
             DrawInspector();
 
             DrawPreviewHeader();
-            Rect promptedRect = Rect.zero;
             var auxRect = EditorGUILayout.BeginVertical("preBackground", GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
             {
-                GUILayout.BeginArea(areaRect);
-                promptedRect = auxRect;
-                auxRect.position = Vector2.zero;
-                GUILayout.BeginHorizontal();
+
+                if (Event.current.type == EventType.Repaint)
                 {
+                    areaRect = auxRect;
+
+                    auxRect.position = Vector2.zero;
                     auxRect.x += 30; auxRect.width -= 60;
                     auxRect.y += 30; auxRect.height -= 60;
 
-                    var viewport = new Rect(auxRect);
+                    previewRect = auxRect;
+                    //previewRect.position += areaRect.position;
+
+                    if (!windowInited)
+                    {
+                        // If no initial position, we move it to the bottom right
+                        windowRect.position = GetCorners(windowRect, previewRect)[Corner.BottomRight];
+                        windowInited = true;
+                    }
+                }
+
+                GUILayout.BeginArea(areaRect);
+                GUILayout.BeginHorizontal();
+                {
+                    BeginWindows();
+
+                    var viewport = new Rect(previewRect);
+
 
                     if (HasToDrawPreviewInspector())
                     {
@@ -164,101 +193,75 @@ namespace uAdventure.Editor
                     }
 
                     DrawPreview(viewport);
+
+                    if (HasToDrawPreviewInspector())
+                    {
+                        // Change the skin to the scene skin to draw it black
+                        var prevSkin = GUI.skin;
+                        GUI.skin = sceneSkin;
+
+                        var prevType = Event.current.type;
+
+                        windowRect.height = Mathf.Clamp(windowRect.height, 0, 500f);
+                        // Create the preview inspector window
+                        var newWindowRect = GUILayout.Window(9999, windowRect, (i) =>
+                        {
+                            if (Event.current.type == EventType.Layout) useScroll = windowRect.height >= 500f;
+
+                            if (useScroll) scroll = EditorGUILayout.BeginScrollView(scroll, GUILayout.Height(500f));
+                            DrawPreviewInspector();
+                            if (useScroll) EditorGUILayout.EndScrollView();
+
+                            var prevHot = GUIUtility.hotControl;
+                            GUI.DragWindow();
+                            if(prevHot != GUIUtility.hotControl)
+                            {
+                                Dragging = true;
+                                DoUpdate = true;
+                            }
+
+                        }, "Properties", sceneSkin.window)
+                        .TrapInside(previewRect);
+
+
+                        // And then, we update the position
+                        windowRect = newWindowRect;
+
+                        // We obtain the corner it should be
+                        var corner = GetDesiredCorner(windowRect, previewRect);
+                        TargetPreviewInspectorPosition = corner.Value;
+
+                        GUI.BringWindowToFront(9999);
+
+                        // If its doing any update its because its being animated
+                        if (DoUpdate)
+                        {
+                            this.OnRequestRepaint();
+                        }
+                        else if (!Dragging)
+                        {
+                            // Otherwise, we just fix the window in the desired corner until it's moved
+                            windowRect.position = corner.Value;
+                        }
+
+                        // Restore the previous skin
+                        GUI.skin = prevSkin;
+                    }
+                    
+                    EndWindows();
                 }
                 GUILayout.EndHorizontal();
                 GUILayout.EndArea();
             }
-
-            if(Event.current.type == EventType.Repaint)
-            {
-                areaRect = promptedRect;
-                previewRect = auxRect;
-                previewRect.position += m_Rect.position + promptedRect.position;
-
-                if (!windowInited)
-                {
-                    // If no initial position, we move it to the bottom right
-                    windowRect.position = GetCorners(windowRect, previewRect)[Corner.BottomRight];
-                    windowInited = true;
-                }
-            }
-
+            
             EditorGUILayout.EndVertical();
+            
         }
 
         private Vector2 scroll;
 
         private bool useScroll = false;
-
-        /** Called when the EditorWindowBase allows for the creation of more windows => Used to draw the preview inspector */
-        public override void OnDrawMoreWindows()
-        {
-            if (HasToDrawPreviewInspector())
-            {
-                // Change the skin to the scene skin to draw it black
-                var prevSkin = GUI.skin;
-                GUI.skin = sceneSkin;
-
-                var prevType = Event.current.type;
-
-                windowRect.height = Mathf.Clamp(windowRect.height, 0, 500f);
-                // Create the preview inspector window
-                var newWindowRect = GUILayout.Window(9999, windowRect, (i) =>
-                {
-                    if (Event.current.type == EventType.Layout) useScroll = windowRect.height >= 500f;
-                    
-                    if (Dragging && Event.current.type == EventType.MouseUp)
-                    {
-                        Dragging = false;
-                        DoUpdate = true;
-                    }
-
-                    if (useScroll) scroll = EditorGUILayout.BeginScrollView(scroll, GUILayout.Height(500f));
-
-                    DrawPreviewInspector();
-
-                    if (useScroll) EditorGUILayout.EndScrollView();
-
-                    if (!DoUpdate) GUI.DragWindow();
-
-                }, "Properties", sceneSkin.window)
-                .TrapInside(previewRect);
-                // If the position has moved, it has been moved by the user
-                if (windowRect.position != newWindowRect.position)
-                {
-                    if(Event.current.type != EventType.Layout && Event.current.type != EventType.Repaint)
-                    {
-                        Dragging = true;
-                    }
-                }
-
-
-                // And then, we update the position
-                windowRect = newWindowRect;
-
-                // We obtain the corner it should be
-                var corner = GetDesiredCorner(windowRect, previewRect);
-                TargetPreviewInspectorPosition = corner.Value;
-
-                GUI.BringWindowToFront(9999);
-
-                // If its doing any update its because its being animated
-                if (DoUpdate)
-                {
-                    this.OnRequestRepaint();
-                }
-                else if(!Dragging)
-                {
-                   // Otherwise, we just fix the window in the desired corner until it's moved
-                   windowRect.position = corner.Value;
-                }
-
-                // Restore the previous skin
-                GUI.skin = prevSkin;
-            }
-
-        }
-
+        
         /** Called to draw the content before the preview area */
         protected virtual void DrawInspector() { }
 

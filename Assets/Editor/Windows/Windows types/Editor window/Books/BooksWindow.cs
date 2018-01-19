@@ -38,7 +38,7 @@ namespace uAdventure.Editor
             booksWindowContents = new BooksWindowContents(aStartPos, new GUIContent(TC.get("Book.Contents")), "Window");
             booksWindowDocumentation = new BooksWindowDocumentation(aStartPos, new GUIContent(TC.get("Book.Documentation")), "Window");
 
-            RequestRepaint requestRepaint = () => OnRequestRepaint();
+            VoidMethodDelegate requestRepaint = () => OnRequestRepaint();
             booksWindowAppearance.OnRequestRepaint += requestRepaint;
             booksWindowContents.OnRequestRepaint += requestRepaint;
             booksWindowDocumentation.OnRequestRepaint += requestRepaint;
@@ -115,25 +115,6 @@ namespace uAdventure.Editor
 
                     GUILayout.EndHorizontal();
 
-                }
-            }
-        }
-
-        public override void OnDrawMoreWindows()
-        {
-            if (isConcreteItemVisible)
-            {
-                switch (openedWindow)
-                {
-                    case BookWindowType.Appearance:
-                        booksWindowAppearance.OnDrawMoreWindows();
-                        break;
-                    case BookWindowType.Documentation:
-                        booksWindowDocumentation.OnDrawMoreWindows();
-                        break;
-                    case BookWindowType.Content:
-                        booksWindowContents.OnDrawMoreWindows();
-                        break;
                 }
             }
         }

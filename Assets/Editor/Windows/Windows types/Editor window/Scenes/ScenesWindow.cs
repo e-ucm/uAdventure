@@ -57,6 +57,8 @@ namespace uAdventure.Editor
             // Chapter preview subwindow
             chapterPreview = new ChapterPreview(rect, new GUIContent(""), "Window");
             chapterPreview.OnRequestRepaint = () => Repaint();
+            chapterPreview.BeginWindows = () => BeginWindows();
+            chapterPreview.EndWindows = () => EndWindows();
             chapterPreview.OnSelectElement += (scene) =>
             {
                 var index = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes().FindIndex(s => s == scene as SceneDataControl);

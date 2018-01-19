@@ -190,7 +190,9 @@ namespace uAdventure.Editor
 					e.Options = ops;
 					e.OnRequestMainView += (thisWindowReference as EditorWindowBase).RequestMainView;
 					e.OnRequestRepaint += thisWindowReference.Repaint;
-				}   
+                    e.BeginWindows = () => thisWindowReference.BeginWindows();
+                    e.EndWindows = () => thisWindowReference.EndWindows();
+                }   
 			}
 		}
 
@@ -268,7 +270,6 @@ namespace uAdventure.Editor
             //GUI.BeginGroup(windowArea);
             if (Controller.Instance.Loaded)
             {
-                BeginWindows();
                 //extensionSelected.OnGUI();
 
                 switch (openedWindow)
@@ -284,23 +285,16 @@ namespace uAdventure.Editor
 
                 if (m_Window != null)
                 {
-                    //leftMenuRect
-                    m_Window.OnGUI();
                     if (Event.current.type == EventType.Repaint)
                     {
                         if (m_Window.Rect != windowArea)
                         {
-                            // We first draw it with the old size to make the window respond the size change
-                            m_Window.OnGUI();
                             m_Window.Rect = windowArea;
+                            extensions.ForEach(e => e.Rect = windowArea);
                         }
-                        extensions.ForEach(e => e.Rect = windowArea);
                     }
-
                     m_Window.OnGUI();
-                    m_Window.OnDrawMoreWindows();
                 }
-                EndWindows();
             }
             else
             {
@@ -320,7 +314,7 @@ namespace uAdventure.Editor
                 }
             }
             
-            //GUI.EndGroup();
+            //GUI.EndGroup(); 
             EditorGUILayout.EndVertical();
             EditorGUILayout.EndHorizontal();
         }

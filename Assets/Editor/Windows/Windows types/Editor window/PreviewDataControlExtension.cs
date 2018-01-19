@@ -151,17 +151,6 @@ namespace uAdventure.Editor
             return content.getId();
         }
 
-        public override void OnDrawMoreWindows()
-        {
-            if (OpenedWindow != null)
-            {
-                // Display Window
-                var window = Childs[OpenedWindow];
-                window.Rect = this.Rect;
-                window.OnDrawMoreWindows();
-            }
-        }
-
         protected abstract void OnDrawMainPreview(Rect rect, int index);
     }
 }

@@ -21,7 +21,7 @@ namespace uAdventure.Editor
 
         public override void Draw(int aID)
         {
-            if (dataControlList.index < 0)
+            if (dataControlList.index < 0 || Tabs.Count == 0)
             {
                 OnDrawMainView(aID);
             }
@@ -44,20 +44,12 @@ namespace uAdventure.Editor
         private Dictionary<int, Rect> rects;
         
 
-        public override void OnDrawMoreWindows()
-        {
-            if (OpenedWindow != null)
-            {
-                // Display Window
-                var window = Childs[OpenedWindow];
-                window.Rect = this.Rect;
-                window.OnDrawMoreWindows();
-            }
-        }
-
         protected void AddTab(string name, Enum identifier, LayoutWindow window)
         {
             Tabs.Add(new KeyValuePair<string, Enum>(name, identifier));
+            window.OnRequestRepaint = () => OnRequestRepaint();
+            window.BeginWindows = () => BeginWindows();
+            window.EndWindows = () => EndWindows();
             Childs.Add(identifier, window);
         }
 
