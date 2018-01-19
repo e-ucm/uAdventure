@@ -130,6 +130,8 @@ namespace uAdventure.Editor
 
             Color lineColor = Color.red;
             var rectangleArea = Target as RectangleArea;
+
+
             var points = WorldToViewport(GetPoints(rectangleArea), SceneEditor.Current.Viewport, SceneEditor.Current.Size.x, SceneEditor.Current.Size.y);
 
             switch (Event.current.type)
@@ -143,16 +145,17 @@ namespace uAdventure.Editor
             int rectCornerChanged = -1;
             foreach (var point in points)
             {
-                switch (Event.current.type)
+                var pointControlId = GUIUtility.GetControlID("Rectangle Point".GetHashCode(), FocusType.Passive, new Rect(point, new Vector2(10,10)));
+                switch (Event.current.GetTypeForControl(pointControlId))
                 {
                     case EventType.Repaint: if (rectangleArea.isRectangular()) HandleUtil.DrawSquare(point, 10f, Color.yellow, Color.black); else HandleUtil.DrawPoint(point, 4.5f, Color.cyan, Color.black); break;
                     case EventType.MouseDown:
                         switch (ActionSelected)
                         {
                             case 0:
-                                if ((point - Event.current.mousePosition).magnitude < 10)
+                                if (GUIUtility.hotControl == 0 && (point - Event.current.mousePosition).magnitude < 10)
                                 {
-                                    GUIUtility.hotControl = rectangleArea.GetHashCode() + index;
+                                    GUIUtility.hotControl = pointControlId;
                                     Event.current.Use();
                                 }
                                 break;
@@ -166,7 +169,7 @@ namespace uAdventure.Editor
                         }
                         break;
                     case EventType.MouseDrag:
-                        if (GUIUtility.hotControl == rectangleArea.GetHashCode() + index)
+                        if (GUIUtility.hotControl == pointControlId)
                         {
                             points[index - 1].x += Event.current.delta.x;
                             points[index - 1].y += Event.current.delta.y;
@@ -176,7 +179,7 @@ namespace uAdventure.Editor
                         }
                         break;
                     case EventType.MouseUp:
-                        if (GUIUtility.hotControl == rectangleArea.GetHashCode() + index)
+                        if (GUIUtility.hotControl == pointControlId)
                         {
                             GUIUtility.hotControl = 0;
                             Event.current.Use();
@@ -186,15 +189,16 @@ namespace uAdventure.Editor
                 index++;
             }
 
-            switch (Event.current.type)
+            var rectangleControlID = GUIUtility.GetControlID("Rectangle".GetHashCode(), FocusType.Passive);
+            switch (Event.current.GetTypeForControl(rectangleControlID))
             {
                 case EventType.MouseDown:
                     switch (ActionSelected)
                     {
                         case 0:
-                            if (Inside(points, Event.current.mousePosition))
+                            if (GUIUtility.hotControl == 0 && Inside(points, Event.current.mousePosition))
                             {
-                                GUIUtility.hotControl = rectangleArea.GetHashCode();
+                                GUIUtility.hotControl = rectangleControlID;
                                 Event.current.Use();
                             }
                             break;
@@ -211,7 +215,7 @@ namespace uAdventure.Editor
                     }
                     break;
                 case EventType.MouseDrag:
-                    if (GUIUtility.hotControl == rectangleArea.GetHashCode())
+                    if (GUIUtility.hotControl == rectangleControlID)
                     {
                         points = points.Select(p => p + Event.current.delta).ToArray();
                         pointsChanged = true;
@@ -219,7 +223,7 @@ namespace uAdventure.Editor
                     }
                     break;
                 case EventType.MouseUp:
-                    if (GUIUtility.hotControl == rectangleArea.GetHashCode())
+                    if (GUIUtility.hotControl == rectangleControlID)
                     {
                         GUIUtility.hotControl = 0;
                         Event.current.Use();
