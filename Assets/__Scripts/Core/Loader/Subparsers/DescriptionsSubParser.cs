@@ -19,21 +19,21 @@ namespace uAdventure.Core
 
 			if(name != null)
             {
-				string soundPath = name.GetAttribute("soundPath") ?? "";
+				string soundPath = name.GetAttribute("soundPath");
                 description.setNameSoundPath(soundPath);
 				description.setName(name.InnerText);
             }
 
 			if(brief != null)
 			{
-				string soundPath = brief.GetAttribute("soundPath") ?? "";
+				string soundPath = brief.GetAttribute("soundPath");
                 description.setDescriptionSoundPath(soundPath);
 				description.setDescription(brief.InnerText);
 			}
 
 			if(detailed != null)
 			{
-				string soundPath = detailed.GetAttribute("soundPath") ?? "";
+				string soundPath = detailed.GetAttribute("soundPath");
                 description.setDetailedDescriptionSoundPath(soundPath);
 				description.setDetailedDescription(detailed.InnerText);
             }

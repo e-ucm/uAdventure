@@ -15,9 +15,9 @@ namespace uAdventure.Core
 
             var completable = new Completable();
 
-			completable.setId(element.GetAttribute("id") ?? "");
+			completable.setId(element.GetAttribute("id"));
 
-            switch (element.GetAttribute("type") ?? "")
+            switch (element.GetAttribute("type"))
             {
                 case "combat": completable.setType(Completable.TYPE_COMBAT); break;
                 case "completable": completable.setType(Completable.TYPE_COMPLETABLE); break;

@@ -42,7 +42,7 @@ namespace uAdventure.Core
 
                 string tmpArgVal;
 
-                XmlNode animationNode = element.SelectSingleNode("/animation");
+                XmlElement animationNode = element.SelectSingleNode("/animation") as XmlElement;
 
                 tmpArgVal = animationNode.Attributes["id"].Value;
                 if (!string.IsNullOrEmpty(tmpArgVal))
@@ -52,8 +52,8 @@ namespace uAdventure.Core
                     animation.getTransitions().Clear();
                 }
 
-                animation.setSlides("yes".Equals(animationNode.Attributes["slides"].Value));
-                animation.setUseTransitions("yes".Equals(animationNode.Attributes["usetransitions"].Value));
+                animation.setSlides(ExString.EqualsDefault(animationNode.GetAttribute("slides"), "yes", false));
+                animation.setUseTransitions(ExString.EqualsDefault(animationNode.GetAttribute("usetransitions"),"yes", false));
 
                 if (element.SelectSingleNode("documentation") != null)
                     animation.setDocumentation(element.SelectSingleNode("documentation").InnerText);

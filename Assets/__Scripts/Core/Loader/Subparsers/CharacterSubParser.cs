@@ -38,7 +38,7 @@ namespace uAdventure.Core
 			// CONVERSATIONS
 			foreach (XmlElement conversation in element.SelectNodes("conversation-ref"))
 			{
-				string idTarget = conversation.GetAttribute("idTarget") ?? "";
+				string idTarget = conversation.GetAttribute("idTarget");
 
 				var conversationReference = new ConversationReference(idTarget);
 				conversationReference.setConditions(
@@ -85,7 +85,7 @@ namespace uAdventure.Core
             if (voice != null)
             {
                 npc.setAlwaysSynthesizer(ExString.EqualsDefault(voice.GetAttribute("synthesizeAlways"), "yes", npc.isAlwaysSynthesizer()));
-                npc.setVoice(voice.GetAttribute("name") ?? "");
+                npc.setVoice(voice.GetAttribute("name"));
             }
         }
     }

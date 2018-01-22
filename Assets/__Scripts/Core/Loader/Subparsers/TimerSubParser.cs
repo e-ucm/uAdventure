@@ -10,17 +10,17 @@ namespace uAdventure.Core
 	{
 		public object DOMParse(XmlElement element, params object[] parameters)
         {
-			string time = element.GetAttribute("time") ?? "";
-			string displayName = element.GetAttribute("displayName") ?? "timer";
+			string time = element.GetAttribute("time");
+			string displayName    = ExString.Default(element.GetAttribute("displayName"), "timer");
+            
+            bool usesEndCondition = ExString.EqualsDefault(element.GetAttribute("usesEndCondition"), "yes", true);
+			bool runsInLoop 	  = ExString.EqualsDefault(element.GetAttribute("runsInLoop"), "yes", true);
+            bool multipleStarts   = ExString.EqualsDefault(element.GetAttribute("multipleStarts"), "yes", true);
+            bool showTime 		  = ExString.EqualsDefault(element.GetAttribute("showTime"), "yes", false);
+            bool countDown 		  = ExString.EqualsDefault(element.GetAttribute("countDown"), "yes", false);
+            bool showWhenStopped  = ExString.EqualsDefault(element.GetAttribute("showWhenStopped"), "yes", false);
 
-			bool usesEndCondition = "yes".Equals(element.GetAttribute("usesEndCondition") ?? "yes");
-			bool runsInLoop 	  = "yes".Equals(element.GetAttribute("runsInLoop")       ?? "yes");
-			bool multipleStarts   = "yes".Equals(element.GetAttribute("multipleStarts")   ?? "yes");
-			bool showTime 		  = "yes".Equals(element.GetAttribute("showTime"));
-			bool countDown 		  = "yes".Equals(element.GetAttribute("countDown"));
-			bool showWhenStopped  = "yes".Equals(element.GetAttribute("showWhenStopped"));
-
-			Timer timer = new Timer(long.Parse(time));
+            Timer timer = new Timer(long.Parse(time));
             timer.setRunsInLoop(runsInLoop);
             timer.setUsesEndCondition(usesEndCondition);
             timer.setMultipleStarts(multipleStarts);

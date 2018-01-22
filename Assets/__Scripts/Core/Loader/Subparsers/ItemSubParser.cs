@@ -12,7 +12,7 @@ namespace uAdventure.Core
     {
 		public object DOMParse(XmlElement element, params object[] parameters)
         {
-			Item parsedObject = new Item(element.GetAttribute("id") ?? "");
+			Item parsedObject = new Item(element.GetAttribute("id"));
 
             if (element.SelectSingleNode("documentation") != null)
                 parsedObject.setDocumentation(element.SelectSingleNode("documentation").InnerText);
@@ -23,7 +23,7 @@ namespace uAdventure.Core
 				default: parsedObject.setBehaviour(Item.BehaviourType.NORMAL); break;
 			}
 
-			parsedObject.setReturnsWhenDragged("yes".Equals (element.GetAttribute("returnsWhenDragged") ?? "yes"));
+            parsedObject.setReturnsWhenDragged(ExString.EqualsDefault(element.GetAttribute("returnsWhenDragged"), "yes", true));
 			parsedObject.setResourcesTransitionTime(ExParsers.ParseDefault(element.GetAttribute("resources-transition-time"), 0L));
 
 			// RESOURCES

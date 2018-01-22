@@ -10,13 +10,13 @@ namespace uAdventure.Core
 		public object DOMParse(XmlElement element, params object[] parameters)
 		{
 			var r = new ResourcesUni();
-			r.setName(element.GetAttribute("name") ?? "");
+			r.setName(element.GetAttribute("name"));
 
 			foreach (XmlElement asset in element.SelectNodes("asset"))
 			{
 				r.addAsset(
-					asset.GetAttribute("type") ?? "", 
-					asset.GetAttribute("uri") ?? "");
+					asset.GetAttribute("type"), 
+					asset.GetAttribute("uri"));
 			}
 
 			r.setConditions(DOMParserUtility.DOMParse<Conditions>(element.SelectSingleNode("condition"), parameters) ?? new Conditions());

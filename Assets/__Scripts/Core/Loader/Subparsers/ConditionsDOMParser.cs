@@ -74,7 +74,7 @@ namespace uAdventure.Core
 				break;
 			}
 
-			var flag = element.GetAttribute ("flag") ?? "";
+			var flag = element.GetAttribute ("flag");
 			chapter.addFlag (flag);
 			return new FlagCondition(flag,state);
 		}
@@ -107,7 +107,7 @@ namespace uAdventure.Core
 			// The var
 			string variable = element.GetAttribute("var");
 			// The value
-			int value = int.Parse(element.GetAttribute("value") ?? "0");
+			int value = ExParsers.ParseDefault(element.GetAttribute("value"), (int) 0);
 
 			chapter.addVar (variable);
 			return new VarCondition (variable, state, value);
@@ -118,8 +118,7 @@ namespace uAdventure.Core
 			// Id
 			string id =  element.GetAttribute("id");
 			// VALUE WAS ADDED IN EAD1.4 - It allows negating a global state
-			string val = element.GetAttribute("value");
-			bool value = "true".Equals (val != null ? val.ToLower() : val);
+			bool value = ExString.EqualsDefault(element.GetAttribute("value"), "yes", false);
 			return new GlobalStateCondition(id,	value ? GlobalStateCondition.GS_SATISFIED : GlobalStateCondition.GS_NOT_SATISFIED);
 		}
     }

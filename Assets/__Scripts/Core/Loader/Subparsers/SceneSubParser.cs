@@ -42,8 +42,8 @@ namespace uAdventure.Core
         {
 			var chapter = parameters [0] as Chapter;
 
-			string sceneId = element.GetAttribute("id") ?? "";
-			bool initialScene = "yes".Equals (element.GetAttribute("start"));
+			string sceneId = element.GetAttribute("id");
+			bool initialScene = ExString.EqualsDefault(element.GetAttribute("start"), "yes", false);
 			int playerLayer = ExParsers.ParseDefault (element.GetAttribute("playerLayer"), -1);
 			float playerScale = ExParsers.ParseDefault (element.GetAttribute("playerScale"), CultureInfo.InvariantCulture, 1.0f);
 
@@ -62,8 +62,8 @@ namespace uAdventure.Core
 				scene.setDocumentation(documentation.InnerText);
 
 			//XAPI ELEMENTS
-			scene.setXApiClass(element.GetAttribute("class") ?? "");
-			scene.setXApiType(element.GetAttribute("type") ?? "");
+			scene.setXApiClass(element.GetAttribute("class"));
+			scene.setXApiType(element.GetAttribute("type"));
             //END OF XAPI
 
 			foreach(var res in DOMParserUtility.DOMParse <ResourcesUni> (element.SelectNodes("resources"), parameters))
@@ -85,21 +85,21 @@ namespace uAdventure.Core
 					width 			= ExParsers.ParseDefault (el.GetAttribute("width"), 0), 
 					height 			= ExParsers.ParseDefault (el.GetAttribute("height"), 0);
 
-				bool rectangular 	= "yes".Equals (el.GetAttribute("rectangular") ?? "yes");
-				bool hasInfluence 	= "yes".Equals (el.GetAttribute("hasInfluenceArea"));
+				bool rectangular 	= ExString.EqualsDefault(el.GetAttribute("rectangular"), "yes", true);
+				bool hasInfluence 	= ExString.EqualsDefault(el.GetAttribute("hasInfluenceArea"), "yes", false);
 
 				int influenceX 		= ExParsers.ParseDefault (el.GetAttribute("influenceX"), 0), 
 					influenceY 		= ExParsers.ParseDefault (el.GetAttribute("influenceY"), 0), 
 					influenceWidth 	= ExParsers.ParseDefault (el.GetAttribute("influenceWidth"), 0), 
 					influenceHeight = ExParsers.ParseDefault (el.GetAttribute("influenceHeight"), 0);
 
-				string idTarget 	= el.GetAttribute("idTarget") ?? "";
+				string idTarget 	= el.GetAttribute("idTarget");
 				int destinyX 		= ExParsers.ParseDefault (el.GetAttribute ("destinyX"), int.MinValue), 
 					destinyY 		= ExParsers.ParseDefault (el.GetAttribute ("destinyY"), int.MinValue);
 
 				int transitionType 	= ExParsers.ParseDefault(el.GetAttribute("transitionType"), 0),
 					transitionTime 	= ExParsers.ParseDefault(el.GetAttribute("transitionTime"), 0);
-				bool notEffects 	= "yes".Equals (el.GetAttribute("not-effects"));
+				bool notEffects     = ExString.EqualsDefault(el.GetAttribute("not-effects"), "yes", false);
 
 
                 currentExit = new Exit(rectangular, x, y, width, height);
@@ -184,7 +184,7 @@ namespace uAdventure.Core
 
 			foreach (XmlElement el in element.SelectNodes("next-scene"))
             {
-				string idTarget = el.GetAttribute("idTarget") ?? "";
+				string idTarget = el.GetAttribute("idTarget");
 				int x 				= ExParsers.ParseDefault (el.GetAttribute ("x"), int.MinValue), 
 					y 				= ExParsers.ParseDefault (el.GetAttribute ("y"), int.MinValue),
 					transitionType 	= ExParsers.ParseDefault (el.GetAttribute ("transitionType"), 0), 
@@ -235,7 +235,7 @@ namespace uAdventure.Core
         }
 
 		private ElementReference parseElementReference(XmlElement element, params object[] parameters){
-			string idTarget = element.GetAttribute("idTarget") ?? "";	
+			string idTarget = element.GetAttribute("idTarget");	
 
 			int x = ExParsers.ParseDefault (element.GetAttribute ("x"), 0), 
 				y = ExParsers.ParseDefault (element.GetAttribute ("y"), 0);
@@ -248,7 +248,7 @@ namespace uAdventure.Core
 				influenceWidth 	= ExParsers.ParseDefault (element.GetAttribute("influenceWidth"), 0), 
 				influenceHeight = ExParsers.ParseDefault (element.GetAttribute("influenceHeight"), 0);
 
-			bool hasInfluence = "yes".Equals (element.GetAttribute("hasInfluenceArea"));
+			bool hasInfluence = ExString.EqualsDefault(element.GetAttribute("hasInfluenceArea"), "yes", false);
 
 			// This is for maintain the back-compatibility: in previous dtd versions layer has -1 as default value and this is
 			// an erroneous value. This reason, if this value is -1, it will be changed to 0. Now in dtd there are not default value

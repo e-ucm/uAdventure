@@ -15,18 +15,18 @@ namespace uAdventure.Core
 
 			foreach (XmlElement el in element.SelectNodes("node"))
 			{
-				string id = el.GetAttribute("id") ?? "";
-				int x = int.Parse(el.GetAttribute("x") ?? "0"),
-					y = int.Parse(el.GetAttribute("y") ?? "0");
-				float scale = float.Parse(el.GetAttribute("scale") ?? "1.0", CultureInfo.InvariantCulture);
+				string id = el.GetAttribute("id");
+				int x = ExParsers.ParseDefault(el.GetAttribute("x"), 0),
+					y = ExParsers.ParseDefault(el.GetAttribute("y"), 0);
+				float scale = ExParsers.ParseDefault(el.GetAttribute("scale"), CultureInfo.InvariantCulture, 1.0f);
 
                 trajectory.addNode(id, x, y, scale);
             }
 
 			foreach (XmlElement el in element.SelectNodes("side"))
             {
-				string idStart = el.GetAttribute("idStart") ?? "";
-				string idEnd = el.GetAttribute("idEnd") ?? "";
+				string idStart = el.GetAttribute("idStart");
+				string idEnd = el.GetAttribute("idEnd");
 				//int length = int.Parse(el.GetAttribute("length") ?? "-1");
 
                 trajectory.addSide(idStart, idEnd, -1);
@@ -34,7 +34,7 @@ namespace uAdventure.Core
 
 			var initialNode = element.SelectSingleNode("initialnode");
 			if(initialNode != null)
-				trajectory.setInitial(element.GetAttribute("id") ?? "");
+				trajectory.setInitial(element.GetAttribute("id"));
 
             if (trajectory.getNodes().Count != 0)
             {

@@ -21,8 +21,8 @@ namespace uAdventure.Core
 
             string tmpArgVal;
 
-			string slidesceneId = element.GetAttribute("id") ?? "";
-			bool initialScene = "yes".Equals (element.GetAttribute("start"));
+			string slidesceneId = element.GetAttribute("id");
+			bool initialScene = ExString.EqualsDefault(element.GetAttribute("start"), "yes", false);
 
             if (element.Name.Equals("slidescene")) cutscene = new Slidescene(slidesceneId);
             else                                   cutscene = new Videoscene(slidesceneId);
@@ -30,11 +30,11 @@ namespace uAdventure.Core
                 chapter.setTargetId(slidesceneId);
 
 			//XAPI ELEMENTS
-			cutscene.setXApiClass(element.GetAttribute("class") ?? "");
-			cutscene.setXApiType(element.GetAttribute("type") ?? "");
+			cutscene.setXApiClass(element.GetAttribute("class"));
+			cutscene.setXApiType(element.GetAttribute("type"));
             //END OF XAPI
 
-			cutscene.setTargetId(element.GetAttribute("idTarget") ?? "");
+			cutscene.setTargetId(element.GetAttribute("idTarget"));
 			cutscene.setPositionX(ExParsers.ParseDefault(element.GetAttribute("destinyX"), int.MinValue));
 			cutscene.setPositionY(ExParsers.ParseDefault(element.GetAttribute("destinyY"), int.MinValue));
 			cutscene.setTransitionType((NextSceneEnumTransitionType)ExParsers.ParseDefault(element.GetAttribute("transitionType"),  0));
@@ -48,10 +48,10 @@ namespace uAdventure.Core
 			cutscene.setEffects(DOMParserUtility.DOMParse (element.SelectSingleNode("effect"), parameters) as Effects ?? new Effects());
 
             if (cutscene is Videoscene)
-				((Videoscene)cutscene).setCanSkip("yes".Equals (element.GetAttribute("canSkip") ?? "yes"));
+				((Videoscene)cutscene).setCanSkip(ExString.EqualsDefault(element.GetAttribute("canSkip"), "yes", true));
 
-			string next = element.GetAttribute("next") ?? "go-back";
-            if (next.Equals("go-back"))				cutscene.setNext(Cutscene.GOBACK);
+			string next = ExString.Default(element.GetAttribute("next"), "go-back");
+            if      (next.Equals("go-back"))		cutscene.setNext(Cutscene.GOBACK);
             else if (next.Equals("new-scene"))		cutscene.setNext(Cutscene.NEWSCENE);
             else if (next.Equals("end-chapter"))	cutscene.setNext(Cutscene.ENDCHAPTER);
 
@@ -66,7 +66,7 @@ namespace uAdventure.Core
 
             foreach (XmlElement el in nextsscene)
             {
-				var currentNextScene = new NextScene(el.GetAttribute("idTarget") ?? "", 
+				var currentNextScene = new NextScene(el.GetAttribute("idTarget"), 
 					ExParsers.ParseDefault(element.GetAttribute("destinyX"), int.MinValue),
 					ExParsers.ParseDefault(element.GetAttribute("destinyY"), int.MinValue));
 				
