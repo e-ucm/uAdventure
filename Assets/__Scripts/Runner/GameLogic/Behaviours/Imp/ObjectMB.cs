@@ -184,7 +184,7 @@ namespace uAdventure.Runner
                             }
                         }
                     }
-                    if (ConditionChecker.check(drag.getConditions()))
+                    if (drag != null && ConditionChecker.check(drag.getConditions()))
                     {
                         dragging = true;
                         ret = InteractuableResult.DOES_SOMETHING;
