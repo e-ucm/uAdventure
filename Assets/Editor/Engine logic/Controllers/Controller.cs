@@ -495,9 +495,6 @@ namespace uAdventure.Editor
         */
         public void Init(string loadProjectPath = null)
         {
-			if (this.Initialized && loadProjectPath == null)
-                return;
-
             Debug.Log("Controller init"); 
             ConfigData.LoadFromXML(ReleaseFolders.configFileEditorRelativePath());
             // Load the configuration
@@ -544,10 +541,10 @@ namespace uAdventure.Editor
                     if (projectFile.FullName.ToLower().EndsWith(".eap"))
                     {
                         string absolutePath = projectFile.FullName;
-                        LoadFile(absolutePath.Substring(0, absolutePath.Length - 4));
+                        Loaded = LoadFile(absolutePath.Substring(0, absolutePath.Length - 4));
                     }
                     else if (projectFile.Exists)
-                        LoadFile(projectFile.FullName);
+                        Loaded = LoadFile(projectFile.FullName);
                 }
             }
             else
@@ -559,7 +556,7 @@ namespace uAdventure.Editor
                 }
                 else
                 {
-                    LoadFile();
+                    Loaded = LoadFile();
                 }
             }
         }
@@ -950,6 +947,7 @@ namespace uAdventure.Editor
                 // Create the folders and add the assets
                 AssetsController.createFolderStructure();
                 AssetsController.addSpecialAssets();
+                AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
 
                 // Check the consistency of the chapters
                 bool valid = chaptersController.isValid(null, null);
@@ -1223,7 +1221,7 @@ namespace uAdventure.Editor
             else 
             {
                 path = path.RemoveFromEnd(".eap");
-                ResourceManager = ResourceManagerFactory.CreateExternal(path);
+                ResourceManager = ResourceManagerFactory.CreateExternal(path + "/");
             }
 
             // VOY A CARGAR
@@ -1248,16 +1246,22 @@ namespace uAdventure.Editor
 
                 if (!localLoaded)
                 {
+                    // Recreate the resource manager
+                    ResourceManager = ResourceManagerFactory.CreateLocal();
+                    directory = new DirectoryInfo("Assets/Resources/CurrentGame");
+                    currentZipFile = "Assets/Resources/CurrentGame";
+                    currentZipName = directory.Name;
+
                     // Import the proyect
                     AssetsController.createFolderStructure();
                     AssetsController.addSpecialAssets();
-                    AssetsController.copyAllFiles(currentZipFile, new DirectoryInfo(path).FullName);
-                    AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
+                    AssetsController.copyAllFiles(new DirectoryInfo(path).FullName, currentZipFile);
+                    try
+                    {
+                        AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
+                    }catch{}
                     AssetsController.checkAssetFilesConsistency(incidences);
                     Incidence.sortIncidences(incidences);
-
-                    // Recreate the resource manager
-                    ResourceManager = ResourceManagerFactory.CreateLocal();
 
                     //TODO: implement If there is any incidence
                     {/*if (incidences.size() > 0)
@@ -1288,7 +1292,6 @@ namespace uAdventure.Editor
             {
                 ConfigData.fileLoaded(currentZipFile);
                 AssetsController.resetCache();
-                Loaded = true;
 
                 //startAutoSave(15);
 

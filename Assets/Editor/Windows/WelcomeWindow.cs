@@ -37,15 +37,9 @@ namespace uAdventure.Editor
             if (!Language.Initialized)
                 Language.Initialize();
 
-            if (!Controller.Instance.Initialized)
-            {
-                Controller.ResetInstance();
-                Controller.Instance.Init();
-            }
-
             openedWindow = WelcomeWindowType.New;
 
-            logo = (Texture2D)Resources.Load("EAdventureData/img/logo-editor", typeof(Texture2D));
+            logo = Resources.Load<Texture2D>("EAdventureData/img/logo-editor");
 
             //newGameWindow = new NewGameWindow(windowRect, new GUIContent(TC.get("GeneralText.New")), "Window");
             //openGameWindow = new OpenGameWindow(windowRect, new GUIContent(TC.get("GeneralText.Open")), "Window");

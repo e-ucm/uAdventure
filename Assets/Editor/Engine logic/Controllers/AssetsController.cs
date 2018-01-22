@@ -766,70 +766,45 @@ namespace uAdventure.Editor
             }
         }
 
+        private static bool addSpecialAsset(string uri, string destination)
+        {
+            // Add the defaultBook
+            FileInfo sourceFile = new FileInfo("Assets/Resources/" + uri);
+            if (sourceFile.Exists)
+            {
+                var finalFile = Path.Combine(Controller.Instance.ProjectFolder, destination);
+                sourceFile.CopyTo(finalFile, true);
+                InitImporterConfig(finalFile);
+                return true;
+            }
+            // If the source file doesn't exist, show an error message
+            else
+                return false;
+        }
+
         public static void addSpecialAssets()
         {
+            if (!addSpecialAsset(SpecialAssetPaths.FILE_DEFAULT_BOOK_IMAGE, SpecialAssetPaths.ASSET_DEFAULT_BOOK_IMAGE))
+                Controller.Instance.showErrorDialog(TC.get("Error.Title"),TC.get("Error.SpecialAssetNotFound", SpecialAssetPaths.FILE_DEFAULT_BOOK_IMAGE));
 
-            // Get the zip file
-            string zipFile = Controller.Instance.ProjectFolder;
+            if (!addSpecialAsset(SpecialAssetPaths.FILE_DEFAULT_ARROW_NORMAL, SpecialAssetPaths.ASSET_DEFAULT_ARROW_NORMAL))
+                Controller.Instance.showErrorDialog(TC.get("Error.Title"), TC.get("Error.SpecialAssetNotFound", SpecialAssetPaths.FILE_DEFAULT_ARROW_NORMAL));
 
-            // Add the defaultBook
-            FileInfo sourceFile = new FileInfo("Assets/Resources/" + SpecialAssetPaths.FILE_DEFAULT_BOOK_IMAGE);
-            if (sourceFile.Exists)
-                sourceFile.CopyTo(Path.Combine(zipFile, SpecialAssetPaths.ASSET_DEFAULT_BOOK_IMAGE), true);
-            // If the source file doesn't exist, show an error message
-            else
-                Controller.Instance                    .showErrorDialog(TC.get("Error.Title"),
-                        TC.get("Error.SpecialAssetNotFound", "img/assets/DefaultBook.jpg"));
+            if (!addSpecialAsset(SpecialAssetPaths.FILE_DEFAULT_ARROW_OVER, SpecialAssetPaths.ASSET_DEFAULT_ARROW_OVER))
+                Controller.Instance.showErrorDialog(TC.get("Error.Title"), TC.get("Error.SpecialAssetNotFound", SpecialAssetPaths.FILE_DEFAULT_ARROW_OVER));
 
-            sourceFile = new FileInfo("Assets/Resources/" + SpecialAssetPaths.FILE_DEFAULT_ARROW_NORMAL);
-            if (sourceFile.Exists)
-                sourceFile.CopyTo(Path.Combine(zipFile, SpecialAssetPaths.ASSET_DEFAULT_ARROW_NORMAL), true);
-            // If the source file doesn't exist, show an error message
-            else
-                Controller.Instance                    .showErrorDialog(TC.get("Error.Title"),
-                        TC.get("Error.SpecialAssetNotFound", "img/assets/DefaultLeftNormalArrow.png"));
+            if (!addSpecialAsset(SpecialAssetPaths.FILE_EMPTY_IMAGE, SpecialAssetPaths.ASSET_EMPTY_IMAGE))
+                Controller.Instance.showErrorDialog(TC.get("Error.Title"), TC.get("Error.SpecialAssetNotFound", SpecialAssetPaths.FILE_EMPTY_IMAGE));
 
-            sourceFile = new FileInfo("Assets/Resources/" + SpecialAssetPaths.FILE_DEFAULT_ARROW_OVER);
-            if (sourceFile.Exists)
-                sourceFile.CopyTo(Path.Combine(zipFile, SpecialAssetPaths.ASSET_DEFAULT_ARROW_OVER), true);
-            // If the source file doesn't exist, show an error message
-            else
-                Controller.Instance                    .showErrorDialog(TC.get("Error.Title"),
-                        TC.get("Error.SpecialAssetNotFound", "img/assets/DefaultLeftOverArrow.png"));
+            if (!addSpecialAsset(SpecialAssetPaths.FILE_EMPTY_BACKGROUND, SpecialAssetPaths.ASSET_EMPTY_BACKGROUND))
+                Controller.Instance.showErrorDialog(TC.get("Error.Title"), TC.get("Error.SpecialAssetNotFound", SpecialAssetPaths.FILE_EMPTY_BACKGROUND));
 
-            // Add the empty image
-            sourceFile = new FileInfo("Assets/Resources/" + SpecialAssetPaths.FILE_EMPTY_IMAGE);
-            if (sourceFile.Exists)
-                sourceFile.CopyTo(Path.Combine(zipFile, SpecialAssetPaths.ASSET_EMPTY_IMAGE), true);
+            if (!addSpecialAsset(SpecialAssetPaths.FILE_EMPTY_ICON, SpecialAssetPaths.ASSET_EMPTY_ICON))
+                Controller.Instance.showErrorDialog(TC.get("Error.Title"), TC.get("Error.SpecialAssetNotFound", SpecialAssetPaths.FILE_EMPTY_ICON));
 
-            // Add the empty backlground image
-            sourceFile = new FileInfo("Assets/Resources/" + SpecialAssetPaths.FILE_EMPTY_BACKGROUND);
-            if (sourceFile.Exists)
-                sourceFile.CopyTo(Path.Combine(zipFile, SpecialAssetPaths.ASSET_EMPTY_BACKGROUND), true);
-
-            // If the source file doesn't exist, show an error message
-            else
-                Controller.Instance                    .showErrorDialog(TC.get("Error.Title"),
-                        TC.get("Error.SpecialAssetNotFound", "img/assets/EmptyImage.png"));
-
-            // Add the empty icon
-            sourceFile = new FileInfo("Assets/Resources/" + SpecialAssetPaths.FILE_EMPTY_ICON);
-            if (sourceFile.Exists)
-                sourceFile.CopyTo(Path.Combine(zipFile, SpecialAssetPaths.ASSET_EMPTY_ICON), true);
-
-            // If the source file doesn't exist, show an error message
-            else
-                Controller.Instance                    .showErrorDialog(TC.get("Error.Title"), TC.get("Error.SpecialAssetNotFound", "img/assets/EmptyIcon.png"));
-
-            // Add the empty animation
-            sourceFile = new FileInfo("Assets/Resources/" + SpecialAssetPaths.FILE_EMPTY_ANIMATION);
-            if (sourceFile.Exists)
-                sourceFile.CopyTo(Path.Combine(zipFile, SpecialAssetPaths.ASSET_EMPTY_ANIMATION + "_01.png"), true);
-
-            // If the source file doesn't exist, show an error message
-            else
-                Controller.Instance                    .showErrorDialog(TC.get("Error.Title"),
-                        TC.get("Error.SpecialAssetNotFound", "img/assets/EmptyAnimation_01.png"));
+            if (!addSpecialAsset(SpecialAssetPaths.FILE_EMPTY_ANIMATION, SpecialAssetPaths.ASSET_EMPTY_ANIMATION + "_01.png"))
+                Controller.Instance.showErrorDialog(TC.get("Error.Title"), TC.get("Error.SpecialAssetNotFound", SpecialAssetPaths.FILE_EMPTY_ANIMATION));
+            
         }
 
         /**
@@ -1159,13 +1134,13 @@ namespace uAdventure.Editor
         { 
 
             string currentDir = Directory.GetCurrentDirectory();
-            var unityLikePath = path.Replace(currentDir, "").Replace("\\", "/").Remove(0, 1);
-            var importer = AssetImporter.GetAtPath(unityLikePath) as TextureImporter;
+            //var unityLikePath = path.Replace(currentDir, "").Replace("\\", "/").Remove(0, 1);
+            var importer = AssetImporter.GetAtPath(path) as TextureImporter;
             if(importer == null)
             {
                 // Refresh
-                AssetDatabase.ImportAsset(unityLikePath);
-                importer = AssetImporter.GetAtPath(unityLikePath) as TextureImporter;
+                AssetDatabase.ImportAsset(path);
+                importer = AssetImporter.GetAtPath(path) as TextureImporter;
             }
 
             if (importer)

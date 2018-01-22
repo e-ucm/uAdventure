@@ -172,6 +172,12 @@ namespace uAdventure.Editor
             thisWindowReference.openedWindow = EditorWindowType.Chapter;
         }
 
+        public static void RefreshWindows()
+        {
+            thisWindowReference.chapterWindow = null;
+            thisWindowReference.InitWindows();
+        }
+
 		void InitWindows(){
 			if (chapterWindow == null) {
 				zeroRect = new Rect(0, 0, 0, 0);    
