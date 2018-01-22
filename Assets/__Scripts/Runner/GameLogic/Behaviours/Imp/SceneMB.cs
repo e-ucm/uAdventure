@@ -111,7 +111,7 @@ namespace uAdventure.Runner
             switch (sd.getType())
             {
                 case GeneralScene.GeneralSceneSceneType.VIDEOSCENE:
-                    movie = ResourceManager.Instance.getVideo(((Videoscene)sd).getResources()[0].getAssetPath(Videoscene.RESOURCE_TYPE_VIDEO));
+                    movie = Game.Instance.ResourceManager.getVideo(((Videoscene)sd).getResources()[0].getAssetPath(Videoscene.RESOURCE_TYPE_VIDEO));
                     movieplayer = MovieState.LOADING;
                     this.transform.Find("Background").localPosition = new Vector3(40, 30, 20);
                     break;
@@ -124,7 +124,7 @@ namespace uAdventure.Runner
                     {
                         if (ConditionChecker.check(sr.getConditions()))
                         {
-                            Texture2D tmp = ResourceManager.Instance.getImage(sr.getAssetPath(Scene.RESOURCE_TYPE_BACKGROUND));
+                            Texture2D tmp = Game.Instance.ResourceManager.getImage(sr.getAssetPath(Scene.RESOURCE_TYPE_BACKGROUND));
 
                             Transform background = this.transform.Find("Background");
                             background.GetComponent<Renderer>().material.mainTexture = tmp;
@@ -136,7 +136,7 @@ namespace uAdventure.Runner
 
                             if (sr.getAssetPath(Scene.RESOURCE_TYPE_FOREGROUND) != "")
                             {
-                                Texture2D fg = ResourceManager.Instance.getImage(sr.getAssetPath(Scene.RESOURCE_TYPE_FOREGROUND));
+                                Texture2D fg = Game.Instance.ResourceManager.getImage(sr.getAssetPath(Scene.RESOURCE_TYPE_FOREGROUND));
 
                                 Transform foreground = this.transform.Find("Foreground");
                                 foreground.GetComponent<Renderer>().material.SetTexture("_MainTex", tmp);
@@ -208,7 +208,7 @@ namespace uAdventure.Runner
                     {
                         if (ConditionChecker.check(r.getConditions()))
                         {
-                            this.slides = ResourceManager.Instance.getAnimation(r.getAssetPath(Slidescene.RESOURCE_TYPE_SLIDES));
+                            this.slides = Game.Instance.ResourceManager.getAnimation(r.getAssetPath(Slidescene.RESOURCE_TYPE_SLIDES));
                             this.transform.Find("Background").GetComponent<Renderer>().material.mainTexture = this.slides.frames[0].Image;
                             this.transform.position = new Vector3(40, 30, 20);
                             break;

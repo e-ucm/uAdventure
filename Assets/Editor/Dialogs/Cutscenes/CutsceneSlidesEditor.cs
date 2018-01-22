@@ -78,11 +78,11 @@ namespace uAdventure.Editor
             };
             Debug.Log(cutsceneFilePath);
 
-            workingAnimation = Loader.loadAnimation(cutsceneFilePath, new EditorImageLoader());
+            workingAnimation = Loader.loadAnimation(cutsceneFilePath, Controller.ResourceManager);
 
             Debug.Log(workingAnimation.getAboslutePath() + " " + workingAnimation.getFrames().Count + " " + workingAnimation.isSlides() + " " + workingAnimation.getId());
             if (workingAnimation == null)
-                workingAnimation = new Animation(cutsceneFilePath, 40, new EditorImageLoader());
+                workingAnimation = new Animation(cutsceneFilePath, 40);
 
             // Initalize
             selectedFrame = -1;

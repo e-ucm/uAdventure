@@ -39,12 +39,12 @@ namespace uAdventure.Runner
         {
             this.path = path;
             frames = new List<eFrame>();
-            Animation = Loader.loadAnimation(path, new ResourceManager.ResourceImageLoader());
+            Animation = Loader.loadAnimation(path, Game.Instance.ResourceManager);
 
             foreach (var frame in Animation.getFrames())
             {
                 var eframe = new eFrame();
-                eframe.Image = ResourceManager.Instance.getImage(frame.getUri());
+                eframe.Image = Game.Instance.ResourceManager.getImage(frame.getUri());
                 eframe.Duration = (int)frame.getTime();
                 frames.Add(eframe);
             }

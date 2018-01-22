@@ -3,34 +3,31 @@ using System.Xml;
 
 // TODO Possible unnecesary coupling
 using uAdventure.Runner;
-using System.Text.RegularExpressions;
 using System.Linq;
 
 namespace uAdventure.Core
 {
-    public class AnimationHandler_
+    public class AnimationHandler
     {
         /**
          * Animation being read.
          */
         private Animation animation;
 
-        private ImageLoaderFactory factory;
-
         string directory = "";
 
-        public AnimationHandler_(ImageLoaderFactory imageloader)
+        private ResourceManager resourceManager;
+
+        public AnimationHandler(ResourceManager resourceManager)
         {
-            this.factory = imageloader;
+            this.resourceManager = resourceManager;
         }
-        
-        private static string[] extensions = { ".png", ".jpg", ".jpeg" };
 
         public void Parse(string path_)
         {
             XmlDocument xmld = new XmlDocument();
 
-            string xml = ResourceManager.Instance.getText(path_);
+            string xml = resourceManager.getText(path_);
             if (!string.IsNullOrEmpty(xml))
             {
                 xmld.LoadXml(xml);
@@ -44,7 +41,7 @@ namespace uAdventure.Core
                 tmpArgVal = animationNode.Attributes["id"].Value;
                 if (!string.IsNullOrEmpty(tmpArgVal))
                 {
-                    animation = new Animation(tmpArgVal, factory);
+                    animation = new Animation(tmpArgVal);
                     animation.getFrames().Clear();
                     animation.getTransitions().Clear();
                 }
@@ -56,7 +53,7 @@ namespace uAdventure.Core
                     animation.setDocumentation(element.SelectSingleNode("documentation").InnerText);
 
                 // FRAMES
-                foreach (var frame in DOMParserUtility.DOMParse<Frame>(element.SelectNodes("/animation/frame"), animation.getImageLoaderFactory()))
+                foreach (var frame in DOMParserUtility.DOMParse<Frame>(element.SelectNodes("/animation/frame")))
                     animation.addFrame(frame);
 
                 // TRANSITIONS
@@ -70,47 +67,25 @@ namespace uAdventure.Core
             }
             else
             {
-                animation = new Animation(path_.Split('/').Last(), factory);
+                animation = new Animation(path_.Split('/').Last());
                 animation.getFrames().Clear();
                 animation.getTransitions().Clear();
 
                 xmld = new XmlDocument();
                 int num = 1;
                 string ruta = path_;
-                var type = ResourceManager.Instance.getLoadingType();
 
-                Sprite img = null;
+                Texture2D img = null;
                 string extension = string.Empty;
 
                 do
                 {
-                    // Put the extension
-                    if (type == ResourceManager.LoadingType.SYSTEM_IO)
-                    {
-                        foreach (string tryExtension in extensions)
-                        {
-                            if (System.IO.File.Exists(path_ + tryExtension))
-                            {
-                                extension = tryExtension;
-                                break;
-                            }
-                        }
-                    }
+                    ruta = path_ + "_" + intToStr(num);
 
-                    ruta = path_ + "_" + intToStr(num) + extension;
-
-                    img = factory.getImageFromPath(ruta);
+                    img = resourceManager.getImage(ruta);
                     if (img)
                     {
-                        if(type == ResourceManager.LoadingType.RESOURCES_LOAD)
-                        {
-                            if (ruta.StartsWith("Assets/"))
-                                ruta = ruta.Substring("Assets/".Length);
-                            if (ruta.StartsWith("Resources/"))
-                                ruta = ruta.Substring("Resources/".Length);
-                        }
-
-                        var newFrame = new Frame(animation.getImageLoaderFactory(), ruta, 100, false);
+                        var newFrame = new Frame(ruta, 100, false);
                         animation.addFrame(newFrame);
                         num++;
                     }

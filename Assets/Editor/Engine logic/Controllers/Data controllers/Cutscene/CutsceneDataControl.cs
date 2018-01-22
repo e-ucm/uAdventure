@@ -426,18 +426,14 @@ namespace uAdventure.Editor
             {
 
                 string previewImagePath = resourcesDataControlList[selectedResources].getAssetPath("slides");
-
-                // Add the extension of the frame
-                if (previewImagePath != null && !previewImagePath.ToLower().EndsWith(".eaa"))
-                    previewImagePath += "_01.jpg";
-                else if (previewImagePath != null)
+                
+                if (!string.IsNullOrEmpty(previewImagePath))
                 {
-                    var animation = Loader.loadAnimation(AssetsController.InputStreamCreatorEditor.getInputStreamCreator(), previewImagePath, new EditorImageLoader());
-
+                    var animation = Loader.loadAnimation(previewImagePath, Controller.ResourceManager);
                     return animation != null && animation.getFrames().Count > 0 ? animation.getFrame(0).getUri() : null;
                 }
 
-                return previewImagePath;
+                return null;
             }
             else
             {

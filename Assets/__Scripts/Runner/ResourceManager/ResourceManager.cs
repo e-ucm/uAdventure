@@ -8,28 +8,39 @@ using System.Text.RegularExpressions;
 
 namespace uAdventure.Runner
 {
+    public sealed class ResourceManagerFactory
+    {
+        public static ResourceManager CreateLocal(string resourcesFolder = "CurrentGame/", ResourceManager.LoadingType loadingType = ResourceManager.LoadingType.RESOURCES_LOAD)
+        {
+            var resourceManager = new ResourceManager(loadingType);
+            if(loadingType == ResourceManager.LoadingType.SYSTEM_IO)
+            {
+                resourceManager.Path = resourceManager.getCurrentDirectory() + resourcesFolder;
+            }
+            else
+            {
+                resourceManager.Path = resourcesFolder;
+            }
+            return resourceManager;
+        }
+
+        public static ResourceManager CreateExternal(string path)
+        {
+            var resourceManager = new ResourceManager(ResourceManager.LoadingType.SYSTEM_IO);
+            resourceManager.Path = path;
+            return resourceManager;
+        }
+
+    }
+
     public sealed class ResourceManager
     {
 
-        //#############################################
-        //################# SINGLETON #################
-        //#############################################
-
+        
         public enum LoadingType
         {
             SYSTEM_IO,
             RESOURCES_LOAD
-        }
-
-        static ResourceManager instance;
-        public static ResourceManager Instance
-        {
-            get
-            {
-                if (instance == null)
-                    instance = new ResourceManager();
-                return instance;
-            }
         }
 
         //##################################################
@@ -37,8 +48,7 @@ namespace uAdventure.Runner
         //##################################################
 
         private string path = "";
-        private string name = "";
-        LoadingType type = LoadingType.SYSTEM_IO;
+        LoadingType type = LoadingType.RESOURCES_LOAD;
         private Dictionary<string, Texture2DHolder> images;
         private Dictionary<string, eAnim> animations;
         private Dictionary<string, MovieHolder> videos;
@@ -55,7 +65,7 @@ namespace uAdventure.Runner
                         ret = path;
                         break;
                     case LoadingType.RESOURCES_LOAD:
-                        ret = name;
+                        ret = "CurrentGame/";
                         break;
                 }
 
@@ -63,30 +73,17 @@ namespace uAdventure.Runner
             }
             set
             {
-                switch (type)
-                {
-                    case LoadingType.SYSTEM_IO:
-                        path = value;
-                        break;
-                    case LoadingType.RESOURCES_LOAD:
-                        name = value + "/";
-                        break;
-                }
+                path = value;
             }
         }
 
-        private ResourceManager()
+        internal ResourceManager(LoadingType loadingType)
         {
             this.images = new Dictionary<string, Texture2DHolder>();
             this.animations = new Dictionary<string, eAnim>();
             this.videos = new Dictionary<string, MovieHolder>();
 
-            if (Game.Instance != null)
-            {
-                type = Game.Instance.getLoadingType();
-            }
-            else
-                type = LoadingType.SYSTEM_IO;
+            type = loadingType;
         }
 
         public LoadingType getLoadingType()
@@ -94,54 +91,37 @@ namespace uAdventure.Runner
             return type;
         }
 
-        public class ResourceImageLoader : ImageLoaderFactory
+        public Sprite getSprite(string uri)
         {
-            private string path_;
+            if (uri == null)
+                return null;
 
-            private static byte[] LoadBytes(string filePath)
+            if (images.ContainsKey(uri))
+                return images[uri].Sprite;
+            else
             {
-                byte[] fileData = null;
-
-#if !(UNITY_WEBPLAYER || UNITY_WEBGL)
-                if (System.IO.File.Exists(filePath))
-                    fileData = System.IO.File.ReadAllBytes(filePath);
-#endif
-
-                return fileData;
-            }
-
-            public Sprite getImageFromPath(string uri)
-            {
-                Sprite img = null;
-                switch (Instance.getLoadingType())
+                Texture2DHolder holder = new Texture2DHolder(fixPath(uri), type);
+                if (holder.Loaded())
                 {
-                    default:
-                    case ResourceManager.LoadingType.RESOURCES_LOAD:
-                        if (uri.StartsWith("Assets/Resources/"))
-                            uri = uri.Remove(0, 17);
-
-                        var parts = uri.Split('.');
-                        uri = parts[0];
-                        img = Resources.Load<Sprite>(uri);
-                        break;
-                    case ResourceManager.LoadingType.SYSTEM_IO:
-#if !(UNITY_WEBPLAYER || UNITY_WEBGL)
-                        var bytes = LoadBytes(uri);
-                        if (bytes != null)
-                        {
-                            var tex = new Texture2D(2, 2, TextureFormat.BGRA32, false);
-                            tex.LoadImage(bytes);
-                            img = Sprite.Create(tex, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f));
-                        }
-#endif
-                        break;
+                    images.Add(uri, holder);
+                    return holder.Sprite;
                 }
-                return img;
-            }
-
-            public void showErrorDialog(string title, string message)
-            {
-                throw new NotImplementedException();
+                else
+                {
+                    // Load from defaults
+                    holder = new Texture2DHolder(defaultPath(uri), type);
+                    if (holder.Loaded())
+                    {
+                        Debug.Log(uri + " loaded from defaults...");
+                        images.Add(uri, holder);
+                        return holder.Sprite;
+                    }
+                    else
+                    {
+                        Debug.LogWarning("Unable to load " + uri);
+                        return null;
+                    }
+                }
             }
         }
 
@@ -163,7 +143,7 @@ namespace uAdventure.Runner
                 else
                 {
                     // Load from defaults
-                    holder = new Texture2DHolder(Path.Replace("CurrentGame/", "") + uri, type);
+                    holder = new Texture2DHolder(defaultPath(uri), type);
                     if (holder.Loaded())
                     {
                         Debug.Log(uri + " loaded from defaults...");
@@ -179,9 +159,13 @@ namespace uAdventure.Runner
             }
         }
 
-
         public eAnim getAnimation(string uri)
         {
+            /*if (uri.EndsWith(".eaa"))
+                uri += ".xml";
+            else if (!uri.EndsWith(".eaa.xml"))
+                uri += ".eaa.xml";*/
+            
             if (animations.ContainsKey(uri))
                 return animations[uri];
             else
@@ -216,23 +200,15 @@ namespace uAdventure.Runner
 
         public string getText(string uri)
         {
-            string xml = "";
+            string xml = null;
 
-            uri = fixPath(uri);
-            
-            if (uri.EndsWith(".eaa"))
-                uri += ".xml";
-            else if (!uri.EndsWith(".eaa.xml"))
-                uri += ".eaa.xml";
+            uri = fixPath(uri); 
 
-            switch (ResourceManager.Instance.getLoadingType())
+            switch (getLoadingType())
             {
-                case ResourceManager.LoadingType.RESOURCES_LOAD:
+                case LoadingType.RESOURCES_LOAD:
                     
-                    if (uri.EndsWith(".xml"))
-                        uri = uri.Substring(0, uri.Length - 4);
-
-                    TextAsset ta = Resources.Load<TextAsset>(uri);
+                    TextAsset ta = Resources.Load<TextAsset>(uri); 
                     if (ta == null)
                     {
                         Debug.Log("Can't load Descriptor file: " + uri);
@@ -241,8 +217,9 @@ namespace uAdventure.Runner
                     else
                         xml = ta.text;
                     break;
-                case ResourceManager.LoadingType.SYSTEM_IO:
-                    xml = System.IO.File.ReadAllText(uri);
+                case LoadingType.SYSTEM_IO:
+                    if(System.IO.File.Exists(uri))
+                        xml = System.IO.File.ReadAllText(uri);
                     break;
             }
 
@@ -263,6 +240,38 @@ namespace uAdventure.Runner
                     uri = uri.Remove(0, "Assets/Resources/".Length);
                 if (uri.StartsWith("Resources/"))
                     uri = uri.Remove(0, "Resources/".Length);
+
+                if (System.IO.Path.HasExtension(uri))
+                {
+                    uri = uri.RemoveFromEnd(System.IO.Path.GetExtension(uri));
+                }
+            }
+
+            return uri;
+        }
+
+        private string defaultPath(string uri)
+        {
+            Regex pattern = new Regex("[óñ]");
+            uri = pattern.Replace(uri, "+¦");
+
+            if(type == LoadingType.SYSTEM_IO)
+            {
+                // Default asset location for SYSTEM_IO
+                uri = getCurrentDirectory() + "Assets/Resources/EAdventureData/" + uri;
+            }
+
+            if (type == LoadingType.RESOURCES_LOAD)
+            {
+                if (uri.StartsWith("Assets/Resources/"))
+                    uri = uri.Remove(0, "Assets/Resources/".Length);
+                if (uri.StartsWith("Resources/"))
+                    uri = uri.Remove(0, "Resources/".Length);
+
+                if (System.IO.Path.HasExtension(uri))
+                {
+                    uri = uri.RemoveFromEnd(System.IO.Path.GetExtension(uri));
+                }
             }
 
             return uri;

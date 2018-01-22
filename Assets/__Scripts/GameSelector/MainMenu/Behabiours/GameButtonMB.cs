@@ -36,9 +36,9 @@ namespace uAdventure.GameSelector
 
             Texture2D tx;
             if (System.IO.File.Exists(imagepath + "standalone_game_icon.png"))
-                tx = ResourceManager.Instance.getImage(imagepath + "standalone_game_icon.png");
+                tx = Game.Instance.ResourceManager.getImage(imagepath + "standalone_game_icon.png");
             else
-                tx = ResourceManager.Instance.getImage(imagepath + "Icono-Motor-128x128.png");
+                tx = Game.Instance.ResourceManager.getImage(imagepath + "Icono-Motor-128x128.png");
 
             image.sprite = Sprite.Create(tx, new Rect(0, 0, tx.width, tx.height), new Vector2(0.5f, 0.5f));
 

@@ -31,16 +31,16 @@ namespace uAdventure.GameSelector
         {
             //slider.value = ZipUtil.Progress;
 
-            if (ResourceManager.Instance.extracted)
+            /*if (ResourceManager.Instance.extracted)
             {
                 SceneManager.LoadScene("_MenuScene");
-            }
+            }*/
         }
 
 
         IEnumerator unZip()
         {
-            ResourceManager.Instance.extractFile(LoaderController.Instance.gamePath);
+            //ResourceManager.Instance.extractFile(LoaderController.Instance.gamePath);
             yield return null;
         }
     }

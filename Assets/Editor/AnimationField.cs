@@ -76,22 +76,14 @@ public class AnimationField : FileChooser {
 
     void OnSlidesceneCreated(string val)
     {
-        uAdventure.Core.Animation newAnim = new uAdventure.Core.Animation(val.Split('/').Last(), new EditorImageLoader());
-        newAnim.getFrame(0).setUri("assets/special/EmptyAnimation_01.png");
+        uAdventure.Core.Animation newAnim = new uAdventure.Core.Animation(val.Split('/').Last());
+        newAnim.getFrame(0).setUri(EMPTY + "_01.png");
         AnimationWriter.writeAnimation(val, newAnim);
         Path = val;
     }
 
     void EditCutscene()
     {
-        if (!Path.EndsWith(".eaa.xml"))
-        {
-            uAdventure.Core.Animation newAnim = new uAdventure.Core.Animation(Path.Split('/').Last(), new EditorImageLoader());
-            newAnim.getFrame(0).setUri(Path + "_01.png");
-            AnimationWriter.writeAnimation(Path + ".eaa.xml", newAnim);
-            Path += ".eaa.xml";
-        }
-
         ScriptableObject.CreateInstance<CutsceneSlidesEditor>().Init(this, Path);
     }
 }

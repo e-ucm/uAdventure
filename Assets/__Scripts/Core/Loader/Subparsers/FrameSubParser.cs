@@ -10,8 +10,7 @@ namespace uAdventure.Core
     {
 		public object DOMParse(XmlElement element, params object[] parameters)
         {
-			ImageLoaderFactory ilf = parameters [0] as ImageLoaderFactory;
-			Frame frame = new Frame(ilf);
+			Frame frame = new Frame();
 
             XmlNodeList
                 assets = element.SelectNodes("next-scene");

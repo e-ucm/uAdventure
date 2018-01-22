@@ -4,6 +4,7 @@ using System.Xml;
 using System.IO;
 using System.Collections.Generic;
 using System;
+using uAdventure.Runner;
 
 namespace uAdventure.Core
 {
@@ -31,33 +32,19 @@ namespace uAdventure.Core
 
         }
 
-        public static AdventureData loadAdventureData(string path, List<Incidence> incidences)
+        public static AdventureData loadAdventureData(ResourceManager resourceManager, List<Incidence> incidences)
         {
             AdventureData adventureDataTemp = new AdventureData();
             try
             {
-                AdventureHandler_ adventureParser = new AdventureHandler_(adventureDataTemp);
-
-                // Read and close the input stream
-                adventureParser.Parse(path + "/descriptor.xml");
-                //descriptorIS.close();
-
+                AdventureHandler adventureParser = new AdventureHandler(adventureDataTemp, resourceManager);
+                adventureParser.Parse("descriptor.xml");
                 adventureDataTemp = adventureParser.getAdventureData();
 
             }
             catch (Exception e) { Debug.LogError(e); }
 
             return adventureDataTemp;
-        }
-
-        /**
-         * @param adventureData
-         *            the adventureData to set
-         */
-        public static void setAdventureData(AdventureData adventureData)
-        {
-
-            Loader.adventureData = adventureData;
         }
 
         private static Dictionary<string, Animation> animationLoadCache;
@@ -69,40 +56,17 @@ namespace uAdventure.Core
          *            The xml descriptor for the animation
          * @return the loaded Animation
          */
-
-        [Obsolete]
-        public static Animation loadAnimation(InputStreamCreator isCreator, string filename, ImageLoaderFactory imageloader)
-        {
-            return loadAnimation(filename, imageloader);
-
-        }
-
-        public static Animation loadAnimation(string filename, ImageLoaderFactory imageloader)
+        public static Animation loadAnimation(string filename, ResourceManager resourceManager)
         {
             if (animationLoadCache == null) animationLoadCache = new Dictionary<string, Animation>();
 
             if (animationLoadCache.ContainsKey(filename))
                 return animationLoadCache[filename];
 
-            AnimationHandler_ animationHandler = new AnimationHandler_(imageloader);
-            
-            try
-            {
-                if(Application.isEditor && !Application.isPlaying)
-                {
-                    uAdventure.Runner.ResourceManager.Instance.Path = "Assets/Resources/CurrentGame/";
-                }
-                animationHandler.Parse(filename);
-            }
-            catch (Exception e) { Debug.LogWarning(e); }
+            AnimationHandler animationHandler = new AnimationHandler(resourceManager);
+            animationHandler.Parse(filename);
+            Animation anim = animationHandler.getAnimation();
 
-            Animation anim = null;
-            if (animationHandler.getAnimation() != null)
-                anim = animationHandler.getAnimation();
-            else
-                anim = new Animation("anim" + (new System.Random()).Next(1000), imageloader);
-
-            animationLoadCache.Add(filename, anim);
             return anim;
         }
 

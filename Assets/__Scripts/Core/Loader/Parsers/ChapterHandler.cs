@@ -10,7 +10,7 @@ using uAdventure.Runner;
 
 namespace uAdventure.Core
 {
-    public class ChapterHandler_
+    public class ChapterHandler
     {
         /**
          * Chapter data
@@ -33,6 +33,7 @@ namespace uAdventure.Core
         //private string currentString;
 
         /* Methods */
+        private ResourceManager resourceManager;
 
         /**
          * Default constructor.
@@ -40,46 +41,17 @@ namespace uAdventure.Core
          * @param chapter
          *            Chapter in which the data will be stored
          */
-        public ChapterHandler_(Chapter chapter)
+        public ChapterHandler(Chapter chapter, ResourceManager resourceManager)
         {
             this.chapter = chapter;
+            this.resourceManager = resourceManager;
            // currentString = string.Empty;
         }
 
         public string getXmlContent(string path)
         {
-            string xml = "";
-#if UNITY_EDITOR
-            if (!UnityEditor.EditorApplication.isPlaying)
-            {
-                xml = System.IO.File.ReadAllText(path);
-            }
-            else
-#endif
-                switch (ResourceManager.Instance.getLoadingType())
-                {
-                    case ResourceManager.LoadingType.RESOURCES_LOAD:
-                        if (path.Contains(".xml"))
-                        {
-                            path = path.Replace(".xml", "");
-                        }
-
-                        TextAsset ta = Resources.Load(path) as TextAsset;
-
-                        if (ta == null)
-                        {
-                            Debug.Log("Can't load chapter file: " + path);
-                        }
-                        else
-                            xml = ta.text;
-                        break;
-                    case ResourceManager.LoadingType.SYSTEM_IO:
-                        xml = System.IO.File.ReadAllText(path);
-                        break;
-                }
-
-            return xml;
-        }
+            return resourceManager.getText(path);
+        } 
 
         public void Parse(string path)
         {

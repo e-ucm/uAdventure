@@ -38,7 +38,8 @@ namespace uAdventure.GameSelector
         // Use this for initialization
         void Start()
         {
-            Path = ResourceManager.Instance.getStoragePath();
+            // TODO 
+            //Path = ResourceManager.Instance.getStoragePath();
 
             if (folderimage == null)
                 folderimage = Resources.Load("GUI/folder") as Sprite;

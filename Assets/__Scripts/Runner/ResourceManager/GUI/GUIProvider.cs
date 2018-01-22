@@ -170,7 +170,7 @@ namespace uAdventure.Runner
                         string selected = "";
                         foreach (string name in DefaultActionAssetWrapper.Assets[button.Key])
                         {
-                            auxTexture = ResourceManager.Instance.getImage(GUIProvider.DEFAULT_ASSET_DIRECTORY + name + ".png");
+                            auxTexture = Game.Instance.ResourceManager.getImage(GUIProvider.DEFAULT_ASSET_DIRECTORY + name + ".png");
 
                             if (auxTexture != null)
                             {
@@ -224,12 +224,12 @@ namespace uAdventure.Runner
                 string path = data.getCursorPath(cursor);
                 if (path != null)
                 {
-                    cursores.Add(cursor, ResourceManager.Instance.getImage(path));
+                    cursores.Add(cursor, Game.Instance.ResourceManager.getImage(path));
                 }
                 else
                 {
                     if (!cursores.ContainsKey("default"))
-                        cursores.Add("default", ResourceManager.Instance.getImage(data.getCursorPath("default")));
+                        cursores.Add("default", Game.Instance.ResourceManager.getImage(data.getCursorPath("default")));
                     cursores.Add(cursor, cursores["default"]);
                 }
             }
@@ -239,10 +239,10 @@ namespace uAdventure.Runner
 
         private void loadDefaultCursors()
         {
-            cursores.Add("default", ResourceManager.Instance.getImage("gui/cursors/default.png"));
-            cursores.Add("over", ResourceManager.Instance.getImage("gui/cursors/over.png"));
-            cursores.Add("exit", ResourceManager.Instance.getImage("gui/cursors/exit.png"));
-            cursores.Add("action", ResourceManager.Instance.getImage("gui/cursors/action.png"));
+            cursores.Add("default", Game.Instance.ResourceManager.getImage("gui/cursors/default.png"));
+            cursores.Add("over", Game.Instance.ResourceManager.getImage("gui/cursors/over.png"));
+            cursores.Add("exit", Game.Instance.ResourceManager.getImage("gui/cursors/exit.png"));
+            cursores.Add("action", Game.Instance.ResourceManager.getImage("gui/cursors/action.png"));
         }
     }
 }

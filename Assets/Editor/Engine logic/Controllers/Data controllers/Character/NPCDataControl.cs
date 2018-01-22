@@ -76,18 +76,13 @@ namespace uAdventure.Editor
          */
         public string getPreviewImage()
         {
-
             string previewImagePath = getExistingPreviewImagePath();
-            // Add the extension of the frame
-            if (previewImagePath != null && !previewImagePath.ToLower().EndsWith(".eaa.xml")
-                //HACK?
-                && previewImagePath.Equals(EMPTY_ANIMATION))
-                previewImagePath += "_01.png";
-            else if (previewImagePath != null)
+            if (!string.IsNullOrEmpty(previewImagePath))
             {
-                return Loader.loadAnimation(previewImagePath, new EditorImageLoader()).getFrame(0).getUri();
+                var animation = Loader.loadAnimation(previewImagePath, Controller.ResourceManager);
+                return animation != null && animation.getFrames().Count > 0 ? animation.getFrame(0).getUri() : null;
             }
-            return previewImagePath;
+            return null;
         }
 
         /**
@@ -103,7 +98,8 @@ namespace uAdventure.Editor
             {
                 if (resource != null && resource.getAssetPath("standright") != null &&
                         !resource.getAssetPath("standright").Equals(EMPTY_ANIMATION) &&
-                        !resource.getAssetPath("standright").Equals(EMPTY_ANIMATION + ".eaa"))
+                        !resource.getAssetPath("standright").Equals(EMPTY_ANIMATION + ".eaa") &&
+                        !resource.getAssetPath("standright").Equals(EMPTY_ANIMATION + ".eaa.xml"))
                     path = resource.getAssetPath("standright");
                 else
                     path = resource.getAssetPath("standleft");
@@ -542,20 +538,16 @@ namespace uAdventure.Editor
         }
 
 
-        public string getAnimationPathPreview(string animation)
+        public string getAnimationPathPreview(string animationPath)
         {
-
-            string previewImagePath = resourcesDataControlList[selectedResources].getAssetPath(animation);
-
-            // Add the extension of the frame
-            if (previewImagePath != null && !previewImagePath.ToLower().EndsWith(".eaa.xml"))
-                previewImagePath += "_01.jpg";
-            else if (previewImagePath != null)
+            string previewImagePath = resourcesDataControlList[selectedResources].getAssetPath(animationPath);
+            if (!string.IsNullOrEmpty(previewImagePath))
             {
-                return Loader.loadAnimation(AssetsController.InputStreamCreatorEditor.getInputStreamCreator(), previewImagePath, new EditorImageLoader()).getFrame(0).getUri();
+                var animation = Loader.loadAnimation(previewImagePath, Controller.ResourceManager);
+                return animation != null && animation.getFrames().Count > 0 ? animation.getFrame(0).getUri() : null;
             }
 
-            return previewImagePath;
+            return null;
         }
 
         public Color getBubbleBorderColor()

@@ -13,6 +13,7 @@ using uAdventure.Core;
 using Animation = uAdventure.Core.Animation;
 using System.Text.RegularExpressions;
 using System.Globalization;
+using uAdventure.Runner;
 
 namespace uAdventure.Editor
 {
@@ -1189,6 +1190,8 @@ namespace uAdventure.Editor
         //    }
 
 
+        public static ResourceManager ResourceManager { get; private set; }
+
         /**
          * Called when the user wants to load data from a file.
          * 
@@ -1200,108 +1203,113 @@ namespace uAdventure.Editor
             bool fileLoaded = false; 
             bool localLoaded = path == null;
             //bool hasIncedence = false;
-            try
-            { 
-                //LoadingScreen loadingScreen = new LoadingScreen(TextConstants.getText( "Operation.LoadProject" ), getLoadingImage( ), mainWindow);
-                // If some file was selected
+            /*try
+            { */
+            //LoadingScreen loadingScreen = new LoadingScreen(TextConstants.getText( "Operation.LoadProject" ), getLoadingImage( ), mainWindow);
+            // If some file was selected
                 
-                AdventureData loadedAdventureData = null;
-                DirectoryInfo directory = null;
+            AdventureData loadedAdventureData = null;
+            DirectoryInfo directory = null;
 
-                List<Incidence> incidences = new List<Incidence>();
+            List<Incidence> incidences = new List<Incidence>();
 
-                // LOCAL FILE PATH
-                if (string.IsNullOrEmpty(path))
-                {
-                    path = "Assets/Resources/CurrentGame";
-                    localLoaded = true;
-                }
-                else 
-                {
-                    path = path.RemoveFromEnd(".eap");
-                }
-
-                // VOY A CARGAR
-                // Create a file to extract the name and path
-                directory = new DirectoryInfo(path);
-
-                if (directory.Exists)
-                {
-                    // Load the data from the file, and update the info
-                    loadedAdventureData = Loader.loadAdventureData(path, incidences);
-                }
-
-                // SI LO CARGO HAGO COSAS
-                if (loadedAdventureData != null)
-                {
-                    // Update the values of the controller
-                    currentZipFile = path;
-                    currentZipName = directory.Name;
-
-                    System.IO.File.WriteAllText("Assets/Resources/CurrentGame.eap", path);
-                    loadedAdventureData.setProjectName(currentZipName);
-
-                    if (!localLoaded)
-                    {
-                        // Import the proyect
-                        AssetsController.createFolderStructure();
-                        AssetsController.addSpecialAssets();
-                        AssetsController.copyAllFiles(currentZipFile, new DirectoryInfo("Assets/Resources/CurrentGame/").FullName);
-                        AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
-                        AssetsController.checkAssetFilesConsistency(incidences);
-                        Incidence.sortIncidences(incidences);
-
-                        //TODO: implement If there is any incidence
-                        {/*if (incidences.size() > 0)
-                        {
-                            bool abort = fixIncidences(incidences);
-                            if (abort)
-                            {
-                                mainWindow.showInformationDialog(TC.get("Error.LoadAborted.Title"), TC.get("Error.LoadAborted.Message"));
-                                hasIncedence = true;
-                            }
-                        }*/
-                        }
-                    }
-                    
-                    // PARSING
-                    adventureDataControl = new AdventureDataControl(loadedAdventureData);
-                    chaptersController = new ChapterListDataControl(adventureDataControl.getChapters());
-                    ProjectConfigData.LoadFromXML();
-
-                    dataModified_F = false;
-                    fileLoaded = true;
-
-                }
-
-                //TODO: implement
-                //if the file was loaded, update the RecentFiles list:
-                if (fileLoaded)
-                {
-                    ConfigData.fileLoaded(currentZipFile);
-                    AssetsController.resetCache();
-                    Loaded = true;
-
-                    //startAutoSave(15);
-
-                    //// Feedback
-                    ////loadingScreen.close( );
-                    //if (!hasIncedence)
-                    //    mainWindow.showInformationDialog(TC.get("Operation.FileLoadedTitle"), TC.get("Operation.FileLoadedMessage"));
-                    //else
-                    //    mainWindow.showInformationDialog(TC.get("Operation.FileLoadedWithErrorTitle"), TC.get("Operation.FileLoadedWithErrorMessage"));
-
-                }
-                //else {
-                //    // Feedback
-                //    //loadingScreen.close( );
-                //    mainWindow.showInformationDialog(TC.get("Operation.FileNotLoadedTitle"), TC.get("Operation.FileNotLoadedMessage"));
-                //}
-
-                //if (loadingImage)
-                //    //ls.close( );
-                //    loadingScreen.setVisible(false);
+            // LOCAL FILE PATH
+            if (string.IsNullOrEmpty(path))
+            {
+                path = "Assets/Resources/CurrentGame";
+                localLoaded = true;
+                ResourceManager = ResourceManagerFactory.CreateLocal();
             }
+            else 
+            {
+                path = path.RemoveFromEnd(".eap");
+                ResourceManager = ResourceManagerFactory.CreateExternal(path);
+            }
+
+            // VOY A CARGAR
+            // Create a file to extract the name and path
+            directory = new DirectoryInfo(path);
+
+            if (directory.Exists)
+            {
+                // Load the data from the file, and update the info
+                loadedAdventureData = Loader.loadAdventureData(ResourceManager, incidences);
+            }
+
+            // SI LO CARGO HAGO COSAS
+            if (loadedAdventureData != null)
+            {
+                // Update the values of the controller
+                currentZipFile = path;
+                currentZipName = directory.Name;
+
+                System.IO.File.WriteAllText("Assets/Resources/CurrentGame.eap", path);
+                loadedAdventureData.setProjectName(currentZipName);
+
+                if (!localLoaded)
+                {
+                    // Import the proyect
+                    AssetsController.createFolderStructure();
+                    AssetsController.addSpecialAssets();
+                    AssetsController.copyAllFiles(currentZipFile, new DirectoryInfo(path).FullName);
+                    AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
+                    AssetsController.checkAssetFilesConsistency(incidences);
+                    Incidence.sortIncidences(incidences);
+
+                    // Recreate the resource manager
+                    ResourceManager = ResourceManagerFactory.CreateLocal();
+
+                    //TODO: implement If there is any incidence
+                    {/*if (incidences.size() > 0)
+                    {
+                        bool abort = fixIncidences(incidences);
+                        if (abort)
+                        {
+                            mainWindow.showInformationDialog(TC.get("Error.LoadAborted.Title"), TC.get("Error.LoadAborted.Message"));
+                            hasIncedence = true;
+                        }
+                    }*/
+                    }
+                }
+                    
+                // PARSING
+                adventureDataControl = new AdventureDataControl(loadedAdventureData);
+                chaptersController = new ChapterListDataControl(adventureDataControl.getChapters());
+                ProjectConfigData.LoadFromXML();
+
+                dataModified_F = false;
+                fileLoaded = true;
+
+            }
+
+            //TODO: implement
+            //if the file was loaded, update the RecentFiles list:
+            if (fileLoaded)
+            {
+                ConfigData.fileLoaded(currentZipFile);
+                AssetsController.resetCache();
+                Loaded = true;
+
+                //startAutoSave(15);
+
+                //// Feedback
+                ////loadingScreen.close( );
+                //if (!hasIncedence)
+                //    mainWindow.showInformationDialog(TC.get("Operation.FileLoadedTitle"), TC.get("Operation.FileLoadedMessage"));
+                //else
+                //    mainWindow.showInformationDialog(TC.get("Operation.FileLoadedWithErrorTitle"), TC.get("Operation.FileLoadedWithErrorMessage"));
+
+            }
+            //else {
+            //    // Feedback
+            //    //loadingScreen.close( );
+            //    mainWindow.showInformationDialog(TC.get("Operation.FileNotLoadedTitle"), TC.get("Operation.FileNotLoadedMessage"));
+            //}
+
+            //if (loadingImage)
+            //    //ls.close( );
+            //    loadingScreen.setVisible(false);
+            /*}
             catch (Exception e)
             {
                 Debug.LogError(e.Message + "\n\n" + e.StackTrace);
@@ -1309,7 +1317,7 @@ namespace uAdventure.Editor
                 //if (loadingImage)
                 //    loadingScreen.setVisible(false);
                 //mainWindow.showInformationDialog(TC.get("Operation.FileNotLoadedTitle"), TC.get("Operation.FileNotLoadedMessage"));
-            }
+            }*/
 
             //Controller.gc();
 
@@ -2335,7 +2343,7 @@ namespace uAdventure.Editor
         private int countAssetReferencesInEAA(string eaaFilePath, string assetPath)
         {
             int refs = 0;
-            Animation animation = Loader.loadAnimation(AssetsController.InputStreamCreatorEditor.getInputStreamCreator(), eaaFilePath, new EditorImageLoader());
+            Animation animation = Loader.loadAnimation(eaaFilePath, ResourceManager);
             foreach (Frame frame in animation.getFrames())
             {
                 if (frame != null)
@@ -2383,8 +2391,7 @@ namespace uAdventure.Editor
 
         private void getAssetReferencesInEAA(string eaaFilePath, List<string> assetPaths, List<int> assetTypes)
         {
-            Animation animation = Loader.loadAnimation(AssetsController.InputStreamCreatorEditor.getInputStreamCreator(),
-                eaaFilePath, new EditorImageLoader());
+            Animation animation = Loader.loadAnimation(eaaFilePath, ResourceManager);
             foreach (Frame frame in animation.getFrames())
             {
                 if (frame != null)

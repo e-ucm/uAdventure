@@ -75,8 +75,6 @@ namespace uAdventure.Core
 
         private string animationPath;
 
-        private ImageLoaderFactory factory;
-
         // private BufferedImage temp;
 
         private int temp_w;
@@ -95,10 +93,8 @@ namespace uAdventure.Core
          *              Object used to create the images for the frames
          *     
          */
-        public Animation(string id, Frame frame, ImageLoaderFactory factory)
+        public Animation(string id, Frame frame)
         {
-            this.factory = factory;
-
             this.id = id;
             resources = new List<ResourcesUni>();
             frames = new List<Frame>();
@@ -121,8 +117,8 @@ namespace uAdventure.Core
          * @param factory
          *              Object used to create the images for the frames
          */
-        public Animation(string id, ImageLoaderFactory factory) :
-            this(id, new Frame(factory), factory)
+        public Animation(string id) :
+            this(id, new Frame())
         {
         }
 
@@ -137,8 +133,8 @@ namespace uAdventure.Core
          * @param factory
          *              Object used to create the images for the frames
          */
-        public Animation(string id, int time, ImageLoaderFactory factory) :
-            this(id, new Frame(factory, time), factory)
+        public Animation(string id, int time) :
+            this(id, new Frame(time))
         {
         }
 
@@ -210,7 +206,7 @@ namespace uAdventure.Core
             if (after >= frames.Count || after < 0)
                 after = frames.Count - 1;
             if (frame == null)
-                frame = new Frame(factory);
+                frame = new Frame();
 
             if (frames.Count == 1 && frames[0].getUri().Equals(""))
             {
@@ -578,11 +574,6 @@ namespace uAdventure.Core
         {
 
             return animationPath;
-        }
-
-        public ImageLoaderFactory getImageLoaderFactory()
-        {
-            return factory;
         }
 
         /***************************************************************/

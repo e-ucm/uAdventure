@@ -100,12 +100,12 @@ namespace uAdventure.Runner
 
         protected void LoadTexture(string uri)
         {
-            texture = ResourceManager.Instance.getImage(resource.getAssetPath(uri));
+            texture = Game.Instance.ResourceManager.getImage(resource.getAssetPath(uri));
         }
 
         protected void setTexture(string uri)
         {
-            texture = ResourceManager.Instance.getImage(resource.getAssetPath(uri));
+            texture = Game.Instance.ResourceManager.getImage(resource.getAssetPath(uri));
             Adaptate();
             Positionate();
         }
@@ -162,12 +162,12 @@ namespace uAdventure.Runner
 
         protected void LoadAnimation(string uri)
         {
-            anim = ResourceManager.Instance.getAnimation(resource.getAssetPath(uri));
+            anim = Game.Instance.ResourceManager.getAnimation(resource.getAssetPath(uri));
             mirror = false;
             
             if((anim == null || anim.Animation == null || anim.Animation.isEmptyAnimation()) && isMirrorable(uri))
             {
-                anim = ResourceManager.Instance.getAnimation(resource.getAssetPath(getMirrorUri(uri)));
+                anim = Game.Instance.ResourceManager.getAnimation(resource.getAssetPath(getMirrorUri(uri)));
                 mirror = true;
             }
         }

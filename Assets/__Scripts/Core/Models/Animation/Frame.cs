@@ -64,13 +64,11 @@ namespace uAdventure.Core
 
         private string animationPath;
 
-        private ImageLoaderFactory factory;
-
         /**
          * Creates a new empty frame
          */
-        public Frame(ImageLoaderFactory factory) :
-            this(factory, "", DEFAULT_TIME, false)
+        public Frame() :
+            this("", DEFAULT_TIME, false)
         {
         }
 
@@ -80,7 +78,7 @@ namespace uAdventure.Core
          * @param uri
          *            the uri for the image
          */
-        public Frame(ImageLoaderFactory factory, string uri) : this(factory, uri, DEFAULT_TIME, false)
+        public Frame(string uri) : this(uri, DEFAULT_TIME, false)
         {
         }
 
@@ -90,8 +88,8 @@ namespace uAdventure.Core
          * @param time
          *            integer with the duration of the frame
          */
-        public Frame(ImageLoaderFactory factory, int time) :
-            this(factory, "", time, false)
+        public Frame(int time) :
+            this("", time, false)
         {
         }
 
@@ -104,10 +102,9 @@ namespace uAdventure.Core
          * @param time
          *            The time (duration) of the frame
          */
-        public Frame(ImageLoaderFactory factory, string uri, long time, bool waitForClick)
+        public Frame(string uri, long time, bool waitForClick)
         {
             this.uri = uri;
-            this.factory = factory;
             type = TYPE_IMAGE;
             this.time = time;
             image = null;

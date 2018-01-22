@@ -379,14 +379,10 @@ namespace uAdventure.Editor
          * @return Image for the given file
          */
 
+        [Obsolete("Use ResourceManager instead")]
         public static Sprite getImage(string imagePath)
         {
-            Sprite image = null;
-
-            if (!string.IsNullOrEmpty(imagePath))
-                image = (Sprite)Resources.Load(BASE_DIR + imagePath.Substring(0, imagePath.LastIndexOf('.')), typeof(Sprite));
-
-            return image;
+            return Controller.ResourceManager.getSprite(imagePath);
         }
 
         /**
@@ -398,14 +394,10 @@ namespace uAdventure.Editor
          * @return Image for the given file
          */
 
+        [Obsolete("Use ResourceManager instead")]
         public static Texture2D getImageTexture(string imagePath)
         {
-            Sprite image = null;
-
-            if (!string.IsNullOrEmpty(imagePath))
-                image = (Sprite)Resources.Load(BASE_DIR + imagePath.Substring(0, imagePath.LastIndexOf('.')), typeof(Sprite));
-
-            return image != null ? image.texture : null;
+            return Controller.ResourceManager.getImage(imagePath);
         }
 
 
@@ -752,8 +744,8 @@ namespace uAdventure.Editor
             if (dest.Exists)
             {
                 Directory.Delete(destinyFile, true);
-                // dest.Delete(true);
             }
+
             DirectoryCopy(sourceFile, destinyFile, true);
         }
 
@@ -773,9 +765,6 @@ namespace uAdventure.Editor
                 DirectoryCopy(gui.FullName, destinyGui.FullName, true);
             }
         }
-        /**
-         * Adds the special assets to the current adventure.
-         */
 
         public static void addSpecialAssets()
         {
@@ -850,7 +839,6 @@ namespace uAdventure.Editor
          *            Asset path
          * @return True if the asset is special, false otherwise
          */
-
         public static bool isAssetSpecial(string assetPath)
         {
 
@@ -859,42 +847,7 @@ namespace uAdventure.Editor
                    assetPath.Equals(SpecialAssetPaths.ASSET_EMPTY_ICON) ||
                    assetPath.Equals(SpecialAssetPaths.ASSET_EMPTY_ANIMATION);
         }
-
-        ////    /**
-        ////     * Returns the filename of the given asset.
-        ////     * 
-        ////     * @param assetPath
-        ////     *            Path to the asset
-        ////     * @return Name of the file representing the asset
-        ////     */
-        ////    public static string getFilename(string assetPath)
-        ////    {
-
-        ////        int lastSlashIndex = Math.Max(assetPath.LastIndexOf('/') + 1, assetPath.LastIndexOf('\\') + 1);
-        ////        return assetPath.Substring(lastSlashIndex, assetPath.Length);
-        ////    }
-
-        ////    /**
-        ////     * Removes the suffix "_01.png" or "_01.jpg" from the given asset path.
-        ////     * 
-        ////     * @param assetPath
-        ////     *            Source asset path
-        ////     * @return Asset path without the suffix
-        ////     */
-        ////    public static string removeSuffix(string assetPath)
-        ////    {
-
-        ////        // Remove the suffix in the PNG animations
-        ////        if (assetPath.ToLower().EndsWith("_01.png"))
-        ////            assetPath = assetPath.Substring(0, assetPath.Length - 7);
-        ////        // Remove the suffix in the JPG slides
-        ////        else if (assetPath.ToLower().EndsWith("_01.jpg"))
-        ////        {
-        ////            assetPath = assetPath.Substring(0, assetPath.Length - 7);
-        ////        }
-
-        ////        return assetPath;
-        ////    }
+        
 
         ////    /**
         ////     * Checks the given asset to see if it fits the category. If the asset has
@@ -964,43 +917,8 @@ namespace uAdventure.Editor
 
         ////        return assetValid;
         ////    }
-
-        ////    private static bool isImageWithRestrictedDimension(int assetCategory)
-        ////    {
-
-        ////        return (assetCategory == CATEGORY_BACKGROUND || assetCategory == CATEGORY_ICON || assetCategory == CATEGORY_ARROW_BOOK);
-        ////    }
-
-        ////    /**
-        ////     * 
-        ////     * @param assetCategory
-        ////     *            The asset category
-        ////     * @return Return the maximum dimensions for an asset category
-        ////     */
-        ////    private static Dimension getRestrictedDimension(int assetCategory)
-        ////    {
-
-        ////        int rest_width = 0;
-        ////        int rest_height = 0;
-
-        ////        switch (assetCategory)
-        ////        {
-        ////            case AssetsConstants.CATEGORY_BACKGROUND:
-        ////                rest_width = AssetsImageDimensions.BACKGROUND_MAX_WIDTH;
-        ////                rest_height = AssetsImageDimensions.BACKGROUND_MAX_HEIGHT;
-        ////                break;
-        ////            case AssetsConstants.CATEGORY_ICON:
-        ////                rest_width = AssetsImageDimensions.ICON_MAX_WIDTH;
-        ////                rest_height = AssetsImageDimensions.ICON_MAX_HEIGHT;
-        ////                break;
-        ////            case AssetsConstants.CATEGORY_ARROW_BOOK:
-        ////                rest_width = AssetsImageDimensions.ARROW_BOOK_MAX_WIDTH;
-        ////                rest_height = AssetsImageDimensions.ARROW_BOOK_MAX_HEIGHT;
-        ////                break;
-        ////        }
-
-        ////        return new Dimension(rest_width, rest_height);
-        ////    }
+        
+        
 
         public static void checkAssetFilesConsistency(List<Incidence> incidences)
         {
@@ -1075,33 +993,6 @@ namespace uAdventure.Editor
         }
 
         ////    /**
-        ////     * Returns the extension of the given asset.
-        ////     * 
-        ////     * @param assetPath
-        ////     *            Path to the asset
-        ////     * @return Extension of the file
-        ////     */
-        ////    private static string getExtension(string assetPath)
-        ////    {
-
-        ////        return assetPath.Substring(assetPath.LastIndexOf('.') + 1, assetPath.Length);
-        ////    }
-
-        ////    /**
-        ////     * Returns the folder associated with the given category.
-        ////     * 
-        ////     * @param assetsCategory
-        ////     *            Category for the folder
-        ////     * @return Folder for the given category, null if the category was not
-        ////     *         recognized
-        ////     */
-        ////    public static string getCategoryAbsoluteFolder(int assetsCategory)
-        ////    {
-
-        ////        return new File(Controller.getInstance().getProjectFolder(), getCategoryFolder(assetsCategory)).getAbsolutePath();
-        ////    }
-
-        ////    /**
         ////     * Returns the folder associated with the given category.
         ////     * 
         ////     * @param assetsCategory
@@ -1116,12 +1007,6 @@ namespace uAdventure.Editor
 
             switch (assetsCategory)
             {
-                /*case CATEGORY_ASSESSMENT:
-                    folder = CATEGORY_ASSESSMENT_FOLDER;
-                    break;
-                case CATEGORY_ADAPTATION:
-                    folder = CATEGORY_ADAPTATION_FOLDER;
-                    break;*/
                 case AssetsConstants.CATEGORY_BACKGROUND:
                     folder = CATEGORY_BACKGROUND_FOLDER;
                     break;
@@ -1259,215 +1144,7 @@ namespace uAdventure.Editor
         ////        }
         ////        return assetChooser;
         ////    }
-
-        ////    /*public static class TempFileGenerator {
-
-        ////        private static Random random = new Random( );
-
-        ////        private static int MAX_RANDOM = 100000;
-
-        ////        public static readonly  string TEMP_FILE_NAME = "eadventure_";
-
-        ////        public TempFileGenerator( ) {
-
-        ////            random = new Random( );
-        ////        }
-
-        ////        public static string generateTempFileAbsolutePath( string extension ) {
-
-        ////            return generateTempFileAbsolutePath( TEMP_FILE_NAME, extension );
-        ////        }
-
-        ////        public static string generateTempFileAbsolutePath( string name, string extension ) {
-
-        ////            string tempDirectory = null;
-        ////            if( System.getenv( "TEMP" ) != null && !System.getenv( "TEMP" ).Equals( "" ) ) {
-        ////                tempDirectory = System.getenv( "TEMP" );
-        ////            }
-        ////            else if( System.getenv( "HOME" ) != null && !System.getenv( "HOME" ).Equals( "" ) ) {
-        ////                tempDirectory = System.getenv( "HOME" );
-        ////            }
-        ////            else if( System.getenv( "ROOT" ) != null && !System.getenv( "ROOT" ).Equals( "" ) ) {
-        ////                tempDirectory = System.getenv( "ROOT" );
-        ////            }
-        ////            else {
-        ////                tempDirectory = "";
-        ////            }
-
-        ////            string fileName = name + "." + extension;
-        ////            File file = new File( tempDirectory + "/" + fileName );
-        ////            while( file.exists( ) ) {
-        ////                fileName = name + random.nextInt( MAX_RANDOM ) + "." + extension;
-        ////                file = new File( tempDirectory + "/" + fileName );
-        ////            }
-        ////            return tempDirectory + "/" + fileName;
-        ////        }
-
-        ////        public static string generateTempFileOverwriteExisting( string name, string extension ) {
-
-        ////            string tempDirectory = null;
-        ////            if( System.getenv( "TEMP" ) != null && !System.getenv( "TEMP" ).Equals( "" ) ) {
-        ////                tempDirectory = System.getenv( "TEMP" );
-        ////            }
-        ////            else if( System.getenv( "HOME" ) != null && !System.getenv( "HOME" ).Equals( "" ) ) {
-        ////                tempDirectory = System.getenv( "HOME" );
-        ////            }
-        ////            else if( System.getenv( "ROOT" ) != null && !System.getenv( "ROOT" ).Equals( "" ) ) {
-        ////                tempDirectory = System.getenv( "ROOT" );
-        ////            }
-        ////            else {
-        ////                tempDirectory = "";
-        ////            }
-
-        ////            string fileName = name + "." + extension;
-        ////            File file = new File( tempDirectory + "/" + fileName );
-        ////            if( file.exists( ) ) {
-        ////                file.delete( );
-        ////            }
-        ////            return tempDirectory + "/" + fileName;
-        ////        }
-
-        ////    }*/
-
-        ////    /**
-        ////     * Extracts the resource and get it copied to a file in the local system.
-        ////     * Required when an asset cannot be loaded directly from zip
-        ////     * 
-        ////     * @param assetPath
-        ////     * @return The absolute path of the destiny file where the asset was copied
-        ////     */
-        ////    public static string extractResource(string assetPath)
-        ////    {
-
-        ////        string toReturn = null;
-        ////        try
-        ////        {
-        ////            //Check if the file has already been extracted
-        ////            if (!tempFiles.ContainsKey(assetPath))
-        ////            {
-
-        ////                //string filePath = VideoCache.generateTempFileAbsolutePath (getExtension(assetPath));
-        ////                FileInfo destinyFile = File.createTempFile("ead-resource", "." + getExtension(assetPath));
-        ////                //string filePath = TempFileGenerator.generateTempFileAbsolutePath( getExtension( assetPath ) );
-        ////                string filePath = destinyFile.getAbsolutePath();
-        ////                File sourceFile = new File(Controller.getInstance().getProjectFolder(), assetPath);
-        ////                //File destinyFile = new File( filePath );
-        ////                if (sourceFile.CopyTo(destinyFile))
-        ////                {
-        ////                    tempFiles.put(assetPath, destinyFile);
-        ////                    toReturn = filePath;
-        ////                }
-        ////                else
-        ////                    toReturn = null;
-        ////            }
-        ////            else
-        ////                toReturn = tempFiles.get(assetPath).getAbsolutePath();
-        ////        }
-        ////        catch (Exception e)
-        ////        {
-        ////            toReturn = null;
-        ////        }
-
-        ////        return toReturn;
-        ////    }
-
-        public class InputStreamCreatorEditor : InputStreamCreator
-        {
-
-            private string absolutePath;
-
-            public InputStreamCreatorEditor()
-            {
-
-                absolutePath = "";
-            }
-
-            public InputStreamCreatorEditor(string absolutePath)
-            {
-
-                this.absolutePath = absolutePath;
-            }
-
-            public string buildInputStream(string filePath)
-            {
-                //TODO: implementation
-                //string iss = "";
-                //if (absolutePath == null)
-                //{
-                //     if( filePath.StartsWith( "/" ) || filePath.StartsWith( "\\" ) ) {
-                //    FIXME: Somehow, these is not needed anymore (check more, might still be needed outside eclipse)
-                //    string os = System.getProperty( "os.name" ).toLowerCase( );
-                //     if ( !filePath.StartsWith( "/User" ) )
-                //       filePath = filePath.Substring( 1, filePath.length( ) );
-                //    }
-
-                //    iss = getInputStream(filePath);
-                //    if (iss == null && filePath.Length > 1 && !filePath.StartsWith("/User"))
-                //    {
-                //        iss = getInputStream(filePath.Substring(1, filePath.Length));
-                //    }
-
-                //}
-                //else {
-                //    try
-                //    {
-                //        iss = new FileInputStream(new File(absolutePath, filePath));
-                //    }
-                //    catch (FileNotFoundException e)
-                //    {
-                //        return null;
-                //    }
-                //}
-
-                //return iss;
-                //Debug.Log(absolutePath + "\n" + filePath);
-                return Path.Combine(absolutePath, filePath);
-            }
-
-            public string[] listNames(string filePath)
-            {
-                string[] fileEntries = null;
-                string targetPath = Path.Combine(absolutePath, filePath);
-                if (Directory.Exists(targetPath))
-                    fileEntries = Directory.GetFiles(targetPath);
-                else
-                    fileEntries = new string[0];
-                return fileEntries;
-            }
-
-            ////    public MediaLocator buildMediaLocator(string file)
-            ////    {
-
-            ////        return getVideo(file);
-            ////    }
-
-            ////    public URL buildURL(string path)
-            ////    {
-
-            ////        try
-            ////        {
-            ////            return new File(Controller.getInstance().getProjectFolder(), path).toURI().toURL();
-            ////        }
-            ////        catch (MalformedURLException e)
-            ////        {
-            ////            return null;
-            ////        }
-            ////    }
-
-            ////}
-
-            public static InputStreamCreator getInputStreamCreator()
-            {
-
-                return new InputStreamCreatorEditor();
-            }
-
-            public static InputStreamCreator getInputStreamCreator(string absolutePath)
-            {
-
-                return new InputStreamCreatorEditor(absolutePath);
-            }
-        }
+        
 
         // TODO: TMP - delte iT
         public class FileFilter
