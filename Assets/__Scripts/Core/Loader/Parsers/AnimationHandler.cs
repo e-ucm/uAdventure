@@ -87,6 +87,7 @@ namespace uAdventure.Core
                     {
                         var newFrame = new Frame(ruta, 100, false);
                         animation.addFrame(newFrame);
+                        animation.getTransitions().Add(new Transition());
                         num++;
                     }
 

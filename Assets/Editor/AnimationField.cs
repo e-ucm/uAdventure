@@ -61,7 +61,7 @@ public class AnimationField : FileChooser {
         }
         else if(workingObject is CutsceneSlidesEditor)
         {
-
+            newFilePath = message;
         }
         else if(workingObject is uAdventure.Core.Animation)
         {

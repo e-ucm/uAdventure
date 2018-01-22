@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using uAdventure.Core;
 using Animation = uAdventure.Core.Animation;
 using UnityEditor;
+using System.IO;
 
 namespace uAdventure.Editor
 {
@@ -247,8 +248,16 @@ namespace uAdventure.Editor
             GUI.enabled = true;
             if (GUILayout.Button("OK"))
             {
+                // If it doesnt have an extension its because its an old animation
+                if (!Path.HasExtension(workingAnimation.getAboslutePath()))
+                {
+                    cutscenePath = cutscenePath + ".eaa.xml";
+                    workingAnimation.setAbsolutePath(workingAnimation.getAboslutePath() + ".eaa.xml");
+                }
+
                 AnimationWriter.writeAnimation(cutscenePath, workingAnimation);
-                reference.OnDialogOk("", this);
+                AssetDatabase.Refresh(ImportAssetOptions.Default);
+                reference.OnDialogOk(cutscenePath, this);
                 this.Close();
             }
             if (GUILayout.Button(TC.get("GeneralText.Cancel")))
