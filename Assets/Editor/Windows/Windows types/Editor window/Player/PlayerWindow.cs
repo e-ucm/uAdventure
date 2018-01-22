@@ -36,12 +36,15 @@ namespace uAdventure.Editor
             c.text = TC.get("Element.Name26");
             ButtonContent = c;
 
-            playerWindowAppearance = new CharactersWindowAppearance(aStartPos,
-                new GUIContent(TC.get("NPC.LookPanelTitle")), "Window");
-            playerWindowDialogConfiguration = new CharactersWindowDialogConfiguration(aStartPos,
-                new GUIContent(TC.get("NPC.DialogPanelTitle")), "Window");
-            playerWindowDocumentation = new PlayerWindowDocumentation(aStartPos,
-                new GUIContent(TC.get("NPC.Documentation")), "Window");
+            playerWindowAppearance = new CharactersWindowAppearance(aStartPos, new GUIContent(TC.get("NPC.LookPanelTitle")), "Window");
+            playerWindowAppearance.BeginWindows = () => BeginWindows();
+            playerWindowAppearance.EndWindows = () => EndWindows();
+            playerWindowDialogConfiguration = new CharactersWindowDialogConfiguration(aStartPos, new GUIContent(TC.get("NPC.DialogPanelTitle")), "Window");
+            playerWindowDialogConfiguration.BeginWindows = () => BeginWindows();
+            playerWindowDialogConfiguration.EndWindows = () => EndWindows();
+            playerWindowDocumentation = new PlayerWindowDocumentation(aStartPos, new GUIContent(TC.get("NPC.Documentation")), "Window");
+            playerWindowDocumentation.BeginWindows = () => BeginWindows();
+            playerWindowDocumentation.EndWindows = () => EndWindows();
             selectedButtonSkin = (GUISkin)Resources.Load("Editor/ButtonSelected", typeof(GUISkin));
 
             openedWindow = PlayerWindowType.DialogConfiguration;
@@ -54,6 +57,7 @@ namespace uAdventure.Editor
             }
             tabs.Add(new KeyValuePair<string, PlayerWindowType>(TC.get("NPC.DialogPanelTitle"), PlayerWindowType.DialogConfiguration));
             tabs.Add(new KeyValuePair<string, PlayerWindowType>(TC.get("NPC.Documentation"), PlayerWindowType.Documentation));
+            
         }
 
 
