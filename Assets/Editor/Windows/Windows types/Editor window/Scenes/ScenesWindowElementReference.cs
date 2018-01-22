@@ -10,40 +10,24 @@ namespace uAdventure.Editor
 
     public class ScenesWindowElementReference : SceneEditorWindow
     {
-        private Texture2D conditionsTex, noConditionsTex;
-        
-        private int currentIndex = -1;
-        private SceneDataControl currentScene;
-
-        private DataControlList referenceList;
-        private SceneDataControl workingScene;
-
-        private Dictionary<Type, Texture2D> icons;
-             
-        public ScenesWindowElementReference(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, SceneEditor sceneEditor,
-            params GUILayoutOption[] aOptions)
-            : base(aStartPos, aContent, aStyle, sceneEditor, aOptions)
+        private class ReferenceList : DataControlList
         {
-            new ReferenceComponent(Rect.zero, new GUIContent(""), aStyle);
-            if (Controller.Instance.playerMode() == DescriptorData.MODE_PLAYER_3RDPERSON)
-            {
-                new InfluenceComponent(Rect.zero, new GUIContent(""), aStyle);
-            }
+            private Texture2D conditionsTex, noConditionsTex;
 
-            conditionsTex = Resources.Load<Texture2D>("EAdventureData/img/icons/conditions-24x24");
-            noConditionsTex = Resources.Load<Texture2D>("EAdventureData/img/icons/no-conditions-24x24");
+            private Dictionary<Type, Texture2D> icons;
 
-            icons = new Dictionary<Type, Texture2D>()
+            public ReferenceList()
             {
-                { typeof(PlayerDataControl),    Resources.Load<Texture2D>("EAdventureData/img/icons/player-old") },
-                { typeof(ItemDataControl),      Resources.Load<Texture2D>("EAdventureData/img/icons/item") },
-                { typeof(AtrezzoDataControl),   Resources.Load<Texture2D>("EAdventureData/img/icons/atrezzo-1") },
-                { typeof(NPCDataControl),       Resources.Load<Texture2D>("EAdventureData/img/icons/npc") }
-            };
-
-            referenceList = new DataControlList()
-            {
-                elementHeight = 20,
+                conditionsTex = Resources.Load<Texture2D>("EAdventureData/img/icons/conditions-24x24");
+                noConditionsTex = Resources.Load<Texture2D>("EAdventureData/img/icons/no-conditions-24x24");
+                icons = new Dictionary<Type, Texture2D>()
+                {
+                    { typeof(PlayerDataControl),    Resources.Load<Texture2D>("EAdventureData/img/icons/player-old") },
+                    { typeof(ItemDataControl),      Resources.Load<Texture2D>("EAdventureData/img/icons/item") },
+                    { typeof(AtrezzoDataControl),   Resources.Load<Texture2D>("EAdventureData/img/icons/atrezzo-1") },
+                    { typeof(NPCDataControl),       Resources.Load<Texture2D>("EAdventureData/img/icons/npc") }
+                };
+                elementHeight = 20;
                 Columns = new List<ColumnList.Column>()
                 {
                     new ColumnList.Column() // Layer column
@@ -66,10 +50,10 @@ namespace uAdventure.Editor
                         Text = TC.get("Conditions.Title"),
                         SizeOptions = new GUILayoutOption[]{ GUILayout.ExpandWidth(true) }
                     }
-                },
+                };
                 drawCell = (columnRect, row, column, isActive, isFocused) =>
                 {
-                    var element = referenceList.list[row] as ElementContainer;
+                    var element = list[row] as ElementContainer;
                     var erdc = element.getErdc();
 
                     switch (column)
@@ -110,7 +94,42 @@ namespace uAdventure.Editor
                             }
                             break;
                     }
-                },
+                };
+            }
+
+            protected override void OnRemove()
+            {
+                DataControl.deleteElement(((ElementContainer)GetChilds(DataControl)[index]).getErdc(), false);
+                OnChanged(reorderableList);
+            }
+
+            protected override void OnDuplicate()
+            {
+                DataControl.duplicateElement(((ElementContainer)GetChilds(DataControl)[index]).getErdc());
+                OnChanged(reorderableList);
+            }
+
+        }
+
+
+        private int currentIndex = -1;
+        private SceneDataControl currentScene;
+
+        private DataControlList referenceList;
+        private SceneDataControl workingScene;
+             
+        public ScenesWindowElementReference(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, SceneEditor sceneEditor,
+            params GUILayoutOption[] aOptions)
+            : base(aStartPos, aContent, aStyle, sceneEditor, aOptions)
+        {
+            new ReferenceComponent(Rect.zero, new GUIContent(""), aStyle);
+            if (Controller.Instance.playerMode() == DescriptorData.MODE_PLAYER_3RDPERSON)
+            {
+                new InfluenceComponent(Rect.zero, new GUIContent(""), aStyle);
+            }
+
+            referenceList = new ReferenceList()
+            {
                 onSelectCallback = (list) =>
                 {
                     sceneEditor.SelectedElement = (referenceList.list[list.index] as ElementContainer).getErdc();

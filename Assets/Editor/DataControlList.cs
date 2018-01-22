@@ -96,19 +96,19 @@ public class DataControlList : ButtonList {
         buttons.Add(buttonDup); 
     }
 
-    protected void OnAdd(object type)
+    protected virtual void OnAdd(object type)
     {
         dataControl.addElement((int)type, dataControl.getDefaultId((int)type));
         OnChanged(reorderableList);
     }
 
-    protected void OnRemove()
+    protected virtual void OnRemove()
     {
         dataControl.deleteElement(childs[index], false);
         OnChanged(reorderableList);
     }
 
-    protected void OnDuplicate()
+    protected virtual void OnDuplicate()
     {
         dataControl.duplicateElement(childs[index]);
         OnChanged(reorderableList);
