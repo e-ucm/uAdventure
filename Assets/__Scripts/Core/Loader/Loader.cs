@@ -58,11 +58,6 @@ namespace uAdventure.Core
          */
         public static Animation loadAnimation(string filename, ResourceManager resourceManager)
         {
-            if (animationLoadCache == null) animationLoadCache = new Dictionary<string, Animation>();
-
-            if (animationLoadCache.ContainsKey(filename))
-                return animationLoadCache[filename];
-
             AnimationHandler animationHandler = new AnimationHandler(resourceManager);
             animationHandler.Parse(filename);
             Animation anim = animationHandler.getAnimation();

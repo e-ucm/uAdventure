@@ -25,6 +25,12 @@ namespace uAdventure.Core
 
         public void Parse(string path_)
         {
+            if (resourceManager.getAnimationsCache().ContainsKey(path_))
+            {
+                animation = resourceManager.getAnimationsCache()[path_];
+                return;
+            }
+
             XmlDocument xmld = new XmlDocument();
 
             string xml = resourceManager.getText(path_);
@@ -92,6 +98,11 @@ namespace uAdventure.Core
                     }
 
                 } while (img);
+            }
+
+            if(animation != null)
+            {
+                resourceManager.getAnimationsCache()[path_] = animation;
             }
         }
 

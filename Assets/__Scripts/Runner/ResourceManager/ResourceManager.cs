@@ -51,6 +51,7 @@ namespace uAdventure.Runner
         LoadingType type = LoadingType.RESOURCES_LOAD;
         private Dictionary<string, Texture2DHolder> images;
         private Dictionary<string, eAnim> animations;
+        private Dictionary<string, Core.Animation> otherAnimations;
         private Dictionary<string, MovieHolder> videos;
 
         public string Path
@@ -77,10 +78,16 @@ namespace uAdventure.Runner
             }
         }
 
+        public Dictionary<string, Core.Animation> getAnimationsCache()
+        {
+            return otherAnimations;
+        }
+
         internal ResourceManager(LoadingType loadingType)
         {
             this.images = new Dictionary<string, Texture2DHolder>();
             this.animations = new Dictionary<string, eAnim>();
+            this.otherAnimations = new Dictionary<string, Core.Animation>();
             this.videos = new Dictionary<string, MovieHolder>();
 
             type = loadingType;
