@@ -8,7 +8,7 @@ using UnityEngine;
 
 public class FileChooser : DialogReceiverInterface
 {
-    private Texture2D delTex;
+    protected Texture2D delTex;
 
     [System.ComponentModel.DefaultValue("")]
     public string Label { get; set; }
@@ -58,7 +58,7 @@ public class FileChooser : DialogReceiverInterface
         }
     }
 
-    protected void drawClear()
+    protected virtual void drawClear()
     {
         if (ShowClear)
         {

@@ -208,6 +208,8 @@ namespace uAdventure.Core
             if (frame == null)
                 frame = new Frame();
 
+            frame = (Frame)frame.Clone();
+
             if (frames.Count == 1 && frames[0].getUri().Equals(""))
             {
                 frames.RemoveAt(0);
@@ -215,7 +217,7 @@ namespace uAdventure.Core
             }
             else
             {
-                frames.Insert(after + 1, (Frame)frame.Clone());
+                frames.Insert(after + 1, frame);
                 transitions.Insert(after + 2, new Transition());
             }
             return frame;

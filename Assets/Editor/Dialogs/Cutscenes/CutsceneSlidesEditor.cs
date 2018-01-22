@@ -169,7 +169,8 @@ namespace uAdventure.Editor
             GUI.enabled = true;
             if (GUILayout.Button(addTexture))
             {
-                workingAnimation.addFrame(selectedFrame, null);
+                var frame = workingAnimation.addFrame(selectedFrame, null);
+                frame.setUri(SpecialAssetPaths.ASSET_EMPTY_ANIMATION + "_01.png");
             }
 
             GUI.enabled = selectedFrame >= 0;
@@ -249,10 +250,9 @@ namespace uAdventure.Editor
             if (GUILayout.Button("OK"))
             {
                 // If it doesnt have an extension its because its an old animation
-                if (!Path.HasExtension(workingAnimation.getAboslutePath()))
+                if (!Path.HasExtension(cutscenePath))
                 {
                     cutscenePath = cutscenePath + ".eaa.xml";
-                    workingAnimation.setAbsolutePath(workingAnimation.getAboslutePath() + ".eaa.xml");
                 }
 
                 AnimationWriter.writeAnimation(cutscenePath, workingAnimation);

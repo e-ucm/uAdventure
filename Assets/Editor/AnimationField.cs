@@ -29,19 +29,30 @@ public class AnimationField : FileChooser {
 
     protected void drawView()
     {
-        using (new EditorGUI.DisabledScope(Path.Equals(EMPTY)))
+        var text = Path.Equals(EMPTY) ? TC.get("Resources.Create") : TC.get("Resources.Edit");
+        if (GUILayout.Button(text, GUILayout.Width(GUI.skin.button.CalcSize(new GUIContent(text)).x)))
         {
-            var text = string.IsNullOrEmpty(Path) ? TC.get("Resources.Create") : TC.get("Resources.Edit");
-            if (GUILayout.Button(text, GUILayout.Width(GUI.skin.button.CalcSize(new GUIContent(text)).x)))
+            // For not-existing cutscene - show new cutscene name dialog
+            if (Path.Equals(EMPTY))
             {
-                // For not-existing cutscene - show new cutscene name dialog
-                if (string.IsNullOrEmpty(Path))
+                ScriptableObject.CreateInstance<CutsceneNameInputPopup>().Init(this, "");
+            }
+            else
+            {
+                EditCutscene();
+            }
+        }
+    }
+
+    protected override void drawClear()
+    {
+        if (ShowClear)
+        {
+            using (new EditorGUI.DisabledScope(Path.Equals(EMPTY)))
+            {
+                if (GUILayout.Button(delTex, GUILayout.Width(delTex.width + 10f)))
                 {
-                    ScriptableObject.CreateInstance<CutsceneNameInputPopup>().Init(this, "");
-                }
-                else
-                {
-                    EditCutscene();
+                    Path = EMPTY;
                 }
             }
         }
@@ -79,6 +90,7 @@ public class AnimationField : FileChooser {
         uAdventure.Core.Animation newAnim = new uAdventure.Core.Animation(val.Split('/').Last());
         newAnim.getFrame(0).setUri(EMPTY + "_01.png");
         AnimationWriter.writeAnimation(val, newAnim);
+        AssetDatabase.ImportAsset("Assets/Resources/CurrentGame/" + val);
         Path = val;
     }
 
