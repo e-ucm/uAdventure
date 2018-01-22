@@ -11,7 +11,6 @@ namespace uAdventure.Core
 		public object DOMParse(XmlElement element, params object[] parameters)
 		{
 			Action currentAction = new Action(0);
-			Chapter chapter = parameters [0] as Chapter;
 
             //First we parse the elements every action haves:
 			bool currentNeedsGoTo       = ExString.EqualsDefault(element.GetAttribute("needsGoTo"), "yes", false);

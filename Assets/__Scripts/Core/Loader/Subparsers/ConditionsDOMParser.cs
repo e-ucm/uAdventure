@@ -14,7 +14,6 @@ namespace uAdventure.Core
 	{
         public object DOMParse(XmlElement element, params object[] parameters)
 		{
-			var chapter = parameters [0] as Chapter;
 			Conditions conditions = element.Name == "global-state" ? new GlobalState (element.GetAttribute("id")) : new Conditions () ;
 
 			foreach (var child in element.ChildNodes)

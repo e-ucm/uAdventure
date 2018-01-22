@@ -12,8 +12,8 @@ namespace uAdventure.Core
         {
 			Frame frame = new Frame();
 
-            XmlNodeList
-                assets = element.SelectNodes("next-scene");
+            /*XmlNodeList
+                assets = element.SelectNodes("next-scene");*/
 
 			switch(element.GetAttribute("type")){
 			case "image":

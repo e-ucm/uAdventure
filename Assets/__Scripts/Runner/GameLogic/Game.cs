@@ -43,7 +43,6 @@ namespace uAdventure.Runner
         public bool useSystemIO = true, forceScene = false, editor_mode = true;
         private GUISkin style;
         public string gamePath = "", gameName = "", scene_name = "";
-        private string /*playerName = "Jugador",*/ selected_game, selected_path;
         public GameObject Blur_Prefab;
         MenuMB menu;
         Interactuable next_interaction = null;
@@ -68,12 +67,12 @@ namespace uAdventure.Runner
         }
 
         public string getSelectedGame()
-        {
-            return selected_game;
+        { 
+            return gameName;
         }
         public string getSelectedPath()
         {
-            return selected_path;
+            return gamePath;
         }
 
         void Awake()

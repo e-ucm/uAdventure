@@ -19,8 +19,6 @@ namespace uAdventure.Core
 			endsgame = element.SelectNodes ("end-game"),
 			nextsscene = element.SelectNodes ("next-scene");
 
-            string tmpArgVal;
-
 			string slidesceneId = element.GetAttribute("id");
 			bool initialScene = ExString.EqualsDefault(element.GetAttribute("start"), "yes", false);
 

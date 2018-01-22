@@ -33,11 +33,9 @@ namespace uAdventure.Runner
         }
 
         public List<eFrame> frames;
-        string path;
 
         public eAnim(string path, ResourceManager.LoadingType type)
         {
-            this.path = path;
             frames = new List<eFrame>();
             Animation = Loader.loadAnimation(path, Game.Instance.ResourceManager);
 

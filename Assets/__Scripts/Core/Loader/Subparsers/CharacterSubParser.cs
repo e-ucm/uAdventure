@@ -12,12 +12,7 @@ namespace uAdventure.Core
     {
 		public object DOMParse(XmlElement element, params object[] parameters)
 		{
-			// PARAMETERS
-			Chapter chapter = parameters [0] as Chapter;
-
 			NPC npc = new NPC(element.GetAttribute("id"));
-
-			List<Description> descriptions = new List<Description>();
 
 			// DOCUMENTATION
 			var doc = element.SelectSingleNode("documentation");
