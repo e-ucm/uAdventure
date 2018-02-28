@@ -41,7 +41,7 @@ public class FileChooser : DialogReceiverInterface
         EditorGUILayout.EndHorizontal();
     }
 
-    protected void drawPath()
+    protected virtual void drawPath()
     {
         EditorGUILayout.LabelField(Label, GUILayout.MaxWidth(250));
         using (new EditorGUI.DisabledScope(!AllowEditingPath))
@@ -50,7 +50,7 @@ public class FileChooser : DialogReceiverInterface
         }
     }
 
-    protected void drawSelect()
+    protected virtual void drawSelect()
     {
         if (GUILayout.Button(TC.get("Buttons.Select"), GUILayout.Width(GUI.skin.button.CalcSize(new GUIContent(TC.get("Buttons.Select"))).x)))
         {
@@ -78,6 +78,7 @@ public class FileChooser : DialogReceiverInterface
 
         switch (type)
         {
+            case BaseFileOpenDialog.FileType.PATH:
             case BaseFileOpenDialog.FileType.SCENE_BACKGROUND:
             case BaseFileOpenDialog.FileType.SCENE_FOREGROUND:
             case BaseFileOpenDialog.FileType.EXIT_ICON:

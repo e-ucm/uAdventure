@@ -151,9 +151,9 @@ namespace uAdventure.Editor
         }
     }
 
-    public class ExportProjectEadMenuItem : IMenuItem
+    public class BuildProjectEadMenuItem : IMenuItem
     {
-        public ExportProjectEadMenuItem(string name_)
+        public BuildProjectEadMenuItem(string name_)
         {
             this.Label = name_;
         }
@@ -165,7 +165,161 @@ namespace uAdventure.Editor
 
         public void OnCliked()
         {
-            Controller.Instance.exportGame();
+            Controller.Instance.buildGame();
+        }
+    }
+    
+    public class BuildProjectWindows : IMenuItem
+    {
+        public BuildProjectWindows(string name_)
+        {
+            this.Label = name_;
+        }
+
+        public string Label
+        {
+            get; set;
+        }
+
+        public void OnCliked()
+        {
+            Controller.Instance.buildGame(Controller.EXPORT_WINDOWS);
+        }
+    }
+    public class BuildProjectLinux : IMenuItem
+    {
+        public BuildProjectLinux(string name_)
+        {
+            this.Label = name_;
+        }
+
+        public string Label
+        {
+            get; set;
+        }
+
+        public void OnCliked()
+        {
+            Controller.Instance.buildGame(Controller.EXPORT_LINUX);
+        }
+    }
+    public class BuildProjectMacOsX : IMenuItem
+    {
+        public BuildProjectMacOsX(string name_)
+        {
+            this.Label = name_;
+        }
+
+        public string Label
+        {
+            get; set;
+        }
+
+        public void OnCliked()
+        {
+            Controller.Instance.buildGame(Controller.EXPORT_MACOSX);
+        }
+    }
+    public class BuildProjectStandalone : IMenuItem
+    {
+        public BuildProjectStandalone(string name_)
+        {
+            this.Label = name_;
+        }
+
+        public string Label
+        {
+            get; set;
+        }
+
+        public void OnCliked()
+        {
+            Controller.Instance.buildGame(Controller.EXPORT_STANDALONE);
+        }
+    }
+    public class BuildProjectAndroid : IMenuItem
+    {
+        public BuildProjectAndroid(string name_)
+        {
+            this.Label = name_;
+        }
+
+        public string Label
+        {
+            get; set;
+        }
+
+        public void OnCliked()
+        {
+            Controller.Instance.buildGame(Controller.EXPORT_ANDROID);
+        }
+    }
+    public class BuildProjectIOS : IMenuItem
+    {
+        public BuildProjectIOS(string name_)
+        {
+            this.Label = name_;
+        }
+
+        public string Label
+        {
+            get; set;
+        }
+
+        public void OnCliked()
+        {
+            Controller.Instance.buildGame(Controller.EXPORT_IOS);
+        }
+    }
+    public class BuildProjectWebGL : IMenuItem
+    {
+        public BuildProjectWebGL(string name_)
+        {
+            this.Label = name_;
+        }
+
+        public string Label
+        {
+            get; set;
+        }
+
+        public void OnCliked()
+        {
+            Controller.Instance.buildGame(Controller.EXPORT_WEBGL);
+        }
+    }
+    public class BuildProjectMobile : IMenuItem
+    {
+        public BuildProjectMobile(string name_)
+        {
+            this.Label = name_;
+        }
+
+        public string Label
+        {
+            get; set;
+        }
+
+        public void OnCliked()
+        {
+            Controller.Instance.buildGame(Controller.EXPORT_MOBILE);
+        }
+    }
+    public class BuildProjectAll : IMenuItem
+    {
+        public BuildProjectAll(string name_)
+        {
+            this.Label = name_;
+        }
+
+        public string Label
+        {
+            get; set;
+        }
+
+        public void OnCliked()
+        {
+            Controller.Instance.buildGame(Controller.EXPORT_ALL);
         }
     }
 

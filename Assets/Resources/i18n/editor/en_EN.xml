@@ -306,7 +306,6 @@ In the game you can define conditions based on the value of the variables.</entr
 <entry key="Operation.AddSceneTitle">Add scene</entry>
 <entry key="Timer.Effects">Effects to be executed if the timer expires</entry>
 <entry key="AssessmentRule.CheckRule.Datav12">is not part of  SCORM  v1.2 Data Model</entry>
-<entry key="MenuFile.ExportStandalone">Export as a standalone jar-based game</entry>
 <entry key="DefaultValue.AdventureTitle">Adventure title</entry>
 <entry key="ActionsList.CustomAction">Custom: {#0}</entry>
 <entry key="Effect.CancelAction">Cancel action</entry>
@@ -1232,7 +1231,16 @@ Please remember that you cannot make any reference to a macro in its definition<
 <entry key="ErrorReport.Name">Name (optional):</entry>
 <entry key="Cutscene.CutsceneEndReached">When the cutscene end is reached...</entry>
 <entry key="Operation.FileNotLoadedTitle">Project not loaded!</entry>
-<entry key="MenuFile.Export">Export project...</entry>
+<entry key="MenuFile.Build">Build project...</entry>
+<entry key="MenuFile.BuildWindows">Build for Windows</entry>
+<entry key="MenuFile.BuildMacOsX">Build for Mac OS X</entry>
+<entry key="MenuFile.BuildLinux">Build for Linux</entry>
+<entry key="MenuFile.BuildStandalone">Build for all Standalone</entry>
+<entry key="MenuFile.BuildAndroid">Build for Android</entry>
+<entry key="MenuFile.BuildIOS">Build for iOS</entry>
+<entry key="MenuFile.BuildWebGL">Build for Web</entry>
+<entry key="MenuFile.BuildMobile">Build for all Mobile</entry>
+<entry key="MenuFile.BuildAll">Build All</entry>
 <entry key="MacrosList.DuplicateMacro">Duplicate selected macro</entry>
 <entry key="Action.ActiveWhenConditionsArent">Active when conditions are not</entry>
 <entry key="Conversation.OperationDeleteLink">Delete link</entry>

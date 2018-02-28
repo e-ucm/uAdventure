@@ -391,6 +391,28 @@ namespace uAdventure.Editor
 
         public const int AGREGA = 2;
 
+
+        /**
+         * Identifiers for differents fast exporting types
+         */
+        public const int EXPORT_WINDOWS = 0;
+
+        public const int EXPORT_MACOSX = 1;
+
+        public const int EXPORT_LINUX = 2;
+
+        public const int EXPORT_STANDALONE = 3;
+
+        public const int EXPORT_ANDROID = 4;
+
+        public const int EXPORT_IOS = 5;
+
+        public const int EXPORT_WEBGL = 6;
+
+        public const int EXPORT_MOBILE = 7;
+
+        public const int EXPORT_ALL = 8;
+
         /**
          * Singleton instance.
          */
@@ -1743,19 +1765,23 @@ namespace uAdventure.Editor
 
         //        }
         //    }
-
-        public bool exportGame()
+        public bool buildGame()
         {
-            return exportGame("Games/" + currentZipName);
+            return buildGame(String.Empty, -1);
+        }
+
+        public bool buildGame(int mode)
+        {
+            return buildGame("Games/" + currentZipName, mode);
         }
         
 
-        public bool exportGame(string targetFilePath)
+        public bool buildGame(string targetFilePath, int mode)
         {
 
-            bool exportGame = true;
+            bool buildGame = true;
             bool exported = false;
-            exportGame = saveFile(true);
+            buildGame = saveFile(false);
             //TODO: testing
             //if (dataModified_F)
             //{
@@ -1775,63 +1801,209 @@ namespace uAdventure.Editor
             //    //    exportGame = false;
             //}
 
-            if (exportGame)
+            if (buildGame)
             {
                 string selectedPath = targetFilePath;
                 //TODO: implementation
                 //if (selectedPath == null)
                 //    selectedPath = mainWindow.showSaveDialog(getCurrentExportSaveFolder(), new EADFileFilter());
-                if (selectedPath != null)
+                
+                if (mode == -1)
                 {
-                    if (!selectedPath.ToLower().EndsWith(".eap"))
-                        selectedPath = selectedPath + ".eap";
-                    AssetsController.copyAllFiles(currentZipFile, new DirectoryInfo(targetFilePath).FullName);
-                    FileInfo destinyFile = new FileInfo(selectedPath);
-
-                    // Check the destinyFile is not in the project folder
-                    if (targetFilePath != null || isValidTargetFile(destinyFile))
-                    {
-
-                        // If the file exists, ask to overwrite
-                        if (!destinyFile.Exists || targetFilePath != null)
-                        //|| mainWindow.showStrictConfirmDialog(TC.get("Operation.SaveFileTitle"), TC.get("Operation.OverwriteExistingFile", destinyFile.getName())))
-                        {
-                            destinyFile.Delete();
-
-                            // Finally, export it
-                            //LoadingScreen loadingScreen = new LoadingScreen(TextConstants.getText( "Operation.ExportProject.AsEAD" ), getLoadingImage( ), mainWindow);
-                            //if (targetFilePath == null)
-                            //{
-                            //    loadingScreen.setMessage(TC.get("Operation.ExportProject.AsEAD"));
-                            //    loadingScreen.setVisible(true);
-                            //}
-                            if (Writer.export(ProjectFolder, destinyFile.FullName))
-                            {
-                                exported = true;
-                                if (targetFilePath == null)
-                                    Debug.Log(TC.get("Operation.ExportT.Success.Title") +
-                                              TC.get("Operation.ExportT.Success.Message"));
-                            }
-                            else
-                            {
-                                Debug.LogError(TC.get("Operation.ExportT.NotSuccess.Title") +
-                                               TC.get("Operation.ExportT.NotSuccess.Message"));
-                            }
-                            //loadingScreen.close( );
-                            //if (targetFilePath == null)
-                            //    loadingScreen.setVisible(false);
-                        }
-                    }
-                    else
-                    {
-                        // Show error: The target dir cannot be contained 
-                        Debug.LogError(TC.get("Operation.ExportT.TargetInProjectDir.Title") +
-                                       TC.get("Operation.ExportT.TargetInProjectDir.Message"));
-                    }
+                    var exportWindow = BuildWindow.CreateBuildWindow();
+                    exportWindow.OnConfigSelected += BuildWindow_OnConfigSelected;
+                }
+                else if (string.IsNullOrEmpty(selectedPath))
+                {
+                    // Get filename.
+                    var path = EditorUtility.SaveFolderPanel("Choose Location of Built Game", "", "");
                 }
             }
 
             return exported;
+        }
+
+        private void BuildWindow_OnConfigSelected(object sender, EventArgs e)
+        {
+            var args = e as ExportConfigSelectedEventArgs;
+            Debug.Log("Config selected.");
+            doBuild(args.exportConfig);
+        }
+
+        public class BuildConfigs
+        {
+            public static bool BuildWindows,
+                BuildLinux,
+                BuildMacOsX,
+                BuildAndroid,
+                BuildIOS,
+                BuildWebGL;
+            public static string path;
+
+            /// <summary>
+            /// Creates a instance of an export config with the current ExportConfigs values and returns it.
+            /// </summary>
+            /// <returns>A instance of ExportConfig with current ExportConfigs values.</returns>
+            public static BuildConfig Instanciate()
+            {
+                var exportConfig = new BuildConfig();
+
+                exportConfig.path = BuildConfigs.path;
+
+                exportConfig.BuildWindows = BuildConfigs.BuildWindows;
+                exportConfig.BuildMacOsX = BuildConfigs.BuildMacOsX;
+                exportConfig.BuildLinux = BuildConfigs.BuildLinux;
+                exportConfig.BuildAndroid = BuildConfigs.BuildAndroid;
+                exportConfig.BuildIOS = BuildConfigs.BuildIOS;
+                exportConfig.BuildWebGL = BuildConfigs.BuildWebGL;
+
+                exportConfig.fileName = PlayerSettings.productName;
+                exportConfig.author = PlayerSettings.companyName;
+                exportConfig.version = PlayerSettings.Android.bundleVersionCode;
+                exportConfig.packageName = PlayerSettings.applicationIdentifier;
+
+                return exportConfig;
+            }
+        }
+
+        /// <summary>
+        /// Class to transfer the export configs to the simplified exporter.
+        /// </summary>
+        public class BuildConfig
+        {
+            /// <summary>
+            /// Check if the builder has to export into Windows x86 and x64.
+            /// </summary>
+            public bool BuildWindows;
+            /// <summary>
+            /// Check if the builder has to export into Linux universal.
+            /// </summary>
+            public bool BuildLinux;
+            /// <summary>
+            /// Check if the builder has to export into Mac Os X universal.
+            /// </summary>
+            public bool BuildMacOsX;
+            /// <summary>
+            /// Check if the builder has to export into Android.
+            /// </summary>
+            public bool BuildAndroid;
+            /// <summary>
+            /// Check if the builder has to export into iOS
+            /// </summary>
+            public bool BuildIOS;
+            /// <summary>
+            /// Check if the builder has to export into WebGL.
+            /// </summary>
+            public bool BuildWebGL;
+            /// <summary>
+            /// Version to tag the current build.
+            /// </summary>
+            public int version;
+            /// <summary>
+            /// Author/Company of the game.
+            /// </summary>
+            public string author;
+            /// <summary>
+            /// Package name in the reverse domain name format (i.e. "com.company.game").
+            /// </summary>
+            public string packageName;
+            /// <summary>
+            /// Name of the game and built file.
+            /// </summary>
+            public string fileName;
+            /// <summary>
+            /// Path to write down the files.
+            /// </summary>
+            public string path;
+            /// <summary>
+            /// Icon for the game.
+            /// </summary>
+            public string icon;
+        }
+
+        private BuildPlayerOptions createBasic(string[] scenes, string path, BuildTarget target, BuildOptions options)
+        {
+            return new BuildPlayerOptions()
+            {
+                scenes = scenes,
+                locationPathName = path,
+                target = target,
+                options = options
+            };
+        }
+
+        private string Namify(string name)
+        {
+            return name.Split(' ')[0];
+        }
+
+        private void doBuild(BuildConfig config)
+        {
+            string[] scenes = new string[] { "Assets/Scenes/_Scene1.unity" };
+
+            // Build player.
+            List<BuildPlayerOptions> builds = new List<BuildPlayerOptions>();
+
+            PlayerSettings.companyName = config.author;
+            PlayerSettings.productName = config.fileName;
+
+            var name = Namify(config.fileName);
+
+            PlayerSettings.SetApplicationIdentifier(BuildTargetGroup.Standalone, config.packageName);
+
+            if (config.BuildWindows)
+            {
+                var b = createBasic(scenes, config.path + "/Windows/" + name + ".exe", BuildTarget.StandaloneWindows, BuildOptions.None);
+                builds.Add(b);
+
+                var b64 = createBasic(scenes, config.path + "/Windows64/" + name + ".exe", BuildTarget.StandaloneWindows64, BuildOptions.None);
+                builds.Add(b64);
+            }
+
+            if (config.BuildLinux)
+            {
+                var b = createBasic(scenes, config.path + "/Linux/" + name, BuildTarget.StandaloneLinuxUniversal, BuildOptions.None);
+                builds.Add(b);
+            }
+
+            if (config.BuildMacOsX)
+            {
+                var b = createBasic(scenes, config.path + "/MacOsX/" + name, BuildTarget.StandaloneOSX, BuildOptions.None);
+                builds.Add(b);
+            }
+
+            if (config.BuildAndroid)
+            {
+                var b = createBasic(scenes, config.path + "/Android/" + name + ".apk", BuildTarget.Android, BuildOptions.None);
+                builds.Add(b);
+
+                PlayerSettings.Android.androidIsGame = true;
+                PlayerSettings.Android.bundleVersionCode = config.version;
+                PlayerSettings.SetApplicationIdentifier(BuildTargetGroup.Android, config.packageName);
+            }
+
+            if (config.BuildIOS)
+            {
+                var b = createBasic(scenes, config.path + "/iOS(XCode)/", BuildTarget.iOS, BuildOptions.None);
+                builds.Add(b);
+
+                PlayerSettings.iOS.buildNumber = config.version.ToString();
+                PlayerSettings.SetApplicationIdentifier(BuildTargetGroup.iOS, config.packageName);
+            }
+
+            if (config.BuildWebGL)
+            {
+                var b = createBasic(scenes, config.path + "/WebGL/", BuildTarget.WebGL, BuildOptions.None);
+                builds.Add(b);
+            }
+
+            for(int build = 0; build < builds.Count; build++)
+            {
+                EditorUtility.DisplayProgressBar("Building...", "Building for: " + builds[build].target.ToString(), build / ((float)builds.Count));
+                BuildPipeline.BuildPlayer(builds[build]);
+            }
+            EditorUtility.ClearProgressBar();
+            EditorUtility.DisplayCancelableProgressBar("Building...", "Done!", 1f);
         }
         
         

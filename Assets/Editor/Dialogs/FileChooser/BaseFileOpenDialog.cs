@@ -11,6 +11,7 @@ namespace uAdventure.Editor
     {
         public enum FileType
         {
+            PATH,
             SCENE_BACKGROUND,
             SCENE_FOREGROUND,
             SCENE_MUSIC,
@@ -64,16 +65,35 @@ namespace uAdventure.Editor
 
         public void OpenFileDialog()
         {
-			var result = EditorUtility.OpenFilePanel ("Select file", basePath, fileFilter);
+            string result;
+            if(fileType == FileType.PATH)
+            {
+                result = EditorUtility.SaveFolderPanel("Select folder", "/", "Exports");
+            }
+            else
+            {
+                result = EditorUtility.OpenFilePanel("Select file", basePath, fileFilter);
+            }
 
 			if (result != "")
             {
-				FileInfo file = new FileInfo (result);
+                bool isValid = false;
+                if (fileType == FileType.PATH)
+                {
+                    DirectoryInfo directory = new DirectoryInfo(result);
+                    isValid = directory.Exists;
+                    selectedAssetPath = directory.FullName;
+                }
+                else
+                {
+                    FileInfo file = new FileInfo(result);
+                    isValid = file.Exists;
+                    selectedAssetPath = file.FullName;
+                }
 
-				if (file.Exists)
+				if (isValid)
                 {
                     // Insert code to read the stream here.
-					selectedAssetPath = file.FullName;
                     ChoosedCorrectFile();
                 }
             }
@@ -89,6 +109,9 @@ namespace uAdventure.Editor
 
             switch (fileType)
             {
+                case FileType.PATH:
+                    returnPath = selectedAssetPath;
+                    return;
                 case FileType.SCENE_BACKGROUND:
                     assetTypeDir = AssetsController.CATEGORY_BACKGROUND_FOLDER;
                     break;
