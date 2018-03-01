@@ -73,11 +73,30 @@ namespace uAdventure.Editor
 
         private static Rect zeroRect;
         private Rect windowArea;
+        private bool hasToReturnFocus = false;
+
+        private void Return()
+        {
+            if (!EditorApplication.isPlaying && !EditorApplication.isPlayingOrWillChangePlaymode)
+            {
+                FocusWindowIfItsOpen(GetType());
+                EditorApplication.update -= Return;
+                hasToReturnFocus = false;
+            }
+        }
 
         public void OnEnable()
 		{
-			if (!thisWindowReference)
-				thisWindowReference = this;
+            if (!EditorApplication.isPlaying && EditorApplication.isPlayingOrWillChangePlaymode && !hasToReturnFocus)
+            {
+                hasToReturnFocus = true;
+                EditorApplication.update += Return; 
+            }
+
+            if (!thisWindowReference)
+            {
+                thisWindowReference = this;
+            }
             else
             {
                 DestroyImmediate(thisWindowReference);
