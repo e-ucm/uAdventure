@@ -998,6 +998,13 @@ namespace uAdventure.Editor
             return fileCreated;
         }
 
+        [UnityEditor.MenuItem("uAdventure/Configure Layout")]
+        public static void ConfigureWindowLayout()
+        {
+            string path = Path.Combine(Directory.GetCurrentDirectory(), "Assets/Editor/Layouts/uAdventure.wlt");
+            EditorUtility.LoadWindowLayout(path);
+        }
+
         //    //public void showLoadingScreen(string message)
         //    //{
 
