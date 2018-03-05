@@ -62,15 +62,21 @@ namespace uAdventure.Core
             // Add scene IDs
             foreach (Scene scene in chapter.getScenes())
             {
-                addSceneId(scene.getId());
+                addId<Scene>(scene.getId());
                 foreach (ActiveArea activeArea in scene.getActiveAreas())
                 {
                     if (activeArea.getId() != null && !activeArea.getId().Equals(""))
-                        addActiveAreaId(activeArea.getId());
+                        addId<ActiveArea>(activeArea.getId());
                 }
+            }            
+            
+            // Add conversation IDs
+            foreach (Conversation conversation in chapter.getConversations())
+            {
+                addId<Conversation>(conversation.getId());
             }
 
-			foreach (var o in chapter.getObjects().FindAll (t => t is HasId)) {
+            foreach (var o in chapter.getObjects().FindAll (t => t is HasId)) {
 				var h = o as HasId;
 				addId(o.GetType (), h.getId ());
 			}
