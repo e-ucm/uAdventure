@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 
-public class ButtonList : ScrollableList
+public class ButtonList : ColumnList
 {
     public float buttonWidth = 25;
 

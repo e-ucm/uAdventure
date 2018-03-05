@@ -62,9 +62,9 @@ namespace uAdventure.Runner
 
             Texture2D tmp;
             if (this.action.getType() == Action.CUSTOM)
-                tmp = ResourceManager.Instance.getImage(resource.getAssetPath("buttonNormal"));
+                tmp = Game.Instance.ResourceManager.getImage(resource.getAssetPath("buttonNormal"));
             else
-                tmp = ResourceManager.Instance.getImage(resource.getAssetPath(DescriptorData.NORMAL_BUTTON));
+                tmp = Game.Instance.ResourceManager.getImage(resource.getAssetPath(DescriptorData.NORMAL_BUTTON));
 
             this.GetComponent<Renderer>().material.mainTexture = tmp;
             this.transform.localScale = new Vector3(tmp.width / 75f, tmp.height / 75f, 1);
@@ -81,9 +81,9 @@ namespace uAdventure.Runner
             showText = true;
             transform.parent.GetComponent<OptionMB>().Highlight = true;
             if (this.action.getType() == Action.CUSTOM)
-                GetComponent<Renderer>().material.mainTexture = ResourceManager.Instance.getImage(resource.getAssetPath("buttonOver"));
+                GetComponent<Renderer>().material.mainTexture = Game.Instance.ResourceManager.getImage(resource.getAssetPath("buttonOver"));
             else
-                GetComponent<Renderer>().material.mainTexture = ResourceManager.Instance.getImage(resource.getAssetPath(DescriptorData.HIGHLIGHTED_BUTTON));
+                GetComponent<Renderer>().material.mainTexture = Game.Instance.ResourceManager.getImage(resource.getAssetPath(DescriptorData.HIGHLIGHTED_BUTTON));
 
             GUIManager.Instance.showHand(true);
         }
@@ -93,9 +93,9 @@ namespace uAdventure.Runner
             showText = false;
             transform.parent.GetComponent<OptionMB>().Highlight = false;
             if (this.action.getType() == Action.CUSTOM)
-                GetComponent<Renderer>().material.mainTexture = ResourceManager.Instance.getImage(resource.getAssetPath("buttonNormal"));
+                GetComponent<Renderer>().material.mainTexture = Game.Instance.ResourceManager.getImage(resource.getAssetPath("buttonNormal"));
             else
-                GetComponent<Renderer>().material.mainTexture = ResourceManager.Instance.getImage(resource.getAssetPath(DescriptorData.NORMAL_BUTTON));
+                GetComponent<Renderer>().material.mainTexture = Game.Instance.ResourceManager.getImage(resource.getAssetPath(DescriptorData.NORMAL_BUTTON));
 
             GUIManager.Instance.showHand(false);
         }

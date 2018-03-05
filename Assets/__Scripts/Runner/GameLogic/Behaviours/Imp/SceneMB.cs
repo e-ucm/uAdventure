@@ -33,6 +33,8 @@ namespace uAdventure.Runner
         private TrajectoryHandler trajectory;
         private Dictionary<ElementReference, ElementReference> contexts = new Dictionary<ElementReference, ElementReference>();
 
+        public List<float> sorting_layers = new List<float>();
+
         // Use this for initialization
         void Start()
         {
@@ -109,7 +111,7 @@ namespace uAdventure.Runner
             switch (sd.getType())
             {
                 case GeneralScene.GeneralSceneSceneType.VIDEOSCENE:
-                    movie = ResourceManager.Instance.getVideo(((Videoscene)sd).getResources()[0].getAssetPath(Videoscene.RESOURCE_TYPE_VIDEO));
+                    movie = Game.Instance.ResourceManager.getVideo(((Videoscene)sd).getResources()[0].getAssetPath(Videoscene.RESOURCE_TYPE_VIDEO));
                     movieplayer = MovieState.LOADING;
                     this.transform.Find("Background").localPosition = new Vector3(40, 30, 20);
                     break;
@@ -122,7 +124,7 @@ namespace uAdventure.Runner
                     {
                         if (ConditionChecker.check(sr.getConditions()))
                         {
-                            Texture2D tmp = ResourceManager.Instance.getImage(sr.getAssetPath(Scene.RESOURCE_TYPE_BACKGROUND));
+                            Texture2D tmp = Game.Instance.ResourceManager.getImage(sr.getAssetPath(Scene.RESOURCE_TYPE_BACKGROUND));
 
                             Transform background = this.transform.Find("Background");
                             background.GetComponent<Renderer>().material.mainTexture = tmp;
@@ -131,6 +133,19 @@ namespace uAdventure.Runner
                             this.transform.position = new Vector3(40, 30, 20);
                             background.localPosition = new Vector3(((80 * scale) - 80) / 2f, 0, 20);
                             background.transform.localScale = new Vector3(scale * 80, 60, 1);
+
+                            if (sr.getAssetPath(Scene.RESOURCE_TYPE_FOREGROUND) != "")
+                            {
+                                Texture2D fg = Game.Instance.ResourceManager.getImage(sr.getAssetPath(Scene.RESOURCE_TYPE_FOREGROUND));
+
+                                Transform foreground = this.transform.Find("Foreground");
+                                foreground.GetComponent<Renderer>().material.SetTexture("_MainTex", tmp);
+                                foreground.GetComponent<Renderer>().material.SetTexture("_AlphaTex", fg);
+
+                                foreground.localPosition = new Vector3(((80 * scale) - 80) / 2f, 0, -50);
+                                foreground.transform.localScale = new Vector3(scale * 80, 60, 1);
+                            }
+
                             break;
                         }
                     }
@@ -174,13 +189,13 @@ namespace uAdventure.Runner
                         if (player_context == null)
                         {
                             //Vector2 pos = LineHandler.nodeToVector2 (lines [lines.Count-1].end);
-                            Trajectory.Node pos = trajectory.getLastNode();
+                            Trajectory.Node pos = trajectory.getInitialNode();
                             player_context = new ElementReference("Player", pos.getX(), pos.getY(), rsd.getPlayerLayer());
                             player_context.setScale(pos.getScale());
                         }
                         /*GameObject.Destroy(this.transform.FindChild ("Player"));*/
 
-                        var player = GameObject.Instantiate(Player_Prefab).GetComponent<PlayerMB>();
+                        PlayerMB player = GameObject.Instantiate(Player_Prefab).GetComponent<PlayerMB>();
                         player.transform.parent = Characters;
                         player.Element = Game.Instance.GameState.getPlayer();
                         player.Context = player_context;
@@ -193,7 +208,7 @@ namespace uAdventure.Runner
                     {
                         if (ConditionChecker.check(r.getConditions()))
                         {
-                            this.slides = ResourceManager.Instance.getAnimation(r.getAssetPath(Slidescene.RESOURCE_TYPE_SLIDES));
+                            this.slides = Game.Instance.ResourceManager.getAnimation(r.getAssetPath(Slidescene.RESOURCE_TYPE_SLIDES));
                             this.transform.Find("Background").GetComponent<Renderer>().material.mainTexture = this.slides.frames[0].Image;
                             this.transform.position = new Vector3(40, 30, 20);
                             break;
@@ -221,6 +236,9 @@ namespace uAdventure.Runner
             {
                 ElementReference new_context = new ElementReference(context.getTargetId(), context.getX(), context.getY());
                 new_context.setScale(context.getScale());
+                new_context.setLayer(context.getLayer());
+                new_context.setInfluenceArea(context.getInfluenceArea());
+                new_context.setConditions(context.getConditions());
                 contexts.Add(context, new_context);
             }
 

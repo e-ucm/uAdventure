@@ -1,66 +1,121 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System.Xml;
+
+// TODO Possible unnecesary coupling
+using uAdventure.Runner;
+using System.Linq;
 
 namespace uAdventure.Core
 {
-    public class AnimationHandler_
+    public class AnimationHandler
     {
         /**
          * Animation being read.
          */
         private Animation animation;
 
-        private ImageLoaderFactory factory;
+        string directory = "";
 
-        public AnimationHandler_(InputStreamCreator isCreator, ImageLoaderFactory imageloader)
+        private ResourceManager resourceManager;
+
+        public AnimationHandler(ResourceManager resourceManager)
         {
-            this.factory = imageloader;
+            this.resourceManager = resourceManager;
         }
 
         public void Parse(string path_)
         {
-            XmlDocument xmld = new XmlDocument();
-            xmld.Load(path_);
-
-            XmlElement element = xmld.DocumentElement;
-
-            string tmpArgVal;
-
-            XmlNode animationNode = element.SelectSingleNode("/animation");
-
-            tmpArgVal = animationNode.Attributes["id"].Value;
-            if (!string.IsNullOrEmpty(tmpArgVal))
+            if (resourceManager.getAnimationsCache().ContainsKey(path_))
             {
-                animation = new Animation(tmpArgVal, factory);
-                animation.getFrames().Clear();
-                animation.getTransitions().Clear();
+                animation = resourceManager.getAnimationsCache()[path_];
+                return;
             }
 
-			animation.setSlides("yes".Equals (animationNode.Attributes["slides"].Value));
-			animation.setUseTransitions("yes".Equals (animationNode.Attributes["usetransitions"].Value));
+            XmlDocument xmld = new XmlDocument();
 
-            if (element.SelectSingleNode("documentation") != null)
-                animation.setDocumentation(element.SelectSingleNode("documentation").InnerText);
+            string xml = resourceManager.getText(path_);
+            if (!string.IsNullOrEmpty(xml))
+            {
+                xmld.LoadXml(xml);
 
-			// FRAMES
-			foreach (var frame in DOMParserUtility.DOMParse<Frame>(element.SelectNodes("/animation/frame"), animation.getImageLoaderFactory ()))
-				animation.addFrame (frame);
+                XmlElement element = xmld.DocumentElement;
 
-			// TRANSITIONS
-			foreach (var transition in DOMParserUtility.DOMParse<Transition>(element.SelectNodes("/animation/transition")))
-				animation.getTransitions ().Add (transition);
+                string tmpArgVal;
+
+                XmlElement animationNode = element.SelectSingleNode("/animation") as XmlElement;
+
+                tmpArgVal = animationNode.Attributes["id"].Value;
+                if (!string.IsNullOrEmpty(tmpArgVal))
+                {
+                    animation = new Animation(tmpArgVal);
+                    animation.getFrames().Clear();
+                    animation.getTransitions().Clear();
+                }
+
+                animation.setSlides(ExString.EqualsDefault(animationNode.GetAttribute("slides"), "yes", false));
+                animation.setUseTransitions(ExString.EqualsDefault(animationNode.GetAttribute("usetransitions"),"yes", false));
+
+                if (element.SelectSingleNode("documentation") != null)
+                    animation.setDocumentation(element.SelectSingleNode("documentation").InnerText);
+
+                // FRAMES
+                foreach (var frame in DOMParserUtility.DOMParse<Frame>(element.SelectNodes("/animation/frame")))
+                    animation.addFrame(frame);
+
+                // TRANSITIONS
+                foreach (var transition in DOMParserUtility.DOMParse<Transition>(element.SelectNodes("/animation/transition")))
+                    animation.getTransitions().Add(transition);
 
 
-			// RESOURCES
-			foreach(var res in DOMParserUtility.DOMParse <ResourcesUni> (element.SelectNodes("/animation/resources")))
-				animation.addResources(res);
+                // RESOURCES
+                foreach (var res in DOMParserUtility.DOMParse<ResourcesUni>(element.SelectNodes("/animation/resources")))
+                    animation.addResources(res);
+            }
+            else
+            {
+                animation = new Animation(path_.Split('/').Last());
+                animation.getFrames().Clear();
+                animation.getTransitions().Clear();
 
+                xmld = new XmlDocument();
+                int num = 1;
+                string ruta = path_;
+                Texture2D img = null;
+
+                do
+                {
+                    ruta = path_ + "_" + intToStr(num);
+
+                    img = resourceManager.getImage(ruta);
+                    if (img)
+                    {
+                        var newFrame = new Frame(ruta, 100, false);
+                        animation.addFrame(newFrame);
+                        animation.getTransitions().Add(new Transition());
+                        num++;
+                    }
+
+                } while (img);
+            }
+
+            if(animation != null)
+            {
+                resourceManager.getAnimationsCache()[path_] = animation;
+            }
         }
 
         public Animation getAnimation()
         {
             return animation;
+        }
+
+
+        private static string intToStr(int number)
+        {
+            if (number < 10)
+                return "0" + number;
+            else
+                return number.ToString();
         }
     }
 }

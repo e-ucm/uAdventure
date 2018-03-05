@@ -8,7 +8,7 @@ namespace uAdventure.Editor
 {
     public class GlobalStateDataControl : DataControl
     {
-        private ConditionsController controller;
+        private ConditionsController conditionsController;
 
         private GlobalState globalState;
 
@@ -16,7 +16,7 @@ namespace uAdventure.Editor
         {
 
             globalState = conditions;
-            controller = new ConditionsController(globalState, Controller.GLOBAL_STATE, globalState.getId());
+            conditionsController = new ConditionsController(globalState, Controller.GLOBAL_STATE, globalState.getId());
         }
 
         public void setDocumentation(string doc)
@@ -36,9 +36,20 @@ namespace uAdventure.Editor
 
             return globalState.getId();
         }
+
         public void setId(string val)
         {
-            globalState.setId(val);
+            if (val != globalState.getId())
+            {
+                var oldId = globalState.getId();
+                if (!controller.isElementIdValid(val))
+                    val = controller.makeElementValid(val);
+                globalState.setId(val);
+
+                controller.replaceIdentifierReferences(oldId, val);
+                controller.IdentifierSummary.deleteId<GlobalState>(oldId);
+                controller.IdentifierSummary.addId<GlobalState>(val);
+            }
         }
 
         /**
@@ -47,7 +58,7 @@ namespace uAdventure.Editor
         public ConditionsController getController()
         {
 
-            return controller;
+            return conditionsController;
         }
 
 
@@ -106,7 +117,7 @@ namespace uAdventure.Editor
         {
 
             int count = 0;
-            count += controller.countIdentifierReferences(id);
+            count += conditionsController.countIdentifierReferences(id);
             return count;
         }
 
@@ -127,7 +138,7 @@ namespace uAdventure.Editor
         public override void deleteIdentifierReferences(string id)
         {
 
-            controller.deleteIdentifierReferences(id);
+            conditionsController.deleteIdentifierReferences(id);
         }
 
 
@@ -211,7 +222,7 @@ namespace uAdventure.Editor
                 Controller.Instance.IdentifierSummary.deleteGlobalStateId(oldId);
                 Controller.Instance.IdentifierSummary.addGlobalStateId(newId);
             }
-            controller.replaceIdentifierReferences(oldId, newId);
+            conditionsController.replaceIdentifierReferences(oldId, newId);
         }
 
 
@@ -225,7 +236,7 @@ namespace uAdventure.Editor
         public override void recursiveSearch()
         {
 
-            check(this.controller, TC.get("Search.Conditions"));
+            check(this.conditionsController, TC.get("Search.Conditions"));
             check(this.getDocumentation(), TC.get("Search.Documentation"));
             check(this.getId(), "ID");
         }

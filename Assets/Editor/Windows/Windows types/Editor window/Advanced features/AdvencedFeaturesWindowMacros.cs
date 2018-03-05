@@ -4,40 +4,67 @@ using System;
 using Random = UnityEngine.Random;
 
 using uAdventure.Core;
+using UnityEditor;
+using System.Linq;
 
 namespace uAdventure.Editor
 {
     public class AdvencedFeaturesWindowMacros : LayoutWindow
     {
-
-        private Texture2D addTex = null;
-        private Texture2D duplicateTex = null;
-        private Texture2D clearTex = null;
-
-        private static GUISkin defaultSkin;
-        private static GUISkin noBackgroundSkin;
-        private static GUISkin selectedAreaSkin;
-
-        private Vector2 scrollPosition;
-
-        private int selectedMacro;
-
-        private Rect macroTableRect, rightPanelRect, descriptionRect, effectsRect;
-
-        private string macroName, macroNameLast;
-        private string macroDocumentation, macroDocumentationLast;
+        private DataControlList macroList;
 
         public AdvencedFeaturesWindowMacros(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
         {
-            clearTex = (Texture2D)Resources.Load("EAdventureData/img/icons/deleteContent", typeof(Texture2D));
-            addTex = (Texture2D)Resources.Load("EAdventureData/img/icons/addNode", typeof(Texture2D));
-            duplicateTex = (Texture2D)Resources.Load("EAdventureData/img/icons/duplicateNode", typeof(Texture2D));
-            
-            noBackgroundSkin = (GUISkin)Resources.Load("Editor/EditorNoBackgroundSkin", typeof(GUISkin));
-            selectedAreaSkin = (GUISkin)Resources.Load("Editor/EditorLeftMenuItemSkinConcreteOptions", typeof(GUISkin));
-            
-            selectedMacro = -1;
+
+            macroList = new DataControlList()
+            {
+                footerHeight = 25,
+                elementHeight = 40,
+                Columns = new System.Collections.Generic.List<ColumnList.Column>()
+                {
+                    new ColumnList.Column()
+                    {
+                        Text = TC.get("MacrosList.ID"),
+                        SizeOptions = new GUILayoutOption[] { GUILayout.Width(150) }
+                    },
+                    new ColumnList.Column()
+                    {
+                        Text = TC.get("Macro.Documentation"),
+                        SizeOptions = new GUILayoutOption[] { GUILayout.ExpandWidth(true) }
+                    },
+                    new ColumnList.Column()
+                    {
+                        Text = TC.get("Element.Effects"),
+                        SizeOptions = new GUILayoutOption[] { GUILayout.Width(220) }
+                    }
+                },
+                drawCell = (rect, index, column, isActive, isFocused) =>
+                {
+                    var macro = macroList.list[index] as MacroDataControl;
+                    switch (column)
+                    {
+                        case 0:
+                            EditorGUI.BeginChangeCheck();
+                            var id = EditorGUI.DelayedTextField(rect, macro.getId());
+                            if (EditorGUI.EndChangeCheck()) macro.setId(id);
+                            break;
+                        case 1:
+                            EditorGUI.BeginChangeCheck();
+                            var documentation = EditorGUI.TextArea(rect, macro.getDocumentation() ?? string.Empty);
+                            if (EditorGUI.EndChangeCheck()) macro.setDocumentation(documentation);
+                            break;
+                        case 2:
+                            if (GUI.Button(rect, TC.get("GeneralText.EditEffects")))
+                            {
+                                EffectEditorWindow window = ScriptableObject.CreateInstance<EffectEditorWindow>();
+                                window.Init(macro.getController());
+                            }
+                            break;
+
+                    }
+                }
+            };
         }
 
         public override void Draw(int aID)
@@ -45,127 +72,9 @@ namespace uAdventure.Editor
             var windowWidth = m_Rect.width;
             var windowHeight = m_Rect.height;
 
-            macroTableRect = new Rect(0f, 0.1f * windowHeight, 0.9f * windowWidth, 0.5f * windowHeight);
-            rightPanelRect = new Rect(0.9f * windowWidth, 0.1f * windowHeight, 0.08f * windowWidth, 0.5f * windowHeight);
-            descriptionRect = new Rect(0f, 0.6f * windowHeight, 0.95f * windowWidth, 0.2f * windowHeight);
-            effectsRect = new Rect(0f, 0.8f * windowHeight, windowWidth, windowHeight * 0.15f);
-
-            GUILayout.BeginArea(macroTableRect);
-            GUILayout.Box(TC.get("MacrosList.ID"), GUILayout.Width(0.85f * windowWidth));
-
-            scrollPosition = GUILayout.BeginScrollView(scrollPosition);
-            for (int i = 0;
-                i <
-                Controller.Instance.SelectedChapterDataControl.getMacrosListDataControl().getMacros().Count;
-                i++)
-            {
-                if (i != selectedMacro)
-                {
-                    GUI.skin = noBackgroundSkin;
-
-                    if (
-                        GUILayout.Button(
-                            Controller.Instance.SelectedChapterDataControl.getMacrosListDataControl().getMacros()[
-                                i].getId(), GUILayout.Width(0.85f * windowWidth)))
-                    {
-                        OnSelectedMacroChanged(i);
-                    }
-                }
-                else
-                {
-                    GUI.skin = selectedAreaSkin;
-
-                    macroName = GUILayout.TextField(macroName, GUILayout.Width(0.85f * windowWidth));
-                    if (!macroName.Equals(macroNameLast))
-                        OnMacroNameChanged(macroName);
-                }
-                GUI.skin = defaultSkin;
-            }
-            GUILayout.EndScrollView();
-            GUILayout.EndArea();
-
-            /*
-            * Right panel
-            */
-            GUILayout.BeginArea(rightPanelRect);
-            GUI.skin = noBackgroundSkin;
-            if (GUILayout.Button(addTex, GUILayout.MaxWidth(0.08f * windowWidth)))
-            {
-                Controller.Instance.SelectedChapterDataControl.getMacrosListDataControl()
-                    .addElement(Controller.MACRO, "Macro" + Random.Range(0, 10000).ToString());
-            }
-            if (GUILayout.Button(duplicateTex, GUILayout.MaxWidth(0.08f * windowWidth)))
-            {
-                Controller.Instance.SelectedChapterDataControl.getMacrosListDataControl()
-                    .duplicateElement(Controller.Instance.SelectedChapterDataControl.getMacrosListDataControl().getMacros()[selectedMacro]);
-            }
-            if (GUILayout.Button(clearTex, GUILayout.MaxWidth(0.08f * windowWidth)))
-            {
-                Controller.Instance.SelectedChapterDataControl.getMacrosListDataControl()
-                    .deleteElement(Controller.Instance.SelectedChapterDataControl.getMacrosListDataControl().getMacros()[selectedMacro], false);
-                selectedMacro = -1;
-            }
-            GUI.skin = defaultSkin;
-            GUILayout.EndArea();
-
-            if (selectedMacro != -1)
-            {
-                GUILayout.Space(10);
-                GUILayout.BeginArea(descriptionRect);
-                GUILayout.Label(TC.get("Macro.Documentation"));
-                GUILayout.Space(10);
-                macroDocumentation = GUILayout.TextArea(macroDocumentation, GUILayout.MinHeight(0.15f * windowHeight));
-                if (!macroDocumentation.Equals(macroDocumentationLast))
-                    OnMacroDocumentationChanged(macroDocumentation);
-                GUILayout.EndArea();
-
-                GUILayout.BeginArea(effectsRect);
-                if (GUILayout.Button(TC.get("Element.Effects")))
-                {
-                    EffectEditorWindow window =
-                    (EffectEditorWindow)ScriptableObject.CreateInstance(typeof(EffectEditorWindow));
-                    window.Init(Controller.Instance                        .SelectedChapterDataControl                        .getMacrosListDataControl().getMacros()[selectedMacro].getController());
-                }
-                GUILayout.EndArea();
-            }
+            macroList.SetData(Controller.Instance.SelectedChapterDataControl.getMacrosListDataControl(),
+                (data) => (data as MacroListDataControl).getMacros().Cast<DataControl>().ToList());
+            macroList.DoList(windowHeight - 60f);
         }
-
-        void OnSelectedMacroChanged(int i)
-        {
-            selectedMacro = i;
-
-            macroName =
-                macroNameLast =
-                    Controller.Instance.SelectedChapterDataControl.getMacrosListDataControl().getMacros()[
-                        selectedMacro].getId();
-
-            if (macroName == null)
-                macroName =
-                    macroNameLast = "";
-
-            macroDocumentation = macroDocumentationLast =
-                    Controller.Instance.SelectedChapterDataControl.getMacrosListDataControl().getMacros()[
-                        selectedMacro].getDocumentation();
-
-            if (macroDocumentation == null)
-                macroDocumentation =
-                    macroDocumentationLast = "";
-        }
-
-        private void OnMacroNameChanged(string val)
-        {
-            if (Controller.Instance.isElementIdValid(val, false))
-            {
-                macroNameLast = val;
-                Controller.Instance.SelectedChapterDataControl.getMacrosListDataControl().getMacros()[selectedMacro].setId(val);
-            }
-        }
-
-        private void OnMacroDocumentationChanged(string val)
-        {
-            macroDocumentationLast = val;
-            Controller.Instance.SelectedChapterDataControl.getMacrosListDataControl().getMacros()[selectedMacro].setDocumentation(val);
-        }
-
     }
 }

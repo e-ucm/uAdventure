@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using uAdventure.Core;
 using uAdventure.QR;
 using System;
+using System.Linq;
+using UnityEditor.SceneManagement;
 
 namespace uAdventure.Editor
 {
@@ -71,11 +73,30 @@ namespace uAdventure.Editor
 
         private static Rect zeroRect;
         private Rect windowArea;
+        private bool hasToReturnFocus = false;
+
+        private void Return()
+        {
+            if (!EditorApplication.isPlaying && !EditorApplication.isPlayingOrWillChangePlaymode)
+            {
+                FocusWindowIfItsOpen(GetType());
+                EditorApplication.update -= Return;
+                hasToReturnFocus = false;
+            }
+        }
 
         public void OnEnable()
 		{
-			if (!thisWindowReference)
-				thisWindowReference = this;
+            if (!EditorApplication.isPlaying && EditorApplication.isPlayingOrWillChangePlaymode && !hasToReturnFocus)
+            {
+                hasToReturnFocus = true;
+                EditorApplication.update += Return; 
+            }
+
+            if (!thisWindowReference)
+            {
+                thisWindowReference = this;
+            }
             else
             {
                 DestroyImmediate(thisWindowReference);
@@ -91,7 +112,19 @@ namespace uAdventure.Editor
 				Controller.Instance.Init();
 			}
 
-			if(!redoTexture)
+            var initialScene = AssetDatabase.LoadAssetAtPath<SceneAsset>("Assets/Scenes/_Scene1.unity");
+
+            if (initialScene)
+            {
+                EditorSceneManager.playModeStartScene = initialScene;
+            }
+            else
+            {
+                EditorUtility.DisplayDialog("Main scene not found!", "Main Scene was not found! Please open \"_Scene1\" in scenes folder before playing the game.", "Understood!");
+            }
+
+
+            if (!redoTexture)
 				redoTexture = (Texture2D)Resources.Load("EAdventureData/img/icons/redo", typeof(Texture2D));
 			if(!undoTexture)
 				undoTexture = (Texture2D)Resources.Load("EAdventureData/img/icons/undo", typeof(Texture2D));
@@ -111,19 +144,67 @@ namespace uAdventure.Editor
 			thisWindowReference.OnEnable ();
 		}
 
+        private static Dictionary<Type, List<EditorComponent>> knownComponents;
+        public static Dictionary<Type, List<EditorComponent>> Components
+        {
+            get { return knownComponents; }
+        }
+
+        public static void RegisterComponent<T>(EditorComponent component) { RegisterComponent(typeof(T), component); }
+
+        public static void RegisterComponent(Type t, EditorComponent component)
+        {
+            if (knownComponents == null)
+            {
+                knownComponents = new Dictionary<Type, List<EditorComponent>>();
+            }
+
+            if (!knownComponents.ContainsKey(t))
+            {
+                knownComponents.Add(t, new List<EditorComponent>());
+            }
+
+            if(component is BaseWindow)
+            {
+                (component as BaseWindow).OnRequestRepaint = () => thisWindowReference.Repaint();
+            }
+
+            // if there's a component of the same tipe already registered we ignore it
+            if (knownComponents[t].Any(c => c.GetType() == component.GetType()))
+                return;
+
+            knownComponents[t].Add(component);
+            knownComponents[t].Sort((c1, c2) => CompareComponents(c1, c2));
+        }
+
+        private static int CompareComponents(EditorComponent c1, EditorComponent c2)
+        {
+            var c1Attr = c1.GetType().GetCustomAttributes(typeof(EditorComponentAttribute), true)[0] as EditorComponentAttribute;
+            var c2Attr = c2.GetType().GetCustomAttributes(typeof(EditorComponentAttribute), true)[0] as EditorComponentAttribute;
+
+            return c1Attr.Order.CompareTo(c2Attr.Order);
+        } 
+
         public static void RefreshChapter()
         {
             thisWindowReference.chapterWindow = new ChapterWindow(zeroRect, new GUIContent(TC.get("Element.Name0")), "Window");
             thisWindowReference.openedWindow = EditorWindowType.Chapter;
         }
 
+        public static void RefreshWindows()
+        {
+            thisWindowReference.chapterWindow = null;
+            thisWindowReference.InitWindows();
+        }
+
 		void InitWindows(){
 			if (chapterWindow == null) {
 				zeroRect = new Rect(0, 0, 0, 0);    
 				chapterWindow = new ChapterWindow(zeroRect, new GUIContent(TC.get("Element.Name0")), "Window");
+                thisWindowReference.openedWindow = EditorWindowType.Chapter;
 
-				// Extensions of the editor
-				extensions = EditorWindowBaseExtensionFactory.Instance.CreateAllExistingExtensions(zeroRect, "Window");
+                // Extensions of the editor
+                extensions = EditorWindowBaseExtensionFactory.Instance.CreateAllExistingExtensions(zeroRect, "Window");
 
 				var ops = new GUILayoutOption[] {
 					GUILayout.ExpandWidth(true),
@@ -134,7 +215,9 @@ namespace uAdventure.Editor
 					e.Options = ops;
 					e.OnRequestMainView += (thisWindowReference as EditorWindowBase).RequestMainView;
 					e.OnRequestRepaint += thisWindowReference.Repaint;
-				}   
+                    e.BeginWindows = () => thisWindowReference.BeginWindows();
+                    e.EndWindows = () => thisWindowReference.EndWindows();
+                }   
 			}
 		}
 
@@ -212,7 +295,6 @@ namespace uAdventure.Editor
             //GUI.BeginGroup(windowArea);
             if (Controller.Instance.Loaded)
             {
-                BeginWindows();
                 //extensionSelected.OnGUI();
 
                 switch (openedWindow)
@@ -228,22 +310,16 @@ namespace uAdventure.Editor
 
                 if (m_Window != null)
                 {
-                    //leftMenuRect
-                    m_Window.OnGUI();
-                    if (Event.current.type == EventType.repaint)
+                    if (Event.current.type == EventType.Repaint)
                     {
                         if (m_Window.Rect != windowArea)
                         {
-                            // We first draw it with the old size to make the window respond the size change
-                            m_Window.OnGUI();
                             m_Window.Rect = windowArea;
+                            extensions.ForEach(e => e.Rect = windowArea);
                         }
-                        extensions.ForEach(e => e.Rect = windowArea);
                     }
-
                     m_Window.OnGUI();
                 }
-                EndWindows();
             }
             else
             {
@@ -263,7 +339,7 @@ namespace uAdventure.Editor
                 }
             }
             
-            //GUI.EndGroup();
+            //GUI.EndGroup(); 
             EditorGUILayout.EndVertical();
             EditorGUILayout.EndHorizontal();
         }

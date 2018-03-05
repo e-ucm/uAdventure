@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace uAdventure.Editor
 {
-    [EditorWindowExtension(80, typeof(Book))]
+    //[EditorWindowExtension(80, typeof(Book))]
     public class BooksWindow : ReorderableListEditorWindowExtension
     {
         private enum BookWindowType { Appearance, Content, Documentation }
@@ -37,7 +37,12 @@ namespace uAdventure.Editor
             booksWindowAppearance = new BooksWindowAppearance(aStartPos, new GUIContent(TC.get("Book.App")), "Window");
             booksWindowContents = new BooksWindowContents(aStartPos, new GUIContent(TC.get("Book.Contents")), "Window");
             booksWindowDocumentation = new BooksWindowDocumentation(aStartPos, new GUIContent(TC.get("Book.Documentation")), "Window");
-            
+
+            VoidMethodDelegate requestRepaint = () => OnRequestRepaint();
+            booksWindowAppearance.OnRequestRepaint += requestRepaint;
+            booksWindowContents.OnRequestRepaint += requestRepaint;
+            booksWindowDocumentation.OnRequestRepaint += requestRepaint;
+
             selectedButtonSkin = (GUISkin)Resources.Load("Editor/ButtonSelected", typeof(GUISkin));
         }
 
@@ -131,11 +136,6 @@ namespace uAdventure.Editor
         {
             isConcreteItemVisible = true;
             GameRources.GetInstance().selectedBookIndex = o;
-
-            // Reload windows for newly selected book
-            booksWindowAppearance = new BooksWindowAppearance(m_Rect, new GUIContent(TC.get("Book.App")), "Window");
-            booksWindowContents = new BooksWindowContents(m_Rect, new GUIContent(TC.get("Book.Contents")), "Window");
-            booksWindowDocumentation = new BooksWindowDocumentation(m_Rect, new GUIContent(TC.get("Book.Documentation")), "Window");
         }
 
         protected override void OnElementNameChanged(ReorderableList r, int index, string newName)

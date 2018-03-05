@@ -168,7 +168,7 @@ namespace uAdventure.Editor
 
                 this.effects.getEffects()[id] = editor.Effect;
 
-				if (Event.current.type != EventType.layout)
+				if (Event.current.type != EventType.Layout)
 				{
 					Rect lastRect = GUILayoutUtility.GetLastRect();
 					Rect myRect = editor.Window;

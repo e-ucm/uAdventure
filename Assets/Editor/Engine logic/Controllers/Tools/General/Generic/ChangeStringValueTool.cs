@@ -60,7 +60,7 @@ namespace uAdventure.Editor
             get = data.GetType().GetMethod(getMethodName);
             this.getName = getMethodName;
             this.setName = setMethodName;
-            if (get.ReturnType != typeof(bool))
+            if (get.ReturnType != typeof(string))
             {
                 get = set = null;
                 getName = setName = null;

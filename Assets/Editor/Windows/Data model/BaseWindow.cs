@@ -6,17 +6,21 @@ namespace uAdventure.Editor
         protected static int m_WindowIDCounter = 5555;
         private int m_WindowID = m_WindowIDCounter++; // simple automatic id distribution
 
+        public delegate void VoidMethodDelegate();
+
         // Public properties
         public Rect Rect { get { return m_Rect; } set { m_Rect = value; } }
         public GUIStyle Style { get; set; }
         public GUIContent Content { get; set; }
+        
+        public VoidMethodDelegate BeginWindows;
+        public VoidMethodDelegate EndWindows;
 
         protected Rect m_Rect;
 
 
         // Request repaint
-        public delegate void RequestRepaint();
-        public RequestRepaint OnRequestRepaint;
+        public VoidMethodDelegate OnRequestRepaint;
         protected void Repaint(){ OnRequestRepaint(); }
 
         public int WindowID { get { return m_WindowID; } }

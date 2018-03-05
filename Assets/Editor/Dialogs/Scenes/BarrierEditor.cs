@@ -53,7 +53,7 @@ namespace uAdventure.Editor
         void OnGUI()
         {
             // Dragging events
-            if (Event.current.type == EventType.mouseDrag)
+            if (Event.current.type == EventType.MouseDrag)
             {
                 if (currentRect.Contains(Event.current.mousePosition))
                 {
@@ -66,7 +66,7 @@ namespace uAdventure.Editor
                 currentPos = Event.current.mousePosition;
             }
 
-            if (Event.current.type == EventType.mouseUp)
+            if (Event.current.type == EventType.MouseUp)
             {
                 dragging = false;
             }

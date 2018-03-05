@@ -2,6 +2,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace uAdventure.Core
 {
@@ -74,8 +75,6 @@ namespace uAdventure.Core
 
         private string animationPath;
 
-        private ImageLoaderFactory factory;
-
         // private BufferedImage temp;
 
         private int temp_w;
@@ -94,10 +93,8 @@ namespace uAdventure.Core
          *              Object used to create the images for the frames
          *     
          */
-        public Animation(string id, Frame frame, ImageLoaderFactory factory)
+        public Animation(string id, Frame frame)
         {
-            this.factory = factory;
-
             this.id = id;
             resources = new List<ResourcesUni>();
             frames = new List<Frame>();
@@ -120,8 +117,8 @@ namespace uAdventure.Core
          * @param factory
          *              Object used to create the images for the frames
          */
-        public Animation(string id, ImageLoaderFactory factory) :
-            this(id, new Frame(factory), factory)
+        public Animation(string id) :
+            this(id, new Frame())
         {
         }
 
@@ -136,8 +133,8 @@ namespace uAdventure.Core
          * @param factory
          *              Object used to create the images for the frames
          */
-        public Animation(string id, int time, ImageLoaderFactory factory) :
-            this(id, new Frame(factory, time), factory)
+        public Animation(string id, int time) :
+            this(id, new Frame(time))
         {
         }
 
@@ -209,7 +206,9 @@ namespace uAdventure.Core
             if (after >= frames.Count || after < 0)
                 after = frames.Count - 1;
             if (frame == null)
-                frame = new Frame(factory);
+                frame = new Frame();
+
+            frame = (Frame)frame.Clone();
 
             if (frames.Count == 1 && frames[0].getUri().Equals(""))
             {
@@ -218,7 +217,7 @@ namespace uAdventure.Core
             }
             else
             {
-                frames.Insert(after + 1, (Frame)frame.Clone());
+                frames.Insert(after + 1, frame);
                 transitions.Insert(after + 2, new Transition());
             }
             return frame;
@@ -357,6 +356,11 @@ namespace uAdventure.Core
             return resources;
         }
 
+        public bool isEmptyAnimation()
+        {
+            return this.id == SpecialAssetPaths.ASSET_EMPTY_ANIMATION.Split('/').Last();
+        }
+
         /**
          * @return the slides
          */
@@ -395,58 +399,6 @@ namespace uAdventure.Core
             this.useTransitions = useTransitions;
         }
 
-        /**
-         * Returns the image in a given moment, or null if the animation has
-         * finished.
-         * 
-         * @param elapsedTime
-         *            Time elapsed since the animation began
-         * @return The image to draw, in a loop
-         */
-        public Sprite getImage(long elapsedTime, int where)
-        {
-            //TODO
-            /*
-            int temp = skippedFrames;
-
-            // check to see if the all the waiting frames have been
-            // skipped
-            int temp2 = 0;
-            for (int i = 0; i < frames.Count; i++)
-            {
-                if (frames[i].isWaitforclick())
-                    temp2++;
-            }
-            if (!slides || temp2 <= skippedFrames)
-                elapsedTime = elapsedTime % getTotalTime();
-
-            for (int i = 0; i < frames.size(); i++)
-            {
-                if (frames[i].isWaitforclick())
-                    temp--;
-                if (frames[i].getTime() > elapsedTime || (frames[i].isWaitforclick() && temp < 0 && slides))
-                {
-                    if (lastSoundFrame != i)
-                    {
-                        newSound = frames[i].getSoundUri();
-                        soundMaxTime = frames[i].getMaxSoundTime();
-                        lastSoundFrame = i;
-                    }
-                    return frames[i].getImage(mirror, fullscreen, where);
-                }
-                if (i == frames.size() - 1)
-                    return noImage();
-                elapsedTime -= frames[i].getTime();
-                if (transitions.get(i + 1).getTime() > elapsedTime && useTransitions)
-                {
-                    return combinedFrames(i, elapsedTime, where);
-                }
-                if (useTransitions)
-                    elapsedTime -= transitions.get(i + 1).getTime();
-            }*/
-            return noImage();
-        }
-
         public string getNewSound()
         {
 
@@ -459,21 +411,6 @@ namespace uAdventure.Core
         {
 
             return soundMaxTime;
-        }
-
-        /**
-         * Method to generate an image with no content.
-         * 
-         * @return A null o empty image.
-         */
-        private Sprite noImage()
-        {
-
-            Sprite icon = (Sprite)Resources.Load("img/icons/noImageFrame");
-            if (icon != null)
-                return icon;
-            else
-                return new Sprite();
         }
 
         /**
@@ -529,81 +466,6 @@ namespace uAdventure.Core
             }
             return temp;*/
             return 0;
-        }
-
-        /**
-         * Returns the combinations of frames i and i+1 that represents the
-         * transition after the elapsed time
-         * 
-         * @param i
-         *            The index of the first frame
-         * @param elapsedTime
-         *            The time elapsed in the transition
-         * @return An image with the combination of the two frames
-         */
-        private Sprite combinedFrames(int i, long elapsedTime, int where)
-        {
-            //TODO
-
-            //Image start = frames[i].getImage(mirror, fullscreen, where);
-            //Image end = frames.get(i + 1).getImage(mirror, fullscreen, where);
-            //long time = transitions.get(i + 1).getTime();
-            //Graphics2D g;
-
-            //switch (transitions.get(i + 1).getType())
-            //{
-            //    case Transition.TYPE_NONE:
-            //        return start;
-            //    case Transition.TYPE_FADEIN:
-            //        /*if (temp_w != end.getWidth( null ) || temp_h != end.getHeight( null )) {*/
-            //        temp = new BufferedImage(end.getWidth(null), end.getHeight(null), BufferedImage.TRANSLUCENT);
-            //        temp_w = end.getWidth(null);
-            //        temp_h = end.getHeight(null);
-            //        //Runtime.getRuntime( ).gc( );
-            //        /*}*/
-            //        g = (Graphics2D)temp.getGraphics();
-            //        AlphaComposite alphaComposite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1 - (float)elapsedTime / (float)time);
-            //        g.setComposite(alphaComposite);
-            //        g.drawImage(start, 0, 0, null);
-
-            //        alphaComposite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float)elapsedTime / (float)time);
-            //        g.setComposite(alphaComposite);
-            //        g.drawImage(end, 0, 0, null);
-
-            //        return temp;
-            //    case Transition.TYPE_VERTICAL:
-            //        /*if (temp_w != end.getWidth( null ) || temp_h != end.getHeight( null )) {*/
-            //        temp = new BufferedImage(end.getWidth(null), end.getHeight(null), /*BufferedImage.TYPE_4BYTE_ABGR*/BufferedImage.TRANSLUCENT);
-            //        temp_w = end.getWidth(null);
-            //        temp_h = end.getHeight(null);
-            //        //Runtime.getRuntime( ).gc( );
-            //        /*}*/
-
-            //        g = temp.createGraphics();
-            //        g.drawImage(start, (int)(end.getWidth(null) * (float)elapsedTime / time), 0, null);
-
-            //        g.drawImage(end, (int)(end.getWidth(null) * (float)elapsedTime / time) - end.getWidth(null), 0, null);
-            //        //g.dispose( );
-
-            //        return temp;
-            //    case Transition.TYPE_HORIZONTAL:
-            //        /*if (temp_w != end.getWidth( null ) || temp_h != end.getHeight( null )) {*/
-            //        temp = new BufferedImage(end.getWidth(null), end.getHeight(null), BufferedImage.TRANSLUCENT);
-            //        temp_w = end.getWidth(null);
-            //        temp_h = end.getHeight(null);
-            //        //Runtime.getRuntime( ).gc( );
-            //        /*}*/
-
-            //        g = (Graphics2D)temp.getGraphics();
-            //        g.drawImage(start, 0, (int)(end.getHeight(null) * (float)elapsedTime / time), null);
-
-            //        g.drawImage(end, 0, (int)(end.getHeight(null) * (float)elapsedTime / time) - end.getHeight(null), null);
-
-            //        return temp;
-            //    default:
-            //        return start;
-            //}
-            return new Sprite();
         }
 
         public void setMirror(bool mirror)
@@ -714,11 +576,6 @@ namespace uAdventure.Core
         {
 
             return animationPath;
-        }
-
-        public ImageLoaderFactory getImageLoaderFactory()
-        {
-            return factory;
         }
 
         /***************************************************************/

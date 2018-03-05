@@ -4,6 +4,7 @@ using System.Xml;
 using System.IO;
 using System.Collections.Generic;
 using System;
+using uAdventure.Runner;
 
 namespace uAdventure.Core
 {
@@ -31,17 +32,13 @@ namespace uAdventure.Core
 
         }
 
-        public static AdventureData loadAdventureData(string path, List<Incidence> incidences)
+        public static AdventureData loadAdventureData(ResourceManager resourceManager, List<Incidence> incidences)
         {
             AdventureData adventureDataTemp = new AdventureData();
             try
             {
-                AdventureHandler_ adventureParser = new AdventureHandler_(adventureDataTemp);
-
-                // Read and close the input stream
-                adventureParser.Parse(path + "/descriptor.xml");
-                //descriptorIS.close();
-
+                AdventureHandler adventureParser = new AdventureHandler(adventureDataTemp, resourceManager);
+                adventureParser.Parse("descriptor.xml");
                 adventureDataTemp = adventureParser.getAdventureData();
 
             }
@@ -50,15 +47,7 @@ namespace uAdventure.Core
             return adventureDataTemp;
         }
 
-        /**
-         * @param adventureData
-         *            the adventureData to set
-         */
-        public static void setAdventureData(AdventureData adventureData)
-        {
-
-            Loader.adventureData = adventureData;
-        }
+        private static Dictionary<string, Animation> animationLoadCache;
 
         /**
          * Loads an animation from a filename
@@ -67,28 +56,13 @@ namespace uAdventure.Core
          *            The xml descriptor for the animation
          * @return the loaded Animation
          */
-        public static Animation loadAnimation(InputStreamCreator isCreator, string filename, ImageLoaderFactory imageloader)
+        public static Animation loadAnimation(string filename, ResourceManager resourceManager)
         {
+            AnimationHandler animationHandler = new AnimationHandler(resourceManager);
+            animationHandler.Parse(filename);
+            Animation anim = animationHandler.getAnimation();
 
-            AnimationHandler_ animationHandler = new AnimationHandler_(isCreator, imageloader);
-            
-            try
-            {
-                string descriptorIS = null;
-
-                descriptorIS = isCreator.buildInputStream("Assets/Resources/CurrentGame/" + filename);
-                if (!descriptorIS.EndsWith(".eaa"))
-                    descriptorIS += ".eaa";
-                animationHandler.Parse(descriptorIS);
-
-
-            }
-            catch (Exception e) { Debug.LogError(e); }
-
-            if (animationHandler.getAnimation() != null)
-                return animationHandler.getAnimation();
-            else
-                return new Animation("anim" + (new System.Random()).Next(1000), imageloader);
+            return anim;
         }
 
         /**

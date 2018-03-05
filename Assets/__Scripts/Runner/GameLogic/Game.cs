@@ -42,8 +42,7 @@ namespace uAdventure.Runner
 
         public bool useSystemIO = true, forceScene = false, editor_mode = true;
         private GUISkin style;
-        public string gamePath = "c:/Games/", gameName = "Fire", scene_name = "";
-        private string /*playerName = "Jugador",*/ selected_game, selected_path;
+        public string gamePath = "", gameName = "", scene_name = "";
         public GameObject Blur_Prefab;
         MenuMB menu;
         Interactuable next_interaction = null;
@@ -60,10 +59,7 @@ namespace uAdventure.Runner
             get { return game_state; }
         }
 
-        public ResourceManager.LoadingType getLoadingType()
-        {
-            return (useSystemIO ? ResourceManager.LoadingType.SYSTEM_IO : ResourceManager.LoadingType.RESOURCES_LOAD);
-        }
+        public ResourceManager ResourceManager { get; private set; }
 
         public string getGameName()
         {
@@ -71,12 +67,12 @@ namespace uAdventure.Runner
         }
 
         public string getSelectedGame()
-        {
-            return selected_game;
+        { 
+            return gameName;
         }
         public string getSelectedPath()
         {
-            return selected_path;
+            return gamePath;
         }
 
         void Awake()
@@ -84,6 +80,7 @@ namespace uAdventure.Runner
             Game.instance = this;
             //Load tracker data
             SimpleJSON.JSONNode hostfile = new SimpleJSON.JSONClass();
+
             bool loaded = false;
 
 #if UNITY_WEBPLAYER || UNITY_WEBGL
@@ -119,33 +116,32 @@ namespace uAdventure.Runner
             if (Game.GameToLoad != "")
             {
                 gameName = Game.GameToLoad;
-                gamePath = ResourceManager.Instance.getCurrentDirectory() + System.IO.Path.DirectorySeparatorChar + "Games" + System.IO.Path.DirectorySeparatorChar;
+                gamePath = ResourceManager.getCurrentDirectory() + System.IO.Path.DirectorySeparatorChar + "Games" + System.IO.Path.DirectorySeparatorChar;
                 useSystemIO = true;
             }
 
-            if (editor_mode)
-                gameName = "CurrentGame";
+            if (!string.IsNullOrEmpty(gamePath))
+            {
+                ResourceManager = ResourceManagerFactory.CreateExternal(gamePath + gameName);
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(gameName))
+                {
+                    ResourceManager = ResourceManagerFactory.CreateLocal(gameName, useSystemIO ? ResourceManager.LoadingType.SYSTEM_IO : ResourceManager.LoadingType.RESOURCES_LOAD);
+                }
+                else
+                {
+                    ResourceManager = ResourceManagerFactory.CreateLocal("CurrentGame/", useSystemIO ? ResourceManager.LoadingType.SYSTEM_IO : ResourceManager.LoadingType.RESOURCES_LOAD);
+                }
+            }
 
-            selected_path = gamePath + gameName;
-            selected_game = selected_path + "/";
-            
             // TODO incidences are unused, why?
             //List<Incidence> incidences = new List<Incidence>();
 
             AdventureData data = new AdventureData();
-            AdventureHandler_ adventure = new AdventureHandler_(data);
-            switch (getLoadingType())
-            {
-                case ResourceManager.LoadingType.RESOURCES_LOAD:
-                    adventure.Parse(gameName + "/descriptor");
-                    ResourceManager.Instance.Path = gameName;
-                    break;
-                case ResourceManager.LoadingType.SYSTEM_IO:
-                    adventure.Parse(selected_game + "descriptor.xml");
-                    ResourceManager.Instance.Path = selected_game;
-                    break;
-            }
-            
+            AdventureHandler adventure = new AdventureHandler(data, ResourceManager);
+            adventure.Parse("descriptor.xml");
             game_state = new GameState(data);
             CompletableController.Instance.setCompletables(GameState.getCompletables());
         }

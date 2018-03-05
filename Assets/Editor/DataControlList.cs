@@ -31,6 +31,8 @@ public class DataControlList : ButtonList {
         this.childs = getChilds(dataControl);
 
         this.list = this.childs;
+        if (this.list.Count <= this.index)
+            this.index = -1;
     }
 
     public DataControlList() : base(new List<DataControl>(), typeof(DataControl), true, true)
@@ -90,19 +92,25 @@ public class DataControlList : ButtonList {
         // Can duplicate
         buttonDup.onButtonEnabledCallback = (list) => dataControl != null && list.index >= 0 && childs[list.index].canBeDuplicated();
         // Do Duplicate
-        buttonDup.onButtonPressedCallback = (rect, list) => dataControl.duplicateElement(childs[list.index]);
-        buttons.Add(buttonDup);
+        buttonDup.onButtonPressedCallback = (rect, list) => OnDuplicate();
+        buttons.Add(buttonDup); 
     }
 
-    protected void OnAdd(object type)
+    protected virtual void OnAdd(object type)
     {
         dataControl.addElement((int)type, dataControl.getDefaultId((int)type));
         OnChanged(reorderableList);
     }
 
-    protected void OnRemove()
+    protected virtual void OnRemove()
     {
         dataControl.deleteElement(childs[index], false);
+        OnChanged(reorderableList);
+    }
+
+    protected virtual void OnDuplicate()
+    {
+        dataControl.duplicateElement(childs[index]);
         OnChanged(reorderableList);
     }
 

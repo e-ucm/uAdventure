@@ -6,7 +6,7 @@ using uAdventure.Core;
 
 namespace uAdventure.Editor
 {
-    public class ExitDataControl : DataControl
+    public class ExitDataControl : DataControl, RectangleArea
     {
         /**
            * Scene controller that contains this element reference (used to extract

@@ -145,17 +145,18 @@ namespace uAdventure.Editor
         public override int[] getAddableElements()
         {
 
-            //return new int[] { Controller.RESOURCES, Controller.NEXT_SCENE, Controller.END_SCENE };
-            return new int[] { Controller.NEXT_SCENE, Controller.END_SCENE };
+            return new int[] { Controller.RESOURCES, Controller.NEXT_SCENE, Controller.END_SCENE };
         }
 
 
         public override bool canAddElement(int type)
         {
+            switch (type)
+            {
+                case Controller.RESOURCES: return true;
+            }
 
-            bool canAddElement = false;
-
-            return canAddElement;
+            return false;
         }
 
 
@@ -164,7 +165,6 @@ namespace uAdventure.Editor
 
             return true;
         }
-
 
         public override bool canBeMoved()
         {
@@ -387,7 +387,7 @@ namespace uAdventure.Editor
         public override bool canBeDuplicated()
         {
 
-            return false;
+            return true;
         }
 
 
@@ -426,18 +426,14 @@ namespace uAdventure.Editor
             {
 
                 string previewImagePath = resourcesDataControlList[selectedResources].getAssetPath("slides");
-
-                // Add the extension of the frame
-                if (previewImagePath != null && !previewImagePath.ToLower().EndsWith(".eaa"))
-                    previewImagePath += "_01.jpg";
-                else if (previewImagePath != null)
+                
+                if (!string.IsNullOrEmpty(previewImagePath))
                 {
-                    var animation = Loader.loadAnimation(AssetsController.InputStreamCreatorEditor.getInputStreamCreator(), previewImagePath, new EditorImageLoader());
-
+                    var animation = Loader.loadAnimation(previewImagePath, Controller.ResourceManager);
                     return animation != null && animation.getFrames().Count > 0 ? animation.getFrame(0).getUri() : null;
                 }
 
-                return previewImagePath;
+                return null;
             }
             else
             {
@@ -463,6 +459,16 @@ namespace uAdventure.Editor
         public void setPathToVideo(string path)
         {
             resourcesDataControlList[selectedResources].addAsset("video", path.Substring(0, path.LastIndexOf(".mpg")));
+        }
+
+        internal string getPathToMusic()
+        {
+            return resourcesDataControlList[selectedResources].getAssetPath("music");
+        }
+
+        public void setPathToMusic(string path)
+        {
+            resourcesDataControlList[selectedResources].addAsset("music", path);
         }
 
 

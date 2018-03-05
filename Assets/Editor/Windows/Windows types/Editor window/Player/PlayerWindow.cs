@@ -2,6 +2,7 @@
 
 using uAdventure.Core;
 using System;
+using System.Collections.Generic;
 
 namespace uAdventure.Editor
 {
@@ -15,15 +16,17 @@ namespace uAdventure.Editor
             Documentation
         }
 
-        private static PlayerWindowType openedWindow = PlayerWindowType.DialogConfiguration;
-        private static PlayerWindowAppearance playerWindowAppearance;
-        private static PlayerWindowDialogConfiguration playerWindowDialogConfiguration;
+        private static PlayerWindowType openedWindow;
+        private static CharactersWindowAppearance playerWindowAppearance;
+        private static CharactersWindowDialogConfiguration playerWindowDialogConfiguration;
         private static PlayerWindowDocumentation playerWindowDocumentation;
 
         private Player playerRef = null;
 
         private static GUISkin selectedButtonSkin;
         private static GUISkin defaultSkin;
+
+        private List<KeyValuePair<string, PlayerWindowType>> tabs;
 
         public PlayerWindow(Rect aStartPos, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, new GUIContent(TC.get("Element.Name26")), aStyle, aOptions)
@@ -33,63 +36,53 @@ namespace uAdventure.Editor
             c.text = TC.get("Element.Name26");
             ButtonContent = c;
 
-            playerWindowAppearance = new PlayerWindowAppearance(aStartPos,
-                new GUIContent(TC.get("NPC.LookPanelTitle")), "Window");
-            playerWindowDialogConfiguration = new PlayerWindowDialogConfiguration(aStartPos,
-                new GUIContent(TC.get("NPC.DialogPanelTitle")), "Window");
-            playerWindowDocumentation = new PlayerWindowDocumentation(aStartPos,
-                new GUIContent(TC.get("NPC.Documentation")), "Window");
+            playerWindowAppearance = new CharactersWindowAppearance(aStartPos, new GUIContent(TC.get("NPC.LookPanelTitle")), "Window");
+            playerWindowAppearance.BeginWindows = () => BeginWindows();
+            playerWindowAppearance.EndWindows = () => EndWindows();
+            playerWindowDialogConfiguration = new CharactersWindowDialogConfiguration(aStartPos, new GUIContent(TC.get("NPC.DialogPanelTitle")), "Window");
+            playerWindowDialogConfiguration.BeginWindows = () => BeginWindows();
+            playerWindowDialogConfiguration.EndWindows = () => EndWindows();
+            playerWindowDocumentation = new PlayerWindowDocumentation(aStartPos, new GUIContent(TC.get("NPC.Documentation")), "Window");
+            playerWindowDocumentation.BeginWindows = () => BeginWindows();
+            playerWindowDocumentation.EndWindows = () => EndWindows();
             selectedButtonSkin = (GUISkin)Resources.Load("Editor/ButtonSelected", typeof(GUISkin));
+
+            openedWindow = PlayerWindowType.DialogConfiguration;
+
+            tabs = new List<KeyValuePair<string, PlayerWindowType>>();
+            if (Controller.Instance.playerMode() == Controller.FILE_ADVENTURE_3RDPERSON_PLAYER)
+            {
+                openedWindow = PlayerWindowType.Appearance;
+                tabs.Add(new KeyValuePair<string, PlayerWindowType>(TC.get("NPC.LookPanelTitle"), PlayerWindowType.Appearance));
+            }
+            tabs.Add(new KeyValuePair<string, PlayerWindowType>(TC.get("NPC.DialogPanelTitle"), PlayerWindowType.DialogConfiguration));
+            tabs.Add(new KeyValuePair<string, PlayerWindowType>(TC.get("NPC.Documentation"), PlayerWindowType.Documentation));
+            
         }
 
 
         public override void Draw(int aID)
         {
-
             GUILayout.BeginHorizontal();
-            if (Controller.Instance.playerMode() == Controller.FILE_ADVENTURE_3RDPERSON_PLAYER)
-            {
-                if (openedWindow == PlayerWindowType.Appearance)
-                    GUI.skin = selectedButtonSkin;
-                if (GUILayout.Button(TC.get("NPC.LookPanelTitle")))
-                {
-                    OnWindowTypeChanged(PlayerWindowType.Appearance);
-                }
-                if (openedWindow == PlayerWindowType.Appearance)
-                    GUI.skin = defaultSkin;
-            }
-
-            if (openedWindow == PlayerWindowType.DialogConfiguration)
-                GUI.skin = selectedButtonSkin;
-            if (GUILayout.Button(TC.get("NPC.DialogPanelTitle")))
-            {
-                OnWindowTypeChanged(PlayerWindowType.DialogConfiguration);
-            }
-            if (openedWindow == PlayerWindowType.DialogConfiguration)
-                GUI.skin = defaultSkin;
-
-
-            if (openedWindow == PlayerWindowType.Documentation)
-                GUI.skin = selectedButtonSkin;
-            if (GUILayout.Button(TC.get("NPC.Documentation")))
-            {
-                OnWindowTypeChanged(PlayerWindowType.Documentation);
-            }
-            if (openedWindow == PlayerWindowType.Documentation)
-                GUI.skin = defaultSkin;
+            GUILayout.FlexibleSpace();
+            openedWindow = tabs[GUILayout.Toolbar(tabs.FindIndex(t => t.Value == openedWindow), tabs.ConvertAll(t => t.Key).ToArray(), GUILayout.ExpandWidth(false))].Value;
+            GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
 
             switch (openedWindow)
             {
                 case PlayerWindowType.Appearance:
+                    playerWindowAppearance.Target = Controller.Instance.SelectedChapterDataControl.getPlayer();
                     playerWindowAppearance.Rect = Rect;
                     playerWindowAppearance.Draw(aID);
                     break;
                 case PlayerWindowType.DialogConfiguration:
+                    playerWindowDialogConfiguration.Target = Controller.Instance.SelectedChapterDataControl.getPlayer();
                     playerWindowDialogConfiguration.Rect = Rect;
                     playerWindowDialogConfiguration.Draw(aID);
                     break;
                 case PlayerWindowType.Documentation:
+                    playerWindowDocumentation.Target = Controller.Instance.SelectedChapterDataControl.getPlayer();
                     playerWindowDocumentation.Rect = Rect;
                     playerWindowDocumentation.Draw(aID);
                     break;
@@ -103,7 +96,6 @@ namespace uAdventure.Editor
 
         protected override void OnButton()
         {
-            OnWindowTypeChanged(PlayerWindowType.Appearance);
         }
     }
 }

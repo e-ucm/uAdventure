@@ -16,7 +16,13 @@ namespace uAdventure.Runner
         private Renderer rend;
         private ElementReference context;
         private ResourcesUni resource;
-        private float deformation;
+        protected float deformation;
+        protected bool mirror;
+
+        public static Vector2 TransformPoint(Vector2 point)
+        {
+            return new Vector2(point.x / DIVISOR, 60 - (point.y / DIVISOR));
+        }
 
         public Element Element
         {
@@ -24,7 +30,7 @@ namespace uAdventure.Runner
             set
             {
                 element = value;
-                deformation = -0.01f * FindObjectsOfType(this.GetType()).Length;
+                //deformation = -0.01f * FindObjectsOfType(this.GetType()).Length;
             }
         }
         public ElementReference Context
@@ -54,7 +60,7 @@ namespace uAdventure.Runner
         protected void Adaptate()
         {
             rend.material.mainTexture = texture;
-            this.transform.localScale = new Vector3(texture.width / DIVISOR, texture.height / DIVISOR, 1) * context.getScale();
+            this.transform.localScale = new Vector3((mirror ? -1f : 1f) * texture.width / DIVISOR, texture.height / DIVISOR, 1) * context.getScale();
         }
 
         protected void Positionate()
@@ -94,12 +100,12 @@ namespace uAdventure.Runner
 
         protected void LoadTexture(string uri)
         {
-            texture = ResourceManager.Instance.getImage(resource.getAssetPath(uri));
+            texture = Game.Instance.ResourceManager.getImage(resource.getAssetPath(uri));
         }
 
         protected void setTexture(string uri)
         {
-            texture = ResourceManager.Instance.getImage(resource.getAssetPath(uri));
+            texture = Game.Instance.ResourceManager.getImage(resource.getAssetPath(uri));
             Adaptate();
             Positionate();
         }
@@ -127,9 +133,43 @@ namespace uAdventure.Runner
             set { anim = value; }
         }
 
+        private string getMirrorUri(string uri)
+        {
+            string mirror = null;
+            switch (uri)
+            {
+                // STAND
+                case NPC.RESOURCE_TYPE_STAND_LEFT:  mirror = NPC.RESOURCE_TYPE_STAND_RIGHT; break;
+                case NPC.RESOURCE_TYPE_STAND_RIGHT: mirror = NPC.RESOURCE_TYPE_STAND_LEFT;  break;
+                // WALK
+                case NPC.RESOURCE_TYPE_WALK_LEFT:   mirror = NPC.RESOURCE_TYPE_WALK_RIGHT;  break;
+                case NPC.RESOURCE_TYPE_WALK_RIGHT:  mirror = NPC.RESOURCE_TYPE_WALK_LEFT;   break;
+                // USING
+                case NPC.RESOURCE_TYPE_USE_LEFT:    mirror = NPC.RESOURCE_TYPE_USE_RIGHT;   break;
+                case NPC.RESOURCE_TYPE_USE_RIGHT:   mirror = NPC.RESOURCE_TYPE_USE_LEFT;    break;
+                // SPEAK
+                case NPC.RESOURCE_TYPE_SPEAK_LEFT:  mirror = NPC.RESOURCE_TYPE_SPEAK_RIGHT; break;
+                case NPC.RESOURCE_TYPE_SPEAK_RIGHT: mirror = NPC.RESOURCE_TYPE_SPEAK_LEFT;  break;
+            }
+
+            return mirror;
+        }
+
+        private bool isMirrorable(string uri)
+        {
+            return getMirrorUri(uri) != null;
+        }
+
         protected void LoadAnimation(string uri)
         {
-            anim = ResourceManager.Instance.getAnimation(resource.getAssetPath(uri));
+            anim = Game.Instance.ResourceManager.getAnimation(resource.getAssetPath(uri));
+            mirror = false;
+            
+            if((anim == null || anim.Animation == null || anim.Animation.isEmptyAnimation()) && isMirrorable(uri))
+            {
+                anim = Game.Instance.ResourceManager.getAnimation(resource.getAssetPath(getMirrorUri(uri)));
+                mirror = true;
+            }
         }
 
         protected void setAnimation(string uri)
@@ -150,7 +190,7 @@ namespace uAdventure.Runner
 
         private void nextFrame()
         {
-            current_time = 0;
+            current_time -= update_ratio;
             setFrame(current_frame + 1);
         }
 
@@ -166,7 +206,15 @@ namespace uAdventure.Runner
 
         public Vector2 getPosition()
         {
-            return new Vector2(this.transform.localPosition.x, this.transform.localPosition.y - (anim.frames[current_frame].Image.height / DIVISOR) / 2);
+            Vector2 ret = new Vector2();
+
+            if(this.anim != null)
+                ret = new Vector2(this.transform.localPosition.x, this.transform.localPosition.y - (anim.frames[current_frame].Image.height * this.Context.getScale() / DIVISOR) / 2);
+            else
+                ret = new Vector2(this.transform.localPosition.x, this.transform.localPosition.y - (this.texture.height * this.Context.getScale() / DIVISOR) / 2);
+
+
+            return ret;
         }
 
         public void Move(Vector2 position)

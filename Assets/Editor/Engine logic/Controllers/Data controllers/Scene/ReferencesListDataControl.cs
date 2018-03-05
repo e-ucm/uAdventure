@@ -3,13 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 
 using uAdventure.Core;
+using System;
 
 namespace uAdventure.Editor
 {
     /**
      * Data control for the list of references in the scene
      */
-    public class ReferencesListDataControl : DataControl
+    public class ReferencesListDataControl : DataControl, DialogReceiverInterface
     {
 
         /**
@@ -396,19 +397,8 @@ namespace uAdventure.Editor
                 // If the list has elements, show the dialog with the options
                 if (items.Length > 0)
                 {
-
-                    // If some value was selected
-                    if (selectedItem != null)
-                    {
-                        ElementReference newElementReference = new ElementReference(selectedItem, 50, 50);
-                        int counter = count(newElementReference);
-                        ElementReferenceDataControl erdc = new ElementReferenceDataControl(sceneDataControl, newElementReference, type, counter);
-                        itemReferencesList.Add(newElementReference);
-                        ElementContainer ec = new ElementContainer(erdc, -1, null);
-                        lastElementContainer = ec;
-                        reassignLayerAllReferencesDataControl(insertInOrder(ec, false));
-                        elementAdded = true;
-                    }
+                    ObjectAddItemReference window = ScriptableObject.CreateInstance<ObjectAddItemReference>();
+                    window.Init(this);
                 }
                 else
                     controller.showErrorDialog(TC.get("Operation.AddItemReferenceTitle"), TC.get("Operation.AddItemReferenceErrorNoItems"));
@@ -421,17 +411,8 @@ namespace uAdventure.Editor
                 // If the list has elements, show the dialog with the options
                 if (items.Length > 0)
                 {
-                    if (selectedItem != null)
-                    {
-                        ElementReference newElementReference = new ElementReference(selectedItem, 50, 50);
-                        int counter = count(newElementReference);
-                        ElementReferenceDataControl erdc = new ElementReferenceDataControl(sceneDataControl, newElementReference, type, counter);
-                        atrezzoReferencesList.Add(newElementReference);
-                        ElementContainer ec = new ElementContainer(erdc, -1, null);
-                        lastElementContainer = ec;
-                        reassignLayerAllReferencesDataControl(insertInOrder(ec, false));
-                        elementAdded = true;
-                    }
+                    ObjectAddSetItemReference window = ScriptableObject.CreateInstance<ObjectAddSetItemReference>();
+                    window.Init(this);
                 }
                 else
                     controller.showErrorDialog(TC.get("Operation.AddAtrezzoReferenceTitle"), TC.get("Operation.AddReferenceErrorNoAtrezzo"));
@@ -442,17 +423,8 @@ namespace uAdventure.Editor
                 string[] items = controller.IdentifierSummary.getNPCIds();
                 if (items.Length > 0)
                 {
-                    if (selectedItem != null)
-                    {
-                        ElementReference newElementReference = new ElementReference(selectedItem, 50, 50);
-                        int counter = count(newElementReference);
-                        ElementReferenceDataControl erdc = new ElementReferenceDataControl(sceneDataControl, newElementReference, type, counter);
-                        npcReferencesList.Add(newElementReference);
-                        ElementContainer ec = new ElementContainer(erdc, -1, null);
-                        lastElementContainer = ec;
-                        reassignLayerAllReferencesDataControl(insertInOrder(ec, false));
-                        elementAdded = true;
-                    }
+                    ObjectAddNPCReference window = ScriptableObject.CreateInstance<ObjectAddNPCReference>();
+                    window.Init(this);
                 }
                 else
                     controller.showErrorDialog(TC.get("Operation.AddNPCReferenceTitle"), TC.get("Operation.AddReferenceErrorNoNPC"));
@@ -932,6 +904,50 @@ namespace uAdventure.Editor
             //else if (type == -1)
             //    category = ScenePreviewEditionPanel.CATEGORY_PLAYER;
             return category;
+        }
+
+        public void OnDialogOk(string message, object workingObject = null, object workingObjectSecond = null)
+        {
+            var type = workingObject.GetType();
+            int objectType = -1; 
+            if (type == typeof(ObjectAddItemReference))
+            {
+                objectType = Controller.ITEM_REFERENCE;
+            }
+            else if (type == typeof(ObjectAddNPCReference))
+            {
+                objectType = Controller.NPC_REFERENCE;
+            }
+            else if (type == typeof(ObjectAddSetItemReference))
+            {
+                objectType = Controller.ATREZZO_REFERENCE;
+            }
+
+            ElementReference newElementReference = new ElementReference(message, 50, 50);
+            int counter = count(newElementReference);
+            ElementReferenceDataControl erdc = new ElementReferenceDataControl(sceneDataControl, newElementReference, objectType, counter);
+
+            if (type == typeof(ObjectAddItemReference))
+            {
+                itemReferencesList.Add(newElementReference);
+            }
+            else if (type == typeof(ObjectAddNPCReference))
+            {
+                npcReferencesList.Add(newElementReference);
+            }
+            else if (type == typeof(ObjectAddSetItemReference))
+            {
+                atrezzoReferencesList.Add(newElementReference);
+            }
+
+            ElementContainer ec = new ElementContainer(erdc, -1, null);
+            lastElementContainer = ec;
+            reassignLayerAllReferencesDataControl(insertInOrder(ec, false));
+        }
+
+        public void OnDialogCanceled(object workingObject = null)
+        {
+
         }
     }
 }

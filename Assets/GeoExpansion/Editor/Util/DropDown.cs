@@ -51,8 +51,8 @@ public class DropDown {
         // Event management
         lastEvent = Event.current.type;
         if (showDropdown && scrollRect.Contains(Event.current.mousePosition) 
-            && Event.current.type != EventType.repaint 
-            && Event.current.type != EventType.layout)
+            && Event.current.type != EventType.Repaint 
+            && Event.current.type != EventType.Layout)
         {
             eventUsed = true;
             Event.current.Use();

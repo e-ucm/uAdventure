@@ -160,8 +160,11 @@ namespace uAdventure.Editor
                     globalStateId = controller.showInputDialog(TC.get("Operation.AddGlobalStateTitle"), TC.get("Operation.AddGlobalStateMessage"), TC.get("Operation.AddGlobalStateDefaultValue"));
 
                 // If some value was typed and the identifier is valid
-                if (globalStateId != null && controller.isElementIdValid(globalStateId))
+                if (globalStateId != null)
                 {
+                    if (!controller.isElementIdValid(globalStateId))
+                        globalStateId = controller.makeElementValid(globalStateId);
+
                     // Add thew new globalState
                     GlobalState newGlobalState = new GlobalState(globalStateId);
                     globalStatesList.Add(newGlobalState);

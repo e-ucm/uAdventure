@@ -1,10 +1,83 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
 
 /// <summary>
 /// The ExtensionRect class hods up multiple util operations for rectangles.
 /// </summary>
 public static class ExtensionRect
 {
+    /// <summary>
+    /// Traps a rect inside another rect. If its ouside it moves it to the closest point inside
+    /// </summary>
+    /// <param name="rect"></param>
+    /// <param name="other"></param>
+    /// <returns></returns>
+    public static Rect TrapInside(this Rect rect, Rect other)
+    {
+        return new Rect(
+            Mathf.Clamp(rect.x, other.x, other.x + other.width - rect.width),
+            Mathf.Clamp(rect.y, other.y, other.y + other.height - rect.height),
+            rect.width, rect.height);
+    }
+
+
+    public static Vector2[] ToPoints(this Rect rect)
+    {
+        return new Vector2[] {
+                rect.position,
+                rect.position + new Vector2(rect.width, 0),
+                rect.position + rect.size,
+                rect.position + new Vector2(0, rect.height)};
+    }
+
+    public static Rect ToRect(this Vector2[] points)
+    {
+        var minX = points.Min(p => p.x);
+        var minY = points.Min(p => p.y);
+        var maxX = points.Max(p => p.x);
+        var maxY = points.Max(p => p.y);
+
+        return new Rect(minX, minY, maxX - minX, maxY - minY);
+    }
+
+    public static Rect AdjustToRatio(this Rect rect, float width, float height)
+    {
+        return rect.AdjustToRatio(width / height);
+    }
+
+    public static Rect AdjustToRatio(this Rect rect, float ratio)
+    {
+        var r = new Rect(rect);
+        var originalCenter = r.center;
+
+        var myRatio = r.width / r.height;
+        if(myRatio > ratio) r.width = r.height * ratio;
+        else r.height = r.width / ratio;
+
+        r.center = originalCenter;
+        return r;
+    }
+
+    public static Rect AdjustToViewport(this Rect rect, float originalWidth, float originalHeight, Rect viewport)
+    {
+        return new Rect(
+                (rect.x / originalWidth) * viewport.width + viewport.x,
+                (rect.y / originalHeight) * viewport.height + viewport.y,
+                (rect.width / originalWidth) * viewport.width,
+                (rect.height / originalHeight) * viewport.height
+            );
+    }
+
+    public static Rect ViewportToScreen(this Rect rect, float screenWidth, float screenHeight, Rect viewport)
+    {
+        return new Rect(
+                ((rect.x - viewport.x) / viewport.width) * screenWidth,
+                ((rect.y - viewport.y) / viewport.height) * screenHeight,
+                (rect.width / viewport.width) * screenWidth,
+                (rect.height / viewport.height) * screenHeight
+            );
+    }
+
     /// <summary>
     /// Performs the intersection of two Rects.
     /// </summary>

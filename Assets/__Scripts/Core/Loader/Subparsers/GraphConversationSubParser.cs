@@ -115,11 +115,11 @@ namespace uAdventure.Core
             foreach (XmlElement el in element)
 			{
 				//If there is a "editor-x" and "editor-y" attributes     
-				editorX = Mathf.Max(-1, ExParsers.ParseDefault(element.GetAttribute("editor-x"), -1));
-				editorY = Mathf.Max(-1, ExParsers.ParseDefault(element.GetAttribute("editor-y"), -1));
+				editorX = Mathf.Max(-1, ExParsers.ParseDefault(el.GetAttribute("editor-x"), -1));
+				editorY = Mathf.Max(-1, ExParsers.ParseDefault(el.GetAttribute("editor-y"), -1));
 
 				//If there is a "waitUserInteraction" attribute, store if the lines will wait until user interacts
-				keepShowingDialogue = "yes".Equals (element.GetAttribute("keepShowing"));
+				keepShowingDialogue = ExString.EqualsDefault(el.GetAttribute("keepShowing"), "yes", false);
 
 				// Node effects
 				end_conversation = el.SelectSingleNode("end-conversation");
@@ -146,14 +146,14 @@ namespace uAdventure.Core
                 }
                 else if (el.Name == "option-node")
                 {
-					random = "yes".Equals (el.GetAttribute ("random"));
-					showUserOption = "yes".Equals (el.GetAttribute ("showUserOption"));
-					preListening = "yes".Equals (el.GetAttribute ("preListening")) || editorX >= 0 || editorY >= 0;
+					random = ExString.EqualsDefault(el.GetAttribute("random"), "yes", false);
+					showUserOption = ExString.EqualsDefault(el.GetAttribute("showUserOption"), "yes", false);
+					preListening = ExString.EqualsDefault(el.GetAttribute("preListening"), "yes", false) || editorX >= 0 || editorY >= 0;
 
 					currentNode = new OptionConversationNode(random, keepShowing, showUserOption, preListening, editorX, editorY);
 
 					//XAPI ELEMENTS
-					((OptionConversationNode)currentNode).setXApiQuestion(el.GetAttribute("question") ?? "");
+					((OptionConversationNode)currentNode).setXApiQuestion(el.GetAttribute("question"));
                     //END OF XAPI
                     // Create a new vector for the links of the current node
                     currentLinks = new List<int>();
@@ -203,9 +203,9 @@ namespace uAdventure.Core
 
 				audioPath = ell.GetAttribute("uri");
 				// If there is a "synthesize" attribute, store its value
-				synthesizerVoice = "yes".Equals (ell.GetAttribute("synthesize"));
+				synthesizerVoice = ExString.EqualsDefault(ell.GetAttribute("synthesize"), "yes", false);
 				// If there is a "keepShowing" attribute, store its value
-				keepShowingLine = "yes".Equals (ell.GetAttribute("keepShowing"));
+				keepShowingLine = ExString.EqualsDefault(ell.GetAttribute("keepShowing"), "yes", false);
 
                 if (ell.Name == "speak-player")
                 {
@@ -228,7 +228,7 @@ namespace uAdventure.Core
                     // Set default name to "NPC"
                     characterName = "NPC";
                     // If there is a "idTarget" attribute, store it
-					characterName = ell.GetAttribute("idTarget") ?? "";
+					characterName = ell.GetAttribute("idTarget");
 
                     // Store the read string into the current node, and then delete the string. The trim is performed so we
                     // don't have to worry with indentations or leading/trailing spaces

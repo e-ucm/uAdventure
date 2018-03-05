@@ -24,18 +24,18 @@ namespace uAdventure.Core
             actionss = element.SelectSingleNode("actions") as XmlElement,
             documentation = element.SelectSingleNode("documentation") as XmlElement;
 
-            string id = element.GetAttribute("id") ?? null;
-            bool rectangular = (element.GetAttribute ("rectangular") ?? "yes").Equals ("yes");
+            string id = ExString.Default(element.GetAttribute("id"), null);
+            bool rectangular = ExString.EqualsDefault(element.GetAttribute ("rectangular"), "yes", true);
 
 			int x 		= ExParsers.ParseDefault(element.GetAttribute("x"), 0),
 			    y 		= ExParsers.ParseDefault(element.GetAttribute("y"), 0),
 			    width 	= ExParsers.ParseDefault(element.GetAttribute("width"), 0),
 			    height	= ExParsers.ParseDefault(element.GetAttribute("height"), 0);
 
-			bool hasInfluence = "yes".Equals (element.GetAttribute ("hasInfluenceArea"));
-			int influenceX = ExParsers.ParseDefault(element.GetAttribute("influenceX"), 0),
-			    influenceY = ExParsers.ParseDefault(element.GetAttribute("influenceY"), 0),
-			    influenceWidth = ExParsers.ParseDefault(element.GetAttribute("influenceWidth"), 0),
+			bool hasInfluence   = ExString.EqualsDefault(element.GetAttribute("hasInfluenceArea"), "yes", false);
+			int influenceX      = ExParsers.ParseDefault(element.GetAttribute("influenceX"), 0),
+			    influenceY      = ExParsers.ParseDefault(element.GetAttribute("influenceY"), 0),
+			    influenceWidth  = ExParsers.ParseDefault(element.GetAttribute("influenceWidth"), 0),
 			    influenceHeight = ExParsers.ParseDefault(element.GetAttribute("influenceHeight"), 0);
 
             ActiveArea activeArea = new ActiveArea((id == null ? generateId() : id), rectangular, x, y, width, height);

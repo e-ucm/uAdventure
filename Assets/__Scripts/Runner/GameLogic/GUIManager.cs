@@ -133,7 +133,7 @@ namespace uAdventure.Runner
                 bubble = GameObject.Instantiate(Bubble_Prefab);
 
             bubble.GetComponent<Bubble>().Data = data;
-            bubble.transform.parent = this.transform;
+            bubble.transform.SetParent(this.transform);
             bubble.transform.localRotation = Quaternion.Euler(0, 0, 0);
             bubble.transform.localPosition = new Vector3(bubble.transform.localPosition.x, bubble.transform.localPosition.y, 0);
         }

@@ -4,9 +4,11 @@ namespace uAdventure.Editor
 {
     public class AnimationFileOpenDialog : BaseFileOpenDialog
     {
-        public virtual void Init(DialogReceiverInterface e, FileType fType)
+
+        override public void Init(DialogReceiverInterface e, FileType fType)
         {
-            fileFilter = "eaa,xml";
+            basePath = "Assets/Resources/CurrentGame/animation/";
+            fileFilter = "eaa.xml";
             base.Init(e, fType);
         }
 

@@ -11,14 +11,13 @@ namespace uAdventure.Core
 		public object DOMParse(XmlElement element, params object[] parameters)
 		{
 			Action currentAction = new Action(0);
-			Chapter chapter = parameters [0] as Chapter;
 
             //First we parse the elements every action haves:
-			bool currentNeedsGoTo = "yes".Equals (element.GetAttribute("needsGoTo"));
-			int currentKeepDistance = ExParsers.ParseDefault(element.GetAttribute ("keepDistance"), 0);
-			bool activateNotEffects = "yes".Equals (element.GetAttribute("not-effects"));
-			bool activateClickEffects = "yes".Equals (element.GetAttribute("click-effects"));
-			string currentIdTarget = element.GetAttribute ("idTarget") ?? "";
+			bool currentNeedsGoTo       = ExString.EqualsDefault(element.GetAttribute("needsGoTo"), "yes", false);
+			int currentKeepDistance     = ExParsers.ParseDefault(element.GetAttribute ("keepDistance"), 0);
+			bool activateNotEffects     = ExString.EqualsDefault(element.GetAttribute("not-effects"), "yes", false);
+			bool activateClickEffects   = ExString.EqualsDefault(element.GetAttribute("click-effects"), "yes", false);
+			string currentIdTarget = element.GetAttribute ("idTarget");
 
 			Conditions conditions = DOMParserUtility.DOMParse<Conditions> ((XmlElement)element.SelectSingleNode("condition"), parameters) 	?? new Conditions();
 			Effects effects 	  = DOMParserUtility.DOMParse<Effects> ((XmlElement)element.SelectSingleNode("effect"), parameters) 		?? new Effects();
@@ -39,7 +38,7 @@ namespace uAdventure.Core
                 case "custom":
                 case "custom-interact":
 					CustomAction customAction = new CustomAction((element.Name == "custom") ? Action.CUSTOM : Action.CUSTOM_INTERACT);
-					customAction.setName(element.GetAttribute("name") ?? "");
+					customAction.setName(element.GetAttribute("name"));
 					customAction.addResources(
 						DOMParserUtility.DOMParse<ResourcesUni>((XmlElement)element.SelectSingleNode("resources"), parameters) ?? new ResourcesUni());
 
@@ -67,13 +66,13 @@ namespace uAdventure.Core
 
             var currentResources = new ResourcesUni();
 
-            currentResources.setName(resources.GetAttribute("name") ?? "");
+            currentResources.setName(resources.GetAttribute("name"));
 
             assets = resources.SelectNodes("asset");
             foreach (XmlElement asset in assets)
             {
-				string type = asset.GetAttribute("type") ?? "";
-				string path = asset.GetAttribute("uri") ?? "";
+				string type = asset.GetAttribute("type");
+				string path = asset.GetAttribute("uri");
 
                 currentResources.addAsset(type, path);
             }

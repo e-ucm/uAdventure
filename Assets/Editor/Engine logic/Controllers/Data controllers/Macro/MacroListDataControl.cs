@@ -158,8 +158,11 @@ namespace uAdventure.Editor
                     macroId = controller.showInputDialog(TC.get("Operation.AddMacroTitle"), TC.get("Operation.AddMacroMessage"), TC.get("Operation.AddMacroDefaultValue"));
 
                 // If some value was typed and the identifier is valid
-                if (macroId != null && controller.isElementIdValid(macroId))
+                if (macroId != null)
                 {
+                    if (!controller.isElementIdValid(macroId))
+                        macroId = controller.makeElementValid(macroId);
+
                     // Add thew new macro
                     Macro newMacro = new Macro(macroId);
                     macrosList.Add(newMacro);

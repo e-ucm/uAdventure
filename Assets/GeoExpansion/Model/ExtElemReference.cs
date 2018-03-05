@@ -248,7 +248,7 @@ namespace uAdventure.Geo
             scale = (Vector3)parameters["Scale"];
             rotation = (float)parameters["Rotation"];
         }
-        bool hidden = false;
+
         public void Update()
         {
             var ray = Camera.main.ScreenPointToRay(new Vector2(0, 0));

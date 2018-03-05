@@ -1,339 +1,478 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using uAdventure.Core;
+using System.Collections.Generic;
+using System;
+using System.Linq;
 
 namespace uAdventure.Editor
 {
 
-    public class ScenesWindowElementReference : LayoutWindow, DialogReceiverInterface
+    public class ScenesWindowElementReference : SceneEditorWindow
     {
+        private class ReferenceList : DataControlList
+        {
+            private Texture2D conditionsTex, noConditionsTex;
 
-        private Texture2D backgroundPreviewTex = null;
-        private Texture2D conditionTex = null;
+            private Dictionary<Type, Texture2D> icons;
 
-        private Texture2D addTexture = null;
-        private Texture2D moveUp, moveDown = null;
-        private Texture2D clearImg = null;
+            public ReferenceList()
+            {
+                conditionsTex = Resources.Load<Texture2D>("EAdventureData/img/icons/conditions-24x24");
+                noConditionsTex = Resources.Load<Texture2D>("EAdventureData/img/icons/no-conditions-24x24");
+                icons = new Dictionary<Type, Texture2D>()
+                {
+                    { typeof(PlayerDataControl),    Resources.Load<Texture2D>("EAdventureData/img/icons/player-old") },
+                    { typeof(ItemDataControl),      Resources.Load<Texture2D>("EAdventureData/img/icons/item") },
+                    { typeof(AtrezzoDataControl),   Resources.Load<Texture2D>("EAdventureData/img/icons/atrezzo-1") },
+                    { typeof(NPCDataControl),       Resources.Load<Texture2D>("EAdventureData/img/icons/npc") }
+                };
+                elementHeight = 20;
+                Columns = new List<ColumnList.Column>()
+                {
+                    new ColumnList.Column() // Layer column
+                    {
+                        Text = TC.get("ElementList.Layer"),
+                        SizeOptions = new GUILayoutOption[]{ GUILayout.Width(50) }
+                    },
+                    new ColumnList.Column() // Enabled Column
+                    {
+                        Text = "Enabled",
+                        SizeOptions = new GUILayoutOption[]{ GUILayout.Width(70) }
+                    },
+                    new ColumnList.Column() // Element name
+                    {
+                        Text = TC.get("ElementList.Title"),
+                        SizeOptions = new GUILayoutOption[]{ GUILayout.ExpandWidth(true) }
+                    },
+                    new ColumnList.Column() // Enabled Column
+                    {
+                        Text = TC.get("Conditions.Title"),
+                        SizeOptions = new GUILayoutOption[]{ GUILayout.ExpandWidth(true) }
+                    }
+                };
+                drawCell = (columnRect, row, column, isActive, isFocused) =>
+                {
+                    var element = list[row] as ElementContainer;
+                    var erdc = element.getErdc();
 
-        private string backgroundPath = "";
-        
-        private static Rect tableRect;
-        private static Rect previewRect;
-        private Rect rightPanelRect;
-        private static Rect infoPreviewRect;
+                    switch (column)
+                    {
+                        case 0: GUI.Label(columnRect, row.ToString()); break;
+                        case 1: /* TODO */ break;
+                        case 2:
+                            var iconSpace = new Rect(columnRect);
+                            var nameSpace = new Rect(columnRect);
+                            iconSpace.size = new Vector2(16, nameSpace.size.y);
+                            nameSpace.position += new Vector2(16, 0);
+                            nameSpace.size += new Vector2(-16, 0);
 
-        private static Vector2 scrollPosition;
+                            if (erdc == null)
+                            {
+                                GUI.Label(iconSpace, icons[typeof(PlayerDataControl)]);
+                                GUI.Label(nameSpace, TC.get("Element.Name26"));
+                            }
+                            else
+                            {
+                                Texture2D icon = null;
+                                var type = erdc.getReferencedElementDataControl().GetType();
+                                if (icons.ContainsKey(type)) icon = icons[type];
+                                if (icon != null)
+                                    GUI.Label(iconSpace, icons[type]);
+                                GUI.Label(icon != null ? nameSpace : columnRect, erdc.getElementId());
+                            }
+                            break;
+                        case 3:
+                            using (new EditorGUI.DisabledScope(erdc == null))
+                            {
+                                if (GUI.Button(columnRect, erdc == null ? noConditionsTex : erdc.getConditions().getBlocksCount() > 0 ? conditionsTex : noConditionsTex))
+                                {
+                                    ConditionEditorWindow window =
+                                            (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
+                                    window.Init(erdc.getConditions());
+                                }
+                            }
+                            break;
+                    }
+                };
+            }
 
-        private static GUISkin selectedElementSkin;
-        private static GUISkin defaultSkin;
-        private static GUISkin noBackgroundSkin;
+            protected override void OnRemove()
+            {
+                DataControl.deleteElement(((ElementContainer)GetChilds(DataControl)[index]).getErdc(), false);
+                OnChanged(reorderableList);
+            }
 
-        private ElementContainer selectedElement;
-        private AddItemActionMenu addMenu;
+            protected override void OnDuplicate()
+            {
+                DataControl.duplicateElement(((ElementContainer)GetChilds(DataControl)[index]).getErdc());
+                OnChanged(reorderableList);
+            }
+
+        }
+
 
         private int currentIndex = -1;
         private SceneDataControl currentScene;
 
-        public ScenesWindowElementReference(Rect aStartPos, GUIContent aContent, GUIStyle aStyle,
+        private DataControlList referenceList;
+        private SceneDataControl workingScene;
+             
+        public ScenesWindowElementReference(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, SceneEditor sceneEditor,
             params GUILayoutOption[] aOptions)
-            : base(aStartPos, aContent, aStyle, aOptions)
+            : base(aStartPos, aContent, aStyle, sceneEditor, aOptions)
         {
-            clearImg = (Texture2D)Resources.Load("EAdventureData/img/icons/deleteContent", typeof(Texture2D));
-            addTexture = (Texture2D)Resources.Load("EAdventureData/img/icons/addNode", typeof(Texture2D));
-            moveUp = (Texture2D)Resources.Load("EAdventureData/img/icons/moveNodeUp", typeof(Texture2D));
-            moveDown = (Texture2D)Resources.Load("EAdventureData/img/icons/moveNodeDown", typeof(Texture2D));
-
-            if (GameRources.GetInstance().selectedSceneIndex >= 0)
+            new ReferenceComponent(Rect.zero, new GUIContent(""), aStyle);
+            if (Controller.Instance.playerMode() == DescriptorData.MODE_PLAYER_3RDPERSON)
             {
-                currentIndex = GameRources.GetInstance().selectedSceneIndex;
-                currentScene = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[currentIndex];
-                backgroundPath = currentScene.getPreviewBackground();
+                new InfluenceComponent(Rect.zero, new GUIContent(""), aStyle);
             }
-            if (backgroundPath != null && !backgroundPath.Equals(""))
-                backgroundPreviewTex = AssetsController.getImage(backgroundPath).texture;
 
-            conditionTex = (Texture2D)Resources.Load("EAdventureData/img/icons/no-conditions-24x24", typeof(Texture2D));
-
-            selectedElementSkin = (GUISkin)Resources.Load("Editor/EditorLeftMenuItemSkinConcreteOptions", typeof(GUISkin));
-            noBackgroundSkin = (GUISkin)Resources.Load("Editor/EditorNoBackgroundSkin", typeof(GUISkin));
-
-
-            selectedElement = null;
-            addMenu = new AddItemActionMenu();
-        }
-
-        public override void Draw(int aID)
-		{
-			if (GameRources.GetInstance().selectedSceneIndex >= 0)
-			{
-				currentIndex = GameRources.GetInstance().selectedSceneIndex;
-				currentScene = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[currentIndex];
-			}
-
-            if (currentScene == null)
-                if (GameRources.GetInstance().selectedSceneIndex >= 0 && currentIndex != GameRources.GetInstance().selectedSceneIndex)
+            referenceList = new ReferenceList()
+            {
+                onSelectCallback = (list) =>
                 {
-                    currentIndex = GameRources.GetInstance().selectedSceneIndex;
-                    currentScene = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[currentIndex];
+                    sceneEditor.SelectedElement = (referenceList.list[list.index] as ElementContainer).getErdc();
+                }
+            };
+
+            sceneEditor.onSelectElement += (element) =>
+            {
+                if (element is ElementReferenceDataControl)
+                {
+                    var erdc = element as ElementReferenceDataControl;
+                    referenceList.index = referenceList.list.Cast<ElementContainer>().Select(e => e.getErdc()).ToList().IndexOf(erdc);
                 }
                 else
+                {
+                    referenceList.index = -1;
+                }
+            };
+
+        }
+
+        protected override void DrawInspector()
+        {
+            var prevWorkingScene = workingScene;
+            workingScene = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[GameRources.GetInstance().selectedSceneIndex];
+            if(workingScene != prevWorkingScene)
+            {
+                referenceList.SetData(workingScene.getReferencesList(),
+                    (dc) => (dc as ReferencesListDataControl).getAllReferencesDataControl().Cast<DataControl>().ToList());
+            }
+
+            if(referenceList.count != workingScene.getReferencesList().getAllReferencesDataControl().Count)
+            {
+                referenceList.SetData(workingScene.getReferencesList(),
+                    (dc) => (dc as ReferencesListDataControl).getAllReferencesDataControl().Cast<DataControl>().ToList());
+            }
+
+            referenceList.DoList(160);
+            GUILayout.Space(20);
+        }
+
+        // ################################################################################################################################################
+        // ########################################################### REFERENCE COMPONENT  ###############################################################
+        // ################################################################################################################################################
+
+        [EditorComponent(typeof(ElementReferenceDataControl), Name = "Transform", Order = 0)]
+        public class ReferenceComponent : AbstractEditorComponent
+        {
+            public ReferenceComponent(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
+            {
+            }
+
+            public override void OnPreRender()
+            {
+                var reference = Target as ElementReferenceDataControl;
+                SceneEditor.Current.PushMatrix();
+                var matrix = SceneEditor.Current.Matrix;
+                SceneEditor.Current.Matrix = matrix * Matrix4x4.TRS(new Vector3(reference.getElementX(), reference.getElementY(), 0), Quaternion.identity, Vector3.one * reference.getElementScale());
+            }
+
+            public override void Draw(int aID)
+            {
+                var reference = Target as ElementReferenceDataControl;
+
+                var oldPos = new Vector2(reference.getElementX(), reference.getElementY());
+                EditorGUI.BeginChangeCheck();
+                var newPos = EditorGUILayout.Vector2Field("Position", oldPos);
+                if (EditorGUI.EndChangeCheck()) { reference.setElementPosition(Mathf.RoundToInt(newPos.x), Mathf.RoundToInt(newPos.y)); }
+                
+                EditorGUI.BeginChangeCheck();
+                var newScale = EditorGUILayout.FloatField("Scale", reference.getElementScale());
+                if (EditorGUI.EndChangeCheck()) { reference.setElementScale(newScale); }
+
+            }
+
+            public static Rect GetUnscaledRect(DataControl elem)
+            {
+                Sprite sprite = null;
+                if (elem is PlayerDataControl)
+                {
+                    sprite = AssetsController.getImage((elem as PlayerDataControl).getPreviewImage());
+                }
+                else if(elem is NodeDataControl)
+                {
+                    sprite = AssetsController.getImage((elem as NodeDataControl).getPlayerImagePath());
+                }
+                else if(elem is ElementReferenceDataControl)
+                {
+                    var referencedElement = (elem as ElementReferenceDataControl).getReferencedElementDataControl();
+                    if (referencedElement is ItemDataControl)
+                    {
+                        sprite = AssetsController.getImage((referencedElement as ItemDataControl).getPreviewImage());
+                    }
+                    else if (referencedElement is NPCDataControl)
+                    {
+                        sprite = AssetsController.getImage((referencedElement as NPCDataControl).getPreviewImage());
+                    }
+                    else if (referencedElement is AtrezzoDataControl)
+                    {
+                        sprite = AssetsController.getImage((referencedElement as AtrezzoDataControl).getPreviewImage());
+                    }
+                }
+
+                if (!sprite)
+                    return new Rect(Vector2.zero, new Vector2(100f, 100f));
+
+                return new Rect(Vector2.zero, new Vector2(sprite.texture.width, sprite.texture.height));
+            }
+
+            public static Rect GetElementRect(DataControl element)
+            {
+                var unscaled = GetUnscaledRect(element);
+
+                var myPos = SceneEditor.Current.Matrix.MultiplyPoint(new Vector2(-0.5f * unscaled.width, -unscaled.height));
+                var mySize = SceneEditor.Current.Matrix.MultiplyVector(new Vector3(unscaled.width, unscaled.height));
+                var rect = new Rect(myPos, mySize).AdjustToViewport(SceneEditor.Current.Size.x, SceneEditor.Current.Size.y, SceneEditor.Current.Viewport);
+
+                return rect;
+            }
+
+            public override bool Update()
+            {
+                var elemRef = Target as ElementReferenceDataControl;
+
+                bool selected = false;
+                switch (Event.current.type)
+                {
+                    case EventType.MouseDown:
+                        var rect = GetElementRect(elemRef);
+                        if (GUIUtility.hotControl == 0)
+                            selected = rect.Contains(Event.current.mousePosition) || rect.ToPoints().ToList().FindIndex(p => (p - Event.current.mousePosition).magnitude <= 10f) != -1;
+                        break;
+                }
+
+                return selected;
+            }
+
+            public override void OnDrawingGizmosSelected()
+            {
+                var elemRef = Target as ElementReferenceDataControl;
+                var rect = GetElementRect(elemRef);
+
+                var newRect = HandleUtil.HandleFixedRatioRect(elemRef.GetHashCode() + 1, rect, rect.width / rect.height, 10f,
+                    polygon => HandleUtil.DrawPolyLine(polygon, true, Color.red),
+                    point => HandleUtil.DrawPoint(point, 4.5f, Color.blue, Color.black));
+
+                if (newRect != rect)
+                {
+                    var original = newRect.ViewportToScreen(SceneEditor.Current.Size.x, SceneEditor.Current.Size.y, SceneEditor.Current.Viewport);
+                    var unscaled = ScenesWindowElementReference.ReferenceComponent.GetUnscaledRect(Target);
+                    // And then we rip the position
+                    var position = original.center + new Vector2(0, original.height / 2f);
+                    var scale = original.size.magnitude / unscaled.size.magnitude;
+
+                    // And then we set the values in the reference
+                    elemRef.setElementPosition(Mathf.RoundToInt(position.x), Mathf.RoundToInt(position.y));
+                    elemRef.setElementScale(scale);
+                }
+
+                EditorGUI.BeginChangeCheck();
+                rect = HandleUtil.HandleRectMovement(elemRef.GetHashCode(), rect);
+                if(EditorGUI.EndChangeCheck())
+                {
+                    var original = rect.ViewportToScreen(SceneEditor.Current.Size.x, SceneEditor.Current.Size.y, SceneEditor.Current.Viewport);
+                    elemRef.setElementPosition(Mathf.RoundToInt(original.x + 0.5f * original.width), Mathf.RoundToInt(original.y + original.height));
+                }
+            }
+
+            public override void OnPostRender()
+            {
+                SceneEditor.Current.PopMatrix();
+            }
+        }
+
+
+
+        // ################################################################################################################################################
+        // ########################################################### INFLUENCE COMPONENT  ###############################################################
+        // ################################################################################################################################################
+
+        [EditorComponent(typeof(ElementReferenceDataControl), typeof(ActiveAreaDataControl), typeof(ExitDataControl), Name = "Influence Area", Order = 1)]
+        public class InfluenceComponent : AbstractEditorComponent
+        {
+            private static InfluenceAreaDataControl getIngluenceArea(DataControl target)
+            {
+                if(target is ElementReferenceDataControl)
+                {
+                    var elemRef = target as ElementReferenceDataControl;
+                    if(elemRef.getType() == Controller.ATREZZO) return null;
+                    return elemRef.getInfluenceArea();
+                }
+                else if(target is ActiveAreaDataControl)
+                {
+                    return (target as ActiveAreaDataControl).getInfluenceArea();
+                }
+                else if(target is ExitDataControl)
+                {
+                    return (target as ExitDataControl).getInfluenceArea();
+                }
+
+                return null;
+            }
+
+            private static Rect getElementBoundaries(DataControl target)
+            {
+
+                if (target is ElementReferenceDataControl)
+                {
+                    var elemRef = target as ElementReferenceDataControl;
+                    var size = ReferenceComponent.GetUnscaledRect(target).size * elemRef.getElementScale();
+                    return new Rect(elemRef.getElementX() - (size.x/2f), elemRef.getElementY() - (size.y), size.x, size.y);
+                }
+                else if (target is RectangleArea)
+                { 
+                    var rectangle = (target as RectangleArea).getRectangle();
+                    if (rectangle.isRectangular())
+                    {
+                        return new Rect(rectangle.getX(), rectangle.getY(), rectangle.getWidth(), rectangle.getHeight());
+                    }
+                    else
+                    {
+                        return rectangle.getPoints().ToArray().ToRect();
+                    }
+                }
+
+                return Rect.zero;
+            }
+
+            private static Rect fixToBoundaries(Vector2 oldSize, Rect rect, Rect boundaries)
+            {
+                var otherCorner = rect.position + rect.size;
+
+                // This works for the top left corner
+                rect.x = Mathf.Min(rect.x, boundaries.width);
+                rect.y = Mathf.Min(rect.y, boundaries.height);
+
+                // This works for the bottom right corner
+                otherCorner.x = Mathf.Max(otherCorner.x, 0);
+                otherCorner.y = Mathf.Max(otherCorner.y, 0);
+
+                var newSize = otherCorner - rect.position;
+
+                return new Rect(rect.position, newSize);
+            }
+
+            public InfluenceComponent(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
+            {
+            }
+
+            public override void Draw(int aID)
+            {
+                var influence = getIngluenceArea(Target);
+
+                if(influence != null)
+                {
+                    var boundaries = getElementBoundaries(Target);
+                    
+                    EditorGUI.BeginChangeCheck();
+                    var rect = influence.ScreenRect(boundaries);
+                    rect.position -= boundaries.position;
+                    var newRect = EditorGUILayout.RectField("Influence", rect);
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        var fixedRect = fixToBoundaries(rect.size, newRect, boundaries);
+                        influence.setInfluenceArea(Mathf.RoundToInt(fixedRect.x), Mathf.RoundToInt(fixedRect.y), Mathf.RoundToInt(fixedRect.width), Mathf.RoundToInt(fixedRect.height));
+                    }
+                }
+                else
+                {
+                    EditorGUILayout.LabelField("This element has no influence area");
+                }
+            }
+
+            private DataControl wasSelected = null;
+
+            public override bool Update()
+            {
+                bool selected = false;
+                switch (Event.current.type)
+                {
+                    case EventType.MouseDown:
+                        // Calculate the influenceAreaRect
+                        var influenceArea = getIngluenceArea(Target);
+                        if (influenceArea == null)
+                            return false;
+                        var boundaries = getElementBoundaries(Target);
+                        
+                        var rect = influenceArea.ScreenRect(boundaries)
+                            .AdjustToViewport(SceneEditor.Current.Size.x, SceneEditor.Current.Size.y, SceneEditor.Current.Viewport);
+
+                        // See if its selected (only if it was previously selected)
+                        if (GUIUtility.hotControl == 0)
+                            selected = (wasSelected == Target) && (rect.Contains(Event.current.mousePosition) || rect.ToPoints().ToList().FindIndex(p => (p - Event.current.mousePosition).magnitude <= 10f) != -1);
+
+                        if(wasSelected == Target)
+                            wasSelected = null;
+
+                        break;
+                }
+
+                return selected;
+            }
+
+            public override void OnDrawingGizmosSelected()
+            {
+                wasSelected = Target;
+                var influenceArea = getIngluenceArea(Target);
+                if (influenceArea == null)
                     return;
 
-            var windowWidth = m_Rect.width;
-            var windowHeight = m_Rect.height;
+                var boundaries = getElementBoundaries(Target);
+                var rect = influenceArea.ScreenRect(boundaries);
+                var originalSize = rect.size;
+                rect = rect.AdjustToViewport(SceneEditor.Current.Size.x, SceneEditor.Current.Size.y, SceneEditor.Current.Viewport);
 
-            tableRect = new Rect(0f, 0.1f * windowHeight, 0.9f * windowWidth, windowHeight * 0.33f);
-            rightPanelRect = new Rect(0.9f * windowWidth, 0.1f * windowHeight, 0.08f * windowWidth, 0.33f * windowHeight);
-            infoPreviewRect = new Rect(0f, 0.45f * windowHeight, windowWidth, windowHeight * 0.05f);
-            previewRect = new Rect(0f, 0.5f * windowHeight, windowWidth, windowHeight * 0.45f);
-
-            GUILayout.BeginArea(tableRect);
-            GUILayout.BeginHorizontal();
-            GUILayout.Box(TC.get("ElementList.Layer"), GUILayout.Width(windowWidth * 0.12f));
-            GUILayout.Box("", GUILayout.Width(windowWidth * 0.06f));
-            GUILayout.Box(TC.get("ElementList.Title"), GUILayout.Width(windowWidth * 0.39f));
-            GUILayout.Box(TC.get("Conditions.Title"), GUILayout.Width(windowWidth * 0.29f));
-            GUILayout.EndHorizontal();
-
-            scrollPosition = GUILayout.BeginScrollView(scrollPosition);
-            int i = 0;
-            foreach (ElementContainer element in currentScene.getReferencesList().getAllReferencesDataControl())
-            {
-                if (element == selectedElement)
-                    GUI.skin = selectedElementSkin;
-
-                GUILayout.BeginHorizontal();
-
-                if (GUILayout.Button(element.getLayer().ToString(), GUILayout.Width(windowWidth * 0.12f)))
-                    selectedElement = element;
-
-                if (element.getErdc() != null)
-                {
-                    // FOR ELEMENT ERDC
-                    element.getErdc().setVisible(GUILayout.Toggle(element.getErdc().isVisible(), "", GUILayout.Width(windowWidth * 0.06f)));
-                    if (GUILayout.Button(element.getErdc().getElementId(), GUILayout.Width(windowWidth * 0.39f)))
+                EditorGUI.BeginChangeCheck();
+                var newRect = HandleUtil.HandleRect(influenceArea.GetHashCode() + 1, rect, 10f,
+                    polygon =>
                     {
-                        selectedElement = element;
-                    }
+                        HandleUtil.DrawPolyLine(polygon, true, Color.blue);
+                        HandleUtil.DrawPolygon(polygon, new Color(0,0,1f,0.3f));
+                    },
+                    point => HandleUtil.DrawSquare(point, 6.5f, Color.yellow, Color.black));
 
-                    if (GUILayout.Button(conditionTex, GUILayout.Width(windowWidth * 0.29f)))
-                    {
-                        selectedElement = element;
-                        ConditionEditorWindow window = ScriptableObject.CreateInstance<ConditionEditorWindow>();
-                        window.Init(element.getErdc().getConditions());
-                    }
-                }
-                else
+                newRect = HandleUtil.HandleRectMovement(influenceArea.GetHashCode(), newRect);
+                
+                if (EditorGUI.EndChangeCheck())
                 {
-                    if (GUILayout.Button("", GUILayout.Width(windowWidth * 0.06f)))
-                        selectedElement = element;
-                    if (GUILayout.Button("", GUILayout.Width(windowWidth * 0.39f)))
-                        selectedElement = element;
-                    if (GUILayout.Button(conditionTex, GUILayout.Width(windowWidth * 0.29f)))
-                        selectedElement = element;
-                }
+                    var original = newRect.ViewportToScreen(SceneEditor.Current.Size.x, SceneEditor.Current.Size.y, SceneEditor.Current.Viewport);
 
-
-                GUILayout.EndHorizontal();
-                GUI.skin = defaultSkin;
-            }
-            GUILayout.EndScrollView();
-            GUILayout.EndArea();
-
-
-            /*
-            * Right panel
-            */
-            GUILayout.BeginArea(rightPanelRect);
-            GUI.skin = noBackgroundSkin;
-            if (GUILayout.Button(addTexture, GUILayout.MaxWidth(0.08f * windowWidth)))
-            {
-                addMenu.menu.ShowAsContext();
-            }
-            if (GUILayout.Button(moveUp, GUILayout.MaxWidth(0.08f * windowWidth)))
-            {
-                currentScene.getReferencesList().moveElementUp(selectedElement.getErdc());
-            }
-            if (GUILayout.Button(moveDown, GUILayout.MaxWidth(0.08f * windowWidth)))
-            {
-                currentScene.getReferencesList().moveElementDown(selectedElement.getErdc());
-            }
-            if (GUILayout.Button(clearImg, GUILayout.MaxWidth(0.08f * windowWidth)))
-            {
-                currentScene.getReferencesList().deleteElement(selectedElement.getErdc(), false);
-            }
-            GUI.skin = defaultSkin;
-            GUILayout.EndArea();
-
-
-            if (backgroundPath != "")
-            {
-
-                GUILayout.BeginArea(infoPreviewRect);
-                // Show preview dialog
-                // Button visible only is there is at least 1 object
-                if (currentScene != null && selectedElement != null)
-                {
-                    if (GUILayout.Button(TC.get("DefaultClickAction.ShowDetails") + "/" + TC.get("GeneralText.Edit")))
-                    {
-                        ObjectInSceneRefrencesEditor window = ScriptableObject.CreateInstance<ObjectInSceneRefrencesEditor>();
-                        window.Init(this, currentScene, currentScene.getReferencesList().getAllReferencesDataControl().IndexOf(selectedElement));
-                    }
-                }
-                GUILayout.EndArea();
-                GUI.DrawTexture(previewRect, backgroundPreviewTex, ScaleMode.ScaleToFit);
-
-            }
-            else
-            {
-                GUILayout.BeginArea(infoPreviewRect);
-                GUILayout.Button("No background!");
-                GUILayout.EndArea();
-            }
-        }
-
-        public void OnDialogOk(string message, object workingObject = null, object workingObjectSecond = null)
-        {
-            Debug.Log("Apply");
-        }
-
-        public void OnDialogCanceled(object workingObject = null)
-        {
-            Debug.Log(TC.get("GeneralText.Cancel"));
-        }
-
-        #region Add ref action options
-
-        class AddItemActionMenu : WindowMenuContainer
-        {
-            private AddItemAction itemAction;
-            private AddSetItemAction setItemAction;
-            private AddNPCAction npcAction;
-
-            public AddItemActionMenu()
-            {
-                SetMenuItems();
-            }
-
-            protected override void Callback(object obj)
-            {
-                if ((obj as AddItemAction) != null)
-                    itemAction.OnCliked();
-                else if ((obj as AddSetItemAction) != null)
-                    setItemAction.OnCliked();
-                else if ((obj as AddNPCAction) != null)
-                    npcAction.OnCliked();
-            }
-
-            protected override void SetMenuItems()
-            {
-                menu = new GenericMenu();
-
-                itemAction = new AddItemAction(TC.get("TreeNode.AddElement6"));
-                setItemAction = new AddSetItemAction(TC.get("TreeNode.AddElement60"));
-                npcAction = new AddNPCAction(TC.get("TreeNode.AddElement8"));
-
-                menu.AddItem(new GUIContent(itemAction.Label), false, Callback, itemAction);
-                menu.AddItem(new GUIContent(setItemAction.Label), false, Callback, setItemAction);
-                menu.AddItem(new GUIContent(npcAction.Label), false, Callback, npcAction);
-            }
-        }
-
-        class AddItemAction : IMenuItem, DialogReceiverInterface
-        {
-            public AddItemAction(string name_)
-            {
-                this.Label = name_;
-            }
-
-            public string Label { get; set; }
-
-            public void OnCliked()
-            {
-                ObjectAddItemReference window = ScriptableObject.CreateInstance<ObjectAddItemReference>();
-                window.Init(this);
-            }
-
-            public void OnDialogOk(string message, object workingObject = null, object workingObjectSecond = null)
-            {
-                if (workingObject is ObjectAddItemReference)
-                {
-                    Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                        GameRources.GetInstance().selectedSceneIndex].getReferencesList()
-                        .addElement(Controller.ITEM_REFERENCE, message);
+                    original.position -= boundaries.position;
+                    original = fixToBoundaries(originalSize, original, boundaries);
+                    // And then we set the values in the reference
+                    influenceArea.setInfluenceArea(Mathf.RoundToInt(original.x), Mathf.RoundToInt(original.y), Mathf.RoundToInt(original.width), Mathf.RoundToInt(original.height));
                 }
             }
-
-            public void OnDialogCanceled(object workingObject = null)
-            {
-                Debug.Log(TC.get("GeneralText.Cancel"));
-            }
         }
-
-        class AddSetItemAction : IMenuItem, DialogReceiverInterface
+    }
+    internal static class ExInfluences
+    {
+        public static Rect ScreenRect(this InfluenceAreaDataControl influence, Rect boundaries)
         {
-            public AddSetItemAction(string name_)
-            {
-                this.Label = name_;
-            }
-
-            public string Label { get; set; }
-
-            public void OnCliked()
-            {
-
-                ObjectAddSetItemReference window = ScriptableObject.CreateInstance<ObjectAddSetItemReference>();
-                window.Init(this);
-            }
-
-            public void OnDialogOk(string message, object workingObject = null, object workingObjectSecond = null)
-            {
-                if (workingObject is ObjectAddSetItemReference)
-                {
-                    Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                        GameRources.GetInstance().selectedSceneIndex].getReferencesList()
-                        .addElement(Controller.ATREZZO_REFERENCE, message);
-                }
-            }
-
-            public void OnDialogCanceled(object workingObject = null)
-            {
-                Debug.Log(TC.get("GeneralText.Cancel"));
-            }
+            return new Rect(boundaries.x + influence.getX(), boundaries.y + influence.getY(), influence.getWidth(), influence.getHeight());
         }
-
-        class AddNPCAction : IMenuItem, DialogReceiverInterface
-        {
-            public AddNPCAction(string name_)
-            {
-                this.Label = name_;
-            }
-
-            public string Label { get; set; }
-
-            public void OnCliked()
-            {
-                ObjectAddNPCReference window =
-                    (ObjectAddNPCReference)ScriptableObject.CreateInstance(typeof(ObjectAddNPCReference));
-                window.Init(this);
-            }
-
-            public void OnDialogOk(string message, object workingObject = null, object workingObjectSecond = null)
-            {
-                if (workingObject is ObjectAddNPCReference)
-                {
-                    Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                        GameRources.GetInstance().selectedSceneIndex].getReferencesList()
-                        .addElement(Controller.NPC_REFERENCE, message);
-                }
-            }
-
-            public void OnDialogCanceled(object workingObject = null)
-            {
-                Debug.Log(TC.get("GeneralText.Cancel"));
-            }
-        }
-
-        #endregion
     }
 }

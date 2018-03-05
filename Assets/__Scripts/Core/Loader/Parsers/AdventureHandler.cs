@@ -10,7 +10,7 @@ using uAdventure.Runner;
 
 namespace uAdventure.Core
 {
-    public class AdventureHandler_
+    public class AdventureHandler
     {
 
         /**
@@ -31,61 +31,24 @@ namespace uAdventure.Core
         // TODO mhm....
         //private List<Chapter> chapters;
 
+        private ResourceManager resourceManager;
+
         /**
          * Constructor.
          * 
          * @param zipFile
          *            Path to the zip file which helds the chapter files
          */
-        public AdventureHandler_(AdventureData adventuredata)
+        public AdventureHandler(AdventureData adventureData, ResourceManager resourceManager)
         {
-            adventureData = adventuredata;
+            this.adventureData = adventureData;
+            this.resourceManager = resourceManager;
             //chapters = new List<Chapter>();
         }
 
         private string getXmlContent(string path)
         {
-            string xml = "";
-#if UNITY_EDITOR
-            if (!UnityEditor.EditorApplication.isPlaying)
-            {
-                xml = System.IO.File.ReadAllText(path);
-
-                FileInfo fi = new FileInfo(path);
-                directory = fi.DirectoryName + "/";
-            }
-            else
-#endif
-                switch (ResourceManager.Instance.getLoadingType())
-                {
-                    case ResourceManager.LoadingType.RESOURCES_LOAD:
-                        directory = path.Split('/')[0] + "/";
-                        if (path.Contains(".xml"))
-                        {
-                            path = path.Replace(".xml", "");
-                        }
-                        TextAsset ta = Resources.Load(path) as TextAsset;
-                        if (ta == null)
-                        {
-                            Debug.Log("Can't load Descriptor file: " + path);
-                            return "";
-                        }
-                        else
-                            xml = ta.text;
-                        break;
-                    case ResourceManager.LoadingType.SYSTEM_IO:
-                        xml = System.IO.File.ReadAllText(path);
-
-                        directory = "";
-                        string[] parts = path.Split('/');
-
-                        for (int i = 0; i < parts.Length - 1; i++)
-                            directory += parts[i] + "/";
-
-                        break;
-                }
-
-            return xml;
+            return resourceManager.getText(path);
         }
 
 
@@ -99,8 +62,7 @@ namespace uAdventure.Core
         {
             return adventureData;
         }
-
-        string directory = "";
+        
         string tmpString = "";
         public void Parse(string path)
         {
@@ -333,10 +295,10 @@ namespace uAdventure.Core
                     {
                         chapterPath = tmpString;
                     }
-                    currentChapter.setChapterPath(directory + chapterPath);
+                    currentChapter.setChapterPath(chapterPath);
 
-                    ChapterHandler_ chapterParser = new ChapterHandler_(currentChapter);
-                    chapterParser.Parse(directory + chapterPath);
+                    ChapterHandler chapterParser = new ChapterHandler(currentChapter, resourceManager);
+                    chapterParser.Parse(chapterPath);
 
                     title = (XmlElement)chapter.SelectSingleNode("title");
                     if (title != null)
@@ -388,7 +350,7 @@ namespace uAdventure.Core
                             currentChapter.setAssessmentName(assessmentName);
                         }
                     }
-
+                     
                     adventureData.addChapter(currentChapter);
                 }
             }

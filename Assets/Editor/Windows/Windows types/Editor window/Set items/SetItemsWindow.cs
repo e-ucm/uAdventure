@@ -4,11 +4,13 @@ using uAdventure.Core;
 using System;
 using UnityEditorInternal;
 using System.Collections.Generic;
+using UnityEditor;
+using System.Linq;
 
 namespace uAdventure.Editor
 {
     [EditorWindowExtension(40, typeof(Atrezzo))]
-    public class SetItemsWindow : ReorderableListEditorWindowExtension
+    public class SetItemsWindow : PreviewDataControlExtension
     {
         private enum SetItemsWindowType { Appearance, Documentation }
 
@@ -34,67 +36,9 @@ namespace uAdventure.Editor
             setItemsWindowDocumentation = new SetItemsWindowDocumentation(aStartPos, new GUIContent(TC.get("Atrezzo.DocPanelTitle")), "Window");
             
             selectedButtonSkin = (GUISkin)Resources.Load("Editor/ButtonSelected", typeof(GUISkin));
-        }
 
-
-        public override void Draw(int aID)
-        {
-            var windowWidth = m_Rect.width;
-            var windowHeight = m_Rect.height;
-
-            // Show information of concrete item
-            if (isConcreteItemVisible)
-            {
-                /**
-                 UPPER MENU
-                */
-                GUILayout.BeginHorizontal();
-                if (openedWindow == SetItemsWindowType.Appearance)
-                    GUI.skin = selectedButtonSkin;
-                if (GUILayout.Button(TC.get("Atrezzo.LookPanelTitle")))
-                {
-                    OnWindowTypeChanged(SetItemsWindowType.Appearance);
-                }
-                if (openedWindow == SetItemsWindowType.Appearance)
-                    GUI.skin = defaultSkin;
-
-                if (openedWindow == SetItemsWindowType.Documentation)
-                    GUI.skin = selectedButtonSkin;
-                if (GUILayout.Button(TC.get("Atrezzo.DocPanelTitle")))
-                {
-                    OnWindowTypeChanged(SetItemsWindowType.Documentation);
-                }
-                if (openedWindow == SetItemsWindowType.Documentation)
-                    GUI.skin = defaultSkin;
-                GUILayout.EndHorizontal();
-
-                switch (openedWindow)
-                {
-                    case SetItemsWindowType.Appearance:
-                        setItemsWindowApperance.Rect = Rect;
-                        setItemsWindowApperance.Draw(aID);
-                        break;
-                    case SetItemsWindowType.Documentation:
-                        setItemsWindowApperance.Rect = Rect;
-                        setItemsWindowDocumentation.Draw(aID);
-                        break;
-                }
-            }
-            else
-            {
-                GUILayout.Space(30);
-                for (int i = 0; i < Controller.Instance.ChapterList.getSelectedChapterData().getAtrezzo().Count; i++)
-                {
-                    GUILayout.BeginHorizontal();
-                    GUILayout.Box(Controller.Instance.ChapterList.getSelectedChapterData().getAtrezzo()[i].getId(), GUILayout.Width(windowWidth * 0.75f));
-                    if (GUILayout.Button(TC.get("GeneralText.Edit"), GUILayout.MaxWidth(windowWidth * 0.2f)))
-                    {
-                        ShowItemWindowView(i);
-                    }
-
-                    GUILayout.EndHorizontal();
-                }
-            }
+            AddTab(TC.get("Atrezzo.LookPanelTitle"), SetItemsWindowType.Appearance, setItemsWindowApperance);
+            AddTab(TC.get("Atrezzo.DocPanelTitle"), SetItemsWindowType.Documentation, setItemsWindowDocumentation);
         }
 
         void OnWindowTypeChanged(SetItemsWindowType type_)
@@ -114,54 +58,6 @@ namespace uAdventure.Editor
         {
             isConcreteItemVisible = true;
             GameRources.GetInstance().selectedSetItemIndex = o;
-
-            setItemsWindowApperance = new SetItemsWindowApperance(m_Rect, new GUIContent(TC.get("Atrezzo.LookPanelTitle")), "Window");
-            setItemsWindowDocumentation = new SetItemsWindowDocumentation(m_Rect, new GUIContent(TC.get("Atrezzo.DocPanelTitle")), "Window");
-        }
-
-        /////////////////////
-
-        protected override void OnElementNameChanged(ReorderableList r, int index, string newName)
-        {
-			Controller.Instance.ChapterList.getSelectedChapterDataControl().getAtrezzoList().getAtrezzoList ()[index].renameElement(newName);
-        }
-
-        protected override void OnAdd(ReorderableList r)
-        {
-            if (r.index != -1 && r.index < r.list.Count)
-            {
-                Controller.Instance                           .ChapterList                           .getSelectedChapterDataControl()
-                           .getAtrezzoList()
-                           .duplicateElement(
-                               Controller.Instance                                   .ChapterList                                   .getSelectedChapterDataControl()
-                                   .getAtrezzoList()
-                                   .getAtrezzoList()[r.index]);
-            }
-            else
-            {
-                Controller.Instance.SelectedChapterDataControl.getAtrezzoList().addElement(Controller.ATREZZO, "newAtrezzo");
-            }
-
-        }
-
-        protected override void OnAddOption(ReorderableList r, string option)
-        {
-            // No options
-        }
-
-        protected override void OnRemove(ReorderableList r)
-        {
-            if (r.index != -1)
-            {
-                Controller.Instance                              .ChapterList                              .getSelectedChapterDataControl()
-                              .getAtrezzoList()
-                              .deleteElement(
-                                  Controller.Instance                                      .ChapterList                                      .getSelectedChapterDataControl()
-                                      .getAtrezzoList()
-                                      .getAtrezzoList()[r.index], false);
-
-                ShowBaseWindowView();
-            }
         }
 
         protected override void OnSelect(ReorderableList r)
@@ -169,25 +65,20 @@ namespace uAdventure.Editor
             ShowItemWindowView(r.index);
         }
 
-        protected override void OnReorder(ReorderableList r)
-        {
-			var dataControlList = Controller.Instance 				.ChapterList .getSelectedChapterDataControl ().getAtrezzoList ();
-
-			var toPos = r.index;
-			var fromPos = dataControlList.getAtrezzoList ().FindIndex (i => i.getId () == r.list [r.index] as string);
-
-			dataControlList.MoveElement (dataControlList.getAtrezzoList ()[fromPos], fromPos, toPos);
-        }
-
         protected override void OnButton()
         {
+            base.OnButton();
             ShowBaseWindowView();
-            reorderableList.index = -1;
+            dataControlList.index = -1;
+            dataControlList.SetData(Controller.Instance.SelectedChapterDataControl.getAtrezzoList(),
+                list => (list as AtrezzoListDataControl).getAtrezzoList().Cast<DataControl>().ToList());
         }
 
-        protected override void OnUpdateList(ReorderableList r)
+        protected override void OnDrawMainPreview(Rect rect, int index)
         {
-			Elements = Controller.Instance.ChapterList.getSelectedChapterDataControl().getAtrezzoList ().getAtrezzoList().ConvertAll(s => s.getId());
+            setItemsWindowApperance.Target = dataControlList.list[index] as DataControl;
+            setItemsWindowApperance.DrawPreview(rect);
+            setItemsWindowApperance.Target = null;
         }
     }
 }

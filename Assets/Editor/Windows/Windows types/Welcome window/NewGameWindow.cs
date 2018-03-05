@@ -120,10 +120,11 @@ namespace uAdventure.Editor
                 case GameType.TPS: type = Controller.FILE_ADVENTURE_3RDPERSON_PLAYER; break;
             }
 
-            if (EditorUtility.DisplayDialog("Seguro?", "Crear una nueva aventura borrará todos los archivos antiguos sin vuelta atrás. Seguro que deseas continuar?", "Sí", "Cancelar"))
+            if (EditorUtility.DisplayDialog("Warning", "Creating a new adventure deletes all previous existing files. Do you want to continue?", "Yes", "No"))
             {
                 Controller.Instance.NewAdventure(type);
                 Controller.OpenEditorWindow();
+                EditorWindowBase.RefreshWindows();
             }
         }
 

@@ -34,7 +34,12 @@ namespace uAdventure.Core
 
             var parser = GetParserFor(el.Name);
             if (parser != null) return parser.DOMParse(el, parameters);
-            else throw new Exception("Parser not found for the desired name: " + el.Name);
+            else
+            {
+                if (el.Name == "adaptation" || el.Name == "assessment")
+                    return null;
+                throw new Exception("Parser not found for the desired name: " + el.Name);
+            }
         }
 
         /// <summary>

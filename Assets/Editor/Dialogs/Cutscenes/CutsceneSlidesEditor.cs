@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using uAdventure.Core;
 using Animation = uAdventure.Core.Animation;
 using UnityEditor;
+using System.IO;
 
 namespace uAdventure.Editor
 {
@@ -48,8 +49,12 @@ namespace uAdventure.Editor
             titleStyle.margin = new RectOffset(0, 0, 5, 5);
         }
 
+        private DialogReceiverInterface parent;
+
         public void Init(DialogReceiverInterface e, string cutsceneFilePath)
         {
+            parent = e;
+
             windowWidth = 800;
             windowHeight = 1000;
 
@@ -74,12 +79,11 @@ namespace uAdventure.Editor
             };
             Debug.Log(cutsceneFilePath);
 
-            workingAnimation = Loader.loadAnimation(AssetsController.InputStreamCreatorEditor.getInputStreamCreator(),
-                cutsceneFilePath, new EditorImageLoader());
+            workingAnimation = Loader.loadAnimation(cutsceneFilePath, Controller.ResourceManager);
 
             Debug.Log(workingAnimation.getAboslutePath() + " " + workingAnimation.getFrames().Count + " " + workingAnimation.isSlides() + " " + workingAnimation.getId());
             if (workingAnimation == null)
-                workingAnimation = new Animation(cutsceneFilePath, 40, new EditorImageLoader());
+                workingAnimation = new Animation(cutsceneFilePath, 40);
 
             // Initalize
             selectedFrame = -1;
@@ -120,7 +124,8 @@ namespace uAdventure.Editor
                     GUI.skin = selectedFrameSkin;
 
                 var frame = workingAnimation.getFrame(i);
-                var frameContent = new GUIContent(frame.getTime().ToString(), frame.getImage(false, false, global::uAdventure.Core.Animation.ENGINE).texture);
+                var image = AssetsController.getImageTexture(frame.getUri());
+                var frameContent = new GUIContent(frame.getTime().ToString(), image);
                 if (GUILayout.Button(frameContent, GUILayout.Height(100), GUILayout.Width(80)))
                 {
                     OnFrameSelectionChanged(i);
@@ -164,7 +169,8 @@ namespace uAdventure.Editor
             GUI.enabled = true;
             if (GUILayout.Button(addTexture))
             {
-                workingAnimation.addFrame(selectedFrame, null);
+                var frame = workingAnimation.addFrame(selectedFrame, null);
+                frame.setUri(SpecialAssetPaths.ASSET_EMPTY_ANIMATION + "_01.png");
             }
 
             GUI.enabled = selectedFrame >= 0;
@@ -243,8 +249,15 @@ namespace uAdventure.Editor
             GUI.enabled = true;
             if (GUILayout.Button("OK"))
             {
+                // If it doesnt have an extension its because its an old animation
+                if (!Path.HasExtension(cutscenePath))
+                {
+                    cutscenePath = cutscenePath + ".eaa.xml";
+                }
+
                 AnimationWriter.writeAnimation(cutscenePath, workingAnimation);
-                reference.OnDialogOk("", this);
+                AssetDatabase.Refresh(ImportAssetOptions.Default);
+                reference.OnDialogOk(cutscenePath, this);
                 this.Close();
             }
             if (GUILayout.Button(TC.get("GeneralText.Cancel")))
@@ -310,6 +323,9 @@ namespace uAdventure.Editor
         {
             imagePath = val;
             workingAnimation.getFrame(selectedFrame).setUri(val);
+            if(selectedFrame == 0)
+                parent.OnDialogOk("Image changed", workingAnimation);
+            
         }
 
         private void OnFrameMusicChanged(string val)

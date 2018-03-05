@@ -10,11 +10,10 @@ namespace uAdventure.Core
     {
 		public object DOMParse(XmlElement element, params object[] parameters)
         {
-			ImageLoaderFactory ilf = parameters [0] as ImageLoaderFactory;
-			Frame frame = new Frame(ilf);
+			Frame frame = new Frame();
 
-            XmlNodeList
-                assets = element.SelectNodes("next-scene");
+            /*XmlNodeList
+                assets = element.SelectNodes("next-scene");*/
 
 			switch(element.GetAttribute("type")){
 			case "image":
@@ -28,9 +27,9 @@ namespace uAdventure.Core
             if (element.SelectSingleNode("documentation") != null)
                 frame.setDocumentation(element.SelectSingleNode("documentation").InnerText);
 
-            frame.setUri(element.GetAttribute("uri") ?? "");
-			frame.setWaitforclick ("yes".Equals (element.GetAttribute ("waitforclick")));
-			frame.setSoundUri(element.GetAttribute("soundUri") ?? "");
+            frame.setUri(element.GetAttribute("uri"));
+			frame.setWaitforclick (ExString.EqualsDefault(element.GetAttribute ("waitforclick"), "yes", false));
+			frame.setSoundUri(element.GetAttribute("soundUri"));
 
 			var time = element.GetAttribute ("time");
 			if(!string.IsNullOrEmpty (time)) frame.setTime(long.Parse(time));

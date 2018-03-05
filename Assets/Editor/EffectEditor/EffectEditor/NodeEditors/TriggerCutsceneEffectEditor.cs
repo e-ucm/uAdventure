@@ -26,12 +26,12 @@ namespace uAdventure.Editor
             }
         }
 
-        private TriggerConversationEffect effect;
+        private TriggerCutsceneEffect effect;
 
         public TriggerCutsceneEffectEditor()
         {
             cutscenes = Controller.Instance.SelectedChapterDataControl.getCutscenesList().getCutscenesIDs();
-            this.effect = new TriggerConversationEffect(cutscenes.Length> 0 ? cutscenes[0] : "");
+            this.effect = new TriggerCutsceneEffect(cutscenes.Length> 0 ? cutscenes[0] : "");
         }
 
         public void draw()
@@ -46,7 +46,7 @@ namespace uAdventure.Editor
             EditorGUILayout.HelpBox(TC.get("TriggerCutsceneEffect.Description"), MessageType.Info);
         }
 
-        public AbstractEffect Effect { get { return effect; } set { effect = value as TriggerConversationEffect; } }
+        public AbstractEffect Effect { get { return effect; } set { effect = value as TriggerCutsceneEffect; } }
         public string EffectName { get { return TC.get("TriggerCutsceneEffect.Title"); } }
 
         public bool Usable

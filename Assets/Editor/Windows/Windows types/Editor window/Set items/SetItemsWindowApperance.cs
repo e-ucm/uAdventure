@@ -1,97 +1,87 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 using uAdventure.Core;
+using UnityEditor;
+using System.Collections.Generic;
+using System;
 
 namespace uAdventure.Editor
 {
-
-    public class SetItemsWindowApperance : LayoutWindow, DialogReceiverInterface
+    [EditorComponent(typeof(AtrezzoDataControl), Name = "Atrezzo.LookPanelTitle", Order = 10)]
+    public class SetItemsWindowApperance : AbstractEditorComponentWithPreview
     {
-        private Texture2D clearImg = null;
-        private Texture2D atrezzoImg = null;
-        private static Rect previewRect;
+
+        private Texture2D imageTex = null;
+
+        private FileChooser image;
         
-        private string pathToImg = "";
+        private AppearanceEditor appearanceEditor;
+
+        private static List<ResourcesDataControl> emptyList;
 
         public SetItemsWindowApperance(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
         {
-            clearImg = (Texture2D)Resources.Load("EAdventureData/img/icons/deleteContent", typeof(Texture2D));
-            
-            if (GameRources.GetInstance().selectedSetItemIndex >= 0)
+
+            appearanceEditor = ScriptableObject.CreateInstance<AppearanceEditor>();
+            appearanceEditor.height = 160;
+            appearanceEditor.onAppearanceSelected = RefreshPathInformation;
+
+            // File selectors
+
+            image = new FileChooser()
             {
-                pathToImg =
-                    Controller.Instance.SelectedChapterDataControl.getAtrezzoList().getAtrezzoList()[
-                        GameRources.GetInstance().selectedSetItemIndex].getPreviewImage();
-            }
-
-
-            if (pathToImg != null && !pathToImg.Equals(""))
-                atrezzoImg = AssetsController.getImage(pathToImg).texture;
+                Label = TC.get("Resources.DescriptionItemImage"),
+                FileType = BaseFileOpenDialog.FileType.SET_ITEM_IMAGE
+            };
         }
 
-
-        public override void Draw(int aID)
+        protected override void DrawInspector()
         {
-            var windowWidth = m_Rect.width;
-            var windowHeight = m_Rect.height;
-            previewRect = new Rect(0f, 0.5f * windowHeight, windowWidth, windowHeight * 0.45f);
+            var workingAtrezzo = Target != null ? Target as AtrezzoDataControl : Controller.Instance.SelectedChapterDataControl.getAtrezzoList().getAtrezzoList()[GameRources.GetInstance().selectedSetItemIndex];
 
-            // Background chooser
-            GUILayout.Label(TC.get("Resources.DescriptionItemImage"));
+            // Appearance table
+            appearanceEditor.Data = workingAtrezzo;
+            appearanceEditor.OnInspectorGUI();
 
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button(clearImg, GUILayout.Width(0.1f * windowWidth)))
+            GUILayout.Space(10);
+
+            EditorGUI.BeginChangeCheck();
+
+            string previousValue = image.Path = workingAtrezzo.getPreviewImage();
+            image.DoLayout(GUILayout.ExpandWidth(true));
+            if (previousValue != image.Path) workingAtrezzo.setImage(image.Path);
+
+
+            if (EditorGUI.EndChangeCheck())
             {
-                OnImageChanged("");
-            }
-            GUILayout.Box(pathToImg, GUILayout.Width(0.6f * windowWidth));
-            if (GUILayout.Button(TC.get("Buttons.Select"), GUILayout.Width(0.1f * windowWidth)))
-            {
-                ImageFileOpenDialog imgDialog =
-                    (ImageFileOpenDialog)ScriptableObject.CreateInstance(typeof(ImageFileOpenDialog));
-                imgDialog.Init(this, BaseFileOpenDialog.FileType.SET_ITEM_IMAGE);
-            }
-            GUILayout.EndHorizontal();
-
-            GUILayout.FlexibleSpace();
-
-            GUILayout.Label(TC.get("ImageAssets.Preview"));
-
-			if (pathToImg != "" && atrezzoImg)
-            {
-                GUI.DrawTexture(previewRect, atrezzoImg, ScaleMode.ScaleToFit);
-            }
-
-        }
-
-        void OnImageChanged(string val)
-        {
-            Debug.Log("PATH: " + val + "\n " + Controller.Instance.SelectedChapterDataControl.getAtrezzoList().getAtrezzoList()[
-                GameRources.GetInstance().selectedSetItemIndex].getPreviewImage());
-            pathToImg = val;
-            Controller.Instance.SelectedChapterDataControl.getAtrezzoList().getAtrezzoList()[
-                GameRources.GetInstance().selectedSetItemIndex].setImage(val);
-            if (pathToImg != null && !pathToImg.Equals(""))
-                atrezzoImg = AssetsController.getImage(pathToImg).texture;
-        }
-
-        public void OnDialogOk(string message, object workingObject = null, object workingObjectSecond = null)
-        {
-            if (workingObject is BaseFileOpenDialog.FileType)
-            {
-                switch ((BaseFileOpenDialog.FileType)workingObject)
-                {
-                    case BaseFileOpenDialog.FileType.SET_ITEM_IMAGE:
-                        OnImageChanged(message);
-                        break;
-                }
+                RefreshPathInformation(workingAtrezzo);
             }
         }
 
-        public void OnDialogCanceled(object workingObject = null)
+        public override void DrawPreview(Rect rect)
         {
-            Debug.Log("Wiadomość nie OK");
+            var elem = Target != null ? Target as AtrezzoDataControl : Controller.Instance.SelectedChapterDataControl.getAtrezzoList().getAtrezzoList()[GameRources.GetInstance().selectedSetItemIndex];
+            var imagePath = elem.getPreviewImage();
+            var imageTex = string.IsNullOrEmpty(imagePath) ? null : AssetsController.getImage(imagePath).texture;
+
+            GUI.DrawTexture(rect, imageTex, ScaleMode.ScaleToFit);
+        }
+
+        public override void OnRender(Rect viewport)
+        {
+            var imagePath = (Target as AtrezzoDataControl).getPreviewImage();
+            var imageTex = string.IsNullOrEmpty(imagePath) ? null : AssetsController.getImage(imagePath).texture;
+
+            var rect = GetViewportRect(new Rect(new Vector2(-0.5f * imageTex.width, -imageTex.height), new Vector2(imageTex.width, imageTex.height)), viewport);
+            GUI.DrawTexture(rect, imageTex, ScaleMode.ScaleToFit);
+        }
+
+        private void RefreshPathInformation(DataControlWithResources data)
+        {
+            var imagePath = (data as AtrezzoDataControl).getPreviewImage();
+            imageTex = string.IsNullOrEmpty(imagePath) ? null : AssetsController.getImage(imagePath).texture;
         }
     }
 }

@@ -64,13 +64,11 @@ namespace uAdventure.Core
 
         private string animationPath;
 
-        private ImageLoaderFactory factory;
-
         /**
          * Creates a new empty frame
          */
-        public Frame(ImageLoaderFactory factory) :
-            this(factory, "", DEFAULT_TIME, false)
+        public Frame() :
+            this("", DEFAULT_TIME, false)
         {
         }
 
@@ -80,7 +78,7 @@ namespace uAdventure.Core
          * @param uri
          *            the uri for the image
          */
-        public Frame(ImageLoaderFactory factory, string uri) : this(factory, uri, DEFAULT_TIME, false)
+        public Frame(string uri) : this(uri, DEFAULT_TIME, false)
         {
         }
 
@@ -90,8 +88,8 @@ namespace uAdventure.Core
          * @param time
          *            integer with the duration of the frame
          */
-        public Frame(ImageLoaderFactory factory, int time) :
-            this(factory, "", time, false)
+        public Frame(int time) :
+            this("", time, false)
         {
         }
 
@@ -104,10 +102,9 @@ namespace uAdventure.Core
          * @param time
          *            The time (duration) of the frame
          */
-        public Frame(ImageLoaderFactory factory, string uri, long time, bool waitForClick)
+        public Frame(string uri, long time, bool waitForClick)
         {
             this.uri = uri;
-            this.factory = factory;
             type = TYPE_IMAGE;
             this.time = time;
             image = null;
@@ -232,151 +229,6 @@ namespace uAdventure.Core
         {
 
             return resources;
-        }
-
-        /**
-         * Returns the image for the frame. The image can be vertically inverted or
-         * scaled to fullscreen
-         * 
-         * @param mirror
-         *            If true, the image is vertically inverted
-         * @param fullscreen
-         *            If true, the image is scaled to fullscreen
-         * @return The image for the frame, with the necessary modifications made
-         */
-        public Sprite getImage(bool mirror, bool fullscreen, int where)
-        {
-            if (image != null)
-                return image;
-            if (uri != null && uri.Length > 0)
-            {
-                if (where == Animation.ENGINE || where == Animation.EDITOR)
-                    image = factory.getImageFromPath(uri);
-                //TODO
-                //else if (where == Animation.PREVIEW)
-                //    image = getImageFromAnimationPath();
-            }
-            if (image != null && mirror)
-                image = getScaledImage(image, -1, 1);
-            if (image != null && fullscreen)
-                image = getFullscreenImage(image);
-            if (image == null)
-            {
-                Sprite icon = (Sprite)Resources.Load("EAdventureData/img/icons/noImageFrame", typeof(Sprite));
-                return icon;
-                //ImageIcon icon = new ImageIcon("img/icons/noImageFrame.png");
-                //if (icon != null && icon.getImage() != null)
-                //    return icon.getImage();
-                //else
-                //    return new BufferedImage(100, 120, BufferedImage.TYPE_3BYTE_BGR);
-            }
-
-            return image;
-        }
-        /*
-        private Image getImageFromAnimationPath()
-        {
-
-            Image image = null;
-
-            try
-            {
-                InputStream inputStream = null;
-
-                string regexp = java.io.File.separator;
-                if (regexp.Equals("\\"))
-                    regexp = "\\\\";
-                string temp[] = this.animationPath.split(regexp);
-                string filename = "";
-                for (int i = 0; i < temp.length - 1; i++)
-                {
-                    filename += temp[i] + java.io.File.separator;
-                }
-
-                temp = this.uri.split("/");
-                filename += temp[temp.length - 1];
-
-                if (new File(filename).exists())
-                    inputStream = new FileInputStream(filename);
-
-                if (inputStream != null)
-                {
-                    image = ImageIO.read(inputStream);
-                    if (image == null || image.getHeight(null) == -1 || image.getWidth(null) == -1)
-                    {
-                        factory.showErrorDialog(Language.GetText("Error.Title"), Language.GetText("Error.ImageTypeNotSupported"));
-                    }
-                    inputStream.close();
-                }
-            }
-            catch (IOException e)
-            {
-                ReportDialog.GenerateErrorReport(e, true, "UNKNOWERROR");
-            }
-            catch (Exception e) { Debug.LogError(e); }
-            {
-                ReportDialog.GenerateErrorReport(e, true, "UNKNOWERROR");
-            }
-
-            return image;
-        }*/
-
-        /**
-         * Returns a new imaged scaled accordingly.
-         * 
-         * @param image
-         *            The original image
-         * @param x
-         *            The scale along the x-axis
-         * @param y
-         *            The scale alogn the y-axis
-         * @return A new, scaled image
-         */
-        private Sprite getScaledImage(Sprite image, float x, float y)
-        {
-
-            Sprite newImage = null;
-            // TODO
-            /*
-            if (image != null)
-            {
-
-                // set up the transform
-                AffineTransform transform = new AffineTransform();
-                transform.scale(x, y);
-                transform.translate((x - 1) * image.getWidth(null) / 2, (y - 1) * image.getHeight(null) / 2);
-
-                // create a transparent (not translucent) image
-                newImage = GUI.getInstance().getGraphicsConfiguration().createCompatibleImage(image.getWidth(null), image.getHeight(null), Transparency.TRANSLUCENT);
-
-                // draw the transformed image
-                Graphics2D g = (Graphics2D)newImage.getGraphics();
-
-                g.drawImage(image, transform, null);
-                g.dispose();
-            }*/
-
-            return newImage;
-        }
-
-        /**
-         * Returns a scaled image that fits in the game screen.
-         * 
-         * @param image
-         *            the image to be scaled.
-         * @return a scaled image that fits in the game screen.
-         */
-        private Sprite getFullscreenImage(Sprite image)
-        {
-            // TODO
-            /*
-            Image newImage = GUI.getInstance().getGraphicsConfiguration().createCompatibleImage(GUI.WINDOW_WIDTH, GUI.WINDOW_HEIGHT, Transparency.TRANSLUCENT);
-
-            Graphics2D g = (Graphics2D)newImage.getGraphics();
-            g.drawImage(image, 0, 0, GUI.WINDOW_WIDTH, GUI.WINDOW_HEIGHT, null);
-            g.dispose();
-            */
-            return image;
         }
 
         /**

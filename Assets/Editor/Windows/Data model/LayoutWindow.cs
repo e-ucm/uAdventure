@@ -12,10 +12,12 @@ namespace uAdventure.Editor
             Options = options;
         }
 
+        private Rect layoutRect;
         public override void OnGUI()
         {
-            //Options
-            Rect = GUILayout.Window(WindowID, Rect, AuxDraw, Content);
+            GUILayout.BeginArea(Rect, Content, "Window");
+            Draw(GetHashCode());
+            GUILayout.EndArea();
         }
 
         void AuxDraw(int id)

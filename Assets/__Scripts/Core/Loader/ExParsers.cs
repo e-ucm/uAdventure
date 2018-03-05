@@ -66,6 +66,11 @@ namespace uAdventure.Core
 
     public static class ExString
     {
+        public static string Default(string original, string def)
+        {
+            return string.IsNullOrEmpty(original) ? def : original;
+        }
+
         public static bool EqualsDefault(string toCompare, string to, bool def)
         {
             return string.IsNullOrEmpty(toCompare) ? def : to.Equals(toCompare);

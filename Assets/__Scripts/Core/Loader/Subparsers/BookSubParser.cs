@@ -26,11 +26,11 @@ namespace uAdventure.Core
             string bookId = "";
             string xPrevious = "", xNext = "", yPrevious = "", yNext = "";
 
-            bookId 		= element.GetAttribute("id") ?? "";
-			xPrevious 	= element.GetAttribute ("xPreviousPage") ?? "";
-			xNext 		= element.GetAttribute ("xNextPage") ?? "";
-			yPrevious 	= element.GetAttribute ("yPreviousPage") ?? "";
-			yNext 		= element.GetAttribute ("yNextPage") ?? "";
+            bookId 		= element.GetAttribute("id");
+			xPrevious 	= element.GetAttribute ("xPreviousPage");
+			xNext 		= element.GetAttribute ("xNextPage");
+			yPrevious 	= element.GetAttribute ("yPreviousPage");
+			yNext 		= element.GetAttribute ("yNextPage");
 
             Book book = new Book(bookId);
 
@@ -115,7 +115,7 @@ namespace uAdventure.Core
                         currentstring = string.Empty;
                     }
 
-					string path = ell.GetAttribute("src") ?? "";
+					string path = ell.GetAttribute("src");
                     // Add the new image paragraph
                     book.addParagraph(new BookParagraph(BookParagraph.IMAGE, path));
                 }
@@ -137,14 +137,14 @@ namespace uAdventure.Core
                     int marginBottom = 0;
                     bool scrollable = false;
 
-					uri = ell.GetAttribute("uri") ?? "";
+					uri = ell.GetAttribute("uri");
 
 					switch(ell.GetAttribute("type")){
 					case "resource" : type = BookPage.TYPE_RESOURCE; break;
 					case "image" : type = BookPage.TYPE_IMAGE; break;
 					}
 
-					scrollable = "yes".Equals (ell.GetAttribute("scrollable"));
+					scrollable = ExString.EqualsDefault(ell.GetAttribute("scrollable"), "yes", false);
 					margin = ExParsers.ParseDefault(ell.GetAttribute("margin"), 0);
 					marginEnd = ExParsers.ParseDefault(ell.GetAttribute("marginEnd"), 0);
 					marginTop = ExParsers.ParseDefault(ell.GetAttribute("marginTop"), 0);

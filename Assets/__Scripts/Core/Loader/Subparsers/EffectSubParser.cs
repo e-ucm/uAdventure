@@ -60,44 +60,41 @@ namespace uAdventure.Core
                         chapter.addVar(var);
                         break;
                     case "macro-ref":
-						currentEffect = new MacroReferenceEffect(effect.GetAttribute("id") ?? "");
+						currentEffect = new MacroReferenceEffect(effect.GetAttribute("id"));
                         break;
                     case "speak-char":
                         // Add the effect and clear the current string
 						currentEffect = new SpeakCharEffect(effect.GetAttribute("idTarget"), effect.InnerText.ToString().Trim());
-						((SpeakCharEffect)currentEffect).setAudioPath(effect.GetAttribute("uri") ?? "");
+						((SpeakCharEffect)currentEffect).setAudioPath(effect.GetAttribute("uri"));
                         break;
                     case "trigger-last-scene":
                         currentEffect = new TriggerLastSceneEffect();
                         break;
                     case "play-sound":
                         // Store the path and background
-                        bool background = true;
-                        tmpArgVal = effect.GetAttribute("background");
-						if (!string.IsNullOrEmpty(tmpArgVal))background = tmpArgVal.Equals("yes");
-
-						path = effect.GetAttribute("uri") ?? "";
+                        bool background = ExString.EqualsDefault(effect.GetAttribute("background"), "yes", true);
+						path = effect.GetAttribute("uri");
 
                         // Add the new play sound effect
                         currentEffect = new PlaySoundEffect(background, path);
                         break;
 
-					case "consume-object": 		currentEffect = new ConsumeObjectEffect(effect.GetAttribute("idTarget") ?? ""); break;
-					case "generate-object": 	currentEffect = new GenerateObjectEffect(effect.GetAttribute("idTarget") ?? ""); break;
-					case "trigger-book": 		currentEffect = new TriggerBookEffect(effect.GetAttribute("idTarget") ?? ""); break;
-					case "trigger-conversation": currentEffect = new TriggerConversationEffect(effect.GetAttribute("idTarget") ?? ""); break;
-					case "trigger-cutscene": 	currentEffect = new TriggerCutsceneEffect(effect.GetAttribute("idTarget") ?? ""); break;
+					case "consume-object": 		currentEffect = new ConsumeObjectEffect(effect.GetAttribute("idTarget")); break;
+					case "generate-object": 	currentEffect = new GenerateObjectEffect(effect.GetAttribute("idTarget")); break;
+					case "trigger-book": 		currentEffect = new TriggerBookEffect(effect.GetAttribute("idTarget")); break;
+					case "trigger-conversation": currentEffect = new TriggerConversationEffect(effect.GetAttribute("idTarget")); break;
+					case "trigger-cutscene": 	currentEffect = new TriggerCutsceneEffect(effect.GetAttribute("idTarget")); break;
                     case "trigger-scene":
 					
 						x = ExParsers.ParseDefault(effect.GetAttribute("x"), 0);
 						y = ExParsers.ParseDefault(effect.GetAttribute("y"), 0);
-						string scene = effect.GetAttribute("idTarget") ?? "";
+						string scene = effect.GetAttribute("idTarget");
                         currentEffect = new TriggerSceneEffect(scene, x, y);
                         break;
 					case "play-animation":
 						x = ExParsers.ParseDefault(effect.GetAttribute("x"), 0);
 						y = ExParsers.ParseDefault(effect.GetAttribute("y"), 0);
-						path = effect.GetAttribute("uri") ?? "";
+						path = effect.GetAttribute("uri");
                         // Add the new play sound effect
                         currentEffect = new PlayAnimationEffect(path, x, y);
                         break;
@@ -110,7 +107,7 @@ namespace uAdventure.Core
 					case "move-npc":
 						x = ExParsers.ParseDefault(effect.GetAttribute("x"), 0);
 						y = ExParsers.ParseDefault(effect.GetAttribute("y"), 0);
-						string npcTarget = effect.GetAttribute("idTarget") ?? "";
+						string npcTarget = effect.GetAttribute("idTarget");
                         // Add the new move NPC effect
                         currentEffect = new MoveNPCEffect(npcTarget, x, y);
                         break;
@@ -132,16 +129,16 @@ namespace uAdventure.Core
 					case "show-text":
 						x = ExParsers.ParseDefault(effect.GetAttribute("x"), 0);
 						y = ExParsers.ParseDefault(effect.GetAttribute("y"), 0);
-						var frontColor = effect.GetAttribute("frontColor") ?? "";
-						var borderColor = effect.GetAttribute("borderColor") ?? "";
+						var frontColor = effect.GetAttribute("frontColor");
+						var borderColor = effect.GetAttribute("borderColor");
 
                         // Add the new ShowTextEffect
                         currentEffect = new ShowTextEffect(effect.InnerText.ToString().Trim(), x, y, frontColor, borderColor);
-						((ShowTextEffect)currentEffect).setAudioPath( effect.GetAttribute("uri") ?? "");
+						((ShowTextEffect)currentEffect).setAudioPath( effect.GetAttribute("uri"));
                         break;
                     case "highlight-item":
-						id = effect.GetAttribute("idTarget") ?? "";
-						animated = "yes".Equals (effect.GetAttribute("animated"));
+						id = effect.GetAttribute("idTarget");
+						animated = ExString.EqualsDefault(effect.GetAttribute("animated"), "yes", false);
 
 						int type = 0;
 						tmpArgVal = effect.GetAttribute("type");
@@ -165,8 +162,8 @@ namespace uAdventure.Core
 						x = ExParsers.ParseDefault (effect.GetAttribute ("x"), 0);
 						y = ExParsers.ParseDefault (effect.GetAttribute ("y"), 0);
 
-						id = effect.GetAttribute ("idTarget") ?? "";
-						animated = "yes".Equals (effect.GetAttribute ("animated"));
+						id = effect.GetAttribute ("idTarget");
+                        animated = ExString.EqualsDefault(effect.GetAttribute("animated"), "yes", false);
 						float scale = ExParsers.ParseDefault (effect.GetAttribute ("scale"), CultureInfo.InvariantCulture, 1.0f);
 						int translateSpeed = ExParsers.ParseDefault(effect.GetAttribute("translateSpeed"), 20);
 						int scaleSpeed = ExParsers.ParseDefault(effect.GetAttribute("scaleSpeed"), 20);
@@ -176,7 +173,7 @@ namespace uAdventure.Core
 				case "speak-player":
                         // Add the effect and clear the current string
 						currentEffect = new SpeakPlayerEffect (effect.InnerText.ToString ().Trim ());
-						((SpeakPlayerEffect)currentEffect).setAudioPath (effect.GetAttribute ("uri") ?? "");
+						((SpeakPlayerEffect)currentEffect).setAudioPath (effect.GetAttribute ("uri"));
                         break;
                     case "condition":
                         addeffect = false;

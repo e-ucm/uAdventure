@@ -26,6 +26,7 @@ namespace uAdventure.Editor
 
         void OnGUI()
         {
+            EditorWindow.FocusWindowIfItsOpen<ObjectAddSetItemReference>();
             EditorGUILayout.LabelField(TC.get("Operation.AddAtrezzoReferenceMessage"), EditorStyles.boldLabel);
 
             GUILayout.Space(20);

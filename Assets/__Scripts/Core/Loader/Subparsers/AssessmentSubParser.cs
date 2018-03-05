@@ -11,18 +11,18 @@ namespace uAdventure.Core
 		{
 			AssessmentProfile profile = new AssessmentProfile ();
 
-			profile.setShowReportAtEnd("yes".Equals (element.GetAttribute("show-report-at-end")));
+			profile.setShowReportAtEnd(ExString.EqualsDefault(element.GetAttribute("show-report-at-end"), "yes", false));
 
-			profile.setName(element.GetAttribute("name") ?? "");
-			profile.setEmail(element.GetAttribute ("send-to-email") ?? "");
+			profile.setName(element.GetAttribute("name"));
+			profile.setEmail(element.GetAttribute ("send-to-email"));
 			profile.setSendByEmail(!string.IsNullOrEmpty(profile.getEmail ()));
-			profile.setScorm12("yes".Equals (element.GetAttribute("scorm12")));
-			profile.setScorm2004("yes".Equals (element.GetAttribute("scorm2004")));
+			profile.setScorm12(ExString.EqualsDefault(element.GetAttribute("scorm12"), "yes", false));
+			profile.setScorm2004(ExString.EqualsDefault(element.GetAttribute("scorm2004"), "yes", false));
 
 			var smtpConfig = element.SelectSingleNode("smtp-config") as XmlElement;
 			if(smtpConfig != null)
 			{
-				profile.setSmtpSSL("yes".Equals (smtpConfig.GetAttribute("smtp-ssl")));
+				profile.setSmtpSSL(ExString.EqualsDefault(element.GetAttribute("smtp-ssl"), "yes", false));
 				profile.setSmtpServer(smtpConfig.GetAttribute("smtp-server"));
 				profile.setSmtpPort(smtpConfig.GetAttribute("smtp-port"));
 				profile.setSmtpUser(smtpConfig.GetAttribute("smtp-user"));
@@ -40,7 +40,7 @@ namespace uAdventure.Core
 			// TIMED ASSESMENT RULES
 			foreach (XmlElement ell in element.SelectNodes("timed-assessment-rule"))
             {
-				bool usesEndConditions = "yes".Equals (element.GetAttribute("usesEndConditions"));
+				bool usesEndConditions = ExString.EqualsDefault(element.GetAttribute("usesEndConditions"), "yes", false);
 
 				var tRule = new TimedAssessmentRule("", 0, false);
 				fillAssesmentRule (ell, tRule, parameters);
@@ -78,7 +78,7 @@ namespace uAdventure.Core
 
 			string id = element.GetAttribute("id");
 			int importance = 0;
-			bool repeatRule = "yes".Equals (element.GetAttribute("repeatRule"));
+			bool repeatRule = ExString.EqualsDefault(element.GetAttribute("repeatRule"), "yes", false);
 
 			var tmpArgVal = element.GetAttribute("importance");
 			if (!string.IsNullOrEmpty(tmpArgVal))

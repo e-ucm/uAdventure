@@ -3,10 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 
 using uAdventure.Core;
+using System;
 
 namespace uAdventure.Editor
 {
-    public class BarrierDataControl : DataControl
+    public class BarrierDataControl : DataControl, RectangleArea
     {
 
         /**
@@ -380,6 +381,39 @@ namespace uAdventure.Editor
         {
 
             return null;
+        }
+
+        public bool isRectangular()
+        {
+            return true;
+        }
+
+        public List<Vector2> getPoints()
+        {
+            return null;
+        }
+
+        public void addPoint(int x, int y)
+        {
+        }
+
+        public Vector2 getLastPoint()
+        {
+            return Vector2.zero;
+        }
+
+        public void deletePoint(Vector2 point)
+        {
+        }
+
+        public void setRectangular(bool selected)
+        {
+
+        }
+
+        public Rectangle getRectangle()
+        {
+            return barrier;
         }
     }
 }

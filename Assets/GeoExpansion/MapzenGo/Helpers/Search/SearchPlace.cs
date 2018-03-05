@@ -2,7 +2,7 @@
 using MapzenGo.Models;
 using UniRx;
 using UnityEngine;
-
+using System;
 
 namespace MapzenGo.Helpers.Search
 {
@@ -10,7 +10,7 @@ namespace MapzenGo.Helpers.Search
     [AddComponentMenu("Mapzen/SearchPlace")]
     public class SearchPlace : MonoBehaviour
     {
-        const string seachUrl = "https://search.mapzen.com/v1/autocomplete?text=";
+        const string seachUrl = "http://nominatim.openstreetmap.org/search/{0}?format=json";
         public string namePlace = "";
         public string namePlaceСache = "";
         public StructSearchData DataStructure;
@@ -29,15 +29,15 @@ namespace MapzenGo.Helpers.Search
 #endif
         }
 
-        public void SearchInMapzen()
+        public void SearchInOSM()
         {
             if (namePlace != string.Empty && namePlaceСache != namePlace)
             {
                 namePlaceСache = namePlace;
-                ObservableWWW.Get(seachUrl + namePlace).Subscribe(
+                ObservableWWW.Get(String.Format(seachUrl, System.Uri.EscapeDataString(namePlaceСache))).Subscribe(
                     success =>
                     {
-                        DataProcessing(success);
+                        DataProcessingOSM(success);
                     },
                     error =>
                     {
@@ -53,7 +53,21 @@ namespace MapzenGo.Helpers.Search
             tm.Longitude = Longitude;
         }
 
-        public void DataProcessing(string success)
+        public void DataProcessingOSM(string success)
+        {
+            JSONObject obj = new JSONObject(success);
+            DataStructure.dataChache = new List<SearchData>();
+            foreach (JSONObject jsonObject in obj.list)
+            {
+                DataStructure.dataChache.Add(new SearchData()
+                {
+                    coordinates = new Vector2(float.Parse(jsonObject["lon"].str), float.Parse(jsonObject["lat"].str)),
+                    label = jsonObject["display_name"].str
+                });
+            }
+        }
+
+        public void DataProcessingMapzen(string success)
         {
             JSONObject obj = new JSONObject(success);
             DataStructure.dataChache = new List<SearchData>();

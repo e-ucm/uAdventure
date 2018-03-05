@@ -3,6 +3,7 @@ using UnityEditor;
 using System.Collections;
 
 using uAdventure.Core;
+using System;
 
 namespace uAdventure.Editor
 {
@@ -17,8 +18,6 @@ namespace uAdventure.Editor
         private Texture2D flagsTex = null;
         private Texture2D varTex = null;
 
-        private GUIContent flagContent, varContent;
-
         private Rect contentRect, addDeleteButtonRect;
 
         private static GUISkin defaultSkin;
@@ -32,7 +31,39 @@ namespace uAdventure.Editor
 
         private WindowType openedWindow;
 
-		[MenuItem("eAdventure/Flags and variables")]
+        public static ChapterVarAndFlagsEditor s_DrawerParametersMenu;
+        private static long s_LastClosedTime;
+
+        internal static bool ShowAtPosition(Rect buttonRect)
+        {
+            long num = DateTime.Now.Ticks / 10000L;
+            if (num >= ChapterVarAndFlagsEditor.s_LastClosedTime + 50L)
+            {
+                if (Event.current != null)
+                {
+                    Event.current.Use();
+                }
+                if (ChapterVarAndFlagsEditor.s_DrawerParametersMenu == null)
+                {
+                    ChapterVarAndFlagsEditor.s_DrawerParametersMenu = ScriptableObject.CreateInstance<ChapterVarAndFlagsEditor>();
+                }
+                ChapterVarAndFlagsEditor.s_DrawerParametersMenu.Init(buttonRect);
+
+                return true;
+            }
+            return false;
+        }
+
+        private void Init(Rect buttonRect)
+        {
+            buttonRect.position = GUIUtility.GUIToScreenPoint(buttonRect.position);
+            float y = 305f;
+            Vector2 windowSize = new Vector2(300f, y);
+            base.ShowAsDropDown(buttonRect, windowSize);
+        }
+
+
+        [MenuItem("eAdventure/Flags and variables")]
 		public static void Init()
 		{
 			var window = GetWindow<ChapterVarAndFlagsEditor> ();
@@ -45,9 +76,6 @@ namespace uAdventure.Editor
 				flagsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/flag16", typeof(Texture2D));
 			if(!varTex)
             	varTex = (Texture2D)Resources.Load("EAdventureData/img/icons/vars", typeof(Texture2D));
-
-            flagContent = new GUIContent(TC.get("Flags.Title"), flagsTex);
-            varContent = new GUIContent(TC.get("Vars.Title"), varTex);
 
 			if(!selectedButtonSkin)
 				selectedButtonSkin = (GUISkin)Resources.Load("Editor/ButtonSelected", typeof(GUISkin));
@@ -73,7 +101,7 @@ namespace uAdventure.Editor
             {
                 GUI.skin = selectedButtonSkin;
             }
-            if (GUILayout.Button(flagContent, GUILayout.MaxHeight(0.08f * windowHeight)))
+            if (GUILayout.Button(new GUIContent(TC.get("Flags.Title"), flagsTex), GUILayout.MaxHeight(0.08f * windowHeight)))
             {
                 if (openedWindow == WindowType.VARS)
                     OnWindowTypeChanged();
@@ -84,7 +112,7 @@ namespace uAdventure.Editor
             {
                 GUI.skin = selectedButtonSkin;
             }
-            if (GUILayout.Button(varContent, GUILayout.MaxHeight(0.08f * windowHeight)))
+            if (GUILayout.Button(new GUIContent(TC.get("Vars.Title"), varTex), GUILayout.MaxHeight(0.08f * windowHeight)))
             {
                 if (openedWindow == WindowType.FLAGS)
                     OnWindowTypeChanged();

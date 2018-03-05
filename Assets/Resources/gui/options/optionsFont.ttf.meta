@@ -1,0 +1,24 @@
+fileFormatVersion: 2
+guid: 1138ee15181d1de40ab1ba4b666e72ff
+timeCreated: 1511871952
+licenseType: Free
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: CasablancaAntique
+  fontNames:
+  - CasablancaAntique
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: bb0a9e983b7d59a42bea30567aa363c9, type: 3}
+  - {fileID: 12800000, guid: 8bfe397b6d0738f4a97f22970bc88adb, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

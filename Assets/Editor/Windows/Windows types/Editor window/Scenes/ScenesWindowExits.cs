@@ -3,306 +3,253 @@ using System.Text.RegularExpressions;
 using UnityEditor;
 
 using uAdventure.Core;
+using System.Collections.Generic;
+using System.Linq;
+using System;
 
 namespace uAdventure.Editor
 {
-    public class ScenesWindowExits : LayoutWindow, DialogReceiverInterface
+    public class ScenesWindowExits : SceneEditorWindow
     {
-        private Texture2D backgroundPreviewTex = null;
-
-        private Texture2D addTexture = null;
-        private Texture2D moveUp, moveDown = null;
-        private Texture2D clearImg = null;
-        private Texture2D duplicateImg = null;
-
-        private string backgroundPath = "";
-        
-        private static Rect tableRect;
-        private static Rect previewRect;
-        private static Rect infoPreviewRect;
-        private Rect rightPanelRect;
-
-        private static Vector2 scrollPosition;
-
-        private static GUISkin selectedAreaSkin;
-        private static GUISkin defaultSkin;
-        private static GUISkin noBackgroundSkin;
-
-        private string[] transitionTypes;
-        private int selectedTransitionType, selectedTransitionTypeLast;
-        private string transitionTimeString, transitionTimeStringLast;
-        private int transitionTimeInt;
-
-        private int selectedExit;
-
-        public ScenesWindowExits(Rect aStartPos, GUIContent aContent, GUIStyle aStyle,
-            params GUILayoutOption[] aOptions)
-            : base(aStartPos, aContent, aStyle, aOptions)
-        {
-
-            clearImg = (Texture2D)Resources.Load("EAdventureData/img/icons/deleteContent", typeof(Texture2D));
-            addTexture = (Texture2D)Resources.Load("EAdventureData/img/icons/addNode", typeof(Texture2D));
-            moveUp = (Texture2D)Resources.Load("EAdventureData/img/icons/moveNodeUp", typeof(Texture2D));
-            moveDown = (Texture2D)Resources.Load("EAdventureData/img/icons/moveNodeDown", typeof(Texture2D));
-            duplicateImg = (Texture2D)Resources.Load("EAdventureData/img/icons/duplicateNode", typeof(Texture2D));
-
-
-            transitionTypes = new string[]
-            { TC.get("Exit.NoTransition"), TC.get("Exit.TopToBottom"), TC.get("Exit.BottomToTop"), TC.get("Exit.LeftToRight"), TC.get("Exit.RightToLeft"), TC.get("Exit.FadeIn") };
-
-            transitionTimeInt = 0;
-            transitionTimeString = transitionTimeStringLast = transitionTimeInt.ToString();
-
-            if (GameRources.GetInstance().selectedSceneIndex >= 0)
-            {
-
-                backgroundPath =
-                    Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                        GameRources.GetInstance().selectedSceneIndex].getPreviewBackground();
-            }
-
-
-
-            if (backgroundPath != null && !backgroundPath.Equals(""))
-                backgroundPreviewTex = AssetsController.getImage(backgroundPath).texture;
-
-            //TODO: do new skin?
-            selectedAreaSkin = (GUISkin)Resources.Load("Editor/EditorLeftMenuItemSkinConcreteOptions", typeof(GUISkin));
-            noBackgroundSkin = (GUISkin)Resources.Load("Editor/EditorNoBackgroundSkin", typeof(GUISkin));
-
-
-            selectedExit = 0;
-        }
-
-        public override void Draw(int aID)
-        {
-            var windowWidth = m_Rect.width;
-            var windowHeight = m_Rect.height;
-
-            tableRect = new Rect(0f, 0.1f * windowHeight, 0.9f * windowWidth, windowHeight * 0.33f);
-            rightPanelRect = new Rect(0.9f * windowWidth, 0.1f * windowHeight, 0.08f * windowWidth, 0.33f * windowHeight);
-            infoPreviewRect = new Rect(0f, 0.45f * windowHeight, windowWidth, windowHeight * 0.05f);
-            previewRect = new Rect(0f, 0.5f * windowHeight, windowWidth, windowHeight * 0.45f);
-
-            GUILayout.BeginArea(tableRect);
-            GUILayout.BeginHorizontal();
+        /*
+         * 
             GUILayout.Box(TC.get("ExitsList.NextScene"), GUILayout.Width(windowWidth * 0.24f));
             GUILayout.Box(TC.get("ExitsList.Transition"), GUILayout.Width(windowWidth * 0.14f));
             GUILayout.Box(TC.get("ExitsList.Appearance"), GUILayout.Width(windowWidth * 0.34f));
             GUILayout.Box(TC.get("ExitsList.ConditionsAndEffects"), GUILayout.Width(windowWidth * 0.14f));
-            GUILayout.EndHorizontal();
+         * 
+         * */
 
-            scrollPosition = GUILayout.BeginScrollView(scrollPosition);
-            for (int i = 0;
-                i <
-                Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                    GameRources.GetInstance().selectedSceneIndex].getExitsList().getExitsList().Count;
-                i++)
+        private string[] sceneNames;
+
+        private DataControlList exitsList;
+        private Texture2D conditionsTex, noConditionsTex;
+        private SceneDataControl workingScene;
+
+        public ScenesWindowExits(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, SceneEditor sceneEditor,
+            params GUILayoutOption[] aOptions)
+            : base(aStartPos, aContent, aStyle, sceneEditor, aOptions)
+        {
+
+            new ExitTransitionComponent(Rect.zero, new GUIContent(""), aStyle);
+            new ExitAppearanceComponent(Rect.zero, new GUIContent(""), aStyle);
+            new ExitConditionsAndEffectsComponent(Rect.zero, new GUIContent(""), aStyle);
+
+            conditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/conditions-24x24", typeof(Texture2D));
+            noConditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/no-conditions-24x24", typeof(Texture2D));
+
+            exitsList = new DataControlList()
             {
-                if (i == selectedExit)
-                    GUI.skin = selectedAreaSkin;
-                else
-                    GUI.skin = noBackgroundSkin;
+                elementHeight = 20,
+                Columns = new List<ColumnList.Column>()
+                {
+                    new ColumnList.Column() // Layer column
+                    {
+                        Text = TC.get("ExitsList.NextScene"),
+                        SizeOptions = new GUILayoutOption[]{ GUILayout.ExpandWidth(true) }
+                    },
+                    new ColumnList.Column() // Enabled Column
+                    {
+                        Text = TC.get("Conditions.Title"),
+                        SizeOptions = new GUILayoutOption[]{ GUILayout.ExpandWidth(true) }
+                    }
+                },
+                drawCell = (columnRect, row, column, isActive, isFocused) =>
+                {
+                    var element = exitsList.list[row] as ExitDataControl;
+                    switch (column)
+                    {
+                        case 0:
+                            if (isActive)
+                            {
+                                var selected = sceneNames.ToList().IndexOf(element.getNextSceneId());
+                                EditorGUI.BeginChangeCheck();
+                                var newId = sceneNames[EditorGUI.Popup(columnRect, selected == -1 ? 0 : selected, sceneNames)];
+                                if (EditorGUI.EndChangeCheck()) element.setNextSceneId(newId == "---" ? "" : newId);
+                            }
+                            else GUI.Label(columnRect, element.getNextSceneId());
+                            break;
+                        case 1:
+                            if (GUI.Button(columnRect, element.getConditions().getBlocksCount() > 0 ? conditionsTex : noConditionsTex))
+                            {
+                                ConditionEditorWindow window =
+                                     (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
+                                window.Init(element.getConditions());
+                            }
+                            break;
+                    }
+                },
+                onSelectCallback = (list) =>
+                {
+                    sceneEditor.SelectedElement = exitsList.list[list.index] as ExitDataControl;
+                }
+            };
 
-                GUILayout.BeginHorizontal();
-                if (GUILayout.Button(Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                    GameRources.GetInstance().selectedSceneIndex].getExitsList().getExitsList()[i].getNextSceneId(),
-                    GUILayout.Width(windowWidth * 0.24f)))
+            sceneEditor.onSelectElement += (element) =>
+            {
+                if (element is ExitDataControl)
                 {
-                    ChangeExitSelection(i);
-                }
-
-                // When is selected - show transition menu
-                if (selectedExit == i)
-                {
-                    GUILayout.BeginVertical();
-                    selectedTransitionType = EditorGUILayout.Popup(selectedTransitionType, transitionTypes,
-                        GUILayout.Width(windowWidth * 0.12f), GUILayout.MaxWidth(windowWidth * 0.12f));
-                    if (selectedTransitionType != selectedTransitionTypeLast)
-                        ChangeSelectedTransitionType(selectedTransitionType);
-                    transitionTimeString = GUILayout.TextField(transitionTimeString, 3, GUILayout.Width(windowWidth * 0.12f),
-                        GUILayout.MaxWidth(windowWidth * 0.12f));
-                    transitionTimeString = Regex.Replace(transitionTimeString, @"[^0-9 ]", "");
-                    if (!transitionTimeString.Equals(transitionTimeStringLast))
-                        ChangeSelectedTransitionTime(transitionTimeString);
-                    GUILayout.EndVertical();
-                }
-                // When is not selected - show normal text
-                else
-                {
-                    if (GUILayout.Button(TC.get("GeneralText.Edit"), GUILayout.Width(windowWidth * 0.14f)))
-                    {
-                        ChangeExitSelection(i);
-                    }
-                }
-
-                if (GUILayout.Button(TC.get("GeneralText.Edit"), GUILayout.Width(windowWidth * 0.34f)))
-                {
-                    ChangeExitSelection(i);
-                    ExitsAppearance window =
-                        (ExitsAppearance)ScriptableObject.CreateInstance(typeof(ExitsAppearance));
-                    window.Init(this, "", selectedExit);
-                }
-                if (selectedExit == i)
-                {
-                    GUILayout.BeginVertical();
-                    if (GUILayout.Button(TC.get("Exit.EditConditions"), GUILayout.Width(windowWidth * 0.14f)))
-                    {
-                        ConditionEditorWindow window =
-                            (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
-                        window.Init(Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                            GameRources.GetInstance().selectedSceneIndex].getExitsList().getExitsList()[i].getConditions());
-                    }
-                    if (GUILayout.Button(TC.get("GeneralText.EditEffects"), GUILayout.Width(windowWidth * 0.14f)))
-                    {
-                        EffectEditorWindow window =
-                            (EffectEditorWindow)ScriptableObject.CreateInstance(typeof(EffectEditorWindow));
-                        window.Init(Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                            GameRources.GetInstance().selectedSceneIndex].getExitsList().getExitsList()[i].getEffects());
-                    }
-                    if (GUILayout.Button(TC.get("Exit.EditPostEffects"), GUILayout.Width(windowWidth * 0.14f)))
-                    {
-                        EffectEditorWindow window =
-                            (EffectEditorWindow)ScriptableObject.CreateInstance(typeof(EffectEditorWindow));
-                        window.Init(Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                            GameRources.GetInstance().selectedSceneIndex].getExitsList().getExitsList()[i].getPostEffects());
-                    }
-                    if (GUILayout.Button(TC.get("Exit.EditNotEffects"), GUILayout.Width(windowWidth * 0.14f)))
-                    {
-                        EffectEditorWindow window =
-                            (EffectEditorWindow)ScriptableObject.CreateInstance(typeof(EffectEditorWindow));
-                        window.Init(Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                            GameRources.GetInstance().selectedSceneIndex].getExitsList().getExitsList()[i].getNotEffects());
-                    }
-                    GUILayout.EndVertical();
+                    exitsList.index = exitsList.list.IndexOf(element as ExitDataControl);
                 }
                 else
                 {
-                    if (GUILayout.Button(TC.get("GeneralText.Edit"), GUILayout.Width(windowWidth * 0.14f)))
-                    {
-                        ChangeExitSelection(i);
-                    }
+                    exitsList.index = -1;
                 }
+            };
+        }
 
-                GUILayout.EndHorizontal();
-                GUI.skin = defaultSkin;
+        protected override void DrawInspector()
+        {
+            var namesList = new List<string>();
+            namesList.Add("---");
+            namesList.AddRange(Controller.Instance.SelectedChapterDataControl.getObjects<IChapterTarget>().ConvertAll(o => o.getId()));
+            sceneNames = namesList.ToArray();
+            
+            var prevWorkingScene = workingScene;
+            workingScene = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[GameRources.GetInstance().selectedSceneIndex];
+            if (workingScene != prevWorkingScene)
+            {
+                exitsList.SetData(workingScene.getExitsList(),
+                    (dc) => (dc as ExitsListDataControl).getExits().Cast<DataControl>().ToList());
             }
 
-            GUILayout.EndScrollView();
-            GUILayout.EndArea();
+            exitsList.DoList(160);
+            GUILayout.Space(20);
+        }
 
+        [EditorComponent(typeof(ExitDataControl), Name = "ExitsList.Transition", Order = 5)]
+        public class ExitTransitionComponent : AbstractEditorComponent
+        {
 
-
-            /*
-            * Right panel
-            */
-            GUILayout.BeginArea(rightPanelRect);
-            GUI.skin = noBackgroundSkin;
-            if (GUILayout.Button(addTexture, GUILayout.MaxWidth(0.08f * windowWidth)))
+            private string[] transitionTypes;
+            public ExitTransitionComponent(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
             {
-                ExitNewLinkTo window =
-                (ExitNewLinkTo)ScriptableObject.CreateInstance(typeof(ExitNewLinkTo));
-                window.Init(this);
+                transitionTypes = new string[]
+                { TC.get("Exit.NoTransition"), TC.get("Exit.TopToBottom"), TC.get("Exit.BottomToTop"), TC.get("Exit.LeftToRight"), TC.get("Exit.RightToLeft"), TC.get("Exit.FadeIn") };
             }
-            if (GUILayout.Button(duplicateImg, GUILayout.MaxWidth(0.08f * windowWidth)))
+
+            public override void Draw(int aID)
             {
-                Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                    GameRources.GetInstance().selectedSceneIndex].getExitsList()
-                    .duplicateElement(Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                        GameRources.GetInstance().selectedSceneIndex].getExitsList().getExits()[selectedExit]);
+                var exit = Target as ExitDataControl;
+
+                // Transition type
+                EditorGUI.BeginChangeCheck();
+                var newtype = EditorGUILayout.Popup(TC.get("NextScene.Transition"), exit.getTransitionType(), transitionTypes);
+                if (EditorGUI.EndChangeCheck()) exit.setTransitionType(newtype);
+
+                // Transition time
+                EditorGUI.BeginChangeCheck();
+                var newtime = EditorGUILayout.IntField(TC.get("NextScene.TransitionTime"), exit.getTransitionTime());
+                if (EditorGUI.EndChangeCheck()) exit.setTransitionTime(newtime);
             }
-            if (GUILayout.Button(moveUp, GUILayout.MaxWidth(0.08f * windowWidth)))
-            {
-                Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                    GameRources.GetInstance().selectedSceneIndex].getExitsList()
-                    .moveElementUp(Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                        GameRources.GetInstance().selectedSceneIndex].getExitsList().getExits()[selectedExit]);
-            }
-            if (GUILayout.Button(moveDown, GUILayout.MaxWidth(0.08f * windowWidth)))
-            {
-                Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                    GameRources.GetInstance().selectedSceneIndex].getExitsList()
-                    .moveElementDown(Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                        GameRources.GetInstance().selectedSceneIndex].getExitsList().getExits()[selectedExit]);
-            }
-            if (GUILayout.Button(clearImg, GUILayout.MaxWidth(0.08f * windowWidth)))
-            {
-                Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                    GameRources.GetInstance().selectedSceneIndex].getExitsList()
-                    .deleteElement(Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                        GameRources.GetInstance().selectedSceneIndex].getExitsList().getExits()[selectedExit], false);
-            }
-            GUI.skin = defaultSkin;
-            GUILayout.EndArea();
+        }
 
 
-            if (backgroundPath != "")
-            {
+        [EditorComponent(typeof(ExitDataControl), Name = "ExitsList.Appearance", Order = 10)]
+        public class ExitAppearanceComponent : AbstractEditorComponent
+        {
+            private TextWithSoundField displayField;
+            private FileChooser cursorField;
 
-                GUILayout.BeginArea(infoPreviewRect);
-                // Show preview dialog
-                if (GUILayout.Button(TC.get("DefaultClickAction.ShowDetails") + "/" + TC.get("GeneralText.Edit")))
+            public ExitAppearanceComponent(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
+            {
+                displayField = new TextWithSoundField()
                 {
-                    ExitsEditor window =
-                        (ExitsEditor)ScriptableObject.CreateInstance(typeof(ExitsEditor));
-                    window.Init(this, Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                        GameRources.GetInstance().selectedSceneIndex], selectedExit);
+                    Label = TC.get("Exit.ExitText"),
+                    FileType = BaseFileOpenDialog.FileType.EXIT_MUSIC
+                };
+                
+                cursorField = new FileChooser()
+                {
+                    Label = TC.get("Cursor.exit.Description"),
+                    FileType = BaseFileOpenDialog.FileType.EXIT_ICON
+                };
+            }
+
+            public override void Draw(int aID)
+            {
+                var exitLook = (Target as ExitDataControl).getExitLookDataControl();
+
+                // Text and sound
+                EditorGUI.BeginChangeCheck();
+                displayField.Content = exitLook.getCustomizedText();
+                displayField.Path = exitLook.getSoundPath();
+                displayField.DoLayout();
+                if (EditorGUI.EndChangeCheck())
+                {
+                    exitLook.setExitText(displayField.Content);
+                    exitLook.setSoundPath(displayField.Path);
                 }
-                GUILayout.EndArea();
-                GUI.DrawTexture(previewRect, backgroundPreviewTex, ScaleMode.ScaleToFit);
 
+                // Cursor
+                EditorGUI.BeginChangeCheck();
+                cursorField.Path = exitLook.getCustomizedCursor();
+                cursorField.DoLayout();
+                if (EditorGUI.EndChangeCheck())
+                {
+                    exitLook.setCursorPath(cursorField.Path);
+                }
             }
-            else
+        }
+
+        [EditorComponent(typeof(ExitDataControl), Name = "ExitsList.ConditionsAndEffects", Order = 15)]
+        public class ExitConditionsAndEffectsComponent : AbstractEditorComponent
+        {
+            private Texture2D conditionsTex, noConditionsTex;
+
+            public ExitConditionsAndEffectsComponent(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
             {
-                GUILayout.BeginArea(infoPreviewRect);
-                GUILayout.Button("No background!");
-                GUILayout.EndArea();
+                conditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/conditions-24x24", typeof(Texture2D));
+                noConditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/no-conditions-24x24", typeof(Texture2D));
             }
-        }
 
-        public void OnDialogOk(string message, object workingObject = null, object workingObjectSecond = null)
-        {
-            if (workingObject is ExitNewLinkTo)
+            public override void Draw(int aID)
             {
-                Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                    GameRources.GetInstance().selectedSceneIndex].getExitsList()
-                    .addElement(Controller.EXIT, message);
+                var exit = Target as ExitDataControl;
+
+
+                // Conditions
+                GUILayout.Label(TC.get("Exit.EditConditions"));
+                if (GUILayout.Button(exit.getConditions().getBlocksCount() > 0 ? conditionsTex : noConditionsTex))
+                {
+                    ConditionEditorWindow window =
+                         (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
+                    window.Init(exit.getConditions());
+                }
+
+                GUILayout.Label(TC.get("Exit.ConditionsActive"));
+                // Effects
+                if (GUILayout.Button(TC.get("GeneralText.EditEffects")))
+                {
+                    EffectEditorWindow window = ScriptableObject.CreateInstance<EffectEditorWindow>();
+                    window.Init(exit.getEffects());
+                }
+
+                // Post Effects
+                if (GUILayout.Button(TC.get("Exit.EditPostEffects")))
+                {
+                    EffectEditorWindow window = ScriptableObject.CreateInstance<EffectEditorWindow>();
+                    window.Init(exit.getPostEffects());
+                }
+
+                GUILayout.Label(TC.get("Exit.ConditionsInactive"));
+                // HasNotEffets
+                EditorGUI.BeginChangeCheck();
+                var hasNotEffects = EditorGUILayout.BeginToggleGroup(TC.get("Exit.ActiveWhenConditionsArent"), exit.isHasNotEffects());
+                if (EditorGUI.EndChangeCheck()) exit.setHasNotEffects(hasNotEffects);
+
+                // Not Effects
+                if (GUILayout.Button(TC.get("Exit.EditNotEffects")))
+                {
+                    EffectEditorWindow window = ScriptableObject.CreateInstance<EffectEditorWindow>();
+                    window.Init(exit.getNotEffects());
+                }
+
+                EditorGUILayout.EndToggleGroup();
+
             }
-        }
-
-        public void OnDialogCanceled(object workingObject = null)
-        {
-            Debug.Log(TC.get("GeneralText.Cancel"));
-        }
-
-        // Event called after change of selected exit
-        public void ChangeExitSelection(int i)
-        {
-            selectedExit = i;
-            selectedTransitionType =
-                selectedTransitionTypeLast =
-                    Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                        GameRources.GetInstance().selectedSceneIndex].getExitsList().getExitsList()[selectedExit]
-                        .getTransitionType();
-            transitionTimeInt = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                GameRources.GetInstance().selectedSceneIndex].getExitsList().getExitsList()[selectedExit].getTransitionTime();
-            transitionTimeString = transitionTimeStringLast = transitionTimeInt.ToString();
-        }
-
-        private void ChangeSelectedTransitionType(int i)
-        {
-            selectedTransitionTypeLast = i;
-            Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                GameRources.GetInstance().selectedSceneIndex].getExitsList().getExitsList()[selectedExit]
-                .setTransitionType(i);
-        }
-
-        private void ChangeSelectedTransitionTime(string t)
-        {
-            transitionTimeStringLast = t;
-            Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                GameRources.GetInstance().selectedSceneIndex].getExitsList().getExitsList()[selectedExit]
-                .setTransitionTime(int.Parse(t));
         }
     }
+
+
 }

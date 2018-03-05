@@ -11,13 +11,16 @@ namespace uAdventure.Core
     public abstract class ConversationNode : ConversationNodeView, ICloneable
     {
         private int xEditor;
-
         private int yEditor;
+        private int wEditor;
+        private int hEditor;
 
         public ConversationNode()
         {
             this.xEditor = -1;
             this.yEditor = -1;
+            this.wEditor = 150;
+            this.hEditor = 150;
         }
 
         /**
@@ -235,6 +238,36 @@ namespace uAdventure.Core
 
             this.yEditor = yEditor;
         }
+
+
+
+        public int getEditorWidth()
+        {
+
+            return wEditor;
+        }
+
+
+        public void setEditorWidth(int wEditor)
+        {
+
+            this.wEditor = wEditor;
+        }
+
+
+        public int getEditorHeight()
+        {
+
+            return hEditor;
+        }
+
+
+        public void setEditorHeight(int hEditor)
+        {
+
+            this.hEditor = hEditor;
+        }
+
 
         public abstract ConversationNodeViewEnum getType();
         public abstract bool isTerminal();

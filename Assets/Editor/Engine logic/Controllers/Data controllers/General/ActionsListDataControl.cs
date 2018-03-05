@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using uAdventure.Core;
+using UnityEditor;
 
 namespace uAdventure.Editor
 {
@@ -194,12 +195,17 @@ namespace uAdventure.Editor
                 string[] conversations = controller.IdentifierSummary.getConversationsIds();
                 if (conversations.Length > 0)
                 {
-                    string selectedElement = controller.showInputDialog(TC.get("Action.OperationAddAction"), TC.get("TalkToAction.MessageSelectConversation"), conversations);
-                    if (selectedElement != null)
+                    var inputDialog = ScriptableObject.CreateInstance<InputDialog>();
+                    inputDialog.Init(new ActionsListReceiver(this)
                     {
-                        newAction = new Action(Action.TALK_TO);
-                        newAction.getEffects().add(new TriggerConversationEffect(selectedElement));
-                    }
+                        ConfigureAction = (selectedID) =>
+                        {
+                            newAction = new Action(Action.TALK_TO);
+                            newAction.getEffects().add(new TriggerConversationEffect(selectedID));
+                            return newAction;
+                        }
+                    }, TC.get("TalkToAction.MessageSelectConversation"), conversations);
+                    return true;
                 }
                 else
                     controller.showErrorDialog(TC.get("Action.OperationAddAction"), TC.get("Action.ErrorNoItems"));
@@ -398,7 +404,7 @@ namespace uAdventure.Editor
             }
             else
             {
-                newElement = (Action)(((Action)(dataControl.getContent())));
+                newElement = (Action)(((Action)(dataControl.getContent())).Clone());
                 adc = new ActionDataControl(newElement);
             }
             actionsList.Add(newElement);
@@ -594,6 +600,35 @@ namespace uAdventure.Editor
         {
 
             return this.actionsList;
+        }
+
+        private class ActionsListReceiver : DialogReceiverInterface
+        {
+            private ActionsListDataControl actionsListDataControl;
+            public System.Func<string, Action> ConfigureAction;
+
+            public ActionsListReceiver(ActionsListDataControl actionsListDataControl)
+            {
+                this.actionsListDataControl = actionsListDataControl;
+            }
+
+            public void OnDialogCanceled(object workingObject = null) { }
+
+            public void OnDialogOk(string message, object workingObject = null, object workingObjectSecond = null)
+            {
+                var newAction = ConfigureAction(message);
+                // If an action was added, create a controller and store it
+                if (newAction != null)
+                {
+                    actionsListDataControl.getActionsList().Add(newAction);
+                    if (newAction.getType() == Action.CUSTOM || newAction.getType() == Action.CUSTOM_INTERACT)
+                        actionsListDataControl.getActions().Add(new CustomActionDataControl((CustomAction)newAction));
+                    else
+                        actionsListDataControl.getActions().Add(new ActionDataControl(newAction));
+                    //controller.dataModified( );
+                }
+            }
+
         }
     }
 }

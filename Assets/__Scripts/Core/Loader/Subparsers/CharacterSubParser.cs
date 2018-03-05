@@ -12,12 +12,7 @@ namespace uAdventure.Core
     {
 		public object DOMParse(XmlElement element, params object[] parameters)
 		{
-			// PARAMETERS
-			Chapter chapter = parameters [0] as Chapter;
-
 			NPC npc = new NPC(element.GetAttribute("id"));
-
-			List<Description> descriptions = new List<Description>();
 
 			// DOCUMENTATION
 			var doc = element.SelectSingleNode("documentation");
@@ -38,7 +33,7 @@ namespace uAdventure.Core
 			// CONVERSATIONS
 			foreach (XmlElement conversation in element.SelectNodes("conversation-ref"))
 			{
-				string idTarget = conversation.GetAttribute("idTarget") ?? "";
+				string idTarget = conversation.GetAttribute("idTarget");
 
 				var conversationReference = new ConversationReference(idTarget);
 				conversationReference.setConditions(
@@ -71,10 +66,10 @@ namespace uAdventure.Core
                 npc.setBubbleBkgColor(ExParsers.ParseDefault(textcolor.GetAttribute("bubbleBkgColor"), npc.getBubbleBkgColor()));
                 npc.setBubbleBorderColor(ExParsers.ParseDefault(textcolor.GetAttribute("bubbleBorderColor"), npc.getBubbleBorderColor()));
 
-                var frontcolor = textcolor.SelectSingleNode("frontcolor/@color") as XmlElement;
+                var frontcolor = textcolor.SelectSingleNode("frontcolor") as XmlElement;
                 if (frontcolor != null) npc.setTextFrontColor(ExParsers.ParseDefault(frontcolor.GetAttribute("color"), npc.getTextFrontColor()));
 
-                var bordercolor = textcolor.SelectSingleNode("bordercolor/@color") as XmlElement;
+                var bordercolor = textcolor.SelectSingleNode("bordercolor") as XmlElement;
                 if (bordercolor != null) npc.setTextBorderColor(ExParsers.ParseDefault(bordercolor.GetAttribute("color"), npc.getTextBorderColor()));
             }
         }
@@ -85,7 +80,7 @@ namespace uAdventure.Core
             if (voice != null)
             {
                 npc.setAlwaysSynthesizer(ExString.EqualsDefault(voice.GetAttribute("synthesizeAlways"), "yes", npc.isAlwaysSynthesizer()));
-                npc.setVoice(voice.GetAttribute("name") ?? "");
+                npc.setVoice(voice.GetAttribute("name"));
             }
         }
     }

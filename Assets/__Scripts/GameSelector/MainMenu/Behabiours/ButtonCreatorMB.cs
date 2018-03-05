@@ -15,8 +15,8 @@ namespace uAdventure.GameSelector
 
         void Start()
         {
-            directories = System.IO.Directory.GetDirectories(ResourceManager.Instance.getCurrentDirectory()
-            + System.IO.Path.DirectorySeparatorChar + "Games" + System.IO.Path.DirectorySeparatorChar);
+            /*directories = System.IO.Directory.GetDirectories(ResourceManager.Instance.getCurrentDirectory()
+            + System.IO.Path.DirectorySeparatorChar + "Games" + System.IO.Path.DirectorySeparatorChar);*/
         }
 
         string[] rendered_directories;

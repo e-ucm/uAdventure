@@ -17,7 +17,7 @@ namespace uAdventure.Core
                 descriptions = element.SelectNodes("description");
             XmlElement documentation = element.SelectSingleNode("documentation") as XmlElement;
 
-            Atrezzo atrezzo = new Atrezzo(element.GetAttribute("id") ?? "");
+            Atrezzo atrezzo = new Atrezzo(element.GetAttribute("id"));
 
             // DOCUMENTATION
             if (documentation != null)

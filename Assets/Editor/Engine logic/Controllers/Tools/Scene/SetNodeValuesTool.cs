@@ -26,8 +26,6 @@ namespace uAdventure.Editor
 
         private Trajectory trajectory;
 
-        private Dictionary<string, float> oldLengths;
-
         public SetNodeValuesTool(Node node, Trajectory trajectory, int newX, int newY, float newScale)
         {
             this.newX = newX;
@@ -38,7 +36,6 @@ namespace uAdventure.Editor
             this.oldScale = node.getScale();
             this.node = node;
             this.trajectory = trajectory;
-            this.oldLengths = new Dictionary<string, float>();
         }
 
 
@@ -80,15 +77,14 @@ namespace uAdventure.Editor
             if (newX != oldX || newY != oldY)
                 foreach (Trajectory.Side side in trajectory.getSides())
                 {
+
                     if (side.getIDEnd().Equals(node.getID()) || side.getIDStart().Equals(node.getID()))
                     {
-                        oldLengths.Add(side.getIDStart() + ";" + side.getIDEnd(), side.getLength());
+                        var sideName = side.getIDStart() + ";" + side.getIDEnd();
                         Trajectory.Node start = trajectory.getNodeForId(side.getIDStart());
                         Trajectory.Node end = trajectory.getNodeForId(side.getIDEnd());
                         float x = start.getX() - end.getX();
                         float y = start.getY() - end.getY();
-                        side.setLenght((float)Mathf.Sqrt(Mathf.Pow(x, 2) + Mathf.Pow(y, 2)));
-                        side.setRealLength((float)Mathf.Sqrt(Mathf.Pow(x, 2) + Mathf.Pow(y, 2)));
                     }
                 }
             return true;
@@ -130,12 +126,7 @@ namespace uAdventure.Editor
                         Node end = trajectory.getNodeForId(side.getIDEnd());
                         float x = start.getX() - end.getX();
                         float y = start.getY() - end.getY();
-                        side.setRealLength((float)Mathf.Sqrt(Mathf.Pow(x, 2) + Mathf.Pow(y, 2)));
                     }
-
-                    float temp = oldLengths[side.getIDStart() + ";" + side.getIDEnd()];
-                    if (temp != null)
-                        side.setLenght(temp);
                 }
 
             Controller.Instance.updatePanel();

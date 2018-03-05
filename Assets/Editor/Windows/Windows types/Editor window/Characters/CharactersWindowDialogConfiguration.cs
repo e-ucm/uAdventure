@@ -3,15 +3,18 @@ using System.Collections;
 using UnityEditor;
 
 using uAdventure.Core;
+using System;
 
 namespace uAdventure.Editor
 {
-    public class CharactersWindowDialogConfiguration : LayoutWindow
+    [EditorComponent(typeof(NPCDataControl), Name = "NPC.DialogPanelTitle", Order = 15)]
+    public class CharactersWindowDialogConfiguration : AbstractEditorComponentWithPreview
     {
-        private Color fontFrontColor, fontBorderColor, bubbleBcgColor, bubbleBorderColor;
-        private Color fontFrontColorLast, fontBorderColorLast, bubbleBcgColorLast, bubbleBorderColorLast;
+        private NPCDataControl workingCharacter;
 
-        private bool shouldShowSpeachBubble, shouldShowSpeachBubbleLast;
+        private Color fontFrontColor, fontBorderColor, bubbleBcgColor, bubbleBorderColor;
+
+        private bool shouldShowSpeechBubble;
 
         private GUISkin skinDefault;
         private GUIStyle previewTextStyle;
@@ -21,108 +24,155 @@ namespace uAdventure.Editor
         public CharactersWindowDialogConfiguration(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
         {
-            if (GameRources.GetInstance().selectedCharacterIndex >= 0)
-            {
-                shouldShowSpeachBubble = shouldShowSpeachBubbleLast =
-                        Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
-                        GameRources.GetInstance().selectedCharacterIndex].getShowsSpeechBubbles();
-
-                fontFrontColor = fontFrontColorLast = Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
-                        GameRources.GetInstance().selectedCharacterIndex].getTextFrontColor();
-                fontBorderColor = fontBorderColorLast = Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
-                        GameRources.GetInstance().selectedCharacterIndex].getTextBorderColor();
-                bubbleBcgColor = bubbleBcgColorLast = Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
-                        GameRources.GetInstance().selectedCharacterIndex].getBubbleBkgColor();
-                bubbleBorderColor = fontFrontColorLast = Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
-                        GameRources.GetInstance().selectedCharacterIndex].getBubbleBorderColor();
-            }
 
             bckImage = (Texture2D)Resources.Load("Editor/TextBubble", typeof(Texture2D));
             previewTextStyle = new GUIStyle();
             previewTextStyle.fontSize = 24;
-            previewTextStyle.normal.textColor = fontFrontColor;
-            //previewTextStyle.normal.background = bckImage;
+            previewTextStyle.alignment = TextAnchor.MiddleCenter;
+            previewTextStyle.border = new RectOffset(32, 32, 32, 32);
+            previewTextStyle.padding = new RectOffset(32, 32, 32, 32);
         }
 
-        public override void Draw(int aID)
+        protected override void DrawInspector()
         {
+            workingCharacter = Target != null ? Target as NPCDataControl : Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[GameRources.GetInstance().selectedCharacterIndex];
+
             GUILayout.Label(TC.get("Player.TextColor"));
 
             GUILayout.Space(20);
-            shouldShowSpeachBubble = GUILayout.Toggle(shouldShowSpeachBubble, TC.get("Player.ShowsSpeechBubble"));
-            if (shouldShowSpeachBubble != shouldShowSpeachBubbleLast)
-                OnShowBubbleChange();
 
-            GUILayout.Space(10);
+            // Use Bubbles
+            EditorGUI.BeginChangeCheck();
+            shouldShowSpeechBubble = GUILayout.Toggle(shouldShowSpeechBubble, TC.get("Player.ShowsSpeechBubble"));
+            if (EditorGUI.EndChangeCheck())
+                workingCharacter.setShowsSpeechBubbles(shouldShowSpeechBubble);
+            
 
-            GUILayout.Label(TC.get("GeneralText.PreviewText"), previewTextStyle);
-
-            GUILayout.Space(20);
-
-            fontFrontColor = EditorGUILayout.ColorField(TC.get("Player.FrontColor"), fontFrontColor);
-            if (fontFrontColor != fontFrontColorLast)
+            // Font Color
+            EditorGUI.BeginChangeCheck();
+            fontFrontColor = EditorGUILayout.ColorField(TC.get("Player.FrontColor"), workingCharacter.getTextFrontColor());
+            if (EditorGUI.EndChangeCheck())
             {
-                OnFontFrontChange(fontFrontColor);
+                workingCharacter.setTextFrontColor(fontFrontColor);
             }
 
-            fontBorderColor = EditorGUILayout.ColorField(TC.get("Player.BorderColor"), fontBorderColor);
-            if (fontBorderColor != fontBorderColorLast)
+            // Font Border Color
+            EditorGUI.BeginChangeCheck();
+            fontBorderColor = EditorGUILayout.ColorField(TC.get("Player.BorderColor"), workingCharacter.getTextBorderColor());
+            if (EditorGUI.EndChangeCheck())
             {
-                OnFontBorderChange(fontBorderColor);
+                workingCharacter.setTextBorderColor(fontBorderColor);
             }
 
-            if (!shouldShowSpeachBubble)
-                GUI.enabled = false;
 
-            bubbleBcgColor = EditorGUILayout.ColorField(TC.get("Player.BubbleBkgColor"), bubbleBcgColor);
-            if (bubbleBcgColor != bubbleBcgColorLast)
+            using (new EditorGUI.DisabledScope(!shouldShowSpeechBubble))
             {
-                OnBubbleBcgChange(bubbleBcgColor);
+                // Background color
+                EditorGUI.BeginChangeCheck();
+                bubbleBcgColor = EditorGUILayout.ColorField(TC.get("Player.BubbleBkgColor"), workingCharacter.getBubbleBkgColor());
+                if (EditorGUI.EndChangeCheck())
+                {
+                    workingCharacter.setBubbleBkgColor(bubbleBcgColor);
+                }
+
+                // Border Color
+                EditorGUI.BeginChangeCheck();
+                bubbleBorderColor = EditorGUILayout.ColorField(TC.get("Player.BubbleBorderColor"), workingCharacter.getBubbleBorderColor());
+                if (EditorGUI.EndChangeCheck())
+                {
+                    workingCharacter.setBubbleBorderColor(bubbleBorderColor);
+                }
+            }
+        }
+
+        private static void DrawPreview(GUIContent content, bool showBackground, Texture2D background, Color backgroundColor, Color borderColor, Color fontColor, Color fontBorder, GUIStyle style)
+        {
+            var size = style.CalcSize(content);
+            var rect = GUILayoutUtility.GetRect(size.x, size.y, style);
+
+            if (showBackground)
+            {
+                DrawBackgroundBorder(rect, content, background, borderColor, style);
+                DrawBackground(rect, content, background, backgroundColor, style);
             }
 
-            bubbleBorderColor = EditorGUILayout.ColorField(TC.get("Player.BubbleBorderColor"), bubbleBorderColor);
-            if (bubbleBorderColor != bubbleBorderColorLast)
+            DrawTextBorder(rect, content, fontBorder, style);
+            DrawText(rect, content, fontColor, style);
+        }
+
+        private static void DrawBackgroundBorder(Rect rect, GUIContent content, Texture2D texture, Color borderColor,  GUIStyle style)
+        {
+            var preColor = GUI.backgroundColor;
+            GUI.backgroundColor = borderColor;
+            style.normal.background = texture;
+            style.normal.textColor = new Color(0, 0, 0, 0);
+
+            if(Event.current.type == EventType.Repaint)
             {
-                OnBubbleBorderChange(bubbleBorderColor);
+                style.Draw(new Rect(rect.x, rect.y - 3, rect.width, rect.height), content, false, false, false, false);
+                style.Draw(new Rect(rect.x - 3, rect.y, rect.width, rect.height), content, false, false, false, false);
+                style.Draw(new Rect(rect.x, rect.y + 3, rect.width, rect.height), content, false, false, false, false);
+                style.Draw(new Rect(rect.x + 3, rect.y, rect.width, rect.height), content, false, false, false, false);
+            }
+            
+            GUI.backgroundColor = preColor;
+            style.normal.background = null;
+        }
+
+        private static void DrawBackground(Rect rect, GUIContent content, Texture2D texture, Color backgroundColor, GUIStyle style)
+        {
+            var preColor = GUI.backgroundColor;
+            GUI.backgroundColor = backgroundColor;
+
+            style.normal.background = texture;
+            style.normal.textColor = new Color(0, 0, 0, 0);
+            if (Event.current.type == EventType.Repaint)
+            {
+                style.Draw(rect, content, false, false, false, false);
             }
 
-            GUI.enabled = true;
+            GUI.backgroundColor = preColor;
+            style.normal.background = null;
         }
 
-        void OnShowBubbleChange()
+
+        private static void DrawTextBorder(Rect rect, GUIContent content, Color fontBorder, GUIStyle style)
         {
-            shouldShowSpeachBubbleLast = shouldShowSpeachBubble;
-            Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
-                   GameRources.GetInstance().selectedCharacterIndex].setShowsSpeechBubbles(shouldShowSpeachBubble);
+            style.normal.textColor = fontBorder;
+
+            if (Event.current.type == EventType.Repaint)
+            {
+                style.Draw(new Rect(rect.x, rect.y - 2, rect.width, rect.height), content, false, false, false, false);
+                style.Draw(new Rect(rect.x - 2, rect.y, rect.width, rect.height), content, false, false, false, false);
+                style.Draw(new Rect(rect.x, rect.y + 2, rect.width, rect.height), content, false, false, false, false);
+                style.Draw(new Rect(rect.x + 2, rect.y, rect.width, rect.height), content, false, false, false, false);
+
+                style.Draw(new Rect(rect.x - 1, rect.y - 1, rect.width, rect.height), content, false, false, false, false);
+                style.Draw(new Rect(rect.x + 1, rect.y - 1, rect.width, rect.height), content, false, false, false, false);
+                style.Draw(new Rect(rect.x - 1, rect.y + 1, rect.width, rect.height), content, false, false, false, false);
+                style.Draw(new Rect(rect.x + 1, rect.y + 1, rect.width, rect.height), content, false, false, false, false);
+            }
         }
 
-        void OnFontFrontChange(Color val)
+        private static void DrawText(Rect rect, GUIContent content, Color fontColor, GUIStyle style)
         {
-            fontFrontColorLast = val;
-            previewTextStyle.normal.textColor = fontFrontColor;
-            Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
-                   GameRources.GetInstance().selectedCharacterIndex].setTextFrontColor(val);
+            style.normal.textColor = fontColor;
+
+            if (Event.current.type == EventType.Repaint)
+            {
+                style.Draw(rect, content, false, false, false, false);
+            }
         }
 
-        void OnFontBorderChange(Color val)
+        public override void DrawPreview(Rect rect)
         {
-            fontBorderColorLast = val;
-            Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
-                   GameRources.GetInstance().selectedCharacterIndex].setTextBorderColor(val);
-        }
-
-        void OnBubbleBcgChange(Color val)
-        {
-            bubbleBcgColorLast = val;
-            Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
-                   GameRources.GetInstance().selectedCharacterIndex].setBubbleBkgColor(val);
-        }
-
-        void OnBubbleBorderChange(Color val)
-        {
-            bubbleBorderColorLast = val;
-            Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
-                   GameRources.GetInstance().selectedCharacterIndex].setBubbleBorderColor(val);
+            GUILayout.BeginVertical();
+            GUILayout.FlexibleSpace();
+            GUILayout.BeginHorizontal(); GUILayout.FlexibleSpace();
+            DrawPreview(new GUIContent(TC.get("GeneralText.PreviewText")), shouldShowSpeechBubble, bckImage, bubbleBcgColor, bubbleBorderColor, fontFrontColor, fontBorderColor, previewTextStyle);
+            GUILayout.FlexibleSpace(); GUILayout.EndHorizontal();
+            GUILayout.FlexibleSpace();
+            GUILayout.EndVertical();
         }
     }
 }

@@ -11,6 +11,7 @@ namespace uAdventure.Editor
     {
         public enum FileType
         {
+            PATH,
             SCENE_BACKGROUND,
             SCENE_FOREGROUND,
             SCENE_MUSIC,
@@ -49,6 +50,7 @@ namespace uAdventure.Editor
         protected string selectedAssetPath = "";
 
         protected string fileFilter;
+        protected string basePath = "Assets/Resources/CurrentGame/assets";
 
         // Return string (for engine purpose)
         protected string returnPath;
@@ -63,16 +65,35 @@ namespace uAdventure.Editor
 
         public void OpenFileDialog()
         {
-			var result = EditorUtility.OpenFilePanel ("Select file", "Assets/", fileFilter);
+            string result;
+            if(fileType == FileType.PATH)
+            {
+                result = EditorUtility.SaveFolderPanel("Select folder", "/", "Builds");
+            }
+            else
+            {
+                result = EditorUtility.OpenFilePanel("Select file", basePath, fileFilter);
+            }
 
 			if (result != "")
             {
-				FileInfo file = new FileInfo (result);
+                bool isValid = false;
+                if (fileType == FileType.PATH)
+                {
+                    DirectoryInfo directory = new DirectoryInfo(result);
+                    isValid = directory.Exists;
+                    selectedAssetPath = directory.FullName;
+                }
+                else
+                {
+                    FileInfo file = new FileInfo(result);
+                    isValid = file.Exists;
+                    selectedAssetPath = file.FullName;
+                }
 
-				if (file.Exists)
+				if (isValid)
                 {
                     // Insert code to read the stream here.
-					selectedAssetPath = file.FullName;
                     ChoosedCorrectFile();
                 }
             }
@@ -88,6 +109,9 @@ namespace uAdventure.Editor
 
             switch (fileType)
             {
+                case FileType.PATH:
+                    returnPath = selectedAssetPath;
+                    return;
                 case FileType.SCENE_BACKGROUND:
                     assetTypeDir = AssetsController.CATEGORY_BACKGROUND_FOLDER;
                     break;
@@ -151,7 +175,14 @@ namespace uAdventure.Editor
             string nameOnly = Path.GetFileName(selectedAssetPath);
             if(selectedAssetPath != Path.Combine(path.FullName, nameOnly)) // Avoid to copy the same origin to same destination files
             {
-                File.Copy(selectedAssetPath, Path.Combine(path.FullName, nameOnly), true);
+                var destination = Path.Combine(path.FullName, nameOnly);
+                File.Copy(selectedAssetPath, destination, true);
+                File.SetAttributes(selectedAssetPath, FileAttributes.Normal);
+
+                if (destination.ToLowerInvariant().EndsWith(".png") || destination.ToLowerInvariant().EndsWith(".jpg"))
+                {
+                    AssetsController.InitImporterConfig(destination);
+                }
 
                 if (fileType == FileType.CUTSCENE_SLIDES || fileType == FileType.CHARACTER_ANIM || fileType == FileType.PLAY_ANIMATION_EFFECT)
                     AssetsController.copyAllFiles(Path.GetDirectoryName(selectedAssetPath), path.FullName);

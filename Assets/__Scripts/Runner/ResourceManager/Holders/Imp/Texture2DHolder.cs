@@ -1,22 +1,36 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System.Text.RegularExpressions;
+using System.IO;
 
 namespace uAdventure.Runner
 {
     public class Texture2DHolder : Resource
     {
+        private static string[] extensions = { ".png", ".jpg", ".jpeg" };
+
         byte[] fileData;
         string path;
         private Texture2D tex;
+        private Sprite sprite;
+
         bool loaded = false;
         ResourceManager.LoadingType type;
+        public Sprite Sprite
+        {
+            get
+            {
+                if (!sprite && tex || (sprite && sprite.texture != tex))
+                { 
+                    sprite = Sprite.Create(tex, new Rect(0,0,tex.width, tex.height), new Vector2(tex.width /2f, tex.height/2f));
+                }
 
+                return sprite;
+            }
+        }
         public Texture2D Texture
         {
             get
             {
-                if (this.tex == null)
+                if (!tex)
                 {
                     tex = LoadTexture();
                 }
@@ -51,9 +65,6 @@ namespace uAdventure.Runner
 
                     if (this.fileData == null)
                     {
-                        Regex pattern = new Regex("[óñ]");
-                        this.path = pattern.Replace(this.path, "+¦");
-
                         this.fileData = LoadBytes(this.path);
 
                         if (this.fileData == null)
@@ -81,8 +92,7 @@ namespace uAdventure.Runner
             switch (type)
             {
                 case ResourceManager.LoadingType.RESOURCES_LOAD:
-                    tex = Resources.Load(this.path.Split('.')[0]) as Texture2D;
-
+                    tex = Resources.Load(path) as Texture2D;
                     if (tex == null)
                     {
                         loaded = false;
@@ -93,6 +103,18 @@ namespace uAdventure.Runner
 
                     break;
                 case ResourceManager.LoadingType.SYSTEM_IO:
+                    if (!Path.HasExtension(path))
+                    {
+                        foreach(var extension in extensions)
+                        {
+                            if(File.Exists(path + "." + extension))
+                            {
+                                path = path + "." + extension;
+                                break;
+                            }
+                        }
+                    }
+
                     tex = new Texture2D(2, 2, TextureFormat.BGRA32, false);
                     tex.LoadImage(fileData);
                     this.fileData = null;

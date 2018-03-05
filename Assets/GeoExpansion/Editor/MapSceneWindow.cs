@@ -106,7 +106,7 @@ namespace uAdventure.Geo
                 }
             }
 
-            if (movingReference != null && Event.current.type == EventType.repaint)
+            if (movingReference != null && Event.current.type == EventType.Repaint)
             {
                 this.positionManagers[movingReference].Repositionate(map, mapRect);
             }
