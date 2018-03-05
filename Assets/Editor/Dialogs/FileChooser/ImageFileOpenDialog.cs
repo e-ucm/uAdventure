@@ -5,7 +5,7 @@ namespace uAdventure.Editor
 {
     public class ImageFileOpenDialog : BaseFileOpenDialog
     {
-        public virtual void Init(DialogReceiverInterface e, FileType fType)
+        public override void Init(DialogReceiverInterface e, FileType fType)
         {
             fileFilter = "jpg,png,bmp";
             base.Init(e, fType);

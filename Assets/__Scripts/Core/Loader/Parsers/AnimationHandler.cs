@@ -80,9 +80,7 @@ namespace uAdventure.Core
                 xmld = new XmlDocument();
                 int num = 1;
                 string ruta = path_;
-
                 Texture2D img = null;
-                string extension = string.Empty;
 
                 do
                 {

@@ -1134,7 +1134,8 @@ namespace uAdventure.Editor
         { 
 
             string currentDir = Directory.GetCurrentDirectory();
-            //var unityLikePath = path.Replace(currentDir, "").Replace("\\", "/").Remove(0, 1);
+            // Clean path
+            path = path.Replace(currentDir, "").Replace("\\", "/").Remove(0, 1);
             var importer = AssetImporter.GetAtPath(path) as TextureImporter;
             if(importer == null)
             {

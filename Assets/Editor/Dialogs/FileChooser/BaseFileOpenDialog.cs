@@ -50,7 +50,7 @@ namespace uAdventure.Editor
         protected string selectedAssetPath = "";
 
         protected string fileFilter;
-        protected string basePath = "Assets/";
+        protected string basePath = "Assets/Resources/CurrentGame/assets";
 
         // Return string (for engine purpose)
         protected string returnPath;
@@ -68,7 +68,7 @@ namespace uAdventure.Editor
             string result;
             if(fileType == FileType.PATH)
             {
-                result = EditorUtility.SaveFolderPanel("Select folder", "/", "Exports");
+                result = EditorUtility.SaveFolderPanel("Select folder", "/", "Builds");
             }
             else
             {
