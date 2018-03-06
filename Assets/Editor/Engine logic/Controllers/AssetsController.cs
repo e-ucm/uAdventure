@@ -6,6 +6,7 @@ using System.IO;
 
 using uAdventure.Core;
 using UnityEditor;
+using System.Linq;
 
 namespace uAdventure.Editor
 {
@@ -704,6 +705,22 @@ namespace uAdventure.Editor
         ////        return assetDeleted;
         ////    }
 
+        private static void ImportAssets(string[] paths)
+        {
+            foreach (string path in paths)
+                AssetDatabase.WriteImportSettingsIfDirty(path);
+            try
+            {
+                AssetDatabase.StartAssetEditing();
+                foreach (string path in paths)
+                    AssetDatabase.ImportAsset(path);
+            }
+            finally
+            {
+                AssetDatabase.StopAssetEditing();
+            }
+        }
+
         /**
          * Copies all the asset files from one ZIP to another.
          * 
@@ -713,58 +730,50 @@ namespace uAdventure.Editor
          *            Destiny ZIP file
          */
 
+
+
         public static void copyAssets(string sourceFile, string destinyFile)
         {
-            Debug.Log("KOPIUJĘ: " + sourceFile + " | " + destinyFile);
-            DirectoryInfo assets = new DirectoryInfo(sourceFile + "\\assets");
-            if (assets.Exists)
+            string[] directoriesToCopy = new string[]
             {
-                DirectoryInfo destinyAssets = new DirectoryInfo(destinyFile + "\\assets");
-                if (destinyAssets.Exists)
-                {
-                    Directory.Delete(destinyFile + "\\assets", true);
-                }
-                DirectoryCopy(assets.FullName, destinyAssets.FullName, true);
-            }
-            DirectoryInfo gui = new DirectoryInfo(sourceFile + "\\gui");
-            if (gui.Exists)
+                "assets", "gui"
+            };
+            
+            foreach (var directory in directoriesToCopy)
             {
-                DirectoryInfo destinyGui = new DirectoryInfo(destinyFile + "\\gui");
-                if (destinyGui.Exists)
+                var dest = Path.Combine(destinyFile, directory);
+                var origin = Path.Combine(sourceFile, directory);
+
+                if (!Directory.Exists(origin))
                 {
-                    Directory.Delete(destinyFile + "\\gui", true);
+                    Debug.LogWarning("Copying expected directory to exist: " + origin);
+                    continue;
                 }
-                DirectoryCopy(gui.FullName, destinyGui.FullName, true);
+
+                FileUtil.ReplaceDirectory(origin, dest);
             }
+
+            ImportDirectory(destinyFile);
+            ModifyImportSpecialCases(destinyFile);
         }
 
         public static void copyAllFiles(string sourceFile, string destinyFile)
         {
-            DirectoryInfo dest = new DirectoryInfo(destinyFile);
-            if (dest.Exists)
+            EditorUtility.DisplayProgressBar("Importing project", "Copying files...", 0.4f);
+            if (!Directory.Exists(sourceFile))
             {
-                Directory.Delete(destinyFile, true);
+                Debug.LogWarning("Copying expected directory to exist: " + sourceFile);
+                return;
             }
 
-            DirectoryCopy(sourceFile, destinyFile, true);
+            FileUtil.ReplaceDirectory(sourceFile, destinyFile);
+            EditorUtility.DisplayProgressBar("Importing project", "Importing files...", 0.6f);
+
+            ImportDirectory(destinyFile);
+            EditorUtility.DisplayProgressBar("Importing project", "Modifying importer config...", 0.8f);
+            ModifyImportSpecialCases(destinyFile);
         }
 
-        public static void copyAssetsWithoutDeleteCurrentFiles(string sourceFile, string destinyFile)
-        {
-
-            DirectoryInfo assets = new DirectoryInfo(sourceFile + "/assets");
-            if (assets.Exists)
-            {
-                DirectoryInfo destinyAssets = new DirectoryInfo(destinyFile + "/assets");
-                DirectoryCopy(assets.FullName, destinyAssets.FullName, true);
-            }
-            DirectoryInfo gui = new DirectoryInfo(sourceFile + "/gui");
-            if (gui.Exists)
-            {
-                DirectoryInfo destinyGui = new DirectoryInfo(destinyFile + "/gui");
-                DirectoryCopy(gui.FullName, destinyGui.FullName, true);
-            }
-        }
 
         private static bool addSpecialAsset(string uri, string destination)
         {
@@ -784,6 +793,8 @@ namespace uAdventure.Editor
 
         public static void addSpecialAssets()
         {
+            pathsToReimport = new List<string>();
+
             if (!addSpecialAsset(SpecialAssetPaths.FILE_DEFAULT_BOOK_IMAGE, SpecialAssetPaths.ASSET_DEFAULT_BOOK_IMAGE))
                 Controller.Instance.showErrorDialog(TC.get("Error.Title"),TC.get("Error.SpecialAssetNotFound", SpecialAssetPaths.FILE_DEFAULT_BOOK_IMAGE));
 
@@ -804,7 +815,8 @@ namespace uAdventure.Editor
 
             if (!addSpecialAsset(SpecialAssetPaths.FILE_EMPTY_ANIMATION, SpecialAssetPaths.ASSET_EMPTY_ANIMATION + "_01.png"))
                 Controller.Instance.showErrorDialog(TC.get("Error.Title"), TC.get("Error.SpecialAssetNotFound", SpecialAssetPaths.FILE_EMPTY_ANIMATION));
-            
+
+            ImportAssets(pathsToReimport.ToArray());
         }
 
         /**
@@ -1130,28 +1142,121 @@ namespace uAdventure.Editor
             }
         }
 
-        public static void InitImporterConfig(string path)
-        { 
+        private static List<string> pathsToReimport;
 
-            string currentDir = Directory.GetCurrentDirectory();
-            // Clean path
-            path = path.Replace(currentDir, "").Replace("\\", "/").Remove(0, 1);
-            var importer = AssetImporter.GetAtPath(path) as TextureImporter;
-            if(importer == null)
+        private static bool InitTextureImporter(TextureImporter textureImporter, bool saveInstant = false)
+        {
+            if (!textureImporter)
+                return false;
+            
+            textureImporter.isReadable = true;
+            textureImporter.npotScale = TextureImporterNPOTScale.None;
+            if (saveInstant)
             {
-                // Refresh
-                AssetDatabase.ImportAsset(path);
-                importer = AssetImporter.GetAtPath(path) as TextureImporter;
+                textureImporter.SaveAndReimport();
+            }
+            else
+            {
+                pathsToReimport.Add(textureImporter.assetPath);
             }
 
-            if (importer)
-            {
-                importer.isReadable = true;
-                importer.npotScale = TextureImporterNPOTScale.None;
-                importer.SaveAndReimport();
-            }
+            return true;
         }
 
+        public static bool InitImporterConfig(string path)
+        {
+            string currentDir = Directory.GetCurrentDirectory();
+            // Clean path
+            path = path.Replace(currentDir, "").Replace("\\", "/");
+            if (path.Length > 0 && path[0] == '/') path = path.Remove(0, 1);
+            if (!path.StartsWith("Assets/"))
+            {
+                Debug.LogWarning("Initing importer config for a route not starting with Assets: \"" + path + '"');
+            }
+
+            var file = new FileInfo(path);
+            if (!file.Exists)
+            {
+                Debug.LogWarning("File not found while importing: " + path);
+            }
+
+            var importer = AssetImporter.GetAtPath(path);
+            if (!importer) // If the importer doesn't exist, the asset might haven't been imported yet
+            {
+                // We import it
+                AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate); 
+                // And then the importer will be accesible
+                importer = AssetImporter.GetAtPath(path);
+                if (!importer) // But if we don't have importer yet it might be failing to import
+                {
+                    Debug.LogWarning("Failed to import: \"" + path + "\"\nPlease check the file and change the import settings manually");
+                    return false;
+                }
+            }
+            
+            if (importer is TextureImporter)
+                InitTextureImporter(importer as TextureImporter);
+
+            return importer != null;
+        }
+
+        internal static void ModifyImportSpecialCases(string assetFolder)
+        {
+            pathsToReimport = new List<string>();
+
+            foreach(var assetPath in AssetDatabase.GetAllAssetPaths().Where(path => path.StartsWith(assetFolder)))
+            {
+                InitImporterConfig(assetPath);
+
+                // In case of animation
+                if (assetPath.EndsWith(".eaa", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    AssetDatabase.RenameAsset(assetPath, assetPath + ".xml");
+                }
+
+                // In case of animation
+                if (assetPath.EndsWith(".xml"))
+                {
+                    string text = File.ReadAllText(assetPath);
+                    text = text.Replace(".eaa", ".eaa.xml");
+                    File.WriteAllText(assetPath, text);
+                }
+            }
+
+            ImportAssets(pathsToReimport.ToArray());
+        }
+
+        internal static void ImportDirectory(string DestinationPath)
+        {
+            if (!DestinationPath.StartsWith("Assets/"))
+            {
+                Debug.LogError("Cannot import an external path");
+            }
+
+            AssetDatabase.ImportAsset(DestinationPath, ImportAssetOptions.ImportRecursive);
+        }
+
+
+        [Obsolete]
+        public static void copyAssetsWithoutDeleteCurrentFiles(string sourceFile, string destinyFile)
+        {
+            pathsToReimport = new List<string>();
+            DirectoryInfo assets = new DirectoryInfo(sourceFile + "/assets");
+            if (assets.Exists)
+            {
+                DirectoryInfo destinyAssets = new DirectoryInfo(destinyFile + "/assets");
+                DirectoryCopy(assets.FullName, destinyAssets.FullName, true);
+            }
+            DirectoryInfo gui = new DirectoryInfo(sourceFile + "/gui");
+            if (gui.Exists)
+            {
+                DirectoryInfo destinyGui = new DirectoryInfo(destinyFile + "/gui");
+                DirectoryCopy(gui.FullName, destinyGui.FullName, true);
+            }
+            ImportAssets(pathsToReimport.ToArray());
+        }
+
+        [Obsolete]
         private static void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs)
         {
             //Debug.Log(sourceDirName + " ||| " + destDirName);
@@ -1177,14 +1282,22 @@ namespace uAdventure.Editor
             FileInfo[] files = dir.GetFiles();
             foreach (FileInfo file in files)
             {
+                if (!file.IsuAdventureRelevant())
+                    continue;
+
                 string temppath = Path.Combine(destDirName, file.Name);
                 //Debug.Log("CopyTo: " + temppath);
                 file.CopyTo(temppath, false);
-
-                // In case of image importing
-                if(file.Extension.ToLowerInvariant() == ".png" || file.Extension.ToLowerInvariant() == ".jpg")
+                
+                if (!InitImporterConfig(temppath))
                 {
-                    InitImporterConfig(temppath);
+                    Debug.LogWarning("Cannot init importer for: " + temppath);
+                }
+
+                // In case of animation
+                if (file.Extension.ToLowerInvariant() == ".eaa")
+                {
+                    File.Move(temppath, temppath + ".xml");
                 }
 
                 // In case of animation
@@ -1193,12 +1306,6 @@ namespace uAdventure.Editor
                     string text = File.ReadAllText(temppath);
                     text = text.Replace(".eaa", ".eaa.xml");
                     File.WriteAllText(temppath, text);
-                }
-
-                // In case of animation
-                if (file.Extension.ToLowerInvariant() == ".eaa")
-                {
-                    File.Move(temppath, temppath + ".xml");
                 }
             }
 

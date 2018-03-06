@@ -1282,13 +1282,11 @@ namespace uAdventure.Editor
                     currentZipName = directory.Name;
 
                     // Import the proyect
+                    EditorUtility.DisplayProgressBar("Importing project", "Creating folder structure", 0);
                     AssetsController.createFolderStructure();
+                    EditorUtility.DisplayProgressBar("Importing project", "Adding special assets...", 0.25f);
                     AssetsController.addSpecialAssets();
                     AssetsController.copyAllFiles(new DirectoryInfo(path).FullName, currentZipFile);
-                    try
-                    {
-                        AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
-                    }catch{}
                     AssetsController.checkAssetFilesConsistency(incidences);
                     Incidence.sortIncidences(incidences);
 
@@ -1303,6 +1301,11 @@ namespace uAdventure.Editor
                         }
                     }*/
                     }
+
+                    // Reload the adventure as probably the animations have been replaced
+                    EditorUtility.DisplayProgressBar("Importing project", "Finished! Reloading project...", 100);
+                    loadedAdventureData = Loader.loadAdventureData(ResourceManager, incidences);
+                    EditorUtility.ClearProgressBar();
                 }
                     
                 // PARSING
