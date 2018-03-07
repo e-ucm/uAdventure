@@ -20,15 +20,18 @@ namespace uAdventure.Editor
             : base(aStartPos, aContent, aStyle, sceneEditor, aOptions)
         {
             new PlayerInitialPositionComponent(Rect.zero, new GUIContent(), null);
+            new SideComponent(Rect.zero, new GUIContent(), null);
             trajectoryComponent = new TrajectoryComponent(Rect.zero, new GUIContent(), null);
             trajectoryComponent.Action = -1;
 
             sceneEditor.TypeEnabling[typeof(Player)] = false;
             sceneEditor.TypeEnabling[typeof(TrajectoryDataControl)] = false;
+            sceneEditor.TypeEnabling[typeof(SideDataControl)] = false;
             sceneEditor.TypeEnabling[typeof(NodeDataControl)] = false;
 
             tools = new GUIContent[]
             {
+                new GUIContent("None"), // TODO language
                 new GUIContent(Resources.Load<Texture2D>("EAdventureData/img/icons/nodeEdit")),
                 new GUIContent(Resources.Load<Texture2D>("EAdventureData/img/icons/sideEdit")),
                 new GUIContent(Resources.Load<Texture2D>("EAdventureData/img/icons/selectStartNode")),
@@ -69,6 +72,7 @@ namespace uAdventure.Editor
 
             sceneEditor.TypeEnabling[typeof(PlayerDataControl)] = true;
             sceneEditor.TypeEnabling[typeof(TrajectoryDataControl)] = true;
+            sceneEditor.TypeEnabling[typeof(SideDataControl)] = true;
             sceneEditor.TypeEnabling[typeof(NodeDataControl)] = true;
 
             base.Draw(aID);
@@ -80,6 +84,7 @@ namespace uAdventure.Editor
 
             sceneEditor.TypeEnabling[typeof(PlayerDataControl)] = false;
             sceneEditor.TypeEnabling[typeof(TrajectoryDataControl)] = false;
+            sceneEditor.TypeEnabling[typeof(SideDataControl)] = false;
             sceneEditor.TypeEnabling[typeof(NodeDataControl)] = false;
         }
 
@@ -247,6 +252,111 @@ namespace uAdventure.Editor
             }
         }
 
+        [EditorComponent(typeof(SideDataControl), Name = "Side", Order = 0)]
+        public class SideComponent : AbstractEditorComponent
+        {
+            private GUIContent lengthContent;
+            public SideComponent(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
+            {
+                lengthContent = new GUIContent();
+            }
+
+            public override void Draw(int aID) {}
+
+            private Rect[] getEditingRects(SideDataControl side)
+            {
+                var p1 = GetPivot(side.getStart());
+                var p2 = GetPivot(side.getEnd());
+
+                int length = side.getLength() != 0 ? side.getLength() : Mathf.RoundToInt((p1 - p2).magnitude);
+                lengthContent.text = length.ToString();
+                Rect rect = new Rect();
+                rect.size = GUI.skin.textField.CalcSize(lengthContent);
+                rect.center = (p1 + p2) / 2f;
+
+                var deleteRect = rect;
+                deleteRect.position += new Vector2(deleteRect.size.x, 0);
+                deleteRect.size = new Vector2(deleteRect.size.y, deleteRect.size.y);
+
+                return new Rect[] { rect, deleteRect };
+            }
+
+            public override bool Update()
+            {
+                var side = Target as SideDataControl;
+                if (Event.current.type == EventType.MouseDown)
+                {
+                    if (SceneEditor.Current.SelectedElement == Target)
+                    {
+                        var rects = getEditingRects(side);
+                        if (rects.Any(r => r.Contains(Event.current.mousePosition)))
+                            return true;
+                    }
+                    var selected = DistanceToPoint(side, Event.current.mousePosition) < 8;
+                    if(SceneEditor.Current.SelectedElement != Target && selected)
+                    {
+                        GUIUtility.hotControl = this.GetHashCode();
+                        GUIUtility.keyboardControl = this.GetHashCode();
+                    }
+
+                    return selected;
+                }
+                return false;
+            }
+
+            public override void OnRender(Rect viewport)
+            {
+                var side = Target as SideDataControl;
+                var p1 = GetPivot(side.getStart());
+                var p2 = GetPivot(side.getEnd());
+
+                HandleUtil.DrawPolyLine(new Vector2[] { p1, p2 }, false, SceneEditor.GetColor(Color.black), 5f);
+                HandleUtil.DrawPolyLine(new Vector2[] { p1, p2 }, false, SceneEditor.GetColor(Color.white), 3f);
+
+                if (side.getLength() != 0)
+                {
+                    var bcColor = GUI.color;
+                    GUI.color = Color.yellow;
+                    EditorGUI.DropShadowLabel(new Rect(((p1 + p2) / 2f) - new Vector2(100f, 25f), new Vector2(200, 30)), new GUIContent(side.getLength() + ""));
+                    GUI.color = bcColor;
+                }
+                else
+                {
+                    var distance = (p1 - p2).magnitude;
+                    EditorGUI.DropShadowLabel(new Rect(((p1 + p2) / 2f) - new Vector2(100f, 25f), new Vector2(200, 30)), new GUIContent(Mathf.RoundToInt(distance) + ""));
+                }
+            }
+
+            public override void OnDrawingGizmosSelected()
+            {
+                var side = Target as SideDataControl;
+                var rects = getEditingRects(side);
+                var p1 = GetPivot(side.getStart());
+                var p2 = GetPivot(side.getEnd());
+
+                int length = side.getLength() != 0 ? side.getLength() : Mathf.RoundToInt((p1 - p2).magnitude);
+                var newlength = EditorGUI.IntField(rects[0], length);
+                if (newlength != length)
+                {
+                    side.setLength(newlength);
+                }
+
+                if (side.getLength() != 0)
+                {
+                    if (GUI.Button(rects[1], "X"))
+                    {
+                        side.setLength(0);
+                        GUIUtility.hotControl = 0;
+                        GUIUtility.keyboardControl = 0;
+                    }
+                }
+                if (GUIUtility.hotControl == this.GetHashCode())
+                {
+                    GUIUtility.hotControl = 0;
+                    GUIUtility.keyboardControl = 0;
+                }
+            }
+        }
 
         [EditorComponent(typeof(TrajectoryDataControl), Name = "Trajectory", Order = 0)]
         public class TrajectoryComponent : AbstractEditorComponent
@@ -264,71 +374,68 @@ namespace uAdventure.Editor
                 if(Event.current.type == EventType.MouseDown)
                 {
                     var trajectory = Target as TrajectoryDataControl;
+                    
+                    DataControl selected = SceneEditor.Current.SelectedElement;
+                    NodeDataControl node = selected as NodeDataControl;
+                    SideDataControl side = selected as SideDataControl;
 
-                    var edge = trajectory.getSides().Find(s => DistanceToPoint(s, Event.current.mousePosition) < 8);
-                    if (edge != null)
-                    {
-                        trajectory.deleteElement(edge, false);
-                        SceneEditor.Current.SelectedElement = null;
-                    }
-                    var selected = SceneEditor.Current.SelectedElement as NodeDataControl;
+                    bool isNode = node != null && trajectory.getNodes().Contains(node);
+                    bool isSide = side != null && trajectory.getSides().Contains(side);
 
-                    if (selected != null && trajectory.getNodes().Contains(selected))
+                    switch (Action)
                     {
-                        switch (Action)
-                        {
-                            case 1:
-                                if (pairing == null) pairing = selected;
+                        // Moving
+                        case 1:
+                            if (SceneEditor.Current.SelectedElement == null)
+                            {
+                                var pos = (Event.current.mousePosition - SceneEditor.Current.Viewport.position);
+                                pos.x = (pos.x / SceneEditor.Current.Viewport.size.x) * SceneEditor.Current.Size.x;
+                                pos.y = (pos.y / SceneEditor.Current.Viewport.size.y) * SceneEditor.Current.Size.y;
+                                trajectory.addNode(Mathf.RoundToInt(pos.x), Mathf.RoundToInt(pos.y));
+                            }
+                            else if (isSide)
+                            {
+
+                            }
+                            break;
+
+                        // Pariring
+                        case 2:
+                            if (isNode)
+                            {
+                                if (pairing == null) pairing = node;
                                 else
                                 {
-                                    var duplicated = trajectory.getSides().Find(s => (s.getStart() == pairing && s.getEnd() == selected) || (s.getEnd() == pairing && s.getStart() == selected)) != null;
-                                    if (!duplicated) trajectory.addSide(pairing, selected);
+                                    var duplicated = trajectory.getSides().Find(s => (s.getStart() == pairing && s.getEnd() == node) || (s.getEnd() == pairing && s.getStart() == node)) != null;
+                                    if (!duplicated) trajectory.addSide(pairing, node);
                                     pairing = null;
                                 }
+                            }
+                            break;
 
-                                break;
+                        // Initial
+                        case 3:
+                            if (isNode)
+                            {
+                                trajectory.setInitialNode(node);
+                            }
+                            break;
 
-                            case 2:
-                                trajectory.setInitialNode(selected);
-                                break;
-                            case 3:
-
-                                if (trajectory.deleteElement(selected, false))
-                                    SceneEditor.Current.SelectedElement = null;
-
-                                break;
-                        }
-                    }
-                    else if(SceneEditor.Current.SelectedElement == null && Action == 0)
-                    {
-                        var pos = (Event.current.mousePosition - SceneEditor.Current.Viewport.position);
-                        pos.x = (pos.x / SceneEditor.Current.Viewport.size.x) * SceneEditor.Current.Size.x;
-                        pos.y = (pos.y / SceneEditor.Current.Viewport.size.y) * SceneEditor.Current.Size.y;
-                        trajectory.addNode(Mathf.RoundToInt(pos.x), Mathf.RoundToInt(pos.y));
+                        // Deleting
+                        case 4:
+                            if ((isNode || isSide) && trajectory.deleteElement(selected, false))
+                            {
+                                SceneEditor.Current.SelectedElement = null;
+                            }
+                            break;
                     }
                 }
 
                 return false;
             }
 
-            private float DistanceToPoint(SideDataControl s, Vector2 point)
-            {
-                var p1 = GetPivot(s.getStart());
-                var p2 = GetPivot(s.getEnd());
-
-                return HandleUtility.DistancePointToLineSegment(point, p1, p2);
-            }
-
             public override void Draw(int aID) {}
 
-            private static Vector2 GetPivot(DataControl dataControl)
-            {
-                PlayerInitialPositionComponent.PutTransform(dataControl);
-                var rect = ScenesWindowElementReference.ReferenceComponent.GetElementRect(dataControl);
-                PlayerInitialPositionComponent.RemoveTransform(dataControl);
-
-                return rect.center + new Vector2(0, rect.height / 2f);
-            }
 
             public override void OnDrawingGizmos()
             {
@@ -338,23 +445,28 @@ namespace uAdventure.Editor
                     HandleUtil.DrawPoint(GetPivot(node), 10f, SceneEditor.GetColor(node.isInitial() ? Color.red : Color.blue), SceneEditor.GetColor(Color.black));
                 }
 
-                foreach(var connection in trajectory.getSides())
-                {
-                    var p1 = GetPivot(connection.getStart());
-                    var p2 = GetPivot(connection.getEnd());
-                    var distance = (p1 - p2).magnitude;
-
-                    HandleUtil.DrawPolyLine(new Vector2[] { p1, p2 }, false, SceneEditor.GetColor(Color.black), 5f);
-                    HandleUtil.DrawPolyLine(new Vector2[] { p1, p2 }, false, SceneEditor.GetColor(Color.white), 3f);
-                    
-                    EditorGUI.DropShadowLabel(new Rect(((p1 + p2) / 2f) - new Vector2(100f, 25f), new Vector2(200, 30)), new GUIContent(Mathf.RoundToInt(distance) + ""));
-                }
-
                 if(pairing != null)
                 {
                     HandleUtil.DrawPolyLine(new Vector2[] { GetPivot(pairing), Event.current.mousePosition }, false, SceneEditor.GetColor(Color.white), 3f);
                 }
             }
+        }
+
+        private static float DistanceToPoint(SideDataControl s, Vector2 point)
+        {
+            var p1 = GetPivot(s.getStart());
+            var p2 = GetPivot(s.getEnd());
+
+            return HandleUtility.DistancePointToLineSegment(point, p1, p2);
+        }
+
+        private static Vector2 GetPivot(DataControl dataControl)
+        {
+            PlayerInitialPositionComponent.PutTransform(dataControl);
+            var rect = ScenesWindowElementReference.ReferenceComponent.GetElementRect(dataControl);
+            PlayerInitialPositionComponent.RemoveTransform(dataControl);
+
+            return rect.center + new Vector2(0, rect.height / 2f);
         }
     }
 }

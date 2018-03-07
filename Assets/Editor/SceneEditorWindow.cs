@@ -11,8 +11,6 @@ namespace uAdventure.Editor
     {
         protected SceneEditor sceneEditor;
 
-        private static Dictionary<Type, List<EditorComponent>> knownComponents;
-
         public SceneEditorWindow(Rect rect, GUIContent content, GUIStyle style, SceneEditor sceneEditor, params GUILayoutOption[] options) : base(rect, content, style, options)
         {
             this.sceneEditor = sceneEditor;
@@ -20,54 +18,33 @@ namespace uAdventure.Editor
             {
                 selectedElement = s;
             };
-
-            sceneEditor.Components = knownComponents;
         }
 
         private DataControl selectedElement;
 
         public override void DrawPreview(Rect rect)
         {
-            LoadComponents();
             sceneEditor.Draw(rect);
         }
 
         protected override bool HasToDrawPreviewInspector()
         {
+            var any = false;
             // We only draw the inspector if we have an element selected and we have components to draw
-            return selectedElement != null && knownComponents.ContainsKey(selectedElement.GetType());
+            if(selectedElement != null) sceneEditor.DoCallForWholeElement(selectedElement, _ => any = true);
+
+            return selectedElement != null && any;
         }
 
-        private Dictionary<DataControl, List<EditorComponent>> cachedComponents = new Dictionary<DataControl, List<EditorComponent>>();
-
-
-        public void DoCallForElement(DataControl element)
+        protected override void DrawPreviewInspector()
         {
-            List<EditorComponent> components;
-            if (!cachedComponents.ContainsKey(element))
-            {
+            if (sceneEditor.SelectedElement == null)
+                return;
 
-                if (!knownComponents.ContainsKey(element.GetType())) return;
-
-                // Component gathering
-                components = new List<EditorComponent>();
-                // Basic
-                components.AddRange(knownComponents[element.GetType()]);
-                // Interface
-                foreach (var inter in element.GetType().GetInterfaces())
-                    if (knownComponents.ContainsKey(inter))
-                        components.AddRange(knownComponents[inter]);
-
-                // Sorting the components by order
-                components.Sort((c1, c2) => c1.Attribute.Order.CompareTo(c2.Attribute.Order));
-                cachedComponents.Add(element, components);
-            }
-
-            // Calling
-            foreach (var component in cachedComponents[element])
+            sceneEditor.DoCallForWholeElement(sceneEditor.SelectedElement, (component) =>
             {
                 var oldTarget = component.Target;
-                component.Target = element;
+                component.Target = sceneEditor.SelectedElement;
                 component.Collapsed = !EditorGUILayout.Foldout(!component.Collapsed, (component.Attribute.Name), true);
                 if (!component.Collapsed)
                 {
@@ -79,36 +56,7 @@ namespace uAdventure.Editor
                 //
                 DrawSplitLine(GUILayoutUtility.GetLastRect().max.y);
                 component.Target = oldTarget;
-            }
-        }
-
-        protected override void DrawPreviewInspector()
-        {
-            var referencedElement = selectedElement;
-
-            // If its a reference
-            if (selectedElement is ElementReferenceDataControl)
-            {
-                // First we draw the special components for the element reference
-                var elemRef = referencedElement as ElementReferenceDataControl;
-                DoCallForElement(elemRef);
-
-                // And then we set it up to be able to draw the referenced element components
-                referencedElement = elemRef.getReferencedElementDataControl();
-            }
-
-            // Component drawing
-            DoCallForElement(referencedElement);
-        }
-
-        // ##################### AUX FUNCTIONS #######################
-
-        private void LoadComponents()
-        {
-            if (knownComponents == null)
-            {
-                knownComponents = sceneEditor.Components;
-            }
+            });
         }
     }
 }
