@@ -44,6 +44,20 @@ public class ColumnList : ScrollableList
         Init();
     }
 
+    private void drawColumns(Rect rowRect, Action<Rect, int> callback)
+    {
+        columnRect = new Rect(rowRect)
+        {
+            width = 0
+        };
+        for (int i = 0; i < Columns.Count; i++)
+        {
+            columnRect.x += columnRect.width;
+            columnRect.width = rowRect.width * columnPercent[i];
+            callback(columnRect, i);
+        }
+    }
+
     Rect headerRect, columnRect;
     private void Init()
     {
@@ -60,16 +74,10 @@ public class ColumnList : ScrollableList
 
         drawElementCallback = (rect, index, isActive, isFocused) =>
         {
-            columnRect = new Rect(rect)
+            drawColumns(rect, (columnRect, column) =>
             {
-                width = 0
-            };
-            for (int i = 0; i < Columns.Count; i++)
-            {
-                columnRect.x += columnRect.width;
-                columnRect.width = rect.width * columnPercent[i];
-                drawCell(columnRect, index, i, isActive, isFocused);
-            }
+                drawCell(columnRect, index, column, isActive, isFocused);
+            });
         };
     }
 
@@ -94,12 +102,10 @@ public class ColumnList : ScrollableList
             if (drawColumn != null && c.Callback)
             {
                 columnRect = GUILayoutUtility.GetRect(0, rect.height, c.SizeOptions ?? defaultColumnBehaviour);
-                drawColumn(columnRect, c);
             }
             else
             {
-                EditorGUILayout.LabelField(c.Text, c.SizeOptions ?? defaultColumnBehaviour);
-                columnRect = GUILayoutUtility.GetLastRect();
+                columnRect = GUILayoutUtility.GetRect(new GUIContent(c.Text), GUI.skin.label, c.SizeOptions ?? defaultColumnBehaviour); ;
             }
 
             if(Event.current.type == EventType.Repaint)
@@ -111,11 +117,23 @@ public class ColumnList : ScrollableList
 
         if (Event.current.type == EventType.Repaint)
         {
-            var missing = 1f - columnPercent.ToList().Sum();
-            columnPercent = columnPercent.ToList().ConvertAll(c => c + missing * c).ToArray();
+            var total = columnPercent.ToList().Sum();
+            columnPercent = columnPercent.ToList().ConvertAll(c => c / total).ToArray();
         }
 
         EditorGUILayout.EndHorizontal();
         GUILayout.EndArea();
+
+        drawColumns(rect, (columnRect, column) =>
+        {
+            if (drawColumn != null && Columns[column].Callback)
+            {
+                drawColumn(columnRect, Columns[column]);
+            }
+            else
+            {
+                EditorGUI.LabelField(columnRect, Columns[column].Text);
+            }
+        });
     }
 }
