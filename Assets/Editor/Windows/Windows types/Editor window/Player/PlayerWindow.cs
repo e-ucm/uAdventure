@@ -31,20 +31,32 @@ namespace uAdventure.Editor
         public PlayerWindow(Rect aStartPos, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, new GUIContent(TC.get("Element.Name26")), aStyle, aOptions)
         {
-            var c = new GUIContent();
-            c.image = (Texture2D)Resources.Load("EAdventureData/img/icons/player", typeof(Texture2D));
-            c.text = TC.get("Element.Name26");
+            var c = new GUIContent()
+            {
+                image = (Texture2D)Resources.Load("EAdventureData/img/icons/player", typeof(Texture2D)),
+                text = TC.get("Element.Name26")
+            };
             ButtonContent = c;
 
-            playerWindowAppearance = new CharactersWindowAppearance(aStartPos, new GUIContent(TC.get("NPC.LookPanelTitle")), "Window");
-            playerWindowAppearance.BeginWindows = () => BeginWindows();
-            playerWindowAppearance.EndWindows = () => EndWindows();
-            playerWindowDialogConfiguration = new CharactersWindowDialogConfiguration(aStartPos, new GUIContent(TC.get("NPC.DialogPanelTitle")), "Window");
-            playerWindowDialogConfiguration.BeginWindows = () => BeginWindows();
-            playerWindowDialogConfiguration.EndWindows = () => EndWindows();
-            playerWindowDocumentation = new PlayerWindowDocumentation(aStartPos, new GUIContent(TC.get("NPC.Documentation")), "Window");
-            playerWindowDocumentation.BeginWindows = () => BeginWindows();
-            playerWindowDocumentation.EndWindows = () => EndWindows();
+            playerWindowAppearance = new CharactersWindowAppearance(aStartPos, new GUIContent(TC.get("NPC.LookPanelTitle")), "Window")
+            {
+                IsPlayer = true,
+                BeginWindows = () => BeginWindows(),
+                EndWindows = () => EndWindows()
+            };
+
+            playerWindowDialogConfiguration = new CharactersWindowDialogConfiguration(aStartPos, new GUIContent(TC.get("NPC.DialogPanelTitle")), "Window")
+            {
+                BeginWindows = () => BeginWindows(),
+                EndWindows = () => EndWindows()
+            };
+
+            playerWindowDocumentation = new PlayerWindowDocumentation(aStartPos, new GUIContent(TC.get("NPC.Documentation")), "Window")
+            {
+                BeginWindows = () => BeginWindows(),
+                EndWindows = () => EndWindows()
+            };
+
             selectedButtonSkin = (GUISkin)Resources.Load("Editor/ButtonSelected", typeof(GUISkin));
 
             openedWindow = PlayerWindowType.DialogConfiguration;
@@ -72,7 +84,7 @@ namespace uAdventure.Editor
             switch (openedWindow)
             {
                 case PlayerWindowType.Appearance:
-                    playerWindowAppearance.Target = Controller.Instance.SelectedChapterDataControl.getPlayer();
+                    playerWindowAppearance.Target = null;
                     playerWindowAppearance.Rect = Rect;
                     playerWindowAppearance.Draw(aID);
                     break;

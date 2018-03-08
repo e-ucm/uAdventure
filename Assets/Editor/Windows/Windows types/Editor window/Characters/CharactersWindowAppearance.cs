@@ -4,12 +4,16 @@ using UnityEditor;
 using System;
 
 using uAdventure.Core;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace uAdventure.Editor
 {
     [EditorComponent(typeof(NPCDataControl), typeof(PlayerDataControl), typeof(NodeDataControl), Name = "NPC.LookPanelTitle", Order = 5)]
     public class CharactersWindowAppearance : AbstractEditorComponentWithPreview
     {
+        public bool IsPlayer { get; set; }
+
         public enum CharacterAnimationType
         {
             LOOKING_UP,
@@ -28,140 +32,106 @@ namespace uAdventure.Editor
             WALKING_LEFT
         };
 
-        private const int LOOK_GROUP = 0, TALK_GROUP = 1, USE_GROUP = 2, WALK_GROUP = 3;
+        private enum CharacterAnimationsGroup { LOOK_GROUP, TALK_GROUP, USE_GROUP, WALK_GROUP }
+
+        private static Dictionary<CharacterAnimationsGroup, string> groupNames = new Dictionary<CharacterAnimationsGroup, string>()
+        {
+            { CharacterAnimationsGroup.LOOK_GROUP, "Resources.StandingAnimations" },
+            { CharacterAnimationsGroup.TALK_GROUP, "Resources.SpeakingAnimations" },
+            { CharacterAnimationsGroup.USE_GROUP,  "Resources.UsingAnimations" },
+            { CharacterAnimationsGroup.WALK_GROUP, "Resources.WalkingAnimations" }
+        };
+        private static Dictionary<CharacterAnimationType, string> fieldNames = new Dictionary<CharacterAnimationType, string>()
+        {
+            { CharacterAnimationType.LOOKING_UP,    "Resources.DescriptionCharacterAnimationStandUp" },
+            { CharacterAnimationType.LOOKING_DOWN,  "Resources.DescriptionCharacterAnimationStandDown" },
+            { CharacterAnimationType.LOOKING_RIGHT, "Resources.DescriptionCharacterAnimationStandRight" },
+            { CharacterAnimationType.LOOKING_LEFT,  "Resources.DescriptionCharacterAnimationStandLeft" },
+            { CharacterAnimationType.TALKING_UP,    "Resources.DescriptionCharacterAnimationSpeakUp" },
+            { CharacterAnimationType.TALKING_DOWN,  "Resources.DescriptionCharacterAnimationSpeakDown" },
+            { CharacterAnimationType.TALKING_RIGHT, "Resources.DescriptionCharacterAnimationSpeakRight" },
+            { CharacterAnimationType.TALKING_LEFT,  "Resources.DescriptionCharacterAnimationSpeakLeft " },
+            { CharacterAnimationType.USE_TO_RIGHT,  "Resources.DescriptionCharacterAnimationUseRight" },
+            { CharacterAnimationType.USE_TO_LEFT,   "Resources.DescriptionCharacterAnimationUseLeft" },
+            { CharacterAnimationType.WALKING_UP,    "Resources.DescriptionCharacterAnimationWalkUp" },
+            { CharacterAnimationType.WALKING_DOWN,  "Resources.DescriptionCharacterAnimationWalkDown" },
+            { CharacterAnimationType.WALKING_RIGHT, "Resources.DescriptionCharacterAnimationWalkRight" },
+            { CharacterAnimationType.WALKING_LEFT,  "Resources.DescriptionCharacterAnimationWalkLeft" }
+        };
+
+        private static Dictionary<CharacterAnimationsGroup, Dictionary<CharacterAnimationType, string>> resourceTypeGroups = new Dictionary<CharacterAnimationsGroup, Dictionary<CharacterAnimationType, string>>()
+        {
+            {
+                CharacterAnimationsGroup.LOOK_GROUP, new Dictionary<CharacterAnimationType, string>()
+                {
+                    { CharacterAnimationType.LOOKING_UP,    NPC.RESOURCE_TYPE_STAND_UP },
+                    { CharacterAnimationType.LOOKING_DOWN,  NPC.RESOURCE_TYPE_STAND_DOWN },
+                    { CharacterAnimationType.LOOKING_RIGHT, NPC.RESOURCE_TYPE_STAND_RIGHT },
+                    { CharacterAnimationType.LOOKING_LEFT,  NPC.RESOURCE_TYPE_STAND_LEFT }
+                }
+            },
+            {
+                CharacterAnimationsGroup.TALK_GROUP, new Dictionary<CharacterAnimationType, string>()
+                {
+                    { CharacterAnimationType.TALKING_UP,    NPC.RESOURCE_TYPE_SPEAK_UP },
+                    { CharacterAnimationType.TALKING_DOWN,  NPC.RESOURCE_TYPE_SPEAK_DOWN },
+                    { CharacterAnimationType.TALKING_RIGHT, NPC.RESOURCE_TYPE_SPEAK_RIGHT },
+                    { CharacterAnimationType.TALKING_LEFT,  NPC.RESOURCE_TYPE_SPEAK_LEFT }
+                }
+            },
+            {
+                CharacterAnimationsGroup.USE_GROUP, new Dictionary<CharacterAnimationType, string>()
+                {
+                    { CharacterAnimationType.USE_TO_RIGHT,  NPC.RESOURCE_TYPE_USE_RIGHT },
+                    { CharacterAnimationType.USE_TO_LEFT,   NPC.RESOURCE_TYPE_USE_LEFT }
+                }
+            },
+            {
+                CharacterAnimationsGroup.WALK_GROUP, new Dictionary<CharacterAnimationType, string>()
+                {
+                    { CharacterAnimationType.WALKING_UP,    NPC.RESOURCE_TYPE_WALK_UP },
+                    { CharacterAnimationType.WALKING_DOWN,  NPC.RESOURCE_TYPE_WALK_DOWN },
+                    { CharacterAnimationType.WALKING_RIGHT, NPC.RESOURCE_TYPE_WALK_RIGHT },
+                    { CharacterAnimationType.WALKING_LEFT,  NPC.RESOURCE_TYPE_WALK_LEFT }
+                }
+            }
+        };
+
+        private static CharacterAnimationsGroup[] groups;
+        private static CharacterAnimationType[] types;
+
+        private Dictionary<CharacterAnimationType, AnimationField> fields = new Dictionary<CharacterAnimationType, AnimationField>();
+        private Dictionary<CharacterAnimationType, Texture2D> textures = new Dictionary<CharacterAnimationType, Texture2D>();
         
+        private CharacterAnimationsGroup selectedAnimationGroup;
+
         private NPCDataControl workingCharacter;
 
         private AppearanceEditor appearanceEditor;
-
-        private AnimationField standingUp;
-        private AnimationField standingLeft;
-        private AnimationField standingRight;
-        private AnimationField standingDown;
-        private AnimationField walkingUp;
-        private AnimationField walkingLeft;
-        private AnimationField walkingRight;
-        private AnimationField walkingDown;
-        private AnimationField usingLeft;
-        private AnimationField usingRight;
-        private AnimationField talkingUp;
-        private AnimationField talkingLeft;
-        private AnimationField talkingRight;
-        private AnimationField talkingDown;
-
-        private Texture2D standingUpTex;
-        private Texture2D standingLeftTex;
-        private Texture2D standingRightTex;
-        private Texture2D standingDownTex;
-        private Texture2D walkingUpTex;
-        private Texture2D walkingLeftTex;
-        private Texture2D walkingRightTex;
-        private Texture2D walkingDownTex;
-        private Texture2D usingLeftTex;
-        private Texture2D usingRightTex;
-        private Texture2D talkingUpTex;
-        private Texture2D talkingLeftTex;
-        private Texture2D talkingRightTex;
-        private Texture2D talkingDownTex;
-
-        private int selectedAnimationGroup;
-        private string[] animationGroupNamesList;
 
         public CharactersWindowAppearance(Rect aStartPos, GUIContent aContent, GUIStyle aStyle,
             params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
         {
+            IsPlayer = false;
 
             appearanceEditor = ScriptableObject.CreateInstance<AppearanceEditor>();
             appearanceEditor.height = 160;
             appearanceEditor.onAppearanceSelected = RefreshPathInformation;
+
+            if(groups == null)
+                groups = Enum.GetValues(typeof(CharacterAnimationsGroup)).Cast<CharacterAnimationsGroup>().ToArray();
+            if(types == null)
+                types = Enum.GetValues(typeof(CharacterAnimationType)).Cast<CharacterAnimationType>().ToArray();
             
-            animationGroupNamesList = new string[] {TC.get("Resources.StandingAnimations"), TC.get("Resources.SpeakingAnimations"), TC.get("Resources.UsingAnimations"), TC.get("Resources.WalkingAnimations")};
-            
-            standingUp = new AnimationField()
+            foreach(var animationType in types)
             {
-                Label = TC.get("Resources.DescriptionCharacterAnimationStandUp"),
-                FileType = BaseFileOpenDialog.FileType.CHARACTER_ANIM
-            };
-
-            standingLeft = new AnimationField()
-            {
-                Label = TC.get("Resources.DescriptionCharacterAnimationStandLeft"),
-                FileType = BaseFileOpenDialog.FileType.CHARACTER_ANIM
-            };
-
-            standingRight = new AnimationField()
-            {
-                Label = TC.get("Resources.DescriptionCharacterAnimationStandRight"),
-                FileType = BaseFileOpenDialog.FileType.CHARACTER_ANIM
-            };
-
-            standingDown = new AnimationField()
-            {
-                Label = TC.get("Resources.DescriptionCharacterAnimationStandDown"),
-                FileType = BaseFileOpenDialog.FileType.CHARACTER_ANIM
-            };
-
-            talkingUp = new AnimationField()
-            {
-                Label = TC.get("Resources.DescriptionCharacterAnimationSpeakUp"),
-                FileType = BaseFileOpenDialog.FileType.CHARACTER_ANIM
-            };
-
-            talkingRight = new AnimationField()
-            {
-                Label = TC.get("Resources.DescriptionCharacterAnimationSpeakRight"),
-                FileType = BaseFileOpenDialog.FileType.CHARACTER_ANIM
-            };
-
-            talkingLeft = new AnimationField()
-            {
-                Label = TC.get("Resources.DescriptionCharacterAnimationSpeakLeft"),
-                FileType = BaseFileOpenDialog.FileType.CHARACTER_ANIM
-            };
-
-            talkingDown = new AnimationField()
-            {
-                Label = TC.get("Resources.DescriptionCharacterAnimationSpeakDown"),
-                FileType = BaseFileOpenDialog.FileType.CHARACTER_ANIM
-            };
-
-            usingLeft = new AnimationField()
-            {
-                Label = TC.get("Resources.DescriptionCharacterAnimationUseRight"),
-                FileType = BaseFileOpenDialog.FileType.CHARACTER_ANIM
-            };
-
-            usingRight = new AnimationField()
-            {
-                Label = TC.get("Resources.DescriptionCharacterAnimationUseLeft"),
-                FileType = BaseFileOpenDialog.FileType.CHARACTER_ANIM
-            };
-
-            walkingUp = new AnimationField()
-            {
-                Label = TC.get("Resources.DescriptionCharacterAnimationWalkUp"),
-                FileType = BaseFileOpenDialog.FileType.CHARACTER_ANIM
-            };
-
-            walkingLeft = new AnimationField()
-            {
-                Label = TC.get("Resources.DescriptionCharacterAnimationWalkLeft"),
-                FileType = BaseFileOpenDialog.FileType.CHARACTER_ANIM
-            };
-
-            walkingRight = new AnimationField()
-            {
-                Label = TC.get("Resources.DescriptionCharacterAnimationWalkRight"),
-                FileType = BaseFileOpenDialog.FileType.CHARACTER_ANIM
-            };
-
-            walkingDown = new AnimationField()
-            {
-                Label = TC.get("Resources.DescriptionCharacterAnimationWalkDown"),
-                FileType = BaseFileOpenDialog.FileType.CHARACTER_ANIM
-            };
-
+                fields[animationType] = new AnimationField()
+                {
+                    Label = TC.get(fieldNames[animationType]),
+                    FileType = BaseFileOpenDialog.FileType.CHARACTER_ANIM
+                };
+            }
         }
 
         private void DoAnimationSelector(AnimationField field, string animationName)
@@ -179,86 +149,62 @@ namespace uAdventure.Editor
         private Texture2D LoadCharacterTexturePreview(NPCDataControl data, string animation)
         {
             var auxPath = data.getAnimationPathPreview(animation);
-            var image = string.IsNullOrEmpty(auxPath) ? null : AssetsController.getImage(auxPath);
-            return image != null ? image.texture : null;
+            return string.IsNullOrEmpty(auxPath) ? null : Controller.ResourceManager.getImage(auxPath);
         }
 
         private void RefreshPathInformation(DataControlWithResources data)
         {
             var npc = data as NPCDataControl;
-
-            standingUpTex        = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_STAND_UP);
-            standingDownTex      = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_STAND_DOWN);
-            standingRightTex     = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_STAND_RIGHT);
-            standingLeftTex      = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_STAND_LEFT);
-            talkingUpTex         = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_SPEAK_UP);
-            talkingDownTex       = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_SPEAK_DOWN);
-            talkingRightTex      = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_SPEAK_RIGHT);
-            talkingLeftTex       = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_SPEAK_LEFT);
-            usingRightTex        = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_USE_RIGHT);
-            usingLeftTex         = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_USE_LEFT);
-            walkingUpTex         = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_WALK_UP);
-            walkingLeftTex       = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_WALK_LEFT);
-            walkingRightTex      = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_WALK_RIGHT);
-            walkingDownTex       = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_WALK_DOWN);
+            foreach(var group in groups) // For each group
+            {
+                foreach (var animationType in resourceTypeGroups[group])
+                {
+                    // Reload the texture
+                    textures[animationType.Key] = LoadCharacterTexturePreview(npc, resourceTypeGroups[group][animationType.Key]);
+                }
+            }
         }
 
         protected override void DrawInspector()
         {
-            if (Target is NodeDataControl)
-                Target = Controller.Instance.SelectedChapterDataControl.getPlayer();
-
             var prevWorkingChar = workingCharacter;
-            workingCharacter = Target != null ? Target as NPCDataControl : Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[GameRources.GetInstance().selectedCharacterIndex];
+
+            var player = Controller.Instance.SelectedChapterDataControl.getPlayer();
+            if (Target is NodeDataControl || IsPlayer)
+                workingCharacter = player;
+            else if (Target is NPCDataControl)
+                workingCharacter = Target as NPCDataControl;
+            else
+                workingCharacter = Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[GameRources.GetInstance().selectedCharacterIndex];
+
             if (workingCharacter != prevWorkingChar)
                 RefreshPathInformation(workingCharacter);
-
 
             // Appearance table
             appearanceEditor.Data = workingCharacter;
             appearanceEditor.OnInspectorGUI();
 
             GUILayout.Label(TC.get("Resources.ResourcesGroup"));
-            selectedAnimationGroup = EditorGUILayout.Popup(selectedAnimationGroup, animationGroupNamesList);
+            selectedAnimationGroup = groups[EditorGUILayout.Popup((int)selectedAnimationGroup, groupNames.Select(kv => TC.get(kv.Value)).ToArray())];
 
-            switch (selectedAnimationGroup)
+            // Draw the animation selector for each animation in the selected resource group
+            foreach(var resourceTypeGroup in resourceTypeGroups[selectedAnimationGroup])
             {
-                case LOOK_GROUP:
-                    DoAnimationSelector(standingUp, NPC.RESOURCE_TYPE_STAND_UP);
-                    DoAnimationSelector(standingDown, NPC.RESOURCE_TYPE_STAND_DOWN);
-                    DoAnimationSelector(standingLeft, NPC.RESOURCE_TYPE_STAND_LEFT);
-                    DoAnimationSelector(standingRight, NPC.RESOURCE_TYPE_STAND_RIGHT);
-                    break;
-
-                case TALK_GROUP:
-                    DoAnimationSelector(talkingUp, NPC.RESOURCE_TYPE_SPEAK_UP);
-                    DoAnimationSelector(talkingDown, NPC.RESOURCE_TYPE_SPEAK_DOWN);
-                    DoAnimationSelector(talkingLeft, NPC.RESOURCE_TYPE_SPEAK_LEFT);
-                    DoAnimationSelector(talkingRight, NPC.RESOURCE_TYPE_SPEAK_RIGHT);
-                    break;
-
-                case USE_GROUP:
-                    DoAnimationSelector(usingLeft, NPC.RESOURCE_TYPE_USE_LEFT);
-                    DoAnimationSelector(usingRight, NPC.RESOURCE_TYPE_USE_RIGHT);
-                    break;
-
-                case WALK_GROUP:
-                    DoAnimationSelector(walkingUp, NPC.RESOURCE_TYPE_WALK_UP);
-                    DoAnimationSelector(walkingDown, NPC.RESOURCE_TYPE_WALK_DOWN);
-                    DoAnimationSelector(walkingLeft, NPC.RESOURCE_TYPE_WALK_LEFT);
-                    DoAnimationSelector(walkingRight, NPC.RESOURCE_TYPE_WALK_RIGHT);
-                    break;
+                DoAnimationSelector(fields[resourceTypeGroup.Key], resourceTypeGroup.Value);
             }
         }
 
-        private void DrawSinglePreview(string title, Texture2D texture)
+        private void DrawSinglePreview(Texture2D texture, string title = null)
         {
             EditorGUILayout.BeginVertical();
-            EditorGUILayout.BeginHorizontal();
-            GUILayout.FlexibleSpace();
-            EditorGUI.DropShadowLabel(GUILayoutUtility.GetRect(200, 50), title);
-            GUILayout.FlexibleSpace();
-            EditorGUILayout.EndHorizontal();
+            if (!string.IsNullOrEmpty(title))
+            {
+                EditorGUILayout.BeginHorizontal();
+                GUILayout.FlexibleSpace();
+                EditorGUI.DropShadowLabel(GUILayoutUtility.GetRect(200, 50), title);
+                GUILayout.FlexibleSpace();
+                EditorGUILayout.EndHorizontal();
+            }
 
             if (texture) GUI.DrawTexture(GUILayoutUtility.GetRect(0, 0, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true)), texture, ScaleMode.ScaleToFit);
 
@@ -268,32 +214,19 @@ namespace uAdventure.Editor
         public override void DrawPreview(Rect rect)
         {
             GUILayout.BeginHorizontal();
-            switch (selectedAnimationGroup)
+            if (Target != null)
             {
-                case LOOK_GROUP:
-                    DrawSinglePreview(TC.get("Resources.DescriptionCharacterAnimationStandUp"), standingUpTex);
-                    DrawSinglePreview(TC.get("Resources.DescriptionCharacterAnimationStandLeft"), standingLeftTex);
-                    DrawSinglePreview(TC.get("Resources.DescriptionCharacterAnimationStandRight"), standingRightTex);
-                    DrawSinglePreview(TC.get("Resources.DescriptionCharacterAnimationStandDown"), standingDownTex);
-                    break;
-
-                case TALK_GROUP:
-                    DrawSinglePreview(TC.get("Resources.DescriptionCharacterAnimationSpeakUp"), talkingUpTex);
-                    DrawSinglePreview(TC.get("Resources.DescriptionCharacterAnimationSpeakLeft"), talkingLeftTex);
-                    DrawSinglePreview(TC.get("Resources.DescriptionCharacterAnimationSpeakRight"), talkingRightTex);
-                    DrawSinglePreview(TC.get("Resources.DescriptionCharacterAnimationSpeakDown"), talkingDownTex);
-                    break;
-
-                case USE_GROUP:
-                    DrawSinglePreview(TC.get("Resources.DescriptionCharacterAnimationUseLeft"), usingLeftTex);
-                    DrawSinglePreview(TC.get("Resources.DescriptionCharacterAnimationUseRight"), usingRightTex);
-                    break;
-                case WALK_GROUP:
-                    DrawSinglePreview(TC.get("Resources.DescriptionCharacterAnimationWalkUp"), walkingUpTex);
-                    DrawSinglePreview(TC.get("Resources.DescriptionCharacterAnimationWalkLeft"), walkingLeftTex);
-                    DrawSinglePreview(TC.get("Resources.DescriptionCharacterAnimationWalkRight"), walkingRightTex);
-                    DrawSinglePreview(TC.get("Resources.DescriptionCharacterAnimationWalkDown"), walkingDownTex);
-                    break;
+                var npc = Target as NPCDataControl;
+                var preview = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_STAND_DOWN);
+                DrawSinglePreview(preview);
+            }
+            else
+            {
+                // Draw the animation selector for each animation in the selected resource group
+                foreach (var resourceTypeGroup in resourceTypeGroups[selectedAnimationGroup])
+                {
+                    DrawSinglePreview(textures[resourceTypeGroup.Key], TC.get(fieldNames[resourceTypeGroup.Key]));
+                }
             }
             GUILayout.EndHorizontal();
         }
@@ -306,9 +239,7 @@ namespace uAdventure.Editor
             }
             
             var npc = Target as NPCDataControl;
-
             var preview = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_STAND_DOWN);
-
             if (preview)
             {
                 var rect = GetViewportRect(new Rect(new Vector2(-0.5f * preview.width, -preview.height), new Vector2(preview.width, preview.height)), viewport);

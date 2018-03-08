@@ -43,8 +43,6 @@ namespace uAdventure.Editor
 
             sceneEditor.DoCallForWholeElement(sceneEditor.SelectedElement, (component) =>
             {
-                var oldTarget = component.Target;
-                component.Target = sceneEditor.SelectedElement;
                 component.Collapsed = !EditorGUILayout.Foldout(!component.Collapsed, (component.Attribute.Name), true);
                 if (!component.Collapsed)
                 {
@@ -55,7 +53,6 @@ namespace uAdventure.Editor
                 }
                 //
                 DrawSplitLine(GUILayoutUtility.GetLastRect().max.y);
-                component.Target = oldTarget;
             });
         }
     }
