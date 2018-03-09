@@ -33,12 +33,14 @@ namespace uAdventure.Runner
                         var option = node as OptionConversationNode;
                         this.additional_effects = new EffectHolder(option.getEffects());
                         this.child = -2;
+                        this.showOption = option.isShowUserOption();
                         break;
                 }
             }
         }
 
         private int current_line = 0;
+        private bool showOption = false;
         public bool execute()
         {
             bool forcewait = false;
@@ -67,6 +69,13 @@ namespace uAdventure.Runner
                         {
                             Game.Instance.showOptions(this);
                             forcewait = true;
+                        }
+                        else if (showOption)
+                        {
+                            l = node.getLine(child);
+                            Game.Instance.talk(l.getText(), l.getName());
+                            forcewait = true;
+                            showOption = false;
                         }
                         else
                         {

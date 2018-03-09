@@ -177,7 +177,7 @@ namespace uAdventure.Runner
                 return animations[uri];
             else
             {
-                eAnim animation = new eAnim(fixPath(uri), type);
+                eAnim animation = new eAnim(uri, type);
                 if (animation.Loaded())
                 {
                     animations.Add(uri, animation);

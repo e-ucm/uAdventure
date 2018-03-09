@@ -6,6 +6,8 @@ using System.IO;
 using uAdventure.Core;
 using RAGE.Analytics;
 using RAGE.Analytics.Formats;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace uAdventure.Runner
 {
@@ -381,6 +383,11 @@ namespace uAdventure.Runner
             {
                 blur = GameObject.Instantiate(Blur_Prefab);
                 blur.transform.position = new Vector3(Camera.main.transform.position.x, Camera.main.transform.position.y, Camera.main.transform.position.z + 1);
+                var node = options.getNode();
+                this.order = Enumerable.Range(0, node.getLineCount()).ToList();
+                // Order shuffeling when node is configured for random
+                if (node is OptionConversationNode && (node as OptionConversationNode).isRandom())
+                    this.order.Shuffle();
                 this.guioptions = options;
                 this.guistate = guiState.ANSWERS_MENU;
             }
@@ -393,6 +400,7 @@ namespace uAdventure.Runner
         
         private guiState guistate = guiState.NOTHING;
         private List<Action> guiactions;
+        private List<int> order;
         private ConversationNodeHolder guioptions;
 
         GUIStyle optionlabel;
@@ -414,8 +422,14 @@ namespace uAdventure.Runner
                     GUILayout.BeginVertical();
                     OptionConversationNode options = (OptionConversationNode)guioptions.getNode();
 
-                    GUILayout.Label(GUIManager.Instance.Last, optionlabel);
-                    for (int i = 0; i < options.getLineCount(); i++)
+                    if (options.isKeepShowing())
+                    {
+                        var text = GUIManager.Instance.Last;
+                        if (text[0] == '#')
+                            text = text.Remove(0, Mathf.Max(0, text.IndexOf(' ') + 1));
+                        GUILayout.Label(text, optionlabel);
+                    }
+                    foreach (var i in order)
                     {
                         ConversationLine ono = options.getLine(i);
                         if (ConditionChecker.check(options.getLineConditions(i)))

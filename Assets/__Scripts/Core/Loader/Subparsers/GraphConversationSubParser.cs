@@ -119,7 +119,7 @@ namespace uAdventure.Core
 				editorY = Mathf.Max(-1, ExParsers.ParseDefault(el.GetAttribute("editor-y"), -1));
 
 				//If there is a "waitUserInteraction" attribute, store if the lines will wait until user interacts
-				keepShowingDialogue = ExString.EqualsDefault(el.GetAttribute("keepShowing"), "yes", false);
+				keepShowingDialogue = ExString.EqualsDefault(el.GetAttribute("waitUserInteraction"), "yes", false);
 
 				// Node effects
 				end_conversation = el.SelectSingleNode("end-conversation");
@@ -148,7 +148,8 @@ namespace uAdventure.Core
                 {
 					random = ExString.EqualsDefault(el.GetAttribute("random"), "yes", false);
 					showUserOption = ExString.EqualsDefault(el.GetAttribute("showUserOption"), "yes", false);
-					preListening = ExString.EqualsDefault(el.GetAttribute("preListening"), "yes", false) || editorX >= 0 || editorY >= 0;
+                    keepShowing = ExString.EqualsDefault(el.GetAttribute("keepShowing"), "yes", false);
+                    preListening = ExString.EqualsDefault(el.GetAttribute("preListening"), "yes", false) || editorX >= 0 || editorY >= 0;
 
 					currentNode = new OptionConversationNode(random, keepShowing, showUserOption, preListening, editorX, editorY);
 

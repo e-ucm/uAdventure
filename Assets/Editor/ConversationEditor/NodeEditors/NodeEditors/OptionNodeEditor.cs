@@ -34,9 +34,10 @@ namespace uAdventure.Editor
             }
         }
 
-        Texture2D conditionsTex, noConditionsTex, effectTex, noEffectTex, linkTex, noLinkTex, tmpTex;
+        Texture2D conditionsTex, noConditionsTex, effectTex, noEffectTex, linkTex, noLinkTex, tmpTex, answerTex, shuffleTex, questionTex;
         GUISkin noBackgroundSkin, defaultSkin;
         GUIStyle closeStyle;
+        GUIContent answerContent, questionContent, shuffleContent;
 
         public OptionNodeEditor()
         {
@@ -51,12 +52,21 @@ namespace uAdventure.Editor
             effectTex = (Texture2D)Resources.Load("EAdventureData/img/icons/effects/32x32/has-macro", typeof(Texture2D));
             noEffectTex = (Texture2D)Resources.Load("EAdventureData/img/icons/effects/32x32/macro", typeof(Texture2D));
 
+            answerTex = (Texture2D)Resources.Load("EAdventureData/img/icons/answer", typeof(Texture2D));
+            questionTex = (Texture2D)Resources.Load("EAdventureData/img/icons/question", typeof(Texture2D));
+            shuffleTex = (Texture2D)Resources.Load("EAdventureData/img/icons/shuffle", typeof(Texture2D));
+
+            answerContent = new GUIContent(answerTex);
+            questionContent = new GUIContent(questionTex);
+            shuffleContent = new GUIContent(shuffleTex);
+
             noBackgroundSkin = (GUISkin)Resources.Load("Editor/EditorNoBackgroundSkin", typeof(GUISkin));
             noBackgroundSkin.button.margin = new RectOffset(1, 1, 1, 1);
             noBackgroundSkin.button.padding = new RectOffset(0, 0, 0, 0);
         }
 
         ConversationEditorWindow parent;
+
         public void setParent(ConversationEditorWindow parent)
         {
             this.parent = parent;
@@ -79,8 +89,17 @@ namespace uAdventure.Editor
             style.padding = new RectOffset(5, 5, 5, 5);
 
             EditorGUILayout.BeginVertical();
+            // Options configuration
+            EditorGUILayout.BeginHorizontal();
+            questionContent.tooltip = TC.get("Conversation.KeepShowing");
+            myNode.setKeepShowing(GUILayout.Toggle(myNode.isKeepShowing(), questionContent, "Button"));
+            shuffleContent.tooltip = TC.get("Conversation.OptionRandomly");
+            myNode.setRandom(GUILayout.Toggle(myNode.isRandom(), shuffleContent, "Button"));
+            answerContent.tooltip = TC.get("Conversation.ShowUserOption");
+            myNode.setShowUserOption(GUILayout.Toggle(myNode.isShowUserOption(), answerContent, "Button"));
+            EditorGUILayout.EndHorizontal();
 
-			EditorGUILayout.HelpBox(TC.get("ConversationEditor.AtLeastOne"), MessageType.None);
+            EditorGUILayout.HelpBox(TC.get("ConversationEditor.AtLeastOne"), MessageType.None);
 			GUILayout.BeginHorizontal ();
 			GUILayout.Label("Question ID: ");
 			//Controller.getInstance ().getIdentifierSummary ().add
@@ -107,11 +126,9 @@ namespace uAdventure.Editor
                 {
                     EditorGUILayout.BeginHorizontal();
 
-                    bool showInfo = false;
-
 					EditorGUIUtility.labelWidth = GUI.skin.label.CalcSize(new GUIContent((i+1) + ": ")).x;
-					myNode.getLine(i).setText(EditorGUILayout.TextField((i+1) + ": ", myNode.getLine(i).getText(), GUILayout.Width(200)));
-					myNode.getLine (i).setXApiCorrect (EditorGUILayout.Toggle(myNode.getLine (i).getXApiCorrect ()));
+					myNode.getLine(i).setText(EditorGUILayout.TextField((i+1) + ": ", myNode.getLine(i).getText(), GUILayout.ExpandWidth(true)));
+					myNode.getLine (i).setXApiCorrect (EditorGUILayout.Toggle(myNode.getLine (i).getXApiCorrect (), GUILayout.Width(15)));
 					GUILayout.Space (5);
 
                     tmpTex = (myNode.getLine(i).getConditions().getConditionsList().Count > 0
@@ -142,7 +159,7 @@ namespace uAdventure.Editor
                 // Timer
 
                 EditorGUILayout.BeginHorizontal();
-
+                EditorGUIUtility.labelWidth = 0;
                 if (EditorGUILayout.Toggle("Timeout: ", myNode.Timeout >= 0))
                 {
                     if(myNode.Timeout < 0)
