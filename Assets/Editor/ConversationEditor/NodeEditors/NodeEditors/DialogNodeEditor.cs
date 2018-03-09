@@ -4,11 +4,45 @@ using System.Collections;
 using System.Collections.Generic;
 
 using uAdventure.Core;
+using System.Text.RegularExpressions;
+using System.Linq;
 
 namespace uAdventure.Editor
 {
     public class DialogNodeEditor : ConversationNodeEditor
     {
+        private struct BubbleType
+        {
+            public BubbleType(string identifier)
+            {
+                Identifier = identifier;
+                Help = "Unknown";
+                Next = "-";
+            }
+
+            public string Identifier;
+            public string Help;
+            public string Next;
+        }
+
+        private static BubbleType[] BubbleTypes = new BubbleType[]
+        {
+            new BubbleType(){
+                Identifier = "-",
+                Help = "Normal",
+                Next = "!"
+            },
+            new BubbleType(){
+                Identifier = "!",
+                Help = "Yell",
+                Next = "O"
+            },
+            new BubbleType(){
+                Identifier = "O",
+                Help = "Think",
+                Next = "-"
+            }
+        };
 
         private DialogueConversationNode myNode;
         private Vector2 scroll = new Vector2(0, 0);
@@ -100,24 +134,46 @@ namespace uAdventure.Editor
 
                 for (int i = 0; i < myNode.getLineCount(); i++)
                 {
+                    var line = myNode.getLine(i);
                     EditorGUILayout.BeginHorizontal();
                     //myNode.getLine(i).IsEntityFragment = EditorGUILayout.Toggle("Is entity: ", frg.IsEntityFragment);
 
                     bool showInfo = false;
                     EditorGUIUtility.labelWidth = GUI.skin.label.CalcSize(new GUIContent(TC.get("ConversationEditor.Speaker"))).x;
-                    myNode.getLine(i).setName(npc[EditorGUILayout.Popup(TC.get("ConversationEditor.Speaker"), npc.IndexOf(myNode.getLine(i).getName()), npc.ToArray())]);
+                    line.setName(npc[EditorGUILayout.Popup(TC.get("ConversationEditor.Speaker"), npc.IndexOf(line.getName()), npc.ToArray())]);
+                    
+                    // Bubble type extraction
+                    var matched = ExString.Default(Regex.Match(line.getText(), @"^#([^\s]+)").Groups[1].Value, "-");
+                    var bubbleType = BubbleTypes.Where(b => matched == b.Identifier).FirstOrDefault();
+                    if (string.IsNullOrEmpty(bubbleType.Identifier))
+                    {
+                        bubbleType = new BubbleType(matched);
+                    }
+
+                    if (bubbleType.Identifier != "-")
+                        line.setText(line.getText().Remove(0, matched.Length + 2));
+                    
+                    // Bubble type control
+                    if (GUILayout.Button(bubbleType.Identifier, GUILayout.Width(19), GUILayout.Height(14)))
+                    {
+                        bubbleType = BubbleTypes.Where(b => bubbleType.Next == b.Identifier).FirstOrDefault();
+                    }
 
                     EditorGUIUtility.labelWidth = GUI.skin.label.CalcSize(new GUIContent(TC.get("ConversationEditor.Line"))).x;
-                    myNode.getLine(i).setText(EditorGUILayout.TextField(TC.get("ConversationEditor.Line"), myNode.getLine(i).getText(), GUILayout.Width(200)));
+                    line.setText(EditorGUILayout.TextField(TC.get("ConversationEditor.Line"), line.getText(), GUILayout.Width(200)));
 
-                    tmpTex = (myNode.getLine(i).getConditions().getConditionsList().Count > 0
+                    // Bubble type reinsert
+                    if (bubbleType.Identifier != "-")
+                        line.setText("#" + bubbleType.Identifier + " " + line.getText());
+
+                    tmpTex = (line.getConditions().getConditionsList().Count > 0
                         ? conditionsTex
                         : noConditionsTex);
 
                     if (GUILayout.Button(tmpTex, noBackgroundSkin.button, GUILayout.Width(15), GUILayout.Height(15)))
                     {
                         ConditionEditorWindow window = (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
-                        window.Init(myNode.getLine(i).getConditions());
+                        window.Init(line.getConditions());
                     }
 
                     if (GUILayout.Button("X", closeStyle, GUILayout.Width(15), GUILayout.Height(15)))
