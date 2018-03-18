@@ -8,6 +8,7 @@ using RAGE.Analytics;
 using RAGE.Analytics.Formats;
 using System.Linq;
 using System.Text.RegularExpressions;
+using UnityEngine.EventSystems;
 
 namespace uAdventure.Runner
 {
@@ -16,7 +17,7 @@ namespace uAdventure.Runner
         GAME_SELECTION, LOADING_GAME, NOTHING, TALK_PLAYER, TALK_CHARACTER, OPTIONS_MENU, ANSWERS_MENU
     }
 
-    public class Game : MonoBehaviour
+    public class Game : MonoBehaviour, IPointerClickHandler
     {
 
         //#################################################################
@@ -50,6 +51,7 @@ namespace uAdventure.Runner
         Interactuable next_interaction = null;
         IRunnerChapterTarget runnerTarget;
         GameState game_state;
+        uAdventureRaycaster uAdventureRaycaster;
 
         public GUISkin Style
         {
@@ -155,13 +157,30 @@ namespace uAdventure.Runner
             else
                 RunTarget(scene_name);
 
+            uAdventureRaycaster = FindObjectOfType<uAdventureRaycaster>();
+            if (!uAdventureRaycaster)
+            {
+                Debug.LogError("No uAdventure raycaster was found in the scene!");
+            }
+
             TimerController.Instance.Timers = GameState.getTimers();
             TimerController.Instance.Run();
         }
 
+
+        public void OnPointerClick(PointerEventData eventData)
+        {
+            if (next_interaction != null && guistate != guiState.ANSWERS_MENU)
+            {
+                Interacted();
+            }
+        }
+
+        private bool mouseDownDisabled = true;
+
         void Update()
         {
-            if (Input.GetMouseButtonDown(0))
+            if (!mouseDownDisabled  && Input.GetMouseButtonDown(0))
             {
                 if (Time.timeScale == 1)
                 {
@@ -171,19 +190,36 @@ namespace uAdventure.Runner
                     }
                     else if (guistate == guiState.NOTHING)
                     {
-                        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                        List<RaycastHit> hits = new List<RaycastHit>(Physics.RaycastAll(ray));
-                        //hits.Reverse ();
-
-                        bool no_interaction = true;
-                        foreach (RaycastHit hit in hits)
+                        // Aux func to avoid repeating code
+                        System.Func<Interactuable, bool> InteractAndTrack = (interacted) =>
                         {
-                            Interactuable interacted = hit.transform.GetComponent<Interactuable>();
                             if (interacted != null && InteractWith(interacted))
                             {
                                 trackInteraction(interacted);
-                                no_interaction = false;
-                                break;
+                                return true;
+                            }
+                            return false;
+                        };
+
+                        bool no_interaction = true;
+
+                        // UI Interactuable elements
+                        if (EventSystem.current.IsPointerOverGameObject())
+                        {
+                            no_interaction = !InteractAndTrack(EventSystem.current.currentSelectedGameObject.GetComponent<Interactuable>());
+                        }
+
+                        // Physical interactuable elements
+                        if (no_interaction)
+                        {
+                            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                            List<RaycastHit> hits = new List<RaycastHit>(Physics.RaycastAll(ray));
+
+                            foreach (RaycastHit hit in hits)
+                            {
+                                no_interaction = !InteractAndTrack(hit.transform.GetComponent<Interactuable>());
+                                if (!no_interaction)
+                                    break;
                             }
                         }
 
@@ -233,12 +269,14 @@ namespace uAdventure.Runner
 
         public bool Execute(Interactuable interactuable)
         {
-            MenuMB.Instance.hide(true);
             if (interactuable.Interacted() == InteractuableResult.REQUIRES_MORE_INTERACTION)
             {
                 this.next_interaction = interactuable;
+                uAdventureRaycaster.Override = this.gameObject;
                 return true;
             }
+            if(uAdventureRaycaster.Override == this.gameObject)
+                uAdventureRaycaster.Override = null;
             return false;
         }
 
@@ -306,7 +344,7 @@ namespace uAdventure.Runner
         {
             switch (with.GetType().ToString())
             {
-                case "ActiveAreaMB": Tracker.T.trackedGameObject.Interacted(((ActiveAreaMB)with).aaData.getId(), GameObjectTracker.TrackedGameObject.Npc); break;
+                case "ActiveAreaMB": Tracker.T.trackedGameObject.Interacted(((ActiveAreaMB)with).Element.getId(), GameObjectTracker.TrackedGameObject.Npc); break;
                 case "CharacterMB": Tracker.T.trackedGameObject.Interacted(((Representable)with).Element.getId(), GameObjectTracker.TrackedGameObject.Npc); break;
                 case "ObjectMB": Tracker.T.trackedGameObject.Interacted(((Representable)with).Element.getId(), GameObjectTracker.TrackedGameObject.Item); break;
             }
@@ -364,13 +402,13 @@ namespace uAdventure.Runner
         //#################################################################
         //#################################################################
         #region Misc
-        public void showActions(List<Action> actions, Vector2 position/*, SceneElement shower = null*/)
+        public void showActions(List<Action> actions, Vector2 position, IActionReceiver actionReceiver = null)
         {
             Vector3 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             var mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
             MenuMB.Instance.transform.position = new Vector3(pos.x, pos.y, pos.z) + mouseRay.direction.normalized * 10;
             MenuMB.Instance.transform.rotation = Camera.main.transform.rotation;
-            MenuMB.Instance.setActions(actions);
+            MenuMB.Instance.setActions(actions, actionReceiver);
             MenuMB.Instance.show();
             // TODO why isnt position used?
             //this.clicked_on = position;
@@ -450,5 +488,19 @@ namespace uAdventure.Runner
             }
         }
         #endregion Misc
+
+
+
+
+        public delegate void SetCharacterCallback(bool success);
+
+        public void SetCharacterTo(CharacterInfo character, SetCharacterCallback callback)
+        {
+
+
+
+            callback(true);
+        }
+
     }
 }

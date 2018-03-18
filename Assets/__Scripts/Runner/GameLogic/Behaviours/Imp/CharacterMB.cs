@@ -5,10 +5,11 @@ using System.Collections.Generic;
 using uAdventure.Core;
 using RAGE.Analytics;
 using RAGE.Analytics.Formats;
+using UnityEngine.EventSystems;
 
 namespace uAdventure.Runner
 {
-    public class CharacterMB : Representable, Interactuable
+    public class CharacterMB : Representable, Interactuable, IPointerClickHandler
     {
         /*  ## ANIMATION METHOD ##
          * 
@@ -48,7 +49,7 @@ namespace uAdventure.Runner
             this.interactable = state;
         }
 
-        public InteractuableResult Interacted(RaycastHit hit = default(RaycastHit))
+        public InteractuableResult Interacted(PointerEventData pointerData = null)
         {
             InteractuableResult res = InteractuableResult.IGNORES;
 
@@ -96,6 +97,9 @@ namespace uAdventure.Runner
             return res;
         }
 
-
+        public void OnPointerClick(PointerEventData eventData)
+        {
+            Interacted(eventData);
+        }
     }
 }

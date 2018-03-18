@@ -7,17 +7,25 @@ namespace uAdventure.Runner
 {
     public class AtrezzoMB : Representable
     {
-
         protected override void Start()
         {
             base.Start();
             base.setTexture(Atrezzo.RESOURCE_TYPE_IMAGE);
             base.Positionate();
-        }
 
-        // Update is called once per frame
-        protected override void Update()
-        {
+            // Disable any kind of colliders
+
+            var collider = GetComponent<Collider>();
+            if (collider)
+            {
+                collider.enabled = false;
+            }
+
+            var collider2d = GetComponent<Collider2D>();
+            if (collider2d)
+            {
+                collider2d.enabled = false;
+            }
 
         }
     }

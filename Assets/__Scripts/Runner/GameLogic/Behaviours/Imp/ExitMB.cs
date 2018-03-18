@@ -4,10 +4,12 @@ using System.Collections;
 using uAdventure.Core;
 using RAGE.Analytics;
 using RAGE.Analytics.Formats;
+using System;
+using UnityEngine.EventSystems;
 
 namespace uAdventure.Runner
 {
-    public class ExitMB : MonoBehaviour, Interactuable
+    public class ExitMB : Area, Interactuable, IPointerClickHandler
     {
 
         private Exit ed;
@@ -16,29 +18,14 @@ namespace uAdventure.Runner
             get { return ed; }
             set { ed = value; }
         }
-        
 
-        // Use this for initialization
-        void Start()
-        {
-
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-
-        }
-
-        public void exit()
+        public void Exit()
         {
             //Game.Instance.hideMenu ();
             if (!Game.Instance.GameState.isFirstPerson())
             { 
                 // move player to influence area
             }
-
-
 
             if (ConditionChecker.check(ed.getConditions()))
             {
@@ -84,18 +71,6 @@ namespace uAdventure.Runner
             Tracker.T.RequestFlush();
         }
 
-        void OnMouseEnter()
-        {
-            GUIManager.Instance.showHand(true);
-            interactable = true;
-        }
-
-        void OnMouseExit()
-        {
-            GUIManager.Instance.showHand(false);
-            interactable = false;
-        }
-
         bool interactable = false;
         public bool canBeInteracted()
         {
@@ -107,10 +82,15 @@ namespace uAdventure.Runner
             this.interactable = state;
         }
 
-        public InteractuableResult Interacted(RaycastHit hit = new RaycastHit())
+        public InteractuableResult Interacted(PointerEventData pointerData = null)
         {
-            exit();
+            Exit();
             return InteractuableResult.DOES_SOMETHING;
+        }
+
+        public void OnPointerClick(PointerEventData eventData)
+        {
+            Interacted(eventData);
         }
     }
 }

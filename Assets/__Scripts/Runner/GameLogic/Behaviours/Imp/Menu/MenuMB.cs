@@ -8,22 +8,26 @@ namespace uAdventure.Runner
 {
     public class MenuMB : MonoBehaviour
     {
-        private enum Quadrant { MIDDLE, TOP, TOP_RIGHT, RIGHT, BOTTOM_RIGHT, BOTTOM, BOTTOM_LEFT, LEFT, TOP_LEFT };
-        private enum Fading { FADE_IN, FADE_OUT, NONE };
-        Fading fading = Fading.NONE;
-        Quadrant quadrant = Quadrant.TOP;
-
+#region Singleton
         static MenuMB instance;
 
         public static MenuMB Instance
         {
             get { return instance; }
         }
+#endregion
 
-        public GameObject Option_Prefab;
-        private List<Action> actions;
+        private enum Quadrant { MIDDLE, TOP, TOP_RIGHT, RIGHT, BOTTOM_RIGHT, BOTTOM, BOTTOM_LEFT, LEFT, TOP_LEFT };
+        private enum Fading { FADE_IN, FADE_OUT, NONE };
         
-        float alpha = 0f;
+        public GameObject Option_Prefab;
+
+        private Fading fading = Fading.NONE;
+        private Quadrant quadrant = Quadrant.TOP;
+        private List<Action> actions;
+        private float alpha = 0f;
+        private IActionReceiver receiver;
+
         void Awake()
         {
             MenuMB.instance = this;
@@ -101,10 +105,11 @@ namespace uAdventure.Runner
             }
         }
 
-        public void setActions(List<Action> actions)
+        public void setActions(List<Action> actions, IActionReceiver receiver = null)
         {
             this.actions = actions;
             this.quadrant = getQuadrant();
+            this.receiver = receiver;
             regenerate();
         }
 
@@ -156,21 +161,19 @@ namespace uAdventure.Runner
                     break;
             }
 
-
-
             float angle = (available_angles_max - available_angles_min) / (actions.Count - complete), current_angle = available_angles_min;
-
-
+            
             foreach (Action action in actions)
             {
                 GameObject option = GameObject.Instantiate(Option_Prefab);
-                option.GetComponent<OptionMB>().setAction(action);
+                var optionMB = option.GetComponent<OptionMB>();
+                optionMB.setAction(action, receiver);
                 option.transform.parent = this.transform;
                 option.transform.localPosition = new Vector3(0, 0, 0);
                 option.transform.localScale = new Vector3(1f, 1f, 1f);
                 option.transform.localRotation = Quaternion.Euler(Vector3.zero);
                 Vector2 v = new Vector2(Mathf.Cos(current_angle) / 1.5f, Mathf.Sin(current_angle) / 1.5f);
-                option.GetComponent<OptionMB>().moveTo(v);
+                optionMB.moveTo(v);
                 current_angle += angle;
             }
         }

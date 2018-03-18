@@ -6,10 +6,11 @@ using uAdventure.Core;
 using RAGE.Analytics;
 using System;
 using RAGE.Analytics.Formats;
+using UnityEngine.EventSystems;
 
 namespace uAdventure.Runner
 {
-    public class SceneMB : MonoBehaviour, IRunnerChapterTarget
+    public class SceneMB : MonoBehaviour, IRunnerChapterTarget, IPointerClickHandler
     {
 
         public GameObject Exit_Prefab, ActiveArea_Prefab, Character_Prefab, Object_Prefab, Atrezzo_Prefab, Player_Prefab;
@@ -303,7 +304,7 @@ namespace uAdventure.Runner
             GameObject ret = GameObject.Instantiate(base_prefab);
             Transform trans = ret.GetComponent<Transform>();
             if (parent == ActiveAreas)
-                ret.GetComponent<ActiveAreaMB>().aaData = (ActiveArea)context;
+                ret.GetComponent<ActiveAreaMB>().Element = (ActiveArea)context;
             else if (parent == Exits)
                 ret.GetComponent<ExitMB>().exitData = (Exit)context;
 
@@ -324,7 +325,7 @@ namespace uAdventure.Runner
             this.interactuable = state;
         }
 
-        public InteractuableResult Interacted(RaycastHit hit = default(RaycastHit))
+        public InteractuableResult Interacted(PointerEventData pointerData = null)
         {
             Effects e;
 
@@ -335,7 +336,7 @@ namespace uAdventure.Runner
                 case GeneralScene.GeneralSceneSceneType.SCENE:
                     if (!Game.Instance.GameState.isFirstPerson())
                     {
-                        PlayerMB.Instance.move(trajectory.route(PlayerMB.Instance.getPosition(), trajectory.closestPoint(Camera.main.ScreenToWorldPoint(Input.mousePosition))));
+                        PlayerMB.Instance.move(trajectory.route(PlayerMB.Instance.getPosition(), trajectory.closestPoint(Camera.main.ScreenToWorldPoint(pointerData.position))));
                     }
                     break;
                 case GeneralScene.GeneralSceneSceneType.SLIDESCENE:
@@ -420,6 +421,12 @@ namespace uAdventure.Runner
             this.transform.Find("Background").GetComponent<MeshRenderer>().material = new Material(Shader.Find("Diffuse"));
             this.transform.Find("Background").GetComponent<MeshRenderer>().material.mainTexture = movie.Movie;
             //sound.clip = movie.audioClip;
+        }
+        
+
+        public void OnPointerClick(PointerEventData eventData)
+        {
+            Interacted(eventData);
         }
     }
 }

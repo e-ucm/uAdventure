@@ -2,6 +2,7 @@
 using System.Collections;
 
 using uAdventure.Core;
+using UnityEngine.EventSystems;
 
 namespace uAdventure.Runner
 {
@@ -12,7 +13,7 @@ namespace uAdventure.Runner
 
     public interface Interactuable
     {
-        InteractuableResult Interacted(RaycastHit hit = new RaycastHit());
+        InteractuableResult Interacted(PointerEventData pointerData = null);
         bool canBeInteracted();
         void setInteractuable(bool state);
     }

@@ -3,10 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 
 using uAdventure.Core;
+using UnityEngine.EventSystems;
 
 namespace uAdventure.Runner
 {
-    public class ButtonMB : MonoBehaviour, Interactuable
+    public class ButtonMB : MonoBehaviour, Interactuable, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
     {
 
 
@@ -22,6 +23,8 @@ namespace uAdventure.Runner
             }
             get { return this.action; }
         }
+
+        public IActionReceiver Receiver { get; set; }
 
         bool showText = false;
 
@@ -69,37 +72,7 @@ namespace uAdventure.Runner
             this.GetComponent<Renderer>().material.mainTexture = tmp;
             this.transform.localScale = new Vector3(tmp.width / 75f, tmp.height / 75f, 1);
         }
-
-        // Update is called once per frame
-        void Update()
-        {
-
-        }
-
-        void OnMouseEnter()
-        {
-            showText = true;
-            transform.parent.GetComponent<OptionMB>().Highlight = true;
-            if (this.action.getType() == Action.CUSTOM)
-                GetComponent<Renderer>().material.mainTexture = Game.Instance.ResourceManager.getImage(resource.getAssetPath("buttonOver"));
-            else
-                GetComponent<Renderer>().material.mainTexture = Game.Instance.ResourceManager.getImage(resource.getAssetPath(DescriptorData.HIGHLIGHTED_BUTTON));
-
-            GUIManager.Instance.showHand(true);
-        }
-
-        void OnMouseExit()
-        {
-            showText = false;
-            transform.parent.GetComponent<OptionMB>().Highlight = false;
-            if (this.action.getType() == Action.CUSTOM)
-                GetComponent<Renderer>().material.mainTexture = Game.Instance.ResourceManager.getImage(resource.getAssetPath("buttonNormal"));
-            else
-                GetComponent<Renderer>().material.mainTexture = Game.Instance.ResourceManager.getImage(resource.getAssetPath(DescriptorData.NORMAL_BUTTON));
-
-            GUIManager.Instance.showHand(false);
-        }
-
+        
         bool interactable = false;
         public bool canBeInteracted()
         {
@@ -111,9 +84,17 @@ namespace uAdventure.Runner
             this.interactable = state;
         }
 
-        public InteractuableResult Interacted(RaycastHit hit = new RaycastHit())
+        public InteractuableResult Interacted(PointerEventData eventData = null)
         {
-            Game.Instance.Execute(new EffectHolder(action.getEffects()));
+            MenuMB.Instance.hide(true);
+            if (Receiver != null)
+            {
+                Receiver.ActionSelected(action);
+            }
+            else
+            {
+                Game.Instance.Execute(new EffectHolder(action.getEffects()));
+            }
             return InteractuableResult.DOES_SOMETHING;
         }
 
@@ -125,6 +106,35 @@ namespace uAdventure.Runner
                 GUILayout.Label(actionName, Game.Instance.Style.label);
                 GUILayout.EndArea();
             }
+        }
+
+        public void OnPointerClick(PointerEventData eventData)
+        {
+            Interacted(eventData);
+        }
+
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            showText = true;
+            transform.parent.GetComponent<OptionMB>().Highlight = true;
+            if (this.action.getType() == Action.CUSTOM)
+                GetComponent<Renderer>().material.mainTexture = Game.Instance.ResourceManager.getImage(resource.getAssetPath("buttonOver"));
+            else
+                GetComponent<Renderer>().material.mainTexture = Game.Instance.ResourceManager.getImage(resource.getAssetPath(DescriptorData.HIGHLIGHTED_BUTTON));
+
+            GUIManager.Instance.showHand(true);
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            showText = false;
+            transform.parent.GetComponent<OptionMB>().Highlight = false;
+            if (this.action.getType() == Action.CUSTOM)
+                GetComponent<Renderer>().material.mainTexture = Game.Instance.ResourceManager.getImage(resource.getAssetPath("buttonNormal"));
+            else
+                GetComponent<Renderer>().material.mainTexture = Game.Instance.ResourceManager.getImage(resource.getAssetPath(DescriptorData.NORMAL_BUTTON));
+
+            GUIManager.Instance.showHand(false);
         }
     }
 }

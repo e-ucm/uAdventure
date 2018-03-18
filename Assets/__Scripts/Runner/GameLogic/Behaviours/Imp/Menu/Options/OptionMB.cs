@@ -21,9 +21,11 @@ namespace uAdventure.Runner
         {
         }
 
-        public void setAction(Action action)
+        public void setAction(Action action, IActionReceiver actionReceiver = null)
         {
-            this.button.GetComponent<ButtonMB>().Action = action;
+            var buttonMB = this.button.GetComponent<ButtonMB>();
+            buttonMB.Action = action;
+            buttonMB.Receiver = actionReceiver;
         }
 
 

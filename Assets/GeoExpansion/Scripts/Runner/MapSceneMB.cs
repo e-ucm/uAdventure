@@ -8,6 +8,7 @@ using MapzenGo.Models;
 using UnityStandardAssets.Characters.ThirdPerson;
 using MapzenGo.Helpers;
 using RAGE.Analytics;
+using UnityEngine.EventSystems;
 
 namespace uAdventure.Geo
 {
@@ -54,7 +55,7 @@ namespace uAdventure.Geo
             DestroyImmediate(this.gameObject);
         }
 
-        public InteractuableResult Interacted(RaycastHit hit = default(RaycastHit))
+        public InteractuableResult Interacted(PointerEventData pointerData = null)
         {
             return InteractuableResult.IGNORES;
         }

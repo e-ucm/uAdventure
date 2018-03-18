@@ -116,7 +116,7 @@ namespace uAdventure.Runner
             {
                 bubble.GetComponent<Bubble>().destroy();
             }
-            if (data.Line[0] == '#')
+            if (data.Line.Length > 0 && data.Line[0] == '#')
             {
                 if (data.Line[1] == 'O')
                 {

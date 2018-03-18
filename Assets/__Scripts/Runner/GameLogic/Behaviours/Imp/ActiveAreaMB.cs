@@ -4,14 +4,14 @@ using System.Collections.Generic;
 using LibTessDotNet;
 
 using uAdventure.Core;
+using UnityEngine.EventSystems;
 
 namespace uAdventure.Runner
 {
-    public class ActiveAreaMB : MonoBehaviour, Interactuable
+    public class ActiveAreaMB : Area, Interactuable, IPointerClickHandler
     {
-
         private ActiveArea aad;
-        public ActiveArea aaData
+        public ActiveArea Element
         {
             get { return aad; }
             set { aad = value; }
@@ -27,18 +27,6 @@ namespace uAdventure.Runner
             adaptate();
         }
 
-        void OnMouseEnter()
-        {
-            GUIManager.Instance.showHand(true);
-            interactable = true;
-        }
-
-        void OnMouseExit()
-        {
-            GUIManager.Instance.showHand(false);
-            interactable = false;
-        }
-
         bool interactable = false;
         public bool canBeInteracted()
         {
@@ -50,7 +38,7 @@ namespace uAdventure.Runner
             this.interactable = state;
         }
 
-        public InteractuableResult Interacted(RaycastHit hit = new RaycastHit())
+        public InteractuableResult Interacted(PointerEventData eventData)
         {
             InteractuableResult ret = InteractuableResult.IGNORES;
 
@@ -119,7 +107,7 @@ namespace uAdventure.Runner
                         {
                             Action ex = new Action(Action.EXAMINE);
                             Effects exeff = new Effects();
-                            exeff.add(new SpeakPlayerEffect(desc));
+                            exeff.Add(new SpeakPlayerEffect(desc));
                             ex.setEffects(exeff);
                             available.Add(ex);
                         }
@@ -205,6 +193,11 @@ namespace uAdventure.Runner
                 this.GetComponent<MeshFilter>().sharedMesh = mesh;
                 this.GetComponent<MeshCollider>().sharedMesh = mesh;
             }
+        }
+
+        public void OnPointerClick(PointerEventData eventData)
+        {
+            Interacted(eventData);
         }
     }
 }
