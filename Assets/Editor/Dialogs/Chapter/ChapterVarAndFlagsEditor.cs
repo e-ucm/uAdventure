@@ -4,6 +4,10 @@ using System.Collections;
 
 using uAdventure.Core;
 using System;
+using System.Collections.Generic;
+using UnityEditorInternal;
+using System.Linq;
+using uAdventure.Runner;
 
 namespace uAdventure.Editor
 {
@@ -18,21 +22,13 @@ namespace uAdventure.Editor
         private Texture2D flagsTex = null;
         private Texture2D varTex = null;
 
-        private Rect contentRect, addDeleteButtonRect;
-
-        private static GUISkin defaultSkin;
-        private static GUISkin noBackgroundSkin;
-        private static GUISkin selectedButtonSkin;
-        private static GUISkin selectedAreaSkin;
-
-        private int selectedObject = -1;
-
-        private Vector2 scrollPosition;
-
         private WindowType openedWindow;
 
         public static ChapterVarAndFlagsEditor s_DrawerParametersMenu;
         private static long s_LastClosedTime;
+
+        private ColumnList variablesAndFlagsList;
+        private string filter;
 
         internal static bool ShowAtPosition(Rect buttonRect)
         {
@@ -70,216 +66,179 @@ namespace uAdventure.Editor
 			window.Show();
 		}
 
+        bool inited = false;
+
         public void OnEnable()
         {
+            inited = false;
 			if(!flagsTex)
 				flagsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/flag16", typeof(Texture2D));
 			if(!varTex)
             	varTex = (Texture2D)Resources.Load("EAdventureData/img/icons/vars", typeof(Texture2D));
 
-			if(!selectedButtonSkin)
-				selectedButtonSkin = (GUISkin)Resources.Load("Editor/ButtonSelected", typeof(GUISkin));
-			if(!noBackgroundSkin)
-				noBackgroundSkin = (GUISkin)Resources.Load("Editor/EditorNoBackgroundSkin", typeof(GUISkin));
-			if(!selectedAreaSkin)
-            	selectedAreaSkin = (GUISkin)Resources.Load("Editor/EditorLeftMenuItemSkinConcreteOptions", typeof(GUISkin));
+            variablesAndFlagsList = new ColumnList(new List<int>(), typeof(int))
+            {
+                Columns = new List<ColumnList.Column>()
+                {
+                    new ColumnList.Column(), new ColumnList.Column() { SizeOptions = new GUILayoutOption[] { GUILayout.Width(80) } }
+                },
+                drawCell = (rect, row, column, isActive, isFocused) =>
+                {
+                    // The list is only storing indexes
+                    var index = (int)variablesAndFlagsList.list[row];
+                    var elem = "";
+                    switch (openedWindow)
+                    {
+                        case WindowType.FLAGS: elem = Controller.Instance.VarFlagSummary.getFlag(index); break;
+                        case WindowType.VARS: elem = Controller.Instance.VarFlagSummary.getVar(index); break;
+                    }
 
+                    switch (column)
+                    {
+                        case 0:
+                            EditorGUI.LabelField(rect, elem);
+                            break;
+                        case 1:
+                            object value = 0;
+                            if (Application.isPlaying)
+                            {
+                                switch (openedWindow)
+                                {
+                                    case WindowType.FLAGS: value = Game.Instance.GameState.checkFlag(elem) == 1 ? "inactive" : "active"; break;
+                                    case WindowType.VARS: value = Game.Instance.GameState.getVariable(elem); break;
+                                }
+                            }
+                            else
+                            {
+                                switch (openedWindow)
+                                {
+                                    case WindowType.FLAGS: value = Controller.Instance.VarFlagSummary.getFlagReferences(index); break;
+                                    case WindowType.VARS: value = Controller.Instance.VarFlagSummary.getVarReferences(index); break;
+                                }
+                            }
+                            EditorGUI.LabelField(rect, value.ToString());
+                            break;
+                    }
+                },
+                onRemoveCallback = OnDeleteClicked,
+                onAddCallback = OnAddCliked,
+                draggable = false
+            };
+        }
+
+        private void Update()
+        {
         }
 
         void OnGUI()
         {
-			var windowWidth = position.width;
-			var windowHeight = position.height;
+            var windowWidth = position.width;
+            var windowHeight = position.height;
 
-			contentRect = new Rect(0f, 0.1f * windowHeight, windowWidth, 0.7f * windowHeight);
-			addDeleteButtonRect = new Rect(0f, 0.8f * windowHeight, windowWidth, 0.15f * windowHeight);
+            // Initialization
+            if (!inited)
+            {
+                if (Controller.Instance.Loaded)
+                {
+                    RefreshList();
+                    inited = true;
+                }
+            }
+            
             /*
             * Upper buttons
             */
-            GUILayout.BeginHorizontal();
-            if (openedWindow == WindowType.FLAGS)
-            {
-                GUI.skin = selectedButtonSkin;
-            }
-            if (GUILayout.Button(new GUIContent(TC.get("Flags.Title"), flagsTex), GUILayout.MaxHeight(0.08f * windowHeight)))
-            {
-                if (openedWindow == WindowType.VARS)
-                    OnWindowTypeChanged();
-            }
-            GUI.skin = defaultSkin;
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+            EditorGUI.BeginChangeCheck();
+            openedWindow = (WindowType) GUILayout.Toolbar((int)openedWindow, new GUIContent[] { new GUIContent(TC.get("Flags.Title"), flagsTex), new GUIContent(TC.get("Vars.Title"), varTex) });
+            GUILayout.FlexibleSpace();
+            EditorGUILayout.EndHorizontal();
+            filter = EditorGUILayout.TextField("Filter", filter);
+            if (EditorGUI.EndChangeCheck())
+                RefreshList();
 
-            if (openedWindow == WindowType.VARS)
-            {
-                GUI.skin = selectedButtonSkin;
-            }
-            if (GUILayout.Button(new GUIContent(TC.get("Vars.Title"), varTex), GUILayout.MaxHeight(0.08f * windowHeight)))
-            {
-                if (openedWindow == WindowType.FLAGS)
-                    OnWindowTypeChanged();
-            }
-            GUI.skin = defaultSkin;
-            GUILayout.EndHorizontal();
-
+            var height = windowHeight - GUILayoutUtility.GetLastRect().max.y - 90f;
             /*
             * Content part
             */
-            GUILayout.BeginArea(contentRect);
-            GUILayout.Space(10);
-            if (openedWindow == WindowType.FLAGS)
+            switch (openedWindow)
             {
-                GUILayout.Label(TC.get("Flags.Title"));
-                GUILayout.BeginHorizontal();
-                GUILayout.Box(TC.get("Flags.FlagName"), GUILayout.Width(0.7f * windowWidth));
-                GUILayout.Box(TC.get("Flags.FlagReferences"), GUILayout.Width(0.25f * windowWidth));
-                GUILayout.EndHorizontal();
-
-                scrollPosition = GUILayout.BeginScrollView(scrollPosition);
-                for (int i = 0; i < Controller.Instance.VarFlagSummary.getFlagCount(); i++)
-                {
-                    GUILayout.BeginHorizontal();
-                    if (selectedObject == i)
-                        GUI.skin = selectedAreaSkin;
-                    else
-                        GUI.skin = noBackgroundSkin;
-
-                    if (GUILayout.Button(Controller.Instance.VarFlagSummary.getFlag(i),
-                        GUILayout.Width(0.7f * windowWidth)))
-                    {
-                        OnSelectedObjectChange(i);
-                    }
-
-                    if (GUILayout.Button(Controller.Instance.VarFlagSummary.getFlagReferences(i).ToString(),
-                        GUILayout.Width(0.25f * windowWidth)))
-                    {
-                        OnSelectedObjectChange(i);
-                    }
-                    GUI.skin = defaultSkin;
-                    GUILayout.EndHorizontal();
-                }
-                GUILayout.EndScrollView();
+                case WindowType.FLAGS:
+                    variablesAndFlagsList.Columns[0].Text = TC.get("Flags.FlagName");
+                    variablesAndFlagsList.Columns[1].Text = Application.isPlaying ? TC.get("Conditions.Flag.State") : TC.get("Flags.FlagReferences");
+                    break;
+                case WindowType.VARS:
+                    variablesAndFlagsList.Columns[0].Text = TC.get("Vars.VarName");
+                    variablesAndFlagsList.Columns[1].Text = Application.isPlaying ? TC.get("Conditions.Var.Value") : TC.get("Vars.VarReferences");
+                    break;
             }
-            else
-            {
-                GUILayout.Label(TC.get("Vars.Title"));
-                GUILayout.BeginHorizontal();
-                GUILayout.Box(TC.get("Vars.VarName"), GUILayout.Width(0.7f * windowWidth));
-                GUILayout.Box(TC.get("Vars.VarReferences"), GUILayout.Width(0.25f * windowWidth));
-                GUILayout.EndHorizontal();
+            var playing = Application.isPlaying || EditorApplication.isPlayingOrWillChangePlaymode;
+            variablesAndFlagsList.displayAddButton = !playing;
+            variablesAndFlagsList.displayRemoveButton = !playing;
 
-                scrollPosition = GUILayout.BeginScrollView(scrollPosition);
-                for (int i = 0; i < Controller.Instance.VarFlagSummary.getVarCount(); i++)
-                {
-                    GUILayout.BeginHorizontal();
-                    if (selectedObject == i)
-                        GUI.skin = selectedAreaSkin;
-                    else
-                        GUI.skin = noBackgroundSkin;
-
-                    if (GUILayout.Button(Controller.Instance.VarFlagSummary.getVar(i),
-                        GUILayout.Width(0.7f * windowWidth)))
-                    {
-                        OnSelectedObjectChange(i);
-                    }
-
-                    if (GUILayout.Button(Controller.Instance.VarFlagSummary.getVarReferences(i).ToString(),
-                        GUILayout.Width(0.25f * windowWidth)))
-                    {
-                        OnSelectedObjectChange(i);
-                    }
-                    GUI.skin = defaultSkin;
-                    GUILayout.EndHorizontal();
-                }
-                GUILayout.EndScrollView();
-            }
-            GUILayout.EndArea();
-
-
-            /*
-            * Add/delete part
-            */
-            GUILayout.BeginArea(addDeleteButtonRect);
-            if (openedWindow == WindowType.FLAGS)
-            {
-                if (GUILayout.Button(TC.get("Flags.AddFlag")))
-                {
-                    OnAddCliked();
-                }
-
-                if (GUILayout.Button(TC.get("Flags.DeleteFlag")))
-                {
-                    OnDeleteClicked();
-                }
-            }
-            else
-            {
-                if (GUILayout.Button(TC.get("Vars.AddVar")))
-                {
-                    OnAddCliked();
-                }
-
-                if (GUILayout.Button(TC.get("Vars.DeleteVar")))
-                {
-                    OnDeleteClicked();
-                }
-            }
-            GUILayout.EndArea();
+            variablesAndFlagsList.DoList(height);
         }
 
-        void OnSelectedObjectChange(int i)
+        void OnAddCliked(ReorderableList reorderableList)
         {
-            selectedObject = i;
-        }
-
-        void OnWindowTypeChanged()
-        {
-            if (openedWindow == WindowType.FLAGS)
-                openedWindow = WindowType.VARS;
-            else
-                openedWindow = WindowType.FLAGS;
-
-            selectedObject = -1;
-            scrollPosition = Vector2.zero;
-        }
-
-        void OnAddCliked()
-        {
-            if (openedWindow == WindowType.FLAGS)
+            switch (openedWindow)
             {
-                ChapterFlagNameInputPopup window =
-                         (ChapterFlagNameInputPopup)ScriptableObject.CreateInstance(typeof(ChapterFlagNameInputPopup));
-                window.Init(this, "IdFlag");
-            }
-            else
-            {
-                ChapterVarNameInputPopup window =
-                         (ChapterVarNameInputPopup)ScriptableObject.CreateInstance(typeof(ChapterVarNameInputPopup));
-                window.Init(this, "IdVar");
+                case WindowType.FLAGS:
+                    CreateInstance<ChapterFlagNameInputPopup>().Init(this, "IdFlag");
+                    break;
+                case WindowType.VARS:
+                    CreateInstance<ChapterVarNameInputPopup>().Init(this, "IdVar");
+                    break;
             }
         }
 
-        void OnDeleteClicked()
+        void OnDeleteClicked(ReorderableList reorderableList)
         {
-            if (selectedObject >= 0)
+            if (reorderableList.index >= 0)
             {
-                if (openedWindow == WindowType.FLAGS)
+                var selected = (int)reorderableList.list[reorderableList.index];
+                var summary = Controller.Instance.VarFlagSummary;
+                switch (openedWindow)
                 {
-                    Controller.Instance                        .VarFlagSummary                        .deleteFlag(Controller.Instance.VarFlagSummary.getFlag(selectedObject));
+                    case WindowType.FLAGS:
+                        summary.deleteFlag(Controller.Instance.VarFlagSummary.getFlag(selected));
+                        break;
+                    case WindowType.VARS:
+                        summary.deleteVar(Controller.Instance.VarFlagSummary.getVar(selected));
+                        break;
                 }
-                else
-                {
-                    Controller.Instance                        .VarFlagSummary                        .deleteVar(Controller.Instance.VarFlagSummary.getVar(selectedObject));
-                }
-                selectedObject = -1;
             }
+            RefreshList();
         }
 
         public void OnDialogOk(string message, object workingObject = null, object workingObjectSecond = null)
         {
-            if (workingObject is ChapterFlagNameInputPopup)
-                Controller.Instance                    .VarFlagSummary.addFlag(message);
+            var summary = Controller.Instance.VarFlagSummary;
+            if (workingObject is ChapterFlagNameInputPopup)     summary.addFlag(message);
+            else if (workingObject is ChapterVarNameInputPopup) summary.addVar(message);
 
-            else if (workingObject is ChapterVarNameInputPopup)
-                Controller.Instance                    .VarFlagSummary.addVar(message);
+            RefreshList();
+        }
+
+        private void RefreshList()
+        {
+            var summary = Controller.Instance.VarFlagSummary;
+            Func<int, bool> filterFunc = (_) => true;
+            IEnumerable<int> indexes = new List<int>();
+            switch (openedWindow)
+            {
+                case WindowType.FLAGS:
+                    indexes = Enumerable.Range(0, summary.getFlagCount());
+                    filterFunc = (i) => summary.getFlag(i).ToLowerInvariant().Contains(filter.ToLowerInvariant());
+                    break;
+                case WindowType.VARS:
+                    indexes = Enumerable.Range(0, summary.getVarCount());
+                    filterFunc = (i) => summary.getVar(i).ToLowerInvariant().Contains(filter.ToLowerInvariant());
+                    break;
+            }
+            variablesAndFlagsList.list = string.IsNullOrEmpty(filter) ? indexes.ToList() : indexes.Where(filterFunc).ToList();
+            this.Repaint();
         }
 
         public void OnDialogCanceled(object workingObject = null)
