@@ -65,13 +65,13 @@ namespace uAdventure.Editor
             }
 
             // Append the effects (if avalaible)
-            if (!timer.getEffects().isEmpty())
+            if (!timer.getEffects().IsEmpty())
             {
                 conditionsAndEffects.Add(EffectsDOMWriter.EFFECTS, timer.getEffects());
             }
 
             // Append the post-effects (if avalaible)
-            if (!timer.getPostEffects().isEmpty())
+            if (!timer.getPostEffects().IsEmpty())
             {
                 conditionsAndEffects.Add(EffectsDOMWriter.POST_EFFECTS, timer.getPostEffects());
             }

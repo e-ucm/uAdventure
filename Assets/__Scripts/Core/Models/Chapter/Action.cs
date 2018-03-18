@@ -10,6 +10,7 @@ namespace uAdventure.Core
 
     public class Action : Documented, HasTargetId, ICloneable
     {
+        public Effects Effects { get { return effects; } set { effects = value; } }
 
         /**
          * An action of type examine.

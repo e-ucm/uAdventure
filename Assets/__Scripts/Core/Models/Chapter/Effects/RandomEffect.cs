@@ -15,12 +15,12 @@ namespace uAdventure.Core
         /**
              * Effect to be triggered PROBABILITY% of the times
              */
-        private AbstractEffect positiveEffect;
+        private IEffect positiveEffect;
 
         /**
          * Effect to be triggered 100-PROBABILITY% of the times
          */
-        private AbstractEffect negativeEffect;
+        private IEffect negativeEffect;
 
         /**
          * Probability in range 0%-100%
@@ -54,7 +54,7 @@ namespace uAdventure.Core
          * @param positiveEffect
          *            the positiveEffect to set
          */
-        public void setPositiveEffect(AbstractEffect positiveEffect)
+        public void setPositiveEffect(IEffect positiveEffect)
         {
 
             this.positiveEffect = positiveEffect;
@@ -64,7 +64,7 @@ namespace uAdventure.Core
          * @param negativeEffect
          *            the negativeEffect to set
          */
-        public void setNegativeEffect(AbstractEffect negativeEffect)
+        public void setNegativeEffect(IEffect negativeEffect)
         {
 
             this.negativeEffect = negativeEffect;
@@ -92,7 +92,7 @@ namespace uAdventure.Core
         /**
          * @return the positiveEffect
          */
-        public AbstractEffect getPositiveEffect()
+        public IEffect getPositiveEffect()
         {
 
             return positiveEffect;
@@ -101,7 +101,7 @@ namespace uAdventure.Core
         /**
          * @return the negativeEffect
          */
-        public AbstractEffect getNegativeEffect()
+        public IEffect getNegativeEffect()
         {
 
             return negativeEffect;

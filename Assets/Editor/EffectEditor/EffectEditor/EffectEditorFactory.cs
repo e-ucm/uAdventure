@@ -22,8 +22,8 @@ namespace uAdventure.Editor
 
         public abstract string[] CurrentEffectEditors { get; }
         public abstract EffectEditor createEffectEditorFor(string effectName);
-        public abstract EffectEditor createEffectEditorFor(AbstractEffect effect);
-        public abstract int EffectEditorIndex(AbstractEffect effect);
+        public abstract EffectEditor createEffectEditorFor(IEffect effect);
+        public abstract int EffectEditorIndex(IEffect effect);
         public void ResetInstance()
         {
             instance = new EffectEditorFactoryImp();
@@ -70,17 +70,15 @@ namespace uAdventure.Editor
         public override EffectEditor createEffectEditorFor(string effectName)
         {
             Debug.Log("Create: " + effectName);
-            foreach (EffectEditor effectEditor in effectEditors)
+            var effectEditor = effectEditors.Find(e => e.EffectName.Equals(effectName, System.StringComparison.InvariantCultureIgnoreCase));
+            if (effectEditor != null)
             {
-                if (effectEditor.EffectName.ToLower() == effectName.ToLower())
-                {
-                    return effectEditor.clone();
-                }
+                return effectEditor.clone();
             }
             return null;
         }
 
-        public override EffectEditor createEffectEditorFor(AbstractEffect effect)
+        public override EffectEditor createEffectEditorFor(IEffect effect)
         {
             foreach (EffectEditor effectEditor in effectEditors)
                 if (effectEditor.manages(effect))
@@ -89,7 +87,7 @@ namespace uAdventure.Editor
             return null;
         }
 
-        public override int EffectEditorIndex(AbstractEffect effect)
+        public override int EffectEditorIndex(IEffect effect)
         {
 
             int i = 0;

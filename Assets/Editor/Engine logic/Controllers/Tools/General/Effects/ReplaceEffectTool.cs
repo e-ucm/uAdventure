@@ -11,20 +11,20 @@ namespace uAdventure.Editor
 
         protected Effects effects;
 
-        protected AbstractEffect effect;
+        protected IEffect effect;
 
         protected Dictionary<int, System.Object> newProperties;
 
-        protected AbstractEffect oldEffect;
+        protected IEffect oldEffect;
 
-        protected AbstractEffect pos;
+        protected IEffect pos;
 
-        protected AbstractEffect neg;
+        protected IEffect neg;
 
-        public ReplaceEffectTool(Effects effects, AbstractEffect effect, Dictionary<int, System.Object> newProperties) : this(effects, effect, newProperties, null, null)
+        public ReplaceEffectTool(Effects effects, IEffect effect, Dictionary<int, System.Object> newProperties) : this(effects, effect, newProperties, null, null)
         { }
 
-        public ReplaceEffectTool(Effects effects, AbstractEffect effect, Dictionary<int, System.Object> newProperties, AbstractEffect pos, AbstractEffect neg)
+        public ReplaceEffectTool(Effects effects, IEffect effect, Dictionary<int, System.Object> newProperties, IEffect pos, IEffect neg)
         {
 
             this.effects = effects;
@@ -63,7 +63,7 @@ namespace uAdventure.Editor
             if (newProperties != null)
             {
                 effectEdited = true;
-                oldEffect = (AbstractEffect)effect;
+                oldEffect = effect;
 
                 switch (effectType)
                 {

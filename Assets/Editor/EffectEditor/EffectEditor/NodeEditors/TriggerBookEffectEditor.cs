@@ -46,7 +46,7 @@ namespace uAdventure.Editor
             EditorGUILayout.HelpBox(TC.get("TriggerBookEffect.Description"), MessageType.Info);
         }
 
-        public AbstractEffect Effect { get { return effect; } set { effect = value as TriggerBookEffect; } }
+        public IEffect Effect { get { return effect; } set { effect = value as TriggerBookEffect; } }
         public string EffectName { get { return TC.get("TriggerBookEffect.Title"); } }
 
         public bool Usable
@@ -59,7 +59,7 @@ namespace uAdventure.Editor
 
         public EffectEditor clone() { return new TriggerBookEffectEditor(); }
 
-        public bool manages(AbstractEffect c)
+        public bool manages(IEffect c)
         {
             return c.GetType() == effect.GetType();
         }

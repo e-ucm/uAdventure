@@ -51,11 +51,11 @@ namespace uAdventure.Editor
             EditorGUILayout.HelpBox(TC.get("ShowTextEffect.Title"), MessageType.Info);
         }
 
-        public AbstractEffect Effect { get { return effect; } set { effect = value as ShowTextEffect; } }
+        public IEffect Effect { get { return effect; } set { effect = value as ShowTextEffect; } }
         public string EffectName { get { return TC.get("Effect.ShowText"); } }
         public EffectEditor clone() { return new ShowTextEffectEditor(); }
 
-        public bool manages(AbstractEffect c)
+        public bool manages(IEffect c)
         {
 
             return c.GetType() == effect.GetType();

@@ -38,14 +38,14 @@ namespace uAdventure.Editor
             EditorGUILayout.HelpBox(TC.get("Effect.CancelActionInfo"), MessageType.Info);
         }
 
-        public AbstractEffect Effect { get { return effect; } set { effect = value as CancelActionEffect; } }
+        public IEffect Effect { get { return effect; } set { effect = value as CancelActionEffect; } }
         public string EffectName { get { return TC.get("Effect.CancelAction"); } }
 
         public bool Usable { get { return true; } }
 
         public EffectEditor clone() { return new CancelActionEffectEditor(); }
 
-        public bool manages(AbstractEffect c)
+        public bool manages(IEffect c)
         {
 
             return c.GetType() == effect.GetType();

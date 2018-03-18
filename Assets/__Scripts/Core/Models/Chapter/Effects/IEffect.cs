@@ -141,7 +141,7 @@ namespace uAdventure.Core
      * This interface defines any individual effect that can be triggered by a
      * player's action during the game.
      */
-    public interface Effect
+    public interface IEffect
     {
         /**
          * Returns the type of the effect.

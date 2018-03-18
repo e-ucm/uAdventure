@@ -4,7 +4,7 @@ using System.Collections;
 
 namespace uAdventure.Core
 {
-    public abstract class AbstractEffect : Effect, ICloneable
+    public abstract class AbstractEffect : IEffect, ICloneable
     {
 
         private Conditions conditions;

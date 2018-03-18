@@ -25,9 +25,9 @@ namespace uAdventure.Core
             string path = "";
             string id = "";
             bool animated = false, addeffect = true;
-            List<AbstractEffect> effectlist;
+            List<IEffect> effectlist;
 
-			AbstractEffect currentEffect = null;
+            IEffect currentEffect = null;
 
             foreach (XmlElement effect in element.ChildNodes)
             {
@@ -178,14 +178,15 @@ namespace uAdventure.Core
                     case "condition":
                         addeffect = false;
 						var currentConditions = DOMParserUtility.DOMParse (effect, parameters) as Conditions ?? new Conditions();
-                        effectlist = effects.getEffects();
-                        effectlist[effectlist.Count - 1].setConditions(currentConditions);
+                        var lastEffect = effects[effects.Count - 1] as AbstractEffect;
+                        if(lastEffect != null)
+                            lastEffect.setConditions(currentConditions);
                         break;
                     case "documentation":
                         addeffect = false;
                         break;
 				default:
-						currentEffect = DOMParserUtility.DOMParse (effect, parameters) as AbstractEffect;
+						currentEffect = DOMParserUtility.DOMParse (effect, parameters) as IEffect;
 						addeffect = currentEffect != null;
 						if(!addeffect) Debug.LogWarning("EFFECT NOT SUPPORTED: " + effect.Name);
 
@@ -193,7 +194,7 @@ namespace uAdventure.Core
                 }
 
                 if (addeffect)
-					effects.add(currentEffect);
+					effects.Add(currentEffect);
             }
 
 			return effects;

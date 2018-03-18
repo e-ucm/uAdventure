@@ -54,7 +54,7 @@ namespace uAdventure.Editor
             EditorGUILayout.HelpBox(TC.get("IncrementVarEffect.Description"), MessageType.Info);
         }
 
-        public AbstractEffect Effect { get { return effect; } set { effect = value as IncrementVarEffect; } }
+        public IEffect Effect { get { return effect; } set { effect = value as IncrementVarEffect; } }
         public string EffectName { get { return TC.get("IncrementVarEffect.Title"); } }
 
         public bool Usable
@@ -67,7 +67,7 @@ namespace uAdventure.Editor
 
         public EffectEditor clone() { return new IncrementVarEffectEditor(); }
 
-        public bool manages(AbstractEffect c)
+        public bool manages(IEffect c)
         {
 
             return c.GetType() == effect.GetType();

@@ -86,7 +86,7 @@ namespace uAdventure.Editor
                 cutsceneElement.AppendChild(cutsceneDocumentationNode);
             }
 
-            if (!cutscene.getEffects().isEmpty())
+            if (!cutscene.getEffects().IsEmpty())
             {
                 DOMWriterUtility.DOMWrite(cutsceneElement, cutscene.getEffects());
             }

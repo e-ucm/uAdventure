@@ -68,7 +68,7 @@ namespace uAdventure.Editor
             EditorGUILayout.HelpBox(TC.get("PlaySoundEffect.Description"), MessageType.Info);
         }
 
-        public AbstractEffect Effect
+        public IEffect Effect
         {
             get { return effect; }
             set { effect = value as PlaySoundEffect; }
@@ -84,7 +84,7 @@ namespace uAdventure.Editor
             return new PlaySoundEffectEditor();
         }
 
-        public bool manages(AbstractEffect c)
+        public bool manages(IEffect c)
         {
 
             return c.GetType() == effect.GetType();

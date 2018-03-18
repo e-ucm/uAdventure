@@ -78,13 +78,13 @@ namespace uAdventure.Core
             transitionType = nextScene.getTransitionType();
             destinyX = nextScene.getPositionX();
             destinyY = nextScene.getPositionY();
-            foreach (AbstractEffect effect in nextScene.getEffects().getEffects())
+            foreach (var effect in nextScene.getEffects())
             {
-                effects.add(effect);
+                effects.Add(effect);
             }
-            foreach (AbstractEffect effect in nextScene.getPostEffects().getEffects())
+            foreach (var effect in nextScene.getPostEffects())
             {
-                effects.add(effect);
+                effects.Add(effect);
             }
         }
 

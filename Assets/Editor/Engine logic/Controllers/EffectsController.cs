@@ -179,10 +179,17 @@ namespace uAdventure.Editor
             controller = Controller.Instance;
             conditionsList = new List<ConditionsController>();
             // create the list of effects controllers
-            foreach (AbstractEffect effect in
+            foreach (var effect in
                 effects.getEffects())
             {
-                conditionsList.Add(new ConditionsController(effect.getConditions(), Controller.EFFECT, getEffectInfo(effect)));
+                if(effect is AbstractEffect)
+                {
+                    conditionsList.Add(new ConditionsController((effect as AbstractEffect).getConditions(), Controller.EFFECT, getEffectInfo(effect)));
+                }
+                else
+                {
+                    conditionsList.Add(null);
+                }
             }
         }
 
@@ -222,7 +229,7 @@ namespace uAdventure.Editor
         {
             if (getEffectCount() > 0)
             {
-                AbstractEffect effect = effects.getEffects()[index];
+                IEffect effect = effects.getEffects()[index];
                 return getEffectInfo(effect);
             }
             else
@@ -241,9 +248,9 @@ namespace uAdventure.Editor
         {
 
             Sprite icon = null;
-            if (index >= 0 && index < effects.getEffects().Count)
+            if (index >= 0 && index < effects.Count)
             {
-                AbstractEffect effect = effects.getEffects()[index];
+                IEffect effect = effects[index];
                 switch (effect.getType())
                 {
                     case EffectType.ACTIVATE:
@@ -344,7 +351,7 @@ namespace uAdventure.Editor
             return icon;
         }
 
-        public static string getEffectInfo(AbstractEffect effect)
+        public static string getEffectInfo(IEffect effect)
         {
 
             string effectInfo = null;
@@ -474,7 +481,7 @@ namespace uAdventure.Editor
             return effectInfo;
         }
 
-        public List<AbstractEffect> getEffects()
+        public List<IEffect> getEffects()
         {
 
             return effects.getEffects();
@@ -508,16 +515,16 @@ namespace uAdventure.Editor
                     selectedType = int.Parse((string)effectProperties[EFFECT_PROPERTY_TYPE]);
                 }
 
-                AbstractEffect newEffect = createNewEffect(effectProperties);
+                IEffect newEffect = createNewEffect(effectProperties);
 
                 if (selectedType == (int)EffectType.RANDOM_EFFECT)
                 {
-                    AbstractEffect firstEffect = null;
-                    AbstractEffect secondEffect = null;
+                    IEffect firstEffect = null;
+                    IEffect secondEffect = null;
                     if (effectProperties.ContainsKey(EFFECT_PROPERTY_FIRST_EFFECT))
-                        firstEffect = (AbstractEffect)effectProperties[EFFECT_PROPERTY_FIRST_EFFECT];
+                        firstEffect = (IEffect)effectProperties[EFFECT_PROPERTY_FIRST_EFFECT];
                     if (effectProperties.ContainsKey(EFFECT_PROPERTY_SECOND_EFFECT))
-                        secondEffect = (AbstractEffect)effectProperties[EFFECT_PROPERTY_SECOND_EFFECT];
+                        secondEffect = (IEffect)effectProperties[EFFECT_PROPERTY_SECOND_EFFECT];
 
                     RandomEffect randomEffect = new RandomEffect(50);
                     if (effectProperties.ContainsKey(EffectsController.EFFECT_PROPERTY_PROBABILITY))
@@ -543,7 +550,7 @@ namespace uAdventure.Editor
          * @return
          */
 
-        protected AbstractEffect createNewEffect(Dictionary<int, System.Object> effectProperties)
+        protected IEffect createNewEffect(Dictionary<int, System.Object> effectProperties)
         {
             EffectType selectedType = 0;
             if (effectProperties.ContainsKey(EFFECT_PROPERTY_TYPE))
@@ -551,7 +558,7 @@ namespace uAdventure.Editor
                 selectedType = (EffectType)int.Parse((string)effectProperties[EFFECT_PROPERTY_TYPE]);
             }
 
-            AbstractEffect newEffect = null;
+            IEffect newEffect = null;
 
             // Take all the values from the set
             string target = (string)effectProperties[EFFECT_PROPERTY_TARGET];
@@ -744,7 +751,7 @@ namespace uAdventure.Editor
             bool effectEdited = false;
 
             // Take the effect and its type
-            AbstractEffect effect = effects.getEffects()[index];
+            IEffect effect = effects[index];
             EffectType effectType = effect.getType();
 
             // Create the hashmap to store the current values
@@ -925,8 +932,7 @@ namespace uAdventure.Editor
         {
 
             // Search every effect
-            foreach (Effect effect in
-            effects.getEffects())
+            foreach (var effect in effects)
             {
 
                 updateVarFlagSummary(varFlagSummary, effect);
@@ -936,12 +942,12 @@ namespace uAdventure.Editor
                     RandomEffect randomEffect = (RandomEffect)effect;
                     if (randomEffect.getNegativeEffect() != null)
                     {
-                        updateVarFlagSummary(varFlagSummary, (Effect)randomEffect.getNegativeEffect());
+                        updateVarFlagSummary(varFlagSummary, randomEffect.getNegativeEffect());
                     }
 
                     if (randomEffect.getPositiveEffect() != null)
                     {
-                        updateVarFlagSummary(varFlagSummary, (Effect)randomEffect.getPositiveEffect());
+                        updateVarFlagSummary(varFlagSummary, randomEffect.getPositiveEffect());
                     }
 
                 }
@@ -956,7 +962,7 @@ namespace uAdventure.Editor
          * @param effect
          */
 
-        private static void updateVarFlagSummary(VarFlagSummary varFlagSummary, Effect effect)
+        private static void updateVarFlagSummary(VarFlagSummary varFlagSummary, IEffect effect)
         {
 
             if (effect.getType() == EffectType.ACTIVATE)
@@ -986,7 +992,8 @@ namespace uAdventure.Editor
             }
 
             // UPdate conditions
-            ConditionsController.updateVarFlagSummary(varFlagSummary, ((AbstractEffect)effect).getConditions());
+            if(effect is AbstractEffect)
+                ConditionsController.updateVarFlagSummary(varFlagSummary, ((AbstractEffect)effect).getConditions());
         }
 
         /**
@@ -1010,8 +1017,7 @@ namespace uAdventure.Editor
             bool valid = true;
 
             // Search every effect
-            foreach (Effect effect in
-            effects.getEffects())
+            foreach (var effect in effects)
             {
                 EffectType type = effect.getType();
 
@@ -1042,9 +1048,9 @@ namespace uAdventure.Editor
                     RandomEffect randomEffect = (RandomEffect)effect;
                     Effects e = new Effects();
                     if (randomEffect.getPositiveEffect() != null)
-                        e.add(randomEffect.getPositiveEffect());
+                        e.Add(randomEffect.getPositiveEffect());
                     if (randomEffect.getNegativeEffect() != null)
-                        e.add(randomEffect.getNegativeEffect());
+                        e.Add(randomEffect.getNegativeEffect());
                     EffectsController.isValid(currentPath, incidences, e);
 
                 }
@@ -1071,8 +1077,7 @@ namespace uAdventure.Editor
             int count = 0;
 
             // Search every effect
-            foreach (Effect effect in
-            effects.getEffects())
+            foreach (var effect in effects)
             {
                 EffectType type = effect.getType();
 
@@ -1090,9 +1095,9 @@ namespace uAdventure.Editor
                     RandomEffect randomEffect = (RandomEffect)effect;
                     Effects e = new Effects();
                     if (randomEffect.getPositiveEffect() != null)
-                        e.add(randomEffect.getPositiveEffect());
+                        e.Add(randomEffect.getPositiveEffect());
                     if (randomEffect.getNegativeEffect() != null)
-                        e.add(randomEffect.getNegativeEffect());
+                        e.Add(randomEffect.getNegativeEffect());
                     count += EffectsController.countAssetReferences(assetPath, e);
 
                 }
@@ -1118,8 +1123,7 @@ namespace uAdventure.Editor
         {
 
             // Search every effect
-            foreach (Effect effect in
-            effects.getEffects())
+            foreach (var effect in effects.getEffects())
             {
                 EffectType type = effect.getType();
 
@@ -1167,9 +1171,9 @@ namespace uAdventure.Editor
                     RandomEffect randomEffect = (RandomEffect)effect;
                     Effects e = new Effects();
                     if (randomEffect.getPositiveEffect() != null)
-                        e.add(randomEffect.getPositiveEffect());
+                        e.Add(randomEffect.getPositiveEffect());
                     if (randomEffect.getNegativeEffect() != null)
-                        e.add(randomEffect.getNegativeEffect());
+                        e.Add(randomEffect.getNegativeEffect());
 
                     EffectsController.getAssetReferences(assetPaths, assetTypes, e);
                 }
@@ -1211,8 +1215,7 @@ namespace uAdventure.Editor
         {
 
             // Search every effect
-            foreach (Effect effect in
-            effects.getEffects())
+            foreach (var effect in effects.getEffects())
             {
                 EffectType type = effect.getType();
 
@@ -1262,9 +1265,9 @@ namespace uAdventure.Editor
                     RandomEffect randomEffect = (RandomEffect)effect;
                     Effects e = new Effects();
                     if (randomEffect.getPositiveEffect() != null)
-                        e.add(randomEffect.getPositiveEffect());
+                        e.Add(randomEffect.getPositiveEffect());
                     if (randomEffect.getNegativeEffect() != null)
-                        e.add(randomEffect.getNegativeEffect());
+                        e.Add(randomEffect.getNegativeEffect());
                     EffectsController.deleteAssetReferences(assetPath, e);
                 }
             }
@@ -1287,8 +1290,7 @@ namespace uAdventure.Editor
             int count = 0;
 
             // Search every effect
-            foreach (Effect effect in
-            effects.getEffects())
+            foreach (var effect in effects.getEffects())
             {
                 EffectType type = effect.getType();
 
@@ -1299,17 +1301,20 @@ namespace uAdventure.Editor
                     RandomEffect randomEffect = (RandomEffect)effect;
                     Effects e = new Effects();
                     if (randomEffect.getPositiveEffect() != null)
-                        e.add(randomEffect.getPositiveEffect());
+                        e.Add(randomEffect.getPositiveEffect());
                     if (randomEffect.getNegativeEffect() != null)
-                        e.add(randomEffect.getNegativeEffect());
+                        e.Add(randomEffect.getNegativeEffect());
                     EffectsController.countIdentifierReferences(id, e);
                 }
                 else if (effect is HasTargetId && ((HasTargetId)effect).getTargetId().Equals(id))
                     count++;
 
-                ConditionsController conditionsController =
-                    new ConditionsController(((AbstractEffect)effect).getConditions());
-                count += conditionsController.countIdentifierReferences(id);
+                if(effect is AbstractEffect)
+                {
+                    ConditionsController conditionsController =
+                        new ConditionsController(((AbstractEffect)effect).getConditions());
+                    count += conditionsController.countIdentifierReferences(id);
+                }
             }
 
             return count;
@@ -1329,8 +1334,7 @@ namespace uAdventure.Editor
 
         public static void replaceIdentifierReferences(string oldId, string newId, Effects effects)
         {
-            foreach (Effect effect in
-            effects.getEffects())
+            foreach (var effect in effects.getEffects())
             {
                 if (effect
                 is HasTargetId)
@@ -1344,15 +1348,18 @@ namespace uAdventure.Editor
                     RandomEffect randomEffect = (RandomEffect)effect;
                     Effects e = new Effects();
                     if (randomEffect.getPositiveEffect() != null)
-                        e.add(randomEffect.getPositiveEffect());
+                        e.Add(randomEffect.getPositiveEffect());
                     if (randomEffect.getNegativeEffect() != null)
-                        e.add(randomEffect.getNegativeEffect());
+                        e.Add(randomEffect.getNegativeEffect());
                     EffectsController.replaceIdentifierReferences(oldId, newId, e);
                 }
 
-                ConditionsController conditionsController =
-                    new ConditionsController(((AbstractEffect)effect).getConditions());
-                conditionsController.replaceIdentifierReferences(oldId, newId);
+                if (effect is AbstractEffect)
+                {
+                    ConditionsController conditionsController =
+                        new ConditionsController(((AbstractEffect)effect).getConditions());
+                    conditionsController.replaceIdentifierReferences(oldId, newId);
+                }
             }
         }
 
@@ -1377,14 +1384,17 @@ namespace uAdventure.Editor
             {
 
                 // Get the effect and the type
-                Effect effect = (Effect)effects.getEffects()[i];
+                IEffect effect = effects.getEffects()[i];
                 EffectType type = effect.getType();
                 bool deleteEffect = false;
 
                 // check identifier references in conditions
-                ConditionsController conditionsController =
-                    new ConditionsController(((AbstractEffect)effect).getConditions());
-                conditionsController.deleteIdentifierReferences(id);
+                if(effect is AbstractEffect)
+                {
+                    ConditionsController conditionsController =
+                        new ConditionsController(((AbstractEffect)effect).getConditions());
+                    conditionsController.deleteIdentifierReferences(id);
+                }
                 // If random effect
                 if (type == EffectType.RANDOM_EFFECT)
                 {
@@ -1392,7 +1402,7 @@ namespace uAdventure.Editor
 
                     if (randomEffect.getPositiveEffect() != null)
                     {
-                        if (deleteSingleEffect(id, (Effect)randomEffect.getPositiveEffect()))
+                        if (deleteSingleEffect(id, randomEffect.getPositiveEffect()))
                         {
                             randomEffect.setPositiveEffect(null);
                             deleteEffect = true;
@@ -1400,7 +1410,7 @@ namespace uAdventure.Editor
                     }
                     if (randomEffect.getNegativeEffect() != null)
                     {
-                        if (deleteSingleEffect(id, (Effect)randomEffect.getNegativeEffect()))
+                        if (deleteSingleEffect(id, randomEffect.getNegativeEffect()))
                         {
                             randomEffect.setNegativeEffect(null);
 
@@ -1422,7 +1432,7 @@ namespace uAdventure.Editor
             }
         }
 
-        private static bool deleteSingleEffect(string id, Effect effect)
+        private static bool deleteSingleEffect(string id, IEffect effect)
         {
             bool deleteEffect = false;
 

@@ -4,6 +4,6 @@ namespace uAdventure.Runner
 {
     public interface CustomEffectRunner : Secuence
     {
-        Effect Effect { get; set; }
+        IEffect Effect { get; set; }
     }
 }

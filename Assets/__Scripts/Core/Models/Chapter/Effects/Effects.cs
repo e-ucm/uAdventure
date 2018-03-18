@@ -10,22 +10,15 @@ namespace uAdventure.Core
      * the game.
      */
 
-    public class Effects : ICloneable
+    public class Effects : List<IEffect>, ICloneable
     {
-
-        /**
-         * List of effects to be triggered
-         */
-        private List<AbstractEffect> effects;
 
         /**
          * Creates a new list of Effects.
          */
 
-        public Effects()
+        public Effects() : base()
         {
-
-            effects = new List<AbstractEffect>();
         }
 
         /**
@@ -34,20 +27,9 @@ namespace uAdventure.Core
          * @return True if the block has no effects, false otherwise
          */
 
-        public bool isEmpty()
+        public bool IsEmpty()
         {
-
-            return effects.Count == 0;
-        }
-
-        /**
-         * Clear the list of effects.
-         */
-
-        public void clear()
-        {
-
-            effects.Clear();
+            return Count == 0;
         }
 
         /**
@@ -57,9 +39,9 @@ namespace uAdventure.Core
          *            the effect to be added
          */
 
-        public void add(AbstractEffect effect)
+        public new void Add(IEffect effect)
         {
-            effects.Add(effect);
+            base.Add(effect);
 
             //Check if the effect has resources, to add it in the AllAssetsPaths
             if (effect.getType() == EffectType.PLAY_ANIMATION || effect.getType() == EffectType.PLAY_SOUND ||
@@ -100,10 +82,9 @@ namespace uAdventure.Core
          * @return List of effects
          */
 
-        public List<AbstractEffect> getEffects()
+        public List<IEffect> getEffects()
         {
-
-            return effects;
+            return this;
         }
 
         /**
@@ -112,9 +93,8 @@ namespace uAdventure.Core
 
         public bool hasCancelAction()
         {
-
             bool hasCancelAction = false;
-            foreach (Effect effect in effects)
+            foreach (IEffect effect in this)
             {
                 if (effect.getType() == EffectType.CANCEL_ACTION)
                 {
@@ -127,14 +107,13 @@ namespace uAdventure.Core
 
         public virtual object Clone()
         {
-
             Effects e = (Effects)this.MemberwiseClone();
-            if (effects != null)
+            if (e != null)
             {
-                e.effects = new List<AbstractEffect>();
+                e.Clear();
                 //TODO: check if its working
-                foreach (AbstractEffect ef in effects)
-                    e.effects.Add((AbstractEffect)ef.Clone());
+                foreach (AbstractEffect ef in this)
+                    e.Add((AbstractEffect)ef.Clone());
             }
             return e;
         }

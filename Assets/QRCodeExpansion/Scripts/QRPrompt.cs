@@ -11,7 +11,7 @@ namespace uAdventure.QR
     public class QRPrompt : MonoBehaviour, CustomEffectRunner
     {
         public QRReader reader;
-        public Effect Effect {
+        public IEffect Effect {
             get { return QRPromptEffect; }
             set { QRPromptEffect = value as QRPromptEffect; }
         }
@@ -55,9 +55,9 @@ namespace uAdventure.QR
                     var effects = new Effects();
                     if(qr.Content != "")
                     {
-                        effects.add(new SpeakPlayerEffect(qr.Content));
+                        effects.Add(new SpeakPlayerEffect(qr.Content));
                     }
-                    foreach(var effect in qr.Effects.getEffects()) effects.add(effect);
+                    foreach(var effect in qr.Effects.getEffects()) effects.Add(effect);
 
                     effectHolder = new EffectHolder(effects);
                     this.transform.GetChild(0).gameObject.SetActive(false);

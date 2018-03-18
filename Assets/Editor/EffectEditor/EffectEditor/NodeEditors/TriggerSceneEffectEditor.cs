@@ -57,11 +57,11 @@ namespace uAdventure.Editor
             EditorGUILayout.HelpBox(TC.get("TriggerSceneEffect.Description"), MessageType.Info);
         }
 
-        public AbstractEffect Effect { get { return effect; } set { effect = value as TriggerSceneEffect; } }
+        public IEffect Effect { get { return effect; } set { effect = value as TriggerSceneEffect; } }
         public virtual string EffectName { get { return TC.get("TriggerSceneEffect.Title"); } }
         public virtual EffectEditor clone() { return new TriggerSceneEffectEditor(); }
 
-        public bool manages(AbstractEffect c)
+        public bool manages(IEffect c)
         {
             return c.GetType() == effect.GetType();
         }

@@ -80,7 +80,7 @@ namespace uAdventure.Editor
             EditorGUILayout.HelpBox(TC.get("PlayAnimationEffect.Description"), MessageType.Info);
         }
 
-        public AbstractEffect Effect
+        public IEffect Effect
         {
             get { return effect; }
             set { effect = value as PlayAnimationEffect; }
@@ -96,7 +96,7 @@ namespace uAdventure.Editor
             return new PlayAnimationEffectEditor();
         }
 
-        public bool manages(AbstractEffect c)
+        public bool manages(IEffect c)
         {
 
             return c.GetType() == effect.GetType();

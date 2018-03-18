@@ -52,7 +52,7 @@ namespace uAdventure.Editor
             EditorGUILayout.HelpBox(TC.get("SetValueEffect.Description"), MessageType.Info);
         }
 
-        public AbstractEffect Effect { get { return effect; } set { effect = value as SetValueEffect; } }
+        public IEffect Effect { get { return effect; } set { effect = value as SetValueEffect; } }
         public string EffectName { get { return TC.get("SetValueEffect.Title"); } }
         
         public bool Usable
@@ -65,7 +65,7 @@ namespace uAdventure.Editor
 
         public EffectEditor clone() { return new SetValueEffectEditor(); }
 
-        public bool manages(AbstractEffect c)
+        public bool manages(IEffect c)
         {
             return c.GetType() == effect.GetType();
         }

@@ -12,7 +12,7 @@ namespace uAdventure.Editor
 
         protected Effects effects;
 
-        protected AbstractEffect effectDeleted;
+        protected IEffect effectDeleted;
 
         protected int index;
 
@@ -55,7 +55,7 @@ namespace uAdventure.Editor
             effects.getEffects().RemoveAt(index);
             condition = conditions[index];
             conditions.RemoveAt(index);
-            updateVarFlagSummary((Effect)effectDeleted);
+            updateVarFlagSummary(effectDeleted);
             return true;
         }
 
@@ -64,7 +64,7 @@ namespace uAdventure.Editor
 
             effects.getEffects().RemoveAt(index);
             conditions.RemoveAt(index);
-            updateVarFlagSummary((Effect)effectDeleted);
+            updateVarFlagSummary(effectDeleted);
             Controller.Instance.updatePanel();
             return true;
         }
@@ -74,7 +74,7 @@ namespace uAdventure.Editor
 
             effects.getEffects().Insert(index, effectDeleted);
             conditions.Insert(index, condition);
-            undoUpdateVarFlagSummary((Effect)effectDeleted);
+            undoUpdateVarFlagSummary(effectDeleted);
             Controller.Instance.updatePanel();
             return true;
         }
@@ -85,7 +85,7 @@ namespace uAdventure.Editor
          * 
          * @param effect
          */
-        protected void updateVarFlagSummary(Effect effect)
+        protected void updateVarFlagSummary(IEffect effect)
         {
 
             if (effect.getType() == EffectType.ACTIVATE)
@@ -122,9 +122,9 @@ namespace uAdventure.Editor
             {
                 RandomEffect randomEffect = (RandomEffect)effect;
                 if (randomEffect.getPositiveEffect() != null)
-                    updateVarFlagSummary((Effect)randomEffect.getPositiveEffect());
+                    updateVarFlagSummary(randomEffect.getPositiveEffect());
                 if (randomEffect.getNegativeEffect() != null)
-                    updateVarFlagSummary((Effect)randomEffect.getNegativeEffect());
+                    updateVarFlagSummary(randomEffect.getNegativeEffect());
             }
         }
 
@@ -133,7 +133,7 @@ namespace uAdventure.Editor
          * 
          * @param effect
          */
-        protected void undoUpdateVarFlagSummary(Effect effect)
+        protected void undoUpdateVarFlagSummary(IEffect effect)
         {
 
             if (effect.getType() == EffectType.ACTIVATE)
@@ -170,9 +170,9 @@ namespace uAdventure.Editor
             {
                 RandomEffect randomEffect = (RandomEffect)effect;
                 if (randomEffect.getPositiveEffect() != null)
-                    undoUpdateVarFlagSummary((Effect)randomEffect.getPositiveEffect());
+                    undoUpdateVarFlagSummary(randomEffect.getPositiveEffect());
                 if (randomEffect.getNegativeEffect() != null)
-                    undoUpdateVarFlagSummary((Effect)randomEffect.getNegativeEffect());
+                    undoUpdateVarFlagSummary(randomEffect.getNegativeEffect());
             }
         }
     }

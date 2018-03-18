@@ -13,7 +13,7 @@ namespace uAdventure.Geo
     {
         TriggerZonedSceneEffect effect;
 
-        public Effect Effect { get { return effect; } set { effect = value as TriggerZonedSceneEffect; } }
+        public IEffect Effect { get { return effect; } set { effect = value as TriggerZonedSceneEffect; } }
 
         public bool execute()
         {

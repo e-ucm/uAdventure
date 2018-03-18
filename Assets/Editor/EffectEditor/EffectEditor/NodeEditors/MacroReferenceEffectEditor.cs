@@ -46,7 +46,7 @@ namespace uAdventure.Editor
             EditorGUILayout.HelpBox(TC.get("Effect.MacroReference"), MessageType.Info);
         }
 
-        public AbstractEffect Effect { get { return effect; } set { effect = value as MacroReferenceEffect; } }
+        public IEffect Effect { get { return effect; } set { effect = value as MacroReferenceEffect; } }
         public string EffectName { get { return TC.get("MacroReferenceEffect.Title"); } }
 
         public bool Usable
@@ -59,7 +59,7 @@ namespace uAdventure.Editor
 
         public EffectEditor clone() { return new MacroReferenceEffectEditor(); }
 
-        public bool manages(AbstractEffect c)
+        public bool manages(IEffect c)
         {
             return c.GetType() == effect.GetType();
         }

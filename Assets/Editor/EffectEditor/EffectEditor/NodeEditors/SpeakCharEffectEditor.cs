@@ -48,11 +48,11 @@ namespace uAdventure.Editor
             EditorGUILayout.HelpBox(TC.get("SpeakCharacterEffect.Description"), MessageType.Info);
         }
 
-        public AbstractEffect Effect { get { return effect; } set { effect = value as SpeakCharEffect; } }
+        public IEffect Effect { get { return effect; } set { effect = value as SpeakCharEffect; } }
         public string EffectName { get { return TC.get("SpeakCharacterEffect.Title"); } }
         public EffectEditor clone() { return new SpeakPlayerEffectEditor(); }
 
-        public bool manages(AbstractEffect c)
+        public bool manages(IEffect c)
         {
 
             return c.GetType() == effect.GetType();

@@ -104,7 +104,7 @@ namespace uAdventure.Editor
                     timersInfo[i][3] = TC.get("GeneralText.No");
                 }
 
-                if (!timer.getEffects().isEmpty())
+                if (!timer.getEffects().IsEmpty())
                 {
                     timersInfo[i][4] = TC.get("GeneralText.Yes");
                 }
@@ -113,7 +113,7 @@ namespace uAdventure.Editor
                     timersInfo[i][4] = TC.get("GeneralText.No");
                 }
 
-                if (!timer.getPostEffects().isEmpty())
+                if (!timer.getPostEffects().IsEmpty())
                 {
                     timersInfo[i][5] = TC.get("GeneralText.Yes");
                 }

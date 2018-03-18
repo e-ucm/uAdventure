@@ -4,12 +4,14 @@ using System.Collections.Generic;
 using System.Xml;
 
 using uAdventure.Core;
+using UnityEngine.EventSystems;
 
 namespace uAdventure.Runner
 {
     public class EffectHolderNode
     {
-        AbstractEffect effect;
+        IEffect effect;
+        Conditions conditions;
 
         private bool runs_once = true;
         private int times_runed = 0;
@@ -19,9 +21,11 @@ namespace uAdventure.Runner
 
         Dictionary<string, object> aditional_info = new Dictionary<string, object>();
 
-        public EffectHolderNode(AbstractEffect effect)
+        public EffectHolderNode(IEffect effect)
         {
             this.effect = effect;
+            if (effect is AbstractEffect)
+                conditions = (effect as AbstractEffect).getConditions();
         }
 
         public bool execute()
@@ -29,15 +33,11 @@ namespace uAdventure.Runner
             bool forcewait = false;
             if (!(runs_once && times_runed > 0))
             {
-                if (effect == null || effect.getConditions() == null)
-                {
-                    Debug.Log("Asd");
-                }
-                else
+                if (effect != null)
                 {
                     if (!validated)
                     {
-                        is_valid = ConditionChecker.check(effect.getConditions());
+                        is_valid = conditions == null || ConditionChecker.check(conditions);
                         validated = true;
                     }
 
@@ -188,7 +188,7 @@ namespace uAdventure.Runner
 
         public bool check()
         {
-            return ConditionChecker.check(effect.getConditions());
+            return conditions == null || ConditionChecker.check(conditions);
         }
     }
 
@@ -206,7 +206,7 @@ namespace uAdventure.Runner
             {
                 
                 //List<Condition> conditions = new List<Condition>();
-                foreach (AbstractEffect effect in effects.getEffects())
+                foreach (IEffect effect in effects.getEffects())
                 {
                     if (effect != null) // TODO check if this (if) is correct
                         this.effects.Add(new EffectHolderNode(effect));
@@ -234,7 +234,7 @@ namespace uAdventure.Runner
             return forcewait;
         }
 
-        public InteractuableResult Interacted(RaycastHit hit = new RaycastHit())
+        public InteractuableResult Interacted(PointerEventData pointerData = null)
         {
             if (this.execute())
             {

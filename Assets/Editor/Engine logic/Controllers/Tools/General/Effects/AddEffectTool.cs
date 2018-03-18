@@ -11,13 +11,13 @@ namespace uAdventure.Editor
 
         protected Effects effects;
 
-        protected AbstractEffect effectToAdd;
+        protected IEffect effectToAdd;
 
         protected List<ConditionsController> conditions;
 
         protected ConditionsController condition;
 
-        public AddEffectTool(Effects effects, AbstractEffect effectToAdd, List<ConditionsController> conditions)
+        public AddEffectTool(Effects effects, IEffect effectToAdd, List<ConditionsController> conditions)
         {
 
             this.effects = effects;
@@ -46,10 +46,10 @@ namespace uAdventure.Editor
         public override bool doTool()
         {
 
-            effects.add(effectToAdd);
-            if (conditions != null)
+            effects.Add(effectToAdd);
+            if (conditions != null && effectToAdd is AbstractEffect)
             {
-                condition = new ConditionsController(effectToAdd.getConditions(), Controller.EFFECT, EffectsController.getEffectInfo(effectToAdd));
+                condition = new ConditionsController((effectToAdd as AbstractEffect).getConditions(), Controller.EFFECT, EffectsController.getEffectInfo(effectToAdd));
                 conditions.Add(condition);
             }
 

@@ -43,9 +43,14 @@ namespace uAdventure.Editor
 
             for (int i = 0; i < effects.getEffects().Count; i++)
             {
-                AbstractEffect myEffect = this.effects.getEffects()[i];
+                IEffect myEffect = this.effects.getEffects()[i];
 
                 EffectEditor editor = EffectEditorFactory.Intance.createEffectEditorFor(myEffect);
+                if(editor == null)
+                {
+                    Debug.LogWarning("Editor effect is null!");
+                    continue;
+                }
                 editor.Effect = myEffect;
 
                 if (i > 0)
@@ -58,8 +63,10 @@ namespace uAdventure.Editor
                     tmpRects.Add(effects.getEffects()[i], current);
 
                 editor.Window = current;
-
-                editor.Effect.setConditions(myEffect.getConditions());
+                if(editor.Effect is AbstractEffect && myEffect is AbstractEffect)
+                {
+                    (editor.Effect as AbstractEffect).setConditions((myEffect as AbstractEffect).getConditions());
+                }
                 editors.Add(editor.Effect, editor);
             }
 
@@ -74,8 +81,8 @@ namespace uAdventure.Editor
         }
 
         private Rect baseRect = new Rect(10, 10, 25, 25);
-        private Dictionary<AbstractEffect, Rect> tmpRects = new Dictionary<AbstractEffect, Rect>();
-        private Dictionary<AbstractEffect, EffectEditor> editors = new Dictionary<AbstractEffect, EffectEditor>();
+        private Dictionary<IEffect, Rect> tmpRects = new Dictionary<IEffect, Rect>();
+        private Dictionary<IEffect, EffectEditor> editors = new Dictionary<IEffect, EffectEditor>();
 
         private GUIStyle closeStyle, collapseStyle;
 
@@ -96,7 +103,7 @@ namespace uAdventure.Editor
 
         void nodeWindow(int id)
         {
-            AbstractEffect myEffect = this.effects.getEffects()[id];
+            IEffect myEffect = this.effects.getEffects()[id];
 
             EffectEditor editor = null;
             editors.TryGetValue(myEffect, out editor);
@@ -115,6 +122,30 @@ namespace uAdventure.Editor
                 int preEditorSelected = EffectEditorFactory.Intance.EffectEditorIndex(myEffect);
                 int editorSelected = EditorGUILayout.Popup(preEditorSelected, editorNames);
 
+                var abstractEffect = myEffect as AbstractEffect;
+
+                if (editor == null || preEditorSelected != editorSelected)
+                {
+                    editor = EffectEditorFactory.Intance.createEffectEditorFor(editorNames[editorSelected]);
+
+                    if (editors.ContainsKey(myEffect))
+                    {
+                        editor.Window = editors[myEffect].Window;
+                        editors.Remove(myEffect);
+                    }
+                    else
+                    {
+                        editor.Window = tmpRects[myEffect];
+                    }
+
+                    editors.Add(editor.Effect, editor);
+                    if(abstractEffect != null && editor.Effect is AbstractEffect)
+                    {
+                        (editor.Effect as AbstractEffect).setConditions(abstractEffect.getConditions());
+                    }
+                    abstractEffect = editor.Effect as AbstractEffect;
+                }
+
                 if (GUILayout.Button("-", collapseStyle, GUILayout.Width(15), GUILayout.Height(15)))
                     editor.Collapsed = true;
 				if (GUILayout.Button ("X", closeStyle, GUILayout.Width (15), GUILayout.Height (15))) {
@@ -124,45 +155,28 @@ namespace uAdventure.Editor
 
                 GUILayout.EndHorizontal();
 
-                GUILayout.BeginVertical(conditionStyle);
-                GUILayout.Label("CONDITIONS");
-                if (GUILayout.Button("Add Block"))
+                if(abstractEffect != null)
                 {
-                    myEffect.getConditions().add(new FlagCondition(""));
-                }
-
-                if (editor == null || preEditorSelected != editorSelected)
-                {
-                    editor = EffectEditorFactory.Intance.createEffectEditorFor(editorNames[editorSelected]);
-
-                    if (editors.ContainsKey(myEffect))
+                    GUILayout.BeginVertical(conditionStyle);
+                    GUILayout.Label("CONDITIONS");
+                    if (GUILayout.Button("Add Block"))
                     {
-						editor.Window = editors[myEffect].Window;
-						editors.Remove(myEffect);
-                    }
-                    else
-                    {
-                        editor.Window = tmpRects[myEffect];
-
+                        abstractEffect.getConditions().add(new FlagCondition(""));
                     }
 
-					editors.Add(editor.Effect, editor);
-					editor.Effect.setConditions(myEffect.getConditions());
+                    //##################################################################################
+                    //############################### CONDITION HANDLING ###############################
+                    //##################################################################################
+                    
+                    var toRemove = new List<Condition>();
+                    var listsToRemove = new List<List<Condition>>();
+                    var conditions = abstractEffect.getConditions();
+                    ConditionEditorWindow.LayoutConditionEditor(conditions);
+
+                    //##################################################################################
+                    
+                    GUILayout.EndVertical();
                 }
-
-                //##################################################################################
-                //############################### CONDITION HANDLING ###############################
-                //##################################################################################
-
-				var toRemove = new List<Condition>();
-				var listsToRemove = new List<List<Condition>>();
-				var conditions = editor.Effect.getConditions ();
-				ConditionEditorWindow.LayoutConditionEditor (conditions);
-				
-                //##################################################################################
-
-
-                GUILayout.EndVertical();
 
                 editor.draw();
 
@@ -223,7 +237,7 @@ namespace uAdventure.Editor
             }
         }
 
-        void createWindow(AbstractEffect effect)
+        void createWindow(IEffect effect)
         {
             if (editors.ContainsKey(effect))
                 editors[effect].Window = GUILayout.Window(windowId, editors[effect].Window, nodeWindow,
@@ -289,7 +303,7 @@ namespace uAdventure.Editor
 
             if (GUILayout.Button("New Effect"))
             {
-                effects.add(new ActivateEffect(""));
+                effects.Add(new ActivateEffect(""));
             }
 
             GUILayout.EndHorizontal();

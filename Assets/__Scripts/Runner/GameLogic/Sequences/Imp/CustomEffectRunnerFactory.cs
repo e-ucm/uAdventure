@@ -21,7 +21,7 @@ namespace uAdventure.Runner
 
         private Dictionary<Type, Type> knownRunners; 
 
-        public CustomEffectRunner CreateRunnerFor(Effect effect)
+        public CustomEffectRunner CreateRunnerFor(IEffect effect)
         {
             CustomEffectRunner r = null;
             if (knownRunners.ContainsKey(effect.GetType()))

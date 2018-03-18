@@ -58,11 +58,11 @@ namespace uAdventure.Editor
             EditorGUILayout.HelpBox(TC.get("MoveObjectEffect.Title"), MessageType.Info);
         }
 
-        public override AbstractEffect Effect { get { return effect; } set { effect = value as MoveObjectEffect; } }
+        public override IEffect Effect { get { return effect; } set { effect = value as MoveObjectEffect; } }
         public override string EffectName { get { return TC.get("Effect.MoveObject"); } }
         public override EffectEditor clone() { return new MoveObjectEffectEditor(); }
 
-        public override bool manages(AbstractEffect c)
+        public override bool manages(IEffect c)
         {
             return c.GetType() == effect.GetType();
         }

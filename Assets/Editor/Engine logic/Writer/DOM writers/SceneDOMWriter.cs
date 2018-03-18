@@ -180,10 +180,10 @@ namespace uAdventure.Editor
 
                         OrderedDictionary nextSceneEffects = new OrderedDictionary();
 
-                        if (nextScene.getEffects() != null && !nextScene.getEffects().isEmpty())
+                        if (nextScene.getEffects() != null && !nextScene.getEffects().IsEmpty())
                             nextSceneEffects.Add(EffectsDOMWriter.EFFECTS, nextScene.getEffects());
 
-                        if (nextScene.getPostEffects() != null && !nextScene.getPostEffects().isEmpty())
+                        if (nextScene.getPostEffects() != null && !nextScene.getPostEffects().IsEmpty())
                             nextSceneEffects.Add(EffectsDOMWriter.POST_EFFECTS, nextScene.getPostEffects());
 
                         // Append the next scene
@@ -210,13 +210,13 @@ namespace uAdventure.Editor
 
                     OrderedDictionary effectsTypes = new OrderedDictionary();
 
-                    if (exit.getEffects() != null && !exit.getEffects().isEmpty())
+                    if (exit.getEffects() != null && !exit.getEffects().IsEmpty())
                         effectsTypes.Add(EffectsDOMWriter.EFFECTS, exit.getEffects());
 
-                    if (exit.getPostEffects() != null && !exit.getPostEffects().isEmpty())
+                    if (exit.getPostEffects() != null && !exit.getPostEffects().IsEmpty())
                         effectsTypes.Add(EffectsDOMWriter.POST_EFFECTS, exit.getPostEffects());
 
-                    if (exit.getNotEffects() != null && !exit.getNotEffects().isEmpty())
+                    if (exit.getNotEffects() != null && !exit.getNotEffects().IsEmpty())
                         effectsTypes.Add(EffectsDOMWriter.NOT_EFFECTS, exit.getNotEffects());
 
 

@@ -186,7 +186,7 @@ namespace uAdventure.Core
         public override bool hasEffects()
         {
 
-            return hasValidEffect() && !effects.isEmpty();
+            return hasValidEffect() && !effects.IsEmpty();
         }
 
         public override void setEffects(Effects effects)

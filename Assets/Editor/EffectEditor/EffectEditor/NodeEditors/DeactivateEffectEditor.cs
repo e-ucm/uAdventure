@@ -48,7 +48,7 @@ namespace uAdventure.Editor
             EditorGUILayout.HelpBox(TC.get("DeactivateEffect.Description"), MessageType.Info);
         }
 
-        public AbstractEffect Effect { get { return effect; } set { effect = value as DeactivateEffect; } }
+        public IEffect Effect { get { return effect; } set { effect = value as DeactivateEffect; } }
         public string EffectName { get { return TC.get("DeactivateEffect.Title"); } }
 
         public bool Usable
@@ -61,7 +61,7 @@ namespace uAdventure.Editor
 
         public EffectEditor clone() { return new DeactivateEffectEditor(); }
 
-        public bool manages(AbstractEffect c)
+        public bool manages(IEffect c)
         {
 
             return c.GetType() == effect.GetType();

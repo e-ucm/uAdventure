@@ -82,7 +82,7 @@ namespace uAdventure.Editor
         public static void appendEffects(XmlDocument doc, XmlNode effectsNode, Effects effects)
         {
             // Add every effect
-            foreach (AbstractEffect effect in effects.getEffects())
+            foreach (IEffect effect in effects.getEffects())
             {
 
                 XmlElement effectElement = null;
@@ -122,12 +122,15 @@ namespace uAdventure.Editor
                 // Add conditions associated to that effect               
                 // Create conditions for current effect
 
-                DOMWriterUtility.DOMWrite(effectsNode, effect.getConditions());
+                if(effect is AbstractEffect)
+                {
+                    DOMWriterUtility.DOMWrite(effectsNode, (effect as AbstractEffect).getConditions());
+                }
             }
 
         }
 
-        private static XmlElement buildEffectNode(AbstractEffect effect, XmlDocument doc)
+        private static XmlElement buildEffectNode(IEffect effect, XmlDocument doc)
         {
             XmlElement effectElement = null;
 

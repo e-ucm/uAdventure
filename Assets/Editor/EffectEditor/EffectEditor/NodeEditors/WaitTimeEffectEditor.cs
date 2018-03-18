@@ -51,7 +51,7 @@ namespace uAdventure.Editor
             EditorGUILayout.HelpBox(TC.get("WaitTimeEffect.Label"), MessageType.Info);
         }
 
-        public AbstractEffect Effect
+        public IEffect Effect
         {
             get { return effect; }
             set { effect = value as WaitTimeEffect; }
@@ -67,7 +67,7 @@ namespace uAdventure.Editor
             return new WaitTimeEffectEditor();
         }
 
-        public bool manages(AbstractEffect c)
+        public bool manages(IEffect c)
         {
             return c.GetType() == effect.GetType();
         }

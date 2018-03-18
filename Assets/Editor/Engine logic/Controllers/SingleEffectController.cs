@@ -11,12 +11,12 @@ namespace uAdventure.Editor
      */
     public class SingleEffectController : EffectsController
     {
-        private static Effects createEffectsStructure(AbstractEffect effect)
+        private static Effects createEffectsStructure(IEffect effect)
         {
 
             Effects effects = new Effects();
             if (effect != null)
-                effects.add(effect);
+                effects.Add(effect);
             return effects;
         }
 
@@ -26,7 +26,7 @@ namespace uAdventure.Editor
          * @param effects
          *            Contained block of effects
          */
-        public SingleEffectController(AbstractEffect effect) : base(createEffectsStructure(effect))
+        public SingleEffectController(IEffect effect) : base(createEffectsStructure(effect))
         {
         }
 
@@ -58,7 +58,7 @@ namespace uAdventure.Editor
         public override bool addEffect()
         {
 
-            effects.clear();
+            effects.Clear();
 
             bool effectAdded = false;
 
@@ -134,7 +134,7 @@ namespace uAdventure.Editor
                 return addEffect();
         }
 
-        public AbstractEffect getEffect()
+        public IEffect getEffect()
         {
 
             if (getEffectCount() > 0)

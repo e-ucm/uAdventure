@@ -8,10 +8,10 @@ namespace uAdventure.Editor
     public interface EffectEditor
     {
         void draw();
-        AbstractEffect Effect { get; set; }
+        IEffect Effect { get; set; }
         string EffectName { get; }
         EffectEditor clone();
-        bool manages(AbstractEffect c);
+        bool manages(IEffect c);
         bool Collapsed { get; set; }
         Rect Window { get; set; }
         bool Usable { get; }

@@ -118,7 +118,7 @@ namespace uAdventure.Editor
                 else
                     actionsInfo[i][1] = TC.get("GeneralText.Yes");
 
-                if (action.getEffects().isEmpty())
+                if (action.getEffects().IsEmpty())
                     actionsInfo[i][2] = TC.get("GeneralText.No");
                 else
                     actionsInfo[i][2] = TC.get("GeneralText.Yes");
@@ -201,7 +201,7 @@ namespace uAdventure.Editor
                         ConfigureAction = (selectedID) =>
                         {
                             newAction = new Action(Action.TALK_TO);
-                            newAction.getEffects().add(new TriggerConversationEffect(selectedID));
+                            newAction.getEffects().Add(new TriggerConversationEffect(selectedID));
                             return newAction;
                         }
                     }, TC.get("TalkToAction.MessageSelectConversation"), conversations);

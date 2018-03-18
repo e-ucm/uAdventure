@@ -62,7 +62,7 @@ namespace uAdventure.Editor
             EditorGUILayout.HelpBox(TC.get("MovePlayerEffect.Description"), MessageType.Info);
         }
 
-        public AbstractEffect Effect
+        public IEffect Effect
         {
             get { return effect; }
             set { effect = value as MovePlayerEffect; }
@@ -78,7 +78,7 @@ namespace uAdventure.Editor
             return new MovePlayerEffectEditor();
         }
 
-        public bool manages(AbstractEffect c)
+        public bool manages(IEffect c)
         {
             return c.GetType() == effect.GetType();
         }

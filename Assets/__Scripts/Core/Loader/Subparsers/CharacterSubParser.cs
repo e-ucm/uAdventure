@@ -44,7 +44,7 @@ namespace uAdventure.Core
 				action.setConditions(conversationReference.getConditions());
 				action.setDocumentation(conversationReference.getDocumentation());
 				TriggerConversationEffect effect = new TriggerConversationEffect(conversationReference.getTargetId());
-				action.getEffects().add(effect);
+				action.getEffects().Add(effect);
 				npc.addAction(action);
 			}
 

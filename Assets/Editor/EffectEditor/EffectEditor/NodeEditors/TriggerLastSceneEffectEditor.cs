@@ -37,11 +37,11 @@ namespace uAdventure.Editor
             EditorGUILayout.HelpBox(TC.get("Effect.TriggerLastScene"), MessageType.Info);
         }
 
-        public AbstractEffect Effect { get { return effect; } set { effect = value as TriggerLastSceneEffect; } }
+        public IEffect Effect { get { return effect; } set { effect = value as TriggerLastSceneEffect; } }
         public string EffectName { get { return TC.get("Effect.TriggerLastSceneInfo"); } }
         public EffectEditor clone() { return new TriggerLastSceneEffectEditor(); }
 
-        public bool manages(AbstractEffect c)
+        public bool manages(IEffect c)
         {
             return c.GetType() == effect.GetType();
         }

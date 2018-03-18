@@ -33,10 +33,10 @@ namespace uAdventure.Editor
             }
         }
 
-        public abstract AbstractEffect Effect { get; set; }
+        public abstract IEffect Effect { get; set; }
         public abstract string EffectName { get; }
         public abstract void draw();
         public abstract EffectEditor clone();
-        public abstract bool manages(AbstractEffect c);
+        public abstract bool manages(IEffect c);
     }
 }

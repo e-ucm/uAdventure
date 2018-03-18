@@ -48,7 +48,7 @@ namespace uAdventure.Editor
             EditorGUILayout.HelpBox(TC.get("TriggerConversationEffect.Description"), MessageType.Info);
         }
 
-        public AbstractEffect Effect { get { return effect; } set { effect = value as TriggerConversationEffect; } }
+        public IEffect Effect { get { return effect; } set { effect = value as TriggerConversationEffect; } }
         public string EffectName { get { return TC.get("TriggerConversationEffect.Title"); } }
 
         public bool Usable
@@ -61,7 +61,7 @@ namespace uAdventure.Editor
 
         public EffectEditor clone() { return new TriggerConversationEffectEditor(); }
 
-        public bool manages(AbstractEffect c)
+        public bool manages(IEffect c)
         {
             return c.GetType() == effect.GetType();
         }

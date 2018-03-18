@@ -119,12 +119,12 @@ namespace uAdventure.Editor
                     }
 
                     // Append the effects (if avalaible)
-                    if (!action.getEffects().isEmpty())
+                    if (!action.getEffects().IsEmpty())
                     {
                         DOMWriterUtility.DOMWrite(actionElement, action.getEffects());
                     }
                     // Append the not effects (if avalaible)
-                    if (action.getNotEffects() != null && !action.getNotEffects().isEmpty())
+                    if (action.getNotEffects() != null && !action.getNotEffects().IsEmpty())
                     {
                         DOMWriterUtility.DOMWrite(actionElement, action.getNotEffects(), DOMWriterUtility.Name(EffectsDOMWriter.NOT_EFFECTS));
                     }

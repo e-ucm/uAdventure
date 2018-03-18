@@ -31,11 +31,11 @@ namespace uAdventure.Editor
             EditorGUILayout.HelpBox(TC.get("ConsumeObject.Description"), MessageType.Info);
         }
 
-        public override AbstractEffect Effect { get { return effect; } set { effect = value as ConsumeObjectEffect; } }
+        public override IEffect Effect { get { return effect; } set { effect = value as ConsumeObjectEffect; } }
         public override string EffectName { get { return TC.get("Effect.ConsumeObject"); } }
         public override EffectEditor clone() { return new ConsumeObjectEffectEditor(); }
 
-        public override bool manages(AbstractEffect c)
+        public override bool manages(IEffect c)
         {
             return c.GetType() == effect.GetType();
         }
