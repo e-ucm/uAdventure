@@ -185,7 +185,17 @@ namespace uAdventure.Editor
                 newAction = new Action(Action.EXAMINE);
 
             else if (type == Controller.ACTION_GRAB)
-                newAction = new Action(Action.GRAB);
+            {
+                var item = parent as ItemDataControl;
+                newAction = new Action(Action.GRAB)
+                {
+                    Effects = new Effects()
+                    {
+                        new RemoveElementEffect(item.getId()),
+                        new GenerateObjectEffect(item.getId())
+                    }
+                };
+            }
 
             else if (type == Controller.ACTION_USE)
                 newAction = new Action(Action.USE);

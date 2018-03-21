@@ -177,7 +177,7 @@ namespace uAdventure.Runner
 
         public void OnTargetSelected(PointerEventData data)
         {
-            var target = data.pointerCurrentRaycast.gameObject;
+            var target = data.dragging ? data.pointerCurrentRaycast.gameObject : data.pointerPress;
 
             if (dragging)
             {

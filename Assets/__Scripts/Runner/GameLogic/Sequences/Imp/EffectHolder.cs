@@ -165,6 +165,16 @@ namespace uAdventure.Runner
                                 MoveObjectEffect moe = (MoveObjectEffect)effect;
                                 Game.Instance.GameState.Move(moe.getTargetId(), new Vector2(moe.getX(), 600 - moe.getY()) / 10f);
                                 break;
+                            case EffectType.GENERATE_OBJECT:
+                                GenerateObjectEffect gen = (GenerateObjectEffect)effect;
+                                var toAdd = Game.Instance.GameState.FindElement<Item>(gen.getTargetId());
+                                InventoryManager.Instance.AddElement(toAdd);
+                                break;
+                            case EffectType.CONSUME_OBJECT:
+                                ConsumeObjectEffect con = (ConsumeObjectEffect)effect;
+                                var toRemove = Game.Instance.GameState.FindElement<Item>(con.getTargetId());
+                                InventoryManager.Instance.RemoveElement(toRemove);
+                                break;
                             case EffectType.CUSTOM_EFFECT:
                                 runs_once = false;
                                 if(times_runed == 0)

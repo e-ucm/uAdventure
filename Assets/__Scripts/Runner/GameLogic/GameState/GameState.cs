@@ -17,6 +17,8 @@ namespace uAdventure.Runner
         AdventureData data;
         int current_chapter = 0;
         string current_target = "";
+        private List<string> removedElements;
+        private List<string> inventoryItems;
 
         public AdventureData Data
         {
@@ -37,6 +39,8 @@ namespace uAdventure.Runner
 
         public GameState(AdventureData data)
         {
+            this.removedElements = new List<string>();
+            this.inventoryItems = new List<string>();
             this.data = data;
         }
 
@@ -216,6 +220,40 @@ namespace uAdventure.Runner
         //##########################################################################
         //##########################################################################
         //##########################################################################
+
+        // Removed objects
+
+        public List<string> getRemovedElements()
+        {
+            return removedElements;
+        }
+
+        public void addRemovedElement(string elementId)
+        {
+            removedElements.Add(elementId);
+        }
+
+        public bool removeRemovedElement(string elementId)
+        {
+            return removedElements.Remove(elementId);
+        }
+
+        // Inventory objects
+
+        public List<string> getInventoryItems()
+        {
+            return inventoryItems;
+        }
+
+        public void addInventoryItem(string elementId)
+        {
+            inventoryItems.Add(elementId);
+        }
+
+        public bool removeInventoryItem(string elementId)
+        {
+            return inventoryItems.Remove(elementId);
+        }
 
     }
 }

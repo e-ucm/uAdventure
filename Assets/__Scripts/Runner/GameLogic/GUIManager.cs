@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using uAdventure.Core;
+using System;
 
 namespace uAdventure.Runner
 {
@@ -14,6 +15,7 @@ namespace uAdventure.Runner
         private string talker_to_find, last_text;
         private GUIProvider guiprovider;
         private AdventureData data;
+        private bool locked = false;
         private string current_cursor = "";
 
         public static GUIManager Instance
@@ -57,7 +59,10 @@ namespace uAdventure.Runner
         {
             if (cursor != current_cursor)
             {
-                Cursor.SetCursor(guiprovider.getCursor(cursor), new Vector2(0f, 0f), CursorMode.Auto);
+                if (!locked)
+                {
+                    Cursor.SetCursor(guiprovider.getCursor(cursor), new Vector2(0f, 0f), CursorMode.Auto);
+                }
                 current_cursor = cursor;
             }
         }
@@ -168,6 +173,19 @@ namespace uAdventure.Runner
             }
 
             return bubble;
+        }
+
+        public void lockCursor()
+        {
+            locked = true;
+        }
+
+        public void releaseCursor()
+        {
+            locked = false;
+            var toPut = current_cursor;
+            current_cursor = null;
+            setCursor(toPut);
         }
 
         private Vector2 sceneVector2guiVector(Vector2 v)
