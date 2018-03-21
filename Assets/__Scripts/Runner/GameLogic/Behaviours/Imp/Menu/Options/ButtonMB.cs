@@ -9,12 +9,16 @@ namespace uAdventure.Runner
 {
     public class ButtonMB : MonoBehaviour, Interactuable, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
     {
-
-
         public ResourcesUni resource;
 
-        Action action;
-        string actionName;
+        private Action action;
+        private string actionName;
+
+        private bool interactable = false;
+        private SpriteRenderer spriteRenderer;
+
+        bool showText = false;
+
         public Action Action
         {
             set
@@ -26,11 +30,11 @@ namespace uAdventure.Runner
 
         public IActionReceiver Receiver { get; set; }
 
-        bool showText = false;
-
         // Use this for initialization
         void Start()
         {
+            spriteRenderer = GetComponent<SpriteRenderer>();
+
             if (this.action.getType() == Action.CUSTOM)
             {
                 actionName = ((CustomAction)action).getName();
@@ -63,17 +67,17 @@ namespace uAdventure.Runner
                 actionName = ConstantNames.L["ES"].Actions[action.getType()];
             }
 
-            Texture2D tmp;
+            Sprite tmp;
             if (this.action.getType() == Action.CUSTOM)
-                tmp = Game.Instance.ResourceManager.getImage(resource.getAssetPath("buttonNormal"));
+                tmp = Game.Instance.ResourceManager.getSprite(resource.getAssetPath("buttonNormal"));
             else
-                tmp = Game.Instance.ResourceManager.getImage(resource.getAssetPath(DescriptorData.NORMAL_BUTTON));
+                tmp = Game.Instance.ResourceManager.getSprite(resource.getAssetPath(DescriptorData.NORMAL_BUTTON));
 
-            this.GetComponent<Renderer>().material.mainTexture = tmp;
-            this.transform.localScale = new Vector3(tmp.width / 75f, tmp.height / 75f, 1);
+            spriteRenderer.sprite = tmp;
+            this.gameObject.AddComponent<PolygonCollider2D>();
+            //this.transform.localScale = new Vector3(tmp.width / 75f, tmp.height / 75f, 1);
         }
-        
-        bool interactable = false;
+
         public bool canBeInteracted()
         {
             return interactable;
@@ -118,9 +122,9 @@ namespace uAdventure.Runner
             showText = true;
             transform.parent.GetComponent<OptionMB>().Highlight = true;
             if (this.action.getType() == Action.CUSTOM)
-                GetComponent<Renderer>().material.mainTexture = Game.Instance.ResourceManager.getImage(resource.getAssetPath("buttonOver"));
+                spriteRenderer.sprite = Game.Instance.ResourceManager.getSprite(resource.getAssetPath("buttonOver"));
             else
-                GetComponent<Renderer>().material.mainTexture = Game.Instance.ResourceManager.getImage(resource.getAssetPath(DescriptorData.HIGHLIGHTED_BUTTON));
+                spriteRenderer.sprite = Game.Instance.ResourceManager.getSprite(resource.getAssetPath(DescriptorData.HIGHLIGHTED_BUTTON));
 
             GUIManager.Instance.showHand(true);
         }
@@ -130,9 +134,9 @@ namespace uAdventure.Runner
             showText = false;
             transform.parent.GetComponent<OptionMB>().Highlight = false;
             if (this.action.getType() == Action.CUSTOM)
-                GetComponent<Renderer>().material.mainTexture = Game.Instance.ResourceManager.getImage(resource.getAssetPath("buttonNormal"));
+                spriteRenderer.sprite = Game.Instance.ResourceManager.getSprite(resource.getAssetPath("buttonNormal"));
             else
-                GetComponent<Renderer>().material.mainTexture = Game.Instance.ResourceManager.getImage(resource.getAssetPath(DescriptorData.NORMAL_BUTTON));
+                spriteRenderer.sprite = Game.Instance.ResourceManager.getSprite(resource.getAssetPath(DescriptorData.NORMAL_BUTTON));
 
             GUIManager.Instance.showHand(false);
         }

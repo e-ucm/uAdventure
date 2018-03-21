@@ -1,16 +1,16 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
-
 using uAdventure.Core;
 using RAGE.Analytics;
 using RAGE.Analytics.Formats;
 using UnityEngine.EventSystems;
+using System.Linq;
 
 namespace uAdventure.Runner
 {
-    public class CharacterMB : Representable, Interactuable, IPointerClickHandler
+    public class CharacterMB : Representable, Interactuable, IPointerClickHandler, IDropHandler
     {
+        private static readonly int[] restrictedActions = { Action.CUSTOM, Action.TALK_TO, Action.EXAMINE };
+
         /*  ## ANIMATION METHOD ##
          * 
          * private Animation current_anim;
@@ -55,38 +55,14 @@ namespace uAdventure.Runner
 
             if (interactable)
             {
-                List<Action> available = new List<Action>();
+                var availableActions = Element.getActions().Valid(restrictedActions).ToList();
 
-                foreach (Action a in base.Element.getActions())
+                ActionsUtil.AddExamineIfNotExists(Element, availableActions);
+
+                //if there is an action, we show them
+                if (availableActions.Count > 0)
                 {
-                    if (ConditionChecker.check(a.getConditions()))
-                    {
-                        bool addaction = true;
-                        foreach (Action a2 in available)
-                        {
-                            if ((a.getType() == Action.CUSTOM || a.getType() == Action.CUSTOM_INTERACT) && (a2.getType() == Action.CUSTOM || a2.getType() == Action.CUSTOM_INTERACT))
-                            {
-                                if (((CustomAction)a).getName() == ((CustomAction)a2).getName())
-                                {
-                                    addaction = false;
-                                    break;
-                                }
-                            }
-                            else if (a.getType() == a2.getType())
-                            {
-                                addaction = false;
-                                break;
-                            }
-                        }
-
-                        if (addaction)
-                            available.Add(a);
-                    }
-                }
-
-                if (available.Count > 0)
-                {
-                    Game.Instance.showActions(available, Input.mousePosition);
+                    Game.Instance.showActions(availableActions, Input.mousePosition);
                     res = InteractuableResult.DOES_SOMETHING;
                 }
 
@@ -100,6 +76,11 @@ namespace uAdventure.Runner
         public void OnPointerClick(PointerEventData eventData)
         {
             Interacted(eventData);
+        }
+
+        public void OnDrop(PointerEventData eventData)
+        {
+            uAdventureInputModule.DropTargetSelected(eventData);
         }
     }
 }

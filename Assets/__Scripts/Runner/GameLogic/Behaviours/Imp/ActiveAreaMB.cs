@@ -5,16 +5,26 @@ using LibTessDotNet;
 
 using uAdventure.Core;
 using UnityEngine.EventSystems;
+using System.Linq;
 
 namespace uAdventure.Runner
 {
-    public class ActiveAreaMB : Area, Interactuable, IPointerClickHandler
+    public class ActiveAreaMB : Area, Interactuable, IPointerClickHandler, IDropHandler
     {
+        private static readonly int[] restrictedActions = { Action.CUSTOM, Action.EXAMINE, Action.USE };
+
         private ActiveArea aad;
         public ActiveArea Element
         {
             get { return aad; }
-            set { aad = value; }
+            set
+            {
+                aad = value;
+                if (aad != null)
+                {
+                    this.gameObject.name = aad.getId();
+                }
+            }
         }
 
         public static Vector3 Vec3toVector3(Vec3 _v)
@@ -50,76 +60,26 @@ namespace uAdventure.Runner
             switch (aad.getBehaviour())
             {
                 case Item.BehaviourType.FIRST_ACTION:
-                    foreach (Action a in aad.getActions())
                     {
-                        if (ConditionChecker.check(a.getConditions()))
+                        var actions = Element.getActions().Checked();
+                        if (actions.Any())
                         {
-                            Game.Instance.Execute(new EffectHolder(a.getEffects()));
-                            break;
+                            Game.Instance.Execute(new EffectHolder(actions.First().getEffects()));
+                            ret = InteractuableResult.DOES_SOMETHING;
                         }
                     }
-                    ret = InteractuableResult.DOES_SOMETHING;
                     break;
                 case Item.BehaviourType.NORMAL:
-                    List<Action> available = new List<Action>();
-                    foreach (Action a in aad.getActions())
+                    var availableActions = Element.getActions().Valid(restrictedActions).ToList();
+
+                    ActionsUtil.AddExamineIfNotExists(Element, availableActions);
+
+                    //if there is an action, we show them
+                    if (availableActions.Count > 0)
                     {
-                        if (ConditionChecker.check(a.getConditions()))
-                        {
-                            bool addaction = true;
-                            foreach (Action a2 in available)
-                            {
-                                if ((a.getType() == Action.CUSTOM || a.getType() == Action.CUSTOM_INTERACT) && (a2.getType() == Action.CUSTOM || a2.getType() == Action.CUSTOM_INTERACT))
-                                {
-                                    if (((CustomAction)a).getName() == ((CustomAction)a2).getName())
-                                    {
-                                        addaction = false;
-                                        break;
-                                    }
-                                }
-                                else if (a.getType() == a2.getType())
-                                {
-                                    addaction = false;
-                                    break;
-                                }
-                            }
-
-                            if (addaction)
-                                available.Add(a);
-                        }
-                    }
-
-                    //We check if it's an examine action, otherwise we create one and add it
-                    bool addexamine = true;
-                    string desc = aad.getDescription(0).getDetailedDescription();
-                    if (desc != "")
-                    {
-                        foreach (Action a in available)
-                        {
-                            if (a.getType() == Action.EXAMINE)
-                            {
-                                addexamine = false;
-                                break;
-                            }
-                        }
-
-                        if (addexamine)
-                        {
-                            Action ex = new Action(Action.EXAMINE);
-                            Effects exeff = new Effects();
-                            exeff.Add(new SpeakPlayerEffect(desc));
-                            ex.setEffects(exeff);
-                            available.Add(ex);
-                        }
-                    }
-
-                    if (available.Count > 0)
-                    {
-                        Game.Instance.showActions(available, Input.mousePosition);
+                        Game.Instance.showActions(availableActions, Input.mousePosition);
                         ret = InteractuableResult.DOES_SOMETHING;
                     }
-
-
                     break;
                 case Item.BehaviourType.ATREZZO:
                 default:
@@ -198,6 +158,11 @@ namespace uAdventure.Runner
         public void OnPointerClick(PointerEventData eventData)
         {
             Interacted(eventData);
+        }
+
+        public void OnDrop(PointerEventData eventData)
+        {
+            uAdventureInputModule.DropTargetSelected(eventData);
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections;
 
 using uAdventure.Core;
+using System;
 
 namespace uAdventure.Runner
 {
@@ -30,6 +31,10 @@ namespace uAdventure.Runner
             set
             {
                 element = value;
+                if (element != null)
+                {
+                    this.gameObject.name = element.getId();
+                }
                 //deformation = -0.01f * FindObjectsOfType(this.GetType()).Length;
             }
         }
@@ -95,7 +100,14 @@ namespace uAdventure.Runner
         public Texture2D Texture
         {
             get { return texture; }
-            set { texture = value; }
+            set
+            {
+                if(value != texture)
+                {
+                    texture = value;
+                    Adaptate();
+                }
+            }
         }
 
         protected void LoadTexture(string uri)

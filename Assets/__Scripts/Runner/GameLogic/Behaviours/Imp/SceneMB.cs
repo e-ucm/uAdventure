@@ -154,24 +154,28 @@ namespace uAdventure.Runner
                     //###################### CHARACTERS ######################
                     deleteChilds(Characters);
                     foreach (ElementReference context in rsd.getCharacterReferences())
-                        instanceElement<NPC>(context);
+                        if (!Game.Instance.GameState.getRemovedElements().Contains(context.getTargetId()))
+                            instanceElement<NPC>(context);
 
                     //###################### OBJECTS ######################
                     deleteChilds(Objects);
                     foreach (ElementReference context in rsd.getItemReferences())
-                        instanceElement<Item>(context);
+                        if(!Game.Instance.GameState.getRemovedElements().Contains(context.getTargetId()))
+                            instanceElement<Item>(context);
 
                     //###################### ATREZZOS ######################
                     deleteChilds(Atrezzos);
                     foreach (ElementReference context in rsd.getAtrezzoReferences())
-                        instanceElement<Atrezzo>(context);
+                        if (!Game.Instance.GameState.getRemovedElements().Contains(context.getTargetId()))
+                            instanceElement<Atrezzo>(context);
 
                     //###################### ACTIVEAREAS ######################
                     deleteChilds(ActiveAreas);
 
                     foreach (ActiveArea ad in rsd.getActiveAreas())
-                        if (ConditionChecker.check(ad.getConditions()))
-                            instanceRectangle<ActiveArea>(ad);
+                        if (!Game.Instance.GameState.getRemovedElements().Contains(ad.getId()))
+                            if (ConditionChecker.check(ad.getConditions()))
+                                instanceRectangle<ActiveArea>(ad);
 
                     //###################### EXITS ######################
                     deleteChilds(Exits);

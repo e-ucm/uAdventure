@@ -8,8 +8,11 @@ using System.Linq;
 
 namespace uAdventure.Runner
 {
-    public class ObjectMB : Representable, Interactuable, IActionReceiver, IPointerClickHandler, IDragHandler, IBeginDragHandler, IEndDragHandler
+    public class ObjectMB : Representable, Interactuable, IActionReceiver, IPointerClickHandler,
+        IDragHandler, IBeginDragHandler, IEndDragHandler, ITargetSelectedHandler
     {
+        private static readonly int[] restrictedActions = { Action.CUSTOM, Action.DRAG_TO, Action.EXAMINE, Action.GRAB, Action.USE };
+
         bool interactable = false;
         bool dragging = false;
         IEnumerable<Action> dragActions;
@@ -75,70 +78,24 @@ namespace uAdventure.Runner
                 switch (((Item)Element).getBehaviour())
                 {
                     case Item.BehaviourType.FIRST_ACTION:
-                        foreach (Action a in Element.getActions())
                         {
-                            if (ConditionChecker.check(a.getConditions()))
+                            var actions = Element.getActions().Checked();
+                            if (actions.Any())
                             {
-                                Game.Instance.Execute(new EffectHolder(a.getEffects()));
-                                break;
+                                Game.Instance.Execute(new EffectHolder(actions.First().getEffects()));
+                                ret = InteractuableResult.DOES_SOMETHING;
                             }
                         }
-                        ret = InteractuableResult.DOES_SOMETHING;
                         break;
                     case Item.BehaviourType.NORMAL:
-                        List<Action> available = new List<Action>();
-                        foreach (Action a in Element.getActions())
-                        {
-                            if (ConditionChecker.check(a.getConditions()))
-                            {
-                                bool addaction = true;
-                                foreach (Action a2 in available)
-                                {
-                                    if ((a.getType() == Action.CUSTOM || a.getType() == Action.CUSTOM_INTERACT) && (a2.getType() == Action.CUSTOM || a2.getType() == Action.CUSTOM_INTERACT))
-                                    {
-                                        if (((CustomAction)a).getName() == ((CustomAction)a2).getName())
-                                        {
-                                            addaction = false;
-                                            break;
-                                        }
-                                    }
-                                    else if (a.getType() == a2.getType())
-                                    {
-                                        addaction = false;
-                                        break;
-                                    }
-                                }
+                        var availableActions = Element.getActions().Valid(restrictedActions).ToList();
 
-                                if (addaction)
-                                    available.Add(a);
-                            }
-                        }
-
-
-                        //We check if it's an examine action, otherwise we create one and add it
-                        bool addexamine = true;
-                        foreach (Action a in available)
-                        {
-                            if (a.getType() == Action.EXAMINE)
-                            {
-                                addexamine = false;
-                                break;
-                            }
-                        }
-
-                        if (addexamine)
-                        {
-                            Action ex = new Action(Action.EXAMINE);
-                            Effects exeff = new Effects();
-                            exeff.Add(new SpeakPlayerEffect(Element.getDescription(0).getDetailedDescription()));
-                            ex.setEffects(exeff);
-                            available.Add(ex);
-                        }
+                        ActionsUtil.AddExamineIfNotExists(Element, availableActions);
 
                         //if there is an action, we show them
-                        if (available.Count > 0)
+                        if (availableActions.Count > 0)
                         {
-                            Game.Instance.showActions(available, Input.mousePosition, this);
+                            Game.Instance.showActions(availableActions, Input.mousePosition, this);
                             ret = InteractuableResult.DOES_SOMETHING;
                         }
                         break;
@@ -166,7 +123,7 @@ namespace uAdventure.Runner
 
         public void OnDrag(PointerEventData eventData)
         {
-            Vector3 pointerPos = eventData == null ? Input.mousePosition : (Vector3) eventData.position;
+            Vector3 pointerPos = eventData == null ? Input.mousePosition : (Vector3)eventData.position;
             Vector2 pos = Camera.main.ScreenToWorldPoint(pointerPos);
             this.transform.localPosition = pos;
         }
@@ -178,53 +135,30 @@ namespace uAdventure.Runner
                           group action by action.getTargetId() into sameTargetActions
                           select sameTargetActions.First();
 
-            uAdventureRaycaster.Instance.Override = this.gameObject;
+            //uAdventureRaycaster.Instance.Override = this.gameObject;
+            EventSystem.current.SetSelectedGameObject(this.gameObject);
 
             if (dragActions.Count() > 0)
             {
                 dragging = true;
+                this.GetComponent<Collider>().enabled = false;
+                if (eventData != null)
+                    eventData.Use();
             }
+
         }
 
         public void OnEndDrag(PointerEventData eventData)
         {
-            Debug.Log("Drag ended");
             if (dragging)
             {
-                if(uAdventureRaycaster.Instance.Override == this.gameObject)
-                    uAdventureRaycaster.Instance.Override = null;
-
-                if (Element.isReturnsWhenDragged())
-                {
-                    Positionate();
-                }
-
-                dragging = false;
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                RaycastHit[] hits = Physics.RaycastAll(ray);
-                //bool no_interaction = true;
-                Representable representable;
-                ActiveAreaMB area;
-                string id;
-
-                foreach (RaycastHit hit in hits)
-                {
-                    representable = hit.transform.GetComponent<Representable>();
-                    area = hit.transform.GetComponent<ActiveAreaMB>();
-                    id = representable ? representable.Element.getId() : area ? area.Element.getId() : null;
-                    if (id != null)
-                    {
-                        var tmpActions = dragActions.Where(a => a.getTargetId() == id);
-                        var action = tmpActions.Any() ? tmpActions.First() : null;
-
-                        if (action != null)
-                        {
-                            Game.Instance.Execute(new EffectHolder(action.getEffects()));
-                            break;
-                        }
-                    }
-                }
+                OnTargetSelected(eventData);
             }
+        }
+
+        public void OnDrop(PointerEventData eventData)
+        {
+            uAdventureInputModule.DropTargetSelected(eventData);
         }
 
         public void ActionSelected(Action action)
@@ -233,10 +167,43 @@ namespace uAdventure.Runner
             {
                 case Action.DRAG_TO:
                     OnBeginDrag(null);
+                    uAdventureInputModule.LookingForTarget = this.gameObject;
                     break;
                 default:
                     Game.Instance.Execute(new EffectHolder(action.Effects));
                     break;
+            }
+        }
+
+        public void OnTargetSelected(PointerEventData data)
+        {
+            var target = data.pointerCurrentRaycast.gameObject;
+
+            if (dragging)
+            {
+                if (Element.isReturnsWhenDragged())
+                {
+                    Positionate();
+                    this.GetComponent<Collider>().enabled = true;
+                }
+
+                dragging = false;
+                data.Use();
+
+                if(target != null)
+                {
+                    string id = target.name;
+                    if (id != null)
+                    {
+                        var tmpActions = dragActions.Where(a => a.getTargetId() == id);
+                        var action = tmpActions.Any() ? tmpActions.First() : null;
+
+                        if (action != null)
+                        {
+                            Game.Instance.Execute(new EffectHolder(action.getEffects()));
+                        }
+                    }
+                }
             }
         }
     }

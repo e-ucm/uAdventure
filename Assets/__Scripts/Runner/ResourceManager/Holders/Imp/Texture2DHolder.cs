@@ -20,7 +20,7 @@ namespace uAdventure.Runner
             {
                 if (!sprite && tex || (sprite && sprite.texture != tex))
                 { 
-                    sprite = Sprite.Create(tex, new Rect(0,0,tex.width, tex.height), new Vector2(tex.width /2f, tex.height/2f));
+                    sprite = Sprite.Create(tex, new Rect(0,0,tex.width, tex.height), new Vector2(0.5f, 0.5f));
                 }
 
                 return sprite;
