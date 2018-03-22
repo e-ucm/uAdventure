@@ -16,6 +16,21 @@ namespace uAdventure.Editor
 
             private Dictionary<Type, Texture2D> icons;
 
+            public ReferencesListDataControl ReferencesListDataControl
+            {
+                get
+                {
+                    return DataControl as ReferencesListDataControl;
+                }
+                set
+                {
+                    if (DataControl != value)
+                    {
+                        SetData(value, (dc) => (dc as ReferencesListDataControl).getAllReferencesDataControl().Cast<DataControl>().ToList());
+                    }
+                }
+            }
+
             public ReferenceList()
             {
                 conditionsTex = Resources.Load<Texture2D>("EAdventureData/img/icons/conditions-24x24");
@@ -115,7 +130,7 @@ namespace uAdventure.Editor
         private int currentIndex = -1;
         private SceneDataControl currentScene;
 
-        private DataControlList referenceList;
+        private ReferenceList referenceList;
         private SceneDataControl workingScene;
              
         public ScenesWindowElementReference(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, SceneEditor sceneEditor,
@@ -157,14 +172,7 @@ namespace uAdventure.Editor
             workingScene = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[GameRources.GetInstance().selectedSceneIndex];
             if(workingScene != prevWorkingScene)
             {
-                referenceList.SetData(workingScene.getReferencesList(),
-                    (dc) => (dc as ReferencesListDataControl).getAllReferencesDataControl().Cast<DataControl>().ToList());
-            }
-
-            if(referenceList.count != workingScene.getReferencesList().getAllReferencesDataControl().Count)
-            {
-                referenceList.SetData(workingScene.getReferencesList(),
-                    (dc) => (dc as ReferencesListDataControl).getAllReferencesDataControl().Cast<DataControl>().ToList());
+                referenceList.ReferencesListDataControl = workingScene.getReferencesList();
             }
 
             referenceList.DoList(160);
@@ -210,26 +218,26 @@ namespace uAdventure.Editor
                 Sprite sprite = null;
                 if (elem is PlayerDataControl)
                 {
-                    sprite = AssetsController.getImage((elem as PlayerDataControl).getPreviewImage());
+                    sprite = Controller.ResourceManager.getSprite((elem as PlayerDataControl).getPreviewImage());
                 }
                 else if(elem is NodeDataControl)
                 {
-                    sprite = AssetsController.getImage((elem as NodeDataControl).getPlayerImagePath());
+                    sprite = Controller.ResourceManager.getSprite((elem as NodeDataControl).getPlayerImagePath());
                 }
                 else if(elem is ElementReferenceDataControl)
                 {
                     var referencedElement = (elem as ElementReferenceDataControl).getReferencedElementDataControl();
                     if (referencedElement is ItemDataControl)
                     {
-                        sprite = AssetsController.getImage((referencedElement as ItemDataControl).getPreviewImage());
+                        sprite = Controller.ResourceManager.getSprite((referencedElement as ItemDataControl).getPreviewImage());
                     }
                     else if (referencedElement is NPCDataControl)
                     {
-                        sprite = AssetsController.getImage((referencedElement as NPCDataControl).getPreviewImage());
+                        sprite = Controller.ResourceManager.getSprite((referencedElement as NPCDataControl).getPreviewImage());
                     }
                     else if (referencedElement is AtrezzoDataControl)
                     {
-                        sprite = AssetsController.getImage((referencedElement as AtrezzoDataControl).getPreviewImage());
+                        sprite = Controller.ResourceManager.getSprite((referencedElement as AtrezzoDataControl).getPreviewImage());
                     }
                 }
 

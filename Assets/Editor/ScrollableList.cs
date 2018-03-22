@@ -74,9 +74,9 @@ public class ScrollableList
         reorderableList.onCanRemoveCallback = null;
         reorderableList.onReorderCallback = OnReorderCallback;
         reorderableList.onSelectCallback = OnSelectCallback;
-        reorderableList.onAddCallback = null;
+        reorderableList.onAddCallback = OnAddCallback;
         reorderableList.onAddDropdownCallback = OnAddDropdownCallback;
-        reorderableList.onRemoveCallback = null;
+        reorderableList.onRemoveCallback = OnRemoveCallback;
         reorderableList.onChangedCallback = OnChangedCallback;
         reorderableList.drawHeaderCallback = null;
         reorderableList.elementHeightCallback = OnElementHeightCallback;

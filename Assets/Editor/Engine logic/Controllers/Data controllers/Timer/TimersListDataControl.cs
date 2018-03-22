@@ -235,7 +235,7 @@ namespace uAdventure.Editor
 
             // Ask for confirmation
             if (!askConfirmation ||
-                controller.showStrictConfirmDialog(TC.get("Operation.DeleteElementTitle"),
+                controller.ShowStrictConfirmDialog(TC.get("Operation.DeleteElementTitle"),
                     TC.get("Operation.DeleteElementWarning",
                         new string[] { TC.getElement(Controller.TIMER) + " #" + index, "0" })))
             {

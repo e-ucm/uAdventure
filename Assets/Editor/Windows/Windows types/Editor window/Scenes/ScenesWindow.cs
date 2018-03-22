@@ -107,6 +107,7 @@ namespace uAdventure.Editor
                     if (hasTrajectory)
                     {
                         allElements.AddRange(scene.getTrajectory().getNodes().Cast<DataControl>());
+                        allElements.AddRange(scene.getTrajectory().getSides().Cast<DataControl>());
                         allElements.Add(scene.getTrajectory());
                     }
                     else
@@ -307,17 +308,17 @@ namespace uAdventure.Editor
 
             private void DrawExit(SceneDataControl scene, ExitDataControl exit)
             {
-                var polygon = AdaptToViewport(GetExitArea(scene, exit), space);
-
-                var c = sceneColors[scene.getId()];
-                c = new Color(c.r, c.g, c.b, 0.8f);
-                HandleUtil.DrawPolygon(polygon, c);
                 var scenes = Controller.Instance.SelectedChapterDataControl.getScenesList();
                 var index = scenes.getSceneIndexByID(exit.getNextSceneId());
 
                 // If the exit points to a cutscene it normally is out of the array
-                if (index < 0 || index >= scenes.getScenes().Count)
+                if (index < 0 || index > scenes.getScenes().Count)
                     return;
+
+                var polygon = AdaptToViewport(GetExitArea(scene, exit), space);
+                var c = sceneColors[scene.getId()];
+                c = new Color(c.r, c.g, c.b, 0.8f);
+                HandleUtil.DrawPolygon(polygon, c);
 
                 var nextScene = scenes.getScenes()[index];
                 var sceneRect = AdaptToViewport(GetSceneRect(nextScene), space);

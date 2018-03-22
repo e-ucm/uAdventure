@@ -161,76 +161,48 @@ namespace uAdventure.Editor
 
         public override bool addElement(int type, string cutsceneId)
         {
-
             bool elementAdded = false;
 
-            ////if (type == Controller.CUTSCENE)
-            ////{
-            //    //TODO: implement
-            //    //CutsceneTypesDialog cutscenesTypesDialog = new CutsceneTypesDialog();
-            //    //type = cutscenesTypesDialog.getOptionSelected();
-            //    //TODO: tmp, delete
-            //    type = Controller.CUTSCENE_SLIDES;
-
-            if (type == Controller.CUTSCENE_SLIDES)
+            if (string.IsNullOrEmpty(cutsceneId))
+                controller.ShowInputDialog(TC.get("Operation.AddCutsceneTitle"),
+                        TC.get("Operation.AddCutsceneMessage"), TC.get("Operation.AddCutsceneDefaultValue"), (o,s) => performCreateCutscene(type, s));
+            else
             {
-
-                // Show a dialog asking for the cutscene id
-                if (cutsceneId == null || cutsceneId.Equals(""))
-                    cutsceneId = controller.showInputDialog(TC.get("Operation.AddCutsceneTitle"),
-                        TC.get("Operation.AddCutsceneMessage"), TC.get("Operation.AddCutsceneDefaultValue"));
-
-                // If some value was typed and the identifier is valid
-                if (!controller.isElementIdValid(cutsceneId))
-                    cutsceneId = controller.makeElementValid(cutsceneId);
-
-                Cutscene newCutscene = null;
-
-                // Create the new cutscene
-                if (type == Controller.CUTSCENE_SLIDES)
-                    newCutscene = new Slidescene(cutsceneId);
-
-                // Add the new cutscene
-                cutscenesList.Add(newCutscene);
-                cutscenesDataControlList.Add(new CutsceneDataControl(newCutscene));
-                controller.IdentifierSummary.addCutsceneId(cutsceneId);
-                //controller.dataModified( );
+                performCreateCutscene(type, cutsceneId);
                 elementAdded = true;
             }
-
-            else if (type == Controller.CUTSCENE_VIDEO)
-            {
-
-                // Show a dialog asking for the cutscene id
-                if (cutsceneId == null)
-                    cutsceneId = controller.showInputDialog(TC.get("Operation.AddCutsceneTitle"),
-                        TC.get("Operation.AddCutsceneMessage"), TC.get("Operation.AddCutsceneDefaultValue"));
-
-                // If some value was typed and the identifier is valid
-                if (!controller.isElementIdValid(cutsceneId))
-                    cutsceneId = controller.makeElementValid(cutsceneId);
-                Cutscene newCutscene = null;
-
-                // Create the new cutscene
-                if (type == Controller.CUTSCENE_VIDEO)
-                    newCutscene = new Videoscene(cutsceneId);
-
-                // Add the new cutscene
-                cutscenesList.Add(newCutscene);
-                cutscenesDataControlList.Add(new CutsceneDataControl(newCutscene));
-                controller.IdentifierSummary.addCutsceneId(cutsceneId);
-                //controller.dataModified( );
-                elementAdded = true;
-            }
-            //}
 
             return elementAdded;
+        }
+
+        private void performCreateCutscene(int type, string cutsceneId)
+        {
+            // If some value was typed and the identifier is valid
+            if (!controller.isElementIdValid(cutsceneId))
+                cutsceneId = controller.makeElementValid(cutsceneId);
+            Cutscene newCutscene = null;
+
+            // Create the new cutscene
+            switch (type)
+            {
+                default:
+                case Controller.CUTSCENE_SLIDES:
+                    newCutscene = new Slidescene(cutsceneId);
+                    break;
+                case Controller.CUTSCENE_VIDEO:
+                    newCutscene = new Videoscene(cutsceneId);
+                    break;
+            }
+
+            // Add the new cutscene
+            cutscenesList.Add(newCutscene);
+            cutscenesDataControlList.Add(new CutsceneDataControl(newCutscene));
+            controller.IdentifierSummary.addId<Cutscene>(cutsceneId);
         }
 
 
         public override string getDefaultId(int type)
         {
-
             return TC.get("Operation.AddCutsceneDefaultValue");
         }
 
@@ -251,14 +223,14 @@ namespace uAdventure.Editor
 
                 // Ask for confirmation
                 if (!askConfirmation ||
-                    controller.showStrictConfirmDialog(TC.get("Operation.DeleteElementTitle"),
+                    controller.ShowStrictConfirmDialog(TC.get("Operation.DeleteElementTitle"),
                         TC.get("Operation.DeleteElementWarning", new string[] { cutsceneId, references })))
                 {
                     if (cutscenesList.Remove((Cutscene)dataControl.getContent()))
                     {
                         cutscenesDataControlList.Remove((CutsceneDataControl)dataControl);
                         controller.deleteIdentifierReferences(cutsceneId);
-                        controller.IdentifierSummary.deleteCutsceneId(cutsceneId);
+                        controller.IdentifierSummary.deleteId<Cutscene>(cutsceneId);
                         //controller.dataModified( );
                         elementDeleted = true;
                     }
@@ -267,7 +239,7 @@ namespace uAdventure.Editor
 
             // If this is the last scene, it can't be deleted
             else
-                controller.showErrorDialog(TC.get("Operation.DeleteElementTitle"), TC.get("Operation.ErrorLastScene"));
+                controller.ShowErrorDialog(TC.get("Operation.DeleteElementTitle"), TC.get("Operation.ErrorLastScene"));
 
             return elementDeleted;
         }
@@ -441,7 +413,7 @@ namespace uAdventure.Editor
 			clone.setId(id);
 			cutscenesList.Add(clone);
 			cutscenesDataControlList.Add(new CutsceneDataControl(clone));
-			controller.IdentifierSummary.addSceneId(id);
+			controller.IdentifierSummary.deleteId<Cutscene>(id);
 			return true;
 		}
 

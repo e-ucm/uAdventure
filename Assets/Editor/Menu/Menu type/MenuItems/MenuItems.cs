@@ -482,16 +482,12 @@ namespace uAdventure.Editor
 
         public void OnCliked()
         {
-            ChapterNewNameInputPopup window = (ChapterNewNameInputPopup)ScriptableObject.CreateInstance(typeof(ChapterNewNameInputPopup));
-            window.Init(this, "chapter");
+            Controller.Instance.ShowInputDialog("", TC.get("Operation.AddChapterMessage"), null, this);
         }
 
         public void OnDialogOk(string message, object workingObject = null, object workingObjectSecond = null)
         {
-            if (workingObject is ChapterNewNameInputPopup)
-            {
-                Controller.Instance.addChapter(message);
-            }
+            Controller.Instance.addChapter(message);
         }
 
         public void OnDialogCanceled(object workingObject = null)

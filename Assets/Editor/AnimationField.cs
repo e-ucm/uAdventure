@@ -29,7 +29,7 @@ public class AnimationField : FileChooser {
 
     protected void drawView()
     {
-        var text = Path.Equals(EMPTY) ? TC.get("Resources.Create") : TC.get("Resources.Edit");
+        var text = EMPTY.Equals(Path) ? TC.get("Resources.Create") : TC.get("Resources.Edit");
         if (GUILayout.Button(text, GUILayout.Width(GUI.skin.button.CalcSize(new GUIContent(text)).x)))
         {
             // For not-existing cutscene - show new cutscene name dialog
@@ -48,7 +48,7 @@ public class AnimationField : FileChooser {
     {
         if (ShowClear)
         {
-            using (new EditorGUI.DisabledScope(Path.Equals(EMPTY)))
+            using (new EditorGUI.DisabledScope(EMPTY.Equals(Path)))
             {
                 if (GUILayout.Button(delTex, GUILayout.Width(delTex.width + 10f)))
                 {

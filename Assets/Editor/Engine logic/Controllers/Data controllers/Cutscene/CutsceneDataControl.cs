@@ -257,28 +257,36 @@ namespace uAdventure.Editor
             string references = controller.countIdentifierReferences(oldCutsceneId).ToString();
 
             // Ask for confirmation
-            if (name != null)// || controller.showStrictConfirmDialog(Language.GetText("Operation.RenameCutsceneTitle"), Language.GetText("Operation.RenameElementWarning", new string[] { oldCutsceneId, references })))
+            if (name != null || controller.ShowStrictConfirmDialog(TC.get("Operation.RenameCutsceneTitle"), TC.get("Operation.RenameElementWarning", new string[] { oldCutsceneId, references })))
             {
 
                 // Show a dialog asking for the new cutscnee id
                 string newCutsceneId = name;
-                //if (name == null)
-                //    newCutsceneId = controller.showInputDialog(Language.GetText("Operation.RenameCutsceneTitle"), Language.GetText("Operation.RenameCutsceneMessage"), oldCutsceneId);
-
-                // If some value was typed and the identifiers are different
-				if (!controller.isElementIdValid (newCutsceneId))
-					newCutsceneId = controller.makeElementValid (newCutsceneId);
-				
-                cutscene.setId(newCutsceneId);
-                controller.replaceIdentifierReferences(oldCutsceneId, newCutsceneId);
-                controller.IdentifierSummary.deleteCutsceneId(oldCutsceneId);
-                controller.IdentifierSummary.addCutsceneId(newCutsceneId);
-                //controller.dataModified( );
-
-				return newCutsceneId;
+                if (name == null)
+                    controller.ShowInputDialog(TC.get("Operation.RenameCutsceneTitle"), TC.get("Operation.RenameCutsceneMessage"), oldCutsceneId, (o,s) => performRenameElement(s));
+                else
+                {
+                    //controller.dataModified( );
+                    return performRenameElement(newCutsceneId);
+                }
             }
                 
 			return null;
+        }
+
+        private string performRenameElement(string newCutsceneId)
+        {
+            string oldCutsceneId = cutscene.getId();
+
+            // If some value was typed and the identifiers are different
+            if (!controller.isElementIdValid(newCutsceneId))
+                newCutsceneId = controller.makeElementValid(newCutsceneId);
+
+            cutscene.setId(newCutsceneId);
+            controller.replaceIdentifierReferences(oldCutsceneId, newCutsceneId);
+            controller.IdentifierSummary.deleteId<Cutscene>(oldCutsceneId);
+            controller.IdentifierSummary.addId<Cutscene>(newCutsceneId);
+            return newCutsceneId;
         }
 
 

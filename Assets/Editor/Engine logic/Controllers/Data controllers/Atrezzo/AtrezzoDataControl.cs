@@ -189,27 +189,33 @@ namespace uAdventure.Editor
             string references = controller.countIdentifierReferences(oldAtrezzoId).ToString();
 
             // Ask for confirmation 
-            if (name != null || controller.showStrictConfirmDialog(TC.get("Operation.RenameAtrezzoTitle"), TC.get("Operation.RenameElementWarning", new string[] { oldAtrezzoId, references })))
+            if (name != null || controller.ShowStrictConfirmDialog(TC.get("Operation.RenameAtrezzoTitle"), TC.get("Operation.RenameElementWarning", new string[] { oldAtrezzoId, references })))
             {
-
                 // Show a dialog asking for the new atrezzo item id
                 string newAtrezzoId = name;
                 if (name == null)
-                    newAtrezzoId = controller.showInputDialog(TC.get("Operation.RenameAtrezzoTitle"), TC.get("Operation.RenameAtrezzoMessage"), oldAtrezzoId);
-
-                // If some value was typed and the identifiers are different
-				if (!controller.isElementIdValid (newAtrezzoId))
-					newAtrezzoId = controller.makeElementValid (newAtrezzoId);
-				
-                atrezzo.setId(newAtrezzoId);
-                controller.replaceIdentifierReferences(oldAtrezzoId, newAtrezzoId);
-                controller.IdentifierSummary.deleteAtrezzoId(oldAtrezzoId);
-                controller.IdentifierSummary.addAtrezzoId(newAtrezzoId);
-				//controller.dataModified( );
-				return newAtrezzoId;
+                    controller.ShowInputDialog(TC.get("Operation.RenameAtrezzoTitle"), TC.get("Operation.RenameAtrezzoMessage"), oldAtrezzoId, (o,s) => performRenameElement(s));
+                else
+                    return performRenameElement(name);
             }
 
             return null;
+        }
+
+        private string performRenameElement(string newAtrezzoId)
+        {
+            string oldAtrezzoId = atrezzo.getId();
+
+            // If some value was typed and the identifiers are different
+            if (!controller.isElementIdValid(newAtrezzoId))
+                newAtrezzoId = controller.makeElementValid(newAtrezzoId);
+
+            atrezzo.setId(newAtrezzoId);
+            controller.replaceIdentifierReferences(oldAtrezzoId, newAtrezzoId);
+            controller.IdentifierSummary.deleteId<Atrezzo>(oldAtrezzoId);
+            controller.IdentifierSummary.addId<Atrezzo>(newAtrezzoId);
+
+            return newAtrezzoId;
         }
 
 

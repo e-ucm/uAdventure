@@ -128,33 +128,35 @@ namespace uAdventure.Editor
 
         public override bool addElement(int type, string id)
         {
-
             bool elementAdded = false;
 
             if (type == Controller.ACTIVE_AREA)
             {
-
                 // Show a dialog asking for the item id
-                string itemId = id;
-                if (id == null)
-                    itemId = controller.showInputDialog(TC.get("Operation.AddItemTitle"), TC.get("Operation.AddItemMessage"),
-                        TC.get("Operation.AddItemDefaultValue"));
-
-                // If some value was typed and the identifier is valid
-                if (itemId != null && controller.isElementIdValid(itemId))
+                if (string.IsNullOrEmpty(id))
+                    controller.ShowInputDialog(TC.get("Operation.AddItemTitle"), TC.get("Operation.AddItemMessage"),
+                        TC.get("Operation.AddItemDefaultValue"), performAddElement);
+                else
                 {
-                    ActiveArea newActiveArea = new ActiveArea(itemId, true, 220, 220, 100, 100);
-                    activeAreasList.Add(newActiveArea);
-                    ActiveAreaDataControl newActiveAreaDataControl = new ActiveAreaDataControl(sceneDataControl,
-                        newActiveArea);
-                    activeAreasDataControlList.Add(newActiveAreaDataControl);
-                    controller.IdentifierSummary.addActiveAreaId(itemId);
-                    //controller.dataModified( );
+                    performAddElement(null, id);
                     elementAdded = true;
                 }
             }
 
             return elementAdded;
+        }
+
+        private void performAddElement(object sender, string id)
+        {
+            if (!controller.isElementIdValid(id))
+                id = controller.makeElementValid(id);
+
+            ActiveArea newActiveArea = new ActiveArea(id, true, 220, 220, 100, 100);
+            activeAreasList.Add(newActiveArea);
+            ActiveAreaDataControl newActiveAreaDataControl = new ActiveAreaDataControl(sceneDataControl, newActiveArea);
+            activeAreasDataControlList.Add(newActiveAreaDataControl);
+            controller.IdentifierSummary.addId<ActiveArea>(id);
+            //controller.dataModified( );
         }
 
 
@@ -183,7 +185,7 @@ namespace uAdventure.Editor
             newElement.setId(id);
             activeAreasList.Add(newElement);
             activeAreasDataControlList.Add(new ActiveAreaDataControl(sceneDataControl, newElement));
-            controller.IdentifierSummary.addActiveAreaId(id);
+            controller.IdentifierSummary.addId<ActiveArea>(id);
             return true;
 
         }
@@ -197,14 +199,14 @@ namespace uAdventure.Editor
             string references = controller.countIdentifierReferences(id).ToString();
 
             if (!askConfirmation ||
-                controller.showStrictConfirmDialog(TC.get("Operation.DeleteElementTitle"),
+                controller.ShowStrictConfirmDialog(TC.get("Operation.DeleteElementTitle"),
                     TC.get("Operation.DeleteElementWarning", new string[] { id, references })))
             {
                 if (activeAreasList.Remove((ActiveArea)dataControl.getContent()))
                 {
                     activeAreasDataControlList.Remove((ActiveAreaDataControl)dataControl);
                     controller.deleteIdentifierReferences(id);
-                    controller.IdentifierSummary.deleteActiveAreaId(((ActiveArea)dataControl.getContent()).getId());
+                    controller.IdentifierSummary.deleteId<ActiveArea>(((ActiveArea)dataControl.getContent()).getId());
                     elementDeleted = true;
                 }
             }
@@ -356,45 +358,6 @@ namespace uAdventure.Editor
         {
 
             return false;
-        }
-
-        /**
-         * Returns the data controllers of the item references of the scene that
-         * contains this element reference.
-         * 
-         * @return List of item references (including the one being edited)
-         */
-
-        public List<ElementReferenceDataControl> getParentSceneItemReferences()
-        {
-
-            return sceneDataControl.getReferencesList().getItemReferences();
-        }
-
-        /**
-         * Returns the data controllers of the character references of the scene
-         * that contains this element reference.
-         * 
-         * @return List of character references (including the one being edited)
-         */
-
-        public List<ElementReferenceDataControl> getParentSceneNPCReferences()
-        {
-
-            return sceneDataControl.getReferencesList().getNPCReferences();
-        }
-
-        /**
-         * Returns the data controllers of the atrezzo items references of the scene
-         * that contains this element reference.
-         * 
-         * @return List of atrezzo references (including the one being edited)
-         */
-
-        public List<ElementReferenceDataControl> getParentSceneAtrezzoReferences()
-        {
-
-            return sceneDataControl.getReferencesList().getAtrezzoReferences();
         }
 
         public List<ExitDataControl> getParentSceneExits()

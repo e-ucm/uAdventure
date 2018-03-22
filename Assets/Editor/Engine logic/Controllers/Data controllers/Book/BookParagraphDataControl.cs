@@ -143,26 +143,20 @@ namespace uAdventure.Editor
 
             // If the list of assets is empty, show an error message
             if (assetFilenames.Length == 0)
-                controller.showErrorDialog(TC.get("Resources.EditAsset"), TC.get("Resources.ErrorNoAssets"));
+                controller.ShowErrorDialog(TC.get("Resources.EditAsset"), TC.get("Resources.ErrorNoAssets"));
 
             // If not empty, select one of them
             else
             {
                 // Let the user choose between the assets
-                string selectedAsset = controller.showInputDialog(TC.get("Resources.EditAsset"), TC.get("Resources.EditAssetMessage"), assetFilenames);
-
-                // If a file was selected
-                if (selectedAsset != null)
-                {
-                    // Take the index of the selected asset
-                    int assetIndex = -1;
-                    for (int i = 0; i < assetFilenames.Length; i++)
-                        if (assetFilenames[i].Equals(selectedAsset))
-                            assetIndex = i;
-
-                    Controller.Instance.addTool(new ChangeParagraphContentTool(bookParagraph, assetPaths[assetIndex]));
-                }
+                controller.ShowInputDialog(TC.get("Resources.EditAsset"), TC.get("Resources.EditAssetMessage"), assetFilenames, performSetImageParagraphContent);
             }
+        }
+
+        private void performSetImageParagraphContent(object sender, string selectedAsset)
+        {
+            // Take the index of the selected asset
+            Controller.Instance.addTool(new ChangeParagraphContentTool(bookParagraph, selectedAsset));
         }
 
         /**

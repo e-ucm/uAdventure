@@ -129,26 +129,38 @@ namespace uAdventure.Editor
 
             if (type == Controller.EXIT)
             {
-				string[] generalScenes = controller.IdentifierSummary.groupIds<IChapterTarget> ();
-
-                if (generalScenes.Length > 0)
+                if (string.IsNullOrEmpty(id))
                 {
-                    string selectedScene = id;
-                    if (selectedScene != null)
+                    string[] generalScenes = controller.IdentifierSummary.groupIds<IChapterTarget>();
+                    if (generalScenes.Length != 0)
+                        controller.ShowInputDialog(TC.get("ExitsList.AddExit"), TC.get("Exit.TargetScene"), generalScenes, performAddExit);
+                    else
+                        controller.ShowErrorDialog(TC.get("ExitsList.AddExit"), TC.get("ExitsList.NoScenesError"));
+                }
+                else
+                {
+                    // We check if the proposed id is a valid IChapterTarget
+                    var destinationType = controller.IdentifierSummary.getType(id);
+                    if (destinationType != null && typeof(IChapterTarget).IsAssignableFrom(destinationType))
                     {
-                        Exit newExit = new Exit(true, 240, 240, 100, 100);
-                        newExit.setNextSceneId(selectedScene);
-                        ExitDataControl newExitDataControl = new ExitDataControl(sceneDataControl, newExit);
-
-                        exitsList.Add(newExit);
-                        exitsDataControlList.Add(newExitDataControl);
+                        // Is valid target
+                        performAddExit(null, id);
                         elementAdded = true;
                     }
                 }
-
             }
 
             return elementAdded;
+        }
+
+        private void performAddExit(object sender, string target)
+        {
+            Exit newExit = new Exit(true, 240, 240, 100, 100);
+            newExit.setNextSceneId(target);
+            ExitDataControl newExitDataControl = new ExitDataControl(sceneDataControl, newExit);
+
+            exitsList.Add(newExit);
+            exitsDataControlList.Add(newExitDataControl);
         }
 
 
@@ -336,42 +348,6 @@ namespace uAdventure.Editor
         {
 
             return false;
-        }
-
-        /**
-         * Returns the data controllers of the item references of the scene that
-         * contains this element reference.
-         * 
-         * @return List of item references (including the one being edited)
-         */
-        public List<ElementReferenceDataControl> getParentSceneItemReferences()
-        {
-
-            return sceneDataControl.getReferencesList().getItemReferences();
-        }
-
-        /**
-         * Returns the data controllers of the character references of the scene
-         * that contains this element reference.
-         * 
-         * @return List of character references (including the one being edited)
-         */
-        public List<ElementReferenceDataControl> getParentSceneNPCReferences()
-        {
-
-            return sceneDataControl.getReferencesList().getNPCReferences();
-        }
-
-        /**
-         * Returns the data controllers of the atrezzo items references of the scene
-         * that contains this element reference.
-         * 
-         * @return List of atrezzo references (including the one being edited)
-         */
-        public List<ElementReferenceDataControl> getParentSceneAtrezzoReferences()
-        {
-
-            return sceneDataControl.getReferencesList().getAtrezzoReferences();
         }
 
         public List<BarrierDataControl> getParentSceneBarriers()

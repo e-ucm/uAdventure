@@ -39,7 +39,10 @@ namespace uAdventure.Editor
             SET_ITEM_IMAGE,
             CHARACTER_ANIM,
             PLAY_SOUND_EFFECT,
-            PLAY_ANIMATION_EFFECT
+            PLAY_ANIMATION_EFFECT,
+            BUTTON,
+            BUTTON_OVER,
+            BUTTON_SOUND
         };
 
         protected const string DIR_PREFIX = "Assets/Resources/CurrentGame";
@@ -129,6 +132,7 @@ namespace uAdventure.Editor
                 case FileType.NPC_DESCRIPTION_BRIEF_SOUND:
                 case FileType.NPC_DESCRIPTION_DETAILED_SOUND:
                 case FileType.PLAY_SOUND_EFFECT:
+                case FileType.BUTTON_SOUND:
                     assetTypeDir = AssetsController.CATEGORY_AUDIO_PATH;
                     break;
                 case FileType.EXIT_ICON:
@@ -152,8 +156,9 @@ namespace uAdventure.Editor
                 case FileType.SET_ITEM_IMAGE:
                     assetTypeDir = AssetsController.CATEGORY_IMAGE_FOLDER;
                     break;
-                case FileType.ITEM_ICON:
-                    assetTypeDir = AssetsController.CATEGORY_ICON_FOLDER;
+                case FileType.BUTTON:
+                case FileType.BUTTON_OVER:
+                    assetTypeDir = AssetsController.CATEGORY_BUTTON_PATH;
                     break;
                 case FileType.BOOK_ARROW_LEFT_NORMAL:
                 case FileType.BOOK_ARROW_RIGHT_NORMAL:

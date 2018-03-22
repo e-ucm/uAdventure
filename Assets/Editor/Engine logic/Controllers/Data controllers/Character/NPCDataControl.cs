@@ -354,27 +354,35 @@ namespace uAdventure.Editor
             string references = controller.countIdentifierReferences(oldNPCId).ToString();
 
             // Ask for confirmation
-            if (name != null || controller.showStrictConfirmDialog(TC.get("Operation.RenameNPCTitle"), TC.get("Operation.RenameElementWarning", new string[] { oldNPCId, references })))
+            if (name != null || controller.ShowStrictConfirmDialog(TC.get("Operation.RenameNPCTitle"), TC.get("Operation.RenameElementWarning", new string[] { oldNPCId, references })))
             {
-
                 // Show a dialog asking for the new npc id
                 string newNPCId = name;
                 if (name == null)
-                    newNPCId = controller.showInputDialog(TC.get("Operation.RenameNPCTitle"), TC.get("Operation.RenameNPCMessage"), oldNPCId);
-
-                // If some value was typed and the identifiers are different
-				if (!controller.isElementIdValid (newNPCId))
-					newNPCId = controller.makeElementValid (newNPCId);
-				
-                npc.setId(newNPCId);
-                controller.replaceIdentifierReferences(oldNPCId, newNPCId);
-                controller.IdentifierSummary.deleteNPCId(oldNPCId);
-                controller.IdentifierSummary.addNPCId(newNPCId);
-				//controller.dataModified( );
-				return newNPCId;
+                    controller.ShowInputDialog(TC.get("Operation.RenameNPCTitle"), TC.get("Operation.RenameNPCMessage"), oldNPCId, (o,s) => performRenameElement(s));
+                else
+                {
+                    //controller.dataModified( );
+                    return performRenameElement(newNPCId);
+                }
             }
 
             return null;
+        }
+
+        private string performRenameElement(string newNPCId)
+        {
+            string oldNPCId = npc.getId();
+            // If some value was typed and the identifiers are different
+            if (!controller.isElementIdValid(newNPCId))
+                newNPCId = controller.makeElementValid(newNPCId);
+
+            npc.setId(newNPCId);
+            controller.replaceIdentifierReferences(oldNPCId, newNPCId);
+            controller.IdentifierSummary.deleteId<NPC>(oldNPCId);
+            controller.IdentifierSummary.addId<NPC>(newNPCId);
+
+            return newNPCId;
         }
 
 

@@ -54,7 +54,7 @@ namespace uAdventure.Editor
 
             // If it is not possible to link the node to the given one, show a message
             if (!dataControl.canLinkNodeTo(fatherView, childView))
-                controller.showErrorDialog(TC.get("Conversation.OperationLinkNode"), TC.get("Conversation.ErrorLinkNode"));
+                controller.ShowErrorDialog(TC.get("Conversation.OperationLinkNode"), TC.get("Conversation.ErrorLinkNode"));
 
             // If it can be linked
             else

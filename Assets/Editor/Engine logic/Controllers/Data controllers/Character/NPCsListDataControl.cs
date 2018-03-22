@@ -159,23 +159,31 @@ namespace uAdventure.Editor
             {
 
                 // Show a dialog asking for the character id
-                if (npcId == null || npcId.Equals(""))
-                    npcId = controller.showInputDialog(TC.get("Operation.AddNPCTitle"), TC.get("Operation.AddNPCMessage"), TC.get("Operation.AddNPCDefaultValue"));
-
-                // If some value was typed and the identifier is valid
-				if (!controller.isElementIdValid (npcId))
-					npcId = controller.makeElementValid (npcId);
-				
-                // Add thew new character
-                NPC newNPC = new NPC(npcId);
-                npcsList.Add(newNPC);
-                npcsDataControlList.Add(new NPCDataControl(newNPC));
-                controller.IdentifierSummary.addNPCId(npcId);
-                //controller.dataModified( );
-                elementAdded = true;
+                if (string.IsNullOrEmpty(npcId))
+                    controller.ShowInputDialog(TC.get("Operation.AddNPCTitle"), TC.get("Operation.AddNPCMessage"), TC.get("Operation.AddNPCDefaultValue"), performAddElement);
+                else
+                {
+                    //controller.dataModified( );
+                    performAddElement(null, npcId);
+                    elementAdded = true;
+                }
             }
 
             return elementAdded;
+        }
+
+
+        private void performAddElement(object sender, string npcId)
+        {
+            // If some value was typed and the identifier is valid
+            if (!controller.isElementIdValid(npcId))
+                npcId = controller.makeElementValid(npcId);
+
+            // Add thew new character
+            NPC newNPC = new NPC(npcId);
+            npcsList.Add(newNPC);
+            npcsDataControlList.Add(new NPCDataControl(newNPC));
+            controller.IdentifierSummary.addId<NPC>(npcId);
         }
 
 
@@ -195,7 +203,7 @@ namespace uAdventure.Editor
             newElement.setId(id);
             npcsList.Add(newElement);
             npcsDataControlList.Add(new NPCDataControl(newElement));
-            controller.IdentifierSummary.addNPCId(id);
+            controller.IdentifierSummary.addId<NPC>(id);
             return true;
         }
 
@@ -215,13 +223,13 @@ namespace uAdventure.Editor
             string references = controller.countIdentifierReferences(npcId).ToString();
 
             // Ask for confirmation
-            if (!askConfirmation || controller.showStrictConfirmDialog(TC.get("Operation.DeleteElementTitle"), TC.get("Operation.DeleteElementWarning", new string[] { npcId, references })))
+            if (!askConfirmation || controller.ShowStrictConfirmDialog(TC.get("Operation.DeleteElementTitle"), TC.get("Operation.DeleteElementWarning", new string[] { npcId, references })))
             {
                 if (npcsList.Remove((NPC)dataControl.getContent()))
                 {
                     npcsDataControlList.Remove((NPCDataControl)dataControl);
                     controller.deleteIdentifierReferences(npcId);
-                    controller.IdentifierSummary.deleteNPCId(npcId);
+                    controller.IdentifierSummary.deleteId<NPC>(npcId);
                     //controller.dataModified( );
                     elementDeleted = true;
                 }

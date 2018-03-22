@@ -98,7 +98,7 @@ public class DataControlList : ButtonList {
 
     protected virtual void OnAdd(object type)
     {
-        dataControl.addElement((int)type, dataControl.getDefaultId((int)type));
+        dataControl.addElement((int)type, null);
         OnChanged(reorderableList);
     }
 
@@ -138,6 +138,36 @@ public class DataControlList : ButtonList {
         var fromPos = list.FindIndex(i => i == r.list[r.index]);
 
         dataControl.MoveElement(list[fromPos], fromPos, toPos);
+    }
+
+    public override void DoList(float height)
+    {
+        var content = dataControl.getContent();
+        if(content != null)
+        {
+            if (content is Array)
+            {
+                if (((Array)content).Length != reorderableList.list.Count)
+                    OnChanged(reorderableList);
+            }
+            else if (content is IList)
+            {
+                if (((IList)content).Count != reorderableList.list.Count)
+                    OnChanged(reorderableList);
+            }
+            /* This has obvious performance issues
+            else if (content is IEnumerable)
+            {
+                var count = 0;
+                foreach (var _ in (IEnumerable)content)
+                    ++count;
+                
+                if (count != reorderableList.list.Count)
+                    OnChanged(reorderableList);
+            }*/
+        }
+
+        base.DoList(height);
     }
 
 }

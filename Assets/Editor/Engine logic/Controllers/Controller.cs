@@ -777,7 +777,7 @@ namespace uAdventure.Editor
                     if (selectedFolder.GetFiles().Length > 0)
                     {
                         // Delete content?
-                        if (this.showStrictConfirmDialog(TC.get("Operation.NewProject.FolderNotEmptyTitle"),
+                        if (this.ShowStrictConfirmDialog(TC.get("Operation.NewProject.FolderNotEmptyTitle"),
                             TC.get("Operation.NewProject.FolderNotEmptyMessage")))
                         {
                             DirectoryInfo directory = new DirectoryInfo(selectedFolder.FullName);
@@ -789,7 +789,7 @@ namespace uAdventure.Editor
                 else
                 {
                     // Create new folder?
-                    if (this.showStrictConfirmDialog(TC.get("Operation.NewProject.FolderNotCreatedTitle"),
+                    if (this.ShowStrictConfirmDialog(TC.get("Operation.NewProject.FolderNotCreatedTitle"),
                         TC.get("Operation.NewProject.FolderNotCreatedMessage")))
                     {
                         DirectoryInfo directory = new DirectoryInfo(selectedFolder.FullName);
@@ -800,7 +800,7 @@ namespace uAdventure.Editor
                         }
                         else
                         {
-                            this.showStrictConfirmDialog(TC.get("Error.Title"), TC.get("Error.CreatingFolder"));
+                            this.ShowStrictConfirmDialog(TC.get("Error.Title"), TC.get("Error.CreatingFolder"));
                         }
 
                     }
@@ -1305,6 +1305,7 @@ namespace uAdventure.Editor
                     // Reload the adventure as probably the animations have been replaced
                     EditorUtility.DisplayProgressBar("Importing project", "Finished! Reloading project...", 100);
                     loadedAdventureData = Loader.loadAdventureData(ResourceManager, incidences);
+                    loadedAdventureData.setProjectName(currentZipName);
                     EditorUtility.ClearProgressBar();
                 }
                     
@@ -2723,79 +2724,54 @@ namespace uAdventure.Editor
          *            Message of the dialog
          * @return True if the "Yes" button was pressed, false otherwise
          */
-        public bool showStrictConfirmDialog(string title, string message)
+        public bool ShowStrictConfirmDialog(string title, string message)
         {
-            //TODO: implementation
-            return true;
-            // return mainWindow.showStrictConfirmDialog(title, message);
+            return EditorUtility.DisplayDialog(title, message, TC.get("GeneralText.Yes"), TC.get("GeneralText.No"));
         }
 
-        ///**
-        // * Shows a dialog with the given set of options.
-        // * 
-        // * @param title
-        // *            Title of the dialog
-        // * @param message
-        // *            Message of the dialog
-        // * @param options
-        // *            Array of strings containing the options of the dialog
-        // * @return The index of the option selected, JOptionPane.CLOSED_OPTION if
-        // *         the dialog was closed.
-        // */
-        ////public int showOptionDialog(string title, string message, string[] options)
-        ////{
-
-        ////    return mainWindow.showOptionDialog(title, message, options);
-        ////}
-
-        ///**
-        // * Uses the GUI to show an input dialog.
-        // * 
-        // * @param title
-        // *            Title of the dialog
-        // * @param message
-        // *            Message of the dialog
-        // * @param defaultValue
-        // *            Default value of the dialog
-        // * @return string typed in the dialog, null if the cancel button was pressed
-        // */
-        public string showInputDialog(string title, string message, string defaultValue)
+        public void ShowInputDialog(string title, string message, InputReceiver.HandleInputCallback onInput, InputReceiver.CancelInputCallback onCancel = null)
         {
-            //TODO: Implementation
-            string s;
-            System.Random random = new System.Random((int)DateTime.Now.Ticks);
-            s = "defaultValue" + random.Next(100);
-
-            return s;
+            ShowInputDialog(title, message, "", onInput, onCancel);
         }
 
-        public string showInputDialog(string title, string message)
+        public void ShowInputDialog(string title, string message, object token, DialogReceiverInterface receiver)
         {
-
-            //TODO: Implementation
-            return "";
-            // return mainWindow.showInputDialog(title, message);
+            ShowInputDialog(title, message, "", token, receiver);
         }
 
-        /**
-         * Uses the GUI to show an input dialog.
-         * 
-         * @param title
-         *            Title of the dialog
-         * @param message
-         *            Message of the dialog
-         * @param selectionValues
-         *            Possible selection values of the dialog
-         * @return Option selected in the dialog, null if the cancel button was
-         *         pressed
-         */
-
-        public string showInputDialog(string title, string message, System.Object[] selectionValues)
+        public void ShowInputDialog(string title, string message, string defaultValue, InputReceiver.HandleInputCallback onInput, InputReceiver.CancelInputCallback onCancel = null)
         {
-            //TODO: Implementation
-            return "";
+            var receiver = new InputReceiver(this, onInput, onCancel);
+            ShowInputDialog(title, message, defaultValue, null, receiver);
+        }
+        public void ShowInputDialog(string title, string message, string defaultValue, object token, DialogReceiverInterface receiver)
+        {
+            var inputDialog = new InputDialog();
+            inputDialog.Init(receiver, token, title, message, defaultValue);
+        }
 
-            //return mainWindow.showInputDialog(title, message, selectionValues);
+        public void ShowInputDialog(string title, string message, object[] selectionValues, InputReceiver.HandleInputCallback onInput, InputReceiver.CancelInputCallback onCancel = null)
+        {
+            var receiver = new InputReceiver(this, onInput, onCancel);
+            ShowInputDialog(title, message, selectionValues, null, receiver);
+        }
+
+        public void ShowInputDialog(string title, string message, object[] selectionValues, object token, DialogReceiverInterface receiver)
+        {
+            var inputDialog = new ChooseObjectDialog();
+            string[] values;
+            if(selectionValues is string[])
+            {
+                values = selectionValues as string[];
+            }
+            else
+            {
+                values = new string[selectionValues.Length];
+                for (int i = 0; i < selectionValues.Length; ++i)
+                    values[i] = selectionValues[i].ToString();
+            }
+
+            inputDialog.Init(receiver, token, title, message, values);
         }
 
         ///**
@@ -2806,9 +2782,9 @@ namespace uAdventure.Editor
         // * @param message
         // *            Message of the dialog
         // */
-        public void showErrorDialog(string title, string message)
+        public void ShowErrorDialog(string title, string message)
         {
-
+            EditorUtility.DisplayDialog(title, message, "Ok");
             Debug.LogError(title + "\n" + message);
         }
 
@@ -3020,6 +2996,36 @@ namespace uAdventure.Editor
         public void RefreshView()
         {
             EditorWindowBase.RefreshChapter();
+        }
+
+        public class InputReceiver : DialogReceiverInterface
+        {
+            public delegate void HandleInputCallback(object sender, string input);
+            public delegate void CancelInputCallback(object sender);
+
+            private object sender;
+            private event HandleInputCallback HandleInput;
+            private event CancelInputCallback CancelInput;
+
+            public InputReceiver(object sender, HandleInputCallback handleInput, CancelInputCallback cancelInput = null)
+            {
+                this.sender = sender;
+                this.HandleInput = handleInput;
+                this.CancelInput = cancelInput;
+            }
+
+            public void OnDialogCanceled(object workingObject = null)
+            {
+                if(CancelInput != null)
+                    CancelInput(workingObject);
+            }
+
+            public void OnDialogOk(string message, object workingObject = null, object workingObjectSecond = null)
+            {
+                if(HandleInput != null)
+                    HandleInput(workingObject, message);
+            }
+
         }
 
         #region Windows

@@ -156,26 +156,30 @@ namespace uAdventure.Editor
             {
 
                 // Show a dialog asking for the globalState id
-                if (globalStateId == null)
-                    globalStateId = controller.showInputDialog(TC.get("Operation.AddGlobalStateTitle"), TC.get("Operation.AddGlobalStateMessage"), TC.get("Operation.AddGlobalStateDefaultValue"));
-
+                if (string.IsNullOrEmpty(globalStateId))
+                    controller.ShowInputDialog(TC.get("Operation.AddGlobalStateTitle"), TC.get("Operation.AddGlobalStateMessage"), TC.get("Operation.AddGlobalStateDefaultValue"), performAddElement);
                 // If some value was typed and the identifier is valid
-                if (globalStateId != null)
+                else
                 {
-                    if (!controller.isElementIdValid(globalStateId))
-                        globalStateId = controller.makeElementValid(globalStateId);
-
-                    // Add thew new globalState
-                    GlobalState newGlobalState = new GlobalState(globalStateId);
-                    globalStatesList.Add(newGlobalState);
-                    globalStatesDataControlList.Add(new GlobalStateDataControl(newGlobalState));
-                    controller.IdentifierSummary.addGlobalStateId(globalStateId);
-                    //controller.dataModified( );
+                    performAddElement(null, globalStateId);
                     elementAdded = true;
                 }
             }
 
             return elementAdded;
+        }
+
+        private void performAddElement(object sender, string globalStateId)
+        {
+            if (!controller.isElementIdValid(globalStateId))
+                globalStateId = controller.makeElementValid(globalStateId);
+
+            // Add thew new globalState
+            GlobalState newGlobalState = new GlobalState(globalStateId);
+            globalStatesList.Add(newGlobalState);
+            globalStatesDataControlList.Add(new GlobalStateDataControl(newGlobalState));
+            controller.IdentifierSummary.addId<GlobalState>(globalStateId);
+            //controller.dataModified( );
         }
 
 
@@ -196,7 +200,7 @@ namespace uAdventure.Editor
             newElement.setId(id);
             globalStatesList.Add(newElement);
             globalStatesDataControlList.Add(new GlobalStateDataControl(newElement));
-            controller.IdentifierSummary.addGlobalStateId(id);
+            controller.IdentifierSummary.addId<GlobalState>(id);
             return true;
         }
 
@@ -216,13 +220,13 @@ namespace uAdventure.Editor
             string references = controller.countIdentifierReferences(globalStateId).ToString();
 
             // Ask for confirmation
-            if (!askConfirmation || controller.showStrictConfirmDialog(TC.get("Operation.DeleteElementTitle"), TC.get("Operation.DeleteElementWarning", new string[] { globalStateId, references })))
+            if (!askConfirmation || controller.ShowStrictConfirmDialog(TC.get("Operation.DeleteElementTitle"), TC.get("Operation.DeleteElementWarning", new string[] { globalStateId, references })))
             {
                 if (globalStatesList.Remove((GlobalState)dataControl.getContent()))
                 {
                     globalStatesDataControlList.Remove((GlobalStateDataControl)dataControl);
                     controller.deleteIdentifierReferences(globalStateId);
-                    controller.IdentifierSummary.deleteGlobalStateId(globalStateId);
+                    controller.IdentifierSummary.deleteId<GlobalState>(globalStateId);
                     //controller.dataModified( );
                     elementDeleted = true;
                 }

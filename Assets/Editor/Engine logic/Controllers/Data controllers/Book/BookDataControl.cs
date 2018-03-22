@@ -356,27 +356,35 @@ namespace uAdventure.Editor
             string references = controller.countIdentifierReferences(oldBookId).ToString();
 
             // Ask for confirmation
-            if (name != null || controller.showStrictConfirmDialog(TC.get("Operation.RenameBookTitle"), TC.get("Operation.RenameElementWarning", new string[] { oldBookId, references })))
+            if (name != null || controller.ShowStrictConfirmDialog(TC.get("Operation.RenameBookTitle"), TC.get("Operation.RenameElementWarning", new string[] { oldBookId, references })))
             {
-
                 // Show a dialog asking for the new book id
                 string newBookId = name;
                 if (name == null)
-                    newBookId = controller.showInputDialog(TC.get("Operation.RenameBookTitle"), TC.get("Operation.RenameBookMessage"), oldBookId);
-
-                // If some value was typed and the identifiers are different
-				if (!controller.isElementIdValid (newBookId))
-					newBookId = controller.makeElementValid (newBookId);
-					
-				book.setId(newBookId);
-                controller.replaceIdentifierReferences(oldBookId, newBookId);
-                controller.IdentifierSummary.deleteBookId(oldBookId);
-                controller.IdentifierSummary.addBookId(newBookId);
-				//controller.dataModified( );
-				return newBookId;
+                    controller.ShowInputDialog(TC.get("Operation.RenameBookTitle"), TC.get("Operation.RenameBookMessage"), oldBookId, (o,s) => performRenameElement(s));
+                else
+                {
+                    //controller.dataModified( );
+                    return performRenameElement(name);
+                }
             }
 
             return null;
+        }
+
+        private string performRenameElement(string newBookId)
+        {
+            string oldBookId = book.getId();
+            // If some value was typed and the identifiers are different
+            if (!controller.isElementIdValid(newBookId))
+                newBookId = controller.makeElementValid(newBookId);
+
+            book.setId(newBookId);
+            controller.replaceIdentifierReferences(oldBookId, newBookId);
+            controller.IdentifierSummary.deleteId<Book>(oldBookId);
+            controller.IdentifierSummary.addId<Book>(newBookId);
+
+            return newBookId;
         }
 
 

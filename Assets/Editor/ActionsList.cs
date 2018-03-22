@@ -12,9 +12,17 @@ public class ActionsList : ScriptableObject {
     private Texture2D noConditionsTex = null;
 
     private DataControlList actionsList;
+    private AppearanceEditor appearances;
+    private CustomActionDataControl customAction;
+    
+    private FileChooser file;
+    private AnimationField animation;
+    private int groupSelected = 0;
 
-    public void OnEnable()
+    public void Awake()
     {
+        appearances = ScriptableObject.CreateInstance<AppearanceEditor>();
+
         conditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/conditions-24x24", typeof(Texture2D));
         noConditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/no-conditions-24x24", typeof(Texture2D));
 
@@ -56,6 +64,7 @@ public class ActionsList : ScriptableObject {
                 switch (column)
                 {
                     case 0:
+                        var name = action.getContent() is CustomAction ? ((CustomAction)action.getContent()).getName() : action.getTypeName();
                         if (action.hasIdTarget())
                         {
                             var leftHalf = new Rect(rect);
@@ -63,7 +72,7 @@ public class ActionsList : ScriptableObject {
                             var rightHalf = new Rect(leftHalf);
                             rightHalf.x += leftHalf.width;
                             rightHalf.height = 25;
-                            EditorGUI.LabelField(leftHalf, action.getTypeName());
+                            EditorGUI.LabelField(leftHalf, name);
                             if (!isActive)
                             {
                                 EditorGUI.LabelField(rightHalf, !string.IsNullOrEmpty(action.getIdTarget()) ? action.getIdTarget() : "---");
@@ -77,16 +86,16 @@ public class ActionsList : ScriptableObject {
                                 {
                                     case Action.DRAG_TO:
                                     case Action.CUSTOM_INTERACT:
-                                        choices = Controller.Instance.IdentifierSummary.getItemActiveAreaNPCIds();
+                                        choices = Controller.Instance.IdentifierSummary.combineIds(new System.Type[] { typeof(Item), typeof(NPC), typeof(ActiveArea) });
                                         break;
                                     case Action.GIVE_TO:
-                                        choices = Controller.Instance.IdentifierSummary.getNPCIds();
+                                        choices = Controller.Instance.IdentifierSummary.getIds<NPC>();
                                         break;
                                     case Action.USE_WITH:
-                                        choices = Controller.Instance.IdentifierSummary.getItemAndActiveAreaIds();
+                                        choices = Controller.Instance.IdentifierSummary.combineIds(new System.Type[] { typeof(Item), typeof(ActiveArea) });
                                         break;
                                 }
-                                
+
                                 var selectedIndex = EditorGUI.Popup(rightHalf, System.Array.FindIndex(choices, action.getIdTarget().Equals), choices);
                                 if (EditorGUI.EndChangeCheck())
                                 {
@@ -100,7 +109,7 @@ public class ActionsList : ScriptableObject {
                         }
                         else
                         {
-                            EditorGUI.LabelField(rect, action.getTypeName());
+                            EditorGUI.LabelField(rect, name);
                         }
                         break;
                     case 1:
@@ -147,9 +156,45 @@ public class ActionsList : ScriptableObject {
                 }
             }
         };
+
+        actionsList.onSelectCallback += (list) =>
+        {
+            var i = list.index;
+            var actions = ActionsListDataControl.getActions();
+            customAction = i != -1 && actions[i] is CustomActionDataControl ? actions[i] as CustomActionDataControl : null;
+            if(customAction != null)
+            {
+                appearances.Data = customAction;
+            }
+        };
+
+        appearances = CreateInstance<AppearanceEditor>();
+
+        file = new FileChooser()
+        {
+            FileType = BaseFileOpenDialog.FileType.BUTTON,
+        };
+
+        animation = new AnimationField()
+        {
+            FileType = BaseFileOpenDialog.FileType.CHARACTER_ANIM,
+        };
     }
 
-    public ActionsListDataControl ActionsListDataControl { get; set; }
+
+    public ActionsListDataControl ActionsListDataControl {
+        get
+        {
+            return actionsList.DataControl as ActionsListDataControl;
+        }
+        set
+        {
+            if(actionsList.DataControl != value)
+            {
+                actionsList.SetData(value, (data) => (data as ActionsListDataControl).getActions().Cast<DataControl>().ToList());
+            }
+        }
+    }
     
 
     public void DoList(float height)
@@ -159,8 +204,35 @@ public class ActionsList : ScriptableObject {
             EditorGUILayout.HelpBox("Actions List not setted!", MessageType.Warning);
             return;
         }
+         
+        actionsList.DoList(customAction != null ? height - 160 : height);
 
-        actionsList.SetData(ActionsListDataControl, (data) => (data as ActionsListDataControl).getActions().Cast<DataControl>().ToList());
-        actionsList.DoList(height);
+        if (customAction != null)
+        {
+            appearances.height = 80;
+            appearances.OnInspectorGUI();
+            var resources = customAction.getResources()[customAction.getSelectedResources()];
+            var titles = new string[resources.getAssetGroupCount()];
+            for (int i = 0, end = titles.Length; i < end; ++i)
+            {
+                titles[i] = resources.getGroupInfo(i);
+            }
+
+            groupSelected = EditorGUILayout.Popup(TC.get("Resources.ResourcesGroup"), groupSelected, titles);
+            int assetIndex;
+            for(int i = 0, end = resources.getGroupAssetCount(groupSelected); i < end; ++i)
+            {
+                assetIndex = resources.getAssetIndex(groupSelected, i);
+                var field = resources.getAssetCategory(assetIndex) == AssetsConstants.CATEGORY_ANIMATION ? animation : file;
+                field.Label = resources.getAssetDescription(i);
+                field.Path = resources.getAssetPath(assetIndex);
+                EditorGUI.BeginChangeCheck();
+                field.DoLayout();
+                if (EditorGUI.EndChangeCheck())
+                {
+                    resources.addAsset(resources.getAssetName(i), field.Path);
+                }
+            }
+        }
     }
 }

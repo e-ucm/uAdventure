@@ -185,52 +185,32 @@ namespace uAdventure.Editor
 
         public override string renameElement(string name)
         {
-
-            bool elementRenamed = false;
             string oldItemId = getId();
-            string references = Controller.Instance.countIdentifierReferences(oldItemId).ToString();
+            string references = controller.countIdentifierReferences(oldItemId).ToString();
 
             // Ask for confirmation
-            if (name != null ||
-                Controller.Instance                    .showStrictConfirmDialog(TC.get("Operation.RenameMacroTitle"),
+            if (name != null || controller.ShowStrictConfirmDialog(TC.get("Operation.RenameMacroTitle"),
                         TC.get("Operation.RenameElementWarning", new string[] { oldItemId, references })))
             {
-
-                // Show a dialog asking for the new item id
-                string newItemId = name;
                 if (name == null)
-                    newItemId = Controller.Instance                        .showInputDialog(TC.get("Operation.RenameMacroTitle"), TC.get("Operation.RenameMacroMessage"),
-                            oldItemId);
-
-                // If some value was typed and the identifiers are different
-                if (newItemId != null && !newItemId.Equals(oldItemId) &&
-                    Controller.Instance.isElementIdValid(newItemId))
-                {
-                    macro.setId(newItemId);
-                    Controller.Instance.replaceIdentifierReferences(oldItemId, newItemId);
-                    Controller.Instance.IdentifierSummary.deleteMacroId(oldItemId);
-                    Controller.Instance.IdentifierSummary.addMacroId(newItemId);
-                    //Controller.getInstance().dataModified( );
-                    elementRenamed = true;
-                }
+                    // Show a dialog asking for the new item id
+                    controller.ShowInputDialog(TC.get("Operation.RenameMacroTitle"), TC.get("Operation.RenameMacroMessage"), oldItemId, (o,s) => performRenameElement<Macro>(s));
+                else
+                    return performRenameElement<Macro>(name);
             }
 
-            if (elementRenamed)
-                return oldItemId;
             return null;
         }
 
 
         public override void replaceIdentifierReferences(string oldId, string newId)
         {
-
             EffectsController.replaceIdentifierReferences(oldId, newId, macro);
         }
 
 
         public override void updateVarFlagSummary(VarFlagSummary varFlagSummary)
         {
-
             EffectsController.updateVarFlagSummary(varFlagSummary, macro);
         }
 

@@ -280,6 +280,23 @@ namespace uAdventure.Editor
             return getPathToDataControl(dataControl);
         }
 
+        protected string performRenameElement<T>(string newId) where T : HasId
+        {
+            var elem = ((T)getContent());
+            string oldId = elem.getId();
+
+            // If some value was typed and the identifiers are different
+            if (!controller.isElementIdValid(newId))
+                newId = controller.makeElementValid(newId);
+
+            elem.setId(newId);
+            controller.replaceIdentifierReferences(oldId, newId);
+            controller.IdentifierSummary.deleteId<T>(oldId);
+            controller.IdentifierSummary.addId<T>(newId);
+
+            return newId;
+        }
+
         public abstract List<Searchable> getPathToDataControl(Searchable dataControl);
 
 		public virtual void MoveElement(DataControl element, int fromPos, int toPos){

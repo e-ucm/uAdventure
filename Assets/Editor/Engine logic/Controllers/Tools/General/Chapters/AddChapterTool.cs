@@ -60,7 +60,7 @@ namespace uAdventure.Editor
                 }
                 else
                 {
-                    controller.showErrorDialog(TC.get("Operation.CreateAdaptationFile.FileName.ExistValue.Title"), TC.get("Operation.NewChapter.ExistingName"));
+                    controller.ShowErrorDialog(TC.get("Operation.CreateAdaptationFile.FileName.ExistValue.Title"), TC.get("Operation.NewChapter.ExistingName"));
                     return false;
                 }
             }

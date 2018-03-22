@@ -254,28 +254,35 @@ namespace uAdventure.Editor
             string references = controller.countIdentifierReferences(oldItemId).ToString();
 
             // Ask for confirmation
-            if (name != null || controller.showStrictConfirmDialog(TC.get("Operation.RenameItemTitle"), TC.get("Operation.RenameElementWarning", new string[] { oldItemId, references })))
+            if (name != null || controller.ShowStrictConfirmDialog(TC.get("Operation.RenameItemTitle"), TC.get("Operation.RenameElementWarning", new string[] { oldItemId, references })))
             {
 
                 // Show a dialog asking for the new item id
-                string newItemId = name;
                 if (name == null)
-                    newItemId = controller.showInputDialog(TC.get("Operation.RenameItemTitle"), TC.get("Operation.RenameItemMessage"), oldItemId);
-
-                // If some value was typed and the identifiers are different
-				if (!controller.isElementIdValid (newItemId))
-					newItemId = controller.makeElementValid (newItemId);
-				
-                item.setId(newItemId);
-                controller.replaceIdentifierReferences(oldItemId, newItemId);
-                controller.IdentifierSummary.deleteItemId(oldItemId);
-                controller.IdentifierSummary.addItemId(newItemId);
-                //controller.dataModified( );
-
-				return newItemId;
+                    controller.ShowInputDialog(TC.get("Operation.RenameItemTitle"), TC.get("Operation.RenameItemMessage"), oldItemId, (o,s) => performRenameElement(s));
+                else
+                    return performRenameElement(name);
             }
 
             return null;
+        }
+
+        private string performRenameElement(string newItemId)
+        {
+            string oldItemId = item.getId();
+
+
+            // If some value was typed and the identifiers are different
+            if (!controller.isElementIdValid(newItemId))
+                newItemId = controller.makeElementValid(newItemId);
+
+            item.setId(newItemId);
+            controller.replaceIdentifierReferences(oldItemId, newItemId);
+            controller.IdentifierSummary.deleteId<Item>(oldItemId);
+            controller.IdentifierSummary.addId<Item>(newItemId);
+            //controller.dataModified( );
+
+            return newItemId;
         }
 
 

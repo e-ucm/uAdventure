@@ -239,28 +239,21 @@ namespace uAdventure.Editor
 
         public override string renameElement(string name)
         {
-
             bool elementRenamed = false;
             string oldSceneId = activeArea.getId();
             string references = controller.countIdentifierReferences(oldSceneId).ToString();
 
             // Ask for confirmation
-            if (name != null || controller.showStrictConfirmDialog(TC.get("Operation.RenameSceneTitle"), TC.get("Operation.RenameElementWarning", new string[] { oldSceneId, references })))
+            if (name != null || controller.ShowStrictConfirmDialog(TC.get("Operation.RenameSceneTitle"), TC.get("Operation.RenameElementWarning", new string[] { oldSceneId, references })))
             {
 
                 // Show a dialog asking for the new scene id
-                string newSceneId = name;
                 if (name == null)
-                    newSceneId = controller.showInputDialog(TC.get("Operation.RenameSceneTitle"), TC.get("Operation.RenameSceneMessage"), oldSceneId);
-
-                // If some value was typed and the identifiers are different
-                if (newSceneId != null && !newSceneId.Equals(oldSceneId) && controller.isElementIdValid(newSceneId))
+                    controller.ShowInputDialog(TC.get("Operation.RenameSceneTitle"), 
+                        TC.get("Operation.RenameSceneMessage"), oldSceneId, (o,s) => performRenameElement<ActiveArea>(s));
+                else
                 {
-                    activeArea.setId(newSceneId);
-                    controller.replaceIdentifierReferences(oldSceneId, newSceneId);
-                    controller.IdentifierSummary.deleteActiveAreaId(oldSceneId);
-                    controller.IdentifierSummary.addActiveAreaId(newSceneId);
-                    //controller.dataModified( );
+                    performRenameElement<ActiveArea>(name);
                     elementRenamed = true;
                 }
             }
@@ -273,7 +266,6 @@ namespace uAdventure.Editor
 
         public override void updateVarFlagSummary(VarFlagSummary varFlagSummary)
         {
-
             actionsListDataControl.updateVarFlagSummary(varFlagSummary);
             ConditionsController.updateVarFlagSummary(varFlagSummary, activeArea.getConditions());
             descriptionsController.updateVarFlagSummary(varFlagSummary);

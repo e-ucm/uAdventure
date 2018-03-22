@@ -117,7 +117,7 @@ namespace uAdventure.Editor
                 var cutscene = Target as CutsceneDataControl;
 
                 if (cutscene.isVideoscene()) slidesPreview = slidePreviewMovie;
-                else slidesPreview = AssetsController.getImageTexture(cutscene.getPreviewImage());
+                else slidesPreview = Controller.ResourceManager.getImage(cutscene.getPreviewImage());
             }
 
             GUI.DrawTexture(rect, slidesPreview, ScaleMode.ScaleToFit);
@@ -127,7 +127,7 @@ namespace uAdventure.Editor
         {
             var cutscene = dataControl as CutsceneDataControl;
             if (cutscene.isVideoscene()) slidesPreview = slidePreviewMovie;
-            else slidesPreview = AssetsController.getImageTexture(cutscene.getPreviewImage());
+            else slidesPreview = Controller.ResourceManager.getImage(cutscene.getPreviewImage());
         }
     }
 }

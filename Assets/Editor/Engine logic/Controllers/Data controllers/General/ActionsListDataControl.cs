@@ -137,13 +137,12 @@ namespace uAdventure.Editor
 
         public override int[] getAddableElements()
         {
-
             if (parent is ItemDataControl)
                 return new int[] { Controller.ACTION_EXAMINE, Controller.ACTION_GRAB, Controller.ACTION_USE, Controller.ACTION_CUSTOM_INTERACT, Controller.ACTION_USE_WITH, Controller.ACTION_GIVE_TO, Controller.ACTION_DRAG_TO };
             if (parent is NPCDataControl)
                 return new int[] { Controller.ACTION_EXAMINE, Controller.ACTION_USE, Controller.ACTION_CUSTOM, Controller.ACTION_TALK_TO, Controller.ACTION_DRAG_TO };
             if (parent is ActiveAreaDataControl)
-                return new int[] { Controller.ACTION_EXAMINE, Controller.ACTION_GRAB, Controller.ACTION_USE, Controller.ACTION_CUSTOM_INTERACT };
+                return new int[] { Controller.ACTION_EXAMINE, Controller.ACTION_USE, Controller.ACTION_CUSTOM };
             return new int[] { Controller.ACTION_EXAMINE, Controller.ACTION_GRAB, Controller.ACTION_USE, Controller.ACTION_CUSTOM, Controller.ACTION_USE_WITH, Controller.ACTION_GIVE_TO, Controller.ACTION_TALK_TO };
         }
 
@@ -181,204 +180,170 @@ namespace uAdventure.Editor
 
             Action newAction = null;
 
-            if (type == Controller.ACTION_EXAMINE)
-                newAction = new Action(Action.EXAMINE);
-
-            else if (type == Controller.ACTION_GRAB)
+            switch (type)
             {
-                var item = parent as ItemDataControl;
-                newAction = new Action(Action.GRAB)
-                {
-                    Effects = new Effects()
+                case Controller.ACTION_EXAMINE:
+                    newAction = new Action(Action.EXAMINE);
+                    break;
+                case Controller.ACTION_USE:
+                    newAction = new Action(Action.USE);
+                    break;
+                case Controller.ACTION_GRAB:
+                    var item = parent as ItemDataControl;
+                    newAction = new Action(Action.GRAB)
                     {
-                        new RemoveElementEffect(item.getId()),
-                        new GenerateObjectEffect(item.getId())
-                    }
-                };
-            }
-
-            else if (type == Controller.ACTION_USE)
-                newAction = new Action(Action.USE);
-
-            else if (type == Controller.ACTION_TALK_TO)
-            {
-                string[] conversations = controller.IdentifierSummary.getConversationsIds();
-                if (conversations.Length > 0)
-                {
-                    var inputDialog = ScriptableObject.CreateInstance<InputDialog>();
-                    inputDialog.Init(new ActionsListReceiver(this)
-                    {
-                        ConfigureAction = (selectedID) =>
+                        Effects = new Effects()
                         {
-                            newAction = new Action(Action.TALK_TO);
-                            newAction.getEffects().Add(new TriggerConversationEffect(selectedID));
-                            return newAction;
+                            new RemoveElementEffect(item.getId()),
+                            new GenerateObjectEffect(item.getId())
                         }
-                    }, TC.get("TalkToAction.MessageSelectConversation"), conversations);
-                    return true;
-                }
-                else
-                    controller.showErrorDialog(TC.get("Action.OperationAddAction"), TC.get("Action.ErrorNoItems"));
+                    };
+                    break;
+                case Controller.ACTION_TALK_TO:
 
+                    string[] conversations = controller.IdentifierSummary.getIds<Conversation>();
+                    if (conversations.Length > 0)
+                    {
+                        controller.ShowInputDialog(TC.get("TalkToAction.MessageSelectConversation"), TC.get("TalkToAction.MessageSelectConversation"), conversations, null,
+                            new ActionsListReceiver(this)
+                            {
+                                ConfigureAction = (selectedID) =>
+                                {
+                                    var action = new Action(Action.TALK_TO);
+                                    action.getEffects().Add(new TriggerConversationEffect(selectedID));
+                                    return action;
+                                }
+                            });
+                        return true;
+                    }
+                    else
+                        controller.ShowErrorDialog(TC.get("Action.OperationAddAction"), TC.get("Action.ErrorNoItems"));
+
+                    break;
+
+                // For these tree the creation pipeline is the same
+                case Controller.ACTION_USE_WITH:
+                case Controller.ACTION_DRAG_TO:
+                case Controller.ACTION_GIVE_TO:
+                    
+                    string message = "";
+                    int actionType = -1;
+                    System.Type[] validTypes = { };
+
+                    // Select the elements, the action, and the popup message
+                    switch (type)
+                    {
+                        case Controller.ACTION_DRAG_TO:
+                            validTypes = new System.Type[] { typeof(Item), typeof(ActiveArea), typeof(NPC) };
+                            actionType = Action.DRAG_TO;
+                            message = TC.get("CustomAction.MessageSelectInteraction");
+                            break;
+                        case Controller.ACTION_USE_WITH:
+                            var itemActiveAreas = new List<string>();
+                            validTypes = new System.Type[] { typeof(Item), typeof(ActiveArea) };
+                            actionType = Action.USE_WITH;
+                            message = TC.get("Action.MessageSelectItem");
+                            break;
+                        case Controller.ACTION_GIVE_TO:
+                            validTypes = new System.Type[] { typeof(NPC) };
+                            message = TC.get("Action.MessageSelectNPC");
+                            actionType = Action.GIVE_TO;
+                            break;
+                    }
+
+                    // If the list has elements, show the dialog with the options
+                    auxCreateInteractiveAction(message, actionType, validTypes, (selectedTarget) => new Action(actionType, selectedTarget));
+                    break;
             }
-            else if (type == Controller.ACTION_CUSTOM_INTERACT)
+
+
+            if (type == Controller.ACTION_CUSTOM_INTERACT)
             {
-                //FIX: 
-                //string name = JOptionPane.showInputDialog( null, TC.get( "CustomAction.GetNameMessage" ), TC.get( "CustomAction.GetNameTitle" ), JOptionPane.QUESTION_MESSAGE );
-
-
-                string name = controller.showInputDialog(TC.get("CustomAction.GetNameTitle"), TC.get("CustomAction.GetNameMessage"));
-                // if user cancels the operation, finish the new action creation
-                /*if( name == null || name.Equals( "" ) ) {
-                    name = "NONAME_" + ( new Random( ) ).nextInt( 1000 );
-                }*/
-
-                // if user do not cancel the operation
-                if (name != null)
+                controller.ShowInputDialog(TC.get("CustomAction.GetNameTitle"), TC.get("CustomAction.GetNameMessage"), (sender, name) =>
                 {
-
-                    // if user press "accept" without introduce any name
-                    if (name.Equals(""))
-                        name = "NONAME_" + (new System.Random()).Next(1000);
-
+                    if (string.IsNullOrEmpty(name))
+                        name = "NONAME_" + Random.Range(0, 1000);
 
                     string[] options = { TC.get("Element.Action"), TC.get("Element.Interaction") };
-                    // TODO: implementation
-                    //int option = JOptionPane.showOptionDialog(null, TC.get("CustomAction.SelectTypeMessage"), TC.get("CustomAction.SelectTypeTitle"), JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, 0);
-                    //if (option != JOptionPane.CLOSED_OPTION)
-                    //{
-                    //    if (option == 0)
-                    //    {
-                    //        newAction = new CustomAction(Action.CUSTOM);
-                    //        ((CustomAction)newAction).setName(name);
-                    //    }
-                    //    else {
-                    //        string[] items = controller.getIdentifierSummary().getItemAndActiveAreaIds();
-                    //        string[] npcs = controller.getIdentifierSummary().getNPCIds();
-                    //        string[] elements = new string[items.Length + npcs.Length];
-                    //        for (int i = 0; i < elements.Length; i++)
-                    //        {
-                    //            if (i < items.Length)
-                    //            {
-                    //                elements[i] = items[i];
-                    //            }
-                    //            else {
-                    //                elements[i] = npcs[i - items.Length];
-                    //            }
-                    //        }
-
-                    //        // If the list has elements, show the dialog with the options
-                    //        if (elements.Length > 0)
-                    //        {
-                    //            string selectedElement = controller.showInputDialog(TC.get("Action.OperationAddAction"), TC.get("CustomAction.MessageSelectInteraction"), elements);
-
-                    //            // If some value was selected
-                    //            if (selectedElement != null)
-                    //            {
-                    //                newAction = new CustomAction(Action.CUSTOM_INTERACT, selectedElement);
-                    //                ((CustomAction)newAction).setName(name);
-                    //            }
-                    //        }
-
-                    //        // If the list had no elements, show an error dialog
-                    //        else
-                    //            controller.showErrorDialog(TC.get("Action.OperationAddAction"), TC.get("Action.ErrorNoItems"));
-
-                    //    }
-                    //}// end if user cancel the action adition after introducing the name
-                }// end if that controls if user
+                    controller.ShowInputDialog(TC.get("CustomAction.SelectTypeMessage"), TC.get("CustomAction.SelectTypeTitle"), options, (sender2, optionSelected) =>
+                    {
+                        switch(System.Array.IndexOf(options, optionSelected))
+                        {
+                            case 0:
+                                {
+                                    var customAction = new CustomAction(Action.CUSTOM);
+                                    customAction.setName(name);
+                                    performAddAction(customAction);
+                                }
+                                break;
+                            case 1:
+                                auxCreateInteractiveAction(TC.get("CustomAction.MessageSelectInteraction"), 
+                                    Action.CUSTOM_INTERACT, new System.Type[] { typeof(Item), typeof(ActiveArea), typeof(NPC) }, 
+                                    (selectedTarget) =>
+                                    {
+                                        var customAction = new CustomAction(Action.CUSTOM_INTERACT, selectedTarget);
+                                        customAction.setName(name);
+                                        return customAction;
+                                    });
+                                break;
+                        }
+                    });
+                });
             }
             else if (type == Controller.ACTION_CUSTOM)
             {
-                string name = controller.showInputDialog(TC.get("CustomAction.GetNameMessage"), TC.get("CustomAction.GetNameTitle"));
-                // if name == null, the user cancel the action addition
-                if (name != null)
+                controller.ShowInputDialog(TC.get("CustomAction.GetNameTitle"), TC.get("CustomAction.GetNameMessage"), (sender, name) =>
                 {
-                    if (name.Equals(""))
-                    {
-                        name = "NONAME_" + (new System.Random()).Next(1000);
-                    }
-
-                    newAction = new CustomAction(Action.CUSTOM);
-                    ((CustomAction)newAction).setName(name);
-                }
-            }
-
-            // If the type of action is use-with, we must ask for a second item
-            else if (type == Controller.ACTION_USE_WITH)
-            {
-                // Take the list of the items
-                string[] items = controller.IdentifierSummary.getItemAndActiveAreaIds();
-
-                // If the list has elements, show the dialog with the options
-                if (items.Length > 0)
-                {
-                    string selectedItem = controller.showInputDialog(TC.get("Action.OperationAddAction"), TC.get("Action.MessageSelectItem"), items);
-
-                    // If some value was selected
-                    if (selectedItem != null)
-                        newAction = new Action(Action.USE_WITH, selectedItem);
-                }
-
-                // If the list had no elements, show an error dialog
-                else
-                    controller.showErrorDialog(TC.get("Action.OperationAddAction"), TC.get("Action.ErrorNoItems"));
-            }
-
-            // If the type of action is drag-to, we must ask for a second item
-            else if (type == Controller.ACTION_DRAG_TO)
-            {
-                // Take the list of the items
-                string[] items = controller.IdentifierSummary.getItemActiveAreaNPCIds();
-
-                // If the list has elements, show the dialog with the options
-                if (items.Length > 0)
-                {
-                    string selectedItem = controller.showInputDialog(TC.get("Action.OperationAddAction"), TC.get("Action.MessageSelectItem"), items);
-
-                    // If some value was selected
-                    if (selectedItem != null)
-                        newAction = new Action(Action.DRAG_TO, selectedItem);
-                }
-
-                // If the list had no elements, show an error dialog
-                else
-                    controller.showErrorDialog(TC.get("Action.OperationAddAction"), TC.get("Action.ErrorNoItems"));
-            }
-
-            // If the type of action is give-to, we must ask for a character
-            else if (type == Controller.ACTION_GIVE_TO)
-            {
-                // Take the list of the characters
-                string[] npcs = controller.IdentifierSummary.getNPCIds();
-
-                // If the list has elements, show the dialog with the options
-                if (npcs.Length > 0)
-                {
-                    string selectedNPC = controller.showInputDialog(TC.get("Action.OperationAddAction"), TC.get("Action.MessageSelectNPC"), npcs);
-
-                    // If some value was selected
-                    if (selectedNPC != null)
-                        newAction = new Action(Action.GIVE_TO, selectedNPC);
-                }
-
-                // If the list had no elements, show an error dialog
-                else
-                    controller.showErrorDialog(TC.get("Action.OperationAddAction"), TC.get("Action.ErrorNoNPCs"));
+                    if (string.IsNullOrEmpty(name))
+                        name = "NONAME_" + Random.Range(0, 1000);
+                    
+                    var customAction = new CustomAction(Action.CUSTOM);
+                    customAction.setName(name);
+                    performAddAction(customAction);
+                });
             }
 
             // If an action was added, create a controller and store it
             if (newAction != null)
-            {
-                actionsList.Add(newAction);
-                if (newAction.getType() == Action.CUSTOM || newAction.getType() == Action.CUSTOM_INTERACT)
-                    actionsDataControlList.Add(new CustomActionDataControl((CustomAction)newAction));
-                else
-                    actionsDataControlList.Add(new ActionDataControl(newAction));
-                //controller.dataModified( );
-            }
+                performAddAction(newAction);
 
             return newAction != null;
+        }
+
+        private void auxCreateInteractiveAction(string message, int actionType, System.Type[] validTargetTypes, System.Func<string, Action> configureAction)
+        {
+            var elementCount = validTargetTypes.Select(t => Controller.Instance.IdentifierSummary.getIds(t).Length).Sum();
+
+            // If the list has elements, show the dialog with the options
+            if (elementCount > 0)
+            {
+                var elements = new string[elementCount];
+                var totalCopied = 0;
+                foreach (var t in validTargetTypes)
+                {
+                    var typeElements = controller.IdentifierSummary.getIds(t);
+                    System.Array.Copy(typeElements, 0, elements, totalCopied, typeElements.Length);
+                    totalCopied += typeElements.Length;
+                }
+
+                controller.ShowInputDialog(TC.get("Action.OperationAddAction"), message, elements, null,
+                    new ActionsListReceiver(this)
+                    {
+                        ConfigureAction = configureAction
+                    });
+            }
+            else
+                controller.ShowErrorDialog(TC.get("Action.OperationAddAction"), TC.get("Action.ErrorNoItems"));
+        }
+
+        private void performAddAction(Action newAction)
+        {
+            getActionsList().Add(newAction);
+            if (newAction.getType() == Action.CUSTOM || newAction.getType() == Action.CUSTOM_INTERACT)
+                getActions().Add(new CustomActionDataControl((CustomAction)newAction));
+            else
+                getActions().Add(new ActionDataControl(newAction));
+            //controller.dataModified( );
         }
 
 
@@ -630,12 +595,8 @@ namespace uAdventure.Editor
                 // If an action was added, create a controller and store it
                 if (newAction != null)
                 {
-                    actionsListDataControl.getActionsList().Add(newAction);
-                    if (newAction.getType() == Action.CUSTOM || newAction.getType() == Action.CUSTOM_INTERACT)
-                        actionsListDataControl.getActions().Add(new CustomActionDataControl((CustomAction)newAction));
-                    else
-                        actionsListDataControl.getActions().Add(new ActionDataControl(newAction));
-                    //controller.dataModified( );
+                    actionsListDataControl.performAddAction(newAction);
+
                 }
             }
 

@@ -123,25 +123,32 @@ namespace uAdventure.Editor
             {
 
                 // Show a dialog asking for the conversation id
-                if (conversationId == null || conversationId.Equals(""))
-                    conversationId = controller.showInputDialog(TC.get("Operation.AddConversationTitle"), TC.get("Operation.AddConversationMessage"), TC.get("Operation.AddConversationDefaultValue"));
-
-                // If some value was typed and the identifier is valid
-                if (conversationId != null && controller.isElementIdValid(conversationId))
+                if (string.IsNullOrEmpty(conversationId))
+                    controller.ShowInputDialog(TC.get("Operation.AddConversationTitle"), TC.get("Operation.AddConversationMessage"), TC.get("Operation.AddConversationDefaultValue"), performAddElement);
+                else
                 {
-                    Conversation newConversation = new GraphConversation(conversationId);
-                    ConversationDataControl newConversationDataControl = new GraphConversationDataControl((GraphConversation)newConversation);
-
-                    // Add the new conversation
-                    conversationsList.Add(newConversation);
-                    conversationsDataControlList.Add(newConversationDataControl);
-                    controller.IdentifierSummary.addConversationId(conversationId);
-                    //controller.dataModified( );
+                    performAddElement(null, conversationId);
                     elementAdded = true;
+                    //controller.dataModified( );
                 }
             }
 
             return elementAdded;
+        }
+
+        private void performAddElement(object sender, string conversationId)
+        {
+            // If some value was typed and the identifier is valid
+            if (!controller.isElementIdValid(conversationId))
+                conversationId = controller.makeElementValid(conversationId);
+
+            Conversation newConversation = new GraphConversation(conversationId);
+            ConversationDataControl newConversationDataControl = new GraphConversationDataControl((GraphConversation)newConversation);
+
+            // Add the new conversation
+            conversationsList.Add(newConversation);
+            conversationsDataControlList.Add(newConversationDataControl);
+            controller.IdentifierSummary.addId<Conversation>(conversationId);
         }
 
 
@@ -164,7 +171,7 @@ namespace uAdventure.Editor
             newElement.setId(id);
             conversationsList.Add(newElement);
             conversationsDataControlList.Add(new GraphConversationDataControl(newElement));
-            controller.IdentifierSummary.addConversationId(id);
+            controller.IdentifierSummary.deleteId<Conversation>(id);
 
             string oldId = ((GraphConversation)(dataControl.getContent())).getId();
             /*bool posConfigured = ConversationConfigData.isConversationConfig( oldId );
@@ -207,13 +214,13 @@ namespace uAdventure.Editor
             string references = controller.countIdentifierReferences(conversationId).ToString();
 
             // Ask for confirmation
-            if (!askConfirmation || controller.showStrictConfirmDialog(TC.get("Operation.DeleteElementTitle"), TC.get("Operation.DeleteElementWarning", new string[] { conversationId, references })))
+            if (!askConfirmation || controller.ShowStrictConfirmDialog(TC.get("Operation.DeleteElementTitle"), TC.get("Operation.DeleteElementWarning", new string[] { conversationId, references })))
             {
                 if (conversationsList.Remove((Conversation)dataControl.getContent()))
                 {
                     conversationsDataControlList.Remove((ConversationDataControl)dataControl);
                     controller.deleteIdentifierReferences(conversationId);
-                    controller.IdentifierSummary.deleteConversationId(conversationId);
+                    controller.IdentifierSummary.deleteId<Conversation>(conversationId);
                     //controller.dataModified( );
                     elementDeleted = true;
                 }

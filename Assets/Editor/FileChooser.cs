@@ -92,6 +92,8 @@ public class FileChooser : DialogReceiverInterface
             case BaseFileOpenDialog.FileType.BOOK_ARROW_LEFT_OVER:
             case BaseFileOpenDialog.FileType.BOOK_ARROW_RIGHT_NORMAL:
             case BaseFileOpenDialog.FileType.BOOK_ARROW_RIGHT_OVER:
+            case BaseFileOpenDialog.FileType.BUTTON:
+            case BaseFileOpenDialog.FileType.BUTTON_OVER:
                 fileDialog = ScriptableObject.CreateInstance<ImageFileOpenDialog>();
                 break;
             case BaseFileOpenDialog.FileType.SCENE_MUSIC:
@@ -105,6 +107,7 @@ public class FileChooser : DialogReceiverInterface
             case BaseFileOpenDialog.FileType.ITEM_DESCRIPTION_DETAILED_SOUND:
             case BaseFileOpenDialog.FileType.ITEM_DESCRIPTION_BRIEF_SOUND:
             case BaseFileOpenDialog.FileType.PLAY_SOUND_EFFECT:
+            case BaseFileOpenDialog.FileType.BUTTON_SOUND:
                 fileDialog = ScriptableObject.CreateInstance<MusicFileOpenDialog>();
                 break;
             case BaseFileOpenDialog.FileType.CHARACTER_ANIM:

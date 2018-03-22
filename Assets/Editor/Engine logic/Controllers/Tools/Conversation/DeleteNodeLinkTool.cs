@@ -57,7 +57,7 @@ namespace uAdventure.Editor
         {
 
             // Ask for confirmation
-            if (Controller.Instance.showStrictConfirmDialog(confirmTitle, confirmText))
+            if (Controller.Instance.ShowStrictConfirmDialog(confirmTitle, confirmText))
             {
                 linkDeleted = parent.removeChild(linkIndex);
                 return true;

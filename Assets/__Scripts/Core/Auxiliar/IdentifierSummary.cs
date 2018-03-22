@@ -117,10 +117,15 @@ namespace uAdventure.Core
 		public bool isType<T>(string id){
 
 			return globalIdentifiers.ContainsKey (id) && globalIdentifiers [id] == typeof(T);
-		}
+        }
+
+        public Type getType(string id)
+        {
+            return existsId(id) ? globalIdentifiers[id] : null;
+        }
 
 
-		public void addId(System.Type t, string id){
+        public void addId(System.Type t, string id){
 			if(!globalIdentifiers.ContainsKey (id))
 				globalIdentifiers.Add(id, t);
 
@@ -135,13 +140,16 @@ namespace uAdventure.Core
 			addId (typeof(T), id);
 		}
 
-		public string[] getIds<T>(){
-			var t = typeof(T);
+        public string[] getIds(Type t)
+        {
+            if (typeGroups.ContainsKey(t))
+                return typeGroups[t].ToArray();
 
-			if (typeGroups.ContainsKey (t))
-				return typeGroups [t].ToArray ();
+            return new string[0];
+        }
 
-			return new string[0];
+        public string[] getIds<T>(){
+			return getIds(typeof(T));
 		}
 
 		public void deleteId<T>(string id){
@@ -797,5 +805,26 @@ namespace uAdventure.Core
 
 			return complete.ToArray ();
 		}
+
+        public string[] combineIds(System.Type[] types)
+        {
+            var elementCount = types.Select(t => getIds(t).Length).Sum();
+
+            // If the list has elements, show the dialog with the options
+            if (elementCount > 0)
+            {
+                var elements = new string[elementCount];
+                var totalCopied = 0;
+                foreach (var t in types)
+                {
+                    var typeElements = getIds(t);
+                    System.Array.Copy(typeElements, 0, elements, totalCopied, typeElements.Length);
+                    totalCopied += typeElements.Length;
+                }
+                return elements;
+            }
+
+            return new string[0];
+        }
     }
 }

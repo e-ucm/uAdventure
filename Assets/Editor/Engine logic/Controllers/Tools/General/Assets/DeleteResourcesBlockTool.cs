@@ -87,7 +87,7 @@ namespace uAdventure.Editor
 
             // If it was the last one, show an error message
             else
-                Controller.Instance.showErrorDialog(TC.get("Operation.DeleteResourcesTitle"), TC.get("Operation.DeleteResourcesErrorLastResources"));
+                Controller.Instance.ShowErrorDialog(TC.get("Operation.DeleteResourcesTitle"), TC.get("Operation.DeleteResourcesErrorLastResources"));
 
             return elementDeleted;
         }

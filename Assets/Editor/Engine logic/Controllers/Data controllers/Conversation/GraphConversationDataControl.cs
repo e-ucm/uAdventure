@@ -345,28 +345,37 @@ namespace uAdventure.Editor
             string references = controller.countIdentifierReferences(oldConversationId).ToString();
 
             // Ask for confirmation
-            if (name != null || controller.showStrictConfirmDialog(TC.get("Operation.RenameConversationTitle"), TC.get("Operation.RenameElementWarning", new string[] { oldConversationId, references })))
+            if (name != null || controller.ShowStrictConfirmDialog(TC.get("Operation.RenameConversationTitle"), TC.get("Operation.RenameElementWarning", new string[] { oldConversationId, references })))
             {
 
                 // Show a dialog asking for the new conversation id
                 string newConversationId = name;
                 if (name == null)
-                    newConversationId = controller.showInputDialog(TC.get("Operation.RenameConversationTitle"), TC.get("Operation.RenameConversationMessage"), oldConversationId);
+                    controller.ShowInputDialog(TC.get("Operation.RenameConversationTitle"), TC.get("Operation.RenameConversationMessage"), oldConversationId, (o,s) => performRenameElement(s));
+                else
+                {
+                    return performRenameElement(newConversationId);
+                }
 
-                // If some value was typed and the identifiers are different
-				if (!controller.isElementIdValid (newConversationId))
-					newConversationId = controller.makeElementValid (newConversationId);
-				
-                graphConversation.setId(newConversationId);
-                controller.replaceIdentifierReferences(oldConversationId, newConversationId);
-                controller.IdentifierSummary.deleteConversationId(oldConversationId);
-                controller.IdentifierSummary.addConversationId(newConversationId);
-                //controller.dataModified( );
-
-				return newConversationId;
             }
 
 			return null;
+        }
+
+        private string performRenameElement(string newConversationId)
+        {
+            string oldConversationId = graphConversation.getId();
+
+            // If some value was typed and the identifiers are different
+            if (!controller.isElementIdValid(newConversationId))
+                newConversationId = controller.makeElementValid(newConversationId);
+
+            graphConversation.setId(newConversationId);
+            controller.replaceIdentifierReferences(oldConversationId, newConversationId);
+            controller.IdentifierSummary.deleteId<Conversation>(oldConversationId);
+            controller.IdentifierSummary.addId<Conversation>(newConversationId);
+            //controller.dataModified( );
+            return newConversationId;
         }
 
 

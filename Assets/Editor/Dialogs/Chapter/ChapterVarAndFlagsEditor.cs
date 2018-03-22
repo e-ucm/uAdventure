@@ -185,10 +185,10 @@ namespace uAdventure.Editor
             switch (openedWindow)
             {
                 case WindowType.FLAGS:
-                    CreateInstance<ChapterFlagNameInputPopup>().Init(this, "IdFlag");
+                    Controller.Instance.ShowInputDialog(TC.get("Flags.AddFlag"), TC.get("Flags.AddFlagMessage"), "IdFlag", "Flag", this);
                     break;
                 case WindowType.VARS:
-                    CreateInstance<ChapterVarNameInputPopup>().Init(this, "IdVar");
+                    Controller.Instance.ShowInputDialog(TC.get("Vars.AddVar"), TC.get("Vars.AddVarMessage"), "IdVar", "Var", this);
                     break;
             }
         }
@@ -212,11 +212,11 @@ namespace uAdventure.Editor
             RefreshList();
         }
 
-        public void OnDialogOk(string message, object workingObject = null, object workingObjectSecond = null)
+        public void OnDialogOk(string message, object token = null, object workingObjectSecond = null)
         {
             var summary = Controller.Instance.VarFlagSummary;
-            if (workingObject is ChapterFlagNameInputPopup)     summary.addFlag(message);
-            else if (workingObject is ChapterVarNameInputPopup) summary.addVar(message);
+            if      ((string)token == "Flag") summary.addFlag(message);
+            else if ((string)token == "Var")  summary.addVar(message);
 
             RefreshList();
         }

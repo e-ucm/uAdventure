@@ -10,6 +10,7 @@ namespace uAdventure.Editor
     {
         private bool isCharacterCutscene = false;
         private CharactersWindowAppearance.CharacterAnimationType type;
+        private string value;
 
         public void Init(DialogReceiverInterface e, string startTextContent, System.Object characterAnimType = null)
         {
@@ -18,8 +19,9 @@ namespace uAdventure.Editor
                 isCharacterCutscene = true;
                 type = (CharactersWindowAppearance.CharacterAnimationType)characterAnimType;
             }
+            this.value = startTextContent;
 
-            base.Init(e, startTextContent);
+            base.Init(e);
         }
 
         void OnGUI()
@@ -27,24 +29,24 @@ namespace uAdventure.Editor
             EditorGUILayout.LabelField(TC.get("Animation.AskFilename"),
                 EditorStyles.wordWrappedLabel);
 
-            GUILayout.Space(30);
+            GUILayout.Space(20);
 
-            textContent = GUILayout.TextField(textContent);
+            value = GUILayout.TextField(value);
 
-            GUILayout.Space(30);
+            GUILayout.FlexibleSpace();
 
-            if (!Controller.Instance.isElementIdValid(textContent, false))
+            if (!Controller.Instance.isElementIdValid(value, false))
             {
                 GUI.enabled = false;
             }
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("OK"))
             {
-                textContent = "assets/animation/" + textContent + ".eaa.xml";
+                value = "assets/animation/" + value + ".eaa.xml";
                 if (isCharacterCutscene)
-                    reference.OnDialogOk(textContent, this, type);
+                    reference.OnDialogOk(value, this, type);
                 else
-                    reference.OnDialogOk(textContent, this);
+                    reference.OnDialogOk(value, this);
 
                 this.Close();
             }

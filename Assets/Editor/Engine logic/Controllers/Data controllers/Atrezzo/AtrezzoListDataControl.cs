@@ -107,30 +107,35 @@ namespace uAdventure.Editor
 
         public override bool addElement(int type, string atrezzoId)
         {
-
             bool elementAdded = false;
 
             if (type == Controller.ATREZZO)
             {
-
                 // Show a dialog asking for the item id
-                if (atrezzoId == null || atrezzoId.Equals(""))
-                    atrezzoId = controller.showInputDialog(TC.get("Operation.AddAtrezzoTitle"), TC.get("Operation.AddAtrezzoMessage"), TC.get("Operation.AddAtrezzoDefaultValue"));
-
-				// If some value was typed and the identifier is valid
-				if (!controller.isElementIdValid(atrezzoId))
-					atrezzoId = controller.makeElementValid(atrezzoId);
-				
-                // Add thew new item
-                Atrezzo newAtrezzo = new Atrezzo(atrezzoId);
-                atrezzoList.Add(newAtrezzo);
-                atrezzoDataControlList.Add(new AtrezzoDataControl(newAtrezzo));
-                controller.IdentifierSummary.addAtrezzoId(atrezzoId);
-                //controller.dataModified( );
-                elementAdded = true;
+                if (string.IsNullOrEmpty(atrezzoId))
+                    controller.ShowInputDialog(TC.get("Operation.AddAtrezzoTitle"), TC.get("Operation.AddAtrezzoMessage"), TC.get("Operation.AddAtrezzoDefaultValue"), performAddElement);
+                else
+                {
+                    elementAdded = true;
+                    performAddElement(null, atrezzoId);
+                }
             }
 
             return elementAdded;
+        }
+
+        private void performAddElement(object sender, string atrezzoId)
+        {
+            // If some value was typed and the identifier is valid
+            if (!controller.isElementIdValid(atrezzoId))
+                atrezzoId = controller.makeElementValid(atrezzoId);
+
+            // Add thew new item
+            Atrezzo newAtrezzo = new Atrezzo(atrezzoId);
+            atrezzoList.Add(newAtrezzo);
+            atrezzoDataControlList.Add(new AtrezzoDataControl(newAtrezzo));
+            controller.IdentifierSummary.addId<Atrezzo>(atrezzoId);
+            //controller.dataModified( );
         }
 
 
@@ -148,7 +153,7 @@ namespace uAdventure.Editor
             newElement.setId(id);
             atrezzoList.Add(newElement);
             atrezzoDataControlList.Add(new AtrezzoDataControl(newElement));
-            controller.IdentifierSummary.addAtrezzoId(id);
+            controller.IdentifierSummary.addId<Atrezzo>(id);
             return true;
 
         }
@@ -236,19 +241,18 @@ namespace uAdventure.Editor
 
         public override bool deleteElement(DataControl dataControl, bool askConfirmation)
         {
-
             bool elementDeleted = false;
             string atrezzoId = ((AtrezzoDataControl)dataControl).getId();
             string references = controller.countIdentifierReferences(atrezzoId).ToString();
 
             // Ask for confirmation
-            if (!askConfirmation || controller.showStrictConfirmDialog(TC.get("Operation.DeleteElementTitle"), TC.get("Operation.DeleteElementWarning", new string[] { atrezzoId, references })))
+            if (!askConfirmation || controller.ShowStrictConfirmDialog(TC.get("Operation.DeleteElementTitle"), TC.get("Operation.DeleteElementWarning", new string[] { atrezzoId, references })))
             {
                 if (atrezzoList.Remove((Atrezzo)dataControl.getContent()))
                 {
                     atrezzoDataControlList.Remove((AtrezzoDataControl)dataControl);
                     controller.deleteIdentifierReferences(atrezzoId);
-                    controller.IdentifierSummary.deleteItemId(atrezzoId);
+                    controller.IdentifierSummary.deleteId<Atrezzo>(atrezzoId);
                     //controller.dataModified( );
                     elementDeleted = true;
                 }

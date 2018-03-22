@@ -380,24 +380,14 @@ namespace uAdventure.Editor
             string references = controller.countIdentifierReferences(oldSceneId).ToString();
 
             // Ask for confirmation
-            if (name != null || controller.showStrictConfirmDialog(TC.get("Operation.RenameSceneTitle"), TC.get("Operation.RenameElementWarning", new string[] { oldSceneId, references })))
+            if (name != null || controller.ShowStrictConfirmDialog(TC.get("Operation.RenameSceneTitle"), TC.get("Operation.RenameElementWarning", new string[] { oldSceneId, references })))
             {
 
                 // Show a dialog asking for the new scene id
-                string newSceneId = name;
                 if (name == null)
-                    newSceneId = controller.showInputDialog(TC.get("Operation.RenameSceneTitle"), TC.get("Operation.RenameSceneMessage"), oldSceneId);
-
-                // If some value was typed and the identifiers are different
-				if (!controller.isElementIdValid (newSceneId))
-					newSceneId = controller.makeElementValid (newSceneId);
-				
-                scene.setId(newSceneId);
-                controller.replaceIdentifierReferences(oldSceneId, newSceneId);
-                controller.IdentifierSummary.deleteSceneId(oldSceneId);
-				controller.IdentifierSummary.addSceneId(newSceneId);
-
-				return newSceneId;
+                    controller.ShowInputDialog(TC.get("Operation.RenameSceneTitle"), TC.get("Operation.RenameSceneMessage"), oldSceneId, (o,s) => performRenameElement<Scene>(s));
+                else
+                    return performRenameElement<Scene>(name);
 
             }
 

@@ -1814,6 +1814,7 @@ When not customized, default buttons will be used in the game.</entry>
 <entry key="MenuAdventure.Title">Adventure</entry>
 <entry key="NextScene.RightToLeft">Right to left</entry>
 <entry key="Operation.AddReferenceErrorNoAtrezzo">There are no set items in the adventure</entry>
+<entry key="Operation.AddReferenceErrorNoNPC">There are no characters in the adventure</entry>
 <entry key="Operation.AddMacroMessage">Type an identifier for the new macro</entry>
 <entry key="Effect.MacroReference">Launch a macro</entry>
 <entry key="ActionProperties.EnableClickFailEffects">Activate "fail click effects"</entry>
@@ -2084,6 +2085,7 @@ In the game you can define conditions based on the value of the variables.</entr
 <entry key="SPEP.XCoordinate">X coordinate</entry>
 <entry key="Exit.ConditionsActive">Conditions active</entry>
 <entry key="ExitsList.AddExit">Add new exit</entry>
+<entry key="ExitsList.NoScenesError">There are no valid scenes in the current chapter.</entry>
 <entry key="CustomAction.MessageSelectInteraction">Select with what of whom the object interacts</entry>
 <entry key="Resources.DescriptionCharacterAnimationStandLeft">Looking left</entry>
 <entry key="Cutscene.Name">Name of the cutscene</entry>
@@ -2120,6 +2122,12 @@ In the game you can define conditions based on the value of the variables.</entr
 <entry key="ConversationEditor.SetChild">Set child</entry>
 <entry key="ConversationEditor.Option">Option</entry>
 <entry key="ConversationEditor.AddOptionChild">Add Option / Add Child</entry>
+  
+<entry key="AddObjectToInventory.Description">Adds the item to the inventory</entry>
+<entry key="RemoveObjectFromInventory.Description">Removes the item from the inventory</entry>
+  
+<entry key="RemoveElementEffect.Title">Remove element</entry>
+<entry key="RemoveElementEffect.Description">Removes the element(s) from the current scene</entry>
 
 <!-- Analytics -->
 <entry key="Analytics.Title">Analytics</entry>

@@ -166,23 +166,32 @@ namespace uAdventure.Editor
             {
 
                 // Show a dialog asking for the scene id
-                if (sceneId == null || sceneId.Equals(""))
-                    sceneId = controller.showInputDialog(TC.get("Operation.AddSceneTitle"), TC.get("Operation.AddSceneMessage"), TC.get("Operation.AddSceneDefaultValue"));
-                // If some value was typed and the identifier is valid
-                if (!controller.isElementIdValid(sceneId))
-                    sceneId = controller.makeElementValid(sceneId);
-                
-                // Add thew new scene
-                Scene newScene = new Scene(sceneId);
-                scenesList.Add(newScene);
-                scenesDataControlList.Add(new SceneDataControl(newScene, controller.getPlayerImagePath()));
-                controller.IdentifierSummary.addSceneId(sceneId);
-                //controller.dataModified( );
-                elementAdded = true;
+                if (string.IsNullOrEmpty(sceneId))
+                    controller.ShowInputDialog(TC.get("Operation.AddSceneTitle"), TC.get("Operation.AddSceneMessage"), TC.get("Operation.AddSceneDefaultValue"), performAddElement);
+                else
+                {
+                    performAddElement(null, sceneId);
+                    elementAdded = true;
+                }
                 
             }
 
             return elementAdded;
+        }
+
+        private void performAddElement(object sender, string id)
+        {
+
+            // If some value was typed and the identifier is valid
+            if (!controller.isElementIdValid(id))
+                id = controller.makeElementValid(id);
+
+            // Add thew new scene
+            Scene newScene = new Scene(id);
+            scenesList.Add(newScene);
+            scenesDataControlList.Add(new SceneDataControl(newScene, controller.getPlayerImagePath()));
+            controller.IdentifierSummary.addId<Scene>(id);
+            //controller.dataModified( );
         }
 
 
@@ -202,7 +211,7 @@ namespace uAdventure.Editor
             newElement.setId(id);
             scenesList.Add(newElement);
             scenesDataControlList.Add(new SceneDataControl(newElement, controller.getPlayerImagePath()));
-            controller.IdentifierSummary.addSceneId(id);
+            controller.IdentifierSummary.addId<Scene>(id);
             return true;
 
         }
@@ -229,13 +238,13 @@ namespace uAdventure.Editor
                 string references = controller.countIdentifierReferences(sceneId).ToString();
 
                 // Ask for confirmation
-                if (!askConfirmation || controller.showStrictConfirmDialog(TC.get("Operation.DeleteElementTitle"), TC.get("Operation.DeleteElementWarning", new string[] { sceneId, references })))
+                if (!askConfirmation || controller.ShowStrictConfirmDialog(TC.get("Operation.DeleteElementTitle"), TC.get("Operation.DeleteElementWarning", new string[] { sceneId, references })))
                 {
                     if (scenesDataControlList.Remove((SceneDataControl)dataControl))
                     {
                         scenesList.Remove((Scene)dataControl.getContent());
                         controller.deleteIdentifierReferences(sceneId);
-                        controller.IdentifierSummary.deleteSceneId(sceneId);
+                        controller.IdentifierSummary.deleteId<Scene>(sceneId);
                         //controller.dataModified( );
                         elementDeleted = true;
                     }
@@ -244,7 +253,7 @@ namespace uAdventure.Editor
 
             // If this is the last scene, it can't be deleted
             else
-                controller.showErrorDialog(TC.get("Operation.DeleteElementTitle"), TC.get("Operation.ErrorLastScene"));
+                controller.ShowErrorDialog(TC.get("Operation.DeleteElementTitle"), TC.get("Operation.ErrorLastScene"));
 
             return elementDeleted;
         }

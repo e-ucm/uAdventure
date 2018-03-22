@@ -173,7 +173,7 @@ namespace uAdventure.Editor
             }
             else
             {
-                Controller.Instance.showErrorDialog("Error.DTD.NotFound.Title", "Error.DTD.NotFound.Message" + " descriptor.dtd");
+                Controller.Instance.ShowErrorDialog("Error.DTD.NotFound.Title", "Error.DTD.NotFound.Message" + " descriptor.dtd");
             }
 
             // eadventure.dtd
@@ -185,7 +185,7 @@ namespace uAdventure.Editor
             }
             else
             {
-                Controller.Instance.showErrorDialog("Error.DTD.NotFound.Title", "Error.DTD.NotFound.Message" + " eadventure.dtd");
+                Controller.Instance.ShowErrorDialog("Error.DTD.NotFound.Title", "Error.DTD.NotFound.Message" + " eadventure.dtd");
             }
 
             // assessment.dtd
@@ -197,7 +197,7 @@ namespace uAdventure.Editor
             }
             else
             {
-                Controller.Instance.showErrorDialog("Error.DTD.NotFound.Title", "Error.DTD.NotFound.Message" + " assessment.dtd");
+                Controller.Instance.ShowErrorDialog("Error.DTD.NotFound.Title", "Error.DTD.NotFound.Message" + " assessment.dtd");
             }
 
 
@@ -210,7 +210,7 @@ namespace uAdventure.Editor
             }
             else
             {
-                Controller.Instance.showErrorDialog("Error.DTD.NotFound.Title", "Error.DTD.NotFound.Message" + " adaptation.dtd");
+                Controller.Instance.ShowErrorDialog("Error.DTD.NotFound.Title", "Error.DTD.NotFound.Message" + " adaptation.dtd");
             }
 
             // animation.dtd
@@ -222,7 +222,7 @@ namespace uAdventure.Editor
             }
             else
             {
-                Controller.Instance.showErrorDialog("Error.DTD.NotFound.Title", "Error.DTD.NotFound.Message" + " animation.dtd");
+                Controller.Instance.ShowErrorDialog("Error.DTD.NotFound.Title", "Error.DTD.NotFound.Message" + " animation.dtd");
             }
         }
 
@@ -796,25 +796,25 @@ namespace uAdventure.Editor
             pathsToReimport = new List<string>();
 
             if (!addSpecialAsset(SpecialAssetPaths.FILE_DEFAULT_BOOK_IMAGE, SpecialAssetPaths.ASSET_DEFAULT_BOOK_IMAGE))
-                Controller.Instance.showErrorDialog(TC.get("Error.Title"),TC.get("Error.SpecialAssetNotFound", SpecialAssetPaths.FILE_DEFAULT_BOOK_IMAGE));
+                Controller.Instance.ShowErrorDialog(TC.get("Error.Title"),TC.get("Error.SpecialAssetNotFound", SpecialAssetPaths.FILE_DEFAULT_BOOK_IMAGE));
 
             if (!addSpecialAsset(SpecialAssetPaths.FILE_DEFAULT_ARROW_NORMAL, SpecialAssetPaths.ASSET_DEFAULT_ARROW_NORMAL))
-                Controller.Instance.showErrorDialog(TC.get("Error.Title"), TC.get("Error.SpecialAssetNotFound", SpecialAssetPaths.FILE_DEFAULT_ARROW_NORMAL));
+                Controller.Instance.ShowErrorDialog(TC.get("Error.Title"), TC.get("Error.SpecialAssetNotFound", SpecialAssetPaths.FILE_DEFAULT_ARROW_NORMAL));
 
             if (!addSpecialAsset(SpecialAssetPaths.FILE_DEFAULT_ARROW_OVER, SpecialAssetPaths.ASSET_DEFAULT_ARROW_OVER))
-                Controller.Instance.showErrorDialog(TC.get("Error.Title"), TC.get("Error.SpecialAssetNotFound", SpecialAssetPaths.FILE_DEFAULT_ARROW_OVER));
+                Controller.Instance.ShowErrorDialog(TC.get("Error.Title"), TC.get("Error.SpecialAssetNotFound", SpecialAssetPaths.FILE_DEFAULT_ARROW_OVER));
 
             if (!addSpecialAsset(SpecialAssetPaths.FILE_EMPTY_IMAGE, SpecialAssetPaths.ASSET_EMPTY_IMAGE))
-                Controller.Instance.showErrorDialog(TC.get("Error.Title"), TC.get("Error.SpecialAssetNotFound", SpecialAssetPaths.FILE_EMPTY_IMAGE));
+                Controller.Instance.ShowErrorDialog(TC.get("Error.Title"), TC.get("Error.SpecialAssetNotFound", SpecialAssetPaths.FILE_EMPTY_IMAGE));
 
             if (!addSpecialAsset(SpecialAssetPaths.FILE_EMPTY_BACKGROUND, SpecialAssetPaths.ASSET_EMPTY_BACKGROUND))
-                Controller.Instance.showErrorDialog(TC.get("Error.Title"), TC.get("Error.SpecialAssetNotFound", SpecialAssetPaths.FILE_EMPTY_BACKGROUND));
+                Controller.Instance.ShowErrorDialog(TC.get("Error.Title"), TC.get("Error.SpecialAssetNotFound", SpecialAssetPaths.FILE_EMPTY_BACKGROUND));
 
             if (!addSpecialAsset(SpecialAssetPaths.FILE_EMPTY_ICON, SpecialAssetPaths.ASSET_EMPTY_ICON))
-                Controller.Instance.showErrorDialog(TC.get("Error.Title"), TC.get("Error.SpecialAssetNotFound", SpecialAssetPaths.FILE_EMPTY_ICON));
+                Controller.Instance.ShowErrorDialog(TC.get("Error.Title"), TC.get("Error.SpecialAssetNotFound", SpecialAssetPaths.FILE_EMPTY_ICON));
 
             if (!addSpecialAsset(SpecialAssetPaths.FILE_EMPTY_ANIMATION, SpecialAssetPaths.ASSET_EMPTY_ANIMATION + "_01.png"))
-                Controller.Instance.showErrorDialog(TC.get("Error.Title"), TC.get("Error.SpecialAssetNotFound", SpecialAssetPaths.FILE_EMPTY_ANIMATION));
+                Controller.Instance.ShowErrorDialog(TC.get("Error.Title"), TC.get("Error.SpecialAssetNotFound", SpecialAssetPaths.FILE_EMPTY_ANIMATION));
 
             ImportAssets(pathsToReimport.ToArray());
         }
@@ -1151,7 +1151,7 @@ namespace uAdventure.Editor
             
             textureImporter.isReadable = true;
             textureImporter.npotScale = TextureImporterNPOTScale.None;
-            if (saveInstant)
+            if (saveInstant || pathsToReimport == null)
             {
                 textureImporter.SaveAndReimport();
             }
@@ -1206,12 +1206,23 @@ namespace uAdventure.Editor
 
             foreach(var assetPath in AssetDatabase.GetAllAssetPaths().Where(path => path.StartsWith(assetFolder)))
             {
-                InitImporterConfig(assetPath);
+                InitImporterConfig(assetPath); 
+                if (assetPath.Remove(0, assetFolder.Length).StartsWith("/gui/cursors/"))
+                {
+                    Debug.Log("Cursor modified!"); 
+                    // The images in the cursors folder are cursors, hence we have to change their types
+                    var cursorImporter = AssetImporter.GetAtPath(assetPath) as TextureImporter;
+                    cursorImporter.textureType = TextureImporterType.Cursor;
+                    pathsToReimport.Add(assetPath);
+                }
 
                 // In case of animation
                 if (assetPath.EndsWith(".eaa", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    AssetDatabase.RenameAsset(assetPath, assetPath + ".xml");
+                    var newName = assetPath + ".xml";
+                    File.Copy(assetPath, newName);
+                    AssetDatabase.DeleteAsset(assetPath);
+                    pathsToReimport.Add(newName);
                 }
 
                 // In case of animation

@@ -154,26 +154,31 @@ namespace uAdventure.Editor
 
         public override bool addElement(int type, string itemId)
         {
-
             bool elementAdded = false;
 
             if (type == Controller.ITEM)
             {
-
-                if (itemId == null || itemId.Equals(""))
-                    itemId = controller.showInputDialog(TC.get("Operation.AddItemTitle"), TC.get("Operation.AddItemMessage"), TC.get("Operation.AddItemDefaultValue"));
-
-				if (!controller.isElementIdValid(itemId))
-					itemId = controller.makeElementValid(itemId);
-				
-                Item newItem = new Item(itemId);
-                itemsList.Add(newItem);
-                itemsDataControlList.Add(new ItemDataControl(newItem));
-                controller.IdentifierSummary.addItemId(itemId);
-                elementAdded = true;
+                if (string.IsNullOrEmpty(itemId))
+                    controller.ShowInputDialog(TC.get("Operation.AddItemTitle"), TC.get("Operation.AddItemMessage"), TC.get("Operation.AddItemDefaultValue"), performAddElement);
+                else
+                {
+                    performAddElement(null, itemId);
+                    elementAdded = true;
+                }
             }
 
             return elementAdded;
+        }
+
+        private void performAddElement(object sender, string itemId)
+        {
+            if (!controller.isElementIdValid(itemId))
+                itemId = controller.makeElementValid(itemId);
+
+            Item newItem = new Item(itemId);
+            itemsList.Add(newItem);
+            itemsDataControlList.Add(new ItemDataControl(newItem));
+            controller.IdentifierSummary.addId<Item>(itemId);
         }
 
 
@@ -193,7 +198,7 @@ namespace uAdventure.Editor
             newElement.setId(id);
             itemsList.Add(newElement);
             itemsDataControlList.Add(new ItemDataControl(newElement));
-            controller.IdentifierSummary.addItemId(id);
+            controller.IdentifierSummary.addId<Item>(id);
             return true;
         }
 
@@ -213,13 +218,13 @@ namespace uAdventure.Editor
             string references = controller.countIdentifierReferences(itemId).ToString();
 
             // Ask for confirmation
-            if (!askConfirmation || controller.showStrictConfirmDialog(TC.get("Operation.DeleteElementTitle"), TC.get("Operation.DeleteElementWarning", new string[] { itemId, references })))
+            if (!askConfirmation || controller.ShowStrictConfirmDialog(TC.get("Operation.DeleteElementTitle"), TC.get("Operation.DeleteElementWarning", new string[] { itemId, references })))
             {
                 if (itemsList.Remove((Item)dataControl.getContent()))
                 {
                     itemsDataControlList.Remove((ItemDataControl)dataControl);
                     controller.deleteIdentifierReferences(itemId);
-                    controller.IdentifierSummary.deleteItemId(itemId);
+                    controller.IdentifierSummary.deleteId<Item>(itemId);
                     //controller.dataModified( );
                     elementDeleted = true;
                 }

@@ -194,8 +194,7 @@ namespace uAdventure.Editor
          */
         public string getAssetDescription(int index)
         {
-            //return "";//Language.GetText(assetsInformation[index].description);
-            return assetsInformation[index].description;
+            return TC.get(assetsInformation[index].description);
         }
 
         /**
@@ -503,9 +502,7 @@ namespace uAdventure.Editor
 
         public string getGroupInfo(int i)
         {
-
-            // return Language.GetText(groupsInfo[i]);
-            return "";
+            return TC.get(groupsInfo[i]);
         }
 
         public int getGroupAssetCount(int selectedIndex)

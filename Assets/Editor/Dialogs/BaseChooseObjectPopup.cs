@@ -15,7 +15,7 @@ namespace uAdventure.Editor
             BaseChooseObjectPopup window = this;
             reference = e;
             window.position = new Rect(Screen.width / 2 - 50, Screen.height / 2 - 150, 500, 100);
-            window.Show();
+            window.ShowUtility();
         }
 
     }

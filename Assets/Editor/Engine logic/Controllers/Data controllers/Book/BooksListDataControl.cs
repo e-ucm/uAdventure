@@ -116,52 +116,41 @@ namespace uAdventure.Editor
 
         public override bool addElement(int type, string bookId)
         {
-
             bool elementAdded = false;
-
-            if (type == Controller.BOOK)
+            
+            // Show a dialog asking for the book id
+            if (string.IsNullOrEmpty(bookId))
+                controller.ShowInputDialog(TC.get("Operation.AddBookTitle"), TC.get("Operation.AddBookMessage"), TC.get("Operation.AddBookDefaultValue"), performAddBook);
+            else
             {
-
-                int bookType = -1;
-                //TODO: tmp, delete this line
-                bookType = 0;
-                //TODO: implement
-                //BookTypesDialog bookTypesDialog = new BookTypesDialog(Book.TYPE_PARAGRAPHS);
-                //bookType = bookTypesDialog.getOptionSelected();
-
-                if (bookType != -1)
-                {
-                    // Show a dialog asking for the book id
-                    if (bookId == null || bookId.Equals(""))
-                        bookId = controller.showInputDialog(TC.get("Operation.AddBookTitle"), TC.get("Operation.AddBookMessage"), TC.get("Operation.AddBookDefaultValue"));
-
-					// If some value was typed and the identifier is valid
-					if (!controller.isElementIdValid(bookId))
-						bookId = controller.makeElementValid(bookId);
-                    
-                        // Add thew new book
-                    Book newBook = new Book(bookId);
-                    newBook.setType(bookType);
-
-                    // Set default background
-                    ResourcesUni resources = new ResourcesUni();
-                    resources.addAsset("background", SpecialAssetPaths.ASSET_DEFAULT_BOOK_IMAGE);
-                    resources.addAsset("arrowLeftNormal", SpecialAssetPaths.ASSET_DEFAULT_ARROW_NORMAL);
-                    resources.addAsset("arrowLeftOver", SpecialAssetPaths.ASSET_DEFAULT_ARROW_OVER);
-                    newBook.addResources(resources);
-
-                    BookDataControl newDataControl = new BookDataControl(newBook);
-                    booksList.Add(newBook);
-                    booksDataControlList.Add(newDataControl);
-                    controller.IdentifierSummary.addBookId(bookId);
-                    //controller.dataModified( );
-                    elementAdded = true;
-
-                }
-
+                performAddBook(null, bookId);
+                elementAdded = true;
             }
 
             return elementAdded;
+        }
+
+        private void performAddBook(object sender, string bookId)
+        {
+            // If some value was typed and the identifier is valid
+            if (!controller.isElementIdValid(bookId))
+                bookId = controller.makeElementValid(bookId);
+
+            // Add thew new book
+            Book newBook = new Book(bookId);
+            newBook.setType(Controller.BOOK);
+
+            // Set default background
+            ResourcesUni resources = new ResourcesUni();
+            resources.addAsset("background", SpecialAssetPaths.ASSET_DEFAULT_BOOK_IMAGE);
+            resources.addAsset("arrowLeftNormal", SpecialAssetPaths.ASSET_DEFAULT_ARROW_NORMAL);
+            resources.addAsset("arrowLeftOver", SpecialAssetPaths.ASSET_DEFAULT_ARROW_OVER);
+            newBook.addResources(resources);
+
+            BookDataControl newDataControl = new BookDataControl(newBook);
+            booksList.Add(newBook);
+            booksDataControlList.Add(newDataControl);
+            controller.IdentifierSummary.addId<Book>(bookId);
         }
 
 
@@ -181,7 +170,7 @@ namespace uAdventure.Editor
             newElement.setId(id);
             booksList.Add(newElement);
             booksDataControlList.Add(new BookDataControl(newElement));
-            controller.IdentifierSummary.addBookId(id);
+            controller.IdentifierSummary.addId<Book>(id);
             return true;
 
         }
@@ -202,13 +191,13 @@ namespace uAdventure.Editor
             string references = controller.countIdentifierReferences(bookId).ToString();
 
             // Ask for confirmation
-            if (!askConfirmation || controller.showStrictConfirmDialog(TC.get("Operation.DeleteElementTitle"), TC.get("Operation.DeleteElementWarning", new string[] { bookId, references })))
+            if (!askConfirmation || controller.ShowStrictConfirmDialog(TC.get("Operation.DeleteElementTitle"), TC.get("Operation.DeleteElementWarning", new string[] { bookId, references })))
             {
                 if (booksList.Remove((Book)dataControl.getContent()))
                 {
                     booksDataControlList.Remove((BookDataControl)dataControl);
                     controller.deleteIdentifierReferences(bookId);
-                    controller.IdentifierSummary.deleteBookId(bookId);
+                    controller.IdentifierSummary.deleteId<Book>(bookId);
                     //controller.dataModified( );
                     elementDeleted = true;
                 }

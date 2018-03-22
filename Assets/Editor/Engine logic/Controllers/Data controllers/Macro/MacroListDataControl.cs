@@ -147,33 +147,34 @@ namespace uAdventure.Editor
 
         public override bool addElement(int type, string macroId)
         {
-
             bool elementAdded = false;
 
             if (type == Controller.MACRO)
             {
-
                 // Show a dialog asking for the macro id
                 if (macroId == null)
-                    macroId = controller.showInputDialog(TC.get("Operation.AddMacroTitle"), TC.get("Operation.AddMacroMessage"), TC.get("Operation.AddMacroDefaultValue"));
-
-                // If some value was typed and the identifier is valid
-                if (macroId != null)
+                    controller.ShowInputDialog(TC.get("Operation.AddMacroTitle"), TC.get("Operation.AddMacroMessage"), TC.get("Operation.AddMacroDefaultValue"), performAddElement);
+                else
                 {
-                    if (!controller.isElementIdValid(macroId))
-                        macroId = controller.makeElementValid(macroId);
-
-                    // Add thew new macro
-                    Macro newMacro = new Macro(macroId);
-                    macrosList.Add(newMacro);
-                    macrosDataControlList.Add(new MacroDataControl(newMacro));
-                    controller.IdentifierSummary.addMacroId(macroId);
-                    //controller.dataModified( );
+                    performAddElement(null, macroId);
                     elementAdded = true;
                 }
             }
 
             return elementAdded;
+        }
+
+        private void performAddElement(object sender, string macroId)
+        {
+            if (!controller.isElementIdValid(macroId))
+                macroId = controller.makeElementValid(macroId);
+
+            // Add thew new macro
+            Macro newMacro = new Macro(macroId);
+            macrosList.Add(newMacro);
+            macrosDataControlList.Add(new MacroDataControl(newMacro));
+            controller.IdentifierSummary.addId<Macro>(macroId);
+            //controller.dataModified( );
         }
 
 
@@ -194,7 +195,7 @@ namespace uAdventure.Editor
             newElement.setId(id);
             macrosList.Add(newElement);
             macrosDataControlList.Add(new MacroDataControl(newElement));
-            controller.IdentifierSummary.addMacroId(id);
+            controller.IdentifierSummary.addId<Macro>(id);
             return true;
 
         }
@@ -215,13 +216,13 @@ namespace uAdventure.Editor
             string references = controller.countIdentifierReferences(macroId).ToString();
 
             // Ask for confirmation
-            if (!askConfirmation || controller.showStrictConfirmDialog(TC.get("Operation.DeleteElementTitle"), TC.get("Operation.DeleteElementWarning", new string[] { macroId, references })))
+            if (!askConfirmation || controller.ShowStrictConfirmDialog(TC.get("Operation.DeleteElementTitle"), TC.get("Operation.DeleteElementWarning", new string[] { macroId, references })))
             {
                 if (macrosList.Remove((Macro)dataControl.getContent()))
                 {
                     macrosDataControlList.Remove((MacroDataControl)dataControl);
                     controller.deleteIdentifierReferences(macroId);
-                    controller.IdentifierSummary.deleteMacroId(macroId);
+                    controller.IdentifierSummary.deleteId<Macro>(macroId);
                     //controller.dataModified( );
                     elementDeleted = true;
                 }

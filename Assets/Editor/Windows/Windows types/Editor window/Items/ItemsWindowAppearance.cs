@@ -92,11 +92,11 @@ namespace uAdventure.Editor
         {
             var item = Target != null ? Target as ItemDataControl : Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[GameRources.GetInstance().selectedItemIndex];
             imagePath = item.getPreviewImage();
-            var imageTex = string.IsNullOrEmpty(imagePath) ? null : AssetsController.getImage(imagePath).texture;
+            var imageTex = string.IsNullOrEmpty(imagePath) ? null : Controller.ResourceManager.getImage(imagePath);
             imagePath = item.getIconImage();
-            var iconTex = string.IsNullOrEmpty(imagePath) ? null : AssetsController.getImage(imagePath).texture;
+            var iconTex = string.IsNullOrEmpty(imagePath) ? null : Controller.ResourceManager.getImage(imagePath);
             imagePath = item.getMouseOverImage();
-            var imageOverTex = string.IsNullOrEmpty(imagePath) ? null : AssetsController.getImage(imagePath).texture;
+            var imageOverTex = string.IsNullOrEmpty(imagePath) ? null : Controller.ResourceManager.getImage(imagePath);
 
             if (imageTex == null)
                 return;
@@ -112,20 +112,20 @@ namespace uAdventure.Editor
             inventoryIconPath   = item.getIconImage();
             imageWhenOverPath   = item.getMouseOverImage();
 
-            imageTex        = string.IsNullOrEmpty(imagePath) ? null : AssetsController.getImage(imagePath).texture;
-            iconTex         = string.IsNullOrEmpty(inventoryIconPath) ? null :AssetsController.getImage(inventoryIconPath).texture;
-            imageOverTex    = string.IsNullOrEmpty(imageWhenOverPath) ? null : AssetsController.getImage(imageWhenOverPath).texture;
+            imageTex        = string.IsNullOrEmpty(imagePath) ? null : Controller.ResourceManager.getImage(imagePath);
+            iconTex         = string.IsNullOrEmpty(inventoryIconPath) ? null :Controller.ResourceManager.getImage(inventoryIconPath);
+            imageOverTex    = string.IsNullOrEmpty(imageWhenOverPath) ? null : Controller.ResourceManager.getImage(imageWhenOverPath);
         }
 
         public override void OnRender(Rect viewport)
         {
             var item = Target as ItemDataControl;
             imagePath = item.getPreviewImage();
-            var imageTex = string.IsNullOrEmpty(imagePath) ? null : AssetsController.getImage(imagePath).texture;
+            var imageTex = string.IsNullOrEmpty(imagePath) ? null : Controller.ResourceManager.getSprite(imagePath).texture;
             imagePath = item.getIconImage();
-            var iconTex = string.IsNullOrEmpty(imagePath) ? null : AssetsController.getImage(imagePath).texture;
+            var iconTex = string.IsNullOrEmpty(imagePath) ? null : Controller.ResourceManager.getSprite(imagePath).texture;
             imagePath = item.getMouseOverImage();
-            var imageOverTex = string.IsNullOrEmpty(imagePath) ? null : AssetsController.getImage(imagePath).texture;
+            var imageOverTex = string.IsNullOrEmpty(imagePath) ? null : Controller.ResourceManager.getSprite(imagePath).texture;
 
             if (imageTex == null)
                 return;

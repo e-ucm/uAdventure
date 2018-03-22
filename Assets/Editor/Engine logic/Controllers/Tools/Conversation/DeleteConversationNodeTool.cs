@@ -90,7 +90,7 @@ namespace uAdventure.Editor
             bool nodeDeleted = false;
 
             // Ask for confirmation
-            if (!showConfirmation || controller.showStrictConfirmDialog(TC.get("Conversation.OperationDeleteNode"), TC.get("Conversation.ConfirmDeleteNode")))
+            if (!showConfirmation || controller.ShowStrictConfirmDialog(TC.get("Conversation.OperationDeleteNode"), TC.get("Conversation.ConfirmDeleteNode")))
             {
                 // Take the complete node
                 ConversationNode node = (ConversationNode)nodeView;

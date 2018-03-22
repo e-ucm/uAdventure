@@ -10,8 +10,46 @@ namespace uAdventure.Editor
     /**
      * Data control for the list of references in the scene
      */
-    public class ReferencesListDataControl : DataControl, DialogReceiverInterface
+    public class ReferencesListDataControl : DataControl
     {
+        private struct AddRefUtil
+        {
+            public Type[] validElementTypes;
+            public string title, message, errorMessage;
+        }
+
+        private static readonly Dictionary<int, AddRefUtil> AddRefUtils = new Dictionary<int, AddRefUtil>{
+            {
+                Controller.ITEM_REFERENCE,
+                new AddRefUtil()
+                {
+                    title = "Operation.AddItemReferenceTitle",
+                    message = "Operation.AddItemReferenceMessage",
+                    errorMessage = "Operation.AddItemReferenceErrorNoItems",
+                    validElementTypes = new Type[] { typeof(Item) }
+                }
+            },
+            {
+                Controller.ATREZZO_REFERENCE,
+                new AddRefUtil()
+                {
+                    title = "Operation.AddAtrezzoReferenceTitle",
+                    message = "Operation.AddAtrezzoReferenceMessage",
+                    errorMessage = "Operation.AddReferenceErrorNoAtrezzo",
+                    validElementTypes = new Type[] { typeof(Atrezzo) }
+                }
+            },
+            {
+                Controller.NPC_REFERENCE,
+                new AddRefUtil()
+                {
+                    title = "Operation.AddNPCReferenceTitle",
+                    message = "Operation.AddNPCReferenceMessage",
+                    errorMessage = "Operation.AddReferenceErrorNoNPC",
+                    validElementTypes = new Type[] { typeof(NPC) }
+                }
+            }
+        };
 
         /**
          * Player image path
@@ -23,20 +61,10 @@ namespace uAdventure.Editor
          */
         private SceneDataControl sceneDataControl;
 
-        /**
-         * List of item references.
-         */
-        private List<ElementReference> itemReferencesList;
-
-        /**
-         * List of atrezzo references.
-         */
-        private List<ElementReference> atrezzoReferencesList;
-
-        /**
-         * List of non-player character references.
-         */
-        private List<ElementReference> npcReferencesList;
+        /// <summary>
+        /// Refferences lists for any type
+        /// </summary>
+        private Dictionary<Type, List<ElementReference>> typeReferenceList;
 
         /**
          * List of all elements order by number of layer (or y position when they
@@ -78,9 +106,10 @@ namespace uAdventure.Editor
 
             this.playerImagePath = playerImagePath;
             this.sceneDataControl = sceneDataControl;
-            this.itemReferencesList = itemReferencesList;
-            this.atrezzoReferencesList = atrezzoReferencesList;
-            this.npcReferencesList = npcReferencesList;
+            this.typeReferenceList = new Dictionary<Type, List<ElementReference>>();
+            getReferencesList(typeof(Item)).AddRange(itemReferencesList);
+            getReferencesList(typeof(NPC)).AddRange(npcReferencesList);
+            getReferencesList(typeof(Atrezzo)).AddRange(atrezzoReferencesList);
             this.allReferencesDataControl = new List<ElementContainer>();
             this.lastElementContainer = null;
             this.playerPositionInAllReferences = NO_PLAYER;
@@ -119,8 +148,16 @@ namespace uAdventure.Editor
                     layer = 0;
                 else
                     layer = sceneDataControl.getPlayerLayer();
-                reassignLayerAllReferencesDataControl(insertInOrder(new ElementContainer(null, layer, AssetsController.getImage(this.playerImagePath)), true));
+                reassignLayerAllReferencesDataControl(insertInOrder(new ElementContainer(null, layer, Controller.ResourceManager.getSprite(this.playerImagePath)), true));
             }
+        }
+
+        private List<ElementReference> getReferencesList(Type t)
+        {
+            if (!typeReferenceList.ContainsKey(t))
+                typeReferenceList.Add(t, new List<ElementReference>());
+
+            return typeReferenceList[t];
         }
 
         private int count(ElementReference er)
@@ -147,36 +184,16 @@ namespace uAdventure.Editor
          */
         private bool hasLayer()
         {
+            foreach (var refference in allReferencesDataControl)
+                return refference.getLayer() != Scene.PLAYER_WITHOUT_LAYER;
 
-            if (itemReferencesList.Count > 0)
-            {
-                if (itemReferencesList[0].getLayer() == Scene.PLAYER_WITHOUT_LAYER)
-                    return false;
-                else
-                    return true;
-            }
-            else if (atrezzoReferencesList.Count > 0)
-            {
-                if (atrezzoReferencesList[0].getLayer() == Scene.PLAYER_WITHOUT_LAYER)
-                    return false;
-                else
-                    return true;
-            }
-            else if (npcReferencesList.Count > 0)
-            {
-                if (npcReferencesList[0].getLayer() == Scene.PLAYER_WITHOUT_LAYER)
-                    return false;
-                else
-                    return true;
-            }
             return false;
         }
 
         public Sprite getPlayerImage()
         {
-
             //CHANGE: Now, the image of the player must be taken from
-            return AssetsController.getImage(Controller.Instance.getPlayerImagePath());
+            return Controller.ResourceManager.getSprite(Controller.Instance.getPlayerImagePath());
             /*if (playerPositionInAllReferences==NO_PLAYER)
             return AssetsController.getImage(Controller.getInstance().getPlayerImagePath());
             else{
@@ -269,58 +286,21 @@ namespace uAdventure.Editor
             return allReferencesDataControl;
 
         }
-
-        /**
-         * Returns the list of item reference controllers.
-         * 
-         * @return List of item reference controllers
-         */
-        public List<ElementReferenceDataControl> getItemReferences()
+        public List<ElementReferenceDataControl> getRefferences()
         {
-
-            List<ElementReferenceDataControl> list = new List<ElementReferenceDataControl>();
-            foreach (ElementContainer element in allReferencesDataControl)
-            {
-                if (element.getErdc() != null && element.getErdc().getType() == Controller.ITEM_REFERENCE)
-                {
-                    list.Add(element.getErdc());
-                }
-            }
-            return list;
-            //		return itemReferencesDataControlList;
+            return getRefferences(null);
         }
-
-        /**
-         * Returns the list of atrezzo item reference controllers.
-         * 
-         * @return List of atrezzo item reference controllers
-         */
-        public List<ElementReferenceDataControl> getAtrezzoReferences()
+        public List<ElementReferenceDataControl> getRefferences<T>()
         {
-
-            List<ElementReferenceDataControl> list = new List<ElementReferenceDataControl>();
-            foreach (ElementContainer element in allReferencesDataControl)
-            {
-                if (element.getErdc() != null && element.getErdc().getType() == Controller.ATREZZO_REFERENCE)
-                {
-                    list.Add(element.getErdc());
-                }
-            }
-            return list;
+            return getRefferences(typeof(T));
         }
-
-        /**
-         * Returns the list of npc reference controllers.
-         * 
-         * @return List of npc reference controllers
-         */
-        public List<ElementReferenceDataControl> getNPCReferences()
+        public List<ElementReferenceDataControl> getRefferences(Type t)
         {
-
             List<ElementReferenceDataControl> list = new List<ElementReferenceDataControl>();
+            var ids = controller.IdentifierSummary;
             foreach (ElementContainer element in allReferencesDataControl)
             {
-                if (element.getErdc() != null && element.getErdc().getType() == Controller.NPC_REFERENCE)
+                if (element.getErdc() != null && ids.getType(element.getErdc().getElementId()) == t)
                 {
                     list.Add(element.getErdc());
                 }
@@ -343,8 +323,7 @@ namespace uAdventure.Editor
 
         public override System.Object getContent()
         {
-
-            return itemReferencesList;
+            return allReferencesDataControl;
         }
 
 
@@ -386,51 +365,47 @@ namespace uAdventure.Editor
 
         public override bool addElement(int type, string id)
         {
-
             bool elementAdded = false;
-            string selectedItem = id;
 
-            if (type == Controller.ITEM_REFERENCE)
+            if (AddRefUtils.ContainsKey(type))
             {
-                // Take the list of the items
-                string[] items = controller.IdentifierSummary.getItemIds();
-                // If the list has elements, show the dialog with the options
-                if (items.Length > 0)
+                if (string.IsNullOrEmpty(id))
                 {
-                    ObjectAddItemReference window = ScriptableObject.CreateInstance<ObjectAddItemReference>();
-                    window.Init(this);
+                    List<string> elements = new List<string>();
+                    var utils = AddRefUtils[type];
+                    foreach (var t in utils.validElementTypes)
+                        elements.AddRange(controller.IdentifierSummary.getIds(t));
+
+                    if(elements.Count != 0)
+                        controller.ShowInputDialog(TC.get(utils.title), TC.get(utils.message), elements.ToArray(), (o,s) => performAddElement(type, s));
+                    else
+                        controller.ShowErrorDialog(TC.get(utils.title), TC.get(utils.errorMessage));
                 }
                 else
-                    controller.showErrorDialog(TC.get("Operation.AddItemReferenceTitle"), TC.get("Operation.AddItemReferenceErrorNoItems"));
-            }
-
-            if (type == Controller.ATREZZO_REFERENCE)
-            {
-                string[] items = controller.IdentifierSummary.getAtrezzoIds();
-
-                // If the list has elements, show the dialog with the options
-                if (items.Length > 0)
                 {
-                    ObjectAddSetItemReference window = ScriptableObject.CreateInstance<ObjectAddSetItemReference>();
-                    window.Init(this);
+                    performAddElement(type, id);
+                    elementAdded = true;
                 }
-                else
-                    controller.showErrorDialog(TC.get("Operation.AddAtrezzoReferenceTitle"), TC.get("Operation.AddReferenceErrorNoAtrezzo"));
-            }
-
-            if (type == Controller.NPC_REFERENCE)
-            {
-                string[] items = controller.IdentifierSummary.getNPCIds();
-                if (items.Length > 0)
-                {
-                    ObjectAddNPCReference window = ScriptableObject.CreateInstance<ObjectAddNPCReference>();
-                    window.Init(this);
-                }
-                else
-                    controller.showErrorDialog(TC.get("Operation.AddNPCReferenceTitle"), TC.get("Operation.AddReferenceErrorNoNPC"));
             }
 
             return elementAdded;
+        }
+
+        private void performAddElement(int type, string id)
+        {
+            var elementType = controller.IdentifierSummary.getType(id);
+
+            if (elementType != null)
+            {
+                ElementReference newElementReference = new ElementReference(id, 50, 50);
+                int counter = count(newElementReference);
+                ElementReferenceDataControl erdc = new ElementReferenceDataControl(sceneDataControl, newElementReference, type, counter);
+                getReferencesList(elementType).Add(newElementReference);
+                ElementContainer ec = new ElementContainer(erdc, -1, null);
+                lastElementContainer = ec;
+                reassignLayerAllReferencesDataControl(insertInOrder(ec, false));
+            }
+
         }
 
         private void reassignLayerAllReferencesDataControl(int index)
@@ -477,24 +452,31 @@ namespace uAdventure.Editor
             bool elementDeleted = false;
             if (dataControl != null)
             {
-                itemReferencesList.Remove((ElementReference)dataControl.getContent());
-                atrezzoReferencesList.Remove((ElementReference)dataControl.getContent());
-                npcReferencesList.Remove((ElementReference)dataControl.getContent());
-                delete(dataControl);
-                elementDeleted = true;
+                // dataControl is ElementRefferenceDataControl
+                var elementRef = (ElementReference)dataControl.getContent();
+                var type = controller.IdentifierSummary.getType(elementRef.getTargetId());
+                if(type != null)
+                {
+                    getReferencesList(type).Remove(elementRef);
+                    delete(dataControl);
+                    elementDeleted = true;
+                }
+                
             }
             return elementDeleted;
         }
 
         public void addElement(ElementContainer element)
         {
+            var elementRef = (ElementReference)element.getErdc().getContent();
+            if (elementRef == null)
+                return;
 
-            if (element.getErdc().getType() == Controller.ITEM_REFERENCE)
-                itemReferencesList.Add((ElementReference)element.getErdc().getContent());
-            else if (element.getErdc().getType() == Controller.ATREZZO_REFERENCE)
-                atrezzoReferencesList.Add((ElementReference)element.getErdc().getContent());
-            else if (element.getErdc().getType() == Controller.NPC_REFERENCE)
-                npcReferencesList.Add((ElementReference)element.getErdc().getContent());
+            var type = controller.IdentifierSummary.getType(elementRef.getTargetId());
+            if (type == null)
+                return;
+
+            getReferencesList(type).Add(elementRef);
             allReferencesDataControl.Insert(element.getLayer(), element);
             reassignLayerAllReferencesDataControl(element.getLayer());
         }
@@ -678,10 +660,16 @@ namespace uAdventure.Editor
 
         public override void deleteIdentifierReferences(string id)
         {
+            var type = controller.IdentifierSummary.getType(id);
+            if(id == null)
+            {
+                // If we cant find the id type, we try to remove it from them all just in case
+                foreach (var kv in typeReferenceList)
+                    deleteIdentifierFromReferenceList(kv.Value, id);
+            }
+            else
+                deleteIdentifierFromReferenceList(getReferencesList(type), id);
 
-            deleteIdentifierFromReferenceList(itemReferencesList, id);
-            deleteIdentifierFromReferenceList(atrezzoReferencesList, id);
-            deleteIdentifierFromReferenceList(npcReferencesList, id);
             foreach (ElementContainer element in allReferencesDataControl)
             {
                 if (element.getErdc() != null)
@@ -691,7 +679,6 @@ namespace uAdventure.Editor
 
         private void deleteIdentifierFromReferenceList(List<ElementReference> list, string id)
         {
-
             int i = 0;
             while (i < list.Count)
             {
@@ -818,7 +805,7 @@ namespace uAdventure.Editor
         public void restorePlayer()
         {
 
-            ElementContainer ec = new ElementContainer(null, sceneDataControl.getPlayerLayer(), AssetsController.getImage(this.playerImagePath));
+            ElementContainer ec = new ElementContainer(null, sceneDataControl.getPlayerLayer(), Controller.ResourceManager.getSprite(this.playerImagePath));
             int layer = insertInOrder(ec, true);
             reassignLayerAllReferencesDataControl(layer);
         }
@@ -829,7 +816,7 @@ namespace uAdventure.Editor
             if (sceneDataControl.isForcedPlayerLayer())
             {
                 playerImagePath = Controller.Instance.getPlayerImagePath();
-                ElementContainer ec = new ElementContainer(null, 0, AssetsController.getImage(this.playerImagePath));
+                ElementContainer ec = new ElementContainer(null, 0, Controller.ResourceManager.getSprite(this.playerImagePath));
                 int layer = insertInOrder(ec, true);
                 reassignLayerAllReferencesDataControl(layer);
                 sceneDataControl.setPlayerLayer(layer);
@@ -845,23 +832,15 @@ namespace uAdventure.Editor
             if (allReferencesDataControl.Count == 0)
             {
                 playerPositionInAllReferences = 0;
-                reassignLayerAllReferencesDataControl(insertInOrder(new ElementContainer(null, 0, AssetsController.getImage(this.playerImagePath)), true));
+                reassignLayerAllReferencesDataControl(insertInOrder(new ElementContainer(null, 0, Controller.ResourceManager.getSprite(this.playerImagePath)), true));
             }
         }
 
 
         public override void recursiveSearch()
         {
-
-            if (this.getAtrezzoReferences() != null)
-                foreach (DataControl dc in this.getAtrezzoReferences())
-                    dc.recursiveSearch();
-            if (this.getItemReferences() != null)
-                foreach (DataControl dc in this.getItemReferences())
-                    dc.recursiveSearch();
-            if (this.getNPCReferences() != null)
-                foreach (DataControl dc in this.getNPCReferences())
-                    dc.recursiveSearch();
+            foreach (var ec in getAllReferencesDataControl())
+                ec.getErdc().recursiveSearch();
         }
 
         public void setPlayerPositionInAllReferences(int playerPositionInAllReferences)
@@ -904,50 +883,6 @@ namespace uAdventure.Editor
             //else if (type == -1)
             //    category = ScenePreviewEditionPanel.CATEGORY_PLAYER;
             return category;
-        }
-
-        public void OnDialogOk(string message, object workingObject = null, object workingObjectSecond = null)
-        {
-            var type = workingObject.GetType();
-            int objectType = -1; 
-            if (type == typeof(ObjectAddItemReference))
-            {
-                objectType = Controller.ITEM_REFERENCE;
-            }
-            else if (type == typeof(ObjectAddNPCReference))
-            {
-                objectType = Controller.NPC_REFERENCE;
-            }
-            else if (type == typeof(ObjectAddSetItemReference))
-            {
-                objectType = Controller.ATREZZO_REFERENCE;
-            }
-
-            ElementReference newElementReference = new ElementReference(message, 50, 50);
-            int counter = count(newElementReference);
-            ElementReferenceDataControl erdc = new ElementReferenceDataControl(sceneDataControl, newElementReference, objectType, counter);
-
-            if (type == typeof(ObjectAddItemReference))
-            {
-                itemReferencesList.Add(newElementReference);
-            }
-            else if (type == typeof(ObjectAddNPCReference))
-            {
-                npcReferencesList.Add(newElementReference);
-            }
-            else if (type == typeof(ObjectAddSetItemReference))
-            {
-                atrezzoReferencesList.Add(newElementReference);
-            }
-
-            ElementContainer ec = new ElementContainer(erdc, -1, null);
-            lastElementContainer = ec;
-            reassignLayerAllReferencesDataControl(insertInOrder(ec, false));
-        }
-
-        public void OnDialogCanceled(object workingObject = null)
-        {
-
         }
     }
 }

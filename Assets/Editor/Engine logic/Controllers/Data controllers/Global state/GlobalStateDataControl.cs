@@ -189,27 +189,31 @@ namespace uAdventure.Editor
             string references = Controller.Instance.countIdentifierReferences(oldItemId).ToString();
 
             // Ask for confirmation
-            if (name != null || Controller.Instance.showStrictConfirmDialog(TC.get("Operation.RenameGlobalStateTitle"), TC.get("Operation.RenameElementWarning", new string[] { oldItemId, references })))
+            if (name != null || Controller.Instance.ShowStrictConfirmDialog(TC.get("Operation.RenameGlobalStateTitle"), TC.get("Operation.RenameElementWarning", new string[] { oldItemId, references })))
             {
-
                 // Show a dialog asking for the new item id
-                string newItemId = name;
                 if (name == null)
-                    newItemId = Controller.Instance.showInputDialog(TC.get("Operation.RenameGlobalStateTitle"), TC.get("Operation.RenameGlobalStateMessage"), oldItemId);
-
-                // If some value was typed and the identifiers are different
-				if (Controller.Instance .isElementIdValid (newItemId))
-					newItemId = Controller.Instance .makeElementValid (newItemId);
-				
-                globalState.setId(newItemId);
-                Controller.Instance.replaceIdentifierReferences(oldItemId, newItemId);
-                Controller.Instance.IdentifierSummary.deleteGlobalStateId(oldItemId);
-                Controller.Instance.IdentifierSummary.addGlobalStateId(newItemId);
-				//Controller.getInstance().dataModified( );
-				return newItemId;
+                    Controller.Instance.ShowInputDialog(TC.get("Operation.RenameGlobalStateTitle"), TC.get("Operation.RenameGlobalStateMessage"), oldItemId, (o,s) => performRenameElement(s));
+                else
+                    return performRenameElement(name);
             }
 
 			return null;
+        }
+
+        private string performRenameElement(string newGlobalStateId)
+        {
+            string oldGlobalStateId = getId();
+            // If some value was typed and the identifiers are different
+            if (Controller.Instance.isElementIdValid(newGlobalStateId))
+                newGlobalStateId = Controller.Instance.makeElementValid(newGlobalStateId);
+
+            globalState.setId(newGlobalStateId);
+            Controller.Instance.replaceIdentifierReferences(oldGlobalStateId, newGlobalStateId);
+            Controller.Instance.IdentifierSummary.deleteId<GlobalState>(oldGlobalStateId);
+            Controller.Instance.IdentifierSummary.addId<GlobalState>(newGlobalStateId);
+            //Controller.getInstance().dataModified( );
+            return newGlobalStateId;
         }
 
 
@@ -219,8 +223,8 @@ namespace uAdventure.Editor
             if (globalState.getId().Equals(oldId))
             {
                 globalState.setId(newId);
-                Controller.Instance.IdentifierSummary.deleteGlobalStateId(oldId);
-                Controller.Instance.IdentifierSummary.addGlobalStateId(newId);
+                Controller.Instance.IdentifierSummary.deleteId<GlobalState>(oldId);
+                Controller.Instance.IdentifierSummary.addId<GlobalState>(newId);
             }
             conditionsController.replaceIdentifierReferences(oldId, newId);
         }
@@ -235,7 +239,6 @@ namespace uAdventure.Editor
 
         public override void recursiveSearch()
         {
-
             check(this.conditionsController, TC.get("Search.Conditions"));
             check(this.getDocumentation(), TC.get("Search.Documentation"));
             check(this.getId(), "ID");

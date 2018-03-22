@@ -8,7 +8,7 @@ namespace uAdventure.Core
      * of the chapter
      * 
      */
-    public class Macro : Effects, Documented
+    public class Macro : Effects, Documented, HasId
     {
         /**
              * Id of the Effects group
