@@ -19,7 +19,7 @@ namespace uAdventure.Runner
 
         private Button closeButton;
         
-        public bool Show { get { return insideElement.activeSelf; } set { insideElement.SetActive(value); } }
+        public bool Opened { get { return insideElement.activeSelf; } set { insideElement.SetActive(value); } }
 
         public void AddElement(GameObject element)
         {

@@ -4,9 +4,9 @@ namespace uAdventure.Editor
 {
     public class VideoFileOpenDialog : BaseFileOpenDialog
     {
-        public virtual void Init(DialogReceiverInterface e, FileType fType)
+        public override void Init(DialogReceiverInterface e, FileType fType)
         {
-            fileFilter = "mpg";
+            fileFilter = "asf,avi,dv,m4v,mov,mp4,mpg,mpeg,ogv,vp8,webm,wmv";
             base.Init(e, fType);
         }
 
@@ -18,7 +18,6 @@ namespace uAdventure.Editor
 
         protected override void FileSelectionNotPerfromed()
         {
-            Debug.Log("NIc nie wybrałeś");
             reference.OnDialogCanceled();
         }
     }

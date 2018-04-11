@@ -258,16 +258,18 @@ namespace uAdventure.Editor
             return sceneDataControl.getPlayerLayer();
         }
 
-        public void setInitial(bool b)
+        public void setInitial(bool initial)
         {
-
-            initial = b;
+            var was = isInitial();
+            if (was && !initial)
+                trajectory.setInitial(trajectory.getNodes()[0].getID());
+            else if (!was && initial)
+                trajectory.setInitial(node.getID());
         }
 
         public bool isInitial()
         {
-
-            return initial;
+            return trajectory.getInitial() == node || trajectory.getInitial().getID() == node.getID();
         }
 
 

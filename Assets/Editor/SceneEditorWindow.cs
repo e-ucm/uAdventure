@@ -24,6 +24,7 @@ namespace uAdventure.Editor
 
         public override void DrawPreview(Rect rect)
         {
+            sceneEditor.Scene = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[GameRources.GetInstance().selectedSceneIndex];
             sceneEditor.Draw(rect);
         }
 

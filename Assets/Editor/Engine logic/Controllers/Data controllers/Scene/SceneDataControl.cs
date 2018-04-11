@@ -61,7 +61,7 @@ namespace uAdventure.Editor
                 resourcesDataControlList.Add(new ResourcesDataControl(resources, Controller.SCENE));
 
             exitsListDataControl = new ExitsListDataControl(this, scene.getExits());
-            referencesListDataControl = new ReferencesListDataControl(playerImagePath, this, scene.getItemReferences(), scene.getAtrezzoReferences(), scene.getCharacterReferences());
+            referencesListDataControl = new ReferencesListDataControl(playerImagePath, this);
             activeAreasListDataControl = new ActiveAreasListDataControl(this, scene.getActiveAreas());
             barriersListDataControl = new BarriersListDataControl(this, scene.getBarriers());
             trajectoryDataControl = new TrajectoryDataControl(this, scene.getTrajectory());

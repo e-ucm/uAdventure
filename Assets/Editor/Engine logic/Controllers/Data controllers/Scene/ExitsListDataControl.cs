@@ -156,6 +156,7 @@ namespace uAdventure.Editor
         private void performAddExit(object sender, string target)
         {
             Exit newExit = new Exit(true, 240, 240, 100, 100);
+            newExit.setDestinyScale(1f);
             newExit.setNextSceneId(target);
             ExitDataControl newExitDataControl = new ExitDataControl(sceneDataControl, newExit);
 

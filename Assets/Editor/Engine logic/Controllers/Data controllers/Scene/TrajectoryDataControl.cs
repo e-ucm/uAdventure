@@ -213,6 +213,15 @@ namespace uAdventure.Editor
             if (startNode == endNode)
                 return false;
 
+            string sID = startNode.getID(), eID = endNode.getID();
+
+            if (trajectory.getSides()
+                .Any(s => (s.getIDStart() == sID && s.getIDEnd() == eID) 
+                       || (s.getIDStart() == eID && s.getIDEnd() == sID)))
+            {
+                return false;
+            }
+
             Controller.Instance.addTool(new AddTrajectorySideTool(startNode, endNode, trajectory, this, sceneDataControl));
 
             return true;

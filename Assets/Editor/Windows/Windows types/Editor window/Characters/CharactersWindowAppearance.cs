@@ -239,11 +239,11 @@ namespace uAdventure.Editor
             }
             
             var npc = Target as NPCDataControl;
-            var preview = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_STAND_DOWN);
-            if (preview)
+            var previewPath = npc.getPreviewImage();
+            if (!string.IsNullOrEmpty(previewPath))
             {
+                var preview = Controller.ResourceManager.getImage(previewPath);
                 var rect = GetViewportRect(new Rect(new Vector2(-0.5f * preview.width, -preview.height), new Vector2(preview.width, preview.height)), viewport);
-                
                 GUI.DrawTexture(rect, preview, ScaleMode.ScaleToFit);
             }
         }

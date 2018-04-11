@@ -102,6 +102,8 @@ namespace uAdventure.Core
 
         private int transitionTime;
 
+        private float destinyScale;
+
         /**
          * Creates a new Exit
          * 
@@ -599,42 +601,53 @@ namespace uAdventure.Core
 
             return getY() + getHeight();
         }
-        /*
-        @Override
-        public Object clone() throws CloneNotSupportedException
-        {
 
-            Exit e = (Exit) super.clone( );
-            e.defaultExitLook = ( defaultExitLook != null ? (ExitLook) defaultExitLook.clone( ) : null );
-            e.documentation = ( documentation != null ? new string(documentation ) : null );
-            e.height = height;
-            if( nextScenes != null ) {
-                e.nextScenes = new List<NextScene>( );
-                for( NextScene ns : nextScenes )
-                    e.nextScenes.add( (NextScene) ns.clone( ) );
-            }
-    e.influenceArea = ( influenceArea != null ? (InfluenceArea) influenceArea.clone( ) : null );
-            e.width = width;
-            e.x = x;
-            e.y = y;
-            e.rectangular = rectangular;
-            if( points != null ) {
-                e.points = new List<Point>( );
-                for( Point p : points )
-                    e.points.add( (Point) p.clone( ) );
-            }
-            e.conditions = ( conditions != null ? (Conditions) conditions.clone( ) : null );
-            e.effects = ( effects != null ? (Effects) effects.clone( ) : null );
-            e.postEffects = ( postEffects != null ? (Effects) postEffects.clone( ) : null );
-            e.notEffects = ( notEffects != null ? (Effects) notEffects.clone( ) : null );
-            e.destinyX = destinyX;
-            e.destinyY = destinyY;
-            e.hasNotEffects = hasNotEffects;
-            e.nextSceneId = ( nextSceneId != null ? new string(nextSceneId ) : null );
-            e.transitionTime = new int(transitionTime );
-    e.transitionType = new int(transitionType );
-            return e;
-        }*/
+        public void setDestinyScale(float destinyScale)
+        {
+            this.destinyScale = destinyScale;
+        }
+
+        public float getDestinyScale()
+        {
+            return destinyScale;
+        }
+
+        /*
+@Override
+public Object clone() throws CloneNotSupportedException
+{
+
+   Exit e = (Exit) super.clone( );
+   e.defaultExitLook = ( defaultExitLook != null ? (ExitLook) defaultExitLook.clone( ) : null );
+   e.documentation = ( documentation != null ? new string(documentation ) : null );
+   e.height = height;
+   if( nextScenes != null ) {
+       e.nextScenes = new List<NextScene>( );
+       for( NextScene ns : nextScenes )
+           e.nextScenes.add( (NextScene) ns.clone( ) );
+   }
+e.influenceArea = ( influenceArea != null ? (InfluenceArea) influenceArea.clone( ) : null );
+   e.width = width;
+   e.x = x;
+   e.y = y;
+   e.rectangular = rectangular;
+   if( points != null ) {
+       e.points = new List<Point>( );
+       for( Point p : points )
+           e.points.add( (Point) p.clone( ) );
+   }
+   e.conditions = ( conditions != null ? (Conditions) conditions.clone( ) : null );
+   e.effects = ( effects != null ? (Effects) effects.clone( ) : null );
+   e.postEffects = ( postEffects != null ? (Effects) postEffects.clone( ) : null );
+   e.notEffects = ( notEffects != null ? (Effects) notEffects.clone( ) : null );
+   e.destinyX = destinyX;
+   e.destinyY = destinyY;
+   e.hasNotEffects = hasNotEffects;
+   e.nextSceneId = ( nextSceneId != null ? new string(nextSceneId ) : null );
+   e.transitionTime = new int(transitionTime );
+e.transitionType = new int(transitionType );
+   return e;
+}*/
 
         public bool isRectangular()
         {

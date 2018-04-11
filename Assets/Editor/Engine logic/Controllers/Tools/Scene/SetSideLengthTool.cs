@@ -14,7 +14,7 @@ namespace uAdventure.Editor
 
         private float value;
 
-        public SetSideLengthTool(Side side, int value)
+        public SetSideLengthTool(Side side, float value)
         {
             this.side = side;
             this.value = value;

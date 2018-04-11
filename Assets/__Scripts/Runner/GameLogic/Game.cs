@@ -47,6 +47,9 @@ namespace uAdventure.Runner
         private GUISkin style;
         public string gamePath = "", gameName = "", scene_name = "";
         public GameObject Blur_Prefab;
+
+        private bool waitingRunTarget = false;
+        private GameObject runTargetPreOverride;
         MenuMB menu;
         Interactuable next_interaction = null;
         IRunnerChapterTarget runnerTarget;
@@ -153,7 +156,7 @@ namespace uAdventure.Runner
         void Start()
         {
             if (!forceScene)
-                RunTarget(GameState.getInitialChapterTarget().getId());
+                RunTarget(GameState.InitialChapterTarget.getId());
             else
                 RunTarget(scene_name);
 
@@ -170,7 +173,7 @@ namespace uAdventure.Runner
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            if (next_interaction != null && guistate != guiState.ANSWERS_MENU)
+            if (!waitingRunTarget && next_interaction != null && guistate != guiState.ANSWERS_MENU)
             {
                 Interacted();
             }
@@ -180,6 +183,16 @@ namespace uAdventure.Runner
 
         void Update()
         {
+            if (waitingRunTarget)
+            {
+                if (runnerTarget.IsReady)
+                {
+                    waitingRunTarget = false;
+                    uAdventureRaycaster.Instance.Override = runTargetPreOverride;
+                    Interacted();
+                }
+            }
+
             if (!mouseDownDisabled  && Input.GetMouseButtonDown(0))
             {
                 if (Time.timeScale == 1)
@@ -272,11 +285,11 @@ namespace uAdventure.Runner
             if (interactuable.Interacted() == InteractuableResult.REQUIRES_MORE_INTERACTION)
             {
                 this.next_interaction = interactuable;
-                uAdventureRaycaster.Override = this.gameObject;
+                uAdventureRaycaster.Instance.Override = this.gameObject;
                 return true;
             }
-            if(uAdventureRaycaster.Override == this.gameObject)
-                uAdventureRaycaster.Override = null;
+            if(uAdventureRaycaster.Instance.Override == this.gameObject)
+                uAdventureRaycaster.Instance.Override = null;
             return false;
         }
 
@@ -365,8 +378,7 @@ namespace uAdventure.Runner
         public IRunnerChapterTarget RunTarget(string scene_id, int transition_time = 0, int transition_type = 0)
         {
             MenuMB.Instance.hide(true);
-            if (runnerTarget != null)
-            {
+            if (runnerTarget != null){
                 runnerTarget.Destroy(transition_time / 1000f);
             }
 
@@ -374,13 +386,15 @@ namespace uAdventure.Runner
             IChapterTarget target = GameState.getChapterTarget(scene_id);
 
             runnerTarget = RunnerChapterTargetFactory.Instance.Instantiate(target);
-
             runnerTarget.Data = target;
-
-            trackSceneChange(target);
-            
             GameState.CurrentTarget = target.getId();
 
+            trackSceneChange(target);
+
+            waitingRunTarget = true;
+            runTargetPreOverride = uAdventureRaycaster.Instance.Override;
+            uAdventureRaycaster.Instance.Override = this.gameObject;
+            
             return runnerTarget;
         }
 

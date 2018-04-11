@@ -101,15 +101,22 @@ namespace uAdventure.Editor
          * @param itemReferencesList
          *            List of item references
          */
-        public ReferencesListDataControl(string playerImagePath, SceneDataControl sceneDataControl, List<ElementReference> itemReferencesList, List<ElementReference> atrezzoReferencesList, List<ElementReference> npcReferencesList)
+        public ReferencesListDataControl(string playerImagePath, SceneDataControl sceneDataControl)
         {
 
             this.playerImagePath = playerImagePath;
             this.sceneDataControl = sceneDataControl;
             this.typeReferenceList = new Dictionary<Type, List<ElementReference>>();
+            var content = sceneDataControl.getContent() as Scene;
+
+            var itemReferencesList = content.getItemReferences();
+            var atrezzoReferencesList = content.getCharacterReferences();
+            var npcReferencesList = content.getAtrezzoReferences();
+
             getReferencesList(typeof(Item)).AddRange(itemReferencesList);
-            getReferencesList(typeof(NPC)).AddRange(npcReferencesList);
-            getReferencesList(typeof(Atrezzo)).AddRange(atrezzoReferencesList);
+            getReferencesList(typeof(NPC)).AddRange(atrezzoReferencesList);
+            getReferencesList(typeof(Atrezzo)).AddRange(npcReferencesList);
+
             this.allReferencesDataControl = new List<ElementContainer>();
             this.lastElementContainer = null;
             this.playerPositionInAllReferences = NO_PLAYER;
@@ -398,6 +405,14 @@ namespace uAdventure.Editor
             if (elementType != null)
             {
                 ElementReference newElementReference = new ElementReference(id, 50, 50);
+                var scene = sceneDataControl.getContent() as Scene;
+                switch (type)
+                {
+                    case Controller.ITEM_REFERENCE: scene.addItemReference(newElementReference); break;
+                    case Controller.NPC_REFERENCE: scene.addCharacterReference(newElementReference); break;
+                    case Controller.ATREZZO_REFERENCE: scene.addAtrezzoReference(newElementReference); break;
+                }
+
                 int counter = count(newElementReference);
                 ElementReferenceDataControl erdc = new ElementReferenceDataControl(sceneDataControl, newElementReference, type, counter);
                 getReferencesList(elementType).Add(newElementReference);

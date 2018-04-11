@@ -189,6 +189,11 @@ namespace uAdventure.Editor
                     AssetsController.InitImporterConfig(destination);
                 }
 
+                if (fileType == FileType.CUTSCENE_VIDEO)
+                {
+                    AssetsController.InitImporterConfig(destination);
+                }
+
                 if (fileType == FileType.CUTSCENE_SLIDES || fileType == FileType.CHARACTER_ANIM || fileType == FileType.PLAY_ANIMATION_EFFECT)
                     AssetsController.copyAllFiles(Path.GetDirectoryName(selectedAssetPath), path.FullName);
                 AssetDatabase.Refresh();

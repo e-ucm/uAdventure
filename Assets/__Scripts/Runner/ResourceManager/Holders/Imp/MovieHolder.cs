@@ -1,20 +1,22 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.Video;
+using System.IO;
 
 namespace uAdventure.Runner
 {
     public class MovieHolder
     {
-#if UNITY_WEBPLAYER || UNITY_WEBGL
-    public WebGLMovieTexture Movie;
-#elif UNITY_ANDROID || UNITY_IPHONE
-    public Texture Movie;
-#else
-    public MovieTexture Movie;
-#endif
+        private static string[] extensions = { ".asf",".avi",".dv",".m4v",".mov",".mp4",".mpg",".mpeg",".ogv",".vp8",".webm",".wmv" };
 
-        bool loaded = false;
+        public RenderTexture Movie { get { return videoPlayer.targetTexture; } }
+        private string error = string.Empty;
+        public string Error { get { return error; } }
+
+        private VideoPlayer videoPlayer;
+        
         string path;
+        private ResourceManager.LoadingType type;
 
         // ##################################################
         // ################## CONSTRUCTORS ##################
@@ -22,169 +24,113 @@ namespace uAdventure.Runner
 
         public MovieHolder(string path, ResourceManager.LoadingType type)
         {
-            loaded = true;
-            this.path = path;
-#if UNITY_WEBPLAYER || UNITY_WEBGL
-            LoadFromWebGL(path);
-#elif UNITY_ANDROID || UNITY_IPHONE
+            this.type = type;
 
-#else
-            switch (type)
-            {
-                case ResourceManager.LoadingType.RESOURCES_LOAD:
-                    LoadFromResources(path);
-                    break;
-                case ResourceManager.LoadingType.SYSTEM_IO:
-                    Game.Instance.StartCoroutine(LoadFromSystem(path));
-                    break;
-            }
-#endif
+            var videoPlayerHolder = new GameObject("VideoPlayer-" + System.IO.Path.GetFileNameWithoutExtension(path));
+            videoPlayer = videoPlayerHolder.AddComponent<VideoPlayer>();
+            videoPlayer.playOnAwake = false;
+            videoPlayer.renderMode = VideoRenderMode.RenderTexture;
+            videoPlayer.aspectRatio = VideoAspectRatio.FitInside;
+            videoPlayer.audioOutputMode = VideoAudioOutputMode.Direct;
+            videoPlayer.errorReceived += VideoPlayer_errorReceived;
+
+            this.path = path;
+            LoadVideo();
+        }
+
+        private void VideoPlayer_errorReceived(VideoPlayer source, string message)
+        {
+            error = message;
+            videoPlayer.errorReceived -= VideoPlayer_errorReceived;
+        }
+
+        public void Clean()
+        {
+            videoPlayer.Stop();
+            videoPlayer.targetTexture.Release();
+            GameObject.Destroy(videoPlayer.gameObject);
         }
 
         public bool Loaded()
         {
-            return loaded;
+            return videoPlayer.isPrepared;
         }
 
         // #####################################################
         // ################## CONTROL METHODS ##################
         // #####################################################
 
-        System.DateTime started_playing;
+
         public bool isPlaying()
         {
-#if UNITY_WEBPLAYER || UNITY_WEBGL
-            return true;
-#elif UNITY_ANDROID || UNITY_IPHONE
-            return true;
-#else
-            return Movie.isPlaying;
-#endif
+            return videoPlayer.isPlaying;
+        }
+
+        public bool isError()
+        {
+            return !string.IsNullOrEmpty(error);
         }
 
         public void Play()
         {
-#if UNITY_WEBPLAYER || UNITY_WEBGL
-        Debug.Log("playing");
-        Movie.Play();
-#elif UNITY_ANDROID || UNITY_IPHONE
-#else
-        Movie.Play();
-#endif
+            videoPlayer.Play();
         }
 
         public void Stop()
         {
-#if UNITY_WEBPLAYER || UNITY_WEBGL
-        Movie.Pause();
-        Movie.Seek(0f);
-#elif UNITY_ANDROID || UNITY_IPHONE
-#else
-            Movie.Stop();
-#endif
+            videoPlayer.Stop();
         }
 
         // #####################################################
         // ################## LOADING METHODS ##################
         // #####################################################
-
-#if UNITY_WEBPLAYER || UNITY_WEBGL
-
-    private WebGLMovieTexture LoadFromWebGL(string uri)
-    {
-        string videoname = uri;
-        string[] splitted = videoname.Split('/');
-
-        splitted = splitted[splitted.Length-1].Split('.');
-        string fullname = splitted[0];
-
-        for (int i = 1; i < splitted.Length - 1; i++)
-            fullname += "." + splitted[i];
-
-        fullname = "StreamingAssets/" + fullname + ".ogv";
-
-        Debug.Log(fullname);
         
-        Movie = new WebGLMovieTexture(fullname);
-        loaded = true;
 
-        return Movie;
-    }
-       
-
-#elif UNITY_ANDROID || UNITY_IPHONE
-
-
-        private IEnumerator LoadFromSystem(string uri)
+        private void LoadVideo()
         {
-            yield return null;
-        }
-
-        private Texture LoadFromResources(string uri)
-        {
-            return new Texture();
-        }
-
+            switch (type)
+            {
+                case ResourceManager.LoadingType.RESOURCES_LOAD:
+#if UNITY_WEBGL
+                    videoPlayer.source = VideoSource.Url;
+                    videoPlayer.url = Application.streamingAssetsPath + "/" + path + ".webm";
+                    videoPlayer.targetTexture = new RenderTexture(Screen.width, Screen.height, 16, RenderTextureFormat.RGB565);
 #else
-        private IEnumerator LoadFromSystem(string uri)
-        {
-            string url_prefix = "file:///";
-            string videoname = uri;
-            string[] splitted = videoname.Split('.');
-            string dir = "", fullname = splitted[0];
-
-            for (int i = 1; i < splitted.Length - 1; i++)
-                fullname += "." + splitted[i];
-
-            if (System.IO.File.Exists(Game.Instance.getSelectedGame() + fullname + ".ogv"))
-                dir = url_prefix + Game.Instance.getSelectedGame() + fullname + ".ogv";
-            else
-                dir = url_prefix + Game.Instance.getSelectedGame() + videoname;
-
-            Debug.Log(dir);
-
-            WWW www = new WWW(dir);
-
-            yield return www;
-            if (www.error != null)
-            {
-                Debug.Log("Error: Can't laod movie! - " + www.error);
-                yield break;
-
-            }
-            else
-            {
-                MovieTexture video = www.GetMovieTexture() as MovieTexture;
-                Debug.Log("Movie loaded");
-                Debug.Log(www.GetMovieTexture());
-                loaded = true;
-                Movie = video;
-            }
-        }
-
-        private MovieTexture LoadFromResources(string uri)
-        {
-            string videoname = uri;
-            string[] splitted = videoname.Split('.');
-            string fullname = splitted[0];
-
-            for (int i = 1; i < splitted.Length - 1; i++)
-                fullname += "." + splitted[i];
-
-            fullname = Game.Instance.getGameName() + "/" + fullname;
-            Movie = Resources.Load(fullname) as MovieTexture;
-
-            if (Movie == null)
-            {
-                loaded = false;
-                Debug.Log("No se pudo cargar: " + this.path);
-            }
-            else
-                loaded = true;
-
-            return Movie;
-        }
+                    videoPlayer.source = VideoSource.VideoClip;
+                    videoPlayer.clip = Resources.Load<VideoClip>(path);
+                    if(videoPlayer.clip)
+                        videoPlayer.targetTexture = new RenderTexture((int)videoPlayer.clip.width, (int)videoPlayer.clip.height, 16, RenderTextureFormat.RGB565);
+                    else
+                        videoPlayer.targetTexture = new RenderTexture(Screen.width, Screen.height, 16, RenderTextureFormat.RGB565);
 #endif
+                    if (videoPlayer.source == VideoSource.VideoClip && videoPlayer.clip == null)
+                    {
+                        error = "Video not found: " + this.path;
+                        Debug.Log("No se pudo cargar: " + this.path);
+                    }
 
+                    break;
+                case ResourceManager.LoadingType.SYSTEM_IO:
+                    if (!Path.HasExtension(path))
+                    {
+                        foreach (var extension in extensions)
+                        {
+                            if (File.Exists(path + "." + extension))
+                            {
+                                path = path + "." + extension;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    videoPlayer.source = VideoSource.Url;
+                    videoPlayer.url = "file://" + path;
+                    videoPlayer.targetTexture = new RenderTexture(Screen.width, Screen.height, 16, RenderTextureFormat.RGB565);
+                    break;
+            }
+
+            videoPlayer.targetTexture.Create();
+            videoPlayer.Prepare();
+        }
     }
 }

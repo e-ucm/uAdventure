@@ -97,6 +97,8 @@ namespace uAdventure.Core
 				int destinyX 		= ExParsers.ParseDefault (el.GetAttribute ("destinyX"), int.MinValue), 
 					destinyY 		= ExParsers.ParseDefault (el.GetAttribute ("destinyY"), int.MinValue);
 
+                float destinyScale  = ExParsers.ParseDefault (el.GetAttribute ("destinyScale"), 1f);
+
 				int transitionType 	= ExParsers.ParseDefault(el.GetAttribute("transitionType"), 0),
 					transitionTime 	= ExParsers.ParseDefault(el.GetAttribute("transitionTime"), 0);
 				bool notEffects     = ExString.EqualsDefault(el.GetAttribute("not-effects"), "yes", false);
@@ -106,6 +108,7 @@ namespace uAdventure.Core
                 currentExit.setNextSceneId(idTarget);
                 currentExit.setDestinyX(destinyX);
                 currentExit.setDestinyY(destinyY);
+                currentExit.setDestinyScale(destinyScale);
                 currentExit.setTransitionTime(transitionTime);
                 currentExit.setTransitionType(transitionType);
                 currentExit.setHasNotEffects(notEffects);

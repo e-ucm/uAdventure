@@ -118,10 +118,7 @@ namespace uAdventure.Editor
             }
         }
 
-        public void OnDialogCanceled(object workingObject = null)
-        {
-            Debug.Log("Wiadomość nie OK");
-        }
+        public void OnDialogCanceled(object workingObject = null) { }
 
         void EditCutscene()
         {

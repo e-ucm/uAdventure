@@ -6,6 +6,7 @@ namespace uAdventure.Runner
 {
     public class Bubble : MonoBehaviour
     {
+        public static readonly Vector2 Margin = new Vector2(20,20);
 
         private enum BubbleState { SHOWING, DESTROYING, NOTHING };
 
@@ -19,20 +20,20 @@ namespace uAdventure.Runner
         }
 
         Transform text;
-        RectTransform bubblePos;
+        RectTransform rectTransform;
         // Use this for initialization
         void Start()
         {
             //resize ();
             text = this.transform.Find("Text");
             text.GetComponent<Text>().text = data.Line;
-            bubblePos = this.GetComponent<RectTransform>();
+            rectTransform = this.GetComponent<RectTransform>();
 
             /*float guiscale = Screen.height/600f;
 
             text.GetComponent<Text>().fontSize = Mathf.RoundToInt(guiscale * 20);*/
 
-            this.bubblePos.anchoredPosition = data.origin;
+            this.rectTransform.anchoredPosition = data.origin;
             this.moveTo(data.destiny);
             this.state = BubbleState.SHOWING;
         }
@@ -77,7 +78,7 @@ namespace uAdventure.Runner
                 case BubbleState.SHOWING:
                     Vector3 destination = finalPosition;
 
-                    destination = Vector3.Lerp(this.bubblePos.anchoredPosition, destination, easing);
+                    destination = Vector3.Lerp(this.rectTransform.anchoredPosition, destination, easing);
                     destination.z = camZ;
 
 
@@ -89,7 +90,7 @@ namespace uAdventure.Runner
                     setAlpha(completed);
                     setScale(completed);
 
-                    this.bubblePos.anchoredPosition = destination;
+                    this.rectTransform.anchoredPosition = destination;
 
                     if (completed >= 1f)
                     {
@@ -99,10 +100,45 @@ namespace uAdventure.Runner
             }
         }
 
+        private Vector2 getMaxSize()
+        {
+            setScale(1);
+            LayoutRebuilder.ForceRebuildLayoutImmediate(rectTransform);
+            var size = rectTransform.sizeDelta;
+            setScale(0);
+            return size;
+        }
+
+        private Vector2 encapsulateInParent(Vector2 position)
+        {
+            var canvasRectTransform = transform.parent.GetComponent<RectTransform>();
+            // Calculate the destination rect
+            var myRect = new Rect();
+            // Calculate my size in the end
+            myRect.size = getMaxSize();
+            // Set the destination position
+            myRect.center = position;
+            // And trap the rect inside of the canvas rect
+            return myRect.TrapInside(new Rect(Margin, canvasRectTransform.sizeDelta - 2 * Margin)).center;
+        }
+
         public void moveTo(Vector2 position)
         {
-            this.distance = Vector2.Distance(this.bubblePos.anchoredPosition, position);
-            this.finalPosition = position;
+            this.finalPosition = encapsulateInParent(position);
+            // If the position on the Y axis has changed we try to move it below
+            if (finalPosition.y != position.y)
+            {
+                var maxSize = getMaxSize();
+                var inversePosition = 2 * rectTransform.anchoredPosition - position - new Vector2(0, maxSize.y * 0.5f);
+                var encapsulatedInverse = encapsulateInParent(inversePosition);
+                // If the inverse position is moved less than the original position then we go with the inverse
+                if (encapsulatedInverse.y - inversePosition.y < position.y - finalPosition.y)
+                {
+                    this.finalPosition = encapsulatedInverse;
+                }
+            }
+            
+            this.distance = Vector2.Distance(rectTransform.anchoredPosition, position);
         }
 
         public void destroy()
@@ -134,7 +170,7 @@ namespace uAdventure.Runner
         {
             float newwidth = (Screen.width / 600f) * width;
 
-            this.bubblePos.sizeDelta = new Vector2(newwidth, 0);
+            this.rectTransform.sizeDelta = new Vector2(newwidth, 0);
         }
     }
 }

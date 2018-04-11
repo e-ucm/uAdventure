@@ -81,10 +81,10 @@ namespace uAdventure.Runner
             if (talker_name == null || talker_name == Player.IDENTIFIER)
             {
                 text = text.Replace("[]", "[" + Player.IDENTIFIER + "]");
-                NPC player = Game.Instance.GameState.getPlayer();
+                NPC player = Game.Instance.GameState.Player;
                 BubbleData bubble;
 
-                if (Game.Instance.GameState.isFirstPerson())
+                if (Game.Instance.GameState.IsFirstPerson)
                 {
                     bubble = generateBubble(player, text);
                 }
@@ -160,16 +160,15 @@ namespace uAdventure.Runner
 
             if (talker != null)
             {
-                Vector2 position = talker.transform.localPosition;
-                position.y += talker.transform.localScale.y / 2;
+                Vector2 position = talker.transform.position;
 
-                bubble.Destiny = position;
-                bubble.Origin = new Vector2(position.x, position.y - 10f);
+                bubble.Origin = position;
+                bubble.Destiny = position + new Vector2(0, talker.transform.lossyScale.y * 0.6f);
             }
             else
             {
-                bubble.Origin = new Vector2(40, 60);
-                bubble.Destiny = new Vector2(40, 45);
+                bubble.Origin = Camera.main.transform.position;
+                bubble.Destiny = Camera.main.transform.position + new Vector3(0, 15, 0);
             }
 
             return bubble;
@@ -190,17 +189,15 @@ namespace uAdventure.Runner
 
         private Vector2 sceneVector2guiVector(Vector2 v)
         {
-            float w = Screen.width, h = Screen.height,
-                relation = w / h,
-                height = 800 / relation,
-                width = (height / 600) * 800,
-                scale = width / 800f,
-                leftmargin = (800 - width) / 2;
+            // Convert it to ViewPort
+            v = Camera.main.WorldToViewportPoint(v);
 
-            float x = (v.x * 10 * scale) + leftmargin;
-            float y = (v.y * 10 * scale);
+            // Adapt from the viewport to the Canvas size
+            var canvasRect = this.GetComponent<RectTransform>();
+            v.x *= canvasRect.sizeDelta.x;
+            v.y *= canvasRect.sizeDelta.y;
 
-            return new Vector2(x, y);
+            return v;
         }
 
         private void correctBoundaries(BubbleData bubble)

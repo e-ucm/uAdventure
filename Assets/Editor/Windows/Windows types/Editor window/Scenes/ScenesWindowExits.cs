@@ -34,6 +34,7 @@ namespace uAdventure.Editor
             new ExitTransitionComponent(Rect.zero, new GUIContent(""), aStyle);
             new ExitAppearanceComponent(Rect.zero, new GUIContent(""), aStyle);
             new ExitConditionsAndEffectsComponent(Rect.zero, new GUIContent(""), aStyle);
+            new ExitPlayerPositionComponent(Rect.zero, new GUIContent(""), aStyle);
 
             conditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/conditions-24x24", typeof(Texture2D));
             noConditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/no-conditions-24x24", typeof(Texture2D));
@@ -246,6 +247,66 @@ namespace uAdventure.Editor
                 }
 
                 EditorGUILayout.EndToggleGroup();
+
+            }
+        }
+
+        [EditorComponent(typeof(ExitDataControl), Name = "ExitsList.PlayerPosition", Order = 2)]
+        public class ExitPlayerPositionComponent : AbstractEditorComponent
+        {
+            private Texture2D conditionsTex, noConditionsTex;
+            private SceneEditor localSceneEditor;
+            private Trajectory.Node playerDestination;
+            private List<DataControl> elements;
+
+            public ExitPlayerPositionComponent(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
+            {
+                localSceneEditor = new SceneEditor();
+                playerDestination = new Trajectory.Node("", 0, 0, 1f);
+                localSceneEditor.elements = new List<DataControl>() { new NodeDataControl(null, playerDestination, new Trajectory()) };
+            }
+
+            public override void Draw(int aID)
+            {
+                var exit = Target as ExitDataControl;
+
+
+                EditorGUI.BeginChangeCheck();
+                var has = EditorGUILayout.Toggle(TC.get("NextSceneCell.UsePosition"), exit.hasDestinyPosition());
+                if (EditorGUI.EndChangeCheck())
+                    exit.setDestinyPosition(has ? 400 : int.MinValue, has ? 300 : int.MinValue);
+
+                if (!has)
+                {
+                    EditorGUILayout.HelpBox("Destination position will be based on origin position.", MessageType.Info);
+                    return;
+                }
+            
+                EditorGUI.BeginChangeCheck();
+                var newPos = EditorGUILayout.Vector2Field(TC.get("Inventory.Position"), new Vector2(exit.getDestinyPositionX(), exit.getDestinyPositionY()));
+                if (EditorGUI.EndChangeCheck())
+                    exit.setDestinyPosition(Mathf.RoundToInt(newPos.x), Mathf.RoundToInt(newPos.y));
+
+                EditorGUI.BeginChangeCheck();
+                var newScale = Mathf.Max(0, EditorGUILayout.FloatField(TC.get("SceneLocation.Scale"), exit.getDestinyScale()));
+                if (EditorGUI.EndChangeCheck())
+                    exit.setDestinyScale(newScale);
+
+                var scenesList = Controller.Instance.SelectedChapterDataControl.getScenesList();
+                var sceneIndex = scenesList.getSceneIndexByID(exit.getNextSceneId());
+                if (sceneIndex == -1)
+                {
+                    EditorGUILayout.HelpBox("Please select a valid destination!", MessageType.Error);
+                    return;
+                }
+
+                localSceneEditor.Components = SceneEditor.Current.Components;
+                localSceneEditor.Scene = scenesList.getScenes()[sceneIndex];
+                playerDestination.setValues(exit.getDestinyPositionX(), exit.getDestinyPositionY(), exit.getDestinyScale());
+                
+                localSceneEditor.Draw(GUILayoutUtility.GetRect(0, 200, GUILayout.ExpandWidth(true)));
+                exit.setDestinyPosition(playerDestination.getX(), playerDestination.getY());
+                exit.setDestinyScale(playerDestination.getScale());
 
             }
         }

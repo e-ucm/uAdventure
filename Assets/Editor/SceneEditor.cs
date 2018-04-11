@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using uAdventure.Editor;
+using UnityEditor;
 using UnityEngine;
 
 public class SceneEditor {
@@ -59,6 +60,22 @@ public class SceneEditor {
 
     public Dictionary<Type, List<EditorComponent>> Components { get; internal set; }
     public Dictionary<Type, bool> TypeEnabling { get; set; }
+    public SceneDataControl Scene
+    {
+        get
+        {
+            return workingScene;
+        }
+        set
+        {
+            if (value != workingScene)
+            {
+                workingScene = value;
+                SelectedElement = null;
+                RefreshSceneResources(workingScene);
+            }
+        }
+    }
     public bool Disabled { get; private set; }
     public Rect Viewport { get; private set; }
 
@@ -118,6 +135,8 @@ public class SceneEditor {
 
     public void DoCallForWholeElement(DataControl element, Action<EditorComponent> call)
     {
+        var currentSceneEditor = SceneEditor.Current;
+        SceneEditor.Current = this;
         var elem = element;
         // If its a reference
         if (element is ElementReferenceDataControl)
@@ -131,6 +150,7 @@ public class SceneEditor {
 
         // Component drawing
         DoCallForElement(element, call);
+        SceneEditor.Current = currentSceneEditor;
     }
 
     public void PushMatrix()
@@ -143,7 +163,7 @@ public class SceneEditor {
         matrices.Pop();
     }
 
-    private void SetDisabled(DataControl element)
+    private void SetDisabledFor(DataControl element)
     {
         if (element == null)
             return;
@@ -157,7 +177,7 @@ public class SceneEditor {
     {
         foreach (var element in elements)
         {
-            SetDisabled(element);
+            SetDisabledFor(element);
             call(element);
         }
     }
@@ -165,32 +185,10 @@ public class SceneEditor {
     public void Draw(Rect rect)
     {
         Viewport = rect.AdjustToRatio(Size.x / Size.y);
-
+        var lastCurrent = Current;
         Current = this;
 
-        if (Event.current.type == EventType.MouseDown && rect.Contains(Event.current.mousePosition) && SelectedElement != null)
-        {
-            var elem = SelectedElement;
-            DoCallForWholeElement(elem, c => c.OnPreRender());
-            bool any = false;
-            DoCallForWholeElement(elem, c =>
-            {
-                SetDisabled(elem);
-                if (c.Update() && !Disabled) any = true;
-            });
-            if (!any)
-                SelectedElement = null;
-            DoCallForWholeElement(elem, c => c.OnPostRender());
-        }
-
-        var previousWorkingScene = workingScene;
-        workingScene = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[GameRources.GetInstance().selectedSceneIndex];
-        if(previousWorkingScene != workingScene)
-        {
-            SelectedElement = null;
-        }
-
-        if(previousWorkingScene != workingScene || workingScene.getSelectedResources() != lastSelectedResources)
+        if (workingScene.getSelectedResources() != lastSelectedResources)
         {
             RefreshSceneResources(workingScene);
         }
@@ -199,14 +197,15 @@ public class SceneEditor {
         if (backgroundPreview)
             GUI.DrawTexture(Viewport, backgroundPreview, ScaleMode.ScaleToFit);
 
-        var somethingWasSelected = SelectedElement != null;
+        var deSelect = Event.current.type == EventType.MouseDown && rect.Contains(Event.current.mousePosition);
+        var toSelect = deSelect ? null : SelectedElement;
+        var eventType = Event.current.type;
 
         CallAll(elements, 
             (elem) =>
             {
                 DoCallForWholeElement(elem, c => c.OnPreRender());
-                if (!somethingWasSelected)
-                    DoCallForWholeElement(elem, c => { if (c.Update() && !Disabled) SelectedElement = elem; });
+                DoCallForWholeElement(elem, c => { if (c.Update() && !Disabled && (toSelect != SelectedElement || SelectedElement == null)) toSelect = elem; });
                 if (Event.current.type == EventType.Repaint)
                 {
                     var oldColor = GUI.color;
@@ -215,10 +214,18 @@ public class SceneEditor {
                     DoCallForWholeElement(elem, c => c.OnRender(Viewport));
                     GUI.color = oldColor;
                 }
+                DoCallForWholeElement(elem, c => c.OnPostRender());
+            });
+        
+        SelectedElement = toSelect;
+
+        CallAll(elements,
+            (elem) =>
+            {
+                DoCallForWholeElement(elem, c => c.OnPreRender());
                 DoCallForWholeElement(elem, c => c.OnDrawingGizmos());
                 DoCallForWholeElement(elem, c => c.OnPostRender());
             });
-
 
         CallAll(elements,
             (elem) =>
@@ -231,7 +238,7 @@ public class SceneEditor {
                 }
             });
 
-        Current = null;
+        Current = lastCurrent;
 
         if (foregroundPreview)
             GUI.DrawTexture(Viewport, foregroundPreview, ScaleMode.ScaleToFit);
@@ -244,8 +251,8 @@ public class SceneEditor {
         var back = workingScene.getPreviewBackground();
         var fore = workingScene.getPreviewForeground();
 
-        backgroundPreview = string.IsNullOrEmpty(back) ? null : AssetsController.getImage(back).texture;
-        foregroundPreview = string.IsNullOrEmpty(fore) ? null : AssetsController.getImage(fore).texture;
+        backgroundPreview = string.IsNullOrEmpty(back) ? null : Controller.ResourceManager.getImage(back);
+        foregroundPreview = string.IsNullOrEmpty(fore) ? null : Controller.ResourceManager.getImage(fore);
 
         if (backgroundPreview && foregroundPreview)
             foregroundPreview = CreateMask(backgroundPreview, foregroundPreview);

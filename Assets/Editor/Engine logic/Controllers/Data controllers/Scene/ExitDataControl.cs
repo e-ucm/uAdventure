@@ -487,6 +487,16 @@ namespace uAdventure.Editor
             return exit.getDestinyY();
         }
 
+        public void setDestinyScale(float destinyScale)
+        {
+            exit.setDestinyScale(destinyScale);
+        }
+
+        public float getDestinyScale()
+        {
+            return exit.getDestinyScale();
+        }
+
         /**
          * Sets the new destiny position of the next scene.
          * 

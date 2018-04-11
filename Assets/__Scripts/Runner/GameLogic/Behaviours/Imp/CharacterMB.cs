@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace uAdventure.Runner
 {
-    public class CharacterMB : Representable, Interactuable, IPointerClickHandler, IDropHandler
+    public class CharacterMB : Representable, Interactuable, IPointerClickHandler, IDropHandler, IActionReceiver
     {
         private static readonly int[] restrictedActions = { Action.CUSTOM, Action.TALK_TO, Action.EXAMINE };
 
@@ -62,7 +62,7 @@ namespace uAdventure.Runner
                 //if there is an action, we show them
                 if (availableActions.Count > 0)
                 {
-                    Game.Instance.showActions(availableActions, Input.mousePosition);
+                    Game.Instance.showActions(availableActions, Input.mousePosition, this);
                     res = InteractuableResult.DOES_SOMETHING;
                 }
 
@@ -81,6 +81,30 @@ namespace uAdventure.Runner
         public void OnDrop(PointerEventData eventData)
         {
             uAdventureInputModule.DropTargetSelected(eventData);
+        }
+
+        public void ActionSelected(Action action)
+        {
+            if(Game.Instance.GameState.IsFirstPerson|| !action.isNeedsGoTo())
+                Game.Instance.Execute(new EffectHolder(action.Effects));
+            else
+            {
+                var sceneMB = FindObjectOfType<SceneMB>();
+                var scene = sceneMB.sceneData as Scene;
+                var topLeft = new Vector2(Context.getX() - Texture.width / 2f, Context.getY() - Texture.height);
+                Rectangle area = null;
+                if (scene != null && scene.getTrajectory() == null)
+                {
+                    // If no trajectory I have to move the area to the trajectory for it to be connected
+                    area = new InfluenceArea((int)topLeft.x, (int)topLeft.y, Texture.width, Texture.height);
+                    area = area.MoveAreaToTrajectory(sceneMB.Trajectory);
+                }
+                else
+                {
+                    area = Context.getInfluenceArea().MoveArea(topLeft);
+                }
+                PlayerMB.Instance.Do(action, area);
+            }
         }
     }
 }

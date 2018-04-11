@@ -89,7 +89,7 @@ namespace uAdventure.Editor
                     return true;
                 }
                 var points = WorldToViewport(GetPoints(rectangleArea), SceneEditor.Current.Viewport, SceneEditor.Current.Size.x, SceneEditor.Current.Size.y);
-                return Inside(points, Event.current.mousePosition) || points.ToList().FindIndex(p => (p - Event.current.mousePosition).magnitude <= 10f) != -1;
+                return points.Inside(Event.current.mousePosition) || points.ToList().FindIndex(p => (p - Event.current.mousePosition).magnitude <= 10f) != -1;
             }
 
             return false;
@@ -196,7 +196,7 @@ namespace uAdventure.Editor
                     switch (ActionSelected)
                     {
                         case 0:
-                            if (GUIUtility.hotControl == 0 && Inside(points, Event.current.mousePosition))
+                            if (GUIUtility.hotControl == 0 && points.Inside(Event.current.mousePosition))
                             {
                                 GUIUtility.hotControl = rectangleControlID;
                                 Event.current.Use();
@@ -286,20 +286,6 @@ namespace uAdventure.Editor
                 }
             }
             return insertIn + 1;
-        }
-
-        private bool Inside(Vector2[] points, Vector2 mousePosition)
-        {
-            bool inside = false;
-            var originPoints = points.Select(p => p - mousePosition).ToList();
-            for (int i = 0; i < originPoints.Count; i++)
-            {
-                if (((originPoints[i].y > 0) != (originPoints[(i + 1) % originPoints.Count].y > 0))
-                && ((originPoints[i].y > 0) == (originPoints[i].y * originPoints[(i + 1) % originPoints.Count].x > originPoints[(i + 1) % originPoints.Count].y * originPoints[i].x)))
-                    inside = !inside;
-            }
-
-            return inside;
         }
 
         private Vector2[] GetPoints(RectangleArea rectangleArea)

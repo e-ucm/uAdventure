@@ -86,13 +86,7 @@ namespace uAdventure.Editor
         }
 
         private bool d = false;
-        private bool Dragging { get { return d; } set {
-                if(d != value)
-                {
-                    Debug.Log(d ? "Dragging" : "Not Dragging");
-                }
-                d = value;
-            } }
+        private bool Dragging { get { return d; } set { d = value; } }
 
         // ######################## MAIN FUNCTIONS ########################
 

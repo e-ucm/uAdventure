@@ -33,6 +33,21 @@ namespace uAdventure.Core
          */
         private int transitionType = 0;
 
+        private float destinyScale;
+
+        public float DestinyScale
+        {
+            get
+            {
+                return destinyScale;
+            }
+
+            set
+            {
+                destinyScale = value;
+            }
+        }
+
         /**
          * Creates a new TriggerSceneEffect
          * 
@@ -43,11 +58,12 @@ namespace uAdventure.Core
          * @param y
          *            Y position of the player in the new scene
          */
-        public TriggerSceneEffect(string targetSceneId, int x, int y, int transitionTime = 0, int transitionType = 0) : base()
+        public TriggerSceneEffect(string targetSceneId, int x, int y, float destinyScale = float.MinValue, int transitionTime = 0, int transitionType = 0) : base()
         {
             this.targetSceneId = targetSceneId;
             this.x = x;
             this.y = y;
+            this.DestinyScale = destinyScale;
             this.transitionTime = transitionTime;
             this.transitionType = transitionType;
         }

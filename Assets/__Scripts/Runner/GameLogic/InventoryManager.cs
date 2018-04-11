@@ -41,15 +41,27 @@ namespace uAdventure.Runner
             }
         }
 
+        public bool Opened
+        {
+            get
+            {
+                return inventory ? inventory.Opened : false;
+            }
+            set
+            {
+                if (inventory) inventory.Opened = value;
+            }
+        }
+
         public bool Show
         {
             get
             {
-                return inventory ? inventory.Show : false;
+                return inventory ? inventory.gameObject.activeSelf : false;
             }
             set
             {
-                if (inventory) inventory.Show = value;
+                if (inventory) inventory.gameObject.SetActive(value);
             }
         }
 

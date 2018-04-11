@@ -13,6 +13,7 @@ namespace uAdventure.Editor
         private static Rect previewRect;
         private SceneDataControl workingScene;
         private static TrajectoryComponent trajectoryComponent;
+        private static InfluenceComponent influenceComponent;
         private int action = 0;
 
         public ScenesWindowPlayerMovement(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, SceneEditor sceneEditor,
@@ -21,8 +22,14 @@ namespace uAdventure.Editor
         {
             new PlayerInitialPositionComponent(Rect.zero, new GUIContent(), null);
             new SideComponent(Rect.zero, new GUIContent(), null);
-            trajectoryComponent = new TrajectoryComponent(Rect.zero, new GUIContent(), null);
-            trajectoryComponent.Action = -1;
+            trajectoryComponent = new TrajectoryComponent(Rect.zero, new GUIContent(), null)
+            {
+                Action = -1
+            };
+            if (Controller.Instance.playerMode() == DescriptorData.MODE_PLAYER_3RDPERSON)
+            {
+                influenceComponent = new InfluenceComponent(Rect.zero, new GUIContent(""), aStyle);
+            }
 
             sceneEditor.TypeEnabling[typeof(Player)] = false;
             sceneEditor.TypeEnabling[typeof(TrajectoryDataControl)] = false;
@@ -41,14 +48,13 @@ namespace uAdventure.Editor
         
         protected override void DrawInspector()
         {
-
             workingScene = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                     GameRources.GetInstance().selectedSceneIndex];
 
             GUILayout.Space(20);
 
             EditorGUI.BeginChangeCheck();
-            var hasTrajectory = GUILayout.Toolbar(workingScene.getTrajectory().hasTrajectory() ? 1 : 0, new string[] { TC.get("Scene.UseInitialPosition"), TC.get("Scene.UseTrajectory") });
+            var hasTrajectory = GUILayout.Toolbar(CurrentSceneHasTrajectory() ? 1 : 0, new string[] { TC.get("Scene.UseInitialPosition"), TC.get("Scene.UseTrajectory") });
             if (EditorGUI.EndChangeCheck()) OnMovementTypeChange(hasTrajectory == 1);
 
             switch (hasTrajectory)
@@ -63,6 +69,12 @@ namespace uAdventure.Editor
                     }
                     break;
             }
+        }
+
+        protected static bool CurrentSceneHasTrajectory()
+        {
+            return Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
+                    GameRources.GetInstance().selectedSceneIndex].getTrajectory().hasTrajectory();
         }
 
         public override void Draw(int aID)
@@ -97,19 +109,209 @@ namespace uAdventure.Editor
                 if (trajectory == null)
                 {
                     trajectory = new Trajectory();
+                    trajectory.addNode("initial", workingScene.getDefaultInitialPositionX(), workingScene.getDefaultInitialPositionY(), workingScene.getPlayerScale());
+                    trajectory.setInitial("initial");
                     var tdc = new TrajectoryDataControl(workingScene, trajectory);
-                    tdc.addNode(0,0);
-                    tdc.getLastNode().setNode(workingScene.getDefaultInitialPositionX(), workingScene.getDefaultInitialPositionY(), workingScene.getPlayerScale());
                     workingScene.setTrajectoryDataControl(tdc);
                     workingScene.setTrajectory(trajectory);
                 }
             }
             else
             {
+                var trajectory = workingScene.getTrajectory().GetTrajectory();
+                var initialPos = new Vector2(trajectory.getInitial().getX(), trajectory.getInitial().getY());
+                var initialScale = trajectory.getInitial().getScale();
                 workingScene.setTrajectoryDataControl(new TrajectoryDataControl(workingScene, null));
                 workingScene.setTrajectory(null);
+                workingScene.setDefaultInitialPosition((int)initialPos.x, (int)initialPos.y);
+                workingScene.setPlayerScale(initialScale);
             }
         }
+
+        // ################################################################################################################################################
+        // ########################################################### INFLUENCE COMPONENT  ###############################################################
+        // ################################################################################################################################################
+
+        [EditorComponent(typeof(ElementReferenceDataControl), typeof(ActiveAreaDataControl), typeof(ExitDataControl), Name = "Influence Area", Order = 1)]
+        public class InfluenceComponent : AbstractEditorComponent
+        {
+            private static InfluenceAreaDataControl getIngluenceArea(DataControl target)
+            {
+                if (target is ElementReferenceDataControl)
+                {
+                    var elemRef = target as ElementReferenceDataControl;
+                    if (elemRef.getType() == Controller.ATREZZO) return null;
+                    return elemRef.getInfluenceArea();
+                }
+                else if (target is ActiveAreaDataControl)
+                {
+                    return (target as ActiveAreaDataControl).getInfluenceArea();
+                }
+                else if (target is ExitDataControl)
+                {
+                    return (target as ExitDataControl).getInfluenceArea();
+                }
+
+                return null;
+            }
+
+            private static Rect getElementBoundaries(DataControl target)
+            {
+
+                if (target is ElementReferenceDataControl)
+                {
+                    var elemRef = target as ElementReferenceDataControl;
+                    var size = ScenesWindowElementReference.ReferenceComponent.GetUnscaledRect(target).size * elemRef.getElementScale();
+                    return new Rect(elemRef.getElementX() - (size.x / 2f), elemRef.getElementY() - (size.y), size.x, size.y);
+                }
+                else if (target is RectangleArea)
+                {
+                    var rectangle = (target as RectangleArea).getRectangle();
+                    if (rectangle.isRectangular())
+                    {
+                        return new Rect(rectangle.getX(), rectangle.getY(), rectangle.getWidth(), rectangle.getHeight());
+                    }
+                    else
+                    {
+                        return rectangle.getPoints().ToArray().ToRect();
+                    }
+                }
+
+                return Rect.zero;
+            }
+
+            private static Rect fixToBoundaries(Vector2 oldSize, Rect rect, Rect boundaries)
+            {
+                var otherCorner = rect.position + rect.size;
+
+                // This works for the top left corner
+                rect.x = Mathf.Min(rect.x, boundaries.width);
+                rect.y = Mathf.Min(rect.y, boundaries.height);
+
+                // This works for the bottom right corner
+                otherCorner.x = Mathf.Max(otherCorner.x, 0);
+                otherCorner.y = Mathf.Max(otherCorner.y, 0);
+
+                var newSize = otherCorner - rect.position;
+
+                return new Rect(rect.position, newSize);
+            }
+
+            public InfluenceComponent(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
+            {
+            }
+
+            public override void Draw(int aID)
+            {
+                if (!CurrentSceneHasTrajectory())
+                {
+                    EditorGUI.indentLevel--;
+                    EditorGUILayout.HelpBox("Influence areas are only available in trajectory mode.", MessageType.Info);
+                    EditorGUI.indentLevel++;
+                    return;
+                }
+
+                var influence = getIngluenceArea(Target);
+
+                if (influence != null)
+                {
+                    var boundaries = getElementBoundaries(Target);
+
+                    EditorGUI.BeginChangeCheck();
+                    var rect = influence.ScreenRect(boundaries);
+                    rect.position -= boundaries.position;
+                    var newRect = EditorGUILayout.RectField("Influence", rect);
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        var fixedRect = fixToBoundaries(rect.size, newRect, boundaries);
+                        influence.setInfluenceArea(Mathf.RoundToInt(fixedRect.x), Mathf.RoundToInt(fixedRect.y), Mathf.RoundToInt(fixedRect.width), Mathf.RoundToInt(fixedRect.height));
+                    }
+                }
+                else
+                {
+                    EditorGUILayout.LabelField("This element has no influence area");
+                }
+            }
+
+            private DataControl wasSelected = null;
+
+            public override bool Update()
+            {
+                if (!CurrentSceneHasTrajectory())
+                {
+                    return false;
+                }
+
+                bool selected = false;
+                switch (Event.current.type)
+                {
+                    case EventType.MouseDown:
+                        // Calculate the influenceAreaRect
+                        var influenceArea = getIngluenceArea(Target);
+                        if (influenceArea == null)
+                            return false;
+                        var boundaries = getElementBoundaries(Target);
+
+                        var rect = influenceArea.ScreenRect(boundaries)
+                            .AdjustToViewport(SceneEditor.Current.Size.x, SceneEditor.Current.Size.y, SceneEditor.Current.Viewport);
+
+                        // See if its selected (only if it was previously selected)
+                        if (GUIUtility.hotControl == 0)
+                            selected = (wasSelected == Target) && (rect.Contains(Event.current.mousePosition) || rect.ToPoints().ToList().FindIndex(p => (p - Event.current.mousePosition).magnitude <= 10f) != -1);
+
+                        if (wasSelected == Target)
+                            wasSelected = null;
+
+                        break;
+                }
+
+                return selected;
+            }
+
+            public override void OnDrawingGizmosSelected()
+            {
+                if (!CurrentSceneHasTrajectory())
+                {
+                    return;
+                }
+
+                wasSelected = Target;
+                var influenceArea = getIngluenceArea(Target);
+                if (influenceArea == null)
+                    return;
+
+                var boundaries = getElementBoundaries(Target);
+                var rect = influenceArea.ScreenRect(boundaries);
+                var originalSize = rect.size;
+                rect = rect.AdjustToViewport(SceneEditor.Current.Size.x, SceneEditor.Current.Size.y, SceneEditor.Current.Viewport);
+
+                EditorGUI.BeginChangeCheck();
+                var newRect = HandleUtil.HandleRect(influenceArea.GetHashCode() + 1, rect, 10f,
+                    polygon =>
+                    {
+                        HandleUtil.DrawPolyLine(polygon, true, Color.blue);
+                        HandleUtil.DrawPolygon(polygon, new Color(0, 0, 1f, 0.3f));
+                    },
+                    point => HandleUtil.DrawSquare(point, 6.5f, Color.yellow, Color.black));
+
+                newRect = HandleUtil.HandleRectMovement(influenceArea.GetHashCode(), newRect);
+
+                if (EditorGUI.EndChangeCheck())
+                {
+                    var original = newRect.ViewportToScreen(SceneEditor.Current.Size.x, SceneEditor.Current.Size.y, SceneEditor.Current.Viewport);
+
+                    original.position -= boundaries.position;
+                    original = fixToBoundaries(originalSize, original, boundaries);
+                    // And then we set the values in the reference
+                    influenceArea.setInfluenceArea(Mathf.RoundToInt(original.x), Mathf.RoundToInt(original.y), Mathf.RoundToInt(original.width), Mathf.RoundToInt(original.height));
+                }
+            }
+        }
+
+
+        // ################################################################################################################################################
+        // ########################################################## PLAYER/NODE COMPONENT ###############################################################
+        // ################################################################################################################################################
 
         [EditorComponent(typeof(PlayerDataControl), typeof(NodeDataControl), Name = "Initial position", Order = 0)]
         public class PlayerInitialPositionComponent : AbstractEditorComponent
@@ -252,6 +454,9 @@ namespace uAdventure.Editor
             }
         }
 
+        // ################################################################################################################################################
+        // ############################################################## SIDE COMPONENT ##################################################################
+        // ################################################################################################################################################
         [EditorComponent(typeof(SideDataControl), Name = "Side", Order = 0)]
         public class SideComponent : AbstractEditorComponent
         {
@@ -267,9 +472,8 @@ namespace uAdventure.Editor
             {
                 var p1 = GetPivot(side.getStart());
                 var p2 = GetPivot(side.getEnd());
-
-                int length = side.getLength() != 0 ? side.getLength() : Mathf.RoundToInt((p1 - p2).magnitude);
-                lengthContent.text = length.ToString();
+                
+                lengthContent.text = side.getLength().ToString();
                 Rect rect = new Rect();
                 rect.size = GUI.skin.textField.CalcSize(lengthContent);
                 rect.center = (p1 + p2) / 2f;
@@ -313,18 +517,13 @@ namespace uAdventure.Editor
                 HandleUtil.DrawPolyLine(new Vector2[] { p1, p2 }, false, SceneEditor.GetColor(Color.black), 5f);
                 HandleUtil.DrawPolyLine(new Vector2[] { p1, p2 }, false, SceneEditor.GetColor(Color.white), 3f);
 
-                if (side.getLength() != 0)
+                var bcColor = GUI.color;
+                if (side.getLength() != side.getRealLength())
                 {
-                    var bcColor = GUI.color;
-                    GUI.color = Color.yellow;
-                    EditorGUI.DropShadowLabel(new Rect(((p1 + p2) / 2f) - new Vector2(100f, 25f), new Vector2(200, 30)), new GUIContent(side.getLength() + ""));
-                    GUI.color = bcColor;
+                    GUI.color = SceneEditor.GetColor(Color.yellow);
                 }
-                else
-                {
-                    var distance = (p1 - p2).magnitude;
-                    EditorGUI.DropShadowLabel(new Rect(((p1 + p2) / 2f) - new Vector2(100f, 25f), new Vector2(200, 30)), new GUIContent(Mathf.RoundToInt(distance) + ""));
-                }
+                EditorGUI.DropShadowLabel(new Rect(((p1 + p2) / 2f) - new Vector2(100f, 25f), new Vector2(200, 30)), new GUIContent(Mathf.RoundToInt(side.getLength()).ToString()));
+                GUI.color = bcColor;
             }
 
             public override void OnDrawingGizmosSelected()
@@ -334,18 +533,18 @@ namespace uAdventure.Editor
                 var p1 = GetPivot(side.getStart());
                 var p2 = GetPivot(side.getEnd());
 
-                int length = side.getLength() != 0 ? side.getLength() : Mathf.RoundToInt((p1 - p2).magnitude);
-                var newlength = EditorGUI.IntField(rects[0], length);
-                if (newlength != length)
+                EditorGUI.BeginChangeCheck();
+                var newlength = EditorGUI.FloatField(rects[0], side.getLength());
+                if (EditorGUI.EndChangeCheck())
                 {
                     side.setLength(newlength);
                 }
 
-                if (side.getLength() != 0)
+                if (side.getLength() != side.getRealLength())
                 {
                     if (GUI.Button(rects[1], "X"))
                     {
-                        side.setLength(0);
+                        side.setLength(side.getRealLength());
                         GUIUtility.hotControl = 0;
                         GUIUtility.keyboardControl = 0;
                     }
@@ -358,6 +557,9 @@ namespace uAdventure.Editor
             }
         }
 
+        // ################################################################################################################################################
+        // ########################################################### TRAJECTORY COMPONENT ###############################################################
+        // ################################################################################################################################################
         [EditorComponent(typeof(TrajectoryDataControl), Name = "Trajectory", Order = 0)]
         public class TrajectoryComponent : AbstractEditorComponent
         {
@@ -369,12 +571,12 @@ namespace uAdventure.Editor
 
             private NodeDataControl pairing = null;
 
-            public override bool Update()
+            public override void OnDrawingGizmos()
             {
-                if(Event.current.type == EventType.MouseDown)
+                var trajectory = Target as TrajectoryDataControl;
+
+                if (Event.current.type == EventType.MouseDown)
                 {
-                    var trajectory = Target as TrajectoryDataControl;
-                    
                     DataControl selected = SceneEditor.Current.SelectedElement;
                     NodeDataControl node = selected as NodeDataControl;
                     SideDataControl side = selected as SideDataControl;
@@ -430,26 +632,21 @@ namespace uAdventure.Editor
                             break;
                     }
                 }
-
-                return false;
-            }
-
-            public override void Draw(int aID) {}
-
-
-            public override void OnDrawingGizmos()
-            {
-                var trajectory = Target as TrajectoryDataControl;
-                foreach(var node in trajectory.getNodes())
-                {    
+                
+                foreach (var node in trajectory.getNodes())
+                {
                     HandleUtil.DrawPoint(GetPivot(node), 10f, SceneEditor.GetColor(node.isInitial() ? Color.red : Color.blue), SceneEditor.GetColor(Color.black));
                 }
 
-                if(pairing != null)
+                if (pairing != null)
                 {
                     HandleUtil.DrawPolyLine(new Vector2[] { GetPivot(pairing), Event.current.mousePosition }, false, SceneEditor.GetColor(Color.white), 3f);
                 }
             }
+
+            public override void Draw(int aID) {}
+
+            
         }
 
         private static float DistanceToPoint(SideDataControl s, Vector2 point)
@@ -467,6 +664,14 @@ namespace uAdventure.Editor
             PlayerInitialPositionComponent.RemoveTransform(dataControl);
 
             return rect.center + new Vector2(0, rect.height / 2f);
+        }
+    }
+
+    internal static class ExInfluences
+    {
+        public static Rect ScreenRect(this InfluenceAreaDataControl influence, Rect boundaries)
+        {
+            return new Rect(boundaries.x + influence.getX(), boundaries.y + influence.getY(), influence.getWidth(), influence.getHeight());
         }
     }
 }

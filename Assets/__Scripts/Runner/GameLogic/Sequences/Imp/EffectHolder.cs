@@ -15,6 +15,7 @@ namespace uAdventure.Runner
 
         private bool runs_once = true;
         private int times_runed = 0;
+        private bool waitForLoadPulse = false;
 
         private bool validated = false;
         private bool is_valid = false;
@@ -31,7 +32,7 @@ namespace uAdventure.Runner
         public bool execute()
         {
             bool forcewait = false;
-            if (!(runs_once && times_runed > 0))
+            if (!(runs_once && times_runed > 0) || waitForLoadPulse)
             {
                 if (effect != null)
                 {
@@ -52,7 +53,7 @@ namespace uAdventure.Runner
                                 Game.Instance.GameState.setFlag(((DeactivateEffect)effect).getTargetId(), FlagCondition.FLAG_INACTIVE);
                                 break;
                             case EffectType.SPEAK_PLAYER:
-                                Game.Instance.talk(((SpeakPlayerEffect)effect).getLine(), null);
+                                Game.Instance.talk(((SpeakPlayerEffect)effect).getLine(), Player.IDENTIFIER);
                                 forcewait = true;
                                 break;
                             case EffectType.SPEAK_CHAR:
@@ -60,9 +61,37 @@ namespace uAdventure.Runner
                                 forcewait = true;
                                 break;
                             case EffectType.TRIGGER_SCENE:
-                                runs_once = false;
-                                TriggerSceneEffect tse = ((TriggerSceneEffect)effect);
-                                Game.Instance.RunTarget(tse.getTargetId(), tse.getTransitionTime(), tse.getTransitionType());
+                                if (!waitForLoadPulse)
+                                {
+                                    runs_once = false;
+                                    TriggerSceneEffect tse = ((TriggerSceneEffect)effect);
+                                    if (!Game.Instance.GameState.IsFirstPerson)
+                                    {
+                                        if (tse.getX() != int.MinValue || tse.getY() != int.MinValue)
+                                        {
+                                            PlayerMB.Instance.Context.setPosition(tse.getX(), tse.getY());
+                                            if (tse.DestinyScale != float.MinValue)
+                                                PlayerMB.Instance.Context.setScale(tse.DestinyScale);
+                                        }
+                                        else
+                                        {
+                                            var targetScene = Game.Instance.GameState.getChapterTarget(tse.getTargetId()) as Scene;
+                                            if (targetScene != null)
+                                            {
+                                                PlayerMB.Instance.Context.setPosition(targetScene.getPositionX(), targetScene.getPositionY());
+                                                PlayerMB.Instance.Context.setScale(targetScene.getPlayerScale());
+                                            }
+                                        }
+                                    }
+
+                                    Game.Instance.RunTarget(tse.getTargetId(), tse.getTransitionTime(), tse.getTransitionType());
+                                    waitForLoadPulse = true;
+                                    forcewait = true;
+                                }
+                                else
+                                {
+                                    waitForLoadPulse = false;
+                                }
                                 // DODO make something to wait until the target is ready to prevent undesired effect advance
                                 break;
                             case EffectType.TRIGGER_CUTSCENE:

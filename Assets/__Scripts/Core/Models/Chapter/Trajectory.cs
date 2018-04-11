@@ -52,11 +52,12 @@ namespace uAdventure.Core
             {
                 int x = a.getX() - b.getX();
                 int y = a.getY() - b.getY();
+                int realLength = Mathf.RoundToInt(new Vector2(x,y).magnitude);
                 if (length == -1)
-                    side.setLenght((float)Mathf.Sqrt(x * x + y * y));
-                else
-                    side.setLenght(length);
-                side.setRealLength((float)Mathf.Sqrt(x * x + y * y));
+                    length = realLength;
+                
+                side.setRealLength(realLength);
+                side.setLenght(length);
             }
 
             if (sides.Contains(side))
@@ -300,40 +301,11 @@ namespace uAdventure.Core
                 this.length = length;
             }
 
-            /*
-            @Override
-                    public boolean equals(Object o)
-            {
-
-                if (o == null)
-                    return false;
-                if (o instanceof Side ) {
-                    Side side = (Side)o;
-                    if (side.idEnd.Equals(this.idEnd) && side.idStart.Equals(this.idStart))
-                        return true;
-                }
-                return false;
-            }
-            */
-
             public float getLength()
             {
 
                 return length;
             }
-
-            /*
-            @Override
-                    public Object clone() throws CloneNotSupportedException
-            {
-
-                Side s = (Side) super.clone( );
-                s.idEnd = ( idEnd != null ? new string(idEnd ) : null );
-                        s.idStart = ( idStart != null ? new string(idStart ) : null );
-                        s.length = length;
-                        return s;
-                    }
-            */
 
             public float getRealLength()
             {
@@ -343,10 +315,13 @@ namespace uAdventure.Core
             public object Clone()
             {
                 Side s = (Side)this.MemberwiseClone();
-                s.idEnd = (idEnd != null ? idEnd : null);
-                s.idStart = (idStart != null ? idStart : null);
-                s.length = length;
                 return s;
+            }
+
+            public override bool Equals(object obj)
+            {
+                var side = obj as Side;
+                return side != null ? side.idStart == idStart && side.idEnd == idEnd : false;
             }
         }
 

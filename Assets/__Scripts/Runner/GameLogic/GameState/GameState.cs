@@ -17,6 +17,7 @@ namespace uAdventure.Runner
         AdventureData data;
         int current_chapter = 0;
         string current_target = "";
+        string last_target = "";
         private List<string> removedElements;
         private List<string> inventoryItems;
 
@@ -31,6 +32,7 @@ namespace uAdventure.Runner
                 return current_target;
             }
             set {
+                last_target = current_target;
                 current_target = value;
                 PlayerPrefs.SetString("target", current_target);
                 PlayerPrefs.Save();
@@ -116,14 +118,20 @@ namespace uAdventure.Runner
             return data.getChapters()[current_chapter].getTimers();
         }
 
-        public Player getPlayer()
+        public Player Player
         {
-            return data.getChapters()[current_chapter].getPlayer();
+            get
+            {
+                return data.getChapters()[current_chapter].getPlayer();
+            }
         }
 
-        public bool isFirstPerson()
+        public bool IsFirstPerson
         {
-            return data.getPlayerMode() == DescriptorData.MODE_PLAYER_1STPERSON;
+            get
+            {
+                return data.getPlayerMode() == DescriptorData.MODE_PLAYER_1STPERSON;
+            }
         }
 
         public void Move(string id, Vector2 position, int time = 0)
@@ -177,18 +185,21 @@ namespace uAdventure.Runner
         {
             return data.getChapters()[current_chapter].getObjects<Cutscene>().Exists(s => s.getId() == scene_id);
         }
-        
-        /*private GeneralScene getInitialScene()
-        { 
 
-            return data.getChapters()[current_chapter].getInitialGeneralScene();
-        }*/
-
-        public IChapterTarget getInitialChapterTarget()
+        public IChapterTarget InitialChapterTarget
         {
-            /*if (PlayerPrefs.HasKey("target")) return data.getChapters()[current_chapter].getObjects<IChapterTarget>().Find(t => t.getId() == PlayerPrefs.GetString("target"));
-            else*/
-            return data.getChapters()[current_chapter].getInitialChapterTarget();
+            get
+            {
+                return data.getChapters()[current_chapter].getInitialChapterTarget();
+            }
+        }
+
+        public IChapterTarget PreviousChapterTarget
+        {
+            get
+            {
+                return getChapterTarget(last_target);
+            }
         }
 
         public GeneralScene getLastScene()

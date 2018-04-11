@@ -272,7 +272,7 @@ In the game you can define conditions based on the value of the variables.</entr
 		Please make sure that this file is included in the editor, as the lack of this file could lead to malfunction of the adventures</entry>
 <entry key="Conversation.Title">Conversation</entry>
 <entry key="ExitList.MoveUp">Move up current reference</entry>
-<entry key="NextScene.EditDestinyPositionSh ort">Edit the destination position</entry>
+<entry key="NextScene.EditDestinyPositionShort">Edit the destination position</entry>
 <entry key="HTMLEditor.Title">HTML Editor - {#0}</entry>
 <entry key="Operation.ExportSCORM2004AGREGA.BadProfiles.Title">Incorrect Profiles</entry>
 <entry key="Search.EffectName">Effect Name</entry>

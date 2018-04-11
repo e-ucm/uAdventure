@@ -27,18 +27,18 @@ namespace uAdventure.Core
             {
 				string idStart = el.GetAttribute("idStart");
 				string idEnd = el.GetAttribute("idEnd");
-				//int length = int.Parse(el.GetAttribute("length") ?? "-1");
+				int length = ExParsers.ParseDefault(el.GetAttribute("length"), -1);
 
-                trajectory.addSide(idStart, idEnd, -1);
+                trajectory.addSide(idStart, idEnd, length);
             }
 
-			var initialNode = element.SelectSingleNode("initialnode");
+			var initialNode = element.SelectSingleNode("initialnode") as XmlElement;
 			if(initialNode != null)
-				trajectory.setInitial(element.GetAttribute("id"));
+				trajectory.setInitial(initialNode.GetAttribute("id"));
 
             if (trajectory.getNodes().Count != 0)
             {
-                trajectory.deleteUnconnectedNodes();
+                // trajectory.deleteUnconnectedNodes();
 				return trajectory;
             }
 

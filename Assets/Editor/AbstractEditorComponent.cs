@@ -4,11 +4,6 @@ namespace uAdventure.Editor
 {
     public abstract class AbstractEditorComponent : LayoutWindow, EditorComponent
     {
-        /*
-        public AbstractEditorComponent() :
-            base(Rect.zero, new GUIContent(""), "")
-        {
-        }*/
 
         public EditorComponentAttribute Attribute {
             get

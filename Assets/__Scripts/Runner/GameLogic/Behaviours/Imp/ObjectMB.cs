@@ -8,8 +8,8 @@ using System.Linq;
 
 namespace uAdventure.Runner
 {
-    public class ObjectMB : Representable, Interactuable, IActionReceiver, IPointerClickHandler,
-        IDragHandler, IBeginDragHandler, IEndDragHandler, ITargetSelectedHandler
+    public class ObjectMB : Representable, Interactuable, IActionReceiver, IPointerClickHandler, ITargetSelectedHandler,
+    IDragHandler, IBeginDragHandler, IEndDragHandler, IConfirmWantsDrag
     {
         private static readonly int[] restrictedActions = { Action.CUSTOM, Action.DRAG_TO, Action.EXAMINE, Action.GRAB, Action.USE };
 
@@ -123,37 +123,41 @@ namespace uAdventure.Runner
 
         public void OnDrag(PointerEventData eventData)
         {
-            Vector3 pointerPos = eventData == null ? Input.mousePosition : (Vector3)eventData.position;
-            Vector2 pos = Camera.main.ScreenToWorldPoint(pointerPos);
-            this.transform.localPosition = pos;
+            Vector2 pointerPos = eventData == null ? (Vector2) Input.mousePosition : eventData.position;
+            Vector3 pos = Camera.main.ScreenToWorldPoint(pointerPos);
+            this.transform.position = new Vector3(pos.x, pos.y, transform.position.z);
+            if(eventData != null)
+                eventData.Use();
         }
 
-        public void OnBeginDrag(PointerEventData eventData)
+        public void OnConfirmWantsDrag(PointerEventData eventData)
         {
             dragActions = from action in Element.getActions()
                           where action.getType() == Action.DRAG_TO && ConditionChecker.check(action.getConditions())
                           group action by action.getTargetId() into sameTargetActions
                           select sameTargetActions.First();
 
-            //uAdventureRaycaster.Instance.Override = this.gameObject;
-            EventSystem.current.SetSelectedGameObject(this.gameObject);
-
             if (dragActions.Count() > 0)
             {
-                dragging = true;
-                this.GetComponent<Collider>().enabled = false;
-                if (eventData != null)
-                    eventData.Use();
+                eventData.Use();
             }
+        }
+
+        public void OnBeginDrag(PointerEventData eventData)
+        {
+            //uAdventureRaycaster.Instance.Override = this.gameObject;
+            EventSystem.current.SetSelectedGameObject(this.gameObject);
+            
+            this.GetComponent<Collider>().enabled = false;
+            if (eventData != null)
+                eventData.Use();
 
         }
 
         public void OnEndDrag(PointerEventData eventData)
         {
-            if (dragging)
-            {
-                OnTargetSelected(eventData);
-            }
+            OnTargetSelected(eventData);
+            eventData.Use();
         }
 
         public void OnDrop(PointerEventData eventData)
@@ -167,10 +171,30 @@ namespace uAdventure.Runner
             {
                 case Action.DRAG_TO:
                     OnBeginDrag(null);
+                    dragging = true;
                     uAdventureInputModule.LookingForTarget = this.gameObject;
                     break;
                 default:
-                    Game.Instance.Execute(new EffectHolder(action.Effects));
+                    if (Game.Instance.GameState.IsFirstPerson|| !action.isNeedsGoTo())
+                        Game.Instance.Execute(new EffectHolder(action.Effects));
+                    else
+                    {
+                        var sceneMB = FindObjectOfType<SceneMB>();
+                        var scene = sceneMB.sceneData as Scene;
+                        var topLeft = new Vector2(Context.getX() - Texture.width / 2f, Context.getY() - Texture.height);
+                        Rectangle area = null;
+                        if (scene != null && scene.getTrajectory() == null)
+                        {
+                            // If no trajectory I have to move the area to the trajectory for it to be connected
+                            area = new InfluenceArea((int) topLeft.x, (int) topLeft.y, Texture.width, Texture.height);
+                            area = area.MoveAreaToTrajectory(sceneMB.Trajectory);
+                        }
+                        else
+                        {
+                            area = Context.getInfluenceArea().MoveArea(topLeft);
+                        }
+                        PlayerMB.Instance.Do(action, area);
+                    }
                     break;
             }
         }
@@ -178,30 +202,27 @@ namespace uAdventure.Runner
         public void OnTargetSelected(PointerEventData data)
         {
             var target = data.dragging ? data.pointerCurrentRaycast.gameObject : data.pointerPress;
-
-            if (dragging)
+            
+            if (Element.isReturnsWhenDragged())
             {
-                if (Element.isReturnsWhenDragged())
-                {
-                    Positionate();
-                    this.GetComponent<Collider>().enabled = true;
-                }
+                Positionate();
+                this.GetComponent<Collider>().enabled = true;
+            }
 
-                dragging = false;
-                data.Use();
+            dragging = false;
+            data.Use();
 
-                if(target != null)
+            if(target != null)
+            {
+                string id = target.name;
+                if (id != null)
                 {
-                    string id = target.name;
-                    if (id != null)
+                    var tmpActions = dragActions.Where(a => a.getTargetId() == id);
+                    var action = tmpActions.Any() ? tmpActions.First() : null;
+
+                    if (action != null)
                     {
-                        var tmpActions = dragActions.Where(a => a.getTargetId() == id);
-                        var action = tmpActions.Any() ? tmpActions.First() : null;
-
-                        if (action != null)
-                        {
-                            Game.Instance.Execute(new EffectHolder(action.getEffects()));
-                        }
+                        Game.Instance.Execute(new EffectHolder(action.getEffects()));
                     }
                 }
             }

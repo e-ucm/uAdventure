@@ -19,7 +19,6 @@ namespace uAdventure.Editor
 
         protected override void FileSelectionNotPerfromed()
         {
-            Debug.Log("NIc nie wybrałeś");
             reference.OnDialogCanceled();
         }
     }

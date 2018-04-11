@@ -20,10 +20,10 @@ namespace uAdventure.Core
 
             if (element.SelectSingleNode("documentation") != null)
                 barrier.setDocumentation(element.SelectSingleNode("documentation").InnerText);
+            
+            barrier.setConditions (DOMParserUtility.DOMParse (element.SelectSingleNode("condition"), parameters) as Conditions ?? new Conditions());
 
-			barrier.setConditions (DOMParserUtility.DOMParse (element.SelectNodes("condition"), parameters) as Conditions ?? new Conditions());
-
-			return barrier;
+            return barrier;
         }
 
 		private string generateId()

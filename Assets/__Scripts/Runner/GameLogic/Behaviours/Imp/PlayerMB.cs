@@ -6,6 +6,32 @@ using uAdventure.Core;
 
 namespace uAdventure.Runner
 {
+    public struct MovementPoint
+    {
+        public Vector2 destination;
+        public float distance;
+        public float scale;
+
+        public float getProgress(float speed, float deltaTime)
+        {
+            return Mathf.Abs((speed * deltaTime) / distance);
+        }
+
+        public Vector2 getPointAt(float progress, Vector2 origin)
+        {
+            return Vector2.Lerp(origin, destination, progress);
+        }
+        public float getScaleAt(float progress, float original)
+        {
+            return Mathf.Lerp(original, scale, progress);
+        }
+
+        public override string ToString()
+        {
+            return "([" + destination.x + ", " + destination.y + "], " + distance + ", " + scale + ")";
+        }
+    }
+
     public class PlayerMB : Representable
     {
 
@@ -15,11 +41,16 @@ namespace uAdventure.Runner
         }
 
         static PlayerMB instance;
-        Vector2 start_pos, end_pos;
+
+        MovementPoint point;
+        Vector2 origin;
+        float originalScale;
+
         float progress = 0.0f;
-        float player_speed = 0.25f;
-        float speed = 0f;
+        float player_speed = 300f;
         Orientation orientation = Orientation.S;
+        Action toDo;
+        Rectangle toDoArea;
 
         private int max_layer = 0;
         private Dictionary<int, float> sorting_layer;
@@ -86,45 +117,63 @@ namespace uAdventure.Runner
         {
             base.Update();
 
-            if (moving && progress < 1.0f)
+            if (moving)
             {
-                // TODO newpos is never used, why?
-                Vector2 newpos = Vector2.Lerp(start_pos, end_pos, progress);
-                base.setPosition(newpos);
+                progress = Mathf.Min(1, progress + point.getProgress(player_speed, Time.deltaTime));
+                Context.setScale(point.getScaleAt(progress, originalScale));
+                base.setPosition(point.getPointAt(progress, origin));
                 sortZ();
-                progress += Time.deltaTime * speed;
-            }
-            else if (moves.Count > 0)
-            {
-                move(moves.Dequeue());
-            }
-            else if (moving && moves.Count <= 0)
-            {
-                switch (this.orientation)
+
+                var isInside = (toDo != null && toDoArea.Contains(getPosition(), toDo.getKeepDistance()));
+
+                if (progress == 1.0f || isInside)
                 {
-                    case Orientation.N:
-                        base.setAnimation(NPC.RESOURCE_TYPE_STAND_UP);
-                        break;
-                    case Orientation.E:
-                        base.setAnimation(NPC.RESOURCE_TYPE_STAND_RIGHT);
-                        break;
-                    case Orientation.S:
-                        base.setAnimation(NPC.RESOURCE_TYPE_STAND_DOWN);
-                        break;
-                    case Orientation.O:
-                        base.setAnimation(NPC.RESOURCE_TYPE_STAND_LEFT);
-                        break;
+                    if (!isInside && moves.Count > 0)
+                    {
+                        move(moves.Dequeue());
+                    }
+                    else
+                    {
+                        moving = false;
+
+                        switch (this.orientation)
+                        {
+                            case Orientation.N:
+                                base.setAnimation(NPC.RESOURCE_TYPE_STAND_UP);
+                                break;
+                            case Orientation.E:
+                                base.setAnimation(NPC.RESOURCE_TYPE_STAND_RIGHT);
+                                break;
+                            case Orientation.S:
+                                base.setAnimation(NPC.RESOURCE_TYPE_STAND_DOWN);
+                                break;
+                            case Orientation.O:
+                                base.setAnimation(NPC.RESOURCE_TYPE_STAND_LEFT);
+                                break;
+                        }
+
+                        if (toDo != null)
+                        {
+                            Game.Instance.Execute(new EffectHolder(toDo.Effects));
+                            toDo = null;
+                        }
+                    }
                 }
-                moving = false;
             }
+
         }
 
         bool moving = false;
-        Queue<KeyValuePair<Vector2, float>> moves = new Queue<KeyValuePair<Vector2, float>>();
+        Queue<MovementPoint> moves = new Queue<MovementPoint>();
 
-        public void move(KeyValuePair<Vector2, float>[] points)
+        public void move(MovementPoint[] points)
         {
-            moves = new Queue<KeyValuePair<Vector2, float>>(points);
+            if (points == null)
+                return;
+
+            moves = new Queue<MovementPoint>(points);
+            if(points.Length > 0)
+                move(moves.Dequeue());
         }
         public void moveInstant(Vector2 point)
         {
@@ -132,15 +181,15 @@ namespace uAdventure.Runner
             base.setPosition(point);
         }
 
-        void move(KeyValuePair<Vector2, float> point)
+        void move(MovementPoint point)
         {
             moving = true;
             progress = 0.0f;
 
-            this.start_pos = this.getPosition();
-            this.end_pos = new Vector2(point.Key.x, point.Key.y + (point.Value) / 2);
-
-            this.orientation = getOrientation(start_pos, end_pos);
+            this.point = point;
+            this.origin = this.getPosition();
+            this.originalScale = Context.getScale();
+            this.orientation = getOrientation(origin, point.destination);
 
             switch(this.orientation)
             {
@@ -157,8 +206,37 @@ namespace uAdventure.Runner
                     base.setAnimation(NPC.RESOURCE_TYPE_WALK_LEFT);
                     break;
             }
+        }
 
-            speed = player_speed * (50 / Vector2.Distance(start_pos, end_pos));
+        /*public void Do(Action action, Vector2 objectCenter)
+        {
+            var accesible = TrajectoryHandler.GetAccessibleTrajectory(getPosition(), FindObjectOfType<SceneMB>().Trajectory);
+            Vector2[] intersections;
+            var area = new InfluenceArea((int)objectCenter.x + influenceArea.getX() - influenceArea.getWidth() / 2,
+                (int)objectCenter.y + influenceArea.getY() - influenceArea.getHeight() / 2, influenceArea.getWidth(), influenceArea.getHeight());
+            if(TrajectoryHandler.TrajectoryRectangleIntersections(area, accesible, out intersections))
+            {
+                toDo = action;
+                move(accesible.route(getPosition(), intersections));
+            }
+        }*/
+
+        public void Do(Action action, Rectangle area)
+        {
+            var accesible = TrajectoryHandler.GetAccessibleTrajectory(getPosition(), FindObjectOfType<SceneMB>().Trajectory);
+            Vector2[] intersections;
+
+            if (area.Contains(this.getPosition(), action.getKeepDistance()))
+            {
+                Game.Instance.Execute(new EffectHolder(action.Effects));
+            }
+            else if (TrajectoryHandler.TrajectoryRectangleIntersections(area, accesible, out intersections))
+            {
+                toDo = action;
+                toDoArea = area;
+                move(accesible.route(getPosition(), intersections));
+
+            }
         }
 
         void sortZ()

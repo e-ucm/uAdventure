@@ -4,18 +4,26 @@ using System.Collections.Generic;
 
 using uAdventure.Core;
 using RAGE.Analytics;
-using System;
 using RAGE.Analytics.Formats;
 using UnityEngine.EventSystems;
+using System.Linq;
 
 namespace uAdventure.Runner
 {
-    public class SceneMB : MonoBehaviour, IRunnerChapterTarget, IPointerClickHandler
+    public class SceneMB : MonoBehaviour, IRunnerChapterTarget, IPointerClickHandler, IBeginDragHandler, IEndDragHandler, IDragHandler, IInitializePotentialDragHandler
     {
+        public static readonly Vector2 ScenePivot = new Vector2(0, 1f);
+        public static readonly Vector2 DefaultPivot = Vector2.one / 2f;
+        public const float VideoSceneRatio = 4f / 3f;
+        public const float PixelsToWorld = 0.1f;
+        public const float PixelsSceneHeight = 600f;
+        public const float WorldSceneHeight = PixelsSceneHeight * PixelsToWorld;
 
         public GameObject Exit_Prefab, ActiveArea_Prefab, Character_Prefab, Object_Prefab, Atrezzo_Prefab, Player_Prefab;
-        private Transform Exits, ActiveAreas, Characters, Objects, Atrezzos;
+        private Transform Exits, ActiveAreas, Characters, Objects, Atrezzos, Background, Foreground;
         private bool interactuable = false;
+        private MovieState movieplayer = MovieState.NOT_MOVIE;
+        private bool ready = false;
 
         private GeneralScene sd;
         public GeneralScene sceneData
@@ -30,8 +38,30 @@ namespace uAdventure.Runner
             set { sceneData = (GeneralScene)value; }
         }
 
+        public Vector2 PixelsSize
+        {
+            get { return WorldSize / PixelsToWorld; }
+        }
+
+        public Vector2 WorldSize
+        {
+            get { return Background.localScale; }
+        }
+
+        public float Scale
+        {
+            get { return PixelsSize.y / PixelsSceneHeight; }
+        }
+
+        public TrajectoryHandler Trajectory
+        {
+            get { return trajectoryHandler; }
+        }
+
+        public bool IsReady { get { return ready; } }
+
         private ElementReference player_context;
-        private TrajectoryHandler trajectory;
+        private TrajectoryHandler trajectoryHandler;
         private Dictionary<ElementReference, ElementReference> contexts = new Dictionary<ElementReference, ElementReference>();
 
         public List<float> sorting_layers = new List<float>();
@@ -45,6 +75,19 @@ namespace uAdventure.Runner
 
         bool fading = false;
         float total_time = 0f, current_time = 0f;
+        float resistance = 5000f;
+
+        private void Update()
+        {
+            if(!dragging && endDragSpeed != Vector2.zero)
+            {
+                MoveCamera(endDragSpeed * -Time.deltaTime);
+                var lastSpeed = endDragSpeed;
+                endDragSpeed -= (endDragSpeed.normalized * resistance) * Time.deltaTime;
+                if (lastSpeed.sqrMagnitude < endDragSpeed.sqrMagnitude)
+                    endDragSpeed = Vector2.zero;
+            }
+        }
 
         void FixedUpdate()
         {
@@ -61,9 +104,13 @@ namespace uAdventure.Runner
 
             if (movieplayer == MovieState.LOADING)
             {
-                if (movie.Loaded())
+                if (movie.isError())
                 {
-                    setMovie();
+                    movieplayer = MovieState.NOT_MOVIE;
+                    Debug.Log(movie.Error);
+                }
+                else if (movie.Loaded())
+                {
                     Debug.Log("Seted movie, ready to play.");
                     movie.Play();
                     interactuable = true;
@@ -75,10 +122,6 @@ namespace uAdventure.Runner
                 movie.Stop();
                 Interacted();
             }
-#if UNITY_WEBGL
-        if(movie!=null)
-            movie.Movie.Update();
-#endif
         }
 
         public void Destroy(float time = 0)
@@ -91,11 +134,13 @@ namespace uAdventure.Runner
                 this.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, this.transform.position.z - 10);
             }
             else
-                GameObject.Destroy(this.gameObject);
+                GameObject.DestroyImmediate(this.gameObject);
         }
 
         private void loadParents()
         {
+            this.Background = this.transform.Find("Background");
+            this.Foreground = this.transform.Find("Foreground");
             this.Exits = this.transform.Find("Exits");
             this.ActiveAreas = this.transform.Find("ActiveAreas");
             this.Characters = this.transform.Find("Characters");
@@ -106,45 +151,76 @@ namespace uAdventure.Runner
         private eAnim slides;
         private int current_slide;
         //private SlidesceneResource current_resource;
+        
+
+        public Vector3 ToWorldSize(Vector2 size)
+        {
+            var worldSize = Vector3.one;
+            worldSize.x = size.x * PixelsToWorld;
+            worldSize.y = size.y * PixelsToWorld;
+            return worldSize;
+        }
+
+        public Vector3 ToWorldPosition(Vector2 position, Vector2 size, Vector2 pivot, float depth = 0f)
+        {
+            return ToWorldPosition(position, size, pivot, DefaultPivot, depth);
+        }
+
+        public Vector3 ToWorldPosition(Vector2 position, Vector2 size, Vector2 pivot, Vector2 objectPivot, float depth = 0f)
+        {
+            // WorldPosition = (Position + (Size . (ObjectPivot - Pivot))) * ToWorldRatio; ( "." means component-wise product)
+            Vector3 worldPosition = position;
+            // Reverse the Y
+            worldPosition.y = PixelsSize.y - worldPosition.y;
+
+            if(pivot != objectPivot)
+            {
+                // Apply the pivot translation
+                var traslation = (Vector3)(objectPivot - pivot);
+                traslation.Scale(size);
+                worldPosition += traslation;
+            }
+
+            worldPosition = ToWorldSize(worldPosition);
+            worldPosition.z = depth;
+
+            return worldPosition;
+        }
 
         public void RenderScene()
         {
+            this.transform.position = new Vector3(0, 0, 0);
+            loadParents();
             switch (sd.getType())
             {
                 case GeneralScene.GeneralSceneSceneType.VIDEOSCENE:
+                    InventoryManager.Instance.Show = false;
                     movie = Game.Instance.ResourceManager.getVideo(((Videoscene)sd).getResources()[0].getAssetPath(Videoscene.RESOURCE_TYPE_VIDEO));
                     movieplayer = MovieState.LOADING;
-                    this.transform.Find("Background").localPosition = new Vector3(40, 30, 20);
+                    SetBackground(movie.Movie);
                     break;
                 case GeneralScene.GeneralSceneSceneType.SCENE:
-
-                    loadParents();
-
+                    InventoryManager.Instance.Show = true;
                     Scene rsd = (Scene)sd;
+                    Texture2D backgroundTexture = null;
                     foreach (ResourcesUni sr in rsd.getResources())
                     {
                         if (ConditionChecker.check(sr.getConditions()))
                         {
-                            Texture2D tmp = Game.Instance.ResourceManager.getImage(sr.getAssetPath(Scene.RESOURCE_TYPE_BACKGROUND));
-
-                            Transform background = this.transform.Find("Background");
-                            background.GetComponent<Renderer>().material.mainTexture = tmp;
-                            float scale = (tmp.width / (tmp.height / 600f)) / 800f;
-
-                            this.transform.position = new Vector3(40, 30, 20);
-                            background.localPosition = new Vector3(((80 * scale) - 80) / 2f, 0, 20);
-                            background.transform.localScale = new Vector3(scale * 80, 60, 1);
+                            backgroundTexture = Game.Instance.ResourceManager.getImage(sr.getAssetPath(Scene.RESOURCE_TYPE_BACKGROUND));
+                            SetBackground(backgroundTexture);
 
                             if (sr.getAssetPath(Scene.RESOURCE_TYPE_FOREGROUND) != "")
                             {
-                                Texture2D fg = Game.Instance.ResourceManager.getImage(sr.getAssetPath(Scene.RESOURCE_TYPE_FOREGROUND));
+                                Texture2D foregroundTexture = Game.Instance.ResourceManager.getImage(sr.getAssetPath(Scene.RESOURCE_TYPE_FOREGROUND));
 
-                                Transform foreground = this.transform.Find("Foreground");
-                                foreground.GetComponent<Renderer>().material.SetTexture("_MainTex", tmp);
-                                foreground.GetComponent<Renderer>().material.SetTexture("_AlphaTex", fg);
+                                Foreground.GetComponent<Renderer>().material.SetTexture("_MainTex", backgroundTexture);
+                                Foreground.GetComponent<Renderer>().material.SetTexture("_AlphaTex", foregroundTexture);
 
-                                foreground.localPosition = new Vector3(((80 * scale) - 80) / 2f, 0, -50);
-                                foreground.transform.localScale = new Vector3(scale * 80, 60, 1);
+                                Foreground.localScale = Background.localScale;
+                                var foreGroundPos = Background.localPosition;
+                                foreGroundPos.z = 1;
+                                Foreground.localPosition = foreGroundPos;
                             }
 
                             break;
@@ -185,37 +261,75 @@ namespace uAdventure.Runner
                             instanceRectangle<Exit>(exit);
 
 
-                    if (!Game.Instance.GameState.isFirstPerson())
+                    if (!Game.Instance.GameState.IsFirstPerson)
                     {
-                        if (rsd.getTrajectory() == null)
-                            break;
-
-                        trajectory = new TrajectoryHandler(rsd.getTrajectory());
+                        var trajectory = rsd.getTrajectory();
+                        player_context = PlayerMB.Instance != null ? PlayerMB.Instance.Context : null;
+                        
                         if (player_context == null)
                         {
                             //Vector2 pos = LineHandler.nodeToVector2 (lines [lines.Count-1].end);
-                            Trajectory.Node pos = trajectory.getInitialNode();
-                            player_context = new ElementReference("Player", pos.getX(), pos.getY(), rsd.getPlayerLayer());
-                            player_context.setScale(pos.getScale());
+
+                            var playerPosition = new Vector2(rsd.getPositionX(), rsd.getPositionY());
+                            var scale = rsd.getPlayerScale();
+                            if (trajectory != null)
+                            {
+                                Trajectory.Node pos = rsd.getTrajectory().getInitial();
+                                playerPosition = new Vector2(pos.getX(), pos.getY());
+                                scale = pos.getScale();
+                            }
+
+                            player_context = new ElementReference("Player", (int) playerPosition.x, (int) playerPosition.y, rsd.getPlayerLayer());
+                            player_context.setScale(scale);
                         }
+
+                        //###################### BARRIERS ######################
+                        var barriers = rsd.getBarriers().FindAll(b => ConditionChecker.check(b.getConditions())).ToArray();
+
+                        if (trajectory == null)
+                        {
+                            barriers = barriers.ToList().ConvertAll(b => {
+                                Barrier r = b.Clone() as Barrier;
+                                r.setValues(r.getX(), 0, r.getWidth(), backgroundTexture.height);
+                                return r;
+                            }).ToArray();
+
+                            trajectory = new Trajectory();
+                            var width = backgroundTexture ? (int)backgroundTexture.width : Screen.width;
+                            trajectory.addNode("leftSide", 0, player_context.getY(), player_context.getScale());
+                            trajectory.addNode("rightSide", width, player_context.getY(), player_context.getScale());
+                            trajectory.addSide("leftSide", "rightSide", width);
+                        }
+
+                        trajectoryHandler = new TrajectoryHandler(TrajectoryHandler.CreateBlockedTrajectory(trajectory, barriers));
                         /*GameObject.Destroy(this.transform.FindChild ("Player"));*/
 
                         PlayerMB player = GameObject.Instantiate(Player_Prefab).GetComponent<PlayerMB>();
                         player.transform.parent = Characters;
-                        player.Element = Game.Instance.GameState.getPlayer();
+                        player.Element = Game.Instance.GameState.Player;
                         player.Context = player_context;
+                        // Force the start
+                        player.SendMessage("Start");
+                        ready = true;
                     }
+                    else
+                    {
+                        ready = true;
+                    }
+                    
+                    Camera.main.GetComponent<PlayerFollower>().SettleInstant();
 
                     break;
                 case GeneralScene.GeneralSceneSceneType.SLIDESCENE:
+                    InventoryManager.Instance.Show = false;
                     Slidescene ssd = (Slidescene)sd;
                     foreach (ResourcesUni r in ssd.getResources())
                     {
                         if (ConditionChecker.check(r.getConditions()))
                         {
                             this.slides = Game.Instance.ResourceManager.getAnimation(r.getAssetPath(Slidescene.RESOURCE_TYPE_SLIDES));
-                            this.transform.Find("Background").GetComponent<Renderer>().material.mainTexture = this.slides.frames[0].Image;
-                            this.transform.position = new Vector3(40, 30, 20);
+                            SetSlide(0);
+                            ready = true;
                             break;
                         }
                     }
@@ -276,11 +390,9 @@ namespace uAdventure.Runner
                 return;
             }
 
-            GameObject ret = GameObject.Instantiate(base_prefab);
-            Transform trans = ret.GetComponent<Transform>();
+            GameObject ret = Instantiate(base_prefab, parent);
             ret.GetComponent<Representable>().Context = context;
             ret.GetComponent<Representable>().Element = element;
-            trans.SetParent(parent);
         }
 
         private void instanceRectangle<T>(Rectangle context) where T : Rectangle
@@ -305,18 +417,19 @@ namespace uAdventure.Runner
                 return;
             }
 
-            GameObject ret = GameObject.Instantiate(base_prefab);
+            GameObject ret = GameObject.Instantiate(base_prefab, parent);
             Transform trans = ret.GetComponent<Transform>();
             if (parent == ActiveAreas)
                 ret.GetComponent<ActiveAreaMB>().Element = (ActiveArea)context;
             else if (parent == Exits)
-                ret.GetComponent<ExitMB>().exitData = (Exit)context;
+                ret.GetComponent<ExitMB>().Element = (Exit)context;
 
-            trans.localScale = new Vector3(context.getWidth() / 10f, context.getHeight() / 10f, 1);
-            Vector2 tmppos = new Vector2(context.getX(), context.getY()) / 10 + (new Vector2(trans.localScale.x, trans.localScale.y)) / 2;
+            Vector2 tmpPos = new Vector2(context.getX(), context.getY());
+            Vector2 tmpSize = new Vector2(context.getWidth(), context.getHeight());
 
-            trans.localPosition = new Vector2(tmppos.x, 60 - tmppos.y);
-            trans.SetParent(ActiveAreas);
+            // ActiveArea pivot starts from top-left corner (Y = 1, X = 0)
+            trans.localPosition = ToWorldPosition(tmpPos, tmpSize, new Vector2(0, 1f), 0);
+            trans.localScale = ToWorldSize(tmpSize);
         }
 
         public bool canBeInteracted()
@@ -329,6 +442,40 @@ namespace uAdventure.Runner
             this.interactuable = state;
         }
 
+        private void SetBackground(Texture texture)
+        {
+            if (Background)
+            {
+                var size = new Vector2(texture.width, texture.height);
+                Background.GetComponent<Renderer>().material.mainTexture = texture;
+                Background.localScale = ToWorldSize(size);
+                Background.localPosition = ToWorldPosition(Vector2.zero, size, ScenePivot, 20);
+                transform.localScale = (Vector3) (Vector2.one * (PixelsSceneHeight / size.y)) + new Vector3(0, 0, 1);
+            }
+
+        }
+
+        private void SetSlide(int i)
+        {
+            if (slides != null && slides.frames.Count < current_slide)
+            {
+                this.current_slide = i;
+                SetBackground(slides.frames[current_slide].Image);
+            }
+        }
+
+        private bool ProgressSlide()
+        {
+            var canProgress = current_slide + 1 < this.slides.frames.Count;
+
+            if (canProgress)
+            {
+                SetSlide(current_slide + 1);
+            }
+
+            return canProgress;
+        }
+
         public InteractuableResult Interacted(PointerEventData pointerData = null)
         {
             Effects e;
@@ -338,58 +485,60 @@ namespace uAdventure.Runner
             switch (sceneData.getType())
             {
                 case GeneralScene.GeneralSceneSceneType.SCENE:
-                    if (!Game.Instance.GameState.isFirstPerson())
+                    if (!Game.Instance.GameState.IsFirstPerson)
                     {
-                        PlayerMB.Instance.move(trajectory.route(PlayerMB.Instance.getPosition(), trajectory.closestPoint(Camera.main.ScreenToWorldPoint(pointerData.position))));
+                        RaycastHit hitInfo;
+                        Background.GetComponent<Collider>().Raycast(Camera.main.ScreenPointToRay(pointerData.position), out hitInfo, float.MaxValue);
+                        var texPos = PixelsSize;
+                        var texCoord = hitInfo.textureCoord;
+                        texCoord.y = 1-texCoord.y;
+                        texPos.Scale(texCoord);
+                        var accesible = TrajectoryHandler.GetAccessibleTrajectory(PlayerMB.Instance.getPosition(), trajectoryHandler);
+                        PlayerMB.Instance.move(accesible.route(PlayerMB.Instance.getPosition(), accesible.closestPoint(texPos)));
                     }
                     break;
                 case GeneralScene.GeneralSceneSceneType.SLIDESCENE:
-                    if (current_slide + 1 < this.slides.frames.Count)
-                    {
-                        current_slide++;
-                        this.transform.Find("Background").GetComponent<Renderer>().material.mainTexture = this.slides.frames[current_slide].Image;
-                        res = InteractuableResult.REQUIRES_MORE_INTERACTION;
-                    }
-                    else
-                    {
-                        switch (((Slidescene)sceneData).getNext())
-                        {
-                            case Slidescene.NEWSCENE:
-                                Game.Instance.RunTarget(((Slidescene)sceneData).getTargetId());
-                                break;
-                            case Slidescene.ENDCHAPTER:
-                                //Game.Instance(); 
-                                break;
-                        }
-
-                        e = ((Slidescene)sceneData).getEffects();
-                        if (e != null && Game.Instance.Execute(new EffectHolder(e)))
-                            res = InteractuableResult.DOES_SOMETHING;
-
-                    }
+                    if (ProgressSlide()) res = InteractuableResult.REQUIRES_MORE_INTERACTION;
+                    else res = FinishCutscene((Cutscene)sceneData);
                     break;
                 case GeneralScene.GeneralSceneSceneType.VIDEOSCENE:
-                    switch (((Videoscene)sceneData).getNext())
-                    {
-                        case Slidescene.NEWSCENE:
-                            Game.Instance.RunTarget(((Videoscene)sceneData).getTargetId());
-                            break;
-                        case Slidescene.ENDCHAPTER:
-                            break;
-                    }
-
-                    e = ((Videoscene)sceneData).getEffects();
-                    if (e != null && Game.Instance.Execute(new EffectHolder(e)))
-                        res = InteractuableResult.DOES_SOMETHING;
-
-                    if (movie.isPlaying())
+                    var videoscene = (Videoscene)sceneData;
+                    if (movieplayer == MovieState.NOT_MOVIE 
+                        || movieplayer == MovieState.STOPPED 
+                        || (movieplayer == MovieState.PLAYING && !movie.isPlaying()) 
+                        || videoscene.isCanSkip())
                     {
                         movie.Stop();
                         Tracker.T.accessible.Skipped(sceneData.getId(), AccessibleTracker.Accessible.Cutscene);
+                        FinishCutscene(videoscene);
                     }
-
                     break;
             }
+
+            return res;
+        }
+
+        private InteractuableResult FinishCutscene(Cutscene cutscene)
+        {
+            InteractuableResult res = InteractuableResult.IGNORES;
+
+            switch ((cutscene).getNext())
+            {
+                case Slidescene.GOBACK:
+                    var previousTarget = Game.Instance.GameState.PreviousChapterTarget;
+                    if (previousTarget != null)
+                        Game.Instance.RunTarget(previousTarget.getId());
+                    break;
+                case Slidescene.NEWSCENE:
+                    Game.Instance.RunTarget(cutscene.getTargetId());
+                    break;
+                case Slidescene.ENDCHAPTER:
+                    break;
+            }
+
+            Effects e = ((Cutscene)cutscene).getEffects();
+            if (e != null && Game.Instance.Execute(new EffectHolder(e)))
+                res = InteractuableResult.DOES_SOMETHING;
 
             return res;
         }
@@ -414,23 +563,60 @@ namespace uAdventure.Runner
 
         // VIDEOSCENE FUNCTIONS
         private enum MovieState { NOT_MOVIE, LOADING, PLAYING, STOPPED };
-        private MovieState movieplayer;
 
         MovieHolder movie;
-
-        public void setMovie()
-        {
-            //this.transform.FindChild ("Background").GetComponent<Renderer>().material.mainTexture =;
-
-            this.transform.Find("Background").GetComponent<MeshRenderer>().material = new Material(Shader.Find("Diffuse"));
-            this.transform.Find("Background").GetComponent<MeshRenderer>().material.mainTexture = movie.Movie;
-            //sound.clip = movie.audioClip;
-        }
         
 
         public void OnPointerClick(PointerEventData eventData)
         {
             Interacted(eventData);
+        }
+
+        bool dragging = false;
+        Vector2 endDragSpeed = Vector2.zero;
+        public void OnBeginDrag(PointerEventData eventData)
+        {
+            if(PlayerMB.Instance == null)
+            {
+                eventData.Use();
+                dragging = true;
+            }
+        }
+
+        
+
+        public void OnEndDrag(PointerEventData eventData)
+        {
+            if (dragging)
+            {
+                dragging = false;
+                eventData.Use();
+                endDragSpeed = eventData.delta / Time.deltaTime;
+            }
+        }
+
+        public void OnDrag(PointerEventData eventData)
+        {
+            if (dragging)
+            {
+                eventData.Use();
+                MoveCamera(-eventData.delta);
+            }
+        }
+
+        private void MoveCamera(Vector2 delta)
+        {
+            var cameraPos = Camera.main.transform.position;
+            var screenCameraPosition = Camera.main.WorldToScreenPoint(cameraPos);
+            screenCameraPosition.x += delta.x;
+            screenCameraPosition.y += delta.y;
+            var newPos = Camera.main.ScreenToWorldPoint(screenCameraPosition);
+            Camera.main.transform.position = new Vector3(newPos.x, newPos.y, cameraPos.z);
+        }
+
+        public void OnInitializePotentialDrag(PointerEventData eventData)
+        {
+            eventData.Use();
         }
     }
 }

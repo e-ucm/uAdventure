@@ -2015,6 +2015,7 @@ namespace uAdventure.Editor
             }
             EditorUtility.ClearProgressBar();
             EditorUtility.DisplayCancelableProgressBar("Building...", "Done!", 1f);
+            EditorUtility.ClearProgressBar();
         }
         
         

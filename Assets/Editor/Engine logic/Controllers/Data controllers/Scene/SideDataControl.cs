@@ -231,12 +231,17 @@ namespace uAdventure.Editor
             return null;
         }
 
-        public int getLength()
+        public float getLength()
         {
-            return (int)side.getLength();
+            return (float)side.getLength();
         }
 
-        public void setLength(int value)
+        public float getRealLength()
+        {
+            return (float)side.getRealLength();
+        }
+
+        public void setLength(float value)
         {
             Controller.Instance.addTool(new SetSideLengthTool(side, value));
         }

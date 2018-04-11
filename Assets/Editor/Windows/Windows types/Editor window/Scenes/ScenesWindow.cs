@@ -70,12 +70,12 @@ namespace uAdventure.Editor
             CreateSceneEditorTab<ScenesWindowDocumentation>(rect, new GUIContent(TC.get("Scene.DocPanelTitle")), "Window", ScenesWindowType.Documentation, sceneEditor);
             CreateSceneEditorTab<ScenesWindowElementReference>(rect, new GUIContent(TC.get("ItemReferencesList.Title")), "Window", ScenesWindowType.ElementRefrence, sceneEditor);
             CreateSceneEditorTab<ScenesWindowActiveAreas>(rect, new GUIContent(TC.get("ActiveAreasList.Title")), "Window", ScenesWindowType.ActiveAreas, sceneEditor);
-            CreateSceneEditorTab<ScenesWindowExits>(rect, new GUIContent(TC.get("Element.Name3")), "Window", ScenesWindowType.Exits, sceneEditor);
+            CreateSceneEditorTab<ScenesWindowExits>(rect, new GUIContent(TC.get("ExitsList.Title")), "Window", ScenesWindowType.Exits, sceneEditor);
             
             if (Controller.Instance.playerMode() == DescriptorData.MODE_PLAYER_3RDPERSON)
             {
                 CreateSceneEditorTab<ScenesWindowBarriers>(rect, new GUIContent(TC.get("BarriersList.Title")), "Window", ScenesWindowType.Barriers, sceneEditor);
-                CreateSceneEditorTab<ScenesWindowPlayerMovement>(rect, new GUIContent(TC.get("ActiveAreasList.Title")), "Window", ScenesWindowType.PlayerMovement, sceneEditor);
+                CreateSceneEditorTab<ScenesWindowPlayerMovement>(rect, new GUIContent(TC.get("Trajectory.Title")), "Window", ScenesWindowType.PlayerMovement, sceneEditor);
             }
 
             DefaultOpenedWindow = ScenesWindowType.Appearance;
@@ -439,7 +439,7 @@ namespace uAdventure.Editor
                     Texture2D scenePreview;
                     if (!images.ContainsKey(background))
                     {
-                        scenePreview = AssetsController.getImageTexture(background);
+                        scenePreview = Controller.ResourceManager.getImage(background);
                         images[background] = scenePreview;
                     }
                     else

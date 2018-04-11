@@ -8,9 +8,6 @@ namespace uAdventure.Runner
 {
     public class LineHandler
     {
-
-        public const float DIVISOR = 10f;
-
         public Trajectory.Node start, end;
         public Trajectory.Side side;
 
@@ -31,7 +28,7 @@ namespace uAdventure.Runner
 
         public static Vector2 nodeToVector2(Trajectory.Node node)
         {
-            return new Vector2(node.getX() / LineHandler.DIVISOR, 60f - node.getY() / LineHandler.DIVISOR);
+            return new Vector2(node.getX(), node.getY());
         }
 
         public LineHandler(Trajectory.Node start, Trajectory.Node end, Trajectory.Side side)
@@ -40,8 +37,8 @@ namespace uAdventure.Runner
             this.end = end;
             this.side = side;
 
-            float start_x = start.getX() / LineHandler.DIVISOR, end_x = end.getX() / LineHandler.DIVISOR
-                , start_y = 60f - start.getY() / LineHandler.DIVISOR, end_y = 60f - end.getY() / LineHandler.DIVISOR;
+            float start_x = start.getX(), end_x = end.getX()
+                , start_y = start.getY() , end_y = end.getY();
 
 
             min_x = Mathf.Min(start_x, end_x);
@@ -65,16 +62,15 @@ namespace uAdventure.Runner
         {
             bool ret = false;
             float x = function.getX(v.y), y = function.getY(v.x);
-
-
+            
             if (
                 (v.x >= min_x && v.x <= max_x)
                 &&
                 (v.y >= min_y && v.y <= max_y)
                 &&
-                (v.x >= (x - 0.01) && v.x <= (x + 0.01))
+                (float.IsNaN(x) || (v.x >= (x - 0.01) && v.x <= (x + 0.01)))
                 &&
-                (v.y >= (y - 0.01) && v.y <= (y + 0.01))
+                (float.IsNaN(y) || (v.y >= (y - 0.01) && v.y <= (y + 0.01)))
             )
                 ret = true;
 
@@ -136,6 +132,45 @@ namespace uAdventure.Runner
             }
 
             return neighbor_nodes.ToArray();
+        }
+
+        public float getDistance()
+        {
+            return side.getLength();
+        }
+
+        public Vector2 closestPoint(Vector2 P)
+        {
+            return GetClosestPointOnLineSegment(nodeToVector2(start), nodeToVector2(end), P);
+        }
+
+        //http://stackoverflow.com/questions/3120357/get-closest-point-to-a-line
+        public static Vector2 GetClosestPointOnLineSegment(Vector2 A, Vector2 B, Vector2 P)
+        {
+            Vector2 AP = P - A;       //Vector from A to P   
+            Vector2 AB = B - A;       //Vector from A to B  
+
+            float magnitudeAB = AB.sqrMagnitude;     //Magnitude of AB vector (it's length squared)     
+            float ABAPproduct = Vector2.Dot(AP, AB);    //The DOT product of a_to_p and a_to_b     
+            float distance = ABAPproduct / magnitudeAB; //The normalized "distance" from a to your closest point  
+
+            if (distance < 0)     //Check if P projection is over vectorAB     
+            {
+                return A;
+            }
+            else if (distance > 1)
+            {
+                return B;
+            }
+            else
+            {
+                return A + AB * distance;
+            }
+        }
+
+        public float getSegmentDistance(Vector2 from, Vector2 to)
+        {
+            return getDistance() * ((to - from).magnitude / (nodeToVector2(end) - nodeToVector2(start)).magnitude);
         }
 
         public float getScaleFor(Vector2 point)

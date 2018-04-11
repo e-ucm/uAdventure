@@ -8,8 +8,7 @@ namespace uAdventure.Runner
 {
     public abstract class Representable : MonoBehaviour, Movable
     {
-
-        public static int DIVISOR = 10, WIDTH = 80, HEIGHT = 60;
+        public static readonly Vector2 RepresentablePivot = new Vector2(0.5f, 0f);
 
         public enum ResourceType { ANIMATION, TEXTURE };
 
@@ -19,11 +18,6 @@ namespace uAdventure.Runner
         private ResourcesUni resource;
         protected float deformation;
         protected bool mirror;
-
-        public static Vector2 TransformPoint(Vector2 point)
-        {
-            return new Vector2(point.x / DIVISOR, 60 - (point.y / DIVISOR));
-        }
 
         public Element Element
         {
@@ -65,14 +59,21 @@ namespace uAdventure.Runner
         protected void Adaptate()
         {
             rend.material.mainTexture = texture;
-            this.transform.localScale = new Vector3((mirror ? -1f : 1f) * texture.width / DIVISOR, texture.height / DIVISOR, 1) * context.getScale();
+            var worldSize = GetComponentInParent<SceneMB>().ToWorldSize(new Vector2(texture.width, texture.height) * context.getScale());
+            // Mirror
+            worldSize.Scale(new Vector3((mirror ? -1 : 1), 1, 1));
+            // Set
+            transform.localScale = worldSize;
         }
 
         protected void Positionate()
         {
-            Vector2 tmppos = new Vector2(context.getX(), context.getY()) / DIVISOR + (new Vector2(0, -transform.localScale.y)) / 2;
+            var texture = rend.material.mainTexture;
+            Vector2 tmpSize = new Vector2(texture.width, texture.height) * context.getScale();
+            Vector2 tmpPos = new Vector2(context.getX(), context.getY());
+            var layerDepth = -context.getLayer() + deformation;
 
-            transform.localPosition = new Vector3(tmppos.x, HEIGHT - tmppos.y, -context.getLayer() + deformation);
+            transform.localPosition = GetComponentInParent<SceneMB>().ToWorldPosition(tmpPos, tmpSize, RepresentablePivot, layerDepth);
         }
 
         public float getHeight()
@@ -87,7 +88,7 @@ namespace uAdventure.Runner
 
         public void setPosition(Vector2 position)
         {
-            this.context.setPosition((int)(position.x * DIVISOR), (int)((HEIGHT - position.y) * DIVISOR));
+            this.context.setPosition((int) position.x, (int) position.y);
             Positionate();
         }
 
@@ -218,21 +219,13 @@ namespace uAdventure.Runner
 
         public Vector2 getPosition()
         {
-            Vector2 ret = new Vector2();
-
-            if(this.anim != null)
-                ret = new Vector2(this.transform.localPosition.x, this.transform.localPosition.y - (anim.frames[current_frame].Image.height * this.Context.getScale() / DIVISOR) / 2);
-            else
-                ret = new Vector2(this.transform.localPosition.x, this.transform.localPosition.y - (this.texture.height * this.Context.getScale() / DIVISOR) / 2);
-
-
-            return ret;
+            return new Vector2(context.getX(), context.getY());
         }
 
         public void Move(Vector2 position)
         {
-            this.transform.localPosition = new Vector3(position.x, position.y, this.transform.localPosition.z);
-            this.context.setPosition((int)position.x * DIVISOR, (int)(HEIGHT - position.y) * DIVISOR);
+            this.context.setPosition((int)position.x, (int)position.y);
+            Positionate();
         }
     }
 }

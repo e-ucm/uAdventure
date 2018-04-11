@@ -89,6 +89,17 @@ namespace uAdventure.Editor
          * Look for one image path. If there no one, return empty animation path
          * 
          */
+
+        private string getNotEmptyAsset(ResourcesDataControl resource, string asset)
+        {
+            if (resource != null)
+            {
+                var path = resource.getAssetPath(asset);
+                return !string.IsNullOrEmpty(path) && !path.StartsWith(EMPTY_ANIMATION) ? path : null;
+            }
+
+            return null;
+        }
         // Modified v1.5 to fix a bug with empty animations in eaa format
         private string getExistingPreviewImagePath()
         {
@@ -96,14 +107,12 @@ namespace uAdventure.Editor
             string path = null;
             foreach (ResourcesDataControl resource in resourcesDataControlList)
             {
-                if (resource != null && resource.getAssetPath("standright") != null &&
-                        !resource.getAssetPath("standright").Equals(EMPTY_ANIMATION) &&
-                        !resource.getAssetPath("standright").Equals(EMPTY_ANIMATION + ".eaa") &&
-                        !resource.getAssetPath("standright").Equals(EMPTY_ANIMATION + ".eaa.xml"))
-                    path = resource.getAssetPath("standright");
-                else
-                    path = resource.getAssetPath("standleft");
-                if (path != null)
+                // We prioritize the left, the right and the down
+                path = (new string[] { "standleft", "standright", "standdown" })
+                    .Select(s => getNotEmptyAsset(resource, s))
+                    .FirstOrDefault(s => s != null);
+
+                if (!string.IsNullOrEmpty(path))
                 {
                     return path;
                 }

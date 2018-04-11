@@ -20,6 +20,8 @@ namespace uAdventure.Editor
 
         private int newY;
 
+        private Dictionary<string, float> oldLength;
+
         private float newScale;
 
         private Node node;
@@ -34,6 +36,18 @@ namespace uAdventure.Editor
             this.oldX = node.getX();
             this.oldY = node.getY();
             this.oldScale = node.getScale();
+            this.oldLength = new Dictionary<string, float>();
+            bool isEnd;
+            foreach (Trajectory.Side side in trajectory.getSides())
+            {
+                isEnd = side.getIDEnd().Equals(node.getID());
+                if (isEnd || side.getIDStart().Equals(node.getID()))
+                {
+                    oldLength.Add(isEnd ? side.getIDStart() : side.getIDEnd(), side.getLength());
+                }
+            }
+
+
             this.node = node;
             this.trajectory = trajectory;
         }
@@ -80,11 +94,14 @@ namespace uAdventure.Editor
 
                     if (side.getIDEnd().Equals(node.getID()) || side.getIDStart().Equals(node.getID()))
                     {
-                        var sideName = side.getIDStart() + ";" + side.getIDEnd();
-                        Trajectory.Node start = trajectory.getNodeForId(side.getIDStart());
-                        Trajectory.Node end = trajectory.getNodeForId(side.getIDEnd());
+                        Node start = trajectory.getNodeForId(side.getIDStart());
+                        Node end = trajectory.getNodeForId(side.getIDEnd());
                         float x = start.getX() - end.getX();
                         float y = start.getY() - end.getY();
+                        var newLength = new Vector2(x,y).magnitude;
+                        if (Mathf.Approximately(side.getLength(), side.getRealLength()))
+                            side.setLenght(newLength);
+                        side.setRealLength(newLength);
                     }
                 }
             return true;
@@ -104,8 +121,10 @@ namespace uAdventure.Editor
                         Node end = trajectory.getNodeForId(side.getIDEnd());
                         float x = start.getX() - end.getX();
                         float y = start.getY() - end.getY();
-                        side.setLenght((float)Mathf.Sqrt(Mathf.Pow(x, 2) + Mathf.Pow(y, 2)));
-                        side.setRealLength((float)Mathf.Sqrt(Mathf.Pow(x, 2) + Mathf.Pow(y, 2)));
+                        var newLength = new Vector2(x, y).magnitude;
+                        if (Mathf.Approximately(side.getLength(), side.getRealLength()))
+                            side.setLenght(newLength);
+                        side.setRealLength(newLength);
                     }
                 }
             Controller.Instance.updatePanel();
@@ -117,15 +136,19 @@ namespace uAdventure.Editor
         {
 
             node.setValues(oldX, oldY, oldScale);
+            bool isEnd;
             if (newX != oldX || newY != oldY)
                 foreach (Trajectory.Side side in trajectory.getSides())
                 {
+                    isEnd = side.getIDEnd().Equals(node.getID());
                     if (side.getIDEnd().Equals(node.getID()) || side.getIDStart().Equals(node.getID()))
                     {
                         Node start = trajectory.getNodeForId(side.getIDStart());
                         Node end = trajectory.getNodeForId(side.getIDEnd());
                         float x = start.getX() - end.getX();
                         float y = start.getY() - end.getY();
+                        side.setRealLength(new Vector2(x,y).magnitude);
+                        side.setLenght(isEnd ? oldLength[side.getIDStart()] : oldLength[side.getIDEnd()]);
                     }
                 }
 

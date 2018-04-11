@@ -13,62 +13,60 @@ namespace uAdventure.Runner
     {
 
         private Exit ed;
-        public Exit exitData
+        public Exit Element
         {
             get { return ed; }
             set { ed = value; }
         }
 
-        public void Exit()
+        private EffectHolder GetExitEffects()
         {
-            //Game.Instance.hideMenu ();
-            if (!Game.Instance.GameState.isFirstPerson())
-            { 
-                // move player to influence area
-            }
-
+            Effects effects = new Effects();
             if (ConditionChecker.check(ed.getConditions()))
             {
-                EffectHolder effect = new EffectHolder(ed.getEffects());
+                effects.AddRange(ed.getEffects());
 
                 if (Game.Instance.GameState.isCutscene(ed.getNextSceneId()))
-                    effect.effects.Add(new EffectHolderNode(new TriggerCutsceneEffect(ed.getNextSceneId())));
+                    effects.Add(new TriggerCutsceneEffect(ed.getNextSceneId()));
                 else
-                    effect.effects.Add(new EffectHolderNode(new TriggerSceneEffect(ed.getNextSceneId(), 0, 0, ed.getTransitionTime(), ed.getTransitionType())));
+                    effects.Add(new TriggerSceneEffect(ed.getNextSceneId(), ed.getDestinyX(), ed.getDestinyY(), ed.getDestinyScale(), ed.getTransitionTime(), ed.getTransitionType()));
 
                 if (ed.getPostEffects() != null)
-                {
-                    EffectHolder eh = new EffectHolder(ed.getPostEffects());
-                    foreach (EffectHolderNode ehn in eh.effects)
-                    {
-                        effect.effects.Add(ehn);
-                    }
-                }
+                    effects.AddRange(ed.getPostEffects());
+            }
+            else
+            {
+                if (ed.isHasNotEffects())
+                    effects.AddRange(ed.getNotEffects());
+            }
 
-                if (Game.Instance.getAlternativeTarget() != null)
+            return new EffectHolder(effects);
+        }
+
+        private void TrackExit()
+        {
+            if (Game.Instance.getAlternativeTarget() != null)
+            {
+                if (ConditionChecker.check(ed.getConditions()))
                 {
                     if (Game.Instance.getAlternativeTarget().getXApiType() == "menu")
                         Tracker.T.alternative.Selected(Game.Instance.getAlternativeTarget().getId(), ed.getNextSceneId(), AlternativeTracker.Alternative.Menu);
                     else
                         Tracker.T.alternative.Selected(Game.Instance.getAlternativeTarget().getId(), ed.getNextSceneId(), true);
                 }
-
-                Game.Instance.Execute(effect);
-                GUIManager.Instance.setCursor("default");
-            }
-            else
-            {
-                if (Game.Instance.getAlternativeTarget() != null)
+                else
                 {
                     if (Game.Instance.getAlternativeTarget().getXApiType() != "menu")
                         Tracker.T.alternative.Selected(Game.Instance.getAlternativeTarget().getId(), "Incorrect", false);
                 }
-
-                if (ed.isHasNotEffects())
-                    Game.Instance.Execute(new EffectHolder(ed.getNotEffects()));
+                Tracker.T.RequestFlush();
             }
+        }
 
-            Tracker.T.RequestFlush();
+        public void Exit()
+        {
+            TrackExit();
+            Game.Instance.Execute(GetExitEffects());
         }
 
         bool interactable = false;
@@ -84,13 +82,66 @@ namespace uAdventure.Runner
 
         public InteractuableResult Interacted(PointerEventData pointerData = null)
         {
-            Exit();
+            if (Game.Instance.GameState.IsFirstPerson)
+            {
+                Exit();
+            }
+            else
+            {
+                var sceneMB = FindObjectOfType<SceneMB>();
+                var scene = sceneMB.sceneData as Scene;
+                Rectangle area = null;
+                if (scene != null && scene.getTrajectory() == null)
+                {
+                    // If no trajectory I have to move the area to the trajectory for it to be connected
+                    area = ed.MoveAreaToTrajectory(sceneMB.Trajectory);
+                }
+                else
+                {
+                    var points = ed.isRectangular() ? ed.ToRect().ToPoints() : ed.getPoints().ToArray();
+                    var topLeft = points.ToRect().position;
+                    area = ed.getInfluenceArea().MoveArea(topLeft);
+                }
+                var exitAction = new Core.Action(Core.Action.CUSTOM) { Effects = new Effects() { new ExecuteExitEffect(this) } };
+                exitAction.setNeedsGoTo(true);
+                PlayerMB.Instance.Do(exitAction, area);
+            }
             return InteractuableResult.DOES_SOMETHING;
         }
 
         public void OnPointerClick(PointerEventData eventData)
         {
             Interacted(eventData);
+        }
+        
+        // Workaround to get execution flow back after the player reaches the target:
+        // The ExtecuteExit effect is passed to the player with an custom action.
+        // When the player reaches the exit, it executes the action effects, therefore
+        // it executes the ExecuteExit effect that gives back the execution flow.
+        public class ExecuteExitEffect : IEffect
+        {
+            public ExitMB exitMB;
+            public ExecuteExitEffect(ExitMB exitMB) { this.exitMB = exitMB; }
+            public EffectType getType() { return EffectType.CUSTOM_EFFECT; }
+        }
+
+        [CustomEffectRunner(typeof(ExecuteExitEffect))]
+        public class ExecuteExitEffectRunner : CustomEffectRunner
+        {
+            private ExecuteExitEffect toRun;
+            private EffectHolder exitEffects;
+
+            public IEffect Effect { get { return toRun; } set { toRun = value as ExecuteExitEffect; } }
+
+            public bool execute()
+            {
+                if(exitEffects == null)
+                {
+                    toRun.exitMB.TrackExit();
+                    exitEffects = toRun.exitMB.GetExitEffects();
+                }
+                return exitEffects.execute();
+            }
         }
     }
 }

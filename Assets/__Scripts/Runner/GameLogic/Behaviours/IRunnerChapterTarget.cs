@@ -7,6 +7,7 @@ namespace uAdventure.Runner
     {
         object Data { get; set; }
         void RenderScene();
+        bool IsReady { get; }
         void Destroy(float time = 0);
         GameObject gameObject { get; }
     }

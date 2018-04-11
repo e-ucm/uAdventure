@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace uAdventure.Runner
 {
-    public class ActiveAreaMB : Area, Interactuable, IPointerClickHandler, IDropHandler
+    public class ActiveAreaMB : Area, Interactuable, IPointerClickHandler, IDropHandler, IActionReceiver
     {
         private static readonly int[] restrictedActions = { Action.CUSTOM, Action.EXAMINE, Action.USE };
 
@@ -77,7 +77,7 @@ namespace uAdventure.Runner
                     //if there is an action, we show them
                     if (availableActions.Count > 0)
                     {
-                        Game.Instance.showActions(availableActions, Input.mousePosition);
+                        Game.Instance.showActions(availableActions, Input.mousePosition, this);
                         ret = InteractuableResult.DOES_SOMETHING;
                     }
                     break;
@@ -164,5 +164,30 @@ namespace uAdventure.Runner
         {
             uAdventureInputModule.DropTargetSelected(eventData);
         }
+
+        public void ActionSelected(Action action)
+        {
+            if (Game.Instance.GameState.IsFirstPerson|| !action.isNeedsGoTo())
+                Game.Instance.Execute(new EffectHolder(action.Effects));
+            else
+            {
+                var sceneMB = FindObjectOfType<SceneMB>();
+                var scene = sceneMB.sceneData as Scene;
+                Rectangle area = null;
+                if (scene!= null && scene.getTrajectory() == null)
+                {
+                    // If no trajectory I have to move the area to the trajectory for it to be connected
+                    area = aad.MoveAreaToTrajectory(sceneMB.Trajectory);
+                }
+                else
+                {
+                    var points = aad.isRectangular() ? aad.ToRect().ToPoints() : aad.getPoints().ToArray();
+                    var topLeft = points.ToRect().position;
+                    area = aad.getInfluenceArea().MoveArea(topLeft);
+                }
+                PlayerMB.Instance.Do(action, area);
+            }
+        }
+
     }
 }

@@ -466,7 +466,7 @@ namespace uAdventure.Editor
 
         public void setPathToVideo(string path)
         {
-            resourcesDataControlList[selectedResources].addAsset("video", path.Substring(0, path.LastIndexOf(".mpg")));
+            resourcesDataControlList[selectedResources].addAsset("video", path);
         }
 
         internal string getPathToMusic()

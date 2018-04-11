@@ -1,5 +1,12 @@
 ﻿using System.Linq;
+using uAdventure.Core;
 using UnityEngine;
+
+using ClipperLib;
+
+using Path = System.Collections.Generic.List<ClipperLib.IntPoint>;
+using Paths = System.Collections.Generic.List<System.Collections.Generic.List<ClipperLib.IntPoint>>;
+using System.Collections.Generic;
 
 /// <summary>
 /// The ExtensionRect class hods up multiple util operations for rectangles.
@@ -21,6 +28,17 @@ public static class ExtensionRect
     }
 
 
+
+    public static Rect KeepInside(this Rect rect, Rect container)
+    {
+        // First we take the max of both top-left corners so we guarantee that  we do not go out of the top-left,
+        // then, we take the min of this (max) and the bottom-right corner minus the rect size.
+        var sizeDiff = Vector2.Min(rect.size, (rect.size + container.size) / 2f);
+        var position = Vector2.Min(Vector2.Max(rect.position, container.position), container.position + container.size - sizeDiff);
+
+        return new Rect(position, rect.size);
+    }
+
     public static Vector2[] ToPoints(this Rect rect)
     {
         return new Vector2[] {
@@ -38,6 +56,71 @@ public static class ExtensionRect
         var maxY = points.Max(p => p.y);
 
         return new Rect(minX, minY, maxX - minX, maxY - minY);
+    }
+
+    public static Vector2[] Extend(this Vector2[] points, float radius)
+    {
+        if (Mathf.Approximately(radius, 0))
+            return points;
+
+        Path polygon = points.ToList().ConvertAll(p => new IntPoint(p.x, p.y));
+
+        Paths solution = new Paths();
+
+        ClipperOffset c = new ClipperOffset();
+
+        c.AddPath(polygon, JoinType.jtRound, EndType.etClosedPolygon);
+        c.Execute(ref solution, radius);
+
+        var r = solution.Count > 0 ? solution[0].ConvertAll(p => new Vector2(p.X, p.Y)) : new List<Vector2>();
+
+        if (r.Count > 0)
+            r.Add(r[0]);
+
+        return r.ToArray();
+    }
+
+
+    public static bool InsideMargin(this Vector2[] points, Vector2 point, float margin)
+    {
+        return points.Inside(point) || points.Any(p => p.InsideRadius(point, margin)) || points.InsideEdgeRange(point, margin, true);
+    }
+
+    public static bool Inside(this Vector2[] points, Vector2 point)
+    {
+        bool inside = false;
+        var originPoints = points.Select(p => p - point).ToList();
+        for (int i = 0; i < originPoints.Count; i++)
+        {
+            if (((originPoints[i].y > 0) != (originPoints[(i + 1) % originPoints.Count].y > 0))
+            && ((originPoints[i].y > 0) == (originPoints[i].y * originPoints[(i + 1) % originPoints.Count].x > originPoints[(i + 1) % originPoints.Count].y * originPoints[i].x)))
+                inside = !inside;
+        }
+
+        return inside;
+    }
+
+    public static bool InsideRadius(this Vector2 p, Vector2 point, float radius)
+    {
+        return (point - p).sqrMagnitude <= radius * radius;
+    }
+
+    public static bool InsideEdgeRange(this Vector2[] points, Vector2 point, float radius, bool closed)
+    {
+        if (points.Length <= 1) // If there are not edges, no sense to do it...
+            return false;
+
+        Vector2 closestPoin = Vector2.zero;
+        int l = closed ? points.Length - 1 : 0;
+        float sqrRadius = radius * radius;
+        for (int i = closed ? 0 : 1, end = points.Length; i < end; ++i)
+        {
+            closestPoin = uAdventure.Runner.LineHandler.GetClosestPointOnLineSegment(points[l], points[i], point);
+            l = i;
+            if ((closestPoin - point).sqrMagnitude <= sqrRadius)
+                return true;
+        }
+        return false;
     }
 
     public static Rect AdjustToRatio(this Rect rect, float width, float height)
@@ -144,5 +227,70 @@ public static class ExtensionRect
     public static Rect GUIAdapt(this Rect rect, Rect guiSpace)
     {
         return rect.Move(guiSpace.position).Intersection(guiSpace);
+    }
+
+    /// <summary>
+    /// Transforms a uAdventure Rect to a Unity Rect
+    /// </summary>
+    /// <param name="rect"></param>
+    /// <returns></returns>
+    public static Rect ToRect(this Rectangle rect)
+    {
+        return new Rect(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
+    }
+
+
+    /// <summary>
+    /// Check if the point is inside of the rect within a distance
+    /// </summary>
+    /// <param name="rect"></param>
+    /// <returns>true if inside</returns>
+    public static bool Contains(this Rectangle rect, Vector2 point, float margin = 0f)
+    {
+        if(Mathf.Approximately(margin, 0f) && rect.isRectangular())
+        {
+            return  rect.ToRect().Contains(point);
+        }
+        else
+        {
+            var points = rect.isRectangular() ? rect.ToRect().ToPoints() : rect.getPoints().ToArray();
+            return points.InsideMargin(point, margin);
+        }
+    }
+
+    public static Rectangle MoveArea(this Rectangle area, Vector2 point)
+    {
+        var r = new InfluenceArea();
+        if (area.isRectangular())
+        {
+            r.setRectangular(true);
+            r.setX(area.getX() + (int)point.x);
+            r.setY(area.getY() + (int)point.y);
+            r.setWidth(area.getWidth());
+            r.setHeight(area.getHeight());
+        }
+        else
+        {
+            var moved = area.getPoints().ConvertAll(p => p + point);
+            r.setRectangular(false);
+            r.getPoints().Clear();
+            r.getPoints().AddRange(moved);
+        }
+
+        return r;
+    }
+
+    public static Rectangle MoveAreaToTrajectory(this Rectangle area, uAdventure.Runner.TrajectoryHandler trajectory)
+    {
+        var points = area.isRectangular() ? area.ToRect().ToPoints() : area.getPoints().ToArray();
+
+        var aa = new ActiveArea("aux", false, 0, 0, 0, 0);
+        var pointsList = aa.getPoints();
+        var center = points.Aggregate((v1, v2) => v1 + v2) / points.Length;
+        var adjust = -center + trajectory.closestPoint(center);
+        foreach (var p in points)
+            pointsList.Add(p + adjust);
+
+        return aa;
     }
 }

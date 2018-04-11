@@ -103,6 +103,7 @@ namespace uAdventure.Editor
                     exitElement.SetAttribute("idTarget", exit.getNextSceneId());
                     exitElement.SetAttribute("destinyY", exit.getDestinyY().ToString());
                     exitElement.SetAttribute("destinyX", exit.getDestinyX().ToString());
+                    exitElement.SetAttribute("destinyScale", exit.getDestinyScale().ToString());
                     exitElement.SetAttribute("transitionType", exit.getTransitionType().ToString());
                     exitElement.SetAttribute("transitionTime", exit.getTransitionTime().ToString());
                     exitElement.SetAttribute("not-effects", (exit.isHasNotEffects() ? "yes" : "no"));

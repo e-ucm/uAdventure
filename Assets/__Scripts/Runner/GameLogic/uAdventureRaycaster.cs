@@ -11,10 +11,15 @@ namespace uAdventure.Runner
         public GameObject Override { get; set; }
         public static uAdventureRaycaster Instance { get; private set; }
 
+        protected override void Awake()
+        {
+            base.Awake();
+            Instance = this;
+        }
+
         protected override void Start()
         {
             base.Start();
-            Instance = this;
         }
 
         RaycastHit[] m_Hits;

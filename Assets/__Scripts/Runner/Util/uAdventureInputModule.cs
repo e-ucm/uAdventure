@@ -196,10 +196,26 @@ namespace uAdventure.Runner
                 pointerEvent.clickTime = time;
 
                 // Save the drag handler as well
-                pointerEvent.pointerDrag = ExecuteEvents.GetEventHandler<IDragHandler>(currentOverGo);
+                var go = currentOverGo;
+                while (go != null && pointerEvent.pointerDrag == null)
+                {
+                    go = pointerEvent.pointerDrag = ExecuteEvents.GetEventHandler<IDragHandler>(go);
 
-                if (pointerEvent.pointerDrag != null)
-                    ExecuteEvents.Execute(pointerEvent.pointerDrag, pointerEvent, ExecuteEvents.initializePotentialDrag);
+                    if (pointerEvent.pointerDrag != null)
+                    {
+                        bool give = true;
+                        // If it executes the initialice potential drag, but doesnt use it, we release it
+                        if (ExecuteEvents.Execute(pointerEvent.pointerDrag, pointerEvent, s_ConfirmWantsDragHandler) && !pointerEvent.used)
+                        {
+                            pointerEvent.pointerDrag = null;
+                            go = go.transform.parent != null ? go.transform.parent.gameObject : null;
+                        }
+                        else
+                        {
+                            ExecuteEvents.Execute(pointerEvent.pointerDrag, pointerEvent, ExecuteEvents.initializePotentialDrag);
+                        }
+                    }
+                }
             }
 
             // PointerUp notification
@@ -281,10 +297,26 @@ namespace uAdventure.Runner
                 pointerEvent.clickTime = time;
 
                 // Save the drag handler as well
-                pointerEvent.pointerDrag = ExecuteEvents.GetEventHandler<IDragHandler>(currentOverGo);
+                var go = currentOverGo;
+                while (go != null && pointerEvent.pointerDrag == null)
+                {
+                    go = pointerEvent.pointerDrag = ExecuteEvents.GetEventHandler<IDragHandler>(go);
 
-                if (pointerEvent.pointerDrag != null)
-                    ExecuteEvents.Execute(pointerEvent.pointerDrag, pointerEvent, ExecuteEvents.initializePotentialDrag);
+                    if (pointerEvent.pointerDrag != null)
+                    {
+                        bool give = true;
+                        // If it executes the initialice potential drag, but doesnt use it, we release it
+                        if (ExecuteEvents.Execute(pointerEvent.pointerDrag, pointerEvent, s_ConfirmWantsDragHandler) && !pointerEvent.used)
+                        {
+                            pointerEvent.pointerDrag = null;
+                            go = go.transform.parent != null ? go.transform.parent.gameObject : null;
+                        }
+                        else
+                        {
+                            ExecuteEvents.Execute(pointerEvent.pointerDrag, pointerEvent, ExecuteEvents.initializePotentialDrag);
+                        }
+                    }
+                }
             }
 
             // PointerUp notification
@@ -349,6 +381,13 @@ namespace uAdventure.Runner
             {
                 ExecuteEvents.ExecuteHierarchy(currentOverGo, pointerEvent, ExecuteEvents.dropHandler);
             }
+        }
+
+        private static readonly ExecuteEvents.EventFunction<IConfirmWantsDrag> s_ConfirmWantsDragHandler = Execute;
+
+        private static void Execute(IConfirmWantsDrag handler, BaseEventData eventData)
+        {
+            handler.OnConfirmWantsDrag(ExecuteEvents.ValidateEventData<PointerEventData>(eventData));
         }
     }
 }

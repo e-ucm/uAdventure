@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 using uAdventure.Core;
 using Dijkstras;
+using System.Linq;
 
 namespace uAdventure.Runner
 {
@@ -50,28 +51,33 @@ namespace uAdventure.Runner
             Vector2 ret = new Vector2(0f, 0f);
 
             float distance = float.MaxValue, current = float.MaxValue;
-
-
-            // TODO why? all comments below
-            //LineHandler tmp = lines[0];
+            
 
             foreach (LineHandler handler in lines)
             {
-                foreach (Vector2 collisions in handler.contactPoints(v))
+                var closestPointToLine = handler.closestPoint(v);
+                current = Vector2.Distance(v, closestPointToLine);
+                if (current < distance)
                 {
-                    current = Vector2.Distance(v, collisions);
-                    if (current < distance)
-                    {
-                        distance = current;
-                        ret = collisions;
-                        //tmp = handler;
-                    }
+                    distance = current;
+                    ret = closestPointToLine;
                 }
             }
 
-            //bool contains = tmp.contains(ret);
-
             return ret;
+        }
+
+        public LineHandler containingLine(Vector2 point)
+        {
+            foreach (LineHandler handler in lines)
+            {
+                if (handler.contains(point))
+                {
+                    return handler;
+                }
+            }
+
+            return null;
         }
 
         public Trajectory.Node getLastNode()
@@ -84,9 +90,29 @@ namespace uAdventure.Runner
             return trajectory.getInitial();
         }
 
-        public KeyValuePair<Vector2, float>[] route(Vector2 origin, Vector2 destiny)
+        public MovementPoint[] route(Vector2 origin, Vector2[] destiny)
         {
-            List<KeyValuePair<Vector2, float>> ret = new List<KeyValuePair<Vector2, float>>();
+            MovementPoint[] bestRoute = null;
+            MovementPoint[] r;
+            float maxDistance = float.MaxValue;
+
+            foreach(var d in destiny)
+            {
+                r = route(origin, d);
+                var distance = r.Sum(m => m.distance);
+                if(distance < maxDistance)
+                {
+                    bestRoute = r;
+                    maxDistance = distance;
+                }
+            }
+
+            return bestRoute;
+        }
+
+        public MovementPoint[] route(Vector2 origin, Vector2 destiny)
+        {
+            List<MovementPoint> ret = new List<MovementPoint>();
 
             LineHandler origin_line = null, destiny_line = null;
             foreach (LineHandler handler in lines)
@@ -105,18 +131,16 @@ namespace uAdventure.Runner
             if (origin_line == null)
             {
                 closest = closestPoint(PlayerMB.Instance.getPosition());
-                foreach (LineHandler handler in lines)
-                {
-                    if (origin_line == null && handler.contains(closest))
-                    {
-                        origin_line = handler;
-                        break;
-                    }
-                }
+                origin_line = containingLine(closest);
             }
 
             if (closest != Vector2.zero)
-                ret.Add(new KeyValuePair<Vector2, float>(closest, origin_line.getScaleFor(closest)));
+                ret.Add(new MovementPoint()
+                {
+                    destination = closest,
+                    scale = origin_line.getScaleFor(closest),
+                    distance = (closest - origin).magnitude
+                });
 
             if (origin_line != null && destiny_line != null)
             {
@@ -127,7 +151,13 @@ namespace uAdventure.Runner
                 //######################################################
                 if (origin_line == destiny_line)
                 {
-                    ret.Add(new KeyValuePair<Vector2, float>(destiny, destiny_line.getScaleFor(destiny)));
+                    ret.Add(new MovementPoint()
+                    {
+                        destination = destiny,
+                        scale = destiny_line.getScaleFor(destiny),
+                        distance = destiny_line.getSegmentDistance(origin, destiny),
+
+                    });
                 }
                 else
                 {
@@ -285,57 +315,454 @@ namespace uAdventure.Runner
 
         }
 
-        public List<KeyValuePair<Vector2, float>> route_d(Vector2 origin, Vector2 destiny, LineHandler originline, LineHandler destinyline)
+        public List<MovementPoint> route_d(Vector2 origin, Vector2 destiny, LineHandler originline, LineHandler destinyline)
         {
             Graph<string> g = new Graph<string>();
 
             Dictionary<string, Dictionary<string, float>> d = new Dictionary<string, Dictionary<string, float>>();
+            Dictionary<string, Dictionary<string, MovementPoint>> ps = new Dictionary<string, Dictionary<string, MovementPoint>>();
             foreach (Trajectory.Node n in this.trajectory.getNodes())
             {
                 d.Add(n.getID(), new Dictionary<string, float>());
+                ps.Add(n.getID(), new Dictionary<string, MovementPoint>());
             }
 
             foreach (Trajectory.Side s in this.trajectory.getSides())
             {
+                var start = trajectory.getNodeForId(s.getIDStart());
+
+                var end = trajectory.getNodeForId(s.getIDEnd());
+
                 d[s.getIDStart()].Add(s.getIDEnd(), s.getLength());
                 d[s.getIDEnd()].Add(s.getIDStart(), s.getLength());
+
+                ps[s.getIDStart()].Add(s.getIDEnd(), new MovementPoint()
+                {
+                    distance = s.getLength(),
+                    scale = end.getScale(),
+                    destination = new Vector2(end.getX(), end.getY())
+                });
+                ps[s.getIDEnd()].Add(s.getIDStart(), new MovementPoint()
+                {
+                    distance = s.getLength(),
+                    scale = start.getScale(),
+                    destination = new Vector2(start.getX(), start.getY())
+                });
             }
 
-            Trajectory.Node no = new Trajectory.Node("origin", Mathd.RoundToInt(origin.x * LineHandler.DIVISOR), Mathd.RoundToInt(60f - (origin.y * LineHandler.DIVISOR)), 1f);
-            Trajectory.Node nd = new Trajectory.Node("destiny", Mathd.RoundToInt(destiny.x * LineHandler.DIVISOR), Mathd.RoundToInt(60f - (destiny.y * LineHandler.DIVISOR)), 1f);
+            Trajectory.Node no = new Trajectory.Node("origin", Mathd.RoundToInt(origin.x), Mathd.RoundToInt(origin.y), 1f);
+            Trajectory.Node nd = new Trajectory.Node("destiny", Mathd.RoundToInt(destiny.x), Mathd.RoundToInt(destiny.y), 1f);
 
-            float od1 = Vector2.Distance(origin, LineHandler.nodeToVector2(originline.start)) * 10f;
-            float od2 = Vector2.Distance(origin, LineHandler.nodeToVector2(originline.end)) * 10f;
+            Vector2 oStartV2 = LineHandler.nodeToVector2(originline.start), oEndV2 = LineHandler.nodeToVector2(originline.end),
+                    dStartV2 = LineHandler.nodeToVector2(destinyline.start), dEndV2 = LineHandler.nodeToVector2(destinyline.end);
+
+            float od1 = originline.getSegmentDistance(origin, oStartV2),
+                od2 = originline.getSegmentDistance(origin, oEndV2);
+            float dd1 = destinyline.getSegmentDistance(destiny, dStartV2),
+                dd2 = destinyline.getSegmentDistance(destiny, dEndV2);
+
             d[originline.start.getID()].Add(no.getID(), od1);
             d[originline.end.getID()].Add(no.getID(), od2);
             d.Add("origin", new Dictionary<string, float>() { { originline.start.getID(), od1 }, { originline.end.getID(), od2 } });
 
-            float dd1 = Vector2.Distance(destiny, LineHandler.nodeToVector2(destinyline.start)) * 10f;
-            float dd2 = Vector2.Distance(destiny, LineHandler.nodeToVector2(destinyline.end)) * 10f;
+            ps[originline.start.getID()].Add(no.getID(), new MovementPoint()
+            {
+                distance = od1,
+                scale = originline.getScaleFor(origin),
+                destination = origin
+            });
+            ps[originline.end.getID()].Add(no.getID(), new MovementPoint()
+            {
+                distance = od2,
+                scale = originline.getScaleFor(origin),
+                destination = origin
+            });
+            ps.Add("origin", new Dictionary<string, MovementPoint>() {
+                { originline.start.getID(), new MovementPoint()
+                    {
+                        distance = od1,
+                        scale = originline.getScaleFor(LineHandler.nodeToVector2(originline.start)),
+                        destination = LineHandler.nodeToVector2(originline.start)
+                    }
+                },
+                { originline.end.getID(), new MovementPoint()
+                    {
+                        distance = od2,
+                        scale = originline.getScaleFor(LineHandler.nodeToVector2(originline.end)),
+                        destination = LineHandler.nodeToVector2(originline.end)
+                    }
+                }
+            });
+
             d[destinyline.start.getID()].Add(nd.getID(), dd1);
             d[destinyline.end.getID()].Add(nd.getID(), dd2);
             d.Add("destiny", new Dictionary<string, float>() { { destinyline.start.getID(), dd1 }, { destinyline.end.getID(), dd2 } });
+            
+            ps[destinyline.start.getID()].Add(nd.getID(), new MovementPoint()
+            {
+                distance = dd1,
+                scale = destinyline.getScaleFor(destiny),
+                destination = destiny
+            });
+            ps[destinyline.end.getID()].Add(nd.getID(), new MovementPoint()
+            {
+                distance = dd2,
+                scale = destinyline.getScaleFor(destiny),
+                destination = destiny
+            });
+            ps.Add("destiny", new Dictionary<string, MovementPoint>() {
+                { destinyline.start.getID(), new MovementPoint()
+                    {
+                        distance = dd1,
+                        scale = destinyline.getScaleFor(LineHandler.nodeToVector2(destinyline.start)),
+                        destination = LineHandler.nodeToVector2(destinyline.start)
+                    }
+                },
+                { destinyline.end.getID(), new MovementPoint()
+                    {
+                        distance = dd2,
+                        scale = destinyline.getScaleFor(LineHandler.nodeToVector2(destinyline.end)),
+                        destination = LineHandler.nodeToVector2(destinyline.end)
+                    }
+                }
+            });
 
             g.set_vertices(d);
 
             List<string> l = g.shortest_path("origin", "destiny");
+            l.Reverse();
 
-            List<KeyValuePair<Vector2, float>> ret = new List<KeyValuePair<Vector2, float>>();
+            List<MovementPoint> ret = new List<MovementPoint>();
 
+            string last = "origin";
             foreach(string n in l)
             {
-                if (n == "destiny")
-                    ret.Add(new KeyValuePair<Vector2, float>(destiny, 1f));
-                else
+                ret.Add(ps[last][n]);
+                last = n;
+            }
+
+            return ret;
+        }
+
+        public static TrajectoryHandler GetAccessibleTrajectory(Vector2 position, TrajectoryHandler original)
+        {
+            position = original.closestPoint(position);
+            var line = original.containingLine(position);
+            if(line == null)
+            {
+                // Return empty trajectory
+                return new TrajectoryHandler(new Trajectory());
+            }
+
+            var output = new Trajectory();
+            var toOpen = new Queue<LineHandler>();
+            var opened = new Dictionary<LineHandler, bool>();
+            var added = new Dictionary<string, bool>();
+
+            toOpen.Enqueue(line);
+            while (toOpen.Count != 0)
+            {
+                var current = toOpen.Dequeue();
+                opened[current] = true;
+
+                // First we add both nodes and the side
+                if (!added.ContainsKey(current.start.getID()))
                 {
-                    Trajectory.Node tmp = trajectory.getNodeForId(n);
-                    ret.Add(new KeyValuePair<Vector2, float>(LineHandler.nodeToVector2(tmp), tmp.getScale()));
+                    output.addNode(current.start.getID(), current.start.getX(), current.start.getY(), current.start.getScale());
+                    added.Add(current.start.getID(), true);
+                }
+                if (!added.ContainsKey(current.end.getID()))
+                {
+                    output.addNode(current.end.getID(), current.end.getX(), current.end.getY(), current.end.getScale());
+                    added.Add(current.end.getID(), true);
+                }
+                output.addSide(current.start.getID(), current.end.getID(), (int)current.getDistance());
+
+                // Then we add the neightbor lines to expand
+                foreach (var side in current.getNeighborLines())
+                {
+                    if (opened.ContainsKey(side) && opened[side]) continue;
+                    else toOpen.Enqueue(side);
                 }
             }
 
-            ret.Reverse();
+            return new TrajectoryHandler(output);
+        }
 
-            return ret;
+        public static Trajectory CreateBlockedTrajectory(Trajectory original, Rectangle[] blockingObjects)
+        {
+            Trajectory r = original;
+            
+            foreach(var blockingObject in blockingObjects)
+            {
+                r = CreateBlockedTrajectory(r, blockingObject);
+            }
+
+            return r;
+        }
+
+        public static Trajectory CreateBlockedTrajectory(Trajectory original, Rectangle blockingObject)
+        {
+            var trajectory = new Trajectory();
+
+            // Fist we add the nodes
+            foreach(var node in original.getNodes())
+            {
+                if (!Inside(LineHandler.nodeToVector2(node), blockingObject))
+                    trajectory.addNode(node.getID(), node.getX(), node.getY(), node.getScale());
+            }
+
+            // Then we add the sides
+            foreach(var side in original.getSides())
+            {
+                //Dividing them with the rect
+                DivideSideByRect(blockingObject, original, side, trajectory);
+            }
+
+            return trajectory;
+        }
+
+        public static void DivideSideByRect(Rectangle rect, Trajectory original, Trajectory.Side side, Trajectory outputTrajectory)
+        {
+            var startNode = original.getNodeForId(side.getIDStart());
+            var endNode = original.getNodeForId(side.getIDEnd());
+
+            Math3DFunc scaleFunc = new Math3DFunc(
+                new Vector3(startNode.getX(), startNode.getY(), startNode.getScale()),
+                new Vector3(  endNode.getX(),   endNode.getY(),   endNode.getScale()));
+            Math3DFunc lengthFunc = new Math3DFunc(
+                new Vector3(startNode.getX(), startNode.getY(), 0),
+                new Vector3(endNode.getX(), endNode.getY(), side.getLength()));
+
+            var startInside = outputTrajectory.getNodeForId(side.getIDStart()) == null;
+            var endInside = outputTrajectory.getNodeForId(side.getIDEnd()) == null;
+
+            if (startInside && endInside)
+                return;
+
+            Vector2 start = LineHandler.nodeToVector2(startNode),
+                end = LineHandler.nodeToVector2(endNode);
+            
+            Vector2[] intersections;
+            if (LineRectangleIntersections(rect, start, end, out intersections))
+            {
+                if (!startInside)
+                {
+                    var cs = ClosestPoint(start, intersections);
+                    var csId = createRandomNodeId(cs.x, cs.y);
+                    outputTrajectory.addNode(csId, (int)cs.x, (int)cs.y, scaleFunc.getZ(cs.x, cs.y));
+                    outputTrajectory.addSide(side.getIDStart(), csId, (int)lengthFunc.getZ(cs.x, cs.y));
+                }
+                if (!endInside)
+                {
+                    var ce = ClosestPoint(end, intersections);
+                    var ceId = createRandomNodeId(ce.x, ce.y);
+                    outputTrajectory.addNode(ceId, (int)ce.x, (int)ce.y, scaleFunc.getZ(ce.x, ce.y));
+                    outputTrajectory.addSide(side.getIDEnd(), ceId, (int) (side.getLength() - lengthFunc.getZ(ce.x, ce.y)));
+                }
+            }
+            else
+            {
+                outputTrajectory.addSide(side.getIDStart(), side.getIDEnd(), (int) side.getLength());
+            }
+        }
+
+        public static string createRandomNodeId(float x, float y)
+        {
+            return "tmpNode" + (int)x + ";" + (int)y + "_" + Random.Range(0,1000); 
+        }
+
+        public static Vector2 ClosestPoint(Vector2 point, Vector2[] points)
+        {
+            if (points.Length == 0)
+                return Vector2.zero;
+
+            float distance;
+            float maxDistance = float.MaxValue;
+            int r = 0;
+
+            for (int i = 0, end  = points.Length; i < end; ++i)
+            {
+                distance = (point - points[i]).sqrMagnitude;
+                if(distance < maxDistance)
+                {
+                    maxDistance = distance;
+                    r = i;
+                }
+            }
+
+            return points[r];
+        }
+        public static bool TrajectoryRectangleIntersections(Rectangle rect, TrajectoryHandler trajectory, out Vector2[] intersections)
+        {
+            List<Vector2> intersectionsList = new List<Vector2>();
+
+            Vector2[] currentIntersections;
+            foreach(var side in trajectory.lines)
+            {
+                if (LineRectangleIntersections(rect, LineHandler.nodeToVector2(side.start), 
+                    LineHandler.nodeToVector2(side.end), out currentIntersections))
+                {
+                    intersectionsList.AddRange(currentIntersections);
+                }
+            }
+
+            intersections = intersectionsList.ToArray();
+
+            return intersections.Length > 0;
+        }
+
+        public static bool LineRectangleIntersections(Rectangle rect, Vector2 p1, Vector2 p2, out Vector2[] intersections)
+        {
+            List<Vector2> intersectionsList = new List<Vector2>();
+            List<Vector2> points = rect.getPoints();
+
+            if (rect.isRectangular())
+            {
+                points = new List<Vector2>(4);
+                var uRect = new Rect(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
+                points.AddRange(uRect.ToPoints());
+            }
+
+            Vector2 intersection;
+            for (int i = 0, end = points.Count; i < end; ++i)
+            {
+                if (LineSegmentsIntersection(p1, p2, points[i], points[(i + 1) % end], out intersection))
+                {
+                    intersectionsList.Add(intersection);
+                }
+            }
+
+            intersections = intersectionsList.ToArray();
+
+            return intersections.Length > 0;
+        }
+
+        private static bool Inside(Vector2 point, Rectangle rect)
+        {
+            if (rect.isRectangular())
+            {
+                // - Rectangular inside case
+                var aux = point - new Vector2(rect.getX(), rect.getY());
+                return aux.x > 0 && aux.y > 0 && aux.x < rect.getWidth() && aux.y < rect.getHeight();
+            }
+            else
+            {
+                // - Polygon inside case
+                // Move the polygon to make the point rest in the center
+                var points = rect.getPoints().ConvertAll(p => p - point); 
+                bool inside = false;
+                for (int i = 0; i < points.Count; i++)
+                {
+                    // Check the times it cuts with the axis
+                    if (((points[i].y > 0) != (points[(i + 1) % points.Count].y > 0))
+                    && ((points[i].y > 0) == (points[i].y * points[(i + 1) % points.Count].x > points[(i + 1) % points.Count].y * points[i].x)))
+                        inside = !inside;
+                }
+                return inside;
+            }
+        }
+
+        // FROM https://github.com/setchi/Unity-LineSegmentsIntersection/blob/master/Assets/LineSegmentIntersection/Scripts/Math2d.cs
+        public static bool LineSegmentsIntersection(Vector2 p1, Vector2 p2, Vector2 p3, Vector3 p4, out Vector2 intersection)
+        {
+            intersection = Vector2.zero;
+
+            var d = (p2.x - p1.x) * (p4.y - p3.y) - (p2.y - p1.y) * (p4.x - p3.x);
+
+            if (d == 0.0f)
+            {
+                return false;
+            }
+
+            var u = ((p3.x - p1.x) * (p4.y - p3.y) - (p3.y - p1.y) * (p4.x - p3.x)) / d;
+            var v = ((p3.x - p1.x) * (p2.y - p1.y) - (p3.y - p1.y) * (p2.x - p1.x)) / d;
+
+            if (u < 0.0f || u > 1.0f || v < 0.0f || v > 1.0f)
+            {
+                return false;
+            }
+
+            intersection.x = p1.x + u * (p2.x - p1.x);
+            intersection.y = p1.y + u * (p2.y - p1.y);
+
+            return true;
+        }
+
+        private static bool same_sign(float a, float b)
+        {
+            return ((a * b) >= 0f);
+        }
+
+        private class Math3DFunc
+        {
+            private Vector3 p;
+            private Vector3 d;
+
+            public Math3DFunc(Vector3 v1, Vector3 v2)
+            {
+                p = v1;
+                d = v2 - v1;
+            }
+
+            public float getX(float t)
+            {
+                return p.x + d.x * t;
+            }
+
+            public float getY(float t)
+            {
+                return p.y + d.y * t;
+            }
+
+            public float getZ(float t)
+            {
+                return p.z + d.z * t;
+            }
+
+            public float getX(float y, float z)
+            {
+                if(d.y != 0)
+                {
+                    return (y - p.y) * d.x / d.y + p.x;
+                }
+                else if(d.z != 0)
+                {
+                    return (z - p.z) * d.x / d.z + p.x;
+                }
+
+                return p.x;
+            }
+
+            public float getY(float x, float z)
+            {
+                if (d.y != 0)
+                {
+                    return (x - p.x) * d.y / d.x + p.y;
+                }
+                else if (d.z != 0)
+                {
+                    return (z - p.z) * d.y / d.z + p.y;
+                }
+
+                return p.y;
+            }
+
+            public float getZ(float x, float y)
+            {
+                if (d.y != 0)
+                {
+                    return (y - p.y) * d.z / d.y + p.z;
+                }
+                else if (d.x != 0)
+                {
+                    return (x - p.x) * d.z / d.x + p.z;
+                }
+
+                return p.x;
+            }
+
+
         }
     }
 }
