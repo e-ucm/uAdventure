@@ -40,18 +40,15 @@ namespace uAdventure.Core
                 Debug.LogError("Error loading the language file: One of the language file required was not found, please verify that the language files are on the disk.\nAlthough you may still be able to use the adventure editor, you might get occasional problems or get some unreadable texts.\nIf you get this error again, please try reinstalling the application. (" + e + ")");
             }
 
-            TCLangbaseRoot LangTexts = TCLangbaseRoot.LoadFromText(serializedLangbase);
             try
             {
+                TCLangbaseRoot LangTexts = TCLangbaseRoot.LoadFromText(serializedLangbase);
                 for (int i = 0; i < LangTexts.Labels.Count; i++)
                 {
                     string textToAdd = LangTexts.Labels[i].TextValue
                         .Replace("\n", "")
                         .Replace("  ", "");
-                    guistrings.Add(
-                        LangTexts.Labels[i].AttributeKey,
-                        textToAdd
-                        );
+                    guistrings.Add(LangTexts.Labels[i].AttributeKey, textToAdd);
                 }
             }
             catch

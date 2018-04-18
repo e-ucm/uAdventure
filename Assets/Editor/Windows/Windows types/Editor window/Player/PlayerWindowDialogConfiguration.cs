@@ -28,7 +28,7 @@ namespace uAdventure.Editor
             bubbleBcgColor = bubbleBcgColorLast = Controller.Instance.ChapterList.getSelectedChapterData().getPlayer().getBubbleBkgColor();
             bubbleBorderColor = fontFrontColorLast = Controller.Instance.ChapterList.getSelectedChapterData().getPlayer().getBubbleBorderColor();
 
-            bckImage = (Texture2D)Resources.Load("Editor/TextBubble", typeof(Texture2D));
+            bckImage = Resources.Load<Texture2D>("EAdventureData/img/TextBubble");
             previewTextStyle = new GUIStyle();
             previewTextStyle.fontSize = 24;
             previewTextStyle.normal.textColor = fontFrontColor;

@@ -57,7 +57,7 @@ namespace uAdventure.Editor
                 EndWindows = () => EndWindows()
             };
 
-            selectedButtonSkin = (GUISkin)Resources.Load("Editor/ButtonSelected", typeof(GUISkin));
+            selectedButtonSkin = Resources.Load<GUISkin>("EAdventureData/skin/ButtonSelected");
 
             openedWindow = PlayerWindowType.DialogConfiguration;
 

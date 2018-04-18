@@ -65,8 +65,8 @@ namespace uAdventure.Editor
             moveRight = Resources.Load<Texture2D>("EAdventureData/img/icons/moveNodeRight");
             duplicateImg = Resources.Load<Texture2D>("EAdventureData/img/icons/duplicateNode");
 
-            noBackgroundSkin = Resources.Load<GUISkin>("Editor/EditorNoBackgroundSkin");
-            selectedFrameSkin = Resources.Load<GUISkin>("Editor/EditorLeftMenuItemSkinConcreteOptions");
+            noBackgroundSkin = Resources.Load<GUISkin>("EAdventureData/skin/EditorNoBackgroundSkin");
+            selectedFrameSkin = Resources.Load<GUISkin>("EAdventureData/skin/EditorLeftMenuItemSkinConcreteOptions");
 
 
             transitionTypeName = new string []{ "None" , "Fade in", "Horizontal", "Vertical"};

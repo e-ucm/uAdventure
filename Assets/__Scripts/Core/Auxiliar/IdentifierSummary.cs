@@ -134,6 +134,10 @@ namespace uAdventure.Core
 
 			if (!typeGroups [t].Contains (id))
 				typeGroups [t].Add (id);
+
+            foreach (var i in t.GetInterfaces())
+                if (typeGroups.ContainsKey(i))
+                    typeGroups.Remove(i);
 		}
 
 		public void addId<T>(string id){
@@ -144,6 +148,17 @@ namespace uAdventure.Core
         {
             if (typeGroups.ContainsKey(t))
                 return typeGroups[t].ToArray();
+
+            if (t.IsInterface)
+            {
+                var allInterfaceIds = new List<string>();
+                foreach(var kv in typeGroups)
+                {
+                    if (t.IsAssignableFrom(kv.Key))
+                        allInterfaceIds.AddRange(kv.Value);
+                }
+                typeGroups[t] = allInterfaceIds;
+            }
 
             return new string[0];
         }

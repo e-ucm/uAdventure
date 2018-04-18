@@ -60,7 +60,7 @@ namespace uAdventure.Editor
             questionContent = new GUIContent(questionTex);
             shuffleContent = new GUIContent(shuffleTex);
 
-            noBackgroundSkin = (GUISkin)Resources.Load("Editor/EditorNoBackgroundSkin", typeof(GUISkin));
+            noBackgroundSkin = (GUISkin)Resources.Load("EAdventureData/skin/EditorNoBackgroundSkin", typeof(GUISkin));
             noBackgroundSkin.button.margin = new RectOffset(1, 1, 1, 1);
             noBackgroundSkin.button.padding = new RectOffset(0, 0, 0, 0);
         }

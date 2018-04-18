@@ -38,12 +38,13 @@ namespace uAdventure.Core
         {
             LanguageNames.Clear();
             LanguageTexts.Clear();
-            string serializedLangbase = Resources.Load<TextAsset>("Editor/languages").text.Replace(Environment.NewLine, "");
+            var languagesFile = Resources.Load<TextAsset>("languages");
+            string serializedLangbase = languagesFile ? languagesFile.text.Replace(Environment.NewLine, "") : "";
 
             Settings.LanguageOption = "English";
-            LangbaseRoot LangTexts = LangbaseRoot.LoadFromText(serializedLangbase);
             try
             {
+                LangbaseRoot LangTexts = LangbaseRoot.LoadFromText(serializedLangbase);
                 for (int i = 0; i < LangTexts.Labels.Label.Count; i++)
                 {
                     for (int j = 0; j < LangTexts.Labels.Label[i].Text.Count; j++)

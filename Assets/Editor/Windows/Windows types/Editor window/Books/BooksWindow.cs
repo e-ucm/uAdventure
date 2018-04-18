@@ -43,7 +43,7 @@ namespace uAdventure.Editor
             booksWindowContents.OnRequestRepaint += requestRepaint;
             booksWindowDocumentation.OnRequestRepaint += requestRepaint;
 
-            selectedButtonSkin = (GUISkin)Resources.Load("Editor/ButtonSelected", typeof(GUISkin));
+            selectedButtonSkin = Resources.Load<GUISkin>("EAdventureData/skin/ButtonSelected");
         }
 
 

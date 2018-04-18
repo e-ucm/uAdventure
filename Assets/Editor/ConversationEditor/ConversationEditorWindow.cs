@@ -3,9 +3,65 @@ using UnityEditor;
 using System.Collections.Generic;
 using uAdventure.Core;
 using System;
+using System.Linq;
 
 namespace uAdventure.Editor
 {
+    internal class ConversationEditor : GraphEditor<GraphConversation, ConversationNode>
+    {
+        private Dictionary<ConversationNode, ConversationNodeEditor> editors = new Dictionary<ConversationNode, ConversationNodeEditor>();
+
+        protected override ConversationNode[] ChildsFor(GraphConversation Content, ConversationNode parent)
+        {
+            return Enumerable.Range(0, parent.getChildCount()).Select(parent.getChild).ToArray();
+        }
+
+        protected override void DrawNodeContent(GraphConversation content, ConversationNode node)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override Rect GetNodeRect(GraphConversation Content, ConversationNode node)
+        {
+            return editors.ContainsKey(node) ? editors[node].Window : new Rect(node.getEditorX(), node.getEditorY(), node.getEditorWidth(), node.getEditorHeight()); 
+        }
+
+        protected override ConversationNode[] GetNodes(GraphConversation Content)
+        {
+            return Content.getAllNodes().ToArray();
+        }
+
+        protected override string GetTitle(GraphConversation Content, ConversationNode node)
+        {
+            return node.getType().ToString();
+        }
+
+        protected override bool IsResizable(GraphConversation content, ConversationNode node)
+        {
+            return editors.ContainsKey(node) ? !editors[node].Collapsed : false;
+        }
+
+        protected override void SetNodeChild(GraphConversation content, ConversationNode node, int slot, ConversationNode child)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void SetNodeRect(GraphConversation Content, ConversationNode node, Rect rect)
+        {
+            node.setEditorX(Mathf.RoundToInt(rect.x));
+            node.setEditorY(Mathf.RoundToInt(rect.y));
+
+            if (editors.ContainsKey(node))
+                editors[node].Window = rect;
+
+            if (!editors.ContainsKey(node) || !editors[node].Collapsed)
+            {
+                node.setEditorWidth(Mathf.RoundToInt(rect.x));
+                node.setEditorHeight(Mathf.RoundToInt(rect.x));
+            }
+        }
+    }
+
     public class ConversationEditorWindow : EditorWindow
     {
 

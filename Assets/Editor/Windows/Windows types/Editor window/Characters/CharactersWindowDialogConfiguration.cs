@@ -25,7 +25,7 @@ namespace uAdventure.Editor
             : base(aStartPos, aContent, aStyle, aOptions)
         {
 
-            bckImage = (Texture2D)Resources.Load("Editor/TextBubble", typeof(Texture2D));
+            bckImage = Resources.Load<Texture2D>("EAdventureData/img/TextBubble");
             previewTextStyle = new GUIStyle();
             previewTextStyle.fontSize = 24;
             previewTextStyle.alignment = TextAnchor.MiddleCenter;

@@ -12,20 +12,11 @@ namespace uAdventure.Editor
         FlagCondition condition = new FlagCondition("");
         string[] types = { TC.get("Conditions.Flag.Active"), TC.get("Conditions.Flag.Inactive") };
         string name = TC.get("Flags.Flag");
-        private string[] flags;
 
         public FlagConditionEditor()
         {
-            flags = Controller.Instance.VarFlagSummary.getFlags();
-            if (flags == null || flags.Length == 0)
-            {
-                Avaiable = false;
-            }
-            else
-            {
-                Avaiable = true;
-                condition = new FlagCondition(flags[0]);
-            }
+            if (Avaiable)
+                condition = new FlagCondition(Controller.Instance.VarFlagSummary.getFlags()[0]);
         }
 
         public void draw(Condition c)
@@ -37,6 +28,7 @@ namespace uAdventure.Editor
 
             if (Avaiable)
             {
+                var flags = Controller.Instance.VarFlagSummary.getFlags();
                 int index = Array.IndexOf(flags, c.getId());
                 c.setId(flags[EditorGUILayout.Popup(index >= 0 ? index : 0, flags)]);
                 c.setState(EditorGUILayout.Popup(c.getState(), types));
@@ -66,6 +58,6 @@ namespace uAdventure.Editor
 
         public bool Collapsed { get; set; }
         public Rect Window { get; set; }
-        public bool Avaiable { get; set; }
+        public bool Avaiable { get { return Controller.Instance.VarFlagSummary.getFlags().Length > 0; } }
     }
 }

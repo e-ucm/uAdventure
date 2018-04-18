@@ -158,6 +158,11 @@ namespace uAdventure.Runner
             return c.getAtrezzo(name);
         }
 
+        public List<T> GetObjects<T>()
+        {
+            return data.getChapters()[current_chapter].getObjects<T>();
+        }
+
         public T FindElement<T>(string id)
         {
             if(typeof(T) == typeof(Element))

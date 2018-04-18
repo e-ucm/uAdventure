@@ -69,14 +69,14 @@ namespace uAdventure.Core
          */
         public static string getLanguageFilePath4Editor(bool editor, string language)
         {
-            string path = "Assets/Resources/" + LANGUAGE_DIR_EDITOR + "/";
             if (editor)
-                path += language + ".xml";
+            {
+                return "Assets/Editor/Resources/" + LANGUAGE_DIR_EDITOR + "/" + language + ".xml";
+            }
             else
             {
-                path = Path.Combine("Assets/Resources/" + LANGUAGE_DIR_ENGINE, language + ".xml");
+                return Path.Combine("Assets/Resources/" + LANGUAGE_DIR_ENGINE, language + ".xml");
             }
-            return path;
         }
 
         /**

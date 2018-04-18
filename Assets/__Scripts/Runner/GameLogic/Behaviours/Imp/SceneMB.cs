@@ -7,10 +7,11 @@ using RAGE.Analytics;
 using RAGE.Analytics.Formats;
 using UnityEngine.EventSystems;
 using System.Linq;
+using System;
 
 namespace uAdventure.Runner
 {
-    public class SceneMB : MonoBehaviour, IRunnerChapterTarget, IPointerClickHandler, IBeginDragHandler, IEndDragHandler, IDragHandler, IInitializePotentialDragHandler
+    public class SceneMB : MonoBehaviour, IRunnerChapterTarget, IPointerClickHandler, IBeginDragHandler, IEndDragHandler, IDragHandler, IConfirmWantsDrag
     {
         public static readonly Vector2 ScenePivot = new Vector2(0, 1f);
         public static readonly Vector2 DefaultPivot = Vector2.one / 2f;
@@ -117,10 +118,14 @@ namespace uAdventure.Runner
                     movieplayer = MovieState.PLAYING;
                 }
             }
-            else if (movieplayer == MovieState.PLAYING && !movie.isPlaying())
+            else if (movieplayer == MovieState.PLAYING)
             {
-                movie.Stop();
-                Interacted();
+                ready = true;
+                if (!movie.isPlaying())
+                {
+                    movie.Stop();
+                    Interacted();
+                }
             }
         }
 
@@ -509,7 +514,9 @@ namespace uAdventure.Runner
                         || videoscene.isCanSkip())
                     {
                         movie.Stop();
-                        Tracker.T.accessible.Skipped(sceneData.getId(), AccessibleTracker.Accessible.Cutscene);
+                        movieplayer = MovieState.STOPPED;
+                        if(movieplayer == MovieState.PLAYING)
+                            Tracker.T.accessible.Skipped(sceneData.getId(), AccessibleTracker.Accessible.Cutscene);
                         FinishCutscene(videoscene);
                     }
                     break;
@@ -526,7 +533,12 @@ namespace uAdventure.Runner
             {
                 case Slidescene.GOBACK:
                     var previousTarget = Game.Instance.GameState.PreviousChapterTarget;
-                    if (previousTarget != null)
+                    if (previousTarget == null)
+                    {
+                        var possibleTargets = Game.Instance.GameState.GetObjects<IChapterTarget>();
+                        previousTarget = possibleTargets.FirstOrDefault(t => t.getId() != this.sceneData.getId());
+                    }
+                    if(previousTarget != null)
                         Game.Instance.RunTarget(previousTarget.getId());
                     break;
                 case Slidescene.NEWSCENE:
@@ -614,9 +626,10 @@ namespace uAdventure.Runner
             Camera.main.transform.position = new Vector3(newPos.x, newPos.y, cameraPos.z);
         }
 
-        public void OnInitializePotentialDrag(PointerEventData eventData)
+        public void OnConfirmWantsDrag(PointerEventData data)
         {
-            eventData.Use();
+            if (sceneData is Scene)
+                data.Use();
         }
     }
 }

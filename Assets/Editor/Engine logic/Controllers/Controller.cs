@@ -1,12 +1,9 @@
 ﻿using System;
 using UnityEngine;
 using UnityEditor;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Threading;
-using System.Windows.Forms;
 
 using uAdventure.Core;
 
@@ -14,6 +11,8 @@ using Animation = uAdventure.Core.Animation;
 using System.Text.RegularExpressions;
 using System.Globalization;
 using uAdventure.Runner;
+using UnityEditor.Callbacks;
+using System.Collections;
 
 namespace uAdventure.Editor
 {
@@ -998,7 +997,7 @@ namespace uAdventure.Editor
             return fileCreated;
         }
 
-        [UnityEditor.MenuItem("uAdventure/Configure Layout")]
+        [UnityEditor.MenuItem("uAdventure/Configure Layout", priority = 4)]
         public static void ConfigureWindowLayout()
         {
             string path = Path.Combine(Directory.GetCurrentDirectory(), "Assets/Editor/Layouts/uAdventure.wlt");
@@ -1950,6 +1949,9 @@ namespace uAdventure.Editor
 
         private void doBuild(BuildConfig config)
         {
+            var activeTarget = EditorUserBuildSettings.activeBuildTarget;
+            var activeGroup = EditorUserBuildSettings.selectedBuildTargetGroup;
+
             string[] scenes = new string[] { "Assets/Scenes/_Scene1.unity" };
 
             // Build player.
@@ -2016,9 +2018,262 @@ namespace uAdventure.Editor
             EditorUtility.ClearProgressBar();
             EditorUtility.DisplayCancelableProgressBar("Building...", "Done!", 1f);
             EditorUtility.ClearProgressBar();
+
+            if (activeTarget != EditorUserBuildSettings.activeBuildTarget || activeGroup != EditorUserBuildSettings.selectedBuildTargetGroup)
+                EditorUserBuildSettings.SwitchActiveBuildTarget(activeGroup, activeTarget);
+        }
+
+        private static readonly string WINDOWS64_FFMPEG_URL = "https://github.com/e-ucm/uAdventure-FFMPEG/releases/download/1/ffmpeg-3.4.2-win64.zip";
+        private static readonly string WINDOWS32_FFMPEG_URL = "https://github.com/e-ucm/uAdventure-FFMPEG/releases/download/1/ffmpeg-3.4.2-win32.zip";
+        private static readonly string MACOSX64_FFMPEG_URL  = "https://github.com/e-ucm/uAdventure-FFMPEG/releases/download/1/ffmpeg-3.4.2-mac64.zip";
+
+        private static void DownloadFFMPEG(string url, System.Action ready)
+        {
+            var projectPath = Directory.GetCurrentDirectory().Replace("\\", "/");
+            var ffmpegPath = projectPath + "/FFMPEG";
+
+            using (WWW www = new WWW(url))
+            {
+                while (!www.isDone)
+                {
+                    if (EditorUtility.DisplayCancelableProgressBar("Downloading", "Downloading ffmpeg...", www.progress))
+                    {
+                        EditorUtility.ClearProgressBar();
+                        return;
+                    }
+                    www.MoveNext();
+                }
+                EditorUtility.ClearProgressBar();
+
+                if (!string.IsNullOrEmpty(www.error))
+                {
+                    EditorUtility.DisplayDialog("Error!", "Download failed! Check your connection and try again. " +
+                        "If the problem persist download it manually and put it in the FFMPEG at the root of the project. (" + www.error + ")", "Ok");
+                    return;
+                }
+
+                if (www.progress != 1f)
+                    return;
+                // Write the zip file
+                File.WriteAllBytes(ffmpegPath + "/ffmpeg.zip", www.bytes);
+                // Unzip it
+                EditorUtility.DisplayProgressBar("Extracting...", "Extracting MMPEG to " + ffmpegPath, 0f);
+                ZipUtil.Unzip(ffmpegPath + "/ffmpeg.zip", ffmpegPath);
+                EditorUtility.DisplayProgressBar("Extracting...", "Extracting MMPEG to " + ffmpegPath, 1f);
+                EditorUtility.ClearProgressBar();
+                // Delete the zip
+                File.Delete(ffmpegPath + "/ffmpeg.zip");
+                // Continue
+                ready();
+            }
         }
         
-        
+        [PostProcessBuild(1)]
+        public static void PostProcess(BuildTarget target, string pathToBuiltProject)
+        {
+
+            if (target == BuildTarget.WebGL)
+            {
+                Debug.Log("Adding videos to WebGL StreamingAssets folder");
+                var projectPath = Directory.GetCurrentDirectory().Replace("\\", "/");
+                var ffmpegPath = projectPath + "/FFMPEG";
+                if (!Directory.Exists(ffmpegPath))
+                    Directory.CreateDirectory(ffmpegPath);
+
+                System.Action convert = () =>
+                {
+                    ConvertVideos(pathToBuiltProject);
+                };
+
+                switch (SystemInfo.operatingSystemFamily)
+                {
+                    case OperatingSystemFamily.Windows:
+                        if (!File.Exists(ffmpegPath + "/ffmpeg.exe"))
+                        {
+                            if(EditorUtility.DisplayDialog("Video conversion", "FFMPEG was not found, do you want to download it?", "Yes", "No"))
+                            {
+
+                                if (SystemInfo.operatingSystem.Contains("64bit"))
+                                    DownloadFFMPEG(WINDOWS64_FFMPEG_URL, convert);
+                                else
+                                    DownloadFFMPEG(WINDOWS32_FFMPEG_URL, convert);
+                            }
+                        }                            
+                        else convert();
+                        break;
+
+                    case OperatingSystemFamily.MacOSX:
+                        if (!File.Exists(ffmpegPath + "/ffmpeg"))
+                        {
+                            if (EditorUtility.DisplayDialog("Video conversion", "FFMPEG was not found, do you want to download it?", "Yes", "No"))
+                            {
+                                DownloadFFMPEG(MACOSX64_FFMPEG_URL, convert);
+                            }
+                        }
+                        else convert();
+                        break;
+
+                    default:
+                        Debug.LogWarning("Video conversion is not supported in the current OS! Copying the videos to streamingassets.");
+                        CopyAll(new DirectoryInfo(UnityEngine.Application.dataPath + "/Resources/CurrentGame/assets/video"), new DirectoryInfo(pathToBuiltProject + "/StreamingAssets"));
+                        break;
+                }
+
+
+                Debug.Log("Done!");
+            }
+        }
+
+        public static int GetFrameCount(FileInfo file)
+        {
+            var projectPath = Directory.GetCurrentDirectory().Replace("\\", "/");
+            var ffmpegPath = projectPath + "/FFMPEG";
+
+            System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo()
+            {
+                Arguments = " -i \"" + file.FullName + "\" -map 0:v:0 -c copy -f null -stats -v quiet -",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+            switch (SystemInfo.operatingSystemFamily)
+            {
+                case OperatingSystemFamily.Windows: startInfo.FileName = ffmpegPath + "/ffmpeg.exe"; break;
+                case OperatingSystemFamily.MacOSX: startInfo.FileName = ffmpegPath + "/ffmpeg"; break;
+            }
+
+            System.Diagnostics.Process processTemp = new System.Diagnostics.Process()
+            {
+                StartInfo = startInfo,
+                EnableRaisingEvents = true
+            };
+
+            int frames = 1;
+            try
+            {
+                processTemp.Start();
+                while (!processTemp.HasExited) { }
+                var error = processTemp.StandardError.ReadToEnd();
+                if (processTemp.ExitCode != 0 && !string.IsNullOrEmpty(error))
+                    EditorUtility.DisplayDialog("Error", error, "continue...");
+                else if(error.Length > 7)
+                {
+                    var framesText = error.Substring(6, 6).Trim();
+                    frames = ExParsers.ParseDefault(framesText, -1);
+                }
+            }
+            catch (Exception)
+            {
+                return -1;
+            }
+            return frames;
+        }
+
+        private static IEnumerator<int> ConvertVideo(FileInfo fi, string outFile)
+        {
+            var projectPath = Directory.GetCurrentDirectory().Replace("\\", "/");
+            var ffmpegPath = projectPath + "/FFMPEG";
+
+            System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo()
+            {
+                Arguments = " -y -i \"" + fi.FullName + "\" -f webm -c:v libvpx -b:v 1M -vf \"scale = 'min(1280,iw)':-1\" -acodec libvorbis " + outFile + " -hide_banner -stats -v quiet",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            switch (SystemInfo.operatingSystemFamily)
+            {
+                case OperatingSystemFamily.Windows: startInfo.FileName = ffmpegPath + "/ffmpeg.exe"; break;
+                case OperatingSystemFamily.MacOSX:  startInfo.FileName = ffmpegPath + "/ffmpeg";     break;
+            }
+
+            System.Diagnostics.Process processTemp = new System.Diagnostics.Process()
+            {
+                StartInfo = startInfo,
+                EnableRaisingEvents = true
+            };
+            if (processTemp.Start())
+            { 
+                while (!processTemp.HasExited)
+                {
+                    var output = processTemp.StandardError.ReadLine();
+                    // Return the current frame
+                    if(!string.IsNullOrEmpty(output))
+                        yield return ExParsers.ParseDefault(output.Substring(6, 6).Trim(), -1);
+                }
+                if (processTemp.ExitCode != 0)
+                {
+                    EditorUtility.DisplayDialog("Error", processTemp.StandardError.ReadToEnd(), "continue...");
+                }
+            }
+            else Debug.Log("Couldn't start the process");
+
+        }
+
+        public static void ConvertVideos(string pathToBuiltProject)
+        {
+            var outFolder = pathToBuiltProject + "/StreamingAssets/CurrentGame/assets/video/";
+            var source = new DirectoryInfo(UnityEngine.Application.dataPath + "/Resources/CurrentGame/assets/video");
+
+            if (!Directory.Exists(outFolder))
+                Directory.CreateDirectory(outFolder);
+            var toConvert = source.GetFiles();
+            var i = 0;
+            EditorUtility.DisplayProgressBar("Converting", "Converting videos...", 0f);
+            // Copy each file into it's new directory.
+            foreach (FileInfo fi in toConvert)
+            {
+                ++i;
+                if (fi.Extension == ".meta")
+                    continue;
+                EditorUtility.DisplayProgressBar("Converting", "Converting videos...", i / (float) toConvert.Length);
+                var outName = outFolder + Path.GetFileNameWithoutExtension(fi.Name) + ".webm";
+                var count = GetFrameCount(fi);
+
+                var convertVideo = ConvertVideo(fi, outName);
+                while (convertVideo.MoveNext())
+                {
+                    EditorUtility.DisplayProgressBar("Encoding", "Encoding video " + fi.Name, convertVideo.Current / (float) count);
+                }
+                EditorUtility.ClearProgressBar();
+            }
+            EditorUtility.ClearProgressBar();
+        }
+
+        public static void CopyAll(DirectoryInfo source, DirectoryInfo target)
+        {
+            if (source.FullName.ToLower() == target.FullName.ToLower())
+            {
+                return;
+            }
+
+            // Check if the target directory exists, if not, create it.
+            if (Directory.Exists(target.FullName) == false)
+            {
+                Directory.CreateDirectory(target.FullName);
+            }
+
+            // Copy each file into it's new directory.
+            foreach (FileInfo fi in source.GetFiles())
+            {
+                fi.CopyTo(Path.Combine(target.ToString(), fi.Name), true);
+            }
+
+            // Copy each subdirectory using recursion.
+            foreach (DirectoryInfo diSourceSubDir in source.GetDirectories())
+            {
+                DirectoryInfo nextTargetSubDir =
+                    target.CreateSubdirectory(diSourceSubDir.Name);
+                CopyAll(diSourceSubDir, nextTargetSubDir);
+            }
+        }
+
+
+
+
         /**
          * Determines if the target file of an exportation process is valid. The
          * file cannot be located neither inside the project folder, nor inside the
@@ -2891,7 +3146,6 @@ namespace uAdventure.Editor
 
         public void setLanguage(string language, bool reloadData)
         {
-
             // image loading route
             string dirImageLoading = ReleaseFolders.IMAGE_LOADING_DIR + "/" + language + "/Editor2D-Loading.png";
             // if there isn't file, load the default file
@@ -2910,9 +3164,6 @@ namespace uAdventure.Editor
             languageFile = language;
             TC.loadstrings(ReleaseFolders.getLanguageFilePath4Editor(true, languageFile));
             TC.appendstrings(ReleaseFolders.getLanguageFilePath4Editor(false, languageFile));
-            //loadingScreen.setImage(getLoadingImage());
-            //if (reloadData)
-            //    mainWindow.reloadData();
         }
         
 
@@ -3029,8 +3280,8 @@ namespace uAdventure.Editor
 
         }
 
-        #region Windows
-        [UnityEditor.MenuItem("eAdventure/Open eAdventure welcome screen")]
+#region Windows
+        [UnityEditor.MenuItem("uAdventure/Welcome screen", priority = 1)]
         public static void OpenWelcomeWindow()
         {
             if (!Language.Initialized)
@@ -3041,7 +3292,7 @@ namespace uAdventure.Editor
         }
 
 
-        [UnityEditor.MenuItem("eAdventure/Open eAdventure editor")]
+        [UnityEditor.MenuItem("uAdventure/Editor", priority = 2)]
         public static void OpenEditorWindow()
         {
             if(!Language.Initialized)
@@ -3051,6 +3302,6 @@ namespace uAdventure.Editor
             window.Show();
         }  
 
-        #endregion
+#endregion
     }
 }

@@ -57,8 +57,8 @@ namespace uAdventure.Editor
             imageParagraphTex =
                 (Texture2D)Resources.Load("EAdventureData/img/icons/imageBookParagraph", typeof(Texture2D));
 
-            selectedElementSkin = (GUISkin)Resources.Load("Editor/EditorLeftMenuItemSkinConcreteOptions", typeof(GUISkin));
-            noBackgroundSkin = (GUISkin)Resources.Load("Editor/EditorNoBackgroundSkin", typeof(GUISkin));
+            selectedElementSkin = Resources.Load<GUISkin>("EAdventureData/skin/EditorLeftMenuItemSkinConcreteOptions");
+            noBackgroundSkin = Resources.Load<GUISkin>("EAdventureData/skin/EditorNoBackgroundSkin");
             
             selectedElement = -1;
 

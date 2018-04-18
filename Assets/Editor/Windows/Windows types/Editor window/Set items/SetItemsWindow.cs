@@ -35,7 +35,7 @@ namespace uAdventure.Editor
             setItemsWindowApperance = new SetItemsWindowApperance(aStartPos, new GUIContent(TC.get("Atrezzo.LookPanelTitle")), "Window");
             setItemsWindowDocumentation = new SetItemsWindowDocumentation(aStartPos, new GUIContent(TC.get("Atrezzo.DocPanelTitle")), "Window");
             
-            selectedButtonSkin = (GUISkin)Resources.Load("Editor/ButtonSelected", typeof(GUISkin));
+            selectedButtonSkin = Resources.Load<GUISkin>("EAdventureData/skin/ButtonSelected");
 
             AddTab(TC.get("Atrezzo.LookPanelTitle"), SetItemsWindowType.Appearance, setItemsWindowApperance);
             AddTab(TC.get("Atrezzo.DocPanelTitle"), SetItemsWindowType.Documentation, setItemsWindowDocumentation);

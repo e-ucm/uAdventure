@@ -59,7 +59,7 @@ namespace uAdventure.Editor
         }
 
 
-        [MenuItem("eAdventure/Flags and variables")]
+        [MenuItem("uAdventure/Flags and variables", priority = 3)]
 		public static void Init()
 		{
 			var window = GetWindow<ChapterVarAndFlagsEditor> ();

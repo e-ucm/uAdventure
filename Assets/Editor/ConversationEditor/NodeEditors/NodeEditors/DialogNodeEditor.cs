@@ -85,7 +85,7 @@ namespace uAdventure.Editor
             effectTex = (Texture2D)Resources.Load("EAdventureData/img/icons/effects/32x32/has-macro", typeof(Texture2D));
             noEffectTex = (Texture2D)Resources.Load("EAdventureData/img/icons/effects/32x32/macro", typeof(Texture2D));
 
-            noBackgroundSkin = (GUISkin)Resources.Load("Editor/EditorNoBackgroundSkin", typeof(GUISkin));
+            noBackgroundSkin = (GUISkin)Resources.Load("EAdventureData/skin/EditorNoBackgroundSkin", typeof(GUISkin));
             noBackgroundSkin.button.margin = new RectOffset(1, 1, 1, 1);
             noBackgroundSkin.button.padding = new RectOffset(0, 0, 0, 0);
         }
