@@ -146,6 +146,12 @@ public class SceneEditor {
             DoCallForElement(elemRef, call);
             // And then we set it up to be able to draw the referenced element components
             element = elemRef.getReferencedElementDataControl();
+            if(element == null)
+            {
+                Debug.LogError("Can't find element refferenced as \"" + elemRef.getElementId() + "\"");
+                SceneEditor.Current = currentSceneEditor;
+                return;
+            }
         }
 
         // Component drawing

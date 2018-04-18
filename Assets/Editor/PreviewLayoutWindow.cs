@@ -195,14 +195,15 @@ namespace uAdventure.Editor
                         GUI.skin = sceneSkin;
 
                         var prevType = Event.current.type;
+                        var maxHeight = viewport.height- 25f;
 
-                        windowRect.height = Mathf.Clamp(windowRect.height, 0, 500f);
+                        windowRect.height = Mathf.Clamp(windowRect.height, 0, maxHeight);
                         // Create the preview inspector window
                         var newWindowRect = GUILayout.Window(9999, windowRect, (i) =>
                         {
-                            if (Event.current.type == EventType.Layout) useScroll = windowRect.height >= 500f;
+                            if (Event.current.type == EventType.Layout) useScroll = windowRect.height >= maxHeight;
 
-                            if (useScroll) scroll = EditorGUILayout.BeginScrollView(scroll, GUILayout.Height(500f));
+                            if (useScroll) scroll = EditorGUILayout.BeginScrollView(scroll, GUILayout.Height(maxHeight));
                             DrawPreviewInspector();
                             if (useScroll) EditorGUILayout.EndScrollView();
 

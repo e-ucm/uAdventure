@@ -107,6 +107,8 @@ namespace uAdventure.Editor
          */
         public Chapter getSelectedChapterData()
         {
+            if (chapterDataControlList == null || selectedChapter < 0 || selectedChapter >= chapterDataControlList.Count)
+                return null;
 
             return (Chapter)chapterDataControlList[selectedChapter].getContent();
         }

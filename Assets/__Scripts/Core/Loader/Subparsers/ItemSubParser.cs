@@ -31,7 +31,7 @@ namespace uAdventure.Core
 				parsedObject.addResources (res);
 
 			// DESCRIPTIONS
-			parsedObject.setDescriptions(DOMParserUtility.DOMParse<Description>(element.SelectNodes ("description")).ToList());
+			parsedObject.setDescriptions(DOMParserUtility.DOMParse<Description>(element.SelectNodes ("description"), parameters).ToList());
 
 			// ACTIONS
 			var actionsNode = element.SelectSingleNode("actions");

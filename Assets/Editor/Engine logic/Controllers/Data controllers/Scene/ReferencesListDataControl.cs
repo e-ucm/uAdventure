@@ -110,8 +110,8 @@ namespace uAdventure.Editor
             var content = sceneDataControl.getContent() as Scene;
 
             var itemReferencesList = content.getItemReferences();
-            var atrezzoReferencesList = content.getCharacterReferences();
-            var npcReferencesList = content.getAtrezzoReferences();
+            var atrezzoReferencesList = content.getAtrezzoReferences();
+            var npcReferencesList = content.getCharacterReferences();
 
             getReferencesList(typeof(Item)).AddRange(itemReferencesList);
             getReferencesList(typeof(NPC)).AddRange(atrezzoReferencesList);

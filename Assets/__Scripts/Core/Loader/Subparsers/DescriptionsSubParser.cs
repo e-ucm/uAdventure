@@ -38,7 +38,7 @@ namespace uAdventure.Core
 				description.setDetailedDescription(detailed.InnerText);
             }
 
-			description.setConditions(DOMParserUtility.DOMParse (element.SelectSingleNode ("condition")) as Conditions ?? new Conditions());
+			description.setConditions(DOMParserUtility.DOMParse (element.SelectSingleNode ("condition"), parameters) as Conditions ?? new Conditions());
 			return description;
         }
     }

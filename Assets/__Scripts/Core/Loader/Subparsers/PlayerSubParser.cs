@@ -28,7 +28,7 @@ namespace uAdventure.Core
             CharacterSubParser.ParseVoice(player, element);
 
             // DESCRIPTIONS
-			player.setDescriptions(DOMParserUtility.DOMParse<Description>(element.SelectNodes ("description")).ToList());
+			player.setDescriptions(DOMParserUtility.DOMParse<Description>(element.SelectNodes ("description"), parameters).ToList());
 
 			// TODO Find a way to set this
 			var chapter = parameters [0] as Chapter;

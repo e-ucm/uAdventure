@@ -328,6 +328,7 @@ namespace uAdventure.Runner
                 case GeneralScene.GeneralSceneSceneType.SLIDESCENE:
                     InventoryManager.Instance.Show = false;
                     Slidescene ssd = (Slidescene)sd;
+                    current_slide = 0;
                     foreach (ResourcesUni r in ssd.getResources())
                     {
                         if (ConditionChecker.check(r.getConditions()))
@@ -462,7 +463,7 @@ namespace uAdventure.Runner
 
         private void SetSlide(int i)
         {
-            if (slides != null && slides.frames.Count < current_slide)
+            if (slides != null && i < slides.frames.Count)
             {
                 this.current_slide = i;
                 SetBackground(slides.frames[current_slide].Image);
