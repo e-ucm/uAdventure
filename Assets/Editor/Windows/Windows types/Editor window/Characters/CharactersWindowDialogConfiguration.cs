@@ -85,7 +85,7 @@ namespace uAdventure.Editor
             }
         }
 
-        private static void DrawPreview(GUIContent content, bool showBackground, Texture2D background, Color backgroundColor, Color borderColor, Color fontColor, Color fontBorder, GUIStyle style)
+        public static void DrawPreview(GUIContent content, bool showBackground, Texture2D background, Color backgroundColor, Color borderColor, Color fontColor, Color fontBorder, GUIStyle style)
         {
             var size = style.CalcSize(content);
             var rect = GUILayoutUtility.GetRect(size.x, size.y, style);

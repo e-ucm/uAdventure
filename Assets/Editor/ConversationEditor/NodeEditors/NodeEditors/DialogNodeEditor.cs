@@ -90,8 +90,8 @@ namespace uAdventure.Editor
             noBackgroundSkin.button.padding = new RectOffset(0, 0, 0, 0);
         }
 
-        ConversationEditorWindow parent;
-        public void setParent(ConversationEditorWindow parent)
+        ConversationEditor parent;
+        public void setParent(ConversationEditor parent)
         {
             this.parent = parent;
         }
@@ -212,7 +212,7 @@ namespace uAdventure.Editor
             btrect = GUILayoutUtility.GetRect(bttext, buttonstyle);
             if (GUI.Button(btrect, bttext))
             {
-                parent.startSetChild(this.myNode, 0);
+                parent.StartSetChild(this.myNode, 0);
             }
 
             tmpTex = (myNode.getEffects().getEffects().Count > 0

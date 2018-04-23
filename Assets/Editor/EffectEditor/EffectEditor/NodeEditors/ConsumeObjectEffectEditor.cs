@@ -9,25 +9,18 @@ namespace uAdventure.Editor
 {
     public class ConsumeObjectEffectEditor : AbstractItemEffectEditor
     {
-        private string[] items;
-
         private ConsumeObjectEffect effect;
 
         public ConsumeObjectEffectEditor()
         {
-            items = Controller.Instance.SelectedChapterDataControl.getItemsList().getItemsIDs();
+            var items = Controller.Instance.IdentifierSummary.getIds<Item>();
             this.effect = new ConsumeObjectEffect(items.Length > 0 ? items[0] : "");
         }
 
         public override void draw()
         {
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(TC.get("Element.Name19"));
-
-            effect.setTargetId(items[EditorGUILayout.Popup(Array.IndexOf(items, effect.getTargetId()), items)]);
-
-            EditorGUILayout.EndHorizontal();
-
+            var items = Controller.Instance.IdentifierSummary.getIds<Item>();
+            effect.setTargetId(items[EditorGUILayout.Popup(TC.get("Element.Name19"), Array.IndexOf(items, effect.getTargetId()), items)]);
             EditorGUILayout.HelpBox(TC.get("ConsumeObject.Description"), MessageType.Info);
         }
 

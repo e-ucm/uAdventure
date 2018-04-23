@@ -26,30 +26,20 @@ namespace uAdventure.Editor
                 else window = value;
             }
         }
-        private string[] vars;
 
         private IncrementVarEffect effect;
 
         public IncrementVarEffectEditor()
         {
-            List<string> tmp = new List<string>();
-            tmp.Add("");
-            tmp.AddRange(Controller.Instance.VarFlagSummary.getVars());
-            vars = tmp.ToArray();
-
+            var vars = Controller.Instance.VarFlagSummary.getVars();
             this.effect = new IncrementVarEffect(vars.Length > 0 ? vars[0] : "", 1);
         }
 
         public void draw()
         {
-
-            EditorGUILayout.BeginHorizontal();
-
-            EditorGUILayout.LabelField(TC.get("Vars.Var"));
-
-            effect.setTargetId(vars[EditorGUILayout.Popup(Array.IndexOf(vars, effect.getTargetId()), vars)]);
-            effect.setIncrement(EditorGUILayout.IntField(effect.getIncrement()));
-            EditorGUILayout.EndHorizontal();
+            var vars = Controller.Instance.VarFlagSummary.getVars();
+            effect.setTargetId(vars[EditorGUILayout.Popup(TC.get("Vars.Var"), Array.IndexOf(vars, effect.getTargetId()), vars)]);
+            effect.setIncrement(EditorGUILayout.IntField(TC.get("VarDialog.Value"), effect.getIncrement()));
 
             EditorGUILayout.HelpBox(TC.get("IncrementVarEffect.Description"), MessageType.Info);
         }

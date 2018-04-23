@@ -19,7 +19,7 @@ namespace uAdventure.Core
 			
 			switch(element.GetAttribute("behaviour")){
 				case "atrezzo": parsedObject.setBehaviour(Item.BehaviourType.ATREZZO); break;
-				case "irst-action": parsedObject.setBehaviour(Item.BehaviourType.FIRST_ACTION); break;
+				case "first-action": parsedObject.setBehaviour(Item.BehaviourType.FIRST_ACTION); break;
 				default: parsedObject.setBehaviour(Item.BehaviourType.NORMAL); break;
 			}
 

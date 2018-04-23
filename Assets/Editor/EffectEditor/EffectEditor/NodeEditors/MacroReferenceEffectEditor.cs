@@ -12,7 +12,6 @@ namespace uAdventure.Editor
         private bool collapsed = false;
         public bool Collapsed { get { return collapsed; } set { collapsed = value; } }
         private Rect window = new Rect(0, 0, 300, 0);
-        private string[] macros;
 
         public Rect Window
         {
@@ -32,16 +31,14 @@ namespace uAdventure.Editor
 
         public MacroReferenceEffectEditor()
         {
-            macros = Controller.Instance.getAdvancedFeaturesController().getMacrosListDataControl().getMacrosIDs();
+            var macros = Controller.Instance.IdentifierSummary.getIds<Macro>();
             this.effect = new MacroReferenceEffect(macros.Length > 0 ? macros[0] : "");
         }
 
         public void draw()
         {
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(TC.get("Element.Name56"));
-            effect.setTargetId(macros[EditorGUILayout.Popup(Array.IndexOf(macros, effect.getTargetId()), macros)]);
-            EditorGUILayout.EndHorizontal();
+            var macros = Controller.Instance.IdentifierSummary.getIds<Macro>();
+            effect.setTargetId(macros[EditorGUILayout.Popup(TC.get("Element.Name56"), Array.IndexOf(macros, effect.getTargetId()), macros)]);
 
             EditorGUILayout.HelpBox(TC.get("Effect.MacroReference"), MessageType.Info);
         }

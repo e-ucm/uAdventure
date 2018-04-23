@@ -288,5 +288,12 @@ namespace uAdventure.Core
             this.keepShowing = keepShowing;
         }
 
+        public override ConversationNode replaceChild(int index, ConversationNode node)
+        {
+            if (index > 0)
+                throw new Exception("You can only replace the first child");
+
+            return nextNode = node;
+        }
     }
 }

@@ -11,7 +11,8 @@ namespace uAdventure.Editor
     {
 
         private Texture2D clearImg = null;
-        private string slidesPath = "";
+        private string slidesPath = "assets/special/EmptyAnimation";
+        private AnimationField animationField;
 
         private bool collapsed = false;
 
@@ -41,41 +42,26 @@ namespace uAdventure.Editor
 
         public PlayAnimationEffectEditor()
         {
+            animationField = new AnimationField()
+            {
+                FileType = BaseFileOpenDialog.FileType.PLAY_ANIMATION_EFFECT
+            };
             this.effect = new PlayAnimationEffect(slidesPath, 300, 300);
         }
 
         public void draw()
         {
-
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(TC.get("Effect.PlayAnimation"));
-            if (GUILayout.Button(clearImg))
-            {
-                OnSlidesceneChanged("");
-            }
-            GUILayout.Box(slidesPath);
-            if (GUILayout.Button(TC.get("Buttons.Select")))
-            {
-                AnimationFileOpenDialog animationDialog =
-                    (AnimationFileOpenDialog)ScriptableObject.CreateInstance(typeof(AnimationFileOpenDialog));
-                animationDialog.Init(this, BaseFileOpenDialog.FileType.PLAY_ANIMATION_EFFECT);
-            }
-            // Create/edit slidescene
-            if (GUILayout.Button(TC.get("Resources.Create") + "/" + TC.get("Resources.Edit")))
-            {
-                // For not-existing cutscene - show new cutscene name dialog
-                if (slidesPath == null || slidesPath.Equals(""))
-                {
-                    CutsceneNameInputPopup createCutsceneDialog =
-                        (CutsceneNameInputPopup)ScriptableObject.CreateInstance(typeof(CutsceneNameInputPopup));
-                    createCutsceneDialog.Init(this, "");
-                }
-                else
-                {
-                    EditCutscene();
-                }
-            }
-            EditorGUILayout.EndHorizontal();
+            // Position
+            var pos = EditorGUILayout.Vector2IntField("", new Vector2Int(effect.getX(), effect.getY()));
+            effect.setDestiny(pos.x, pos.y);
+            // Animation
+            var prevLabelWidth = EditorGUIUtility.labelWidth;
+            EditorGUIUtility.labelWidth = 90;
+            animationField.Label = TC.get("Effect.PlayAnimation");
+            animationField.Path = effect.getPath();
+            animationField.DoLayout();
+            effect.setPath(animationField.Path);
+            EditorGUIUtility.labelWidth = prevLabelWidth;
 
             EditorGUILayout.HelpBox(TC.get("PlayAnimationEffect.Description"), MessageType.Info);
         }

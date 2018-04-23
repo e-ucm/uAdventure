@@ -25,11 +25,11 @@ namespace uAdventure.Editor
             }
         }
 
-        public bool Usable
+        public virtual bool Usable
         {
             get
             {
-                return (Controller.Instance.SelectedChapterDataControl.getItemsList().getItemsIDs().Length > 0);
+                return (Controller.Instance.IdentifierSummary.getIds<Item>().Length > 0);
             }
         }
 

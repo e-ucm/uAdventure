@@ -43,7 +43,7 @@ public class FileChooser : DialogReceiverInterface
 
     protected virtual void drawPath()
     {
-        EditorGUILayout.LabelField(Label, GUILayout.MaxWidth(250));
+        EditorGUILayout.LabelField(Label, GUILayout.MaxWidth(EditorGUIUtility.labelWidth));
         using (new EditorGUI.DisabledScope(!AllowEditingPath))
         {
             Path = EditorGUILayout.TextField(Path, GUILayout.ExpandWidth(true));
@@ -110,6 +110,7 @@ public class FileChooser : DialogReceiverInterface
             case BaseFileOpenDialog.FileType.BUTTON_SOUND:
                 fileDialog = ScriptableObject.CreateInstance<MusicFileOpenDialog>();
                 break;
+            case BaseFileOpenDialog.FileType.PLAY_ANIMATION_EFFECT:
             case BaseFileOpenDialog.FileType.CHARACTER_ANIM:
             case BaseFileOpenDialog.FileType.CUTSCENE_SLIDES:
                 fileDialog = ScriptableObject.CreateInstance<AnimationFileOpenDialog>();

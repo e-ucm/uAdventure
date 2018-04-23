@@ -2,6 +2,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 
 namespace uAdventure.Core
 {
@@ -277,6 +278,28 @@ namespace uAdventure.Core
         {
 
             return conditionsList.Count;
+        }
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            List<string> andList = new List<string>();
+            List<string> orList = new List<string>();
+            
+            foreach(var block in conditionsList)
+            {
+                if (block.Count > 1) sb.Append("(");
+                orList.Clear();
+                foreach (var c in block)
+                {
+                    orList.Add(c.ToString());
+                }
+                sb.Append(string.Join(" or ", orList.ToArray()));
+                if (block.Count > 1) sb.Append(")");
+                andList.Add(sb.ToString());
+                sb.Length = 0;
+            }
+            return sb.Append("if ").Append(string.Join(" and ", andList.ToArray())).Append(" then").ToString();
         }
 
         public virtual object Clone()

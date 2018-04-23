@@ -70,6 +70,15 @@ namespace uAdventure.Core
         public abstract ConversationNode removeChild(int index);
 
         /**
+         * Removes the child in the specified position
+         * 
+         * @param index
+         *            Index for removal
+         * @return Reference to the removed child
+         */
+        public abstract ConversationNode replaceChild(int index, ConversationNode node);
+
+        /**
          * Returns the line in the specified position.
          * 
          * @param index

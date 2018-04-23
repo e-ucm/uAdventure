@@ -97,6 +97,11 @@ namespace uAdventure.Core
             return root;
         }
 
+        public void setRootNode(ConversationNode node)
+        {
+            root = node;
+        }
+
         /**
          * Sets the a new identifier for the conversation.
          * 

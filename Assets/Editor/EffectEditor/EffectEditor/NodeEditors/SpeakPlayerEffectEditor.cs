@@ -8,6 +8,7 @@ namespace uAdventure.Editor
 {
     public class SpeakPlayerEffectEditor : EffectEditor
     {
+        private FileChooser audioField;
         private bool collapsed = false;
         public bool Collapsed { get { return collapsed; } set { collapsed = value; } }
         private Rect window = new Rect(0, 0, 300, 0);
@@ -29,18 +30,24 @@ namespace uAdventure.Editor
 
         public SpeakPlayerEffectEditor()
         {
+            audioField = new FileChooser()
+            {
+                FileType = BaseFileOpenDialog.FileType.PLAY_SOUND_EFFECT
+            };
             this.effect = new SpeakPlayerEffect("");
         }
 
         public void draw()
         {
-
-            EditorGUILayout.BeginHorizontal();
+            // Line
             EditorGUILayout.LabelField(TC.get("ConversationEditor.Line"));
+            effect.setLine(EditorGUILayout.TextArea(effect.getLine(), GUILayout.MinWidth(200), GUILayout.MinHeight(50)));
 
-            effect.setLine(EditorGUILayout.TextField(effect.getLine()));
-
-            EditorGUILayout.EndHorizontal();
+            // Sound
+            audioField.Label = TC.get("Animation.Sound");
+            audioField.Path = effect.getAudioPath();
+            audioField.DoLayout();
+            effect.setAudioPath(audioField.Path);
 
             EditorGUILayout.HelpBox(TC.get("SpeakPlayerEffect.Description"), MessageType.Info);
         }

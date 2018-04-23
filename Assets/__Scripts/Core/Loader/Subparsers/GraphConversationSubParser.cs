@@ -152,9 +152,11 @@ namespace uAdventure.Core
                     preListening = ExString.EqualsDefault(el.GetAttribute("preListening"), "yes", false) || editorX >= 0 || editorY >= 0;
 
 					currentNode = new OptionConversationNode(random, keepShowing, showUserOption, preListening, editorX, editorY);
+                    currentNode.setEditorX(editorX);
+                    currentNode.setEditorY(editorY);
 
-					//XAPI ELEMENTS
-					((OptionConversationNode)currentNode).setXApiQuestion(el.GetAttribute("question"));
+                    //XAPI ELEMENTS
+                    ((OptionConversationNode)currentNode).setXApiQuestion(el.GetAttribute("question"));
                     //END OF XAPI
                     // Create a new vector for the links of the current node
                     currentLinks = new List<int>();

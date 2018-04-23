@@ -584,13 +584,13 @@ namespace uAdventure.Editor
             if (effectProperties.ContainsKey(EFFECT_PROPERTY_TIME))
                 time = int.Parse((string)effectProperties[EFFECT_PROPERTY_TIME]);
 
-            int frontColor = 0;
+            Color frontColor = default(Color);
             if (effectProperties.ContainsKey(EFFECT_PROPERTY_FRONT_COLOR))
-                frontColor = int.Parse((string)effectProperties[EFFECT_PROPERTY_FRONT_COLOR]);
+                ColorUtility.TryParseHtmlString((string)effectProperties[EFFECT_PROPERTY_FRONT_COLOR], out frontColor);
 
-            int borderColor = 0;
+            Color borderColor = default(Color);
             if (effectProperties.ContainsKey(EFFECT_PROPERTY_BORDER_COLOR))
-                borderColor = int.Parse((string)effectProperties[EFFECT_PROPERTY_BORDER_COLOR]);
+                ColorUtility.TryParseHtmlString((string)effectProperties[EFFECT_PROPERTY_BORDER_COLOR], out borderColor);
 
             int type = 0;
             if (effectProperties.ContainsKey(EFFECT_PROPERTY_HIGHLIGHT_TYPE))
@@ -682,7 +682,7 @@ namespace uAdventure.Editor
                     newEffect = new WaitTimeEffect(time);
                     break;
                 case EffectType.SHOW_TEXT:
-                    newEffect = new ShowTextEffect(text, x, y, frontColor.ToString(), borderColor.ToString());
+                    newEffect = new ShowTextEffect(text, x, y, frontColor, borderColor);
                     ((ShowTextEffect)newEffect).setAudioPath(path);
                     break;
                 case EffectType.HIGHLIGHT_ITEM:

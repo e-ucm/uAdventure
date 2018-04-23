@@ -13,6 +13,7 @@ namespace uAdventure.Editor
     public class ConversationWindow : PreviewDataControlExtension
     {
         //private ConversationEditorWindow convEditor;
+        private enum ConversationWindowTabs { Preview };
 
         private Dictionary<Conversation, ConversationEditorWindow> conversationWindows;
 
@@ -25,6 +26,10 @@ namespace uAdventure.Editor
             ButtonContent = c;
 
             conversationWindows = new Dictionary<Conversation, ConversationEditorWindow>();
+
+            DefaultOpenedWindow = ConversationWindowTabs.Preview;
+            OpenedWindow = ConversationWindowTabs.Preview;
+            AddTab("Preview", ConversationWindowTabs.Preview, new ConversationWindowEdit(aStartPos, new GUIContent("Preview"), "Window"));
         }
 
         public ConversationEditorWindow GetConversationEditor(int conversationIndex, bool createIfNotExists)
@@ -60,10 +65,14 @@ namespace uAdventure.Editor
         protected override void OnSelect(ReorderableList r)
         {
             GameRources.GetInstance().selectedConversationIndex = r.index;
-            GetConversationEditor(r.index, true);
+            EditorWindowBase.WantsMouseMove = true;
+            // Create the editor GetConversationEditor(r.index, true);
         }
         protected override void OnButton()
         {
+            if(!this.Selected)
+                EditorWindowBase.WantsMouseMove = false;
+
             dataControlList.index = -1;
             dataControlList.SetData(Controller.Instance.SelectedChapterDataControl.getConversationsList(),
                 sceneList => (sceneList as ConversationsListDataControl).getConversations().Cast<DataControl>().ToList());
@@ -72,6 +81,55 @@ namespace uAdventure.Editor
         protected override void OnDrawMainPreview(Rect rect, int index)
         {
             GUI.Label(rect, "Preview Unavaliable");
+        }
+    }
+
+    public class ConversationWindowEdit : PreviewLayoutWindow
+    {
+        private ConversationEditor conversationEditor;
+        private ConversationDataControl workingConversation;
+
+        public ConversationWindowEdit(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
+        {
+        }
+
+        protected override void DrawInspector()
+        {
+            EditorWindowBase.WantsMouseMove = true;
+            base.DrawInspector();
+            var prevWorkingConversation = workingConversation;
+            workingConversation = Controller.Instance.ChapterList.getSelectedChapterDataControl()
+                    .getConversationsList().getConversations()[GameRources.GetInstance().selectedConversationIndex];
+            if(workingConversation != null && prevWorkingConversation != workingConversation)
+            {
+                conversationEditor = ConversationEditor.CreateInstance<ConversationEditor>();
+                conversationEditor.BeginWindows = () => BeginWindows();
+                conversationEditor.EndWindows = () => EndWindows();
+                conversationEditor.Repaint = () => Repaint();
+                conversationEditor.Init(workingConversation.getConversation() as GraphConversation);
+            }
+            
+            EditorGUI.BeginChangeCheck();
+            var newId = EditorGUILayout.TextField(TC.get("Conversation.Title"), workingConversation.getId());
+            if (EditorGUI.EndChangeCheck())
+                workingConversation.getConversation().setId(newId);
+        }
+
+        public override void Draw(int aID)
+        {
+            DrawInspector();
+            DrawPreviewHeader();
+            DrawPreview(GUILayoutUtility.GetRect(0, 0, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true)));
+        }
+
+        protected override void DrawPreviewHeader()
+        {
+            conversationEditor.DoToolbar();
+        }
+
+        public override void DrawPreview(Rect rect)
+        {
+            conversationEditor.DoGraph(rect);
         }
     }
 }

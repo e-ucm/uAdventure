@@ -37,14 +37,8 @@ namespace uAdventure.Editor
 
         public void draw()
         {
-
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(TC.get("Condition.FlagID"));
-
-            effect.setTargetId(flags[EditorGUILayout.Popup(Array.IndexOf(flags, effect.getTargetId()), flags)]);
-
-            EditorGUILayout.EndHorizontal();
-
+            flags = Controller.Instance.VarFlagSummary.getFlags();
+            effect.setTargetId(flags[EditorGUILayout.Popup(TC.get("Condition.FlagID"), Array.IndexOf(flags, effect.getTargetId()), flags)]);
             EditorGUILayout.HelpBox(TC.get("ActivateEffect.Description"), MessageType.Info);
         }
 

@@ -57,7 +57,7 @@ namespace uAdventure.Editor
         {
             base.OnButton();
             dataControlList.index = -1;
-            OpenedWindow = DefaultOpenedWindow != null ? DefaultOpenedWindow : Tabs[0].Value;
+            OpenedWindow = DefaultOpenedWindow ?? Tabs[0].Value;
         }
 
         protected abstract void OnDrawMainView(int aID);

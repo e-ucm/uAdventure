@@ -129,8 +129,10 @@ namespace uAdventure.Core
 					case "show-text":
 						x = ExParsers.ParseDefault(effect.GetAttribute("x"), 0);
 						y = ExParsers.ParseDefault(effect.GetAttribute("y"), 0);
-						var frontColor = effect.GetAttribute("frontColor");
-						var borderColor = effect.GetAttribute("borderColor");
+                        Color frontColor = default(Color);
+                        ColorUtility.TryParseHtmlString(effect.GetAttribute("frontColor"), out frontColor);
+                        Color borderColor = default(Color);
+                        ColorUtility.TryParseHtmlString(effect.GetAttribute("borderColor"), out borderColor);
 
                         // Add the new ShowTextEffect
                         currentEffect = new ShowTextEffect(effect.InnerText.ToString().Trim(), x, y, frontColor, borderColor);

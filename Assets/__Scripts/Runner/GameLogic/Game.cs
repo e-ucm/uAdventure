@@ -433,6 +433,7 @@ namespace uAdventure.Runner
         {
             if (options.getNode().getType() == ConversationNodeViewEnum.OPTION)
             {
+                uAdventureRaycaster.Instance.enabled = false;
                 blur = GameObject.Instantiate(Blur_Prefab);
                 blur.transform.position = new Vector3(Camera.main.transform.position.x, Camera.main.transform.position.y, Camera.main.transform.position.z + 1);
                 var node = options.getNode();
@@ -491,6 +492,7 @@ namespace uAdventure.Runner
                                 guioptions.clicked(i);
                                 /*Tracker.T ().Choice (GUIManager.Instance.Last, ono.getText ());
                                 Tracker.T ().RequestFlush ();*/
+                                uAdventureRaycaster.Instance.enabled = true;
                                 Interacted();
                             }
                         ;

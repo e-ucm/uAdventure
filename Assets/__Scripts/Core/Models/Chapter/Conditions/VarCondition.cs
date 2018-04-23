@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using System.Collections;
+using System.Text;
 
 namespace uAdventure.Core
 {
@@ -97,6 +98,33 @@ namespace uAdventure.Core
             this.value = value;
         }
 
+        public override string ToString()
+        {
+            var sb = new StringBuilder(getId());
+            switch (this.state)
+            {
+                case VAR_GREATER_THAN:
+                    sb.Append(" > ");
+                    break;
+                case VAR_GREATER_EQUALS_THAN:
+                    sb.Append(" >= ");
+                    break;
+                case VAR_EQUALS:
+                    sb.Append(" == ");
+                    break;
+                case VAR_LESS_EQUALS_THAN:
+                    sb.Append(" <= ");
+                    break;
+                case VAR_LESS_THAN:
+                    sb.Append(" < ");
+                    break;
+                case VAR_NOT_EQUALS:
+                    sb.Append(" != ");
+                    break;
+            }
+
+            return sb.Append(value).ToString();
+        }
         public override object Clone()
         {
             VarCondition vc = (VarCondition)base.Clone();

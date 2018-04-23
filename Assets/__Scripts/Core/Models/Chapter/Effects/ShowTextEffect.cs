@@ -31,12 +31,12 @@ namespace uAdventure.Core
         /**
          * The text front color in RGB format
          */
-        private string rgbFrontColor;
+        private Color rgbFrontColor;
 
         /**
          * The text border color in RGB fotrmat
          */
-        private string rgbBorderColor;
+        private Color rgbBorderColor;
 
         /**
          * Constructor
@@ -47,7 +47,7 @@ namespace uAdventure.Core
          * @param front
          * @param border
          */
-        public ShowTextEffect(string text, int x, int y, string front, string border) : base()
+        public ShowTextEffect(string text, int x, int y, Color front, Color border) : base()
         {
             this.text = text;
             this.x = x;
@@ -133,7 +133,7 @@ namespace uAdventure.Core
         /**
          * @return the rgbFrontColor
          */
-        public string getRgbFrontColor()
+        public Color getRgbFrontColor()
         {
 
             return rgbFrontColor;
@@ -143,7 +143,7 @@ namespace uAdventure.Core
          * @param rgbFrontColor
          *            the rgbFrontColor to set
          */
-        public void setRgbFrontColor(string rgbFrontColor)
+        public void setRgbFrontColor(Color rgbFrontColor)
         {
 
             this.rgbFrontColor = rgbFrontColor;
@@ -152,7 +152,7 @@ namespace uAdventure.Core
         /**
          * @return the rgbBorderColor
          */
-        public string getRgbBorderColor()
+        public Color getRgbBorderColor()
         {
 
             return rgbBorderColor;
@@ -162,7 +162,7 @@ namespace uAdventure.Core
          * @param rgbBorderColor
          *            the rgbBorderColor to set
          */
-        public void setRgbBorderColor(string rgbBorderColor)
+        public void setRgbBorderColor(Color rgbBorderColor)
         {
 
             this.rgbBorderColor = rgbBorderColor;

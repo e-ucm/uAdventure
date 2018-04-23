@@ -10,6 +10,7 @@ namespace uAdventure.Editor
         private bool collapsed = false;
         public bool Collapsed { get { return collapsed; } set { collapsed = value; } }
         private Rect window = new Rect(0, 0, 300, 0);
+        private GUIStyle previewTextStyle;
         public Rect Window
         {
             get
@@ -30,25 +31,37 @@ namespace uAdventure.Editor
 
         public ShowTextEffectEditor()
         {
-            this.effect = new ShowTextEffect("", x, y, ColorConverter.ColorToHex(Color.white), ColorConverter.ColorToHex(Color.black));
+            this.effect = new ShowTextEffect("", x, y, Color.white, Color.black);
+            previewTextStyle = new GUIStyle();
+            previewTextStyle.fontSize = 24;
+            previewTextStyle.alignment = TextAnchor.MiddleCenter;
+            previewTextStyle.border = new RectOffset(12, 12, 12, 12);
+            previewTextStyle.padding = new RectOffset(12, 12, 12, 12);
         }
 
         public void draw()
         {
-
-            EditorGUILayout.BeginHorizontal();
+            EditorGUI.BeginChangeCheck();
+            // Line
             EditorGUILayout.LabelField(TC.get("ConversationEditor.Line"));
-            effect.setText(EditorGUILayout.TextField(effect.getText()));
-            EditorGUILayout.LabelField("X: ");
-            x = EditorGUILayout.IntField(effect.getX());
-            EditorGUILayout.LabelField("Y: ");
-            y = EditorGUILayout.IntField(effect.getY());
+            effect.setText(EditorGUILayout.TextArea(effect.getText(), GUILayout.MinWidth(200), GUILayout.MinHeight(50)));
+            // Position
+            var position = EditorGUILayout.Vector2IntField("", new Vector2Int(effect.getX(), effect.getY()));
+            effect.setTextPosition(position.x, position.y);
+            // Style
+            GUILayout.BeginHorizontal();
+            effect.setRgbFrontColor(EditorGUILayout.ColorField(effect.getRgbFrontColor()));
+            effect.setRgbBorderColor(EditorGUILayout.ColorField(effect.getRgbBorderColor()));
+            GUILayout.EndHorizontal();
 
-            effect.setTextPosition(x, y);
-
-            EditorGUILayout.EndHorizontal();
-
+            // Preview
+            CharactersWindowDialogConfiguration.DrawPreview(new GUIContent(effect.getText()), false, null, default(Color), default(Color), effect.getRgbFrontColor(), effect.getRgbBorderColor(), previewTextStyle);
+            
             EditorGUILayout.HelpBox(TC.get("ShowTextEffect.Title"), MessageType.Info);
+            if (EditorGUI.EndChangeCheck())
+            {
+                Event.current.Use();
+            }
         }
 
         public IEffect Effect { get { return effect; } set { effect = value as ShowTextEffect; } }

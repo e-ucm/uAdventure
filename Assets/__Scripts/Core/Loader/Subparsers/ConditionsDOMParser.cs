@@ -117,7 +117,7 @@ namespace uAdventure.Core
 			// Id
 			string id =  element.GetAttribute("id");
 			// VALUE WAS ADDED IN EAD1.4 - It allows negating a global state
-			bool value = ExString.EqualsDefault(element.GetAttribute("value"), "yes", false);
+			bool value = ExString.EqualsDefault(element.GetAttribute("value"), "true", false);
 			return new GlobalStateCondition(id,	value ? GlobalStateCondition.GS_SATISFIED : GlobalStateCondition.GS_NOT_SATISFIED);
 		}
     }

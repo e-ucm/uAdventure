@@ -44,19 +44,19 @@ namespace uAdventure.Editor
 
         protected override void FillNode(XmlNode node, object target, params IDOMWriterParam[] options)
         {
-            if (target is Conditions)
-                FillNode(node, target as Conditions, options);
-            else if (target is GlobalState)
+            if (target is GlobalState)
                 FillNode(node, target as GlobalState, options);
+            else if (target is Conditions)
+                FillNode(node, target as Conditions, options);
         }
 
         protected override string GetElementNameFor(object target)
         {
             string name = "";
-            if (target is Conditions)
-                name = CONDITIONS;
-            else if (target is GlobalState)
+            if (target is GlobalState)
                 name = GLOBAL_STATE;
+            else if (target is Conditions)
+                name = CONDITIONS;
             return name;
         }
 

@@ -13,8 +13,6 @@ namespace uAdventure.Editor
         private bool collapsed = false;
         public bool Collapsed { get { return collapsed; } set { collapsed = value; } }
         private Rect window = new Rect(0, 0, 300, 0);
-        private string[] npc;
-        private string xString = "", yString = "";
 
         public Rect Window
         {
@@ -34,26 +32,24 @@ namespace uAdventure.Editor
 
         public MoveNPCEffectEditor()
         {
-            npc = Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCsIDs();
-            this.effect = new MoveNPCEffect(npc.Length> 0 ? npc[0] : "", 300, 300);
+            var npcs = Controller.Instance.IdentifierSummary.getIds<NPC>();
+            if (npcs != null && npcs.Length > 0 && effect == null)
+                effect = new MoveNPCEffect(npcs[0], 300, 300);
         }
 
         public void draw()
         {
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(TC.get("Element.Name28"));
-            effect.setTargetId(npc[EditorGUILayout.Popup(Array.IndexOf(npc, effect.getTargetId()), npc)]);
-            EditorGUILayout.EndHorizontal();
+            var npc = Controller.Instance.IdentifierSummary.getIds<NPC>();
+            if(npc == null || npc.Length == 0)
+            {
+                EditorGUILayout.HelpBox(TC.get("Action.ErrorNoNPCs"), MessageType.Error);
+                return;
+            }
 
-            xString = effect.getX().ToString();
-            yString = effect.getY().ToString();
+            effect.setTargetId(npc[EditorGUILayout.Popup(TC.get("Element.Name28"), Array.IndexOf(npc, effect.getTargetId()), npc)]);
 
-            xString = EditorGUILayout.TextField(xString);
-            xString = Regex.Replace(xString, "[^0-9]", "");
-
-            yString = EditorGUILayout.TextField(yString);
-            yString = Regex.Replace(xString, "[^0-9]", "");
-            effect.setDestiny(int.Parse(xString), int.Parse(yString));
+            var value = EditorGUILayout.Vector2IntField("", new Vector2Int(effect.getX(), effect.getY()));
+            effect.setDestiny(value.x, value.y);
 
             EditorGUILayout.HelpBox(TC.get("MoveNPCEffect.Description"), MessageType.Info);
         }
@@ -65,7 +61,7 @@ namespace uAdventure.Editor
         {
             get
             {
-                return Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCsIDs().Length > 0;
+                return effect != null;
             }
         }
 
@@ -73,7 +69,7 @@ namespace uAdventure.Editor
 
         public bool manages(IEffect c)
         {
-            return c.GetType() == effect.GetType();
+            return c.getType() == EffectType.MOVE_NPC;
         }
     }
 }

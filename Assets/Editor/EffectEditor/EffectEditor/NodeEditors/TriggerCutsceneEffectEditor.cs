@@ -11,7 +11,6 @@ namespace uAdventure.Editor
         private bool collapsed = false;
         public bool Collapsed { get { return collapsed; } set { collapsed = value; } }
         private Rect window = new Rect(0, 0, 300, 0);
-        private string[] cutscenes;
         public Rect Window
         {
             get
@@ -30,19 +29,14 @@ namespace uAdventure.Editor
 
         public TriggerCutsceneEffectEditor()
         {
-            cutscenes = Controller.Instance.SelectedChapterDataControl.getCutscenesList().getCutscenesIDs();
+            var cutscenes = Controller.Instance.IdentifierSummary.getIds<Cutscene>();
             this.effect = new TriggerCutsceneEffect(cutscenes.Length> 0 ? cutscenes[0] : "");
         }
 
         public void draw()
         {
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(TC.get("Element.Name2"));
-
-            effect.setTargetId(cutscenes[EditorGUILayout.Popup(Array.IndexOf(cutscenes, effect.getTargetId()), cutscenes)]);
-
-            EditorGUILayout.EndHorizontal();
-
+            var cutscenes = Controller.Instance.IdentifierSummary.getIds<Cutscene>();
+            effect.setTargetId(cutscenes[EditorGUILayout.Popup(TC.get("Element.Name2"), Array.IndexOf(cutscenes, effect.getTargetId()), cutscenes)]);
             EditorGUILayout.HelpBox(TC.get("TriggerCutsceneEffect.Description"), MessageType.Info);
         }
 
@@ -53,7 +47,8 @@ namespace uAdventure.Editor
         {
             get
             {
-                return Controller.Instance.SelectedChapterDataControl.getCutscenesList().getCutscenesIDs().Length > 0;
+                var cutscenes = Controller.Instance.IdentifierSummary.getIds<Cutscene>();
+                return cutscenes.Length > 0;
             }
         }
 

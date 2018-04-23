@@ -19,7 +19,6 @@ namespace uAdventure.Editor
         }
 
         private Rect window = new Rect(0, 0, 300, 0);
-        private string xString = "", yString = "";
 
         public Rect Window
         {
@@ -44,20 +43,8 @@ namespace uAdventure.Editor
 
         public void draw()
         {
-            EditorGUILayout.BeginHorizontal();
-
-            xString = effect.getX().ToString();
-            yString = effect.getY().ToString();
-
-            xString = EditorGUILayout.TextField(xString);
-            xString = Regex.Replace(xString, "[^0-9]", "");
-
-            yString = EditorGUILayout.TextField(yString);
-            yString = Regex.Replace(xString, "[^0-9]", "");
-
-            effect.setDestiny(int.Parse(xString), int.Parse(yString));
-
-            EditorGUILayout.EndHorizontal();
+            var value = EditorGUILayout.Vector2IntField("", new Vector2Int(effect.getX(), effect.getY()));
+            effect.setDestiny(value.x, value.y);
 
             EditorGUILayout.HelpBox(TC.get("MovePlayerEffect.Description"), MessageType.Info);
         }

@@ -168,8 +168,13 @@ namespace uAdventure.Editor
                         ShowTextEffect showTextEffect = (ShowTextEffect)effect;
                         showTextEffect.setText((string)newProperties[EffectsController.EFFECT_PROPERTY_TEXT]);
                         showTextEffect.setTextPosition(int.Parse((string)newProperties[EffectsController.EFFECT_PROPERTY_X]), int.Parse((string)newProperties[EffectsController.EFFECT_PROPERTY_Y]));
-                        showTextEffect.setRgbFrontColor((string)newProperties[EffectsController.EFFECT_PROPERTY_FRONT_COLOR]);
-                        showTextEffect.setRgbBorderColor((string)newProperties[EffectsController.EFFECT_PROPERTY_BORDER_COLOR]);
+
+                        Color frontColor = default(Color);
+                        ColorUtility.TryParseHtmlString((string)newProperties[EffectsController.EFFECT_PROPERTY_FRONT_COLOR], out frontColor);
+                        showTextEffect.setRgbFrontColor(frontColor);
+                        Color borderColor = default(Color);
+                        ColorUtility.TryParseHtmlString((string)newProperties[EffectsController.EFFECT_PROPERTY_BORDER_COLOR], out borderColor);
+                        showTextEffect.setRgbFrontColor(borderColor);
                         showTextEffect.setAudioPath((string)newProperties[EffectsController.EFFECT_PROPERTY_PATH]);
                         break;
                     case EffectType.HIGHLIGHT_ITEM:

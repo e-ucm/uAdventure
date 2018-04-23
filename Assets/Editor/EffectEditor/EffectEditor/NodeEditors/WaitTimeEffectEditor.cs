@@ -17,7 +17,6 @@ namespace uAdventure.Editor
         }
 
         private Rect window = new Rect(0, 0, 300, 0);
-        private int time = 0;
 
         public Rect Window
         {
@@ -37,17 +36,12 @@ namespace uAdventure.Editor
 
         public WaitTimeEffectEditor()
         {
-            this.effect = new WaitTimeEffect(time);
+            this.effect = new WaitTimeEffect(1);
         }
 
         public void draw()
         {
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(TC.get("Effect.WaitTime"));
-            time = EditorGUILayout.IntField(effect.getTime());
-            effect.setTime(time);
-            EditorGUILayout.EndHorizontal();
-
+            effect.setTime(Mathf.Max(0, EditorGUILayout.IntField(TC.get("Effect.WaitTime"), effect.getTime())));
             EditorGUILayout.HelpBox(TC.get("WaitTimeEffect.Label"), MessageType.Info);
         }
 

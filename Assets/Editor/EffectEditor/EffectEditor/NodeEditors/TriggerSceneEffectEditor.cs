@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEditor;
 
 using uAdventure.Core;
+using System.Collections.Generic;
 
 namespace uAdventure.Editor
 {
@@ -12,7 +13,9 @@ namespace uAdventure.Editor
         public bool Collapsed { get { return collapsed; } set { collapsed = value; } }
         private Rect window = new Rect(0, 0, 300, 0);
         private string[] scenes;
-        private int x = 300, y = 300;
+        private SceneEditor localSceneEditor;
+        private Trajectory.Node playerDestination;
+        private List<DataControl> elements;
 
         public Rect Window
         {
@@ -32,27 +35,42 @@ namespace uAdventure.Editor
 
         public TriggerSceneEffectEditor()
         {
-            scenes = Controller.Instance.SelectedChapterDataControl.getObjects()
-                .FindAll(o => o is IChapterTarget)
-                .ConvertAll(t => (t as IChapterTarget).getId())
-                .ToArray();
+            scenes = Controller.Instance.IdentifierSummary.getIds<IChapterTarget>();
+            this.effect = new TriggerSceneEffect(scenes[0], 400, 300);
+            this.effect.DestinyScale = 1;
 
-            this.effect = new TriggerSceneEffect(scenes[0], x, y);
+            localSceneEditor = new SceneEditor();
+            playerDestination = new Trajectory.Node("", 0, 0, 1f);
+            localSceneEditor.elements = new List<DataControl>() { new NodeDataControl(null, playerDestination, new Trajectory()) };
         }
 
         public virtual void draw()
         {
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(TC.get("Element.Name2"));
+            scenes = Controller.Instance.IdentifierSummary.getIds<IChapterTarget>();
+            var sceneIndex = EditorGUILayout.Popup(TC.get("Element.Name2"), Array.IndexOf(scenes, effect.getTargetId()), scenes);
+            effect.setTargetId(scenes[sceneIndex]);
+            if (sceneIndex == -1)
+            {
+                EditorGUILayout.HelpBox("Please select a valid destination!", MessageType.Error);
+                return;
+            }
+            
+            var scenesList = Controller.Instance.SelectedChapterDataControl.getScenesList();
+            // If the selected scene IS a scene (not a cutscene or any other type)
+            if(sceneIndex < scenesList.getScenes().Count)
+            {
+                var pos = EditorGUILayout.Vector2IntField(TC.get("Inventory.Position"), new Vector2Int(effect.getX(), effect.getY()));
+                effect.setPosition(pos.x, pos.y);
+                effect.DestinyScale = EditorGUILayout.FloatField(TC.get("SceneLocation.Scale"), effect.DestinyScale);
 
-            effect.setTargetId(scenes[EditorGUILayout.Popup(Array.IndexOf(scenes, effect.getTargetId()), scenes)]);
-            EditorGUILayout.LabelField("X: ");
-            x = EditorGUILayout.IntField(effect.getX());
-            EditorGUILayout.LabelField("Y: ");
-            y = EditorGUILayout.IntField(effect.getY());
+                localSceneEditor.Components = EditorWindowBase.Components;
+                localSceneEditor.Scene = scenesList.getScenes()[sceneIndex];
+                playerDestination.setValues(effect.getX(), effect.getY(), effect.DestinyScale);
 
-            effect.setPosition(x, y);
-            EditorGUILayout.EndHorizontal();
+                localSceneEditor.Draw(GUILayoutUtility.GetRect(0, 200, GUILayout.ExpandWidth(true)));
+                effect.setPosition(playerDestination.getX(), playerDestination.getY());
+                effect.DestinyScale = playerDestination.getScale(); 
+            }
 
             EditorGUILayout.HelpBox(TC.get("TriggerSceneEffect.Description"), MessageType.Info);
         }

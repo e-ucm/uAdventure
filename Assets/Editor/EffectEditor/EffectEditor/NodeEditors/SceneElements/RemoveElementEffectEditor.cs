@@ -38,13 +38,7 @@ namespace uAdventure.Editor
         public void draw()
         {
             items = Controller.Instance.IdentifierSummary.getIds<Item>();
-
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(TC.get("Condition.FlagID"));
-
-            effect.setTargetId(items[EditorGUILayout.Popup(Array.IndexOf(items, effect.getTargetId()), items)]);
-
-            EditorGUILayout.EndHorizontal();
+            effect.setTargetId(items[EditorGUILayout.Popup(TC.get("Condition.FlagID"), Array.IndexOf(items, effect.getTargetId()), items)]);
 
             EditorGUILayout.HelpBox(TC.get("RemoveElementEffect.Description"), MessageType.Info);
         }
@@ -65,7 +59,6 @@ namespace uAdventure.Editor
 
         public bool manages(IEffect c)
         {
-
             return c.GetType() == effect.GetType();
         }
     }

@@ -138,7 +138,15 @@ namespace uAdventure.Core
             foreach (var i in t.GetInterfaces())
                 if (typeGroups.ContainsKey(i))
                     typeGroups.Remove(i);
-		}
+
+            
+            foreach (var kv in typeGroups)
+            {
+                if (t.IsSubclassOf(kv.Key))
+                    if (!typeGroups[kv.Key].Contains(id))
+                        typeGroups[kv.Key].Add(id);
+            }
+        }
 
 		public void addId<T>(string id){
 			addId (typeof(T), id);
@@ -159,6 +167,16 @@ namespace uAdventure.Core
                 }
                 typeGroups[t] = allInterfaceIds;
             }
+            else
+            {
+                var allTypeIds = new List<string>();
+                foreach (var kv in typeGroups)
+                {
+                    if (kv.Key.IsSubclassOf(t))
+                        allTypeIds.AddRange(kv.Value);
+                }
+                typeGroups[t] = allTypeIds;
+            }
 
             return new string[0];
         }
@@ -168,12 +186,25 @@ namespace uAdventure.Core
 		}
 
 		public void deleteId<T>(string id){
-			if (globalIdentifiers.ContainsKey (id))
-				globalIdentifiers.Remove (id);
-
-			var t = typeof(T);
-			if (typeGroups.ContainsKey (t) && typeGroups [t].Contains (id))
-				typeGroups [t].Remove (id);
+			if (globalIdentifiers.ContainsKey(id))
+            {
+                globalIdentifiers.Remove(id);
+                var t = typeof(T);
+                if (typeGroups.ContainsKey(t) && typeGroups[t].Contains(id))
+                    typeGroups[t].Remove(id);
+                if (t.IsInterface)
+                {
+                    foreach (var kv in typeGroups)
+                        if (t.IsAssignableFrom(kv.Key) && kv.Value.Contains(id))
+                            kv.Value.Remove(id);
+                }
+                else
+                {
+                    foreach (var kv in typeGroups)
+                        if ((t.IsSubclassOf(kv.Key) || kv.Key.IsSubclassOf(t)) && kv.Value.Contains(id))
+                            kv.Value.Remove(id);
+                }
+            }
 		}
 
         /**

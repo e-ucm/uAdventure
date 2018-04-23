@@ -9,26 +9,23 @@ namespace uAdventure.Editor
 {
     public class HighlightItemEffectEditor : AbstractItemEffectEditor
     {
-        private string[] items;
-        private string[] higlightTypes = { TC.get("HighlightItemEffect.None"), TC.get("HighlightItemEffect.Blue"), TC.get("HighlightItemEffect.Red"), TC.get("HighlightItemEffect.Green"), TC.get("HighlightItemEffect.Border") };
-        
 
         private HighlightItemEffect effect;
 
         public HighlightItemEffectEditor()
         {
-            items = Controller.Instance.SelectedChapterDataControl.getItemsList().getItemsIDs();
+            var items = Controller.Instance.IdentifierSummary.getIds<Item>();
             this.effect = new HighlightItemEffect(items.Length > 0 ? items[0] : "", 0, false);
         }
 
         public override void draw()
         {
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(TC.get("Element.Name19"));
-            effect.setTargetId(items[EditorGUILayout.Popup(Array.IndexOf(items, effect.getTargetId()), items)]);
-            effect.setHighlightType(EditorGUILayout.Popup(Array.IndexOf(higlightTypes, effect.getHighlightType()), higlightTypes));
+            var higlightTypes = new string[]{ TC.get("HighlightItemEffect.None"), TC.get("HighlightItemEffect.Blue"), TC.get("HighlightItemEffect.Red"), TC.get("HighlightItemEffect.Green"), TC.get("HighlightItemEffect.Border") };
+
+            var items = Controller.Instance.IdentifierSummary.getIds<Item>();
+            effect.setTargetId(items[EditorGUILayout.Popup(TC.get("Element.Name19"), Array.IndexOf(items, effect.getTargetId()), items)]);
+            effect.setHighlightType(EditorGUILayout.Popup(TC.get("HighlightItemEffect.ShortDescription"), effect.getHighlightType(), higlightTypes));
             effect.setHighlightAnimated(GUILayout.Toggle(effect.isHighlightAnimated(), TC.get("HighlightItemEffect.Animated")));
-            EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.HelpBox(TC.get("HighlightItemEffect.Description"), MessageType.Info);
         }
@@ -39,7 +36,7 @@ namespace uAdventure.Editor
 
         public override bool manages(IEffect c)
         {
-            return c.GetType() == effect.GetType();
+            return EffectType.HIGHLIGHT_ITEM == c.getType();
         }
     }
 }

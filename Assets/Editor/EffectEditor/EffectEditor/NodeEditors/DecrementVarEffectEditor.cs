@@ -27,30 +27,19 @@ namespace uAdventure.Editor
             }
         }
 
-        private string[] vars;
-
         private DecrementVarEffect effect;
 
         public DecrementVarEffectEditor()
         {
-            List<string> tmp = new List<string>();
-            tmp.Add("");
-            tmp.AddRange(Controller.Instance.VarFlagSummary.getVars());
-            vars = tmp.ToArray();
-
+            var vars = Controller.Instance.VarFlagSummary.getVars();
             this.effect = new DecrementVarEffect(vars.Length > 0 ? vars[0] : "", 1);
         }
 
         public void draw()
         {
-
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(TC.get("Vars.Var"));
-
-            effect.setTargetId(vars[EditorGUILayout.Popup(Array.IndexOf(vars, effect.getTargetId()), vars)]);
-            effect.setDecrement(EditorGUILayout.IntField(effect.getDecrement()));
-            EditorGUILayout.EndHorizontal();
-
+            var vars = Controller.Instance.VarFlagSummary.getVars();
+            effect.setTargetId(vars[EditorGUILayout.Popup(TC.get("Vars.Var"), Array.IndexOf(vars, effect.getTargetId()), vars)]);
+            effect.setDecrement(EditorGUILayout.IntField(TC.get("VarDialog.Value"), effect.getDecrement()));
             EditorGUILayout.HelpBox(TC.get("DecrementVarEffect.Description"), MessageType.Info);
         }
 

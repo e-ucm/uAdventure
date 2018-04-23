@@ -12,19 +12,15 @@ namespace uAdventure.Editor
     {
         void Repaint();
     }
-
-    public interface INodeEditor
-    {
-        IParentEditor Parent { get; set; }
-        object Node { get; set; }
-        bool Collapsed { get; set; }
-        Rect Window { get; set; }
-
-        void Draw();
-    }
+    
 
     public abstract class GraphEditor<T, N> : UnityEditor.Editor, IParentEditor
     {
+        public delegate void VoidCall();
+        public BaseWindow.VoidMethodDelegate BeginWindows;
+        public BaseWindow.VoidMethodDelegate EndWindows;
+        public new BaseWindow.VoidMethodDelegate Repaint;
+
         protected T Content { get; set; }
         /*******************
 		 *  PROPERTIES
@@ -37,14 +33,15 @@ namespace uAdventure.Editor
         protected abstract void DrawNodeContent(T content, N node);
         protected abstract bool IsResizable(T content, N node);
         protected abstract void SetNodeChild(T content, N node, int slot, N child);
+        public List<N> Selection { get { return selection; } }
 
         /*******************
 		 *  ATTRIBUTES
 		 * *****************/
 
         // Main vars
-        private GUIStyle closeStyle, collapseStyle, selectedStyle, buttonstyle;
         private Dictionary<int, N> nodes = new Dictionary<int, N>();
+        private GUIStyle selectedStyle;
 
         int nodespositioned = 0;
 
@@ -56,8 +53,8 @@ namespace uAdventure.Editor
         // Graph management
         private bool reinitWindows = false;
         private Rect baseRect = new Rect(10, 10, 25, 25);
-        private int lookingChildSlot;
-        private N lookingChildNode;
+        protected int lookingChildSlot = -1;
+        protected N lookingChildNode = default(N);
         private Dictionary<N, bool> loopCheck = new Dictionary<N, bool>();
 
         // Graph scroll
@@ -71,66 +68,39 @@ namespace uAdventure.Editor
 
         NodePositioner positioner;
 
+        private void Awake()
+        {
+            Repaint = base.Repaint;
+        }
+
         /*******************************
 		 * Initialization methods
 		 ******************************/
         public virtual void Init(T content)
         {
+
+            if (selectedStyle == null)
+                selectedStyle = Resources.Load<GUISkin>("resplandor").box;
+
             Content = content;
 
             ConversationNodeEditorFactory.Intance.ResetInstance();
-
-            InitStyles();
+            
             InitWindows();
-        }
-
-
-        void InitStyles()
-        {
-            if (closeStyle == null)
-            {
-                closeStyle = new GUIStyle(GUI.skin.button);
-                closeStyle.padding = new RectOffset(0, 0, 0, 0);
-                closeStyle.margin = new RectOffset(0, 5, 2, 0);
-                closeStyle.normal.textColor = Color.red;
-                closeStyle.focused.textColor = Color.red;
-                closeStyle.active.textColor = Color.red;
-                closeStyle.hover.textColor = Color.red;
-            }
-
-            if (collapseStyle == null)
-            {
-                collapseStyle = new GUIStyle(GUI.skin.button);
-                collapseStyle.padding = new RectOffset(0, 0, 0, 0);
-                collapseStyle.margin = new RectOffset(0, 5, 2, 0);
-                collapseStyle.normal.textColor = Color.blue;
-                collapseStyle.focused.textColor = Color.blue;
-                collapseStyle.active.textColor = Color.blue;
-                collapseStyle.hover.textColor = Color.blue;
-            }
-
-            if (buttonstyle == null)
-            {
-                buttonstyle = new GUIStyle();
-                buttonstyle.padding = new RectOffset(5, 5, 5, 5);
-                buttonstyle.wordWrap = true;
-            }
-
-            if (selectedStyle == null)
-            {
-                selectedStyle = Resources.Load<GUISkin>("resplandor").box;
-            }
         }
 
         private void InitWindows()
         {
             N[] nodes = GetNodes(Content);
-            N current_node = nodes[0];
+            if (nodes.Length == 0)
+                return;
+
+            /*N current_node = nodes[0];
 
             loopCheck.Clear();
 
             this.positioner = new NodePositioner(nodes.Length - 1, new Rect(0,0, 1280, 720));
-            InitWindowsRecursive(current_node);
+            InitWindowsRecursive(current_node);*/
         }
         private void InitWindowsRecursive(N node)
         {
@@ -185,7 +155,7 @@ namespace uAdventure.Editor
         /**************************
 		 * TOOLBAR
 		 **************************/
-        protected virtual Rect DoToolbar()
+        public virtual Rect DoToolbar()
         {
 
             GUILayout.BeginVertical(GUILayout.Height(17));
@@ -208,17 +178,13 @@ namespace uAdventure.Editor
 
             return GUILayoutUtility.GetLastRect();
         }
+        
 
 
         /********************
 		 * GRAPH
 		 * ******************/
-
-
-        /********************
-		 * GRAPH
-		 * ******************/
-        void DoGraph(Rect rect)
+        public void DoGraph(Rect rect)
         {
             // Scrolling area extension calculation based on the nodes
             float maxX = rect.width, maxY = rect.height;
@@ -283,10 +249,26 @@ namespace uAdventure.Editor
             }
             EndWindows();
 
+            OnAfterDrawWindows();
+            /*graphMatrix = GUI.matrix;
+            GUI.matrix = prevMatrix;*/
+            GUI.EndScrollView();
+        }
+
+        protected virtual void OnAfterDrawWindows()
+        {
 
             switch (Event.current.type)
             {
                 case EventType.MouseMove:
+
+                    if (GUIUtility.hotControl == GetHashCode())
+                    {
+                        // Drawing selection => repaint afterwards
+                        this.Repaint();
+                        Event.current.Use();
+                    }
+
                     if (lookingChildNode != null)
                     {
                         this.Repaint();
@@ -348,19 +330,6 @@ namespace uAdventure.Editor
                     }
                     break;
             }
-            /*graphMatrix = GUI.matrix;
-            GUI.matrix = prevMatrix;*/
-            GUI.EndScrollView();
-        }
-
-        private void EndWindows()
-        {
-            throw new NotImplementedException();
-        }
-
-        private void BeginWindows()
-        {
-            throw new NotImplementedException();
         }
 
         public void StartSetChild(N node, int child)
@@ -428,6 +397,7 @@ namespace uAdventure.Editor
 
             Handles.BeginGUI();
             Handles.color = color;
+            List<Vector3> points = new List<Vector3>();
             if (start.x > end.x)
             {
                 var sep = 30f;
@@ -469,19 +439,42 @@ namespace uAdventure.Editor
                 staCornerT2 = staCorner + new Vector2(-1, 0) * Mathf.Lerp(ds, (ds + de) / 2f, fus);
                 endCornerT1 = endCorner + new Vector2(1, 0) * Mathf.Lerp(de, (ds + de) / 2f, fus);
 
-                Handles.DrawBezier(start, staCorner, startTangent, midCornerT1, color /*Color.yellow*/, null, 3);
+
+                points.AddRange(Handles.MakeBezierPoints(start, staCorner, startTangent, midCornerT1, 4));
+                Handles.DrawBezier(start, staCorner, startTangent, midCornerT1, color, null, 3);
                 if (fus < 1)
-                    Handles.DrawBezier(staCorner, endCorner, staCornerT2, endCornerT1, color /*Color.blue*/, null, 3);
-                Handles.DrawBezier(endCorner, end, midCornerT2, endTangent, color /*Color.red*/, null, 3);
+                {   
+                    Handles.DrawBezier(staCorner, endCorner, staCornerT2, endCornerT1, color, null, 3);
+                }
+                else
+                    points.RemoveAt(points.Count - 1);
+                points.AddRange(Handles.MakeBezierPoints(endCorner, end, midCornerT2, endTangent, 3));
+                Handles.DrawBezier(endCorner, end, midCornerT2, endTangent, color, null, 3);
 
             }
             else
             {
-
+                points.AddRange(Handles.MakeBezierPoints(start, end, startTangent, endTangent, 4));
                 Handles.DrawBezier(start, end, startTangent, endTangent, color, null, 3);
 
             }
+            for (int i = 2, pl = points.Count - 1; i < pl; ++i)
+            {
+                DrawTriangle(points[i], points[i + 1] - points[i - 1], 10f);
+            }
             Handles.EndGUI();
+        }
+
+        private void DrawTriangle(Vector2 center, Vector2 direction, float size)
+        {
+            direction = direction.normalized;
+            var perpendicularDirection = new Vector2(direction.y, -direction.x);
+            Handles.DrawAAConvexPolygon(new Vector3[]
+            {
+                center + direction * size,
+                center + perpendicularDirection * size*0.5f,
+                center + perpendicularDirection * size*-0.5f
+            });
         }
 
         private Rect SumRect(Rect r1, Rect r2)
@@ -492,10 +485,17 @@ namespace uAdventure.Editor
         void DrawLines()
         {
             loopCheck.Clear();
-            //drawLines(new Rect(0, 0, 0, position.height), editors[conversation.getRootNode()]);
+
+            var nodes = GetNodes(Content);
+            if(nodes.Length > 0)
+            {
+                Rect from = new Rect(0, 0, 0, 50f);
+                Rect to = GetNodeRect(Content, nodes[0]);
+                CurveFromTo(from, to, new Color(0.8f, 0.5f, 0.1f));
+            }
 
             // Draw the rest of the lines in red
-            foreach (N n in GetNodes(Content))
+            foreach (N n in nodes)
             {
                 if (!loopCheck.ContainsKey(n))
                 {
@@ -505,36 +505,28 @@ namespace uAdventure.Editor
 
                     var childs = ChildsFor(Content, n);
                     int childcount = childs.Length;
-                    if (n.Equals(lookingChildNode))
-                    {
-                        if (lookingChildSlot >= childcount)
-                            childcount++;
-
-                        if (childcount == 0)
-                        {
-                            Rect fromRect = SumRect(from, new Rect(0, from.height / 2f, 0, from.height / 2f));
-                            CurveFromTo(fromRect, GetNodeRect(Content, nodes[hovering]), Color.blue);
-                        }
-                    }
 
                     float h = from.height / (childcount * 1.0f);
 
                     for (int i = 0; i < childcount; i++)
+                    {
+                        Rect fromRect = SumRect(from, new Rect(0, h * i, 0, h - from.height));
+                        var isLookingThis = n.Equals(lookingChildNode) && lookingChildSlot == i;
+                        if (isLookingThis)
+                        {
+                            var b = new Color(0.3f, 0.3f, 0.9f);
+                            if (hovering != -1) CurveFromTo(fromRect, GetNodeRect(Content, this.nodes[hovering]), b);
+                            else CurveFromTo(fromRect, new Rect(Event.current.mousePosition, Vector2.one), b);
+                        }
                         if (childs[i] != null)
                         {
+                            var r = new Color(0.9f, 0.1f, 0.1f);
                             Rect to = GetNodeRect(Content, childs[i]);
-                            Rect fromRect = SumRect(from, new Rect(0, h * i, 0, h - from.height));
-
-                            if (n.Equals(lookingChildNode) && lookingChildSlot == i)
-                            {
-                                CurveFromTo(fromRect, to, Color.red);
-
-                                if (hovering != -1) CurveFromTo(fromRect, GetNodeRect(Content, nodes[hovering]), Color.blue);
-                                else CurveFromTo(fromRect, new Rect(Event.current.mousePosition, Vector2.one), Color.blue);
-                            }
-                            else
-                                CurveFromTo(fromRect, to, l);
+                            if (isLookingThis) CurveFromTo(fromRect, to, r);
+                            else CurveFromTo(fromRect, to, l);
                         }
+                    }
+                        
                 }
             }
         }
@@ -610,7 +602,7 @@ namespace uAdventure.Editor
                     break;
                 case EventType.MouseDown:
                     if (hovering == id) focusing = hovering;
-                    if (lookingChildNode != null || !lookingChildNode.Equals(default(N)))
+                    if (lookingChildSlot != -1)
                     {
                         SetNodeChild(Content, lookingChildNode, lookingChildSlot, myNode);
                         // finishing search
@@ -723,7 +715,6 @@ namespace uAdventure.Editor
 
         void UpdateSelection()
         {
-
             var xmin = Math.Min(startPoint.x, Event.current.mousePosition.x);
             var ymin = Math.Min(startPoint.y, Event.current.mousePosition.y);
             var xmax = Math.Max(startPoint.x, Event.current.mousePosition.x);
@@ -743,5 +734,125 @@ namespace uAdventure.Editor
                 ? r1.xMin < r2.xMin && r1.xMax > r2.xMax && r1.yMin < r2.yMin && r1.yMax > r2.yMax // Completely inside
                     : intersection.width > 0 && intersection.height > 0;
         }
+    }
+
+    public abstract class CollapsibleGraphEditor<T, N> : GraphEditor<T, N>
+    {
+        private static readonly Vector2 CollapsedSize = new Vector2(200, 50);
+        private static GUIContent openButton = new GUIContent();
+        private GUIStyle closeStyle, collapseStyle, buttonstyle;
+        protected Dictionary<N, bool> collapsedState;
+
+        public override void Init(T content)
+        {
+            collapsedState = new Dictionary<N, bool>();
+            InitStyles();
+            base.Init(content);
+        }
+
+        void InitStyles()
+        {
+            if (closeStyle == null)
+            {
+                closeStyle = new GUIStyle(GUI.skin.button);
+                closeStyle.padding = new RectOffset(0, 0, 0, 0);
+                closeStyle.margin = new RectOffset(0, 5, 2, 0);
+                closeStyle.normal.textColor = Color.red;
+                closeStyle.focused.textColor = Color.red;
+                closeStyle.active.textColor = Color.red;
+                closeStyle.hover.textColor = Color.red;
+            }
+
+            if (collapseStyle == null)
+            {
+                collapseStyle = new GUIStyle(GUI.skin.button);
+                collapseStyle.padding = new RectOffset(0, 0, 0, 0);
+                collapseStyle.margin = new RectOffset(0, 5, 2, 0);
+                collapseStyle.normal.textColor = Color.blue;
+                collapseStyle.focused.textColor = Color.blue;
+                collapseStyle.active.textColor = Color.blue;
+                collapseStyle.hover.textColor = Color.blue;
+            }
+
+            if (buttonstyle == null)
+            {
+                buttonstyle = new GUIStyle();
+                buttonstyle.padding = new RectOffset(5, 5, 5, 5);
+                buttonstyle.wordWrap = true;
+            }
+        }
+
+        protected override void DrawNodeContent(T content, N node)
+        {
+
+            if (IsCollapsed(content, node))
+            {
+                GUIContent bttext = OpenButtonText(content, node);
+                Rect btrect = GUILayoutUtility.GetRect(bttext, buttonstyle);
+
+                GUILayout.BeginHorizontal();
+                if (GUI.Button(btrect, bttext))
+                    collapsedState[node] = false;
+                GUILayout.EndHorizontal();
+            }
+            else
+            {
+                GUILayout.BeginHorizontal();
+                DrawNodeControls(content, node);
+                GUILayout.EndHorizontal();
+
+                GUILayout.BeginVertical();
+                DrawOpenNodeContent(content, node);
+                GUILayout.EndVertical();
+            }
+        }
+
+        protected virtual void DrawNodeControls(T content, N node)
+        {
+            if (GUILayout.Button("-", collapseStyle, GUILayout.Width(15), GUILayout.Height(15)))
+            {
+                collapsedState[node] = true;
+            }
+            if (GUILayout.Button("X", closeStyle, GUILayout.Width(15), GUILayout.Height(15)))
+            {
+                DeleteNode(Content, node);
+            }
+        }
+        protected virtual GUIContent OpenButtonText(T content, N node)
+        {
+            openButton.text = TC.get("GeneralText.Open");
+            return openButton;
+        }
+
+        private bool IsCollapsed(T Content, N node)
+        {
+            return collapsedState.ContainsKey(node) ? collapsedState[node] : true;
+        }
+
+        protected override void SetNodeRect(T Content, N node, Rect rect)
+        {
+            SetNodePosition(Content, node, rect.position);
+            if (!IsCollapsed(Content, node))
+                SetNodeSize(Content, node, rect.size);
+        }
+
+        protected override Rect GetNodeRect(T Content, N node)
+        {
+            var rect = GetOpenedNodeRect(Content, node);
+            if(IsCollapsed(Content, node))
+                rect.size = CollapsedSize;
+            return rect;
+        }
+
+        protected override bool IsResizable(T content, N node)
+        {
+            return !IsCollapsed(content, node);
+        }
+
+        protected abstract Rect GetOpenedNodeRect(T content, N node);
+        protected abstract void SetNodePosition(T content, N node, Vector2 position);
+        protected abstract void SetNodeSize(T content, N node, Vector2 size);
+        protected abstract void DrawOpenNodeContent(T content, N node);
+        protected abstract void DeleteNode(T content, N node);
     }
 }

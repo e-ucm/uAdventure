@@ -76,6 +76,11 @@ namespace uAdventure.Core
             return state == FLAG_INACTIVE;
         }
 
+        public override string ToString()
+        {
+            return state == FLAG_ACTIVE ? getId() : "not " + getId(); 
+        }
+
         public override object Clone()
         {
             FlagCondition gsr = (FlagCondition)base.Clone();

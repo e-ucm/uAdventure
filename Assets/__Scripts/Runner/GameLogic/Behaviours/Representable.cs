@@ -182,6 +182,11 @@ namespace uAdventure.Runner
             {
                 anim = Game.Instance.ResourceManager.getAnimation(resource.getAssetPath(getMirrorUri(uri)));
                 mirror = true;
+
+                if(anim == null)
+                {
+                    Debug.LogWarning("Couldn't load animation: " + uri);
+                }
             }
         }
 
@@ -194,9 +199,12 @@ namespace uAdventure.Runner
 
         protected void setFrame(int framenumber)
         {
-            current_frame = framenumber % anim.frames.Count;
-            texture = anim.frames[current_frame].Image;
-            update_ratio = anim.frames[current_frame].Duration / 1000f;
+            if(anim != null)
+            {
+                current_frame = framenumber % anim.frames.Count;
+                texture = anim.frames[current_frame].Image;
+                update_ratio = anim.frames[current_frame].Duration / 1000f;
+            }
 
             Adaptate();
         }

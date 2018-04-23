@@ -9,25 +9,18 @@ namespace uAdventure.Editor
 {
     public class GenerateObjectEffectEditor : AbstractItemEffectEditor
     {
-        private string[] items;
-
         private GenerateObjectEffect effect;
 
         public GenerateObjectEffectEditor()
         {
-            items = Controller.Instance.SelectedChapterDataControl.getItemsList().getItemsIDs();
+            var items = Controller.Instance.IdentifierSummary.getIds<Item>();
             this.effect = new GenerateObjectEffect(items.Length > 0 ? items[0] : "");
         }
 
         public override void draw()
         {
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(TC.get("Element.Name19"));
-
-            effect.setTargetId(items[EditorGUILayout.Popup(Array.IndexOf(items, effect.getTargetId()), items)]);
-
-            EditorGUILayout.EndHorizontal();
-
+            var items = Controller.Instance.IdentifierSummary.getIds<Item>();
+            effect.setTargetId(items[EditorGUILayout.Popup(TC.get("Element.Name19"), Array.IndexOf(items, effect.getTargetId()), items)]);
             EditorGUILayout.HelpBox(TC.get("GenerateObject.Description"), MessageType.Info);
         }
 

@@ -12,7 +12,6 @@ namespace uAdventure.Editor
         private bool collapsed = false;
         public bool Collapsed { get { return collapsed; } set { collapsed = value; } }
         private Rect window = new Rect(0, 0, 300, 0);
-        private string[] flags;
         public Rect Window
         {
             get
@@ -31,20 +30,14 @@ namespace uAdventure.Editor
 
         public DeactivateEffectEditor()
         {
-            flags = Controller.Instance.VarFlagSummary.getFlags();
+            var flags = Controller.Instance.VarFlagSummary.getFlags();
             this.effect = new DeactivateEffect(flags.Length > 0 ? flags[0] : "");
         }
 
         public void draw()
         {
-
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(TC.get("Condition.FlagID"));
-
-            effect.setTargetId(flags[EditorGUILayout.Popup(Array.IndexOf(flags, effect.getTargetId()), flags)]);
-
-            EditorGUILayout.EndHorizontal();
-
+            var flags = Controller.Instance.VarFlagSummary.getFlags();
+            effect.setTargetId(flags[EditorGUILayout.Popup(TC.get("Condition.FlagID"), Array.IndexOf(flags, effect.getTargetId()), flags)]);
             EditorGUILayout.HelpBox(TC.get("DeactivateEffect.Description"), MessageType.Info);
         }
 

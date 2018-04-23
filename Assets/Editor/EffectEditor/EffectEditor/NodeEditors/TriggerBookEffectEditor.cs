@@ -11,7 +11,6 @@ namespace uAdventure.Editor
         private bool collapsed = false;
         public bool Collapsed { get { return collapsed; } set { collapsed = value; } }
         private Rect window = new Rect(0, 0, 300, 0);
-        private string[] books;
         public Rect Window
         {
             get
@@ -30,19 +29,14 @@ namespace uAdventure.Editor
 
         public TriggerBookEffectEditor()
         {
-            books = Controller.Instance.SelectedChapterDataControl.getBooksList().getBooksIDs();
+            var books = Controller.Instance.IdentifierSummary.getIds<Book>();
             this.effect = new TriggerBookEffect(books.Length > 0 ? books[0] : "");
         }
 
         public void draw()
         {
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(TC.get("Element.Name12"));
-
-            effect.setTargetId(books[EditorGUILayout.Popup(Array.IndexOf(books, effect.getTargetId()), books)]);
-
-            EditorGUILayout.EndHorizontal();
-
+            var books = Controller.Instance.IdentifierSummary.getIds<Book>();
+            effect.setTargetId(books[EditorGUILayout.Popup(TC.get("Element.Name12"), Array.IndexOf(books, effect.getTargetId()), books)]);
             EditorGUILayout.HelpBox(TC.get("TriggerBookEffect.Description"), MessageType.Info);
         }
 

@@ -43,6 +43,7 @@ namespace uAdventure.Editor
 
         // The position of the window
         private static EditorWindowBase thisWindowReference;
+        public static bool WantsMouseMove = false;
 
 
         private static WindowMenuContainer fileMenu,
@@ -214,16 +215,18 @@ namespace uAdventure.Editor
 				{
 					e.Options = ops;
 					e.OnRequestMainView += (thisWindowReference as EditorWindowBase).RequestMainView;
-					e.OnRequestRepaint += thisWindowReference.Repaint;
-                    e.BeginWindows = () => thisWindowReference.BeginWindows();
-                    e.EndWindows = () => thisWindowReference.EndWindows();
+					e.OnRequestRepaint += Repaint;
+                    e.EndWindows = EndWindows;
+                    e.BeginWindows = BeginWindows;
                 }   
 			}
 		}
 
         void OnGUI()
 		{
-			InitWindows ();
+            this.wantsMouseMove = WantsMouseMove;
+
+            InitWindows ();
             /**
             UPPER MENU
             */

@@ -11,7 +11,6 @@ namespace uAdventure.Editor
         private bool collapsed = false;
         public bool Collapsed { get { return collapsed; } set { collapsed = value; } }
         private Rect window = new Rect(0, 0, 300, 0);
-        private string[] conversations;
         public Rect Window
         {
             get
@@ -30,20 +29,14 @@ namespace uAdventure.Editor
 
         public TriggerConversationEffectEditor()
         {
-            conversations = Controller.Instance.SelectedChapterDataControl.getConversationsList().getConversationsIDs();
-            Debug.Log(conversations.Length);
+            var conversations = Controller.Instance.IdentifierSummary.getIds<Conversation>();
             this.effect = new TriggerConversationEffect(conversations.Length > 0 ? conversations[0] : "");
         }
 
         public void draw()
         {
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(TC.get("Conversation.Title"));
-
-            var conversationIndex = Array.IndexOf(conversations, effect.getTargetId());
-            effect.setTargetId(conversations[EditorGUILayout.Popup(conversationIndex == -1 ? 0 : conversationIndex, conversations)]);
-
-            EditorGUILayout.EndHorizontal();
+            var conversations = Controller.Instance.IdentifierSummary.getIds<Conversation>();
+            effect.setTargetId(conversations[EditorGUILayout.Popup(TC.get("Conversation.Title"), Array.IndexOf(conversations, effect.getTargetId()), conversations)]);
 
             EditorGUILayout.HelpBox(TC.get("TriggerConversationEffect.Description"), MessageType.Info);
         }
@@ -55,7 +48,7 @@ namespace uAdventure.Editor
         {
             get
             {
-                return Controller.Instance.SelectedChapterDataControl.getConversationsList().getConversationsIDs().Length > 0;
+                return Controller.Instance.IdentifierSummary.getIds<Conversation>().Length > 0;
             }
         }
 

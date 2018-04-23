@@ -65,9 +65,9 @@ namespace uAdventure.Editor
             noBackgroundSkin.button.padding = new RectOffset(0, 0, 0, 0);
         }
 
-        ConversationEditorWindow parent;
+        ConversationEditor parent;
 
-        public void setParent(ConversationEditorWindow parent)
+        public void setParent(ConversationEditor parent)
         {
             this.parent = parent;
         }
@@ -143,7 +143,7 @@ namespace uAdventure.Editor
 
                     if (GUILayout.Button(linkTex, noBackgroundSkin.button, GUILayout.Width(15), GUILayout.Height(15)))
                     {
-                        parent.startSetChild(this.myNode, i);
+                        parent.StartSetChild(this.myNode, i);
                     }
 
 
@@ -181,7 +181,7 @@ namespace uAdventure.Editor
 
                     if (GUILayout.Button(linkTex, noBackgroundSkin.button, GUILayout.Width(15), GUILayout.Height(15)))
                     {
-                        parent.startSetChild(this.myNode, myNode.getLineCount());
+                        parent.StartSetChild(this.myNode, myNode.getLineCount());
                     }
 
                     if (GUILayout.Button("X", closeStyle, GUILayout.Width(15), GUILayout.Height(15)))

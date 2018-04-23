@@ -40,20 +40,20 @@ namespace uAdventure.Editor
         
         protected override string GetElementNameFor(object target)
         {
-            if (target is Effects)
-                return EFFECTS;
-            else if (target is Macro)
+            if (target is Macro)
                 return MACRO;
+            else if(target is Effects)
+                return EFFECTS;
 
             return "";
         }
 
         protected override void FillNode(XmlNode node, object target, params IDOMWriterParam[] options)
         {
-            if (target is Effects)
-                FillNode(node, target as Effects, options);
-            else if (target is Macro)
+            if (target is Macro)
                 FillNode(node, target as Macro, options);
+            else if (target is Effects)
+                FillNode(node, target as Effects, options);
         }
 
         protected void FillNode(XmlNode node, Effects effects, params IDOMWriterParam[] options)

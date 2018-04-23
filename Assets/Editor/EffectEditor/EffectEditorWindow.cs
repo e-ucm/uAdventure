@@ -4,284 +4,20 @@ using System.Collections.Generic;
 using System.Linq;
 
 using uAdventure.Core;
+using System;
 
 namespace uAdventure.Editor
 {
-    public class EffectEditorWindow : EditorWindow
+    public class EffectsEditor : CollapsibleGraphEditor<Effects, IEffect>
     {
-        private static EffectEditorWindow editor;
-
-        public Vector2 scrollPosition = Vector2.zero;
-
-        public void Init(Effects e)
-        {
-            editor = EditorWindow.GetWindow<EffectEditorWindow>();
-            editor.s = Color.black;
-
-            editor.Effects = e;
-
-            EffectEditorFactory.Intance.ResetInstance();
-
-            InitWindows();
-        }
-
-        public void Init(EffectsController e)
-        {
-            editor = EditorWindow.GetWindow<EffectEditorWindow>();
-            editor.s = Color.black;
-
-            editor.Effects = e.getEffectsDirectly();
-
-            EffectEditorFactory.Intance.ResetInstance();
-
-            InitWindows();
-        }
-
-        private void InitWindows()
-        {
-            Rect previous = new Rect(0, 25, 0, 100);
-
-            for (int i = 0; i < effects.getEffects().Count; i++)
-            {
-                IEffect myEffect = this.effects.getEffects()[i];
-
-                EffectEditor editor = EffectEditorFactory.Intance.createEffectEditorFor(myEffect);
-                if(editor == null)
-                {
-                    Debug.LogWarning("Editor effect is null!");
-                    continue;
-                }
-                editor.Effect = myEffect;
-
-                if (i > 0)
-                {
-                    previous = editors[effects.getEffects()[i - 1]].Window;
-                }
-
-                Rect current = new Rect(previous.x + previous.width + 35, previous.y, 150, 0);
-                if (!tmpRects.ContainsKey(effects.getEffects()[i]))
-                    tmpRects.Add(effects.getEffects()[i], current);
-
-                editor.Window = current;
-                if(editor.Effect is AbstractEffect && myEffect is AbstractEffect)
-                {
-                    (editor.Effect as AbstractEffect).setConditions((myEffect as AbstractEffect).getConditions());
-                }
-                editors.Add(editor.Effect, editor);
-            }
-
-        }
-
-        private Effects effects;
-
-        public Effects Effects
-        {
-            get { return effects; }
-            set { this.effects = value; }
-        }
-
-        private Rect baseRect = new Rect(10, 10, 25, 25);
-        private Dictionary<IEffect, Rect> tmpRects = new Dictionary<IEffect, Rect>();
+        private static readonly Vector2 initialSize = new Vector2(200, 50);
+        private static GUIContent buttonContent = new GUIContent();
         private Dictionary<IEffect, EffectEditor> editors = new Dictionary<IEffect, EffectEditor>();
+        private GUIStyle conditionStyle, eitherConditionStyle;
+        private Dictionary<string, Texture2D> icons = new Dictionary<string, Texture2D>();
 
-        private GUIStyle closeStyle, collapseStyle;
-
-        private static Texture2D MakeTex(int width, int height, Color col)
+        public override void Init(Effects content)
         {
-            Color[] pix = new Color[width * height];
-
-            for (int i = 0; i < pix.Length; i++)
-                pix[i] = col;
-
-            Texture2D result = new Texture2D(width, height);
-            result.SetPixels(pix);
-            result.Apply();
-
-            return result;
-        }
-
-
-        void nodeWindow(int id)
-        {
-            IEffect myEffect = this.effects.getEffects()[id];
-
-            EffectEditor editor = null;
-            editors.TryGetValue(myEffect, out editor);
-
-            if (editor != null && editor.Collapsed)
-            {
-                if (GUILayout.Button(TC.get("GeneralText.Open")))
-                    editor.Collapsed = false;
-            }
-            else
-            {
-
-                string[] editorNames = EffectEditorFactory.Intance.CurrentEffectEditors;
-
-                GUILayout.BeginHorizontal();
-                int preEditorSelected = EffectEditorFactory.Intance.EffectEditorIndex(myEffect);
-                int editorSelected = EditorGUILayout.Popup(preEditorSelected, editorNames);
-
-                var abstractEffect = myEffect as AbstractEffect;
-
-                if (editor == null || preEditorSelected != editorSelected)
-                {
-                    editor = EffectEditorFactory.Intance.createEffectEditorFor(editorNames[editorSelected]);
-
-                    if (editors.ContainsKey(myEffect))
-                    {
-                        editor.Window = editors[myEffect].Window;
-                        editors.Remove(myEffect);
-                    }
-                    else
-                    {
-                        editor.Window = tmpRects[myEffect];
-                    }
-
-                    editors.Add(editor.Effect, editor);
-                    if(abstractEffect != null && editor.Effect is AbstractEffect)
-                    {
-                        (editor.Effect as AbstractEffect).setConditions(abstractEffect.getConditions());
-                    }
-                    abstractEffect = editor.Effect as AbstractEffect;
-                }
-
-                if (GUILayout.Button("-", collapseStyle, GUILayout.Width(15), GUILayout.Height(15)))
-                    editor.Collapsed = true;
-				if (GUILayout.Button ("X", closeStyle, GUILayout.Width (15), GUILayout.Height (15))) {
-					effects.getEffects().Remove(myEffect);
-					return;
-				}
-
-                GUILayout.EndHorizontal();
-
-                if(abstractEffect != null)
-                {
-                    GUILayout.BeginVertical(conditionStyle);
-                    GUILayout.Label("CONDITIONS");
-                    if (GUILayout.Button("Add Block"))
-                    {
-                        abstractEffect.getConditions().add(new FlagCondition(""));
-                    }
-
-                    //##################################################################################
-                    //############################### CONDITION HANDLING ###############################
-                    //##################################################################################
-                    
-                    var toRemove = new List<Condition>();
-                    var listsToRemove = new List<List<Condition>>();
-                    var conditions = abstractEffect.getConditions();
-                    ConditionEditorWindow.LayoutConditionEditor(conditions);
-
-                    //##################################################################################
-                    
-                    GUILayout.EndVertical();
-                }
-
-                editor.draw();
-
-                this.effects.getEffects()[id] = editor.Effect;
-
-				if (Event.current.type != EventType.Layout)
-				{
-					Rect lastRect = GUILayoutUtility.GetLastRect();
-					Rect myRect = editor.Window;
-					myRect.height = lastRect.y + lastRect.height;
-					editor.Window = myRect;
-					this.Repaint();
-				}
-            }
-
-            GUI.DragWindow();
-        }
-
-        void curveFromTo(Rect wr, Rect wr2, Color color, Color shadow)
-        {
-            Vector2 start = new Vector2(wr.x + wr.width, wr.y + 3 + wr.height / 2),
-                startTangent = new Vector2(wr.x + wr.width + Mathf.Abs(wr2.x - (wr.x + wr.width)) / 2, wr.y + 3 + wr.height / 2),
-                end = new Vector2(wr2.x, wr2.y + 3 + wr2.height / 2),
-                endTangent = new Vector2(wr2.x - Mathf.Abs(wr2.x - (wr.x + wr.width)) / 2, wr2.y + 3 + wr2.height / 2);
-
-            Handles.BeginGUI();
-            Handles.color = color;
-            Handles.DrawBezier(start, end, startTangent, endTangent, color, null, 3);
-            Handles.EndGUI();
-        }
-
-        private int windowId;
-
-        void createWindows()
-        {
-            float altura = 100;
-            Rect previous = new Rect(0, 25, 0, 100);
-            for (int i = 0; i < effects.getEffects().Count; i++)
-            {
-                if (i > 0)
-                {
-                    previous = editors[effects.getEffects()[i - 1]].Window;
-                }
-
-                Rect current;
-                if (!editors.ContainsKey(effects.getEffects()[i]))
-                {
-                    current = new Rect(previous.x + previous.width + 35, previous.y, 0, 0);
-                    if (!tmpRects.ContainsKey(effects.getEffects()[i]))
-                        tmpRects.Add(effects.getEffects()[i], current);
-                }
-                else
-                    current = editors[effects.getEffects()[i]].Window;
-
-                curveFromTo(previous, current, new Color(0.3f, 0.7f, 0.4f), s);
-                createWindow(effects.getEffects()[i]);
-                windowId++;
-            }
-        }
-
-        void createWindow(IEffect effect)
-        {
-            if (editors.ContainsKey(effect))
-                editors[effect].Window = GUILayout.Window(windowId, editors[effect].Window, nodeWindow,
-                    effect.getType().ToString(), GUILayout.MinWidth(150));
-            else
-                tmpRects[effect] = GUILayout.Window(windowId, tmpRects[effect], nodeWindow, effect.getType().ToString(),
-                    GUILayout.MinWidth(150));
-        }
-
-        Color s = new Color(0.4f, 0.4f, 0.5f),
-            l = new Color(0.3f, 0.7f, 0.4f),
-            r = new Color(0.8f, 0.2f, 0.2f);
-
-        GUIStyle conditionStyle, eitherConditionStyle;
-
-        void OnGUI()
-        {
-			if (effects == null) {
-				DestroyImmediate (this);
-				return;
-			}
-
-            if (closeStyle == null)
-            {
-                closeStyle = new GUIStyle(GUI.skin.button);
-                closeStyle.padding = new RectOffset(0, 0, 0, 0);
-                closeStyle.margin = new RectOffset(0, 5, 2, 0);
-                closeStyle.normal.textColor = Color.red;
-                closeStyle.focused.textColor = Color.red;
-                closeStyle.active.textColor = Color.red;
-                closeStyle.hover.textColor = Color.red;
-            }
-
-            if (collapseStyle == null)
-            {
-                collapseStyle = new GUIStyle(GUI.skin.button);
-                collapseStyle.padding = new RectOffset(0, 0, 0, 0);
-                collapseStyle.margin = new RectOffset(0, 5, 2, 0);
-                collapseStyle.normal.textColor = Color.blue;
-                collapseStyle.focused.textColor = Color.blue;
-                collapseStyle.active.textColor = Color.blue;
-                collapseStyle.hover.textColor = Color.blue;
-            }
-
             if (conditionStyle == null)
             {
                 conditionStyle = new GUIStyle(GUI.skin.box);
@@ -295,24 +31,250 @@ namespace uAdventure.Editor
                 eitherConditionStyle.padding.left = 15;
             }
 
-            windowId = 0;
-            BeginWindows();
+            base.Init(content);
+        }
+
+        protected override IEffect[] ChildsFor(Effects effects, IEffect parent)
+        {
+            var index = effects.FindIndex(parent.Equals);
+            return index == effects.Count - 1 ? new IEffect[0] : new IEffect[1] { effects[index + 1] };
+        }
+
+        protected override void DeleteNode(Effects effects, IEffect effect)
+        {
+            effects.Remove(effect);
+            if(Selection.Contains(effect))
+                Selection.Remove(effect);
+        }
+
+        protected override void DrawOpenNodeContent(Effects effects, IEffect effect)
+        {
+            var abstractEffect = effect as AbstractEffect;
+
+            if (abstractEffect != null)
+            {
+                GUILayout.BeginVertical(conditionStyle);
+                GUILayout.Label("CONDITIONS");
+                if (GUILayout.Button("Add Block"))
+                {
+                    abstractEffect.getConditions().add(new FlagCondition(""));
+                }
+
+                //##################################################################################
+                //############################### CONDITION HANDLING ###############################
+                //##################################################################################
+
+                var toRemove = new List<Condition>();
+                var listsToRemove = new List<List<Condition>>();
+                var conditions = abstractEffect.getConditions();
+                ConditionEditorWindow.LayoutConditionEditor(conditions);
+
+                //##################################################################################
+
+                GUILayout.EndVertical();
+            }
+            var prevLabelSize = EditorGUIUtility.labelWidth;
+            EditorGUIUtility.labelWidth = 75;
+            if (editors.ContainsKey(effect))
+                editors[effect].draw(); 
+            EditorGUIUtility.labelWidth = prevLabelSize;
+        }
+
+        protected override IEffect[] GetNodes(Effects effects)
+        {
+            return effects.ToArray();
+        }
+
+        private bool CreateAndInitEffectEditor(Effects effects, IEffect effect)
+        {
+            var editor = EffectEditorFactory.Intance.createEffectEditorFor(effect);
+            editor.Window = new Rect(new Vector2(50, 50), initialSize);
+            if (editor == null)
+            {
+                Debug.LogWarning("No effect editor available for: " + effect.getType().ToString());
+                return false;
+            }
+
+            var index = effects.IndexOf(effect);
+            if (index > 0)
+            {
+                var pos = editor.Window;
+                var parentPos = editors[effects[index - 1]].Window;
+                pos.position = parentPos.position + new Vector2(parentPos.size.x + 50, 0);
+                editor.Window = pos;
+            }
+
+            editors[effect] = editor;
+            return true;
+        }
+
+        protected override Rect GetOpenedNodeRect(Effects effects, IEffect effect)
+        {
+            if (!editors.ContainsKey(effect))
+            {
+                if(!CreateAndInitEffectEditor(effects, effect))
+                    return Rect.zero;
+            }
+
+            return editors[effect].Window;
+        }
+
+        protected override string GetTitle(Effects effects, IEffect effect)
+        {
+            return effect.getType().ToString();
+        }
+
+        protected override GUIContent OpenButtonText(Effects content, IEffect node)
+        {
+            var nodeType = node.getType().ToString();
+            if (!icons.ContainsKey(nodeType))
+            {
+                var n = nodeType.Replace("_", "-").ToLower();
+                icons[nodeType] = Resources.Load<Texture2D>("EAdventureData/img/icons/effects/16x16/" + n);
+            }
+            buttonContent.image = icons[nodeType];
+            buttonContent.text = node.ToString();
+            return buttonContent;
+        }
+
+        protected override void DrawNodeControls(Effects effects, IEffect effect)
+        {
+            EffectEditor editor = null;
+            editors.TryGetValue(effect, out editor);
+
+            string[] editorNames = EffectEditorFactory.Intance.CurrentEffectEditors;
+            int preEditorSelected = EffectEditorFactory.Intance.EffectEditorIndex(effect);
+            int editorSelected = EditorGUILayout.Popup(preEditorSelected, editorNames);
+
+            var abstractEffect = effect as AbstractEffect;
+
+            if (preEditorSelected != editorSelected)
+            {
+                editor = EffectEditorFactory.Intance.createEffectEditorFor(editorNames[editorSelected]);
+                editor.Window = editors[effect].Window;
+                editors[editor.Effect] = editor;
+                collapsedState[editor.Effect] = collapsedState[effect];
+                collapsedState.Remove(effect);
+                effects[effects.IndexOf(effect)] = editor.Effect;
+
+                if (abstractEffect != null && editor.Effect is AbstractEffect)
+                {
+                    (editor.Effect as AbstractEffect).setConditions(abstractEffect.getConditions());
+                }
+            }
+
+            base.DrawNodeControls(effects, effect);
+        }
+
+        protected override void SetNodeChild(Effects effects, IEffect effect, int slot, IEffect child)
+        {
+            var index = effects.IndexOf(effect) + 1;
+            var childIndex = effects.IndexOf(child);
+            while (index < childIndex)
+            {
+                effects.RemoveAt(index);
+                ++index;
+            }
+        }
+
+        protected override void SetNodePosition(Effects effects, IEffect effect, Vector2 position)
+        {
+            if (!editors.ContainsKey(effect))
+                return;
+
+            var rect = editors[effect].Window;
+            rect.position = position;
+            editors[effect].Window = rect;
+        }
+
+        protected override void SetNodeSize(Effects effects, IEffect effect, Vector2 size)
+        {
+            if (!editors.ContainsKey(effect))
+                return;
+
+            var rect = editors[effect].Window;
+            rect.size = size;
+            editors[effect].Window = rect;
+        }
+
+        // AUX METHODS
+        private static Texture2D MakeTex(int width, int height, Color col)
+        {
+            Color[] pix = new Color[width * height];
+
+            for (int i = 0; i < pix.Length; i++)
+                pix[i] = col;
+
+            Texture2D result = new Texture2D(width, height);
+            result.SetPixels(pix);
+            result.Apply();
+
+            return result;
+        }
+    }
+
+    public class EffectEditorWindow : EditorWindow
+    {
+        private static EffectEditorWindow editor;
+        private EffectsEditor effectsEditor;
+        private Effects effects;
+
+        public Vector2 scrollPosition = Vector2.zero;
+
+        public void Init(Effects e)
+        {
+            editor = EditorWindow.GetWindow<EffectEditorWindow>();
+            effects = e;
+            effectsEditor = CreateInstance<EffectsEditor>();
+            effectsEditor.Repaint = Repaint;
+            effectsEditor.BeginWindows = BeginWindows;
+            effectsEditor.EndWindows = EndWindows;
+            effectsEditor.Init(e);
+
+            EffectEditorFactory.Intance.ResetInstance();
+
+        }
+
+        public void Init(EffectsController e)
+        {
+            Init(e.getEffectsDirectly());
+        }
+
+        void OnGUI()
+        {
+            if (effects == null) {
+                Close(); 
+				DestroyImmediate (this);
+				return;
+			}
+            this.wantsMouseMove = true;
 
             GUILayout.BeginVertical(GUILayout.Height(20));
             GUILayout.BeginHorizontal();
 
             if (GUILayout.Button("New Effect"))
             {
-                effects.Add(new ActivateEffect(""));
+                var names = EffectEditorFactory.Intance.CurrentEffectEditors;
+                if(names.Length > 0)
+                {
+                    Controller.Instance.ShowInputDialog(TC.get("Effects.SelectEffectType"), TC.get("Effects.SelectEffectType"),
+                       EffectEditorFactory.Intance.CurrentEffectEditors, (sender, selected) =>
+                       {
+                           effects.Add(EffectEditorFactory.Intance.createEffectEditorFor(selected).Effect);
+                           Repaint();
+                       });
+                }
+                else
+                {
+                    EditorUtility.DisplayDialog("Cant create", "No effects available!", "Ok");
+                }
+                    
             }
 
             GUILayout.EndHorizontal();
             GUILayout.EndVertical();
-
-            GUILayout.BeginScrollView(scrollPosition);
-            createWindows();
-            GUILayout.EndScrollView();
-            EndWindows();
+            
+            effectsEditor.OnInspectorGUI();
         }
     }
 }

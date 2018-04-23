@@ -483,5 +483,13 @@ namespace uAdventure.Core
 
             return y;
         }
+        public override ConversationNode replaceChild(int index, ConversationNode node)
+        {
+            if (index > getChildCount())
+                throw new Exception("Replacing out of bounds!");
+
+            optionNodes[index] = node;
+            return optionNodes[index] = node;
+        }
     }
 }

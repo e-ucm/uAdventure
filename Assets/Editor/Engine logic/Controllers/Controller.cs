@@ -895,6 +895,9 @@ namespace uAdventure.Editor
 
         public void DeleteDirectory(string targetDir)
         {
+            if (!Directory.Exists(targetDir))
+                return;
+
             File.SetAttributes(targetDir, FileAttributes.Normal);
 
             string[] files = Directory.GetFiles(targetDir);

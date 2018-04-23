@@ -56,5 +56,22 @@ namespace uAdventure.Core
        absEf.conditions = (Conditions) conditions.clone( );
       return absEf;
     }*/
+
+        protected virtual string ToEffectString()
+        {
+            var name = getType().ToString().Replace("_", " ").ToLower();
+            if (typeof(HasTargetId).IsAssignableFrom(GetType()))
+            {
+                var targetId = (this as HasTargetId).getTargetId();
+                return name + " '" + targetId + "'";
+            }
+            return name;
+        }
+
+        public override string ToString()
+        {
+            var conditions = getConditions().getConditionsList().Count > 0 ? getConditions().ToString() + "\n" : "";
+            return conditions + ToEffectString();
+        }
     }
 }

@@ -7,6 +7,8 @@ using System.IO;
 using uAdventure.Core;
 using UnityEditor;
 using System.Linq;
+using System.Globalization;
+using System.Text;
 
 namespace uAdventure.Editor
 {
@@ -754,6 +756,9 @@ namespace uAdventure.Editor
             }
 
             ImportDirectory(destinyFile);
+            EditorUtility.DisplayProgressBar("Importing project", "Removing special characters...", 0.7f);
+            FixImportSpecialCharacters(destinyFile);
+            EditorUtility.DisplayProgressBar("Importing project", "Modifying importer config...", 0.8f);
             ModifyImportSpecialCases(destinyFile);
         }
 
@@ -770,6 +775,8 @@ namespace uAdventure.Editor
             EditorUtility.DisplayProgressBar("Importing project", "Importing files...", 0.6f);
 
             ImportDirectory(destinyFile);
+            EditorUtility.DisplayProgressBar("Importing project", "Removing special characters...", 0.7f);
+            FixImportSpecialCharacters(destinyFile);
             EditorUtility.DisplayProgressBar("Importing project", "Modifying importer config...", 0.8f);
             ModifyImportSpecialCases(destinyFile);
         }
@@ -1266,6 +1273,32 @@ namespace uAdventure.Editor
             return importer != null;
         }
 
+        internal static void FixImportSpecialCharacters(string assetFolder)
+        {
+            pathsToReimport = new List<string>();
+
+            foreach (var assetPath in AssetDatabase.GetAllAssetPaths().Where(path => path.StartsWith(assetFolder)))
+            {
+                // Remove all accents from the file
+                var goodName = RemoveDiacritics(assetPath);
+                if (goodName != assetPath)
+                {
+                    File.Move(assetPath, goodName);
+                    pathsToReimport.Add(goodName);
+                }
+
+                // In case of animation
+                if (goodName.EndsWith(".eaa", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    var newName = goodName + ".xml";
+                    File.Move(goodName, newName);
+                    pathsToReimport.Add(newName);
+                }
+            }
+
+            ImportAssets(pathsToReimport.ToArray());
+        }
+
         internal static void ModifyImportSpecialCases(string assetFolder)
         {
             pathsToReimport = new List<string>();
@@ -1283,24 +1316,33 @@ namespace uAdventure.Editor
                 }
 
                 // In case of animation
-                if (assetPath.EndsWith(".eaa", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    var newName = assetPath + ".xml";
-                    File.Copy(assetPath, newName);
-                    AssetDatabase.DeleteAsset(assetPath);
-                    pathsToReimport.Add(newName);
-                }
-
-                // In case of animation
                 if (assetPath.EndsWith(".xml"))
                 {
                     string text = File.ReadAllText(assetPath);
+                    text = RemoveDiacritics(text);
                     text = text.Replace(".eaa", ".eaa.xml");
                     File.WriteAllText(assetPath, text);
                 }
             }
 
             ImportAssets(pathsToReimport.ToArray());
+        }
+
+        static string RemoveDiacritics(string text)
+        {
+            var normalizedString = text.Normalize(NormalizationForm.FormD);
+            var stringBuilder = new StringBuilder();
+
+            foreach (var c in normalizedString)
+            {
+                var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
+                if (unicodeCategory != UnicodeCategory.NonSpacingMark)
+                {
+                    stringBuilder.Append(c);
+                }
+            }
+
+            return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
         }
 
         internal static void ImportDirectory(string DestinationPath)
