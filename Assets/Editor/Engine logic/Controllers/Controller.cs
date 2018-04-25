@@ -372,6 +372,19 @@ namespace uAdventure.Editor
 
         public const int EFFECT = 66;
 
+
+
+        /**
+         * Id for Completables
+         */
+
+        public const int COMPLETABLE = 67;
+
+        public const int MILESTONE = 68;
+
+        public const int PROGRESS = 69;
+
+
         //TYPES OF EAD FILES
         public const int FILE_ADVENTURE_1STPERSON_PLAYER = 0;
 
@@ -919,6 +932,9 @@ namespace uAdventure.Editor
 
         public bool NewAdventure(int fileType)
         {
+
+            ResourceManager = ResourceManagerFactory.CreateLocal(); 
+
             string currentGamePath = "Assets/Resources/CurrentGame";
             bool fileCreated = false;
             bool create = false;
@@ -937,7 +953,7 @@ namespace uAdventure.Editor
                     // Clean the CurrentGame directory
                 }*/
                 Directory.CreateDirectory(currentGamePath);
-                create = true;
+                create = true; 
             }
             else
             {
@@ -949,6 +965,8 @@ namespace uAdventure.Editor
 
             if (create)
             {
+                EditorUtility.DisplayProgressBar("Creating new Adventure", "Starting", 0);
+
                 DirectoryInfo selectedDir = new DirectoryInfo(currentGamePath);
                 // Set the new file, path and create the new adventure
                 currentZipFile = currentGamePath;
@@ -961,6 +979,7 @@ namespace uAdventure.Editor
                     playerMode = DescriptorData.MODE_PLAYER_1STPERSON;
 
 
+                EditorUtility.DisplayProgressBar("Creating new Adventure", "Creating model", 0.1f);
                 adventureDataControl = new AdventureDataControl(TC.get("DefaultValue.AdventureTitle"), "ChapterTitle", TC.get("DefaultValue.SceneId"), playerMode);
                 // Clear the list of data controllers and refill it
                 chaptersController = new ChapterListDataControl(adventureDataControl.getChapters());
@@ -969,13 +988,16 @@ namespace uAdventure.Editor
                 ProjectConfigData.init();
 
                 // Create the folders and add the assets
+                EditorUtility.DisplayProgressBar("Creating new Adventure", "Creating folder structure", 0.4f);
                 AssetsController.createFolderStructure();
+                EditorUtility.DisplayProgressBar("Creating new Adventure", "Adding special assets", 0.6f);
                 AssetsController.addSpecialAssets();
                 AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
 
                 // Check the consistency of the chapters
                 bool valid = chaptersController.isValid(null, null);
 
+                EditorUtility.DisplayProgressBar("Creating new Adventure", "Persisting model", 0.9f);
                 // Save the data
                 if (Writer.writeData(currentZipFile, adventureDataControl, valid))
                 {
@@ -992,11 +1014,13 @@ namespace uAdventure.Editor
                     // The file was saved
                     fileCreated = true;
                     Loaded = true;
+                    EditorUtility.DisplayProgressBar("Creating new Adventure", "Done!", 1f);
                 }
                 else
                     fileCreated = false;
+                EditorUtility.ClearProgressBar();
             }
-
+            Loaded = fileCreated;
             return fileCreated;
         }
 

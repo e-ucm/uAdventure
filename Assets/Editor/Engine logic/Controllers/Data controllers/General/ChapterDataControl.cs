@@ -118,7 +118,7 @@ namespace uAdventure.Editor
             advancedFeaturesDataControl.setTimerListDataControl(timersListDataControl);
             advancedFeaturesDataControl.setGlobalStatesListDataContorl(globalStatesListDataControl);
             advancedFeaturesDataControl.setMacrosListDataControl(macrosListDataControl);
-            this.completables = chapter.getCompletabes(); 
+            this.completables = chapter.getCompletables(); 
             // assessmentProfilesDataControl = new AssessmentProfilesDataControl(chapter.getAssessmentProfiles());
             //adaptationProfilesDataControl = new AdaptationProfilesDataControl(chapter.getAdaptationProfiles());
         }

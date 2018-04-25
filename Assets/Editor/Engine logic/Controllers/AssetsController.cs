@@ -167,7 +167,7 @@ namespace uAdventure.Editor
             projectDir.CreateSubdirectory("assets/special/");
 
             // Copy eadventure.dtd, descriptor.dtd, assessment.dtd, adaptation.dtd
-            FileInfo descriptorDTD = new FileInfo(Path.Combine("Assets/Resources/" + EADVETURE_CONTENT_FOLDER, "descriptor.dtd"));
+            FileInfo descriptorDTD = new FileInfo(Path.Combine("Assets/Editor/Resources/" + EADVETURE_CONTENT_FOLDER, "descriptor.dtd"));
             if (descriptorDTD.Exists)
             {
                 // TODO: Check if its working
@@ -179,7 +179,7 @@ namespace uAdventure.Editor
             }
 
             // eadventure.dtd
-            FileInfo eadventureDTD = new FileInfo(Path.Combine("Assets/Resources/" + EADVETURE_CONTENT_FOLDER, "eadventure.dtd"));
+            FileInfo eadventureDTD = new FileInfo(Path.Combine("Assets/Editor/Resources/" + EADVETURE_CONTENT_FOLDER, "eadventure.dtd"));
             if (eadventureDTD.Exists)
             {
                 // TODO: Check if its working
@@ -191,7 +191,7 @@ namespace uAdventure.Editor
             }
 
             // assessment.dtd
-            FileInfo assessmentDTD = new FileInfo("Assets/Resources/" + Path.Combine(EADVETURE_CONTENT_FOLDER, "assessment.dtd"));
+            FileInfo assessmentDTD = new FileInfo("Assets/Editor/Resources/" + Path.Combine(EADVETURE_CONTENT_FOLDER, "assessment.dtd"));
             if (assessmentDTD.Exists)
             {
                 // TODO: Check if its working
@@ -204,7 +204,7 @@ namespace uAdventure.Editor
 
 
             // adaptation.dtd
-            FileInfo adaptationDTD = new FileInfo(Path.Combine("Assets/Resources/" + EADVETURE_CONTENT_FOLDER, "adaptation.dtd"));
+            FileInfo adaptationDTD = new FileInfo(Path.Combine("Assets/Editor/Resources/" + EADVETURE_CONTENT_FOLDER, "adaptation.dtd"));
             if (adaptationDTD.Exists)
             {
                 // TODO: Check if its working
@@ -216,7 +216,7 @@ namespace uAdventure.Editor
             }
 
             // animation.dtd
-            FileInfo animationDTD = new FileInfo(Path.Combine("Assets/Resources/" + EADVETURE_CONTENT_FOLDER, "animation.dtd"));
+            FileInfo animationDTD = new FileInfo(Path.Combine("Assets/Editor/Resources/" + EADVETURE_CONTENT_FOLDER, "animation.dtd"));
             if (animationDTD.Exists)
             {
                 // TODO: Check if its working
@@ -785,17 +785,13 @@ namespace uAdventure.Editor
         private static bool addSpecialAsset(string uri, string destination)
         {
             // Add the defaultBook
-            FileInfo sourceFile = new FileInfo("Assets/Resources/" + uri);
-            if (sourceFile.Exists)
+            var finalDest = Path.Combine(Controller.Instance.ProjectFolder, destination);
+            if (AssetDatabase.CopyAsset("Assets/Editor/Resources/" + uri, finalDest))
             {
-                var finalFile = Path.Combine(Controller.Instance.ProjectFolder, destination);
-                sourceFile.CopyTo(finalFile, true);
-                InitImporterConfig(finalFile);
+                pathsToReimport.Add(finalDest);
                 return true;
             }
-            // If the source file doesn't exist, show an error message
-            else
-                return false;
+            return false;
         }
 
         public static void addSpecialAssets()

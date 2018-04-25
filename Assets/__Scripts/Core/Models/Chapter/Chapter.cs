@@ -712,7 +712,7 @@ namespace uAdventure.Core
          * set the completables
          */
 
-        public void setCompletabes(List<Completable> completables)
+        public void setCompletables(List<Completable> completables)
 		{
 			this.extensionObjects [typeof(Completable)] = completables;
         }
@@ -722,7 +722,7 @@ namespace uAdventure.Core
          * @return the completables
          */
 
-        public List<Completable> getCompletabes()
+        public List<Completable> getCompletables()
         {
 			return getObjects<Completable> ();
         }
@@ -738,7 +738,7 @@ namespace uAdventure.Core
         {
             Completable selectedCompletable = null;
 
-			foreach (Completable completable in getCompletabes ())
+			foreach (Completable completable in getCompletables ())
                 if (completable.getId().Equals(id))
                     selectedCompletable = completable;
 
@@ -753,7 +753,7 @@ namespace uAdventure.Core
 
         public void addCompletable(Completable completable)
         {
-			getCompletabes().Add(completable);
+			getCompletables().Add(completable);
         }
 
 		public object findObject(string id){

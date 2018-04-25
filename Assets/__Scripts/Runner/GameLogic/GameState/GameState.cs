@@ -225,7 +225,7 @@ namespace uAdventure.Runner
 
         public List<Completable> getCompletables()
         {
-            return data.getChapters()[current_chapter].getCompletabes();
+            return data.getChapters()[current_chapter].getCompletables();
         }
 
         public IChapterTarget getChapterTarget(string runnerTargetId)

@@ -49,19 +49,22 @@ namespace uAdventure.Editor
 
             col_width = 0.8f / num_colums;
 
-            this.completables = Controller.Instance.SelectedChapterDataControl.getCompletables();
-
-            foreach (Completable c in completables)
+            if(Controller.Instance.SelectedChapterDataControl != null)
             {
-                int pos = 0;
-                for (int i = 0; i < variables.Length; i++)
-                    if (variables[i] == c.getScore().getId())
-                    {
-                        pos = i;
-                        break;
-                    }
+                this.completables = Controller.Instance.SelectedChapterDataControl.getCompletables();
 
-                selected_variable.Add(c, pos);
+                foreach (Completable c in completables)
+                {
+                    int pos = 0;
+                    for (int i = 0; i < variables.Length; i++)
+                        if (variables[i] == c.getScore().getId())
+                        {
+                            pos = i;
+                            break;
+                        }
+
+                    selected_variable.Add(c, pos);
+                }
             }
         }
 

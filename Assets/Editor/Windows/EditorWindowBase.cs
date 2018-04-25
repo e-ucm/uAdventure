@@ -252,53 +252,53 @@ namespace uAdventure.Editor
             /**
             LEFT MENU
             */
-            EditorGUILayout.BeginHorizontal(GUILayout.ExpandWidth(true));
-            var leftMenuRect = EditorGUILayout.BeginVertical(GUILayout.Width(LEFT_MENU_WIDTH), GUILayout.ExpandHeight(true));
-
-            //EditorGUILayout.BeginHorizontal(EditorGUILayout.MaxWidth(25), EditorGUILayout.MaxHeight(25));
-            //if (EditorGUILayout.Button(undoTexture, EditorGUILayout.MaxWidth(25), EditorGUILayout.MaxHeight(25)))
-            //{
-            //    UndoAction();
-            //}
-
-            //EditorGUILayout.Space(5);
-
-            //if (EditorGUILayout.Button(redoTexture, EditorGUILayout.MaxWidth(25), EditorGUILayout.MaxHeight(25)))
-            //{
-            //    RedoAction();
-            //}
-            //EditorGUILayout.EndHorizontal();
-
-            //EditorGUILayout.Space(25);
-
-            scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
-
-            // Button event chapter
-            if (GUILayout.Button(TC.get("Element.Name0")))
-            {
-                OnWindowTypeChanged(EditorWindowType.Chapter);
-            }
-
-            // Button event scene
-            extensions.ForEach(e => e.LayoutDrawLeftPanelContent(null, null));
-
-            EditorGUILayout.EndScrollView();
-            EditorGUILayout.EndVertical();
-
-            /**
-            WINDOWS
-            */
-
-            windowArea = EditorGUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
-            /*if (windowArea != null)
-            {
-                windowArea = GUILayoutUtility.GetRect(0, 0, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
-                Debug.Log(Event.current.type + " " + windowArea);
-            }*/
-            //GUI.BeginGroup(windowArea);
             if (Controller.Instance.Loaded)
             {
-                //extensionSelected.OnGUI();
+                EditorGUILayout.BeginHorizontal(GUILayout.ExpandWidth(true));
+                var leftMenuRect = EditorGUILayout.BeginVertical(GUILayout.Width(LEFT_MENU_WIDTH), GUILayout.ExpandHeight(true));
+
+                //EditorGUILayout.BeginHorizontal(EditorGUILayout.MaxWidth(25), EditorGUILayout.MaxHeight(25));
+                //if (EditorGUILayout.Button(undoTexture, EditorGUILayout.MaxWidth(25), EditorGUILayout.MaxHeight(25)))
+                //{
+                //    UndoAction();
+                //}
+
+                //EditorGUILayout.Space(5);
+
+                //if (EditorGUILayout.Button(redoTexture, EditorGUILayout.MaxWidth(25), EditorGUILayout.MaxHeight(25)))
+                //{
+                //    RedoAction();
+                //}
+                //EditorGUILayout.EndHorizontal();
+
+                //EditorGUILayout.Space(25);
+
+                scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
+
+                // Button event chapter
+                if (GUILayout.Button(TC.get("Element.Name0")))
+                {
+                    OnWindowTypeChanged(EditorWindowType.Chapter);
+                }
+
+                // Button event scene
+                extensions.ForEach(e => e.LayoutDrawLeftPanelContent(null, null));
+
+                EditorGUILayout.EndScrollView();
+                EditorGUILayout.EndVertical();
+
+                /**
+                WINDOWS
+                */
+
+                windowArea = EditorGUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+                /*if (windowArea != null)
+                {
+                    windowArea = GUILayoutUtility.GetRect(0, 0, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+                    Debug.Log(Event.current.type + " " + windowArea);
+                }*/
+                //GUI.BeginGroup(windowArea);
+                    //extensionSelected.OnGUI();
 
                 switch (openedWindow)
                 {
@@ -323,6 +323,10 @@ namespace uAdventure.Editor
                     }
                     m_Window.OnGUI();
                 }
+
+                //GUI.EndGroup(); 
+                EditorGUILayout.EndVertical();
+                EditorGUILayout.EndHorizontal();
             }
             else
             {
@@ -335,16 +339,18 @@ namespace uAdventure.Editor
                 {
                     Controller.ResetInstance();
                     Controller.Instance.Init();
+                    EditorWindowBase.RefreshWindows();
                 }
                 if (GUILayout.Button("New"))
                 {
-                    Controller.Instance.NewAdventure(0);
+                    if (EditorUtility.DisplayDialog("Warning", "Creating a new adventure deletes all previous existing files. Do you want to continue?", "Yes", "No"))
+                    {
+                        Controller.Instance.NewAdventure(Controller.FILE_ADVENTURE_1STPERSON_PLAYER);
+                        Controller.OpenEditorWindow();
+                        EditorWindowBase.RefreshWindows();
+                    }
                 }
             }
-            
-            //GUI.EndGroup(); 
-            EditorGUILayout.EndVertical();
-            EditorGUILayout.EndHorizontal();
         }
 
         void OnWindowTypeChanged(EditorWindowType type_)

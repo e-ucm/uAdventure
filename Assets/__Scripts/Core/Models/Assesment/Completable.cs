@@ -14,7 +14,7 @@ namespace uAdventure.Core
 
     public class Completable : HasId, ICloneable
     {
-        public class Milestone
+        public class Milestone : HasId
         {
             public enum MilestoneType { SCENE, ITEM, CHARACTER, COMPLETABLE, CONDITION };
 
