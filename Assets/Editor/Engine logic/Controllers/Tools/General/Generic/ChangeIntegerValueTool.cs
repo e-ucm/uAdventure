@@ -229,7 +229,7 @@ namespace uAdventure.Editor
             get = data.GetType().GetMethod(getMethodName);
             this.getName = getMethodName;
             this.setName = setMethodName;
-            if (get.ReturnType != typeof(int))
+            if (get.ReturnType != typeof(float))
             {
                 get = set = null;
                 getName = setName = null;
@@ -392,7 +392,7 @@ namespace uAdventure.Editor
             get = data.GetType().GetMethod(getMethodName);
             this.getName = getMethodName;
             this.setName = setMethodName;
-            if (get.ReturnType != typeof(int))
+            if (!get.ReturnType.IsSubclassOf(typeof(System.Enum)))
             {
                 get = set = null;
                 getName = setName = null;

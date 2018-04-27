@@ -298,6 +298,7 @@ namespace uAdventure.Editor
         private MilestoneDataControl startDataControl;
         private MilestoneDataControl endDataControl;
         private ProgressDataControl progressDataControl;
+        private ScoreDataControl scoreDataControl;
 
         public CompletableDataControl(Completable completable)
         {
@@ -305,6 +306,7 @@ namespace uAdventure.Editor
             this.startDataControl = new MilestoneDataControl(completable.getStart());
             this.endDataControl = new MilestoneDataControl(completable.getEnd());
             this.progressDataControl = new ProgressDataControl(completable.getProgress());
+            this.scoreDataControl = new ScoreDataControl(completable.getScore());
 
             Controller.Instance.IdentifierSummary.addId<Completable>(completable.getId());
         }
@@ -364,6 +366,9 @@ namespace uAdventure.Editor
         public override string renameElement(string newName)
         {
             string oldSceneId = completable.getId();
+            if (oldSceneId == newName)
+                return newName;
+
             string references = controller.countIdentifierReferences(oldSceneId).ToString();
 
             // Ask for confirmation
@@ -413,6 +418,11 @@ namespace uAdventure.Editor
         public ProgressDataControl getProgress()
         {
             return progressDataControl;
+        }
+
+        public ScoreDataControl getScore()
+        {
+            return scoreDataControl;
         }
     }
 }

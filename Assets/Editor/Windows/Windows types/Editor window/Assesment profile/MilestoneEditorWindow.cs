@@ -14,68 +14,31 @@ namespace uAdventure.Editor
         public enum MilestoneType { SCENE, ITEM, CHARACTER, COMPLETABLE, CONDITION };
         private string[] milestonetypes =
         {
-        "Scene has been visited"
-        ,"Player interacts with Item"
-        ,"Player interacts with character"
-        ,"A completable has been completed"
-        ,"A condition is true"
-    };
-        private string[] scenes;
-        private string[] characters;
-        private string[] items;
-        private string[] completables;
-
-        private int selectedId = 0;
-        Completable.Milestone.MilestoneType antiguo;
+            "Scene has been visited"
+            ,"Player interacts with Item"
+            ,"Player interacts with character"
+            ,"A completable has been completed"
+            ,"A condition is true"
+        };
 
         GUIStyle conditionStyle, eitherConditionStyle, closeStyle, collapseStyle;
+        
+        public MilestoneDataControl Milestone { get; set; }
 
-        public void Init(Completable.Milestone mil)
+        public static MilestoneEditorWindow Create(MilestoneDataControl mil)
         {
-            editor = EditorWindow.GetWindow<MilestoneEditorWindow>();
-
+            editor = ScriptableObject.CreateInstance<MilestoneEditorWindow>();
             editor.Milestone = mil;
-
-            scenes = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenesIDs();
-            characters = Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCsIDs();
-            items = Controller.Instance.SelectedChapterDataControl.getItemsList().getItemsIDs();
-
-            List<string> tmplist = new List<string>();
-            foreach (Completable c in Controller.Instance.SelectedChapterDataControl.getCompletables())
-                tmplist.Add(c.getId());
-            completables = tmplist.ToArray();
-
-            selectedId = 0;
-            antiguo = milestone.getType();
-
-            if (milestone.getId() != "")
-            {
-                string[] tmp = { };
-                switch (milestone.getType())
-                {
-                    case Completable.Milestone.MilestoneType.CHARACTER: tmp = characters; break;
-                    case Completable.Milestone.MilestoneType.ITEM: tmp = items; break;
-                    case Completable.Milestone.MilestoneType.SCENE: tmp = scenes; break;
-                    case Completable.Milestone.MilestoneType.COMPLETABLE: break;
-                }
-
-                for (int i = 0; i < tmp.Length; i++)
-                    if (tmp[i] == milestone.getId())
-                    {
-                        selectedId = i;
-                        break;
-                    }
-            }
+            return editor;
         }
 
-        private Completable.Milestone milestone;
 
-        public Completable.Milestone Milestone
+        public static void ShowMilestoneEditor(Rect rect, MilestoneDataControl milestone)
         {
-            get { return milestone; }
-            set { this.milestone = value; }
+            var window = MilestoneEditorWindow.Create(milestone);
+            rect.position = GUIUtility.GUIToScreenPoint(rect.position);
+            window.ShowAsDropDown(rect, new Vector2(Mathf.Max(rect.width, 250), 300));
         }
-
 
         void OnGUI()
         {
@@ -115,95 +78,75 @@ namespace uAdventure.Editor
                 collapseStyle.hover.textColor = Color.blue;
             }
 
-            GUILayout.BeginVertical();
-
-            antiguo = milestone.getType();
-            GUILayout.Label("The milestone will be reached when");
-            milestone.setType((Completable.Milestone.MilestoneType)EditorGUILayout.Popup((int)milestone.getType(), milestonetypes));
-            if (antiguo != milestone.getType())
+            using (new GUILayout.VerticalScope())
             {
-                selectedId = 0;
-            }
+                var antiguo = Milestone.getType();
+                GUILayout.Label("The milestone will be reached when");
+                Milestone.setType((Completable.Milestone.MilestoneType)EditorGUILayout.Popup((int)Milestone.getType(), milestonetypes));
+                if (antiguo != Milestone.getType())
+                {
+                    Milestone.setId("");
+                }
 
-            switch (milestone.getType())
-            {
-                case Completable.Milestone.MilestoneType.CHARACTER:
-                    EditorGUILayout.LabelField("Character:");
-                    selectedId = EditorGUILayout.Popup(selectedId, characters);
-                    milestone.setId(characters[selectedId]);
-                    break;
-                case Completable.Milestone.MilestoneType.ITEM:
-                    EditorGUILayout.LabelField("Item:");
-                    selectedId = EditorGUILayout.Popup(selectedId, items);
-                    milestone.setId(items[selectedId]);
-                    break;
-                case Completable.Milestone.MilestoneType.SCENE:
-                    EditorGUILayout.LabelField("Scene:");
-                    selectedId = EditorGUILayout.Popup(selectedId, scenes);
-                    milestone.setId(scenes[selectedId]);
-                    break;
-                case Completable.Milestone.MilestoneType.COMPLETABLE:
-                    EditorGUILayout.LabelField("Completable:");
-                    selectedId = EditorGUILayout.Popup(selectedId, completables);
-                    milestone.setId(completables[selectedId]);
-                    break;
-                case Completable.Milestone.MilestoneType.CONDITION:
-                    if (milestone.getConditions() == null)
-                        milestone.setConditions(new Conditions());
+                switch (Milestone.getType())
+                {
+                    case Completable.Milestone.MilestoneType.CHARACTER:
+                        SelectElement<NPC>(Milestone, "Character:");
+                        break;
+                    case Completable.Milestone.MilestoneType.ITEM:
+                        SelectElement<Item>(Milestone, "Item:");
+                        break;
+                    case Completable.Milestone.MilestoneType.SCENE:
+                        SelectElement<IChapterTarget>(Milestone, "Scene:");
+                        break;
+                    case Completable.Milestone.MilestoneType.COMPLETABLE:
+                        SelectElement<Completable>(Milestone, "Completable:");
+                        break;
+                    case Completable.Milestone.MilestoneType.CONDITION:
+                        if (Milestone.getConditions() == null)
+                            Milestone.setConditions(new ConditionsController(new Conditions()));
 
-                    GUILayout.BeginVertical(conditionStyle);
-                    GUILayout.Label("CONDITIONS");
-                    if (GUILayout.Button("Add Block"))
-                    {
-                        milestone.getConditions().add(new FlagCondition(""));
-                    }
-
-                    foreach (List<Condition> cl in milestone.getConditions().getConditionsList())
-                    {
-                        if (cl.Count > 1)
-                            GUILayout.BeginVertical(eitherConditionStyle);
-                        for (int i = 0; i < cl.Count; i++)
+                        using (new GUILayout.VerticalScope(conditionStyle))
                         {
-                            GUILayout.BeginHorizontal();
-                            int preConEdiSel = ConditionEditorFactory.Intance.ConditionEditorIndex(cl[i]);
-                            int conEdiSel = EditorGUILayout.Popup(preConEdiSel,
-                                ConditionEditorFactory.Intance.CurrentConditionEditors);
-
-                            if (preConEdiSel != conEdiSel)
-                                cl[i] = ConditionEditorFactory.Intance.Editors[conEdiSel].InstanceManagedCondition();
-
-                            ConditionEditorFactory.Intance.getConditionEditorFor(cl[i]).draw(cl[i]);
-
-                            if (GUILayout.Button("+", collapseStyle, GUILayout.Width(15), GUILayout.Height(15)))
+                            GUILayout.Label("CONDITIONS");
+                            if (GUILayout.Button("Add Block"))
                             {
-                                cl.Add(new FlagCondition(""));
+                                Milestone.getConditions().Conditions.add(new FlagCondition(""));
                             }
 
-                            if (GUILayout.Button("X", closeStyle, GUILayout.Width(15), GUILayout.Height(15)))
-                            {
-                                cl.Remove(cl[i]);
+                            //##################################################################################
+                            //############################### CONDITION HANDLING ###############################
+                            //##################################################################################
 
-                                if (cl.Count == 0)
-                                    milestone.getConditions().getConditionsList().Remove(cl);
-                            }
+                            var toRemove = new List<Condition>();
+                            var listsToRemove = new List<List<Condition>>();
+                            var conditions = Milestone.getConditions().Conditions;
+                            ConditionEditorWindow.LayoutConditionEditor(conditions);
 
-                            GUILayout.EndHorizontal();
+                            //##################################################################################
                         }
-                        if (cl.Count > 1)
-                            GUILayout.EndVertical();
-                    }
 
-                    GUILayout.EndVertical();
+                        break;
+                }
 
-                    break;
+                if (GUILayout.Button("Save milestone"))
+                {
+                    this.Close();
+                }
             }
+        }
 
-            if (GUILayout.Button("Save milestone"))
+        private void SelectElement<T>(MilestoneDataControl milestone, string label)
+        {
+            var ids = Controller.Instance.IdentifierSummary.getIds<T>();
+            if(ids.Length == 0)
             {
-                this.Close();
+                EditorGUILayout.HelpBox("There are no elements for the selected type!", MessageType.Error);
+                return;
             }
 
-            GUILayout.EndVertical();
+            var newId = ids[EditorGUILayout.Popup(label, Mathf.Max(0, Array.IndexOf(ids, milestone.getId())), ids)];
+            Milestone.setId(newId);
         }
 
         private static Texture2D MakeTex(int width, int height, Color col)

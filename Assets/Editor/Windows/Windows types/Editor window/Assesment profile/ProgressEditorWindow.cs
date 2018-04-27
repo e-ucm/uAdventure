@@ -2,6 +2,8 @@
 using UnityEditor;
 
 using uAdventure.Core;
+using System.Collections.Generic;
+using System;
 
 namespace uAdventure.Editor
 {
@@ -18,107 +20,101 @@ namespace uAdventure.Editor
 
         private static Vector2 scrollPosition;
 
-        private Completable.Milestone selectedMilestone;
-        private Completable.Progress progress;
+        private DataControlList progressList;
+        private ProgressDataControl progress;
+        private ColumnList.Column progressColumn;
 
-        public void Init(Completable.Progress progress)
+        private Completable.Progress.ProgressType currentMode = Completable.Progress.ProgressType.SUM;
+
+        public void Init(ProgressDataControl progress)
         {
-            editor = EditorWindow.GetWindow<ProgressEditorWindow>();
-
-            clearImg = (Texture2D)Resources.Load("EAdventureData/img/icons/deleteContent", typeof(Texture2D));
-            addTexture = (Texture2D)Resources.Load("EAdventureData/img/icons/addNode", typeof(Texture2D));
-            moveUp = (Texture2D)Resources.Load("EAdventureData/img/icons/moveNodeUp", typeof(Texture2D));
-            moveDown = (Texture2D)Resources.Load("EAdventureData/img/icons/moveNodeDown", typeof(Texture2D));
+            clearImg = Resources.Load<Texture2D>("EAdventureData/img/icons/deleteContent");
+            addTexture = Resources.Load<Texture2D>("EAdventureData/img/icons/addNode");
+            moveUp = Resources.Load<Texture2D>("EAdventureData/img/icons/moveNodeUp");
+            moveDown = Resources.Load<Texture2D>("EAdventureData/img/icons/moveNodeDown");
 
             this.progress = progress;
+
+            progressList = new DataControlList()
+            {
+                Columns = new List<ColumnList.Column>()
+                {
+                    new ColumnList.Column()
+                    {
+                        Text = "Time"
+                    }
+                },
+                drawCell = (rect, row, column, isActive, isFocused) =>
+                {
+                    var milestone = progressList.list[row] as MilestoneDataControl;
+                    switch (column)
+                    {
+                        case 0:
+                            if (GUI.Button(rect, milestone.getContent().ToString()))
+                                MilestoneEditorWindow.ShowMilestoneEditor(rect, milestone);
+                            break;
+                        case 1:
+                            milestone.setProgress(EditorGUI.Slider(rect, milestone.getProgress(), 0, 1));
+                            break;
+                    }
+                }
+            };
+
+            progressColumn = new ColumnList.Column()
+            {
+                Text = "Progress"
+            };
+
         }
 
+        private bool hasToRepaint = false;
         public void OnGUI()
         {
             GUILayout.Label("Progress is given by: ");
-
+            
             progress.setType((Completable.Progress.ProgressType)EditorGUILayout.Popup((int)progress.getType(), typeoptions));
 
-            GUILayout.Label("Milestones: ");
-
-            //GUILayout.BeginArea(tableRect);
-            GUILayout.BeginHorizontal();
-            GUILayout.BeginVertical(GUILayout.Width(position.width * 0.9f));
-            GUILayout.BeginHorizontal();
-            if (progress.getType() == Completable.Progress.ProgressType.SUM)
+            if(progress.getType() != currentMode)
             {
-                GUILayout.Box("Time", GUILayout.Width(position.width * 0.88f));
-            }
-            else
-            {
-                GUILayout.Box("Time", GUILayout.Width(position.width * 0.44f));
-                GUILayout.Box("Progress", GUILayout.Width(position.width * 0.44f));
-            }
-            GUILayout.EndHorizontal();
-
-            scrollPosition = GUILayout.BeginScrollView(scrollPosition);
-            foreach (Completable.Milestone milestone in progress.getMilestones())
-            {
-                GUILayout.BeginHorizontal();
-                if (progress.getType() == Completable.Progress.ProgressType.SUM)
+                currentMode = progress.getType();
+                switch (currentMode)
                 {
-                    if (GUILayout.Button(milestone.ToString(), GUILayout.Width(position.width * 0.88f)))
-                    {
-                        MilestoneEditorWindow window = ScriptableObject.CreateInstance<MilestoneEditorWindow>();
-                        window.Init(milestone);
-                    }
+                    case Completable.Progress.ProgressType.SUM:
+                        if (progressList.Columns.Contains(progressColumn))
+                            progressList.Columns.Remove(progressColumn);
+                        break;
+                    case Completable.Progress.ProgressType.SPECIFIC:
+                        if (!progressList.Columns.Contains(progressColumn))
+                            progressList.Columns.Add(progressColumn);
+                        break;
                 }
-                else
-                {
-                    if (GUILayout.Button(milestone.ToString(), GUILayout.Width(position.width * 0.44f)))
-                    {
-                        MilestoneEditorWindow window = ScriptableObject.CreateInstance<MilestoneEditorWindow>();
-                        window.Init(milestone);
-                    }
-
-                    milestone.setProgress(EditorGUILayout.Slider(milestone.getProgress(), 0, 1, GUILayout.Width(position.width * 0.44f)));
-                }
-
-                GUILayout.EndHorizontal();
+                hasToRepaint = true;
             }
-            GUILayout.EndScrollView();
-            GUILayout.EndVertical();
 
-
-            //GUILayout.EndArea();
-
-
-            //GUILayout.BeginArea(rightPanelRect);
-            GUILayout.BeginVertical(GUILayout.Width(0.1f * position.width));
-            if (GUILayout.Button(addTexture))
+            if (hasToRepaint && Event.current.type == EventType.Layout)
             {
-                progress.addMilestone(new Completable.Milestone());
+                this.Repaint();
+                hasToRepaint = false;
             }
-            if (GUILayout.Button(moveUp))
-            {
-                int pos = progress.getMilestones().IndexOf(selectedMilestone);
-                if (pos > 0)
-                {
-                    Completable.Milestone tmp = progress.getMilestones()[pos - 1];
-                    progress.getMilestones()[pos - 1] = progress.getMilestones()[pos];
-                    progress.getMilestones()[pos] = tmp;
-                }
-            }
-            if (GUILayout.Button(moveDown))
-            {
-                int pos = progress.getMilestones().IndexOf(selectedMilestone);
-                if (pos < progress.getMilestones().Count - 1)
-                {
-                    Completable.Milestone tmp = progress.getMilestones()[pos + 1];
-                    progress.getMilestones()[pos + 1] = progress.getMilestones()[pos];
-                    progress.getMilestones()[pos] = tmp;
-                }
-            }
-            if (GUILayout.Button(clearImg))
-            {
-            }
-            GUILayout.EndVertical();
-            GUILayout.EndHorizontal();
+
+            progressList.SetData(progress, (p) => (p as ProgressDataControl).getMilestones().ConvertAll(m => m as DataControl));
+            progressList.DoList(position.height - 55);
+        }
+
+
+        public static ProgressEditorWindow Create(ProgressDataControl progress)
+        {
+            editor = ScriptableObject.CreateInstance<ProgressEditorWindow>();
+            editor.Init(progress);
+            return editor;
+        }
+
+
+        public static void ShowProgressEditor(Rect rect, ProgressDataControl progress)
+        {
+            var window = ProgressEditorWindow.Create(progress);
+            rect.position = GUIUtility.GUIToScreenPoint(rect.position);
+            window.ShowAsDropDown(rect, new Vector2(Mathf.Max(rect.width, 250), 300));
         }
     }
 }

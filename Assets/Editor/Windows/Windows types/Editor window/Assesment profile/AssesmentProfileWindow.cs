@@ -4,6 +4,7 @@ using UnityEditor;
 
 using uAdventure.Core;
 using System;
+using System.Linq;
 
 namespace uAdventure.Editor
 {
@@ -15,70 +16,135 @@ namespace uAdventure.Editor
         int end = 0;
         int progress = 0;
         int num_colums = 5;
-        float col_width;
 
-        private Texture2D addTexture = null;
-        private Texture2D moveUp, moveDown = null;
-        private Texture2D clearImg = null;
-        
-        private static Rect tableRect;
-        private Rect rightPanelRect;
-        private static Vector2 scrollPosition;
-
+        private DataControlList completablesList;
         private Completable selectedCompletable;
-        private Dictionary<Completable, int> selected_variable = new Dictionary<Completable, int>();
 
         private string[] variables;
 
-        private List<Completable> completables = new List<Completable>();
+        private CompletableListDataControl completables;
 		private bool Available { get; set; }
 
         public AssesmentProfileWindow(Rect aStartPos, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, new GUIContent(TC.get("Analytics.Title")), aStyle, aOptions)
         {
-            var buttonContent = new GUIContent();
-            buttonContent.image = (Texture2D)Resources.Load("EAdventureData/img/icons/assessmentProfiles", typeof(Texture2D)); ;
-			buttonContent.text = TC.get("Analytics.Title");
+            var buttonContent = new GUIContent()
+            {
+                image = Resources.Load<Texture2D>("EAdventureData/img/icons/assessmentProfiles"),
+                text = TC.get("Analytics.Title")
+            };
             ButtonContent = buttonContent;
 
-            clearImg = (Texture2D)Resources.Load("EAdventureData/img/icons/deleteContent", typeof(Texture2D));
-            addTexture = (Texture2D)Resources.Load("EAdventureData/img/icons/addNode", typeof(Texture2D));
-            moveUp = (Texture2D)Resources.Load("EAdventureData/img/icons/moveNodeUp", typeof(Texture2D));
-            moveDown = (Texture2D)Resources.Load("EAdventureData/img/icons/moveNodeDown", typeof(Texture2D));
-
-
-            col_width = 0.8f / num_colums;
-
-            if(Controller.Instance.SelectedChapterDataControl != null)
+            completablesList = new DataControlList()
             {
-                this.completables = Controller.Instance.SelectedChapterDataControl.getCompletables();
-
-                foreach (Completable c in completables)
+                Columns = new List<ColumnList.Column>()
                 {
-                    int pos = 0;
-                    for (int i = 0; i < variables.Length; i++)
-                        if (variables[i] == c.getScore().getId())
-                        {
-                            pos = i;
+                    new ColumnList.Column()
+                    {
+                        Text = TC.get("Analytics.Completable.Id")
+                    },
+                    new ColumnList.Column()
+                    {
+                        Text = TC.get("Analytics.Completable.Start")
+                    },
+                    new ColumnList.Column()
+                    {
+                        Text = TC.get("Analytics.Completable.End")
+                    },
+                    new ColumnList.Column()
+                    {
+                        Text = TC.get("Analytics.Completable.Progress")
+                    },
+                    new ColumnList.Column()
+                    {
+                        Text = TC.get("Analytics.Completable.Score")
+                    }
+                },
+                drawCell = (rect, row, column, isActive, isFocused) =>
+                {
+                    var completable = completablesList.list[row] as CompletableDataControl;
+                    switch (column)
+                    {
+                        case 0:
+                            completable.renameElement(EditorGUI.TextField(rect, completable.getId()));
                             break;
-                        }
-
-                    selected_variable.Add(c, pos);
+                        case 1:
+                            if (GUI.Button(rect, completable.getStart().getContent().ToString()))
+                                MilestoneEditorWindow.ShowMilestoneEditor(rect, completable.getStart());
+                            break;
+                        case 2:
+                            if (GUI.Button(rect, completable.getEnd().getContent().ToString()))
+                                MilestoneEditorWindow.ShowMilestoneEditor(rect, completable.getEnd());
+                            break;
+                        case 3:
+                            if (GUI.Button(rect, TC.get("Analytics.Completable.Define")))
+                                ProgressEditorWindow.ShowProgressEditor(rect, completable.getProgress());
+                            break;
+                        case 4:
+                            {
+                                if (Available)
+                                {
+                                    ScoreEditor(rect, completable.getScore());
+                                }
+                                else
+                                {
+                                    EditorGUI.HelpBox(rect, TC.get("Condition.Var.Warning"), MessageType.Error);
+                                }
+                            }
+                            break;
+                    }
                 }
+            };
+        }
+
+        internal static Rect[] DivideRect(Rect r, int slices)
+        {
+            Rect[] rects = new Rect[slices];
+            var sliceWidth = r.width / slices;
+            rects[0] = new Rect(r.x, r.y, sliceWidth, r.height);
+            for(int i = 1; i<slices; ++i)
+            {
+                rects[i] = rects[i - 1];
+                rects[i].x += sliceWidth;
+            }
+            return rects;
+        }
+
+        public static void ScoreEditor(Rect rect, ScoreDataControl score)
+        {
+            var rects = DivideRect(rect, 3);
+
+            score.setMethod((Completable.Score.ScoreMethod)EditorGUI.EnumPopup(rects[0], score.getMethod()));
+            switch (score.getMethod())
+            {
+                case Completable.Score.ScoreMethod.AVERAGE:
+                case Completable.Score.ScoreMethod.SUM:
+                    rects[1].width += rects[2].width;
+                    if (GUI.Button(rects[1], "SubScores"))
+                    {
+                        CompletableScoreEditorWindow.Create(score);
+                    }
+                    break;
+                case Completable.Score.ScoreMethod.SINGLE:
+                    score.setType((Completable.Score.ScoreType)EditorGUI.EnumPopup(rects[1], score.getType()));
+                    string[] switchOn = null;
+                    switch (score.getType())
+                    {
+                        case Completable.Score.ScoreType.VARIABLE: switchOn = Controller.Instance.VarFlagSummary.getVars(); break;
+                        case Completable.Score.ScoreType.COMPLETABLE: switchOn = Controller.Instance.IdentifierSummary.getIds<Completable>(); break;
+                    }
+                    score.renameElement(switchOn[EditorGUI.Popup(rects[2], Mathf.Max(0, Array.IndexOf(switchOn, score.getId())), switchOn)]);
+                    break;
             }
         }
 
         public override void Draw(int aID)
 		{
-
 			variables = Controller.Instance.VarFlagSummary.getVars();
 			Available = variables != null && variables.Length > 0;
 
             var windowWidth = Rect.width;
             var windowHeight = Rect.height;
-
-            tableRect = new Rect(0f, 200, 0.8f * windowWidth, windowHeight * 0.33f);
-            rightPanelRect = new Rect(0.85f * windowWidth, 0.1f * windowHeight, 0.08f * windowWidth, 0.33f * windowHeight);
 
 			GUILayout.Label(TC.get("Analytics.GameStart") + Controller.Instance.SelectedChapterDataControl.getInitialScene());
 			GUILayout.Label(TC.get("Analytics.GameEnd"));
@@ -94,100 +160,64 @@ namespace uAdventure.Editor
 				GUILayout.Button(TC.get("Analytics.EditProgress"));
             }
 
-            //GUILayout.BeginArea(tableRect);
-            GUILayout.BeginHorizontal();
-            GUILayout.BeginVertical(GUILayout.ExpandWidth(true));
-            GUILayout.BeginHorizontal();
-			GUILayout.Box(TC.get("Analytics.Completable.Id"), GUILayout.Width(windowWidth * col_width));
-			GUILayout.Box(TC.get("Analytics.Completable.Start"), GUILayout.Width(windowWidth * col_width));
-			GUILayout.Box(TC.get("Analytics.Completable.End"), GUILayout.Width(windowWidth * col_width));
-			GUILayout.Box(TC.get("Analytics.Completable.Progress"), GUILayout.Width(windowWidth * col_width));
-			GUILayout.Box(TC.get("Analytics.Completable.Score"), GUILayout.Width(windowWidth * col_width));
-            GUILayout.EndHorizontal();
+            completables = Controller.Instance.SelectedChapterDataControl.getCompletables();
+            completablesList.SetData(completables, (c) => (c as CompletableListDataControl).getCompletables().Cast<DataControl>().ToList());
+            completablesList.DoList(windowHeight - 130);
 
-            scrollPosition = GUILayout.BeginScrollView(scrollPosition);
-            foreach (Completable completable in completables)
-            {
-                GUILayout.BeginHorizontal();
-                completable.setId(GUILayout.TextField(completable.getId(), GUILayout.Width(windowWidth * col_width)));
-
-                if (GUILayout.Button(completable.getStart().ToString(), GUILayout.Width(windowWidth * col_width)))
-                {
-                    MilestoneEditorWindow window = ScriptableObject.CreateInstance<MilestoneEditorWindow>();
-                    window.Init(completable.getStart());
-                }
-
-                if (GUILayout.Button(completable.getEnd().ToString(), GUILayout.Width(windowWidth * col_width)))
-                {
-                    MilestoneEditorWindow window = ScriptableObject.CreateInstance<MilestoneEditorWindow>();
-                    window.Init(completable.getEnd());
-                }
-
-				if (GUILayout.Button(TC.get("Analytics.Completable.Define"), GUILayout.Width(windowWidth * col_width)))
-                {
-                    ProgressEditorWindow window = ScriptableObject.CreateInstance<ProgressEditorWindow>();
-                    window.Init(completable.getProgress());
-                }
-
-				if (Available)
-				{
-
-					selected_variable[completable] = EditorGUILayout.Popup(selected_variable[completable], variables, GUILayout.Width(windowWidth * col_width));
-					completable.getScore().setId(variables[selected_variable[completable]]);
-
-				}
-				else
-				{
-					EditorGUILayout.HelpBox(TC.get("Condition.Var.Warning"), MessageType.Error);
-				}
-                GUILayout.EndHorizontal();
-            }
-            GUILayout.EndScrollView();
-            GUILayout.EndVertical();
-
-
-            //GUILayout.EndArea();
-
-
-            //GUILayout.BeginArea(rightPanelRect);
-            GUILayout.BeginVertical(GUILayout.Width(0.1f * windowWidth));
-            if (GUILayout.Button(addTexture))
-            {
+            /* ADD COMPLETABLE
+             * 
                 Completable nc = new Completable();
                 Completable.Score score = new Completable.Score();
                 score.setMethod(Completable.Score.ScoreMethod.SINGLE);
                 score.setType(Completable.Score.ScoreType.VARIABLE);
                 nc.setScore(score);
-                completables.Add(nc);
-                selected_variable.Add(nc, 0);
-            }
-            if (GUILayout.Button(moveUp))
-            {
-                int pos = completables.IndexOf(selectedCompletable);
-                if (pos > 0)
-                {
-                    Completable tmp = completables[pos - 1];
-                    completables[pos - 1] = completables[pos];
-                    completables[pos] = tmp;
-                }
-            }
-            if (GUILayout.Button(moveDown))
-            {
-                int pos = completables.IndexOf(selectedCompletable);
-                if (pos < completables.Count - 1)
-                {
-                    Completable tmp = completables[pos + 1];
-                    completables[pos + 1] = completables[pos];
-                    completables[pos] = tmp;
-                }
-            }
-            if (GUILayout.Button(clearImg))
-            {
-            }
-            GUILayout.EndVertical();
-            GUILayout.EndHorizontal();
+                */
         }
 
         protected override void OnButton() {}
     }
+
+    public class CompletableScoreEditorWindow : EditorWindow
+    {
+        private ScoreDataControl score;
+        private DataControlList scoresList;
+
+        public static void Create(ScoreDataControl score)
+        {
+            var window = CreateInstance<CompletableScoreEditorWindow>();
+            window.score = score;
+            window.ShowUtility();
+        }
+
+        private void Awake()
+        {
+            scoresList = new DataControlList()
+            {
+                Columns = new List<ColumnList.Column>()
+                {
+                    new ColumnList.Column()
+                    {
+                        Text = "Sub scores"
+                    }
+                },
+                drawCell = (rect, row, column, isActive, isFocused) =>
+                {
+                    AssesmentProfileWindow.ScoreEditor(rect, scoresList.list[row] as ScoreDataControl);
+                }
+            };
+        }
+
+        private void OnGUI()
+        {
+            if(score.getMethod() == Completable.Score.ScoreMethod.SINGLE)
+            {
+                EditorGUILayout.HelpBox("The score subscores you're trying to edit is in SINGLE mode. Select the SUM or AVERAGE modes to edit its subscores.", MessageType.Error);
+                return;
+            }
+
+            scoresList.SetData(score, s => (s as ScoreDataControl).getScores().Cast<DataControl>().ToList());
+            scoresList.DoList(position.height-15);
+        }
+    }
 }
+ 

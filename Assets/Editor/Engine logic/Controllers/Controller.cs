@@ -384,6 +384,8 @@ namespace uAdventure.Editor
 
         public const int PROGRESS = 69;
 
+        public const int SCORE = 70;
+
 
         //TYPES OF EAD FILES
         public const int FILE_ADVENTURE_1STPERSON_PLAYER = 0;

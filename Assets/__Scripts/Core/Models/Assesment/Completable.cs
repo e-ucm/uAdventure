@@ -20,7 +20,7 @@ namespace uAdventure.Core
 
             MilestoneType type;
             string id = "";
-            Conditions conditions;
+            Conditions conditions = new Conditions();
             float progress = -1;
             bool reached = false;
 
@@ -245,7 +245,7 @@ namespace uAdventure.Core
             ScoreMethod method;
 
             string id;
-            List<Score> scores;
+            List<Score> scores = new List<Score>();
 
             public ScoreType getType()
             {

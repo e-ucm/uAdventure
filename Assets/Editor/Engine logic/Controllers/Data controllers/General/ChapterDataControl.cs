@@ -77,7 +77,7 @@ namespace uAdventure.Editor
         /**
         * Completables data control
         */
-        private List<Completable> completables;
+        private CompletableListDataControl completableListDataControl;
 
         /**
          * Constructor.
@@ -118,7 +118,7 @@ namespace uAdventure.Editor
             advancedFeaturesDataControl.setTimerListDataControl(timersListDataControl);
             advancedFeaturesDataControl.setGlobalStatesListDataContorl(globalStatesListDataControl);
             advancedFeaturesDataControl.setMacrosListDataControl(macrosListDataControl);
-            this.completables = chapter.getCompletables(); 
+            completableListDataControl = new CompletableListDataControl(chapter.getObjects<Completable>()); 
             // assessmentProfilesDataControl = new AssessmentProfilesDataControl(chapter.getAssessmentProfiles());
             //adaptationProfilesDataControl = new AdaptationProfilesDataControl(chapter.getAdaptationProfiles());
         }
@@ -557,6 +557,7 @@ namespace uAdventure.Editor
             count += npcsListDataControl.countIdentifierReferences(id);
             count += conversationsListDataControl.countIdentifierReferences(id);
             count += advancedFeaturesDataControl.countIdentifierReferences(id);
+            count += completableListDataControl.countIdentifierReferences(id);
             //count += adaptationProfilesDataControl.countIdentifierReferences(id);
             //count += assessmentProfilesDataControl.countIdentifierReferences(id);
 
@@ -579,6 +580,7 @@ namespace uAdventure.Editor
             npcsListDataControl.replaceIdentifierReferences(oldId, newId);
             conversationsListDataControl.replaceIdentifierReferences(oldId, newId);
             advancedFeaturesDataControl.replaceIdentifierReferences(oldId, newId);
+            completableListDataControl.replaceIdentifierReferences(oldId, newId);
             //        assessmentProfilesDataControl.replaceIdentifierReferences( oldId, newId );
             //adaptationProfilesDataControl.replaceIdentifierReferences(oldId, newId);
         }
@@ -601,6 +603,7 @@ namespace uAdventure.Editor
             npcsListDataControl.deleteIdentifierReferences(id);
             conversationsListDataControl.deleteIdentifierReferences(id);
             advancedFeaturesDataControl.deleteIdentifierReferences(id);
+            completableListDataControl.deleteIdentifierReferences(id);
             //        assessmentProfilesDataControl.deleteIdentifierReferences( id );
             //adaptationProfilesDataControl.deleteIdentifierReferences(id);
         }
@@ -633,10 +636,10 @@ namespace uAdventure.Editor
         /**
          * @return the Completables
          */
-        public List<Completable> getCompletables()
+        public CompletableListDataControl getCompletables()
         {
 
-            return this.completables;
+            return this.completableListDataControl;
         }
 
         public List<object> getObjects()
@@ -665,6 +668,7 @@ namespace uAdventure.Editor
             this.getNPCsList().recursiveSearch();
             this.getPlayer().recursiveSearch();
             this.getScenesList().recursiveSearch();
+            this.getCompletables().recursiveSearch();
             // this.getAdvancedFeaturesController().recursiveSearch();
             // this.getAdaptationProfilesDataControl().recursiveSearch();
             // this.getAssessmentProfilesDataControl().recursiveSearch();
