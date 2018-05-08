@@ -268,29 +268,12 @@ namespace uAdventure.Runner
 
                     if (!Game.Instance.GameState.IsFirstPerson)
                     {
-                        var trajectory = rsd.getTrajectory();
-                        player_context = PlayerMB.Instance != null ? PlayerMB.Instance.Context : null;
-                        
-                        if (player_context == null)
-                        {
-                            //Vector2 pos = LineHandler.nodeToVector2 (lines [lines.Count-1].end);
-
-                            var playerPosition = new Vector2(rsd.getPositionX(), rsd.getPositionY());
-                            var scale = rsd.getPlayerScale();
-                            if (trajectory != null)
-                            {
-                                Trajectory.Node pos = rsd.getTrajectory().getInitial();
-                                playerPosition = new Vector2(pos.getX(), pos.getY());
-                                scale = pos.getScale();
-                            }
-
-                            player_context = new ElementReference("Player", (int) playerPosition.x, (int) playerPosition.y, rsd.getPlayerLayer());
-                            player_context.setScale(scale);
-                        }
+                        player_context = Game.Instance.GameState.PlayerContext;
 
                         //###################### BARRIERS ######################
                         var barriers = rsd.getBarriers().FindAll(b => ConditionChecker.check(b.getConditions())).ToArray();
 
+                        var trajectory = rsd.getTrajectory();
                         if (trajectory == null)
                         {
                             barriers = barriers.ToList().ConvertAll(b => {
@@ -500,7 +483,7 @@ namespace uAdventure.Runner
                         texCoord.y = 1-texCoord.y;
                         texPos.Scale(texCoord);
                         var accesible = TrajectoryHandler.GetAccessibleTrajectory(PlayerMB.Instance.getPosition(), trajectoryHandler);
-                        PlayerMB.Instance.move(accesible.route(PlayerMB.Instance.getPosition(), accesible.closestPoint(texPos)));
+                        PlayerMB.Instance.Move(accesible.closestPoint(texPos));
                     }
                     break;
                 case GeneralScene.GeneralSceneSceneType.SLIDESCENE:

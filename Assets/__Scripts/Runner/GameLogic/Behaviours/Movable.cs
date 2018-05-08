@@ -5,7 +5,7 @@ namespace uAdventure.Runner
 {
     public interface Movable
     {
-        void Move(Vector2 position);
+        void Traslate(Vector2 position);
     }
 }
 

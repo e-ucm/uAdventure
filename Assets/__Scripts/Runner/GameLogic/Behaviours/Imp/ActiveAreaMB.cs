@@ -181,9 +181,13 @@ namespace uAdventure.Runner
                 }
                 else
                 {
-                    var points = aad.isRectangular() ? aad.ToRect().ToPoints() : aad.getPoints().ToArray();
-                    var topLeft = points.ToRect().position;
-                    area = aad.getInfluenceArea().MoveArea(topLeft);
+                    area = new InfluenceArea(aad.getX() - 20, aad.getY() - 20, aad.getWidth() + 40, aad.getHeight() + 40);
+                    if(aad.getInfluenceArea() != null && aad.getInfluenceArea().isExists())
+                    {
+                        var points = aad.isRectangular() ? aad.ToRect().ToPoints() : aad.getPoints().ToArray();
+                        var topLeft = points.ToRect().position;
+                        area = aad.getInfluenceArea().MoveArea(topLeft);
+                    }
                 }
                 PlayerMB.Instance.Do(action, area);
             }

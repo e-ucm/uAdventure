@@ -15,6 +15,7 @@ namespace uAdventure.Runner
         //###########################################################################
 
         AdventureData data;
+        private ElementReference playerContext;
         int current_chapter = 0;
         string current_target = "";
         string last_target = "";
@@ -118,6 +119,36 @@ namespace uAdventure.Runner
             return data.getChapters()[current_chapter].getTimers();
         }
 
+
+        public ElementReference PlayerContext
+        {
+            get
+            {
+                if (playerContext == null)
+                {
+                    var scene = getChapterTarget(CurrentTarget) as Scene;
+                    if (scene == null)
+                        return null;
+                    
+                    var trajectory = scene.getTrajectory();
+
+                    var playerPosition = new Vector2(scene.getPositionX(), scene.getPositionY());
+                    var scale = scene.getPlayerScale();
+                    if (trajectory != null)
+                    {
+                        Trajectory.Node pos = scene.getTrajectory().getInitial();
+                        playerPosition = new Vector2(pos.getX(), pos.getY());
+                        scale = pos.getScale();
+                    }
+
+                    playerContext = new ElementReference("Player", (int)playerPosition.x, (int)playerPosition.y, scene.getPlayerLayer());
+                    playerContext.setScale(scale);
+                }
+
+                return playerContext;
+            }
+        }
+
         public Player Player
         {
             get
@@ -139,7 +170,7 @@ namespace uAdventure.Runner
             GameObject go = GameObject.Find(id);
             Movable m = go.GetComponent<Movable>();
             if (m != null)
-                m.Move(position);
+                m.Traslate(position);
         }
 
         public NPC getCharacter(string name)

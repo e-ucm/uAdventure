@@ -166,6 +166,8 @@ namespace uAdventure.Runner
 
         public eAnim getAnimation(string uri)
         {
+            if (string.IsNullOrEmpty(uri))
+                return null;
             /*if (uri.EndsWith(".eaa"))
                 uri += ".xml";
             else if (!uri.EndsWith(".eaa.xml"))

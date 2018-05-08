@@ -182,14 +182,13 @@ namespace uAdventure.Runner
                         var sceneMB = FindObjectOfType<SceneMB>();
                         var scene = sceneMB.sceneData as Scene;
                         var topLeft = new Vector2(Context.getX() - Texture.width / 2f, Context.getY() - Texture.height);
-                        Rectangle area = null;
+                        Rectangle area = new InfluenceArea((int)topLeft.x - 20, (int)topLeft.y - 20, Texture.width + 40, Texture.height + 40);
                         if (scene != null && scene.getTrajectory() == null)
                         {
                             // If no trajectory I have to move the area to the trajectory for it to be connected
-                            area = new InfluenceArea((int) topLeft.x, (int) topLeft.y, Texture.width, Texture.height);
                             area = area.MoveAreaToTrajectory(sceneMB.Trajectory);
                         }
-                        else
+                        else if (Context.getInfluenceArea() != null && Context.getInfluenceArea().isExists())
                         {
                             area = Context.getInfluenceArea().MoveArea(topLeft);
                         }

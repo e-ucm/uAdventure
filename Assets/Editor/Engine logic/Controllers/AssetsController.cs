@@ -1317,11 +1317,35 @@ namespace uAdventure.Editor
                     string text = File.ReadAllText(assetPath);
                     text = RemoveDiacritics(text);
                     text = text.Replace(".eaa", ".eaa.xml");
-                    File.WriteAllText(assetPath, text);
+                    WriteAllTextWithFlush(assetPath, text);
+                    pathsToReimport.Add(assetPath);
                 }
             }
 
             ImportAssets(pathsToReimport.ToArray());
+        }
+
+        public static void WriteAllTextWithFlush(string path, string contents)
+        {
+            // generate a temp filename
+            var tempPath = Path.GetTempFileName();
+
+            // create the backup name
+            var backup = path + ".tmp";
+
+            // delete any existing backups
+            if (File.Exists(backup))
+                File.Delete(backup);
+
+            // get the bytes
+            var data = Encoding.UTF8.GetBytes(contents);
+
+            // write the data to a temp file
+            using (var tempFile = File.Create(tempPath, 4096, FileOptions.WriteThrough))
+                tempFile.Write(data, 0, data.Length);
+
+            // replace the contents
+            File.Replace(tempPath, path, backup);
         }
 
         static string RemoveDiacritics(string text)

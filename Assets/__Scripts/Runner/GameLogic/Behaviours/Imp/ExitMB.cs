@@ -98,9 +98,13 @@ namespace uAdventure.Runner
                 }
                 else
                 {
-                    var points = ed.isRectangular() ? ed.ToRect().ToPoints() : ed.getPoints().ToArray();
-                    var topLeft = points.ToRect().position;
-                    area = ed.getInfluenceArea().MoveArea(topLeft);
+                    area = new InfluenceArea(ed.getX() - 20, ed.getY() - 20, ed.getWidth() + 40, ed.getHeight() + 40);
+                    if(this.ed.getInfluenceArea() != null && this.ed.getInfluenceArea().isExists())
+                    {
+                        var points = this.ed.isRectangular() ? this.ed.ToRect().ToPoints() : this.ed.getPoints().ToArray();
+                        var topLeft = points.ToRect().position;
+                        area = this.ed.getInfluenceArea().MoveArea(topLeft);
+                    }
                 }
                 var exitAction = new Core.Action(Core.Action.CUSTOM) { Effects = new Effects() { new ExecuteExitEffect(this) } };
                 exitAction.setNeedsGoTo(true);

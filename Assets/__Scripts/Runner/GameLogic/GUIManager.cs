@@ -12,7 +12,7 @@ namespace uAdventure.Runner
         public GameObject Bubble_Prefab, Think_Prefab, Yell_Prefab, Config_Menu_Ref;
         GameObject bubble;
         private bool get_talker = false;
-        private string talker_to_find, last_text;
+        private string talkerToFind, lastText;
         private GUIProvider guiprovider;
         private AdventureData data;
         private bool locked = false;
@@ -25,7 +25,7 @@ namespace uAdventure.Runner
 
         public string Last
         {
-            get { return last_text; }
+            get { return lastText; }
         }
 
         public GUIProvider Provider
@@ -47,10 +47,10 @@ namespace uAdventure.Runner
         {
             if (get_talker)
             {
-                if (GameObject.Find(talker_to_find) != null)
+                if (GameObject.Find(talkerToFind) != null)
                 {
                     get_talker = false;
-                    Talk(last_text, talker_to_find);
+                    Talk(lastText, talkerToFind);
                 }
             }
         }
@@ -75,10 +75,11 @@ namespace uAdventure.Runner
                 setCursor("default");
         }
 
-        public void Talk(string text, string talker_name = null)
+        public void Talk(string text, string talkerName = null)
         {
-            last_text = text;
-            if (talker_name == null || talker_name == Player.IDENTIFIER)
+            lastText = text;
+            GameObject talkerObject = null;
+            if (talkerName == null || talkerName == Player.IDENTIFIER)
             {
                 text = text.Replace("[]", "[" + Player.IDENTIFIER + "]");
                 NPC player = Game.Instance.GameState.Player;
@@ -90,23 +91,29 @@ namespace uAdventure.Runner
                 }
                 else
                 {
-                    GameObject talker_object = getTalker(talker_name);
-                    if (talker_object == null)
+                    talkerObject = getTalker(talkerName);
+                    if (talkerObject == null)
                         return;
-                    bubble = generateBubble(player, text, talker_object);
+                    bubble = generateBubble(player, text, talkerObject);
                 }
 
                 GUIManager.Instance.ShowBubble(bubble);
             }
             else
             {
-                GameObject talker_object = getTalker(talker_name);
-                if (talker_object == null)
+                talkerObject = getTalker(talkerName);
+                if (talkerObject == null)
                     return;
 
-                NPC cha = Game.Instance.GameState.getCharacter(talker_name);
-                BubbleData bubble = generateBubble(cha, text, talker_object);
+                NPC cha = Game.Instance.GameState.getCharacter(talkerName);
+                BubbleData bubble = generateBubble(cha, text, talkerObject);
                 GUIManager.Instance.ShowBubble(bubble);
+            }
+            if (talkerObject)
+            {
+                var bubbleTalker = talkerObject.GetComponent<CharacterMB>();
+                if (bubbleTalker)
+                    bubbleTalker.Play("speak");
             }
         }
 
@@ -146,12 +153,21 @@ namespace uAdventure.Runner
         public void destroyBubbles()
         {
             if (bubble != null)
+            {
+                var bubbleMB = this.bubble.GetComponent<Bubble>();
+                if (bubbleMB.Data.Talker)
+                {
+                    var characterMB = bubbleMB.Data.Talker.GetComponent<CharacterMB>();
+                    if (characterMB)
+                        characterMB.Play("stand");
+                } 
                 this.bubble.GetComponent<Bubble>().destroy();
+            }
         }
 
         public BubbleData generateBubble(NPC cha, string text, GameObject talker = null)
         {
-            BubbleData bubble = new BubbleData(text, new Vector2(40, 60), new Vector2(40, 45));
+            BubbleData bubble = new BubbleData(text, new Vector2(40, 60), new Vector2(40, 45), talker);
 
             bubble.TextColor = cha.getTextFrontColor();
             bubble.TextOutlineColor = cha.getTextBorderColor();
@@ -212,7 +228,7 @@ namespace uAdventure.Runner
 
             if (ret == null)
             {
-                talker_to_find = talker;
+                talkerToFind = talker;
                 get_talker = true;
             }
 

@@ -1332,6 +1332,9 @@ namespace uAdventure.Editor
 
                     // Reload the adventure as probably the animations have been replaced
                     EditorUtility.DisplayProgressBar("Importing project", "Finished! Reloading project...", 100);
+                    ResourceManager = null;
+                    Resources.UnloadUnusedAssets();
+                    ResourceManager = ResourceManagerFactory.CreateLocal();
                     loadedAdventureData = Loader.loadAdventureData(ResourceManager, incidences);
                     loadedAdventureData.setProjectName(currentZipName);
                     EditorUtility.ClearProgressBar();
