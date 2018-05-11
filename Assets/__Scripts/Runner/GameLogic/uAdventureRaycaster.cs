@@ -8,12 +8,14 @@ namespace uAdventure.Runner
 {
     public class uAdventureRaycaster : PhysicsRaycaster
     {
+        public bool Disabled { get; set; }
         public GameObject Override { get; set; }
         public static uAdventureRaycaster Instance { get; private set; }
 
         protected override void Awake()
         {
             base.Awake();
+            Disabled = false;
             Instance = this;
         }
 
@@ -27,7 +29,10 @@ namespace uAdventure.Runner
 
         public override void Raycast(PointerEventData eventData, List<RaycastResult> resultAppendList)
         {
-            if (Override)
+            if (Disabled)
+                return;
+
+            if (Override != null)
             {
                 var result = new RaycastResult
                 {

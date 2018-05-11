@@ -44,17 +44,16 @@ namespace uAdventure.Runner
         #region Monobehaviour
 
         public bool useSystemIO = true, forceScene = false, editor_mode = true;
-        private GUISkin style;
         public string gamePath = "", gameName = "", scene_name = "";
         public GameObject Blur_Prefab;
 
+        private GUISkin style;
+        private MenuMB menu;
         private bool waitingRunTarget = false;
-        private GameObject runTargetPreOverride;
-        MenuMB menu;
-        Interactuable next_interaction = null;
-        IRunnerChapterTarget runnerTarget;
-        GameState game_state;
-        uAdventureRaycaster uAdventureRaycaster;
+        private Stack<Interactuable> executeStack;
+        private IRunnerChapterTarget runnerTarget;
+        private GameState game_state;
+        private uAdventureRaycaster uAdventureRaycaster;
 
         public GUISkin Style
         {
@@ -85,6 +84,7 @@ namespace uAdventure.Runner
         void Awake()
         {
             Game.instance = this;
+            executeStack = new Stack<Interactuable>();
             //Load tracker data
             SimpleJSON.JSONNode hostfile = new SimpleJSON.JSONClass();
 
@@ -173,7 +173,7 @@ namespace uAdventure.Runner
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            if (!waitingRunTarget && next_interaction != null && guistate != guiState.ANSWERS_MENU)
+            if (!waitingRunTarget && executeStack.Count > 0 && guistate != guiState.ANSWERS_MENU)
             {
                 Interacted();
             }
@@ -188,14 +188,14 @@ namespace uAdventure.Runner
                 if (runnerTarget.IsReady)
                 {
                     waitingRunTarget = false;
-                    uAdventureRaycaster.Instance.Override = runTargetPreOverride;
+                    uAdventureRaycaster.Instance.Override = null;
                     Interacted();
                 }
             }
 
             if (!mouseDownDisabled  && Input.GetMouseButtonDown(0))
             {
-                if (Time.timeScale == 1)
+                /*if (Time.timeScale == 1)
                 {
                     if (next_interaction != null && guistate != guiState.ANSWERS_MENU)
                     {
@@ -239,7 +239,7 @@ namespace uAdventure.Runner
                         if (no_interaction)
                             runnerTarget.Interacted();
                     }
-                }
+                }*/
             }
             else if (Input.GetMouseButtonDown(1))
             {
@@ -263,7 +263,7 @@ namespace uAdventure.Runner
         private bool InteractWith(Interactuable interacted)
         {
             bool exit = false;
-            next_interaction = null;
+            /*next_interaction = null;
             switch (interacted.Interacted())
             {
                 case InteractuableResult.DOES_SOMETHING:
@@ -276,20 +276,41 @@ namespace uAdventure.Runner
                 case InteractuableResult.IGNORES:
                 default:
                     break;
-            }
+            }*/
             return exit;
         }
 
         public bool Execute(Interactuable interactuable)
         {
-            if (interactuable.Interacted() == InteractuableResult.REQUIRES_MORE_INTERACTION)
+            if(executeStack.Count == 0 || executeStack.Peek() != interactuable)
+                executeStack.Push(interactuable);
+            while(executeStack.Count > 0)
             {
-                this.next_interaction = interactuable;
-                uAdventureRaycaster.Instance.Override = this.gameObject;
-                return true;
+                var preInteractSize = executeStack.Count;
+                var toExecute = executeStack.Peek();
+                if (toExecute.Interacted() == InteractuableResult.REQUIRES_MORE_INTERACTION)
+                {
+                    uAdventureRaycaster.Instance.Override = this.gameObject;
+                    return true;
+                }
+                else
+                {
+                    if (preInteractSize != executeStack.Count)
+                    {
+                        var backupStack = new Stack<Interactuable>();
+                        // We backup the new stacked things
+                        while (executeStack.Count > preInteractSize)
+                            backupStack.Push(executeStack.Pop());
+                        // Then we remove our entry
+                        executeStack.Pop();
+                        // Then we reinsert the backuped stuff
+                        while (backupStack.Count > 0)
+                            executeStack.Push(backupStack.Pop());
+                    }
+                    else executeStack.Pop();
+                }
             }
-            if(uAdventureRaycaster.Instance.Override == this.gameObject)
-                uAdventureRaycaster.Instance.Override = null;
+            uAdventureRaycaster.Instance.Override = null;
             return false;
         }
 
@@ -297,23 +318,21 @@ namespace uAdventure.Runner
         {
             guistate = guiState.NOTHING;
             GUIManager.Instance.destroyBubbles();
-            if (this.next_interaction != null)
+            if (executeStack.Count > 0)
             {
-                Interactuable tmp = next_interaction;
-                next_interaction = null;
-                return Execute(tmp);
+                return Execute(executeStack.Peek());
             }
             return false;
         }
 
         public bool isSomethingRunning()
         {
-            return next_interaction != null;
+            return executeStack.Count > 0;
         }
 
         public Interactuable getNextInteraction()
         {
-            return next_interaction;
+            return executeStack.Count > 0 ? executeStack.Peek() : null;
         }
 
         #endregion Monobehaviour
@@ -375,8 +394,14 @@ namespace uAdventure.Runner
             return (T)System.Enum.Parse(typeof(T), value, true);
         }
 
-        public IRunnerChapterTarget RunTarget(string scene_id, int transition_time = 0, int transition_type = 0)
+        public IRunnerChapterTarget RunTarget(string scene_id, Interactuable notifyObject)
         {
+            return RunTarget(scene_id, 0, 0, notifyObject);
+        }
+
+        public IRunnerChapterTarget RunTarget(string scene_id, int transition_time = 0, int transition_type = 0, Interactuable notifyObject = null)
+        {
+            Debug.Log("Run target: " + scene_id);
             MenuMB.Instance.hide(true);
             if (runnerTarget != null){
                 runnerTarget.Destroy(transition_time / 1000f);
@@ -392,7 +417,8 @@ namespace uAdventure.Runner
             trackSceneChange(target);
 
             waitingRunTarget = true;
-            runTargetPreOverride = uAdventureRaycaster.Instance.Override;
+            if(notifyObject != null)
+                executeStack.Push(notifyObject);
             uAdventureRaycaster.Instance.Override = this.gameObject;
             
             return runnerTarget;

@@ -152,60 +152,59 @@ namespace uAdventure.Editor
             base.DrawNodeControls(content, node);
         }
 
-
-        private int setNode(GraphConversation content, ConversationNode oldNode, ConversationNode newNode, ConversationNode rootnode = null)
+        private bool setNode(GraphConversation content, ConversationNode oldNode, ConversationNode newNode)
         {
             if (newNode is DialogueConversationNode && oldNode.getChildCount() > 1)
                 if (!EditorUtility.DisplayDialog("Warning", "Switching this node to dialogue will only keep the first child (the rest of them will be deleted!). Continue?", "Yes", "No"))
-                    return 2;
+                    return false;
 
-            if (rootnode == null)
-                rootnode = content.getRootNode();
-
-            if (oldNode == rootnode)
+            // Replace the childs of the current node
+            for (int i = 0; i < oldNode.getChildCount(); i++)
             {
-
-                for (int i = 0; i < rootnode.getChildCount(); i++)
+                if (newNode is DialogueConversationNode)
                 {
-                    if (newNode is DialogueConversationNode)
-                    {
-                        if (i > 0) break;
-                    }
-                    else if (newNode is OptionConversationNode)
-                    {
-                        newNode.addLine(new ConversationLine("Player", ""));
-                    }
-
-                    newNode.addChild(rootnode.getChild(i));
+                    if (i > 0) break;
+                }
+                else if (newNode is OptionConversationNode)
+                {
+                    newNode.addLine(new ConversationLine("Player", ""));
                 }
 
-                if (content.getRootNode() == rootnode)
-                {
-                    content.setRootNode(newNode);
-                    return 1;
-                }
-                else
-                {
-                    return 2;
-                }
-
+                // Add the childs
+                ConversationNode oldNodeChild = oldNode.getChild(i);
+                // But if the child is looping to itself, just add the new node instead
+                if (oldNodeChild == oldNode) oldNodeChild = newNode;
+                newNode.addChild(oldNodeChild);
             }
-            else
+
+            if (content.getRootNode() == oldNode)
             {
-                for (int i = 0; i < rootnode.getChildCount(); i++)
+                content.setRootNode(newNode);
+            }
+
+
+            // Replace the node
+            return setNode(new Dictionary<ConversationNode, bool>(), content, oldNode, newNode, content.getRootNode()) > 0;
+        }
+
+
+        private int setNode(Dictionary<ConversationNode, bool> opened, GraphConversation content, ConversationNode oldNode, ConversationNode newNode, ConversationNode currentNode)
+        {
+            int r = 0;
+
+            if (!opened.ContainsKey(currentNode))
+            {
+                opened[currentNode] = true;
+                for (int i = 0; i < currentNode.getChildCount(); i++)
                 {
-                    int result = setNode(content, oldNode, newNode, rootnode.getChild(i));
-
-                    if (result == 2)
-                    {
-                        rootnode.replaceChild(i, newNode);
-                    }
-
-                    if (result != 0)
-                        return 1;
+                    var child = currentNode.getChild(i);
+                    r += setNode(opened, content, oldNode, newNode, child);
+                    if (child == oldNode)
+                        currentNode.replaceChild(i, newNode);
                 }
             }
-            return 0;
+
+            return r;
         }
 
         public void addChild(ConversationNode parent, ConversationNode child)

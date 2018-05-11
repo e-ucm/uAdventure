@@ -97,7 +97,7 @@ namespace uAdventure.Runner
                             case EffectType.TRIGGER_CUTSCENE:
                                 runs_once = false;
                                 TriggerCutsceneEffect tce = (TriggerCutsceneEffect)effect;
-                                if (times_runed > 0)
+                                if (times_runed > 1) // The first interaction is the run target callback
                                 {
                                     if (!aditional_info.ContainsKey("cutscene_effect"))
                                     {
@@ -113,7 +113,11 @@ namespace uAdventure.Runner
                                     else
                                         forcewait = ((Interactuable)aditional_info["cutscene_effect"]).Interacted() == InteractuableResult.REQUIRES_MORE_INTERACTION;
                                 }
-                                else
+                                else if(times_runed == 1)
+                                {
+                                    forcewait = true;
+                                }
+                                else if (times_runed == 0)
                                 {
                                     aditional_info = new Dictionary<string, object>();
                                     aditional_info.Add("lastscene", Game.Instance.GameState.CurrentTarget);

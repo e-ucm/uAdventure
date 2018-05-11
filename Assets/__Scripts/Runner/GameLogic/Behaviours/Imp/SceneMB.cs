@@ -467,10 +467,8 @@ namespace uAdventure.Runner
 
         public InteractuableResult Interacted(PointerEventData pointerData = null)
         {
-            Effects e;
-
             InteractuableResult res = InteractuableResult.IGNORES;
-
+            
             switch (sceneData.getType())
             {
                 case GeneralScene.GeneralSceneSceneType.SCENE:
@@ -480,7 +478,7 @@ namespace uAdventure.Runner
                         Background.GetComponent<Collider>().Raycast(Camera.main.ScreenPointToRay(pointerData.position), out hitInfo, float.MaxValue);
                         var texPos = PixelsSize;
                         var texCoord = hitInfo.textureCoord;
-                        texCoord.y = 1-texCoord.y;
+                        texCoord.y = 1 - texCoord.y;
                         texPos.Scale(texCoord);
                         var accesible = TrajectoryHandler.GetAccessibleTrajectory(PlayerMB.Instance.getPosition(), trajectoryHandler);
                         PlayerMB.Instance.Move(accesible.closestPoint(texPos));
@@ -492,16 +490,16 @@ namespace uAdventure.Runner
                     break;
                 case GeneralScene.GeneralSceneSceneType.VIDEOSCENE:
                     var videoscene = (Videoscene)sceneData;
-                    if (movieplayer == MovieState.NOT_MOVIE 
-                        || movieplayer == MovieState.STOPPED 
-                        || (movieplayer == MovieState.PLAYING && !movie.isPlaying()) 
+                    if (movieplayer == MovieState.NOT_MOVIE
+                        || movieplayer == MovieState.STOPPED
+                        || (movieplayer == MovieState.PLAYING && !movie.isPlaying())
                         || videoscene.isCanSkip())
                     {
                         movie.Stop();
                         movieplayer = MovieState.STOPPED;
-                        if(movieplayer == MovieState.PLAYING)
+                        if (movieplayer == MovieState.PLAYING)
                             Tracker.T.accessible.Skipped(sceneData.getId(), AccessibleTracker.Accessible.Cutscene);
-                        FinishCutscene(videoscene);
+                        res = FinishCutscene(videoscene);
                     }
                     break;
             }
@@ -511,7 +509,8 @@ namespace uAdventure.Runner
 
         private InteractuableResult FinishCutscene(Cutscene cutscene)
         {
-            InteractuableResult res = InteractuableResult.IGNORES;
+            InteractuableResult res = InteractuableResult.DOES_SOMETHING;
+            TriggerSceneEffect triggerScene = null;
 
             switch ((cutscene).getNext())
             {
@@ -523,18 +522,28 @@ namespace uAdventure.Runner
                         previousTarget = possibleTargets.FirstOrDefault(t => t.getId() != this.sceneData.getId());
                     }
                     if(previousTarget != null)
-                        Game.Instance.RunTarget(previousTarget.getId());
+                    {
+                        triggerScene = new TriggerSceneEffect(previousTarget.getId(), int.MinValue, int.MinValue);
+                    }
                     break;
                 case Slidescene.NEWSCENE:
-                    Game.Instance.RunTarget(cutscene.getTargetId());
+                    triggerScene = new TriggerSceneEffect(cutscene.getTargetId(), int.MinValue, int.MinValue);
                     break;
                 case Slidescene.ENDCHAPTER:
                     break;
             }
 
-            Effects e = ((Cutscene)cutscene).getEffects();
-            if (e != null && Game.Instance.Execute(new EffectHolder(e)))
-                res = InteractuableResult.DOES_SOMETHING;
+            Effects e = new Effects()
+            {
+                triggerScene
+            };
+            var cutsceneEffects = ((Cutscene)sceneData).getEffects();
+            if (cutsceneEffects != null)
+            {
+                e.AddRange(cutsceneEffects);
+            }
+
+            Game.Instance.Execute(new EffectHolder(e));
 
             return res;
         }

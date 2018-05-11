@@ -88,6 +88,8 @@ namespace uAdventure.Editor
         private bool CreateAndInitEffectEditor(Effects effects, IEffect effect)
         {
             var editor = EffectEditorFactory.Intance.createEffectEditorFor(effect);
+            if (editor.manages(effect))
+                editor.Effect = effect;
             editor.Window = new Rect(new Vector2(50, 50), initialSize);
             if (editor == null)
             {
@@ -146,7 +148,6 @@ namespace uAdventure.Editor
             int preEditorSelected = EffectEditorFactory.Intance.EffectEditorIndex(effect);
             int editorSelected = EditorGUILayout.Popup(preEditorSelected, editorNames);
 
-            var abstractEffect = effect as AbstractEffect;
 
             if (preEditorSelected != editorSelected)
             {
@@ -155,11 +156,19 @@ namespace uAdventure.Editor
                 editors[editor.Effect] = editor;
                 collapsedState[editor.Effect] = collapsedState[effect];
                 collapsedState.Remove(effect);
-                effects[effects.IndexOf(effect)] = editor.Effect;
 
-                if (abstractEffect != null && editor.Effect is AbstractEffect)
+                if (editor.manages(effect))
+                    editor.Effect = effect;
+                else
                 {
-                    (editor.Effect as AbstractEffect).setConditions(abstractEffect.getConditions());
+                    // Re insert the conditions
+                    var abstractEffect = effect as AbstractEffect;
+                    if (abstractEffect != null && editor.Effect is AbstractEffect)
+                    {
+                        (editor.Effect as AbstractEffect).setConditions(abstractEffect.getConditions());
+                    }
+                    // Replace the effect
+                    effects[effects.IndexOf(effect)] = editor.Effect;
                 }
             }
 
