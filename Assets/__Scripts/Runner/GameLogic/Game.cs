@@ -283,9 +283,13 @@ namespace uAdventure.Runner
         public bool Execute(Interactuable interactuable)
         {
             if(executeStack.Count == 0 || executeStack.Peek() != interactuable)
+            {
+                Debug.Log("Pushed " + interactuable.ToString());
                 executeStack.Push(interactuable);
+            }
             while(executeStack.Count > 0)
             {
+                Debug.Log("executeStack.Count: " + executeStack.Count);
                 var preInteractSize = executeStack.Count;
                 var toExecute = executeStack.Peek();
                 if (toExecute.Interacted() == InteractuableResult.REQUIRES_MORE_INTERACTION)
@@ -295,8 +299,10 @@ namespace uAdventure.Runner
                 }
                 else
                 {
+                    Debug.Log("Execution finished " + toExecute.ToString());
                     if (preInteractSize != executeStack.Count)
                     {
+                        Debug.Log("The size was different");
                         var backupStack = new Stack<Interactuable>();
                         // We backup the new stacked things
                         while (executeStack.Count > preInteractSize)

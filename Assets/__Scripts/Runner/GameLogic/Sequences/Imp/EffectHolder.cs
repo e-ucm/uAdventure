@@ -99,19 +99,19 @@ namespace uAdventure.Runner
                                 TriggerCutsceneEffect tce = (TriggerCutsceneEffect)effect;
                                 if (times_runed > 1) // The first interaction is the run target callback
                                 {
-                                    if (!aditional_info.ContainsKey("cutscene_effect"))
+                                    if (aditional_info.ContainsKey("sub_effects_wait"))
+                                        forcewait = false;
+                                    else
                                     {
                                         InteractuableResult res = ((Interactuable)aditional_info["scene"]).Interacted();
                                         if (res == InteractuableResult.REQUIRES_MORE_INTERACTION)
                                             forcewait = true;
                                         else if (res == InteractuableResult.DOES_SOMETHING)
                                         {
+                                            aditional_info["sub_effects_wait"] = true;
                                             forcewait = true;
-                                            aditional_info.Add("cutscene_effect", Game.Instance.getNextInteraction());
                                         }
                                     }
-                                    else
-                                        forcewait = ((Interactuable)aditional_info["cutscene_effect"]).Interacted() == InteractuableResult.REQUIRES_MORE_INTERACTION;
                                 }
                                 else if(times_runed == 1)
                                 {
