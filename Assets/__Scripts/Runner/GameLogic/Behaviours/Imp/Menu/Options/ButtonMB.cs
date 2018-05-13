@@ -107,7 +107,7 @@ namespace uAdventure.Runner
             if (showText)
             {
                 GUILayout.BeginArea(new Rect(Input.mousePosition.x - 100, Screen.height - Input.mousePosition.y + 20, 200, 300));
-                GUILayout.Label(actionName, Game.Instance.Style.label);
+                GUILayout.Label(actionName, Game.Instance.Skin.label);
                 GUILayout.EndArea();
             }
         }

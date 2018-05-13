@@ -45,19 +45,32 @@ namespace uAdventure.Runner
 
         public bool useSystemIO = true, forceScene = false, editor_mode = true;
         public string gamePath = "", gameName = "", scene_name = "";
-        public GameObject Blur_Prefab;
 
-        private GUISkin style;
-        private MenuMB menu;
+        // Execution
         private bool waitingRunTarget = false;
         private Stack<Interactuable> executeStack;
         private IRunnerChapterTarget runnerTarget;
         private GameState game_state;
         private uAdventureRaycaster uAdventureRaycaster;
 
-        public GUISkin Style
+        // Tracking
+        IChapterTarget alternative;
+
+        // GUI
+        public GameObject Blur_Prefab;
+        private GUISkin skin;
+        private GameObject blur;
+        private MenuMB menu;
+        private guiState guistate = guiState.NOTHING;
+        private List<Action> guiactions;
+        private List<int> order;
+        private ConversationNodeHolder guioptions;
+        private float elapsedTime;
+        private bool doTimeOut;
+
+        public GUISkin Skin
         {
-            get { return style; }
+            get { return skin; }
         }
 
         public GameState GameState
@@ -117,8 +130,7 @@ namespace uAdventure.Runner
             }
             catch { }
 
-            style = Resources.Load("basic") as GUISkin;
-            optionlabel = new GUIStyle(style.label);
+            skin = Resources.Load("basic") as GUISkin;
 
             if (Game.GameToLoad != "")
             {
@@ -191,6 +203,11 @@ namespace uAdventure.Runner
                     uAdventureRaycaster.Instance.Override = null;
                     Interacted();
                 }
+            }
+
+            if (doTimeOut)
+            {
+                elapsedTime += Time.deltaTime;
             }
 
             if (!mouseDownDisabled  && Input.GetMouseButtonDown(0))
@@ -347,8 +364,6 @@ namespace uAdventure.Runner
         //################################################################
         #region Tracking
 
-        IChapterTarget alternative;
-
         // TODO ?????
         //List<GeneralScene> finalprogress = new List<GeneralScene>();
 
@@ -460,21 +475,36 @@ namespace uAdventure.Runner
             //this.clicked_on = position;
         }
 
-        GameObject blur;
         public void showOptions(ConversationNodeHolder options)
         {
             if (options.getNode().getType() == ConversationNodeViewEnum.OPTION)
             {
+                var optionsNode = options.getNode() as OptionConversationNode;
+                if (optionsNode == null) // It must contain an OptionConversationNode
+                    return;
+
+                // Disable the UI interactivity
                 uAdventureRaycaster.Instance.enabled = false;
+
+                // Enable blurred background
                 blur = GameObject.Instantiate(Blur_Prefab);
                 blur.transform.position = new Vector3(Camera.main.transform.position.x, Camera.main.transform.position.y, Camera.main.transform.position.z + 1);
-                var node = options.getNode();
-                this.order = Enumerable.Range(0, node.getLineCount()).ToList();
+
                 // Order shuffeling when node is configured for random
-                if (node is OptionConversationNode && (node as OptionConversationNode).isRandom())
+                this.order = Enumerable.Range(0, optionsNode.getLineCount()).ToList();
+                if (optionsNode.isRandom())
                     this.order.Shuffle();
                 this.guioptions = options;
                 this.guistate = guiState.ANSWERS_MENU;
+
+                // Timeout option
+                if (optionsNode.Timeout > 0 && ConditionChecker.check(optionsNode.TimeoutConditions))
+                {
+                    this.doTimeOut = true;
+                    this.elapsedTime = 0;
+                }
+                else
+                    this.doTimeOut = false;
             }
         }
         
@@ -482,22 +512,16 @@ namespace uAdventure.Runner
         {
             GUIManager.Instance.Talk(text, character);
         }
-        
-        private guiState guistate = guiState.NOTHING;
-        private List<Action> guiactions;
-        private List<int> order;
-        private ConversationNodeHolder guioptions;
-
-        GUIStyle optionlabel;
 
         void OnGUI()
         {
             float guiscale = Screen.width / 800f;
-            style.box.fontSize = Mathf.RoundToInt(guiscale * 20);
-            style.button.fontSize = Mathf.RoundToInt(guiscale * 20);
-            style.label.fontSize = Mathf.RoundToInt(guiscale * 20);
-            optionlabel.fontSize = Mathf.RoundToInt(guiscale * 36);
-            style.GetStyle("talk_player").fontSize = Mathf.RoundToInt(guiscale * 20);
+            skin.box.fontSize = Mathf.RoundToInt(guiscale * 20);
+            skin.button.fontSize = Mathf.RoundToInt(guiscale * 20);
+            skin.label.fontSize = Mathf.RoundToInt(guiscale * 20);
+            skin.GetStyle("optionLabel").fontSize = Mathf.RoundToInt(guiscale * 36);
+            skin.GetStyle("talk_player").fontSize = Mathf.RoundToInt(guiscale * 20);
+            skin.GetStyle("emptyProgressBar").fontSize = Mathf.RoundToInt(guiscale * 20);
             //float rectwith = guiscale * 330;
 
             switch (guistate)
@@ -512,29 +536,81 @@ namespace uAdventure.Runner
                         var text = GUIManager.Instance.Last;
                         if (text[0] == '#')
                             text = text.Remove(0, Mathf.Max(0, text.IndexOf(' ') + 1));
-                        GUILayout.Label(text, optionlabel);
+                        GUILayout.Label(text, "optionLabel");
                     }
                     foreach (var i in order)
                     {
                         ConversationLine ono = options.getLine(i);
                         if (ConditionChecker.check(options.getLineConditions(i)))
-                            if (GUILayout.Button((string)ono.getText(), style.button))
+                        {
+                            if (GUILayout.Button((string)ono.getText(), skin.button))
                             {
-                                GameObject.Destroy(blur);
-                                guioptions.clicked(i);
-                                /*Tracker.T ().Choice (GUIManager.Instance.Last, ono.getText ());
-                                Tracker.T ().RequestFlush ();*/
-                                uAdventureRaycaster.Instance.enabled = true;
-                                Interacted();
+                                OptionSelected(i);
                             }
-                        ;
+                        }
                     }
+
+                    if(doTimeOut)
+                    {
+                        if(Event.current.type == EventType.Repaint && elapsedTime > options.Timeout)
+                        {
+                            OptionSelected(options.getChildCount()-1);
+                        }
+
+                        var timeLeft = Mathf.Max(0, options.Timeout - elapsedTime);
+                        var timeLeftText = Mathf.Round(timeLeft * 10) / 10 + " s";
+                        GUILayout.FlexibleSpace();
+                        DrawProgressBar(GUILayoutUtility.GetRect(0, 0, "emptyProgressBar", GUILayout.ExpandWidth(true), GUILayout.Height(50)), timeLeftText, 1 - (elapsedTime / options.Timeout));
+                    }
+
                     GUILayout.EndVertical();
                     GUILayout.EndArea();
                     break;
                 default: break;
             }
         }
+
+        private void OptionSelected(int i)
+        {
+            doTimeOut = false;
+            GameObject.Destroy(blur);
+            guioptions.clicked(i);
+            /*Tracker.T ().Choice (GUIManager.Instance.Last, ono.getText ());
+            Tracker.T ().RequestFlush ();*/
+            uAdventureRaycaster.Instance.enabled = true;
+            Interacted();
+        }
+
+        private void DrawProgressBar(Rect rect, string text, float progress)
+        {
+            var pos = rect.position;
+            var size = rect.size;
+
+            var bcSkin = GUI.skin;
+            GUI.skin = skin;
+
+            progress = Mathf.Clamp01(progress);
+
+            // draw the background:
+            GUI.BeginGroup(new Rect(pos.x, pos.y, size.x, size.y));
+            {
+                var backgroundRect = new Rect(0, 0, size.x, size.y);
+                GUI.Box(backgroundRect, new GUIContent(), "emptyProgressBar");
+
+                // draw the filled-in part:
+                GUI.BeginGroup(new Rect(0, 0, size.x * progress, size.y));
+                {
+                    GUI.Box(new Rect(0, 0, size.x, size.y), new GUIContent(), "fullProgressBar");
+                }
+                GUI.EndGroup();
+
+                GUI.Label(backgroundRect, text, "textProgressBar");
+            }
+            GUI.EndGroup();
+
+            GUI.skin = bcSkin;
+        }
+
         #endregion Misc
 
 
