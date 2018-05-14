@@ -85,14 +85,14 @@ namespace uAdventure.Editor
                 // ################
 
                 EditorGUI.BeginChangeCheck();
-                var showTime = EditorGUILayout.BeginToggleGroup(TC.get("TimersList.Time"), workingTimer.isShowTime());
+                var showTime = EditorGUILayout.BeginToggleGroup(TC.get("TimersList.Display"), workingTimer.isShowTime());
                 if (EditorGUI.EndChangeCheck()) workingTimer.setShowTime(showTime);
                 {
                     EditorGUI.indentLevel++;
 
                     // Display name
                     EditorGUI.BeginChangeCheck();
-                    var id = EditorGUILayout.TextField(workingTimer.getDisplayName());
+                    var id = EditorGUILayout.TextField(TC.get("Item.Name"), workingTimer.getDisplayName());
                     if (EditorGUI.EndChangeCheck()) workingTimer.setDisplayName(id);
 
                     // CountDown
@@ -158,7 +158,7 @@ namespace uAdventure.Editor
                     EditorGUI.indentLevel++;
 
                     EditorGUI.BeginChangeCheck();
-                    var usesEndCondition = EditorGUILayout.BeginToggleGroup(TC.get("TimersList.UsesEndConditionShort"), workingTimer.isUsesEndCondition());
+                    var usesEndCondition = EditorGUILayout.BeginToggleGroup(TC.get("Timer.UsesEndConditionShort"), workingTimer.isUsesEndCondition());
                     if (EditorGUI.EndChangeCheck()) workingTimer.setUsesEndCondition(usesEndCondition);
 
                     if (GUILayout.Button(TC.get("GeneralText.EditEndConditions")))

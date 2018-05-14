@@ -65,7 +65,7 @@ namespace uAdventure.Editor
             get = data.GetType().GetMethod(getMethodName);
             this.getName = getMethodName;
             this.setName = setMethodName;
-            if (get.ReturnType != typeof(int))
+            if (get.ReturnType != typeof(long))
             {
                 get = set = null;
                 getName = setName = null;
@@ -113,7 +113,7 @@ namespace uAdventure.Editor
                 // Get the old value
                 //try
                 //{
-                oldValue = (int)get.Invoke(data, null);
+                oldValue = (long)get.Invoke(data, null);
                 if (newValue != null && oldValue == null || newValue == null && oldValue != null ||
                     (newValue != null && oldValue != null && !oldValue.Equals(newValue)))
                 {

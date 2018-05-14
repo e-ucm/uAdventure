@@ -3,32 +3,65 @@ using System.Collections;
 using System.Collections.Generic;
 
 using uAdventure.Core;
+using System;
 
 namespace uAdventure.Runner
 {
+
     public class TimerController : MonoBehaviour
     {
+
+        public enum TimerState { New, Running, Finished };
+        public enum TimerType { Normal, Countdown };
+        public class TimerVars
+        {
+            public Timer timer;
+            public float currentTime;
+            public float maxTime;
+            public TimerType type;
+        }
+
+        #region Singleton
 
         //#################################################################
         //########################### SINGLETON ###########################
         //#################################################################
 
-        private enum TimerType { NORMAL, COUNTDOWN };
-        private class TimerState
-        {
-            public Timer timer;
-            public float current_time;
-            public float max_time;
-            public TimerType type;
-        }
-
         private static TimerController instance;
-
         public static TimerController Instance
         {
             get
             {
                 return instance;
+            }
+        }
+        #endregion
+
+        [SerializeField]
+        private GameObject timerPrefab;
+        [SerializeField]
+        private GameObject timersContainer;
+
+        private List<Timer> timers = new List<Timer>();
+        private Dictionary<Timer, GameObject> timerObject = new Dictionary<Timer, GameObject>();
+        private Dictionary<Timer, TimerState> timerState = new Dictionary<Timer, TimerState>();
+        private Dictionary<Timer, TimerVars> runningTimers = new Dictionary<Timer, TimerVars>();
+
+        private Queue<EffectHolder> finalizationQueue = new Queue<EffectHolder>();
+
+        public List<Timer> Timers
+        {
+            get { return timers; }
+            set
+            {
+                // Update the timer states
+                var newTimerStates = new Dictionary<Timer, TimerState>();
+                foreach (var timer in value)
+                    newTimerStates.Add(timer, timerState.ContainsKey(timer) ? timerState[timer] : TimerState.New);
+                timerState = newTimerStates;
+
+                this.timers = value;
+
             }
         }
 
@@ -37,8 +70,6 @@ namespace uAdventure.Runner
         //######################################################################
 
         //###### MONOBEHAVIOUR ######
-
-        //bool running = false;
 
         void Awake()
         {
@@ -51,109 +82,146 @@ namespace uAdventure.Runner
 
         void Update()
         {
-            if (!Game.Instance.isSomethingRunning() && running_timers.Count > 0)
+            foreach (var kv in runningTimers)
             {
-                foreach (TimerState ts in running_timers)
+                TimerVars timerVars = kv.Value;
+                switch (timerVars.type)
                 {
-                    switch (ts.type)
-                    {
-                        case TimerType.NORMAL:
-                            ts.current_time += Time.deltaTime;
-                            if (ts.current_time >= ts.max_time)
-                            {
-                                completed_timers.Push(ts.timer);
-                                ts.current_time = 0f;
-                            }
-                            break;
-                        case TimerType.COUNTDOWN:
-                            ts.current_time -= Time.deltaTime;
-                            if (ts.current_time <= 0)
-                                completed_timers.Push(ts.timer);
-                            break;
-                    }
-                }
-
-                while (completed_timers.Count > 0)
-                {
-                    if (Game.Instance.isSomethingRunning())
+                    case TimerType.Normal:
+                        timerVars.currentTime += Time.deltaTime;
+                        if (timerVars.currentTime >= timerVars.maxTime)
+                            FinalizeTimer(timerVars.timer);
                         break;
-                    Game.Instance.Execute(new EffectHolder(completed_timers.Pop().getEffects()));
+                    case TimerType.Countdown:
+                        timerVars.currentTime -= Time.deltaTime;
+                        if (timerVars.currentTime <= 0)
+                            FinalizeTimer(timerVars.timer);
+                        break;
                 }
+            }
+
+            while (finalizationQueue.Count > 0)
+            {
+                if (Game.Instance.isSomethingRunning())
+                    break;
+                Game.Instance.Execute(finalizationQueue.Dequeue());
             }
         }
 
-        //###### TIMERHANDLER ######
-
-        List<Timer> timers = new List<Timer>();
-        Stack<Timer> completed_timers = new Stack<Timer>();
-        List<TimerState> running_timers = new List<TimerState>();
-
-        public List<Timer> Timers
+        private void InitTimer(Timer timer, TimerVars timerVars)
         {
-            get { return timers; }
-            set { this.timers = value; }
+            if (timer.isShowTime())
+            {
+                if (!timerObject.ContainsKey(timer))
+                    timerObject[timer] = Instantiate(timerPrefab, timersContainer.transform);
+                var uiTimerController = timerObject[timer].GetComponent<UITimerController>();
+                uiTimerController.Timer = timer;
+                uiTimerController.Running = true;
+                uiTimerController.Reset();
+            }
+
+            if (timer.isCountDown())
+            {
+                timerVars.type = TimerType.Countdown;
+                timerVars.maxTime = 0;
+                timerVars.currentTime = System.Convert.ToInt64(timer.getTime() * 1000) / 1000f;
+            }
+            else
+            {
+                timerVars.type = TimerType.Normal;
+                timerVars.maxTime = System.Convert.ToInt64(timer.getTime() * 1000) / 1000f;
+                timerVars.currentTime = 0;
+            }
+
+            timerVars.timer = timer;
+        }
+
+        private void FinalizeTimer(Timer timer)
+        {
+            var timerVars = runningTimers[timer];
+            timerVars.currentTime = 0f;
+            if (timer.isRunsInLoop())
+            {
+                InitTimer(timer, timerVars);
+            }
+            else
+            {
+                timerState[timer] = timer.isMultipleStarts() ? TimerState.New : TimerState.Finished;
+                runningTimers.Remove(timer);
+            }
+
+            finalizationQueue.Enqueue(new EffectHolder(timerVars.timer.getEffects()));
+
+            // Destroy the visualization (if not shown when stopped)
+            if (!timer.isShowWhenStopped() && timerObject.ContainsKey(timer))
+            {
+                DestroyImmediate(timerObject[timer]);
+                timerObject.Remove(timer);
+            }
+        }
+
+        private void StopTimer(Timer timer)
+        {
+            runningTimers.Remove(timer);
+            timerState[timer] = timer.isMultipleStarts() ? TimerState.New : TimerState.Finished;
+            if(timer.getPostEffects() != null)
+                finalizationQueue.Enqueue(new EffectHolder(timer.getPostEffects()));
+
+            // Destroy the visualization
+            if (timerObject.ContainsKey(timer))
+            {
+                DestroyImmediate(timerObject[timer]);
+                timerObject.Remove(timer);
+            }
         }
 
         public void Run()
         {
-            //this.running = true;
-            checkTimers();
+            CheckTimers();
         }
 
-        public void checkTimers()
+        public void CheckTimers()
         {
-            foreach (Timer t in timers)
+            foreach (Timer timer in timers)
             {
-                if (ConditionChecker.check(t.getInitCond()))
-                {
-                    if (!isRunning(t))
-                    {
-                        TimerState ts = new TimerState();
-                        if (t.isCountDown())
-                        {
-                            ts.type = TimerType.COUNTDOWN;
-                            ts.max_time = 0;
-                            ts.current_time = System.Convert.ToInt64(t.getTime() * 1000) / 1000f;
-                        }
-                        else
-                        {
-                            ts.type = TimerType.NORMAL;
-                            ts.max_time = System.Convert.ToInt64(t.getTime() * 1000) / 1000f;
-                            ts.current_time = 0;
-                        }
-                        ts.timer = t;
+                // Finished timers dont restart
+                if (timerState[timer] == TimerState.Finished)
+                    continue;
 
-                        running_timers.Add(ts);
+                if (!IsRunning(timer))
+                {
+                    if (timer.isShowTime() && timer.isShowWhenStopped())
+                    {
+                        if (!timerObject.ContainsKey(timer))
+                            timerObject[timer] = Instantiate(timerPrefab, timersContainer.transform);
+
+                        var uiTimerController = timerObject[timer].GetComponent<UITimerController>();
+                        uiTimerController.Timer = timer;
+                        uiTimerController.Running = false;
+                        uiTimerController.Reset();
+                    }
+
+                    if (ConditionChecker.check(timer.getInitCond()))
+                    {
+                        TimerVars timerVars = new TimerVars();
+                        InitTimer(timer, timerVars);
+                        runningTimers[timer] = timerVars;
                     }
                 }
-                else if (isRunning(t))
-                    removeFromRunning(t);
-            }
-        }
-
-        private bool isRunning(Timer t)
-        {
-            foreach (TimerState ts in running_timers)
-            {
-                if (t == ts.timer)
-                    return true; 
-            }
-            return false;
-        }
-
-        private void removeFromRunning(Timer t)
-        {
-            TimerState state = null;
-            foreach (TimerState ts in running_timers)
-            {
-                if (t == ts.timer)
+                else
                 {
-                    state = ts;
-                    break;
+                    // Timer can end either by using its end condition or else by not satisfying his init condition
+                    if ((timer.isUsesEndCondition() && ConditionChecker.check(timer.getEndCond())) || !ConditionChecker.check(timer.getInitCond()))
+                    {
+                        StopTimer(timer);
+                    }
                 }
             }
-            if (state != null)
-                running_timers.Remove(state);
+        }
+
+        private bool IsRunning(Timer t)
+        {
+            return runningTimers.ContainsKey(t);
         }
     }
 }

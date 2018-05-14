@@ -67,7 +67,7 @@ namespace uAdventure.Runner
 
             // TODO check this after this: https://github.com/e-ucm/unity-tracker/issues/29
             Tracker.T.setVar(name, bstate ? 1 : 0);
-            TimerController.Instance.checkTimers();
+            TimerController.Instance.CheckTimers();
             CompletableController.Instance.conditionChanged();
             Game.Instance.reRenderScene();
         }
