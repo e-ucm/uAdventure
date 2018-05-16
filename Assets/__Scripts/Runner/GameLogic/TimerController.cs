@@ -46,6 +46,7 @@ namespace uAdventure.Runner
         private Dictionary<Timer, GameObject> timerObject = new Dictionary<Timer, GameObject>();
         private Dictionary<Timer, TimerState> timerState = new Dictionary<Timer, TimerState>();
         private Dictionary<Timer, TimerVars> runningTimers = new Dictionary<Timer, TimerVars>();
+        private bool checkAfterwards = false;
 
         private Queue<EffectHolder> finalizationQueue = new Queue<EffectHolder>();
 
@@ -82,9 +83,12 @@ namespace uAdventure.Runner
 
         void Update()
         {
-            foreach (var kv in runningTimers)
+            foreach (var timer in timers)
             {
-                TimerVars timerVars = kv.Value;
+                if (!runningTimers.ContainsKey(timer))
+                    continue;
+                
+                TimerVars timerVars = runningTimers[timer];
                 switch (timerVars.type)
                 {
                     case TimerType.Normal:
@@ -98,6 +102,12 @@ namespace uAdventure.Runner
                             FinalizeTimer(timerVars.timer);
                         break;
                 }
+            }
+
+            if (checkAfterwards)
+            {
+                checkAfterwards = false;
+                CheckTimers();
             }
 
             while (finalizationQueue.Count > 0)
@@ -146,7 +156,12 @@ namespace uAdventure.Runner
             }
             else
             {
-                timerState[timer] = timer.isMultipleStarts() ? TimerState.New : TimerState.Finished;
+                timerState[timer] = TimerState.Finished;
+                if (timer.isMultipleStarts())
+                {
+                    timerState[timer] = TimerState.New;
+                    checkAfterwards = true;
+                }
                 runningTimers.Remove(timer);
             }
 
@@ -163,7 +178,13 @@ namespace uAdventure.Runner
         private void StopTimer(Timer timer)
         {
             runningTimers.Remove(timer);
-            timerState[timer] = timer.isMultipleStarts() ? TimerState.New : TimerState.Finished;
+            timerState[timer] = TimerState.Finished;
+            if (timer.isMultipleStarts())
+            {
+                timerState[timer] = TimerState.New;
+                checkAfterwards = true;
+            }
+
             if(timer.getPostEffects() != null)
                 finalizationQueue.Enqueue(new EffectHolder(timer.getPostEffects()));
 
@@ -208,7 +229,9 @@ namespace uAdventure.Runner
                         runningTimers[timer] = timerVars;
                     }
                 }
-                else
+
+                // If the timer has been just started
+                if (IsRunning(timer))
                 {
                     // Timer can end either by using its end condition or else by not satisfying his init condition
                     if ((timer.isUsesEndCondition() && ConditionChecker.check(timer.getEndCond())) || !ConditionChecker.check(timer.getInitCond()))
