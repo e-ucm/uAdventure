@@ -178,7 +178,7 @@ namespace uAdventure.Runner
 
         public void ActionSelected(Action action)
         {
-            if(Game.Instance.GameState.IsFirstPerson|| !action.isNeedsGoTo())
+            if(Game.Instance.GameState.IsFirstPerson || !action.isNeedsGoTo())
                 Game.Instance.Execute(new EffectHolder(action.Effects));
             else
             {
@@ -219,8 +219,7 @@ namespace uAdventure.Runner
         public bool Move(Rectangle area, float distance)
         {
             AbortCurrentMovement();
-
-            if (area.Contains(this.getPosition(), distance))
+            if (area.Contains(this.getPosition(), 0))
             {
                 OnMovementFinished();
                 return true;
@@ -269,6 +268,7 @@ namespace uAdventure.Runner
             toArea = null;
             if (moving)
             {
+                Play("stand");
                 // Clear the main variables
                 moving = false;
                 progress = 0.0f;
