@@ -10,6 +10,7 @@ namespace uAdventure.Runner
     {
         public bool Disabled { get; set; }
         public GameObject Override { get; set; }
+        public GameObject Base { get; set; }
         public static uAdventureRaycaster Instance { get; private set; }
 
         protected override void Awake()
@@ -127,6 +128,22 @@ namespace uAdventure.Runner
                     };
                     resultAppendList.Add(result);
                 }
+            }
+
+            if (Base != null)
+            {
+                var result = new RaycastResult
+                {
+                    gameObject = Base,
+                    module = this,
+                    screenPosition = eventData.position,
+                    index = -1,
+                    sortingLayer = 0,
+                    sortingOrder = 0,
+                    distance = int.MinValue,
+                    depth = int.MinValue
+                };
+                resultAppendList.Add(result);
             }
         }
 

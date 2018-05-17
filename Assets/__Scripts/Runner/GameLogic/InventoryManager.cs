@@ -49,6 +49,7 @@ namespace uAdventure.Runner
             }
             set
             {
+                MenuMB.Instance.hide(true);
                 if (inventory) inventory.Opened = value;
             }
         }
@@ -78,6 +79,18 @@ namespace uAdventure.Runner
                 Debug.LogWarning("Inventory gameobject MUST have an Inventory component!");
 
             elementObjects = new Dictionary<Element, GameObject>();
+            inventory.openButton.onClick.AddListener(delegate { Open(); });
+            inventory.closeButton.onClick.AddListener(delegate { Close(); });
+        }
+
+        public void Open()
+        {
+            Opened = true;
+        }
+
+        public void Close()
+        {
+            Opened = false;
         }
 
         public void AddElement(Element element)

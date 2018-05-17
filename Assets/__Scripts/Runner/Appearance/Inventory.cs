@@ -9,15 +9,15 @@ namespace uAdventure.Runner
     public class Inventory : MonoBehaviour
     {
         [SerializeField]
-        private GameObject addedItemParticlePrefab;
+        public Button openButton;
         [SerializeField]
-        private Button openButton;
+        public Button closeButton;
+        [SerializeField]
+        private GameObject addedItemParticlePrefab;
         [SerializeField]
         private GameObject insideElement;
         [SerializeField]
         private GameObject elementHolder;
-
-        private Button closeButton;
         
         public bool Opened { get { return insideElement.activeSelf; } set { insideElement.SetActive(value); } }
 

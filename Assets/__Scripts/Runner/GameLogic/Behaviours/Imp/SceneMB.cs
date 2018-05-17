@@ -574,6 +574,7 @@ namespace uAdventure.Runner
 
         public void OnPointerClick(PointerEventData eventData)
         {
+            MenuMB.Instance.hide();
             Interacted(eventData);
         }
 

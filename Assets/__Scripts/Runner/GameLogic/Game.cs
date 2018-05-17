@@ -178,6 +178,9 @@ namespace uAdventure.Runner
                 Debug.LogError("No uAdventure raycaster was found in the scene!");
             }
 
+            // When clicks are out, i capture them
+            uAdventureRaycaster.Base = this.gameObject;
+
             TimerController.Instance.Timers = GameState.getTimers();
             TimerController.Instance.Run();
         }
@@ -185,6 +188,7 @@ namespace uAdventure.Runner
 
         public void OnPointerClick(PointerEventData eventData)
         {
+            MenuMB.Instance.hide();
             if (!waitingRunTarget && executeStack.Count > 0 && guistate != guiState.ANSWERS_MENU)
             {
                 Interacted();
@@ -299,7 +303,10 @@ namespace uAdventure.Runner
 
         public bool Execute(Interactuable interactuable)
         {
-            if(executeStack.Count == 0 || executeStack.Peek() != interactuable)
+            // In case any menu is shown, we hide it
+            MenuMB.Instance.hide(true);
+            // Then we execute anything
+            if (executeStack.Count == 0 || executeStack.Peek() != interactuable)
             {
                 Debug.Log("Pushed " + interactuable.ToString());
                 executeStack.Push(interactuable);
