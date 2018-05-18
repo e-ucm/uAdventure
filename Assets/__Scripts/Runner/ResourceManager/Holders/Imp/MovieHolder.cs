@@ -91,18 +91,22 @@ namespace uAdventure.Runner
             switch (type)
             {
                 case ResourceManager.LoadingType.RESOURCES_LOAD:
-#if UNITY_WEBGL
-                    videoPlayer.source = VideoSource.Url;
-                    videoPlayer.url = Application.streamingAssetsPath + "/" + path + ".webm";
-                    videoPlayer.targetTexture = new RenderTexture(Screen.width, Screen.height, 16, RenderTextureFormat.RGB565);
-#else
-                    videoPlayer.source = VideoSource.VideoClip;
-                    videoPlayer.clip = Resources.Load<VideoClip>(path);
-                    if(videoPlayer.clip)
-                        videoPlayer.targetTexture = new RenderTexture((int)videoPlayer.clip.width, (int)videoPlayer.clip.height, 16, RenderTextureFormat.RGB565);
-                    else
+                    if (Application.platform == RuntimePlatform.WebGLPlayer)
+                    {
+                        videoPlayer.source = VideoSource.Url;
+                        videoPlayer.url = Application.streamingAssetsPath + "/" + path + ".webm";
                         videoPlayer.targetTexture = new RenderTexture(Screen.width, Screen.height, 16, RenderTextureFormat.RGB565);
-#endif
+                    }
+                    else
+                    {
+                        videoPlayer.source = VideoSource.VideoClip;
+                        videoPlayer.clip = Resources.Load<VideoClip>(path);
+                        if (videoPlayer.clip)
+                            videoPlayer.targetTexture = new RenderTexture((int)videoPlayer.clip.width, (int)videoPlayer.clip.height, 16, RenderTextureFormat.RGB565);
+                        else
+                            videoPlayer.targetTexture = new RenderTexture(Screen.width, Screen.height, 16, RenderTextureFormat.RGB565);
+                    }
+
                     if (videoPlayer.source == VideoSource.VideoClip && videoPlayer.clip == null)
                     {
                         error = "Video not found: " + this.path;

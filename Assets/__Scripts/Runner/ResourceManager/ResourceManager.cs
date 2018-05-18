@@ -276,7 +276,13 @@ namespace uAdventure.Runner
         public void extractFile(string file)
         {
             extracted = false;
-#if !(UNITY_WEBPLAYER || UNITY_WEBGL)
+            if (Application.platform == RuntimePlatform.WebGLPlayer)
+            {
+                Debug.LogWarning("Extraction is not allowed in browser!");
+                return;
+            }
+
+
             string[] dir = file.Split(System.IO.Path.DirectorySeparatorChar);
             string filename = dir[dir.Length - 1].Split('.')[0];
 
@@ -303,34 +309,42 @@ namespace uAdventure.Runner
             {
                 converter.Convert(video);
             }
-
             extracted = true;
-#endif
         }
 
         public string getCurrentDirectory()
         {
             string ret = "";
-#if UNITY_ANDROID
-		ret = "/mnt/sdcard/uAdventure";//Application.persistentDataPath;
-#elif UNITY_IPHONE
-		ret = "";
-#else
-            ret = System.IO.Directory.GetCurrentDirectory();
-#endif
+            switch (Application.platform)
+            {
+                case RuntimePlatform.Android:
+                    ret = "/mnt/sdcard/uAdventure";//Application.persistentDataPath;
+                    break;
+                case RuntimePlatform.IPhonePlayer:
+                    ret = "";
+                    break;
+                default:
+                    ret = System.IO.Directory.GetCurrentDirectory();
+                    break;
+            }
             return ret;
         }
 
         public string getStoragePath()
         {
             string ret = "";
-#if UNITY_ANDROID
-		ret = "/mnt/sdcard";
-#elif UNITY_IPHONE
-		ret = "";
-#else
-            ret = System.IO.Directory.GetCurrentDirectory();
-#endif
+            switch (Application.platform)
+            {
+                case RuntimePlatform.Android:
+                    ret = "/mnt/sdcard";
+                    break;
+                case RuntimePlatform.IPhonePlayer:
+                    ret = "";
+                    break;
+                default:
+                    ret = System.IO.Directory.GetCurrentDirectory();
+                    break;
+            }
             return ret;
         }
     }

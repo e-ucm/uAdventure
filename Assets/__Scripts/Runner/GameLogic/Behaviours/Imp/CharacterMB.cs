@@ -221,7 +221,7 @@ namespace uAdventure.Runner
             AbortCurrentMovement();
             if (area.Contains(this.getPosition(), 0))
             {
-                OnMovementFinished();
+                OnMovementFinished(); 
                 return true;
             }
 

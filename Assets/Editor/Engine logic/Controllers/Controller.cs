@@ -13,6 +13,7 @@ using System.Globalization;
 using uAdventure.Runner;
 using UnityEditor.Callbacks;
 using System.Collections;
+using System.Reflection;
 
 namespace uAdventure.Editor
 {
@@ -526,6 +527,97 @@ namespace uAdventure.Editor
             return adventureDataControl.getPlayerMode();
         }
 
+        private bool CheckLayers()
+        {
+            SerializedObject tagManager = new SerializedObject(AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/TagManager.asset")[0]);
+
+            // Layer for Not Targetable Elements
+            SerializedProperty layers = tagManager.FindProperty("layers");
+            string layerName = "UINotTargetable";
+            int layerPos = 8;
+            if (layers == null)
+            {
+                Debug.LogWarning("uAdventure was not able to check layers configuation, please make sure there is a "+ layerName + " layer" +
+                    " and is properly configured at layer " + layerPos + " for elements that cannot be selected as targets.");
+            }
+            else
+            {
+                bool hasUINotTargetableLayer = false;
+                int wronglyFoundAt = -1;
+                var layer = layers.GetArrayElementAtIndex(layerPos);
+                if (layer.stringValue != layerName)
+                {
+                    if (!string.IsNullOrEmpty(layer.stringValue))
+                    {
+                        Debug.LogWarning("uAdventure requires layer " + layerPos + " for not targetable elements. Please free the layer and restart uAdventure.");
+                    }
+                    else
+                    {
+                        for (int i = 0; i < layers.arraySize; i++)
+                        {
+                            if (i == layerPos)
+                                continue;
+
+                            if (layers.GetArrayElementAtIndex(i).stringValue == layerName)
+                            {
+                                wronglyFoundAt = i;
+                                break;
+                            }
+                        }
+                    }
+                } else
+                    hasUINotTargetableLayer = true;
+
+                if(wronglyFoundAt != -1 && EditorUtility.DisplayDialog("Layer wrongly located", "uAdventure requires " + layerName + " at layer " + layerPos +
+                    ". Do you want it to move it to position 9 automatically?", "Yes", "No"))
+                {
+                    layer.stringValue = layerName;
+                    layers.GetArrayElementAtIndex(wronglyFoundAt).stringValue = string.Empty;
+                }
+
+                if (!hasUINotTargetableLayer && EditorUtility.DisplayDialog("Layer not found", "uAdventure requires layer " + layerPos +
+                    " for not targetable elements. Do you want to try to configure it automatically?", "Yes", "No"))
+                {
+                    layer.stringValue = layerName;
+                }
+            }
+
+            // Sorting Layer For Buttons
+            string sortingLayerName = "Buttons";
+            int buttonsLayerId = 115252387;
+            SerializedProperty sortingLayers = tagManager.FindProperty("m_SortingLayers");
+            if(sortingLayers == null)
+            {
+                Debug.LogWarning("uAdventure was not able to check sorting layers configuation, please make sure there is a " + sortingLayerName + 
+                    " sorting layer and is properly configured in in-game buttons to guarantee they're always on top of the UI");
+            }
+            else
+            {
+                bool hasButtonsSortingLayer = false;
+                for (int i = 0; i < sortingLayers.arraySize; i++)
+                {
+                    if (sortingLayers.GetArrayElementAtIndex(i).FindPropertyRelative("uniqueID").intValue == buttonsLayerId)
+                    {
+                        hasButtonsSortingLayer = true;
+                        break;
+                    }
+                }
+
+                if (!hasButtonsSortingLayer && EditorUtility.DisplayDialog("Sorting layer not found", "uAdventure requires a sorting layer to " +
+                    "correctly display interaction buttons. Do you want to try to create it automatically?", "Yes", "No"))
+                {
+                    sortingLayers.InsertArrayElementAtIndex(sortingLayers.arraySize);
+                    var newLayer = sortingLayers.GetArrayElementAtIndex(sortingLayers.arraySize - 1);
+                    newLayer.FindPropertyRelative("name").stringValue = "Buttons";
+                    newLayer.FindPropertyRelative("uniqueID").intValue = buttonsLayerId;
+                }
+            }
+
+            tagManager.ApplyModifiedPropertiesWithoutUndo();
+
+            return true;
+        }
+
         /**
         * Initializing function.
         */
@@ -533,6 +625,8 @@ namespace uAdventure.Editor
         {
             Debug.Log("Controller init"); 
             ConfigData.LoadFromXML(ReleaseFolders.configFileEditorRelativePath());
+
+            CheckLayers();
             // Load the configuration
             //ProjectConfigData.init();
             //SCORMConfigData.init();
@@ -1021,6 +1115,7 @@ namespace uAdventure.Editor
                 else
                     fileCreated = false;
                 EditorUtility.ClearProgressBar();
+                
             }
             Loaded = fileCreated;
             return fileCreated;

@@ -128,10 +128,11 @@ namespace uAdventure.Runner
         {
             byte[] fileData = null;
 
-#if !(UNITY_WEBPLAYER || UNITY_WEBGL)
-            if (System.IO.File.Exists(filePath))
-                fileData = System.IO.File.ReadAllBytes(filePath);
-#endif
+            if (Application.platform != RuntimePlatform.WebGLPlayer)
+            {
+                if (System.IO.File.Exists(filePath))
+                    fileData = System.IO.File.ReadAllBytes(filePath);
+            }
 
             return fileData;
         }

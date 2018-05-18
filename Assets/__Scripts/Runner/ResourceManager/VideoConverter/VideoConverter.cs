@@ -25,10 +25,11 @@ namespace uAdventure.Runner
             foo.StartInfo.UseShellExecute = false;
             foo.StartInfo.CreateNoWindow = true;
             foo.Start();
-
-#if !(UNITY_WEBPLAYER || UNITY_WEBGL)
-            while (!foo.HasExited) { }
-#endif
+            
+            if(Application.platform != RuntimePlatform.WebGLPlayer)
+            {
+                while (!foo.HasExited) { }
+            }
         }
     }
 }

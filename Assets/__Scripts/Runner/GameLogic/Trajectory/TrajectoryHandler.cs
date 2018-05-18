@@ -350,8 +350,8 @@ namespace uAdventure.Runner
                 });
             }
 
-            Trajectory.Node no = new Trajectory.Node("origin", Mathd.RoundToInt(origin.x), Mathd.RoundToInt(origin.y), 1f);
-            Trajectory.Node nd = new Trajectory.Node("destiny", Mathd.RoundToInt(destiny.x), Mathd.RoundToInt(destiny.y), 1f);
+            Trajectory.Node no = new Trajectory.Node("origin", Mathf.RoundToInt(origin.x), Mathf.RoundToInt(origin.y), 1f);
+            Trajectory.Node nd = new Trajectory.Node("destiny", Mathf.RoundToInt(destiny.x), Mathf.RoundToInt(destiny.y), 1f);
 
             Vector2 oStartV2 = LineHandler.nodeToVector2(originline.start), oEndV2 = LineHandler.nodeToVector2(originline.end),
                     dStartV2 = LineHandler.nodeToVector2(destinyline.start), dEndV2 = LineHandler.nodeToVector2(destinyline.end);

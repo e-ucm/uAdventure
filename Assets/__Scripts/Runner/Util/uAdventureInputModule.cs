@@ -48,10 +48,10 @@ namespace uAdventure.Runner
                 case OperatingSystemFamily.Windows:
                 case OperatingSystemFamily.Linux:
                 case OperatingSystemFamily.MacOSX:
-#if UNITY_EDITOR
-                    if (UnityEditor.EditorApplication.isRemoteConnected)
-                        return false;
-#endif
+//#if UNITY_EDITOR
+//                    if (UnityEditor.EditorApplication.isRemoteConnected)
+//                        return false;
+//#endif
                     return true;
                 default:
                     return false;
