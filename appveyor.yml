@@ -12,6 +12,12 @@ version: 1.0.{build}
 # Build worker image (VM template)
 image: Visual Studio 2015
 
+environment:
+  license_username:
+    secure: KNlG5Hhn9bdBILKKEW8h74PsOpFS0aOD3dZvIxRRmIk=
+  license_password:
+    secure: 4KdzmiX+1YUARu7Tevrv6Q==
+
 install:
   - ps: . .\scripts\install-unity.ps1
 #---------------------------------#
@@ -24,7 +30,7 @@ configuration: Release
 
 build:
   parallel: true                  # enable MSBuild parallel builds
-  project: .\BuildProjects\uAdventureEditor\uAdventureEditor.sln      # path to Visual Studio solution or project
+  project: .\BuildProject\uAdventureEditor\uAdventureEditor.sln      # path to Visual Studio solution or project
   verbosity: normal
 
 # scripts to run before build
