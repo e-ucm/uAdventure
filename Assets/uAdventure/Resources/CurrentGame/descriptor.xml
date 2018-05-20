@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE game-descriptor PUBLIC "SYSTEM" "descriptor.dtd">
+<game-descriptor versionNumber="0">
+  <title>Adventure title</title>
+  <description>
+  </description>
+  <configuration keepShowing="no" keyboard-navigation="disabled" defaultClickAction="showDetails" perspective="regular" dragBehaviour="considerNonTargets">
+    <gui type="contextual" inventoryPosition="top_bottom" />
+    <mode playerTransparent="yes" />
+    <graphics mode="windowed" />
+  </configuration>
+  <contents>
+    <chapter path="chapter1.xml">
+      <title>ChapterTitle</title>
+      <description>
+      </description>
+    </chapter>
+  </contents>
+</game-descriptor>

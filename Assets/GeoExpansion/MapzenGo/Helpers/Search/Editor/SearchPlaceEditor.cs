@@ -12,7 +12,7 @@ namespace MapzenGo.Helpers.Search.Editor
     [CustomEditor(typeof(SearchPlace))]
     public class SearchPlaceEditor : UnityEditor.Editor
     {
-        const string PATH_SAVE_SCRIPTABLE_OBJECT = "Assets/MapzenGo/Resources/Settings/";
+        const string PATH_SAVE_SCRIPTABLE_OBJECT = "Assets/GeoExpansion/MapzenGo/Resources/Settings/";
         public bool show = true;
         List<string> mKeys;
         private SearchPlace place;

@@ -1,0 +1,54 @@
+#---------------------------------#
+#      general configuration      #
+#---------------------------------#
+
+# version format
+version: 1.0.{build}
+
+#---------------------------------#
+#    environment configuration    #
+#---------------------------------#
+
+# Build worker image (VM template)
+image: Visual Studio 2015
+
+install:
+  - ps: . .\scripts\install-unity.ps1
+#---------------------------------#
+#       build configuration       #
+#---------------------------------#
+
+# build platform, i.e. x86, x64, Any CPU. This setting is optional.
+platform: Any CPU
+configuration: Release
+
+build:
+  parallel: true                  # enable MSBuild parallel builds
+  project: .\BuildProjects\uAdventureEditor\uAdventureEditor.sln      # path to Visual Studio solution or project
+  verbosity: normal
+
+# scripts to run before build
+before_build:
+  - ps: . .\scripts\create-guidmap.ps1 uAdventure
+
+# scripts to run after build
+after_build:
+  - ps: . .\scripts\setup-project.ps1 uAdventure
+  - ps: . .\scripts\apply-guidmap.ps1 uAdventure
+  - ps: . .\scripts\export-package.ps1 uAdventure
+  
+#---------------------------------#
+#     deployment configuration    #
+#---------------------------------#
+
+# providers: Local, FTP, WebDeploy, AzureCS, AzureBlob, S3, NuGet, Environment
+# provider names are case-sensitive!
+deploy:
+    # Deploy to GitHub Releases
+  - provider: GitHub
+    artifact: /.*\.unitypackage/           # upload all UnityPackage packages to release assets
+    draft: false
+    prerelease: false
+    on:
+      branch: master                # release from master branch only
+      appveyor_repo_tag: true       # deploy on tag push only
