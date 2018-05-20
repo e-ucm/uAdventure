@@ -47,6 +47,15 @@ after_build:
 #---------------------------------#
 
 test: off
+
+
+#---------------------------------#
+#      artifacts configuration    #
+#---------------------------------#
+
+artifacts:
+  # pushing all *.unitypackage files in build directory recursively
+  - path: '**\*.unitypackage'
   
 #---------------------------------#
 #     deployment configuration    #
@@ -57,7 +66,7 @@ test: off
 deploy:
     # Deploy to GitHub Releases
   - provider: GitHub
-    artifact: /.*\.unitypackage/           # upload all UnityPackage packages to release assets
+    artifact: /.*\.unitypackage/          # upload all UnityPackage packages to release assets
     draft: false
     prerelease: false
     on:
