@@ -37,7 +37,7 @@ Write-Output "Creating Export dir"
 New-Item -ItemType directory -Path $export_directory
 
 $unity = "C:\\Program Files\\Unity\\Editor\\Unity.exe"
-$arguments = "-batchmode -force-free -username $Evn:license_username -password $Evn:license_password -nographics -silent-crashes -logFile $($log_file) -projectPath $($package_project_path) -quit -exportPackage ""$($asset_path)"" ""$($export_path)"""
+$arguments = "-batchmode -force-free -username $($env:license_username) -password $($env:license_password) -nographics -silent-crashes -logFile $($log_file) -projectPath $($package_project_path) -quit -exportPackage ""$($asset_path)"" ""$($export_path)"""
 
 
 Write-Output "Creating package for $($asset_path)"

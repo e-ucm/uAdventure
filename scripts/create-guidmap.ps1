@@ -23,7 +23,7 @@ $log_file = "$($exchange_folder)\\unity.log"
 $guidmap_method = "uAdventure.Editor.FileIDUtil.GenerateGUIDMap"
 
 $unity = "C:\\Program Files\\Unity\\Editor\\Unity.exe"
-$arguments = "-batchmode -force-free -username $Evn:license_username -password $Evn:license_password -nographics -silent-crashes -logFile $($log_file) -projectPath $($project_path) -quit -executeMethod $($guidmap_method) $($guid_file)"
+$arguments = "-batchmode -force-free -username $($env:license_username) -password $($env:license_password) -nographics -silent-crashes -logFile $($log_file) -projectPath $($project_path) -quit -executeMethod $($guidmap_method) $($guid_file)"
 
 Write-Output "Creating Exchange dir"
 New-Item -ItemType directory -Path $exchange_folder
