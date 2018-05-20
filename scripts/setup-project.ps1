@@ -20,10 +20,10 @@ $project_path = "$($pwd)\\Assets\\uAdventure"
 $assets_folder = "$($pwd)\\BuildProject\\\uAdventurePackage\\\uAdventurePackage\\Assets\\uAdventure"
 $build_folder = "$($pwd)\\BuildProject\\uAdventureEditor\\uAdventureEditor\\bin\\Release"
 
-# Core and Runner File
-Copy-Item "$($build_folder)\\uAdventureScripts.dll" -Destination "$($assets_folder)\\Plugins\\uAdventureScripts.dll"
 # Plugins Folder
 Copy-Item -Path "$($project_path)\\Plugins" -Destination "$($assets_folder)\\" -Recurse -Force
+# Core and Runner File
+Copy-Item "$($build_folder)\\uAdventureScripts.dll" -Destination "$($assets_folder)\\Plugins\\uAdventureScripts.dll"
 # Animations Folder
 Copy-Item -Path "$($project_path)\\Animations" -Destination "$($assets_folder)\\" -Recurse -Force
 # Materials Folder
@@ -36,9 +36,9 @@ Copy-Item -Path "$($project_path)\\Prefabs" -Destination "$($assets_folder)\\" -
 Copy-Item -Path "$($project_path)\\Scenes" -Destination "$($assets_folder)\\" -Recurse -Force
 # Resources Folder
 Copy-Item -Path "$($project_path)\\Resources" -Destination "$($assets_folder)\\" -Recurse -Force
-# Editor File
-Copy-Item "$($build_folder)\\uAdventureEditor.dll" -Destination "$($assets_folder)\\Editor\\Plugins\\uAdventureEditor.dll"
 # Editor Plugins Folder
 Copy-Item -Path "$($project_path)\\Editor\\Plugins" -Destination "$($assets_folder)\\Editor\\" -Recurse -Force
+# Editor File
+Copy-Item "$($build_folder)\\uAdventureEditor.dll" -Destination "$($assets_folder)\\Editor\\Plugins\\uAdventureEditor.dll"
 # Editor resources Folder
 Copy-Item -Path "$($project_path)\\Editor\\Resources" -Destination "$($assets_folder)\\Editor\\" -Recurse -Force

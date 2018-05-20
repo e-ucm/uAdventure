@@ -40,6 +40,13 @@ after_build:
   - ps: . .\scripts\setup-project.ps1
   - ps: . .\scripts\apply-guidmap.ps1
   - ps: . .\scripts\export-package.ps1 uAdventure
+
+
+#---------------------------------#
+#       tests configuration       #
+#---------------------------------#
+
+test: off
   
 #---------------------------------#
 #     deployment configuration    #
