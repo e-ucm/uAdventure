@@ -30,17 +30,17 @@ configuration: Release
 
 build:
   parallel: true                  # enable MSBuild parallel builds
-  project: .\BuildProject\uAdventureEditor\uAdventureEditor.sln      # path to Visual Studio solution or project
+  project: BuildProject\uAdventureEditor\uAdventureEditor.sln      # path to Visual Studio solution or project
   verbosity: normal
 
 # scripts to run before build
 before_build:
-  - ps: . .\scripts\create-guidmap.ps1 uAdventure
+  - ps: . .\scripts\create-guidmap.ps1
 
 # scripts to run after build
 after_build:
-  - ps: . .\scripts\setup-project.ps1 uAdventure
-  - ps: . .\scripts\apply-guidmap.ps1 uAdventure
+  - ps: . .\scripts\setup-project.ps1
+  - ps: . .\scripts\apply-guidmap.ps1
   - ps: . .\scripts\export-package.ps1 uAdventure
   
 #---------------------------------#
