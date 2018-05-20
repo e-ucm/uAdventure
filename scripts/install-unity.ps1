@@ -31,6 +31,3 @@ curl -o $unitysetup $url
 
 Write-Output "Installing $($unitysetup)"
 Start-Process $unitysetup $unitysetupargs -Wait 
-
-Write-Output "Activating Unity"
-Start-Process "C:\\Program Files\\Unity\\Editor\\Unity.exe" "-batchmode -nographics -username $Evn:license_username -password $Evn:license_password -quit" -Wait 
