@@ -31,3 +31,6 @@ curl -o $unitysetup $url
 
 Write-Output "Installing $($unitysetup)"
 Start-Process $unitysetup $unitysetupargs -Wait 
+
+7z x .\scripts\license.7z -p"$($env:license_password)" 2>&1 > $null
+.\install-license.ps1

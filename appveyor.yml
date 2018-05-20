@@ -13,10 +13,8 @@ version: 1.0.{build}
 image: Visual Studio 2015
 
 environment:
-  license_username:
-    secure: KNlG5Hhn9bdBILKKEW8h74PsOpFS0aOD3dZvIxRRmIk=
   license_password:
-    secure: 4KdzmiX+1YUARu7Tevrv6Q==
+    secure: kQfSf/462WF11kNc60/KXQ==
 
 install:
   - ps: . .\scripts\install-unity.ps1
