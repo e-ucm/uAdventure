@@ -23,12 +23,12 @@ $build_folder = "$($pwd)\\BuildProject\\uAdventureEditor\\uAdventureEditor\\bin\
 # Plugins Folder
 Copy-Item -Path "$($project_path)\\Plugins" -Destination "$($assets_folder)\\" -Recurse -Force
 # Tracker Folder
-Remove-Item -Path "$($project_path)\\unity-tracker" -Recurse -Force 
+Remove-Item -Path "$($assets_folder)\\Plugins\\unity-tracker" -Recurse -Force 
 # Replace Tracker folder and files
-New-Item -ItemType directory -Path "$($project_path)\\unity-tracker" -Force
+New-Item -ItemType directory -Path "$($assets_folder)\\Plugins\\unity-tracker" -Force 2>&1 > $null
 Copy-Item "$($build_folder)\\UnityTracker.dll" -Destination "$($assets_folder)\\Plugins\\unity-tracker\\" -Force
-Copy-Item "$($project_path)\\unity-tracker\\Tracker.prefab" -Destination "$($assets_folder)\\Plugins\\unity-tracker\\" -Force
-Copy-Item "$($project_path)\\unity-tracker\\Tracker.prefab.meta" -Destination "$($assets_folder)\\Plugins\\unity-tracker\\" -Force
+Copy-Item "$($project_path)\\Plugins\\unity-tracker\\Tracker.prefab" -Destination "$($assets_folder)\\Plugins\\unity-tracker\\" -Force
+Copy-Item "$($project_path)\\Plugins\\unity-tracker\\Tracker.prefab.meta" -Destination "$($assets_folder)\\Plugins\\unity-tracker\\" -Force
 # Core and Runner File
 Copy-Item "$($build_folder)\\uAdventureScripts.dll" -Destination "$($assets_folder)\\Plugins\\uAdventureScripts.dll"
 # Animations Folder

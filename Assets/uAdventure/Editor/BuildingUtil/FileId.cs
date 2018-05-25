@@ -179,17 +179,16 @@ namespace uAdventure.Editor
 
     public static class FileIDUtil
     {
-        public static IEnumerable<Type> FindDerivedTypes(Type[] types, Type baseType)
+        public static IEnumerable<Type> FindDerivedTypes(IEnumerable<Type> types, Type baseType)
         {
             return types.Where(t => baseType.IsAssignableFrom(t));
         }
 
-        private static Type[] GetTypesInNamespace(Assembly assembly, string nameSpace)
+        private static IEnumerable<Type> GetTypesInNamespace(string nameSpace)
         {
-            return
-              assembly.GetTypes()
-                      .Where(t => String.Equals(t.Namespace, nameSpace, StringComparison.Ordinal))
-                      .ToArray();
+            return AppDomain.CurrentDomain.GetAssemblies()
+                            .SelectMany(t => t.GetTypes())
+                            .Where(t => t.IsClass && t.Namespace == nameSpace);
         }
 
         public static void GenerateGUIDMap()
@@ -198,11 +197,15 @@ namespace uAdventure.Editor
             var args = System.Environment.GetCommandLineArgs();
             string outputPath = args[args.Length - 1];
 
-            Assembly runnerAssembly = typeof(uAdventure.Runner.Game).Assembly;
-            Assembly trackerAssembly = typeof(RAGE.Analytics.Tracker).Assembly;
-            Dictionary<Type, string> guids = new Dictionary<Type, string>();
-            var monobehaviours = FindDerivedTypes(runnerAssembly.GetTypes(), typeof(MonoBehaviour))
-                        .Union(FindDerivedTypes(trackerAssembly.GetTypes(), typeof(MonoBehaviour)));
+            var runnerAssemblyFile = "Assets/uAdventure/Plugins/uAdventureScripts.dll";
+            var trackerAssemblyFile = "Assets/uAdventure/Plugins/unity-tracker/UnityTracker.dll";
+            
+            Dictionary<Type, KeyValuePair<string, string>> guids = new Dictionary<Type, KeyValuePair<string, string>>();
+            var monobehaviours = FindDerivedTypes(GetTypesInNamespace("uAdventure.Runner"), typeof(MonoBehaviour))
+                .Select(t => new KeyValuePair<Type, string>(t, runnerAssemblyFile))
+                        .Union(FindDerivedTypes(GetTypesInNamespace("RAGE.Analytics"), typeof(MonoBehaviour))
+                .Select(t => new KeyValuePair<Type, string>(t, trackerAssemblyFile)));
+
             var scripts = System.IO.Directory.GetFiles("./", "*.cs", System.IO.SearchOption.AllDirectories);
 
             foreach(var s in scripts)
@@ -210,24 +213,26 @@ namespace uAdventure.Editor
                 Debug.Log("Script found: " + s);
             }
 
-            foreach (var type in monobehaviours)
+            foreach (var kv in monobehaviours)
             {
-                Debug.Log("Type found: " + type.ToString());
                 // Iterate over all uAdventure monobehaviours
+                Type type = kv.Key;
+                string assemblyFile = kv.Value;
+                Debug.Log("Type found: " + type.ToString());
                 var path = Array.Find(scripts, s => s.EndsWith("\\" + type.Name + ".cs"));
                 if (!string.IsNullOrEmpty(path))
                 {
                     var cleanPath = path.Substring(2, path.Length - 2).Replace("\\", "/");
                     var guid = AssetDatabase.AssetPathToGUID(cleanPath);
-                    guids.Add(type, guid);
-                    Debug.Log("Adding guid and file id for " + type.ToString() + ": " + Compute(type) + ", " + guid);
+                    guids[type] = new KeyValuePair<string, string>(guid, assemblyFile);
+                    Debug.Log("Adding guid and file id for " + type.ToString() + ": " + Compute(type) + ", " + guid + ", " + assemblyFile);
                 }
             }
 
             var fileInfo = new System.IO.FileInfo(outputPath);
             if (!System.IO.Directory.Exists(fileInfo.DirectoryName))
                 System.IO.Directory.CreateDirectory(fileInfo.DirectoryName);
-            System.IO.File.WriteAllText(outputPath, String.Join("\n", guids.Select(kv => kv.Value + "," + Compute(kv.Key)).ToArray()));
+            System.IO.File.WriteAllText(outputPath, String.Join("\n", guids.Select(kv => kv.Value.Key + "," + Compute(kv.Key) + "," + kv.Value.Value).ToArray()));
         }
 
         public static void SwitchPrefabsGUIDsToDLL()
@@ -235,22 +240,15 @@ namespace uAdventure.Editor
             // Last two arguments are guidpath and dllpath
             var args = System.Environment.GetCommandLineArgs();
             string guidsPath = args[args.Length - 2];
-            string dllPath = args[args.Length - 1];
 
             var text = System.IO.File.ReadAllLines(guidsPath);
-            Dictionary<string, string> guidToFileId = new Dictionary<string, string>();
+            Dictionary<string, KeyValuePair<string,string>> guidToFileIdAndDllGUID = new Dictionary<string, KeyValuePair<string, string>>();
 
-            foreach (var kv in text.Select(l => l.Split(','))
-                .Select(l => new KeyValuePair<string, string>(l[0], l[1])))
+            foreach (var tokens in text.Select(l => l.Split(',')))
             {
-                guidToFileId[kv.Key] = kv.Value;
+                guidToFileIdAndDllGUID[tokens[0]] = new KeyValuePair<string, string>(tokens[1], tokens[2]);
             }
-
-            //var dllPath = EditorUtility.OpenFilePanel("Select the dll", "", "dll").Remove(0, Application.dataPath.Length - 6);
-            Debug.Log("Dll Path: " + dllPath);
-            var dllGUID = AssetDatabase.AssetPathToGUID(dllPath);
-            Debug.Log("Dll GUID: " + dllGUID);
-
+            
             List<string> assetsToReimport = new List<string>();
 
             var scenes = System.IO.Directory.GetFiles(".\\", "*.unity", System.IO.SearchOption.AllDirectories);
@@ -258,7 +256,7 @@ namespace uAdventure.Editor
             foreach (var scene in scenes)
             {
                 Debug.Log("Scene: " + scene);
-                if (FixFile(scene, guidToFileId, dllGUID))
+                if (FixFile(scene, guidToFileIdAndDllGUID))
                 {
                     assetsToReimport.Add(scene);
                 }
@@ -269,7 +267,7 @@ namespace uAdventure.Editor
             foreach (var prefab in prefabs)
             {
                 Debug.Log("Prefab: " + prefab);
-                if (FixFile(prefab, guidToFileId, dllGUID))
+                if (FixFile(prefab, guidToFileIdAndDllGUID))
                 {
                     assetsToReimport.Add(prefab);
                 }
@@ -291,7 +289,7 @@ namespace uAdventure.Editor
             }
         }
 
-        private static bool FixFile(string file, Dictionary<string, string> guidToFileId, string dllGUID)
+        private static bool FixFile(string file, Dictionary<string, KeyValuePair<string, string>> guidToFileIdAndDllGUID)
         {
             var fileText = System.IO.File.ReadAllLines(file);
             bool modified = false;
@@ -309,14 +307,14 @@ namespace uAdventure.Editor
                     if (attrs["fileID"] != "11500000")
                         continue;
 
-                    if (!guidToFileId.ContainsKey(attrs["guid"]))
+                    if (!guidToFileIdAndDllGUID.ContainsKey(attrs["guid"]))
                     {
                         Debug.LogWarning("Couldn't find type for: " + attrs["guid"]);
                         continue;
                     }
-                    var type = guidToFileId[attrs["guid"]];
-                    attrs["fileID"] = type.ToString();
-                    attrs["guid"] = dllGUID;
+                    var fileIdAndGUID = guidToFileIdAndDllGUID[attrs["guid"]];
+                    attrs["fileID"] = fileIdAndGUID.Key;
+                    attrs["guid"] = fileIdAndGUID.Value;
                     fileText[i] = "  m_Script: " + EncodeLine(attrs);
                     Debug.Log("Fixed! " + fileText[i]);
                     modified = true;
