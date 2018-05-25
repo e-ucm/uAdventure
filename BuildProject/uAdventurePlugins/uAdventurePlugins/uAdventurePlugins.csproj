@@ -40,7 +40,8 @@
     <Reference Include="$(MSBuildProjectDirectory)\..\..\..\Assets\uAdventure\Plugins\**\*.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildProjectDirectory)\..\..\..\Assets\uAdventure\Plugins\**\*.cs">
+    <Compile Include="$(MSBuildProjectDirectory)\..\..\..\Assets\uAdventure\Plugins\**\*.cs"
+        Exclude="$(MSBuildProjectDirectory)\..\..\..\Assets\uAdventure\Plugins\unity-tracker\csharp-tracker\AssetManager\RageAssetManager\Properties\AssemblyInfo.cs">
       <Link>Plugins\%(RecursiveDir)%(FileName)</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />

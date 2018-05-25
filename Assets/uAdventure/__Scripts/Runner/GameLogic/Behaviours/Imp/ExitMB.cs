@@ -131,25 +131,25 @@ namespace uAdventure.Runner
             {
                 var sceneMB = FindObjectOfType<SceneMB>();
                 var scene = sceneMB.sceneData as Scene;
-                Rectangle area = null;
+                Rectangle actionArea = null;
                 if (scene != null && scene.getTrajectory() == null)
                 {
                     // If no trajectory I have to move the area to the trajectory for it to be connected
-                    area = ed.MoveAreaToTrajectory(sceneMB.Trajectory);
+                    actionArea = ed.MoveAreaToTrajectory(sceneMB.Trajectory);
                 }
                 else
                 {
-                    area = new InfluenceArea(ed.getX() - 20, ed.getY() - 20, ed.getWidth() + 40, ed.getHeight() + 40);
+                    actionArea = new InfluenceArea(ed.getX() - 20, ed.getY() - 20, ed.getWidth() + 40, ed.getHeight() + 40);
                     if(ed.getInfluenceArea() != null && ed.getInfluenceArea().isExists())
                     {
                         var points = ed.isRectangular() ? ed.ToRect().ToPoints() : ed.getPoints().ToArray();
                         var topLeft = points.ToRect().position;
-                        area = ed.getInfluenceArea().MoveArea(topLeft);
+                        actionArea = ed.getInfluenceArea().MoveArea(topLeft);
                     }
                 }
                 var exitAction = new Core.Action(Core.Action.CUSTOM) { Effects = new Effects() { new ExecuteExitEffect(this) } };
                 exitAction.setNeedsGoTo(true);
-                PlayerMB.Instance.Do(exitAction, area);
+                PlayerMB.Instance.Do(exitAction, actionArea);
             }
             return InteractuableResult.DOES_SOMETHING;
         }
