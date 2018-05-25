@@ -6,7 +6,12 @@ using System;
 
 namespace uAdventure.Runner
 {
-    public abstract class Representable : MonoBehaviour, Movable
+    public enum Orientation
+    {
+        N, E, S, O
+    }
+
+    public class Representable : MonoBehaviour, Movable
     {
         public static readonly Vector2 RepresentablePivot = new Vector2(0.5f, 0f);
 
@@ -100,7 +105,7 @@ namespace uAdventure.Runner
             }
         }
 
-        protected void Adaptate()
+        public void Adaptate()
         {
             rend.material.mainTexture = texture;
             Vector2 tmpSize = texture ? new Vector2(texture.width, texture.height) : new Vector2(50,50);
@@ -111,7 +116,7 @@ namespace uAdventure.Runner
             transform.localScale = worldSize;
         }
 
-        protected void Positionate()
+        public void Positionate()
         {
             var texture = rend.material.mainTexture;
             Vector2 tmpSize = texture ? new Vector2(texture.width, texture.height) * context.getScale(): new Vector2(50,50);
@@ -146,7 +151,7 @@ namespace uAdventure.Runner
             texture = Game.Instance.ResourceManager.getImage(resource.getAssetPath(uri));
         }
 
-        protected void setTexture(string uri)
+        public void SetTexture(string uri)
         {
             texture = Game.Instance.ResourceManager.getImage(resource.getAssetPath(uri));
             Adaptate();
@@ -181,6 +186,22 @@ namespace uAdventure.Runner
         //#################################################
         //################ ANIMATIONS PART ################
         //#################################################
+
+        /*  ## ANIMATION METHOD ##
+         * 
+         * private Animation current_anim;
+         * 
+         * Texture2D tmp = current_anim.getFrame(0).getImage(false,false,0).texture;
+            update_ratio = current_anim.getFrame(0).getTime();//Duration/1000f;
+         * 
+         * return (current_anim.getFrame(current_frame).getImage(false,false,0).texture.height) * context.getScale();
+         * 
+         * current_frame = (current_frame + 1) % current_anim.getFrames().Count;
+            Texture2D tmp = current_anim.getFrame(current_frame).getImage(false,false,0).texture;
+            update_ratio = current_anim.getFrame(current_frame).getTime();
+         * 
+         */
+
         public bool Play(string animation, string then = null)
         {
             string uri = animation;

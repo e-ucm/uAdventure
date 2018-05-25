@@ -278,7 +278,7 @@ namespace uAdventure.Editor
 
                 if (!has)
                 {
-                    EditorGUILayout.HelpBox("Destination position will be based on origin position.", MessageType.Info);
+                    EditorGUILayout.HelpBox("Destination position will be based on origin position.", MessageType.Info); // TODO LANG
                     return;
                 }
             
@@ -288,25 +288,38 @@ namespace uAdventure.Editor
                     exit.setDestinyPosition(Mathf.RoundToInt(newPos.x), Mathf.RoundToInt(newPos.y));
 
                 EditorGUI.BeginChangeCheck();
-                var newScale = Mathf.Max(0, EditorGUILayout.FloatField(TC.get("SceneLocation.Scale"), exit.getDestinyScale()));
+                bool useDestinyScale = EditorGUILayout.Toggle("Use destiny scale", exit.getDestinyScale() > 0); // TODO LANG
                 if (EditorGUI.EndChangeCheck())
-                    exit.setDestinyScale(newScale);
+                    exit.setDestinyScale(useDestinyScale ? 1f : float.MinValue);
+
+                if (useDestinyScale)
+                {
+                    EditorGUI.BeginChangeCheck();
+                    var newScale = Mathf.Max(0, EditorGUILayout.FloatField(TC.get("SceneLocation.Scale"), exit.getDestinyScale()));
+                    if (EditorGUI.EndChangeCheck())
+                        exit.setDestinyScale(newScale);
+                }
+                else
+                {
+                    EditorGUILayout.HelpBox("The player size will stay as before entering the exit.", MessageType.Info); // TODO LANG
+                }
 
                 var scenesList = Controller.Instance.SelectedChapterDataControl.getScenesList();
                 var sceneIndex = scenesList.getSceneIndexByID(exit.getNextSceneId());
                 if (sceneIndex == -1)
                 {
-                    EditorGUILayout.HelpBox("Please select a valid destination!", MessageType.Error);
+                    EditorGUILayout.HelpBox("Please select a valid destination!", MessageType.Error); // TODO LANG
                     return;
                 }
 
                 localSceneEditor.Components = SceneEditor.Current.Components;
                 localSceneEditor.Scene = scenesList.getScenes()[sceneIndex];
-                playerDestination.setValues(exit.getDestinyPositionX(), exit.getDestinyPositionY(), exit.getDestinyScale());
+                playerDestination.setValues(exit.getDestinyPositionX(), exit.getDestinyPositionY(), exit.getDestinyScale() < 0 ? 1f : exit.getDestinyScale());
                 
                 localSceneEditor.Draw(GUILayoutUtility.GetRect(0, 200, GUILayout.ExpandWidth(true)));
                 exit.setDestinyPosition(playerDestination.getX(), playerDestination.getY());
-                exit.setDestinyScale(playerDestination.getScale());
+                if(useDestinyScale)
+                    exit.setDestinyScale(playerDestination.getScale());
 
             }
         }

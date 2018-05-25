@@ -5,7 +5,7 @@ using System;
 
 using uAdventure.Core;
 using RAGE.Analytics;
-using RAGE.Analytics.Formats;
+using AssetPackage;
 
 namespace uAdventure.Runner
 {
@@ -68,7 +68,7 @@ namespace uAdventure.Runner
             //Complete if any scene is completed on exit.
             if (completeOnExit != null)
             {
-                Tracker.T.completable.Completed(completeOnExit.getId(), CompletableTracker.Completable.Stage, true, completeOnExit.getScore().getScore());
+                TrackerAsset.Instance.Completable.Completed(completeOnExit.getId(), CompletableTracker.Completable.Stage, true, completeOnExit.getScore().getScore());
                 completeOnExit = null;
             }
 
@@ -76,7 +76,7 @@ namespace uAdventure.Runner
             foreach (Completable toComplete in completables)
             {
                 if (toComplete.getProgress().updateMilestones(target))
-                    Tracker.T.completable.Progressed(toComplete.getId(), (CompletableTracker.Completable)toComplete.getType(), toComplete.currentProgress());
+                    TrackerAsset.Instance.Completable.Progressed(toComplete.getId(), (CompletableTracker.Completable)toComplete.getType(), toComplete.currentProgress());
 
                 if (toComplete.getEnd().Update(target))
                 {
@@ -97,8 +97,8 @@ namespace uAdventure.Runner
                 {
                     trackingCompletables.Add(completable);
                     times.Add(completable, DateTime.Now);
-                    Tracker.T.completable.Initialized(completable.getId(), (CompletableTracker.Completable)completable.getType());
-                    Tracker.T.completable.Progressed(completable.getId(), (CompletableTracker.Completable)completable.getType(), 0);
+                    TrackerAsset.Instance.Completable.Initialized(completable.getId(), (CompletableTracker.Completable)completable.getType());
+                    TrackerAsset.Instance.Completable.Progressed(completable.getId(), (CompletableTracker.Completable)completable.getType(), 0);
 
                     if (completable.getEnd() == null)
                     {
@@ -120,7 +120,7 @@ namespace uAdventure.Runner
             {
                 if (c.getProgress().updateMilestones())
                 {
-                    Tracker.T.completable.Progressed(c.getId(), (CompletableTracker.Completable)c.getType(), c.currentProgress());
+                    TrackerAsset.Instance.Completable.Progressed(c.getId(), (CompletableTracker.Completable)c.getType(), c.currentProgress());
                 }
                 if (c.getEnd().getType() == Completable.Milestone.MilestoneType.CONDITION && c.getEnd().Update())
                 {
@@ -138,8 +138,8 @@ namespace uAdventure.Runner
                 {
                     trackingCompletables.Add(completable);
                     times.Add(completable, DateTime.Now);
-                    Tracker.T.completable.Initialized(completable.getId(), (CompletableTracker.Completable)completable.getType());
-                    Tracker.T.completable.Progressed(completable.getId(), (CompletableTracker.Completable)completable.getType(), 0);
+                    TrackerAsset.Instance.Completable.Initialized(completable.getId(), (CompletableTracker.Completable)completable.getType());
+                    TrackerAsset.Instance.Completable.Progressed(completable.getId(), (CompletableTracker.Completable)completable.getType(), 0);
 
                     if (completable.getEnd() == null)
                     {
@@ -153,8 +153,8 @@ namespace uAdventure.Runner
         {
             float score = Mathf.Max(Mathf.Min(c.getScore().getScore() / 10f, 1f), 0f);
             
-            Tracker.T.setVar("time", (DateTime.Now - times[c]).TotalSeconds);
-            Tracker.T.completable.Completed(c.getId(), (CompletableTracker.Completable)c.getType(), true, score);
+            TrackerAsset.Instance.setVar("time", (DateTime.Now - times[c]).TotalSeconds);
+            TrackerAsset.Instance.Completable.Completed(c.getId(), (CompletableTracker.Completable)c.getType(), true, score);
         }
 
         public void clearToRemove()

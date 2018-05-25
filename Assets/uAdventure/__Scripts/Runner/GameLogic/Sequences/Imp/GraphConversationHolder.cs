@@ -3,8 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 using uAdventure.Core;
-using RAGE.Analytics;
-using RAGE.Analytics.Formats;
+using AssetPackage;
 
 namespace uAdventure.Runner
 {
@@ -14,6 +13,14 @@ namespace uAdventure.Runner
         public int child = -2;
         private EffectHolder additional_effects;
         private EffectHolder end_conversation_effects;
+        private int current_line = 0;
+        private bool showOption = false;
+        private bool isTracePending = false;
+        private string xAPIQuestion;
+        private string xAPIResponse;
+        private bool xAPISuccess;
+
+        public bool TracePending { get { return isTracePending; } }
 
 
         public ConversationNodeHolder(ConversationNode node)
@@ -39,8 +46,6 @@ namespace uAdventure.Runner
             }
         }
 
-        private int current_line = 0;
-        private bool showOption = false;
         public bool execute()
         {
             bool forcewait = false;
@@ -67,6 +72,11 @@ namespace uAdventure.Runner
                     case ConversationNodeViewEnum.OPTION:
                         if (this.child == -2)
                         {
+                            if (isTracePending)
+                            {
+                                EndTrace();
+                            }
+                            
                             Game.Instance.showOptions(this);
                             forcewait = true;
                         }
@@ -102,9 +112,20 @@ namespace uAdventure.Runner
 
             if (!string.IsNullOrEmpty(onode.getXApiQuestion()))
             {
-                Tracker.T.alternative.Selected(onode.getXApiQuestion(), onode.getLine(option).getText().Replace(",", " "), onode.getLine(option).getXApiCorrect(), AlternativeTracker.Alternative.Question);
-                Tracker.T.RequestFlush();
+                isTracePending = true;
+                Game.Instance.GameState.BeginChangeAmbit();
+                xAPISuccess = onode.getLine(option).getXApiCorrect();
+                xAPIQuestion = onode.getXApiQuestion();
+                xAPIResponse = onode.getLine(option).getText().Replace(",", " ");
             }
+        }
+
+        public void EndTrace()
+        {
+            Game.Instance.GameState.EndChangeAmbitAsExtensions();
+            TrackerAsset.Instance.setSuccess(xAPISuccess);
+            TrackerAsset.Instance.Alternative.Selected(xAPIQuestion, xAPIResponse, AlternativeTracker.Alternative.Question);
+            TrackerAsset.Instance.Flush();
         }
 
         public ConversationNodeHolder getChild()
@@ -133,6 +154,7 @@ namespace uAdventure.Runner
         }
 
         private ConversationNodeHolder current;
+        private ConversationNodeHolder tracePendingNode;
         public bool execute()
         {
             bool forcewait = false;
@@ -149,9 +171,22 @@ namespace uAdventure.Runner
                 }
                 else
                 {
-                    current = current.getChild();
+                    ConversationNodeHolder child = current.getChild();
+                    if (current.TracePending)
+                    {
+                        if (tracePendingNode != null)
+                            tracePendingNode.EndTrace();
+
+                        tracePendingNode = current;
+                    }
+
+                    current = child;
                     if (current == null)
+                    {
+                        if(tracePendingNode != null)
+                            tracePendingNode.EndTrace();
                         break;
+                    }
                 }
             }
 

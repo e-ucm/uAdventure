@@ -62,7 +62,24 @@ namespace uAdventure.Core
                 return def;
             }
         }
-	}
+
+
+        public static T ParseEnum<T>(string value)
+        {
+            return (T)System.Enum.Parse(typeof(T), value, true);
+        }
+        public static T ParseDefault<T>(string value, T def)
+        {
+            try
+            {
+                return (T)System.Enum.Parse(typeof(T), value, true);
+            }
+            catch
+            {
+                return def;
+            }
+        }
+    }
 
     public static class ExString
     {

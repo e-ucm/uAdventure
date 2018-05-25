@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using uAdventure.Core;
 using RAGE.Analytics;
 using System;
+using AssetPackage;
 
 namespace uAdventure.Runner
 {
@@ -21,6 +22,7 @@ namespace uAdventure.Runner
         string last_target = "";
         private List<string> removedElements;
         private List<string> inventoryItems;
+        private Stack<List<KeyValuePair<string, int>>> varFlagChangeAmbits;
 
         public AdventureData Data
         {
@@ -45,6 +47,7 @@ namespace uAdventure.Runner
             this.removedElements = new List<string>();
             this.inventoryItems = new List<string>();
             this.data = data;
+            varFlagChangeAmbits = new Stack<List<KeyValuePair<string, int>>>();
         }
 
         public int checkFlag(string flag)
@@ -64,9 +67,11 @@ namespace uAdventure.Runner
 
             //Debug.Log ("Flag '" + name + " puesta a " + state);
             bool bstate = state == FlagCondition.FLAG_ACTIVE;
+            int intVal = bstate ? 1 : 0;
 
             // TODO check this after this: https://github.com/e-ucm/unity-tracker/issues/29
-            Tracker.T.setVar(name, bstate ? 1 : 0);
+            if (varFlagChangeAmbits.Count > 0) varFlagChangeAmbits.Peek().Add(new KeyValuePair<string, int>(name, intVal));
+            else TrackerAsset.Instance.setVar(name, intVal);
             TimerController.Instance.CheckTimers();
             CompletableController.Instance.conditionChanged();
             Game.Instance.reRenderScene();
@@ -87,7 +92,9 @@ namespace uAdventure.Runner
             PlayerPrefs.SetInt("var_" + name, value);
             PlayerPrefs.Save();
 
-            Tracker.T.setVar(name, value);
+            if (varFlagChangeAmbits.Count > 0) varFlagChangeAmbits.Peek().Add(new KeyValuePair<string, int>(name, value));
+            else TrackerAsset.Instance.setVar(name, value);
+
             CompletableController.Instance.conditionChanged();
 
             Game.Instance.reRenderScene();
@@ -128,21 +135,26 @@ namespace uAdventure.Runner
                 {
                     var scene = getChapterTarget(CurrentTarget) as Scene;
                     if (scene == null)
-                        return null;
-                    
-                    var trajectory = scene.getTrajectory();
-
-                    var playerPosition = new Vector2(scene.getPositionX(), scene.getPositionY());
-                    var scale = scene.getPlayerScale();
-                    if (trajectory != null)
                     {
-                        Trajectory.Node pos = scene.getTrajectory().getInitial();
-                        playerPosition = new Vector2(pos.getX(), pos.getY());
-                        scale = pos.getScale();
+                        playerContext = new ElementReference("Player", 0, 0, 0);
+                        return playerContext;
                     }
+                    else
+                    {
+                        var trajectory = scene.getTrajectory();
 
-                    playerContext = new ElementReference("Player", (int)playerPosition.x, (int)playerPosition.y, scene.getPlayerLayer());
-                    playerContext.setScale(scale);
+                        var playerPosition = new Vector2(scene.getPositionX(), scene.getPositionY());
+                        var scale = scene.getPlayerScale();
+                        if (trajectory != null)
+                        {
+                            Trajectory.Node pos = scene.getTrajectory().getInitial();
+                            playerPosition = new Vector2(pos.getX(), pos.getY());
+                            scale = pos.getScale();
+                        }
+
+                        playerContext = new ElementReference("Player", (int)playerPosition.x, (int)playerPosition.y, scene.getPlayerLayer());
+                        playerContext.setScale(scale);
+                    }
                 }
 
                 return playerContext;
@@ -302,5 +314,40 @@ namespace uAdventure.Runner
             return inventoryItems.Remove(elementId);
         }
 
+        // Var flag change ambits
+        public void BeginChangeAmbit()
+        {
+            this.varFlagChangeAmbits.Push(new List<KeyValuePair<string, int>>());
+        }
+
+        public List<KeyValuePair<string, int>> EndChangeAmbit(bool appendToParent = false)
+        {
+            var currentAmbit = this.varFlagChangeAmbits.Pop();
+
+            if (appendToParent)
+            {
+                if(varFlagChangeAmbits.Count > 0)
+                {
+                    foreach(var varChange in currentAmbit)
+                        varFlagChangeAmbits.Peek().Add(varChange);
+                }
+                else
+                {
+                    foreach (var varChange in currentAmbit)
+                        TrackerAsset.Instance.setVar(varChange.Key, varChange.Value);
+                }
+            }
+
+            return currentAmbit;
+        }
+
+        public void EndChangeAmbitAsExtensions()
+        {
+            var currentChanges = EndChangeAmbit(false);
+            foreach(var varChange in currentChanges)
+            {
+                TrackerAsset.Instance.setVar(varChange.Key, varChange.Value);
+            }
+        }
     }
 }

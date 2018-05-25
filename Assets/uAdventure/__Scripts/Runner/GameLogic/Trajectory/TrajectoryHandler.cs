@@ -130,7 +130,7 @@ namespace uAdventure.Runner
             Vector2 closest = Vector2.zero;
             if (origin_line == null)
             {
-                closest = closestPoint(PlayerMB.Instance.getPosition());
+                closest = closestPoint(PlayerMB.Instance.GetComponent<Representable>().getPosition());
                 origin_line = containingLine(closest);
             }
 

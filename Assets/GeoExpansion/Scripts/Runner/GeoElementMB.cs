@@ -10,11 +10,11 @@ using System.Linq;
 using System;
 using uAdventure.Runner;
 using RAGE.Analytics;
-using RAGE.Analytics.Formats;
 using ClipperLib;
 
 using Path = System.Collections.Generic.List<ClipperLib.IntPoint>;
 using Paths = System.Collections.Generic.List<System.Collections.Generic.List<ClipperLib.IntPoint>>;
+using AssetPackage;
 
 public class GeoElementMB : MonoBehaviour {
 
@@ -294,10 +294,10 @@ public class GeoElementMB : MonoBehaviour {
         {
             var latlon = LatLon.ToVector2();
 
-            Tracker.T.setGeopoint(latlon.x, latlon.y);
-            Tracker.T.setVar("geocommand", "enter");
-            Tracker.T.accessible.Accessed(Element.Id, AccessibleTracker.Accessible.Zone);
-            Tracker.T.RequestFlush();
+            TrackerAsset.Instance.setGeopoint(latlon.x, latlon.y);
+            TrackerAsset.Instance.setVar("geocommand", "enter");
+            TrackerAsset.Instance.Accessible.Accessed(Element.Id, AccessibleTracker.Accessible.Zone);
+            TrackerAsset.Instance.Flush();
             base.Execute();
         }
     }
@@ -340,10 +340,10 @@ public class GeoElementMB : MonoBehaviour {
         {
             var latlon = LatLon.ToVector2();
 
-            Tracker.T.setGeopoint(latlon.x, latlon.y);
-            Tracker.T.setVar("geocommand", "exit");
-            Tracker.T.accessible.Accessed(Element.Id, AccessibleTracker.Accessible.Zone);
-            Tracker.T.RequestFlush();
+            TrackerAsset.Instance.setGeopoint(latlon.x, latlon.y);
+            TrackerAsset.Instance.setVar("geocommand", "exit");
+            TrackerAsset.Instance.Accessible.Accessed(Element.Id, AccessibleTracker.Accessible.Zone);
+            TrackerAsset.Instance.Flush();
 
             base.Execute();
         }
@@ -377,10 +377,10 @@ public class GeoElementMB : MonoBehaviour {
         {
             var latlon = LatLon.ToVector2();
 
-            Tracker.T.setGeopoint(latlon.x, latlon.y);
-            Tracker.T.setVar("geocommand", "look");
-            Tracker.T.accessible.Accessed(Element.Id, AccessibleTracker.Accessible.Zone);
-            Tracker.T.RequestFlush();
+            TrackerAsset.Instance.setGeopoint(latlon.x, latlon.y);
+            TrackerAsset.Instance.setVar("geocommand", "look");
+            TrackerAsset.Instance.Accessible.Accessed(Element.Id, AccessibleTracker.Accessible.Zone);
+            TrackerAsset.Instance.Flush();
 
             base.Execute();
         }
@@ -414,9 +414,9 @@ public class GeoElementMB : MonoBehaviour {
 
         protected override void Execute()
         {
-            Tracker.T.setVar("geocommand", "inspect");
-            Tracker.T.trackedGameObject.Interacted(Element.Id, GameObjectTracker.TrackedGameObject.GameObject);
-            Tracker.T.RequestFlush();
+            TrackerAsset.Instance.setVar("geocommand", "inspect");
+            TrackerAsset.Instance.GameObject.Interacted(Element.Id, GameObjectTracker.TrackedGameObject.GameObject);
+            TrackerAsset.Instance.Flush();
 
             base.Execute();
         }

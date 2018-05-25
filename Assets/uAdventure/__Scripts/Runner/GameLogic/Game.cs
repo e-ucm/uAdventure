@@ -5,10 +5,10 @@ using System.IO;
 
 using uAdventure.Core;
 using RAGE.Analytics;
-using RAGE.Analytics.Formats;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine.EventSystems;
+using AssetPackage;
 
 namespace uAdventure.Runner
 {
@@ -48,7 +48,7 @@ namespace uAdventure.Runner
 
         // Execution
         private bool waitingRunTarget = false;
-        private Stack<Interactuable> executeStack;
+        private Stack<KeyValuePair<Interactuable, OnExecutionFinished>> executeStack;
         private IRunnerChapterTarget runnerTarget;
         private GameState game_state;
         private uAdventureRaycaster uAdventureRaycaster;
@@ -67,6 +67,8 @@ namespace uAdventure.Runner
         private ConversationNodeHolder guioptions;
         private float elapsedTime;
         private bool doTimeOut;
+
+        public delegate void OnExecutionFinished(object interactuable);
 
         public GUISkin Skin
         {
@@ -97,7 +99,7 @@ namespace uAdventure.Runner
         void Awake()
         {
             Game.instance = this;
-            executeStack = new Stack<Interactuable>();
+            executeStack = new Stack<KeyValuePair<Interactuable, OnExecutionFinished>>();
             //Load tracker data
             SimpleJSON.JSONNode hostfile = new SimpleJSON.JSONClass();
 
@@ -123,8 +125,9 @@ namespace uAdventure.Runner
             {
                 if (loaded)
                 {
-                    Tracker.T.host = hostfile["host"];
-                    Tracker.T.trackingCode = hostfile["trackingCode"];
+                    var settings = TrackerAsset.Instance.Settings as TrackerAssetSettings;
+                    settings.Host = hostfile["host"];
+                    settings.TrackingCode = hostfile["trackingCode"];
                     //End tracker data loading
                 }
             }
@@ -281,42 +284,21 @@ namespace uAdventure.Runner
             }
         }
 
-        private bool InteractWith(Interactuable interacted)
-        {
-            bool exit = false;
-            /*next_interaction = null;
-            switch (interacted.Interacted())
-            {
-                case InteractuableResult.DOES_SOMETHING:
-                    exit = true;
-                    break;
-                case InteractuableResult.REQUIRES_MORE_INTERACTION:
-                    exit = true;
-                    next_interaction = interacted;
-                    break;
-                case InteractuableResult.IGNORES:
-                default:
-                    break;
-            }*/
-            return exit;
-        }
-
-        public bool Execute(Interactuable interactuable)
+        public bool Execute(Interactuable interactuable, OnExecutionFinished callback = null)
         {
             // In case any menu is shown, we hide it
             MenuMB.Instance.hide(true);
             // Then we execute anything
-            if (executeStack.Count == 0 || executeStack.Peek() != interactuable)
+            if (executeStack.Count == 0 || executeStack.Peek().Key != interactuable)
             {
                 Debug.Log("Pushed " + interactuable.ToString());
-                executeStack.Push(interactuable);
+                executeStack.Push(new KeyValuePair<Interactuable, OnExecutionFinished>(interactuable, callback));
             }
             while(executeStack.Count > 0)
             {
-                Debug.Log("executeStack.Count: " + executeStack.Count);
                 var preInteractSize = executeStack.Count;
                 var toExecute = executeStack.Peek();
-                if (toExecute.Interacted() == InteractuableResult.REQUIRES_MORE_INTERACTION)
+                if (toExecute.Key.Interacted() == InteractuableResult.REQUIRES_MORE_INTERACTION)
                 {
                     uAdventureRaycaster.Instance.Override = this.gameObject;
                     return true;
@@ -327,7 +309,7 @@ namespace uAdventure.Runner
                     if (preInteractSize != executeStack.Count)
                     {
                         Debug.Log("The size was different");
-                        var backupStack = new Stack<Interactuable>();
+                        var backupStack = new Stack<KeyValuePair<Interactuable, OnExecutionFinished>>();
                         // We backup the new stacked things
                         while (executeStack.Count > preInteractSize)
                             backupStack.Push(executeStack.Pop());
@@ -338,6 +320,15 @@ namespace uAdventure.Runner
                             executeStack.Push(backupStack.Pop());
                     }
                     else executeStack.Pop();
+                    try
+                    {
+                        if (toExecute.Value != null)
+                            toExecute.Value(toExecute.Key);
+                    }
+                    catch (System.Exception ex)
+                    {
+                        Debug.Log("Execution OnFinished execution exception: " + ex.Message);
+                    }
                 }
             }
             uAdventureRaycaster.Instance.Override = null;
@@ -350,7 +341,7 @@ namespace uAdventure.Runner
             GUIManager.Instance.destroyBubbles();
             if (executeStack.Count > 0)
             {
-                return Execute(executeStack.Peek());
+                return Execute(executeStack.Peek().Key);
             }
             return false;
         }
@@ -362,7 +353,7 @@ namespace uAdventure.Runner
 
         public Interactuable getNextInteraction()
         {
-            return executeStack.Count > 0 ? executeStack.Peek() : null;
+            return executeStack.Count > 0 ? executeStack.Peek().Key : null;
         }
 
         #endregion Monobehaviour
@@ -373,11 +364,7 @@ namespace uAdventure.Runner
 
         // TODO ?????
         //List<GeneralScene> finalprogress = new List<GeneralScene>();
-
-        public IChapterTarget getAlternativeTarget()
-        {
-            return alternative;
-        }
+        
 
         private void trackSceneChange(IChapterTarget target)
         {
@@ -387,29 +374,12 @@ namespace uAdventure.Runner
             {
                 if (target.getXApiClass() == "accesible")
                 {
-                    Tracker.T.accessible.Accessed(target.getId(), ParseEnum<AccessibleTracker.Accessible>(target.getXApiType()));
-                }
-                else if (target.getXApiClass() == "alternative")
-                {
-                    alternative = target;
+                    TrackerAsset.Instance.Accessible.Accessed(target.getId(), ExParsers.ParseEnum<AccessibleTracker.Accessible>(target.getXApiType()));
+                    TrackerAsset.Instance.Flush();
                 }
             }
 
             CompletableController.Instance.targetChanged(target);
-
-            Tracker.T.RequestFlush();
-        }
-
-        private void trackInteraction(Interactuable with)
-        {
-            switch (with.GetType().ToString())
-            {
-                case "ActiveAreaMB": Tracker.T.trackedGameObject.Interacted(((ActiveAreaMB)with).Element.getId(), GameObjectTracker.TrackedGameObject.Npc); break;
-                case "CharacterMB": Tracker.T.trackedGameObject.Interacted(((Representable)with).Element.getId(), GameObjectTracker.TrackedGameObject.Npc); break;
-                case "ObjectMB": Tracker.T.trackedGameObject.Interacted(((Representable)with).Element.getId(), GameObjectTracker.TrackedGameObject.Item); break;
-            }
-
-            Tracker.T.RequestFlush();
         }
 
         #endregion Tracking
@@ -417,17 +387,13 @@ namespace uAdventure.Runner
         //########################### RENDERING ###########################
         //#################################################################
         #region Rendering
-        public static T ParseEnum<T>(string value)
+
+        public IRunnerChapterTarget RunTarget(string scene_id, Interactuable notifyObject, bool trace = true)
         {
-            return (T)System.Enum.Parse(typeof(T), value, true);
+            return RunTarget(scene_id, 0, 0, notifyObject, trace);
         }
 
-        public IRunnerChapterTarget RunTarget(string scene_id, Interactuable notifyObject)
-        {
-            return RunTarget(scene_id, 0, 0, notifyObject);
-        }
-
-        public IRunnerChapterTarget RunTarget(string scene_id, int transition_time = 0, int transition_type = 0, Interactuable notifyObject = null)
+        public IRunnerChapterTarget RunTarget(string scene_id, int transition_time = 0, int transition_type = 0, Interactuable notifyObject = null, bool trace = true)
         {
             Debug.Log("Run target: " + scene_id);
             MenuMB.Instance.hide(true);
@@ -442,11 +408,12 @@ namespace uAdventure.Runner
             runnerTarget.Data = target;
             GameState.CurrentTarget = target.getId();
 
-            trackSceneChange(target);
+            if(!trace)
+                trackSceneChange(target);
 
             waitingRunTarget = true;
             if(notifyObject != null)
-                executeStack.Push(notifyObject);
+                executeStack.Push(new KeyValuePair<Interactuable, OnExecutionFinished>(notifyObject, null));
             uAdventureRaycaster.Instance.Override = this.gameObject;
             
             return runnerTarget;
@@ -582,8 +549,6 @@ namespace uAdventure.Runner
             doTimeOut = false;
             GameObject.Destroy(blur);
             guioptions.clicked(i);
-            /*Tracker.T ().Choice (GUIManager.Instance.Last, ono.getText ());
-            Tracker.T ().RequestFlush ();*/
             uAdventureRaycaster.Instance.enabled = true;
             Interacted();
         }

@@ -1,29 +1,30 @@
-﻿using UnityEngine;
-using System.Collections;
-
-using uAdventure.Core;
-using RAGE.Analytics;
-using RAGE.Analytics.Formats;
-using System;
+﻿using uAdventure.Core;
+using UnityEngine;
 using UnityEngine.EventSystems;
+using AssetPackage;
 
 namespace uAdventure.Runner
 {
-    public class ExitMB : Area, Interactuable, IPointerClickHandler
-    {
 
-        private Exit ed;
-        public Exit Element
+    [RequireComponent(typeof(Area))]
+    public class ExitMB : MonoBehaviour, Interactuable, IPointerClickHandler
+    {
+        System.StringComparison IgnoreCase = System.StringComparison.InvariantCultureIgnoreCase;
+        private Area area;
+
+        protected void Start()
         {
-            get { return ed; }
-            set { ed = value; }
+            area = GetComponent<Area>();
         }
 
-        private EffectHolder GetExitEffects()
+        private EffectHolder GetExitEffects(out bool exited)
         {
+            var ed = area.Element as Exit;
             Effects effects = new Effects();
+            exited = false;
             if (ConditionChecker.check(ed.getConditions()))
             {
+                exited = true;
                 effects.AddRange(ed.getEffects());
 
                 if (Game.Instance.GameState.isCutscene(ed.getNextSceneId()))
@@ -40,33 +41,72 @@ namespace uAdventure.Runner
                     effects.AddRange(ed.getNotEffects());
             }
 
-            return new EffectHolder(effects);
+            var effectHolder = new EffectHolder(effects);
+            if (exited)
+            {
+                effectHolder.effects[ed.getEffects().Count].AddAditionalInfo("not_trace", true);
+            }
+
+            return effectHolder;
         }
 
-        private void TrackExit()
+        private void TrackExit(bool exited, IChapterTarget targetOnExit)
         {
-            if (Game.Instance.getAlternativeTarget() != null)
+            var ed = area.Element as Exit;
+
+            // ALTERNATIVE
+            if ("alternative".Equals(targetOnExit.getXApiClass(), IgnoreCase))
             {
                 if (ConditionChecker.check(ed.getConditions()))
                 {
-                    if (Game.Instance.getAlternativeTarget().getXApiType() == "menu")
-                        Tracker.T.alternative.Selected(Game.Instance.getAlternativeTarget().getId(), ed.getNextSceneId(), AlternativeTracker.Alternative.Menu);
+                    if (targetOnExit.getXApiType() == "menu")
+                        TrackerAsset.Instance.Alternative.Selected(targetOnExit.getId(), ed.getNextSceneId(), AlternativeTracker.Alternative.Menu);
                     else
-                        Tracker.T.alternative.Selected(Game.Instance.getAlternativeTarget().getId(), ed.getNextSceneId(), true);
+                    {
+                        TrackerAsset.Instance.setSuccess(true);
+                        TrackerAsset.Instance.Alternative.Selected(targetOnExit.getId(), ed.getNextSceneId());
+                    }
                 }
                 else
                 {
-                    if (Game.Instance.getAlternativeTarget().getXApiType() != "menu")
-                        Tracker.T.alternative.Selected(Game.Instance.getAlternativeTarget().getId(), "Incorrect", false);
+                    if (targetOnExit.getXApiType() != "menu")
+                    {
+                        TrackerAsset.Instance.setSuccess(false);
+                        TrackerAsset.Instance.Alternative.Selected(targetOnExit.getId(), "Incorrect");
+                    }
                 }
-                Tracker.T.RequestFlush();
+                TrackerAsset.Instance.Flush();
             }
+
+            // ACCESIBLE
+
+            // If no exited, accesible doesnt matter
+            if (!exited)
+                return;
+
+            // If no destination accesible doesnt matter
+            var destination = Game.Instance.GameState.getChapterTarget(ed.getNextSceneId());
+            if (destination == null)
+                return;
+
+            if ("accesible".Equals(destination.getXApiClass(), IgnoreCase))
+            {
+                var type = ExParsers.ParseDefault(destination.getXApiType(), AccessibleTracker.Accessible.Accessible);
+                TrackerAsset.Instance.Accessible.Accessed(destination.getId(), type);
+            }
+
         }
 
         public void Exit()
         {
-            TrackExit();
-            Game.Instance.Execute(GetExitEffects());
+            var currentTarget = Game.Instance.GameState.getChapterTarget(Game.Instance.GameState.CurrentTarget);
+            Game.Instance.GameState.BeginChangeAmbit();
+            bool exited;
+            Game.Instance.Execute(GetExitEffects(out exited), (effects) =>
+            {
+                Game.Instance.GameState.EndChangeAmbitAsExtensions();
+                TrackExit(exited, currentTarget);
+            });
         }
 
         bool interactable = false;
@@ -82,6 +122,7 @@ namespace uAdventure.Runner
 
         public InteractuableResult Interacted(PointerEventData pointerData = null)
         {
+            var ed = area.Element as Exit;
             if (Game.Instance.GameState.IsFirstPerson)
             {
                 Exit();
@@ -99,11 +140,11 @@ namespace uAdventure.Runner
                 else
                 {
                     area = new InfluenceArea(ed.getX() - 20, ed.getY() - 20, ed.getWidth() + 40, ed.getHeight() + 40);
-                    if(this.ed.getInfluenceArea() != null && this.ed.getInfluenceArea().isExists())
+                    if(ed.getInfluenceArea() != null && ed.getInfluenceArea().isExists())
                     {
-                        var points = this.ed.isRectangular() ? this.ed.ToRect().ToPoints() : this.ed.getPoints().ToArray();
+                        var points = ed.isRectangular() ? ed.ToRect().ToPoints() : ed.getPoints().ToArray();
                         var topLeft = points.ToRect().position;
-                        area = this.ed.getInfluenceArea().MoveArea(topLeft);
+                        area = ed.getInfluenceArea().MoveArea(topLeft);
                     }
                 }
                 var exitAction = new Core.Action(Core.Action.CUSTOM) { Effects = new Effects() { new ExecuteExitEffect(this) } };
@@ -134,6 +175,8 @@ namespace uAdventure.Runner
         {
             private ExecuteExitEffect toRun;
             private EffectHolder exitEffects;
+            private bool exit;
+            private IChapterTarget targetOnExit;
 
             public IEffect Effect { get { return toRun; } set { toRun = value as ExecuteExitEffect; } }
 
@@ -141,10 +184,18 @@ namespace uAdventure.Runner
             {
                 if(exitEffects == null)
                 {
-                    toRun.exitMB.TrackExit();
-                    exitEffects = toRun.exitMB.GetExitEffects();
+                    Game.Instance.GameState.BeginChangeAmbit();
+                    targetOnExit = Game.Instance.GameState.getChapterTarget(Game.Instance.GameState.CurrentTarget);
+                    exitEffects = toRun.exitMB.GetExitEffects(out exit);
                 }
-                return exitEffects.execute();
+
+                var forceWait = exitEffects.execute();
+                if (!forceWait)
+                {
+                    Game.Instance.GameState.EndChangeAmbit();
+                    toRun.exitMB.TrackExit(exit, targetOnExit);
+                }
+                return forceWait;
             }
         }
     }

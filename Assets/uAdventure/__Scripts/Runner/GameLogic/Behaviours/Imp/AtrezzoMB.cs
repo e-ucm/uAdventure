@@ -10,7 +10,7 @@ namespace uAdventure.Runner
         protected override void Start()
         {
             base.Start();
-            base.setTexture(Atrezzo.RESOURCE_TYPE_IMAGE);
+            base.SetTexture(Atrezzo.RESOURCE_TYPE_IMAGE);
             base.Positionate();
 
             // Disable any kind of colliders

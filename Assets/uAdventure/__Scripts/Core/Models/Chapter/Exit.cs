@@ -121,6 +121,7 @@ namespace uAdventure.Core
 
             this.x = x;
             this.y = y;
+            this.destinyScale = float.MinValue;
             this.width = width;
             this.height = height;
 

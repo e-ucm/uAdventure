@@ -111,7 +111,7 @@ namespace uAdventure.Runner
             }
             if (talkerObject)
             {
-                var bubbleTalker = talkerObject.GetComponent<CharacterMB>();
+                var bubbleTalker = talkerObject.GetComponent<Representable>();
                 if (bubbleTalker)
                     bubbleTalker.Play("speak");
             }
@@ -157,9 +157,9 @@ namespace uAdventure.Runner
                 var bubbleMB = this.bubble.GetComponent<Bubble>();
                 if (bubbleMB.Data.Talker)
                 {
-                    var characterMB = bubbleMB.Data.Talker.GetComponent<CharacterMB>();
-                    if (characterMB)
-                        characterMB.Play("stand");
+                    var talker = bubbleMB.Data.Talker.GetComponent<Representable>();
+                    if (talker)
+                        talker.Play("stand");
                 } 
                 this.bubble.GetComponent<Bubble>().destroy();
             }

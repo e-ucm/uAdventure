@@ -6,16 +6,27 @@ using uAdventure.Core;
 
 namespace uAdventure.Runner
 {
-
-    public class PlayerMB : CharacterMB
+    [RequireComponent(typeof(Representable))]
+    [RequireComponent(typeof(Mover))]
+    public class PlayerMB : MonoBehaviour
     {
+        private class ActionArea
+        {
+            public Action action;
+            public Rectangle area;
 
+            public ActionArea(Action action, Rectangle area)
+            {
+                this.action = action;
+                this.area = area;
+            }
+        }
 
-        static PlayerMB instance;
-        Action toDo;
-        Rectangle toDoArea;
+        private static PlayerMB instance;
+        private Game.OnExecutionFinished onExecutionFinished;
 
-
+        private Mover mover;
+        private Representable representable;
 
         static public PlayerMB Instance
         {
@@ -27,71 +38,55 @@ namespace uAdventure.Runner
             instance = this;
         }
 
-        protected override void Start()
+        protected void Start()
         {
-            this.gameObject.name = base.Element.getId();
-            base.Start();
-            this.deformation = -0.3f;
+            mover = GetComponent<Mover>();
+            representable = GetComponent<Representable>();
         }
 
-
-        /*public void Do(Action action, Vector2 objectCenter)
+        public void Do(Action action, Rectangle area, Game.OnExecutionFinished onExecutionFinishes = null)
         {
-            var accesible = TrajectoryHandler.GetAccessibleTrajectory(getPosition(), FindObjectOfType<SceneMB>().Trajectory);
-            Vector2[] intersections;
-            var area = new InfluenceArea((int)objectCenter.x + influenceArea.getX() - influenceArea.getWidth() / 2,
-                (int)objectCenter.y + influenceArea.getY() - influenceArea.getHeight() / 2, influenceArea.getWidth(), influenceArea.getHeight());
-            if(TrajectoryHandler.TrajectoryRectangleIntersections(area, accesible, out intersections))
-            {
-                toDo = action;
-                move(accesible.route(getPosition(), intersections));
-            }
-        }*/
-
-        public void Do(Action action, Rectangle area)
-        {
-            toDoArea = area;
-            toDo = action;
-            if (!Move(area, action.getKeepDistance()))
-            {
-                toDo = null;
-            }
-            else
-            {
-                toDo = action;
-            }
+            this.onExecutionFinished = onExecutionFinishes;
+            mover.Move(area, action.getKeepDistance(), new ActionArea(action, area), OnMovementFinished, OnMovementCancelled);
         }
 
-        protected override void OnMovementCancelled()
+        protected void OnMovementCancelled(object data)
         {
-            base.OnMovementCancelled();
 
-            toDo = null;
         }
 
-        protected override void OnMovementFinished()
+        protected void OnMovementFinished(object data)
         {
-            base.OnMovementFinished();
-
+            var toDo = data as ActionArea;
             if (toDo != null)
             {
-                switch (toDo.getType())
+                switch (toDo.action.getType())
                 {
                     case Action.USE:
                     case Action.USE_WITH:
                     case Action.GRAB:
-                        Orientation = (this.getPosition() - toDoArea.ToRect().center).ToOrientation(true);
-                        Play("use", "stand");
+                        representable.Orientation = (representable.getPosition() - toDo.area.ToRect().center).ToOrientation(true);
+                        representable.Play("use", "stand");
                         break;
                     case Action.CUSTOM:
-                        Orientation = (this.getPosition() - toDoArea.ToRect().center).ToOrientation(true);
-                        Play("actionAnimation", "stand");
+                        representable.Orientation = (representable.getPosition() - toDo.area.ToRect().center).ToOrientation(true);
+                        representable.Play("actionAnimation", "stand");
                         break;
                 }
-
-                Game.Instance.Execute(new EffectHolder(toDo.Effects));
+                
+                Game.Instance.GameState.BeginChangeAmbit();
+                Game.Instance.Execute(new EffectHolder(toDo.action.Effects), FinishedCallbackFor(toDo, onExecutionFinished));
                 toDo = null;
             }
+        }
+
+        private Game.OnExecutionFinished FinishedCallbackFor(ActionArea data, Game.OnExecutionFinished onExecutionFinished)
+        {
+            return (_) =>
+            {
+                if (onExecutionFinished != null)
+                    onExecutionFinished(data.action);
+            };
         }
 
     }

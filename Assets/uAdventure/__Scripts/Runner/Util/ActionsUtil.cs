@@ -53,15 +53,25 @@ namespace uAdventure.Runner
 
                 if (description != null)
                 {
-                    actions.Add(
-                        new Action(Action.EXAMINE)
-                        {
-                            Effects = new Effects
+                    var textToShow = description.getDetailedDescription();
+                    if (string.IsNullOrEmpty(textToShow))
+                        textToShow = description.getDescription();
+                    if (string.IsNullOrEmpty(textToShow))
+                        textToShow = description.getName();
+
+                    // Only add the examine if there's text to show
+                    if (!string.IsNullOrEmpty(textToShow))
+                    {
+                        actions.Add(
+                            new Action(Action.EXAMINE)
                             {
-                                new SpeakPlayerEffect(description.getDetailedDescription())
+                                Effects = new Effects
+                                {
+                                    new SpeakPlayerEffect(textToShow)
+                                }
                             }
-                        }
-                    );
+                        );
+                    }
                 }
             }
         }

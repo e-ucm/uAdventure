@@ -1,4 +1,5 @@
-﻿using RAGE.Analytics;
+﻿using AssetPackage;
+using RAGE.Analytics;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -43,12 +44,12 @@ public static class TrackerExtension {
     /// <summary>
     /// Movement tracker class used to extend the normal tracker
     /// </summary>
-    public class MovementTracker : Tracker.IGameObjectTracker
+    public class MovementTracker : TrackerAsset.IGameObjectTracker
     {
 
-        private Tracker tracker;
+        private TrackerAsset tracker;
 
-        public void setTracker(Tracker tracker)
+        public void setTracker(TrackerAsset tracker)
         {
             this.tracker = tracker;
         }
@@ -84,7 +85,7 @@ public static class TrackerExtension {
     /// <param name="t">tracker to use</param>
     /// <param name="lat">latitude</param>
     /// <param name="lon">longitude</param>
-    public static void setGeopoint(this Tracker t, float lat, float lon)
+    public static void setGeopoint(this TrackerAsset t, float lat, float lon)
     {
         if (TR == null)
             TR = new ExtensionTransformations();
@@ -102,7 +103,7 @@ public static class TrackerExtension {
             if (MT == null)
             {
                 MT = new MovementTracker();
-                MT.setTracker(Tracker.T);
+                MT.setTracker(TrackerAsset.Instance);
             }
 
             return MT;

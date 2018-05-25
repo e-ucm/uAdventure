@@ -11,8 +11,9 @@ GameObject:
   - component: {fileID: 3379384}
   - component: {fileID: 6426114}
   - component: {fileID: 2360830}
-  - component: {fileID: 11402898}
   - component: {fileID: 11444980}
+  - component: {fileID: 114962360362277628}
+  - component: {fileID: 114057352860411156}
   m_Layer: 0
   m_Name: ActiveArea
   m_TagString: Untagged
@@ -88,17 +89,6 @@ MeshCollider:
   m_CookingOptions: 14
   m_SkinWidth: 0.01
   m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &11402898
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 152522}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2f90983139a209b40bc9fd853c0759d2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &11444980
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -123,3 +113,25 @@ Prefab:
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 152522}
   m_IsPrefabParent: 1
+--- !u!114 &114057352860411156
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 152522}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f90983139a209b40bc9fd853c0759d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &114962360362277628
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 152522}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57b00eb378a05824199797dfb45b20cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

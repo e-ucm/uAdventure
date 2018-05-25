@@ -21,6 +21,10 @@ namespace uAdventure.Runner
         private bool is_valid = false;
 
         Dictionary<string, object> aditional_info = new Dictionary<string, object>();
+        public void AddAditionalInfo(string key, object value)
+        {
+            aditional_info[key] = value;
+        }
 
         public EffectHolderNode(IEffect effect)
         {
@@ -67,24 +71,37 @@ namespace uAdventure.Runner
                                     TriggerSceneEffect tse = ((TriggerSceneEffect)effect);
                                     if (!Game.Instance.GameState.IsFirstPerson)
                                     {
+                                        var playerContext = Game.Instance.GameState.PlayerContext;
                                         if (tse.getX() != int.MinValue || tse.getY() != int.MinValue)
                                         {
-                                            PlayerMB.Instance.Context.setPosition(tse.getX(), tse.getY());
-                                            if (tse.DestinyScale != float.MinValue)
-                                                PlayerMB.Instance.Context.setScale(tse.DestinyScale);
+                                            playerContext.setPosition(tse.getX(), tse.getY());
+                                            if (tse.DestinyScale > 0)
+                                                playerContext.setScale(tse.DestinyScale);
                                         }
                                         else
                                         {
                                             var targetScene = Game.Instance.GameState.getChapterTarget(tse.getTargetId()) as Scene;
                                             if (targetScene != null)
                                             {
-                                                PlayerMB.Instance.Context.setPosition(targetScene.getPositionX(), targetScene.getPositionY());
-                                                PlayerMB.Instance.Context.setScale(targetScene.getPlayerScale());
+                                                if(targetScene.getTrajectory() != null)
+                                                {
+                                                    var initial = targetScene.getTrajectory().getInitial();
+                                                    playerContext.setPosition(initial.getX(), initial.getY());
+                                                    playerContext.setScale(initial.getScale());
+                                                }
+                                                else
+                                                {
+                                                    playerContext.setPosition(targetScene.getPositionX(), targetScene.getPositionY());
+                                                    playerContext.setScale(targetScene.getPlayerScale());
+                                                }
                                             }
                                         }
                                     }
+                                    bool trace = true;
+                                    if (aditional_info.ContainsKey("disable_trace") && (bool)aditional_info["disable_trace"] == true)
+                                        trace = false;
 
-                                    Game.Instance.RunTarget(tse.getTargetId(), tse.getTransitionTime(), tse.getTransitionType());
+                                    Game.Instance.RunTarget(tse.getTargetId(), tse.getTransitionTime(), tse.getTransitionType(), null, trace);
                                     waitForLoadPulse = true;
                                     forcewait = true;
                                 }
@@ -119,9 +136,12 @@ namespace uAdventure.Runner
                                 }
                                 else if (times_runed == 0)
                                 {
-                                    aditional_info = new Dictionary<string, object>();
+                                    bool trace = true;
+                                    if (aditional_info.ContainsKey("disable_trace") && (bool)aditional_info["disable_trace"] == true)
+                                        trace = false;
+                                    
                                     aditional_info.Add("lastscene", Game.Instance.GameState.CurrentTarget);
-                                    aditional_info.Add("scene", Game.Instance.RunTarget(tce.getTargetId()));
+                                    aditional_info.Add("scene", Game.Instance.RunTarget(tce.getTargetId(), null, trace));
                                     forcewait = true;
                                 }
 

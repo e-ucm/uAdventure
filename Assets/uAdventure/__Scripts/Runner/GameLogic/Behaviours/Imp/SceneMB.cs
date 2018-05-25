@@ -4,10 +4,10 @@ using System.Collections.Generic;
 
 using uAdventure.Core;
 using RAGE.Analytics;
-using RAGE.Analytics.Formats;
 using UnityEngine.EventSystems;
 using System.Linq;
 using System;
+using AssetPackage;
 
 namespace uAdventure.Runner
 {
@@ -292,8 +292,7 @@ namespace uAdventure.Runner
                         trajectoryHandler = new TrajectoryHandler(TrajectoryHandler.CreateBlockedTrajectory(trajectory, barriers));
                         /*GameObject.Destroy(this.transform.FindChild ("Player"));*/
 
-                        PlayerMB player = GameObject.Instantiate(Player_Prefab).GetComponent<PlayerMB>();
-                        player.transform.parent = Characters;
+                        Representable player = GameObject.Instantiate(Player_Prefab, Characters).GetComponent<Representable>();
                         player.Element = Game.Instance.GameState.Player;
                         player.Context = player_context;
                         // Force the start
@@ -409,9 +408,9 @@ namespace uAdventure.Runner
             GameObject ret = GameObject.Instantiate(base_prefab, parent);
             Transform trans = ret.GetComponent<Transform>();
             if (parent == ActiveAreas)
-                ret.GetComponent<ActiveAreaMB>().Element = (ActiveArea)context;
+                ret.GetComponent<Area>().Element = (ActiveArea)context;
             else if (parent == Exits)
-                ret.GetComponent<ExitMB>().Element = (Exit)context;
+                ret.GetComponent<Area>().Element = (Exit)context;
 
             Vector2 tmpPos = new Vector2(context.getX(), context.getY());
             Vector2 tmpSize = new Vector2(context.getWidth(), context.getHeight());
@@ -480,8 +479,8 @@ namespace uAdventure.Runner
                         var texCoord = hitInfo.textureCoord;
                         texCoord.y = 1 - texCoord.y;
                         texPos.Scale(texCoord);
-                        var accesible = TrajectoryHandler.GetAccessibleTrajectory(PlayerMB.Instance.getPosition(), trajectoryHandler);
-                        PlayerMB.Instance.Move(accesible.closestPoint(texPos));
+                        var accesible = TrajectoryHandler.GetAccessibleTrajectory(PlayerMB.Instance.GetComponent<Representable>().getPosition(), trajectoryHandler);
+                        PlayerMB.Instance.GetComponent<Mover>().Move(accesible.closestPoint(texPos));
                     }
                     break;
                 case GeneralScene.GeneralSceneSceneType.SLIDESCENE:
@@ -498,7 +497,7 @@ namespace uAdventure.Runner
                         movie.Stop();
                         movieplayer = MovieState.STOPPED;
                         if (movieplayer == MovieState.PLAYING)
-                            Tracker.T.accessible.Skipped(sceneData.getId(), AccessibleTracker.Accessible.Cutscene);
+                            TrackerAsset.Instance.Accessible.Skipped(sceneData.getId(), AccessibleTracker.Accessible.Cutscene);
                         res = FinishCutscene(videoscene);
                     }
                     break;
