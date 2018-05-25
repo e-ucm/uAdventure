@@ -198,9 +198,11 @@ namespace uAdventure.Editor
             var args = System.Environment.GetCommandLineArgs();
             string outputPath = args[args.Length - 1];
 
-            Assembly myAssembly = typeof(uAdventure.Runner.Game).Assembly;
+            Assembly runnerAssembly = typeof(uAdventure.Runner.Game).Assembly;
+            Assembly trackerAssembly = typeof(RAGE.Analytics.Tracker).Assembly;
             Dictionary<Type, string> guids = new Dictionary<Type, string>();
-            var monobehaviours = FindDerivedTypes(myAssembly.GetTypes(), typeof(MonoBehaviour));//FindDerivedTypes(GetTypesInNamespace(myAssembly, "uAdventure.Runner"), typeof(MonoBehaviour));
+            var monobehaviours = FindDerivedTypes(runnerAssembly.GetTypes(), typeof(MonoBehaviour))
+                        .Union(FindDerivedTypes(trackerAssembly.GetTypes(), typeof(MonoBehaviour)));
             var scripts = System.IO.Directory.GetFiles("./", "*.cs", System.IO.SearchOption.AllDirectories);
 
             foreach(var s in scripts)
