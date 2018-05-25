@@ -16,7 +16,7 @@ namespace uAdventure.Editor
             if(!geoAction.Conditions.isEmpty())
                 DOMWriterUtility.DOMWrite(node, geoAction.Conditions);
 
-            if (!geoAction.Effects.isEmpty())
+            if (!geoAction.Effects.IsEmpty())
                 DOMWriterUtility.DOMWrite(node, geoAction.Effects);
 
             if (geoAction is ExitAction)

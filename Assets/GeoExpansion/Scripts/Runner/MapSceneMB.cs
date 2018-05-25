@@ -8,6 +8,7 @@ using MapzenGo.Models;
 using UnityStandardAssets.Characters.ThirdPerson;
 using MapzenGo.Helpers;
 using RAGE.Analytics;
+using UnityEngine.EventSystems;
 
 namespace uAdventure.Geo
 {
@@ -18,6 +19,7 @@ namespace uAdventure.Geo
         public GeoPositionedCharacter geoCharacter;
         public ThirdPersonCharacter character;
 
+        private bool ready = false;
         private MapScene mapScene;
         private LocationService locationService;
 
@@ -43,6 +45,8 @@ namespace uAdventure.Geo
             }
         }
 
+        public bool IsReady { get { return ready; } }
+
         public bool canBeInteracted()
         {
             return false;
@@ -54,7 +58,7 @@ namespace uAdventure.Geo
             DestroyImmediate(this.gameObject);
         }
 
-        public InteractuableResult Interacted(RaycastHit hit = default(RaycastHit))
+        public InteractuableResult Interacted(PointerEventData pointerData = null)
         {
             return InteractuableResult.IGNORES;
         }
@@ -107,6 +111,7 @@ namespace uAdventure.Geo
                 if (GPSController.Instance.IsLocationValid() 
                     && (GM.LatLonToMeters(lastUpdatedPosition) - GM.LatLonToMeters(inputLatLon)).sqrMagnitude >= 1f)
                 {
+                    ready = true;
                     if (GM.SeparationInMeters(geoCharacter.LatLon, inputLatLon) > 150) geoCharacter.LatLon = inputLatLon;
                     else geoCharacter.MoveTo(inputLatLon);
                 }

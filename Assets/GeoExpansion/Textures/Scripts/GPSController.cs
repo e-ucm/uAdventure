@@ -2,6 +2,7 @@
 using System.Collections;
 using RAGE.Analytics;
 using MapzenGo.Helpers;
+using AssetPackage;
 
 namespace uAdventure.Geo
 {
@@ -123,11 +124,9 @@ namespace uAdventure.Geo
                 if (IsStarted() || geochar)
                 {
                     var latlon = IsStarted() ? Input.location.lastData.LatLon() : geochar.LatLon.ToVector2();
-
-                    //Tracker.T.movement.Geoposition("player", latlon);
-
+                    
                     TrackerExtension.Movement.Geoposition("player", latlon);
-                    Tracker.T.RequestFlush();
+                    TrackerAsset.Instance.Flush();
                     timeSinceLastPositionUpdate = 0;
 
                     Debug.Log(latlon);

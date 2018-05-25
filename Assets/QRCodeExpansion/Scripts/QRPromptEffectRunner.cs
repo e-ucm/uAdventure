@@ -16,7 +16,7 @@ namespace uAdventure.QR
             QRPromptPrefab = Resources.Load<GameObject>("QRPrompt");
         }
 
-        public Effect Effect { get; set; }
+        public IEffect Effect { get; set; }
 
         public bool execute()
         {

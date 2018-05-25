@@ -9,7 +9,7 @@ namespace uAdventure.Geo
     public class TriggerZonedSceneEffect : TriggerSceneEffect
     {
 
-        public TriggerZonedSceneEffect(string targetSceneId, string zoneId, int x, int y, int transitionTime = 0, int transitionType = 0) : base(targetSceneId, x, y, transitionTime, transitionType)
+        public TriggerZonedSceneEffect(string targetSceneId, string zoneId, int x, int y, float destinyScale = float.MinValue, int transitionTime = 0, int transitionType = 0) : base(targetSceneId, x, y, destinyScale, transitionTime, transitionType)
         {
             ZoneId = zoneId;
         }

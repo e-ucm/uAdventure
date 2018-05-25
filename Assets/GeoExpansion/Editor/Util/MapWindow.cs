@@ -12,7 +12,7 @@ using UnityEditorInternal;
 public class MapWindow : EditorWindow {
 
 
-    const string PATH_SAVE_SCRIPTABLE_OBJECT = "Assets/MapzenGo/Resources/Settings/";
+    const string PATH_SAVE_SCRIPTABLE_OBJECT = "Assets/GeoExpansion/MapzenGo/Resources/Settings/";
 
     /* ----------------------------------------
      * CREATE: static method for window creation

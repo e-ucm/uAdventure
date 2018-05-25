@@ -1,0 +1,127 @@
+<!--################################################################################ 
+# eAdventure (formerly <e-Adventure> and <e-Game>) is a research project of the e-UCM
+#          research group.
+#   
+#    Copyright 2005-2012 e-UCM research group.
+#  
+#     e-UCM is a research group of the Department of Software Engineering
+#          and Artificial Intelligence at the Complutense University of Madrid
+#          (School of Computer Science).
+#  
+#          C Profesor Jose Garcia Santesmases sn,
+#          28040 Madrid (Madrid), Spain.
+#  
+#          For more info please visit:  <http://e-adventure.e-ucm.es> or
+#          <http://www.e-ucm.es>
+#  
+#  ****************************************************************************
+# This file is part of eAdventure, version 1.5.
+# 
+#   You can access a list of all the contributors to eAdventure at:
+#          http://e-adventure.e-ucm.es/contributors
+#  
+#  ****************************************************************************
+#       eAdventure is free software: you can redistribute it and/or modify
+#      it under the terms of the GNU Lesser General Public License as published by
+#      the Free Software Foundation, either version 3 of the License, or
+#      (at your option) any later version.
+#  
+#      eAdventure is distributed in the hope that it will be useful,
+#      but WITHOUT ANY WARRANTY; without even the implied warranty of
+#      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#      GNU Lesser General Public License for more details.
+#  
+#      You should have received a copy of the GNU Lesser General Public License
+#      along with Adventure.  If not, see <http://www.gnu.org/licenses/>.
+################################################################################ -->
+<!ELEMENT assessment-rules (smtp-config?, (assessment-rule | timed-assessment-rule)*)>
+<!ATTLIST assessment-rules
+	show-report-at-end ( yes | no ) "no"
+	send-to-email CDATA #IMPLIED
+	scorm12 (yes|no) "no"
+	scorm2004 (yes|no) "no"
+>
+
+<!ELEMENT smtp-config EMPTY>
+<!ATTLIST smtp-config
+	smtp-ssl (yes | no) "no"
+	smtp-server CDATA #IMPLIED
+	smtp-port CDATA #IMPLIED
+	smtp-user CDATA #IMPLIED
+	smtp-pwd CDATA #IMPLIED
+>
+
+<!ELEMENT assessment-rule (concept?, condition?, effect?)>
+<!ATTLIST assessment-rule
+	id ID #REQUIRED
+	importance ( verylow | low | normal | high | veryhigh ) #REQUIRED
+>
+
+<!ELEMENT timed-assessment-rule (concept?, init-condition?, end-condition?, effect*)>
+<!ATTLIST timed-assessment-rule
+	id ID #REQUIRED
+	importance ( verylow | low | normal | high | veryhigh ) #REQUIRED
+	usesEndConditions ( yes | no) "yes"
+>
+
+
+<!ELEMENT concept (#PCDATA)>
+<!ENTITY % basic-condition "(active|inactive| 
+							greater-than| greater-equals-than | equals| less-equals-than | less-than |
+							global-state-ref )?">
+
+<!ELEMENT condition (%basic-condition; | either)+>
+<!ELEMENT init-condition (%basic-condition; | either)+>
+<!ELEMENT end-condition (%basic-condition; | either)+>
+<!ELEMENT active EMPTY>
+<!ATTLIST active
+	flag NMTOKEN #REQUIRED
+>
+<!ELEMENT inactive EMPTY>
+<!ATTLIST inactive
+	flag NMTOKEN #REQUIRED
+>
+<!ELEMENT greater-than EMPTY>
+<!ATTLIST greater-than
+	var NMTOKEN #REQUIRED
+	value NMTOKEN #REQUIRED
+>
+<!ELEMENT greater-equals-than EMPTY>
+<!ATTLIST greater-equals-than
+	var NMTOKEN #REQUIRED
+	value NMTOKEN #REQUIRED
+>
+<!ELEMENT equals EMPTY>
+<!ATTLIST equals
+	var NMTOKEN #REQUIRED
+	value NMTOKEN #REQUIRED
+>
+<!ELEMENT less-than EMPTY>
+<!ATTLIST less-than
+	var NMTOKEN #REQUIRED
+	value NMTOKEN #REQUIRED
+>
+<!ELEMENT less-equals-than EMPTY>
+<!ATTLIST less-equals-than
+	var NMTOKEN #REQUIRED
+	value NMTOKEN #REQUIRED
+>
+<!ELEMENT global-state-ref EMPTY>
+<!ATTLIST global-state-ref
+	id NMTOKEN #REQUIRED
+>
+
+<!ELEMENT either (%basic-condition;)+>
+
+<!ELEMENT effect (set-text?, set-property*)>
+<!ATTLIST effect 
+	time-min NMTOKEN #IMPLIED
+	time-max NMTOKEN #IMPLIED
+>
+
+<!ELEMENT set-text (#PCDATA)>
+<!ELEMENT set-property EMPTY>
+<!ATTLIST set-property
+	id NMTOKEN #REQUIRED
+	value NMTOKEN #REQUIRED
+>

@@ -74,7 +74,7 @@ namespace uAdventure.QR
                 else window = value;
             }
         }
-        public AbstractEffect Effect
+        public IEffect Effect
         {
             get { return effect; }
             set { effect = value as QRPromptEffect; }
@@ -89,7 +89,7 @@ namespace uAdventure.QR
             return new QRPromtEffectEditor();
         }
 
-        public bool manages(AbstractEffect c)
+        public bool manages(IEffect c)
         {
             return c is QRPromptEffect;
         }
