@@ -198,11 +198,16 @@ namespace uAdventure.Editor
             string outputPath = args[args.Length - 1];
 
             var runnerAssemblyFile = "Assets/uAdventure/Plugins/uAdventureScripts.dll";
+            var editorAssemblyFile = "Assets/uAdventure/Editor/Plugins/uAdventureEditor.dll";
             var trackerAssemblyFile = "Assets/uAdventure/Plugins/unity-tracker/UnityTracker.dll";
-            
+
             Dictionary<Type, KeyValuePair<string, string>> guids = new Dictionary<Type, KeyValuePair<string, string>>();
             var monobehaviours = FindDerivedTypes(GetTypesInNamespace("uAdventure.Runner"), typeof(MonoBehaviour))
                 .Select(t => new KeyValuePair<Type, string>(t, runnerAssemblyFile))
+                        .Union(FindDerivedTypes(GetTypesInNamespace("uAdventure.GameSelector"), typeof(MonoBehaviour))
+                .Select(t => new KeyValuePair<Type, string>(t, runnerAssemblyFile)))
+                        .Union(FindDerivedTypes(GetTypesInNamespace("uAdventure.Editor"), typeof(EditorWindow))
+                .Select(t => new KeyValuePair<Type, string>(t, editorAssemblyFile)))
                         .Union(FindDerivedTypes(GetTypesInNamespace("RAGE.Analytics"), typeof(MonoBehaviour))
                 .Select(t => new KeyValuePair<Type, string>(t, trackerAssemblyFile)));
 
@@ -239,7 +244,7 @@ namespace uAdventure.Editor
         {
             // Last two arguments are guidpath and dllpath
             var args = System.Environment.GetCommandLineArgs();
-            string guidsPath = args[args.Length - 2];
+            string guidsPath = args[args.Length - 1];
 
             var text = System.IO.File.ReadAllLines(guidsPath);
             Dictionary<string, KeyValuePair<string,string>> guidToFileIdAndDllGUID = new Dictionary<string, KeyValuePair<string, string>>();
@@ -250,6 +255,14 @@ namespace uAdventure.Editor
             }
             
             List<string> assetsToReimport = new List<string>();
+
+            var layouts = System.IO.Directory.GetFiles(".\\", "*.wlt", System.IO.SearchOption.AllDirectories);
+            Debug.Log("Layouts found: " + layouts.Length);
+            foreach (var layout in layouts)
+            {
+                Debug.Log("Layout: " + layout);
+                FixFile(layout, guidToFileIdAndDllGUID);
+            }
 
             var scenes = System.IO.Directory.GetFiles(".\\", "*.unity", System.IO.SearchOption.AllDirectories);
             Debug.Log("Scenes found: " + scenes.Length);
@@ -313,8 +326,15 @@ namespace uAdventure.Editor
                         continue;
                     }
                     var fileIdAndGUID = guidToFileIdAndDllGUID[attrs["guid"]];
+                    var guid = AssetDatabase.AssetPathToGUID(fileIdAndGUID.Value);
+                    if (string.IsNullOrEmpty(guid))
+                    {
+                        Debug.LogWarning("Failed to get GUID for: " + fileIdAndGUID.Value);
+                        continue;
+                    }
+
                     attrs["fileID"] = fileIdAndGUID.Key;
-                    attrs["guid"] = fileIdAndGUID.Value;
+                    attrs["guid"] = guid;
                     fileText[i] = "  m_Script: " + EncodeLine(attrs);
                     Debug.Log("Fixed! " + fileText[i]);
                     modified = true;
