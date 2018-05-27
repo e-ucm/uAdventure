@@ -10,7 +10,7 @@ namespace MapzenGo.Models.Settings.Editor
     public class LayerSettingWindows : EditorWindow
     {
 
-        const string PATH_SAVE_SCRIPTABLE_OBJECT = "Assets/MapzenGo/Resources/Settings/";
+        const string PATH_SAVE_SCRIPTABLE_OBJECT = "Assets/GeoExpansion/MapzenGo/Resources/Settings/";
         private BuildingFactorySettings _factorySettingsBuildingFactory;
         private BuildingFactorySettings BuildingFactorySettings
         {

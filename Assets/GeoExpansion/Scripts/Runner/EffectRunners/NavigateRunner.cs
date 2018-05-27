@@ -11,7 +11,7 @@ namespace uAdventure.Geo
     public class NavigateRunner : CustomEffectRunner
     {
         private NavigateEffect navEffect;
-        public Effect Effect { get { return navEffect; } set { navEffect = value as NavigateEffect; } }
+        public IEffect Effect { get { return navEffect; } set { navEffect = value as NavigateEffect; } }
         
         public NavigateRunner()
         {

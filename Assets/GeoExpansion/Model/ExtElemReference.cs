@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System;
 using MapzenGo.Helpers;
-using MapzenGo.Models;
 using uAdventure.Runner;
 using uAdventure.Core;
-using RAGE.Analytics;
+using AssetPackage;
 
 namespace uAdventure.Geo
 {
@@ -360,7 +359,7 @@ namespace uAdventure.Geo
                     if (revealOnRange)
                     {
                         // TODO change this after: https://github.com/e-ucm/unity-tracker/issues/29
-                        Tracker.T.setVar("geo_element_" + wrapper.Element.getId(), 1);
+                        TrackerAsset.Instance.setVar("geo_element_" + wrapper.Element.getId(), 1);
                         particles.gameObject.SetActive(true);
                         particles.Play();
                         particles.transform.localPosition = childTransform.localPosition;

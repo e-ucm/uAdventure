@@ -10,7 +10,7 @@ namespace uAdventure.Geo
 {
     public class PlaceSearcher
     {
-        const string PATH_SAVE_SCRIPTABLE_OBJECT = "Assets/MapzenGo/Resources/Settings/";
+        const string PATH_SAVE_SCRIPTABLE_OBJECT = "Assets/GeoExpansion/MapzenGo/Resources/Settings/";
         public delegate void RequestRepaint();
         public RequestRepaint OnRequestRepaint;
 

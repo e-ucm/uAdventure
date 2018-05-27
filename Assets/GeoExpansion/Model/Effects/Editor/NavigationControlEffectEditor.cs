@@ -52,7 +52,7 @@ namespace uAdventure.Geo
             }
         }
 
-        public AbstractEffect Effect
+        public IEffect Effect
         {
             get { return effect; }
             set { effect = value as NavigationControlEffect; }
@@ -68,7 +68,7 @@ namespace uAdventure.Geo
             return new NavigationControlEffectEditor();
         }
 
-        public bool manages(AbstractEffect c)
+        public bool manages(IEffect c)
         {
             return c is NavigationControlEffect;
         }

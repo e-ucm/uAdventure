@@ -27,3 +27,13 @@ ExportedObj/
 
 # Unity3D Generated File On Crash Reports
 sysinfo.txt
+
+#Building exceptions
+!UnityTracker.sln
+!UnityTracker.csproj
+!uAdventurePlugins.sln
+!uAdventurePlugins.csproj
+!uAdventureScripts.sln
+!uAdventureScripts.csproj
+!uAdventureEditor.sln
+!uAdventureEditor.csproj
