@@ -722,6 +722,13 @@ namespace uAdventure.Editor
                 return new FileInfo(currentZipFile);
             }
         }
+        public AdventureDataControl AdventureData
+        {
+            get
+            {
+                return adventureDataControl;
+            }
+        }
 
         /**
          * Returns the selected chapter data controller.

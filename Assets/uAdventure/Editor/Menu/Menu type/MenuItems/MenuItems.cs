@@ -409,7 +409,7 @@ namespace uAdventure.Editor
 
         public void OnCliked()
         {
-
+            AdventureWindow.OpenAdventureWindow();
         }
     }
 

@@ -136,8 +136,8 @@ namespace uAdventure.Core
             ad.guiCustomized = guiCustomized;
             ad.guiType = guiType;
             ad.playerMode = playerMode;
-            ad.playerName = (playerName != null ? playerName : null);
-            ad.title = (title != null ? title : null);
+            ad.playerName = playerName;
+            ad.title = title;
             return ad;
         }
         /*
