@@ -24,7 +24,7 @@ namespace uAdventure.Runner
 
             var topLeft = new Vector2(context.getX() - texture.width / 2f, context.getY() - texture.height);
             Rectangle area = new InfluenceArea((int)topLeft.x - 20, (int)topLeft.y - 20, texture.width + 40, texture.height + 40);
-            var scene = sceneMB.sceneData as Scene;
+            var scene = sceneMB.SceneData as Scene;
             if (scene != null && scene.getTrajectory() == null)
             {
                 // If no trajectory I have to move the area to the trajectory for it to be connected

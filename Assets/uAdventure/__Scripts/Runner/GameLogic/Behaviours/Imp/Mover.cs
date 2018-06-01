@@ -40,9 +40,6 @@ namespace uAdventure.Runner
 
         // Representation
         private float originalScale;
-        // Layering
-        private int max_layer = 0;
-        private Dictionary<int, float> sorting_layer;
         // Movement control
         private bool moving = false;
         private float progress = 0.0f;
@@ -58,48 +55,6 @@ namespace uAdventure.Runner
         private object data;
         private OnMovementFinished onMovementFinished;
         private OnMovementCancelled onMovementCancelled;
-
-        public Dictionary<int, float> SortingLayer
-        {
-            set { this.sorting_layer = value; }
-            get
-            {
-                if (this.sorting_layer == null)
-                {
-                    List<Representable> rl = new List<Representable>(GameObject.FindObjectsOfType<Representable>());
-                    this.sorting_layer = new Dictionary<int, float>();
-
-                    rl.Remove(this.GetComponent<Representable>());
-
-                    if (rl.Count > 0)
-                    {
-                        rl.Sort((x, y) => x.Context.getLayer() - y.Context.getLayer());
-
-                        sorting_layer.Add(-1, 60);
-                        sorting_layer.Add(rl[0].Context.getLayer(), rl[0].getPosition().y);
-                        rl.Remove(rl[0]);
-
-                        foreach (Representable r in rl)
-                        {
-                            ElementReference c = r.Context;
-
-                            int prelayer = c.getLayer() - 1;
-
-                            while (sorting_layer.ContainsKey(prelayer) && prelayer > 0)
-                                prelayer--;
-
-                            if (sorting_layer[prelayer] > r.getPosition().y)
-                                sorting_layer.Add(c.getLayer(), r.getPosition().y);
-                            else
-                                sorting_layer.Add(c.getLayer(), sorting_layer[prelayer]);
-
-                            this.max_layer = c.getLayer();
-                        }
-                    }
-                }
-                return this.sorting_layer;
-            }
-        }
 
 
         /*  ## ANIMATION METHOD ##
@@ -251,7 +206,6 @@ namespace uAdventure.Runner
                 progress = progress + point.getProgress(player_speed, Time.deltaTime);
                 representable.Context.setScale(point.getScaleAt(progress, originalScale));
                 representable.setPosition(point.getPointAt(progress, origin));
-                SortZ();
 
                 var isInside = (toArea != null && toArea.Contains(representable.getPosition(), distanceToArea));
 
@@ -268,20 +222,6 @@ namespace uAdventure.Runner
                         if(onMovementFinished != null)
                             onMovementFinished(data);
                     }
-                }
-            }
-        }
-
-        private void SortZ()
-        {
-            Vector2 currentpos = representable.getPosition();
-            for (int i = max_layer; i >= -1; i--)
-            {
-                if (SortingLayer.ContainsKey(i) && SortingLayer[i] > currentpos.y)
-                {
-                    this.transform.localPosition = new Vector3(this.transform.localPosition.x, this.transform.localPosition.y, -0.3f - i);
-                    representable.Context.setLayer(i);
-                    break;
                 }
             }
         }

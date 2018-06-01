@@ -130,7 +130,7 @@ namespace uAdventure.Runner
             else
             {
                 var sceneMB = FindObjectOfType<SceneMB>();
-                var scene = sceneMB.sceneData as Scene;
+                var scene = sceneMB.SceneData as Scene;
                 Rectangle actionArea = null;
                 if (scene != null && scene.getTrajectory() == null)
                 {

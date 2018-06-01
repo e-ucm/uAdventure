@@ -27,8 +27,10 @@ namespace uAdventure.Runner
         protected bool mirror;
         protected Orientation orientation = Orientation.O;
 
+        private SceneMB scene;
+
         // Texture
-        int hasovertex = -1;
+        private int hasovertex = -1;
         private Texture2D texture;
 
         private string then = null;
@@ -36,6 +38,7 @@ namespace uAdventure.Runner
         private int currentFrame;
         private float currentFrameDuration = 0.5f;
         private float timeElapsedInCurrentFrame = 0;
+        private float z = 0;
 
 #endregion Attributes
 
@@ -58,6 +61,26 @@ namespace uAdventure.Runner
             get { return anim; }
             set { anim = value; }
         }
+
+        public SceneMB Scene
+        {
+            get { return scene; }
+            set { scene = value; }
+        }
+
+        public float Z
+        {
+            get { return z; }
+            set
+            {
+                if (value != z)
+                {
+                    z = value;
+                    this.Positionate();
+                }
+            }
+        }
+
 
         public Element Element
         {
@@ -109,7 +132,7 @@ namespace uAdventure.Runner
         {
             rend.material.mainTexture = texture;
             Vector2 tmpSize = texture ? new Vector2(texture.width, texture.height) : new Vector2(50,50);
-            var worldSize = GetComponentInParent<SceneMB>().ToWorldSize(tmpSize * context.getScale());
+            var worldSize = scene.ToWorldSize(tmpSize * context.getScale());
             // Mirror
             worldSize.Scale(new Vector3((mirror ? -1 : 1), 1, 1));
             // Set
@@ -118,12 +141,14 @@ namespace uAdventure.Runner
 
         public void Positionate()
         {
+            if(!rend)
+                rend = this.GetComponent<Renderer>();
+
             var texture = rend.material.mainTexture;
             Vector2 tmpSize = texture ? new Vector2(texture.width, texture.height) * context.getScale(): new Vector2(50,50);
             Vector2 tmpPos = new Vector2(context.getX(), context.getY());
-            var layerDepth = -context.getLayer() + deformation;
 
-            transform.localPosition = GetComponentInParent<SceneMB>().ToWorldPosition(tmpPos, tmpSize, RepresentablePivot, layerDepth);
+            transform.localPosition = scene.ToWorldPosition(tmpPos, tmpSize, RepresentablePivot, z);
         }
 
         public float getHeight()
