@@ -42,11 +42,11 @@ namespace uAdventure.Editor
             convertTo = new ConvertToMenuItem("MenuAdventure.ChangeToModePlayerVisible");
             deleteUnused = new DeleteUnusedDataMenuItem("MenuAdventure.DeleteUnusedAssets");
 
-            menu.AddItem(new GUIContent(TC.get(consistency.Label)), false, Callback, consistency);
+            // menu.AddItem(new GUIContent(TC.get(consistency.Label)), false, Callback, consistency);
             menu.AddItem(new GUIContent(TC.get(editAdventureData.Label)), false, Callback, editAdventureData);
-            menu.AddItem(new GUIContent(TC.get(visualisation.Label)), false, Callback, visualisation);
-            menu.AddItem(new GUIContent(TC.get(convertTo.Label)), false, Callback, convertTo);
-            menu.AddItem(new GUIContent(TC.get(deleteUnused.Label)), false, Callback, deleteUnused);
+            // menu.AddItem(new GUIContent(TC.get(visualisation.Label)), false, Callback, visualisation);
+            // menu.AddItem(new GUIContent(TC.get(convertTo.Label)), false, Callback, convertTo);
+            // menu.AddItem(new GUIContent(TC.get(deleteUnused.Label)), false, Callback, deleteUnused);
         }
     }
 }

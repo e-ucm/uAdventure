@@ -94,7 +94,6 @@ namespace uAdventure.Editor
          */
         public void setLayer(int layer)
         {
-
             Controller.Instance.DataModified();
             if (erdc == null)
                 playerLayer = layer;

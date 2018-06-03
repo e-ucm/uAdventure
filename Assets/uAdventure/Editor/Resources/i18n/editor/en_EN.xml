@@ -1275,6 +1275,7 @@ Please remember that you cannot make any reference to a macro in its definition<
 <entry key="ResourcesList.ResourcesBlockNumber">Appearance #</entry>
 <entry key="AdaptationRulesList.Scorm12">SCORM 1.2 profile</entry>
 <entry key="MenuAdventure.KeepShowing">For each conversation line</entry>
+<entry key="MenuAdventure.KeepText">Keep text until user interacts</entry>
 <entry key="AdaptationProfiles.Title">Adaptation profiles</entry>
 <entry key="SPEP.Width">Width</entry>
 <entry key="Error.LoadAborted.Message">A critical error occurred loading the files.
@@ -2072,7 +2073,7 @@ In the game you can define conditions based on the value of the variables.</entr
 <entry key="IMS.Classification.Tab">Classification</entry>
 <entry key="Operation.RenameBookMessage">Type a new identifier to rename the book</entry>
 <entry key="ConversationLine.Type.Normal">Normal</entry>
-<entry key="Scene.UseInitialPosition">Use initial position </entry>
+<entry key="Scene.UseInitialPosition">Use initial position</entry>
 <entry key="Language.Name">English</entry>
 <entry key="Conditions.ConditionGroup.NotSatisfied">is not satisfied</entry>
 <entry key="Operation.AddSceneMessage">Type an identifier for the new scene</entry>
@@ -2128,6 +2129,7 @@ In the game you can define conditions based on the value of the variables.</entr
   
 <entry key="RemoveElementEffect.Title">Remove element</entry>
 <entry key="RemoveElementEffect.Description">Removes the element(s) from the current scene</entry>
+<entry key="Scene.NoPlayer">Hide player</entry>
 
 <!-- Analytics -->
 <entry key="Analytics.Title">Analytics</entry>

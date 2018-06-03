@@ -70,7 +70,7 @@ namespace uAdventure.Editor
         //            profile.addRule(adpRule);
         //            dataControls.Add(new AdaptationRuleDataControl(adpRule, profile));
         //            controller.getIdentifierSummary().addAdaptationRuleId(id, profile.getName());
-        //            //controller.dataModified( );
+        //            controller.DataModified();
         //            added = true;
         //        }
         //    }
@@ -96,7 +96,7 @@ namespace uAdventure.Editor
         //            profile.addRule(adpRule);
         //            dataControls.Add(new AdaptationRuleDataControl(adpRule, profile));
         //            controller.getIdentifierSummary().addAdaptationRuleId(adpRuleId, profile.getName());
-        //            //controller.dataModified( );
+        //            controller.DataModified();
         //            added = true;
         //        }
         //    }
@@ -184,7 +184,7 @@ namespace uAdventure.Editor
         //        dataControls.Remove(dataControl);
         //        controller.deleteIdentifierReferences(adpRuleId);
         //        controller.getIdentifierSummary().deleteAdaptationRuleId(adpRuleId, profile.getName());
-        //        //controller.dataModified( );
+        //        controller.DataModified();
         //        deleted = true;
         //    }
         //    //  }
@@ -263,7 +263,7 @@ namespace uAdventure.Editor
         //    {
         //        profile.getRules().Add(elementIndex + 1, profile.getRules().RemoveAt(elementIndex));
         //        dataControls.Add(elementIndex + 1, dataControls.RemoveAt(elementIndex));
-        //        //controller.dataModified( );
+        //        controller.DataModified();
         //        elementMoved = true;
         //    }
 
@@ -281,7 +281,7 @@ namespace uAdventure.Editor
         //    {
         //        profile.getRules().add(elementIndex - 1, profile.getRules().remove(elementIndex));
         //        dataControls.add(elementIndex - 1, dataControls.remove(elementIndex));
-        //        //controller.dataModified( );
+        //        controller.DataModified();
         //        elementMoved = true;
         //    }
 
@@ -318,7 +318,7 @@ namespace uAdventure.Editor
         //        {
         //            if (!controller.getIdentifierSummary().isAdaptationProfileId(name))
         //            {
-        //                //controller.dataModified( );
+        //                controller.DataModified();
         //                profile.setName(fileName);
         //                controller.getIdentifierSummary().renameAdaptationProfile(oldName, fileName);
 

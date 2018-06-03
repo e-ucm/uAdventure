@@ -187,7 +187,7 @@ namespace uAdventure.Editor
                 // Add the new timer
                 timersList.Add(newTimer);
                 timersDataControlList.Add(new TimerDataControl(newTimer));
-                //controller.dataModified( );
+                controller.DataModified();
                 elementAdded = true;
             }
 
@@ -242,7 +242,7 @@ namespace uAdventure.Editor
                 if (timersList.Remove((Timer)dataControl.getContent()))
                 {
                     timersDataControlList.Remove((TimerDataControl)dataControl);
-                    //controller.dataModified( );
+                    controller.DataModified();
                     elementDeleted = true;
                 }
             }
@@ -265,7 +265,7 @@ namespace uAdventure.Editor
                 timersDataControlList.RemoveAt(elementIndex);
                 timersList.Insert(elementIndex - 1, e);
                 timersDataControlList.Insert(elementIndex - 1, c);
-                //controller.dataModified( );
+                controller.DataModified();
                 elementMoved = true;
             }
 
@@ -287,7 +287,7 @@ namespace uAdventure.Editor
                 timersDataControlList.RemoveAt(elementIndex);
                 timersList.Insert(elementIndex + 1, e);
                 timersDataControlList.Insert(elementIndex + 1, c);
-                //controller.dataModified( );
+                controller.DataModified();
                 elementMoved = true;
             }
 

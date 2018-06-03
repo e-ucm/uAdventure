@@ -174,7 +174,7 @@ namespace uAdventure.Editor
             macrosList.Add(newMacro);
             macrosDataControlList.Add(new MacroDataControl(newMacro));
             controller.IdentifierSummary.addId<Macro>(macroId);
-            //controller.dataModified( );
+            controller.DataModified();
         }
 
 
@@ -223,7 +223,7 @@ namespace uAdventure.Editor
                     macrosDataControlList.Remove((MacroDataControl)dataControl);
                     controller.deleteIdentifierReferences(macroId);
                     controller.IdentifierSummary.deleteId<Macro>(macroId);
-                    //controller.dataModified( );
+                    controller.DataModified();
                     elementDeleted = true;
                 }
             }
@@ -246,7 +246,7 @@ namespace uAdventure.Editor
                 macrosDataControlList.RemoveAt(elementIndex);
                 macrosList.Insert(elementIndex - 1, e);
                 macrosDataControlList.Insert(elementIndex - 1, c);
-                //controller.dataModified( );
+                controller.DataModified();
                 elementMoved = true;
             }
 
@@ -268,7 +268,7 @@ namespace uAdventure.Editor
                 macrosDataControlList.RemoveAt(elementIndex);
                 macrosList.Insert(elementIndex + 1, e);
                 macrosDataControlList.Insert(elementIndex + 1, c);
-                //controller.dataModified( );
+                controller.DataModified();
                 elementMoved = true;
             }
 

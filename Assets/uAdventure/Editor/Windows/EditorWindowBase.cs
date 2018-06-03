@@ -235,6 +235,10 @@ namespace uAdventure.Editor
             {
                 fileMenu.menu.ShowAsContext();
             }
+            if (GUILayout.Button(TC.get("MenuAdventure.Title"), "toolbarButton"))
+            {
+                adventureMenu.menu.ShowAsContext();
+            }
             if (GUILayout.Button(TC.get("MenuChapters.Title"), "toolbarButton"))
             {
                 chaptersMenu.menu.ShowAsContext();

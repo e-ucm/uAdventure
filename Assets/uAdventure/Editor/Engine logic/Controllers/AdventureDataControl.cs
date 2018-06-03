@@ -178,14 +178,14 @@ namespace uAdventure.Editor
             return adventureData.isKeyboardNavigationEnabled();
         }
 
-        ///**
-        // * Enables/Disables keyboard navigation - by default is set to false
-        // * @param enabled
-        // */
-        //public bool setKeyboardNavigation(bool enabled)
-        //{
-        //    return Controller.getInstance().addTool(new ChangeBooleanValueTool(adventureData, enabled, "isKeyboardNavigationEnabled", "setKeyboardNavigation"));
-        //}
+        /**
+         * Enables/Disables keyboard navigation - by default is set to false
+         * @param enabled
+         */
+        public bool setKeyboardNavigation(bool enabled)
+        {
+            return Controller.Instance.addTool(new ChangeBooleanValueTool(adventureData, enabled, "isKeyboardNavigationEnabled", "setKeyboardNavigation"));
+        }
 
         /**
          * Sets the title of the adventure.
@@ -569,6 +569,11 @@ namespace uAdventure.Editor
         public DescriptorData.DragBehaviour getDragBehaviour()
         {
             return adventureData.getDragBehaviour();
+        }
+
+        public string getVersionNumber()
+        {
+            return adventureData.getVersionNumber();
         }
 
         /**

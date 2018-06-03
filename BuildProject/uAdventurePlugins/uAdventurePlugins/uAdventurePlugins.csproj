@@ -40,11 +40,16 @@
     <Reference Include="$(MSBuildProjectDirectory)\..\..\..\Assets\uAdventure\Plugins\**\*.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildProjectDirectory)\..\..\..\Assets\uAdventure\Plugins\**\*.cs"
-        Exclude="$(MSBuildProjectDirectory)\..\..\..\Assets\uAdventure\Plugins\unity-tracker\csharp-tracker\AssetManager\RageAssetManager\Properties\AssemblyInfo.cs">
+    <Compile Include="$(MSBuildProjectDirectory)\..\..\..\Assets\uAdventure\Plugins\**\*.cs" Exclude="$(MSBuildProjectDirectory)\..\..\..\Assets\uAdventure\Plugins\unity-tracker\**\*.cs">
       <Link>Plugins\%(RecursiveDir)%(FileName)</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\UnityTracker\UnityTracker\UnityTracker.csproj">
+      <Project>{d7ef1723-e739-46c0-aa87-2447803f548b}</Project>
+      <Name>UnityTracker</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

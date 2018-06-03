@@ -19,12 +19,11 @@
 $project_path = "$($pwd)\BuildProject\uAdventurePackage\uAdventurePackage"
 $exchange_folder = "$($pwd)\Exchange"
 $guid_file = "$($exchange_folder)\guidmap.csv"
-$dll_file = "Assets/uAdventure/Plugins/uAdventureScripts.dll"
 $log_file = "$($exchange_folder)\\unity.log"
 $fix_guids_method = "uAdventure.Editor.FileIDUtil.SwitchPrefabsGUIDsToDLL"
 
 $unity = "C:\\Program Files\\Unity\\Editor\\Unity.exe"
-$arguments = "-batchmode -force-free -nographics -silent-crashes -logFile $($log_file) -projectPath $($project_path) -quit -executeMethod $($fix_guids_method) $($guid_file) $($dll_file)"
+$arguments = "-batchmode -force-free -nographics -silent-crashes -logFile $($log_file) -projectPath $($project_path) -quit -executeMethod $($fix_guids_method) $($guid_file)"
 
 Write-Output "Applying GUIDMap to $($project_path)"
 $process = Start-Process $unity $arguments -Wait 

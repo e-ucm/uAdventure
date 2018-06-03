@@ -22,6 +22,7 @@ namespace uAdventure.Runner
         string last_target = "";
         private List<string> removedElements;
         private List<string> inventoryItems;
+        private Dictionary<string, int> varFlagValues;
         private Stack<List<KeyValuePair<string, int>>> varFlagChangeAmbits;
 
         public AdventureData Data
@@ -37,8 +38,9 @@ namespace uAdventure.Runner
             set {
                 last_target = current_target;
                 current_target = value;
-                PlayerPrefs.SetString("target", current_target);
-                PlayerPrefs.Save();
+                // TODO use PlayerPrefs in settings
+                // PlayerPrefs.SetString("target", current_target);
+                // PlayerPrefs.Save();
             }
         }
 
@@ -47,24 +49,33 @@ namespace uAdventure.Runner
             this.removedElements = new List<string>();
             this.inventoryItems = new List<string>();
             this.data = data;
+            varFlagValues = new Dictionary<string, int>();
             varFlagChangeAmbits = new Stack<List<KeyValuePair<string, int>>>();
         }
 
         public int checkFlag(string flag)
         {
             int ret = FlagCondition.FLAG_INACTIVE;
-            if (PlayerPrefs.HasKey("flag_"+flag))
+            // TODO use PlayerPrefs in adventure settings
+            /*if (PlayerPrefs.HasKey("flag_"+flag))
             {
                 ret = PlayerPrefs.GetInt("flag_" + flag);
+            }*/
+
+            if(varFlagValues.ContainsKey("flag_" + flag))
+            {
+                ret = varFlagValues["flag_" + flag];
             }
             return ret;
         }
 
         public void setFlag(string name, int state)
         {
-            PlayerPrefs.SetInt("flag_" + name, state);
-            PlayerPrefs.Save();
+            // TODO use PlayerPrefs in adventure settings
+            // PlayerPrefs.SetInt("flag_" + name, state);
+            // PlayerPrefs.Save();
 
+            varFlagValues["flag_" + name] = state;
             //Debug.Log ("Flag '" + name + " puesta a " + state);
             bool bstate = state == FlagCondition.FLAG_ACTIVE;
             int intVal = bstate ? 1 : 0;
@@ -80,17 +91,25 @@ namespace uAdventure.Runner
         public int getVariable(string var)
         {
             int ret = 0;
-            if (PlayerPrefs.HasKey("var_" + var))
+            // TODO use PlayerPrefs in adventure settings
+            /*if (PlayerPrefs.HasKey("var_" + var))
             {
                 ret = PlayerPrefs.GetInt("var_" + var);
+            }*/
+
+            if (varFlagValues.ContainsKey("var_" + var))
+            {
+                ret = varFlagValues["var_" + var];
             }
             return ret;
         }
 
         public void setVariable(string name, int value)
         {
-            PlayerPrefs.SetInt("var_" + name, value);
-            PlayerPrefs.Save();
+            // TODO use PlayerPrefs in adventure settings
+            /*PlayerPrefs.SetInt("var_" + name, value);
+            PlayerPrefs.Save();*/
+            varFlagValues["var_" + name] = value;
 
             if (varFlagChangeAmbits.Count > 0) varFlagChangeAmbits.Peek().Add(new KeyValuePair<string, int>(name, value));
             else TrackerAsset.Instance.setVar(name, value);
@@ -136,7 +155,7 @@ namespace uAdventure.Runner
                     var scene = getChapterTarget(CurrentTarget) as Scene;
                     if (scene == null)
                     {
-                        playerContext = new ElementReference("Player", 0, 0, 0);
+                        playerContext = new ElementReference("Player", 0, 0, -1);
                         return playerContext;
                     }
                     else

@@ -1,18 +1,13 @@
 ﻿using UnityEngine;
-using System.Collections;
 using UnityEngine.SceneManagement;
 
-public class SceneChangerMB : MonoBehaviour {
-	
-	void Start ()
+namespace uAdventure.GameSelector
+{
+    public class SceneChangerMB : MonoBehaviour
     {
+        public void ChangeScene(string name)
+        {
+            SceneManager.LoadScene(name);
+        }
     }
-
-	void Update () {
-		
-	}
-
-	public void ChangeScene(string name){
-		SceneManager.LoadScene (name);
-	}
 }

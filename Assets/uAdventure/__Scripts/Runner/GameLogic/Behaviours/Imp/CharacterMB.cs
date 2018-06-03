@@ -24,7 +24,7 @@ namespace uAdventure.Runner
         {
             var context = representable.Context;
             var texture = representable.Texture;
-            var scene = sceneMB.sceneData as Scene;
+            var scene = sceneMB.SceneData as Scene;
             var topLeft = new Vector2(context.getX() - texture.width / 2f, context.getY() - texture.height);
             Rectangle area = new InfluenceArea((int)topLeft.x - 20, (int)topLeft.y - 20, texture.width + 40, texture.height + 40);
             if (scene != null && scene.getTrajectory() == null)

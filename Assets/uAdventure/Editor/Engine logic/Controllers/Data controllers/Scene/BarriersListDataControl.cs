@@ -177,7 +177,7 @@ namespace uAdventure.Editor
             if (barriersList.Remove((Barrier)dataControl.getContent()))
             {
                 barriersDataControlList.Remove((BarrierDataControl)dataControl);
-                //controller.dataModified( );
+                controller.DataModified();
                 elementDeleted = true;
             }
 
@@ -199,7 +199,7 @@ namespace uAdventure.Editor
                 barriersDataControlList.RemoveAt(elementIndex);
                 barriersList.Insert(elementIndex - 1, o);
                 barriersDataControlList.Insert(elementIndex - 1, c);
-                //controller.dataModified( );
+                controller.DataModified();
                 elementMoved = true;
             }
 
@@ -221,7 +221,7 @@ namespace uAdventure.Editor
                 barriersDataControlList.RemoveAt(elementIndex);
                 barriersList.Insert(elementIndex + 1, o);
                 barriersDataControlList.Insert(elementIndex + 1, c);
-                //controller.dataModified( );
+                controller.DataModified();
                 elementMoved = true;
             }
 

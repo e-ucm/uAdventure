@@ -343,7 +343,7 @@ namespace uAdventure.Editor
                 getActions().Add(new CustomActionDataControl((CustomAction)newAction));
             else
                 getActions().Add(new ActionDataControl(newAction));
-            //controller.dataModified( );
+            controller.DataModified();
         }
 
 
@@ -355,7 +355,7 @@ namespace uAdventure.Editor
             if (actionsList.Remove((Action)dataControl.getContent()))
             {
                 actionsDataControlList.Remove((ActionDataControl)dataControl);
-                //controller.dataModified( );
+                controller.DataModified();
                 elementDeleted = true;
             }
 

@@ -29,6 +29,8 @@ ExportedObj/
 sysinfo.txt
 
 #Building exceptions
+!UnityTracker.sln
+!UnityTracker.csproj
 !uAdventurePlugins.sln
 !uAdventurePlugins.csproj
 !uAdventureScripts.sln

@@ -9,6 +9,7 @@ namespace uAdventure.Editor
 {
     public class ScenesWindowPlayerMovement : SceneEditorWindow
     {
+        public enum PlayerMode { NoPlayer, InitialPosition, Trajectory }
         private GUIContent[] tools;
         private static Rect previewRect;
         private SceneDataControl workingScene;
@@ -54,16 +55,23 @@ namespace uAdventure.Editor
             GUILayout.Space(20);
 
             EditorGUI.BeginChangeCheck();
-            var hasTrajectory = GUILayout.Toolbar(CurrentSceneHasTrajectory() ? 1 : 0, new string[] { TC.get("Scene.UseInitialPosition"), TC.get("Scene.UseTrajectory") });
-            if (EditorGUI.EndChangeCheck()) OnMovementTypeChange(hasTrajectory == 1);
+            var playerMode = GetScenePlayerMode(workingScene);
+            var playerModeTexts = new string[] { TC.get("Scene.NoPlayer"), TC.get("Scene.UseInitialPosition"), TC.get("Scene.UseTrajectory") };
+            playerMode = (PlayerMode) GUILayout.Toolbar((int) playerMode, playerModeTexts);
+            if (EditorGUI.EndChangeCheck()) OnPlayerModeChange(playerMode);
 
-            switch (hasTrajectory)
+            switch (playerMode)
             {
-                case 0: // No trajectory
+                case PlayerMode.NoPlayer: // No Player
                     {
                     }
                     break;
-                case 1: // Trajectory
+                case PlayerMode.InitialPosition: // No trajectory
+                    {
+
+                    }
+                    break;
+                case PlayerMode.Trajectory: // Trajectory
                     {
                         trajectoryComponent.Action = GUILayout.Toolbar(action, tools);
                     }
@@ -71,10 +79,17 @@ namespace uAdventure.Editor
             }
         }
 
-        protected static bool CurrentSceneHasTrajectory()
+        public static PlayerMode GetScenePlayerMode(SceneDataControl scene)
         {
-            return Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                    GameRources.GetInstance().selectedSceneIndex].getTrajectory().hasTrajectory();
+            if (!scene.isAllowPlayer())
+            {
+                return PlayerMode.NoPlayer;
+            }
+            else
+            {
+                var hasTrajectory = scene.getTrajectory().hasTrajectory();
+                return hasTrajectory ? PlayerMode.Trajectory : PlayerMode.InitialPosition;
+            }
         }
 
         public override void Draw(int aID)
@@ -101,30 +116,44 @@ namespace uAdventure.Editor
         }
 
 
-        private void OnMovementTypeChange(bool val)
+        private void OnPlayerModeChange(PlayerMode val)
         {
-            if (val)
+            switch (val)
             {
-                var trajectory = workingScene.getTrajectory().GetTrajectory();
-                if (trajectory == null)
-                {
-                    trajectory = new Trajectory();
-                    trajectory.addNode("initial", workingScene.getDefaultInitialPositionX(), workingScene.getDefaultInitialPositionY(), workingScene.getPlayerScale());
-                    trajectory.setInitial("initial");
-                    var tdc = new TrajectoryDataControl(workingScene, trajectory);
-                    workingScene.setTrajectoryDataControl(tdc);
-                    workingScene.setTrajectory(trajectory);
-                }
+                default:
+                case PlayerMode.NoPlayer:
+                    workingScene.changeAllowPlayerLayer(false);
+                    break;
+                case PlayerMode.InitialPosition:
+                    {
+                        var trajectory = workingScene.getTrajectory().GetTrajectory();
+                        var initialPos = new Vector2(trajectory.getInitial().getX(), trajectory.getInitial().getY());
+                        var initialScale = trajectory.getInitial().getScale();
+                        workingScene.setTrajectoryDataControl(new TrajectoryDataControl(workingScene, null));
+                        workingScene.setTrajectory(null);
+                        workingScene.setDefaultInitialPosition((int)initialPos.x, (int)initialPos.y);
+                        workingScene.setPlayerScale(initialScale);
+                    }
+                    break;
+                case PlayerMode.Trajectory:
+                    {
+                        var trajectory = workingScene.getTrajectory().GetTrajectory();
+                        if (trajectory == null)
+                        {
+                            trajectory = new Trajectory();
+                            trajectory.addNode("initial", workingScene.getDefaultInitialPositionX(), workingScene.getDefaultInitialPositionY(), workingScene.getPlayerScale());
+                            trajectory.setInitial("initial");
+                            var tdc = new TrajectoryDataControl(workingScene, trajectory);
+                            workingScene.setTrajectoryDataControl(tdc);
+                            workingScene.setTrajectory(trajectory);
+                        }
+                    }
+                    break;
             }
-            else
+
+            if(val != PlayerMode.NoPlayer && !workingScene.isAllowPlayer())
             {
-                var trajectory = workingScene.getTrajectory().GetTrajectory();
-                var initialPos = new Vector2(trajectory.getInitial().getX(), trajectory.getInitial().getY());
-                var initialScale = trajectory.getInitial().getScale();
-                workingScene.setTrajectoryDataControl(new TrajectoryDataControl(workingScene, null));
-                workingScene.setTrajectory(null);
-                workingScene.setDefaultInitialPosition((int)initialPos.x, (int)initialPos.y);
-                workingScene.setPlayerScale(initialScale);
+                workingScene.changeAllowPlayerLayer(true);
             }
         }
 
@@ -203,7 +232,7 @@ namespace uAdventure.Editor
 
             public override void Draw(int aID)
             {
-                if (!CurrentSceneHasTrajectory())
+                if (GetScenePlayerMode(SceneEditor.Current.Scene) != PlayerMode.Trajectory)
                 {
                     EditorGUI.indentLevel--;
                     EditorGUILayout.HelpBox("Influence areas are only available in trajectory mode.", MessageType.Info);
@@ -242,7 +271,7 @@ namespace uAdventure.Editor
 
             public override bool Update()
             {
-                if (!CurrentSceneHasTrajectory())
+                if (GetScenePlayerMode(SceneEditor.Current.Scene) != PlayerMode.Trajectory)
                 {
                     return false;
                 }
@@ -275,7 +304,7 @@ namespace uAdventure.Editor
 
             public override void OnDrawingGizmosSelected()
             {
-                if (!CurrentSceneHasTrajectory())
+                if (GetScenePlayerMode(SceneEditor.Current.Scene) != PlayerMode.Trajectory)
                 {
                     return;
                 }
