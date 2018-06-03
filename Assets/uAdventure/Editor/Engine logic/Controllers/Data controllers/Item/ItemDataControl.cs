@@ -218,7 +218,7 @@ namespace uAdventure.Editor
                 resourcesDataControlList.RemoveAt(elementIndex);
                 resourcesList.Insert(elementIndex - 1, e);
                 resourcesDataControlList.Insert(elementIndex - 1, c);
-                //controller.dataModified( );
+                controller.DataModified();
                 elementMoved = true;
             }
 
@@ -240,7 +240,7 @@ namespace uAdventure.Editor
                 resourcesDataControlList.RemoveAt(elementIndex);
                 resourcesList.Insert(elementIndex + 1, e);
                 resourcesDataControlList.Insert(elementIndex + 1, c);
-                //controller.dataModified( );
+                controller.DataModified();
                 elementMoved = true;
             }
 
@@ -280,7 +280,7 @@ namespace uAdventure.Editor
             controller.replaceIdentifierReferences(oldItemId, newItemId);
             controller.IdentifierSummary.deleteId<Item>(oldItemId);
             controller.IdentifierSummary.addId<Item>(newItemId);
-            //controller.dataModified( );
+            controller.DataModified();
 
             return newItemId;
         }

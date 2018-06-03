@@ -163,7 +163,7 @@ namespace uAdventure.Editor
                     controller.ShowInputDialog(TC.get("Operation.AddNPCTitle"), TC.get("Operation.AddNPCMessage"), TC.get("Operation.AddNPCDefaultValue"), performAddElement);
                 else
                 {
-                    //controller.dataModified( );
+                    controller.DataModified();
                     performAddElement(null, npcId);
                     elementAdded = true;
                 }
@@ -230,7 +230,7 @@ namespace uAdventure.Editor
                     npcsDataControlList.Remove((NPCDataControl)dataControl);
                     controller.deleteIdentifierReferences(npcId);
                     controller.IdentifierSummary.deleteId<NPC>(npcId);
-                    //controller.dataModified( );
+                    controller.DataModified();
                     elementDeleted = true;
                 }
             }
@@ -253,7 +253,7 @@ namespace uAdventure.Editor
                 npcsDataControlList.RemoveAt(elementIndex);
                 npcsList.Insert(elementIndex - 1, e);
                 npcsDataControlList.Insert(elementIndex - 1, c);
-                //controller.dataModified( );
+                controller.DataModified();
                 elementMoved = true;
             }
 
@@ -275,7 +275,7 @@ namespace uAdventure.Editor
                 npcsDataControlList.RemoveAt(elementIndex);
                 npcsList.Insert(elementIndex + 1, e);
                 npcsDataControlList.Insert(elementIndex + 1, c);
-                //controller.dataModified( );
+                controller.DataModified();
                 elementMoved = true;
             }
 

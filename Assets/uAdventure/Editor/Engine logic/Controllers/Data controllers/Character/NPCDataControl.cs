@@ -327,7 +327,7 @@ namespace uAdventure.Editor
                 resourcesDataControlList.RemoveAt(elementIndex);
                 resourcesList.Insert(elementIndex - 1, e);
                 resourcesDataControlList.Insert(elementIndex - 1, c);
-                //controller.dataModified( );
+                controller.DataModified();
                 elementMoved = true;
             }
 
@@ -349,7 +349,7 @@ namespace uAdventure.Editor
                 resourcesDataControlList.RemoveAt(elementIndex);
                 resourcesList.Insert(elementIndex + 1, e);
                 resourcesDataControlList.Insert(elementIndex + 1, c);
-                //controller.dataModified( );
+                controller.DataModified();
                 elementMoved = true;
             }
 
@@ -371,7 +371,7 @@ namespace uAdventure.Editor
                     controller.ShowInputDialog(TC.get("Operation.RenameNPCTitle"), TC.get("Operation.RenameNPCMessage"), oldNPCId, (o,s) => performRenameElement(s));
                 else
                 {
-                    //controller.dataModified( );
+                    controller.DataModified();
                     return performRenameElement(newNPCId);
                 }
             }

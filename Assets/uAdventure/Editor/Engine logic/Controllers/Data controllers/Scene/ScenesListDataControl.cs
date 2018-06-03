@@ -191,7 +191,7 @@ namespace uAdventure.Editor
             scenesList.Add(newScene);
             scenesDataControlList.Add(new SceneDataControl(newScene, controller.getPlayerImagePath()));
             controller.IdentifierSummary.addId<Scene>(id);
-            //controller.dataModified( );
+            controller.DataModified();
         }
 
 
@@ -245,7 +245,7 @@ namespace uAdventure.Editor
                         scenesList.Remove((Scene)dataControl.getContent());
                         controller.deleteIdentifierReferences(sceneId);
                         controller.IdentifierSummary.deleteId<Scene>(sceneId);
-                        //controller.dataModified( );
+                        controller.DataModified();
                         elementDeleted = true;
                     }
                 }
@@ -273,7 +273,7 @@ namespace uAdventure.Editor
                 scenesDataControlList.RemoveAt(elementIndex);
                 scenesList.Insert(elementIndex - 1, s);
                 scenesDataControlList.Insert(elementIndex - 1, c);
-                //controller.dataModified( );
+                controller.DataModified();
                 elementMoved = true;
             }
 
@@ -295,7 +295,7 @@ namespace uAdventure.Editor
                 scenesDataControlList.RemoveAt(elementIndex);
                 scenesList.Insert(elementIndex + 1, s);
                 scenesDataControlList.Insert(elementIndex + 1, c);
-                //controller.dataModified( );
+                controller.DataModified();
                 elementMoved = true;
             }
 

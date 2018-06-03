@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 using uAdventure.Core;
 using System;
+using System.Linq;
 
 namespace uAdventure.Editor
 {
@@ -124,26 +125,26 @@ namespace uAdventure.Editor
             // Check if one of references has layer -1: if it is true, it means that element references has no layer. 
             // Create subcontrollers
 
-            bool hasLayerV = hasLayer();
+            bool hasLayerV = false;
             foreach (ElementReference itemReference in itemReferencesList)
             {
                 int counter = count(itemReference);
                 ElementReferenceDataControl erdc = new ElementReferenceDataControl(sceneDataControl, itemReference, Controller.ITEM_REFERENCE, counter);
-                insertInOrder(new ElementContainer(erdc, -1, null), hasLayerV);
+                insertInOrder(new ElementContainer(erdc, -1, null), hasLayerV |= (itemReference.getLayer() >= 0));
             }
 
             foreach (ElementReference atrezzoReference in atrezzoReferencesList)
             {
                 int counter = count(atrezzoReference);
                 ElementReferenceDataControl erdc = new ElementReferenceDataControl(sceneDataControl, atrezzoReference, Controller.ATREZZO_REFERENCE, counter);
-                insertInOrder(new ElementContainer(erdc, -1, null), hasLayerV);
+                insertInOrder(new ElementContainer(erdc, -1, null), hasLayerV |= (atrezzoReference.getLayer() >= 0));
             }
 
             foreach (ElementReference npcReference in npcReferencesList)
             {
                 int counter = count(npcReference);
                 ElementReferenceDataControl erdc = new ElementReferenceDataControl(sceneDataControl, npcReference, Controller.NPC_REFERENCE, counter);
-                insertInOrder(new ElementContainer(erdc, -1, null), hasLayerV);
+                insertInOrder(new ElementContainer(erdc, -1, null), hasLayerV |= (npcReference.getLayer() >= 0));
             }
 
             // insert player
@@ -230,56 +231,40 @@ namespace uAdventure.Editor
          */
         public int insertInOrder(ElementContainer element, bool hasLayer)
         {
-
-            bool added = false;
-            int i = 0;
-            bool empty = allReferencesDataControl.Count == 0;
             // While the element has not been added, and
             // we haven't checked every previous element
-            while (!added && (i < allReferencesDataControl.Count || empty))
+            int i = 0;
+            bool added = false;
+            while (!added && (i < allReferencesDataControl.Count))
             {
-                if (!empty)
+                if (hasLayer)
                 {
-                    if (hasLayer)
+                    if (element.getLayer() <= allReferencesDataControl[i].getLayer())
                     {
-                        if (element.getLayer() <= allReferencesDataControl[i].getLayer())
-                        {
-                            allReferencesDataControl.Insert(i, element);
-                            added = true;
-                        }
+                        allReferencesDataControl.Insert(i, element);
+                        added = true;
                     }
-                    else
-                    {
-                        if (element.getY() <= Mathf.Round(allReferencesDataControl[i].getY()))
-                        {
-                            allReferencesDataControl.Insert(i, element);
-                            reassignLayerAllReferencesDataControl(i);
-                            added = true;
-                        }
-                    }
-                    i++;
                 }
                 else
                 {
-                    allReferencesDataControl.Insert(i, element);
-                    if (!hasLayer)
+                    if (element.getY() <= Mathf.Round(allReferencesDataControl[i].getY()))
+                    {
+                        allReferencesDataControl.Insert(i, element);
                         reassignLayerAllReferencesDataControl(i);
-                    added = true;
-                    i++;
+                        added = true;
+                    }
                 }
-
+                i++;
             }
 
             // If the element wasn't added, add it in the last position
             if (!added)
             {
-                //element.setLayer(i);
                 allReferencesDataControl.Add(element);
                 if (!hasLayer)
-                    reassignLayerAllReferencesDataControl(i - 1);
-
+                    reassignLayerAllReferencesDataControl(Math.Max(0, i - 1));
             }
-            return i - 1;
+            return Math.Max(0, i - 1);
         }
 
         /**
@@ -420,16 +405,14 @@ namespace uAdventure.Editor
                 lastElementContainer = ec;
                 reassignLayerAllReferencesDataControl(insertInOrder(ec, false));
             }
-
         }
 
         private void reassignLayerAllReferencesDataControl(int index)
         {
-
             for (int i = index; i < allReferencesDataControl.Count; i++)
             {
                 allReferencesDataControl[i].setLayer(i);
-                if (allReferencesDataControl[i].isPlayer())
+                if (allReferencesDataControl[i].isPlayer()) 
                     playerPositionInAllReferences = i;
             }
 
@@ -496,109 +479,55 @@ namespace uAdventure.Editor
             reassignLayerAllReferencesDataControl(element.getLayer());
         }
 
-        private void moveUp(DataControl dataControl)
+        private bool moveElement(DataControl dataControl, bool up)
         {
+            bool moved = false;
 
             bool player;
             int index = 0;
             if (dataControl != null)
             {
                 player = false;
-                for (index = 0; index < allReferencesDataControl.Count; index++)
-                    if (!allReferencesDataControl[index].isPlayer())
-                        if (allReferencesDataControl[index].getErdc().Equals(dataControl))
-                            break;
+                index = allReferencesDataControl.FindIndex(dc => !dc.isPlayer() && (dc == dataControl ||dc.getErdc() == dataControl));
             }
             else
             {
-                index = playerPositionInAllReferences;
                 player = true;
+                index = playerPositionInAllReferences;
             }
+
             if (index > 0)
             {
+                int toIndex = up ? index - 1 : index + 1;
+
                 ElementContainer e = allReferencesDataControl[index];
                 allReferencesDataControl.RemoveAt(index);
-                allReferencesDataControl.Insert(index - 1, e);
+                allReferencesDataControl.Insert(toIndex, e);
                 allReferencesDataControl[index].setLayer(index);
-                allReferencesDataControl[index - 1].setLayer(index - 1);
+                allReferencesDataControl[toIndex].setLayer(toIndex);
                 if (player)
-                    setPlayerPosition(index - 1);
+                {
+                    setPlayerPosition(toIndex);
+                }
                 if (allReferencesDataControl[index].isPlayer())
+                {
                     setPlayerPosition(index);
+                }
+                moved = true;
             }
+
+            return moved;
         }
 
 
         public override bool moveElementUp(DataControl dataControl)
         {
-
-            bool elementMoved = false;
-            if (dataControl != null)
-            {
-                moveUp(dataControl);
-                elementMoved = true;
-            }
-            else
-            {
-                moveUp(dataControl);
-                elementMoved = true;
-            }
-
-            return elementMoved;
+            return moveElement(dataControl, true);
         }
-
-        private void moveDown(DataControl dataControl)
-        {
-
-            bool player;
-            int index = 0;
-            if (dataControl != null)
-            {
-                player = false;
-                for (index = 0; index < allReferencesDataControl.Count; index++)
-                    if (!allReferencesDataControl[index].isPlayer())
-                        if (allReferencesDataControl[index].getErdc().Equals(dataControl))
-                            break;
-            }
-            else
-            {
-                index = playerPositionInAllReferences;
-                player = true;
-            }
-            if (index >= 0 && index < allReferencesDataControl.Count - 1)
-            {
-                //change the elements      
-                ElementContainer e = allReferencesDataControl[index];
-                allReferencesDataControl.RemoveAt(index);
-                allReferencesDataControl.Insert(index + 1, e);
-                //update element layer
-                allReferencesDataControl[index].setLayer(index);
-                allReferencesDataControl[index + 1].setLayer(index + 1);
-                if (player)
-                    setPlayerPosition(index + 1);
-                if (allReferencesDataControl[index].isPlayer())
-                    setPlayerPosition(index);
-            }
-        }
-
 
         public override bool moveElementDown(DataControl dataControl)
         {
-
-            bool elementMoved = false;
-
-            if (dataControl != null)
-            {
-                moveDown(dataControl);
-                elementMoved = true;
-            }
-            else
-            {
-                moveDown(dataControl);
-                elementMoved = true;
-            }
-
-            return elementMoved;
+            return moveElement(dataControl, false);
         }
 
 

@@ -135,7 +135,7 @@ namespace uAdventure.Editor
             atrezzoList.Add(newAtrezzo);
             atrezzoDataControlList.Add(new AtrezzoDataControl(newAtrezzo));
             controller.IdentifierSummary.addId<Atrezzo>(atrezzoId);
-            //controller.dataModified( );
+            controller.DataModified();
         }
 
 
@@ -253,7 +253,7 @@ namespace uAdventure.Editor
                     atrezzoDataControlList.Remove((AtrezzoDataControl)dataControl);
                     controller.deleteIdentifierReferences(atrezzoId);
                     controller.IdentifierSummary.deleteId<Atrezzo>(atrezzoId);
-                    //controller.dataModified( );
+                    controller.DataModified();
                     elementDeleted = true;
                 }
             }
@@ -327,7 +327,7 @@ namespace uAdventure.Editor
                 atrezzoDataControlList.RemoveAt(elementIndex);
                 atrezzoList.Insert(elementIndex - 1, e);
                 atrezzoDataControlList.Insert(elementIndex - 1, c);
-                //controller.dataModified( );
+                controller.DataModified();
                 elementMoved = true;
             }
 
@@ -349,7 +349,7 @@ namespace uAdventure.Editor
                 atrezzoDataControlList.RemoveAt(elementIndex);
                 atrezzoList.Insert(elementIndex + 1, e);
                 atrezzoDataControlList.Insert(elementIndex + 1, c);
-                //controller.dataModified( );
+                controller.DataModified();
                 elementMoved = true;
             }
 

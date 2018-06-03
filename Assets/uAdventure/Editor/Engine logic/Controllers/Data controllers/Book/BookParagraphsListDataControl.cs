@@ -164,7 +164,7 @@ namespace uAdventure.Editor
             {
                 bookParagraphsList.Add(newBookParagraph);
                 bookParagraphsDataControlList.Add(new BookParagraphDataControl(newBookParagraph));
-                //controller.dataModified( );
+                controller.DataModified();
             }
 
             return newBookParagraph != null;

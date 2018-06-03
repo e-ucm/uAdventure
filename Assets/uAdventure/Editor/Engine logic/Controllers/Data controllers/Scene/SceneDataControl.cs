@@ -344,7 +344,7 @@ namespace uAdventure.Editor
                 resourcesDataControlList.RemoveAt(elementIndex);
                 resourcesList.Insert(elementIndex - 1, r);
                 resourcesDataControlList.Insert(elementIndex - 1, d);
-                //controller.dataModified( );
+                controller.DataModified();
                 elementMoved = true;
             }
 
@@ -366,7 +366,7 @@ namespace uAdventure.Editor
                 resourcesDataControlList.RemoveAt(elementIndex);
                 resourcesList.Insert(elementIndex + 1, r);
                 resourcesDataControlList.Insert(elementIndex + 1, d);
-                //controller.dataModified( );
+                controller.DataModified();
                 elementMoved = true;
             }
 

@@ -214,7 +214,7 @@ namespace uAdventure.Editor
                     ResourcesDataControl d = resourcesDataControlList[elementIndex];
                     resourcesDataControlList.RemoveAt(elementIndex);
                     resourcesDataControlList.Insert(elementIndex - 1, d);
-                    //controller.dataModified( );
+                    controller.DataModified();
                     elementMoved = true;
                 }
             }
@@ -242,7 +242,7 @@ namespace uAdventure.Editor
                     ResourcesDataControl d = resourcesDataControlList[elementIndex];
                     resourcesDataControlList.RemoveAt(elementIndex);
                     resourcesDataControlList.Insert(elementIndex + 1, d);
-                    //controller.dataModified( );
+                    controller.DataModified();
                     elementMoved = true;
                 }
             }
@@ -266,7 +266,7 @@ namespace uAdventure.Editor
                     controller.ShowInputDialog(TC.get("Operation.RenameCutsceneTitle"), TC.get("Operation.RenameCutsceneMessage"), oldCutsceneId, (o,s) => performRenameElement(s));
                 else
                 {
-                    //controller.dataModified( );
+                    controller.DataModified();
                     return performRenameElement(newCutsceneId);
                 }
             }

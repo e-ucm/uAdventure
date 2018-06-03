@@ -58,7 +58,7 @@ namespace uAdventure.Editor{
             completables.Add(newCompletable);
             completableDataControls.Add(new CompletableDataControl(newCompletable));
             controller.IdentifierSummary.addId<Completable>(id);
-            //controller.dataModified( );
+            controller.DataModified();
         }
 
         public override bool canAddElement(int type) { return type == Controller.COMPLETABLE; }

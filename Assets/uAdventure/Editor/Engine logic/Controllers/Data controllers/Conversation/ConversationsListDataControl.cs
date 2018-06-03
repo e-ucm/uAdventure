@@ -129,7 +129,7 @@ namespace uAdventure.Editor
                 {
                     performAddElement(null, conversationId);
                     elementAdded = true;
-                    //controller.dataModified( );
+                    controller.DataModified();
                 }
             }
 
@@ -221,7 +221,7 @@ namespace uAdventure.Editor
                     conversationsDataControlList.Remove((ConversationDataControl)dataControl);
                     controller.deleteIdentifierReferences(conversationId);
                     controller.IdentifierSummary.deleteId<Conversation>(conversationId);
-                    //controller.dataModified( );
+                    controller.DataModified();
                     elementDeleted = true;
                 }
             }
@@ -244,7 +244,7 @@ namespace uAdventure.Editor
                 conversationsDataControlList.RemoveAt(elementIndex);
                 conversationsList.Insert(elementIndex - 1, e);
                 conversationsDataControlList.Insert(elementIndex - 1, c);
-                //controller.dataModified( );
+                controller.DataModified();
                 elementMoved = true;
             }
 
@@ -266,7 +266,7 @@ namespace uAdventure.Editor
                 conversationsDataControlList.RemoveAt(elementIndex);
                 conversationsList.Insert(elementIndex + 1, e);
                 conversationsDataControlList.Insert(elementIndex + 1, c);
-                //controller.dataModified( );
+                controller.DataModified();
                 elementMoved = true;
             }
 

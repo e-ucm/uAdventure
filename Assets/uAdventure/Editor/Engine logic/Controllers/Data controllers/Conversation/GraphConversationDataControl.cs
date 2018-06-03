@@ -374,7 +374,7 @@ namespace uAdventure.Editor
             controller.replaceIdentifierReferences(oldConversationId, newConversationId);
             controller.IdentifierSummary.deleteId<Conversation>(oldConversationId);
             controller.IdentifierSummary.addId<Conversation>(newConversationId);
-            //controller.dataModified( );
+            controller.DataModified();
             return newConversationId;
         }
 

@@ -231,7 +231,7 @@ namespace uAdventure.Editor
                         cutscenesDataControlList.Remove((CutsceneDataControl)dataControl);
                         controller.deleteIdentifierReferences(cutsceneId);
                         controller.IdentifierSummary.deleteId<Cutscene>(cutsceneId);
-                        //controller.dataModified( );
+                        controller.DataModified();
                         elementDeleted = true;
                     }
                 }
@@ -259,7 +259,7 @@ namespace uAdventure.Editor
                 cutscenesDataControlList.RemoveAt(elementIndex);
                 cutscenesList.Insert(elementIndex - 1, e);
                 cutscenesDataControlList.Insert(elementIndex - 1, c);
-                //controller.dataModified( );
+                controller.DataModified();
                 elementMoved = true;
             }
 
@@ -281,7 +281,7 @@ namespace uAdventure.Editor
                 cutscenesDataControlList.RemoveAt(elementIndex);
                 cutscenesList.Insert(elementIndex + 1, e);
                 cutscenesDataControlList.Insert(elementIndex + 1, c);
-                //controller.dataModified( );
+                controller.DataModified();
                 elementMoved = true;
             }
 

@@ -179,7 +179,7 @@ namespace uAdventure.Editor
             globalStatesList.Add(newGlobalState);
             globalStatesDataControlList.Add(new GlobalStateDataControl(newGlobalState));
             controller.IdentifierSummary.addId<GlobalState>(globalStateId);
-            //controller.dataModified( );
+            controller.DataModified();
         }
 
 
@@ -227,7 +227,7 @@ namespace uAdventure.Editor
                     globalStatesDataControlList.Remove((GlobalStateDataControl)dataControl);
                     controller.deleteIdentifierReferences(globalStateId);
                     controller.IdentifierSummary.deleteId<GlobalState>(globalStateId);
-                    //controller.dataModified( );
+                    controller.DataModified();
                     elementDeleted = true;
                 }
             }
@@ -250,7 +250,7 @@ namespace uAdventure.Editor
                 globalStatesDataControlList.RemoveAt(elementIndex);
                 globalStatesList.Insert(elementIndex - 1, e);
                 globalStatesDataControlList.Insert(elementIndex - 1, c);
-                //controller.dataModified( );
+                controller.DataModified();
                 elementMoved = true;
             }
 
@@ -272,7 +272,7 @@ namespace uAdventure.Editor
                 globalStatesDataControlList.RemoveAt(elementIndex);
                 globalStatesList.Insert(elementIndex + 1, e);
                 globalStatesDataControlList.Insert(elementIndex + 1, c);
-                //controller.dataModified( );
+                controller.DataModified();
                 elementMoved = true;
             }
 

@@ -519,6 +519,8 @@ namespace uAdventure.Editor
         public static void ResetInstance()
         {
             controllerInstance = null;
+            EditorApplication.playModeStateChanged -= controllerInstance.OnPlay;
+
             GameRources.GetInstance().Reset();
         }
 
@@ -625,6 +627,9 @@ namespace uAdventure.Editor
         {
             Debug.Log("Controller init"); 
             ConfigData.LoadFromXML(ReleaseFolders.configFileEditorRelativePath());
+
+            // On play callback
+            EditorApplication.playModeStateChanged += OnPlay;
 
             CheckLayers();
             // Load the configuration
@@ -3323,6 +3328,23 @@ namespace uAdventure.Editor
 
             chaptersController.redoTool();
             //tsd.update();
+        }
+
+        private void OnPlay(PlayModeStateChange playModeStateChange)
+        {
+            switch (playModeStateChange)
+            {
+                case PlayModeStateChange.ExitingEditMode:
+                    if (IsDataModified)
+                    {
+                        if (EditorUtility.DisplayDialog(TC.get("Operation.SaveChangesTitle"),
+                            TC.get("Run.CanBeRun.Text"), TC.get("GeneralText.Yes"), TC.get("GeneralText.No")))
+                        {
+                            Save();
+                        }
+                    }
+                    break;
+            }
         }
 
         //public void search()

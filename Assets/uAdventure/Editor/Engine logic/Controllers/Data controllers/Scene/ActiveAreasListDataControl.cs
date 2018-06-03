@@ -156,7 +156,7 @@ namespace uAdventure.Editor
             ActiveAreaDataControl newActiveAreaDataControl = new ActiveAreaDataControl(sceneDataControl, newActiveArea);
             activeAreasDataControlList.Add(newActiveAreaDataControl);
             controller.IdentifierSummary.addId<ActiveArea>(id);
-            //controller.dataModified( );
+            controller.DataModified();
         }
 
 
@@ -229,7 +229,7 @@ namespace uAdventure.Editor
                 activeAreasDataControlList.RemoveAt(elementIndex);
                 activeAreasList.Insert(elementIndex - 1, a);
                 activeAreasDataControlList.Insert(elementIndex - 1, c);
-                //controller.dataModified( );
+                controller.DataModified();
                 elementMoved = true;
             }
 
@@ -251,7 +251,7 @@ namespace uAdventure.Editor
                 activeAreasDataControlList.RemoveAt(elementIndex);
                 activeAreasList.Insert(elementIndex + 1, a);
                 activeAreasDataControlList.Insert(elementIndex + 1, c);
-                //controller.dataModified( );
+                controller.DataModified();
                 elementMoved = true;
             }
 

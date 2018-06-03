@@ -11,6 +11,7 @@ namespace uAdventure.Editor
         private Controller controller;
 
         private bool isAllow;
+        private int previousPlayerLayer;
 
         //private ScenePreviewEditionPanel scenePreviewEditionPanel;
 
@@ -21,6 +22,7 @@ namespace uAdventure.Editor
 
             controller = Controller.Instance;
             this.isAllow = isAllow;
+            previousPlayerLayer = scene.getPlayerLayer();
             //this.scenePreviewEditionPanel = scenePreviewEditionPanel;
             this.scene = scene;
         }
@@ -49,21 +51,19 @@ namespace uAdventure.Editor
 
         public override bool doTool()
         {
-
-            action(isAllow);
+            action(isAllow, Scene.PLAYER_WITHOUT_LAYER);
             return true;
         }
 
-        private void action(bool al)
+        private void action(bool allow, int playerLayer)
         {
-
-            if (!al)
-                scene.setPlayerLayer(Scene.PLAYER_WITHOUT_LAYER);
+            if (!allow)
+                scene.setPlayerLayer(Scene.PLAYER_NO_ALLOWED);
             else
-                scene.setPlayerLayer(0);
+                scene.setPlayerLayer(playerLayer);
 
             //if it is not allow that the player has layer, delete it in all references container
-            if (al)
+            if (allow)
             {
                 scene.addPlayerInReferenceList();
             }
@@ -95,8 +95,7 @@ namespace uAdventure.Editor
 
         public override bool undoTool()
         {
-
-            action(!isAllow);
+            action(!isAllow, previousPlayerLayer);
             return true;
         }
     }

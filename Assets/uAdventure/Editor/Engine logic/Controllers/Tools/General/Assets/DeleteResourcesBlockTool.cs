@@ -80,7 +80,7 @@ namespace uAdventure.Editor
                         parentDataControl.setSelectedResources(selectedResources - 1);
                     }
 
-                    //controller.dataModified( );
+                    Controller.Instance.DataModified();
                     elementDeleted = true;
                 }
             }
