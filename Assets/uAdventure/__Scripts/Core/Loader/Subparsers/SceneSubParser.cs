@@ -48,6 +48,7 @@ namespace uAdventure.Core
 			float playerScale = ExParsers.ParseDefault (element.GetAttribute("playerScale"), CultureInfo.InvariantCulture, 1.0f);
 
             scene = new Scene(sceneId);
+            
             scene.setPlayerLayer(playerLayer);
             scene.setPlayerScale(playerScale);
 
@@ -244,7 +245,7 @@ namespace uAdventure.Core
 				y = ExParsers.ParseDefault (element.GetAttribute ("y"), 0);
 
 			float scale = ExParsers.ParseDefault (element.GetAttribute("scale"), NumberFormatInfo.CurrentInfo, 0f);
-			int layer = ExParsers.ParseDefault (element.GetAttribute("layer"), 0);
+			int layer = ExParsers.ParseDefault (element.GetAttribute("layer"), -1);
 
 			int influenceX 		= ExParsers.ParseDefault (element.GetAttribute("influenceX"), 0), 
 				influenceY 		= ExParsers.ParseDefault (element.GetAttribute("influenceY"), 0), 
@@ -252,12 +253,6 @@ namespace uAdventure.Core
 				influenceHeight = ExParsers.ParseDefault (element.GetAttribute("influenceHeight"), 0);
 
 			bool hasInfluence = ExString.EqualsDefault(element.GetAttribute("hasInfluenceArea"), "yes", false);
-
-			// This is for maintain the back-compatibility: in previous dtd versions layer has -1 as default value and this is
-			// an erroneous value. This reason, if this value is -1, it will be changed to 0. Now in dtd there are not default value
-			// for layer
-			if (layer == -1)
-				layer = 0;
 
 			var currentElementReference = new ElementReference(idTarget, x, y, layer);
 			if (hasInfluence)

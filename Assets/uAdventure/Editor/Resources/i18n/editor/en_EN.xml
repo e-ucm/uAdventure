@@ -2073,7 +2073,7 @@ In the game you can define conditions based on the value of the variables.</entr
 <entry key="IMS.Classification.Tab">Classification</entry>
 <entry key="Operation.RenameBookMessage">Type a new identifier to rename the book</entry>
 <entry key="ConversationLine.Type.Normal">Normal</entry>
-<entry key="Scene.UseInitialPosition">Use initial position </entry>
+<entry key="Scene.UseInitialPosition">Use initial position</entry>
 <entry key="Language.Name">English</entry>
 <entry key="Conditions.ConditionGroup.NotSatisfied">is not satisfied</entry>
 <entry key="Operation.AddSceneMessage">Type an identifier for the new scene</entry>
@@ -2129,6 +2129,7 @@ In the game you can define conditions based on the value of the variables.</entr
   
 <entry key="RemoveElementEffect.Title">Remove element</entry>
 <entry key="RemoveElementEffect.Description">Removes the element(s) from the current scene</entry>
+<entry key="Scene.NoPlayer">Hide player</entry>
 
 <!-- Analytics -->
 <entry key="Analytics.Title">Analytics</entry>

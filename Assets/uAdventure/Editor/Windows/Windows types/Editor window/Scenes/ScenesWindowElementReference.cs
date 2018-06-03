@@ -73,7 +73,9 @@ namespace uAdventure.Editor
 
                     switch (column)
                     {
-                        case 0: GUI.Label(columnRect, row.ToString()); break;
+                        case 0:
+                            GUI.Label(columnRect, element.getLayer().ToString());
+                            break;
                         case 1: /* TODO */ break;
                         case 2:
                             var iconSpace = new Rect(columnRect);

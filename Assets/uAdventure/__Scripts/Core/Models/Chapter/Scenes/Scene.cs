@@ -65,7 +65,7 @@ namespace uAdventure.Core
          * Set if it is allow to use the player layer or not. Its default value it
          * is true.
          */
-        // private bool allowPlayerLayer;
+        private bool allowPlayerLayer;
 
         /**
          * List of exits
@@ -118,7 +118,7 @@ namespace uAdventure.Core
             activeAreas = new List<ActiveArea>();
             barriers = new List<Barrier>();
             playerLayer = PLAYER_WITHOUT_LAYER;
-            //allowPlayerLayer = true;
+            allowPlayerLayer = true;
             playerScale = 1.0f;
         }
 
@@ -342,12 +342,12 @@ namespace uAdventure.Core
          * @param allowPlayerLayer
          * 
          */
-        /*   public void setAllowPlayerLayer( bool allowPlayerLayer ) {
+        public void setAllowPlayerLayer( bool allowPlayerLayer ) {
 
-               this.allowPlayerLayer = allowPlayerLayer;
-               if( !allowPlayerLayer )
-                   playerLayer = PLAYER_NO_ALLOWED;
-           }*/
+            this.allowPlayerLayer = allowPlayerLayer;
+            if (!allowPlayerLayer)
+                playerLayer = PLAYER_NO_ALLOWED;
+        }
 
         /**
          * Returns the player layer
@@ -370,8 +370,8 @@ namespace uAdventure.Core
         {
 
             this.playerLayer = playerLayer;
-            //  if( playerLayer == PLAYER_NO_ALLOWED )
-            //    allowPlayerLayer = false;
+            if( playerLayer == PLAYER_NO_ALLOWED )
+                allowPlayerLayer = false;
 
         }
 
@@ -386,51 +386,7 @@ namespace uAdventure.Core
 
             return playerScale;
         }
-        /*
-        @Override
-        public Object clone() throws CloneNotSupportedException
-        {
 
-            Scene s = (Scene) super.clone( );
-            if( activeAreas != null ) {
-                s.activeAreas = new List<ActiveArea>();
-                for (ActiveArea aa : activeAreas)
-                    s.activeAreas.add((ActiveArea)aa.clone());
-            }
-            //s.allowPlayerLayer = allowPlayerLayer;
-            if( atrezzoReferences != null ) {
-                s.atrezzoReferences = new List<ElementReference>();
-                for (ElementReference er : atrezzoReferences)
-                    s.atrezzoReferences.add((ElementReference)er.clone());
-            }
-            if( barriers != null ) {
-                s.barriers = new List<Barrier>();
-                for (Barrier b : barriers)
-                    s.barriers.add((Barrier)b.clone());
-            }
-            if( characterReferences != null ) {
-                s.characterReferences = new List<ElementReference>();
-                for (ElementReference er : characterReferences)
-                    s.characterReferences.add((ElementReference)er.clone());
-            }
-            s.defaultX = defaultX;
-            s.defaultY = defaultY;
-            if( exits != null ) {
-                s.exits = new List<Exit>();
-                for (Exit e : exits)
-                    s.exits.add((Exit)e.clone());
-            }
-            if( itemReferences != null ) {
-                s.itemReferences = new List<ElementReference>();
-                for (ElementReference er : itemReferences)
-                    s.itemReferences.add((ElementReference)er.clone());
-            }
-            s.playerLayer = playerLayer;
-            s.playerScale = playerScale;
-            s.trajectory = ( trajectory != null ? (Trajectory) trajectory.clone( ) : null );
-            return s;
-        }
-        */
         public void setPositionX(int newX)
         {
 
@@ -452,7 +408,7 @@ namespace uAdventure.Core
                 foreach (ActiveArea aa in activeAreas)
                     s.activeAreas.Add((ActiveArea)aa.Clone());
             }
-            //s.allowPlayerLayer = allowPlayerLayer;
+            s.allowPlayerLayer = allowPlayerLayer;
             if (atrezzoReferences != null)
             {
                 s.atrezzoReferences = new List<ElementReference>();

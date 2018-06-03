@@ -55,10 +55,12 @@ namespace uAdventure.Editor
             sceneEditor = new SceneEditor();
 
             // Chapter preview subwindow
-            chapterPreview = new ChapterPreview(rect, new GUIContent(""), "Window");
-            chapterPreview.OnRequestRepaint = () => Repaint();
-            chapterPreview.BeginWindows = () => BeginWindows();
-            chapterPreview.EndWindows = () => EndWindows();
+            chapterPreview = new ChapterPreview(rect, new GUIContent(""), "Window")
+            {
+                OnRequestRepaint = () => Repaint(),
+                BeginWindows = () => BeginWindows(),
+                EndWindows = () => EndWindows()
+            };
             chapterPreview.OnSelectElement += (scene) =>
             {
                 var index = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes().FindIndex(s => s == scene as SceneDataControl);
@@ -96,23 +98,30 @@ namespace uAdventure.Editor
 
                 sceneEditor.Components = EditorWindowBase.Components;
                 var allElements = new List<DataControl>();
-                allElements.AddRange(scene.getReferencesList().getAllReferencesDataControl().FindAll(elem => elem.getErdc() != null).ConvertAll(elem => elem.getErdc() as DataControl));
+                allElements.AddRange(scene
+                    .getReferencesList()
+                    .getAllReferencesDataControl()
+                    .FindAll(elem => elem.getErdc() != null)
+                    .ConvertAll(elem => elem.getErdc() as DataControl));
                 allElements.AddRange(scene.getActiveAreasList().getActiveAreas().Cast<DataControl>());
                 allElements.AddRange(scene.getExitsList().getExits().Cast<DataControl>());
 
-                if (Controller.Instance.playerMode() == DescriptorData.MODE_PLAYER_3RDPERSON)
+                var playerMode = ScenesWindowPlayerMovement.PlayerMode.NoPlayer;
+                if(Controller.Instance.playerMode() == Controller.FILE_ADVENTURE_3RDPERSON_PLAYER)
                 {
                     allElements.AddRange(scene.getBarriersList().getBarriers().Cast<DataControl>());
-                    var hasTrajectory = scene.getTrajectory().hasTrajectory();
-                    if (hasTrajectory)
-                    {
+                    playerMode = ScenesWindowPlayerMovement.GetScenePlayerMode(scene);
+                }
+                switch (playerMode)
+                {
+                    case ScenesWindowPlayerMovement.PlayerMode.InitialPosition:
+                        allElements.Add(Controller.Instance.SelectedChapterDataControl.getPlayer());
+                        break;
+                    case ScenesWindowPlayerMovement.PlayerMode.Trajectory:
                         allElements.AddRange(scene.getTrajectory().getNodes().Cast<DataControl>());
                         allElements.AddRange(scene.getTrajectory().getSides().Cast<DataControl>());
                         allElements.Add(scene.getTrajectory());
-                    }
-                    else
-                        allElements.Add(Controller.Instance.SelectedChapterDataControl.getPlayer());
-
+                        break;
                 }
                 sceneEditor.elements = allElements;
             }

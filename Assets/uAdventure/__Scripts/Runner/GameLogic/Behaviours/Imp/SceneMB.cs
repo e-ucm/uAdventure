@@ -133,7 +133,9 @@ namespace uAdventure.Runner
         private void LateUpdate()
         {
             if (!referencesHolder || referencesHolder.childCount == 0)
+            {
                 return;
+            }
 
             // First we categorize the childs
             // (This is not necesary if the childs wont change)
@@ -144,13 +146,20 @@ namespace uAdventure.Runner
             for (int i = 0; i < referencesHolder.childCount; i++)
             {
                 var representable = referencesHolder.GetChild(i).GetComponent<Representable>();
-                if (representable.Context.getLayer() == 0)
-                    finalOrder[representable] = heights[representable] = representable.Context.getY();
-                else staticChilds.Add(representable);
+                // Not layered element
+                if (representable.Context.getLayer() < 0)
+                {
+                    heights[representable] = representable.Context.getY();
+                    finalOrder[representable] = representable.Context.getY();
+                }
+                else
+                {
+                    staticChilds.Add(representable);
+                }
             }
 
             // Then we sort the static childs by layer
-            staticChilds.Sort((r1, r2) => { return r1.Context.getLayer() - r2.Context.getLayer(); });
+            staticChilds.Sort((r1, r2) => r1.Context.getLayer() - r2.Context.getLayer());
 
             // Then we stabilish a layer Y:
             //  Higher layers should appear on top of lower layers.
@@ -163,14 +172,18 @@ namespace uAdventure.Runner
                 // Since we're iterating backwards we carry the minimum to the higher layers
                 maxY = Mathf.Max(maxY, child.getPosition().y);
                 // Finally we insert the elements: The layered elements use the simulated Y, whereas the dynamic ones use their real Y.
-                finalOrder[child] = heights[child] = maxY;
+                heights[child] = maxY;
+                finalOrder[child] = maxY;
             }
             
             // And then we apply the Z coordinate
             var zStep = (maxZ - minZ) / finalOrder.Count;
             var count = 0;
             foreach(var kv in finalOrder)
-                kv.Key.Z = minZ + zStep * count++;
+            {
+                kv.Key.Z = minZ + zStep * count;
+                count++;
+            }
         }
 
         void FixedUpdate()
@@ -351,7 +364,7 @@ namespace uAdventure.Runner
                             InstanceRectangle<Exit>(exit);
 
 
-                    if (!Game.Instance.GameState.IsFirstPerson)
+                    if (!Game.Instance.GameState.IsFirstPerson && scene.isAllowPlayerLayer())
                     {
                         var playerContext = Game.Instance.GameState.PlayerContext;
 
@@ -559,7 +572,8 @@ namespace uAdventure.Runner
             switch (SceneData.getType())
             {
                 case GeneralScene.GeneralSceneSceneType.SCENE:
-                    if (!Game.Instance.GameState.IsFirstPerson)
+                    var scene = sceneData as Scene;
+                    if (!Game.Instance.GameState.IsFirstPerson && scene.isAllowPlayerLayer())
                     {
                         RaycastHit hitInfo;
                         background.GetComponent<Collider>().Raycast(Camera.main.ScreenPointToRay(pointerData.position), out hitInfo, float.MaxValue);
