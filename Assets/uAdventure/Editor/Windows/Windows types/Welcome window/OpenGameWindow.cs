@@ -1,11 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
-using System.Collections;
-using System.Runtime.InteropServices;
-using System.Windows.Forms;
-using System;
 using System.IO;
-using System.Collections.Generic;
 
 using uAdventure.Core;
 
@@ -27,8 +22,6 @@ namespace uAdventure.Editor
 
         public void OpenFileDialog()
         {
-            Stream myStream = null;
-
 			var fileFilter = "eap";
 			var result = EditorUtility.OpenFilePanel ("Select file", "C://", fileFilter);
 
@@ -45,7 +38,6 @@ namespace uAdventure.Editor
                     Controller.OpenEditorWindow();
                     EditorWindowBase.RefreshWindows();
                 }
-
             }
         }
     }

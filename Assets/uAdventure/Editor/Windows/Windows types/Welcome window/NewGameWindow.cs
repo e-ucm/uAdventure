@@ -17,19 +17,6 @@ namespace uAdventure.Editor
         };
 
         private string selectedGameProjectPath = "";
-        
-        public NewGameWindow(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
-            : base(aStartPos, aContent, aStyle, aOptions)
-        {
-
-            newGameButtonFPSImage =
-                (Texture2D)Resources.Load("EAdventureData/img/newAdventureTransparentMode65", typeof(Texture2D));
-            newGameButtonTPSImage =
-                (Texture2D)Resources.Load("EAdventureData/img/newAdventureNormalMode65", typeof(Texture2D));
-            newGameScreenFPSImage =
-                (Texture2D)Resources.Load("EAdventureData/help/common_img/fireProtocol", typeof(Texture2D));
-            newGameScreenTPSImage = (Texture2D)Resources.Load("EAdventureData/help/common_img/1492", typeof(Texture2D));
-        }
 
         public Vector2 scrollPositionButtons;
         public Vector2 scrollPositionInfo;
@@ -49,6 +36,15 @@ namespace uAdventure.Editor
         public static GameType selectedGameType;
 
         private string newGameName;
+
+        public NewGameWindow(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
+            : base(aStartPos, aContent, aStyle, aOptions)
+        {
+            newGameButtonFPSImage = Resources.Load<Texture2D>("EAdventureData/img/icons/newAdventureTransparentMode65");
+            newGameButtonTPSImage = Resources.Load<Texture2D>("EAdventureData/img/icons/newAdventureNormalMode65");
+            newGameScreenFPSImage = Resources.Load<Texture2D>("EAdventureData/help/common_img/fireProtocol");
+            newGameScreenTPSImage = Resources.Load<Texture2D>("EAdventureData/help/common_img/1492");
+        }
 
         public override void Draw(int aID)
         {
@@ -76,19 +72,13 @@ namespace uAdventure.Editor
                     GUILayout.Height(0.8f * windowHeight));
                 if (selectedGameType == GameType.FPS)
                 {
-                    //GUILayout.Label(infoFPS);
                     GUILayout.Label(infoFPS);
                     GUILayout.Box(newGameScreenFPSImage);
-                    //GUI.DrawTexture(screenRect, newGameScreenFPSImage);
-                    // GUI.DrawTexture(newGameScreenFPSImage);
                 }
                 else
                 {
                     GUILayout.Label(infoTPS);
                     GUILayout.Box(newGameScreenTPSImage);
-                    //GUI.DrawTexture(screenRect, newGameScreenTPSImage);
-                    //GUILayout.Box(newGameScreenTPSImage, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
-                    // GUI.DrawTexture(newGameScreenTPSImage);
                 }
                 GUILayout.EndScrollView();
             }
@@ -96,12 +86,9 @@ namespace uAdventure.Editor
 
             GUILayout.BeginArea(bottomButtonRect);
             GUILayout.BeginHorizontal();
-
-            //if (GUILayout.Button(TC.get("GeneralText.New")))
+            
             if (GUILayout.Button("New"))
             {
-                //NewGameInputPopup window = (NewGameInputPopup) ScriptableObject.CreateInstance(typeof (NewGameInputPopup));
-                //window.Init(this, "Game");
                 startNewGame();
             }
 

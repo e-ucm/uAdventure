@@ -1,6 +1,5 @@
 ﻿using UnityEditor;
 using UnityEngine;
-using System.Collections;
 
 using uAdventure.Core;
 
@@ -21,7 +20,6 @@ namespace uAdventure.Editor
         private LayoutWindow m_Window1 = null;
         private static NewGameWindow newGameWindow;
         private static OpenGameWindow openGameWindow;
-        //private static RecentGameWindow recentGameWindow;
 
         // Add menu item 
         private void OnEnable()
@@ -39,11 +37,7 @@ namespace uAdventure.Editor
 
             openedWindow = WelcomeWindowType.New;
 
-            logo = Resources.Load<Texture2D>("EAdventureData/img/logo-editor");
-
-            //newGameWindow = new NewGameWindow(windowRect, new GUIContent(TC.get("GeneralText.New")), "Window");
-            //openGameWindow = new OpenGameWindow(windowRect, new GUIContent(TC.get("GeneralText.Open")), "Window");
-            //recentGameWindow = new RecentGameWindow(windowRect, new GUIContent(Language.GetText("RECENT_GAME")), "Window");
+            logo = Resources.Load<Texture2D>("EAdventureData/img/icons/logo-editor");
         }
 
         public void OnGUI()
@@ -65,28 +59,21 @@ namespace uAdventure.Editor
 
             GUILayout.BeginArea(buttonsRect);
             GUILayout.BeginHorizontal();
-
-            //if (GUILayout.Button(TC.get("GeneralText.New")))
+            
             if (GUILayout.Button("New"))
             {
                 OnWindowTypeChanged(WelcomeWindowType.New);
             }
-            //if (GUILayout.Button(TC.get("GeneralText.Open")))
             if (GUILayout.Button("Open"))
             {
                 OnWindowTypeChanged(WelcomeWindowType.Open);
                 openGameWindow.OpenFileDialog();
             }
-            //if (GUILayout.Button(Language.GetText("RECENT_GAME")))
-            //{
-            //    OnWindowTypeChanged(WelcomeWindowType.Recent);
-            //}
 
             GUILayout.EndHorizontal();
             GUILayout.EndArea();
 
             BeginWindows();
-            //GUI.enabled = m_Window1 == null;
 
             switch (openedWindow)
             {
@@ -96,9 +83,6 @@ namespace uAdventure.Editor
                 case WelcomeWindowType.Open:
                     m_Window1 = openGameWindow;
                     break;
-                    //case WelcomeWindowType.Recent:
-                    //    m_Window1 = recentGameWindow;
-                    //    break;
             }
 
             if (m_Window1 != null)

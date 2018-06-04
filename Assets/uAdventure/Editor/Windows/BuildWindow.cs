@@ -24,12 +24,12 @@ public class BuildWindow : EditorWindow {
         pathSelector = new FileChooser()
         {
             Label = "Path",
-            FileType = BaseFileOpenDialog.FileType.PATH
+            FileType = FileType.PATH
         };
 
         windowsIcon = new GUIContent("Windows", EditorGUIUtility.IconContent("BuildSettings.Metro").image);
-        linuxIcon = new GUIContent("Linux", Resources.Load<Texture2D>("Icons/linux"));
-        macOSIcon = new GUIContent("Mac Os X", Resources.Load<Texture2D>("Icons/macosx"));
+        linuxIcon = new GUIContent("Linux", Resources.Load<Texture2D>("EAdventureData/build-icons/linux"));
+        macOSIcon = new GUIContent("Mac Os X", Resources.Load<Texture2D>("EAdventureData/build-icons/macosx"));
         androidIcon = new GUIContent("Android", EditorGUIUtility.IconContent("BuildSettings.Android").image);
         iOSIcon = new GUIContent("iPhone", EditorGUIUtility.IconContent("BuildSettings.iPhone").image);
         webGLIcon = new GUIContent("WebGL", EditorGUIUtility.IconContent("BuildSettings.WebGL").image);
