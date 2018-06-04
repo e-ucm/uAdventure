@@ -243,7 +243,7 @@ namespace uAdventure.Editor
 
         public void setLength(float value)
         {
-            Controller.Instance.addTool(new SetSideLengthTool(side, value));
+            Controller.Instance.AddTool(new SetSideLengthTool(side, value));
         }
     }
 }

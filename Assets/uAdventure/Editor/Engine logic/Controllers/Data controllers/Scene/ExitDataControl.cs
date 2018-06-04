@@ -137,7 +137,7 @@ namespace uAdventure.Editor
         public void setExit(int x, int y, int width, int height)
         {
 
-            controller.addTool(new ChangeRectangleValueTool(exit, x, y, width, height));
+            controller.AddTool(new ChangeRectangleValueTool(exit, x, y, width, height));
         }
 
         /**
@@ -149,7 +149,7 @@ namespace uAdventure.Editor
         public void setDocumentation(string documentation)
         {
 
-            controller.addTool(new ChangeDocumentationTool(exit, documentation));
+            controller.AddTool(new ChangeDocumentationTool(exit, documentation));
         }
 
         public override System.Object getContent()
@@ -404,7 +404,7 @@ namespace uAdventure.Editor
         public void addPoint(int x, int y)
         {
 
-            controller.addTool(new AddNewPointTool(exit, x, y));
+            controller.AddTool(new AddNewPointTool(exit, x, y));
         }
 
         public Vector2 getLastPoint()
@@ -418,13 +418,13 @@ namespace uAdventure.Editor
         public void deletePoint(Vector2 point)
         {
 
-            controller.addTool(new DeletePointTool(exit, point));
+            controller.AddTool(new DeletePointTool(exit, point));
         }
 
         public void setRectangular(bool selected)
         {
 
-            controller.addTool(new ChangeRectangularValueTool(exit, selected));
+            controller.AddTool(new ChangeRectangularValueTool(exit, selected));
         }
 
         public Rectangle getRectangle()
@@ -472,7 +472,7 @@ namespace uAdventure.Editor
         public void setNextSceneId(string value)
         {
 
-            Controller.Instance.addTool(new ChangeStringValueTool(exit, value, "getNextSceneId", "setNextSceneId"));
+            Controller.Instance.AddTool(new ChangeStringValueTool(exit, value, "getNextSceneId", "setNextSceneId"));
         }
 
         public int getDestinyPositionX()
@@ -508,7 +508,7 @@ namespace uAdventure.Editor
         public void setDestinyPosition(int positionX, int positionY)
         {
 
-            controller.addTool(new ChangeNSDestinyPositionTool(exit, positionX, positionY));
+            controller.AddTool(new ChangeNSDestinyPositionTool(exit, positionX, positionY));
         }
 
         /**
@@ -519,9 +519,9 @@ namespace uAdventure.Editor
         {
 
             if (exit.hasPlayerPosition())
-                controller.addTool(new ChangeNSDestinyPositionTool(exit, int.MinValue, int.MinValue));
+                controller.AddTool(new ChangeNSDestinyPositionTool(exit, int.MinValue, int.MinValue));
             else
-                controller.addTool(new ChangeNSDestinyPositionTool(exit, 0, 0));
+                controller.AddTool(new ChangeNSDestinyPositionTool(exit, 0, 0));
         }
 
         /**
@@ -550,13 +550,13 @@ namespace uAdventure.Editor
         public void setTransitionTime(int value)
         {
 
-            Controller.Instance.addTool(new ChangeIntegerValueTool(exit, value, "getTransitionTime", "setTransitionTime"));
+            Controller.Instance.AddTool(new ChangeIntegerValueTool(exit, value, "getTransitionTime", "setTransitionTime"));
         }
 
         public void setTransitionType(int selectedIndex)
         {
 
-            Controller.Instance.addTool(new ChangeIntegerValueTool(exit, selectedIndex, "getTransitionType", "setTransitionType"));
+            Controller.Instance.AddTool(new ChangeIntegerValueTool(exit, selectedIndex, "getTransitionType", "setTransitionType"));
         }
 
         public bool isHasNotEffects()
@@ -568,7 +568,7 @@ namespace uAdventure.Editor
         public void setHasNotEffects(bool selected)
         {
 
-            Controller.Instance.addTool(new ChangeBooleanValueTool(exit, selected, "isHasNotEffects", "setHasNotEffects"));
+            Controller.Instance.AddTool(new ChangeBooleanValueTool(exit, selected, "isHasNotEffects", "setHasNotEffects"));
         }
 
         public EffectsController getEffects()

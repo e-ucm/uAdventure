@@ -264,7 +264,7 @@ namespace uAdventure.Editor
         public void setDocumentation(string documentation)
         {
 
-            controller.addTool(new ChangeDocumentationTool(action, documentation));
+            controller.AddTool(new ChangeDocumentationTool(action, documentation));
         }
 
         /**
@@ -276,7 +276,7 @@ namespace uAdventure.Editor
         public void setIdTarget(string idTarget)
         {
 
-            controller.addTool(new ChangeTargetIdTool(action, idTarget, true, false));
+            controller.AddTool(new ChangeTargetIdTool(action, idTarget, true, false));
         }
 
         public override System.Object getContent()
@@ -523,7 +523,7 @@ namespace uAdventure.Editor
          */
         public void setNeedsGoTo(bool needsGoTo)
         {
-            controller.addTool(new ChangeBooleanValueTool(action, needsGoTo, "isNeedsGoTo", "setNeedsGoTo"));
+            controller.AddTool(new ChangeBooleanValueTool(action, needsGoTo, "isNeedsGoTo", "setNeedsGoTo"));
         }
 
         /**
@@ -541,7 +541,7 @@ namespace uAdventure.Editor
          */
         public void setKeepDistance(int keepDistance)
         {
-            controller.addTool(new ChangeIntegerValueTool(action, keepDistance, "getKeepDistance", "setKeepDistance"));
+            controller.AddTool(new ChangeIntegerValueTool(action, keepDistance, "getKeepDistance", "setKeepDistance"));
         }
 
         /**

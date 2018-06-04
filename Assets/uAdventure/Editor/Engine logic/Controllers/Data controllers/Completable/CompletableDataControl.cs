@@ -82,7 +82,7 @@ namespace uAdventure.Editor
 
         public void setType(Completable.Milestone.MilestoneType type)
         {
-            Controller.Instance.addTool(new ChangeEnumValueTool(milestone, type, "getType", "setType"));
+            Controller.Instance.AddTool(new ChangeEnumValueTool(milestone, type, "getType", "setType"));
         }
 
         public string getId()
@@ -92,7 +92,7 @@ namespace uAdventure.Editor
 
         public void setId(string newId)
         {
-            Controller.Instance.addTool(new ChangeIdTool(milestone, newId));
+            Controller.Instance.AddTool(new ChangeIdTool(milestone, newId));
         }
 
         public float getProgress()
@@ -102,7 +102,7 @@ namespace uAdventure.Editor
 
         public void setProgress(float progress)
         {
-            Controller.Instance.addTool(new ChangeFloatValueTool(milestone, progress, "getProgress", "setProgress"));
+            Controller.Instance.AddTool(new ChangeFloatValueTool(milestone, progress, "getProgress", "setProgress"));
         }
 
         public ConditionsController getConditions()
@@ -277,7 +277,7 @@ namespace uAdventure.Editor
 
         public void setProgress(float value)
         {
-            Controller.Instance.addTool(new ChangeFloatValueTool(progress, value, "getProgress", "setProgress"));
+            Controller.Instance.AddTool(new ChangeFloatValueTool(progress, value, "getProgress", "setProgress"));
         }
 
         public Completable.Progress.ProgressType getType()
@@ -287,7 +287,7 @@ namespace uAdventure.Editor
 
         public void setType(Completable.Progress.ProgressType type)
         {
-            Controller.Instance.addTool(new ChangeEnumValueTool(progress, type, "getType", "setType"));
+            Controller.Instance.AddTool(new ChangeEnumValueTool(progress, type, "getType", "setType"));
         }
     }
 

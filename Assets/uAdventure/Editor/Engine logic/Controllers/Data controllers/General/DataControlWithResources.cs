@@ -74,13 +74,13 @@ namespace uAdventure.Editor
         public override bool deleteElement(DataControl dataControl, bool askConfirmation)
         {
 
-            return controller.addTool(new DeleteResourcesBlockTool(resourcesList, resourcesDataControlList, dataControl, this));
+            return controller.AddTool(new DeleteResourcesBlockTool(resourcesList, resourcesDataControlList, dataControl, this));
         }
 
         public bool duplicateResources(DataControl dataControl)
         {
 
-            return controller.addTool(new DuplicateResourcesBlockTool(dataControl, resourcesList, resourcesDataControlList, this));
+            return controller.AddTool(new DuplicateResourcesBlockTool(dataControl, resourcesList, resourcesDataControlList, this));
         }
     }
 }

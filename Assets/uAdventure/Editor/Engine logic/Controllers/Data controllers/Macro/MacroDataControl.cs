@@ -22,7 +22,7 @@ namespace uAdventure.Editor
         public void setDocumentation(string doc)
         {
 
-            Controller.Instance.addTool(new ChangeDocumentationTool(macro, doc));
+            Controller.Instance.AddTool(new ChangeDocumentationTool(macro, doc));
         }
 
         public string getDocumentation()

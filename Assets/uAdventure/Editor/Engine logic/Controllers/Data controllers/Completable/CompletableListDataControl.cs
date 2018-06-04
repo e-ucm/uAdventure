@@ -364,7 +364,7 @@ namespace uAdventure.Editor{
                     scoreDataControls.Clear();
                 }
 
-                Controller.Instance.addTool(new ChangeEnumValueTool(score, scoreMethod, "getMethod", "setMethod"));
+                Controller.Instance.AddTool(new ChangeEnumValueTool(score, scoreMethod, "getMethod", "setMethod"));
             }
         }
 
@@ -376,7 +376,7 @@ namespace uAdventure.Editor{
         public void setType(Completable.Score.ScoreType scoreType)
         {
             score.setId("");
-            Controller.Instance.addTool(new ChangeEnumValueTool(score, scoreType, "getType", "setType"));
+            Controller.Instance.AddTool(new ChangeEnumValueTool(score, scoreType, "getType", "setType"));
         }
 
         public Completable.Score.ScoreType getType()
@@ -393,7 +393,7 @@ namespace uAdventure.Editor{
         {
             if (!id.Equals(score.getId()))
             {
-                Controller.Instance.addTool(new ChangeStringValueTool(score, id, "getId", "setId"));
+                Controller.Instance.AddTool(new ChangeStringValueTool(score, id, "getId", "setId"));
             }
         }
     }

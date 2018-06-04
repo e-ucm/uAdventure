@@ -159,7 +159,7 @@ namespace uAdventure.Editor
         {
 
             // If the value is different
-            controller.addTool(new ChangeTargetIdTool(elementReference, elementId));
+            controller.AddTool(new ChangeTargetIdTool(elementReference, elementId));
             //if( !elementId.equals( elementReference.getTargetId( ) ) ) {
             // Set the new element id, update the tree and modify the data
             //	elementReference.setTargetId( elementId );
@@ -179,7 +179,7 @@ namespace uAdventure.Editor
         public void setElementPosition(int x, int y)
         {
 
-            controller.addTool(new ChangeElementReferenceTool(elementReference, x, y));
+            controller.AddTool(new ChangeElementReferenceTool(elementReference, x, y));
         }
 
         /**
@@ -191,7 +191,7 @@ namespace uAdventure.Editor
         public void setDocumentation(string documentation)
         {
 
-            controller.addTool(new ChangeDocumentationTool(elementReference, documentation));
+            controller.AddTool(new ChangeDocumentationTool(elementReference, documentation));
         }
 
         /**
@@ -214,7 +214,7 @@ namespace uAdventure.Editor
         public void setElementScale(float scale)
         {
 
-            controller.addTool(new ChangeElementReferenceTool(elementReference, scale));
+            controller.AddTool(new ChangeElementReferenceTool(elementReference, scale));
         }
 
 

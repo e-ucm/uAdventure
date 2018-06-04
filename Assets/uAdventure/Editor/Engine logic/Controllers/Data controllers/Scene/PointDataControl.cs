@@ -64,7 +64,7 @@ namespace uAdventure.Editor
         public void setPoint(int x, int y)
         {
 
-            controller.addTool(new ChangePointValueTool(point, x, y));
+            controller.AddTool(new ChangePointValueTool(point, x, y));
         }
 
 

@@ -161,7 +161,7 @@ namespace uAdventure.Editor
         public void setActiveArea(int x, int y, int width, int height)
         {
 
-            controller.addTool(new ChangeRectangleValueTool(activeArea, x, y, width, height));
+            controller.AddTool(new ChangeRectangleValueTool(activeArea, x, y, width, height));
         }
 
         public override System.Object getContent()
@@ -398,7 +398,7 @@ namespace uAdventure.Editor
         public void addPoint(int x, int y)
         {
 
-            controller.addTool(new AddNewPointTool(activeArea, x, y, influenceAreaDataControl));
+            controller.AddTool(new AddNewPointTool(activeArea, x, y, influenceAreaDataControl));
         }
 
         public Vector2 getLastPoint()
@@ -412,13 +412,13 @@ namespace uAdventure.Editor
         public void deletePoint(Vector2 point)
         {
 
-            controller.addTool(new DeletePointTool(activeArea, point, influenceAreaDataControl));
+            controller.AddTool(new DeletePointTool(activeArea, point, influenceAreaDataControl));
         }
 
         public void setRectangular(bool selected)
         {
 
-            controller.addTool(new ChangeRectangularValueTool(activeArea, selected));
+            controller.AddTool(new ChangeRectangularValueTool(activeArea, selected));
         }
 
         public Rectangle getRectangle()

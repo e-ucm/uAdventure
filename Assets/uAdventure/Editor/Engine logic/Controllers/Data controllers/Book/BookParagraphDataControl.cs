@@ -81,7 +81,7 @@ namespace uAdventure.Editor
         public void setParagraphTextContent(string content)
         {
 
-            Controller.Instance.addTool(new ChangeParagraphContentTool(bookParagraph, content));
+            Controller.Instance.AddTool(new ChangeParagraphContentTool(bookParagraph, content));
         }
 
         /**
@@ -125,7 +125,7 @@ namespace uAdventure.Editor
                     if (assetFilenames[i].Equals(selectedAsset))
                         assetIndex = i;
 
-                Controller.Instance.addTool(new ChangeParagraphContentTool(bookParagraph, assetPaths[assetIndex]));
+                Controller.Instance.AddTool(new ChangeParagraphContentTool(bookParagraph, assetPaths[assetIndex]));
 
             }
         }
@@ -156,7 +156,7 @@ namespace uAdventure.Editor
         private void performSetImageParagraphContent(object sender, string selectedAsset)
         {
             // Take the index of the selected asset
-            Controller.Instance.addTool(new ChangeParagraphContentTool(bookParagraph, selectedAsset));
+            Controller.Instance.AddTool(new ChangeParagraphContentTool(bookParagraph, selectedAsset));
         }
 
         /**
@@ -166,7 +166,7 @@ namespace uAdventure.Editor
         public void deleteImageParagraphContent()
         {
 
-            Controller.Instance.addTool(new ChangeParagraphContentTool(bookParagraph, ""));
+            Controller.Instance.AddTool(new ChangeParagraphContentTool(bookParagraph, ""));
         }
 
 

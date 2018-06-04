@@ -124,7 +124,7 @@ namespace uAdventure.Editor
         public bool addChild(ConversationNodeView nodeView, int nodeType, Dictionary<ConversationNodeView, List<ConditionsController>> allConditions)
         {
 
-            return controller.addTool(new AddConversationNodeTool(nodeView, nodeType, allConditions));
+            return controller.AddTool(new AddConversationNodeTool(nodeView, nodeType, allConditions));
         }
 
         /**
@@ -191,7 +191,7 @@ namespace uAdventure.Editor
         public void addNodeLine(ConversationNodeView nodeView, int lineIndex, string name, List<ConditionsController> node)
         {
 
-            controller.addTool(new AddNodeLineTool(nodeView, lineIndex, name, node));
+            controller.AddTool(new AddNodeLineTool(nodeView, lineIndex, name, node));
         }
 
         /**
@@ -210,7 +210,7 @@ namespace uAdventure.Editor
             // Take the complete node
             ConversationNode node = (ConversationNode)nodeView;
 
-            controller.addTool(new ChangeNameTool(node.getLine(lineIndex), name));
+            controller.AddTool(new ChangeNameTool(node.getLine(lineIndex), name));
         }
 
         /**
@@ -228,7 +228,7 @@ namespace uAdventure.Editor
 
             // Take the complete node
             ConversationNode node = (ConversationNode)nodeView;
-            controller.addTool(new ChangeStringValueTool(node.getLine(lineIndex), text, "getText", "setText"));
+            controller.AddTool(new ChangeStringValueTool(node.getLine(lineIndex), text, "getText", "setText"));
         }
 
         /**
@@ -250,7 +250,7 @@ namespace uAdventure.Editor
             // Set the new text for the line if the value has changed
             if (!node.hasAudioPath(lineIndex) || !node.getAudioPath(lineIndex).Equals(audioPath))
             {
-                controller.addTool(new ChangeStringValueTool(node.getLine(lineIndex), audioPath, "getAudioPath", "setAudioPath"));
+                controller.AddTool(new ChangeStringValueTool(node.getLine(lineIndex), audioPath, "getAudioPath", "setAudioPath"));
             }
         }
 
@@ -266,7 +266,7 @@ namespace uAdventure.Editor
         public bool moveNodeLineUp(ConversationNodeView nodeView, int lineIndex)
         {
 
-            return controller.addTool(new MoveNodeLineTool(nodeView, lineIndex, MoveNodeLineTool.UP));
+            return controller.AddTool(new MoveNodeLineTool(nodeView, lineIndex, MoveNodeLineTool.UP));
         }
 
         /**
@@ -281,7 +281,7 @@ namespace uAdventure.Editor
         public bool moveNodeLineDown(ConversationNodeView nodeView, int lineIndex)
         {
 
-            return controller.addTool(new MoveNodeLineTool(nodeView, lineIndex, MoveNodeLineTool.DOWN));
+            return controller.AddTool(new MoveNodeLineTool(nodeView, lineIndex, MoveNodeLineTool.DOWN));
         }
 
         /**
@@ -298,7 +298,7 @@ namespace uAdventure.Editor
         public void deleteNodeLine(ConversationNodeView nodeView, int lineIndex, List<ConditionsController> node)
         {
 
-            controller.addTool(new DeleteNodeLineTool(nodeView, lineIndex, node));
+            controller.AddTool(new DeleteNodeLineTool(nodeView, lineIndex, node));
         }
 
         /**
@@ -313,7 +313,7 @@ namespace uAdventure.Editor
         public bool deleteNodeLink(ConversationNodeView nodeView)
         {
 
-            return controller.addTool(new DeleteNodeLinkTool(nodeView));
+            return controller.AddTool(new DeleteNodeLinkTool(nodeView));
         }
 
         /**
@@ -331,7 +331,7 @@ namespace uAdventure.Editor
         public bool deleteNodeOption(ConversationNodeView nodeView, int optionIndex)
         {
 
-            return controller.addTool(new DeleteNodeOptionTool(nodeView, optionIndex));
+            return controller.AddTool(new DeleteNodeOptionTool(nodeView, optionIndex));
         }
 
         /**
@@ -419,7 +419,7 @@ namespace uAdventure.Editor
 
             //try
             //{
-            return controller.addTool(new SelectLineAudioPathTool(((ConversationNode)selectedNode).getLine(selectedRow)));
+            return controller.AddTool(new SelectLineAudioPathTool(((ConversationNode)selectedNode).getLine(selectedRow)));
             //}
             //catch (CloneNotSupportedException e)
             //{
@@ -440,7 +440,7 @@ namespace uAdventure.Editor
 
             ConversationNode node = (ConversationNode)selectedNode;
             //Change the randomly of showing of options
-            controller.addTool(new ChangeBooleanValueTool(node, !((OptionConversationNode)node).isRandom(), "isRandom", "setRandom"));
+            controller.AddTool(new ChangeBooleanValueTool(node, !((OptionConversationNode)node).isRandom(), "isRandom", "setRandom"));
         }
 
         /**
@@ -454,7 +454,7 @@ namespace uAdventure.Editor
         {
 
             ConversationNode node = (ConversationNode)selectedNode;
-            controller.addTool(new ChangeBooleanValueTool(node, !((OptionConversationNode)node).isKeepShowing(), "isKeepShowing", "setKeepShowing"));
+            controller.AddTool(new ChangeBooleanValueTool(node, !((OptionConversationNode)node).isKeepShowing(), "isKeepShowing", "setKeepShowing"));
         }
 
         /**
@@ -467,7 +467,7 @@ namespace uAdventure.Editor
         public void setOptionPositions(ConversationNodeView selectedNode, bool bottomPosition)
         {
             ConversationNode node = (ConversationNode)selectedNode;
-            controller.addTool(new OptionsPositionTool(((OptionConversationNode)node), bottomPosition));
+            controller.AddTool(new OptionsPositionTool(((OptionConversationNode)node), bottomPosition));
         }
 
         /**
@@ -481,7 +481,7 @@ namespace uAdventure.Editor
         {
 
             ConversationNode node = (ConversationNode)selectedNode;
-            controller.addTool(new ChangeBooleanValueTool(node, !((OptionConversationNode)node).isShowUserOption(), "isShowUserOption", "setShowUserOption"));
+            controller.AddTool(new ChangeBooleanValueTool(node, !((OptionConversationNode)node).isShowUserOption(), "isShowUserOption", "setShowUserOption"));
         }
 
         /**
@@ -495,7 +495,7 @@ namespace uAdventure.Editor
         {
 
             ConversationNode node = (ConversationNode)selectedNode;
-            controller.addTool(new ChangeBooleanValueTool(node, !((DialogueConversationNode)node).isKeepShowing(), "isKeepShowing", "setKeepShowing"));
+            controller.AddTool(new ChangeBooleanValueTool(node, !((DialogueConversationNode)node).isKeepShowing(), "isKeepShowing", "setKeepShowing"));
         }
 
 
@@ -510,7 +510,7 @@ namespace uAdventure.Editor
         {
 
             ConversationNode node = (ConversationNode)selectedNode;
-            controller.addTool(new ChangeBooleanValueTool(node, !((OptionConversationNode)node).isPreListening(), "isPreListening", "setPreListening"));
+            controller.AddTool(new ChangeBooleanValueTool(node, !((OptionConversationNode)node).isPreListening(), "isPreListening", "setPreListening"));
         }
 
 

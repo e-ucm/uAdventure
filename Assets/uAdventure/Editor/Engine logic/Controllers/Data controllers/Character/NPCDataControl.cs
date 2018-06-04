@@ -229,7 +229,7 @@ namespace uAdventure.Editor
         public void setAlwaysSynthesizer(bool always)
         {
 
-            controller.addTool(new ChangeBooleanValueTool(npc, always, "isAlwaysSynthesizer", "setAlwaysSynthesizer"));
+            controller.AddTool(new ChangeBooleanValueTool(npc, always, "isAlwaysSynthesizer", "setAlwaysSynthesizer"));
         }
 
         /**
@@ -241,7 +241,7 @@ namespace uAdventure.Editor
         public void setVoice(string voice)
         {
 
-            controller.addTool(new ChangeStringValueTool(npc, voice, "getVoice", "setVoice"));
+            controller.AddTool(new ChangeStringValueTool(npc, voice, "getVoice", "setVoice"));
         }
 
         /**
@@ -306,7 +306,7 @@ namespace uAdventure.Editor
 
             if (type == Controller.RESOURCES)
             {
-                elementAdded = Controller.Instance.addTool(new AddResourcesBlockTool(resourcesList, resourcesDataControlList, Controller.NPC, this));
+                elementAdded = Controller.Instance.AddTool(new AddResourcesBlockTool(resourcesList, resourcesDataControlList, Controller.NPC, this));
             }
 
             return elementAdded;
@@ -586,7 +586,7 @@ namespace uAdventure.Editor
         public void setShowsSpeechBubbles(bool showsSpeechBubbles)
         {
 
-            controller.addTool(new ChangeBooleanValueTool(npc, showsSpeechBubbles, "getShowsSpeechBubbles", "setShowsSpeechBubbles"));
+            controller.AddTool(new ChangeBooleanValueTool(npc, showsSpeechBubbles, "getShowsSpeechBubbles", "setShowsSpeechBubbles"));
         }
 
 

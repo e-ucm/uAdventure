@@ -111,7 +111,7 @@ namespace uAdventure.Editor
         {
 
             influenceArea.setExists(true);
-            controller.addTool(new ChangeRectangleValueTool(influenceArea, x, y, width, height));
+            controller.AddTool(new ChangeRectangleValueTool(influenceArea, x, y, width, height));
         }
 
         public void setInfluenceArea(InfluenceArea influenceArea)

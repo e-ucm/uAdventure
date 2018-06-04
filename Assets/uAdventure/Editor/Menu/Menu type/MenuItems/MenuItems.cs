@@ -337,7 +337,7 @@ namespace uAdventure.Editor
 
         public void OnCliked()
         {
-
+            Controller.Instance.UndoTool();
         }
     }
 
@@ -355,7 +355,7 @@ namespace uAdventure.Editor
 
         public void OnCliked()
         {
-
+            Controller.Instance.RedoTool();
         }
     }
 

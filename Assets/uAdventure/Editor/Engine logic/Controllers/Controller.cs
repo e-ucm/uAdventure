@@ -2556,7 +2556,7 @@ namespace uAdventure.Editor
          */
         public void addChapter(string val)
         {
-            addTool(new AddChapterTool(chaptersController, val));
+            AddTool(new AddChapterTool(chaptersController, val));
         }
 
         ///**
@@ -2586,7 +2586,7 @@ namespace uAdventure.Editor
         public void deleteChapter()
         {
 
-            addTool(new DeleteChapterTool(chaptersController));
+            AddTool(new DeleteChapterTool(chaptersController));
         }
 
         ///**
@@ -3308,26 +3308,20 @@ namespace uAdventure.Editor
 
         //// METHODS TO MANAGE UNDO/REDO
 
-        public bool addTool(Tool tool)
+        public bool AddTool(Tool tool)
         {
-
-            bool added = chaptersController.addTool(tool);
-            //tsd.update();
-            return added;
+            Debug.Log("Tool added");
+            return chaptersController.addTool(tool);
         }
 
-        public void undoTool()
+        public void UndoTool()
         {
-
             chaptersController.undoTool();
-            //tsd.update();
         }
 
-        public void redoTool()
+        public void RedoTool()
         {
-
             chaptersController.redoTool();
-            //tsd.update();
         }
 
         private void OnPlay(PlayModeStateChange playModeStateChange)
