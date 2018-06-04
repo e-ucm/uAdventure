@@ -20,6 +20,7 @@ namespace uAdventure.Editor
 
     public class AssetsController
     {
+        protected const string DIR_PREFIX = "Assets/uAdventure/Resources/CurrentGame";
         /**
          * Assessment files category.
          */
@@ -404,157 +405,57 @@ namespace uAdventure.Editor
         }
 
 
-        public static bool addSingleAsset(int assetsCategory, string assetPath)
+        public static string addSingleAsset(int assetsCategory, string assetPath)
         {
             return addSingleAsset(assetsCategory, assetPath, true);
         }
 
-        public static bool addSingleAsset(int assetsCategory, string assetPath, bool checkIfAssetExists)
+        public static string addSingleAsset(int assetsCategory, string assetPath, bool checkIfAssetExists)
         {
             return addSingleAsset(assetsCategory, assetPath, null, checkIfAssetExists);
         }
 
-        public static bool addSingleAsset(int assetsCategory, string assetPath, string destinyAssetName,
+        public static string addSingleAsset(int assetsCategory, string assetPath, string destinyAssetName,
             bool checkIfAssetExists)
         {
+            string assetTypeDir = getCategoryFolder(assetsCategory);
 
-            bool assetsAdded = false;
-            // Take the category folder, from the ZIP file name
-            //File categoryFolder = new File(Controller.getInstance().getProjectFolder(), getCategoryFolder(assetsCategory));
+            DirectoryInfo path = new DirectoryInfo(DIR_PREFIX + "/" + assetTypeDir);
+            if (!Directory.Exists(path.FullName))
+                Directory.CreateDirectory(path.FullName);
 
-            //// Check if the file is correct, and is going to be added
-            //if (checkAsset(assetPath, assetsCategory))
-            //{
+            string nameOnly = !string.IsNullOrEmpty(destinyAssetName) ? destinyAssetName : Path.GetFileName(assetPath);
+            string returnPath = null;
+            if (assetPath != Path.Combine(path.FullName, nameOnly)) // Avoid to copy the same origin to same destination files
+            {
+                var destination = Path.Combine(path.FullName, nameOnly);
+                File.Copy(assetPath, destination, true);
+                File.SetAttributes(assetPath, FileAttributes.Normal);
 
-            //    // If it is an animation asset, add all the images of the animation
-            //    if (assetsCategory == AssetsConstants.CATEGORY_ANIMATION && !assetPath.EndsWith(".eaa"))
-            //    {
-            //        // Prepare the root of the animation path and the extension
-            //        string extension = getExtension(assetPath);
-            //        assetPath = removeSuffix(assetPath);
+                if (assetsCategory == AssetsConstants.CATEGORY_ANIMATION)
+                {
+                    AssetsController.copyAllFiles(Path.GetDirectoryName(assetPath), path.FullName);
+                }
+                AssetDatabase.ImportAsset(path.FullName, ImportAssetOptions.ForceUpdate | ImportAssetOptions.ForceSynchronousImport);
+                var importer = AssetImporter.GetAtPath(path.FullName);
+                AssetDatabase.SaveAssets();
+                AssetDatabase.Refresh();
+                if(assetsCategory == AssetsConstants.CATEGORY_IMAGE)
+                {
+                    // Force unload
+                    var image = Controller.ResourceManager.getImage(assetPath);
+                    Resources.UnloadAsset(image);
+                }
 
-            //        // While the last image has not been read
-            //        bool end = false;
-            //        for (int i = 1; i < 100 && !end; i++)
-            //        {
-            //            // Open source file
-            //            File sourceFile = new File(assetPath + string.format("_%02d.", i) + extension);
-
-            //            // If the file exists, create the destiny file and do the copy
-            //            if (sourceFile.Exists)
-            //            {
-            //                File destinyFile = new File(categoryFolder, destinyAssetName == null ? sourceFile.getName() : destinyAssetName);
-
-            //                // Check those are not the same file
-            //                if (!sourceFile.getAbsolutePath().ToLower().Equals(destinyFile.getAbsolutePath().ToLower()))
-            //                {
-
-            //                    //If is directory, copy all contents
-            //                    if (sourceFile.isDirectory())
-            //                        assetsAdded = sourceFile.copyAllTo(destinyFile);
-            //                    else
-            //                        assetsAdded = sourceFile.CopyTo(destinyFile);
-            //                }
-            //                else {
-            //                    assetsAdded = false;
-            //                    end = true;
-            //                }
-            //            }
-
-            //            // If it doesn't exist, stop loading data
-            //            else
-            //                end = true;
-            //        }
-            //    }
-            //    else if (assetsCategory == AssetsConstants.CATEGORY_ANIMATION)
-            //    {
-
-            //        Animation animation = Loader.loadAnimation(AssetsController.getInputStreamCreator(), assetPath, new EditorImageLoader());
-            //        animation.setAbsolutePath(assetPath);
-            //        File sourceFile = new File(assetPath);
-            //        File destinyFile;
-            //        // empty animation always goes to assets/special folder
-            //        if (sourceFile.getName().contains("EmptyAnimation"))
-            //        {
-            //            destinyFile = new File(Controller.getInstance().getProjectFolder() + "/" + CATEGORY_SPECIAL_ASSETS + "/" + destinyAssetName == null ? sourceFile.getName() : destinyAssetName);
-            //        }
-            //        else
-            //            destinyFile = new File(categoryFolder, destinyAssetName == null ? sourceFile.getName() : destinyAssetName);
-
-            //        if (!sourceFile.getAbsolutePath().ToLower().Equals(destinyFile.getAbsolutePath().ToLower()))
-            //        {
-            //            if (destinyFile.Exists && !Controller.getInstance().showStrictConfirmDialog( TC.get("Assets.AddAsset"),  TC.get("Assets.WarningAssetFound", destinyFile.getName())))
-            //            {
-            //                deleteAsset(assetPath, false);
-            //            }
-            //            assetsAdded = sourceFile.CopyTo(destinyFile);
-            //        }
-            //        else {
-            //            assetsAdded = true;
-            //        }
-
-            //        if (assetsAdded)
-            //        {
-            //            for (Frame frame : animation.getFrames())
-            //            {
-            //                string image = frame.getImageAbsolutePath();
-            //                sourceFile = new File(image);
-            //                destinyFile = new File(categoryFolder, sourceFile.getName());
-            //                sourceFile.CopyTo(destinyFile);
-
-            //                string sound = frame.getSoundAbsolutePath();
-            //                if (sound != null)
-            //                {
-            //                    sourceFile = new File(sound);
-            //                    destinyFile = new File(categoryFolder, sourceFile.getName());
-            //                    sourceFile.CopyTo(destinyFile);
-            //                }
-            //            }
-            //        }
-
-            //    }
-
-            //    // If it's a styled text, images associated with it have to be imported too
-            //    else if (assetsCategory == CATEGORY_STYLED_TEXT && (assetPath.EndsWith(".html") || assetPath.EndsWith(".htm")))
-            //    {
-            //        assetsAdded = addStyledText(assetPath, destinyAssetName, categoryFolder);
-            //    }
-            //    // If it is not an animation asset, just add the file
-            //    else {
-            //        // Open source file, and create destiny file in the ZIP
-            //        File sourceFile = new File(assetPath);
-            //        File destinyFile = new File(categoryFolder, destinyAssetName == null ? sourceFile.getName() : destinyAssetName);
-
-            //        // Check those are not the same file
-            //        if (!sourceFile.getAbsolutePath().ToLower().Equals(destinyFile.getAbsolutePath().ToLower()))
-            //        {
-
-            //            // Check if the asset is being overwritten, if so prompt the user for action
-            //            if (checkIfAssetExists && destinyFile.Exists && !Controller.getInstance().showStrictConfirmDialog( TC.get("Assets.AddAsset"),  TC.get("Assets.WarningAssetFound", destinyFile.getName())))
-            //            {
-            //                // If the user accepts to overwrite the asset, delete it first
-            //                deleteAsset(assetPath, false);
-            //            }
-
-            //            // Copy the data
-            //            //If is directory, copy all contents
-            //            if (sourceFile.isDirectory())
-            //                assetsAdded = sourceFile.copyAllTo(destinyFile);
-            //            else
-            //                assetsAdded = sourceFile.CopyTo(destinyFile);
-            //        }
-            //        else {
-            //            assetsAdded = true;
-            //        }
-
-            //        //If it is a video, cache it 
-            //        /*if( assetsCategory == CATEGORY_VIDEO ) {
-            //            if( !videoCache.isVideoCachedZip( getCategoryFolder( assetsCategory ) + "/" + sourceFile.getName( ) ) )
-            //                videoCache.cacheVideo( getCategoryFolder( assetsCategory ) + "/" + sourceFile.getName( ), sourceFile.getAbsolutePath( ) );
-            //        }*/
-            //    }
-            //}
-            return assetsAdded;
+                // File doesnt exist
+                returnPath = assetTypeDir + "/" + nameOnly;
+            }
+            else
+            {
+                // File already exists
+                returnPath = assetTypeDir + "/" + nameOnly;
+            }
+            return returnPath;
 
         }
 
@@ -1147,128 +1048,6 @@ namespace uAdventure.Editor
 
         private static List<string> pathsToReimport;
 
-        private static bool InitTextureImporter(TextureImporter textureImporter, bool saveInstant = false)
-        {
-            if (!textureImporter)
-                return false;
-            
-            textureImporter.isReadable = true;
-            textureImporter.npotScale = TextureImporterNPOTScale.None;
-            if (saveInstant || pathsToReimport == null)
-            {
-                textureImporter.SaveAndReimport();
-            }
-            else
-            {
-                pathsToReimport.Add(textureImporter.assetPath);
-            }
-
-            return true;
-        }
-        private static bool InitVideoClipImporter(VideoClipImporter videoClipImporter, bool saveInstant = false)
-        {
-            if (!videoClipImporter)
-                return false;
-
-            var width = videoClipImporter.GetResizeWidth(VideoResizeMode.OriginalSize);
-            var height = videoClipImporter.GetResizeHeight(VideoResizeMode.OriginalSize);
-            var ratio = width / (float)height;
-            
-            // Default for standalone
-            videoClipImporter.defaultTargetSettings = new VideoImporterTargetSettings()
-            {
-                enableTranscoding = true,
-                resizeMode = width <= 1920 || height <= 1080 ? VideoResizeMode.OriginalSize : VideoResizeMode.CustomSize,
-                customWidth = ratio > 1 ? 1920 : Mathf.FloorToInt(1080 * ratio),
-                customHeight = ratio < 1 ? 1080 : Mathf.FloorToInt(1920 / ratio),
-                aspectRatio = VideoEncodeAspectRatio.NoScaling,
-                codec = VideoCodec.Auto,
-                spatialQuality = VideoSpatialQuality.HighSpatialQuality,
-                bitrateMode = VideoBitrateMode.High
-            };
-
-
-            // Valid names: 'Default', 'Web', 'Standalone', 'iOS', 'Android', 'WebGL', 'PS4', 'PSP2', 'XBox360', 'XboxOne', 'WP8', or 'WSA'
-            // From: https://github.com/Unity-Technologies/UnityCsReference/blob/11bcfd801fccd2a52b09bb6fd636c1ddcc9f1705/artifacts/generated/bindings_old/common/Editor/VideoImporterBindings.gen.cs#L224
-            
-            // Android
-            videoClipImporter.SetTargetSettings("Android", new VideoImporterTargetSettings()
-            {
-                enableTranscoding = true,
-                resizeMode = width <= 1280 || height <= 720 ? VideoResizeMode.OriginalSize : VideoResizeMode.CustomSize,
-                customWidth = ratio > 1 ? 1280 : Mathf.FloorToInt(720 * ratio),
-                customHeight = ratio < 1 ? 720 : Mathf.FloorToInt(1280 / ratio),
-                aspectRatio = VideoEncodeAspectRatio.NoScaling,
-                codec = VideoCodec.Auto,
-                spatialQuality = VideoSpatialQuality.LowSpatialQuality,
-                bitrateMode = VideoBitrateMode.Low
-            });
-
-            // iOS
-            videoClipImporter.SetTargetSettings("iOS", new VideoImporterTargetSettings()
-            {
-                enableTranscoding = true,
-                resizeMode = width <= 1280 || height <= 720 ? VideoResizeMode.OriginalSize : VideoResizeMode.CustomSize,
-                customWidth = ratio > 1 ? 1280 : Mathf.FloorToInt(720 * ratio),
-                customHeight = ratio < 1 ? 720 : Mathf.FloorToInt(1280 / ratio),
-                aspectRatio = VideoEncodeAspectRatio.NoScaling,
-                codec = VideoCodec.Auto,
-                spatialQuality = VideoSpatialQuality.MediumSpatialQuality,
-                bitrateMode = VideoBitrateMode.Medium
-            });
-
-            if (saveInstant || pathsToReimport == null)
-            {
-                videoClipImporter.SaveAndReimport();
-            }
-            else
-            {
-                pathsToReimport.Add(videoClipImporter.assetPath);
-            }
-
-            return true;
-        }
-
-        public static bool InitImporterConfig(string path)
-        {
-            string currentDir = Directory.GetCurrentDirectory();
-            // Clean path
-            path = path.Replace(currentDir, "").Replace("\\", "/");
-            if (path.Length > 0 && path[0] == '/') path = path.Remove(0, 1);
-            if (!path.StartsWith("Assets/"))
-            {
-                Debug.LogWarning("Initing importer config for a route not starting with Assets: \"" + path + '"');
-            }
-
-            var file = new FileInfo(path);
-            if (!file.Exists)
-            {
-                Debug.LogWarning("File not found while importing: " + path);
-            }
-
-            var importer = AssetImporter.GetAtPath(path);
-            if (!importer) // If the importer doesn't exist, the asset might haven't been imported yet
-            {
-                // We import it
-                AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate); 
-                // And then the importer will be accesible
-                importer = AssetImporter.GetAtPath(path);
-                if (!importer) // But if we don't have importer yet it might be failing to import
-                {
-                    Debug.LogWarning("Failed to import: \"" + path + "\"\nPlease check the file and change the import settings manually");
-                    return false;
-                }
-            }
-            
-            if (importer is TextureImporter)
-                InitTextureImporter(importer as TextureImporter);
-
-            if (importer is VideoClipImporter)
-                InitVideoClipImporter(importer as VideoClipImporter);
-
-            return importer != null;
-        }
-
         internal static void FixImportSpecialCharacters(string assetFolder)
         {
             pathsToReimport = new List<string>();
@@ -1301,16 +1080,6 @@ namespace uAdventure.Editor
 
             foreach(var assetPath in AssetDatabase.GetAllAssetPaths().Where(path => path.StartsWith(assetFolder)))
             {
-                InitImporterConfig(assetPath); 
-                if (assetPath.Remove(0, assetFolder.Length).StartsWith("/gui/cursors/"))
-                {
-                    Debug.Log("Cursor modified!"); 
-                    // The images in the cursors folder are cursors, hence we have to change their types
-                    var cursorImporter = AssetImporter.GetAtPath(assetPath) as TextureImporter;
-                    cursorImporter.textureType = TextureImporterType.Cursor;
-                    pathsToReimport.Add(assetPath);
-                }
-
                 // In case of animation
                 if (assetPath.EndsWith(".xml"))
                 {
@@ -1427,11 +1196,6 @@ namespace uAdventure.Editor
                 string temppath = Path.Combine(destDirName, file.Name);
                 //Debug.Log("CopyTo: " + temppath);
                 file.CopyTo(temppath, false);
-                
-                if (!InitImporterConfig(temppath))
-                {
-                    Debug.LogWarning("Cannot init importer for: " + temppath);
-                }
 
                 // In case of animation
                 if (file.Extension.ToLowerInvariant() == ".eaa")
