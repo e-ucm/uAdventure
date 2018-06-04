@@ -179,6 +179,8 @@ namespace uAdventure.Editor
             private Dictionary<string, Texture2D> images;
             private Dictionary<string, Vector2> sizes;
 
+            private Texture2D noBackground;
+
             public delegate void OnSelectElementDelegate(DataControl selected);
             public event OnSelectElementDelegate OnSelectElement;
 
@@ -187,6 +189,8 @@ namespace uAdventure.Editor
             public ChapterPreview(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
             {
                 ProjectConfigData.addConsumer(this);
+
+                noBackground = Controller.ResourceManager.getImage(SpecialAssetPaths.ASSET_EMPTY_BACKGROUND);
 
                 sceneColors = new Dictionary<string, Color>();
                 positions = new Dictionary<string, Vector2>();
@@ -290,7 +294,7 @@ namespace uAdventure.Editor
                 switch (Event.current.type)
                 {
                     case EventType.Repaint:
-                        GUI.DrawTexture(rect, images[scene.getPreviewBackground()]);
+                        GUI.DrawTexture(rect, images[scene.getPreviewBackground()] ?? noBackground);
                         if (sceneList.index != -1 && Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[sceneList.index] == scene)
                         {
                             HandleUtil.DrawPolyLine(rect.ToPoints().ToArray(), true, Color.red);
@@ -422,22 +426,40 @@ namespace uAdventure.Editor
                 var background = scene.getPreviewBackground();
                 if (!sizes.ContainsKey(background))
                 {
-                    Texture2D scenePreview;
+                    Texture2D scenePreview = null;
+                    Vector2 previewSize = new Vector2(800, 600);
                     if (!images.ContainsKey(background))
                     {
                         scenePreview = Controller.ResourceManager.getImage(background);
                         images[background] = scenePreview;
                     }
                     else
+                    {
                         scenePreview = images[background];
+                    }
 
-                    sizes.Add(background, new Vector2(scenePreview.width, scenePreview.height));
-                    var pixel = scenePreview.GetPixel(scenePreview.width / 2, scenePreview.height / 2);
-                    var color = ToHSV(new Color(1f - pixel.r, 1f - pixel.g, 1f - pixel.b));
-                    color.y *= 2f;
-                    color.z *= 1.5f;
+                    if (scenePreview)
+                    {
+                        previewSize = new Vector2(scenePreview.width, scenePreview.height);
+                    }
 
-                    sceneColors[scene.getId()] = FromHSV(color);
+                    sizes.Add(background, previewSize);
+                    Color color = Color.black;
+                    try
+                    {
+                        var pixel = scenePreview.GetPixel(scenePreview.width / 2, scenePreview.height / 2);
+                        var colorAsVector = ToHSV(new Color(1f - pixel.r, 1f - pixel.g, 1f - pixel.b));
+                        colorAsVector.y *= 2f;
+                        colorAsVector.z *= 1.5f;
+                        color = FromHSV(colorAsVector);
+                    }
+                    catch
+                    {
+                        // Error getting the pixel
+                        color = UnityEngine.Random.ColorHSV(0f, 1f, 0.8f, 1f, 0.5f, 1f, 1f, 1f);
+                    }
+
+                    sceneColors[scene.getId()] = color;
                 }
 
                 return new Rect(positions[scene.getId()], sizes[background] * SceneScaling);

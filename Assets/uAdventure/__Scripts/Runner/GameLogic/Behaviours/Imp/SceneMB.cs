@@ -334,34 +334,35 @@ namespace uAdventure.Runner
                     //###################### REFERENCES ######################
                     DeleteChilds(referencesHolder);
                     // Characters
-                    foreach (ElementReference context in scene.getCharacterReferences())
-                        if (!Game.Instance.GameState.getRemovedElements().Contains(context.getTargetId()))
-                            InstanceElement<NPC>(context);
 
-                    // Items
-                    foreach (ElementReference context in scene.getItemReferences())
-                        if(!Game.Instance.GameState.getRemovedElements().Contains(context.getTargetId()))
-                            InstanceElement<Item>(context);
-
-                    // Atrezzos
-                    foreach (ElementReference context in scene.getAtrezzoReferences())
-                        if (!Game.Instance.GameState.getRemovedElements().Contains(context.getTargetId()))
-                            InstanceElement<Atrezzo>(context);
+                    foreach (var typeContext in scene.getCharacterReferences()
+                            .Select(elemRef => new { type = typeof(NPC), context = elemRef })
+                        .Union(scene.getAtrezzoReferences()
+                            .Select(elemRef => new { type = typeof(Atrezzo), context = elemRef }))
+                        .Union(scene.getItemReferences()
+                            .Select(elemRef => new { type = typeof(Item), context = elemRef }))
+                        .Where(tc => !tc.context.IsRemoved() && ConditionChecker.check(tc.context.getConditions())))
+                    {
+                        InstanceElement(typeContext.type, typeContext.context);
+                    }
 
                     //###################### ACTIVEAREAS ######################
                     DeleteChilds(activeAreasHolder);
 
-                    foreach (ActiveArea ad in scene.getActiveAreas())
-                        if (!Game.Instance.GameState.getRemovedElements().Contains(ad.getId()))
-                            if (ConditionChecker.check(ad.getConditions()))
-                                InstanceRectangle<ActiveArea>(ad);
+                    foreach (var activeArea in scene.getActiveAreas().NotRemoved()
+                        .Where(a => ConditionChecker.check(a.getConditions())))
+                    {
+                        InstanceRectangle<ActiveArea>(activeArea);
+                    }
 
                     //###################### EXITS ######################
                     DeleteChilds(exitsHolder);
 
-                    foreach (Exit exit in scene.getExits())
-                        if (exit.isHasNotEffects() || ConditionChecker.check(exit.getConditions()))
-                            InstanceRectangle<Exit>(exit);
+                    foreach (var exit in scene.getExits()
+                        .Where(e => e.isHasNotEffects() || ConditionChecker.check(e.getConditions())))
+                    {
+                        InstanceRectangle<Exit>(exit);
+                    }
 
 
                     if (!Game.Instance.GameState.IsFirstPerson && scene.isAllowPlayerLayer())
@@ -437,8 +438,21 @@ namespace uAdventure.Runner
 
         private void InstanceElement<T>(ElementReference context) where T : Element
         {
-            if (!ConditionChecker.check(context.getConditions()))
+            InstanceElement(typeof(T), context);
+        }
+
+        private void InstanceElement(Type type, ElementReference context)
+        {
+            if (!typeof(Element).IsAssignableFrom(type))
+            {
+                Debug.LogError("Trying to instance a non-element");
                 return;
+            }
+
+            if (!ConditionChecker.check(context.getConditions()))
+            {
+                return;
+            }
 
             if (!localContexts.ContainsKey(context))
             {
@@ -456,19 +470,19 @@ namespace uAdventure.Runner
             Transform parent;
             Element element;
 
-            if (typeof(T) == typeof(Atrezzo))
+            if (type == typeof(Atrezzo))
             {
                 basePrefab = atrezzoPrefab;
                 parent = referencesHolder;
                 element = Game.Instance.GameState.getAtrezzo(localContext.getTargetId());
             }
-            else if (typeof(T) == typeof(NPC))
+            else if (type == typeof(NPC))
             {
                 basePrefab = characterPrefab;
                 parent = referencesHolder;
                 element = Game.Instance.GameState.getCharacter(localContext.getTargetId());
             }
-            else if (typeof(T) == typeof(Item))
+            else if (type == typeof(Item))
             {
                 basePrefab = objectPrefab;
                 parent = referencesHolder;
@@ -535,8 +549,11 @@ namespace uAdventure.Runner
         {
             if (background)
             {
-                var size = new Vector2(texture.width, texture.height);
-                background.GetComponent<Renderer>().material.mainTexture = texture;
+                var size = texture ? new Vector2(texture.width, texture.height) : new Vector2(Screen.width, Screen.height);
+                if (texture)
+                {
+                    background.GetComponent<Renderer>().material.mainTexture = texture;
+                }
                 background.localScale = ToWorldSize(size);
                 background.localPosition = ToWorldPosition(Vector2.zero, size, ScenePivot, 20);
                 transform.localScale = (Vector3) (Vector2.one * (PixelsSceneHeight / size.y)) + new Vector3(0, 0, 1);
