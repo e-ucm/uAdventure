@@ -88,19 +88,19 @@ public class DescriptionsEditor : Editor {
         nameField = new TextWithSoundField()
         {
             Label = TC.get("Item.Name"),
-            FileType = BaseFileOpenDialog.FileType.ITEM_DESCRIPTION_NAME_SOUND
+            FileType = FileType.ITEM_DESCRIPTION_NAME_SOUND
         };
 
         briefField = new TextWithSoundField()
         {
             Label = TC.get("Item.Description"),
-            FileType = BaseFileOpenDialog.FileType.ITEM_DESCRIPTION_BRIEF_SOUND
+            FileType = FileType.ITEM_DESCRIPTION_BRIEF_SOUND
         };
 
         fullField = new TextWithSoundField()
         {
             Label = TC.get("Item.DetailedDescription"),
-            FileType = BaseFileOpenDialog.FileType.ITEM_DESCRIPTION_DETAILED_SOUND
+            FileType = FileType.ITEM_DESCRIPTION_DETAILED_SOUND
         };
 
     }

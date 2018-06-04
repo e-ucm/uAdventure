@@ -32,7 +32,7 @@ namespace uAdventure.Editor
         {
             audioField = new FileChooser()
             {
-                FileType = BaseFileOpenDialog.FileType.PLAY_SOUND_EFFECT
+                FileType = FileType.PLAY_SOUND_EFFECT
             };
             this.effect = new SpeakPlayerEffect("");
         }

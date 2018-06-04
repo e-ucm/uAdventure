@@ -33,7 +33,7 @@ namespace uAdventure.Editor
             image = new FileChooser()
             {
                 Label = TC.get("Resources.DescriptionItemImage"),
-                FileType = BaseFileOpenDialog.FileType.SET_ITEM_IMAGE
+                FileType = FileType.SET_ITEM_IMAGE
             };
         }
 
@@ -64,7 +64,7 @@ namespace uAdventure.Editor
         {
             var elem = Target != null ? Target as AtrezzoDataControl : Controller.Instance.SelectedChapterDataControl.getAtrezzoList().getAtrezzoList()[GameRources.GetInstance().selectedSetItemIndex];
             var imagePath = elem.getPreviewImage();
-            var imageTex = string.IsNullOrEmpty(imagePath) ? null : AssetsController.getImage(imagePath).texture;
+            var imageTex = string.IsNullOrEmpty(imagePath) ? null : Controller.ResourceManager.getImage(imagePath);
 
             GUI.DrawTexture(rect, imageTex, ScaleMode.ScaleToFit);
         }
@@ -72,7 +72,7 @@ namespace uAdventure.Editor
         public override void OnRender(Rect viewport)
         {
             var imagePath = (Target as AtrezzoDataControl).getPreviewImage();
-            var imageTex = string.IsNullOrEmpty(imagePath) ? null : AssetsController.getImage(imagePath).texture;
+            var imageTex = string.IsNullOrEmpty(imagePath) ? null : Controller.ResourceManager.getImage(imagePath);
 
             var rect = GetViewportRect(new Rect(new Vector2(-0.5f * imageTex.width, -imageTex.height), new Vector2(imageTex.width, imageTex.height)), viewport);
             GUI.DrawTexture(rect, imageTex, ScaleMode.ScaleToFit);
@@ -81,7 +81,7 @@ namespace uAdventure.Editor
         private void RefreshPathInformation(DataControlWithResources data)
         {
             var imagePath = (data as AtrezzoDataControl).getPreviewImage();
-            imageTex = string.IsNullOrEmpty(imagePath) ? null : AssetsController.getImage(imagePath).texture;
+            imageTex = string.IsNullOrEmpty(imagePath) ? null : Controller.ResourceManager.getImage(imagePath);
         }
     }
 }

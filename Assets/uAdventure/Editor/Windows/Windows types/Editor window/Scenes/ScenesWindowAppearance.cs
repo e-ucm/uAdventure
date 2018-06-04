@@ -27,19 +27,20 @@ namespace uAdventure.Editor
             background = new FileChooser()
             {
                 Label = TC.get("Resources.DescriptionSceneBackground"),
-                FileType = BaseFileOpenDialog.FileType.SCENE_BACKGROUND
+                FileType = FileType.SCENE_BACKGROUND,
+                Empty = SpecialAssetPaths.ASSET_EMPTY_BACKGROUND
             };
 
             foreground = new FileChooser()
             {
                 Label = TC.get("Resources.DescriptionSceneForeground"),
-                FileType = BaseFileOpenDialog.FileType.SCENE_FOREGROUND
+                FileType = FileType.SCENE_FOREGROUND
             };
 
             music = new FileChooser()
             {
                 Label = TC.get("Resources.DescriptionSceneMusic"),
-                FileType = BaseFileOpenDialog.FileType.SCENE_MUSIC
+                FileType = FileType.SCENE_MUSIC
             };
         }
 

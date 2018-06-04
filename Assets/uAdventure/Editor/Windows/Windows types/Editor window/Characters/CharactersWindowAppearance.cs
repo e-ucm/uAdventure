@@ -129,7 +129,7 @@ namespace uAdventure.Editor
                 fields[animationType] = new AnimationField()
                 {
                     Label = TC.get(fieldNames[animationType]),
-                    FileType = BaseFileOpenDialog.FileType.CHARACTER_ANIM
+                    FileType = FileType.CHARACTER_ANIM
                 };
             }
         }

@@ -184,7 +184,7 @@ namespace uAdventure.Editor
          */
         public bool setKeyboardNavigation(bool enabled)
         {
-            return Controller.Instance.addTool(new ChangeBooleanValueTool(adventureData, enabled, "isKeyboardNavigationEnabled", "setKeyboardNavigation"));
+            return Controller.Instance.AddTool(new ChangeBooleanValueTool(adventureData, enabled, "isKeyboardNavigationEnabled", "setKeyboardNavigation"));
         }
 
         /**
@@ -197,7 +197,7 @@ namespace uAdventure.Editor
         {
 
             Tool tool = new ChangeTitleTool(adventureData, title);
-            Controller.Instance.addTool(tool);
+            Controller.Instance.AddTool(tool);
         }
 
         /**
@@ -210,7 +210,7 @@ namespace uAdventure.Editor
         {
 
             Tool tool = new ChangeDescriptionTool(adventureData, description);
-            Controller.Instance.addTool(tool);
+            Controller.Instance.AddTool(tool);
         }
 
         /**
@@ -240,7 +240,7 @@ namespace uAdventure.Editor
         {
 
             Tool tool = new ChangeIntegerValueTool(adventureData, playerMode, "getPlayerMode", "setPlayerMode");
-            Controller.Instance.addTool(tool);
+            Controller.Instance.AddTool(tool);
         }
 
         public List<CustomCursor> getCursors()
@@ -295,7 +295,7 @@ namespace uAdventure.Editor
             }
             if (position >= 0)
             {
-                Controller.Instance.addTool(new DeleteCursorTool(adventureData, position));
+                Controller.Instance.AddTool(new DeleteCursorTool(adventureData, position));
             }
         }
 
@@ -304,7 +304,7 @@ namespace uAdventure.Editor
 
             //try
             //{
-            Controller.Instance.addTool(new SelectCursorPathTool(adventureData, t));
+            Controller.Instance.AddTool(new SelectCursorPathTool(adventureData, t));
             //}
             //catch (CloneNotSupportedException e)
             //{
@@ -339,7 +339,7 @@ namespace uAdventure.Editor
             }
             if (position >= 0)
             {
-                Controller.Instance.addTool(new DeleteArrowTool(adventureData, position));
+                Controller.Instance.AddTool(new DeleteArrowTool(adventureData, position));
             }
         }
 
@@ -414,7 +414,7 @@ namespace uAdventure.Editor
         {
 
             Tool tool = new ChangeBooleanValueTool(adventureData, commentaries, "isCommentaries", "setCommentaries");
-            Controller.Instance.addTool(tool);
+            Controller.Instance.AddTool(tool);
         }
 
         public bool isKeepShowing()
@@ -437,7 +437,7 @@ namespace uAdventure.Editor
         {
 
             Tool tool = new ChangeBooleanValueTool(adventureData, keepShowing, "isKeepShowing", "setKeepShowing");
-            Controller.Instance.addTool(tool);
+            Controller.Instance.AddTool(tool);
         }
 
         public int getGraphicConfig()
@@ -450,7 +450,7 @@ namespace uAdventure.Editor
         {
 
             Tool tool = new ChangeIntegerValueTool(adventureData, graphicConfig, "getGraphicConfig", "setGraphicConfig");
-            Controller.Instance.addTool(tool);
+            Controller.Instance.AddTool(tool);
         }
 
         /**
@@ -476,7 +476,7 @@ namespace uAdventure.Editor
         public void deleteButton(string action, string type)
         {
 
-            Controller.Instance.addTool(new DeleteButtonTool(adventureData, action, type));
+            Controller.Instance.AddTool(new DeleteButtonTool(adventureData, action, type));
         }
 
         public void editButtonPath(string action, string type)
@@ -484,7 +484,7 @@ namespace uAdventure.Editor
 
             //try
             //{
-            Controller.Instance.addTool(new SelectButtonTool(adventureData, action, type));
+            Controller.Instance.AddTool(new SelectButtonTool(adventureData, action, type));
             //}
             //catch (CloneNotSupportedException e)
             //{
@@ -496,7 +496,7 @@ namespace uAdventure.Editor
         {
             //try
             //{
-            Controller.Instance.addTool(new SelectArrowTool(adventureData, type));
+            Controller.Instance.AddTool(new SelectArrowTool(adventureData, type));
             //}
             //catch (CloneNotSupportedException e)
             //{
@@ -513,7 +513,7 @@ namespace uAdventure.Editor
         public void setInventoryPosition(int inventoryPosition)
         {
 
-            Controller.Instance.addTool(new ChangeIntegerValueTool(adventureData, inventoryPosition, "getInventoryPosition", "setInventoryPosition"));
+            Controller.Instance.AddTool(new ChangeIntegerValueTool(adventureData, inventoryPosition, "getInventoryPosition", "setInventoryPosition"));
         }
 
         public int countAssetReferences(string assetPath)
@@ -545,7 +545,7 @@ namespace uAdventure.Editor
         {
 
             Tool tool = new ChangeIntegerValueTool(adventureData, optionSelected, "getGUIType", "setGUIType");
-            Controller.Instance.addTool(tool);
+            Controller.Instance.AddTool(tool);
 
         }
 

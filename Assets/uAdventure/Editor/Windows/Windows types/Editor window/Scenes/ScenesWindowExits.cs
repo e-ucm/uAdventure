@@ -157,13 +157,14 @@ namespace uAdventure.Editor
                 displayField = new TextWithSoundField()
                 {
                     Label = TC.get("Exit.ExitText"),
-                    FileType = BaseFileOpenDialog.FileType.EXIT_MUSIC
+                    FileType = FileType.EXIT_MUSIC
                 };
                 
                 cursorField = new FileChooser()
                 {
                     Label = TC.get("Cursor.exit.Description"),
-                    FileType = BaseFileOpenDialog.FileType.EXIT_ICON
+                    FileType = FileType.EXIT_ICON,
+                    Empty = SpecialAssetPaths.ASSET_EMPTY_ICON
                 };
             }
 

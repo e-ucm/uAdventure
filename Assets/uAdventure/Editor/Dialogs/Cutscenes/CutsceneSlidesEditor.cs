@@ -215,7 +215,7 @@ namespace uAdventure.Editor
             {
                 ImageFileOpenDialog imageDialog =
                     (ImageFileOpenDialog)ScriptableObject.CreateInstance(typeof(ImageFileOpenDialog));
-                imageDialog.Init(this, BaseFileOpenDialog.FileType.FRAME_IMAGE);
+                imageDialog.Init(this, FileType.FRAME_IMAGE);
             }
             EditorGUILayout.EndHorizontal();
             EditorGUILayout.BeginHorizontal();
@@ -228,7 +228,7 @@ namespace uAdventure.Editor
             {
                 MusicFileOpenDialog musicDialog =
                     (MusicFileOpenDialog)ScriptableObject.CreateInstance(typeof(MusicFileOpenDialog));
-                musicDialog.Init(this, BaseFileOpenDialog.FileType.FRAME_MUSIC);
+                musicDialog.Init(this, FileType.FRAME_MUSIC);
             }
             EditorGUILayout.EndHorizontal();
 
@@ -340,14 +340,14 @@ namespace uAdventure.Editor
 
         public void OnDialogOk(string message, object workingObject = null, object workingObjectSecond = null)
         {
-            if (workingObject is BaseFileOpenDialog.FileType)
+            if (workingObject is FileType)
             {
-                switch ((BaseFileOpenDialog.FileType)workingObject)
+                switch ((FileType)workingObject)
                 {
-                    case BaseFileOpenDialog.FileType.FRAME_IMAGE:
+                    case FileType.FRAME_IMAGE:
                         OnFrameImageChanged(message);
                         break;
-                    case BaseFileOpenDialog.FileType.FRAME_MUSIC:
+                    case FileType.FRAME_MUSIC:
                         OnFrameMusicChanged(message);
                         break;
                 }

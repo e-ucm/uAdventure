@@ -558,7 +558,7 @@ namespace uAdventure.Editor
                 return false;
 
             return
-                Controller.Instance                    .addTool(new AddConditionTool(conditions, index1, index2, conditionType, conditionId, conditionState,
+                Controller.Instance                    .AddTool(new AddConditionTool(conditions, index1, index2, conditionType, conditionId, conditionState,
                         value));
         }
 
@@ -859,7 +859,7 @@ namespace uAdventure.Editor
         public void clearConditions()
         {
 
-            Controller.Instance.addTool(new ClearConditionsTool(conditions));
+            Controller.Instance.AddTool(new ClearConditionsTool(conditions));
 
         }
     }

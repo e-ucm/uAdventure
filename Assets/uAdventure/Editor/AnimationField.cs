@@ -8,6 +8,11 @@ public class AnimationField : FileChooser {
 
     const string EMPTY = "assets/special/EmptyAnimation";
 
+    public AnimationField()
+    {
+        Empty = EMPTY;
+    }
+
     public override void DoLayout(params GUILayoutOption[] options)
     {
         var initialPath = Path;
@@ -40,20 +45,6 @@ public class AnimationField : FileChooser {
             else
             {
                 EditCutscene();
-            }
-        }
-    }
-
-    protected override void drawClear()
-    {
-        if (ShowClear)
-        {
-            using (new EditorGUI.DisabledScope(EMPTY.Equals(Path)))
-            {
-                if (GUILayout.Button(delTex, GUILayout.Width(delTex.width + 10f)))
-                {
-                    Path = EMPTY;
-                }
             }
         }
     }
