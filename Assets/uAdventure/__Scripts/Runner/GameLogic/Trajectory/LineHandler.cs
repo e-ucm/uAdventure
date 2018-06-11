@@ -60,21 +60,8 @@ namespace uAdventure.Runner
 
         public bool contains(Vector2 v)
         {
-            bool ret = false;
-            float x = function.getX(v.y), y = function.getY(v.x);
-            
-            if (
-                (v.x >= min_x && v.x <= max_x)
-                &&
-                (v.y >= min_y && v.y <= max_y)
-                &&
-                (float.IsNaN(x) || (v.x >= (x - 0.01) && v.x <= (x + 0.01)))
-                &&
-                (float.IsNaN(y) || (v.y >= (y - 0.01) && v.y <= (y + 0.01)))
-            )
-                ret = true;
-
-            return ret;
+            var closest = closestPoint(v);
+            return (closest - v).sqrMagnitude < 0.001f;
         }
 
         public bool containsNode(Trajectory.Node node)
