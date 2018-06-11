@@ -22,11 +22,12 @@ namespace uAdventure.Runner
 
         protected override Rectangle GetInteractionArea(SceneMB sceneMB)
         {
+            var size = representable.Size;
             var context = representable.Context;
-            var texture = representable.Texture;
+
+            var topLeft = new Vector2(context.getX() - size.x / 2f, context.getY() - size.y);
+            Rectangle area = new InfluenceArea((int)topLeft.x - 20, (int)topLeft.y - 20, (int)size.x + 40, (int)size.y + 40);
             var scene = sceneMB.SceneData as Scene;
-            var topLeft = new Vector2(context.getX() - texture.width / 2f, context.getY() - texture.height);
-            Rectangle area = new InfluenceArea((int)topLeft.x - 20, (int)topLeft.y - 20, texture.width + 40, texture.height + 40);
             if (scene != null && scene.getTrajectory() == null)
             {
                 // If no trajectory I have to move the area to the trajectory for it to be connected

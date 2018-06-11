@@ -21,20 +21,15 @@ namespace uAdventure.Runner
 
         private Element element;
         private Renderer rend;
-        private ElementReference context;
         private ResourcesUni resource;
         protected float deformation;
         protected bool mirror;
-        protected Orientation orientation = Orientation.O;
-
-        private SceneMB scene;
 
         // Texture
         private int hasovertex = -1;
         private Texture2D texture;
 
         private string then = null;
-        private eAnim anim;
         private int currentFrame;
         private float currentFrameDuration = 0.5f;
         private float timeElapsedInCurrentFrame = 0;
@@ -43,6 +38,10 @@ namespace uAdventure.Runner
 #endregion Attributes
 
 #region Properties
+        public eAnim Animation { get; set; }
+        public SceneMB Scene { get; set; }
+        public ElementReference Context { get; set; }
+        public Orientation Orientation { get; set; }
 
         public Texture2D Texture
         {
@@ -56,16 +55,19 @@ namespace uAdventure.Runner
                 }
             }
         }
-        public eAnim Animation
-        {
-            get { return anim; }
-            set { anim = value; }
-        }
 
-        public SceneMB Scene
+        public Vector2 Size
         {
-            get { return scene; }
-            set { scene = value; }
+            get
+            {
+                Vector2 size = new Vector2(50, 50);
+                if (Texture)
+                {
+                    size = new Vector2(texture.width, texture.height);
+                }
+                return size * Context.getScale();
+
+            }
         }
 
         public float Z
@@ -95,20 +97,15 @@ namespace uAdventure.Runner
                 //deformation = -0.01f * FindObjectsOfType(this.GetType()).Length;
             }
         }
-        public ElementReference Context
-        {
-            get { return context; }
-            set { context = value; }
-        }
 
-        public Orientation Orientation
-        {
-            get { return orientation; }
-            set { orientation = value; }
-        }
 
 
         #endregion Properties
+
+        protected void Awake()
+        {
+            Orientation = Orientation.O;
+        }
 
         protected virtual void Start()
         {
@@ -130,9 +127,11 @@ namespace uAdventure.Runner
 
         public void Adaptate()
         {
-            rend.material.mainTexture = texture;
-            Vector2 tmpSize = texture ? new Vector2(texture.width, texture.height) : new Vector2(50,50);
-            var worldSize = scene.ToWorldSize(tmpSize * context.getScale());
+            if (texture)
+            {
+                rend.material.mainTexture = texture;
+            }
+            var worldSize = Scene.ToWorldSize(Size);
             // Mirror
             worldSize.Scale(new Vector3((mirror ? -1 : 1), 1, 1));
             // Set
@@ -141,29 +140,17 @@ namespace uAdventure.Runner
 
         public void Positionate()
         {
-            if(!rend)
+            if (!rend)
+            {
                 rend = this.GetComponent<Renderer>();
+            }
 
-            var texture = rend.material.mainTexture;
-            Vector2 tmpSize = texture ? new Vector2(texture.width, texture.height) * context.getScale(): new Vector2(50,50);
-            Vector2 tmpPos = new Vector2(context.getX(), context.getY());
-
-            transform.localPosition = scene.ToWorldPosition(tmpPos, tmpSize, RepresentablePivot, z);
-        }
-
-        public float getHeight()
-        {
-            return this.GetComponent<Renderer>().material.mainTexture.height * context.getScale();
-        }
-
-        public Texture2D getTexture()
-        {
-            return (Texture2D)rend.material.mainTexture;
+            transform.localPosition = Scene.ToWorldPosition(getPosition(), Size, RepresentablePivot, z);
         }
 
         public void setPosition(Vector2 position)
         {
-            this.context.setPosition((int) position.x, (int) position.y);
+            Context.setPosition((int) position.x, (int) position.y);
             Positionate();
         }
 
@@ -171,39 +158,27 @@ namespace uAdventure.Runner
         //################ TEXTURE PART ################
         //##############################################
 
-        protected void LoadTexture(string uri)
+        protected Texture2D LoadTexture(string uri)
         {
-            texture = Game.Instance.ResourceManager.getImage(resource.getAssetPath(uri));
+            return Game.Instance.ResourceManager.getImage(resource.getAssetPath(uri));
         }
 
         public void SetTexture(string uri)
         {
-            texture = Game.Instance.ResourceManager.getImage(resource.getAssetPath(uri));
+            texture = LoadTexture(uri);
             Adaptate();
             Positionate();
         }
 
-        protected bool hasOverSprite()
-        {
-            if (hasovertex == -1)
-                hasovertex = resource.getAssetPath(Item.RESOURCE_TYPE_IMAGEOVER) != null ? 1 : 0;
-
-            return hasovertex == 1;
-        }
-
-        private string orientationToText(Orientation orientation)
+        private string OrientationToText(Orientation orientation)
         {
             switch (orientation)
             {
-                case Orientation.N:
-                    return "up";
-                case Orientation.E:
-                    return "right";
-                case Orientation.O:
-                    return "left";
                 default:
-                case Orientation.S:
-                    return "down";
+                case Orientation.S: return "down";
+                case Orientation.N: return "up";
+                case Orientation.E: return "right";
+                case Orientation.O: return "left";
             }
 
         }
@@ -232,20 +207,20 @@ namespace uAdventure.Runner
             string uri = animation;
             switch (animation)
             {
-                case "speak": uri = "speak" + orientationToText(orientation); break;
-                case "walk":  uri = "walk"  + orientationToText(orientation); break;
-                case "use":   uri = "use"   + orientationToText(orientation); break;
-                case "stand": uri = "stand" + orientationToText(orientation); break;
+                case "speak": uri = "speak" + OrientationToText(Orientation); break;
+                case "walk":  uri = "walk"  + OrientationToText(Orientation); break;
+                case "use":   uri = "use"   + OrientationToText(Orientation); break;
+                case "stand": uri = "stand" + OrientationToText(Orientation); break;
                 case "actionAnimation":
+                    if(Orientation == Orientation.O)
                     {
-                        if(orientation == Orientation.O)
-                            uri = "actionAnimation" + orientationToText(orientation);
+                        uri = "actionAnimation" + OrientationToText(Orientation);
                     }
                     break;
             }
             this.then = then;
 
-            return setAnimation(uri);
+            return SetAnimation(uri);
         }
         
         private Orientation getAnimationOrientation(string uri)
@@ -287,7 +262,7 @@ namespace uAdventure.Runner
             return orientation;
         }
 
-        private string getMirrorUri(string uri)
+        private string GetMirrorURI(string uri)
         {
             string mirror = uri;
             switch (uri)
@@ -318,19 +293,19 @@ namespace uAdventure.Runner
             return mirror;
         }
 
-        private bool isMirrorable(string uri)
+        private bool IsMirrorable(string uri)
         {
-            return getMirrorUri(uri) != null;
+            return GetMirrorURI(uri) != null;
         }
 
-        protected bool LoadAnimation(string uri)
+        protected eAnim LoadAnimation(string uri)
         {
-            anim = Game.Instance.ResourceManager.getAnimation(resource.getAssetPath(uri));
+            var anim = Game.Instance.ResourceManager.getAnimation(resource.getAssetPath(uri));
             mirror = false;
 
-            if ((anim == null || anim.Animation == null || anim.Animation.isEmptyAnimation()) && isMirrorable(uri))
+            if ((anim == null || anim.Animation == null || anim.Animation.isEmptyAnimation()) && IsMirrorable(uri))
             {
-                anim = Game.Instance.ResourceManager.getAnimation(resource.getAssetPath(getMirrorUri(uri)));
+                anim = Game.Instance.ResourceManager.getAnimation(resource.getAssetPath(GetMirrorURI(uri)));
                 mirror = true;
 
                 if(anim == null)
@@ -339,65 +314,63 @@ namespace uAdventure.Runner
                 }
             }
 
-            return anim != null;
+            return anim;
         }
 
-        protected bool setAnimation(string uri)
+        protected bool SetAnimation(string uri)
         {
             timeElapsedInCurrentFrame = 0;
-            var loaded = LoadAnimation(uri);
-            if (loaded)
+            var animationLoaded = LoadAnimation(uri);
+            if (animationLoaded != null)
             {
-                setFrame(0);
+                Animation = animationLoaded;
+                SetFrame(0);
                 Positionate();
             }
-            return loaded;
+            return animationLoaded != null;
         }
 
-        protected void setFrame(int framenumber)
+        protected void SetFrame(int framenumber)
         {
-            if(anim != null)
+            if(Animation != null)
             {
-                currentFrame = framenumber % anim.frames.Count;
-                texture = anim.frames[currentFrame].Image;
-                currentFrameDuration = anim.frames[currentFrame].Duration / 1000f;
+                currentFrame = framenumber % Animation.frames.Count;
+                texture = Animation.frames[currentFrame].Image;
+                currentFrameDuration = Animation.frames[currentFrame].Duration / 1000f;
                 Adaptate();
             }
         }
 
-        private void nextFrame()
+        private void NextFrame()
         {
-            timeElapsedInCurrentFrame -= currentFrameDuration;
-            ++currentFrame;
-            if (!string.IsNullOrEmpty(then) && currentFrame == anim.frames.Count)
+            if (Animation != null)
             {
-                Play(then);
+                timeElapsedInCurrentFrame -= currentFrameDuration;
+                currentFrame++;
+                if (!string.IsNullOrEmpty(then) && currentFrame == Animation.frames.Count)
+                {
+                    Play(then);
+                }
+                SetFrame(currentFrame);
             }
-            setFrame(currentFrame);
         }
 
         protected virtual void Update()
         {
-            if(anim != null)
+            if(Animation != null)
             {
                 timeElapsedInCurrentFrame += Time.deltaTime;
 
                 if (timeElapsedInCurrentFrame >= currentFrameDuration)
                 {
-                    this.nextFrame();
+                    this.NextFrame();
                 }
             }
         }
 
         public Vector2 getPosition()
         {
-            return new Vector2(context.getX(), context.getY());
-        }
-
-        public void Traslate(Vector2 position)
-        {
-            this.context.setPosition((int)position.x, (int)position.y);
-            Positionate();
+            return new Vector2(Context.getX(), Context.getY());
         }
     }
 }

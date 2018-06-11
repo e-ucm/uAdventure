@@ -3,10 +3,41 @@
 <eAdventure>
   <player>
     <resources name="No name">
-      <asset type="standup" uri="assets/special/EmptyAnimation" />
-      <asset type="standdown" uri="assets/special/EmptyAnimation" />
-      <asset type="standright" uri="assets/special/EmptyAnimation" />
+      <asset type="standup" uri="assets/animation/AlexIdleUp.eaa.xml" />
+      <asset type="standdown" uri="assets/animation/AlexIdleUp.eaa.xml" />
+      <asset type="standright" uri="assets/animation/AlexIdleRight.eaa.xml" />
       <asset type="standleft" uri="assets/special/EmptyAnimation" />
+      <asset type="speakup" uri="assets/animation/AlexIdleUp.eaa.xml" />
+      <asset type="speakdown" uri="assets/animation/AlexIdleUp.eaa.xml" />
+      <asset type="speakright" uri="assets/animation/AlexIdleRight.eaa.xml" />
+      <asset type="speakleft" uri="assets/special/EmptyAnimation" />
+      <asset type="useright" uri="assets/special/EmptyAnimation" />
+      <asset type="useleft" uri="assets/special/EmptyAnimation" />
+      <asset type="walkup" uri="assets/animation/AlexWalkingUp.eaa.xml" />
+      <asset type="walkdown" uri="assets/animation/AlexWalkingUp.eaa.xml" />
+      <asset type="walkright" uri="assets/animation/AlexWalkingRight.eaa.xml" />
+      <asset type="walkleft" uri="assets/special/EmptyAnimation" />
+    </resources>
+    <textcolor showsSpeechBubble="no" bubbleBkgColor="#FFFFFF" bubbleBorderColor="#000000">
+      <frontcolor color="#FF9900" />
+      <bordercolor color="#000000" />
+    </textcolor>
+    <description>
+      <name>
+      </name>
+      <brief>
+      </brief>
+      <detailed>
+      </detailed>
+    </description>
+    <voice name="" synthesizeAlways="no" />
+  </player>
+  <character id="AlexIntro">
+    <resources name="No name">
+      <asset type="standup" uri="assets/animation/AlexIdleUp.eaa.xml" />
+      <asset type="standdown" uri="assets/animation/AlexIdleUp.eaa.xml" />
+      <asset type="standright" uri="assets/animation/AlexIdleUp.eaa.xml" />
+      <asset type="standleft" uri="assets/animation/AlexIdleUp.eaa.xml" />
       <asset type="speakup" uri="assets/special/EmptyAnimation" />
       <asset type="speakdown" uri="assets/special/EmptyAnimation" />
       <asset type="speakright" uri="assets/special/EmptyAnimation" />
@@ -31,15 +62,955 @@
       </detailed>
     </description>
     <voice name="" synthesizeAlways="no" />
-  </player>
-  <scene id="SceneId" start="yes" playerLayer="-1" playerScale="1" class="accesible" type="area">
+  </character>
+  <character id="Alison">
+    <resources name="No name">
+      <asset type="standup" uri="assets/animation/AlisonLookingDown.eaa.xml" />
+      <asset type="standdown" uri="assets/animation/AlisonLookingDown.eaa.xml" />
+      <asset type="standright" uri="assets/animation/AlisonLookingDown.eaa.xml" />
+      <asset type="standleft" uri="assets/animation/AlisonLookingDown.eaa.xml" />
+      <asset type="speakup" uri="assets/animation/AlisonLookingDown.eaa.xml" />
+      <asset type="speakdown" uri="assets/animation/AlisonLookingDown.eaa.xml" />
+      <asset type="speakright" uri="assets/animation/AlisonLookingDown.eaa.xml" />
+      <asset type="speakleft" uri="assets/animation/AlisonLookingDown.eaa.xml" />
+      <asset type="useright" uri="assets/special/EmptyAnimation" />
+      <asset type="useleft" uri="assets/special/EmptyAnimation" />
+      <asset type="walkup" uri="assets/special/EmptyAnimation" />
+      <asset type="walkdown" uri="assets/special/EmptyAnimation" />
+      <asset type="walkright" uri="assets/special/EmptyAnimation" />
+      <asset type="walkleft" uri="assets/special/EmptyAnimation" />
+    </resources>
+    <textcolor showsSpeechBubble="no" bubbleBkgColor="#FFFFFF" bubbleBorderColor="#000000">
+      <frontcolor color="#FF00F7" />
+      <bordercolor color="#000000" />
+    </textcolor>
+    <description>
+      <name>
+      </name>
+      <brief>
+      </brief>
+      <detailed>
+      </detailed>
+    </description>
+    <voice name="" synthesizeAlways="no" />
+    <actions>
+      <talk-to needsGoTo="yes" keepDistance="35" not-effects="no">
+        <effect>
+          <trigger-conversation idTarget="AlisonDeberes" />
+          <condition />
+        </effect>
+      </talk-to>
+    </actions>
+  </character>
+  <character id="Ana">
+    <resources name="No name">
+      <asset type="standup" uri="assets/animation/MariaIdleUp.eaa.xml" />
+      <asset type="standdown" uri="assets/animation/MariaIdleUp.eaa.xml" />
+      <asset type="standright" uri="assets/animation/MariaIdleUp.eaa.xml" />
+      <asset type="standleft" uri="assets/animation/MariaIdleUp.eaa.xml" />
+      <asset type="speakup" uri="assets/animation/MariaIdleUp.eaa.xml" />
+      <asset type="speakdown" uri="assets/animation/MariaIdleUp.eaa.xml" />
+      <asset type="speakright" uri="assets/animation/MariaIdleUp.eaa.xml" />
+      <asset type="speakleft" uri="assets/animation/MariaIdleUp.eaa.xml" />
+      <asset type="useright" uri="assets/special/EmptyAnimation" />
+      <asset type="useleft" uri="assets/special/EmptyAnimation" />
+      <asset type="walkup" uri="assets/special/EmptyAnimation" />
+      <asset type="walkdown" uri="assets/special/EmptyAnimation" />
+      <asset type="walkright" uri="assets/special/EmptyAnimation" />
+      <asset type="walkleft" uri="assets/special/EmptyAnimation" />
+    </resources>
+    <textcolor showsSpeechBubble="no" bubbleBkgColor="#FFFFFF" bubbleBorderColor="#000000">
+      <frontcolor color="#FFFFFF" />
+      <bordercolor color="#000000" />
+    </textcolor>
+    <description>
+      <name>
+      </name>
+      <brief>
+      </brief>
+      <detailed>
+      </detailed>
+    </description>
+    <voice name="" synthesizeAlways="no" />
+    <actions>
+      <talk-to needsGoTo="yes" keepDistance="35" not-effects="no">
+        <effect>
+          <trigger-conversation idTarget="AnaDeberes" />
+          <condition />
+        </effect>
+      </talk-to>
+    </actions>
+  </character>
+  <character id="Maria">
+    <resources name="No name">
+      <asset type="standup" uri="assets/animation/AnaLookingUp.eaa.xml" />
+      <asset type="standdown" uri="assets/animation/AnaLookingDown.eaa.xml" />
+      <asset type="standright" uri="assets/animation/AnaLookingDown.eaa.xml" />
+      <asset type="standleft" uri="assets/special/EmptyAnimation" />
+      <asset type="speakup" uri="assets/animation/AnaLookingDown.eaa.xml" />
+      <asset type="speakdown" uri="assets/animation/AnaLookingDown.eaa.xml" />
+      <asset type="speakright" uri="assets/animation/AnaLookingDown.eaa.xml" />
+      <asset type="speakleft" uri="assets/animation/AnaLookingDown.eaa.xml" />
+      <asset type="useright" uri="assets/special/EmptyAnimation" />
+      <asset type="useleft" uri="assets/special/EmptyAnimation" />
+      <asset type="walkup" uri="assets/special/EmptyAnimation" />
+      <asset type="walkdown" uri="assets/special/EmptyAnimation" />
+      <asset type="walkright" uri="assets/special/EmptyAnimation" />
+      <asset type="walkleft" uri="assets/special/EmptyAnimation" />
+    </resources>
+    <textcolor showsSpeechBubble="no" bubbleBkgColor="#FFFFFF" bubbleBorderColor="#000000">
+      <frontcolor color="#FF0000" />
+      <bordercolor color="#000000" />
+    </textcolor>
+    <description>
+      <name>
+      </name>
+      <brief>
+      </brief>
+      <detailed>
+      </detailed>
+    </description>
+    <voice name="" synthesizeAlways="no" />
+    <actions>
+      <talk-to needsGoTo="yes" keepDistance="35" not-effects="no">
+        <effect>
+          <trigger-conversation idTarget="MariaDeberes" />
+          <condition />
+        </effect>
+      </talk-to>
+    </actions>
+  </character>
+  <character id="Guille">
+    <resources name="No name">
+      <asset type="standup" uri="assets/animation/GuilleIdleDown.eaa.xml" />
+      <asset type="standdown" uri="assets/animation/GuilleIdleDown.eaa.xml" />
+      <asset type="standright" uri="assets/animation/GuilleIdleDown.eaa.xml" />
+      <asset type="standleft" uri="assets/animation/GuilleIdleDown.eaa.xml" />
+      <asset type="speakup" uri="assets/animation/GuilleIdleDown.eaa.xml" />
+      <asset type="speakdown" uri="assets/animation/GuilleIdleDown.eaa.xml" />
+      <asset type="speakright" uri="assets/animation/GuilleIdleDown.eaa.xml" />
+      <asset type="speakleft" uri="assets/animation/GuilleIdleDown.eaa.xml" />
+      <asset type="useright" uri="assets/special/EmptyAnimation" />
+      <asset type="useleft" uri="assets/special/EmptyAnimation" />
+      <asset type="walkup" uri="assets/special/EmptyAnimation" />
+      <asset type="walkdown" uri="assets/special/EmptyAnimation" />
+      <asset type="walkright" uri="assets/special/EmptyAnimation" />
+      <asset type="walkleft" uri="assets/special/EmptyAnimation" />
+    </resources>
+    <textcolor showsSpeechBubble="no" bubbleBkgColor="#FFFFFF" bubbleBorderColor="#000000">
+      <frontcolor color="#FFF700" />
+      <bordercolor color="#000000" />
+    </textcolor>
+    <description>
+      <name>
+      </name>
+      <brief>
+      </brief>
+      <detailed>
+      </detailed>
+    </description>
+    <voice name="" synthesizeAlways="no" />
+    <actions>
+      <talk-to needsGoTo="yes" keepDistance="35" not-effects="no">
+        <effect>
+          <trigger-conversation idTarget="GuilleDeberes" />
+          <condition />
+        </effect>
+      </talk-to>
+    </actions>
+  </character>
+  <character id="Jose">
+    <resources name="No name">
+      <asset type="standup" uri="assets/animation/JoseIdleDown.eaa.xml" />
+      <asset type="standdown" uri="assets/animation/JoseIdleDown.eaa.xml" />
+      <asset type="standright" uri="assets/animation/JoseIdleDown.eaa.xml" />
+      <asset type="standleft" uri="assets/animation/JoseIdleDown.eaa.xml" />
+      <asset type="speakup" uri="assets/animation/JoseIdleDown.eaa.xml" />
+      <asset type="speakdown" uri="assets/animation/JoseIdleDown.eaa.xml" />
+      <asset type="speakright" uri="assets/animation/JoseIdleDown.eaa.xml" />
+      <asset type="speakleft" uri="assets/animation/JoseIdleDown.eaa.xml" />
+      <asset type="useright" uri="assets/special/EmptyAnimation" />
+      <asset type="useleft" uri="assets/special/EmptyAnimation" />
+      <asset type="walkup" uri="assets/special/EmptyAnimation" />
+      <asset type="walkdown" uri="assets/special/EmptyAnimation" />
+      <asset type="walkright" uri="assets/special/EmptyAnimation" />
+      <asset type="walkleft" uri="assets/special/EmptyAnimation" />
+    </resources>
+    <textcolor showsSpeechBubble="no" bubbleBkgColor="#FFFFFF" bubbleBorderColor="#000000">
+      <frontcolor color="#697FEA" />
+      <bordercolor color="#000000" />
+    </textcolor>
+    <description>
+      <name>
+      </name>
+      <brief>
+      </brief>
+      <detailed>
+      </detailed>
+    </description>
+    <voice name="" synthesizeAlways="no" />
+    <actions>
+      <talk-to needsGoTo="yes" keepDistance="100" not-effects="no">
+        <effect>
+          <trigger-conversation idTarget="Deberes" />
+          <condition />
+        </effect>
+      </talk-to>
+    </actions>
+  </character>
+  <character id="Profesor">
+    <resources name="No name">
+      <condition>
+        <active flag="TeacherNotLooking" />
+      </condition>
+      <asset type="standup" uri="assets/animation/ProfesorLookingUp.eaa.xml" />
+      <asset type="standdown" uri="assets/animation/ProfesorLookingUp.eaa.xml" />
+      <asset type="standright" uri="assets/animation/ProfesorLookingUp.eaa.xml" />
+      <asset type="standleft" uri="assets/animation/ProfesorLookingUp.eaa.xml" />
+      <asset type="speakup" uri="assets/special/EmptyAnimation" />
+      <asset type="speakdown" uri="assets/special/EmptyAnimation" />
+      <asset type="speakright" uri="assets/special/EmptyAnimation" />
+      <asset type="speakleft" uri="assets/special/EmptyAnimation" />
+      <asset type="useright" uri="assets/special/EmptyAnimation" />
+      <asset type="useleft" uri="assets/special/EmptyAnimation" />
+      <asset type="walkup" uri="assets/special/EmptyAnimation" />
+      <asset type="walkdown" uri="assets/special/EmptyAnimation" />
+      <asset type="walkright" uri="assets/special/EmptyAnimation" />
+      <asset type="walkleft" uri="assets/special/EmptyAnimation" />
+    </resources>
+    <resources name="No name">
+      <asset type="standup" uri="assets/animation/ProfesorLookingDown.eaa.xml" />
+      <asset type="standdown" uri="assets/animation/ProfesorLookingDown.eaa.xml" />
+      <asset type="standright" uri="assets/animation/ProfesorLookingDown.eaa.xml" />
+      <asset type="standleft" uri="assets/animation/ProfesorLookingDown.eaa.xml" />
+      <asset type="speakup" uri="assets/special/EmptyAnimation" />
+      <asset type="speakdown" uri="assets/special/EmptyAnimation" />
+      <asset type="speakright" uri="assets/special/EmptyAnimation" />
+      <asset type="speakleft" uri="assets/special/EmptyAnimation" />
+      <asset type="useright" uri="assets/special/EmptyAnimation" />
+      <asset type="useleft" uri="assets/special/EmptyAnimation" />
+      <asset type="walkup" uri="assets/special/EmptyAnimation" />
+      <asset type="walkdown" uri="assets/special/EmptyAnimation" />
+      <asset type="walkright" uri="assets/special/EmptyAnimation" />
+      <asset type="walkleft" uri="assets/special/EmptyAnimation" />
+    </resources>
+    <textcolor showsSpeechBubble="no" bubbleBkgColor="#FFFFFF" bubbleBorderColor="#000000">
+      <frontcolor color="#39A554" />
+      <bordercolor color="#000000" />
+    </textcolor>
+    <description>
+      <name>
+      </name>
+      <brief>
+      </brief>
+      <detailed>
+      </detailed>
+    </description>
+    <voice name="" synthesizeAlways="no" />
+  </character>
+  <scene id="Portada" start="yes" playerLayer="-2" playerScale="1" class="accesible" type="area">
     <documentation>
     </documentation>
     <resources name="No name">
-      <asset type="background" uri="assets/special/EmptyBackground.png" />
+      <asset type="background" uri="assets/background/black.jpg" />
     </resources>
     <name>
     </name>
     <default-initial-position x="400" y="300" />
+    <objects>
+      <object-ref idTarget="StartButton" x="971" y="719" scale="1" layer="0" hasInfluenceArea="no" />
+    </objects>
   </scene>
+  <scene id="Intro" start="no" playerLayer="-2" playerScale="1" class="accesible" type="area">
+    <documentation>
+    </documentation>
+    <resources name="No name">
+      <condition>
+        <inactive flag="Intro" />
+      </condition>
+      <asset type="background" uri="assets/background/black.jpg" />
+    </resources>
+    <name>
+    </name>
+    <default-initial-position x="400" y="300" />
+    <characters>
+      <character-ref idTarget="AlexIntro" x="585" y="2277" scale="1" layer="5" hasInfluenceArea="no" />
+      <character-ref idTarget="Alison" x="1604" y="1206" scale="0.4" layer="4" hasInfluenceArea="no">
+        <condition>
+          <active flag="IntroAlison" />
+        </condition>
+      </character-ref>
+      <character-ref idTarget="Ana" x="1379" y="1203" scale="0.4" layer="3" hasInfluenceArea="no">
+        <condition>
+          <active flag="IntroAna" />
+        </condition>
+      </character-ref>
+      <character-ref idTarget="Maria" x="1469" y="1196" scale="0.4" layer="2" hasInfluenceArea="no">
+        <condition>
+          <active flag="IntroMaria" />
+        </condition>
+      </character-ref>
+      <character-ref idTarget="Guille" x="1706" y="1207" scale="0.4" layer="1" hasInfluenceArea="no">
+        <condition>
+          <active flag="IntroGuille" />
+        </condition>
+      </character-ref>
+      <character-ref idTarget="Jose" x="1491" y="1199" scale="0.4" layer="0" hasInfluenceArea="no">
+        <condition>
+          <active flag="IntroJose" />
+        </condition>
+      </character-ref>
+    </characters>
+  </scene>
+  <scene id="Patio" start="no" playerLayer="-1" playerScale="0.1138012" class="accesible" type="area">
+    <documentation>
+    </documentation>
+    <resources name="No name">
+      <asset type="background" uri="assets/background/Patio.png" />
+    </resources>
+    <name>
+    </name>
+    <default-initial-position x="164" y="812" />
+    <exits>
+      <exit rectangular="yes" x="1393" y="561" width="246" height="166" hasInfluenceArea="yes" idTarget="Entrada" destinyY="1445" destinyX="235" destinyScale="0.483463" transitionType="0" transitionTime="0" not-effects="no" influenceX="-20" influenceY="-20" influenceWidth="284" influenceHeight="264">
+        <exit-look text="" cursor-path="" sound-path="" />
+      </exit>
+    </exits>
+    <characters>
+      <character-ref idTarget="Guille" x="1665" y="836" scale="0.1" layer="0" hasInfluenceArea="no" />
+    </characters>
+    <trajectory>
+      <node id="initial" x="185" y="1138" scale="0.2894613" />
+      <node id="node6872" x="716" y="728" scale="0.08" />
+      <node id="node5333" x="1465" y="764" scale="0.08" />
+      <node id="node2637" x="1743" y="916" scale="0.14" />
+      <node id="node1931" x="1058" y="774" scale="0.09" />
+      <node id="node5218" x="475" y="908" scale="0.15" />
+      <node id="node4417" x="874" y="871" scale="0.12" />
+      <node id="node5809" x="1230" y="869" scale="0.12" />
+      <initialnode id="initial" />
+      <side idStart="initial" idEnd="node5218" length="400" />
+      <side idStart="node5218" idEnd="node6872" length="700" />
+      <side idStart="node6872" idEnd="node1931" length="700" />
+      <side idStart="node1931" idEnd="node5218" length="700" />
+      <side idStart="node1931" idEnd="node5333" length="600" />
+      <side idStart="node5333" idEnd="node2637" length="600" />
+      <side idStart="node1931" idEnd="node2637" length="770" />
+      <side idStart="node5218" idEnd="node4417" length="401" />
+      <side idStart="node4417" idEnd="node1931" length="400" />
+      <side idStart="node4417" idEnd="node5809" length="450" />
+      <side idStart="node5809" idEnd="node1931" length="450" />
+      <side idStart="node5809" idEnd="node5333" length="500" />
+      <side idStart="node5809" idEnd="node2637" length="515" />
+      <side idStart="node4417" idEnd="node6872" length="500" />
+    </trajectory>
+  </scene>
+  <scene id="Entrada" start="no" playerLayer="-1" playerScale="0.4704854" class="accesible" type="area">
+    <documentation>
+    </documentation>
+    <resources name="No name">
+      <asset type="background" uri="assets/background/StairsBackground.png" />
+    </resources>
+    <name>
+    </name>
+    <default-initial-position x="268" y="1303" />
+    <exits>
+      <exit rectangular="yes" x="-21" y="-14" width="220" height="1151" hasInfluenceArea="yes" idTarget="Patio" destinyY="767" destinyX="1497" destinyScale="0.08" transitionType="0" transitionTime="0" not-effects="no" influenceX="-20" influenceY="-20" influenceWidth="447" influenceHeight="1376">
+        <exit-look text="" cursor-path="" sound-path="" />
+      </exit>
+      <exit rectangular="no" x="790" y="80" width="627" height="684" hasInfluenceArea="yes" idTarget="Pasillo" destinyY="709" destinyX="693" destinyScale="0.1" transitionType="0" transitionTime="0" not-effects="no" influenceX="398" influenceY="435" influenceWidth="301" influenceHeight="441">
+        <exit-look text="" cursor-path="" sound-path="" />
+        <point x="1155" y="622" />
+        <point x="790" y="202" />
+        <point x="861" y="80" />
+        <point x="1038" y="89" />
+        <point x="1039" y="293" />
+        <point x="1417" y="732" />
+        <point x="1152" y="764" />
+      </exit>
+    </exits>
+    <characters>
+      <character-ref idTarget="Ana" x="1831" y="1024" scale="0.35" layer="0" hasInfluenceArea="yes" influenceX="-304" influenceY="158" influenceWidth="347" influenceHeight="756" />
+    </characters>
+    <trajectory>
+      <node id="initial" x="276" y="1303" scale="0.4187931" />
+      <node id="node3152" x="1352" y="900" scale="0.3156432" />
+      <node id="node4338" x="1504" y="1167" scale="0.3922949" />
+      <initialnode id="initial" />
+      <side idStart="initial" idEnd="node4338" length="500" />
+      <side idStart="node4338" idEnd="node3152" length="200" />
+    </trajectory>
+  </scene>
+  <scene id="Pasillo" start="no" playerLayer="-1" playerScale="1" class="accesible" type="area">
+    <documentation>
+    </documentation>
+    <resources name="No name">
+      <asset type="background" uri="assets/background/CorridorBackground.png" />
+    </resources>
+    <name>
+    </name>
+    <default-initial-position x="400" y="300" />
+    <exits>
+      <exit rectangular="yes" x="601" y="478" width="189" height="198" hasInfluenceArea="yes" idTarget="Entrada" destinyY="872" destinyX="1319" destinyScale="0.3156432" transitionType="0" transitionTime="0" not-effects="no" influenceX="-20" influenceY="-20" influenceWidth="229" influenceHeight="264">
+        <exit-look text="" cursor-path="" sound-path="" />
+      </exit>
+      <exit rectangular="no" x="1054" y="428" width="47" height="335" hasInfluenceArea="yes" idTarget="Bano" destinyY="-2147483648" destinyX="-2147483648" destinyScale="1" transitionType="0" transitionTime="0" not-effects="yes" influenceX="-81" influenceY="10" influenceWidth="121" influenceHeight="374">
+        <exit-look text="" cursor-path="" sound-path="" />
+        <point x="1056" y="446" />
+        <point x="1101" y="428" />
+        <point x="1101" y="763" />
+        <point x="1054" y="748" />
+        <condition>
+          <active flag="JoseBano" />
+        </condition>
+        <effect>
+          <speak-player>Mas le vale estar aquí...</speak-player>
+          <condition>
+            <inactive flag="PrimerBano" />
+          </condition>
+          <activate flag="PrimerBano" />
+          <condition>
+            <inactive flag="PrimerBano" />
+          </condition>
+        </effect>
+        <not-effect>
+          <speak-player>No se me ha perdido nada ahí...</speak-player>
+          <condition />
+        </not-effect>
+      </exit>
+    </exits>
+    <characters>
+      <character-ref idTarget="Alison" x="1593" y="1019" scale="0.32" layer="1" hasInfluenceArea="yes" influenceX="-87" influenceY="49" influenceWidth="285" influenceHeight="695" />
+      <character-ref idTarget="Maria" x="508" y="744" scale="0.13" layer="0" hasInfluenceArea="yes" influenceX="-20" influenceY="-20" influenceWidth="125" influenceHeight="381" />
+    </characters>
+    <active-areas>
+      <active-area id="Clase1" rectangular="no" x="102" y="269" width="117" height="669" hasInfluenceArea="yes" influenceX="-20" influenceY="-20" influenceWidth="238" influenceHeight="709">
+        <description>
+          <name>
+          </name>
+          <brief>
+          </brief>
+          <detailed>
+          </detailed>
+        </description>
+        <actions>
+          <use needsGoTo="yes" keepDistance="35" not-effects="no">
+            <effect>
+              <trigger-conversation idTarget="EntrarClase" />
+              <condition />
+            </effect>
+          </use>
+        </actions>
+        <point x="109" y="269" />
+        <point x="216" y="335" />
+        <point x="219" y="860" />
+        <point x="102" y="938" />
+      </active-area>
+    </active-areas>
+    <trajectory>
+      <node id="initial" x="788" y="981" scale="0.3081034" />
+      <node id="node650" x="688" y="699" scale="0.1" />
+      <node id="node7568" x="1513" y="1051" scale="0.3521797" />
+      <node id="node7628" x="724" y="823" scale="0.1790069" />
+      <node id="node8161" x="1011" y="774" scale="0.15" />
+      <node id="node2177" x="263" y="922" scale="0.259049" />
+      <node id="node1047" x="551" y="790" scale="0.16" />
+      <initialnode id="node650" />
+      <side idStart="node2177" idEnd="initial" length="300" />
+      <side idStart="initial" idEnd="node7628" length="300" />
+      <side idStart="node7628" idEnd="node650" length="400" />
+      <side idStart="node8161" idEnd="node7628" length="320" />
+      <side idStart="initial" idEnd="node7568" length="330" />
+      <side idStart="node1047" idEnd="node7628" length="280" />
+    </trajectory>
+  </scene>
+  <scene id="Clase" start="no" playerLayer="-1" playerScale="0.17" class="accesible" type="area">
+    <documentation>
+    </documentation>
+    <resources name="No name">
+      <asset type="background" uri="assets/background/fondoclasetodo.png" />
+    </resources>
+    <name>
+    </name>
+    <default-initial-position x="1595" y="777" />
+    <exits>
+      <exit rectangular="yes" x="1595" y="394" width="92" height="380" hasInfluenceArea="yes" idTarget="Pasillo" destinyY="923" destinyX="234" destinyScale="0.26" transitionType="0" transitionTime="0" not-effects="no" influenceX="-28" influenceY="-14" influenceWidth="132" influenceHeight="451">
+        <exit-look text="" cursor-path="" sound-path="" />
+      </exit>
+    </exits>
+    <characters>
+      <character-ref idTarget="Maria" x="1219" y="744" scale="0.15" layer="4" hasInfluenceArea="no" />
+      <character-ref idTarget="Profesor" x="586" y="829" scale="0.2" layer="0" hasInfluenceArea="no" />
+    </characters>
+    <atrezzo>
+      <atrezzo-ref idTarget="ClaseSillasMesas1" x="1024" y="1130" scale="1" layer="6" />
+      <atrezzo-ref idTarget="ClaseMesas2" x="1024" y="1034" scale="1" layer="5" />
+      <atrezzo-ref idTarget="ClaseSillas2" x="1024" y="982" scale="1" layer="3" />
+      <atrezzo-ref idTarget="ClaseMesas3" x="1024" y="922" scale="1" layer="2" />
+      <atrezzo-ref idTarget="ClaseSillasMesas4" x="1024" y="867" scale="1" layer="1" />
+    </atrezzo>
+    <trajectory>
+      <node id="initial" x="1595" y="796" scale="0.17" />
+      <node id="node4067" x="843" y="815" scale="0.17" />
+      <node id="node8897" x="795" y="1113" scale="0.23" />
+      <node id="node3155" x="1393" y="1120" scale="0.23" />
+      <node id="node5465" x="144" y="1106" scale="0.23" />
+      <node id="node4179" x="1120" y="819" scale="0.17" />
+      <initialnode id="initial" />
+      <side idStart="node4067" idEnd="node8897" length="650" />
+      <side idStart="node8897" idEnd="node5465" length="570" />
+      <side idStart="node8897" idEnd="node3155" length="550" />
+      <side idStart="initial" idEnd="node4179" length="650" />
+      <side idStart="node4179" idEnd="node4067" length="550" />
+      <side idStart="node4179" idEnd="node3155" length="650" />
+    </trajectory>
+  </scene>
+  <scene id="Bano" start="no" playerLayer="-1" playerScale="0.38" class="accesible" type="area">
+    <documentation>
+    </documentation>
+    <resources name="No name">
+      <asset type="background" uri="assets/background/Bathroom.png" />
+    </resources>
+    <name>
+    </name>
+    <default-initial-position x="918" y="1016" />
+    <exits>
+      <exit rectangular="yes" x="716" y="134" width="371" height="755" hasInfluenceArea="no" idTarget="Pasillo" destinyY="754" destinyX="1028" destinyScale="0.14" transitionType="0" transitionTime="0" not-effects="no">
+        <exit-look text="" cursor-path="" sound-path="" />
+      </exit>
+    </exits>
+    <characters>
+      <character-ref idTarget="Jose" x="1383" y="1083" scale="0.38" layer="0" hasInfluenceArea="no" />
+    </characters>
+    <barriers>
+      <barrier x="493" y="26" width="75" height="1062" />
+      <barrier x="1337" y="-3" width="62" height="1062" />
+    </barriers>
+  </scene>
+  <atrezzoobject id="ClaseSillasMesas1">
+    <resources name="No name">
+      <asset type="image" uri="assets/image/sillamesa1.png" />
+      <asset type="icon" uri="assets/special/EmptyIcon.png" />
+    </resources>
+    <description>
+      <name>
+      </name>
+      <brief>
+      </brief>
+      <detailed>
+      </detailed>
+    </description>
+  </atrezzoobject>
+  <atrezzoobject id="ClaseMesas2">
+    <resources name="No name">
+      <asset type="image" uri="assets/image/mesa2.png" />
+      <asset type="icon" uri="assets/special/EmptyIcon.png" />
+    </resources>
+    <description>
+      <name>
+      </name>
+      <brief>
+      </brief>
+      <detailed>
+      </detailed>
+    </description>
+  </atrezzoobject>
+  <atrezzoobject id="ClaseSillas2">
+    <resources name="No name">
+      <asset type="image" uri="assets/image/silla2back.png" />
+      <asset type="icon" uri="assets/special/EmptyIcon.png" />
+    </resources>
+    <description>
+      <name>
+      </name>
+      <brief>
+      </brief>
+      <detailed>
+      </detailed>
+    </description>
+  </atrezzoobject>
+  <atrezzoobject id="ClaseMesas3">
+    <resources name="No name">
+      <asset type="image" uri="assets/image/mesa3back.png" />
+      <asset type="icon" uri="assets/special/EmptyIcon.png" />
+    </resources>
+    <description>
+      <name>
+      </name>
+      <brief>
+      </brief>
+      <detailed>
+      </detailed>
+    </description>
+  </atrezzoobject>
+  <atrezzoobject id="ClaseSillasMesas4">
+    <resources name="No name">
+      <asset type="image" uri="assets/image/sillamesa4.png" />
+      <asset type="icon" uri="assets/special/EmptyIcon.png" />
+    </resources>
+    <description>
+      <name>
+      </name>
+      <brief>
+      </brief>
+      <detailed>
+      </detailed>
+    </description>
+  </atrezzoobject>
+  <graph-conversation id="Intro1">
+    <dialogue-node nodeindex="0" editor-x="157" editor-y="242">
+      <speak-player>Hola</speak-player>
+      <condition />
+      <speak-player>Soy Alex</speak-player>
+      <condition />
+      <child nodeindex="1" />
+      <effect>
+        <activate flag="IntroAlison" />
+        <condition />
+      </effect>
+    </dialogue-node>
+    <dialogue-node nodeindex="1" editor-x="606" editor-y="239">
+      <speak-player>Esta es Alison</speak-player>
+      <condition />
+      <speak-char idTarget="Alison">Hola</speak-char>
+      <condition />
+      <child nodeindex="2" />
+      <effect>
+        <deactivate flag="IntroAlison" />
+        <condition />
+        <activate flag="IntroGuille" />
+        <condition />
+      </effect>
+    </dialogue-node>
+    <dialogue-node nodeindex="2" editor-x="1057" editor-y="229">
+      <speak-player>Este es guille</speak-player>
+      <condition />
+      <speak-char idTarget="Guille">Hola</speak-char>
+      <condition />
+      <child nodeindex="3" />
+      <effect>
+        <deactivate flag="IntroGuille" />
+        <condition />
+        <activate flag="IntroAna" />
+        <condition />
+      </effect>
+    </dialogue-node>
+    <dialogue-node nodeindex="3" editor-x="1561" editor-y="221">
+      <speak-player>Esta es Ana</speak-player>
+      <condition />
+      <speak-char idTarget="Ana">Hola</speak-char>
+      <condition />
+      <child nodeindex="4" />
+      <effect>
+        <deactivate flag="IntroAna" />
+        <condition />
+        <activate flag="IntroJose" />
+        <condition />
+      </effect>
+    </dialogue-node>
+    <dialogue-node nodeindex="4" editor-x="1990" editor-y="208">
+      <speak-player>Este es Jose</speak-player>
+      <condition />
+      <speak-char idTarget="Jose">Hola</speak-char>
+      <condition />
+      <speak-player>Tiene que darme los deberes de hoy</speak-player>
+      <condition />
+      <speak-char idTarget="Jose">Sí...</speak-char>
+      <condition />
+      <child nodeindex="5" />
+      <effect>
+        <deactivate flag="IntroJose" />
+        <condition />
+        <activate flag="IntroMaria" />
+        <condition />
+      </effect>
+    </dialogue-node>
+    <dialogue-node nodeindex="5" editor-x="2485" editor-y="189">
+      <speak-player>ESta es maria</speak-player>
+      <condition />
+      <speak-char idTarget="Maria">Hola</speak-char>
+      <condition />
+      <child nodeindex="6" />
+      <effect>
+        <deactivate flag="IntroMaria" />
+        <condition />
+      </effect>
+    </dialogue-node>
+    <dialogue-node nodeindex="6" editor-x="2935" editor-y="255">
+      <speak-player>Bueno, vayamos a por los deberes</speak-player>
+      <condition />
+      <end-conversation>
+        <effect>
+          <trigger-scene idTarget="Patio" x="214" y="1447" />
+          <condition />
+          <activate flag="Intro" />
+          <condition />
+        </effect>
+      </end-conversation>
+    </dialogue-node>
+  </graph-conversation>
+  <graph-conversation id="Deberes">
+    <dialogue-node nodeindex="0" editor-x="337" editor-y="149">
+      <speak-player>Jose, al fin te encuentro.</speak-player>
+      <condition />
+      <speak-player>Espero que tengas mis deberes...</speak-player>
+      <condition />
+      <speak-char idTarget="Jose">Eh...</speak-char>
+      <condition />
+      <speak-player>¿Cómo dices?</speak-player>
+      <condition />
+      <speak-char idTarget="Jose">Sí! Aquí los tengo...</speak-char>
+      <condition />
+      <speak-char idTarget="Jose">Los ejercicios de ciencias, tal y cómo me pediste...</speak-char>
+      <condition />
+      <speak-player>Muy bien, espero que esté todo bien.</speak-player>
+      <condition />
+      <speak-player>Otra cosa no, pero al menos sabes hacerme los deberes.</speak-player>
+      <condition />
+      <speak-player>Espero no tener que buscarte la próxima vez</speak-player>
+      <condition />
+      <speak-char idTarget="Jose">...</speak-char>
+      <condition />
+      <speak-player>Anda, pipa, me voy a clase.</speak-player>
+      <condition />
+      <end-conversation>
+        <effect>
+          <activate flag="Deberes" />
+          <condition />
+        </effect>
+      </end-conversation>
+    </dialogue-node>
+  </graph-conversation>
+  <graph-conversation id="GuilleDeberes">
+    <dialogue-node nodeindex="0" editor-x="217" editor-y="92">
+      <speak-player>Tú, bollicao, sabes dónde está Jose?</speak-player>
+      <condition />
+      <speak-player>Tiene que darme los deberes de hoy.</speak-player>
+      <condition />
+      <speak-char idTarget="Guille">No lo sé, le vi llegar hace un rato...</speak-char>
+      <condition />
+      <speak-player>Vale, bollicao</speak-player>
+      <condition />
+      <speak-char idTarget="Guille">...</speak-char>
+      <condition />
+      <end-conversation />
+    </dialogue-node>
+  </graph-conversation>
+  <graph-conversation id="AnaDeberes">
+    <dialogue-node nodeindex="0" editor-x="258" editor-y="108">
+      <speak-player>Hey chula, sabes dónde está Jose? Tiene que darme los deberes de hoy</speak-player>
+      <condition />
+      <speak-char idTarget="Ana">Jajaja, estás buscando al chepao, seguro que está escondido</speak-char>
+      <condition />
+      <speak-player>Más le vale aparecer...</speak-player>
+      <condition />
+      <end-conversation />
+    </dialogue-node>
+  </graph-conversation>
+  <graph-conversation id="MariaDeberes">
+    <dialogue-node nodeindex="0" editor-x="189" editor-y="108">
+      <speak-char idTarget="Maria">...</speak-char>
+      <condition />
+      <speak-player>Bú</speak-player>
+      <condition />
+      <speak-char idTarget="Maria">Ay!</speak-char>
+      <condition />
+      <speak-player>Encima de friki miedosa.</speak-player>
+      <condition />
+      <speak-player>Tus padres no serán hermanos? jajaja</speak-player>
+      <condition />
+      <speak-char idTarget="Maria">...</speak-char>
+      <condition />
+      <end-conversation />
+    </dialogue-node>
+  </graph-conversation>
+  <graph-conversation id="AlisonDeberes">
+    <dialogue-node nodeindex="0" editor-x="117" editor-y="150">
+      <speak-char idTarget="Alison">Hola Alex</speak-char>
+      <condition />
+      <speak-char idTarget="Alison">Jose está en el baño</speak-char>
+      <condition />
+      <speak-player>Al fin! Alguien que sabe quien manda aquí</speak-player>
+      <condition />
+      <end-conversation>
+        <effect>
+          <activate flag="JoseBano" />
+          <condition />
+        </effect>
+      </end-conversation>
+    </dialogue-node>
+  </graph-conversation>
+  <graph-conversation id="EntrarClase">
+    <dialogue-node nodeindex="0" editor-x="199" editor-y="238">
+      <speak-player>Aún no tengo mis deberes...</speak-player>
+      <condition>
+        <inactive flag="Deberes" />
+      </condition>
+      <speak-player>Ya tengo los deberes</speak-player>
+      <condition>
+        <active flag="Deberes" />
+      </condition>
+      <speak-player>¿Debería entrar a clase?</speak-player>
+      <condition />
+      <child nodeindex="1" />
+    </dialogue-node>
+    <option-node nodeindex="1" keepShowing="yes" preListening="yes" editor-x="615" editor-y="252" x="615" y="252">
+      <speak-player>Entrar</speak-player>
+      <condition />
+      <child nodeindex="2" />
+      <speak-player>Esperar un rato más</speak-player>
+      <condition />
+      <child nodeindex="3" />
+    </option-node>
+    <dialogue-node nodeindex="2" editor-x="896" editor-y="134">
+      <child nodeindex="4" />
+      <effect>
+        <trigger-scene idTarget="Intro" x="400" y="300" />
+        <condition />
+      </effect>
+    </dialogue-node>
+    <dialogue-node nodeindex="3" editor-x="892" editor-y="427">
+      <end-conversation />
+    </dialogue-node>
+    <dialogue-node nodeindex="4" editor-x="1158" editor-y="126">
+      <speak-player>Bueno, ya empieza la clase...</speak-player>
+      <condition />
+      <speak-player>Vaya rollo, aunque para lo que me espera en casa...</speak-player>
+      <condition />
+      <child nodeindex="5" />
+      <effect>
+        <show-text x="300" y="300" frontColor="RGBA(1.000, 1.000, 1.000, 1.000)" borderColor="RGBA(1.000, 1.000, 1.000, 1.000)" uri="">Alex! Estás ahí?!</show-text>
+        <condition />
+        <trigger-scene idTarget="Clase" x="468" y="1237" />
+        <condition />
+      </effect>
+    </dialogue-node>
+    <dialogue-node nodeindex="5" editor-x="1599" editor-y="134">
+      <speak-player>Sí!</speak-player>
+      <condition />
+      <speak-player>Las placas tectónicas, verdad?</speak-player>
+      <condition />
+      <speak-char idTarget="Profesor">Estabas otra vez en tu mundo, verdad?</speak-char>
+      <condition />
+      <speak-player>Que no, profesor, que estaba atendiendo, lo prometo!</speak-player>
+      <condition />
+      <speak-char idTarget="Profesor">Ah si? Entonces habrás hecho los deberes, no?</speak-char>
+      <condition />
+      <child nodeindex="6" />
+    </dialogue-node>
+    <option-node nodeindex="6" keepShowing="yes" showUserOption="yes" preListening="yes" editor-x="2083" editor-y="159" x="2083" y="159">
+      <speak-player>Claro! Aquí mismo los tengo!</speak-player>
+      <condition>
+        <active flag="Deberes" />
+      </condition>
+      <child nodeindex="7" />
+      <speak-player>Eh... pues no los tengo...</speak-player>
+      <condition />
+      <child nodeindex="8" />
+    </option-node>
+    <dialogue-node nodeindex="7" editor-x="2368" editor-y="96">
+      <speak-char idTarget="Profesor">Ah si? </speak-char>
+      <condition />
+      <speak-char idTarget="Profesor">Entonces podrás responderme a la pregunta, no?</speak-char>
+      <condition />
+      <end-conversation>
+        <effect>
+          <trigger-conversation idTarget="PreguntasClase" />
+          <condition />
+        </effect>
+      </end-conversation>
+    </dialogue-node>
+    <dialogue-node nodeindex="8" editor-x="2373" editor-y="362">
+      <end-conversation />
+    </dialogue-node>
+  </graph-conversation>
+  <graph-conversation id="PreguntasClase">
+    <dialogue-node nodeindex="0" editor-x="53" editor-y="162">
+      <speak-char idTarget="Profesor">Cuál es el océano más grande?</speak-char>
+      <condition />
+      <child nodeindex="1" />
+    </dialogue-node>
+    <option-node nodeindex="1" keepShowing="yes" showUserOption="yes" preListening="yes" editor-x="413" editor-y="109" x="413" y="109">
+      <speak-player>Pacífico</speak-player>
+      <condition />
+      <child nodeindex="2" />
+      <speak-player>Ártico</speak-player>
+      <condition />
+      <child nodeindex="2" />
+      <speak-player>Atlántico</speak-player>
+      <condition />
+      <child nodeindex="2" />
+      <speak-player>Índico</speak-player>
+      <condition />
+      <child nodeindex="2" />
+      <timeout>5</timeout>
+      <condition />
+      <child nodeindex="3" />
+    </option-node>
+    <dialogue-node nodeindex="2" editor-x="814" editor-y="120">
+      <speak-char idTarget="Profesor">Error!</speak-char>
+      <condition />
+      <speak-char idTarget="Profesor">Prueba de nuevo</speak-char>
+      <condition>
+        <less-equals-than var="Respuestas" value="2" />
+      </condition>
+      <speak-char idTarget="Profesor">Ya me he cansado...</speak-char>
+      <condition>
+        <equals var="Respuestas" value="3" />
+      </condition>
+      <end-conversation>
+        <effect>
+          <increment var="Respuestas" value="1" />
+          <condition />
+          <trigger-conversation idTarget="FinalClaseFriki" />
+          <condition>
+            <equals var="Respuestas" value="4" />
+          </condition>
+          <trigger-conversation idTarget="PreguntasClase" />
+          <condition>
+            <less-equals-than var="Respuestas" value="3" />
+          </condition>
+        </effect>
+      </end-conversation>
+    </dialogue-node>
+    <dialogue-node nodeindex="3" editor-x="367" editor-y="529">
+      <speak-player>El silencio no es una respuesta...</speak-player>
+      <condition />
+      <child nodeindex="0" />
+    </dialogue-node>
+  </graph-conversation>
+  <graph-conversation id="FinalClaseFriki">
+    <dialogue-node nodeindex="0" editor-x="186" editor-y="162">
+      <end-conversation />
+    </dialogue-node>
+  </graph-conversation>
+  <graph-conversation id="FinalClaseJose">
+    <dialogue-node nodeindex="0">
+      <end-conversation />
+    </dialogue-node>
+  </graph-conversation>
+  <object id="StartButton" returnsWhenDragged="yes" behaviour="first-action" resources-transition-time="0">
+    <resources name="No name">
+      <asset type="image" uri="assets/image/logo.png" />
+      <asset type="icon" uri="assets/special/EmptyIcon.png" />
+    </resources>
+    <description>
+      <name>
+      </name>
+      <brief>
+      </brief>
+      <detailed>
+      </detailed>
+    </description>
+    <actions>
+      <use needsGoTo="no" keepDistance="35" not-effects="no">
+        <effect>
+          <trigger-scene idTarget="Intro" x="730" y="1790" />
+          <condition />
+          <trigger-conversation idTarget="Intro1" />
+          <condition />
+        </effect>
+      </use>
+    </actions>
+  </object>
 </eAdventure>
