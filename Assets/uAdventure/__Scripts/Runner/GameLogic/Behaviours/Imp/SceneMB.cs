@@ -103,7 +103,7 @@ namespace uAdventure.Runner
 
         public bool IsReady { get { return ready; } }
 
-        private void Awake()
+        protected void Awake()
         {
             var comparer = new HeightLayerComparer();
             heights = new Dictionary<Representable, float>();
@@ -112,13 +112,13 @@ namespace uAdventure.Runner
         }
 
         // Use this for initialization
-        void Start()
+        protected void Start()
         {
             this.gameObject.name = sceneData.getId();
             RenderScene();
         }
 
-        private void Update()
+        protected void Update()
         {
             if(!dragging && endDragSpeed != Vector2.zero)
             {
@@ -130,7 +130,7 @@ namespace uAdventure.Runner
             }
         }
 
-        private void LateUpdate()
+        protected void LateUpdate()
         {
             if (!referencesHolder || referencesHolder.childCount == 0)
             {
@@ -166,7 +166,7 @@ namespace uAdventure.Runner
             //  Lower Y elements should also appear on top of higher Y elements.
             //  Since the first rule is more important, to fix this, we simulate the Y coordinate for elements
             //  that have higher Y coordinate, but lower layer. The Y used is the minimum Y for the lower layer elements.
-            var maxY = staticChilds.First().getPosition().y;
+            var maxY = staticChilds.Any() ? staticChilds.First().getPosition().y : 0;
             foreach(var child in staticChilds)
             {
                 // Since we're iterating backwards we carry the minimum to the higher layers
@@ -175,18 +175,21 @@ namespace uAdventure.Runner
                 heights[child] = maxY;
                 finalOrder[child] = maxY;
             }
-            
+
             // And then we apply the Z coordinate
-            var zStep = (maxZ - minZ) / finalOrder.Count;
-            var count = 0;
-            foreach(var kv in finalOrder)
+            if (finalOrder.Any())
             {
-                kv.Key.Z = minZ + zStep * count;
-                count++;
+                var zStep = (maxZ - minZ) / finalOrder.Count;
+                var count = 0;
+                foreach (var kv in finalOrder)
+                {
+                    kv.Key.Z = minZ + zStep * count;
+                    count++;
+                }
             }
         }
 
-        void FixedUpdate()
+        protected void FixedUpdate()
         {
             if (fading)
             {
