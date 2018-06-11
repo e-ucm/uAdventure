@@ -84,7 +84,7 @@ namespace uAdventure.Runner
             if (varFlagChangeAmbits.Count > 0) varFlagChangeAmbits.Peek().Add(new KeyValuePair<string, int>(name, intVal));
             else TrackerAsset.Instance.setVar(name, intVal);
             TimerController.Instance.CheckTimers();
-            CompletableController.Instance.conditionChanged();
+            CompletablesController.Instance.ConditionChanged();
             Game.Instance.reRenderScene();
         }
 
@@ -114,7 +114,7 @@ namespace uAdventure.Runner
             if (varFlagChangeAmbits.Count > 0) varFlagChangeAmbits.Peek().Add(new KeyValuePair<string, int>(name, value));
             else TrackerAsset.Instance.setVar(name, value);
 
-            CompletableController.Instance.conditionChanged();
+            CompletablesController.Instance.ConditionChanged();
 
             Game.Instance.reRenderScene();
         }
@@ -201,7 +201,7 @@ namespace uAdventure.Runner
             GameObject go = GameObject.Find(id);
             Movable m = go.GetComponent<Movable>();
             if (m != null)
-                m.Traslate(position);
+                m.setPosition(position);
         }
 
         public NPC getCharacter(string name)
