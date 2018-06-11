@@ -85,7 +85,7 @@ namespace uAdventure.Runner
                 NPC player = Game.Instance.GameState.Player;
                 BubbleData bubble;
 
-                if (Game.Instance.GameState.IsFirstPerson)
+                if (Game.Instance.GameState.IsFirstPerson || PlayerMB.Instance == null)
                 {
                     bubble = generateBubble(player, text);
                 }
