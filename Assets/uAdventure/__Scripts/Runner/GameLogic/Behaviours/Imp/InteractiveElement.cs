@@ -95,7 +95,7 @@ namespace uAdventure.Runner
                             var actions = Element.getActions().Valid(AvailableActions);
                             if (actions.Any())
                             {
-                                Game.Instance.Execute(new EffectHolder(actions.First().getEffects()));
+                                ActionSelected(actions.First());
                                 ret = InteractuableResult.DOES_SOMETHING;
                             }
                         }

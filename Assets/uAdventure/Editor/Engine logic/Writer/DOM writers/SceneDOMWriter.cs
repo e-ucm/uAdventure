@@ -103,8 +103,10 @@ namespace uAdventure.Editor
                     exitElement.SetAttribute("idTarget", exit.getNextSceneId());
                     exitElement.SetAttribute("destinyY", exit.getDestinyY().ToString());
                     exitElement.SetAttribute("destinyX", exit.getDestinyX().ToString());
-                    if (exit.getDestinyScale() > 0)
+                    if (exit.getDestinyScale() >= 0)
+                    {
                         exitElement.SetAttribute("destinyScale", exit.getDestinyScale().ToString());
+                    }
                     exitElement.SetAttribute("transitionType", exit.getTransitionType().ToString());
                     exitElement.SetAttribute("transitionTime", exit.getTransitionTime().ToString());
                     exitElement.SetAttribute("not-effects", (exit.isHasNotEffects() ? "yes" : "no"));
@@ -363,6 +365,14 @@ namespace uAdventure.Editor
                     {
                         aaElement.SetAttribute("hasInfluenceArea", "no");
                     }
+
+                    // Behavior
+                    if (activeArea.getBehaviour() == Item.BehaviourType.NORMAL)
+                        aaElement.SetAttribute("behaviour", "normal");
+                    if (activeArea.getBehaviour() == Item.BehaviourType.ATREZZO)
+                        aaElement.SetAttribute("behaviour", "atrezzo");
+                    if (activeArea.getBehaviour() == Item.BehaviourType.FIRST_ACTION)
+                        aaElement.SetAttribute("behaviour", "first-action");
 
                     // Append the documentation (if avalaible)
                     if (activeArea.getDocumentation() != null)
