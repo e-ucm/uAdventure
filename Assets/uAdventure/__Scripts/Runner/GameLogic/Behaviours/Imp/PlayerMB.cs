@@ -23,7 +23,8 @@ namespace uAdventure.Runner
         }
 
         private static PlayerMB instance;
-        private Game.OnExecutionFinished onExecutionFinished;
+        private Game.ExecutionEvent onExecutionStarted;
+        private Game.ExecutionEvent onExecutionFinished;
 
         private Mover mover;
         private Representable representable;
@@ -33,7 +34,7 @@ namespace uAdventure.Runner
             get { return instance; }
         }
 
-        void Awake()
+        protected void Awake()
         {
             instance = this;
         }
@@ -44,8 +45,9 @@ namespace uAdventure.Runner
             representable = GetComponent<Representable>();
         }
 
-        public void Do(Action action, Rectangle area, Game.OnExecutionFinished onExecutionFinishes = null)
+        public void Do(Action action, Rectangle area, Game.ExecutionEvent onExecutionStarted = null, Game.ExecutionEvent onExecutionFinishes = null)
         {
+            this.onExecutionStarted = onExecutionStarted;
             this.onExecutionFinished = onExecutionFinishes;
             mover.Move(area, action.getKeepDistance(), new ActionArea(action, area), OnMovementFinished, OnMovementCancelled);
         }
@@ -75,14 +77,17 @@ namespace uAdventure.Runner
                 }
                 
                 Game.Instance.GameState.BeginChangeAmbit();
+                if(onExecutionStarted != null)
+                {
+                    onExecutionStarted(toDo.action);
+                }
                 Game.Instance.Execute(new EffectHolder(toDo.action.Effects), FinishedCallbackFor(toDo, onExecutionFinished));
-                toDo = null;
             }
         }
 
-        private Game.OnExecutionFinished FinishedCallbackFor(ActionArea data, Game.OnExecutionFinished onExecutionFinished)
+        private Game.ExecutionEvent FinishedCallbackFor(ActionArea data, Game.ExecutionEvent onExecutionFinished)
         {
-            return (_) =>
+            return _ =>
             {
                 if (onExecutionFinished != null)
                     onExecutionFinished(data.action);

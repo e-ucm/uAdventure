@@ -12,7 +12,7 @@ using AssetPackage;
 
 namespace uAdventure.Runner
 {
-    public enum guiState
+    public enum GUIState
     {
         GAME_SELECTION, LOADING_GAME, NOTHING, TALK_PLAYER, TALK_CHARACTER, OPTIONS_MENU, ANSWERS_MENU
     }
@@ -30,13 +30,8 @@ namespace uAdventure.Runner
         {
             get { return instance; }
         }
-
-        static string gameToLoad = "";
-        public static string GameToLoad
-        {
-            get { return gameToLoad; }
-            set { gameToLoad = value; }
-        }
+        
+        public static string GameToLoad { get; set; }
         #endregion Singleton
         //#####################################################################
         //########################### MONOBEHAVIOUR ###########################
@@ -48,7 +43,7 @@ namespace uAdventure.Runner
 
         // Execution
         private bool waitingRunTarget = false;
-        private Stack<KeyValuePair<Interactuable, OnExecutionFinished>> executeStack;
+        private Stack<KeyValuePair<Interactuable, ExecutionEvent>> executeStack;
         private IRunnerChapterTarget runnerTarget;
         private GameState game_state;
         private uAdventureRaycaster uAdventureRaycaster;
@@ -60,15 +55,13 @@ namespace uAdventure.Runner
         public GameObject Blur_Prefab;
         private GUISkin skin;
         private GameObject blur;
-        private MenuMB menu;
-        private guiState guistate = guiState.NOTHING;
-        private List<Action> guiactions;
+        private GUIState guistate = GUIState.NOTHING;
         private List<int> order;
         private ConversationNodeHolder guioptions;
         private float elapsedTime;
         private bool doTimeOut;
 
-        public delegate void OnExecutionFinished(object interactuable);
+        public delegate void ExecutionEvent(object interactuable);
 
         public GUISkin Skin
         {
@@ -82,65 +75,28 @@ namespace uAdventure.Runner
 
         public ResourceManager ResourceManager { get; private set; }
 
-        public string getGameName()
+        public string GameName
         {
-            return gameName;
+            get { return gameName; }
         }
 
-        public string getSelectedGame()
-        { 
-            return gameName;
-        }
-        public string getSelectedPath()
+        public string SelectedGame
         {
-            return gamePath;
+            get { return gameName; }
         }
 
-        void Awake()
+        public string SelectedPath
+        {
+            get { return gamePath; }
+        }
+
+        protected void Awake()
         {
             Game.instance = this;
-            executeStack = new Stack<KeyValuePair<Interactuable, OnExecutionFinished>>();
-            //Load tracker data
-            SimpleJSON.JSONNode hostfile = new SimpleJSON.JSONClass();
-
-            bool loaded = false;
-
-#if UNITY_WEBPLAYER || UNITY_WEBGL
-#elif UNITY_ANDROID || UNITY_IPHONE
-#else
-            if (useSystemIO)
-            {
-                if (!System.IO.File.Exists("host.cfg"))
-                {
-                    hostfile.Add("host", new SimpleJSON.JSONData("http://192.168.175.117:3000/api/proxy/gleaner/collector/"));
-                    hostfile.Add("trackingCode", new SimpleJSON.JSONData("57d81d5585b094006eab04d6ndecvjlvjss8aor"));
-                    System.IO.File.WriteAllText("host.cfg", hostfile.ToString());
-                }
-                else
-                    hostfile = SimpleJSON.JSON.Parse(System.IO.File.ReadAllText("host.cfg"));
-                loaded = true;
-            }
-#endif
-            try
-            {
-                if (loaded)
-                {
-                    var settings = TrackerAsset.Instance.Settings as TrackerAssetSettings;
-                    settings.Host = hostfile["host"];
-                    settings.TrackingCode = hostfile["trackingCode"];
-                    //End tracker data loading
-                }
-            }
-            catch { }
+            executeStack = new Stack<KeyValuePair<Interactuable, ExecutionEvent>>();
+            LoadTrackerSettings();
 
             skin = Resources.Load("basic") as GUISkin;
-
-            if (Game.GameToLoad != "")
-            {
-                gameName = Game.GameToLoad;
-                gamePath = ResourceManager.getCurrentDirectory() + System.IO.Path.DirectorySeparatorChar + "Games" + System.IO.Path.DirectorySeparatorChar;
-                useSystemIO = true;
-            }
 
             if (!string.IsNullOrEmpty(gamePath))
             {
@@ -158,17 +114,22 @@ namespace uAdventure.Runner
                 }
             }
 
-            // TODO incidences are unused, why?
-            //List<Incidence> incidences = new List<Incidence>();
+            if (Game.GameToLoad != "")
+            {
+                gameName = Game.GameToLoad;
+                gamePath = ResourceManager.getCurrentDirectory() + System.IO.Path.DirectorySeparatorChar + "Games" + System.IO.Path.DirectorySeparatorChar;
+                useSystemIO = true;
+            }
 
             AdventureData data = new AdventureData();
             AdventureHandler adventure = new AdventureHandler(data, ResourceManager);
             adventure.Parse("descriptor.xml");
             game_state = new GameState(data);
-            CompletableController.Instance.setCompletables(GameState.getCompletables());
+            CompletablesController.Instance.SetCompletables(GameState.getCompletables());
         }
 
-        void Start()
+
+        protected void Start()
         {
             if (!forceScene)
                 RunTarget(GameState.InitialChapterTarget.getId());
@@ -192,24 +153,19 @@ namespace uAdventure.Runner
         public void OnPointerClick(PointerEventData eventData)
         {
             MenuMB.Instance.hide();
-            if (!waitingRunTarget && executeStack.Count > 0 && guistate != guiState.ANSWERS_MENU)
+            if (!waitingRunTarget && executeStack.Count > 0 && guistate != GUIState.ANSWERS_MENU)
             {
                 Interacted();
             }
         }
 
-        private bool mouseDownDisabled = true;
-
-        void Update()
+        protected void Update()
         {
-            if (waitingRunTarget)
+            if (waitingRunTarget && runnerTarget.IsReady)
             {
-                if (runnerTarget.IsReady)
-                {
-                    waitingRunTarget = false;
-                    uAdventureRaycaster.Instance.Override = null;
-                    Interacted();
-                }
+                waitingRunTarget = false;
+                uAdventureRaycaster.Instance.Override = null;
+                Interacted();
             }
 
             if (doTimeOut)
@@ -217,55 +173,7 @@ namespace uAdventure.Runner
                 elapsedTime += Time.deltaTime;
             }
 
-            if (!mouseDownDisabled  && Input.GetMouseButtonDown(0))
-            {
-                /*if (Time.timeScale == 1)
-                {
-                    if (next_interaction != null && guistate != guiState.ANSWERS_MENU)
-                    {
-                        Interacted();
-                    }
-                    else if (guistate == guiState.NOTHING)
-                    {
-                        // Aux func to avoid repeating code
-                        System.Func<Interactuable, bool> InteractAndTrack = (interacted) =>
-                        {
-                            if (interacted != null && InteractWith(interacted))
-                            {
-                                trackInteraction(interacted);
-                                return true;
-                            }
-                            return false;
-                        };
-
-                        bool no_interaction = true;
-
-                        // UI Interactuable elements
-                        if (EventSystem.current.IsPointerOverGameObject())
-                        {
-                            no_interaction = !InteractAndTrack(EventSystem.current.currentSelectedGameObject.GetComponent<Interactuable>());
-                        }
-
-                        // Physical interactuable elements
-                        if (no_interaction)
-                        {
-                            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                            List<RaycastHit> hits = new List<RaycastHit>(Physics.RaycastAll(ray));
-
-                            foreach (RaycastHit hit in hits)
-                            {
-                                no_interaction = !InteractAndTrack(hit.transform.GetComponent<Interactuable>());
-                                if (!no_interaction)
-                                    break;
-                            }
-                        }
-
-                        if (no_interaction)
-                            runnerTarget.Interacted();
-                    }
-                }*/
-            }
-            else if (Input.GetMouseButtonDown(1))
+            if (Input.GetMouseButtonDown(1))
             {
                 MenuMB.Instance.hide();
             }
@@ -284,7 +192,7 @@ namespace uAdventure.Runner
             }
         }
 
-        public bool Execute(Interactuable interactuable, OnExecutionFinished callback = null)
+        public bool Execute(Interactuable interactuable, ExecutionEvent callback = null)
         {
             // In case any menu is shown, we hide it
             MenuMB.Instance.hide(true);
@@ -292,7 +200,7 @@ namespace uAdventure.Runner
             if (executeStack.Count == 0 || executeStack.Peek().Key != interactuable)
             {
                 Debug.Log("Pushed " + interactuable.ToString());
-                executeStack.Push(new KeyValuePair<Interactuable, OnExecutionFinished>(interactuable, callback));
+                executeStack.Push(new KeyValuePair<Interactuable, ExecutionEvent>(interactuable, callback));
             }
             while(executeStack.Count > 0)
             {
@@ -309,21 +217,30 @@ namespace uAdventure.Runner
                     if (preInteractSize != executeStack.Count)
                     {
                         Debug.Log("The size was different");
-                        var backupStack = new Stack<KeyValuePair<Interactuable, OnExecutionFinished>>();
+                        var backupStack = new Stack<KeyValuePair<Interactuable, ExecutionEvent>>();
                         // We backup the new stacked things
                         while (executeStack.Count > preInteractSize)
+                        {
                             backupStack.Push(executeStack.Pop());
+                        }
                         // Then we remove our entry
                         executeStack.Pop();
                         // Then we reinsert the backuped stuff
                         while (backupStack.Count > 0)
+                        {
                             executeStack.Push(backupStack.Pop());
+                        }
                     }
-                    else executeStack.Pop();
+                    else
+                    {
+                        executeStack.Pop();
+                    }
                     try
                     {
                         if (toExecute.Value != null)
+                        {
                             toExecute.Value(toExecute.Key);
+                        }
                     }
                     catch (System.Exception ex)
                     {
@@ -337,7 +254,7 @@ namespace uAdventure.Runner
 
         private bool Interacted()
         {
-            guistate = guiState.NOTHING;
+            guistate = GUIState.NOTHING;
             GUIManager.Instance.destroyBubbles();
             if (executeStack.Count > 0)
             {
@@ -362,27 +279,58 @@ namespace uAdventure.Runner
         //################################################################
         #region Tracking
 
-        // TODO ?????
-        //List<GeneralScene> finalprogress = new List<GeneralScene>();
-        
+        private void LoadTrackerSettings()
+        {
+            //Load tracker data
+            SimpleJSON.JSONNode hostfile = new SimpleJSON.JSONClass();
+            bool loaded = false;
+
+            if (!Application.isMobilePlatform && Application.platform != RuntimePlatform.WebGLPlayer && useSystemIO)
+            {
+                if (!System.IO.File.Exists("host.cfg"))
+                {
+                    hostfile.Add("host", new SimpleJSON.JSONData("http://192.168.175.117:3000/api/proxy/gleaner/collector/"));
+                    hostfile.Add("trackingCode", new SimpleJSON.JSONData("57d81d5585b094006eab04d6ndecvjlvjss8aor"));
+                    System.IO.File.WriteAllText("host.cfg", hostfile.ToString());
+                }
+                else
+                {
+                    hostfile = SimpleJSON.JSON.Parse(System.IO.File.ReadAllText("host.cfg"));
+                }
+                loaded = true;
+            }
+
+            try
+            {
+                if (loaded)
+                {
+                    var settings = TrackerAsset.Instance.Settings as TrackerAssetSettings;
+                    settings.Host = hostfile["host"];
+                    settings.TrackingCode = hostfile["trackingCode"];
+                    //End tracker data loading
+                }
+            }
+            catch
+            {
+                Debug.Log("Error loading the tracker settings");
+            }
+        }
 
         private void trackSceneChange(IChapterTarget target)
         {
             alternative = null;
 
-            if (!string.IsNullOrEmpty(target.getXApiClass()))
+            if (!string.IsNullOrEmpty(target.getXApiClass()) && target.getXApiClass() == "accesible")
             {
-                if (target.getXApiClass() == "accesible")
-                {
-                    TrackerAsset.Instance.Accessible.Accessed(target.getId(), ExParsers.ParseEnum<AccessibleTracker.Accessible>(target.getXApiType()));
-                    TrackerAsset.Instance.Flush();
-                }
+                TrackerAsset.Instance.Accessible.Accessed(target.getId(), ExParsers.ParseEnum<AccessibleTracker.Accessible>(target.getXApiType()));
+                TrackerAsset.Instance.Flush();
             }
 
-            CompletableController.Instance.targetChanged(target);
+            CompletablesController.Instance.TargetChanged(target);
         }
 
         #endregion Tracking
+
         //#################################################################
         //########################### RENDERING ###########################
         //#################################################################
@@ -408,12 +356,16 @@ namespace uAdventure.Runner
             runnerTarget.Data = target;
             GameState.CurrentTarget = target.getId();
 
-            if(!trace)
+            if (!trace)
+            {
                 trackSceneChange(target);
+            }
 
             waitingRunTarget = true;
             if(notifyObject != null)
-                executeStack.Push(new KeyValuePair<Interactuable, OnExecutionFinished>(notifyObject, null));
+            {
+                executeStack.Push(new KeyValuePair<Interactuable, ExecutionEvent>(notifyObject, null));
+            }
             uAdventureRaycaster.Instance.Override = this.gameObject;
             
             return runnerTarget;
@@ -422,7 +374,9 @@ namespace uAdventure.Runner
         public void reRenderScene()
         {
             if (runnerTarget != null)
+            {
                 runnerTarget.RenderScene();
+            }
         }
 
         public void SwitchToLastTarget()
@@ -467,9 +421,11 @@ namespace uAdventure.Runner
                 // Order shuffeling when node is configured for random
                 this.order = Enumerable.Range(0, optionsNode.getLineCount()).ToList();
                 if (optionsNode.isRandom())
+                {
                     this.order.Shuffle();
+                }
                 this.guioptions = options;
-                this.guistate = guiState.ANSWERS_MENU;
+                this.guistate = GUIState.ANSWERS_MENU;
 
                 // Timeout option
                 if (optionsNode.Timeout > 0 && ConditionChecker.check(optionsNode.TimeoutConditions))
@@ -478,7 +434,9 @@ namespace uAdventure.Runner
                     this.elapsedTime = 0;
                 }
                 else
+                {
                     this.doTimeOut = false;
+                }
             }
         }
         
@@ -487,7 +445,7 @@ namespace uAdventure.Runner
             GUIManager.Instance.Talk(text, character);
         }
 
-        void OnGUI()
+        protected void OnGUI()
         {
             float guiscale = Screen.width / 800f;
             skin.box.fontSize = Mathf.RoundToInt(guiscale * 20);
@@ -496,11 +454,10 @@ namespace uAdventure.Runner
             skin.GetStyle("optionLabel").fontSize = Mathf.RoundToInt(guiscale * 36);
             skin.GetStyle("talk_player").fontSize = Mathf.RoundToInt(guiscale * 20);
             skin.GetStyle("emptyProgressBar").fontSize = Mathf.RoundToInt(guiscale * 20);
-            //float rectwith = guiscale * 330;
 
             switch (guistate)
             {
-                case guiState.ANSWERS_MENU:
+                case GUIState.ANSWERS_MENU:
                     GUILayout.BeginArea(new Rect(Screen.width * 0.1f, Screen.height * 0.1f, Screen.width * 0.8f, Screen.height * 0.8f));
                     GUILayout.BeginVertical();
                     OptionConversationNode options = (OptionConversationNode)guioptions.getNode();
@@ -515,12 +472,9 @@ namespace uAdventure.Runner
                     foreach (var i in order)
                     {
                         ConversationLine ono = options.getLine(i);
-                        if (ConditionChecker.check(options.getLineConditions(i)))
+                        if (ConditionChecker.check(options.getLineConditions(i)) && GUILayout.Button(ono.getText(), skin.button))
                         {
-                            if (GUILayout.Button((string)ono.getText(), skin.button))
-                            {
-                                OptionSelected(i);
-                            }
+                            OptionSelected(i);
                         }
                     }
 
@@ -584,19 +538,6 @@ namespace uAdventure.Runner
         }
 
         #endregion Misc
-
-
-
-
-        public delegate void SetCharacterCallback(bool success);
-
-        public void SetCharacterTo(CharacterInfo character, SetCharacterCallback callback)
-        {
-
-
-
-            callback(true);
-        }
 
     }
 }
