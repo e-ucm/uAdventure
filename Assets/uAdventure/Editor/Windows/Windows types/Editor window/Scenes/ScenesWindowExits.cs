@@ -41,6 +41,7 @@ namespace uAdventure.Editor
 
             exitsList = new DataControlList()
             {
+                RequestRepaint = Repaint,
                 elementHeight = 20,
                 Columns = new List<ColumnList.Column>()
                 {
@@ -289,14 +290,14 @@ namespace uAdventure.Editor
                     exit.setDestinyPosition(Mathf.RoundToInt(newPos.x), Mathf.RoundToInt(newPos.y));
 
                 EditorGUI.BeginChangeCheck();
-                bool useDestinyScale = EditorGUILayout.Toggle("Use destiny scale", exit.getDestinyScale() > 0); // TODO LANG
+                bool useDestinyScale = EditorGUILayout.Toggle("Use destiny scale", exit.getDestinyScale() >= 0); // TODO LANG
                 if (EditorGUI.EndChangeCheck())
                     exit.setDestinyScale(useDestinyScale ? 1f : float.MinValue);
 
                 if (useDestinyScale)
                 {
                     EditorGUI.BeginChangeCheck();
-                    var newScale = Mathf.Max(0, EditorGUILayout.FloatField(TC.get("SceneLocation.Scale"), exit.getDestinyScale()));
+                    var newScale = Mathf.Max(0.001f, EditorGUILayout.FloatField(TC.get("SceneLocation.Scale"), exit.getDestinyScale()));
                     if (EditorGUI.EndChangeCheck())
                         exit.setDestinyScale(newScale);
                 }

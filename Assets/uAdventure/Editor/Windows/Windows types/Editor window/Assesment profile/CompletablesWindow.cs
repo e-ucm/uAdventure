@@ -9,23 +9,19 @@ using System.Linq;
 namespace uAdventure.Editor
 {
     [EditorWindowExtension(200, typeof(Completable))]
-    public class AssesmentProfileWindow : DefaultButtonMenuEditorWindowExtension
+    public class CompletablesWindow : DefaultButtonMenuEditorWindowExtension
     {
-		string[] endoptions = { TC.get("Analytics.EndOptions.FinalScene"), TC.get("Analytics.EndOptions.AllLevels") };
-		string[] progressoptions = { TC.get("Analytics.ProgressOptions.NumberOfLevels"), TC.get("Analytics.ProgressOptions.Manual") };
-        int end = 0;
-        int progress = 0;
-        int num_colums = 5;
+        private readonly string[] endOptions = { TC.get("Analytics.EndOptions.FinalScene"), TC.get("Analytics.EndOptions.AllLevels") };
+        private readonly string[] progressOptions = { TC.get("Analytics.ProgressOptions.NumberOfLevels"), TC.get("Analytics.ProgressOptions.Manual") };
+        private readonly DataControlList completablesList;
 
-        private DataControlList completablesList;
-        private Completable selectedCompletable;
-
-        private string[] variables;
-
+        private int end = 0;
+        private int progress = 0;
         private CompletableListDataControl completables;
+
 		private bool Available { get; set; }
 
-        public AssesmentProfileWindow(Rect aStartPos, GUIStyle aStyle, params GUILayoutOption[] aOptions)
+        public CompletablesWindow(Rect aStartPos, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, new GUIContent(TC.get("Analytics.Title")), aStyle, aOptions)
         {
             var buttonContent = new GUIContent()
@@ -37,6 +33,7 @@ namespace uAdventure.Editor
 
             completablesList = new DataControlList()
             {
+                RequestRepaint = Repaint,
                 Columns = new List<ColumnList.Column>()
                 {
                     new ColumnList.Column()
@@ -140,20 +137,19 @@ namespace uAdventure.Editor
 
         public override void Draw(int aID)
 		{
-			variables = Controller.Instance.VarFlagSummary.getVars();
+			var variables = Controller.Instance.VarFlagSummary.getVars();
 			Available = variables != null && variables.Length > 0;
-
-            var windowWidth = Rect.width;
+            
             var windowHeight = Rect.height;
 
 			GUILayout.Label(TC.get("Analytics.GameStart") + Controller.Instance.SelectedChapterDataControl.getInitialScene());
 			GUILayout.Label(TC.get("Analytics.GameEnd"));
 
-            end = EditorGUILayout.Popup(end, endoptions);
+            end = EditorGUILayout.Popup(end, endOptions);
 
 			GUILayout.Label(TC.get("Analytics.GameProgress"));
 
-            progress = EditorGUILayout.Popup(progress, progressoptions);
+            progress = EditorGUILayout.Popup(progress, progressOptions);
 
             if (progress == 1)
             {
@@ -163,15 +159,6 @@ namespace uAdventure.Editor
             completables = Controller.Instance.SelectedChapterDataControl.getCompletables();
             completablesList.SetData(completables, (c) => (c as CompletableListDataControl).getCompletables().Cast<DataControl>().ToList());
             completablesList.DoList(windowHeight - 130);
-
-            /* ADD COMPLETABLE
-             * 
-                Completable nc = new Completable();
-                Completable.Score score = new Completable.Score();
-                score.setMethod(Completable.Score.ScoreMethod.SINGLE);
-                score.setType(Completable.Score.ScoreType.VARIABLE);
-                nc.setScore(score);
-                */
         }
 
         protected override void OnButton() {}
@@ -189,10 +176,11 @@ namespace uAdventure.Editor
             window.ShowUtility();
         }
 
-        private void Awake()
+        protected void Awake()
         {
             scoresList = new DataControlList()
             {
+                RequestRepaint = Repaint,
                 Columns = new List<ColumnList.Column>()
                 {
                     new ColumnList.Column()
@@ -202,12 +190,12 @@ namespace uAdventure.Editor
                 },
                 drawCell = (rect, row, column, isActive, isFocused) =>
                 {
-                    AssesmentProfileWindow.ScoreEditor(rect, scoresList.list[row] as ScoreDataControl);
+                    CompletablesWindow.ScoreEditor(rect, scoresList.list[row] as ScoreDataControl);
                 }
             };
         }
 
-        private void OnGUI()
+        protected void OnGUI()
         {
             if(score.getMethod() == Completable.Score.ScoreMethod.SINGLE)
             {

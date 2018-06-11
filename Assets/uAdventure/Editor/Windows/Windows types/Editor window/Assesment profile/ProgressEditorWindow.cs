@@ -37,6 +37,7 @@ namespace uAdventure.Editor
 
             progressList = new DataControlList()
             {
+                RequestRepaint = Repaint,
                 Columns = new List<ColumnList.Column>()
                 {
                     new ColumnList.Column()
@@ -66,8 +67,7 @@ namespace uAdventure.Editor
             };
 
         }
-
-        private bool hasToRepaint = false;
+        
         public void OnGUI()
         {
             GUILayout.Label("Progress is given by: ");
@@ -88,13 +88,6 @@ namespace uAdventure.Editor
                             progressList.Columns.Add(progressColumn);
                         break;
                 }
-                hasToRepaint = true;
-            }
-
-            if (hasToRepaint && Event.current.type == EventType.Layout)
-            {
-                this.Repaint();
-                hasToRepaint = false;
             }
 
             progressList.SetData(progress, (p) => (p as ProgressDataControl).getMilestones().ConvertAll(m => m as DataControl));

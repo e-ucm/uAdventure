@@ -6,13 +6,13 @@ using System.Linq;
 
 namespace uAdventure.Editor
 {
-    public class AdvencedFeaturesWindowListOfTimers : LayoutWindow
+    public class AdvancedFeaturesWindowListOfTimers : LayoutWindow
     {
         
         private GUIStyle smallFontStyle;
         private DataControlList timerList;
 
-        public AdvencedFeaturesWindowListOfTimers(Rect aStartPos, GUIContent aContent, GUIStyle aStyle,
+        public AdvancedFeaturesWindowListOfTimers(Rect aStartPos, GUIContent aContent, GUIStyle aStyle,
             params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
         {
@@ -23,6 +23,7 @@ namespace uAdventure.Editor
 
             timerList = new DataControlList()
             {
+                RequestRepaint = Repaint,
                 footerHeight = 25,
                 elementHeight = 25,
                 Columns = new System.Collections.Generic.List<ColumnList.Column>()

@@ -445,8 +445,7 @@ namespace uAdventure.Editor
             if (behaviour != item.getBehaviour())
             {
                 Controller.Instance.AddTool(new ChangeIntegerValueTool(item, (int)behaviour, "getBehaviourInteger", "setBehaviourInteger"));
-                //item.setBehaviour( behaviour );
-                //Controller.getInstance( ).dataModified( );
+                Controller.Instance.DataModified();
             }
         }
 
@@ -465,8 +464,7 @@ namespace uAdventure.Editor
             if (resourcesTransitionTime != item.getResourcesTransitionTime())
             {
                 Controller.Instance.AddTool(new ChangeLongValueTool(item, resourcesTransitionTime, "getResourcesTransitionTime", "setResourcesTransitionTime"));
-                //item.setResourcesTransitionTime( resourcesTransitionTime );
-                //Controller.getInstance( ).dataModified( );
+                Controller.Instance.DataModified();
             }
         }
     }

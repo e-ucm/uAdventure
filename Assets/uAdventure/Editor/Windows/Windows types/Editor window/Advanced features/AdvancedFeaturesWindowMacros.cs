@@ -9,16 +9,17 @@ using System.Linq;
 
 namespace uAdventure.Editor
 {
-    public class AdvencedFeaturesWindowMacros : LayoutWindow
+    public class AdvancedFeaturesWindowMacros : LayoutWindow
     {
         private DataControlList macroList;
 
-        public AdvencedFeaturesWindowMacros(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
+        public AdvancedFeaturesWindowMacros(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
         {
 
             macroList = new DataControlList()
             {
+                RequestRepaint = Repaint,
                 footerHeight = 25,
                 elementHeight = 40,
                 Columns = new System.Collections.Generic.List<ColumnList.Column>()

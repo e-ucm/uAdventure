@@ -12,17 +12,17 @@ namespace uAdventure.Editor
              * Scene controller that contains this element reference (used to extract
              * the id of the scene).
              */
-        private SceneDataControl sceneDataControl;
+        private readonly SceneDataControl sceneDataControl;
 
         /**
          * Contained activeArea.
          */
-        private ActiveArea activeArea;
+        private readonly ActiveArea activeArea;
 
         /**
          * Actions list controller.
          */
-        private ActionsListDataControl actionsListDataControl;
+        private readonly ActionsListDataControl actionsListDataControl;
 
         /**
          * Conditions controller.
@@ -32,9 +32,9 @@ namespace uAdventure.Editor
         /**
          * Controller for descriptions
          */
-        private DescriptionsController descriptionsController;
+        private readonly DescriptionsController descriptionsController;
 
-        private InfluenceAreaDataControl influenceAreaDataControl;
+        private readonly InfluenceAreaDataControl influenceAreaDataControl;
 
         /**
          * Constructor.
@@ -223,37 +223,33 @@ namespace uAdventure.Editor
 
         public override bool moveElementUp(DataControl dataControl)
         {
-
-            bool elementMoved = false;
-            return elementMoved;
+            return false;
         }
 
 
         public override bool moveElementDown(DataControl dataControl)
         {
-
-            bool elementMoved = false;
-            return elementMoved;
+            return false;
         }
 
 
-        public override string renameElement(string name)
+        public override string renameElement(string newName)
         {
             bool elementRenamed = false;
             string oldSceneId = activeArea.getId();
             string references = controller.countIdentifierReferences(oldSceneId).ToString();
 
             // Ask for confirmation
-            if (name != null || controller.ShowStrictConfirmDialog(TC.get("Operation.RenameSceneTitle"), TC.get("Operation.RenameElementWarning", new string[] { oldSceneId, references })))
+            if (newName != null || controller.ShowStrictConfirmDialog(TC.get("Operation.RenameSceneTitle"), TC.get("Operation.RenameElementWarning", new string[] { oldSceneId, references })))
             {
 
                 // Show a dialog asking for the new scene id
-                if (name == null)
+                if (newName == null)
                     controller.ShowInputDialog(TC.get("Operation.RenameSceneTitle"), 
                         TC.get("Operation.RenameSceneMessage"), oldSceneId, (o,s) => performRenameElement<ActiveArea>(s));
                 else
                 {
-                    performRenameElement<ActiveArea>(name);
+                    performRenameElement<ActiveArea>(newName);
                     elementRenamed = true;
                 }
             }
@@ -274,13 +270,7 @@ namespace uAdventure.Editor
 
         public override bool isValid(string currentPath, List<string> incidences)
         {
-
-            bool valid = true;
-
-            valid &= actionsListDataControl.isValid(currentPath, incidences);
-            //  valid &= descriptionsController.isValid( currentPath, incidences );
-
-            return valid;
+            return actionsListDataControl.isValid(currentPath, incidences);
         }
 
 
@@ -425,6 +415,21 @@ namespace uAdventure.Editor
         {
 
             return (Rectangle)this.getContent();
+        }
+
+        //v1.4
+        public void setBehaviour(Item.BehaviourType behaviour)
+        {
+            if (behaviour != activeArea.getBehaviour())
+            {
+                Controller.Instance.AddTool(new ChangeIntegerValueTool(activeArea, (int)behaviour, "getBehaviourInteger", "setBehaviourInteger"));
+                Controller.Instance.DataModified();
+            }
+        }
+
+        public Item.BehaviourType getBehaviour()
+        {
+            return activeArea.getBehaviour();
         }
 
         public InfluenceAreaDataControl getInfluenceArea()

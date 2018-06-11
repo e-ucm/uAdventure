@@ -270,16 +270,6 @@ namespace uAdventure.Editor
             return milestoneDataControls;
         }
 
-        public float getProgress()
-        {
-            return progress.getProgress();
-        } 
-
-        public void setProgress(float value)
-        {
-            Controller.Instance.AddTool(new ChangeFloatValueTool(progress, value, "getProgress", "setProgress"));
-        }
-
         public Completable.Progress.ProgressType getType()
         {
             return progress.getType();

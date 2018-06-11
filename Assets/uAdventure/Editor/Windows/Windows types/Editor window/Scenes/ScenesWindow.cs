@@ -200,6 +200,7 @@ namespace uAdventure.Editor
                 // SceneList
                 sceneList = new DataControlList()
                 {
+                    RequestRepaint = Repaint,
                     footerHeight = 10,
                     elementHeight = 20,
                     Columns = new List<ColumnList.Column>()

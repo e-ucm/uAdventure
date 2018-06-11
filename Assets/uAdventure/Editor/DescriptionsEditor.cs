@@ -39,6 +39,7 @@ public class DescriptionsEditor : Editor {
 
         descriptionsList = new DataControlList()
         {
+            RequestRepaint = Repaint,
             elementHeight = 20,
             Columns = new List<ColumnList.Column>()
             {

@@ -7,13 +7,13 @@ using System.Linq;
 
 namespace uAdventure.Editor
 {
-    public class AdvencedFeaturesWindowGlobalStates : LayoutWindow
+    public class AdvancedFeaturesWindowGlobalStates : LayoutWindow
     {
         private DataControlList globalStateList;
         private Texture2D conditionsTex;
         private Texture2D noConditionsTex;
 
-        public AdvencedFeaturesWindowGlobalStates(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
+        public AdvancedFeaturesWindowGlobalStates(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
         {
 
@@ -22,6 +22,7 @@ namespace uAdventure.Editor
 
             globalStateList = new DataControlList()
             {
+                RequestRepaint = Repaint,
                 footerHeight = 25,
                 elementHeight = 40,
                 Columns = new System.Collections.Generic.List<ColumnList.Column>()

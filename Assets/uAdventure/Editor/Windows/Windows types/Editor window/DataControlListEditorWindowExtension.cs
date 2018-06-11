@@ -21,6 +21,7 @@ namespace uAdventure.Editor
 
             dataControlList = new DataControlList()
             {
+                RequestRepaint = Repaint,
                 footerHeight = 25,
                 elementHeight = 25,
                 headerHeight = 0,

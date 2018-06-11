@@ -1012,6 +1012,7 @@ namespace uAdventure.Editor
         {
             Writer.writeData("Assets/uAdventure/Resources/CurrentGame", adventureDataControl, true);
             UnityEditor.AssetDatabase.Refresh();
+            dataModified_F = false;
         }
 
         public void DeleteDirectory(string targetDir)

@@ -78,6 +78,7 @@ namespace uAdventure.Editor
 
             variablesAndFlagsList = new ColumnList(new List<int>(), typeof(int))
             {
+                RequestRepaint = Repaint,
                 Columns = new List<ColumnList.Column>()
                 {
                     new ColumnList.Column(), new ColumnList.Column() { SizeOptions = new GUILayoutOption[] { GUILayout.Width(80) } }
