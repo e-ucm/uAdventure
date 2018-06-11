@@ -56,12 +56,18 @@ namespace uAdventure.Runner
                             case EffectType.DEACTIVATE:
                                 Game.Instance.GameState.setFlag(((DeactivateEffect)effect).getTargetId(), FlagCondition.FLAG_INACTIVE);
                                 break;
+                            case EffectType.SHOW_TEXT:
+                                var showTextEffect = (ShowTextEffect)effect;
+                                Game.Instance.Talk(showTextEffect.getText(), showTextEffect.getX(), showTextEffect.getY(),
+                                    showTextEffect.getRgbFrontColor(), showTextEffect.getRgbBorderColor());
+                                forcewait = true;
+                                break;
                             case EffectType.SPEAK_PLAYER:
-                                Game.Instance.talk(((SpeakPlayerEffect)effect).getLine(), Player.IDENTIFIER);
+                                Game.Instance.Talk(((SpeakPlayerEffect)effect).getLine(), Player.IDENTIFIER);
                                 forcewait = true;
                                 break;
                             case EffectType.SPEAK_CHAR:
-                                Game.Instance.talk(((SpeakCharEffect)effect).getLine(), ((SpeakCharEffect)effect).getTargetId());
+                                Game.Instance.Talk(((SpeakCharEffect)effect).getLine(), ((SpeakCharEffect)effect).getTargetId());
                                 forcewait = true;
                                 break;
                             case EffectType.TRIGGER_SCENE:

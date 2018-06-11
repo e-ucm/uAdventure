@@ -61,7 +61,23 @@ namespace uAdventure.Editor
             {
                 var pos = EditorGUILayout.Vector2IntField(TC.get("Inventory.Position"), new Vector2Int(effect.getX(), effect.getY()));
                 effect.setPosition(pos.x, pos.y);
-                effect.DestinyScale = EditorGUILayout.FloatField(TC.get("SceneLocation.Scale"), effect.DestinyScale);
+
+                EditorGUI.BeginChangeCheck();
+                bool useDestinyScale = EditorGUILayout.Toggle("Use destiny scale", effect.DestinyScale >= 0); // TODO LANG
+                if (EditorGUI.EndChangeCheck())
+                    effect.DestinyScale = useDestinyScale ? 1f : float.MinValue;
+
+                if (useDestinyScale)
+                {
+                    EditorGUI.BeginChangeCheck();
+                    var newScale = Mathf.Max(0.001f, EditorGUILayout.FloatField(TC.get("SceneLocation.Scale"), effect.DestinyScale));
+                    if (EditorGUI.EndChangeCheck())
+                        effect.DestinyScale = newScale;
+                }
+                else
+                {
+                    EditorGUILayout.HelpBox("The player size will stay as before entering the exit.", MessageType.Info); // TODO LANG
+                }
 
                 localSceneEditor.Components = EditorWindowBase.Components;
                 localSceneEditor.Scene = scenesList.getScenes()[sceneIndex];

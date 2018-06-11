@@ -248,6 +248,10 @@ namespace uAdventure.Editor
                     effectElement.SetAttribute("idTarget", triggerSceneEffect.getTargetId());
                     effectElement.SetAttribute("x", triggerSceneEffect.getX().ToString());
                     effectElement.SetAttribute("y", triggerSceneEffect.getY().ToString());
+                    if(triggerSceneEffect.DestinyScale >= 0)
+                    {
+                        effectElement.SetAttribute("scale", triggerSceneEffect.DestinyScale.ToString());
+                    }
                     break;
                 case EffectType.WAIT_TIME:
                     WaitTimeEffect waitTimeEffect = (WaitTimeEffect)effect;
@@ -259,8 +263,8 @@ namespace uAdventure.Editor
                     effectElement = doc.CreateElement("show-text");
                     effectElement.SetAttribute("x", showTextEffect.getX().ToString());
                     effectElement.SetAttribute("y", showTextEffect.getY().ToString());
-                    effectElement.SetAttribute("frontColor", showTextEffect.getRgbFrontColor().ToString());
-                    effectElement.SetAttribute("borderColor", showTextEffect.getRgbBorderColor().ToString());
+                    effectElement.SetAttribute("frontColor", "#" + ColorUtility.ToHtmlStringRGBA(showTextEffect.getRgbFrontColor()));
+                    effectElement.SetAttribute("borderColor", "#" + ColorUtility.ToHtmlStringRGBA(showTextEffect.getRgbBorderColor()));
                     effectElement.SetAttribute("uri", showTextEffect.getAudioPath());
                     effectElement.AppendChild(doc.CreateTextNode(showTextEffect.getText()));
                     break;

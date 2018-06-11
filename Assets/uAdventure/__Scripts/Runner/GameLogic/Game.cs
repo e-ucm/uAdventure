@@ -439,8 +439,18 @@ namespace uAdventure.Runner
                 }
             }
         }
-        
-        public void talk(string text, string character)
+
+        public void Talk(string text, int x, int y, Color textColor, Color textOutlineColor)
+        {
+            GUIManager.Instance.Talk(text, x, y, textColor, textOutlineColor);
+        }
+
+        public void Talk(string text, int x, int y, Color textColor, Color textOutlineColor, Color baseColor, Color outlineColor)
+        {
+            GUIManager.Instance.Talk(text, x, y, textColor, textOutlineColor, baseColor, outlineColor);
+        }
+
+        public void Talk(string text, string character)
         {
             GUIManager.Instance.Talk(text, character);
         }

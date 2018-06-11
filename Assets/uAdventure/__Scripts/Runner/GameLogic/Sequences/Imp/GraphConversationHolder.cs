@@ -61,7 +61,7 @@ namespace uAdventure.Runner
                             if (ConditionChecker.check(l.getConditions()))
                             {
                                 forcewait = true;
-                                Game.Instance.talk(l.getText(), l.getName());
+                                Game.Instance.Talk(l.getText(), l.getName());
                             }
                             current_line++;
                         }
@@ -83,7 +83,7 @@ namespace uAdventure.Runner
                         else if (showOption)
                         {
                             l = node.getLine(child);
-                            Game.Instance.talk(l.getText(), l.getName());
+                            Game.Instance.Talk(l.getText(), l.getName());
                             forcewait = true;
                             showOption = false;
                         }

@@ -169,10 +169,10 @@ namespace uAdventure.Editor
                         showTextEffect.setText((string)newProperties[EffectsController.EFFECT_PROPERTY_TEXT]);
                         showTextEffect.setTextPosition(int.Parse((string)newProperties[EffectsController.EFFECT_PROPERTY_X]), int.Parse((string)newProperties[EffectsController.EFFECT_PROPERTY_Y]));
 
-                        Color frontColor = default(Color);
+                        Color frontColor;
                         ColorUtility.TryParseHtmlString((string)newProperties[EffectsController.EFFECT_PROPERTY_FRONT_COLOR], out frontColor);
                         showTextEffect.setRgbFrontColor(frontColor);
-                        Color borderColor = default(Color);
+                        Color borderColor;
                         ColorUtility.TryParseHtmlString((string)newProperties[EffectsController.EFFECT_PROPERTY_BORDER_COLOR], out borderColor);
                         showTextEffect.setRgbFrontColor(borderColor);
                         showTextEffect.setAudioPath((string)newProperties[EffectsController.EFFECT_PROPERTY_PATH]);
