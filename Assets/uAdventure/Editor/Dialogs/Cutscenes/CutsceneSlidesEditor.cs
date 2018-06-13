@@ -42,7 +42,7 @@ namespace uAdventure.Editor
 
         private string cutscenePath;
 
-        private void OnEnable()
+        protected void OnEnable()
         {
             titleStyle = new GUIStyle();
             titleStyle.fontStyle = FontStyle.Bold;
@@ -96,8 +96,32 @@ namespace uAdventure.Editor
             base.Init(e);
         }
 
-        void OnGUI()
+        protected void OnGUI()
         {
+            Debug.Log("Eventtype: " + Event.current.type);
+            switch (Event.current.type)
+            {                
+                case EventType.DragUpdated:
+                    if (DragAndDrop.paths != null && DragAndDrop.paths.Length > 0)
+                    {
+                        DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
+                        Debug.Log("Dragging (" + Event.current.type + "):" + System.String.Join("\n", DragAndDrop.paths));
+                    }
+                    break;
+                case EventType.DragPerform:
+                    if (DragAndDrop.paths != null && DragAndDrop.paths.Length > 0)
+                    {
+                        DragAndDrop.AcceptDrag();
+                        foreach (var path in DragAndDrop.paths)
+                        {
+                            var uri = AssetsController.addSingleAsset(AssetsConstants.CATEGORY_ANIMATION_IMAGE, path);
+                            var frame = workingAnimation.addFrame(selectedFrame, null);
+                            frame.setUri(uri);
+                        }
+                    }
+                    break;
+            }
+
             EditorGUILayout.PrefixLabel(TC.get("Animation.GeneralInfo"), GUIStyle.none, titleStyle);
             EditorGUI.BeginChangeCheck();
             documentationTextContent = EditorGUILayout.TextField(TC.get("Animation.Documentation"), documentationTextContent);

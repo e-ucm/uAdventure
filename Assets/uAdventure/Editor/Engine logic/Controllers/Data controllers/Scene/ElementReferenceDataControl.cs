@@ -288,7 +288,7 @@ namespace uAdventure.Editor
         }
 
 
-        public override string renameElement(string name)
+        public override string renameElement(string newName)
         {
 
             return null;
@@ -436,12 +436,16 @@ namespace uAdventure.Editor
 
         }
 
+        public bool UsesOrientation()
+        {
+            return type == Controller.NPC_REFERENCE || type == Controller.PLAYER;
+        }
+
 
         public override void recursiveSearch()
         {
-
             check(this.conditionsController, TC.get("Search.Conditions"));
-            //check( this.getDocumentation( ), TC.get( "Search.Documentation" ) );
+            check(this.getDocumentation(), TC.get("Search.Documentation"));
             check(this.getElementId(), TC.get("Search.ElementID"));
         }
 
@@ -455,6 +459,16 @@ namespace uAdventure.Editor
         {
 
             this.visible = visible;
+        }
+
+        public Runner.Orientation GetOrientation()
+        {
+            return elementReference.GetOrientation();
+        }
+
+        public void SetOrientation(Runner.Orientation value)
+        {
+            Controller.Instance.AddTool(new ChangeEnumValueTool(elementReference, value, "GetOrientation", "SetOrientation"));
         }
 
 

@@ -40,8 +40,30 @@ namespace uAdventure.Runner
 #region Properties
         public eAnim Animation { get; set; }
         public SceneMB Scene { get; set; }
-        public ElementReference Context { get; set; }
-        public Orientation Orientation { get; set; }
+
+        private ElementReference context;
+
+
+        public ElementReference Context
+        {
+            get { return context; }
+            set
+            {
+                context = value;
+                Orientation = context.GetOrientation();
+            }
+        }
+
+        private Orientation orientation;
+        public Orientation Orientation
+        {
+            get { return orientation; }
+            set
+            {
+                orientation = value;
+                context.SetOrientation(orientation);
+            }
+        }
 
         public Texture2D Texture
         {
@@ -94,7 +116,6 @@ namespace uAdventure.Runner
                 {
                     this.gameObject.name = element.getId();
                 }
-                //deformation = -0.01f * FindObjectsOfType(this.GetType()).Length;
             }
         }
 

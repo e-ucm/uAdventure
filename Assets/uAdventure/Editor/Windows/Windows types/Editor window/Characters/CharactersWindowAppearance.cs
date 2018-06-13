@@ -239,7 +239,15 @@ namespace uAdventure.Editor
             }
             
             var npc = Target as NPCDataControl;
-            var previewPath = npc.getPreviewImage();
+            var previewPath = string.Empty;
+            if (SceneEditor.ElementReference != null)
+            {
+                previewPath = npc.getPreviewImage(SceneEditor.ElementReference.GetOrientation());
+            }
+            else
+            {
+                previewPath = npc.getPreviewImage();
+            }
             if (!string.IsNullOrEmpty(previewPath))
             {
                 var preview = Controller.ResourceManager.getImage(previewPath);

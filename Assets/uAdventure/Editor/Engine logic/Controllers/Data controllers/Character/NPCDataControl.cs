@@ -74,9 +74,9 @@ namespace uAdventure.Editor
          * 
          * @return Path to the image, null if not present
          */
-        public string getPreviewImage()
+        public string getPreviewImage(Runner.Orientation orientation = Runner.Orientation.E)
         {
-            string previewImagePath = getExistingPreviewImagePath();
+            string previewImagePath = getExistingPreviewImagePath(orientation);
             if (!string.IsNullOrEmpty(previewImagePath))
             {
                 var animation = Loader.loadAnimation(previewImagePath, Controller.ResourceManager);
@@ -101,16 +101,24 @@ namespace uAdventure.Editor
             return null;
         }
         // Modified v1.5 to fix a bug with empty animations in eaa format
-        private string getExistingPreviewImagePath()
+        private string getExistingPreviewImagePath(Runner.Orientation orientation = Runner.Orientation.E)
         {
 
             string path = null;
             foreach (ResourcesDataControl resource in resourcesDataControlList)
             {
+                string[] previews = null;
+                switch (orientation)
+                {
+                    case Runner.Orientation.N: previews = new string[] { "standup",    "standright", "standdown",  "standleft"  }; break;
+                    case Runner.Orientation.E: previews = new string[] { "standright", "standdown",  "standleft",  "standup"    }; break;
+                    case Runner.Orientation.S: previews = new string[] { "standdown",  "standleft",  "standup",    "standright" }; break;
+                    case Runner.Orientation.O: previews = new string[] { "standleft" , "standup",    "standright", "standdown"  }; break;
+                }
+
                 // We prioritize the left, the right and the down
-                path = (new string[] { "standleft", "standright", "standdown" })
-                    .Select(s => getNotEmptyAsset(resource, s))
-                    .FirstOrDefault(s => s != null);
+                path = (previews).Select(s => getNotEmptyAsset(resource, s))
+                                 .FirstOrDefault(s => s != null);
 
                 if (!string.IsNullOrEmpty(path))
                 {

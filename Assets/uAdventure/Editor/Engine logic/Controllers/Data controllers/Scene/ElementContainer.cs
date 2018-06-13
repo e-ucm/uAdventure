@@ -9,9 +9,7 @@ namespace uAdventure.Editor
 {
     public class ElementContainer : DataControl
     {
-
-
-        private ElementReferenceDataControl erdc;
+        private readonly ElementReferenceDataControl erdc;
 
         private int playerLayer;
 
@@ -53,7 +51,6 @@ namespace uAdventure.Editor
          */
         public void setImage(Sprite image)
         {
-
             Controller.Instance.DataModified();
             this.image = image;
         }
@@ -65,11 +62,14 @@ namespace uAdventure.Editor
          */
         public int getLayer()
         {
-
             if (erdc == null)
+            {
                 return playerLayer;
+            }
             else
+            {
                 return erdc.getElementReference().getLayer();
+            }
         }
 
         /**
@@ -79,11 +79,14 @@ namespace uAdventure.Editor
          */
         public int getY()
         {
-
             if (erdc == null)
+            {
                 return playerLayer;
+            }
             else
+            {
                 return erdc.getElementReference().getY();
+            }
         }
 
         /**
@@ -96,9 +99,13 @@ namespace uAdventure.Editor
         {
             Controller.Instance.DataModified();
             if (erdc == null)
+            {
                 playerLayer = layer;
+            }
             else
+            {
                 erdc.getElementReference().setLayer(layer);
+            }
         }
 
         /**
@@ -108,7 +115,6 @@ namespace uAdventure.Editor
          */
         public bool isPlayer()
         {
-
             return erdc == null;
         }
 
@@ -131,24 +137,44 @@ namespace uAdventure.Editor
                 int type = erdc.getType();
                 string imagePath = string.Empty;
 
-                if (type == Controller.ITEM_REFERENCE)
-                    imagePath =
-                        Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
-                            Controller.Instance                                .SelectedChapterDataControl                                .getItemsList()
-                                .getItemIndexByID(erdc.getElementId())].getPreviewImage();
-                else if (type == Controller.ATREZZO_REFERENCE)
-                    imagePath =
-                        Controller.Instance.SelectedChapterDataControl.getAtrezzoList().getAtrezzoList()[
-                            Controller.Instance                                .SelectedChapterDataControl                                .getAtrezzoList()
-                                .getAtrezzoIndexByID(erdc.getElementId())].getPreviewImage();
-                else if (type == Controller.NPC_REFERENCE)
-                    imagePath =
-                        Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
-                            Controller.Instance                                .SelectedChapterDataControl                                .getNPCsList()
-                                .getNPCIndexByID(erdc.getElementId())].getPreviewImage();
+                switch (type)
+                {
+                    case Controller.ITEM_REFERENCE:
+                        {
+                            var items = Controller.Instance.SelectedChapterDataControl.getItemsList();
+                            var itemIndex = items.getItemIndexByID(erdc.getElementId());
+                            if(itemIndex != -1)
+                            {
+                                imagePath = items.getItems()[itemIndex].getPreviewImage();
+                            }
+                        }
+                        break;
+                    case Controller.ATREZZO_REFERENCE:
+                        {
+                            var atrezzos = Controller.Instance.SelectedChapterDataControl.getAtrezzoList();
+                            var atrezzoIndex = atrezzos.getAtrezzoIndexByID(erdc.getElementId());
+                            if (atrezzoIndex != -1)
+                            {
+                                imagePath = atrezzos.getAtrezzoList()[atrezzoIndex].getPreviewImage();
+                            }
+                        }
+                        break;
+                    case Controller.NPC_REFERENCE:
+                        {
+                            var npcs = Controller.Instance.SelectedChapterDataControl.getNPCsList();
+                            var npcIndex = npcs.getNPCIndexByID(erdc.getElementId());
+                            if (npcIndex != -1)
+                            {
+                                imagePath = npcs.getNPCs()[npcIndex].getPreviewImage(erdc.GetOrientation());
+                            }
+                        }
+                        break;
+                }
 
                 if (!string.IsNullOrEmpty(imagePath))
-                    image = AssetsController.getImage(imagePath);
+                {
+                    image = Controller.ResourceManager.getSprite(imagePath);
+                }
             }
             return image;
         }
@@ -177,150 +203,130 @@ namespace uAdventure.Editor
         // Embebbed erdc
         public override object getContent()
         {
-            if (erdc != null)
-                return erdc.getContent();
-            return null;
+            return erdc != null ? erdc.getContent() : null;
         }
 
         public override int[] getAddableElements()
         {
-            if (erdc != null)
-                return erdc.getAddableElements();
-            return null;
+            return erdc != null ? erdc.getAddableElements() : null;
         }
 
         public override bool canAddElement(int type)
         {
-            if (erdc != null)
-                return erdc.canAddElement(type);
-            return false;
+            return erdc != null && erdc.canAddElement(type);
         }
 
         public override bool canBeDeleted()
         {
-            if (erdc != null)
-                return erdc.canBeDeleted();
-            return false;
+            return erdc != null && erdc.canBeDeleted();
         }
 
         public override bool canBeDuplicated()
         {
-            if (erdc != null)
-                return erdc.canBeDuplicated();
-            return false;
+            return erdc != null && erdc.canBeDuplicated();
         }
 
         public override bool canBeMoved()
         {
-            if (erdc != null)
-                return erdc.canBeMoved();
-            return false;
+            return erdc != null && erdc.canBeMoved();
         }
 
         public override bool canBeRenamed()
         {
-            if (erdc != null)
-                return erdc.canBeRenamed();
-            return false;
+            return erdc != null && erdc.canBeRenamed();
         }
 
         public override bool addElement(int type, string id)
         {
-            if (erdc != null)
-                return erdc.addElement(type, id);
-            return false;
+            return erdc != null && erdc.addElement(type, id);
         }
 
         public override bool deleteElement(DataControl dataControl, bool askConfirmation)
         {
-            if (erdc != null)
-                return erdc.deleteElement(dataControl, askConfirmation);
-            return false;
+            return erdc != null && erdc.deleteElement(dataControl, askConfirmation);
         }
 
         public override bool moveElementUp(DataControl dataControl)
         {
-            if (erdc != null)
-                return erdc.moveElementUp(dataControl);
-            return false;
+            return erdc != null && erdc.moveElementUp(dataControl);
         }
 
         public override bool moveElementDown(DataControl dataControl)
         {
-            if (erdc != null)
-                return erdc.moveElementDown(dataControl);
-            return false;
+            return erdc != null && erdc.moveElementDown(dataControl);
         }
 
         public override string renameElement(string newName)
         {
-            if (erdc != null)
-                return erdc.renameElement(newName);
-            return string.Empty;
+            return erdc != null ? erdc.renameElement(newName) : string.Empty;
         }
 
         public override void updateVarFlagSummary(VarFlagSummary varFlagSummary)
         {
             if (erdc != null)
+            {
                 erdc.updateVarFlagSummary(varFlagSummary);
+            }
         }
 
         public override bool isValid(string currentPath, List<string> incidences)
         {
-            if (erdc != null)
-                return erdc.isValid(currentPath, incidences);
-            return true;
+            return erdc == null || erdc.isValid(currentPath, incidences);
         }
 
         public override int countAssetReferences(string assetPath)
         {
-            if (erdc != null)
-                return erdc.countAssetReferences(assetPath);
-            return 0;
+            return erdc != null ? erdc.countAssetReferences(assetPath) : 0;
         }
 
         public override void getAssetReferences(List<string> assetPaths, List<int> assetTypes)
         {
             if (erdc != null)
+            {
                 erdc.getAssetReferences(assetPaths, assetTypes);
+            }
         }
 
         public override void deleteAssetReferences(string assetPath)
         {
             if (erdc != null)
+            {
                 erdc.deleteAssetReferences(assetPath);
+            }
         }
 
         public override int countIdentifierReferences(string id)
         {
-            if (erdc != null)
-                return erdc.countIdentifierReferences(id);
-            return 0;
+            return erdc != null ? erdc.countIdentifierReferences(id) : 0;
         }
 
         public override void replaceIdentifierReferences(string oldId, string newId)
         {
             if (erdc != null)
+            {
                 erdc.replaceIdentifierReferences(oldId, newId);
+            }
         }
 
         public override void deleteIdentifierReferences(string id)
         {
             if (erdc != null)
+            {
                 erdc.deleteIdentifierReferences(id);
+            }
         }
 
         public override List<Searchable> getPathToDataControl(Searchable dataControl)
         {
-            if (erdc != null)
-                return erdc.getPathToDataControl(dataControl);
-            return null;
+            return erdc != null ? erdc.getPathToDataControl(dataControl) : null;
         }
 
         public override void recursiveSearch()
         {
             if (erdc != null)
+            {
                 erdc.recursiveSearch();
+            }
         }
     }
 }

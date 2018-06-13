@@ -298,6 +298,7 @@ namespace uAdventure.Editor
                     npcReferenceElement.SetAttribute("x", characterReference.getX().ToString());
                     npcReferenceElement.SetAttribute("y", characterReference.getY().ToString());
                     npcReferenceElement.SetAttribute("scale", characterReference.getScale().ToString());
+                    npcReferenceElement.SetAttribute("orientation", ((int)characterReference.GetOrientation()).ToString());
                     if (characterReference.getLayer() != -1)
                         npcReferenceElement.SetAttribute("layer", characterReference.getLayer().ToString());
                     if (characterReference.getInfluenceArea().isExists())

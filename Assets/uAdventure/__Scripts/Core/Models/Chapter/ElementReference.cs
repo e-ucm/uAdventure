@@ -51,6 +51,8 @@ namespace uAdventure.Core
          */
         private InfluenceArea influenceArea;
 
+        private Runner.Orientation orientation;
+
         /**
          * Creates a new ElementReference
          * 
@@ -73,6 +75,7 @@ namespace uAdventure.Core
             documentation = null;
             conditions = new Conditions();
             influenceArea = new InfluenceArea();
+            orientation = Runner.Orientation.E;
         }
 
         /**
@@ -285,6 +288,16 @@ namespace uAdventure.Core
         {
 
             this.influenceArea = influenceArea;
+        }
+
+        public Runner.Orientation GetOrientation()
+        {
+            return orientation;
+        }
+
+        public void SetOrientation(Runner.Orientation value)
+        {
+            orientation = value;
         }
 
         public object Clone()

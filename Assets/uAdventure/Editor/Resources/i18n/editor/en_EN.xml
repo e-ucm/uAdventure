@@ -2130,6 +2130,13 @@ In the game you can define conditions based on the value of the variables.</entr
 <entry key="RemoveElementEffect.Title">Remove element</entry>
 <entry key="RemoveElementEffect.Description">Removes the element(s) from the current scene</entry>
 <entry key="Scene.NoPlayer">Hide player</entry>
+<entry key="ChangeOrientationEffect.Title">Change Orientation</entry>
+<entry key="ChangeOrientationEffect.Description">Change the orientation where the element is looking to.</entry>
+<entry key="ElementReference.Orientation">Orientation</entry>
+<entry key="Orientation.N">Up</entry>
+<entry key="Orientation.S">Down</entry>
+<entry key="Orientation.W">Left</entry>
+<entry key="Orientation.E">Right</entry>
 
 <!-- Analytics -->
 <entry key="Analytics.Title">Analytics</entry>

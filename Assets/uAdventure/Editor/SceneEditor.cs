@@ -8,6 +8,7 @@ using UnityEngine;
 public class SceneEditor {
 
     public static SceneEditor Current;
+    public static ElementReferenceDataControl ElementReference;
 
     private DataControl selectedElement;
 
@@ -109,11 +110,17 @@ public class SceneEditor {
             components = new List<EditorComponent>();
             // Basic
             if (Components.ContainsKey(element.GetType()))
+            {
                 components.AddRange(Components[element.GetType()]);
+            }
+
             // Interface
-            foreach (var inter in element.GetType().GetInterfaces())
-                if (Components.ContainsKey(inter))
-                    components.AddRange(Components[inter]);
+            var typeInterfaceComponents = element.GetType()
+                .GetInterfaces()
+                .Where(i => Components.ContainsKey(i))
+                .SelectMany(i => Components[i]);
+
+            components.AddRange(typeInterfaceComponents);
 
             // Sorting the components by order
             if(components.Count > 0)
@@ -136,13 +143,16 @@ public class SceneEditor {
     public void DoCallForWholeElement(DataControl element, Action<EditorComponent> call)
     {
         var currentSceneEditor = SceneEditor.Current;
+        var currentReference = SceneEditor.ElementReference;
         SceneEditor.Current = this;
+        SceneEditor.ElementReference = null;
         var elem = element;
         // If its a reference
         if (element is ElementReferenceDataControl)
         {
             // First we draw the special components for the element reference
             var elemRef = element as ElementReferenceDataControl;
+            SceneEditor.ElementReference = elemRef;
             DoCallForElement(elemRef, call);
             // And then we set it up to be able to draw the referenced element components
             element = elemRef.getReferencedElementDataControl();
@@ -157,6 +167,7 @@ public class SceneEditor {
         // Component drawing
         DoCallForElement(element, call);
         SceneEditor.Current = currentSceneEditor;
+        SceneEditor.ElementReference = currentReference;
     }
 
     public void PushMatrix()
