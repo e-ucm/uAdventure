@@ -41,7 +41,7 @@ namespace uAdventure.Editor
 
             localSceneEditor = new SceneEditor();
             playerDestination = new Trajectory.Node("", 0, 0, 1f);
-            localSceneEditor.elements = new List<DataControl>() { new NodeDataControl(null, playerDestination, new Trajectory()) };
+            localSceneEditor.Elements = new List<DataControl>() { new NodeDataControl(null, playerDestination, new Trajectory()) };
         }
 
         public virtual void draw()

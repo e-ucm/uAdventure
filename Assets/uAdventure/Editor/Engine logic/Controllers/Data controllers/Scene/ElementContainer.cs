@@ -139,7 +139,7 @@ namespace uAdventure.Editor
 
                 switch (type)
                 {
-                    case Controller.ITEM_REFERENCE:
+                    default:
                         {
                             var items = Controller.Instance.SelectedChapterDataControl.getItemsList();
                             var itemIndex = items.getItemIndexByID(erdc.getElementId());

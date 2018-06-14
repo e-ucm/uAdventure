@@ -244,7 +244,9 @@ namespace uAdventure.Core
 			int x = ExParsers.ParseDefault (element.GetAttribute ("x"), 0), 
 				y = ExParsers.ParseDefault (element.GetAttribute ("y"), 0);
 
-			float scale = ExParsers.ParseDefault (element.GetAttribute("scale"), NumberFormatInfo.CurrentInfo, 0f);
+            Runner.Orientation orientation = (Runner.Orientation) ExParsers.ParseDefault(element.GetAttribute("orientation"), 1);
+
+            float scale = ExParsers.ParseDefault (element.GetAttribute("scale"), NumberFormatInfo.CurrentInfo, 0f);
 			int layer = ExParsers.ParseDefault (element.GetAttribute("layer"), -1);
 
 			int influenceX 		= ExParsers.ParseDefault (element.GetAttribute("influenceX"), 0), 
@@ -255,6 +257,7 @@ namespace uAdventure.Core
 			bool hasInfluence = ExString.EqualsDefault(element.GetAttribute("hasInfluenceArea"), "yes", false);
 
 			var currentElementReference = new ElementReference(idTarget, x, y, layer);
+            currentElementReference.SetOrientation(orientation);
 			if (hasInfluence)
 			{
 				InfluenceArea influenceArea = new InfluenceArea(influenceX, influenceY, influenceWidth, influenceHeight);

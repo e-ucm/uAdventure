@@ -132,11 +132,15 @@ namespace uAdventure.Runner
 
         public Texture2D getImage(string uri)
         {
-            if (uri == null)
+            if (string.IsNullOrEmpty(uri))
+            {
                 return null;
+            }
 
             if (images.ContainsKey(uri))
+            {
                 return images[uri].Texture;
+            }
             else
             {
                 Texture2DHolder holder = new Texture2DHolder(fixPath(uri), type);

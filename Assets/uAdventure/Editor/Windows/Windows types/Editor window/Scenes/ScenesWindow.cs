@@ -123,7 +123,7 @@ namespace uAdventure.Editor
                         allElements.Add(scene.getTrajectory());
                         break;
                 }
-                sceneEditor.elements = allElements;
+                sceneEditor.Elements = allElements;
             }
 
             // Send the callback back

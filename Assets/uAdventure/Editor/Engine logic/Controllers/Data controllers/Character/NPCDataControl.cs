@@ -9,6 +9,11 @@ namespace uAdventure.Editor
 {
     public class NPCDataControl : DataControlWithResources
     {
+        private static readonly string[] previewPriorityUp     = { "standup",    "standright", "standdown",  "standleft"  };
+        private static readonly string[] previewPriorityRight  = { "standright", "standdown",  "standleft",  "standup"    };
+        private static readonly string[] previewPriorityDown   = { "standdown",  "standleft",  "standup",    "standright" };
+        private static readonly string[] previewPriorityLeft   = { "standleft" , "standup",    "standright", "standdown"  };
+
         /**
              * Constant for the empty animation
              */
@@ -17,17 +22,17 @@ namespace uAdventure.Editor
         /**
          * Contained NPC data.
          */
-        private NPC npc;
+        private readonly NPC npc;
 
         /**
          * Actions list controller.
          */
-        private ActionsListDataControl actionsListDataControl;
+        private readonly ActionsListDataControl actionsListDataControl;
 
         /**
          * Controller for descriptions
          */
-        private DescriptionsController descriptionController;
+        private readonly DescriptionsController descriptionController;
 
         /**
          * Constructor
@@ -69,12 +74,14 @@ namespace uAdventure.Editor
             return actionsListDataControl;
         }
 
+
         /**
          * Returns the path to the selected preview image.
          * 
          * @return Path to the image, null if not present
          */
-        public string getPreviewImage(Runner.Orientation orientation = Runner.Orientation.E)
+        public string getPreviewImage() { return getPreviewImage(Runner.Orientation.E); }
+        public string getPreviewImage(Runner.Orientation orientation)
         {
             string previewImagePath = getExistingPreviewImagePath(orientation);
             if (!string.IsNullOrEmpty(previewImagePath))
@@ -110,10 +117,10 @@ namespace uAdventure.Editor
                 string[] previews = null;
                 switch (orientation)
                 {
-                    case Runner.Orientation.N: previews = new string[] { "standup",    "standright", "standdown",  "standleft"  }; break;
-                    case Runner.Orientation.E: previews = new string[] { "standright", "standdown",  "standleft",  "standup"    }; break;
-                    case Runner.Orientation.S: previews = new string[] { "standdown",  "standleft",  "standup",    "standright" }; break;
-                    case Runner.Orientation.O: previews = new string[] { "standleft" , "standup",    "standright", "standdown"  }; break;
+                    default:                   previews = previewPriorityRight; break;
+                    case Runner.Orientation.N: previews = previewPriorityUp;    break;
+                    case Runner.Orientation.S: previews = previewPriorityDown;  break;
+                    case Runner.Orientation.O: previews = previewPriorityLeft;  break;
                 }
 
                 // We prioritize the left, the right and the down
@@ -365,7 +372,7 @@ namespace uAdventure.Editor
         }
 
 
-        public override string renameElement(string name)
+        public override string renameElement(string newName)
         {
             string oldNPCId = npc.getId();
             string references = controller.countIdentifierReferences(oldNPCId).ToString();

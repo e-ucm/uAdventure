@@ -10,24 +10,21 @@ namespace uAdventure.Editor
 {
     public class ChangeOrientationEffectEditor : EffectEditor
     {
-        private readonly Type[] types = new Type[] { typeof(NPC) };
+        private readonly Type[] types = { typeof(NPC) };
         private readonly int[] orientationValues;
         private readonly string[] orientationTexts;
 
         public bool Collapsed { get; set; }
         private Rect window = new Rect(0, 0, 300, 0);
-        private string[] ids;
         public Rect Window
         {
             get
             {
-                if (Collapsed) return new Rect(window.x, window.y, 50, 30);
-                else return window;
+                return Collapsed ? new Rect(window.x, window.y, 50, 30) : window;
             }
             set
             {
-                if (Collapsed) window = new Rect(value.x, value.y, window.width, window.height);
-                else window = value;
+                window = Collapsed ? new Rect(value.x, value.y, window.width, window.height) : value;
             }
         }
 
@@ -35,7 +32,7 @@ namespace uAdventure.Editor
 
         public ChangeOrientationEffectEditor()
         {
-            ids = Controller.Instance.IdentifierSummary.combineIds(types);
+            var ids = Controller.Instance.IdentifierSummary.combineIds(types);
             this.effect = new ChangeOrientationEffect(ids.FirstOrDefault(), Runner.Orientation.S);
 
             var orientations = Enum.GetValues(typeof(Runner.Orientation));
@@ -45,7 +42,7 @@ namespace uAdventure.Editor
 
         public void draw()
         {
-            ids = Controller.Instance.VarFlagSummary.getFlags();
+            var ids = Controller.Instance.VarFlagSummary.getFlags();
             effect.setTargetId(ids[EditorGUILayout.Popup(TC.get("Condition.FlagID"), Array.IndexOf(ids, effect.getTargetId()), ids)]);
 
             EditorGUI.BeginChangeCheck();

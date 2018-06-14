@@ -61,7 +61,10 @@ namespace uAdventure.Runner
             set
             {
                 orientation = value;
-                context.SetOrientation(orientation);
+                if (context != null)
+                {
+                    context.SetOrientation(orientation);
+                }
             }
         }
 
