@@ -278,6 +278,18 @@ namespace uAdventure.Core
                         }
                     }
                 }
+
+                tmpString = configuration.GetAttribute("autosave");
+                if (!string.IsNullOrEmpty(tmpString))
+                {
+                    adventureData.setAutoSave(tmpString.Equals("yes"));
+                }
+
+                tmpString = configuration.GetAttribute("save-on-suspend");
+                if (!string.IsNullOrEmpty(tmpString))
+                {
+                    adventureData.setSaveOnSuspend(tmpString.Equals("yes"));
+                }
             }
 
             if (contents != null)

@@ -4,6 +4,7 @@ using System.Xml;
 
 using uAdventure.Core;
 using System;
+using System.Linq;
 
 namespace uAdventure.Editor
 {
@@ -38,10 +39,10 @@ namespace uAdventure.Editor
         /// <summary>
         /// Fills the descriptor node with the addventure data control data
         /// </summary>
-        /// <param name="descriptorNode"></param>
+        /// <param name="node"></param>
         /// <param name="target"></param>
         /// <param name="options">InvalidAdventureDataControlParam is accepted</param>
-        protected override void FillNode(XmlNode descriptorNode, object target, params IDOMWriterParam[] options)
+        protected override void FillNode(XmlNode node, object target, params IDOMWriterParam[] options)
         {
             var adventureData = target as AdventureDataControl;
 
@@ -49,81 +50,88 @@ namespace uAdventure.Editor
             XmlDocument doc = Writer.GetDoc();
 
             // Create the root node
-            ((XmlElement)descriptorNode).SetAttribute("versionNumber", adventureData.getAdventureData().getVersionNumber());
+            ((XmlElement)node).SetAttribute("versionNumber", adventureData.getAdventureData().getVersionNumber());
 
             // Create and append the title
             XmlNode adventureTitleNode = doc.CreateElement("title");
             adventureTitleNode.AppendChild(doc.CreateTextNode(adventureData.getTitle()));
-            descriptorNode.AppendChild(adventureTitleNode);
+            node.AppendChild(adventureTitleNode);
 
             // Create and append the description
             XmlNode adventureDescriptionNode = doc.CreateElement("description");
             adventureDescriptionNode.AppendChild(doc.CreateTextNode(adventureData.getDescription()));
-            descriptorNode.AppendChild(adventureDescriptionNode);
+            node.AppendChild(adventureDescriptionNode);
 
             // Create and append the "invalid" tag (if necessary)
-            var valid = true;
-            foreach (var o in options)
-                if (o is InvalidAdventureDataControlParam)
-                    valid = false;
+            var invalid = options.Any(option => option is InvalidAdventureDataControlParam);
+            if (invalid)
+            {
+                node.AppendChild(doc.CreateElement("invalid"));
+            }
 
-            if (!valid)
-                descriptorNode.AppendChild(doc.CreateElement("invalid"));
+            // Automatic commentaries
             if (adventureData.isCommentaries())
             {
-                descriptorNode.AppendChild(doc.CreateElement("automatic-commentaries"));
+                node.AppendChild(doc.CreateElement("automatic-commentaries"));
             }
 
             // Create and append the configuration
-            XmlNode configurationNode = doc.CreateElement("configuration");
-            if (adventureData.isKeepShowing())
-                ((XmlElement)configurationNode).SetAttribute("keepShowing", "yes");
-            else
-                ((XmlElement)configurationNode).SetAttribute("keepShowing", "no");
+            XmlElement configurationNode = doc.CreateElement("configuration");
 
-            if (adventureData.isKeyboardNavigationEnabled())
-                ((XmlElement)configurationNode).SetAttribute("keyboard-navigation", "enabled");
-            else
-                ((XmlElement)configurationNode).SetAttribute("keyboard-navigation", "disabled");
+            // Keep Showing
+            var keepShowingValue = adventureData.isKeepShowing() ? "yes" : "no";
+            configurationNode.SetAttribute("keepShowing", keepShowingValue);
 
+            // Keyboard Navigation
+            var keyboardNavigationValue = adventureData.isKeepShowing() ? "enabled" : "disabled";
+            configurationNode.SetAttribute("keyboard-navigation", keyboardNavigationValue);
 
+            // Default click action
             switch (adventureData.getDefaultClickAction())
             {
                 case DescriptorData.DefaultClickAction.SHOW_DETAILS:
-                    ((XmlElement)configurationNode).SetAttribute("defaultClickAction", "showDetails");
+                    configurationNode.SetAttribute("defaultClickAction", "showDetails");
                     break;
                 case DescriptorData.DefaultClickAction.SHOW_ACTIONS:
-                    ((XmlElement)configurationNode).SetAttribute("defaultClickAction", "showActions");
+                    configurationNode.SetAttribute("defaultClickAction", "showActions");
                     break;
             }
 
+            // Perspective
             switch (adventureData.getPerspective())
             {
                 case DescriptorData.Perspective.REGULAR:
-                    ((XmlElement)configurationNode).SetAttribute("perspective", "regular");
+                    configurationNode.SetAttribute("perspective", "regular");
                     break;
                 case DescriptorData.Perspective.ISOMETRIC:
-                    ((XmlElement)configurationNode).SetAttribute("perspective", "isometric");
+                    configurationNode.SetAttribute("perspective", "isometric");
                     break;
             }
 
+            // Drag Behaviour
             switch (adventureData.getDragBehaviour())
             {
                 case DescriptorData.DragBehaviour.IGNORE_NON_TARGETS:
-                    ((XmlElement)configurationNode).SetAttribute("dragBehaviour", "ignoreNonTargets");
+                    configurationNode.SetAttribute("dragBehaviour", "ignoreNonTargets");
                     break;
-                case DescriptorData.DragBehaviour.CONSIDER_NON_TARGETS:
-                    ((XmlElement)configurationNode).SetAttribute("dragBehaviour", "considerNonTargets");
+                default: // CONSIDER_NON_TARGETS
+                    configurationNode.SetAttribute("dragBehaviour", "considerNonTargets");
                     break;
             }
 
-            //GUI Element
+            // GUI Element
             XmlElement guiElement = doc.CreateElement("gui");
-            if (adventureData.getGUIType() == DescriptorData.GUI_TRADITIONAL)
-                guiElement.SetAttribute("type", "traditional");
-            else if (adventureData.getGUIType() == DescriptorData.GUI_CONTEXTUAL)
-                guiElement.SetAttribute("type", "contextual");
+            switch (adventureData.getGUIType())
+            {
+                case DescriptorData.GUI_TRADITIONAL:
+                    guiElement.SetAttribute("type", "ignoreNonTargets");
+                    break;
+                default: // GUI CONTEXTUAL
+                    guiElement.SetAttribute("type", "contextual");
+                    break;
+            }
 
+            // Inventory Position
             switch (adventureData.getInventoryPosition())
             {
                 case DescriptorData.INVENTORY_NONE:
@@ -147,6 +155,7 @@ namespace uAdventure.Editor
 
             }
 
+            // Cursors
             if (adventureData.getCursors().Count > 0)
             {
                 XmlNode cursorsNode = doc.CreateElement("cursors");
@@ -160,6 +169,7 @@ namespace uAdventure.Editor
                 guiElement.AppendChild(cursorsNode);
             }
 
+            // Buttons
             if (adventureData.getButtons().Count > 0)
             {
                 XmlNode buttonsNode = doc.CreateElement("buttons");
@@ -175,6 +185,7 @@ namespace uAdventure.Editor
                 guiElement.AppendChild(buttonsNode);
             }
 
+            // Arrows
             if (adventureData.getArrows().Count > 0)
             {
                 XmlNode arrowNode = doc.CreateElement("arrows");
@@ -193,24 +204,33 @@ namespace uAdventure.Editor
 
             //Player mode element
             XmlElement playerModeElement = doc.CreateElement("mode");
-            if (adventureData.getPlayerMode() == DescriptorData.MODE_PLAYER_1STPERSON)
-                playerModeElement.SetAttribute("playerTransparent", "yes");
-            else if (adventureData.getPlayerMode() == DescriptorData.MODE_PLAYER_3RDPERSON)
-                playerModeElement.SetAttribute("playerTransparent", "no");
+            var isPlayerTransparent = adventureData.getPlayerMode() == DescriptorData.MODE_PLAYER_1STPERSON;
+            playerModeElement.SetAttribute("playerTransparent", isPlayerTransparent ? "yes" : "no");
             configurationNode.AppendChild(playerModeElement);
 
             //Graphic config element
             XmlElement graphicConfigElement = doc.CreateElement("graphics");
-            if (adventureData.getGraphicConfig() == DescriptorData.GRAPHICS_WINDOWED)
-                graphicConfigElement.SetAttribute("mode", "windowed");
-            else if (adventureData.getGraphicConfig() == DescriptorData.GRAPHICS_FULLSCREEN)
-                graphicConfigElement.SetAttribute("mode", "fullscreen");
-            else if (adventureData.getGraphicConfig() == DescriptorData.GRAPHICS_BLACKBKG)
-                graphicConfigElement.SetAttribute("mode", "blackbkg");
+            var graphicsMode = "fullscreen"; // GRAPHICS_FULLSCREEN
+            switch (adventureData.getGraphicConfig())
+            {
+                case DescriptorData.GRAPHICS_WINDOWED: graphicsMode = "windowed"; break;
+                case DescriptorData.GRAPHICS_BLACKBKG: graphicsMode = "blackbkg"; break;
+            }
+            graphicConfigElement.SetAttribute("mode", graphicsMode);
+
             configurationNode.AppendChild(graphicConfigElement);
 
+
+            // Keep Showing
+            var autoSave = adventureData.isAutoSave() ? "yes" : "no";
+            configurationNode.SetAttribute("autosave", autoSave);
+
+            // Keep Showing
+            var saveOnSuspend = adventureData.isSaveOnSuspend() ? "yes" : "no";
+            configurationNode.SetAttribute("save-on-suspend", saveOnSuspend);
+
             //Append configurationNode
-            descriptorNode.AppendChild(configurationNode);
+            node.AppendChild(configurationNode);
 
             // Create and add the contents with the chapters
             XmlNode contentsNode = doc.CreateElement("contents");
@@ -231,25 +251,11 @@ namespace uAdventure.Editor
                 chapterDescriptionNode.AppendChild(doc.CreateTextNode(chapter.getDescription()));
                 chapterElement.AppendChild(chapterDescriptionNode);
 
-                // Create and append the adaptation configuration
-                /*if( !chapter.getAdaptationPath( ).equals( "" ) ) {
-                        Element adaptationPathElement = doc.CreateElement( "adaptation-configuration" );
-                        adaptationPathElement.SetAttribute( "path", chapter.getAdaptationPath( ) );
-                        chapterElement.AppendChild( adaptationPathElement );
-                    }
-
-                    // Create and append the assessment configuration
-                    if( !chapter.getAssessmentPath( ).equals( "" ) ) {
-                        Element assessmentPathElement = doc.CreateElement( "assessment-configuration" );
-                        assessmentPathElement.SetAttribute( "path", chapter.getAssessmentPath( ) );
-                        chapterElement.AppendChild( assessmentPathElement );
-                    }*/
-
                 // Store the node
                 contentsNode.AppendChild(chapterElement);
             }
             // Store the chapters in the descriptor
-            descriptorNode.AppendChild(contentsNode);
+            node.AppendChild(contentsNode);
         }
     }
 }

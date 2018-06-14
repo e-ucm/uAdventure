@@ -105,8 +105,8 @@ namespace uAdventure.Editor
                             {
                                 switch (openedWindow)
                                 {
-                                    case WindowType.FLAGS: value = Game.Instance.GameState.checkFlag(elem) == 1 ? "inactive" : "active"; break;
-                                    case WindowType.VARS: value = Game.Instance.GameState.getVariable(elem); break;
+                                    case WindowType.FLAGS: value = Game.Instance.GameState.CheckFlag(elem) == 1 ? "inactive" : "active"; break;
+                                    case WindowType.VARS: value = Game.Instance.GameState.GetVariable(elem); break;
                                 }
                             }
                             else

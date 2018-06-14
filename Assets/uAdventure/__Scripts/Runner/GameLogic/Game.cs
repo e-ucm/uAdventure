@@ -125,7 +125,7 @@ namespace uAdventure.Runner
             AdventureHandler adventure = new AdventureHandler(data, ResourceManager);
             adventure.Parse("descriptor.xml");
             game_state = new GameState(data);
-            CompletablesController.Instance.SetCompletables(GameState.getCompletables());
+            CompletablesController.Instance.SetCompletables(GameState.GetCompletables());
         }
 
 
@@ -145,7 +145,7 @@ namespace uAdventure.Runner
             // When clicks are out, i capture them
             uAdventureRaycaster.Base = this.gameObject;
 
-            TimerController.Instance.Timers = GameState.getTimers();
+            TimerController.Instance.Timers = GameState.GetTimers();
             TimerController.Instance.Run();
         }
 
@@ -350,7 +350,7 @@ namespace uAdventure.Runner
             }
 
             // Here we connect with the IChapterTargetFactory and create an IRunnerChapterTarget
-            IChapterTarget target = GameState.getChapterTarget(scene_id);
+            IChapterTarget target = GameState.GetChapterTarget(scene_id);
 
             runnerTarget = RunnerChapterTargetFactory.Instance.Instantiate(target);
             runnerTarget.Data = target;
@@ -381,7 +381,7 @@ namespace uAdventure.Runner
 
         public void SwitchToLastTarget()
         {
-            GeneralScene scene = GameState.getLastScene();
+            GeneralScene scene = GameState.GetLastScene();
 
             if (scene != null)
                 RunTarget(scene.getId());

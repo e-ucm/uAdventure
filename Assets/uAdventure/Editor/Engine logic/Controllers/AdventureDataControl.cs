@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 using uAdventure.Core;
+using System;
 
 namespace uAdventure.Editor
 {
@@ -123,6 +124,26 @@ namespace uAdventure.Editor
         {
 
             return DescriptorData.typeAllowed[adventureData.getGUIType()][type];
+        }
+
+        public bool isAutoSave()
+        {
+            return adventureData.isAutoSave();
+        }
+
+        public void setAutoSave(bool autoSave)
+        {
+            Controller.Instance.AddTool(new ChangeBooleanValueTool(adventureData, autoSave, "isAutoSave", "setAutoSave"));
+        }
+
+        public bool isSaveOnSuspend()
+        {
+            return adventureData.isSaveOnSuspend();
+        }
+
+        public void setSaveOnSuspend(bool autoSave)
+        {
+            Controller.Instance.AddTool(new ChangeBooleanValueTool(adventureData, autoSave, "isSaveOnSuspend", "setSaveOnSuspend"));
         }
 
         /**

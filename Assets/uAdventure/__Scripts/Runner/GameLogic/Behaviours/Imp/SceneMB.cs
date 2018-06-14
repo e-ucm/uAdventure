@@ -477,19 +477,19 @@ namespace uAdventure.Runner
             {
                 basePrefab = atrezzoPrefab;
                 parent = referencesHolder;
-                element = Game.Instance.GameState.getAtrezzo(localContext.getTargetId());
+                element = Game.Instance.GameState.GetAtrezzo(localContext.getTargetId());
             }
             else if (type == typeof(NPC))
             {
                 basePrefab = characterPrefab;
                 parent = referencesHolder;
-                element = Game.Instance.GameState.getCharacter(localContext.getTargetId());
+                element = Game.Instance.GameState.GetCharacter(localContext.getTargetId());
             }
             else if (type == typeof(Item))
             {
                 basePrefab = objectPrefab;
                 parent = referencesHolder;
-                element = Game.Instance.GameState.getObject(localContext.getTargetId());
+                element = Game.Instance.GameState.GetObject(localContext.getTargetId());
             }
             else
             {

@@ -7,7 +7,7 @@ namespace uAdventure.Core
     /**
      * LMS property, stores an id and a value, for adaptation purposes
      */
-    public class UOLProperty : ICloneable
+    public class UOLProperty : ICloneable, HasId
     {
         /**
          * Required

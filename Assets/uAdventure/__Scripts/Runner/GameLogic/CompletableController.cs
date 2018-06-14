@@ -237,7 +237,7 @@ namespace uAdventure.Runner
                     {
                         case Completable.Score.ScoreType.VARIABLE:
                             // In case of variable type, the target id points to a variable
-                            var variableValue = Game.Instance.GameState.getVariable(targetId);
+                            var variableValue = Game.Instance.GameState.GetVariable(targetId);
                             score = variableValue;
                             break;
                         case Completable.Score.ScoreType.COMPLETABLE:

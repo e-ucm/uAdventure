@@ -12,7 +12,7 @@ namespace uAdventure.Runner
         public bool execute()
         {
             // Add the element
-            Game.Instance.GameState.addRemovedElement(effect.getTargetId());
+            Game.Instance.GameState.AddRemovedElement(effect.getTargetId());
             // Refresh the scene
             Game.Instance.RunTarget(Game.Instance.GameState.CurrentTarget);
             return false;

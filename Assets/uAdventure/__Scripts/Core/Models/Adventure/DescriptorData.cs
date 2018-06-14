@@ -331,6 +331,10 @@ namespace uAdventure.Core
 
         protected bool keyboardNavigationEnabled;
 
+        protected bool autoSave;
+
+        protected bool saveOnSuspend;
+
         /**
          * Constant for identify when a game is executed from engine
          */
@@ -955,6 +959,26 @@ namespace uAdventure.Core
         {
 
             this.keyboardNavigationEnabled = keyboardNavigation;
+        }
+        
+        public bool isAutoSave()
+        {
+            return autoSave;
+        }
+
+        public void setAutoSave(bool autoSave)
+        {
+            this.autoSave = autoSave;
+        }
+
+        public bool isSaveOnSuspend()
+        {
+            return saveOnSuspend;
+        }
+
+        public void setSaveOnSuspend(bool saveOnSuspend)
+        {
+            this.saveOnSuspend = saveOnSuspend;
         }
 
         public virtual object Clone()

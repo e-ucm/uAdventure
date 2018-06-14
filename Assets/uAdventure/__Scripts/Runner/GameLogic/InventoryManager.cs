@@ -106,7 +106,7 @@ namespace uAdventure.Runner
             elementGO.SendMessage("Start"); // Force start
 
             // Add the element to the gamestate
-            Game.Instance.GameState.addInventoryItem(element.getId());
+            Game.Instance.GameState.AddInventoryItem(element.getId());
             // Save the element in the cache
             elementObjects.Add(element, elementGO);
             // Add the element to the rendered inventory
@@ -122,7 +122,7 @@ namespace uAdventure.Runner
             }
 
             // Remove the element from the gamestate
-            Game.Instance.GameState.removeInventoryItem(element.getId());
+            Game.Instance.GameState.RemoveInventoryItem(element.getId());
             // Remove from the inventory
             inventory.RemoveElement(elementObjects[element]);
             // Destroy the object

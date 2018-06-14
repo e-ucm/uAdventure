@@ -15,12 +15,12 @@ namespace uAdventure.Runner
 
         public static bool IsRemoved(this HasTargetId element)
         {
-            return Game.Instance.GameState.getRemovedElements().Contains(element.getTargetId());
+            return Game.Instance.GameState.GetRemovedElements().Contains(element.getTargetId());
         }
 
         public static bool IsRemoved(this HasId element)
         {
-            return Game.Instance.GameState.getRemovedElements().Contains(element.getId());
+            return Game.Instance.GameState.GetRemovedElements().Contains(element.getId());
         }
 
         public static IEnumerable<HasTargetId> NotRemoved(this IEnumerable<HasTargetId> elements)

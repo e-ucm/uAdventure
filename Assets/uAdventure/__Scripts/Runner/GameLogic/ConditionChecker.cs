@@ -56,15 +56,15 @@ namespace uAdventure.Runner
             switch (condition.getType())
             {
                 case Condition.FLAG_CONDITION:
-                    ret = Game.Instance.GameState.checkFlag(condition.getId()) == condition.getState();
+                    ret = Game.Instance.GameState.CheckFlag(condition.getId()) == condition.getState();
                     break;
                 case Condition.GLOBAL_STATE_CONDITION:
-                    ret = Game.Instance.GameState.checkGlobalState(condition.getId()) == condition.getState();
+                    ret = Game.Instance.GameState.CheckGlobalState(condition.getId()) == condition.getState();
                     break;
                 case Condition.NO_STATE: break;
                 case Condition.VAR_CONDITION:
                     VarCondition c = (VarCondition)condition;
-                    int val = Game.Instance.GameState.getVariable(condition.getId());
+                    int val = Game.Instance.GameState.GetVariable(condition.getId());
 
                     switch (c.getState())
                     {

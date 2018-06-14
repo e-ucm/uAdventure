@@ -119,7 +119,7 @@ namespace uAdventure.Runner
                 if (talkerObject == null)
                     return;
 
-                NPC cha = Game.Instance.GameState.getCharacter(talkerName);
+                NPC cha = Game.Instance.GameState.GetCharacter(talkerName);
                 ShowBubble(generateBubble(cha, text, talkerObject));
             }
             if (talkerObject)

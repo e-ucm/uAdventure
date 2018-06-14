@@ -378,12 +378,14 @@ namespace uAdventure.Editor
             string references = controller.countIdentifierReferences(oldNPCId).ToString();
 
             // Ask for confirmation
-            if (name != null || controller.ShowStrictConfirmDialog(TC.get("Operation.RenameNPCTitle"), TC.get("Operation.RenameElementWarning", new string[] { oldNPCId, references })))
+            if (newName != null || controller.ShowStrictConfirmDialog(TC.get("Operation.RenameNPCTitle"), TC.get("Operation.RenameElementWarning", new string[] { oldNPCId, references })))
             {
                 // Show a dialog asking for the new npc id
-                string newNPCId = name;
-                if (name == null)
-                    controller.ShowInputDialog(TC.get("Operation.RenameNPCTitle"), TC.get("Operation.RenameNPCMessage"), oldNPCId, (o,s) => performRenameElement(s));
+                string newNPCId = newName;
+                if (newName == null)
+                {
+                    controller.ShowInputDialog(TC.get("Operation.RenameNPCTitle"), TC.get("Operation.RenameNPCMessage"), oldNPCId, (o, s) => performRenameElement(s));
+                }
                 else
                 {
                     controller.DataModified();
@@ -399,7 +401,9 @@ namespace uAdventure.Editor
             string oldNPCId = npc.getId();
             // If some value was typed and the identifiers are different
             if (!controller.isElementIdValid(newNPCId))
+            {
                 newNPCId = controller.makeElementValid(newNPCId);
+            }
 
             npc.setId(newNPCId);
             controller.replaceIdentifierReferences(oldNPCId, newNPCId);
