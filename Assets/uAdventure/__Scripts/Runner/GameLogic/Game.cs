@@ -184,12 +184,23 @@ namespace uAdventure.Runner
                     Time.timeScale = 1;
                     GUIManager.Instance.showConfigMenu();
                 }
-                else
+                else if (!isSomethingRunning())
                 {
                     Time.timeScale = 0;
                     GUIManager.Instance.showConfigMenu();
                 }
             }
+        }
+
+        public void LoadGame()
+        {
+            GameState.RestoreFrom("save");
+            RunTarget(GameState.CurrentTarget);
+        }
+
+        public void SaveGame()
+        {
+            GameState.SerializeTo("save");
         }
 
         public bool Execute(Interactuable interactuable, ExecutionEvent callback = null)
@@ -335,6 +346,7 @@ namespace uAdventure.Runner
         //########################### RENDERING ###########################
         //#################################################################
         #region Rendering
+
 
         public IRunnerChapterTarget RunTarget(string scene_id, Interactuable notifyObject, bool trace = true)
         {

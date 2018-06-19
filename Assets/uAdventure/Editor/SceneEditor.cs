@@ -55,6 +55,7 @@ namespace uAdventure.Editor
                 return size;
             }
         }
+
         public SceneDataControl Scene
         {
             get
@@ -216,6 +217,9 @@ namespace uAdventure.Editor
 
         public void Draw(Rect rect)
         {
+            var previousCurrent = Current;
+            Current = this;
+
             Viewport = rect.AdjustToRatio(Size.x / Size.y);
 
             if (workingScene.getSelectedResources() != lastSelectedResources)
@@ -239,6 +243,30 @@ namespace uAdventure.Editor
             {
                 GUI.DrawTexture(Viewport, foregroundPreview, ScaleMode.ScaleToFit);
             }
+
+            Current = previousCurrent;
+        }
+
+        public void OnInspectorGUI()
+        {
+            var previousCurrent = Current;
+            Current = this;
+
+            DoCallForWholeElement(SelectedElement, (component) =>
+            {
+                component.Collapsed = !EditorGUILayout.Foldout(!component.Collapsed, (component.Attribute.Name), true);
+                if (!component.Collapsed)
+                {
+                    EditorGUI.indentLevel++;
+                    component.DrawInspector();
+                    GUILayout.Space(5);
+                    EditorGUI.indentLevel--;
+                }
+                //
+                DrawSplitLine(GUILayoutUtility.GetLastRect().max.y);
+            });
+
+            Current = previousCurrent;
         }
 
         private DataControl UpdateAndRenderElements(bool wantsToDeselect)
@@ -310,6 +338,14 @@ namespace uAdventure.Editor
             }
 
             lastSelectedResources = scene.getSelectedResources();
+        }
+
+
+        protected void DrawSplitLine(float y)
+        {
+            Rect position = new Rect(-5f, y, 1000f, 1f);
+            Rect texCoords = new Rect(0f, 1f, 1f, 1f - 1f / (float)GUI.skin.FindStyle("IN title").normal.background.height);
+            GUI.DrawTextureWithTexCoords(position, GUI.skin.FindStyle("IN title").normal.background, texCoords);
         }
 
         private Texture2D CreateMask(Texture2D background, Texture2D foreground)

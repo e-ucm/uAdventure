@@ -83,7 +83,7 @@ namespace uAdventure.Editor
 
             if (newCondition != null)
             {
-                if (index1 < conditions.size())
+                if (index1 < conditions.Size())
                 {
 
                     if (index2 == ConditionsController.INDEX_NOT_USED)
@@ -91,17 +91,17 @@ namespace uAdventure.Editor
                         // Add new block
                         List<Condition> newBlock = new List<Condition>();
                         newBlock.Add(newCondition);
-                        conditions.add(index1, newBlock);
+                        conditions.Add(index1, newBlock);
                         indexAdded = index1;
                         blockAdded = newBlock;
                     }
                     else
                     {
-                        List<Condition> block = conditions.get(index1);
+                        var block = conditions.Get(index1);
                         if (index2 < 0 || index2 > block.Count)
                             return false;
 
-                        if (index2 == conditions.size())
+                        if (index2 == conditions.Size())
                         {
                             block.Add(newCondition);
                             indexAdded = block.IndexOf(newCondition);
@@ -121,8 +121,8 @@ namespace uAdventure.Editor
                     // Add new block
                     List<Condition> newBlock = new List<Condition>();
                     newBlock.Add(newCondition);
-                    conditions.add(newBlock);
-                    indexAdded = conditions.size() - 1;
+                    conditions.Add(newBlock);
+                    indexAdded = conditions.Size() - 1;
                     blockAdded = newBlock;
                 }
                 Controller.Instance.updateVarFlagSummary();
@@ -137,14 +137,14 @@ namespace uAdventure.Editor
 
             if (blockAdded != null)
             {
-                conditions.add(indexAdded, blockAdded);
+                conditions.Add(indexAdded, blockAdded);
                 Controller.Instance.updateVarFlagSummary();
                 Controller.Instance.updatePanel();
                 return true;
             }
             else if (conditionAdded != null)
             {
-                conditions.get(index1).Insert(indexAdded, conditionAdded);
+                conditions.Get(index1).Insert(indexAdded, conditionAdded);
                 Controller.Instance.updateVarFlagSummary();
                 Controller.Instance.updatePanel();
                 return true;
@@ -158,14 +158,14 @@ namespace uAdventure.Editor
 
             if (blockAdded != null)
             {
-                conditions.delete(indexAdded);
+                conditions.Delete(indexAdded);
                 Controller.Instance.updateVarFlagSummary();
                 Controller.Instance.updatePanel();
                 return true;
             }
             else if (conditionAdded != null)
             {
-                conditions.get(index1).RemoveAt(indexAdded);
+                conditions.Get(index1).RemoveAt(indexAdded);
                 Controller.Instance.updateVarFlagSummary();
                 Controller.Instance.updatePanel();
                 return true;

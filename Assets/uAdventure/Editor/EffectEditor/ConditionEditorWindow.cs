@@ -112,7 +112,7 @@ namespace uAdventure.Editor
             GUILayout.Label(TC.get("Conditions.Title"));
             if (GUILayout.Button(TC.get("Condition.AddBlock")))
             {
-                conditions.add(new FlagCondition(""));
+                conditions.Add(new FlagCondition(""));
             }
             GUILayout.EndVertical();
 
@@ -128,7 +128,7 @@ namespace uAdventure.Editor
 			var toRemove = new List<Condition>();
 			var listsToRemove = new List<List<Condition>>();
 			bool toAdd = false;
-			foreach (List<Condition> cl in conditions.getConditionsList())
+			foreach (List<Condition> cl in conditions.GetConditionsList())
 			{
 				if (cl.Count > 1)
 					GUILayout.BeginVertical(eitherConditionStyle);
@@ -174,7 +174,7 @@ namespace uAdventure.Editor
 			}
 
 			foreach(var l in listsToRemove)
-				conditions.getConditionsList().Remove(l);
+				conditions.GetConditionsList().Remove(l);
 		}
     }
 

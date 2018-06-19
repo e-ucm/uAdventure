@@ -16,11 +16,13 @@ namespace uAdventure.Runner
         private class HeightLayerComparer : IComparer<Representable>
         {
             public Dictionary<Representable, float> Heights { get; set; }
-            public int Compare(Representable r1, Representable r2)
+            public int Compare(Representable x, Representable y)
             {
-                var order = (int)(Heights[r1] - Heights[r2]);
+                var order = (int)(Heights[x] - Heights[y]);
                 if (Mathf.Approximately(order, 0))
-                    order = r1.Context.getLayer() - r2.Context.getLayer();
+                {
+                    order = x.Context.getLayer() - y.Context.getLayer();
+                }
                 return order;
             }
         }
@@ -39,12 +41,9 @@ namespace uAdventure.Runner
         public GameObject exitPrefab, activeAreaPrefab, characterPrefab, objectPrefab, atrezzoPrefab, playerPrefab;
         private Transform exitsHolder, activeAreasHolder, referencesHolder, background, foreground;
         private bool interactuable = false;
-        private GeneralScene sceneData;
         private bool ready = false;
         private bool dragging = false;
         private Vector2 endDragSpeed = Vector2.zero;
-        private Dictionary<ElementReference, ElementReference> localContexts = new Dictionary<ElementReference, ElementReference>();
-        private HeightLayerComparer comparer;
         private Dictionary<Representable, float> heights;
         private SortedList<Representable, float> finalOrder;
 
@@ -52,12 +51,11 @@ namespace uAdventure.Runner
         private float minZ;
         private float maxZ;
         private TrajectoryHandler trajectoryHandler;
-        private float[] layerY = new float[0];
 
         // Transitions
         private bool fading = false;
         private float totalTime = 0f, currentTime = 0f;
-        private float resistance = 5000f;
+        private readonly float resistance = 5000f;
 
 
         // Slides Properties
@@ -69,11 +67,7 @@ namespace uAdventure.Runner
         private MovieState movieplayer = MovieState.NOT_MOVIE;
 
 
-        public GeneralScene SceneData
-        {
-            get { return sceneData; }
-            set { sceneData = value; }
-        }
+        public GeneralScene SceneData { get; set; }
 
         public object Data
         {
@@ -114,7 +108,7 @@ namespace uAdventure.Runner
         // Use this for initialization
         protected void Start()
         {
-            this.gameObject.name = sceneData.getId();
+            this.gameObject.name = SceneData.getId();
             RenderScene();
         }
 
@@ -126,7 +120,9 @@ namespace uAdventure.Runner
                 var lastSpeed = endDragSpeed;
                 endDragSpeed -= (endDragSpeed.normalized * resistance) * Time.deltaTime;
                 if (lastSpeed.sqrMagnitude < endDragSpeed.sqrMagnitude)
+                {
                     endDragSpeed = Vector2.zero;
+                }
             }
         }
 
@@ -253,8 +249,8 @@ namespace uAdventure.Runner
         private void LoadZBoundaries()
         {
             // Space for references goes from background to the references holder
-            minZ = 1; // background.localPosition.z;
-            maxZ = -1; // referencesHolder.localPosition.z;
+            minZ = 1; 
+            maxZ = -1; 
         }
 
 
@@ -297,17 +293,17 @@ namespace uAdventure.Runner
         {
             this.transform.position = new Vector3(0, 0, 0);
             LoadParents();
-            switch (sceneData.getType())
+            switch (SceneData.getType())
             {
                 case GeneralScene.GeneralSceneSceneType.VIDEOSCENE:
                     InventoryManager.Instance.Show = false;
-                    movie = Game.Instance.ResourceManager.getVideo(((Videoscene)sceneData).getResources()[0].getAssetPath(Videoscene.RESOURCE_TYPE_VIDEO));
+                    movie = Game.Instance.ResourceManager.getVideo(((Videoscene)SceneData).getResources()[0].getAssetPath(Videoscene.RESOURCE_TYPE_VIDEO));
                     movieplayer = MovieState.LOADING;
                     SetBackground(movie.Movie);
                     break;
                 case GeneralScene.GeneralSceneSceneType.SCENE:
                     InventoryManager.Instance.Show = true;
-                    Scene scene = (Scene)sceneData;
+                    Scene scene = (Scene)SceneData;
                     Texture2D backgroundTexture = null;
                     foreach (ResourcesUni sr in scene.getResources())
                     {
@@ -338,15 +334,12 @@ namespace uAdventure.Runner
                     DeleteChilds(referencesHolder);
                     // Characters
 
-                    foreach (var typeContext in scene.getCharacterReferences()
-                            .Select(elemRef => new { type = typeof(NPC), context = elemRef })
-                        .Union(scene.getAtrezzoReferences()
-                            .Select(elemRef => new { type = typeof(Atrezzo), context = elemRef }))
-                        .Union(scene.getItemReferences()
-                            .Select(elemRef => new { type = typeof(Item), context = elemRef }))
-                        .Where(tc => !tc.context.IsRemoved() && ConditionChecker.check(tc.context.getConditions())))
+                    foreach (var context in Game.Instance.GameState
+                        .GetElementReferences(scene.getId())
+                        .Where(tc => !tc.IsRemoved())
+                        .Checked())
                     {
-                        InstanceElement(typeContext.type, typeContext.context);
+                        InstanceElement(context);
                     }
 
                     //###################### ACTIVEAREAS ######################
@@ -385,14 +378,13 @@ namespace uAdventure.Runner
                             }).ToArray();
 
                             trajectory = new Trajectory();
-                            var width = backgroundTexture ? (int)backgroundTexture.width : Screen.width;
+                            var width = backgroundTexture ? backgroundTexture.width : Screen.width;
                             trajectory.addNode("leftSide", 0, playerContext.getY(), playerContext.getScale());
                             trajectory.addNode("rightSide", width, playerContext.getY(), playerContext.getScale());
                             trajectory.addSide("leftSide", "rightSide", width);
                         }
 
                         trajectoryHandler = new TrajectoryHandler(TrajectoryHandler.CreateBlockedTrajectory(trajectory, barriers));
-                        /*GameObject.Destroy(this.transform.FindChild ("Player"));*/
 
                         Representable player = GameObject.Instantiate(playerPrefab, referencesHolder).GetComponent<Representable>();
                         player.Element = Game.Instance.GameState.Player;
@@ -412,7 +404,7 @@ namespace uAdventure.Runner
                     break;
                 case GeneralScene.GeneralSceneSceneType.SLIDESCENE:
                     InventoryManager.Instance.Show = false;
-                    Slidescene ssd = (Slidescene)sceneData;
+                    Slidescene ssd = (Slidescene)SceneData;
                     currentSlide = 0;
                     foreach (ResourcesUni r in ssd.getResources())
                     {
@@ -439,57 +431,31 @@ namespace uAdventure.Runner
             }
         }
 
-        private void InstanceElement<T>(ElementReference context) where T : Element
+        private void InstanceElement(ElementReference context)
         {
-            InstanceElement(typeof(T), context);
-        }
-
-        private void InstanceElement(Type type, ElementReference context)
-        {
-            if (!typeof(Element).IsAssignableFrom(type))
+            Element element = Game.Instance.GameState.FindElement<Element>(context.getTargetId());
+            if(element == null)
             {
-                Debug.LogError("Trying to instance a non-element");
+                Debug.LogError("Unable to find target element: " + context.getTargetId());
                 return;
             }
-
-            if (!ConditionChecker.check(context.getConditions()))
-            {
-                return;
-            }
-
-            if (!localContexts.ContainsKey(context))
-            {
-                ElementReference new_context = new ElementReference(context.getTargetId(), context.getX(), context.getY());
-                new_context.setScale(context.getScale());
-                new_context.setLayer(context.getLayer());
-                new_context.setInfluenceArea(context.getInfluenceArea());
-                new_context.setConditions(context.getConditions());
-                localContexts.Add(context, new_context);
-            }
-
-            ElementReference localContext = localContexts[context];
 
             GameObject basePrefab;
             Transform parent;
-            Element element;
-
-            if (type == typeof(Atrezzo))
+            if (element.GetType() == typeof(Atrezzo))
             {
                 basePrefab = atrezzoPrefab;
                 parent = referencesHolder;
-                element = Game.Instance.GameState.GetAtrezzo(localContext.getTargetId());
             }
-            else if (type == typeof(NPC))
+            else if (element.GetType() == typeof(NPC))
             {
                 basePrefab = characterPrefab;
                 parent = referencesHolder;
-                element = Game.Instance.GameState.GetCharacter(localContext.getTargetId());
             }
-            else if (type == typeof(Item))
+            else if (element.GetType() == typeof(Item))
             {
                 basePrefab = objectPrefab;
                 parent = referencesHolder;
-                element = Game.Instance.GameState.GetObject(localContext.getTargetId());
             }
             else
             {
@@ -499,7 +465,7 @@ namespace uAdventure.Runner
             GameObject ret = Instantiate(basePrefab, parent);
             var representable = ret.GetComponent<Representable>();
             representable.Scene = this;
-            representable.Context = localContext;
+            representable.Context = context;
             representable.Element = element;
         }
 
@@ -592,7 +558,7 @@ namespace uAdventure.Runner
             switch (SceneData.getType())
             {
                 case GeneralScene.GeneralSceneSceneType.SCENE:
-                    var scene = sceneData as Scene;
+                    var scene = SceneData as Scene;
                     if (!Game.Instance.GameState.IsFirstPerson && scene.isAllowPlayerLayer())
                     {
                         RaycastHit hitInfo;

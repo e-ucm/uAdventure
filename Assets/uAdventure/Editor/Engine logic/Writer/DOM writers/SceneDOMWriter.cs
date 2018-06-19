@@ -161,7 +161,7 @@ namespace uAdventure.Editor
                         nextSceneElement.SetAttribute("transitionType", nextScene.getTransitionType().ToString());
 
                         // Append the conditions (if avalaible)
-                        if (!nextScene.getConditions().isEmpty())
+                        if (!nextScene.getConditions().IsEmpty())
                         {
                             DOMWriterUtility.DOMWrite(nextSceneElement, nextScene.getConditions());
                         }
@@ -207,7 +207,7 @@ namespace uAdventure.Editor
                         }
                     }
 
-                    if (exit.getConditions() != null && !exit.getConditions().isEmpty())
+                    if (exit.getConditions() != null && !exit.getConditions().IsEmpty())
                     {
                         DOMWriterUtility.DOMWrite(exitElement, exit.getConditions());
                     }
@@ -272,7 +272,7 @@ namespace uAdventure.Editor
                     }
 
                     // Append the conditions (if avalaible)
-                    if (!itemReference.getConditions().isEmpty())
+                    if (!itemReference.getConditions().IsEmpty())
                     {
                         DOMWriterUtility.DOMWrite(itemReferenceElement, itemReference.getConditions());
                     }
@@ -324,7 +324,7 @@ namespace uAdventure.Editor
                     }
 
                     // Append the conditions (if avalaible)
-                    if (!characterReference.getConditions().isEmpty())
+                    if (!characterReference.getConditions().IsEmpty())
                     {
                         DOMWriterUtility.DOMWrite(npcReferenceElement, characterReference.getConditions());
                     }
@@ -384,7 +384,7 @@ namespace uAdventure.Editor
                     }
 
                     // Append the conditions (if avalaible)
-                    if (!activeArea.getConditions().isEmpty())
+                    if (!activeArea.getConditions().IsEmpty())
                     {
                         DOMWriterUtility.DOMWrite(aaElement, activeArea.getConditions());
                     }
@@ -396,7 +396,7 @@ namespace uAdventure.Editor
                         XmlNode descriptionNode = doc.CreateElement("description");
 
                         // Append the conditions (if available)
-                        if (description.getConditions() != null && !description.getConditions().isEmpty())
+                        if (description.getConditions() != null && !description.getConditions().IsEmpty())
                         {
                             DOMWriterUtility.DOMWrite(descriptionNode, description.getConditions());
                         }
@@ -480,7 +480,7 @@ namespace uAdventure.Editor
                     }
 
                     // Append the conditions (if avalaible)
-                    if (!barrier.getConditions().isEmpty())
+                    if (!barrier.getConditions().IsEmpty())
                     {
                         DOMWriterUtility.DOMWrite(barrierElement, barrier.getConditions());
                     }
@@ -518,7 +518,7 @@ namespace uAdventure.Editor
                     }
 
                     // Append the conditions (if avalaible)
-                    if (!atrezzoReference.getConditions().isEmpty())
+                    if (!atrezzoReference.getConditions().IsEmpty())
                     {
                         DOMWriterUtility.DOMWrite(atrezzoReferenceElement, atrezzoReference.getConditions());
                     }

@@ -166,7 +166,7 @@ namespace uAdventure.Editor
                     if (bubbleType.Identifier != "-")
                         line.setText("#" + bubbleType.Identifier + " " + line.getText());
 
-                    tmpTex = (line.getConditions().getConditionsList().Count > 0
+                    tmpTex = (line.getConditions().GetConditionsList().Count > 0
                         ? conditionsTex
                         : noConditionsTex);
 

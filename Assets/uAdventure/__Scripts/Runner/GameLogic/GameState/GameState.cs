@@ -17,9 +17,19 @@ namespace uAdventure.Runner
         //########################### GAME STATE HANDLING ###########################
         //###########################################################################
 
+        /// This class is used for serialization purposes only
+        [Serializable]
+        protected class ContextList
+        {
+            [SerializeField]
+            protected List<ElementReference> elementReferences;
+            public List<ElementReference> ElementReferences { get { return elementReferences; } set { elementReferences = value; } }
+        }
+
         private readonly AdventureData data;
         [SerializeField]
         private ElementReference playerContext;
+
         [SerializeField]
         private int currentChapter = 0;
         [SerializeField]
@@ -31,12 +41,18 @@ namespace uAdventure.Runner
         [SerializeField]
         private List<string> inventoryItems;
 
+        private Dictionary<string, List<ElementReference>> elementContexts;
         private Dictionary<string, int> varFlags;
 
         [SerializeField]
         private List<string> varFlagKeys;
         [SerializeField]
         private List<int> varFlagValues;
+
+        [SerializeField]
+        private List<string> elementContextsKeys;
+        [SerializeField]
+        private List<ContextList> elementContextsValues;
 
         private Stack<List<KeyValuePair<string, int>>> varFlagChangeAmbits;
 
@@ -94,6 +110,7 @@ namespace uAdventure.Runner
             this.inventoryItems = new List<string>();
             this.data = data;
             varFlags = new Dictionary<string, int>();
+            elementContexts = new Dictionary<string, List<ElementReference>>();
             varFlagChangeAmbits = new Stack<List<KeyValuePair<string, int>>>();
         }
         
@@ -195,6 +212,24 @@ namespace uAdventure.Runner
             CompletablesController.Instance.ConditionChanged();
 
             Game.Instance.reRenderScene();
+        }
+
+        public List<ElementReference> GetElementReferences(string sceneId)
+        {
+            if (!elementContexts.ContainsKey(sceneId))
+            {
+                var scene = data.getChapters()[currentChapter].getScene(sceneId);
+                var elementReferences = new List<ElementReference>();
+                elementReferences.AddRange(scene.getItemReferences()
+                    .ConvertAll(r => r.Clone() as ElementReference));
+                elementReferences.AddRange(scene.getAtrezzoReferences()
+                    .ConvertAll(r => r.Clone() as ElementReference));
+                elementReferences.AddRange(scene.getCharacterReferences()
+                    .ConvertAll(r => r.Clone() as ElementReference));
+                elementContexts[sceneId] = elementReferences;
+            }
+
+            return elementContexts[sceneId];
         }
 
         public int CheckGlobalState(string globalState)
@@ -382,6 +417,12 @@ namespace uAdventure.Runner
         {
             varFlagKeys = varFlags.Keys.ToList();
             varFlagValues = varFlags.Values.ToList();
+            elementContextsKeys = elementContexts.Keys.ToList();
+            elementContextsValues = elementContexts.Values.ToList()
+                .ConvertAll(l => new ContextList() { ElementReferences = l });
+
+            var json = JsonUtility.ToJson(this);
+            Debug.Log(json);
             PlayerPrefs.SetString(field, JsonUtility.ToJson(this));
         }
 
@@ -392,6 +433,11 @@ namespace uAdventure.Runner
             for(int i = 0, totalVars = varFlagKeys.Count; i < totalVars; i++)
             {
                 varFlags[varFlagKeys[i]] = varFlagValues[i];
+            }
+            elementContexts.Clear();
+            for (int i = 0, totalVars = elementContextsKeys.Count; i < totalVars; i++)
+            {
+                elementContexts[elementContextsKeys[i]] = elementContextsValues[i].ElementReferences;
             }
         }
     }

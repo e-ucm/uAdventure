@@ -29,11 +29,11 @@ namespace uAdventure.Core
 
 			switch (element.Name) {
 			case "either":
-				c.add(parseEither (element, parameters));
+				c.Add(parseEither (element, parameters));
 				break;
 			case "active":
 			case "inactive":
-				c.add(parseFlag (element, parameters));
+				c.Add(parseFlag (element, parameters));
 				break;
 			case "greater-than":
 			case "greater-equals-than":
@@ -41,10 +41,10 @@ namespace uAdventure.Core
             case "less-equals-than":
             case "equals":
 			case "not-equals":
-				c.add(parseVar (element, parameters));
+				c.Add(parseVar (element, parameters));
 				break;
 			case "global-state-ref":
-				c.add(parseGlobal (element, parameters));
+				c.Add(parseGlobal (element, parameters));
 				break;
 
 			}

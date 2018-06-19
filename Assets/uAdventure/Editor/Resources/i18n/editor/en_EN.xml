@@ -2137,6 +2137,10 @@ In the game you can define conditions based on the value of the variables.</entr
 <entry key="Orientation.S">Down</entry>
 <entry key="Orientation.W">Left</entry>
 <entry key="Orientation.E">Right</entry>
+  
+<entry key="MenuAdventure.SaveMode">Save configuration</entry>
+<entry key="MenuAdventure.AutoSave.Checkbox">Save the game automatically?</entry>
+<entry key="MenuAdventure.SaveOnSuspend.Checkbox">Save on suspend? (Useful for mobile devices)</entry>
 
 <!-- Analytics -->
 <entry key="Analytics.Title">Analytics</entry>

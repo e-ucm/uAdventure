@@ -53,13 +53,13 @@ namespace uAdventure.Editor
 
 
             // Append the init conditions (if avalaible)
-            if (!timer.getInitCond().isEmpty())
+            if (!timer.getInitCond().IsEmpty())
             {
                 conditionsAndEffects.Add(ConditionsDOMWriter.INIT_CONDITIONS, timer.getInitCond());
             }
 
             // Append the end-conditions (if avalaible)
-            if (!timer.getEndCond().isEmpty())
+            if (!timer.getEndCond().IsEmpty())
             {
                 conditionsAndEffects.Add(ConditionsDOMWriter.END_CONDITIONS, timer.getEndCond());
             }

@@ -111,7 +111,7 @@ namespace uAdventure.Editor
                             GUILayout.Label("CONDITIONS");
                             if (GUILayout.Button("Add Block"))
                             {
-                                Milestone.getConditions().Conditions.add(new FlagCondition(""));
+                                Milestone.getConditions().Conditions.Add(new FlagCondition(""));
                             }
 
                             //##################################################################################

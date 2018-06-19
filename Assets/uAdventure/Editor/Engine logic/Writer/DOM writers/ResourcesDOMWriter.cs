@@ -54,7 +54,7 @@ namespace uAdventure.Editor
             resourcesNode.SetAttribute("name", resources.getName());
 
             // Append the conditions block (if there is one)
-            if (!resources.getConditions().isEmpty())
+            if (!resources.getConditions().IsEmpty())
             {
                 DOMWriterUtility.DOMWrite(resourcesNode, resources.getConditions());
             }

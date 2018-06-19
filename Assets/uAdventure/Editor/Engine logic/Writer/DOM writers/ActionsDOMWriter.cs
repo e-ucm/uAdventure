@@ -113,7 +113,7 @@ namespace uAdventure.Editor
                     }
 
                     // Append the conditions (if avalaible)
-                    if (!action.getConditions().isEmpty())
+                    if (!action.getConditions().IsEmpty())
                     {
                         DOMWriterUtility.DOMWrite(actionElement, action.getConditions());
                     }

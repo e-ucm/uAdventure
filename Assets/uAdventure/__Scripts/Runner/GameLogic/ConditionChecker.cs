@@ -18,16 +18,16 @@ namespace uAdventure.Runner
 
         public static bool check(Conditions conditions)
         {
-            foreach (Condition c in conditions.getSimpleConditions())
+            foreach (Condition c in conditions.GetSimpleConditions())
             {
                 if (!check(c))
                     return false;
             }
 
-            for (int i = 0; i < conditions.getEitherConditionsBlockCount(); i++)
+            for (int i = 0; i < conditions.GetEitherConditionsBlockCount(); i++)
             {
                 bool block = false;
-                foreach (Condition c in conditions.getEitherConditions(i))
+                foreach (Condition c in conditions.GetEitherConditions(i))
                 {
                     block |= check(c);
 
