@@ -10,13 +10,11 @@ namespace uAdventure.Runner
     {
         public Trajectory.Node start, end;
         public Trajectory.Side side;
-
-        private float min_x, max_x, min_y, max_y;
         public MathFunction function;
 
-        private MathFunction scale_function;
+        private readonly MathFunction scale_function;
 
-        private List<LineHandler> neighbours = new List<LineHandler>();
+        private readonly List<LineHandler> neighbours = new List<LineHandler>();
 
         public static Trajectory.Node commonPoint(LineHandler l1, LineHandler l2)
         {
@@ -39,14 +37,6 @@ namespace uAdventure.Runner
 
             float start_x = start.getX(), end_x = end.getX()
                 , start_y = start.getY() , end_y = end.getY();
-
-
-            min_x = Mathf.Min(start_x, end_x);
-            max_x = Mathf.Max(start_x, end_x);
-
-            min_y = Mathf.Min(start_y, end_y);
-            max_y = Mathf.Max(start_y, end_y);
-
 
             this.function = new MathFunction(new Vector2(start_x, start_y), new Vector2(end_x, end_y));
 
@@ -93,13 +83,6 @@ namespace uAdventure.Runner
         {
             return neighbours.ToArray();
         }
-
-        /*public LineHandler[] getNeighborLinesSorted(){
-                List<LineHandler> n;
-                n.Sort (new LineHandlerComparer());
-
-                return n.ToArray ();
-            }*/
 
         public List<Trajectory.Node> neighbor_nodes;
         public Trajectory.Node[] getNeighborNodes()

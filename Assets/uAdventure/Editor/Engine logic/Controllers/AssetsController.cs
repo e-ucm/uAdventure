@@ -122,24 +122,9 @@ namespace uAdventure.Editor
 
         public static void resetCache()
         {
-
-            //Reset video cache
-            /*videoCache.clean( );
-            videoCache.reset( );
-            string[] videoAssets = getAssetsList( CATEGORY_VIDEO );
-            for( string videoAsset : videoAssets ) {
-
-                // Add the file
-                videoCache.cacheVideo( videoAsset );
-            }*/
-
             //Reset tempFiles
             tempFiles = new Dictionary<string, FileInfo>();
         }
-
-        /*public static void cleanVideoCache( ) {
-            videoCache.clean( );
-        }*/
 
         public static string[] categoryFolders()
         {
@@ -163,7 +148,7 @@ namespace uAdventure.Editor
             string[] folders = categoryFolders();
             for (int i = 0; i < folders.Length; i++)
             {
-                DirectoryInfo category = projectDir.CreateSubdirectory(folders[i]);
+                projectDir.CreateSubdirectory(folders[i]);
             }
             projectDir.CreateSubdirectory("assets/special/");
 
@@ -171,7 +156,6 @@ namespace uAdventure.Editor
             FileInfo descriptorDTD = new FileInfo(Path.Combine("Assets/uAdventure/Editor/Resources/" + EADVETURE_CONTENT_FOLDER, "descriptor.dtd"));
             if (descriptorDTD.Exists)
             {
-                // TODO: Check if its working
                 descriptorDTD.CopyTo(Path.Combine(projectDir.FullName, "descriptor.dtd"), true);
             }
             else
@@ -183,7 +167,6 @@ namespace uAdventure.Editor
             FileInfo eadventureDTD = new FileInfo(Path.Combine("Assets/uAdventure/Editor/Resources/" + EADVETURE_CONTENT_FOLDER, "eadventure.dtd"));
             if (eadventureDTD.Exists)
             {
-                // TODO: Check if its working
                 eadventureDTD.CopyTo(Path.Combine(projectDir.FullName, "eadventure.dtd"), true);
             }
             else
@@ -195,7 +178,6 @@ namespace uAdventure.Editor
             FileInfo assessmentDTD = new FileInfo("Assets/uAdventure/Editor/Resources/" + Path.Combine(EADVETURE_CONTENT_FOLDER, "assessment.dtd"));
             if (assessmentDTD.Exists)
             {
-                // TODO: Check if its working
                 assessmentDTD.CopyTo(Path.Combine(projectDir.FullName, "assessment.dtd"), true);
             }
             else
@@ -208,7 +190,6 @@ namespace uAdventure.Editor
             FileInfo adaptationDTD = new FileInfo(Path.Combine("Assets/uAdventure/Editor/Resources/" + EADVETURE_CONTENT_FOLDER, "adaptation.dtd"));
             if (adaptationDTD.Exists)
             {
-                // TODO: Check if its working
                 adaptationDTD.CopyTo(Path.Combine(projectDir.FullName, "adaptation.dtd"), true);
             }
             else
@@ -220,7 +201,6 @@ namespace uAdventure.Editor
             FileInfo animationDTD = new FileInfo(Path.Combine("Assets/uAdventure/Editor/Resources/" + EADVETURE_CONTENT_FOLDER, "animation.dtd"));
             if (animationDTD.Exists)
             {
-                // TODO: Check if its working
                 animationDTD.CopyTo(Path.Combine(projectDir.FullName, "animation.dtd"), true);
             }
             else
@@ -266,34 +246,18 @@ namespace uAdventure.Editor
                     getCategoryFolder(assetsCategory)));
 
             // Take the file list and create the array
-            //FileInfo[] fileList = categoryFolder.listFiles( getAssetsFileFilter( assetsCategory, filter ), categoryFolder.getArchiveDetector( ) );
             FileInfo[] fileList = categoryFolder.GetFiles(getAssetsFileFilter(assetsCategory, filter));
 
             // If the array is not empty
             if (fileList != null)
             {
                 // Copy the relative paths to the string array
-
                 // If is styled text, remove referenced files (folder) when present
                 if (assetsCategory != AssetsConstants.CATEGORY_STYLED_TEXT)
                 {
                     assetsList = new string[fileList.Length];
                     for (int i = 0; i < fileList.Length; i++)
                         assetsList[i] = fileList[i].Name;
-                }
-                else
-                {
-                    ////Remove those files which are directories
-                    //List<FileInfo> filteredFileList = new List<FileInfo>();
-                    //for (int i = 0; i < fileList.Length; i++)
-                    //{
-                    //    if (!fileList[i].isDirectory())
-                    //        filteredFileList.add(fileList[i]);
-                    //}
-
-                    //assetsList = new string[filteredFileList.size()];
-                    //for (int i = 0; i < filteredFileList.size(); i++)
-                    //    assetsList[i] = filteredFileList[i].getName();
                 }
             }
 
@@ -700,25 +664,39 @@ namespace uAdventure.Editor
             pathsToReimport = new List<string>();
 
             if (!addSpecialAsset(SpecialAssetPaths.FILE_DEFAULT_BOOK_IMAGE, SpecialAssetPaths.ASSET_DEFAULT_BOOK_IMAGE))
-                Controller.Instance.ShowErrorDialog(TC.get("Error.Title"),TC.get("Error.SpecialAssetNotFound", SpecialAssetPaths.FILE_DEFAULT_BOOK_IMAGE));
+            {
+                Controller.Instance.ShowErrorDialog(TC.get("Error.Title"), TC.get("Error.SpecialAssetNotFound", SpecialAssetPaths.FILE_DEFAULT_BOOK_IMAGE));
+            }
 
             if (!addSpecialAsset(SpecialAssetPaths.FILE_DEFAULT_ARROW_NORMAL, SpecialAssetPaths.ASSET_DEFAULT_ARROW_NORMAL))
+            {
                 Controller.Instance.ShowErrorDialog(TC.get("Error.Title"), TC.get("Error.SpecialAssetNotFound", SpecialAssetPaths.FILE_DEFAULT_ARROW_NORMAL));
+            }
 
             if (!addSpecialAsset(SpecialAssetPaths.FILE_DEFAULT_ARROW_OVER, SpecialAssetPaths.ASSET_DEFAULT_ARROW_OVER))
+            {
                 Controller.Instance.ShowErrorDialog(TC.get("Error.Title"), TC.get("Error.SpecialAssetNotFound", SpecialAssetPaths.FILE_DEFAULT_ARROW_OVER));
+            }
 
             if (!addSpecialAsset(SpecialAssetPaths.FILE_EMPTY_IMAGE, SpecialAssetPaths.ASSET_EMPTY_IMAGE))
+            {
                 Controller.Instance.ShowErrorDialog(TC.get("Error.Title"), TC.get("Error.SpecialAssetNotFound", SpecialAssetPaths.FILE_EMPTY_IMAGE));
+            }
 
             if (!addSpecialAsset(SpecialAssetPaths.FILE_EMPTY_BACKGROUND, SpecialAssetPaths.ASSET_EMPTY_BACKGROUND))
+            {
                 Controller.Instance.ShowErrorDialog(TC.get("Error.Title"), TC.get("Error.SpecialAssetNotFound", SpecialAssetPaths.FILE_EMPTY_BACKGROUND));
+            }
 
             if (!addSpecialAsset(SpecialAssetPaths.FILE_EMPTY_ICON, SpecialAssetPaths.ASSET_EMPTY_ICON))
+            {
                 Controller.Instance.ShowErrorDialog(TC.get("Error.Title"), TC.get("Error.SpecialAssetNotFound", SpecialAssetPaths.FILE_EMPTY_ICON));
+            }
 
             if (!addSpecialAsset(SpecialAssetPaths.FILE_EMPTY_ANIMATION, SpecialAssetPaths.ASSET_EMPTY_ANIMATION + "_01.png"))
+            {
                 Controller.Instance.ShowErrorDialog(TC.get("Error.Title"), TC.get("Error.SpecialAssetNotFound", SpecialAssetPaths.FILE_EMPTY_ANIMATION));
+            }
 
             ImportAssets(pathsToReimport.ToArray());
         }
