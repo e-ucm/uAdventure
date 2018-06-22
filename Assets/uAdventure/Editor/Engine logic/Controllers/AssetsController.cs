@@ -386,13 +386,20 @@ namespace uAdventure.Editor
 
             DirectoryInfo path = new DirectoryInfo(DIR_PREFIX + "/" + assetTypeDir);
             if (!Directory.Exists(path.FullName))
+            {
                 Directory.CreateDirectory(path.FullName);
+            }
 
             string nameOnly = !string.IsNullOrEmpty(destinyAssetName) ? destinyAssetName : Path.GetFileName(assetPath);
             string returnPath = null;
-            if (assetPath != Path.Combine(path.FullName, nameOnly)) // Avoid to copy the same origin to same destination files
+            string destinationPath = Path.Combine(path.FullName, nameOnly);
+
+            var isSameAsDestiny = assetPath != destinationPath;
+            var isLocalFile = assetPath.StartsWith(DIR_PREFIX);
+
+            if (!isSameAsDestiny && !isLocalFile) // Avoid to copy the same origin to same destination files
             {
-                var destination = Path.Combine(path.FullName, nameOnly);
+                var destination = destinationPath;
                 File.Copy(assetPath, destination, true);
                 File.SetAttributes(assetPath, FileAttributes.Normal);
 
@@ -401,8 +408,6 @@ namespace uAdventure.Editor
                     AssetsController.copyAllFiles(Path.GetDirectoryName(assetPath), path.FullName);
                 }
                 AssetDatabase.ImportAsset(path.FullName, ImportAssetOptions.ForceUpdate | ImportAssetOptions.ForceSynchronousImport);
-                var importer = AssetImporter.GetAtPath(path.FullName);
-                AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
                 if(assetsCategory == AssetsConstants.CATEGORY_IMAGE)
                 {
