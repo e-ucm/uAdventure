@@ -47,21 +47,6 @@ namespace uAdventure.Editor
             return player;
         }
 
-
-        public override int[] getAddableElements()
-        {
-
-            return new int[] { };
-        }
-
-
-        public override bool canAddElement(int type)
-        {
-
-            return false;
-        }
-
-
         public override bool canBeDeleted()
         {
 
