@@ -110,13 +110,9 @@ namespace uAdventure.Editor
             this.typeReferenceList = new Dictionary<Type, List<ElementReference>>();
             var content = sceneDataControl.getContent() as Scene;
 
-            var itemReferencesList = content.getItemReferences();
-            var atrezzoReferencesList = content.getAtrezzoReferences();
-            var npcReferencesList = content.getCharacterReferences();
-
-            getReferencesList(typeof(Item)).AddRange(itemReferencesList);
-            getReferencesList(typeof(NPC)).AddRange(atrezzoReferencesList);
-            getReferencesList(typeof(Atrezzo)).AddRange(npcReferencesList);
+            typeReferenceList.Add(typeof(Item), content.getItemReferences());
+            typeReferenceList.Add(typeof(Atrezzo), content.getAtrezzoReferences());
+            typeReferenceList.Add(typeof(NPC), content.getCharacterReferences());
 
             this.allReferencesDataControl = new List<ElementContainer>();
             this.lastElementContainer = null;
@@ -126,25 +122,20 @@ namespace uAdventure.Editor
             // Create subcontrollers
 
             bool hasLayerV = false;
-            foreach (ElementReference itemReference in itemReferencesList)
+
+            foreach (var itemReference in getReferencesList(typeof(Item)))
             {
-                int counter = count(itemReference);
-                ElementReferenceDataControl erdc = new ElementReferenceDataControl(sceneDataControl, itemReference, Controller.ITEM_REFERENCE, counter);
-                insertInOrder(new ElementContainer(erdc, -1, null), hasLayerV |= (itemReference.getLayer() >= 0));
+                hasLayerV |= InsertReference(itemReference, Controller.ITEM_REFERENCE);
             }
 
-            foreach (ElementReference atrezzoReference in atrezzoReferencesList)
+            foreach (var atrezzoReference in getReferencesList(typeof(Atrezzo)))
             {
-                int counter = count(atrezzoReference);
-                ElementReferenceDataControl erdc = new ElementReferenceDataControl(sceneDataControl, atrezzoReference, Controller.ATREZZO_REFERENCE, counter);
-                insertInOrder(new ElementContainer(erdc, -1, null), hasLayerV |= (atrezzoReference.getLayer() >= 0));
+                hasLayerV |= InsertReference(atrezzoReference, Controller.ATREZZO_REFERENCE);
             }
 
-            foreach (ElementReference npcReference in npcReferencesList)
+            foreach (var npcReference in getReferencesList(typeof(NPC)))
             {
-                int counter = count(npcReference);
-                ElementReferenceDataControl erdc = new ElementReferenceDataControl(sceneDataControl, npcReference, Controller.NPC_REFERENCE, counter);
-                insertInOrder(new ElementContainer(erdc, -1, null), hasLayerV |= (npcReference.getLayer() >= 0));
+                hasLayerV |= InsertReference(npcReference, Controller.NPC_REFERENCE);
             }
 
             // insert player
@@ -160,6 +151,15 @@ namespace uAdventure.Editor
             }
         }
 
+        private bool InsertReference(ElementReference reference, int referenceType)
+        {
+            int counter = count(reference);
+            ElementReferenceDataControl erdc = new ElementReferenceDataControl(sceneDataControl, reference, referenceType, counter);
+            bool hasLayer = reference.getLayer() >= 0;
+            insertInOrder(new ElementContainer(erdc, -1, null), (reference.getLayer() >= 0));
+            return hasLayer;
+        }
+
         private List<ElementReference> getReferencesList(Type t)
         {
             if (!typeReferenceList.ContainsKey(t))
@@ -170,32 +170,7 @@ namespace uAdventure.Editor
 
         private int count(ElementReference er)
         {
-            int count = 0;
-            foreach (ElementContainer e in allReferencesDataControl)
-            {
-                if (!e.isPlayer())
-                {
-                    if (e.getErdc().getElementId().Equals(er.getTargetId()))
-                        count++;
-                }
-            }
-            return count;
-        }
-
-        /**
-         * This method analyze the references finding if references has layer. It is
-         * easy, we must only inspect one reference. If this reference has the value
-         * "-1" in it "layer" attribute, it means that neither of elements has
-         * layer.
-         * 
-         * @return true, if there are not one references with -1
-         */
-        private bool hasLayer()
-        {
-            foreach (var refference in allReferencesDataControl)
-                return refference.getLayer() != Scene.PLAYER_WITHOUT_LAYER;
-
-            return false;
+            return allReferencesDataControl.Count(e => !e.isPlayer() && e.getErdc().getElementId().Equals(er.getTargetId()));
         }
 
         public Sprite getPlayerImage()
@@ -310,8 +285,6 @@ namespace uAdventure.Editor
 
             return sceneDataControl.getId();
         }
-
-        //TODO ver si se puede devolver allReferences
 
         public override System.Object getContent()
         {
@@ -496,7 +469,7 @@ namespace uAdventure.Editor
                 index = playerPositionInAllReferences;
             }
 
-            if (index > 0)
+            if (index >= 0)
             {
                 int toIndex = up ? index - 1 : index + 1;
 
@@ -531,7 +504,7 @@ namespace uAdventure.Editor
         }
 
 
-        public override string renameElement(string name)
+        public override string renameElement(string newName)
         {
 
             return null;
@@ -804,29 +777,6 @@ namespace uAdventure.Editor
                     list.Add(container.getErdc());
             }
             return getPathFromChild(dataControl, list);
-        }
-
-        /**
-         * Catch the type of the element reference control data and return the
-         * associated scene preview category
-         * 
-         * @param type
-         * @return the scene preview category
-         */
-        public static int transformType(int type)
-        {
-
-            int category = 0;
-            // TODO: implement
-            //if (type == Controller.ITEM_REFERENCE)
-            //    category = ScenePreviewEditionPanel.CATEGORY_OBJECT;
-            //else if (type == Controller.ATREZZO_REFERENCE)
-            //    category = ScenePreviewEditionPanel.CATEGORY_ATREZZO;
-            //else if (type == Controller.NPC_REFERENCE)
-            //    category = ScenePreviewEditionPanel.CATEGORY_CHARACTER;
-            //else if (type == -1)
-            //    category = ScenePreviewEditionPanel.CATEGORY_PLAYER;
-            return category;
         }
     }
 }
