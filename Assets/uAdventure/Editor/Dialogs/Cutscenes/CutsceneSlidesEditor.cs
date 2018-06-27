@@ -5,14 +5,13 @@ using uAdventure.Core;
 using Animation = uAdventure.Core.Animation;
 using UnityEditor;
 using System.IO;
+using System.Collections.Generic;
 
 namespace uAdventure.Editor
 {
     public class CutsceneSlidesEditor : BaseCreatorPopup, DialogReceiverInterface
     {
         private GUIStyle titleStyle;
-
-        private Texture2D backgroundPreviewTex = null;
 
         private Texture2D addTexture = null;
         private Texture2D moveLeft, moveRight = null;
@@ -79,11 +78,14 @@ namespace uAdventure.Editor
             };
             Debug.Log(cutsceneFilePath);
 
-            workingAnimation = Loader.loadAnimation(cutsceneFilePath, Controller.ResourceManager);
+            var incidences = new List<Incidence>();
+            workingAnimation = Loader.LoadAnimation(cutsceneFilePath, Controller.ResourceManager, incidences);
 
             Debug.Log(workingAnimation.getAboslutePath() + " " + workingAnimation.getFrames().Count + " " + workingAnimation.isSlides() + " " + workingAnimation.getId());
             if (workingAnimation == null)
+            {
                 workingAnimation = new Animation(cutsceneFilePath, 40);
+            }
 
             // Initalize
             selectedFrame = -1;

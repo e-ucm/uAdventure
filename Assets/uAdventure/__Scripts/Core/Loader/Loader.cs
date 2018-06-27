@@ -1,10 +1,8 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System.Xml;
-using System.IO;
 using System.Collections.Generic;
 using System;
 using uAdventure.Runner;
+using uAdventure.Core.XmlUpgrader;
 
 namespace uAdventure.Core
 {
@@ -13,32 +11,26 @@ namespace uAdventure.Core
      */
     public class Loader
     {
-        /**
-            * AdventureData structure which has been previously read. (For Debug
-            * execution)
-            */
-        private static AdventureData adventureData;
-
-        /**
-         * Cache the SaxParserFactory
-         */
-        //private static SAXParserFactory factory = SAXParserFactory.newInstance();
-
-        /**
-         * Private constructor
-         */
         private Loader()
         {
-
         }
 
-        public static AdventureData loadAdventureData(ResourceManager resourceManager, List<Incidence> incidences)
+        public static AdventureData LoadAdventureData(ResourceManager resourceManager, List<Incidence> incidences)
         {
-            AdventureData adventureDataTemp = new AdventureData();
+            var adventureDataTemp = new AdventureData();
             try
             {
-                AdventureHandler adventureParser = new AdventureHandler(adventureDataTemp, resourceManager);
-                adventureParser.Parse("descriptor.xml");
+                var adventureParser = new AdventureHandler(adventureDataTemp, resourceManager, incidences);
+                var upgrader = new Upgrader(resourceManager, incidences);
+                if (upgrader.NeedsUpgrade("descriptor.xml"))
+                {
+                    var upgraded = upgrader.Upgrade("descriptor.xml");
+                    adventureParser.ParseXml(upgraded);
+                }
+                else
+                {
+                    adventureParser.Parse("descriptor.xml");
+                }
                 adventureDataTemp = adventureParser.getAdventureData();
 
             }
@@ -47,8 +39,25 @@ namespace uAdventure.Core
             return adventureDataTemp;
         }
 
-        private static Dictionary<string, Animation> animationLoadCache;
+        public static Chapter LoadChapter(string filename, ResourceManager resourceManager, List<Incidence> incidences)
+        {
 
+            var currentChapter = new Chapter();
+            currentChapter.setChapterPath(filename);
+            ChapterHandler chapterParser = new ChapterHandler(currentChapter, resourceManager, incidences);
+            var upgrader = new Upgrader(resourceManager, incidences);
+            if (upgrader.NeedsUpgrade(filename))
+            {
+                var upgraded = upgrader.Upgrade(filename);
+                chapterParser.ParseXml(upgraded);
+            }
+            else
+            {
+                chapterParser.Parse(filename);
+            }
+
+            return currentChapter;
+        }
         /**
          * Loads an animation from a filename
          * 
@@ -56,72 +65,34 @@ namespace uAdventure.Core
          *            The xml descriptor for the animation
          * @return the loaded Animation
          */
-        public static Animation loadAnimation(string filename, ResourceManager resourceManager)
+        public static Animation LoadAnimation(string filename, ResourceManager resourceManager, List<Incidence> incidences)
         {
-            AnimationHandler animationHandler = new AnimationHandler(resourceManager);
-            animationHandler.Parse(filename);
-            Animation anim = animationHandler.getAnimation();
+            if (resourceManager.getAnimationsCache().ContainsKey(filename))
+            {
+                return resourceManager.getAnimationsCache()[filename];
+            }
+
+            AnimationHandler animationHandler = new AnimationHandler(resourceManager, incidences);
+
+            var upgrader = new Upgrader(resourceManager, incidences);
+            if (upgrader.NeedsUpgrade(filename))
+            {
+                var upgraded = upgrader.Upgrade(filename);
+                animationHandler.ParseXml(upgraded);
+            }
+            else
+            {
+                animationHandler.Parse(filename);
+            }
+
+            Animation anim = animationHandler.GetAnimation();
+
+            if (anim != null)
+            {
+                resourceManager.getAnimationsCache()[filename] = anim;
+            }
 
             return anim;
         }
-
-        /**
-         * Returns true if the given file contains an eAdventure game from a newer
-         * version. Essentially, it looks for the "ead.properties" file in the new
-         * eAdventure games. If it's found, then returns true
-         * 
-         * @param f
-         *            the file to check
-         * @return if the game requires a newer version
-         */
-        //public static bool requiresNewVersion(java.io.File f)
-        //{
-        //    bool isOldProject = true;
-        //    FileInputStream in = null;
-        //    ZipInputStream zipIn = null;
-        //    try
-        //    {
-        //        in = new FileInputStream(f);
-        //        zipIn = new ZipInputStream( in );
-        //        ZipEntry zipEntry = null;
-        //        while ((zipEntry = zipIn.getNextEntry()) != null)
-        //        {
-        //            if (zipEntry.getName().endsWith("ead.properties"))
-        //            {
-        //                isOldProject = false;
-        //            }
-        //        }
-        //        zipIn.close();
-        //    }
-        //    catch (IOException e)
-        //    {
-
-        //    }
-        //    finally
-        //    {
-        //        if ( in != null ) {
-        //            try
-        //            {
-        //                in.close();
-        //            }
-        //            catch (IOException e)
-        //            {
-
-        //            }
-        //        }
-
-        //        if (zipIn != null)
-        //        {
-        //            try
-        //            {
-        //                zipIn.close();
-        //            }
-        //            catch (IOException e)
-        //            {
-        //            }
-        //        }
-        //    }
-        //    return !isOldProject;
-        //}
     }
 }

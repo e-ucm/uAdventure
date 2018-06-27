@@ -4,6 +4,7 @@ using System.Xml;
 // TODO Possible unnecesary coupling
 using uAdventure.Runner;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace uAdventure.Core
 {
@@ -14,26 +15,29 @@ namespace uAdventure.Core
          */
         private Animation animation;
 
-        string directory = "";
+        private readonly ResourceManager resourceManager;
+        private readonly List<Incidence> incidences;
 
-        private ResourceManager resourceManager;
-
-        public AnimationHandler(ResourceManager resourceManager)
+        public AnimationHandler(ResourceManager resourceManager, List<Incidence> incidences)
         {
             this.resourceManager = resourceManager;
+            this.incidences = incidences;
         }
 
-        public void Parse(string path_)
+        public void Parse(string path)
         {
-            if (resourceManager.getAnimationsCache().ContainsKey(path_))
+            string xml = resourceManager.getText(path);
+            if (!string.IsNullOrEmpty(xml))
             {
-                animation = resourceManager.getAnimationsCache()[path_];
-                return;
+                ParseXml(xml);
             }
+        }
 
+        public void ParseXml(string xml)
+        {
             XmlDocument xmld = new XmlDocument();
+            xmld.LoadXml(xml);
 
-            string xml = resourceManager.getText(path_);
             if (!string.IsNullOrEmpty(xml))
             {
                 xmld.LoadXml(xml);
@@ -56,66 +60,34 @@ namespace uAdventure.Core
                 animation.setUseTransitions(ExString.EqualsDefault(animationNode.GetAttribute("usetransitions"),"yes", false));
 
                 if (element.SelectSingleNode("documentation") != null)
+                {
                     animation.setDocumentation(element.SelectSingleNode("documentation").InnerText);
+                }
 
                 // FRAMES
                 foreach (var frame in DOMParserUtility.DOMParse<Frame>(element.SelectNodes("/animation/frame")))
+                {
                     animation.addFrame(frame);
+                }
 
                 // TRANSITIONS
                 foreach (var transition in DOMParserUtility.DOMParse<Transition>(element.SelectNodes("/animation/transition")))
+                {
                     animation.getTransitions().Add(transition);
+                }
 
 
                 // RESOURCES
                 foreach (var res in DOMParserUtility.DOMParse<ResourcesUni>(element.SelectNodes("/animation/resources")))
-                    animation.addResources(res);
-            }
-            else
-            {
-                animation = new Animation(path_.Split('/').Last());
-                animation.getFrames().Clear();
-                animation.getTransitions().Clear();
-
-                xmld = new XmlDocument();
-                int num = 1;
-                string ruta = path_;
-                Texture2D img = null;
-
-                do
                 {
-                    ruta = path_ + "_" + intToStr(num);
-
-                    img = resourceManager.getImage(ruta);
-                    if (img)
-                    {
-                        var newFrame = new Frame(ruta, 100, false);
-                        animation.addFrame(newFrame);
-                        animation.getTransitions().Add(new Transition());
-                        num++;
-                    }
-
-                } while (img);
-            }
-
-            if(animation != null)
-            {
-                resourceManager.getAnimationsCache()[path_] = animation;
+                    animation.addResources(res);
+                }
             }
         }
 
-        public Animation getAnimation()
+        public Animation GetAnimation()
         {
             return animation;
-        }
-
-
-        private static string intToStr(int number)
-        {
-            if (number < 10)
-                return "0" + number;
-            else
-                return number.ToString();
         }
     }
 }

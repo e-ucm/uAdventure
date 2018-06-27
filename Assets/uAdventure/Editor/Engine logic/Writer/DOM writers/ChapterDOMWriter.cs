@@ -22,7 +22,7 @@ namespace uAdventure.Editor
 
         public class ChapterTargetIDParam : IDOMWriterParam
         {
-            private string targetId;
+            private readonly string targetId;
             public ChapterTargetIDParam(string targetId)
             {
                 this.targetId = targetId;
@@ -55,14 +55,8 @@ namespace uAdventure.Editor
             var chapter = target as Chapter;
             var doc = Writer.GetDoc();
             XmlElement chapterNode = node as XmlElement;
+            chapterNode.SetAttribute("version", "1");
 
-            //try {
-            // Create the necessary elements to create the DOM
-            /*DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance( );
-            DocumentBuilder db = dbf.newDocumentBuilder( );
-            Document doc = db.newDocument( );
-            */
-            
             // Add the adaptation and assessment active profiles
             if (!chapter.getAdaptationName().Equals(""))
                 chapterNode.SetAttribute("adaptProfile", chapter.getAdaptationName());
@@ -74,77 +68,6 @@ namespace uAdventure.Editor
             }
 
             var targetParam = ChapterTargetID(chapter.getTargetId());
-            /*
-            // Append the scene elements
-            foreach (Scene scene in chapter.getScenes())
-            {
-                DOMWriterUtility.DOMWrite(chapterNode, scene, targetParam);
-            }
-
-            // Append the cutscene elements
-            foreach (Cutscene cutscene in chapter.getCutscenes())
-            {
-                DOMWriterUtility.DOMWrite(chapterNode, cutscene, targetParam);
-            }
-
-            // Append the book elements
-            foreach (Book book in chapter.getBooks())
-            {
-                DOMWriterUtility.DOMWrite(chapterNode, book, targetParam);
-            }
-
-            // Append the item elements
-            foreach (Item item in chapter.getItems())
-            {
-                DOMWriterUtility.DOMWrite(chapterNode, item, targetParam);
-            }
-
-
-            // Append the character element
-            foreach (NPC character in chapter.getCharacters())
-            {
-                DOMWriterUtility.DOMWrite(chapterNode, character, targetParam);
-            }
-
-            // Append the conversation element
-            foreach (Conversation conversation in chapter.getConversations())
-            {
-                DOMWriterUtility.DOMWrite(chapterNode, conversation, targetParam);
-            }
-
-            // Append the timers
-            foreach (Timer timer in chapter.getTimers())
-            {
-                DOMWriterUtility.DOMWrite(chapterNode, timer, targetParam);
-            }
-
-            // Append global states
-            foreach (GlobalState globalState in chapter.getGlobalStates())
-            {
-                DOMWriterUtility.DOMWrite(chapterNode, globalState, targetParam);
-            }
-
-            // Append macros
-            foreach (Macro macro in chapter.getMacros())
-            {
-                DOMWriterUtility.DOMWrite(chapterNode, macro, targetParam);
-            }
-
-            // Append the atrezzo item elements
-            foreach (Atrezzo atrezzo in chapter.getAtrezzo())
-            {
-                DOMWriterUtility.DOMWrite(chapterNode, atrezzo, targetParam);
-            }
-
-            // Append the completables
-            foreach (Completable completable in chapter.getCompletabes())
-            {
-                DOMWriterUtility.DOMWrite(chapterNode, completable, targetParam);
-            }
-            */
-            /*} catch( ParserConfigurationException e ) {
-                ReportDialog.GenerateErrorReport(e, true, "UNKNOWERROR");
-            }*/
 
             // Append the player element
             DOMWriterUtility.DOMWrite(chapterNode, chapter.getPlayer(), targetParam);

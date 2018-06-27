@@ -15,25 +15,9 @@ namespace uAdventure.Core
         /**
          * Chapter data
          */
-        private Chapter chapter;
-
-        /**
-         * Current global state being subparsed
-         */
-        private GlobalState currentGlobalState;
-
-        /**
-         * Current macro being subparsed
-         */
-        private Macro currentMacro;
-
-        /**
-         * Buffer for globalstate docs
-         */
-        //private string currentString;
-
-        /* Methods */
-        private ResourceManager resourceManager;
+        private readonly Chapter chapter;
+        private readonly ResourceManager resourceManager;
+        private readonly List<Incidence> incidences;
 
         /**
          * Default constructor.
@@ -41,29 +25,34 @@ namespace uAdventure.Core
          * @param chapter
          *            Chapter in which the data will be stored
          */
-        public ChapterHandler(Chapter chapter, ResourceManager resourceManager)
+        public ChapterHandler(Chapter chapter, ResourceManager resourceManager, List<Incidence> incidences)
         {
             this.chapter = chapter;
             this.resourceManager = resourceManager;
-           // currentString = string.Empty;
+            this.incidences = incidences;
         }
 
         public string getXmlContent(string path)
         {
             return resourceManager.getText(path);
-        } 
+        }
 
         public void Parse(string path)
         {
-            XmlDocument xmld = new XmlDocument();
-
             string xml = getXmlContent(path);
+            if (string.IsNullOrEmpty(xml))
+                return;
 
+            ParseXml(xml);
+        }
+
+        public void ParseXml(string xml)
+        {
+            XmlDocument xmld = new XmlDocument();
             xmld.LoadXml(xml);
 
             XmlElement element = xmld.DocumentElement;
-            XmlNodeList
-                eAdventure = element.SelectNodes("/eAdventure");
+            XmlNodeList eAdventure = element.SelectNodes("/eAdventure");
 
             var restNodes = new List<XmlNode>();
             var e = element.ChildNodes.GetEnumerator();
@@ -81,6 +70,18 @@ namespace uAdventure.Core
                 }
             }
 
+            var title = (XmlElement)element.SelectSingleNode("title");
+            if (title != null)
+            {
+                chapter.setTitle(title.InnerText);
+            }
+
+            var description = (XmlElement)element.SelectSingleNode("description");
+            if (description != null)
+            {
+                chapter.setTitle(description.InnerText);
+            }
+
 
             foreach (XmlElement el in eAdventure)
             {
@@ -94,7 +95,36 @@ namespace uAdventure.Core
                 }
             }
 
-            foreach(var el in restNodes)
+
+            XmlElement adaptation = (XmlElement)element.SelectSingleNode("adaptation-configuration");
+            if (adaptation != null)
+            {
+                var tmpString = adaptation.GetAttribute("path");
+                if (!string.IsNullOrEmpty(tmpString))
+                {
+                    string adaptationName = tmpString;
+                    // delete the path's characteristics
+                    adaptationName = adaptationName.Substring(adaptationName.IndexOf("/") + 1);
+                    adaptationName = adaptationName.Substring(0, adaptationName.IndexOf("."));
+                    chapter.setAdaptationName(adaptationName);
+                }
+            }
+
+            XmlElement assestment = (XmlElement)element.SelectSingleNode("assessment-configuration");
+            if (assestment != null)
+            {
+                var tmpString = assestment.GetAttribute("path");
+                if (!string.IsNullOrEmpty(tmpString))
+                {
+                    string assessmentName = tmpString;
+                    // delete the path's characteristics
+                    assessmentName = assessmentName.Substring(assessmentName.IndexOf("/") + 1);
+                    assessmentName = assessmentName.Substring(0, assessmentName.IndexOf("."));
+                    chapter.setAssessmentName(assessmentName);
+                }
+            }
+
+            foreach (var el in restNodes)
             {
                 object parsed = DOMParserUtility.DOMParse(el as XmlElement, chapter);
                 if(parsed != null)

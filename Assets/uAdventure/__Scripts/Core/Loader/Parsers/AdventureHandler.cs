@@ -26,12 +26,11 @@ namespace uAdventure.Core
         /**
          * Adventure data being read.
          */
-        private AdventureData adventureData;
+        private readonly AdventureData adventureData;
 
-        // TODO mhm....
-        //private List<Chapter> chapters;
+        private readonly ResourceManager resourceManager;
 
-        private ResourceManager resourceManager;
+        private readonly List<Incidence> incidences;
 
         /**
          * Constructor.
@@ -39,11 +38,11 @@ namespace uAdventure.Core
          * @param zipFile
          *            Path to the zip file which helds the chapter files
          */
-        public AdventureHandler(AdventureData adventureData, ResourceManager resourceManager)
+        public AdventureHandler(AdventureData adventureData, ResourceManager resourceManager, List<Incidence> incidences)
         {
             this.adventureData = adventureData;
             this.resourceManager = resourceManager;
-            //chapters = new List<Chapter>();
+            this.incidences = incidences;
         }
 
         private string getXmlContent(string path)
@@ -66,11 +65,15 @@ namespace uAdventure.Core
         string tmpString = "";
         public void Parse(string path)
         {
-            XmlDocument xmld = new XmlDocument();
-
             string xml = getXmlContent(path);
             if (string.IsNullOrEmpty(xml))
                 return;
+
+            ParseXml(xml);
+        }
+        public void ParseXml(string xml)
+        {
+            XmlDocument xmld = new XmlDocument();
 
             xmld.LoadXml(xml);
 
@@ -294,83 +297,18 @@ namespace uAdventure.Core
 
             if (contents != null)
             {
-                Chapter currentChapter;
-
                 XmlNodeList chapters = contents.SelectNodes("chapter");
                 foreach (XmlElement chapter in chapters)
                 {
-                    currentChapter = new Chapter();
-
                     string chapterPath = "";
                     tmpString = chapter.GetAttribute("path");
                     if (!string.IsNullOrEmpty(tmpString))
                     {
                         chapterPath = tmpString;
+                        adventureData.addChapter(Loader.LoadChapter(chapterPath, resourceManager, incidences));
                     }
-                    currentChapter.setChapterPath(chapterPath);
-
-                    ChapterHandler chapterParser = new ChapterHandler(currentChapter, resourceManager);
-                    chapterParser.Parse(chapterPath);
-
-                    title = (XmlElement)chapter.SelectSingleNode("title");
-                    if (title != null)
-                    {
-                        tmpString = title.InnerText;
-
-                        if (!string.IsNullOrEmpty(tmpString))
-                        {
-                            currentChapter.setTitle(tmpString);
-                        }
-                    }
-
-                    description = (XmlElement)chapter.SelectSingleNode("description");
-                    if (description != null)
-                    {
-                        tmpString = title.InnerText;
-
-                        if (!string.IsNullOrEmpty(tmpString))
-                        {
-                            currentChapter.setDescription(tmpString);
-                        }
-                    }
-
-
-                    XmlElement adaptation = (XmlElement)chapter.SelectSingleNode("adaptation-configuration");
-                    if (adaptation != null)
-                    {
-                        tmpString = adaptation.GetAttribute("path");
-                        if (!string.IsNullOrEmpty(tmpString))
-                        {
-                            string adaptationName = tmpString;
-                            // delete the path's characteristics
-                            adaptationName = adaptationName.Substring(adaptationName.IndexOf("/") + 1);
-                            adaptationName = adaptationName.Substring(0, adaptationName.IndexOf("."));
-                            currentChapter.setAdaptationName(adaptationName);
-                        }
-                    }
-
-                    XmlElement assestment = (XmlElement)chapter.SelectSingleNode("assessment-configuration");
-                    if (assestment != null)
-                    {
-                        tmpString = assestment.GetAttribute("path");
-                        if (!string.IsNullOrEmpty(tmpString))
-                        {
-                            string assessmentName = tmpString;
-                            // delete the path's characteristics
-                            assessmentName = assessmentName.Substring(assessmentName.IndexOf("/") + 1);
-                            assessmentName = assessmentName.Substring(0, assessmentName.IndexOf("."));
-                            currentChapter.setAssessmentName(assessmentName);
-                        }
-                    }
-                     
-                    adventureData.addChapter(currentChapter);
                 }
             }
-
-            /*if (qName.EndsWith("automatic-commentaries"))
-            {
-                adventureData.setCommentaries(true);
-            }*/
         }
     }
 }

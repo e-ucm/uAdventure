@@ -437,7 +437,8 @@ namespace uAdventure.Editor
                 
                 if (!string.IsNullOrEmpty(previewImagePath))
                 {
-                    var animation = Loader.loadAnimation(previewImagePath, Controller.ResourceManager);
+                    var incidences = new List<Incidence>();
+                    var animation = Loader.LoadAnimation(previewImagePath, Controller.ResourceManager, incidences);
                     return animation != null && animation.getFrames().Count > 0 ? animation.getFrame(0).getUri() : null;
                 }
 

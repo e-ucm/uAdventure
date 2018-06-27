@@ -122,7 +122,8 @@ namespace uAdventure.Runner
             }
 
             AdventureData data = new AdventureData();
-            AdventureHandler adventure = new AdventureHandler(data, ResourceManager);
+            var incidences = new List<Incidence>();
+            AdventureHandler adventure = new AdventureHandler(data, ResourceManager, incidences);
             adventure.Parse("descriptor.xml");
             game_state = new GameState(data);
             CompletablesController.Instance.SetCompletables(GameState.GetCompletables());

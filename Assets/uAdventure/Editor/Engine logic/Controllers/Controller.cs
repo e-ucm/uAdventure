@@ -1396,7 +1396,7 @@ namespace uAdventure.Editor
             if (directory.Exists)
             {
                 // Load the data from the file, and update the info
-                loadedAdventureData = Loader.loadAdventureData(ResourceManager, incidences);
+                loadedAdventureData = Loader.LoadAdventureData(ResourceManager, incidences);
             }
 
             // SI LO CARGO HAGO COSAS
@@ -1443,7 +1443,7 @@ namespace uAdventure.Editor
                     ResourceManager = null;
                     Resources.UnloadUnusedAssets();
                     ResourceManager = ResourceManagerFactory.CreateLocal();
-                    loadedAdventureData = Loader.loadAdventureData(ResourceManager, incidences);
+                    loadedAdventureData = Loader.LoadAdventureData(ResourceManager, incidences);
                     loadedAdventureData.setProjectName(currentZipName);
                     EditorUtility.ClearProgressBar();
                 }
@@ -2925,7 +2925,8 @@ namespace uAdventure.Editor
         private int countAssetReferencesInEAA(string eaaFilePath, string assetPath)
         {
             int refs = 0;
-            Animation animation = Loader.loadAnimation(eaaFilePath, ResourceManager);
+            var incidences = new List<Incidence>();
+            Animation animation = Loader.LoadAnimation(eaaFilePath, ResourceManager, incidences);
             foreach (Frame frame in animation.getFrames())
             {
                 if (frame != null)
@@ -2973,7 +2974,9 @@ namespace uAdventure.Editor
 
         private void getAssetReferencesInEAA(string eaaFilePath, List<string> assetPaths, List<int> assetTypes)
         {
-            Animation animation = Loader.loadAnimation(eaaFilePath, ResourceManager);
+            var incidences = new List<Incidence>();
+            Animation animation = Loader.LoadAnimation(eaaFilePath, ResourceManager, incidences);
+
             foreach (Frame frame in animation.getFrames())
             {
                 if (frame != null)
