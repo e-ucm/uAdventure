@@ -1,313 +1,211 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System.Xml;
 using System.Collections.Generic;
-using System;
-using System.IO;
-using System.Xml;
 
-// TODO Possible unnecesary coupling
 using uAdventure.Runner;
 
 namespace uAdventure.Core
 {
-    public class AdventureHandler
+    public class AdventureHandler : XmlHandler<AdventureData>
     {
-
-        /**
-         * Constant with the assessment folder path
-         */
-        private const string assessmentFolderPath = "assessment";
-
-        /**
-         * Constant with the adaptation folder path
-         */
-        private const string adaptationFolderPath = "adaptation";
-
-        /**
-         * Adventure data being read.
-         */
-        private readonly AdventureData adventureData;
-
-        private readonly ResourceManager resourceManager;
-
-        private readonly List<Incidence> incidences;
-
-        /**
-         * Constructor.
-         * 
-         * @param zipFile
-         *            Path to the zip file which helds the chapter files
-         */
-        public AdventureHandler(AdventureData adventureData, ResourceManager resourceManager, List<Incidence> incidences)
+        public AdventureHandler(AdventureData adventureData, ResourceManager resourceManager, List<Incidence> incidences) 
+            : base(adventureData, resourceManager, incidences)
         {
-            this.adventureData = adventureData;
-            this.resourceManager = resourceManager;
-            this.incidences = incidences;
         }
 
-        private string getXmlContent(string path)
+        protected override AdventureData CreateObject()
         {
-            return resourceManager.getText(path);
+            return new AdventureData();
         }
 
-
-
-        /**
-         * Returns the adventure data read
-         * 
-         * @return The adventure data from the XML descriptor
-         */
-        public AdventureData getAdventureData()
+        protected override AdventureData ParseXml(XmlDocument doc)
         {
-            return adventureData;
+            XmlElement element = doc.DocumentElement,
+                descriptor     = (XmlElement)element.SelectSingleNode("/game-descriptor"),
+                title          = (XmlElement)descriptor.SelectSingleNode("title"),
+                description    = (XmlElement)descriptor.SelectSingleNode("description");
+
+            // Basic attributes
+            content.setVersionNumber(ExParsers.ParseDefault(descriptor.GetAttribute("versionNumber"), "0"));
+            content.setTitle(title.InnerText ?? "");
+            content.setDescription(description.InnerText ?? "");
+
+            // Sub nodes
+            XmlElement configuration = (XmlElement)descriptor.SelectSingleNode("configuration"),
+                       contents      = (XmlElement)descriptor.SelectSingleNode("contents");
+
+            ParseConfiguration(configuration);
+            ParseContents(contents);
+
+            return base.content;
         }
-        
-        string tmpString = "";
-        public void Parse(string path)
+
+        private void ParseContents(XmlElement contents)
         {
-            string xml = getXmlContent(path);
-            if (string.IsNullOrEmpty(xml))
+            if (contents == null)
+            {
                 return;
+            }
 
-            ParseXml(xml);
+            XmlNodeList chapters = contents.SelectNodes("chapter");
+            foreach (XmlElement chapter in chapters)
+            {
+                string chapterPath = chapter.GetAttribute("path");
+                if (!string.IsNullOrEmpty(chapterPath))
+                {
+                    content.addChapter(Loader.LoadChapter(chapterPath, resourceManager, incidences));
+                }
+            }
         }
-        public void ParseXml(string xml)
+
+        private void ParseConfiguration(XmlElement configuration)
         {
-            XmlDocument xmld = new XmlDocument();
-
-            xmld.LoadXml(xml);
-
-            XmlElement element = xmld.DocumentElement
-                , descriptor = (XmlElement)element.SelectSingleNode("/game-descriptor")
-                , title = (XmlElement)descriptor.SelectSingleNode("title")
-                , description = (XmlElement)descriptor.SelectSingleNode("description")
-                , configuration = (XmlElement)descriptor.SelectSingleNode("configuration")
-                , contents = (XmlElement)descriptor.SelectSingleNode("contents");
-
-
-
-            if (descriptor != null)
+            if (configuration == null)
             {
-                tmpString = descriptor.GetAttribute("versionNumber");
-
-                if (!string.IsNullOrEmpty(tmpString))
-                {
-                    adventureData.setVersionNumber(tmpString);
-                }
+                return;
             }
 
-            if (title != null)
-            {
-                tmpString = title.InnerText;
+            // Keep showing text until user clicks
+            var keepShowing = ExParsers.ParseDefault(configuration.GetAttribute("keepShowing"), "no");
+            var isKeepShowing = "yes".Equals(keepShowing);
+            content.setKeepShowing(isKeepShowing);
 
-                if (!string.IsNullOrEmpty(tmpString))
-                {
-                    adventureData.setTitle(tmpString);
-                }
+            // Use keys to navigate in the scene
+            var keyboardNavigation = ExParsers.ParseDefault(configuration.GetAttribute("keyboard-navigation"), "disabled");
+            var isKeyboardNavigation = "enabled".Equals(keyboardNavigation);
+            content.setKeyboardNavigation(isKeyboardNavigation);
+
+            // Default click action for scene elements
+            var defaultClickAction = ExParsers.ParseDefault(configuration.GetAttribute("defaultClickAction"), "showDetails");
+            switch (defaultClickAction)
+            {
+                case "showDetails": content.setDeafultClickAction(DescriptorData.DefaultClickAction.SHOW_DETAILS); break;
+                case "showActions": content.setDeafultClickAction(DescriptorData.DefaultClickAction.SHOW_ACTIONS); break;
+                default: incidences.Add(Incidence.createDescriptorIncidence("Unknown defaultClickAction type: " + defaultClickAction, null)); break;
             }
 
-            if (description != null)
+            // Perspective for rendering
+            var perspective = ExParsers.ParseDefault(configuration.GetAttribute("perspective"), "regular");
+            switch (perspective)
             {
-                tmpString = description.InnerText;
-
-                if (!string.IsNullOrEmpty(tmpString))
-                {
-                    adventureData.setDescription(tmpString);
-                }
+                case "regular": content.setPerspective(DescriptorData.Perspective.REGULAR); break;
+                case "isometric": content.setPerspective(DescriptorData.Perspective.ISOMETRIC); break;
+                default: incidences.Add(Incidence.createDescriptorIncidence("Unknown perspective type: " + perspective, null)); break;
             }
 
-            if (configuration != null)
+            // Drag behaviour configuration
+            var dragBehaviour = ExParsers.ParseDefault(configuration.GetAttribute("dragBehaviour"), "considerNonTargets");
+            switch (dragBehaviour)
             {
-                tmpString = configuration.GetAttribute("keepShowing");
-                if (!string.IsNullOrEmpty(tmpString))
-                {
-                    adventureData.setKeepShowing(tmpString.Equals("yes"));
-                }
-
-                tmpString = configuration.GetAttribute("keyboard-navigation");
-                if (!string.IsNullOrEmpty(tmpString))
-                {
-                    adventureData.setKeyboardNavigation(tmpString.Equals("enabled"));
-                }
-
-                tmpString = configuration.GetAttribute("defaultClickAction");
-                if (!string.IsNullOrEmpty(tmpString))
-                {
-                    if (tmpString.Equals("showDetails"))
-                        adventureData.setDeafultClickAction(DescriptorData.DefaultClickAction.SHOW_DETAILS);
-                    else if (tmpString.Equals("showDetails"))
-                        adventureData.setDeafultClickAction(DescriptorData.DefaultClickAction.SHOW_ACTIONS);
-                }
-
-                tmpString = configuration.GetAttribute("perspective");
-                if (!string.IsNullOrEmpty(tmpString))
-                {
-                    if (tmpString.Equals("regular"))
-                        adventureData.setPerspective(DescriptorData.Perspective.REGULAR);
-                    else if (tmpString.Equals("isometric"))
-                        adventureData.setPerspective(DescriptorData.Perspective.ISOMETRIC);
-                }
-
-                tmpString = configuration.GetAttribute("dragBehaviour");
-                if (!string.IsNullOrEmpty(tmpString))
-                {
-                    if (tmpString.Equals("considerNonTargets"))
-                        adventureData.setDragBehaviour(DescriptorData.DragBehaviour.CONSIDER_NON_TARGETS);
-                    else if (tmpString.Equals("ignoreNonTargets"))
-                        adventureData.setDragBehaviour(DescriptorData.DragBehaviour.IGNORE_NON_TARGETS);
-                }
-
-
-                XmlElement gui = (XmlElement)configuration.SelectSingleNode("gui");
-                if (gui != null)
-                {
-                    tmpString = gui.GetAttribute("type");
-                    if (!string.IsNullOrEmpty(tmpString))
-                    {
-                        if (tmpString.Equals("traditional"))
-                            adventureData.setGUIType(DescriptorData.GUI_TRADITIONAL);
-                        else if (tmpString.Equals("contextual"))
-                            adventureData.setGUIType(DescriptorData.GUI_CONTEXTUAL);
-                    }
-
-                    tmpString = gui.GetAttribute("customized");
-                    if (!string.IsNullOrEmpty(tmpString))
-                    {
-                        adventureData.setGUI(adventureData.getGUIType(), tmpString.Equals("yes"));
-                    }
-
-                    tmpString = gui.GetAttribute("inventoryPosition");
-                    if (!string.IsNullOrEmpty(tmpString))
-                    {
-                        switch (tmpString)
-                        {
-                            case "none": adventureData.setInventoryPosition(DescriptorData.INVENTORY_NONE); break;
-                            case "top_bottom": adventureData.setInventoryPosition(DescriptorData.INVENTORY_TOP_BOTTOM); break;
-                            case "top": adventureData.setInventoryPosition(DescriptorData.INVENTORY_TOP); break;
-                            case "bottom": adventureData.setInventoryPosition(DescriptorData.INVENTORY_BOTTOM); break;
-                            case "fixed_top": adventureData.setInventoryPosition(DescriptorData.INVENTORY_FIXED_TOP); break;
-                            case "fixed_bottom": adventureData.setInventoryPosition(DescriptorData.INVENTORY_FIXED_BOTTOM); break;
-                        }
-                    }
-
-                    XmlNodeList cursors = gui.SelectNodes("cursors/cursor");
-                    foreach (XmlElement cursor in cursors)
-                    {
-                        string type = ""; string uri = "";
-
-                        tmpString = cursor.GetAttribute("type");
-                        if (!string.IsNullOrEmpty(tmpString))
-                        {
-                            type = tmpString;
-                        }
-
-                        tmpString = cursor.GetAttribute("uri");
-                        if (!string.IsNullOrEmpty(tmpString))
-                        {
-                            uri = tmpString;
-                        }
-
-                        adventureData.addCursor(type, uri);
-                    }
-
-                    XmlNodeList buttons = gui.SelectNodes("buttons/button");
-                    foreach (XmlElement button in buttons)
-                    {
-                        string type = ""; string uri = ""; string action = "";
-
-                        tmpString = button.GetAttribute("type");
-                        if (!string.IsNullOrEmpty(tmpString))
-                        {
-                            type = tmpString;
-                        }
-
-                        tmpString = button.GetAttribute("uri");
-                        if (!string.IsNullOrEmpty(tmpString))
-                        {
-                            uri = tmpString;
-                        }
-
-                        tmpString = button.GetAttribute("action");
-                        if (!string.IsNullOrEmpty(tmpString))
-                        {
-                            action = tmpString;
-                        }
-
-                        adventureData.addButton(action, type, uri);
-                    }
-
-                    XmlNodeList arrows = gui.SelectNodes("cursors/cursor");
-                    foreach (XmlElement arrow in arrows)
-                    {
-                        string type = ""; string uri = "";
-
-                        tmpString = arrow.GetAttribute("type");
-                        if (!string.IsNullOrEmpty(tmpString))
-                        {
-                            type = tmpString;
-                        }
-
-                        tmpString = arrow.GetAttribute("uri");
-                        if (!string.IsNullOrEmpty(tmpString))
-                        {
-                            uri = tmpString;
-                        }
-
-                        adventureData.addArrow(type, uri);
-                    }
-                }
-
-                XmlElement mode = (XmlElement)configuration.SelectSingleNode("mode");
-                if (mode != null)
-                {
-                    tmpString = mode.GetAttribute("playerTransparent");
-                    if (!string.IsNullOrEmpty(tmpString))
-                    {
-                        adventureData.setPlayerMode(tmpString.Equals("yes") ? DescriptorData.MODE_PLAYER_1STPERSON : DescriptorData.MODE_PLAYER_3RDPERSON);
-                    }
-                }
-
-                XmlElement graphics = (XmlElement)configuration.SelectSingleNode("graphics");
-                if (graphics != null)
-                {
-                    tmpString = graphics.GetAttribute("playerTransparent");
-                    if (!string.IsNullOrEmpty(tmpString))
-                    {
-                        switch (tmpString)
-                        {
-                            case "windowed": adventureData.setGraphicConfig(DescriptorData.GRAPHICS_WINDOWED); break;
-                            case "fullscreen": adventureData.setGraphicConfig(DescriptorData.GRAPHICS_FULLSCREEN); break;
-                            case "blackbkg": adventureData.setGraphicConfig(DescriptorData.GRAPHICS_BLACKBKG); break;
-                        }
-                    }
-                }
-
-                tmpString = configuration.GetAttribute("autosave");
-                if (!string.IsNullOrEmpty(tmpString))
-                {
-                    adventureData.setAutoSave(tmpString.Equals("yes"));
-                }
-
-                tmpString = configuration.GetAttribute("save-on-suspend");
-                if (!string.IsNullOrEmpty(tmpString))
-                {
-                    adventureData.setSaveOnSuspend(tmpString.Equals("yes"));
-                }
+                case "considerNonTargets": content.setDragBehaviour(DescriptorData.DragBehaviour.CONSIDER_NON_TARGETS); break;
+                case "ignoreNonTargets": content.setDragBehaviour(DescriptorData.DragBehaviour.IGNORE_NON_TARGETS); break;
+                default: incidences.Add(Incidence.createDescriptorIncidence("Unknown dragBehaviour type: " + dragBehaviour, null)); break;
             }
 
-            if (contents != null)
+            // Auto Save
+            var autosave = ExParsers.ParseDefault(configuration.GetAttribute("autosave"), "yes");
+            var isAutoSave = "yes".Equals(autosave);
+            content.setAutoSave(isAutoSave);
+
+            // Save on suspend
+            var saveOnSuspend = ExParsers.ParseDefault(configuration.GetAttribute("save-on-suspend"), "yes");
+            var isSaveOnSuspend = "yes".Equals(saveOnSuspend);
+            content.setSaveOnSuspend(isSaveOnSuspend);
+
+            // Sub nodes
+            XmlElement gui = (XmlElement)configuration.SelectSingleNode("gui"),
+                mode       = (XmlElement)configuration.SelectSingleNode("mode"),
+                graphics   = (XmlElement)configuration.SelectSingleNode("graphics");
+
+            ParseGui(gui);
+            ParseMode(mode);
+            ParseGraphics(graphics);
+        }
+
+        private void ParseGraphics(XmlElement graphics)
+        {
+            if (graphics == null)
             {
-                XmlNodeList chapters = contents.SelectNodes("chapter");
-                foreach (XmlElement chapter in chapters)
-                {
-                    string chapterPath = "";
-                    tmpString = chapter.GetAttribute("path");
-                    if (!string.IsNullOrEmpty(tmpString))
-                    {
-                        chapterPath = tmpString;
-                        adventureData.addChapter(Loader.LoadChapter(chapterPath, resourceManager, incidences));
-                    }
-                }
+                return;
+            }
+
+            var mode = ExParsers.ParseDefault(graphics.GetAttribute("mode"), "fullscreen");
+            switch (mode)
+            {
+                case "windowed": content.setGraphicConfig(DescriptorData.GRAPHICS_WINDOWED); break;
+                case "fullscreen": content.setGraphicConfig(DescriptorData.GRAPHICS_FULLSCREEN); break;
+                case "blackbkg": content.setGraphicConfig(DescriptorData.GRAPHICS_BLACKBKG); break;
+            }
+        }
+
+        private void ParseMode(XmlElement mode)
+        {
+            if (mode == null)
+            {
+                return;
+            }
+
+            var playerTransparent = ExParsers.ParseDefault(mode.GetAttribute("playerTransparent"), "yes");
+            var isPlayerTransparent = "yes".Equals(playerTransparent);
+            content.setPlayerMode(isPlayerTransparent ? DescriptorData.MODE_PLAYER_1STPERSON : DescriptorData.MODE_PLAYER_3RDPERSON);
+        }
+
+        private void ParseGui(XmlElement gui)
+        {
+            if (gui == null)
+            {
+                return;
+            }
+
+            var guiType = ExParsers.ParseDefault(gui.GetAttribute("type"), "contextual");
+            switch (guiType)
+            {
+                case "traditional": content.setGUIType(DescriptorData.GUI_TRADITIONAL); break;
+                case "contextual":  content.setGUIType(DescriptorData.GUI_CONTEXTUAL);  break;
+                default: incidences.Add(Incidence.createDescriptorIncidence("Unknown GUIType type: " + guiType, null)); break;
+            }
+
+            var customized = ExParsers.ParseDefault(gui.GetAttribute("customized"), "no");
+            var isCustomized = "yes".Equals(customized);
+            content.setGUI(content.getGUIType(), isCustomized);
+
+            var inventoryPosition = ExParsers.ParseDefault(gui.GetAttribute("inventoryPosition"), "top_bottom");
+            switch (inventoryPosition)
+            {
+                case "none": content.setInventoryPosition(DescriptorData.INVENTORY_NONE); break;
+                case "top_bottom": content.setInventoryPosition(DescriptorData.INVENTORY_TOP_BOTTOM); break;
+                case "top": content.setInventoryPosition(DescriptorData.INVENTORY_TOP); break;
+                case "bottom": content.setInventoryPosition(DescriptorData.INVENTORY_BOTTOM); break;
+                case "fixed_top": content.setInventoryPosition(DescriptorData.INVENTORY_FIXED_TOP); break;
+                case "fixed_bottom": content.setInventoryPosition(DescriptorData.INVENTORY_FIXED_BOTTOM); break;
+                default: incidences.Add(Incidence.createDescriptorIncidence("Unknown inventoryPosition type: " + inventoryPosition, null)); break;
+            }
+
+            XmlNodeList cursors = gui.SelectNodes("cursors/cursor");
+            foreach (XmlElement cursor in cursors)
+            {
+                string type = ExParsers.ParseDefault(cursor.GetAttribute("type"), ""),
+                    uri     = ExParsers.ParseDefault(cursor.GetAttribute("uri"), "");
+
+                content.addCursor(type, uri);
+            }
+
+            XmlNodeList buttons = gui.SelectNodes("buttons/button");
+            foreach (XmlElement button in buttons)
+            {
+                string type = ExParsers.ParseDefault(button.GetAttribute("type"), ""),
+                    uri     = ExParsers.ParseDefault(button.GetAttribute("uri"), ""),
+                    action  = ExParsers.ParseDefault(button.GetAttribute("action"), "");
+
+                content.addButton(action, type, uri);
+            }
+
+            XmlNodeList arrows = gui.SelectNodes("cursors/cursor");
+            foreach (XmlElement arrow in arrows)
+            {
+                string type = ExParsers.ParseDefault(arrow.GetAttribute("type"), ""),
+                    uri     = ExParsers.ParseDefault(arrow.GetAttribute("uri"), "");
+
+                content.addArrow(type, uri);
             }
         }
     }

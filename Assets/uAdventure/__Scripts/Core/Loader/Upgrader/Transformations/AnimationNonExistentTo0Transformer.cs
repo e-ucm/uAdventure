@@ -59,13 +59,9 @@ namespace uAdventure.Core.XmlUpgrader
         {
             var doc = new XmlDocument();
 
-            // Declaration, encoding, version, etc
-            XmlDeclaration declaration = doc.CreateXmlDeclaration("1.0", "UTF-8", "no");
-            doc.AppendChild(declaration);
-
-            // DTD
-            XmlDocumentType typeDescriptor = doc.CreateDocumentType("animation", "SYSTEM", "animation.dtd", null);
-            doc.AppendChild(typeDescriptor);
+            // Declaration, encoding, version, and dtd
+            doc.AppendChild(doc.CreateXmlDeclaration("1.0", "UTF-8", "no"));
+            doc.AppendChild(doc.CreateDocumentType("animation", "SYSTEM", "animation.dtd", null));
 
             // Main animation node
             XmlElement mainNode = doc.CreateElement("animation");
