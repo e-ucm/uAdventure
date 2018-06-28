@@ -17,12 +17,7 @@ namespace uAdventure.Core
 
         protected FileHandler(T content, ResourceManager resourceManager, List<Incidence> incidences)
         {
-            if (content == null)
-            {
-                content = CreateObject();
-            }
-
-            this.content = content;
+            this.content = object.Equals(content, default(T)) ? CreateObject() : content;
             this.resourceManager = resourceManager;
             this.incidences = incidences;
             this.upgrader = new XmlUpgrader.Upgrader(resourceManager, incidences);

@@ -49,35 +49,37 @@ namespace uAdventure.Core
                 restNodes.Remove(enumerator.Current as XmlNode);
             }
 
-            ParseContent(restNodes);
-            ParseAdaptation(eAdventure, adaptation);
-            ParseAssessment(eAdventure, assessment);
-            ConfigureInitialScene();
+            ParseContent(content, restNodes);
+            ParseAdaptation(content, eAdventure, adaptation);
+            ParseAssessment(content, eAdventure, assessment);
+            ConfigureInitialScene(content);
 
             return content;
         }
 
-        private void ConfigureInitialScene()
+        private static void ConfigureInitialScene(Chapter chapter)
         {
-
             // In the end of the document, if the chapter has no initial scene
-            if (content.getTargetId() == null)
+            if (chapter.getTargetId() == null)
             {
                 // Set it to the first scene
-                if (content.getScenes().Count > 0)
-                    content.setTargetId(content.getScenes()[0].getId());
-
+                if (chapter.getScenes().Count > 0)
+                {
+                    chapter.setTargetId(chapter.getScenes()[0].getId());
+                }
                 // Or to the first cutscene
-                else if (content.getCutscenes().Count > 0)
-                    content.setTargetId(content.getCutscenes()[0].getId());
+                else if (chapter.getCutscenes().Count > 0)
+                {
+                    chapter.setTargetId(chapter.getCutscenes()[0].getId());
+                }
             }
         }
 
-        private void ParseContent(List<XmlNode> restNodes)
+        private static void ParseContent(Chapter chapter, List<XmlNode> restNodes)
         {
             foreach (var el in restNodes)
             {
-                object parsed = DOMParserUtility.DOMParse(el as XmlElement, content);
+                object parsed = DOMParserUtility.DOMParse(el as XmlElement, chapter);
                 if (parsed != null)
                 {
                     var t = parsed.GetType();
@@ -87,12 +89,12 @@ namespace uAdventure.Core
                         t = (parsed as ITypeGroupable).GetGroupType();
                     }
 
-                    content.getObjects(t).Add(parsed);
+                    chapter.getObjects(t).Add(parsed);
                 }
             }
         }
 
-        private void ParseAssessment(XmlNodeList eAdventure, XmlElement assestment)
+        private static void ParseAssessment(Chapter chapter, XmlNodeList eAdventure, XmlElement assestment)
         {
             if (assestment == null)
             {
@@ -103,22 +105,19 @@ namespace uAdventure.Core
             {
                 if (!string.IsNullOrEmpty(el.GetAttribute("assessProfile")))
                 {
-                    content.setAssessmentName(el.GetAttribute("assessProfile"));
+                    chapter.setAssessmentName(el.GetAttribute("assessProfile"));
                 }
             }
 
             var path = assestment.GetAttribute("path");
             if (!string.IsNullOrEmpty(path))
             {
-                string assessmentName = path;
-                // delete the path's characteristics
-                assessmentName = assessmentName.Substring(assessmentName.IndexOf("/") + 1);
-                assessmentName = assessmentName.Substring(0, assessmentName.IndexOf("."));
-                content.setAssessmentName(assessmentName);
+                string assessmentName = GetName(path);
+                chapter.setAssessmentName(assessmentName);
             }
         }
 
-        private void ParseAdaptation(XmlNodeList eAdventure, XmlElement adaptation)
+        private static void ParseAdaptation(Chapter chapter, XmlNodeList eAdventure, XmlElement adaptation)
         {
             if (adaptation == null)
             {
@@ -129,19 +128,24 @@ namespace uAdventure.Core
             {
                 if (!string.IsNullOrEmpty(el.GetAttribute("adaptProfile")))
                 {
-                    content.setAdaptationName(el.GetAttribute("adaptProfile"));
+                    chapter.setAdaptationName(el.GetAttribute("adaptProfile"));
                 }
             }
 
             var path = adaptation.GetAttribute("path");
             if (!string.IsNullOrEmpty(path))
             {
-                string adaptationName = path;
-                // delete the path's characteristics
-                adaptationName = adaptationName.Substring(adaptationName.IndexOf("/") + 1);
-                adaptationName = adaptationName.Substring(0, adaptationName.IndexOf("."));
-                content.setAdaptationName(adaptationName);
+                string adaptationName = GetName(path);
+                chapter.setAdaptationName(adaptationName);
             }
+        }
+
+        private static string GetName(string path)
+        {
+            var name = path.Substring(path.IndexOf("/", System.StringComparison.InvariantCulture) + 1);
+            name = name.Substring(0, name.IndexOf(".", System.StringComparison.InvariantCulture));
+
+            return name;
         }
     }
 }
