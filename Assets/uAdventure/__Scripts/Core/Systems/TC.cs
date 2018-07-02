@@ -4,10 +4,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml.Serialization;
+using System.Linq;
 
 namespace uAdventure.Core
 {
-    public class TC
+    public static class TC
     {
 
         public const int NORMAL_SENTENCE = 1;
@@ -340,6 +341,23 @@ namespace uAdventure.Core
             }
 
             return text;
+        }
+
+        public static string Traslate(this string text, params string[] parameters)
+        {
+            if(parameters != null && parameters.Length > 0)
+            {
+                return get(text, parameters);
+            }
+            else
+            {
+                return get(text);
+            }
+        }
+
+        public static string[] Traslate(this IEnumerable<string> texts)
+        {
+            return texts.Select(get).ToArray();
         }
 
         /**

@@ -49,7 +49,7 @@ namespace uAdventure.Editor
         {
             if (conditions != null)
             {
-                conditions.getConditionsList().Clear();
+                conditions.GetConditionsList().Clear();
                 Controller.Instance.updateVarFlagSummary();
                 Controller.Instance.updatePanel();
                 return true;

@@ -45,7 +45,7 @@ namespace uAdventure.Editor
         public void setName(string name)
         {
 
-            controller.addTool(new ChangeNameTool(customAction, name));
+            controller.AddTool(new ChangeNameTool(customAction, name));
         }
 
 
@@ -80,7 +80,7 @@ namespace uAdventure.Editor
 
             if (type == Controller.RESOURCES)
             {
-                elementAdded = Controller.Instance.addTool(new AddResourcesBlockTool(resourcesList, resourcesDataControlList, Controller.ACTION_CUSTOM, this));
+                elementAdded = Controller.Instance.AddTool(new AddResourcesBlockTool(resourcesList, resourcesDataControlList, Controller.ACTION_CUSTOM, this));
             }
 
             return elementAdded;
@@ -91,7 +91,7 @@ namespace uAdventure.Editor
         public override bool deleteElement(DataControl dataControl, bool askConfirmation)
         {
 
-            return controller.addTool(new DeleteResourcesBlockTool(resourcesList, resourcesDataControlList, dataControl, this));
+            return controller.AddTool(new DeleteResourcesBlockTool(resourcesList, resourcesDataControlList, dataControl, this));
         }
     }
 }

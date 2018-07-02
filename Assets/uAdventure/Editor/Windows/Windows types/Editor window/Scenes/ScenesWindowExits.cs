@@ -41,6 +41,7 @@ namespace uAdventure.Editor
 
             exitsList = new DataControlList()
             {
+                RequestRepaint = Repaint,
                 elementHeight = 20,
                 Columns = new List<ColumnList.Column>()
                 {
@@ -157,13 +158,14 @@ namespace uAdventure.Editor
                 displayField = new TextWithSoundField()
                 {
                     Label = TC.get("Exit.ExitText"),
-                    FileType = BaseFileOpenDialog.FileType.EXIT_MUSIC
+                    FileType = FileType.EXIT_MUSIC
                 };
                 
                 cursorField = new FileChooser()
                 {
                     Label = TC.get("Cursor.exit.Description"),
-                    FileType = BaseFileOpenDialog.FileType.EXIT_ICON
+                    FileType = FileType.EXIT_ICON,
+                    Empty = SpecialAssetPaths.ASSET_EMPTY_ICON
                 };
             }
 
@@ -263,7 +265,7 @@ namespace uAdventure.Editor
             {
                 localSceneEditor = new SceneEditor();
                 playerDestination = new Trajectory.Node("", 0, 0, 1f);
-                localSceneEditor.elements = new List<DataControl>() { new NodeDataControl(null, playerDestination, new Trajectory()) };
+                localSceneEditor.Elements = new List<DataControl>() { new NodeDataControl(null, playerDestination, new Trajectory()) };
             }
 
             public override void Draw(int aID)
@@ -288,14 +290,14 @@ namespace uAdventure.Editor
                     exit.setDestinyPosition(Mathf.RoundToInt(newPos.x), Mathf.RoundToInt(newPos.y));
 
                 EditorGUI.BeginChangeCheck();
-                bool useDestinyScale = EditorGUILayout.Toggle("Use destiny scale", exit.getDestinyScale() > 0); // TODO LANG
+                bool useDestinyScale = EditorGUILayout.Toggle("Use destiny scale", exit.getDestinyScale() >= 0); // TODO LANG
                 if (EditorGUI.EndChangeCheck())
                     exit.setDestinyScale(useDestinyScale ? 1f : float.MinValue);
 
                 if (useDestinyScale)
                 {
                     EditorGUI.BeginChangeCheck();
-                    var newScale = Mathf.Max(0, EditorGUILayout.FloatField(TC.get("SceneLocation.Scale"), exit.getDestinyScale()));
+                    var newScale = Mathf.Max(0.001f, EditorGUILayout.FloatField(TC.get("SceneLocation.Scale"), exit.getDestinyScale()));
                     if (EditorGUI.EndChangeCheck())
                         exit.setDestinyScale(newScale);
                 }

@@ -51,17 +51,23 @@ namespace uAdventure.Runner
                         switch (effect.getType())
                         {
                             case EffectType.ACTIVATE:
-                                Game.Instance.GameState.setFlag(((ActivateEffect)effect).getTargetId(), FlagCondition.FLAG_ACTIVE);
+                                Game.Instance.GameState.SetFlag(((ActivateEffect)effect).getTargetId(), FlagCondition.FLAG_ACTIVE);
                                 break;
                             case EffectType.DEACTIVATE:
-                                Game.Instance.GameState.setFlag(((DeactivateEffect)effect).getTargetId(), FlagCondition.FLAG_INACTIVE);
+                                Game.Instance.GameState.SetFlag(((DeactivateEffect)effect).getTargetId(), FlagCondition.FLAG_INACTIVE);
+                                break;
+                            case EffectType.SHOW_TEXT:
+                                var showTextEffect = (ShowTextEffect)effect;
+                                Game.Instance.Talk(showTextEffect.getText(), showTextEffect.getX(), showTextEffect.getY(),
+                                    showTextEffect.getRgbFrontColor(), showTextEffect.getRgbBorderColor());
+                                forcewait = true;
                                 break;
                             case EffectType.SPEAK_PLAYER:
-                                Game.Instance.talk(((SpeakPlayerEffect)effect).getLine(), Player.IDENTIFIER);
+                                Game.Instance.Talk(((SpeakPlayerEffect)effect).getLine(), Player.IDENTIFIER);
                                 forcewait = true;
                                 break;
                             case EffectType.SPEAK_CHAR:
-                                Game.Instance.talk(((SpeakCharEffect)effect).getLine(), ((SpeakCharEffect)effect).getTargetId());
+                                Game.Instance.Talk(((SpeakCharEffect)effect).getLine(), ((SpeakCharEffect)effect).getTargetId());
                                 forcewait = true;
                                 break;
                             case EffectType.TRIGGER_SCENE:
@@ -80,7 +86,7 @@ namespace uAdventure.Runner
                                         }
                                         else
                                         {
-                                            var targetScene = Game.Instance.GameState.getChapterTarget(tse.getTargetId()) as Scene;
+                                            var targetScene = Game.Instance.GameState.GetChapterTarget(tse.getTargetId()) as Scene;
                                             if (targetScene != null)
                                             {
                                                 if(targetScene.getTrajectory() != null)
@@ -162,7 +168,7 @@ namespace uAdventure.Runner
                                 if (times_runed == 0)
                                 {
                                     TriggerConversationEffect tcoe = (TriggerConversationEffect)effect;
-                                    this.aditional_info.Add("conversation", new GraphConversationHolder(Game.Instance.GameState.getConversation(tcoe.getTargetId())));
+                                    this.aditional_info.Add("conversation", new GraphConversationHolder(Game.Instance.GameState.GetConversation(tcoe.getTargetId())));
                                 }
                                 forcewait = ((GraphConversationHolder)this.aditional_info["conversation"]).execute();
                                 break;
@@ -195,22 +201,22 @@ namespace uAdventure.Runner
                                 break;
                             case EffectType.SET_VALUE:
                                 SetValueEffect sve = (SetValueEffect)effect;
-                                Game.Instance.GameState.setVariable(sve.getTargetId(), sve.getValue());
+                                Game.Instance.GameState.SetVariable(sve.getTargetId(), sve.getValue());
                                 break;
                             case EffectType.INCREMENT_VAR:
                                 IncrementVarEffect ive = (IncrementVarEffect)effect;
-                                Game.Instance.GameState.setVariable(ive.getTargetId(), Game.Instance.GameState.getVariable(ive.getTargetId()) + ive.getIncrement());
+                                Game.Instance.GameState.SetVariable(ive.getTargetId(), Game.Instance.GameState.GetVariable(ive.getTargetId()) + ive.getIncrement());
                                 break;
                             case EffectType.DECREMENT_VAR:
                                 DecrementVarEffect dve = (DecrementVarEffect)effect;
-                                Game.Instance.GameState.setVariable(dve.getTargetId(), Game.Instance.GameState.getVariable(dve.getTargetId()) - dve.getDecrement());
+                                Game.Instance.GameState.SetVariable(dve.getTargetId(), Game.Instance.GameState.GetVariable(dve.getTargetId()) - dve.getDecrement());
                                 break;
                             case EffectType.MACRO_REF:
                                 runs_once = false;
                                 if (times_runed == 0)
                                 {
                                     MacroReferenceEffect mre = (MacroReferenceEffect)effect;
-                                    this.aditional_info.Add("macro", new EffectHolder(Game.Instance.GameState.getMacro(mre.getTargetId())));
+                                    this.aditional_info.Add("macro", new EffectHolder(Game.Instance.GameState.GetMacro(mre.getTargetId())));
                                 }
                                 forcewait = ((EffectHolder)this.aditional_info["macro"]).execute();
                                 break;

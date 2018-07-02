@@ -282,14 +282,6 @@ namespace uAdventure.Editor
 
         // ######################## AUX FUNCTIONS ########################
 
-
-        protected void DrawSplitLine(float y)
-        {
-            Rect position = new Rect(-5f, y, windowRect.width + 6f, 1f);
-            Rect texCoords = new Rect(0f, 1f, 1f, 1f - 1f / (float)GUI.skin.FindStyle("IN title").normal.background.height);
-            GUI.DrawTextureWithTexCoords(position, GUI.skin.FindStyle("IN title").normal.background, texCoords);
-        }
-
         private Dictionary<Corner, Vector3> GetCorners(Rect windowRect, Rect holderRect)
         {
             var bottomRight = new Vector2(holderRect.width - windowRect.width, holderRect.height - windowRect.height);

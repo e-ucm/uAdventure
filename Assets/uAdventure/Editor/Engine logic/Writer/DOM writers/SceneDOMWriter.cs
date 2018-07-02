@@ -103,8 +103,10 @@ namespace uAdventure.Editor
                     exitElement.SetAttribute("idTarget", exit.getNextSceneId());
                     exitElement.SetAttribute("destinyY", exit.getDestinyY().ToString());
                     exitElement.SetAttribute("destinyX", exit.getDestinyX().ToString());
-                    if (exit.getDestinyScale() > 0)
+                    if (exit.getDestinyScale() >= 0)
+                    {
                         exitElement.SetAttribute("destinyScale", exit.getDestinyScale().ToString());
+                    }
                     exitElement.SetAttribute("transitionType", exit.getTransitionType().ToString());
                     exitElement.SetAttribute("transitionTime", exit.getTransitionTime().ToString());
                     exitElement.SetAttribute("not-effects", (exit.isHasNotEffects() ? "yes" : "no"));
@@ -159,7 +161,7 @@ namespace uAdventure.Editor
                         nextSceneElement.SetAttribute("transitionType", nextScene.getTransitionType().ToString());
 
                         // Append the conditions (if avalaible)
-                        if (!nextScene.getConditions().isEmpty())
+                        if (!nextScene.getConditions().IsEmpty())
                         {
                             DOMWriterUtility.DOMWrite(nextSceneElement, nextScene.getConditions());
                         }
@@ -205,7 +207,7 @@ namespace uAdventure.Editor
                         }
                     }
 
-                    if (exit.getConditions() != null && !exit.getConditions().isEmpty())
+                    if (exit.getConditions() != null && !exit.getConditions().IsEmpty())
                     {
                         DOMWriterUtility.DOMWrite(exitElement, exit.getConditions());
                     }
@@ -270,7 +272,7 @@ namespace uAdventure.Editor
                     }
 
                     // Append the conditions (if avalaible)
-                    if (!itemReference.getConditions().isEmpty())
+                    if (!itemReference.getConditions().IsEmpty())
                     {
                         DOMWriterUtility.DOMWrite(itemReferenceElement, itemReference.getConditions());
                     }
@@ -296,6 +298,7 @@ namespace uAdventure.Editor
                     npcReferenceElement.SetAttribute("x", characterReference.getX().ToString());
                     npcReferenceElement.SetAttribute("y", characterReference.getY().ToString());
                     npcReferenceElement.SetAttribute("scale", characterReference.getScale().ToString());
+                    npcReferenceElement.SetAttribute("orientation", ((int)characterReference.GetOrientation()).ToString());
                     if (characterReference.getLayer() != -1)
                         npcReferenceElement.SetAttribute("layer", characterReference.getLayer().ToString());
                     if (characterReference.getInfluenceArea().isExists())
@@ -321,7 +324,7 @@ namespace uAdventure.Editor
                     }
 
                     // Append the conditions (if avalaible)
-                    if (!characterReference.getConditions().isEmpty())
+                    if (!characterReference.getConditions().IsEmpty())
                     {
                         DOMWriterUtility.DOMWrite(npcReferenceElement, characterReference.getConditions());
                     }
@@ -364,6 +367,14 @@ namespace uAdventure.Editor
                         aaElement.SetAttribute("hasInfluenceArea", "no");
                     }
 
+                    // Behavior
+                    if (activeArea.getBehaviour() == Item.BehaviourType.NORMAL)
+                        aaElement.SetAttribute("behaviour", "normal");
+                    if (activeArea.getBehaviour() == Item.BehaviourType.ATREZZO)
+                        aaElement.SetAttribute("behaviour", "atrezzo");
+                    if (activeArea.getBehaviour() == Item.BehaviourType.FIRST_ACTION)
+                        aaElement.SetAttribute("behaviour", "first-action");
+
                     // Append the documentation (if avalaible)
                     if (activeArea.getDocumentation() != null)
                     {
@@ -373,7 +384,7 @@ namespace uAdventure.Editor
                     }
 
                     // Append the conditions (if avalaible)
-                    if (!activeArea.getConditions().isEmpty())
+                    if (!activeArea.getConditions().IsEmpty())
                     {
                         DOMWriterUtility.DOMWrite(aaElement, activeArea.getConditions());
                     }
@@ -385,7 +396,7 @@ namespace uAdventure.Editor
                         XmlNode descriptionNode = doc.CreateElement("description");
 
                         // Append the conditions (if available)
-                        if (description.getConditions() != null && !description.getConditions().isEmpty())
+                        if (description.getConditions() != null && !description.getConditions().IsEmpty())
                         {
                             DOMWriterUtility.DOMWrite(descriptionNode, description.getConditions());
                         }
@@ -469,7 +480,7 @@ namespace uAdventure.Editor
                     }
 
                     // Append the conditions (if avalaible)
-                    if (!barrier.getConditions().isEmpty())
+                    if (!barrier.getConditions().IsEmpty())
                     {
                         DOMWriterUtility.DOMWrite(barrierElement, barrier.getConditions());
                     }
@@ -507,7 +518,7 @@ namespace uAdventure.Editor
                     }
 
                     // Append the conditions (if avalaible)
-                    if (!atrezzoReference.getConditions().isEmpty())
+                    if (!atrezzoReference.getConditions().IsEmpty())
                     {
                         DOMWriterUtility.DOMWrite(atrezzoReferenceElement, atrezzoReference.getConditions());
                     }

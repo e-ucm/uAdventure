@@ -45,19 +45,19 @@ namespace uAdventure.Editor
             video = new FileChooser()
             {
                 Label = TC.get("Resources.DescriptionVideoscenes"),
-                FileType = BaseFileOpenDialog.FileType.CUTSCENE_VIDEO
+                FileType = FileType.CUTSCENE_VIDEO
             };
 
             slides = new AnimationField()
             {
                 Label = TC.get("Resources.DescriptionSlidesceneSlides"),
-                FileType = BaseFileOpenDialog.FileType.CUTSCENE_SLIDES
+                FileType = FileType.CUTSCENE_SLIDES
             };
 
             music = new FileChooser()
             {
                 Label = TC.get("Resources.DescriptionSceneMusic"),
-                FileType = BaseFileOpenDialog.FileType.CUTSCENE_MUSIC
+                FileType = FileType.CUTSCENE_MUSIC
             };
         }
 

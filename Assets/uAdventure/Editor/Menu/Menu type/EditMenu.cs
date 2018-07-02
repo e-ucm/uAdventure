@@ -9,7 +9,7 @@ namespace uAdventure.Editor
     {
         private UndoMenuItem undo;
         private RedoMenuItem redo;
-        private SearchMenuItem search;
+        // TODO private SearchMenuItem search;
 
         public EditMenu()
         {
@@ -19,11 +19,19 @@ namespace uAdventure.Editor
         protected override void Callback(object obj)
         {
             if ((obj as UndoMenuItem) != null)
+            {
                 undo.OnCliked();
+            }
             else if ((obj as RedoMenuItem) != null)
+            {
                 redo.OnCliked();
+            }
+            /* TODO Search
             else if ((obj as SearchMenuItem) != null)
+            {
                 search.OnCliked();
+            }
+            */
         }
 
         protected override void SetMenuItems()
@@ -32,11 +40,11 @@ namespace uAdventure.Editor
 
             undo = new UndoMenuItem("UNDO");
             redo = new RedoMenuItem("REDO");
-            search = new SearchMenuItem("SEARCH");
+            // TODO search = new SearchMenuItem("SEARCH");
 
             menu.AddItem(new GUIContent(Language.GetText(undo.Label)), false, Callback, undo);
             menu.AddItem(new GUIContent(Language.GetText(redo.Label)), false, Callback, redo);
-            menu.AddItem(new GUIContent(Language.GetText(search.Label)), false, Callback, search);
+            // TODO menu.AddItem(new GUIContent(Language.GetText(search.Label)), false, Callback, search);
         }
     }
 }

@@ -42,19 +42,7 @@ namespace uAdventure.Editor
             if (sceneEditor.SelectedElement == null)
                 return;
 
-            sceneEditor.DoCallForWholeElement(sceneEditor.SelectedElement, (component) =>
-            {
-                component.Collapsed = !EditorGUILayout.Foldout(!component.Collapsed, (component.Attribute.Name), true);
-                if (!component.Collapsed)
-                {
-                    EditorGUI.indentLevel++;
-                    component.DrawInspector();
-                    GUILayout.Space(5);
-                    EditorGUI.indentLevel--;
-                }
-                //
-                DrawSplitLine(GUILayoutUtility.GetLastRect().max.y);
-            });
+            sceneEditor.OnInspectorGUI();
         }
     }
 }

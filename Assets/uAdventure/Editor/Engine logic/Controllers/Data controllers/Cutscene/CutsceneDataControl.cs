@@ -107,7 +107,7 @@ namespace uAdventure.Editor
         public void setDocumentation(string documentation)
         {
 
-            controller.addTool(new ChangeDocumentationTool(cutscene, documentation));
+            controller.AddTool(new ChangeDocumentationTool(cutscene, documentation));
         }
 
         /**
@@ -119,7 +119,7 @@ namespace uAdventure.Editor
         public void setName(string name)
         {
 
-            controller.addTool(new ChangeNameTool(cutscene, name));
+            controller.AddTool(new ChangeNameTool(cutscene, name));
         }
 
         public string getTargetId()
@@ -188,7 +188,7 @@ namespace uAdventure.Editor
             // If the element is a resources block
             if (type == Controller.RESOURCES)
             {
-                elementAdded = Controller.Instance.addTool(new AddResourcesBlockTool(resourcesList, resourcesDataControlList, cutsceneType, this));
+                elementAdded = Controller.Instance.AddTool(new AddResourcesBlockTool(resourcesList, resourcesDataControlList, cutsceneType, this));
             }
 
             return elementAdded;
@@ -437,7 +437,8 @@ namespace uAdventure.Editor
                 
                 if (!string.IsNullOrEmpty(previewImagePath))
                 {
-                    var animation = Loader.loadAnimation(previewImagePath, Controller.ResourceManager);
+                    var incidences = new List<Incidence>();
+                    var animation = Loader.LoadAnimation(previewImagePath, Controller.ResourceManager, incidences);
                     return animation != null && animation.getFrames().Count > 0 ? animation.getFrame(0).getUri() : null;
                 }
 
@@ -489,7 +490,7 @@ namespace uAdventure.Editor
         public void setNext(int next)
         {
 			var chapterTargets = controller.IdentifierSummary .groupIds<IChapterTarget> ();
-            Controller.Instance.addTool(new ChangeIntegerValueTool(cutscene, next, "getNext", "setNext"));
+            Controller.Instance.AddTool(new ChangeIntegerValueTool(cutscene, next, "getNext", "setNext"));
             if (cutscene.getTargetId() == null || cutscene.getTargetId().Equals(""))
 			{
 				if(chapterTargets.Length > 0)
@@ -541,13 +542,13 @@ namespace uAdventure.Editor
         public void setTransitionTime(int value)
         {
 
-            Controller.Instance.addTool(new ChangeIntegerValueTool(cutscene, value, "getTransitionTime", "setTransitionTime"));
+            Controller.Instance.AddTool(new ChangeIntegerValueTool(cutscene, value, "getTransitionTime", "setTransitionTime"));
         }
 
         public void setTransitionType(int value)
         {
 
-            Controller.Instance.addTool(new ChangeIntegerValueTool(cutscene, value, "getTransitionType", "setTransitionType"));
+            Controller.Instance.AddTool(new ChangeIntegerValueTool(cutscene, value, "getTransitionType", "setTransitionType"));
         }
 
         /**
@@ -558,9 +559,9 @@ namespace uAdventure.Editor
         {
 
             if (cutscene.hasPlayerPosition())
-                controller.addTool(new ChangeNSDestinyPositionTool(cutscene, int.MinValue, int.MinValue));
+                controller.AddTool(new ChangeNSDestinyPositionTool(cutscene, int.MinValue, int.MinValue));
             else
-                controller.addTool(new ChangeNSDestinyPositionTool(cutscene, AssetsImageDimensions.BACKGROUND_MAX_WIDTH / 2, AssetsImageDimensions.BACKGROUND_MAX_HEIGHT / 2));
+                controller.AddTool(new ChangeNSDestinyPositionTool(cutscene, AssetsImageDimensions.BACKGROUND_MAX_WIDTH / 2, AssetsImageDimensions.BACKGROUND_MAX_HEIGHT / 2));
         }
 
         /**
@@ -596,7 +597,7 @@ namespace uAdventure.Editor
         public void setDestinyPosition(int positionX, int positionY)
         {
 
-            controller.addTool(new ChangeNSDestinyPositionTool(cutscene, positionX, positionY));
+            controller.AddTool(new ChangeNSDestinyPositionTool(cutscene, positionX, positionY));
         }
 
         public EffectsController getEffects()

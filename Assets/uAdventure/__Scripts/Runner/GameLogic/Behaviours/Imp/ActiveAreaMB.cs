@@ -32,5 +32,10 @@ namespace uAdventure.Runner
             }
             return area;
         }
+
+        protected override Item.BehaviourType GetBehaviourType()
+        {
+            return (element as ActiveArea).getBehaviour();
+        }
     }
 }

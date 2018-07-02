@@ -103,7 +103,7 @@ namespace uAdventure.Editor
         public void setDocumentation(string documentation)
         {
 
-            controller.addTool(new ChangeDocumentationTool(barrier, documentation));
+            controller.AddTool(new ChangeDocumentationTool(barrier, documentation));
         }
 
         /**
@@ -115,7 +115,7 @@ namespace uAdventure.Editor
         public void setName(string name)
         {
 
-            controller.addTool(new ChangeNameTool(descriptionController.getSelectedDescription(), name));
+            controller.AddTool(new ChangeNameTool(descriptionController.getSelectedDescription(), name));
         }
 
         /**
@@ -127,7 +127,7 @@ namespace uAdventure.Editor
         public void setBriefDescription(string description)
         {
 
-            controller.addTool(new ChangeDescriptionTool(descriptionController.getSelectedDescription(), description));
+            controller.AddTool(new ChangeDescriptionTool(descriptionController.getSelectedDescription(), description));
         }
 
         /**
@@ -139,7 +139,7 @@ namespace uAdventure.Editor
         public void setDetailedDescription(string detailedDescription)
         {
 
-            controller.addTool(new ChangeDetailedDescriptionTool(descriptionController.getSelectedDescription(), detailedDescription));
+            controller.AddTool(new ChangeDetailedDescriptionTool(descriptionController.getSelectedDescription(), detailedDescription));
         }
 
         /**
@@ -201,7 +201,7 @@ namespace uAdventure.Editor
         public void setBarrier(int x, int y, int width, int height)
         {
 
-            controller.addTool(new ChangeRectangleValueTool(barrier, x, y, width, height));
+            controller.AddTool(new ChangeRectangleValueTool(barrier, x, y, width, height));
         }
 
 

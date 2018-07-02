@@ -131,7 +131,7 @@ namespace uAdventure.Editor
 					myNode.getLine (i).setXApiCorrect (EditorGUILayout.Toggle(myNode.getLine (i).getXApiCorrect (), GUILayout.Width(15)));
 					GUILayout.Space (5);
 
-                    tmpTex = (myNode.getLine(i).getConditions().getConditionsList().Count > 0
+                    tmpTex = (myNode.getLine(i).getConditions().GetConditionsList().Count > 0
                         ? conditionsTex
                         : noConditionsTex);
 
@@ -169,7 +169,7 @@ namespace uAdventure.Editor
 
                     GUILayout.Space(5);
 
-                    tmpTex = (myNode.TimeoutConditions.getConditionsList().Count > 0
+                    tmpTex = (myNode.TimeoutConditions.GetConditionsList().Count > 0
                         ? conditionsTex
                         : noConditionsTex);
                     

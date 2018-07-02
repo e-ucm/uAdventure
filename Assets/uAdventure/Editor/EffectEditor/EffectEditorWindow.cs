@@ -57,7 +57,7 @@ namespace uAdventure.Editor
                 GUILayout.Label("CONDITIONS");
                 if (GUILayout.Button("Add Block"))
                 {
-                    abstractEffect.getConditions().add(new FlagCondition(""));
+                    abstractEffect.getConditions().Add(new FlagCondition(""));
                 }
 
                 //##################################################################################

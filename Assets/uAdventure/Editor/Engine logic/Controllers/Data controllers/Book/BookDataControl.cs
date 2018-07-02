@@ -245,7 +245,7 @@ namespace uAdventure.Editor
         public void setDocumentation(string documentation)
         {
 
-            controller.addTool(new ChangeDocumentationTool(book, documentation));
+            controller.AddTool(new ChangeDocumentationTool(book, documentation));
         }
 
 
@@ -299,7 +299,7 @@ namespace uAdventure.Editor
 
             if (type == Controller.RESOURCES)
             {
-                elementAdded = Controller.Instance.addTool(new AddResourcesBlockTool(resourcesList, resourcesDataControlList, Controller.BOOK, this));
+                elementAdded = Controller.Instance.AddTool(new AddResourcesBlockTool(resourcesList, resourcesDataControlList, Controller.BOOK, this));
             }
 
             return elementAdded;

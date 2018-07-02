@@ -172,12 +172,12 @@ public class ActionsList : ScriptableObject {
 
         file = new FileChooser()
         {
-            FileType = BaseFileOpenDialog.FileType.BUTTON,
+            FileType = FileType.BUTTON,
         };
 
         animation = new AnimationField()
         {
-            FileType = BaseFileOpenDialog.FileType.CHARACTER_ANIM,
+            FileType = FileType.CHARACTER_ANIM,
         };
     }
 

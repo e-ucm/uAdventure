@@ -7,6 +7,7 @@ namespace uAdventure.Core
     /**
      * This class manages a condition in eAdventure
      */
+    [System.Serializable]
     public abstract class Condition : HasId, ICloneable
     {
 
@@ -33,17 +34,20 @@ namespace uAdventure.Core
         /**
          * Name of the flag to be checked
          */
+        [SerializeField]
         protected string id;
 
         /**
          * Stores if the flag must be active or inactive
          */
+        [SerializeField]
         protected int state;
 
         /**
          * Type of the condition ({@link #VAR_CONDITION}, {@link #FLAG_CONDITION}
          * or {@link #GLOBAL_STATE_CONDITION}
          */
+        [SerializeField]
         protected int type;
 
         /**

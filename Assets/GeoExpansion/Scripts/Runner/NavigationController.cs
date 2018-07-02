@@ -95,6 +95,7 @@ namespace uAdventure.Geo
 
         private void SaveNavigation()
         {
+            // TODO use PlayerPrefs in settings
             PlayerPrefs.SetInt("navigating", navigating ? 1 : 0);
             if (navigating)
             {
@@ -109,7 +110,8 @@ namespace uAdventure.Geo
 
         private void RestoreNavigation()
         {
-            if(PlayerPrefs.HasKey("navigating") && PlayerPrefs.GetInt("navigating") == 1)
+            // TODO use PlayerPrefs in settings
+            if (PlayerPrefs.HasKey("navigating") && PlayerPrefs.GetInt("navigating") == 1)
             {
                 stepCompleted.Clear();
                 completedElementsForStep.Clear();
@@ -117,6 +119,7 @@ namespace uAdventure.Geo
                 try
                 {
                     navigating = true;
+                    // TODO use PlayerPrefs in settings
                     NavigationStrategy = PlayerPrefs.GetString("navigation_strategy").ToEnum<NavigationType>();
                     var locks = PlayerPrefs.GetString("navigation_locks").Split(',').ToList().ConvertAll(l => bool.Parse(l));
                     var completed = PlayerPrefs.GetString("navigation_completed").Split(',').ToList().ConvertAll(l => bool.Parse(l));

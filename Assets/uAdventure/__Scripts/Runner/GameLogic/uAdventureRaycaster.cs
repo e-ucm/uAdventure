@@ -8,6 +8,9 @@ namespace uAdventure.Runner
 {
     public class uAdventureRaycaster : PhysicsRaycaster
     {
+        private RaycastHit[] m_Hits;
+        private RaycastHit2D[] m_Hits2D;
+
         public bool Disabled { get; set; }
         public GameObject Override { get; set; }
         public GameObject Base { get; set; }
@@ -19,14 +22,6 @@ namespace uAdventure.Runner
             Disabled = false;
             Instance = this;
         }
-
-        protected override void Start()
-        {
-            base.Start();
-        }
-
-        RaycastHit[] m_Hits;
-        RaycastHit2D[] m_Hits2D;
 
         public override void Raycast(PointerEventData eventData, List<RaycastResult> resultAppendList)
         {
@@ -78,7 +73,9 @@ namespace uAdventure.Runner
             hitCount2D = m_Hits2D.Length;
 
             if (hitCount > 1)
+            {
                 System.Array.Sort(m_Hits, (r1, r2) => r1.distance.CompareTo(r2.distance));
+            }
 
             if (hitCount != 0)
             {
@@ -86,10 +83,9 @@ namespace uAdventure.Runner
                 {
                     var hitTransparent = m_Hits[b].collider.gameObject.GetComponent<Transparent>();
 
-                    if (hitTransparent)
+                    if (hitTransparent && hitTransparent.CheckTransparency(m_Hits[b]))
                     {
-                        if (hitTransparent.CheckTransparency(m_Hits[b]))
-                            continue;
+                        continue;
                     }
     
                     var result = new RaycastResult

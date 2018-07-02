@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using uAdventure.Core;
+﻿using uAdventure.Core;
 using uAdventure.Editor;
 using UnityEditor;
 using UnityEngine;
@@ -18,8 +15,9 @@ public class FileChooser : DialogReceiverInterface
     public bool AllowEditingPath { get; set; }
     [System.ComponentModel.DefaultValue("")]
     public string Path { get; set; }
-    
-    public BaseFileOpenDialog.FileType FileType { get; set; }
+    public string Empty { get; set; }
+
+    public FileType FileType { get; set; }
 
     public FileChooser()
     {
@@ -28,6 +26,7 @@ public class FileChooser : DialogReceiverInterface
         AllowEditingPath = false;
         ShowClear = true;
         Label = "";
+        Empty = string.Empty;
     }
 
     public virtual void DoLayout(params GUILayoutOption[] options)
@@ -62,60 +61,60 @@ public class FileChooser : DialogReceiverInterface
     {
         if (ShowClear)
         {
-            using (new EditorGUI.DisabledScope(string.IsNullOrEmpty(Path)))
+            using (new EditorGUI.DisabledScope(Empty.Equals(Path)))
             {
                 if (GUILayout.Button(delTex, GUILayout.Width(delTex.width + 10f)))
                 {
-                    Path = string.Empty;
+                    Path = Empty;
                 }
             }
         }
     }
 
-    void ShowAssetChooser(BaseFileOpenDialog.FileType type)
+    void ShowAssetChooser(FileType type)
     {
         BaseFileOpenDialog fileDialog = null;
 
         switch (type)
         {
-            case BaseFileOpenDialog.FileType.PATH:
-            case BaseFileOpenDialog.FileType.SCENE_BACKGROUND:
-            case BaseFileOpenDialog.FileType.SCENE_FOREGROUND:
-            case BaseFileOpenDialog.FileType.EXIT_ICON:
-            case BaseFileOpenDialog.FileType.FRAME_IMAGE:
-            case BaseFileOpenDialog.FileType.ITEM_ICON:
-            case BaseFileOpenDialog.FileType.ITEM_IMAGE:
-            case BaseFileOpenDialog.FileType.ITEM_IMAGE_OVER:
-            case BaseFileOpenDialog.FileType.SET_ITEM_IMAGE:
-            case BaseFileOpenDialog.FileType.BOOK_IMAGE_PARAGRAPH:
-            case BaseFileOpenDialog.FileType.BOOK_ARROW_LEFT_NORMAL:
-            case BaseFileOpenDialog.FileType.BOOK_ARROW_LEFT_OVER:
-            case BaseFileOpenDialog.FileType.BOOK_ARROW_RIGHT_NORMAL:
-            case BaseFileOpenDialog.FileType.BOOK_ARROW_RIGHT_OVER:
-            case BaseFileOpenDialog.FileType.BUTTON:
-            case BaseFileOpenDialog.FileType.BUTTON_OVER:
+            case FileType.PATH:
+            case FileType.SCENE_BACKGROUND:
+            case FileType.SCENE_FOREGROUND:
+            case FileType.EXIT_ICON:
+            case FileType.FRAME_IMAGE:
+            case FileType.ITEM_ICON:
+            case FileType.ITEM_IMAGE:
+            case FileType.ITEM_IMAGE_OVER:
+            case FileType.SET_ITEM_IMAGE:
+            case FileType.BOOK_IMAGE_PARAGRAPH:
+            case FileType.BOOK_ARROW_LEFT_NORMAL:
+            case FileType.BOOK_ARROW_LEFT_OVER:
+            case FileType.BOOK_ARROW_RIGHT_NORMAL:
+            case FileType.BOOK_ARROW_RIGHT_OVER:
+            case FileType.BUTTON:
+            case FileType.BUTTON_OVER:
                 fileDialog = ScriptableObject.CreateInstance<ImageFileOpenDialog>();
                 break;
-            case BaseFileOpenDialog.FileType.SCENE_MUSIC:
-            case BaseFileOpenDialog.FileType.CUTSCENE_MUSIC:
-            case BaseFileOpenDialog.FileType.EXIT_MUSIC:
-            case BaseFileOpenDialog.FileType.FRAME_MUSIC:
-            case BaseFileOpenDialog.FileType.NPC_DESCRIPTION_NAME_SOUND:
-            case BaseFileOpenDialog.FileType.NPC_DESCRIPTION_DETAILED_SOUND:
-            case BaseFileOpenDialog.FileType.NPC_DESCRIPTION_BRIEF_SOUND:
-            case BaseFileOpenDialog.FileType.ITEM_DESCRIPTION_NAME_SOUND:
-            case BaseFileOpenDialog.FileType.ITEM_DESCRIPTION_DETAILED_SOUND:
-            case BaseFileOpenDialog.FileType.ITEM_DESCRIPTION_BRIEF_SOUND:
-            case BaseFileOpenDialog.FileType.PLAY_SOUND_EFFECT:
-            case BaseFileOpenDialog.FileType.BUTTON_SOUND:
+            case FileType.SCENE_MUSIC:
+            case FileType.CUTSCENE_MUSIC:
+            case FileType.EXIT_MUSIC:
+            case FileType.FRAME_MUSIC:
+            case FileType.NPC_DESCRIPTION_NAME_SOUND:
+            case FileType.NPC_DESCRIPTION_DETAILED_SOUND:
+            case FileType.NPC_DESCRIPTION_BRIEF_SOUND:
+            case FileType.ITEM_DESCRIPTION_NAME_SOUND:
+            case FileType.ITEM_DESCRIPTION_DETAILED_SOUND:
+            case FileType.ITEM_DESCRIPTION_BRIEF_SOUND:
+            case FileType.PLAY_SOUND_EFFECT:
+            case FileType.BUTTON_SOUND:
                 fileDialog = ScriptableObject.CreateInstance<MusicFileOpenDialog>();
                 break;
-            case BaseFileOpenDialog.FileType.PLAY_ANIMATION_EFFECT:
-            case BaseFileOpenDialog.FileType.CHARACTER_ANIM:
-            case BaseFileOpenDialog.FileType.CUTSCENE_SLIDES:
+            case FileType.PLAY_ANIMATION_EFFECT:
+            case FileType.CHARACTER_ANIM:
+            case FileType.CUTSCENE_SLIDES:
                 fileDialog = ScriptableObject.CreateInstance<AnimationFileOpenDialog>();
                 break;
-            case BaseFileOpenDialog.FileType.CUTSCENE_VIDEO:
+            case FileType.CUTSCENE_VIDEO:
                 fileDialog = ScriptableObject.CreateInstance<VideoFileOpenDialog>();
                 break;
         }

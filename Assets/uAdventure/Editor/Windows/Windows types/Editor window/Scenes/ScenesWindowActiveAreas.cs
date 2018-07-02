@@ -11,9 +11,9 @@ namespace uAdventure.Editor
     public class ScenesWindowActiveAreas : SceneEditorWindow
     {
         
-        private Texture2D conditionsTex, noConditionsTex;
+        private readonly Texture2D conditionsTex, noConditionsTex;
         
-        private DataControlList activeAreasList;
+        private readonly DataControlList activeAreasList;
         private SceneDataControl workingScene;
 
         public ScenesWindowActiveAreas(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, SceneEditor sceneEditor,
@@ -28,6 +28,7 @@ namespace uAdventure.Editor
 
             activeAreasList = new DataControlList()
             {
+                RequestRepaint = Repaint,
                 elementHeight = 20,
                 Columns = new List<ColumnList.Column>()
                 {
@@ -110,7 +111,7 @@ namespace uAdventure.Editor
         [EditorComponent(typeof(ActiveAreaDataControl), Name = "Item.ActionsPanelTitle", Order = 10)]
         private class ActiveAreaActionsComponent : AbstractEditorComponent
         {
-            private ActionsList actionsList;
+            private readonly ActionsList actionsList;
 
             public ActiveAreaActionsComponent(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
             {
@@ -129,7 +130,10 @@ namespace uAdventure.Editor
         [EditorComponent(typeof(ActiveAreaDataControl), Name = "Item.DocPanelTitle", Order = 20)]
         public class ActiveAreaDescriptionsComponent : AbstractEditorComponent
         {
-            private DescriptionsEditor descriptionsEditor;
+            private readonly string[] behaviourTypes = { "Behaviour.Normal", "Behaviour.FirstAction" };
+            private readonly string[] behaviourTypesDescription = { "Behaviour.Selection.Normal", "Behaviour.Selection.FirstAction" };
+
+            private readonly DescriptionsEditor descriptionsEditor;
 
             public ActiveAreaDescriptionsComponent(Rect aStartPos, GUIContent aContent, GUIStyle aStyle,
                 params GUILayoutOption[] aOptions)
@@ -148,6 +152,17 @@ namespace uAdventure.Editor
                 // -------------
                 descriptionsEditor.Descriptions = workingActiveArea.getDescriptionsController();
                 descriptionsEditor.OnInspectorGUI();
+                GUILayout.Space(20);
+                
+                // -------------
+                // Behaviour
+                // -------------
+                EditorGUI.BeginChangeCheck();
+                var selectedBehaviourType = EditorGUILayout.Popup(TC.get("Behaviour"), (int)workingActiveArea.getBehaviour(), behaviourTypes.Select(bt => TC.get(bt)).ToArray());
+                Item.BehaviourType type = (selectedBehaviourType == 0 ? Item.BehaviourType.NORMAL : Item.BehaviourType.FIRST_ACTION);
+                if (EditorGUI.EndChangeCheck())
+                    workingActiveArea.setBehaviour(type);
+                EditorGUILayout.HelpBox(TC.get(behaviourTypesDescription[selectedBehaviourType]), MessageType.Info);
                 GUILayout.Space(20);
             }
         }

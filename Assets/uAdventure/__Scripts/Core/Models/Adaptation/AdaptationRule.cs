@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace uAdventure.Core
 {
-    public class AdaptationRule : Described, ContainsAdaptedState, ICloneable
+    public class AdaptationRule : Described, HasId, ContainsAdaptedState, ICloneable
     {
 
         //ID

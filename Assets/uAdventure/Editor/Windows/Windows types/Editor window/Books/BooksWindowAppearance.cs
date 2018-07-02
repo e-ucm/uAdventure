@@ -36,31 +36,36 @@ namespace uAdventure.Editor
             background = new FileChooser()
             {
                 Label = TC.get("Resources.DescriptionBookBackground"),
-                FileType = BaseFileOpenDialog.FileType.SCENE_BACKGROUND
+                FileType = FileType.SCENE_BACKGROUND,
+                Empty = SpecialAssetPaths.ASSET_EMPTY_IMAGE
             };
 
             left = new FileChooser()
             {
                 Label = TC.get("Resources.ArrowLeftNormal"),
-                FileType = BaseFileOpenDialog.FileType.BOOK_ARROW_LEFT_NORMAL
+                FileType = FileType.BOOK_ARROW_LEFT_NORMAL,
+                Empty = SpecialAssetPaths.ASSET_DEFAULT_ARROW_NORMAL
             };
 
             left_over = new FileChooser()
             {
                 Label = TC.get("Resources.ArrowLeftOver"),
-                FileType = BaseFileOpenDialog.FileType.BOOK_ARROW_LEFT_OVER
+                FileType = FileType.BOOK_ARROW_LEFT_OVER,
+                Empty = SpecialAssetPaths.ASSET_DEFAULT_ARROW_OVER
             };
 
             right = new FileChooser()
             {
                 Label = TC.get("Resources.ArrowRightNormal"),
-                FileType = BaseFileOpenDialog.FileType.BOOK_ARROW_RIGHT_NORMAL
+                FileType = FileType.BOOK_ARROW_RIGHT_NORMAL,
+                Empty = SpecialAssetPaths.ASSET_DEFAULT_ARROW_NORMAL_RIGHT
             };
 
             right_over = new FileChooser()
             {
                 Label = TC.get("Resources.ArrowRightOver"),
-                FileType = BaseFileOpenDialog.FileType.BOOK_ARROW_RIGHT_OVER
+                FileType = FileType.BOOK_ARROW_RIGHT_OVER,
+                Empty = SpecialAssetPaths.ASSET_DEFAULT_ARROW_OVER_RIGHT
             };
 
         }
@@ -79,7 +84,7 @@ namespace uAdventure.Editor
         private Texture2D LoadArrowTexture(BookDataControl book,int arrowType, int arrowMode)
         {
             var path = book.getArrowImagePath(arrowType, arrowMode);
-            return !string.IsNullOrEmpty(path) ? AssetsController.getImage(path).texture : null;
+            return !string.IsNullOrEmpty(path) ? Controller.ResourceManager.getImage(path) : null;
         }
 
         private void RefreshPathInformation(DataControlWithResources data)
@@ -87,7 +92,7 @@ namespace uAdventure.Editor
             var book = (BookDataControl)data;
             
             var backgroundPath = book.getPreviewImage();
-            backgroundPreview = !string.IsNullOrEmpty(backgroundPath) ? AssetsController.getImage(backgroundPath).texture : null;
+            backgroundPreview = !string.IsNullOrEmpty(backgroundPath) ? Controller.ResourceManager.getImage(backgroundPath) : null;
 
             leftNormalArrow = LoadArrowTexture(book,    BookDataControl.ARROW_LEFT, BookDataControl.ARROW_NORMAL);
             rightNormalArrow = LoadArrowTexture(book,   BookDataControl.ARROW_RIGHT, BookDataControl.ARROW_NORMAL);

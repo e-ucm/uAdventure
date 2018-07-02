@@ -152,7 +152,7 @@ namespace uAdventure.Editor
         {
 
             // First check the main block of conditions
-            foreach (Condition condition in conditions.getSimpleConditions())
+            foreach (Condition condition in conditions.GetSimpleConditions())
             {
                 if (condition.getType() == Condition.FLAG_CONDITION)
                     varFlagSummary.addFlagReference(condition.getId());
@@ -161,9 +161,9 @@ namespace uAdventure.Editor
             }
 
             // Then add the references from the either blocks
-            for (int i = 0; i < conditions.getEitherConditionsBlockCount(); i++)
+            for (int i = 0; i < conditions.GetEitherConditionsBlockCount(); i++)
             {
-                foreach (Condition condition in conditions.getEitherConditions(i))
+                foreach (Condition condition in conditions.GetEitherConditions(i))
                 {
                     if (condition.getType() == Condition.FLAG_CONDITION)
                         varFlagSummary.addFlagReference(condition.getId());
@@ -320,7 +320,7 @@ namespace uAdventure.Editor
         public int getBlocksCount()
         {
 
-            return conditions.size();
+            return conditions.Size();
         }
 
         /**
@@ -332,7 +332,7 @@ namespace uAdventure.Editor
         public bool isEmpty()
         {
 
-            return conditions.isEmpty();
+            return conditions.IsEmpty();
         }
 
         /**
@@ -349,10 +349,10 @@ namespace uAdventure.Editor
         {
 
             // Check index
-            if (index1 < 0 || index1 >= conditions.size())
+            if (index1 < 0 || index1 >= conditions.Size())
                 return -1;
 
-            return conditions.get(index1).Count;
+            return conditions.Get(index1).Count;
         }
 
         /**
@@ -427,7 +427,7 @@ namespace uAdventure.Editor
 
         public void deleteIdentifierReferences(string id)
         {
-            foreach (List<Condition> c in conditions.getConditionsList())
+            foreach (List<Condition> c in conditions.GetConditionsList())
             {
                 foreach (Condition con in c)
                 {
@@ -437,7 +437,7 @@ namespace uAdventure.Editor
                     }
                 }
                 if (c.Count == 0)
-                    conditions.getConditionsList().Remove(c);
+                    conditions.GetConditionsList().Remove(c);
             }
         }
 
@@ -451,12 +451,12 @@ namespace uAdventure.Editor
         public void replaceIdentifierReferences(string oldId, string newId)
         {
 
-            for (int i = 0; i < conditions.size(); i++)
+            for (int i = 0; i < conditions.Size(); i++)
             {
-                for (int j = 0; j < conditions.get(i).Count; j++)
+                for (int j = 0; j < conditions.Get(i).Count; j++)
                 {
-                    if (conditions.get(i)[j].getId().Equals(oldId))
-                        conditions.get(i)[j].setId(newId);
+                    if (conditions.Get(i)[j].getId().Equals(oldId))
+                        conditions.Get(i)[j].setId(newId);
                 }
             }
 
@@ -474,11 +474,11 @@ namespace uAdventure.Editor
 
             int count = 0;
 
-            for (int i = 0; i < conditions.size(); i++)
+            for (int i = 0; i < conditions.Size(); i++)
             {
-                for (int j = 0; j < conditions.get(i).Count; j++)
+                for (int j = 0; j < conditions.Get(i).Count; j++)
                 {
-                    if (conditions.get(i)[j].getId().Equals(id))
+                    if (conditions.Get(i)[j].getId().Equals(id))
                         count++;
                 }
             }
@@ -492,10 +492,10 @@ namespace uAdventure.Editor
             Dictionary<string, string> conditionProperties = new Dictionary<string, string>();
 
             // Check index
-            if (index1 < 0 || index1 >= conditions.size())
+            if (index1 < 0 || index1 >= conditions.Size())
                 return null;
 
-            List<Condition> conditionsList = conditions.get(index1);
+            var conditionsList = conditions.Get(index1);
             // Check index2
             if (index2 < 0 || index2 >= conditionsList.Count)
                 return null;
@@ -548,7 +548,7 @@ namespace uAdventure.Editor
             string value)
         {
 
-            if (index1 < 0 || index1 > conditions.size())
+            if (index1 < 0 || index1 > conditions.Size())
                 return false;
 
             if (conditionType == null || conditionId == null || conditionState == null)
@@ -558,7 +558,7 @@ namespace uAdventure.Editor
                 return false;
 
             return
-                Controller.Instance                    .addTool(new AddConditionTool(conditions, index1, index2, conditionType, conditionId, conditionState,
+                Controller.Instance                    .AddTool(new AddConditionTool(conditions, index1, index2, conditionType, conditionId, conditionState,
                         value));
         }
 
@@ -859,7 +859,7 @@ namespace uAdventure.Editor
         public void clearConditions()
         {
 
-            Controller.Instance.addTool(new ClearConditionsTool(conditions));
+            Controller.Instance.AddTool(new ClearConditionsTool(conditions));
 
         }
     }

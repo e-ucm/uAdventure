@@ -44,7 +44,7 @@ namespace uAdventure.Editor
         {
             animationField = new AnimationField()
             {
-                FileType = BaseFileOpenDialog.FileType.PLAY_ANIMATION_EFFECT
+                FileType = FileType.PLAY_ANIMATION_EFFECT
             };
             this.effect = new PlayAnimationEffect(slidesPath, 300, 300);
         }
@@ -96,9 +96,9 @@ namespace uAdventure.Editor
 
         public void OnDialogOk(string message, object workingObject = null, object workingObjectSecond = null)
         {
-            switch ((BaseFileOpenDialog.FileType)workingObject)
+            switch ((FileType)workingObject)
             {
-                case BaseFileOpenDialog.FileType.PLAY_ANIMATION_EFFECT:
+                case FileType.PLAY_ANIMATION_EFFECT:
                     OnSlidesceneChanged(message);
                     break;
             }

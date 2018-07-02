@@ -46,6 +46,7 @@ public class AppearanceEditor : Editor {
 
         appearanceList = new DataControlList()
         {
+            RequestRepaint = Repaint,
             headerHeight = 20,
             footerHeight = 20,
             Columns = new List<ColumnList.Column>()

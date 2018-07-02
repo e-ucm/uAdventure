@@ -247,11 +247,13 @@ namespace uAdventure.Editor
             string guidsPath = args[args.Length - 1];
 
             var text = System.IO.File.ReadAllLines(guidsPath);
-            Dictionary<string, KeyValuePair<string,string>> guidToFileIdAndDllGUID = new Dictionary<string, KeyValuePair<string, string>>();
+            var guidToFileIdAndDllGUID = new Dictionary<string, KeyValuePair<string, string>>();
+            var fileIdInDll = new Dictionary<string, string>();
 
             foreach (var tokens in text.Select(l => l.Split(',')))
             {
                 guidToFileIdAndDllGUID[tokens[0]] = new KeyValuePair<string, string>(tokens[1], tokens[2]);
+                fileIdInDll[tokens[1]] = tokens[2];
             }
             
             List<string> assetsToReimport = new List<string>();
@@ -261,7 +263,7 @@ namespace uAdventure.Editor
             foreach (var layout in layouts)
             {
                 Debug.Log("Layout: " + layout);
-                FixFile(layout, guidToFileIdAndDllGUID);
+                FixFile(layout, guidToFileIdAndDllGUID, fileIdInDll);
             }
 
             var scenes = System.IO.Directory.GetFiles(".\\", "*.unity", System.IO.SearchOption.AllDirectories);
@@ -269,7 +271,7 @@ namespace uAdventure.Editor
             foreach (var scene in scenes)
             {
                 Debug.Log("Scene: " + scene);
-                if (FixFile(scene, guidToFileIdAndDllGUID))
+                if (FixFile(scene, guidToFileIdAndDllGUID, fileIdInDll))
                 {
                     assetsToReimport.Add(scene);
                 }
@@ -280,7 +282,7 @@ namespace uAdventure.Editor
             foreach (var prefab in prefabs)
             {
                 Debug.Log("Prefab: " + prefab);
-                if (FixFile(prefab, guidToFileIdAndDllGUID))
+                if (FixFile(prefab, guidToFileIdAndDllGUID, fileIdInDll))
                 {
                     assetsToReimport.Add(prefab);
                 }
@@ -302,7 +304,7 @@ namespace uAdventure.Editor
             }
         }
 
-        private static bool FixFile(string file, Dictionary<string, KeyValuePair<string, string>> guidToFileIdAndDllGUID)
+        private static bool FixFile(string file, Dictionary<string, KeyValuePair<string, string>> guidToFileIdAndDllGUID, Dictionary<string, string> fileIdInDll)
         {
             var fileText = System.IO.File.ReadAllLines(file);
             bool modified = false;
@@ -317,23 +319,43 @@ namespace uAdventure.Editor
                 if (fileText[i].StartsWith("  m_Script: "))
                 {
                     Dictionary<string, string> attrs = ParseLine(fileText[i]);
-                    if (attrs["fileID"] != "11500000")
-                        continue;
+                    var fileId = attrs["fileID"];
+                    var isRuntime = fileId == "11500000";
 
-                    if (!guidToFileIdAndDllGUID.ContainsKey(attrs["guid"]))
+                    var existsInRuntime = isRuntime && guidToFileIdAndDllGUID.ContainsKey(attrs["guid"]);
+                    var existsCompiled = !isRuntime && fileIdInDll.ContainsKey(fileId);
+
+                    if (!existsInRuntime && !existsCompiled)
                     {
-                        Debug.LogWarning("Couldn't find type for: " + attrs["guid"]);
+                        if (isRuntime)
+                        {
+                            Debug.LogWarning("Couldn't find type for: " + attrs["guid"]);
+                        }
                         continue;
                     }
-                    var fileIdAndGUID = guidToFileIdAndDllGUID[attrs["guid"]];
-                    var guid = AssetDatabase.AssetPathToGUID(fileIdAndGUID.Value);
+
+                    string dll;
+                    if(isRuntime)
+                    {
+                        // Is runtime script
+                        var fileIdAndDll = guidToFileIdAndDllGUID[attrs["guid"]];
+                        fileId = fileIdAndDll.Key;
+                        dll = fileIdAndDll.Value;
+                    }
+                    else
+                    {
+                        // Is editor script
+                        dll = fileIdInDll[fileId];
+                    }
+
+                    var guid = AssetDatabase.AssetPathToGUID(dll);
                     if (string.IsNullOrEmpty(guid))
                     {
-                        Debug.LogWarning("Failed to get GUID for: " + fileIdAndGUID.Value);
+                        Debug.LogWarning("Failed to get GUID for: " + dll);
                         continue;
                     }
 
-                    attrs["fileID"] = fileIdAndGUID.Key;
+                    attrs["fileID"] = fileId;
                     attrs["guid"] = guid;
                     fileText[i] = "  m_Script: " + EncodeLine(attrs);
                     Debug.Log("Fixed! " + fileText[i]);

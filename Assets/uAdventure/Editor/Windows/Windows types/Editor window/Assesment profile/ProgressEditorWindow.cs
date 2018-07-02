@@ -3,23 +3,15 @@ using UnityEditor;
 
 using uAdventure.Core;
 using System.Collections.Generic;
-using System;
+using System.Linq;
 
 namespace uAdventure.Editor
 {
     public class ProgressEditorWindow : EditorWindow
     {
         private static ProgressEditorWindow editor;
-        string[] typeoptions = { "Milestones reached/total", "Max progress of all milestones" };
-
-        int type = 0;
-
-        private Texture2D addTexture = null;
-        private Texture2D moveUp, moveDown = null;
-        private Texture2D clearImg = null;
-
-        private static Vector2 scrollPosition;
-
+        private readonly string[] milestoneTypeTexts = { "Analytics.Milestone.Progress.Sum", "Analytics.Milestone.Progress.Max" };
+        
         private DataControlList progressList;
         private ProgressDataControl progress;
         private ColumnList.Column progressColumn;
@@ -28,20 +20,16 @@ namespace uAdventure.Editor
 
         public void Init(ProgressDataControl progress)
         {
-            clearImg = Resources.Load<Texture2D>("EAdventureData/img/icons/deleteContent");
-            addTexture = Resources.Load<Texture2D>("EAdventureData/img/icons/addNode");
-            moveUp = Resources.Load<Texture2D>("EAdventureData/img/icons/moveNodeUp");
-            moveDown = Resources.Load<Texture2D>("EAdventureData/img/icons/moveNodeDown");
-
             this.progress = progress;
 
             progressList = new DataControlList()
             {
+                RequestRepaint = Repaint,
                 Columns = new List<ColumnList.Column>()
                 {
                     new ColumnList.Column()
                     {
-                        Text = "Time"
+                        Text = "Analytics.Milestone.Time".Traslate()
                     }
                 },
                 drawCell = (rect, row, column, isActive, isFocused) =>
@@ -49,9 +37,11 @@ namespace uAdventure.Editor
                     var milestone = progressList.list[row] as MilestoneDataControl;
                     switch (column)
                     {
-                        case 0:
+                        default:
                             if (GUI.Button(rect, milestone.getContent().ToString()))
+                            {
                                 MilestoneEditorWindow.ShowMilestoneEditor(rect, milestone);
+                            }
                             break;
                         case 1:
                             milestone.setProgress(EditorGUI.Slider(rect, milestone.getProgress(), 0, 1));
@@ -62,39 +52,35 @@ namespace uAdventure.Editor
 
             progressColumn = new ColumnList.Column()
             {
-                Text = "Progress"
+                Text = "Analytics.Completable.Progress".Traslate()
             };
 
         }
-
-        private bool hasToRepaint = false;
+        
         public void OnGUI()
         {
-            GUILayout.Label("Progress is given by: ");
-            
-            progress.setType((Completable.Progress.ProgressType)EditorGUILayout.Popup((int)progress.getType(), typeoptions));
+            GUILayout.Label("Analytics.Milestone.Progress".Traslate());
+
+            progress.setType((Completable.Progress.ProgressType)EditorGUILayout.Popup((int)progress.getType(), milestoneTypeTexts.Traslate()));
 
             if(progress.getType() != currentMode)
             {
                 currentMode = progress.getType();
                 switch (currentMode)
                 {
-                    case Completable.Progress.ProgressType.SUM:
+                    default: // ProgressType.SUM:
                         if (progressList.Columns.Contains(progressColumn))
+                        {
                             progressList.Columns.Remove(progressColumn);
+                        }
                         break;
                     case Completable.Progress.ProgressType.SPECIFIC:
                         if (!progressList.Columns.Contains(progressColumn))
+                        {
                             progressList.Columns.Add(progressColumn);
+                        }
                         break;
                 }
-                hasToRepaint = true;
-            }
-
-            if (hasToRepaint && Event.current.type == EventType.Layout)
-            {
-                this.Repaint();
-                hasToRepaint = false;
             }
 
             progressList.SetData(progress, (p) => (p as ProgressDataControl).getMilestones().ConvertAll(m => m as DataControl));

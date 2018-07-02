@@ -9,6 +9,11 @@ namespace uAdventure.Editor
 {
     public class NPCDataControl : DataControlWithResources
     {
+        private static readonly string[] previewPriorityUp     = { "standup",    "standright", "standdown",  "standleft"  };
+        private static readonly string[] previewPriorityRight  = { "standright", "standdown",  "standleft",  "standup"    };
+        private static readonly string[] previewPriorityDown   = { "standdown",  "standleft",  "standup",    "standright" };
+        private static readonly string[] previewPriorityLeft   = { "standleft" , "standup",    "standright", "standdown"  };
+
         /**
              * Constant for the empty animation
              */
@@ -17,17 +22,17 @@ namespace uAdventure.Editor
         /**
          * Contained NPC data.
          */
-        private NPC npc;
+        private readonly NPC npc;
 
         /**
          * Actions list controller.
          */
-        private ActionsListDataControl actionsListDataControl;
+        private readonly ActionsListDataControl actionsListDataControl;
 
         /**
          * Controller for descriptions
          */
-        private DescriptionsController descriptionController;
+        private readonly DescriptionsController descriptionController;
 
         /**
          * Constructor
@@ -69,17 +74,20 @@ namespace uAdventure.Editor
             return actionsListDataControl;
         }
 
+
         /**
          * Returns the path to the selected preview image.
          * 
          * @return Path to the image, null if not present
          */
-        public string getPreviewImage()
+        public string getPreviewImage() { return getPreviewImage(Runner.Orientation.E); }
+        public string getPreviewImage(Runner.Orientation orientation)
         {
-            string previewImagePath = getExistingPreviewImagePath();
+            string previewImagePath = getExistingPreviewImagePath(orientation);
             if (!string.IsNullOrEmpty(previewImagePath))
             {
-                var animation = Loader.loadAnimation(previewImagePath, Controller.ResourceManager);
+                var incidences = new List<Incidence>();
+                var animation = Loader.LoadAnimation(previewImagePath, Controller.ResourceManager, incidences);
                 return animation != null && animation.getFrames().Count > 0 ? animation.getFrame(0).getUri() : null;
             }
             return null;
@@ -101,16 +109,24 @@ namespace uAdventure.Editor
             return null;
         }
         // Modified v1.5 to fix a bug with empty animations in eaa format
-        private string getExistingPreviewImagePath()
+        private string getExistingPreviewImagePath(Runner.Orientation orientation = Runner.Orientation.E)
         {
 
             string path = null;
             foreach (ResourcesDataControl resource in resourcesDataControlList)
             {
+                string[] previews = null;
+                switch (orientation)
+                {
+                    default:                   previews = previewPriorityRight; break;
+                    case Runner.Orientation.N: previews = previewPriorityUp;    break;
+                    case Runner.Orientation.S: previews = previewPriorityDown;  break;
+                    case Runner.Orientation.O: previews = previewPriorityLeft;  break;
+                }
+
                 // We prioritize the left, the right and the down
-                path = (new string[] { "standleft", "standright", "standdown" })
-                    .Select(s => getNotEmptyAsset(resource, s))
-                    .FirstOrDefault(s => s != null);
+                path = (previews).Select(s => getNotEmptyAsset(resource, s))
+                                 .FirstOrDefault(s => s != null);
 
                 if (!string.IsNullOrEmpty(path))
                 {
@@ -229,7 +245,7 @@ namespace uAdventure.Editor
         public void setAlwaysSynthesizer(bool always)
         {
 
-            controller.addTool(new ChangeBooleanValueTool(npc, always, "isAlwaysSynthesizer", "setAlwaysSynthesizer"));
+            controller.AddTool(new ChangeBooleanValueTool(npc, always, "isAlwaysSynthesizer", "setAlwaysSynthesizer"));
         }
 
         /**
@@ -241,7 +257,7 @@ namespace uAdventure.Editor
         public void setVoice(string voice)
         {
 
-            controller.addTool(new ChangeStringValueTool(npc, voice, "getVoice", "setVoice"));
+            controller.AddTool(new ChangeStringValueTool(npc, voice, "getVoice", "setVoice"));
         }
 
         /**
@@ -306,7 +322,7 @@ namespace uAdventure.Editor
 
             if (type == Controller.RESOURCES)
             {
-                elementAdded = Controller.Instance.addTool(new AddResourcesBlockTool(resourcesList, resourcesDataControlList, Controller.NPC, this));
+                elementAdded = Controller.Instance.AddTool(new AddResourcesBlockTool(resourcesList, resourcesDataControlList, Controller.NPC, this));
             }
 
             return elementAdded;
@@ -357,18 +373,20 @@ namespace uAdventure.Editor
         }
 
 
-        public override string renameElement(string name)
+        public override string renameElement(string newName)
         {
             string oldNPCId = npc.getId();
             string references = controller.countIdentifierReferences(oldNPCId).ToString();
 
             // Ask for confirmation
-            if (name != null || controller.ShowStrictConfirmDialog(TC.get("Operation.RenameNPCTitle"), TC.get("Operation.RenameElementWarning", new string[] { oldNPCId, references })))
+            if (newName != null || controller.ShowStrictConfirmDialog(TC.get("Operation.RenameNPCTitle"), TC.get("Operation.RenameElementWarning", new string[] { oldNPCId, references })))
             {
                 // Show a dialog asking for the new npc id
-                string newNPCId = name;
-                if (name == null)
-                    controller.ShowInputDialog(TC.get("Operation.RenameNPCTitle"), TC.get("Operation.RenameNPCMessage"), oldNPCId, (o,s) => performRenameElement(s));
+                string newNPCId = newName;
+                if (newName == null)
+                {
+                    controller.ShowInputDialog(TC.get("Operation.RenameNPCTitle"), TC.get("Operation.RenameNPCMessage"), oldNPCId, (o, s) => performRenameElement(s));
+                }
                 else
                 {
                     controller.DataModified();
@@ -384,7 +402,9 @@ namespace uAdventure.Editor
             string oldNPCId = npc.getId();
             // If some value was typed and the identifiers are different
             if (!controller.isElementIdValid(newNPCId))
+            {
                 newNPCId = controller.makeElementValid(newNPCId);
+            }
 
             npc.setId(newNPCId);
             controller.replaceIdentifierReferences(oldNPCId, newNPCId);
@@ -560,7 +580,8 @@ namespace uAdventure.Editor
             string previewImagePath = resourcesDataControlList[selectedResources].getAssetPath(animationPath);
             if (!string.IsNullOrEmpty(previewImagePath))
             {
-                var animation = Loader.loadAnimation(previewImagePath, Controller.ResourceManager);
+                var incidences = new List<Incidence>();
+                var animation = Loader.LoadAnimation(previewImagePath, Controller.ResourceManager, incidences);
                 return animation != null && animation.getFrames().Count > 0 ? animation.getFrame(0).getUri() : null;
             }
 
@@ -586,7 +607,7 @@ namespace uAdventure.Editor
         public void setShowsSpeechBubbles(bool showsSpeechBubbles)
         {
 
-            controller.addTool(new ChangeBooleanValueTool(npc, showsSpeechBubbles, "getShowsSpeechBubbles", "setShowsSpeechBubbles"));
+            controller.AddTool(new ChangeBooleanValueTool(npc, showsSpeechBubbles, "getShowsSpeechBubbles", "setShowsSpeechBubbles"));
         }
 
 

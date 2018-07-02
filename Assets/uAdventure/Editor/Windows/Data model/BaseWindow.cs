@@ -21,7 +21,13 @@ namespace uAdventure.Editor
 
         // Request repaint
         public VoidMethodDelegate OnRequestRepaint;
-        protected void Repaint(){ OnRequestRepaint(); }
+        protected void Repaint()
+        {
+            if(OnRequestRepaint != null)
+            {
+                OnRequestRepaint();
+            }
+        }
 
         public int WindowID { get { return m_WindowID; } }
         

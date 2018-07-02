@@ -159,7 +159,7 @@ namespace uAdventure.Editor
         {
 
             // If the value is different
-            controller.addTool(new ChangeTargetIdTool(elementReference, elementId));
+            controller.AddTool(new ChangeTargetIdTool(elementReference, elementId));
             //if( !elementId.equals( elementReference.getTargetId( ) ) ) {
             // Set the new element id, update the tree and modify the data
             //	elementReference.setTargetId( elementId );
@@ -179,7 +179,7 @@ namespace uAdventure.Editor
         public void setElementPosition(int x, int y)
         {
 
-            controller.addTool(new ChangeElementReferenceTool(elementReference, x, y));
+            controller.AddTool(new ChangeElementReferenceTool(elementReference, x, y));
         }
 
         /**
@@ -191,7 +191,7 @@ namespace uAdventure.Editor
         public void setDocumentation(string documentation)
         {
 
-            controller.addTool(new ChangeDocumentationTool(elementReference, documentation));
+            controller.AddTool(new ChangeDocumentationTool(elementReference, documentation));
         }
 
         /**
@@ -214,7 +214,7 @@ namespace uAdventure.Editor
         public void setElementScale(float scale)
         {
 
-            controller.addTool(new ChangeElementReferenceTool(elementReference, scale));
+            controller.AddTool(new ChangeElementReferenceTool(elementReference, scale));
         }
 
 
@@ -288,7 +288,7 @@ namespace uAdventure.Editor
         }
 
 
-        public override string renameElement(string name)
+        public override string renameElement(string newName)
         {
 
             return null;
@@ -436,12 +436,16 @@ namespace uAdventure.Editor
 
         }
 
+        public bool UsesOrientation()
+        {
+            return type == Controller.NPC_REFERENCE || type == Controller.PLAYER;
+        }
+
 
         public override void recursiveSearch()
         {
-
             check(this.conditionsController, TC.get("Search.Conditions"));
-            //check( this.getDocumentation( ), TC.get( "Search.Documentation" ) );
+            check(this.getDocumentation(), TC.get("Search.Documentation"));
             check(this.getElementId(), TC.get("Search.ElementID"));
         }
 
@@ -455,6 +459,16 @@ namespace uAdventure.Editor
         {
 
             this.visible = visible;
+        }
+
+        public Runner.Orientation GetOrientation()
+        {
+            return elementReference.GetOrientation();
+        }
+
+        public void SetOrientation(Runner.Orientation value)
+        {
+            Controller.Instance.AddTool(new ChangeEnumValueTool(elementReference, value, "GetOrientation", "SetOrientation"));
         }
 
 

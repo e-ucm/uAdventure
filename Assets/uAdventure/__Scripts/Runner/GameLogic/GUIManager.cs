@@ -75,6 +75,18 @@ namespace uAdventure.Runner
                 setCursor("default");
         }
 
+        public void Talk(string text, int x, int y, Color textColor, Color textBorderColor)
+        {
+            lastText = text;
+            ShowBubble(generateBubble(text, x, y, textColor, textBorderColor));
+        }
+
+        public void Talk(string text, int x, int y, Color textColor, Color textBorderColor, Color backgroundColor, Color borderColor)
+        {
+            lastText = text;
+            ShowBubble(generateBubble(text, x, y, textColor, textBorderColor, backgroundColor, borderColor));
+        }
+
         public void Talk(string text, string talkerName = null)
         {
             lastText = text;
@@ -83,21 +95,23 @@ namespace uAdventure.Runner
             {
                 text = text.Replace("[]", "[" + Player.IDENTIFIER + "]");
                 NPC player = Game.Instance.GameState.Player;
-                BubbleData bubble;
+                BubbleData bubbleData;
 
-                if (Game.Instance.GameState.IsFirstPerson)
+                if (Game.Instance.GameState.IsFirstPerson || PlayerMB.Instance == null)
                 {
-                    bubble = generateBubble(player, text);
+                    bubbleData = generateBubble(player, text);
                 }
                 else
                 {
                     talkerObject = getTalker(talkerName);
                     if (talkerObject == null)
+                    {
                         return;
-                    bubble = generateBubble(player, text, talkerObject);
+                    }
+                    bubbleData = generateBubble(player, text, talkerObject);
                 }
 
-                GUIManager.Instance.ShowBubble(bubble);
+                ShowBubble(bubbleData);
             }
             else
             {
@@ -105,15 +119,16 @@ namespace uAdventure.Runner
                 if (talkerObject == null)
                     return;
 
-                NPC cha = Game.Instance.GameState.getCharacter(talkerName);
-                BubbleData bubble = generateBubble(cha, text, talkerObject);
-                GUIManager.Instance.ShowBubble(bubble);
+                NPC cha = Game.Instance.GameState.GetCharacter(talkerName);
+                ShowBubble(generateBubble(cha, text, talkerObject));
             }
             if (talkerObject)
             {
                 var bubbleTalker = talkerObject.GetComponent<Representable>();
                 if (bubbleTalker)
+                {
                     bubbleTalker.Play("speak");
+                }
             }
         }
 
@@ -163,6 +178,35 @@ namespace uAdventure.Runner
                 } 
                 this.bubble.GetComponent<Bubble>().destroy();
             }
+        }
+        public BubbleData generateBubble(string text, int x, int y)
+        {
+            return generateBubble(text, x, y, Color.white, Color.black);
+        }
+        public BubbleData generateBubble(string text, int x, int y, Color textColor, Color textOutlineColor)
+        {
+            return generateBubble(text, x, y, false, textColor, textOutlineColor, Color.white, Color.black);
+        }
+        public BubbleData generateBubble(string text, int x, int y, Color textColor, Color textOutlineColor, Color baseColor, Color outlineColor)
+        {
+            return generateBubble(text, x, y, true, textColor, textOutlineColor, baseColor, outlineColor);
+        }
+        private BubbleData generateBubble(string text, int x, int y, bool showBorder, Color textColor, Color textOutlineColor, Color baseColor, Color outlineColor)
+        {
+            var currentScene = FindObjectOfType<SceneMB>();
+
+            var destiny = currentScene.ToWorldSize(new Vector2(x, y));
+            var bubbleData = new BubbleData(text, destiny, destiny - new Vector3(0, -15, 0));
+
+            bubbleData.TextColor = textColor;
+            bubbleData.TextOutlineColor = textOutlineColor;
+            if (showBorder)
+            {
+                bubbleData.BaseColor = baseColor;
+                bubbleData.OutlineColor = outlineColor;
+            }
+
+            return bubbleData;
         }
 
         public BubbleData generateBubble(NPC cha, string text, GameObject talker = null)
@@ -238,6 +282,16 @@ namespace uAdventure.Runner
         public void showConfigMenu()
         {
             this.Config_Menu_Ref.SetActive(!Config_Menu_Ref.activeSelf);
+        }
+
+        public void OnClickLoad()
+        {
+            Game.Instance.LoadGame();
+        }
+
+        public void OnClickSave()
+        {
+            Game.Instance.SaveGame();
         }
 
         public void resetAndExit()

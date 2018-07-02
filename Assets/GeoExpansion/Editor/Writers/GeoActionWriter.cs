@@ -13,7 +13,7 @@ namespace uAdventure.Editor
         {
             var geoAction = target as GeoAction;
 
-            if(!geoAction.Conditions.isEmpty())
+            if(!geoAction.Conditions.IsEmpty())
                 DOMWriterUtility.DOMWrite(node, geoAction.Conditions);
 
             if (!geoAction.Effects.IsEmpty())

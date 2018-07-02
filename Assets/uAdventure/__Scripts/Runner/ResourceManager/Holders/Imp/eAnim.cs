@@ -1,8 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using System.Xml;
 using uAdventure.Core;
 
 namespace uAdventure.Runner
@@ -10,34 +7,27 @@ namespace uAdventure.Runner
     public class eFrame
     {
 
-        private Texture2D image;
-        public Texture2D Image
-        {
-            get { return image; }
-            set { image = value; }
-        }
+        public Texture2D Image { get; set; }
 
-        private int duration = 500;
-        public int Duration
+        public int Duration { get; set; }
+
+        public eFrame()
         {
-            get { return duration; }
-            set { duration = value; }
+            Duration = 500;
         }
     }
 
     public class eAnim : Resource
     {
-        public uAdventure.Core.Animation Animation
-        {
-            get; protected set;
-        }
+        public uAdventure.Core.Animation Animation { get; protected set; }
 
         public List<eFrame> frames;
 
         public eAnim(string path, ResourceManager.LoadingType type)
         {
             frames = new List<eFrame>();
-            Animation = Loader.loadAnimation(path, Game.Instance.ResourceManager);
+            var incidences = new List<Incidence>();
+            Animation = Loader.LoadAnimation(path, Game.Instance.ResourceManager, incidences);
 
             foreach (var frame in Animation.getFrames())
             {

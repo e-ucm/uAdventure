@@ -27,7 +27,7 @@ namespace uAdventure.Runner
                 exited = true;
                 effects.AddRange(ed.getEffects());
 
-                if (Game.Instance.GameState.isCutscene(ed.getNextSceneId()))
+                if (Game.Instance.GameState.IsCutscene(ed.getNextSceneId()))
                     effects.Add(new TriggerCutsceneEffect(ed.getNextSceneId()));
                 else
                     effects.Add(new TriggerSceneEffect(ed.getNextSceneId(), ed.getDestinyX(), ed.getDestinyY(), ed.getDestinyScale(), ed.getTransitionTime(), ed.getTransitionType()));
@@ -85,7 +85,7 @@ namespace uAdventure.Runner
                 return;
 
             // If no destination accesible doesnt matter
-            var destination = Game.Instance.GameState.getChapterTarget(ed.getNextSceneId());
+            var destination = Game.Instance.GameState.GetChapterTarget(ed.getNextSceneId());
             if (destination == null)
                 return;
 
@@ -99,7 +99,7 @@ namespace uAdventure.Runner
 
         public void Exit()
         {
-            var currentTarget = Game.Instance.GameState.getChapterTarget(Game.Instance.GameState.CurrentTarget);
+            var currentTarget = Game.Instance.GameState.GetChapterTarget(Game.Instance.GameState.CurrentTarget);
             Game.Instance.GameState.BeginChangeAmbit();
             bool exited;
             Game.Instance.Execute(GetExitEffects(out exited), (effects) =>
@@ -185,7 +185,7 @@ namespace uAdventure.Runner
                 if(exitEffects == null)
                 {
                     Game.Instance.GameState.BeginChangeAmbit();
-                    targetOnExit = Game.Instance.GameState.getChapterTarget(Game.Instance.GameState.CurrentTarget);
+                    targetOnExit = Game.Instance.GameState.GetChapterTarget(Game.Instance.GameState.CurrentTarget);
                     exitEffects = toRun.exitMB.GetExitEffects(out exit);
                 }
 

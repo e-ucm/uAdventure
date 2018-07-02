@@ -86,7 +86,7 @@ namespace uAdventure.Editor
                 timersInfo[i][0] = i.ToString();
                 timersInfo[i][1] = timersDataControlList[i].getTimeHhMmSs();
 
-                if (!timer.getInitCond().isEmpty())
+                if (!timer.getInitCond().IsEmpty())
                 {
                     timersInfo[i][2] = TC.get("GeneralText.Yes");
                 }
@@ -95,7 +95,7 @@ namespace uAdventure.Editor
                     timersInfo[i][2] = TC.get("GeneralText.No");
                 }
 
-                if (!timer.getEndCond().isEmpty())
+                if (!timer.getEndCond().IsEmpty())
                 {
                     timersInfo[i][3] = TC.get("GeneralText.Yes");
                 }

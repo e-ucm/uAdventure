@@ -24,6 +24,7 @@ namespace uAdventure.Editor
 
             barriersList = new DataControlList()
             {
+                RequestRepaint = Repaint,
                 elementHeight = 20,
                 Columns = new List<ColumnList.Column>()
                 {

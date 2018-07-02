@@ -193,7 +193,7 @@ namespace uAdventure.Editor
                 return false;
             }
 
-            Controller.Instance.addTool(new AddTrajectoryNodeTool(trajectory, this, x, y, sceneDataControl));
+            Controller.Instance.AddTool(new AddTrajectoryNodeTool(trajectory, this, x, y, sceneDataControl));
 
             return true;
         }
@@ -222,7 +222,7 @@ namespace uAdventure.Editor
                 return false;
             }
 
-            Controller.Instance.addTool(new AddTrajectorySideTool(startNode, endNode, trajectory, this, sceneDataControl));
+            Controller.Instance.AddTool(new AddTrajectorySideTool(startNode, endNode, trajectory, this, sceneDataControl));
 
             return true;
         }
@@ -244,7 +244,7 @@ namespace uAdventure.Editor
             {
                 if (nodeDataControlList.Count > 1)
                 {
-                    Controller.Instance.addTool(new DeleteTrajectoryNodeTool(dataControl, trajectory, this));
+                    Controller.Instance.AddTool(new DeleteTrajectoryNodeTool(dataControl, trajectory, this));
                     return true;
                 }
                 else
@@ -252,7 +252,7 @@ namespace uAdventure.Editor
             }
             if (dataControl is SideDataControl && sideDataControlList.Contains((SideDataControl)dataControl))
             {
-                Controller.Instance.addTool(new DeleteTrajectorySideTool((SideDataControl)dataControl, trajectory, this));
+                Controller.Instance.AddTool(new DeleteTrajectorySideTool((SideDataControl)dataControl, trajectory, this));
                 trajectory.getSides().Remove((Side)dataControl.getContent());
                 sideDataControlList.Remove((SideDataControl)dataControl);
                 return true;
@@ -412,7 +412,7 @@ namespace uAdventure.Editor
         public void setInitialNode(NodeDataControl nodeDataControl)
         {
 
-            Controller.Instance.addTool(new SetTrajectoryInitialNodeTool(trajectory, this, nodeDataControl));
+            Controller.Instance.AddTool(new SetTrajectoryInitialNodeTool(trajectory, this, nodeDataControl));
         }
 
         /**

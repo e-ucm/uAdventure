@@ -142,7 +142,7 @@ namespace uAdventure.Editor
         public override bool duplicateElement(DataControl dataControl)
         {
 
-            return Controller.Instance.addTool(new DuplicateDescriptionTool(this));
+            return Controller.Instance.AddTool(new DuplicateDescriptionTool(this));
         }
 
 
@@ -200,7 +200,7 @@ namespace uAdventure.Editor
         {
             if(type == 999)
             {
-                controller.addTool(new AddDescriptionTool(this));
+                controller.AddTool(new AddDescriptionTool(this));
                 return true;
             }
 
@@ -213,7 +213,7 @@ namespace uAdventure.Editor
         {
             if (this.getDescriptions().Contains(dataControl as DescriptionController))
             {
-                controller.addTool(new RemoveDescriptionTool(this));
+                controller.AddTool(new RemoveDescriptionTool(this));
                 return true;
             }
             

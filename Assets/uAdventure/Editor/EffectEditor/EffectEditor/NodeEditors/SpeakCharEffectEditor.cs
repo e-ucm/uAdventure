@@ -33,7 +33,7 @@ namespace uAdventure.Editor
         {
             audioField = new FileChooser()
             {
-                FileType = BaseFileOpenDialog.FileType.PLAY_SOUND_EFFECT
+                FileType = FileType.PLAY_SOUND_EFFECT
             };
 
             var npcs = Controller.Instance.IdentifierSummary.getIds<NPC>();

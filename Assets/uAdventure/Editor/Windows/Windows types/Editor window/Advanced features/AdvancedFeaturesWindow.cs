@@ -1,8 +1,6 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 using uAdventure.Core;
-using System;
 using System.Collections.Generic;
 
 namespace uAdventure.Editor
@@ -10,7 +8,7 @@ namespace uAdventure.Editor
     [EditorWindowExtension(90, typeof(AdvancedFeaturesWindow))]
     public class AdvancedFeaturesWindow : DefaultButtonMenuEditorWindowExtension
     {
-        private enum AdvencedFeaturesWindowType
+        private enum AdvancedFeaturesWindowType
         {
             GlobalStates,
             ListOfTimers,
@@ -18,37 +16,43 @@ namespace uAdventure.Editor
         }
         
 
-        private static AdvencedFeaturesWindowType openedWindow = AdvencedFeaturesWindowType.ListOfTimers;
+        private AdvancedFeaturesWindowType openedWindow = AdvancedFeaturesWindowType.ListOfTimers;
 
-        private static AdvencedFeaturesWindowGlobalStates advencedFeaturesWindowGlobalStates;
-        private static AdvencedFeaturesWindowListOfTimers advencedFeaturesWindowListOfTimers;
-        private static AdvencedFeaturesWindowMacros advencedFeaturesWindowMacros;
+        private readonly BaseWindow[] windows;
 
-        private List<KeyValuePair<string, AdvencedFeaturesWindowType>> tabs;
+        private readonly List<KeyValuePair<string, AdvancedFeaturesWindowType>> tabs;
 
         public AdvancedFeaturesWindow(Rect aStartPos, GUIStyle aStyle,
             params GUILayoutOption[] aOptions)
             : base(aStartPos, new GUIContent(TC.get("AdvancedFeatures.Title")), aStyle, aOptions)
         {
-            var c = new GUIContent();
-            c.image = (Texture2D)Resources.Load("EAdventureData/img/icons/advanced", typeof(Texture2D));
-            c.text = TC.get("AdvancedFeatures.Title");
+            var c = new GUIContent(TC.get("AdvancedFeatures.Title"), 
+                Resources.Load<Texture2D>("EAdventureData/img/icons/advanced"));
             ButtonContent = c;
 
-            advencedFeaturesWindowGlobalStates = new AdvencedFeaturesWindowGlobalStates(aStartPos,
-                new GUIContent(TC.get("Element.Name55")), "Window");
-            advencedFeaturesWindowListOfTimers = new AdvencedFeaturesWindowListOfTimers(aStartPos,
-                new GUIContent(TC.get("TimersList.Title")), "Window");
-            advencedFeaturesWindowMacros = new AdvencedFeaturesWindowMacros(aStartPos,
-                new GUIContent(TC.get("Element.Name57")), "Window");
+            windows = new BaseWindow[3]
+            {
+                new AdvancedFeaturesWindowGlobalStates(aStartPos,
+                    new GUIContent(TC.get("Element.Name55")), "Window"),
+                new AdvancedFeaturesWindowListOfTimers(aStartPos,
+                    new GUIContent(TC.get("TimersList.Title")), "Window"),
+                new AdvancedFeaturesWindowMacros(aStartPos,
+                    new GUIContent(TC.get("Element.Name57")), "Window")
+            };
 
-
-            tabs = new List<KeyValuePair<string, AdvencedFeaturesWindowType>>()
-                {
-                    new KeyValuePair<string, AdvencedFeaturesWindowType>(TC.get("TimersList.Title"),      AdvencedFeaturesWindowType.ListOfTimers),
-                    new KeyValuePair<string, AdvencedFeaturesWindowType>(TC.get("Element.Name55"),       AdvencedFeaturesWindowType.GlobalStates),
-                    new KeyValuePair<string, AdvencedFeaturesWindowType>(TC.get("Element.Name57"),  AdvencedFeaturesWindowType.Macros)
-                };
+            foreach(var window in windows)
+            {
+                window.BeginWindows = BeginWindows;
+                window.EndWindows = EndWindows;
+                window.OnRequestRepaint = OnRequestRepaint;
+            }
+            
+            tabs = new List<KeyValuePair<string, AdvancedFeaturesWindowType>>()
+            {
+                new KeyValuePair<string, AdvancedFeaturesWindowType>(TC.get("TimersList.Title"), AdvancedFeaturesWindowType.ListOfTimers),
+                new KeyValuePair<string, AdvancedFeaturesWindowType>(TC.get("Element.Name55"),   AdvancedFeaturesWindowType.GlobalStates),
+                new KeyValuePair<string, AdvancedFeaturesWindowType>(TC.get("Element.Name57"),   AdvancedFeaturesWindowType.Macros)
+            };
         }
 
 
@@ -64,31 +68,17 @@ namespace uAdventure.Editor
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
 
-            switch (openedWindow)
+            var windowIndex = (int)openedWindow;
+            if (windowIndex< 0 || windowIndex >= windows.Length)
             {
-                case AdvencedFeaturesWindowType.GlobalStates:
-                    advencedFeaturesWindowGlobalStates.Rect = Rect;
-                    advencedFeaturesWindowGlobalStates.Draw(aID);
-                    break;
-                case AdvencedFeaturesWindowType.ListOfTimers:
-                    advencedFeaturesWindowListOfTimers.Rect = Rect;
-                    advencedFeaturesWindowListOfTimers.Draw(aID);
-                    break;
-                case AdvencedFeaturesWindowType.Macros:
-                    advencedFeaturesWindowMacros.Rect = Rect;
-                    advencedFeaturesWindowMacros.Draw(aID);
-                    break;
+                return;
             }
+
+            var currentWindow = windows[windowIndex];
+            currentWindow.Rect = Rect;
+            currentWindow.Draw(aID);
         }
 
-
-        void OnWindowTypeChanged(AdvencedFeaturesWindowType type_)
-        {
-            openedWindow = type_;
-        }
-
-        protected override void OnButton()
-        {
-        }
+        protected override void OnButton() { }
     }
 }

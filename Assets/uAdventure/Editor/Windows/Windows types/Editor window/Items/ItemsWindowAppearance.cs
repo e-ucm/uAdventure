@@ -43,19 +43,21 @@ namespace uAdventure.Editor
             image = new FileChooser()
             {
                 Label = TC.get("Resources.DescriptionItemImage"),
-                FileType = BaseFileOpenDialog.FileType.ITEM_IMAGE
+                FileType = FileType.ITEM_IMAGE,
+                Empty = SpecialAssetPaths.ASSET_EMPTY_IMAGE
             };
 
             icon = new FileChooser()
             {
                 Label = TC.get("Resources.DescriptionItemIcon"),
-                FileType = BaseFileOpenDialog.FileType.ITEM_ICON
+                FileType = FileType.ITEM_ICON,
+                Empty = SpecialAssetPaths.ASSET_EMPTY_ICON
             };
 
             image_over = new FileChooser()
             {
                 Label = TC.get("Resources.DescriptionItemImageOver"),
-                FileType = BaseFileOpenDialog.FileType.ITEM_IMAGE_OVER
+                FileType = FileType.ITEM_IMAGE_OVER
             };
         }
 

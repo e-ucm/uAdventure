@@ -238,14 +238,14 @@ namespace uAdventure.Editor
         public override bool linkNode(ConversationNodeView fatherView, ConversationNodeView childView)
         {
 
-            return controller.addTool(new LinkConversationNodeTool(this, fatherView, childView));
+            return controller.AddTool(new LinkConversationNodeTool(this, fatherView, childView));
         }
 
 
         public override bool deleteNode(ConversationNodeView nodeView)
         {
 
-            return controller.addTool(new DeleteConversationNodeTool(nodeView, (GraphConversation)getConversation(), allConditions));
+            return controller.AddTool(new DeleteConversationNodeTool(nodeView, (GraphConversation)getConversation(), allConditions));
         }
 
 

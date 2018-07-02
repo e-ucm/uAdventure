@@ -3,7 +3,6 @@ using UnityEngine;
 
 using System.Collections.Generic;
 using uAdventure.Core;
-using uAdventure.QR;
 using System;
 using System.Linq;
 using UnityEditor.SceneManagement;
@@ -58,7 +57,6 @@ namespace uAdventure.Editor
 
         private LayoutWindow m_Window = null;
         private ChapterWindow chapterWindow;
-        //private static AdaptationProfileWindow adapatationProfileWindow;
 
         private Vector2 scrollPosition;
 
@@ -74,29 +72,21 @@ namespace uAdventure.Editor
 
         private static Rect zeroRect;
         private Rect windowArea;
-        private bool hasToReturnFocus = false;
 
-        private void Return()
+        private void Return(PlayModeStateChange playModeStateChange)
         {
-            if (!EditorApplication.isPlaying && !EditorApplication.isPlayingOrWillChangePlaymode)
+            if(playModeStateChange == PlayModeStateChange.EnteredEditMode)
             {
                 FocusWindowIfItsOpen(GetType());
-                EditorApplication.update -= Return;
-                hasToReturnFocus = false;
             }
         }
 
         public void OnEnable()
-		{
-            if (!EditorApplication.isPlaying && EditorApplication.isPlayingOrWillChangePlaymode && !hasToReturnFocus)
-            {
-                hasToReturnFocus = true;
-                EditorApplication.update += Return; 
-            }
-
+        {
             if (!thisWindowReference)
             {
                 thisWindowReference = this;
+                EditorApplication.playModeStateChanged += Return;
             }
             else
             {
@@ -126,11 +116,17 @@ namespace uAdventure.Editor
 
 
             if (!redoTexture)
-				redoTexture = (Texture2D)Resources.Load("EAdventureData/img/icons/redo", typeof(Texture2D));
-			if(!undoTexture)
-				undoTexture = (Texture2D)Resources.Load("EAdventureData/img/icons/undo", typeof(Texture2D));
-			if(!adaptationTexture)
-				adaptationTexture = (Texture2D)Resources.Load("EAdventureData/img/icons/adaptationProfiles", typeof(Texture2D));
+            {
+                redoTexture = (Texture2D)Resources.Load("EAdventureData/img/icons/redo", typeof(Texture2D));
+            }
+            if (!undoTexture)
+            {
+                undoTexture = (Texture2D)Resources.Load("EAdventureData/img/icons/undo", typeof(Texture2D));
+            }
+            if (!adaptationTexture)
+            {
+                adaptationTexture = (Texture2D)Resources.Load("EAdventureData/img/icons/adaptationProfiles", typeof(Texture2D));
+            }
 			
 			fileMenu = new FileMenu();
 			editMenu = new EditMenu();
@@ -141,7 +137,15 @@ namespace uAdventure.Editor
 			aboutMenu = new AboutMenu();
         }
 
-		public static void RefreshLanguage(){
+        private void OnDestroy()
+        {
+            if(thisWindowReference == this)
+            {
+                EditorApplication.playModeStateChanged -= Return;
+            }
+        }
+
+        public static void RefreshLanguage(){
 			thisWindowReference.OnEnable ();
 		}
 
@@ -172,7 +176,9 @@ namespace uAdventure.Editor
 
             // if there's a component of the same tipe already registered we ignore it
             if (knownComponents[t].Any(c => c.GetType() == component.GetType()))
+            {
                 return;
+            }
 
             knownComponents[t].Add(component);
             knownComponents[t].Sort((c1, c2) => CompareComponents(c1, c2));
@@ -235,6 +241,10 @@ namespace uAdventure.Editor
             {
                 fileMenu.menu.ShowAsContext();
             }
+            if (GUILayout.Button(TC.get("MenuEdit.Title"), "toolbarButton"))
+            {
+                editMenu.menu.ShowAsContext();
+            }
             if (GUILayout.Button(TC.get("MenuAdventure.Title"), "toolbarButton"))
             {
                 adventureMenu.menu.ShowAsContext();
@@ -261,22 +271,6 @@ namespace uAdventure.Editor
                 EditorGUILayout.BeginHorizontal(GUILayout.ExpandWidth(true));
                 var leftMenuRect = EditorGUILayout.BeginVertical(GUILayout.Width(LEFT_MENU_WIDTH), GUILayout.ExpandHeight(true));
 
-                //EditorGUILayout.BeginHorizontal(EditorGUILayout.MaxWidth(25), EditorGUILayout.MaxHeight(25));
-                //if (EditorGUILayout.Button(undoTexture, EditorGUILayout.MaxWidth(25), EditorGUILayout.MaxHeight(25)))
-                //{
-                //    UndoAction();
-                //}
-
-                //EditorGUILayout.Space(5);
-
-                //if (EditorGUILayout.Button(redoTexture, EditorGUILayout.MaxWidth(25), EditorGUILayout.MaxHeight(25)))
-                //{
-                //    RedoAction();
-                //}
-                //EditorGUILayout.EndHorizontal();
-
-                //EditorGUILayout.Space(25);
-
                 scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
 
                 // Button event chapter
@@ -296,14 +290,6 @@ namespace uAdventure.Editor
                 */
 
                 windowArea = EditorGUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
-                /*if (windowArea != null)
-                {
-                    windowArea = GUILayoutUtility.GetRect(0, 0, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
-                    Debug.Log(Event.current.type + " " + windowArea);
-                }*/
-                //GUI.BeginGroup(windowArea);
-                    //extensionSelected.OnGUI();
-
                 switch (openedWindow)
                 {
                     case EditorWindowType.Chapter:
@@ -327,8 +313,7 @@ namespace uAdventure.Editor
                     }
                     m_Window.OnGUI();
                 }
-
-                //GUI.EndGroup(); 
+ 
                 EditorGUILayout.EndVertical();
                 EditorGUILayout.EndHorizontal();
             }
@@ -365,16 +350,14 @@ namespace uAdventure.Editor
         void RedoAction()
         {
             Debug.Log("redo clicked");
-            Controller.Instance.redoTool();
+            Controller.Instance.RedoTool();
         }
 
         void UndoAction()
         {
             Debug.Log("undo clicked");
-            Controller.Instance.undoTool();
+            Controller.Instance.UndoTool();
         }
-
-        // Request
 
         void RequestMainView(EditorWindowExtension who)
         {

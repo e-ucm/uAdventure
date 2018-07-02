@@ -257,7 +257,7 @@ namespace uAdventure.Editor
          */
         public void editAssetPath(int index)
         {
-            controller.addTool(new SelectResourceTool(resources, assetsInformation, resourcesType, index));
+            controller.AddTool(new SelectResourceTool(resources, assetsInformation, resourcesType, index));
         }
 
         /**
@@ -268,7 +268,7 @@ namespace uAdventure.Editor
          */
         public void deleteAssetPath(int index)
         {
-            controller.addTool(new DeleteResourceTool(resources, assetsInformation, index));
+            controller.AddTool(new DeleteResourceTool(resources, assetsInformation, index));
         }
 
         public override System.Object getContent()
@@ -427,7 +427,7 @@ namespace uAdventure.Editor
 
         public override void deleteAssetReferences(string assetPath)
         {
-            controller.addTool(new DeleteAssetReferencesInResources(resources, assetPath));
+            controller.AddTool(new DeleteAssetReferencesInResources(resources, assetPath));
         }
 
 
@@ -466,7 +466,7 @@ namespace uAdventure.Editor
          */
         public void setAssetPath(string filename, string destinyAssetName, int index)
         {
-            controller.addTool(new EditResourceTool(resources, assetsInformation, index, filename, destinyAssetName));
+            controller.AddTool(new EditResourceTool(resources, assetsInformation, index, filename, destinyAssetName));
         }
 
 

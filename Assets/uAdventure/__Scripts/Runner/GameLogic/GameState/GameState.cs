@@ -6,23 +6,54 @@ using uAdventure.Core;
 using RAGE.Analytics;
 using System;
 using AssetPackage;
+using System.Linq;
 
 namespace uAdventure.Runner
 {
+    [Serializable]
     public class GameState
     {
         //###########################################################################
         //########################### GAME STATE HANDLING ###########################
         //###########################################################################
 
-        AdventureData data;
+        /// This class is used for serialization purposes only
+        [Serializable]
+        protected class ContextList
+        {
+            [SerializeField]
+            protected List<ElementReference> elementReferences;
+            public List<ElementReference> ElementReferences { get { return elementReferences; } set { elementReferences = value; } }
+        }
+
+        private readonly AdventureData data;
+        [SerializeField]
         private ElementReference playerContext;
-        int current_chapter = 0;
-        string current_target = "";
-        string last_target = "";
+
+        [SerializeField]
+        private int currentChapter = 0;
+        [SerializeField]
+        private string currentTarget = "";
+        [SerializeField]
+        private string lastTarget = "";
+        [SerializeField]
         private List<string> removedElements;
+        [SerializeField]
         private List<string> inventoryItems;
-        private Dictionary<string, int> varFlagValues;
+
+        private Dictionary<string, List<ElementReference>> elementContexts;
+        private Dictionary<string, int> varFlags;
+
+        [SerializeField]
+        private List<string> varFlagKeys;
+        [SerializeField]
+        private List<int> varFlagValues;
+
+        [SerializeField]
+        private List<string> elementContextsKeys;
+        [SerializeField]
+        private List<ContextList> elementContextsValues;
+
         private Stack<List<KeyValuePair<string, int>>> varFlagChangeAmbits;
 
         public AdventureData Data
@@ -32,117 +63,15 @@ namespace uAdventure.Runner
 
         public string CurrentTarget
         {
-            get {
-                return current_target;
-            }
-            set {
-                last_target = current_target;
-                current_target = value;
-                // TODO use PlayerPrefs in settings
-                // PlayerPrefs.SetString("target", current_target);
-                // PlayerPrefs.Save();
-            }
-        }
-
-        public GameState(AdventureData data)
-        {
-            this.removedElements = new List<string>();
-            this.inventoryItems = new List<string>();
-            this.data = data;
-            varFlagValues = new Dictionary<string, int>();
-            varFlagChangeAmbits = new Stack<List<KeyValuePair<string, int>>>();
-        }
-
-        public int checkFlag(string flag)
-        {
-            int ret = FlagCondition.FLAG_INACTIVE;
-            // TODO use PlayerPrefs in adventure settings
-            /*if (PlayerPrefs.HasKey("flag_"+flag))
+            get
             {
-                ret = PlayerPrefs.GetInt("flag_" + flag);
-            }*/
-
-            if(varFlagValues.ContainsKey("flag_" + flag))
-            {
-                ret = varFlagValues["flag_" + flag];
+                return currentTarget;
             }
-            return ret;
-        }
-
-        public void setFlag(string name, int state)
-        {
-            // TODO use PlayerPrefs in adventure settings
-            // PlayerPrefs.SetInt("flag_" + name, state);
-            // PlayerPrefs.Save();
-
-            varFlagValues["flag_" + name] = state;
-            //Debug.Log ("Flag '" + name + " puesta a " + state);
-            bool bstate = state == FlagCondition.FLAG_ACTIVE;
-            int intVal = bstate ? 1 : 0;
-
-            // TODO check this after this: https://github.com/e-ucm/unity-tracker/issues/29
-            if (varFlagChangeAmbits.Count > 0) varFlagChangeAmbits.Peek().Add(new KeyValuePair<string, int>(name, intVal));
-            else TrackerAsset.Instance.setVar(name, intVal);
-            TimerController.Instance.CheckTimers();
-            CompletableController.Instance.conditionChanged();
-            Game.Instance.reRenderScene();
-        }
-
-        public int getVariable(string var)
-        {
-            int ret = 0;
-            // TODO use PlayerPrefs in adventure settings
-            /*if (PlayerPrefs.HasKey("var_" + var))
+            set
             {
-                ret = PlayerPrefs.GetInt("var_" + var);
-            }*/
-
-            if (varFlagValues.ContainsKey("var_" + var))
-            {
-                ret = varFlagValues["var_" + var];
+                lastTarget = currentTarget;
+                currentTarget = value;
             }
-            return ret;
-        }
-
-        public void setVariable(string name, int value)
-        {
-            // TODO use PlayerPrefs in adventure settings
-            /*PlayerPrefs.SetInt("var_" + name, value);
-            PlayerPrefs.Save();*/
-            varFlagValues["var_" + name] = value;
-
-            if (varFlagChangeAmbits.Count > 0) varFlagChangeAmbits.Peek().Add(new KeyValuePair<string, int>(name, value));
-            else TrackerAsset.Instance.setVar(name, value);
-
-            CompletableController.Instance.conditionChanged();
-
-            Game.Instance.reRenderScene();
-        }
-
-        public int checkGlobalState(string global_state)
-        {
-            int ret = GlobalStateCondition.GS_SATISFIED;
-            GlobalState gs = data.getChapters()[current_chapter].getGlobalState(global_state);
-            if (gs != null)
-            {
-                ret = ConditionChecker.check(gs);
-            }
-            return ret;
-        }
-
-        public Macro getMacro(string id)
-        {
-            return data.getChapters()[current_chapter].getMacro(id);
-        }
-
-        public Conversation getConversation(string id)
-        {
-            return data.getChapters()[current_chapter].getConversation(id);
-        }
-
-        public List<Timer> getTimers()
-        {
-            return data.getChapters()[current_chapter].getTimers();
         }
 
 
@@ -152,28 +81,7 @@ namespace uAdventure.Runner
             {
                 if (playerContext == null)
                 {
-                    var scene = getChapterTarget(CurrentTarget) as Scene;
-                    if (scene == null)
-                    {
-                        playerContext = new ElementReference("Player", 0, 0, -1);
-                        return playerContext;
-                    }
-                    else
-                    {
-                        var trajectory = scene.getTrajectory();
-
-                        var playerPosition = new Vector2(scene.getPositionX(), scene.getPositionY());
-                        var scale = scene.getPlayerScale();
-                        if (trajectory != null)
-                        {
-                            Trajectory.Node pos = scene.getTrajectory().getInitial();
-                            playerPosition = new Vector2(pos.getX(), pos.getY());
-                            scale = pos.getScale();
-                        }
-
-                        playerContext = new ElementReference("Player", (int)playerPosition.x, (int)playerPosition.y, scene.getPlayerLayer());
-                        playerContext.setScale(scale);
-                    }
+                    InitPlayerContext();
                 }
 
                 return playerContext;
@@ -184,7 +92,7 @@ namespace uAdventure.Runner
         {
             get
             {
-                return data.getChapters()[current_chapter].getPlayer();
+                return data.getChapters()[currentChapter].getPlayer();
             }
         }
 
@@ -196,68 +104,218 @@ namespace uAdventure.Runner
             }
         }
 
+        public GameState(AdventureData data)
+        {
+            this.removedElements = new List<string>();
+            this.inventoryItems = new List<string>();
+            this.data = data;
+            varFlags = new Dictionary<string, int>();
+            elementContexts = new Dictionary<string, List<ElementReference>>();
+            varFlagChangeAmbits = new Stack<List<KeyValuePair<string, int>>>();
+        }
+        
+        public void OnGameSuspend()
+        {
+            if (data.isSaveOnSuspend())
+            {
+                SerializeTo("suspend_state");
+            }
+        }
+
+        public void OnGameResume()
+        {
+            if (data.isSaveOnSuspend())
+            {
+                RestoreFrom("suspend_state");
+            }
+        }
+
+        private void InitPlayerContext()
+        {
+            var scene = GetChapterTarget(CurrentTarget) as Scene;
+            if (scene == null)
+            {
+                playerContext = new ElementReference("Player", 0, 0, -1);
+            }
+            else
+            {
+                var trajectory = scene.getTrajectory();
+
+                var playerPosition = new Vector2(scene.getPositionX(), scene.getPositionY());
+                var scale = scene.getPlayerScale();
+                if (trajectory != null)
+                {
+                    Trajectory.Node pos = scene.getTrajectory().getInitial();
+                    playerPosition = new Vector2(pos.getX(), pos.getY());
+                    scale = pos.getScale();
+                }
+
+                playerContext = new ElementReference("Player", (int)playerPosition.x, (int)playerPosition.y, scene.getPlayerLayer());
+                playerContext.setScale(scale);
+            }
+        }
+
+        public int CheckFlag(string flag)
+        {
+            int ret = FlagCondition.FLAG_INACTIVE;
+            if(varFlags.ContainsKey("flag_" + flag))
+            {
+                ret = varFlags["flag_" + flag];
+            }
+            return ret;
+        }
+
+        public void SetFlag(string name, int state)
+        {
+            varFlags["flag_" + name] = state;
+            bool bstate = state == FlagCondition.FLAG_ACTIVE;
+            int intVal = bstate ? 1 : 0;
+
+            // TODO check this after this: https://github.com/e-ucm/unity-tracker/issues/29
+            if (varFlagChangeAmbits.Count > 0)
+            {
+                varFlagChangeAmbits.Peek().Add(new KeyValuePair<string, int>(name, intVal));
+            }
+            else
+            {
+                TrackerAsset.Instance.setVar(name, intVal);
+            }
+            TimerController.Instance.CheckTimers();
+            CompletablesController.Instance.ConditionChanged();
+            Game.Instance.reRenderScene();
+        }
+
+        public int GetVariable(string var)
+        {
+            int ret = 0;
+
+            if (varFlags.ContainsKey("var_" + var))
+            {
+                ret = varFlags["var_" + var];
+            }
+            return ret;
+        }
+
+        public void SetVariable(string name, int value)
+        {
+            varFlags["var_" + name] = value;
+
+            if (varFlagChangeAmbits.Count > 0)
+            {
+                varFlagChangeAmbits.Peek().Add(new KeyValuePair<string, int>(name, value));
+            }
+            else
+            {
+                TrackerAsset.Instance.setVar(name, value);
+            }
+
+            CompletablesController.Instance.ConditionChanged();
+
+            Game.Instance.reRenderScene();
+        }
+
+        public List<ElementReference> GetElementReferences(string sceneId)
+        {
+            if (!elementContexts.ContainsKey(sceneId))
+            {
+                var scene = data.getChapters()[currentChapter].getScene(sceneId);
+                var elementReferences = new List<ElementReference>();
+                elementReferences.AddRange(scene.getItemReferences()
+                    .ConvertAll(r => r.Clone() as ElementReference));
+                elementReferences.AddRange(scene.getAtrezzoReferences()
+                    .ConvertAll(r => r.Clone() as ElementReference));
+                elementReferences.AddRange(scene.getCharacterReferences()
+                    .ConvertAll(r => r.Clone() as ElementReference));
+                elementContexts[sceneId] = elementReferences;
+            }
+
+            return elementContexts[sceneId];
+        }
+
+        public int CheckGlobalState(string globalState)
+        {
+            int ret = GlobalStateCondition.GS_SATISFIED;
+            GlobalState gs = data.getChapters()[currentChapter].getGlobalState(globalState);
+            if (gs != null)
+            {
+                ret = ConditionChecker.check(gs);
+            }
+            return ret;
+        }
+
+        public Macro GetMacro(string id)
+        {
+            return data.getChapters()[currentChapter].getMacro(id);
+        }
+
+        public Conversation GetConversation(string id)
+        {
+            return data.getChapters()[currentChapter].getConversation(id);
+        }
+
+        public List<Timer> GetTimers()
+        {
+            return data.getChapters()[currentChapter].getTimers();
+        }
+
         public void Move(string id, Vector2 position, int time = 0)
         {
             GameObject go = GameObject.Find(id);
             Movable m = go.GetComponent<Movable>();
             if (m != null)
-                m.Traslate(position);
+            {
+                m.setPosition(position);
+            }
         }
 
-        public NPC getCharacter(string name)
+        public NPC GetCharacter(string name)
         {
-            return data.getChapters()[current_chapter].getCharacter(name);
+            return data.getChapters()[currentChapter].getCharacter(name);
         }
 
-        public Item getObject(string name)
+        public Item GetObject(string name)
         {
-            return data.getChapters()[current_chapter].getItem(name);
+            return data.getChapters()[currentChapter].getItem(name);
         }
 
-        public Atrezzo getAtrezzo(string name)
+        public Atrezzo GetAtrezzo(string name)
         {
-            Chapter c = data.getChapters()[current_chapter];
-            return c.getAtrezzo(name);
+            return data.getChapters()[currentChapter].getAtrezzo(name);
         }
 
         public List<T> GetObjects<T>()
         {
-            return data.getChapters()[current_chapter].getObjects<T>();
+            return data.getChapters()[currentChapter].getObjects<T>();
         }
 
         public T FindElement<T>(string id)
         {
             if(typeof(T) == typeof(Element))
             {
-                Element r = getCharacter(id);
+                Element r = ((Element) GetCharacter(id) ?? GetObject(id)) ?? GetAtrezzo(id);
                 if (r != null)
-                    return (T) (r as object);
-                r = getObject(id);
-                if (r != null)
+                {
                     return (T)(r as object);
-                r = getAtrezzo(id);
-                if (r != null)
-                    return (T)(r as object);
+                }
             }
 
-            return data.getChapters()[current_chapter].getObjects<T>().Find(e =>
-            {
-                var idMethod = e.GetType().GetMethod("getId");
-                return idMethod != null && ((string)idMethod.Invoke(e, null)) == id;
-            });
+            var allObjects = data.getChapters()[currentChapter].getObjects<T>();
+
+            return allObjects.Where(o => o is HasId)
+                .FirstOrDefault(e => (e as HasId).getId() == id);
         }
         
 
-        public bool isCutscene(string scene_id)
+        public bool IsCutscene(string sceneId)
         {
-            return data.getChapters()[current_chapter].getObjects<Cutscene>().Exists(s => s.getId() == scene_id);
+            return data.getChapters()[currentChapter].getObjects<Cutscene>().Exists(s => s.getId() == sceneId);
         }
 
         public IChapterTarget InitialChapterTarget
         {
             get
             {
-                return data.getChapters()[current_chapter].getInitialChapterTarget();
+                return data.getChapters()[currentChapter].getInitialChapterTarget();
             }
         }
 
@@ -265,70 +323,56 @@ namespace uAdventure.Runner
         {
             get
             {
-                return getChapterTarget(last_target);
+                return GetChapterTarget(lastTarget);
             }
         }
 
-        public GeneralScene getLastScene()
+        public GeneralScene GetLastScene()
         {
-            GeneralScene ret = null;
-
-            foreach (GeneralScene scene in data.getChapters()[current_chapter].getGeneralScenes())
-            {
-                if (scene.getType() == GeneralScene.GeneralSceneSceneType.SLIDESCENE && ((Slidescene)scene).getNext() == Slidescene.ENDCHAPTER)
-                {
-                    ret = scene;
-                    break;
-                }
-            }
-
-            return ret;
+            var scenes = data.getChapters()[currentChapter].getGeneralScenes();
+            return scenes.Where(scene => scene is Slidescene)
+                .FirstOrDefault(scene => ((Slidescene)scene).getNext() == Cutscene.ENDCHAPTER);
         }
 
-        public List<Completable> getCompletables()
+        public List<Completable> GetCompletables()
         {
-            return data.getChapters()[current_chapter].getCompletables();
+            return data.getChapters()[currentChapter].getCompletables();
         }
 
-        public IChapterTarget getChapterTarget(string runnerTargetId)
+        public IChapterTarget GetChapterTarget(string runnerTargetId)
         {
-            return data.getChapters()[current_chapter].getObjects<IChapterTarget>().Find(o => o.getId() == runnerTargetId);
+            return data.getChapters()[currentChapter].getObjects<IChapterTarget>()
+                .Find(o => o.getId() == runnerTargetId);
         }
 
-        //##########################################################################
-        //##########################################################################
-        //##########################################################################
-
-        // Removed objects
-
-        public List<string> getRemovedElements()
+        public List<string> GetRemovedElements()
         {
             return removedElements;
         }
 
-        public void addRemovedElement(string elementId)
+        public void AddRemovedElement(string elementId)
         {
             removedElements.Add(elementId);
         }
 
-        public bool removeRemovedElement(string elementId)
+        public bool RemoveRemovedElement(string elementId)
         {
             return removedElements.Remove(elementId);
         }
 
         // Inventory objects
 
-        public List<string> getInventoryItems()
+        public List<string> GetInventoryItems()
         {
             return inventoryItems;
         }
 
-        public void addInventoryItem(string elementId)
+        public void AddInventoryItem(string elementId)
         {
             inventoryItems.Add(elementId);
         }
 
-        public bool removeInventoryItem(string elementId)
+        public bool RemoveInventoryItem(string elementId)
         {
             return inventoryItems.Remove(elementId);
         }
@@ -366,6 +410,34 @@ namespace uAdventure.Runner
             foreach(var varChange in currentChanges)
             {
                 TrackerAsset.Instance.setVar(varChange.Key, varChange.Value);
+            }
+        }
+
+        public void SerializeTo(string field)
+        {
+            varFlagKeys = varFlags.Keys.ToList();
+            varFlagValues = varFlags.Values.ToList();
+            elementContextsKeys = elementContexts.Keys.ToList();
+            elementContextsValues = elementContexts.Values.ToList()
+                .ConvertAll(l => new ContextList() { ElementReferences = l });
+
+            var json = JsonUtility.ToJson(this);
+            Debug.Log(json);
+            PlayerPrefs.SetString(field, JsonUtility.ToJson(this));
+        }
+
+        public void RestoreFrom(string field)
+        {
+            JsonUtility.FromJsonOverwrite(PlayerPrefs.GetString(field), this);
+            varFlags.Clear();
+            for(int i = 0, totalVars = varFlagKeys.Count; i < totalVars; i++)
+            {
+                varFlags[varFlagKeys[i]] = varFlagValues[i];
+            }
+            elementContexts.Clear();
+            for (int i = 0, totalVars = elementContextsKeys.Count; i < totalVars; i++)
+            {
+                elementContexts[elementContextsKeys[i]] = elementContextsValues[i].ElementReferences;
             }
         }
     }

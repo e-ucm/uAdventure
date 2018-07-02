@@ -287,7 +287,7 @@ namespace uAdventure.Editor
         {
 
             ChangeTitleTool tool = new ChangeTitleTool(chapter, title);
-            controller.addTool(tool);
+            controller.AddTool(tool);
         }
 
         /**
@@ -300,7 +300,7 @@ namespace uAdventure.Editor
         {
 
             ChangeDescriptionTool tool = new ChangeDescriptionTool(chapter, description);
-            controller.addTool(tool);
+            controller.AddTool(tool);
         }
 
         /**
@@ -331,7 +331,7 @@ namespace uAdventure.Editor
         public void setInitialScene(string initialScene)
         {
 
-            Controller.Instance.addTool(new ChangeTargetIdTool(chapter, initialScene));
+            Controller.Instance.AddTool(new ChangeTargetIdTool(chapter, initialScene));
         }
 
         /**

@@ -538,7 +538,7 @@ namespace uAdventure.Editor
                         randomEffect.setNegativeEffect(secondEffect);
                     newEffect = randomEffect;
                 }
-                effectAdded = controller.addTool(new AddEffectTool(effects, newEffect, conditionsList));
+                effectAdded = controller.AddTool(new AddEffectTool(effects, newEffect, conditionsList));
             }
             return effectAdded;
         }
@@ -708,7 +708,7 @@ namespace uAdventure.Editor
 
         public void deleteEffect(int index)
         {
-            controller.addTool(new DeleteEffectTool(effects, index, conditionsList));
+            controller.AddTool(new DeleteEffectTool(effects, index, conditionsList));
         }
 
         /**
@@ -721,7 +721,7 @@ namespace uAdventure.Editor
 
         public bool moveUpEffect(int index)
         {
-            return controller.addTool(new MoveEffectInTableTool(effects, index, MoveObjectTool.MODE_UP, conditionsList));
+            return controller.AddTool(new MoveEffectInTableTool(effects, index, MoveObjectTool.MODE_UP, conditionsList));
         }
 
         /**
@@ -734,7 +734,7 @@ namespace uAdventure.Editor
 
         public bool moveDownEffect(int index)
         {
-            return controller.addTool(new MoveEffectInTableTool(effects, index, MoveObjectTool.MODE_DOWN, conditionsList));
+            return controller.AddTool(new MoveEffectInTableTool(effects, index, MoveObjectTool.MODE_DOWN, conditionsList));
         }
 
         /**
@@ -875,12 +875,12 @@ namespace uAdventure.Editor
 
                 if (effectType != EffectType.RANDOM_EFFECT)
                 {
-                    effectEdited = controller.addTool(new ReplaceEffectTool(effects, effect, newProperties));
+                    effectEdited = controller.AddTool(new ReplaceEffectTool(effects, effect, newProperties));
                 }
                 else
                 {
                     effectEdited =
-                        controller.addTool(new ReplaceEffectTool(effects, effect, newProperties, pos.getEffect(),
+                        controller.AddTool(new ReplaceEffectTool(effects, effect, newProperties, pos.getEffect(),
                             neg.getEffect()));
                 }
             }

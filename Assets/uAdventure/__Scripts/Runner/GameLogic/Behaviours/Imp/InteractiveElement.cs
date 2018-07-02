@@ -15,7 +15,7 @@ namespace uAdventure.Runner
         private bool interactable = false;
         private bool dragging = false;
         private IEnumerable<Action> dragActions;
-        private Dictionary<EffectHolder, Action> executingAction = new Dictionary<EffectHolder, Action>();
+        private readonly Dictionary<EffectHolder, Action> executingAction = new Dictionary<EffectHolder, Action>();
 
         protected Element element;
         protected Element Element
@@ -95,7 +95,7 @@ namespace uAdventure.Runner
                             var actions = Element.getActions().Valid(AvailableActions);
                             if (actions.Any())
                             {
-                                Game.Instance.Execute(new EffectHolder(actions.First().getEffects()));
+                                ActionSelected(actions.First());
                                 ret = InteractuableResult.DOES_SOMETHING;
                             }
                         }
@@ -111,7 +111,6 @@ namespace uAdventure.Runner
                             ret = InteractuableResult.DOES_SOMETHING;
                         }
                         break;
-                    case Item.BehaviourType.ATREZZO:
                     default:
                         ret = InteractuableResult.IGNORES;
                         break;
@@ -142,16 +141,16 @@ namespace uAdventure.Runner
                 eventData.Use();
         }
 
-        public void OnConfirmWantsDrag(PointerEventData eventData)
+        public void OnConfirmWantsDrag(PointerEventData data)
         {
             dragActions = from action in Element.getActions().Valid(AvailableActions)
                           where action.getType() == Action.DRAG_TO && ConditionChecker.check(action.getConditions())
                           group action by action.getTargetId() into sameTargetActions
                           select sameTargetActions.First();
 
-            if (dragActions.Count() > 0)
+            if (dragActions.Any())
             {
-                eventData.Use();
+                data.Use();
             }
         }
 
@@ -162,8 +161,9 @@ namespace uAdventure.Runner
 
             this.GetComponent<Collider>().enabled = false;
             if (eventData != null)
+            {
                 eventData.Use();
-
+            }
         }
 
         public void OnEndDrag(PointerEventData eventData)
@@ -190,16 +190,22 @@ namespace uAdventure.Runner
                     if (Game.Instance.GameState.IsFirstPerson || !action.isNeedsGoTo())
                     {
                         Game.Instance.GameState.BeginChangeAmbit();
+                        OnActionStarted(action);
                         Game.Instance.Execute(new EffectHolder(action.Effects), OnActionFinished);
                     }
                     else
                     {
                         var sceneMB = FindObjectOfType<SceneMB>();
                         Rectangle area = GetInteractionArea(sceneMB);
-                        PlayerMB.Instance.Do(action, area, OnActionFinished);
+                        PlayerMB.Instance.Do(action, area, OnActionStarted, OnActionFinished);
                     }
                     break;
             }
+        }
+        private void OnActionStarted(object interactuable)
+        {
+            Action action = interactuable as Action;
+            CompletablesController.Instance.ElementInteracted(this, action.getType().ToString(), action.getTargetId());
         }
 
         private void OnActionFinished(object interactuable)

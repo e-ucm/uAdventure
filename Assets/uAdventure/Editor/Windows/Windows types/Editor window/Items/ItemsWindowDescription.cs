@@ -5,41 +5,32 @@ using UnityEditor;
 
 using uAdventure.Core;
 using System;
+using System.Linq;
 
 namespace uAdventure.Editor
 {
     [EditorComponent(typeof(ItemDataControl), Name = "Item.DocPanelTitle", Order = 20)]
     public class ItemsWindowDescription : AbstractEditorComponent
     {
+        private readonly string[] behaviourTypes = { "Behaviour.Normal", "Behaviour.FirstAction" };
+
+        private readonly string[] behaviourTypesDescription = { "Behaviour.Selection.Normal", "Behaviour.Selection.FirstAction" };
+
 
         private ItemDataControl workingItem;
 
-        private GUIContent dragdropLabel, transitionLabel;
+        private readonly GUIContent dragdropLabel, transitionLabel;
 
         /*
         * SETTINGS fields
         */
-        private bool dragdropToogle, dragdropToogleLast;
-
-        private string[] behaviourTypes = { TC.get("Behaviour.Normal"), TC.get("Behaviour.FirstAction") };
-
-        private string[] behaviourTypesDescription =
-        {
-           TC.get("Behaviour.Selection.Normal"), TC.get("Behaviour.Selection.FirstAction")
-        };
-
-        private int selectedBehaviourType, selectedBehaviourTypeLast;
-
-        private string transitionTime, transitionTimeLast;
-
-        private DescriptionsEditor descriptionsEditor;
+        private readonly DescriptionsEditor descriptionsEditor;
 
         public ItemsWindowDescription(Rect aStartPos, GUIContent aContent, GUIStyle aStyle,
             params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
         {
             descriptionsEditor = ScriptableObject.CreateInstance<DescriptionsEditor>();
-
             dragdropLabel = new GUIContent(TC.get("Item.ReturnsWhenDragged"), TC.get("Item.ReturnsWhenDragged.Description"));
             transitionLabel = new GUIContent(TC.get("Resources.TransitionTime"), TC.get("Resources.TransitionTime.Description"));
         }
@@ -47,6 +38,7 @@ namespace uAdventure.Editor
 
         public override void Draw(int aID)
         {
+
             workingItem = Target != null ? Target as ItemDataControl : Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[GameRources.GetInstance().selectedItemIndex];
 
 
@@ -83,11 +75,11 @@ namespace uAdventure.Editor
             // Behaviour
             // -------------
             EditorGUI.BeginChangeCheck();
-            var selectedBehaviourType = EditorGUILayout.Popup(TC.get("Behaviour"), (int)workingItem.getBehaviour(), behaviourTypes);
+            var selectedBehaviourType = EditorGUILayout.Popup(TC.get("Behaviour"), (int)workingItem.getBehaviour(), behaviourTypes.Select(bt => TC.get(bt)).ToArray());
             Item.BehaviourType type = (selectedBehaviourType == 0 ? Item.BehaviourType.NORMAL : Item.BehaviourType.FIRST_ACTION);
             if (EditorGUI.EndChangeCheck())
                 workingItem.setBehaviour(type);
-            EditorGUILayout.HelpBox(behaviourTypesDescription[selectedBehaviourType], MessageType.Info);
+            EditorGUILayout.HelpBox(TC.get(behaviourTypesDescription[selectedBehaviourType]), MessageType.Info);
             GUILayout.Space(20);
 
             // -------------

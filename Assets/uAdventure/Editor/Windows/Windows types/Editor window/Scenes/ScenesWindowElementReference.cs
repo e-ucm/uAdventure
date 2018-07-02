@@ -184,8 +184,14 @@ namespace uAdventure.Editor
         [EditorComponent(typeof(ElementReferenceDataControl), Name = "Transform", Order = 0)]
         public class ReferenceComponent : AbstractEditorComponent
         {
+            private readonly int[] orientationValues;
+            private readonly string[] orientationTexts;
+
             public ReferenceComponent(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
             {
+                var orientations = Enum.GetValues(typeof(Runner.Orientation));
+                orientationValues = orientations.Cast<int>().ToArray();
+                orientationTexts = orientations.Cast<Runner.Orientation>().Select(s => "Orientation." + s.ToString()).ToArray();
             }
 
             public override void OnPreRender()
@@ -209,6 +215,17 @@ namespace uAdventure.Editor
                 var newScale = EditorGUILayout.FloatField("Scale", reference.getElementScale());
                 if (EditorGUI.EndChangeCheck()) { reference.setElementScale(newScale); }
 
+                if(reference.UsesOrientation())
+                {
+                    EditorGUI.BeginChangeCheck();
+                    var orientationLabel = TC.get("ElementReference.Orientation");
+                    var translatedTexts = orientationTexts.Select(TC.get).ToArray();
+                    var newOrientation = (Runner.Orientation)EditorGUILayout.IntPopup(orientationLabel, (int)reference.GetOrientation(), translatedTexts, orientationValues);
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        reference.SetOrientation(newOrientation);
+                    }
+                }
             }
 
             public static Rect GetUnscaledRect(DataControl elem)

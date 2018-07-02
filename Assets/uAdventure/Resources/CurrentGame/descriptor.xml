@@ -6,14 +6,13 @@
   </description>
   <configuration keepShowing="no" keyboard-navigation="disabled" defaultClickAction="showDetails" perspective="regular" dragBehaviour="considerNonTargets">
     <gui type="contextual" inventoryPosition="top_bottom" />
-    <mode playerTransparent="yes" />
+    <mode playerTransparent="no" />
     <graphics mode="windowed" />
   </configuration>
   <contents>
     <chapter path="chapter1.xml">
       <title>ChapterTitle</title>
-      <description>
-      </description>
+      <description>ChapterTitle</description>
     </chapter>
   </contents>
 </game-descriptor>

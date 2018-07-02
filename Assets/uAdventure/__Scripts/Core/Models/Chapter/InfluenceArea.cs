@@ -8,34 +8,40 @@ namespace uAdventure.Core
     /**
      * The influence area for an item reference or active area
      */
+    [System.Serializable]
     public class InfluenceArea : Rectangle, ICloneable
     {
 
         /**
          * True if the influence area exists (is defined)
          */
+        [SerializeField]
         private bool exists = false;
 
         /**
          * The x axis value of the influence area, relative to the objects top left
          * corner
          */
+        [SerializeField]
         private int x;
 
         /**
          * The y axis value of the influence area, relative to the objects top left
          * corner
          */
+        [SerializeField]
         private int y;
 
         /**
          * The width of the active area
          */
+        [SerializeField]
         private int width;
 
         /**
          * The height of the active area
          */
+        [SerializeField]
         private int height;
 
         public InfluenceArea()

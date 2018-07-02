@@ -113,7 +113,7 @@ namespace uAdventure.Editor
                 else if (action.getType() == Action.DRAG_TO)
                     actionsInfo[i][0] = TC.get("ActionsList.DragToAction");
 
-                if (action.getConditions().isEmpty())
+                if (action.getConditions().IsEmpty())
                     actionsInfo[i][1] = TC.get("GeneralText.No");
                 else
                     actionsInfo[i][1] = TC.get("GeneralText.Yes");

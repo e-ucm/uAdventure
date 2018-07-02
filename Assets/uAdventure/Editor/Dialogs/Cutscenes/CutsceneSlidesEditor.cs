@@ -5,14 +5,13 @@ using uAdventure.Core;
 using Animation = uAdventure.Core.Animation;
 using UnityEditor;
 using System.IO;
+using System.Collections.Generic;
 
 namespace uAdventure.Editor
 {
     public class CutsceneSlidesEditor : BaseCreatorPopup, DialogReceiverInterface
     {
         private GUIStyle titleStyle;
-
-        private Texture2D backgroundPreviewTex = null;
 
         private Texture2D addTexture = null;
         private Texture2D moveLeft, moveRight = null;
@@ -42,7 +41,7 @@ namespace uAdventure.Editor
 
         private string cutscenePath;
 
-        private void OnEnable()
+        protected void OnEnable()
         {
             titleStyle = new GUIStyle();
             titleStyle.fontStyle = FontStyle.Bold;
@@ -79,11 +78,14 @@ namespace uAdventure.Editor
             };
             Debug.Log(cutsceneFilePath);
 
-            workingAnimation = Loader.loadAnimation(cutsceneFilePath, Controller.ResourceManager);
+            var incidences = new List<Incidence>();
+            workingAnimation = Loader.LoadAnimation(cutsceneFilePath, Controller.ResourceManager, incidences);
 
             Debug.Log(workingAnimation.getAboslutePath() + " " + workingAnimation.getFrames().Count + " " + workingAnimation.isSlides() + " " + workingAnimation.getId());
             if (workingAnimation == null)
+            {
                 workingAnimation = new Animation(cutsceneFilePath, 40);
+            }
 
             // Initalize
             selectedFrame = -1;
@@ -96,8 +98,32 @@ namespace uAdventure.Editor
             base.Init(e);
         }
 
-        void OnGUI()
+        protected void OnGUI()
         {
+            Debug.Log("Eventtype: " + Event.current.type);
+            switch (Event.current.type)
+            {                
+                case EventType.DragUpdated:
+                    if (DragAndDrop.paths != null && DragAndDrop.paths.Length > 0)
+                    {
+                        DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
+                        Debug.Log("Dragging (" + Event.current.type + "):" + System.String.Join("\n", DragAndDrop.paths));
+                    }
+                    break;
+                case EventType.DragPerform:
+                    if (DragAndDrop.paths != null && DragAndDrop.paths.Length > 0)
+                    {
+                        DragAndDrop.AcceptDrag();
+                        foreach (var path in DragAndDrop.paths)
+                        {
+                            var uri = AssetsController.addSingleAsset(AssetsConstants.CATEGORY_ANIMATION_IMAGE, path);
+                            var frame = workingAnimation.addFrame(selectedFrame, null);
+                            frame.setUri(uri);
+                        }
+                    }
+                    break;
+            }
+
             EditorGUILayout.PrefixLabel(TC.get("Animation.GeneralInfo"), GUIStyle.none, titleStyle);
             EditorGUI.BeginChangeCheck();
             documentationTextContent = EditorGUILayout.TextField(TC.get("Animation.Documentation"), documentationTextContent);
@@ -215,7 +241,7 @@ namespace uAdventure.Editor
             {
                 ImageFileOpenDialog imageDialog =
                     (ImageFileOpenDialog)ScriptableObject.CreateInstance(typeof(ImageFileOpenDialog));
-                imageDialog.Init(this, BaseFileOpenDialog.FileType.FRAME_IMAGE);
+                imageDialog.Init(this, FileType.FRAME_IMAGE);
             }
             EditorGUILayout.EndHorizontal();
             EditorGUILayout.BeginHorizontal();
@@ -228,7 +254,7 @@ namespace uAdventure.Editor
             {
                 MusicFileOpenDialog musicDialog =
                     (MusicFileOpenDialog)ScriptableObject.CreateInstance(typeof(MusicFileOpenDialog));
-                musicDialog.Init(this, BaseFileOpenDialog.FileType.FRAME_MUSIC);
+                musicDialog.Init(this, FileType.FRAME_MUSIC);
             }
             EditorGUILayout.EndHorizontal();
 
@@ -340,14 +366,14 @@ namespace uAdventure.Editor
 
         public void OnDialogOk(string message, object workingObject = null, object workingObjectSecond = null)
         {
-            if (workingObject is BaseFileOpenDialog.FileType)
+            if (workingObject is FileType)
             {
-                switch ((BaseFileOpenDialog.FileType)workingObject)
+                switch ((FileType)workingObject)
                 {
-                    case BaseFileOpenDialog.FileType.FRAME_IMAGE:
+                    case FileType.FRAME_IMAGE:
                         OnFrameImageChanged(message);
                         break;
-                    case BaseFileOpenDialog.FileType.FRAME_MUSIC:
+                    case FileType.FRAME_MUSIC:
                         OnFrameMusicChanged(message);
                         break;
                 }

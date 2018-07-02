@@ -4,48 +4,105 @@ using System.Collections;
 using System.IO;
 using System.Windows.Forms;
 using Screen = UnityEngine.Screen;
+using uAdventure.Core;
 
 namespace uAdventure.Editor
 {
-    public abstract class BaseFileOpenDialog : EditorWindow
+    public enum FileType
     {
-        public enum FileType
-        {
-            PATH,
-            SCENE_BACKGROUND,
-            SCENE_FOREGROUND,
-            SCENE_MUSIC,
-            EXIT_MUSIC,
-            EXIT_ICON,
-            CUTSCENE_MUSIC,
-            CUTSCENE_VIDEO,
-            CUTSCENE_SLIDES,
-            FRAME_IMAGE,
-            FRAME_MUSIC,
-            BOOK_IMAGE_PARAGRAPH,
-            BOOK_ARROW_LEFT_NORMAL,
-            BOOK_ARROW_RIGHT_NORMAL,
-            BOOK_ARROW_LEFT_OVER,
-            BOOK_ARROW_RIGHT_OVER,
-            ITEM_IMAGE,
-            ITEM_ICON,
-            ITEM_IMAGE_OVER,
-            ITEM_DESCRIPTION_NAME_SOUND,
-            ITEM_DESCRIPTION_BRIEF_SOUND,
-            ITEM_DESCRIPTION_DETAILED_SOUND,
-            NPC_DESCRIPTION_NAME_SOUND,
-            NPC_DESCRIPTION_BRIEF_SOUND,
-            NPC_DESCRIPTION_DETAILED_SOUND,
-            SET_ITEM_IMAGE,
-            CHARACTER_ANIM,
-            PLAY_SOUND_EFFECT,
-            PLAY_ANIMATION_EFFECT,
-            BUTTON,
-            BUTTON_OVER,
-            BUTTON_SOUND
-        };
+        PATH,
+        SCENE_BACKGROUND,
+        SCENE_FOREGROUND,
+        SCENE_MUSIC,
+        EXIT_MUSIC,
+        EXIT_ICON,
+        CUTSCENE_MUSIC,
+        CUTSCENE_VIDEO,
+        CUTSCENE_SLIDES,
+        FRAME_IMAGE,
+        FRAME_MUSIC,
+        BOOK_IMAGE_PARAGRAPH,
+        BOOK_ARROW_LEFT_NORMAL,
+        BOOK_ARROW_RIGHT_NORMAL,
+        BOOK_ARROW_LEFT_OVER,
+        BOOK_ARROW_RIGHT_OVER,
+        ITEM_IMAGE,
+        ITEM_ICON,
+        ITEM_IMAGE_OVER,
+        ITEM_DESCRIPTION_NAME_SOUND,
+        ITEM_DESCRIPTION_BRIEF_SOUND,
+        ITEM_DESCRIPTION_DETAILED_SOUND,
+        NPC_DESCRIPTION_NAME_SOUND,
+        NPC_DESCRIPTION_BRIEF_SOUND,
+        NPC_DESCRIPTION_DETAILED_SOUND,
+        SET_ITEM_IMAGE,
+        CHARACTER_ANIM,
+        PLAY_SOUND_EFFECT,
+        PLAY_ANIMATION_EFFECT,
+        BUTTON,
+        BUTTON_OVER,
+        BUTTON_SOUND
+    }
 
-        protected const string DIR_PREFIX = "Assets/uAdventure/Resources/CurrentGame";
+    public static class FileTypeExtension
+    {
+        public static int GetAssetCategory(this FileType fileType)
+        {
+            switch (fileType)
+            {
+                case FileType.PATH:
+                    break;
+                case FileType.SCENE_BACKGROUND:
+                case FileType.SCENE_FOREGROUND:
+                    return AssetsConstants.CATEGORY_BACKGROUND;
+                case FileType.BUTTON_SOUND:
+                case FileType.CUTSCENE_MUSIC:
+                case FileType.SCENE_MUSIC:
+                case FileType.EXIT_MUSIC:
+                case FileType.PLAY_SOUND_EFFECT:
+                case FileType.ITEM_DESCRIPTION_NAME_SOUND:
+                case FileType.ITEM_DESCRIPTION_BRIEF_SOUND:
+                case FileType.ITEM_DESCRIPTION_DETAILED_SOUND:
+                case FileType.NPC_DESCRIPTION_NAME_SOUND:
+                case FileType.NPC_DESCRIPTION_BRIEF_SOUND:
+                case FileType.NPC_DESCRIPTION_DETAILED_SOUND:
+                    return AssetsConstants.CATEGORY_AUDIO;
+                case FileType.EXIT_ICON:
+                case FileType.ITEM_ICON:
+                    return AssetsConstants.CATEGORY_ICON;
+                case FileType.CUTSCENE_VIDEO:
+                    return AssetsConstants.CATEGORY_VIDEO;
+                case FileType.BOOK_IMAGE_PARAGRAPH:
+                case FileType.ITEM_IMAGE:
+                case FileType.ITEM_IMAGE_OVER:
+                case FileType.SET_ITEM_IMAGE:
+                    return AssetsConstants.CATEGORY_IMAGE;
+                case FileType.BOOK_ARROW_LEFT_NORMAL:
+                case FileType.BOOK_ARROW_RIGHT_NORMAL:
+                case FileType.BOOK_ARROW_LEFT_OVER:
+                case FileType.BOOK_ARROW_RIGHT_OVER:
+                    return AssetsConstants.CATEGORY_ARROW_BOOK;
+                case FileType.BUTTON:
+                case FileType.BUTTON_OVER:
+                    return AssetsConstants.CATEGORY_BUTTON;
+                // Animations
+                case FileType.CUTSCENE_SLIDES:
+                case FileType.CHARACTER_ANIM:
+                case FileType.PLAY_ANIMATION_EFFECT:
+                    return AssetsConstants.CATEGORY_ANIMATION;
+                case FileType.FRAME_IMAGE:
+                    return AssetsConstants.CATEGORY_ANIMATION_IMAGE;
+                case FileType.FRAME_MUSIC:
+                    return AssetsConstants.CATEGORY_ANIMATION_AUDIO;
+            }
+            return AssetsConstants.CATEGORY_IMAGE;
+        }
+    }
+
+
+public abstract class BaseFileOpenDialog : EditorWindow
+    {
+
 
         protected DialogReceiverInterface reference;
         protected FileType fileType;
@@ -108,98 +165,7 @@ namespace uAdventure.Editor
 
         protected void CopySelectedAssset()
         {
-            string assetTypeDir;
-
-            switch (fileType)
-            {
-                case FileType.PATH:
-                    returnPath = selectedAssetPath;
-                    return;
-                case FileType.SCENE_BACKGROUND:
-                    assetTypeDir = AssetsController.CATEGORY_BACKGROUND_FOLDER;
-                    break;
-                case FileType.SCENE_FOREGROUND:
-                    assetTypeDir = AssetsController.CATEGORY_BACKGROUND_FOLDER;
-                    break;
-                case FileType.SCENE_MUSIC:
-                case FileType.EXIT_MUSIC:
-                case FileType.CUTSCENE_MUSIC:
-                case FileType.FRAME_MUSIC:
-                case FileType.ITEM_DESCRIPTION_NAME_SOUND:
-                case FileType.ITEM_DESCRIPTION_BRIEF_SOUND:
-                case FileType.ITEM_DESCRIPTION_DETAILED_SOUND:
-                case FileType.NPC_DESCRIPTION_NAME_SOUND:
-                case FileType.NPC_DESCRIPTION_BRIEF_SOUND:
-                case FileType.NPC_DESCRIPTION_DETAILED_SOUND:
-                case FileType.PLAY_SOUND_EFFECT:
-                case FileType.BUTTON_SOUND:
-                    assetTypeDir = AssetsController.CATEGORY_AUDIO_PATH;
-                    break;
-                case FileType.EXIT_ICON:
-                    assetTypeDir = AssetsController.CATEGORY_CURSOR_PATH;
-                    break;
-                case FileType.CUTSCENE_VIDEO:
-                    assetTypeDir = AssetsController.CATEGORY_VIDEO_PATH;
-                    break;
-                case FileType.CUTSCENE_SLIDES:
-                case FileType.CHARACTER_ANIM:
-                case FileType.PLAY_ANIMATION_EFFECT:
-                    //TODO: copy all assets files (slides, music)
-                    assetTypeDir = AssetsController.CATEGORY_ANIMATION_FOLDER;
-                    break;
-                case FileType.FRAME_IMAGE:
-                    assetTypeDir = AssetsController.CATEGORY_ANIMATION_FOLDER;
-                    break;
-                case FileType.BOOK_IMAGE_PARAGRAPH:
-                case FileType.ITEM_IMAGE:
-                case FileType.ITEM_IMAGE_OVER:
-                case FileType.SET_ITEM_IMAGE:
-                    assetTypeDir = AssetsController.CATEGORY_IMAGE_FOLDER;
-                    break;
-                case FileType.BUTTON:
-                case FileType.BUTTON_OVER:
-                    assetTypeDir = AssetsController.CATEGORY_BUTTON_PATH;
-                    break;
-                case FileType.BOOK_ARROW_LEFT_NORMAL:
-                case FileType.BOOK_ARROW_RIGHT_NORMAL:
-                case FileType.BOOK_ARROW_LEFT_OVER:
-                case FileType.BOOK_ARROW_RIGHT_OVER:
-                    assetTypeDir = AssetsController.CATEGORY_ARROW_BOOK_PATH;
-                    break;
-                default:
-                    assetTypeDir = "";
-                    break;
-            }
-
-            string file = Controller.Instance.ProjectFolder;
-
-            DirectoryInfo path = new DirectoryInfo(DIR_PREFIX + "/" + assetTypeDir);
-            if (!Directory.Exists(path.FullName))
-                Directory.CreateDirectory(path.FullName);
-
-            string nameOnly = Path.GetFileName(selectedAssetPath);
-            if(selectedAssetPath != Path.Combine(path.FullName, nameOnly)) // Avoid to copy the same origin to same destination files
-            {
-                var destination = Path.Combine(path.FullName, nameOnly);
-                File.Copy(selectedAssetPath, destination, true);
-                File.SetAttributes(selectedAssetPath, FileAttributes.Normal);
-
-                if (destination.ToLowerInvariant().EndsWith(".png") || destination.ToLowerInvariant().EndsWith(".jpg"))
-                {
-                    AssetsController.InitImporterConfig(destination);
-                }
-
-                if (fileType == FileType.CUTSCENE_VIDEO)
-                {
-                    AssetsController.InitImporterConfig(destination);
-                }
-
-                if (fileType == FileType.CUTSCENE_SLIDES || fileType == FileType.CHARACTER_ANIM || fileType == FileType.PLAY_ANIMATION_EFFECT)
-                    AssetsController.copyAllFiles(Path.GetDirectoryName(selectedAssetPath), path.FullName);
-                AssetDatabase.Refresh();
-            }
-
-            returnPath = assetTypeDir + "/" + nameOnly;
+            returnPath = AssetsController.addSingleAsset(fileType.GetAssetCategory(), selectedAssetPath);
         }
 
         protected abstract void ChoosedCorrectFile();

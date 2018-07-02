@@ -1,86 +1,128 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Xml;
 using System.Linq;
-
-// TODO possible unnecesary coupling
 using uAdventure.Runner;
 
 namespace uAdventure.Core
 {
-    public class ChapterHandler
+    public class ChapterHandler : XmlHandler<Chapter>
     {
-        /**
-         * Chapter data
-         */
-        private Chapter chapter;
-
-        /**
-         * Current global state being subparsed
-         */
-        private GlobalState currentGlobalState;
-
-        /**
-         * Current macro being subparsed
-         */
-        private Macro currentMacro;
-
-        /**
-         * Buffer for globalstate docs
-         */
-        //private string currentString;
-
-        /* Methods */
-        private ResourceManager resourceManager;
-
-        /**
-         * Default constructor.
-         * 
-         * @param chapter
-         *            Chapter in which the data will be stored
-         */
-        public ChapterHandler(Chapter chapter, ResourceManager resourceManager)
+        public ChapterHandler(Chapter chapter, ResourceManager resourceManager, List<Incidence> incidences) : base(chapter, resourceManager, incidences)
         {
-            this.chapter = chapter;
-            this.resourceManager = resourceManager;
-           // currentString = string.Empty;
         }
 
-        public string getXmlContent(string path)
+        protected override Chapter CreateObject()
         {
-            return resourceManager.getText(path);
-        } 
+            return new Chapter();
+        }
 
-        public void Parse(string path)
+        protected override Chapter ParseXml(XmlDocument doc)
         {
-            XmlDocument xmld = new XmlDocument();
+            XmlElement element = doc.DocumentElement;
+            XmlNodeList eAdventure = element.SelectNodes("/eAdventure");
 
-            string xml = getXmlContent(path);
+            XmlElement adaptation = (XmlElement)element.SelectSingleNode("adaptation-configuration"),
+                assessment        = (XmlElement)element.SelectSingleNode("assessment-configuration"),
+                title             = (XmlElement)element.SelectSingleNode("title"),
+                description       = (XmlElement)element.SelectSingleNode("description");
+            
+            if (title != null)
+            {
+                content.setTitle(title.InnerText);
+            }
 
-            xmld.LoadXml(xml);
-
-            XmlElement element = xmld.DocumentElement;
-            XmlNodeList
-                eAdventure = element.SelectNodes("/eAdventure");
-
+            if (description != null)
+            {
+                content.setTitle(description.InnerText);
+            }
+            
             var restNodes = new List<XmlNode>();
             var e = element.ChildNodes.GetEnumerator();
-            while (e.MoveNext()) restNodes.Add(e.Current as XmlNode);
-
-            var l = new List<XmlNodeList>();
-            l.Add(eAdventure);
-
-            foreach(var xmlnodelist in l)
+            while (e.MoveNext())
             {
-                var enumerator = xmlnodelist.GetEnumerator();
-                while (enumerator.MoveNext())
+                restNodes.Add(e.Current as XmlNode);
+            }
+
+            var enumerator = eAdventure.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                restNodes.Remove(enumerator.Current as XmlNode);
+            }
+
+            ParseContent(content, restNodes);
+            ParseAdaptation(content, eAdventure, adaptation);
+            ParseAssessment(content, eAdventure, assessment);
+            ConfigureInitialScene(content);
+
+            return content;
+        }
+
+        private static void ConfigureInitialScene(Chapter chapter)
+        {
+            // In the end of the document, if the chapter has no initial scene
+            if (chapter.getTargetId() == null)
+            {
+                // Set it to the first scene
+                if (chapter.getScenes().Count > 0)
                 {
-                    restNodes.Remove(enumerator.Current as XmlNode);
+                    chapter.setTargetId(chapter.getScenes()[0].getId());
+                }
+                // Or to the first cutscene
+                else if (chapter.getCutscenes().Count > 0)
+                {
+                    chapter.setTargetId(chapter.getCutscenes()[0].getId());
+                }
+            }
+        }
+
+        private static void ParseContent(Chapter chapter, List<XmlNode> restNodes)
+        {
+            foreach (var el in restNodes)
+            {
+                object parsed = DOMParserUtility.DOMParse(el as XmlElement, chapter);
+                if (parsed != null)
+                {
+                    var t = parsed.GetType();
+                    // Gropu elements that are ITypeGroupable
+                    if (parsed is ITypeGroupable)
+                    {
+                        t = (parsed as ITypeGroupable).GetGroupType();
+                    }
+
+                    chapter.getObjects(t).Add(parsed);
+                }
+            }
+        }
+
+        private static void ParseAssessment(Chapter chapter, XmlNodeList eAdventure, XmlElement assestment)
+        {
+            if (assestment == null)
+            {
+                return;
+            }
+
+            foreach (XmlElement el in eAdventure)
+            {
+                if (!string.IsNullOrEmpty(el.GetAttribute("assessProfile")))
+                {
+                    chapter.setAssessmentName(el.GetAttribute("assessProfile"));
                 }
             }
 
+            var path = assestment.GetAttribute("path");
+            if (!string.IsNullOrEmpty(path))
+            {
+                string assessmentName = GetName(path);
+                chapter.setAssessmentName(assessmentName);
+            }
+        }
+
+        private static void ParseAdaptation(Chapter chapter, XmlNodeList eAdventure, XmlElement adaptation)
+        {
+            if (adaptation == null)
+            {
+                return;
+            }
 
             foreach (XmlElement el in eAdventure)
             {
@@ -88,37 +130,22 @@ namespace uAdventure.Core
                 {
                     chapter.setAdaptationName(el.GetAttribute("adaptProfile"));
                 }
-                if (!string.IsNullOrEmpty(el.GetAttribute("assessProfile")))
-                {
-                    chapter.setAssessmentName(el.GetAttribute("assessProfile"));
-                }
             }
 
-            foreach(var el in restNodes)
+            var path = adaptation.GetAttribute("path");
+            if (!string.IsNullOrEmpty(path))
             {
-                object parsed = DOMParserUtility.DOMParse(el as XmlElement, chapter);
-                if(parsed != null)
-                {
-                    var t = parsed.GetType();
-                    if (parsed is ITypeGroupable)
-                        t = (parsed as ITypeGroupable).GetGroupType();
-
-                    chapter.getObjects(t).Add(parsed);
-                }
-            }
-
-            // In the end of the document, if the chapter has no initial scene
-            if (chapter.getTargetId() == null)
-            {
-                // Set it to the first scene
-                if (chapter.getScenes().Count > 0)
-                    chapter.setTargetId(chapter.getScenes()[0].getId());
-
-                // Or to the first cutscene
-                else if (chapter.getCutscenes().Count > 0)
-                    chapter.setTargetId(chapter.getCutscenes()[0].getId());
+                string adaptationName = GetName(path);
+                chapter.setAdaptationName(adaptationName);
             }
         }
 
+        private static string GetName(string path)
+        {
+            var name = path.Substring(path.IndexOf("/", System.StringComparison.InvariantCulture) + 1);
+            name = name.Substring(0, name.IndexOf(".", System.StringComparison.InvariantCulture));
+
+            return name;
+        }
     }
 }

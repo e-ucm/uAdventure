@@ -1,10 +1,8 @@
 ﻿using System;
-using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
-
-// TODO possible unnecesary coupling
+using System.Linq;
 using uAdventure.Runner;
+using UnityEngine;
 
 namespace uAdventure.Core
 {
@@ -14,15 +12,15 @@ namespace uAdventure.Core
 
     public class Completable : HasId, ICloneable
     {
-        public class Milestone : HasId
+        public class Milestone : HasId, HasTargetId
         {
             public enum MilestoneType { SCENE, ITEM, CHARACTER, COMPLETABLE, CONDITION };
 
-            MilestoneType type;
-            string id = "";
-            Conditions conditions = new Conditions();
-            float progress = -1;
-            bool reached = false;
+            private MilestoneType type;
+            private string id = "";
+            private string targetId = "";
+            private Conditions conditions = new Conditions();
+            private float progress = -1;
 
             public MilestoneType getType()
             {
@@ -34,24 +32,24 @@ namespace uAdventure.Core
                 return id;
             }
 
-            public Conditions getConditions()
-            {
-                return conditions;
-            }
-
-            public float getProgress()
-            {
-                return progress;
-            }
-
-            public bool getReached()
-            {
-                return reached;
-            }
-
             public void setType(MilestoneType type)
             {
                 this.type = type;
+            }
+
+            public string getTargetId()
+            {
+                return targetId;
+            }
+
+            public void setTargetId(string id)
+            {
+                this.targetId = id;
+            }
+
+            public Conditions getConditions()
+            {
+                return conditions;
             }
 
             public void setId(string id)
@@ -59,9 +57,9 @@ namespace uAdventure.Core
                 this.id = id;
             }
 
-            public void setConditions(Conditions conditions)
+            public float getProgress()
             {
-                this.conditions = conditions;
+                return progress;
             }
 
             public void setProgress(float progress)
@@ -69,45 +67,9 @@ namespace uAdventure.Core
                 this.progress = progress;
             }
 
-            public void setReached(bool reached)
+            public void setConditions(Conditions conditions)
             {
-                this.reached = reached;
-            }
-
-            public bool Update(IChapterTarget target)
-            {
-                if (!reached && type == Completable.Milestone.MilestoneType.SCENE && id == target.getId())
-                    reached = true;
-
-                return reached;
-            }
-
-            public bool Update(Interactuable interactuable)
-            {
-                Milestone.MilestoneType type;
-
-                switch (interactuable.GetType().ToString())
-                {
-                    case "CharacterMB": type = Milestone.MilestoneType.CHARACTER; break;
-                    case "ObjectMB": type = Milestone.MilestoneType.ITEM; break;
-                    default: return false;
-                }
-
-                if (!reached && type == this.type && id == ((Representable)interactuable).Element.getId())
-                    reached = true;
-
-                return reached;
-            }
-
-            public bool Update()
-            {
-                if (!reached)
-                    if (type == MilestoneType.CONDITION)
-                        reached = ConditionChecker.check(conditions);
-                    else if (type == MilestoneType.COMPLETABLE)
-                        reached = CompletableController.Instance.getCompletable(id).getEnd().reached;
-
-                return reached;
+                this.conditions = conditions;
             }
 
             override public string ToString()
@@ -174,66 +136,6 @@ namespace uAdventure.Core
             {
                 this.milestones.Add(milestone);
             }
-
-            public bool updateMilestones(IChapterTarget target)
-            {
-                bool reached = false;
-
-                foreach (Milestone m in milestones)
-                    reached = m.Update(target) || reached;
-
-                return reached;
-            }
-
-            public bool updateMilestones(Interactuable interactuable)
-            {
-                bool reached = false;
-
-
-
-                return reached;
-            }
-
-            public bool updateMilestones()
-            {
-                bool reached = false;
-
-                foreach (Milestone m in milestones)
-                    reached = m.Update() || reached;
-
-                return reached;
-            }
-
-            public float getProgress()
-            {
-                float p = 0f;
-
-                if (type == ProgressType.SUM)
-                {
-                    int r = 0;
-                    foreach (Milestone m in milestones)
-                    {
-                        if (m.getReached()) r++;
-                    }
-                    p = r / milestones.Count;
-                }
-                else if (type == ProgressType.SPECIFIC)
-                {
-                    foreach (Milestone m in milestones)
-                        if (m.getReached() && m.getProgress() > p)
-                            p = m.getProgress();
-                }
-
-                return p;
-            }
-
-            public void Reset()
-            {
-                foreach (Milestone milestone in milestones)
-                {
-                    milestone.setReached(false);
-                }
-            }
         }
 
         public class Score
@@ -294,42 +196,6 @@ namespace uAdventure.Core
 
                 this.scores.Add(score);
             }
-
-            public float getScore()
-            {
-                float score = 0;
-
-                switch (method)
-                {
-                    case ScoreMethod.SINGLE:
-                        switch (type)
-                        {
-                            case ScoreType.VARIABLE: score = Game.Instance.GameState.getVariable(id); break;
-                            case ScoreType.COMPLETABLE: score = CompletableController.Instance.getCompletable(id).getScore().getScore(); break;
-                        }
-                        break;
-                    case ScoreMethod.AVERAGE:
-                        score = sumScores() / scores.Count;
-                        break;
-                    case ScoreMethod.SUM:
-                        score = sumScores();
-                        break;
-                }
-
-                return score;
-            }
-
-            private float sumScores()
-            {
-                float sum = 0;
-
-                foreach (Score score in scores)
-                {
-                    sum += score.getScore();
-                }
-
-                return sum;
-            }
         }
 
         public const int TYPE_GAME = 1;
@@ -372,11 +238,6 @@ namespace uAdventure.Core
         public Progress getProgress()
         {
             return this.progress;
-        }
-
-        public float currentProgress()
-        {
-            return this.progress.getProgress();
         }
 
         public int getType()
@@ -436,17 +297,6 @@ namespace uAdventure.Core
         //#################################################
         //#################################################
         //#################################################
-
-        public void Reset()
-        {
-            this.progress.Reset();
-
-            if (this.start != null)
-                this.start.setReached(false);
-
-            if (this.end != null)
-                this.end.setReached(false);
-        }
 
         public object Clone()
         {

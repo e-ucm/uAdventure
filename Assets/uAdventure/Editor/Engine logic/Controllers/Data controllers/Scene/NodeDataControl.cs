@@ -86,7 +86,7 @@ namespace uAdventure.Editor
         public void setNode(int x, int y, float scale)
         {
 
-            controller.addTool(new SetNodeValuesTool(node, trajectory, x, y, scale));
+            controller.AddTool(new SetNodeValuesTool(node, trajectory, x, y, scale));
         }
 
 

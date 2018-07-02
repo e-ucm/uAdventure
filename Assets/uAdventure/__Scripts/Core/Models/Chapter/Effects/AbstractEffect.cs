@@ -70,7 +70,7 @@ namespace uAdventure.Core
 
         public override string ToString()
         {
-            var conditions = getConditions().getConditionsList().Count > 0 ? getConditions().ToString() + "\n" : "";
+            var conditions = getConditions().GetConditionsList().Count > 0 ? getConditions().ToString() + "\n" : "";
             return conditions + ToEffectString();
         }
     }

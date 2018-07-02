@@ -1012,6 +1012,7 @@ namespace uAdventure.Editor
         {
             Writer.writeData("Assets/uAdventure/Resources/CurrentGame", adventureDataControl, true);
             UnityEditor.AssetDatabase.Refresh();
+            dataModified_F = false;
         }
 
         public void DeleteDirectory(string targetDir)
@@ -1126,6 +1127,8 @@ namespace uAdventure.Editor
                 }
                 else
                     fileCreated = false;
+
+                Save();
                 EditorUtility.ClearProgressBar();
                 
             }
@@ -1395,7 +1398,7 @@ namespace uAdventure.Editor
             if (directory.Exists)
             {
                 // Load the data from the file, and update the info
-                loadedAdventureData = Loader.loadAdventureData(ResourceManager, incidences);
+                loadedAdventureData = Loader.LoadAdventureData(ResourceManager, incidences);
             }
 
             // SI LO CARGO HAGO COSAS
@@ -1442,7 +1445,7 @@ namespace uAdventure.Editor
                     ResourceManager = null;
                     Resources.UnloadUnusedAssets();
                     ResourceManager = ResourceManagerFactory.CreateLocal();
-                    loadedAdventureData = Loader.loadAdventureData(ResourceManager, incidences);
+                    loadedAdventureData = Loader.LoadAdventureData(ResourceManager, incidences);
                     loadedAdventureData.setProjectName(currentZipName);
                     EditorUtility.ClearProgressBar();
                 }
@@ -1463,6 +1466,11 @@ namespace uAdventure.Editor
             {
                 ConfigData.fileLoaded(currentZipFile);
                 AssetsController.resetCache();
+                if (!localLoaded)
+                {
+                    // Save to store the upgrades
+                    Save();
+                }
 
                 //startAutoSave(15);
 
@@ -2556,7 +2564,7 @@ namespace uAdventure.Editor
          */
         public void addChapter(string val)
         {
-            addTool(new AddChapterTool(chaptersController, val));
+            AddTool(new AddChapterTool(chaptersController, val));
         }
 
         ///**
@@ -2586,7 +2594,7 @@ namespace uAdventure.Editor
         public void deleteChapter()
         {
 
-            addTool(new DeleteChapterTool(chaptersController));
+            AddTool(new DeleteChapterTool(chaptersController));
         }
 
         ///**
@@ -2924,7 +2932,8 @@ namespace uAdventure.Editor
         private int countAssetReferencesInEAA(string eaaFilePath, string assetPath)
         {
             int refs = 0;
-            Animation animation = Loader.loadAnimation(eaaFilePath, ResourceManager);
+            var incidences = new List<Incidence>();
+            Animation animation = Loader.LoadAnimation(eaaFilePath, ResourceManager, incidences);
             foreach (Frame frame in animation.getFrames())
             {
                 if (frame != null)
@@ -2972,7 +2981,9 @@ namespace uAdventure.Editor
 
         private void getAssetReferencesInEAA(string eaaFilePath, List<string> assetPaths, List<int> assetTypes)
         {
-            Animation animation = Loader.loadAnimation(eaaFilePath, ResourceManager);
+            var incidences = new List<Incidence>();
+            Animation animation = Loader.LoadAnimation(eaaFilePath, ResourceManager, incidences);
+
             foreach (Frame frame in animation.getFrames())
             {
                 if (frame != null)
@@ -3308,26 +3319,20 @@ namespace uAdventure.Editor
 
         //// METHODS TO MANAGE UNDO/REDO
 
-        public bool addTool(Tool tool)
+        public bool AddTool(Tool tool)
         {
-
-            bool added = chaptersController.addTool(tool);
-            //tsd.update();
-            return added;
+            Debug.Log("Tool added");
+            return chaptersController.addTool(tool);
         }
 
-        public void undoTool()
+        public void UndoTool()
         {
-
             chaptersController.undoTool();
-            //tsd.update();
         }
 
-        public void redoTool()
+        public void RedoTool()
         {
-
             chaptersController.redoTool();
-            //tsd.update();
         }
 
         private void OnPlay(PlayModeStateChange playModeStateChange)

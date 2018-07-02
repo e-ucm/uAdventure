@@ -74,7 +74,7 @@ namespace uAdventure.Editor
                 // Create the description
                 XmlNode descriptionNode = doc.CreateElement("description");
                 // Append the conditions (if available)
-                if (description.getConditions() != null && !description.getConditions().isEmpty())
+                if (description.getConditions() != null && !description.getConditions().IsEmpty())
                 {
                     DOMWriterUtility.DOMWrite(descriptionNode, description.getConditions());
                 }

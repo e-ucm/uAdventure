@@ -224,7 +224,7 @@ namespace uAdventure.Editor
         {
 
             ChangeNameTool tool = new ChangeNameTool(scene, name);
-            controller.addTool(tool);
+            controller.AddTool(tool);
         }
 
         public void imageChangeNotify(string imagePath)
@@ -243,7 +243,7 @@ namespace uAdventure.Editor
         {
 
             ChangeDocumentationTool tool = new ChangeDocumentationTool(scene, documentation);
-            controller.addTool(tool);
+            controller.AddTool(tool);
         }
 
         /**
@@ -254,9 +254,9 @@ namespace uAdventure.Editor
         {
 
             if (scene.hasDefaultPosition())
-                controller.addTool(new ChangeNSDestinyPositionTool(scene, Int32.MinValue, Int32.MinValue));
+                controller.AddTool(new ChangeNSDestinyPositionTool(scene, Int32.MinValue, Int32.MinValue));
             else
-                controller.addTool(new ChangeNSDestinyPositionTool(scene, AssetsImageDimensions.BACKGROUND_MAX_WIDTH / 2, AssetsImageDimensions.BACKGROUND_MAX_HEIGHT / 2));
+                controller.AddTool(new ChangeNSDestinyPositionTool(scene, AssetsImageDimensions.BACKGROUND_MAX_WIDTH / 2, AssetsImageDimensions.BACKGROUND_MAX_HEIGHT / 2));
         }
 
         /**
@@ -270,7 +270,7 @@ namespace uAdventure.Editor
         public void setDefaultInitialPosition(int positionX, int positionY)
         {
 
-            controller.addTool(new ChangePositionTool(scene, positionX, positionY));
+            controller.AddTool(new ChangePositionTool(scene, positionX, positionY));
         }
 
         public override System.Object getContent()
@@ -323,7 +323,7 @@ namespace uAdventure.Editor
 
             if (type == Controller.RESOURCES)
             {
-                elementAdded = Controller.Instance.addTool(new AddResourcesBlockTool(resourcesList, resourcesDataControlList, Controller.SCENE, this));
+                elementAdded = Controller.Instance.AddTool(new AddResourcesBlockTool(resourcesList, resourcesDataControlList, Controller.SCENE, this));
             }
 
             return elementAdded;
@@ -583,7 +583,7 @@ namespace uAdventure.Editor
         public void changeAllowPlayerLayer(bool isAllowPlayerLayer /*, ScenePreviewEditionPanel scenePreviewEditionPanel^*/ )
         {
 
-            Controller.Instance.addTool(new ChangeForcePlayerInSceneTool(isAllowPlayerLayer, /*scenePreviewEditionPanel,*/ this));
+            Controller.Instance.AddTool(new ChangeForcePlayerInSceneTool(isAllowPlayerLayer, /*scenePreviewEditionPanel,*/ this));
         }
 
         // this method is only used in SwapPlayerModeTool
@@ -600,7 +600,7 @@ namespace uAdventure.Editor
         {
 
             //scene.setPlayerScale(scale);
-            Controller.Instance.addTool(new ChangePlayerScaleTool(scene, scale));
+            Controller.Instance.AddTool(new ChangePlayerScaleTool(scene, scale));
         }
 
         public float getPlayerScale()

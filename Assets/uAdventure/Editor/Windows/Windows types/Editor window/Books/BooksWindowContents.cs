@@ -146,7 +146,7 @@ namespace uAdventure.Editor
                         {
                             ImageFileOpenDialog imageDialog =
                                 (ImageFileOpenDialog)ScriptableObject.CreateInstance(typeof(ImageFileOpenDialog));
-                            imageDialog.Init(this, BaseFileOpenDialog.FileType.BOOK_IMAGE_PARAGRAPH);
+                            imageDialog.Init(this, FileType.BOOK_IMAGE_PARAGRAPH);
                         }
                         GUILayout.Box(Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
                             GameRources.GetInstance().selectedBookIndex].getBookParagraphsList().getBookParagraphs()[
@@ -211,12 +211,12 @@ namespace uAdventure.Editor
 
         public void OnDialogOk(string message, object workingObject = null, object workingObjectSecond = null)
         {
-            if (workingObject is BaseFileOpenDialog.FileType)
+            if (workingObject is FileType)
             {
-                switch ((BaseFileOpenDialog.FileType)workingObject)
+                switch ((FileType)workingObject)
                 {
-                    case BaseFileOpenDialog.FileType.BOOK_IMAGE_PARAGRAPH:
-                        Controller.Instance                            .addTool(
+                    case FileType.BOOK_IMAGE_PARAGRAPH:
+                        Controller.Instance                            .AddTool(
                                 new ChangeParagraphContentTool(
                                     Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
                                         GameRources.GetInstance().selectedBookIndex].getBookParagraphsList()

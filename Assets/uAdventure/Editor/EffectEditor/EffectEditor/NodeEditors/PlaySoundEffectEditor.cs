@@ -41,7 +41,7 @@ namespace uAdventure.Editor
         {
             musicField = new FileChooser()
             {
-                FileType = BaseFileOpenDialog.FileType.PLAY_SOUND_EFFECT                
+                FileType = FileType.PLAY_SOUND_EFFECT                
             };
             this.effect = new PlaySoundEffect(false, "");
         }

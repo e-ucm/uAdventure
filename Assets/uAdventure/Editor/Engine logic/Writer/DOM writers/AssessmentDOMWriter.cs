@@ -108,13 +108,13 @@ namespace uAdventure.Editor
                     }
 
                     //Append conditions (always required at least one)
-                    if (!tRule.getInitConditions().isEmpty())
+                    if (!tRule.getInitConditions().IsEmpty())
                     {
                         DOMWriterUtility.DOMWrite(ruleNode, tRule.getInitConditions(), DOMWriterUtility.Name(ConditionsDOMWriter.INIT_CONDITIONS));
                     }
 
                     //Append conditions (always required at least one)
-                    if (!tRule.getEndConditions().isEmpty())
+                    if (!tRule.getEndConditions().IsEmpty())
                     {
                         DOMWriterUtility.DOMWrite(ruleNode, tRule.getEndConditions(), DOMWriterUtility.Name(ConditionsDOMWriter.END_CONDITIONS));
                     }
@@ -169,7 +169,7 @@ namespace uAdventure.Editor
                     }
 
                     //Append conditions (always required at least one)
-                    if (!rule.getConditions().isEmpty())
+                    if (!rule.getConditions().IsEmpty())
                     {
                         DOMWriterUtility.DOMWrite(ruleNode, rule.getConditions());
                     }

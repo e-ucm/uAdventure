@@ -7,49 +7,60 @@ namespace uAdventure.Core
     /**
      * This class holds the data for a element reference in eAdventure
      */
-
+    [System.Serializable]
     public class ElementReference : Documented, HasTargetId, ICloneable
     {
 
         /**
          * Id of the element referenced
          */
+        [SerializeField]
         private string idTarget;
 
         /**
          * X position of the referenced element
          */
+        [SerializeField]
         private int x;
 
         /**
          * Y position of the referenced element
          */
+        [SerializeField]
         private int y;
 
         /**
          * Scale of the referenced element
          */
+        [SerializeField]
         private float scale;
 
         /**
          * The order in which will be drown this element
          */
+        [SerializeField]
         private int layer;
 
         /**
          * Documentation of the element reference.
          */
+        [SerializeField]
         private string documentation;
 
         /**
          * Conditions for the element to be placed
          */
+        [SerializeField]
         private Conditions conditions;
 
         /**
          * The influenceArea of the object, used with trajectories
          */
+        [SerializeField]
         private InfluenceArea influenceArea;
+
+        [SerializeField]
+        private Runner.Orientation orientation;
 
         /**
          * Creates a new ElementReference
@@ -73,6 +84,7 @@ namespace uAdventure.Core
             documentation = null;
             conditions = new Conditions();
             influenceArea = new InfluenceArea();
+            orientation = Runner.Orientation.E;
         }
 
         /**
@@ -285,6 +297,16 @@ namespace uAdventure.Core
         {
 
             this.influenceArea = influenceArea;
+        }
+
+        public Runner.Orientation GetOrientation()
+        {
+            return orientation;
+        }
+
+        public void SetOrientation(Runner.Orientation value)
+        {
+            orientation = value;
         }
 
         public object Clone()

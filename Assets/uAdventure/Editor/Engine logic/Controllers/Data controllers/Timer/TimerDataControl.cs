@@ -339,13 +339,13 @@ namespace uAdventure.Editor
         public void setDocumentation(string newDoc)
         {
 
-            controller.addTool(new ChangeDocumentationTool(timer, newDoc));
+            controller.AddTool(new ChangeDocumentationTool(timer, newDoc));
         }
 
         public void setTime(long newTime)
         {
 
-            controller.addTool(new ChangeLongValueTool(timer, newTime, "getTime", "setTime"));
+            controller.AddTool(new ChangeLongValueTool(timer, newTime, "getTime", "setTime"));
         }
 
 
@@ -389,7 +389,7 @@ namespace uAdventure.Editor
         public void setUsesEndCondition(bool selected)
         {
 
-            controller.addTool(new ChangeBooleanValueTool(timer, selected, "isUsesEndCondition", "setUsesEndCondition"));
+            controller.AddTool(new ChangeBooleanValueTool(timer, selected, "isUsesEndCondition", "setUsesEndCondition"));
         }
 
         public bool isMultipleStarts()
@@ -401,7 +401,7 @@ namespace uAdventure.Editor
         public void setMultipleStarts(bool multipleStarts)
         {
 
-            controller.addTool(new ChangeBooleanValueTool(timer, multipleStarts, "isMultipleStarts", "setMultipleStarts"));
+            controller.AddTool(new ChangeBooleanValueTool(timer, multipleStarts, "isMultipleStarts", "setMultipleStarts"));
         }
 
         public bool isRunsInLoop()
@@ -413,7 +413,7 @@ namespace uAdventure.Editor
         public void setRunsInLoop(bool runsInLoop)
         {
 
-            controller.addTool(new ChangeBooleanValueTool(timer, runsInLoop, "isRunsInLoop", "setRunsInLoop"));
+            controller.AddTool(new ChangeBooleanValueTool(timer, runsInLoop, "isRunsInLoop", "setRunsInLoop"));
         }
 
         public bool isShowTime()
@@ -425,7 +425,7 @@ namespace uAdventure.Editor
         public void setShowTime(bool selected)
         {
 
-            controller.addTool(new ChangeBooleanValueTool(timer, selected, "isShowTime", "setShowTime"));
+            controller.AddTool(new ChangeBooleanValueTool(timer, selected, "isShowTime", "setShowTime"));
         }
 
         public bool isCountDown()
@@ -437,7 +437,7 @@ namespace uAdventure.Editor
         public void setCountDown(bool countDown)
         {
 
-            controller.addTool(new ChangeBooleanValueTool(timer, countDown, "isCountDown", "setCountDown"));
+            controller.AddTool(new ChangeBooleanValueTool(timer, countDown, "isCountDown", "setCountDown"));
         }
 
         public bool isShowWhenStopped()
@@ -449,7 +449,7 @@ namespace uAdventure.Editor
         public void setShowWhenStopped(bool showWhenStopped)
         {
 
-            controller.addTool(new ChangeBooleanValueTool(timer, showWhenStopped, "isShowWhenStopped", "setShowWhenStopped"));
+            controller.AddTool(new ChangeBooleanValueTool(timer, showWhenStopped, "isShowWhenStopped", "setShowWhenStopped"));
         }
 
         public string getDisplayName()
@@ -461,7 +461,7 @@ namespace uAdventure.Editor
         public void setDisplayName(string displayName)
         {
 
-            controller.addTool(new ChangeStringValueTool(timer, displayName, "getDisplayName", "setDisplayName"));
+            controller.AddTool(new ChangeStringValueTool(timer, displayName, "getDisplayName", "setDisplayName"));
         }
 
 

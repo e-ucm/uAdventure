@@ -11,10 +11,9 @@ namespace uAdventure.Editor
     [DOMWriter(typeof(Conditions), typeof(GlobalState))]
     public class ConditionsDOMWriter : ParametrizedDOMWriter
     {
-
         /**
-             * Constant for "condition" tag (general case)
-             */
+         * Constant for "condition" tag (general case)
+         */
         public const string CONDITIONS = "condition";
 
         /**
@@ -31,32 +30,34 @@ namespace uAdventure.Editor
          * Constant for "global-state" tag
          */
         public const string GLOBAL_STATE = "global-state";
-
-        /**
-         * Private constructor.
-         */
-
+        
         public ConditionsDOMWriter()
         {
-
         }
-
 
         protected override void FillNode(XmlNode node, object target, params IDOMWriterParam[] options)
         {
             if (target is GlobalState)
+            {
                 FillNode(node, target as GlobalState, options);
+            }
             else if (target is Conditions)
+            {
                 FillNode(node, target as Conditions, options);
+            }
         }
 
         protected override string GetElementNameFor(object target)
         {
             string name = "";
             if (target is GlobalState)
+            {
                 name = GLOBAL_STATE;
+            }
             else if (target is Conditions)
+            {
                 name = CONDITIONS;
+            }
             return name;
         }
 
@@ -79,16 +80,15 @@ namespace uAdventure.Editor
             conditionsNode.AppendChild(documentationNode);
 
             // Iterate all the condition'blocks
-            for (int i = 0; i < globalState.size(); i++)
+            for (int i = 0; i < globalState.Size(); i++)
             {
-                List<Condition> block = globalState.get(i);
+                var block = globalState.Get(i);
                 // Single condition
                 if (block.Count == 1)
                 {
                     XmlElement conditionElement = createConditionElement(doc, block[0]);
                     doc.ImportNode(conditionElement, true);
                     conditionsNode.AppendChild(conditionElement);
-
                 }
                 else if (block.Count > 1)
                 {
@@ -107,9 +107,9 @@ namespace uAdventure.Editor
             var doc = Writer.GetDoc();
 
             // Iterate all the condition'blocks
-            for (int i = 0; i < conditions.size(); i++)
+            for (int i = 0; i < conditions.Size(); i++)
             {
-                List<Condition> block = conditions.get(i);
+                IList<Condition> block = conditions.Get(i);
                 // Single condition
                 if (block.Count == 1)
                 {
@@ -127,9 +127,8 @@ namespace uAdventure.Editor
             }
         }
 
-        private static XmlNode createElementWithList(String tagname, List<Condition> conditions)
+        private static XmlNode createElementWithList(String tagname, IList<Condition> conditions)
         {
-
             XmlElement conditionsListNode = null;
 
             // Create the necessary elements to create the DOM
@@ -151,9 +150,13 @@ namespace uAdventure.Editor
             {
                 // Create the tag
                 if (condition.getState() == FlagCondition.FLAG_ACTIVE)
+                {
                     conditionElement = doc.CreateElement("active");
+                }
                 else if (condition.getState() == FlagCondition.FLAG_INACTIVE)
+                {
                     conditionElement = doc.CreateElement("inactive");
+                }
 
                 // Set the target flag and append it
                 conditionElement.SetAttribute("flag", condition.getId());
@@ -162,18 +165,27 @@ namespace uAdventure.Editor
             {
                 VarCondition varCondition = (VarCondition)condition;
                 // Create the tag
-                if (varCondition.getState() == VarCondition.VAR_EQUALS)
-                    conditionElement = doc.CreateElement("equals");
-                else if (varCondition.getState() == VarCondition.VAR_NOT_EQUALS)
-                    conditionElement = doc.CreateElement("not-equals");
-                else if (condition.getState() == VarCondition.VAR_GREATER_EQUALS_THAN)
-                    conditionElement = doc.CreateElement("greater-equals-than");
-                else if (condition.getState() == VarCondition.VAR_GREATER_THAN)
-                    conditionElement = doc.CreateElement("greater-than");
-                else if (condition.getState() == VarCondition.VAR_LESS_EQUALS_THAN)
-                    conditionElement = doc.CreateElement("less-equals-than");
-                else if (condition.getState() == VarCondition.VAR_LESS_THAN)
-                    conditionElement = doc.CreateElement("less-than");
+                switch (varCondition.getState())
+                {
+                    default: // VAR_EQUALS
+                        conditionElement = doc.CreateElement("equals");
+                        break;
+                    case VarCondition.VAR_NOT_EQUALS:
+                        conditionElement = doc.CreateElement("not-equals");
+                        break;
+                    case VarCondition.VAR_GREATER_EQUALS_THAN:
+                        conditionElement = doc.CreateElement("greater-equals-than");
+                        break;
+                    case VarCondition.VAR_GREATER_THAN:
+                        conditionElement = doc.CreateElement("greater-than");
+                        break;
+                    case VarCondition.VAR_LESS_EQUALS_THAN:
+                        conditionElement = doc.CreateElement("less-equals-than");
+                        break;
+                    case VarCondition.VAR_LESS_THAN:
+                        conditionElement = doc.CreateElement("less-than");
+                        break;
+                }
 
                 // Set the target flag and append it
                 conditionElement.SetAttribute("var", varCondition.getId());
@@ -195,13 +207,11 @@ namespace uAdventure.Editor
             return conditionElement;
         }
 
-        private static void createElementWithList(XmlDocument doc, XmlElement conditionsListNode, List<Condition> conditions)
+        private static void createElementWithList(XmlDocument doc, XmlElement conditionsListNode, IList<Condition> conditions)
         {
-
             // Write every condition
             foreach (Condition condition in conditions)
             {
-
                 conditionsListNode.AppendChild(createConditionElement(doc, condition));
             }
         }
