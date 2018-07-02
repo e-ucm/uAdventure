@@ -320,17 +320,22 @@ namespace uAdventure.Editor
                 {
                     Dictionary<string, string> attrs = ParseLine(fileText[i]);
                     var fileId = attrs["fileID"];
-                    if (fileId != "11500000" && !fileIdInDll.ContainsValue(fileId))
-                        continue;
+                    var isRuntime = fileId == "11500000";
 
-                    if (!guidToFileIdAndDllGUID.ContainsKey(attrs["guid"]))
+                    var existsInRuntime = isRuntime && guidToFileIdAndDllGUID.ContainsKey(attrs["guid"]);
+                    var existsCompiled = !isRuntime && fileIdInDll.ContainsKey(fileId);
+
+                    if (!existsInRuntime && !existsCompiled)
                     {
-                        Debug.LogWarning("Couldn't find type for: " + attrs["guid"]);
+                        if (isRuntime)
+                        {
+                            Debug.LogWarning("Couldn't find type for: " + attrs["guid"]);
+                        }
                         continue;
                     }
 
                     string dll;
-                    if(fileId == "11500000")
+                    if(isRuntime)
                     {
                         // Is runtime script
                         var fileIdAndDll = guidToFileIdAndDllGUID[attrs["guid"]];
