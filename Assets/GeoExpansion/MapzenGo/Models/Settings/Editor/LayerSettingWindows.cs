@@ -995,7 +995,7 @@ namespace MapzenGo.Models.Settings.Editor
                     UsingType.Add("bt_" + element.Type.ToString());
                 }
 
-                element.Material = (Material)EditorGUILayout.ObjectField("Material", element.Material, typeof(Material));
+                element.Material = (Material)EditorGUILayout.ObjectField("Material", element.Material, typeof(Material), false);
 
                 if (element.Material == null) DisplayErrorMEssage("Not setting material");
 
@@ -1027,7 +1027,7 @@ namespace MapzenGo.Models.Settings.Editor
                 {
                     element.TypeRail = (RailwayType)EditorGUILayout.EnumPopup("Type Rail:", element.TypeRail);
                 }
-                element.Material = (Material)EditorGUILayout.ObjectField("Material", element.Material, typeof(Material));
+                element.Material = (Material)EditorGUILayout.ObjectField("Material", element.Material, typeof(Material), false);
 
                 if (element.Material == null) DisplayErrorMEssage("Not setting material");
                 element.Width = EditorGUILayout.FloatField("Road Width", element.Width);
@@ -1047,7 +1047,7 @@ namespace MapzenGo.Models.Settings.Editor
                     UsingType.Add("lt_" + element.Type.ToString());
                 }
 
-                element.Material = (Material)EditorGUILayout.ObjectField("Material", element.Material, typeof(Material));
+                element.Material = (Material)EditorGUILayout.ObjectField("Material", element.Material, typeof(Material), false);
 
                 if (element.Material == null) DisplayErrorMEssage("Not setting material");
             }
@@ -1065,7 +1065,7 @@ namespace MapzenGo.Models.Settings.Editor
                     UsingType.Add("wt_" + element.Type.ToString());
                 }
 
-                element.Material = (Material)EditorGUILayout.ObjectField("Material", element.Material, typeof(Material));
+                element.Material = (Material)EditorGUILayout.ObjectField("Material", element.Material, typeof(Material), false);
 
                 if (element.Material == null) DisplayErrorMEssage("Not setting material");
             }
@@ -1084,7 +1084,7 @@ namespace MapzenGo.Models.Settings.Editor
                     UsingType.Add("et_" + element.Type.ToString());
                 }
 
-                element.Material = (Material)EditorGUILayout.ObjectField("Material", element.Material, typeof(Material));
+                element.Material = (Material)EditorGUILayout.ObjectField("Material", element.Material, typeof(Material), false);
 
                 if (element.Material == null) DisplayErrorMEssage("Not setting material");
             }
@@ -1139,7 +1139,7 @@ namespace MapzenGo.Models.Settings.Editor
                     UsingType.Add("bt_" + element.Type.ToString());
                 }
 
-                element.Material = (Material)EditorGUILayout.ObjectField("Material", element.Material, typeof(Material));
+                element.Material = (Material)EditorGUILayout.ObjectField("Material", element.Material, typeof(Material), false);
 
                 if (element.Material == null) DisplayErrorMEssage("Not setting material");
                 element.Width = EditorGUILayout.FloatField("Boundary Width", element.Width);

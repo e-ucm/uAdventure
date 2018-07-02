@@ -81,6 +81,7 @@ namespace uAdventure.Geo
 
         void RemoveKeys()
         {
+            // TODO use PlayerPrefs in settings
             PlayerPrefs.DeleteKey("zone_control");
             PlayerPrefs.DeleteKey("zone_control_loadonexit");
             PlayerPrefs.DeleteKey("zone_control_id");
@@ -90,6 +91,7 @@ namespace uAdventure.Geo
 
         public void Save()
         {
+            // TODO use PlayerPrefs in settings
             PlayerPrefs.SetInt("zone_control", 1);
             PlayerPrefs.SetString("zone_control_loadonexit", loadOnExit);
             PlayerPrefs.SetString("zone_control_id", zoneid);
@@ -99,9 +101,11 @@ namespace uAdventure.Geo
 
         public void Restore()
         {
+            // TODO use PlayerPrefs in settings
             loadOnExit = PlayerPrefs.GetString("zone_control_loadonexit");
             zone = Game.Instance.GameState.FindElement<GeoElement>(PlayerPrefs.GetString("zone_control_id")).Geometry;
             transitionTime = PlayerPrefs.GetFloat("zone_control_transitiontime");
         }
     }
 }
+ 

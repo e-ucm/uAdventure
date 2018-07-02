@@ -51,7 +51,8 @@ namespace uAdventure.Geo
                 StartCoroutine(StartLocation());
 
             // In case is necesary
-            if(PlayerPrefs.HasKey("navigating") && PlayerPrefs.GetInt("navigating") == 1)
+            // TODO use PlayerPrefs in settings
+            if (PlayerPrefs.HasKey("navigating") && PlayerPrefs.GetInt("navigating") == 1)
                 GameObject.Instantiate(Resources.Load<GameObject>("navigation"));
 
             if (PlayerPrefs.HasKey("zone_control") && !FindObjectOfType<ZoneControl>())

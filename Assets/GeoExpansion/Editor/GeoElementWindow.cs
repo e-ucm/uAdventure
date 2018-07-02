@@ -326,7 +326,7 @@ namespace uAdventure.Geo
                 case AssetType.Image:
                     ImageFileOpenDialog backgroundDialog =
                     (ImageFileOpenDialog)ScriptableObject.CreateInstance(typeof(ImageFileOpenDialog));
-                    backgroundDialog.Init(this, BaseFileOpenDialog.FileType.ITEM_IMAGE);
+                    backgroundDialog.Init(this, FileType.ITEM_IMAGE);
                     break;
             }
 
@@ -334,9 +334,9 @@ namespace uAdventure.Geo
 
         public void OnDialogOk(string message, object workingObject = null, object workingObjectSecond = null)
         {
-            switch ((BaseFileOpenDialog.FileType)workingObject)
+            switch ((FileType)workingObject)
             {
-                case BaseFileOpenDialog.FileType.ITEM_IMAGE:
+                case FileType.ITEM_IMAGE:
                     element.Image = message;
                     Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                        GameRources.GetInstance().selectedSceneIndex].setPreviewBackground(message);
