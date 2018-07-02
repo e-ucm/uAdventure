@@ -28,6 +28,7 @@ namespace uAdventure.Editor
         private static long s_LastClosedTime;
 
         private ColumnList variablesAndFlagsList;
+        private VarFlagSummary varFlagSummary;
         private string filter;
 
         internal static bool ShowAtPosition(Rect buttonRect)
@@ -90,8 +91,8 @@ namespace uAdventure.Editor
                     var elem = "";
                     switch (openedWindow)
                     {
-                        case WindowType.FLAGS: elem = Controller.Instance.VarFlagSummary.getFlag(index); break;
-                        case WindowType.VARS: elem = Controller.Instance.VarFlagSummary.getVar(index); break;
+                        case WindowType.FLAGS: elem = varFlagSummary.getFlag(index); break;
+                        case WindowType.VARS: elem = varFlagSummary.getVar(index); break;
                     }
 
                     switch (column)
@@ -113,8 +114,8 @@ namespace uAdventure.Editor
                             {
                                 switch (openedWindow)
                                 {
-                                    case WindowType.FLAGS: value = Controller.Instance.VarFlagSummary.getFlagReferences(index); break;
-                                    case WindowType.VARS: value = Controller.Instance.VarFlagSummary.getVarReferences(index); break;
+                                    case WindowType.FLAGS: value = varFlagSummary.getFlagReferences(index); break;
+                                    case WindowType.VARS: value = varFlagSummary.getVarReferences(index); break;
                                 }
                             }
                             EditorGUI.LabelField(rect, value.ToString());
@@ -127,22 +128,19 @@ namespace uAdventure.Editor
             };
         }
 
-        private void Update()
-        {
-        }
-
-        void OnGUI()
+        protected void OnGUI()
         {
             var windowWidth = position.width;
             var windowHeight = position.height;
 
             // Initialization
-            if (!inited)
+            if (!inited || varFlagSummary != Controller.Instance.VarFlagSummary)
             {
                 if (Controller.Instance.Loaded)
                 {
                     RefreshList();
                     inited = true;
+                    varFlagSummary = Controller.Instance.VarFlagSummary;
                 }
             }
             
@@ -157,7 +155,9 @@ namespace uAdventure.Editor
             EditorGUILayout.EndHorizontal();
             filter = EditorGUILayout.TextField("Filter", filter);
             if (EditorGUI.EndChangeCheck())
+            {
                 RefreshList();
+            }
 
             var height = windowHeight - GUILayoutUtility.GetLastRect().max.y - 90f;
             /*
@@ -203,10 +203,10 @@ namespace uAdventure.Editor
                 switch (openedWindow)
                 {
                     case WindowType.FLAGS:
-                        summary.deleteFlag(Controller.Instance.VarFlagSummary.getFlag(selected));
+                        summary.deleteFlag(varFlagSummary.getFlag(selected));
                         break;
                     case WindowType.VARS:
-                        summary.deleteVar(Controller.Instance.VarFlagSummary.getVar(selected));
+                        summary.deleteVar(varFlagSummary.getVar(selected));
                         break;
                 }
             }
@@ -215,9 +215,14 @@ namespace uAdventure.Editor
 
         public void OnDialogOk(string message, object token = null, object workingObjectSecond = null)
         {
-            var summary = Controller.Instance.VarFlagSummary;
-            if      ((string)token == "Flag") summary.addFlag(message);
-            else if ((string)token == "Var")  summary.addVar(message);
+            if ((string)token == "Flag")
+            {
+                varFlagSummary.addFlag(message);
+            }
+            else if ((string)token == "Var")
+            {
+                varFlagSummary.addVar(message);
+            }
 
             RefreshList();
         }
@@ -237,6 +242,7 @@ namespace uAdventure.Editor
                     indexes = Enumerable.Range(0, summary.getVarCount());
                     filterFunc = (i) => summary.getVar(i).ToLowerInvariant().Contains(filter.ToLowerInvariant());
                     break;
+                default: break;
             }
             variablesAndFlagsList.list = string.IsNullOrEmpty(filter) ? indexes.ToList() : indexes.Where(filterFunc).ToList();
             this.Repaint();

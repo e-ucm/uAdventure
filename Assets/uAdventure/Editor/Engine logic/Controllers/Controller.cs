@@ -1127,6 +1127,8 @@ namespace uAdventure.Editor
                 }
                 else
                     fileCreated = false;
+
+                Save();
                 EditorUtility.ClearProgressBar();
                 
             }
@@ -1464,6 +1466,11 @@ namespace uAdventure.Editor
             {
                 ConfigData.fileLoaded(currentZipFile);
                 AssetsController.resetCache();
+                if (!localLoaded)
+                {
+                    // Save to store the upgrades
+                    Save();
+                }
 
                 //startAutoSave(15);
 
