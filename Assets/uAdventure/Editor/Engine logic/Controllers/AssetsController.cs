@@ -394,7 +394,7 @@ namespace uAdventure.Editor
             string returnPath = null;
             string destinationPath = Path.Combine(path.FullName, nameOnly);
 
-            var isSameAsDestiny = assetPath != destinationPath;
+            var isSameAsDestiny = assetPath.Equals(destinationPath, StringComparison.InvariantCultureIgnoreCase);
             var isLocalFile = assetPath.StartsWith(DIR_PREFIX);
 
             if (!isSameAsDestiny && !isLocalFile) // Avoid to copy the same origin to same destination files
