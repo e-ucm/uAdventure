@@ -4,15 +4,16 @@
   <title>Adventure title</title>
   <description>
   </description>
-  <configuration keepShowing="no" keyboard-navigation="disabled" defaultClickAction="showDetails" perspective="regular" dragBehaviour="considerNonTargets">
+  <configuration keepShowing="no" keyboard-navigation="disabled" defaultClickAction="showDetails" perspective="regular" dragBehaviour="considerNonTargets" autosave="no" save-on-suspend="no">
     <gui type="contextual" inventoryPosition="top_bottom" />
-    <mode playerTransparent="no" />
+    <mode playerTransparent="yes" />
     <graphics mode="windowed" />
   </configuration>
   <contents>
     <chapter path="chapter1.xml">
       <title>ChapterTitle</title>
-      <description>ChapterTitle</description>
+      <description>
+      </description>
     </chapter>
   </contents>
 </game-descriptor>
