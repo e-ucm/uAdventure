@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 namespace uAdventure.Core
 {
@@ -10,86 +11,32 @@ namespace uAdventure.Core
      * This class holds a list of conditions
      */
     [Serializable]
-    public class Conditions : ICloneable
+    public class Conditions : ICloneable, ISerializationCallbackReceiver
     {
         [Serializable]
-        protected class ConditionBlock : IList<Condition>
+        protected class ConditionBlockWrapper
         {
             [SerializeField]
             protected List<Condition> conditions = new List<Condition>();
 
-            public Condition this[int index] { get { return ((IList<Condition>)conditions)[index]; } set { ((IList<Condition>) conditions)[index] = value; } }
-
             public List<Condition> Conditions { get { return conditions; } set { conditions = value; } }
-
-            public int Count { get { return ((IList<Condition>)conditions).Count; } }
-
-            public bool IsReadOnly { get { return ((IList<Condition>)conditions).IsReadOnly; } }
-
-            public void Add(Condition item)
-            {
-                ((IList<Condition>)conditions).Add(item);
-            }
-
-            public void Clear()
-            {
-                ((IList<Condition>)conditions).Clear();
-            }
-
-            public bool Contains(Condition item)
-            {
-                return ((IList<Condition>)conditions).Contains(item);
-            }
-
-            public void CopyTo(Condition[] array, int arrayIndex)
-            {
-                ((IList<Condition>)conditions).CopyTo(array, arrayIndex);
-            }
-
-            public IEnumerator<Condition> GetEnumerator()
-            {
-                return ((IList<Condition>)conditions).GetEnumerator();
-            }
-
-            public int IndexOf(Condition item)
-            {
-                return ((IList<Condition>)conditions).IndexOf(item);
-            }
-
-            public void Insert(int index, Condition item)
-            {
-                ((IList<Condition>)conditions).Insert(index, item);
-            }
-
-            public bool Remove(Condition item)
-            {
-                return ((IList<Condition>)conditions).Remove(item);
-            }
-
-            public void RemoveAt(int index)
-            {
-                ((IList<Condition>)conditions).RemoveAt(index);
-            }
-
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return ((IList<Condition>)conditions).GetEnumerator();
-            }
         }
 
         /**
          * The list of conditions
          */
 
+        private List<List<Condition>> conditionsList;
+
         [SerializeField]
-        private List<ConditionBlock> conditionsList;
+        private List<ConditionBlockWrapper> serializableConditionList;
 
         /**
          * Create a new Conditions
          */
         public Conditions()
         {
-            conditionsList = new List<ConditionBlock>();
+            conditionsList = new List<List<Condition>>();
         }
 
         /**
@@ -100,7 +47,7 @@ namespace uAdventure.Core
          */
         public void Add(int index, Condition condition)
         {
-            conditionsList.Insert(index, new ConditionBlock { condition });
+            conditionsList.Insert(index, new List<Condition> { condition });
         }
 
         /**
@@ -111,7 +58,7 @@ namespace uAdventure.Core
          */
         public void Add(Condition condition)
         {
-            conditionsList.Add(new ConditionBlock { condition });
+            conditionsList.Add(new List<Condition> { condition });
         }
 
         /**
@@ -122,10 +69,7 @@ namespace uAdventure.Core
          */
         public void Add(Conditions conditions)
         {
-            conditionsList.Add(new ConditionBlock()
-            {
-                Conditions = conditions.GetSimpleConditions()
-            });
+            conditionsList.Add(new List<Condition>(conditions.GetSimpleConditions()));
         }
 
         /**
@@ -138,10 +82,7 @@ namespace uAdventure.Core
          */
         public void Add(int index, Conditions conditions)
         {
-            conditionsList.Insert(index, new ConditionBlock()
-            {
-                Conditions = conditions.GetSimpleConditions()
-            });
+            conditionsList.Insert(index, new List<Condition>(conditions.GetSimpleConditions()));
         }
 
         /**
@@ -154,10 +95,7 @@ namespace uAdventure.Core
          */
         public void Add(int index, List<Condition> conditions)
         {
-            conditionsList.Insert(index, new ConditionBlock()
-            {
-                Conditions = conditions
-            });
+            conditionsList.Insert(index, new List<Condition>(conditions));
         }
 
         /**
@@ -170,10 +108,7 @@ namespace uAdventure.Core
          */
         public void Add(List<Condition> conditions)
         {
-            conditionsList.Add(new ConditionBlock()
-            {
-                Conditions = conditions
-            });
+            conditionsList.Add(new List<Condition>(conditions));
         }
 
         /**
@@ -194,9 +129,9 @@ namespace uAdventure.Core
          */
         public List<Condition> Delete(int index)
         {
-            ConditionBlock item = conditionsList[index];
+            List<Condition> item = conditionsList[index];
             conditionsList.RemoveAt(index);
-            return item.Conditions;
+            return item;
         }
 
         /**
@@ -208,7 +143,7 @@ namespace uAdventure.Core
         public List<Condition> GetSimpleConditions()
         {
             List<Condition> conditions = new List<Condition>();
-            foreach (ConditionBlock conditionBlock in conditionsList)
+            foreach (List<Condition> conditionBlock in conditionsList)
             {
                 if (conditionBlock.Count == 1)
                 {
@@ -228,7 +163,7 @@ namespace uAdventure.Core
         {
 
             List<Conditions> conditions = new List<Conditions>();
-            foreach (ConditionBlock conditionBlock in conditionsList)
+            foreach (List<Condition> conditionBlock in conditionsList)
             {
                 if (conditionBlock.Count > 1)
                 {
@@ -248,7 +183,7 @@ namespace uAdventure.Core
          */
         public List<List<Condition>> GetConditionsList()
         {
-            return conditionsList.ConvertAll(conditionBlock => new List<Condition>(conditionBlock));
+            return conditionsList;
         }
 
         /**
@@ -259,7 +194,7 @@ namespace uAdventure.Core
         public List<string> GetGloblalStateIds()
         {
             List<string> conditions = new List<string>();
-            foreach (ConditionBlock conditionBlock in conditionsList)
+            foreach (List<Condition> conditionBlock in conditionsList)
             {
                 foreach (Condition condition in conditionBlock)
                 {
@@ -348,7 +283,7 @@ namespace uAdventure.Core
         public virtual object Clone()
         {
             Conditions clone = (Conditions)this.MemberwiseClone();
-            clone.conditionsList = new List<ConditionBlock>();
+            clone.conditionsList = new List<List<Condition>>();
             foreach (var conditionBlock in this.conditionsList)
             {
                 List<Condition> wrapperClone = new List<Condition>();
@@ -359,6 +294,16 @@ namespace uAdventure.Core
                 }
             }
             return clone;
+        }
+
+        public void OnBeforeSerialize()
+        {
+            serializableConditionList = conditionsList.ConvertAll(l => new ConditionBlockWrapper() { Conditions = l });
+        }
+
+        public void OnAfterDeserialize()
+        {
+            conditionsList = serializableConditionList.ConvertAll(cb => cb.Conditions);
         }
     }
 }

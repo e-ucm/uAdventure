@@ -4,6 +4,7 @@ using UnityEditor;
 using System.Collections.Generic;
 
 using uAdventure.Core;
+using System.Linq;
 
 namespace uAdventure.Editor
 {
@@ -14,8 +15,6 @@ namespace uAdventure.Editor
         public void Init(ConditionsController con)
         {
             editor = EditorWindow.GetWindow<ConditionEditorWindow>();
-            editor.s = Color.black;
-
             editor.Conditions = con.Conditions;
 
             ConditionEditorFactory.Intance.ResetInstance();
@@ -24,24 +23,12 @@ namespace uAdventure.Editor
         public void Init(Conditions con)
         {
             editor = EditorWindow.GetWindow<ConditionEditorWindow>();
-            editor.s = Color.black;
-
             editor.Conditions = con;
 
             ConditionEditorFactory.Intance.ResetInstance();
         }
 
-        private Conditions conditions;
-
-        public Conditions Conditions
-        {
-            get { return conditions; }
-            set { this.conditions = value; }
-        }
-
-        private Rect baseRect = new Rect(10, 10, 25, 25);
-        //private Dictionary<Condition, Rect> tmpRects = new Dictionary<Condition, Rect>();
-        private Dictionary<Condition, ConditionEditor> editors = new Dictionary<Condition, ConditionEditor>();
+        public Conditions Conditions { get; set; }
 
 		private static bool stylesInited = false;
 		private static GUIStyle closeStyle, collapseStyle, conditionStyle, eitherConditionStyle;
@@ -59,10 +46,6 @@ namespace uAdventure.Editor
 
             return result;
         }
-
-        Color s = new Color(0.4f, 0.4f, 0.5f),
-        	l = new Color(0.3f, 0.7f, 0.4f),
-        	r = new Color(0.8f, 0.2f, 0.2f);
 
 		static void InitStyles(){
 			if (!stylesInited) {
@@ -104,7 +87,7 @@ namespace uAdventure.Editor
 			}
 		}
 
-        void OnGUI()
+        protected void OnGUI()
         {
 			InitStyles ();
 
@@ -112,70 +95,81 @@ namespace uAdventure.Editor
             GUILayout.Label(TC.get("Conditions.Title"));
             if (GUILayout.Button(TC.get("Condition.AddBlock")))
             {
-                conditions.Add(new FlagCondition(""));
+                Conditions.Add(new FlagCondition(""));
             }
             GUILayout.EndVertical();
 
             //##################################################################################
             //############################### CONDITION HANDLING ###############################
 			//##################################################################################
-			LayoutConditionEditor(conditions);
+			LayoutConditionEditor(Conditions);
         }
 
 		public static void LayoutConditionEditor(Conditions conditions){
 
 			InitStyles ();
-			var toRemove = new List<Condition>();
-			var listsToRemove = new List<List<Condition>>();
-			bool toAdd = false;
-			foreach (List<Condition> cl in conditions.GetConditionsList())
-			{
-				if (cl.Count > 1)
-					GUILayout.BeginVertical(eitherConditionStyle);
-				
-				for (int i = 0; i < cl.Count; i++)
-				{
+			var blocksToRemove = new List<List<Condition>>();
+			foreach (var conditionBlock in conditions.GetConditionsList())
+            {
+                DoConditionBlock(conditionBlock);
 
-					GUILayout.BeginHorizontal();
-					int preConEdiSel = ConditionEditorFactory.Intance.ConditionEditorIndex(cl[i]);
-					int conEdiSel = EditorGUILayout.Popup(preConEdiSel, ConditionEditorFactory.Intance.CurrentConditionEditors);
+                if (conditionBlock.Count == 0)
+                {
+                    blocksToRemove.Add(conditionBlock);
+                }
+            }
 
-					if (preConEdiSel != conEdiSel)
-						cl[i] = ConditionEditorFactory.Intance.Editors[conEdiSel].InstanceManagedCondition();
-
-					ConditionEditorFactory.Intance.getConditionEditorFor(cl[i]).draw(cl[i]);
-
-					if (GUILayout.Button("+", collapseStyle, GUILayout.Width(15), GUILayout.Height(15)))
-					{
-						toAdd = true;
-					}
-
-					if (GUILayout.Button("X", closeStyle, GUILayout.Width(15), GUILayout.Height(15)))
-					{
-						toRemove.Add(cl[i]);
-
-					}
-
-					GUILayout.EndHorizontal();
-				}
-				if (cl.Count > 1)
-					GUILayout.EndVertical();
-
-				foreach(var t in toRemove)
-					cl.Remove(t);
-
-				if (toAdd) {
-					cl.Add(new FlagCondition(""));
-					toAdd = false;
-				}
-
-				if (cl.Count == 0)
-					listsToRemove.Add(cl);
-			}
-
-			foreach(var l in listsToRemove)
-				conditions.GetConditionsList().Remove(l);
+            foreach (var block in blocksToRemove)
+            {
+                conditions.GetConditionsList().Remove(block);
+            }
 		}
+
+        private static void DoConditionBlock(List<Condition> conditionBlock)
+        {
+            bool eitherStyle = conditionBlock.Count > 1;
+
+            if (eitherStyle)
+            {
+                GUILayout.BeginVertical(eitherConditionStyle);
+            }
+
+            var conditionEditorFactory = ConditionEditorFactory.Intance;
+
+            for (int i = 0; i < conditionBlock.Count; i++)
+            {
+                var condition = conditionBlock[i];
+                using (new GUILayout.HorizontalScope())
+                {
+                    int previousEditorSelected = conditionEditorFactory.ConditionEditorIndex(condition);
+                    int editorSelected = EditorGUILayout.Popup(previousEditorSelected, conditionEditorFactory.CurrentConditionEditors);
+
+                    if (previousEditorSelected != editorSelected)
+                    {
+                        condition = conditionEditorFactory.Editors[editorSelected].InstanceManagedCondition();
+                        conditionBlock[i] = condition;
+                    }
+
+                    conditionEditorFactory.getConditionEditorFor(condition).draw(condition);
+
+                    if (GUILayout.Button("+", collapseStyle, GUILayout.Width(15), GUILayout.Height(15)))
+                    {
+                        conditionBlock.Add(new FlagCondition(""));
+                    }
+
+                    if (GUILayout.Button("X", closeStyle, GUILayout.Width(15), GUILayout.Height(15)))
+                    {
+                        conditionBlock.RemoveAt(i);
+                        i--;
+                    }
+                }
+            }
+
+            if (eitherStyle)
+            {
+                GUILayout.EndVertical();
+            }
+        }
     }
 
 
