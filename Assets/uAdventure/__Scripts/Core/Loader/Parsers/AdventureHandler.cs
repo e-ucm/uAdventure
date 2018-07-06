@@ -25,7 +25,7 @@ namespace uAdventure.Core
                 description    = (XmlElement)descriptor.SelectSingleNode("description");
 
             // Basic attributes
-            content.setVersionNumber(ExParsers.ParseDefault(descriptor.GetAttribute("versionNumber"), "0"));
+            content.setVersionNumber(ExString.Default(descriptor.GetAttribute("versionNumber"), "0"));
             content.setTitle(title.InnerText ?? "");
             content.setDescription(description.InnerText ?? "");
 
@@ -65,17 +65,15 @@ namespace uAdventure.Core
             }
 
             // Keep showing text until user clicks
-            var keepShowing = ExParsers.ParseDefault(configuration.GetAttribute("keepShowing"), "no");
-            var isKeepShowing = "yes".Equals(keepShowing);
+            var isKeepShowing = ExString.EqualsDefault(configuration.GetAttribute("keepShowing"), "yes", false);
             adventureData.setKeepShowing(isKeepShowing);
 
             // Use keys to navigate in the scene
-            var keyboardNavigation = ExParsers.ParseDefault(configuration.GetAttribute("keyboard-navigation"), "disabled");
-            var isKeyboardNavigation = "enabled".Equals(keyboardNavigation);
+            var isKeyboardNavigation = ExString.EqualsDefault(configuration.GetAttribute("keyboard-navigation"), "enabled", false);
             adventureData.setKeyboardNavigation(isKeyboardNavigation);
 
             // Default click action for scene elements
-            var defaultClickAction = ExParsers.ParseDefault(configuration.GetAttribute("defaultClickAction"), "showDetails");
+            var defaultClickAction = ExString.Default(configuration.GetAttribute("defaultClickAction"), "showDetails");
             switch (defaultClickAction)
             {
                 case "showDetails": adventureData.setDeafultClickAction(DescriptorData.DefaultClickAction.SHOW_DETAILS); break;
@@ -84,7 +82,7 @@ namespace uAdventure.Core
             }
 
             // Perspective for rendering
-            var perspective = ExParsers.ParseDefault(configuration.GetAttribute("perspective"), "regular");
+            var perspective = ExString.Default(configuration.GetAttribute("perspective"), "regular");
             switch (perspective)
             {
                 case "regular": adventureData.setPerspective(DescriptorData.Perspective.REGULAR); break;
@@ -93,7 +91,7 @@ namespace uAdventure.Core
             }
 
             // Drag behaviour configuration
-            var dragBehaviour = ExParsers.ParseDefault(configuration.GetAttribute("dragBehaviour"), "considerNonTargets");
+            var dragBehaviour = ExString.Default(configuration.GetAttribute("dragBehaviour"), "considerNonTargets");
             switch (dragBehaviour)
             {
                 case "considerNonTargets": adventureData.setDragBehaviour(DescriptorData.DragBehaviour.CONSIDER_NON_TARGETS); break;
@@ -102,13 +100,11 @@ namespace uAdventure.Core
             }
 
             // Auto Save
-            var autosave = ExParsers.ParseDefault(configuration.GetAttribute("autosave"), "yes");
-            var isAutoSave = "yes".Equals(autosave);
+            var isAutoSave = ExString.EqualsDefault(configuration.GetAttribute("autosave"), "yes", true);
             adventureData.setAutoSave(isAutoSave);
 
             // Save on suspend
-            var saveOnSuspend = ExParsers.ParseDefault(configuration.GetAttribute("save-on-suspend"), "yes");
-            var isSaveOnSuspend = "yes".Equals(saveOnSuspend);
+            var isSaveOnSuspend = ExString.EqualsDefault(configuration.GetAttribute("save-on-suspend"), "yes", true);
             adventureData.setSaveOnSuspend(isSaveOnSuspend);
 
             // Sub nodes
@@ -128,7 +124,7 @@ namespace uAdventure.Core
                 return;
             }
 
-            var graphicsMode = ExParsers.ParseDefault(graphics.GetAttribute("mode"), "fullscreen");
+            var graphicsMode = ExString.Default(graphics.GetAttribute("mode"), "fullscreen");
             switch (graphicsMode)
             {
                 case "windowed": adventureData.setGraphicConfig(DescriptorData.GRAPHICS_WINDOWED); break;
@@ -144,9 +140,8 @@ namespace uAdventure.Core
             {
                 return;
             }
-
-            var playerTransparent = ExParsers.ParseDefault(mode.GetAttribute("playerTransparent"), "yes");
-            var isPlayerTransparent = "yes".Equals(playerTransparent);
+            
+            var isPlayerTransparent = ExString.EqualsDefault(mode.GetAttribute("playerTransparent"), "yes", true);
             adventureData.setPlayerMode(isPlayerTransparent ? DescriptorData.MODE_PLAYER_1STPERSON : DescriptorData.MODE_PLAYER_3RDPERSON);
         }
 
@@ -157,19 +152,18 @@ namespace uAdventure.Core
                 return;
             }
 
-            var guiType = ExParsers.ParseDefault(gui.GetAttribute("type"), "contextual");
+            var guiType = ExString.Default(gui.GetAttribute("type"), "contextual");
             switch (guiType)
             {
                 case "traditional": adventureData.setGUIType(DescriptorData.GUI_TRADITIONAL); break;
                 case "contextual":  adventureData.setGUIType(DescriptorData.GUI_CONTEXTUAL);  break;
                 default: incidences.Add(Incidence.createDescriptorIncidence("Unknown GUIType type: " + guiType, null)); break;
             }
-
-            var customized = ExParsers.ParseDefault(gui.GetAttribute("customized"), "no");
-            var isCustomized = "yes".Equals(customized);
+            
+            var isCustomized = ExString.EqualsDefault(gui.GetAttribute("customized"), "yes", false);
             adventureData.setGUI(adventureData.getGUIType(), isCustomized);
 
-            var inventoryPosition = ExParsers.ParseDefault(gui.GetAttribute("inventoryPosition"), "top_bottom");
+            var inventoryPosition = ExString.Default(gui.GetAttribute("inventoryPosition"), "top_bottom");
             switch (inventoryPosition)
             {
                 case "none": adventureData.setInventoryPosition(DescriptorData.INVENTORY_NONE); break;
@@ -184,8 +178,8 @@ namespace uAdventure.Core
             XmlNodeList cursors = gui.SelectNodes("cursors/cursor");
             foreach (XmlElement cursor in cursors)
             {
-                string type = ExParsers.ParseDefault(cursor.GetAttribute("type"), ""),
-                    uri     = ExParsers.ParseDefault(cursor.GetAttribute("uri"), "");
+                string type = ExString.Default(cursor.GetAttribute("type"), ""),
+                    uri     = ExString.Default(cursor.GetAttribute("uri"), "");
 
                 adventureData.addCursor(type, uri);
             }
@@ -193,9 +187,9 @@ namespace uAdventure.Core
             XmlNodeList buttons = gui.SelectNodes("buttons/button");
             foreach (XmlElement button in buttons)
             {
-                string type = ExParsers.ParseDefault(button.GetAttribute("type"), ""),
-                    uri     = ExParsers.ParseDefault(button.GetAttribute("uri"), ""),
-                    action  = ExParsers.ParseDefault(button.GetAttribute("action"), "");
+                string type = ExString.Default(button.GetAttribute("type"), ""),
+                    uri     = ExString.Default(button.GetAttribute("uri"), ""),
+                    action  = ExString.Default(button.GetAttribute("action"), "");
 
                 adventureData.addButton(action, type, uri);
             }
@@ -203,8 +197,8 @@ namespace uAdventure.Core
             XmlNodeList arrows = gui.SelectNodes("cursors/cursor");
             foreach (XmlElement arrow in arrows)
             {
-                string type = ExParsers.ParseDefault(arrow.GetAttribute("type"), ""),
-                    uri     = ExParsers.ParseDefault(arrow.GetAttribute("uri"), "");
+                string type = ExString.Default(arrow.GetAttribute("type"), ""),
+                    uri     = ExString.Default(arrow.GetAttribute("uri"), "");
 
                 adventureData.addArrow(type, uri);
             }
