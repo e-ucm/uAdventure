@@ -61,7 +61,15 @@ namespace uAdventure.Runner
             {
                 if (!locked)
                 {
-                    Cursor.SetCursor(guiprovider.getCursor(cursor), new Vector2(0f, 0f), CursorMode.Auto);
+                    var cursorToSet = guiprovider.getCursor(cursor);
+                    if(cursor != null)
+                    {
+                        Cursor.SetCursor(cursorToSet, new Vector2(0f, 0f), CursorMode.Auto);
+                    }
+                    else
+                    {
+                        Debug.Log("Could not set cursor with name: " + cursor);
+                    }
                 }
                 current_cursor = cursor;
             }
