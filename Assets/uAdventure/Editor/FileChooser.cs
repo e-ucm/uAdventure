@@ -78,6 +78,8 @@ public class FileChooser : DialogReceiverInterface
         switch (type)
         {
             case FileType.PATH:
+                fileDialog = ScriptableObject.CreateInstance<PathFileOpenDialog>();
+                break;
             case FileType.SCENE_BACKGROUND:
             case FileType.SCENE_FOREGROUND:
             case FileType.EXIT_ICON:
