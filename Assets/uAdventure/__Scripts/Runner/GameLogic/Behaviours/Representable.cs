@@ -39,6 +39,9 @@ namespace uAdventure.Runner
         private float timeElapsedInCurrentFrame = 0;
         private float z = 0;
 
+        private ElementReference context;
+        private Orientation orientation;
+
         #endregion Attributes
 
         #region Properties
@@ -46,10 +49,11 @@ namespace uAdventure.Runner
             get { return animationUri; }
             set
             {
-                if(animationUri != value)
+                if (animationUri != value)
                 {
                     animationUri = value;
                     resourceType = ResourceType.ANIMATION;
+                    Debug.Log("Setted animation: " + value);
                     eAnim = GetAnimationInPriority(animationUri, Orientation, ref mirror);
                 }
             }
@@ -67,8 +71,6 @@ namespace uAdventure.Runner
         }
         public SceneMB Scene { get; set; }
 
-        private ElementReference context;
-
 
         public ElementReference Context
         {
@@ -80,14 +82,11 @@ namespace uAdventure.Runner
             }
         }
 
-        private Orientation orientation;
         public Orientation Orientation
         {
             get { return orientation; }
             set
             {
-                orientation = value;
-                
                 if (orientation != value)
                 {
                     orientation = value;
@@ -167,7 +166,7 @@ namespace uAdventure.Runner
                 if(resourceType != value)
                 {
                     resourceType = value;
-                    if(resourceType == Representable.ResourceType.ANIMATION)
+                    if (resourceType == ResourceType.ANIMATION)
                     {
                         eAnim = GetAnimationInPriority(animationUri, orientation, ref mirror);
                     }
@@ -183,19 +182,18 @@ namespace uAdventure.Runner
         {
             rend = this.GetComponent<Renderer>();
             checkResources();
-            Orientation = Orientation.E;
+            Orientation = Orientation.S;
         }
 
         protected void checkResources()
         {
-            foreach (ResourcesUni resource in element.getResources())
+            if(element == null || element.getResources() == null)
             {
-                if (ConditionChecker.check(resource.getConditions()))
-                {
-                    this.resource = resource;
-                    break;
-                }
+                return;
             }
+
+            this.resource = element.getResources()
+                .Find(res => ConditionChecker.check(res.getConditions()));
         }
 
         public void Adaptate()
@@ -261,24 +259,9 @@ namespace uAdventure.Runner
         //################ ANIMATIONS PART ################
         //#################################################
 
-        /*  ## ANIMATION METHOD ##
-         * 
-         * private Animation current_anim;
-         * 
-         * Texture2D tmp = current_anim.getFrame(0).getImage(false,false,0).texture;
-            update_ratio = current_anim.getFrame(0).getTime();//Duration/1000f;
-         * 
-         * return (current_anim.getFrame(current_frame).getImage(false,false,0).texture.height) * context.getScale();
-         * 
-         * current_frame = (current_frame + 1) % current_anim.getFrames().Count;
-            Texture2D tmp = current_anim.getFrame(current_frame).getImage(false,false,0).texture;
-            update_ratio = current_anim.getFrame(current_frame).getTime();
-         * 
-         */
-
         public bool Play(string animation, string then = null)
         {
-            ResourceMode = ResourceType.TEXTURE;
+            ResourceMode = ResourceType.ANIMATION;
             this.then = then;
             this.Animation = animation;
 
@@ -291,7 +274,7 @@ namespace uAdventure.Runner
             {
                 timeElapsedInCurrentFrame = 0;
                 SetFrame(0);
-                Positionate();
+                Positionate(); 
             }
         }
 
@@ -301,8 +284,8 @@ namespace uAdventure.Runner
             switch (animationName)
             {
                 case "speak": uri = "speak" + OrientationToText(orientation); break;
-                case "walk": uri = "walk" + OrientationToText(orientation); break;
-                case "use": uri = "use" + OrientationToText(orientation); break;
+                case "walk" : uri = "walk"  + OrientationToText(orientation); break;
+                case "use"  : uri = "use"   + OrientationToText(orientation); break;
                 case "stand": uri = "stand" + OrientationToText(orientation); break;
                 case "actionAnimation":
                     if (orientation == Orientation.O)
@@ -351,21 +334,21 @@ namespace uAdventure.Runner
             }
         }
 
-        protected Orientation GetNextOrientationInPriority(Orientation orientation, ref bool isMirror)
+        protected static Orientation GetNextOrientationInPriority(Orientation orientation, ref bool isMirror)
         {
             Orientation next;
             switch (orientation)
             {
                 default:
-                    next = Orientation.S;
+                    next     = Orientation.S;
                     isMirror = false;
                     break;
                 case Orientation.E:
-                    next = isMirror ? Orientation.S : Orientation.O;
+                    next     = isMirror ? Orientation.S : Orientation.O;
                     isMirror = !isMirror;
                     break;
                 case Orientation.O:
-                    next = isMirror ? Orientation.S : Orientation.E;
+                    next     = isMirror ? Orientation.S : Orientation.E;
                     isMirror = !isMirror;
                     break;
             }
@@ -373,12 +356,12 @@ namespace uAdventure.Runner
             return next;
         }
 
-        protected string GetNextAnimationInPriority(string animation)
+        protected static string GetNextAnimationInPriority(string animation)
         {
             return "stand";
         }
 
-        protected bool NextAnimation(Orientation originalOrientation, ref string animation, ref Orientation orientation, ref bool isMirror)
+        protected static bool NextAnimation(Orientation originalOrientation, ref string animation, ref Orientation orientation, ref bool isMirror)
         {
             var previousOrientation = orientation;
             var previousMirror = isMirror;
@@ -404,8 +387,14 @@ namespace uAdventure.Runner
 
         protected eAnim GetAnimationInPriority(string animation, Orientation orientation, ref bool isMirror)
         {
+            if (string.IsNullOrEmpty(animation))
+            {
+                return null;
+            }
+
             eAnim loadedAnimation = null;
             bool loaded = false;
+            isMirror = false;
             var originalOrientation = orientation;
 
             do
@@ -420,10 +409,11 @@ namespace uAdventure.Runner
 
         protected virtual void Update()
         {
+            Debug.Log(gameObject.name + " : " + resourceType);
             if (resourceType == ResourceType.ANIMATION && eAnim != null)
             {
                 timeElapsedInCurrentFrame += Time.deltaTime;
-
+                
                 if (timeElapsedInCurrentFrame >= currentFrameDuration)
                 {
                     this.NextFrame();

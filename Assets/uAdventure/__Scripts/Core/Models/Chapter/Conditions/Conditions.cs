@@ -82,7 +82,7 @@ namespace uAdventure.Core
          */
         public void Add(int index, Conditions conditions)
         {
-            conditionsList.Insert(index, new List<Condition>(conditions.GetSimpleConditions()));
+            conditionsList.Insert(index, conditions.GetSimpleConditions());
         }
 
         /**
@@ -95,7 +95,7 @@ namespace uAdventure.Core
          */
         public void Add(int index, List<Condition> conditions)
         {
-            conditionsList.Insert(index, new List<Condition>(conditions));
+            conditionsList.Insert(index, conditions);
         }
 
         /**
@@ -108,7 +108,7 @@ namespace uAdventure.Core
          */
         public void Add(List<Condition> conditions)
         {
-            conditionsList.Add(new List<Condition>(conditions));
+            conditionsList.Add(conditions);
         }
 
         /**
@@ -287,11 +287,11 @@ namespace uAdventure.Core
             foreach (var conditionBlock in this.conditionsList)
             {
                 List<Condition> wrapperClone = new List<Condition>();
-                clone.Add(wrapperClone);
                 foreach (Condition condition in conditionBlock)
                 {
                     wrapperClone.Add((Condition)condition.Clone());
                 }
+                clone.Add(wrapperClone);
             }
             return clone;
         }

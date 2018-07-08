@@ -134,11 +134,12 @@ namespace uAdventure.Core
         public virtual object Clone()
         {
             Condition c = (Condition)this.MemberwiseClone();
-            c.id = (id != null ? id : null);
+            c.id = id;
             c.state = state;
             c.type = type;
             return c;
         }
+
         /*
     @Override
     public Object clone() throws CloneNotSupportedException

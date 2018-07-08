@@ -429,20 +429,19 @@ namespace uAdventure.Editor
          */
         public string getPreviewImage()
         {
-
             if (cutsceneType == Controller.CUTSCENE_SLIDES)
             {
-
-                string previewImagePath = resourcesDataControlList[selectedResources].getAssetPath("slides");
-                
-                if (!string.IsNullOrEmpty(previewImagePath))
+                string previewAnimationPath = resourcesDataControlList[selectedResources].getAssetPath("slides");
+                if (!string.IsNullOrEmpty(previewAnimationPath) && !previewAnimationPath.EndsWith(SpecialAssetPaths.ASSET_EMPTY_ANIMATION))
                 {
                     var incidences = new List<Incidence>();
-                    var animation = Loader.LoadAnimation(previewImagePath, Controller.ResourceManager, incidences);
+                    var animation = Loader.LoadAnimation(previewAnimationPath, Controller.ResourceManager, incidences);
                     return animation != null && animation.getFrames().Count > 0 ? animation.getFrame(0).getUri() : null;
                 }
-
-                return null;
+                else
+                {
+                    return SpecialAssetPaths.ASSET_EMPTY_BACKGROUND;
+                }
             }
             else
             {
