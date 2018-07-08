@@ -206,8 +206,8 @@ namespace uAdventure.Editor
 
             public ExitConditionsAndEffectsComponent(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
             {
-                conditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/conditions-24x24", typeof(Texture2D));
-                noConditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/no-conditions-24x24", typeof(Texture2D));
+                conditionsTex = Resources.Load<Texture2D>("EAdventureData/img/icons/conditions-24x24");
+                noConditionsTex = Resources.Load<Texture2D>("EAdventureData/img/icons/no-conditions-24x24");
             }
 
             public override void Draw(int aID)
