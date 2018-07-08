@@ -49,3 +49,5 @@ Copy-Item -Path "$($project_path)\\Editor\\Plugins" -Destination "$($assets_fold
 Copy-Item "$($build_folder)\\uAdventureEditor.dll" -Destination "$($assets_folder)\\Editor\\Plugins\\uAdventureEditor.dll"
 # Editor resources Folder
 Copy-Item -Path "$($project_path)\\Editor\\Resources" -Destination "$($assets_folder)\\Editor\\" -Recurse -Force
+# Editor Layouts Folder
+Copy-Item -Path "$($project_path)\\Editor\\Layouts" -Destination "$($assets_folder)\\Editor\\" -Recurse -Force
