@@ -43,8 +43,8 @@ namespace uAdventure.Editor
         {
             myNode = new OptionConversationNode();
 
-            conditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/conditions-24x24", typeof(Texture2D));
-            noConditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/no-conditions-24x24", typeof(Texture2D));
+            conditionsTex = Resources.Load<Texture2D>("EAdventureData/img/icons/conditions-24x24");
+            noConditionsTex = Resources.Load<Texture2D>("EAdventureData/img/icons/no-conditions-24x24");
 
             linkTex = (Texture2D)Resources.Load("EAdventureData/img/icons/linkNode", typeof(Texture2D));
             noLinkTex = (Texture2D)Resources.Load("EAdventureData/img/icons/deleteNodeLink", typeof(Texture2D));

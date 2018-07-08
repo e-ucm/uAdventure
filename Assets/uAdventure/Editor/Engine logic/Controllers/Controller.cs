@@ -3321,7 +3321,6 @@ namespace uAdventure.Editor
 
         public bool AddTool(Tool tool)
         {
-            Debug.Log("Tool added");
             return chaptersController.addTool(tool);
         }
 

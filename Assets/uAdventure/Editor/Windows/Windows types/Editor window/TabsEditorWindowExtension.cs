@@ -13,7 +13,7 @@ namespace uAdventure.Editor
         protected Enum OpenedWindow;
         protected Enum DefaultOpenedWindow;
 
-        public TabsEditorWindowExtension(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
+        protected TabsEditorWindowExtension(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
         {
             Tabs = new List<KeyValuePair<string, Enum>>();
             Childs = new Dictionary<Enum, LayoutWindow>();
@@ -39,10 +39,7 @@ namespace uAdventure.Editor
                 window.Rect = this.Rect;
                 window.Draw(aID);
             }
-        }
-
-        private Dictionary<int, Rect> rects;
-        
+        }        
 
         protected void AddTab(string name, Enum identifier, LayoutWindow window)
         {

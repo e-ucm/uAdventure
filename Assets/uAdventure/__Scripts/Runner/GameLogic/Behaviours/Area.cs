@@ -39,13 +39,13 @@ namespace uAdventure.Runner
 
         public void OnPointerEnter(PointerEventData eventData)
         {
-            GUIManager.Instance.showHand(true);
+            GUIManager.Instance.ShowHand(true);
             interactuable.setInteractuable(true);
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
-            GUIManager.Instance.showHand(false);
+            GUIManager.Instance.ShowHand(false);
             interactuable.setInteractuable(false);
         }
 

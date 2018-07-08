@@ -67,13 +67,13 @@ namespace uAdventure.Runner
 
         public void OnPointerEnter(PointerEventData eventData)
         {
-            GUIManager.Instance.showHand(true);
+            GUIManager.Instance.ShowHand(true);
             this.setInteractuable(true);
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
-            GUIManager.Instance.showHand(false);
+            GUIManager.Instance.ShowHand(false);
             this.setInteractuable(false);
         }
 
@@ -90,7 +90,7 @@ namespace uAdventure.Runner
                 case Action.USE_WITH:
                     var texture = sprite.texture;
                     Cursor.SetCursor(texture, new Vector2(texture.width, texture.height) / 2f, CursorMode.Auto);
-                    GUIManager.Instance.lockCursor();
+                    GUIManager.Instance.LockCursor();
                     uAdventureInputModule.LookingForTarget = this.gameObject;
                     targetActionType = action.getType();
                     break;
@@ -106,7 +106,7 @@ namespace uAdventure.Runner
                 return;
 
             var target = data.dragging ? data.pointerCurrentRaycast.gameObject : data.pointerPress;
-            GUIManager.Instance.releaseCursor();
+            GUIManager.Instance.ReleaseCursor();
             
             data.Use();
 

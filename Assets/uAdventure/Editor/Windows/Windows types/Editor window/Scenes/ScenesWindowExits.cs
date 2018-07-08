@@ -22,9 +22,8 @@ namespace uAdventure.Editor
 
         private string[] sceneNames;
 
-        private DataControlList exitsList;
-        private Texture2D conditionsTex, noConditionsTex;
-        private SceneDataControl workingScene;
+        private readonly DataControlList exitsList;
+        private readonly Texture2D conditionsTex, noConditionsTex;
 
         public ScenesWindowExits(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, SceneEditor sceneEditor,
             params GUILayoutOption[] aOptions)
@@ -36,8 +35,8 @@ namespace uAdventure.Editor
             new ExitConditionsAndEffectsComponent(Rect.zero, new GUIContent(""), aStyle);
             new ExitPlayerPositionComponent(Rect.zero, new GUIContent(""), aStyle);
 
-            conditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/conditions-24x24", typeof(Texture2D));
-            noConditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/no-conditions-24x24", typeof(Texture2D));
+            conditionsTex = Resources.Load<Texture2D>("EAdventureData/img/icons/conditions-24x24");
+            noConditionsTex = Resources.Load<Texture2D>("EAdventureData/img/icons/no-conditions-24x24");
 
             exitsList = new DataControlList()
             {
@@ -74,6 +73,7 @@ namespace uAdventure.Editor
                         case 1:
                             if (GUI.Button(columnRect, element.getConditions().getBlocksCount() > 0 ? conditionsTex : noConditionsTex))
                             {
+                                exitsList.index = row;
                                 ConditionEditorWindow window =
                                      (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
                                 window.Init(element.getConditions());
@@ -84,6 +84,10 @@ namespace uAdventure.Editor
                 onSelectCallback = (list) =>
                 {
                     sceneEditor.SelectedElement = exitsList.list[list.index] as ExitDataControl;
+                },
+                onRemoveCallback = (list) =>
+                {
+                    sceneEditor.SelectedElement = null;
                 }
             };
 
@@ -100,20 +104,20 @@ namespace uAdventure.Editor
             };
         }
 
+        public override void OnSceneSelected(SceneDataControl scene)
+        {
+            base.OnSceneSelected(scene);
+
+            exitsList.SetData(scene.getExitsList(),
+                (dc) => (dc as ExitsListDataControl).getExits().Cast<DataControl>().ToList());
+        }
+
         protected override void DrawInspector()
         {
             var namesList = new List<string>();
             namesList.Add("---");
             namesList.AddRange(Controller.Instance.SelectedChapterDataControl.getObjects<IChapterTarget>().ConvertAll(o => o.getId()));
             sceneNames = namesList.ToArray();
-            
-            var prevWorkingScene = workingScene;
-            workingScene = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[GameRources.GetInstance().selectedSceneIndex];
-            if (workingScene != prevWorkingScene)
-            {
-                exitsList.SetData(workingScene.getExitsList(),
-                    (dc) => (dc as ExitsListDataControl).getExits().Cast<DataControl>().ToList());
-            }
 
             exitsList.DoList(160);
             GUILayout.Space(20);
@@ -202,8 +206,8 @@ namespace uAdventure.Editor
 
             public ExitConditionsAndEffectsComponent(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
             {
-                conditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/conditions-24x24", typeof(Texture2D));
-                noConditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/no-conditions-24x24", typeof(Texture2D));
+                conditionsTex = Resources.Load<Texture2D>("EAdventureData/img/icons/conditions-24x24");
+                noConditionsTex = Resources.Load<Texture2D>("EAdventureData/img/icons/no-conditions-24x24");
             }
 
             public override void Draw(int aID)

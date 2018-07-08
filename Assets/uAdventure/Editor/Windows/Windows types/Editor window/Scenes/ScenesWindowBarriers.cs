@@ -9,18 +9,16 @@ namespace uAdventure.Editor
 
     public class ScenesWindowBarriers : SceneEditorWindow
     {
-
-        private DataControlList barriersList;
-        private Texture2D conditionsTex, noConditionsTex;
-        private SceneDataControl workingScene;
+        private readonly DataControlList barriersList;
+        private readonly Texture2D conditionsTex, noConditionsTex;
 
         public ScenesWindowBarriers(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, SceneEditor sceneEditor,
            params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, sceneEditor, aOptions)
         {
 
-            conditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/conditions-24x24", typeof(Texture2D));
-            noConditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/no-conditions-24x24", typeof(Texture2D));
+            conditionsTex = Resources.Load<Texture2D>("EAdventureData/img/icons/conditions-24x24");
+            noConditionsTex = Resources.Load<Texture2D>("EAdventureData/img/icons/no-conditions-24x24");
 
             barriersList = new DataControlList()
             {
@@ -50,8 +48,8 @@ namespace uAdventure.Editor
                         case 1:
                             if (GUI.Button(columnRect, element.getConditions().getBlocksCount() > 0 ? conditionsTex : noConditionsTex))
                             {
-                                ConditionEditorWindow window =
-                                     (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
+                                barriersList.index = row;
+                                ConditionEditorWindow window = ScriptableObject.CreateInstance<ConditionEditorWindow>();
                                 window.Init(element.getConditions());
                             }
                             break;
@@ -60,6 +58,10 @@ namespace uAdventure.Editor
                 onSelectCallback = (list) =>
                 {
                     sceneEditor.SelectedElement = barriersList.list[list.index] as BarrierDataControl;
+                },
+                onRemoveCallback = (list) =>
+                {
+                    sceneEditor.SelectedElement = null;
                 }
             };
 
@@ -75,17 +77,17 @@ namespace uAdventure.Editor
                 }
             };
         }
-        
+
+        public override void OnSceneSelected(SceneDataControl scene)
+        {
+            base.OnSceneSelected(scene);
+            barriersList.SetData(scene.getBarriersList(),
+                (dc) => (dc as BarriersListDataControl).getBarriers().Cast<DataControl>().ToList());
+
+        }
+
         protected override void DrawInspector()
         {
-            var prevWorkingScene = workingScene;
-            workingScene = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[GameRources.GetInstance().selectedSceneIndex];
-            if (workingScene != prevWorkingScene)
-            {
-                barriersList.SetData(workingScene.getBarriersList(),
-                    (dc) => (dc as BarriersListDataControl).getBarriers().Cast<DataControl>().ToList());
-            }
-
             barriersList.DoList(160);
             GUILayout.Space(20);
         }

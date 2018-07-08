@@ -32,18 +32,19 @@ namespace uAdventure.Runner
         // Constants
         public static readonly Vector2 ScenePivot = new Vector2(0, 1f);
         public static readonly Vector2 DefaultPivot = Vector2.one / 2f;
-        public const float VideoSceneRatio = 4f / 3f;
-        public const float PixelsToWorld = 0.1f;
-        public const float PixelsSceneHeight = 600f;
-        public const float WorldSceneHeight = PixelsSceneHeight * PixelsToWorld;
+        public static readonly float VideoSceneRatio = 4f / 3f;
+        public static readonly float PixelsToWorld = 0.1f;
+        public static readonly float PixelsSceneHeight = 600f;
+        public static readonly float WorldSceneHeight = PixelsSceneHeight * PixelsToWorld;
 
         // Properties
-        public GameObject exitPrefab, activeAreaPrefab, characterPrefab, objectPrefab, atrezzoPrefab, playerPrefab;
+        [SerializeField]
+        protected GameObject exitPrefab, activeAreaPrefab, characterPrefab, objectPrefab, atrezzoPrefab, playerPrefab;
         private Transform exitsHolder, activeAreasHolder, referencesHolder, background, foreground;
-        private bool interactuable = false;
-        private bool ready = false;
-        private bool dragging = false;
-        private Vector2 endDragSpeed = Vector2.zero;
+        private bool interactuable;
+        private bool ready;
+        private bool dragging;
+        private Vector2 endDragSpeed;
         private Dictionary<Representable, float> heights;
         private SortedList<Representable, float> finalOrder;
 
@@ -53,8 +54,8 @@ namespace uAdventure.Runner
         private TrajectoryHandler trajectoryHandler;
 
         // Transitions
-        private bool fading = false;
-        private float totalTime = 0f, currentTime = 0f;
+        private bool fading;
+        private float totalTime, currentTime;
         private readonly float resistance = 5000f;
 
 
@@ -191,7 +192,7 @@ namespace uAdventure.Runner
             {
                 currentTime -= Time.deltaTime;
                 float alpha = currentTime / totalTime;
-                ColorChilds(new Color(1, 1, 1, alpha));
+                ColorChilds(transform, new Color(1, 1, 1, alpha));
                 if (alpha <= 0)
                 {
                     GameObject.Destroy(this.gameObject);
@@ -224,9 +225,14 @@ namespace uAdventure.Runner
             }
         }
 
-        public void Destroy(float time = 0)
+        public void Destroy()
         {
-            if (time != 0)
+            Destroy(0f);
+        }
+
+        public void Destroy(float time)
+        {
+            if (time != 0f)
             {
                 totalTime = time;
                 currentTime = time;
@@ -234,7 +240,9 @@ namespace uAdventure.Runner
                 this.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, this.transform.position.z - 10);
             }
             else
+            {
                 GameObject.DestroyImmediate(this.gameObject);
+            }
         }
 
         private void LoadParents()
@@ -252,10 +260,8 @@ namespace uAdventure.Runner
             minZ = 1; 
             maxZ = -1; 
         }
-
-
-
-        public Vector3 ToWorldSize(Vector2 size)
+        
+        public static Vector3 ToWorldSize(Vector2 size)
         {
             var worldSize = Vector3.one;
             worldSize.x = size.x * PixelsToWorld;
@@ -263,12 +269,22 @@ namespace uAdventure.Runner
             return worldSize;
         }
 
-        public Vector3 ToWorldPosition(Vector2 position, Vector2 size, Vector2 pivot, float depth = 0f)
+        public Vector3 ToWorldPosition(Vector2 position, Vector2 size, Vector2 pivot)
+        {
+            return ToWorldPosition(position, size, pivot, 0f);
+        }
+
+        public Vector3 ToWorldPosition(Vector2 position, Vector2 size, Vector2 pivot, float depth)
         {
             return ToWorldPosition(position, size, pivot, DefaultPivot, depth);
         }
 
-        public Vector3 ToWorldPosition(Vector2 position, Vector2 size, Vector2 pivot, Vector2 objectPivot, float depth = 0f)
+        public Vector3 ToWorldPosition(Vector2 position, Vector2 size, Vector2 pivot, Vector2 objectPivot)
+        {
+            return ToWorldPosition(position, size, pivot, objectPivot, 0f);
+        }
+
+        public Vector3 ToWorldPosition(Vector2 position, Vector2 size, Vector2 pivot, Vector2 objectPivot, float depth)
         {
             // WorldPosition = (Position + (Size . (ObjectPivot - Pivot))) * ToWorldRatio; ( "." means component-wise product)
             Vector3 worldPosition = position;
@@ -295,6 +311,10 @@ namespace uAdventure.Runner
             LoadParents();
             switch (SceneData.getType())
             {
+                default:
+                    Debug.LogError("Wrong scene type: " + SceneData.GetType());
+                    ready = true;
+                    break;
                 case GeneralScene.GeneralSceneSceneType.VIDEOSCENE:
                     InventoryManager.Instance.Show = false;
                     movie = Game.Instance.ResourceManager.getVideo(((Videoscene)SceneData).getResources()[0].getAssetPath(Videoscene.RESOURCE_TYPE_VIDEO));
@@ -312,9 +332,10 @@ namespace uAdventure.Runner
                             backgroundTexture = Game.Instance.ResourceManager.getImage(sr.getAssetPath(Scene.RESOURCE_TYPE_BACKGROUND));
                             SetBackground(backgroundTexture);
 
-                            if (sr.getAssetPath(Scene.RESOURCE_TYPE_FOREGROUND) != "")
+                            var foregroundPath = sr.getAssetPath(Scene.RESOURCE_TYPE_FOREGROUND);
+                            if (!string.IsNullOrEmpty(foregroundPath))
                             {
-                                Texture2D foregroundTexture = Game.Instance.ResourceManager.getImage(sr.getAssetPath(Scene.RESOURCE_TYPE_FOREGROUND));
+                                Texture2D foregroundTexture = Game.Instance.ResourceManager.getImage(foregroundPath);
 
                                 foreground.GetComponent<Renderer>().material.SetTexture("_MainTex", backgroundTexture);
                                 foreground.GetComponent<Renderer>().material.SetTexture("_AlphaTex", foregroundTexture);
@@ -324,6 +345,8 @@ namespace uAdventure.Runner
                                 foreGroundPos.z = 1;
                                 foreground.localPosition = foreGroundPos;
                             }
+
+                            LoadBackgroundMusic(sr);
 
                             break;
                         }
@@ -392,6 +415,7 @@ namespace uAdventure.Runner
                         player.Scene = this;
                         // Force the start
                         player.SendMessage("Start");
+                        
                         ready = true;
                     }
                     else
@@ -412,6 +436,9 @@ namespace uAdventure.Runner
                         {
                             this.slides = Game.Instance.ResourceManager.getAnimation(r.getAssetPath(Slidescene.RESOURCE_TYPE_SLIDES));
                             SetSlide(0);
+
+                            LoadBackgroundMusic(r);
+
                             ready = true;
                             break;
                         }
@@ -420,7 +447,20 @@ namespace uAdventure.Runner
             }
         }
 
-        private void DeleteChilds(Transform parent)
+        private void LoadBackgroundMusic(ResourcesUni sr)
+        {
+            var musicPath = sr.getAssetPath(Scene.RESOURCE_TYPE_MUSIC);
+            if (!string.IsNullOrEmpty(musicPath))
+            {
+                AudioClip audioClip = Game.Instance.ResourceManager.getAudio(musicPath);
+                var audioSource = GetComponent<AudioSource>();
+                audioSource.clip = audioClip;
+                audioSource.loop = true;
+                audioSource.Play();
+            }
+        }
+
+        private static void DeleteChilds(Transform parent)
         {
             if (parent != null)
             {
@@ -472,7 +512,9 @@ namespace uAdventure.Runner
         private void InstanceRectangle<T>(Rectangle context) where T : Rectangle
         {
             if (context == null)
+            {
                 return;
+            }
 
             GameObject basePrefab;
             Transform parent;
@@ -551,7 +593,12 @@ namespace uAdventure.Runner
             return canProgress;
         }
 
-        public InteractuableResult Interacted(PointerEventData pointerData = null)
+        public InteractuableResult Interacted()
+        {
+            return Interacted(null);
+        }
+
+        public InteractuableResult Interacted(PointerEventData pointerData)
         {
             InteractuableResult res = InteractuableResult.IGNORES;
             
@@ -572,8 +619,14 @@ namespace uAdventure.Runner
                     }
                     break;
                 case GeneralScene.GeneralSceneSceneType.SLIDESCENE:
-                    if (ProgressSlide()) res = InteractuableResult.REQUIRES_MORE_INTERACTION;
-                    else res = FinishCutscene((Cutscene)SceneData);
+                    if (ProgressSlide())
+                    {
+                        res = InteractuableResult.REQUIRES_MORE_INTERACTION;
+                    }
+                    else
+                    {
+                        res = FinishCutscene((Cutscene)SceneData);
+                    }
                     break;
                 case GeneralScene.GeneralSceneSceneType.VIDEOSCENE:
                     var videoscene = (Videoscene)SceneData;
@@ -585,7 +638,9 @@ namespace uAdventure.Runner
                         movie.Stop();
                         movieplayer = MovieState.STOPPED;
                         if (movieplayer == MovieState.PLAYING)
+                        {
                             TrackerAsset.Instance.Accessible.Skipped(SceneData.getId(), AccessibleTracker.Accessible.Cutscene);
+                        }
                         res = FinishCutscene(videoscene);
                     }
                     break;
@@ -601,7 +656,7 @@ namespace uAdventure.Runner
 
             switch ((cutscene).getNext())
             {
-                case Slidescene.GOBACK:
+                default: // By default Cutscene.GOBACK
                     var previousTarget = Game.Instance.GameState.PreviousChapterTarget;
                     if (previousTarget == null)
                     {
@@ -613,41 +668,45 @@ namespace uAdventure.Runner
                         triggerScene = new TriggerSceneEffect(previousTarget.getId(), int.MinValue, int.MinValue);
                     }
                     break;
-                case Slidescene.NEWSCENE:
+                case Cutscene.NEWSCENE:
                     triggerScene = new TriggerSceneEffect(cutscene.getTargetId(), int.MinValue, int.MinValue);
                     break;
-                case Slidescene.ENDCHAPTER:
+                case Cutscene.ENDCHAPTER:
                     break;
             }
 
-            Effects e = new Effects()
+            var effects = new Effects
             {
                 triggerScene
             };
             var cutsceneEffects = ((Cutscene)SceneData).getEffects();
             if (cutsceneEffects != null)
             {
-                e.AddRange(cutsceneEffects);
+                effects.AddRange(cutsceneEffects);
             }
 
-            Game.Instance.Execute(new EffectHolder(e));
+            Game.Instance.Execute(new EffectHolder(effects));
 
             return res;
         }
 
-        private void ColorChilds(Color color)
+        private static void ColorChilds(Transform transform, Color color)
         {
             foreach (Transform t1 in transform)
             {
                 if (t1.name != "Exits")
                 {
                     if (t1.GetComponent<Renderer>() != null)
+                    {
                         t1.GetComponent<Renderer>().material.color = color;
+                    }
 
                     foreach (Transform t2 in t1)
                     {
                         if (t2.GetComponent<Renderer>() != null)
+                        {
                             t2.GetComponent<Renderer>().material.color = color;
+                        }
                     }
                 }
             }
@@ -691,7 +750,7 @@ namespace uAdventure.Runner
             }
         }
 
-        private void MoveCamera(Vector2 delta)
+        private static void MoveCamera(Vector2 delta)
         {
             var cameraPos = Camera.main.transform.position;
             var screenCameraPosition = Camera.main.WorldToScreenPoint(cameraPos);
@@ -704,7 +763,9 @@ namespace uAdventure.Runner
         public void OnConfirmWantsDrag(PointerEventData data)
         {
             if (SceneData is Scene)
+            {
                 data.Use();
+            }
         }
     }
 }

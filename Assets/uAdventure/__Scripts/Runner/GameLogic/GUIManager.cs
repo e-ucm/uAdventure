@@ -1,20 +1,17 @@
 ﻿using UnityEngine;
-using System.Collections;
 using uAdventure.Core;
-using System;
 
 namespace uAdventure.Runner
 {
     public class GUIManager : MonoBehaviour
     {
+        public GameObject Bubble_Prefab, Think_Prefab, Yell_Prefab, Config_Menu_Ref;
 
         private static GUIManager instance;
-        public GameObject Bubble_Prefab, Think_Prefab, Yell_Prefab, Config_Menu_Ref;
-        GameObject bubble;
+        private GameObject bubble;
         private bool get_talker = false;
         private string talkerToFind, lastText;
         private GUIProvider guiprovider;
-        private AdventureData data;
         private bool locked = false;
         private string current_cursor = "";
 
@@ -33,58 +30,60 @@ namespace uAdventure.Runner
             get { return guiprovider; }
         }
 
-        void Awake()
+        protected void Awake()
         {
             instance = this;
         }
 
-        void Start()
+        protected void Start()
         {
             guiprovider = new GUIProvider(Game.Instance.GameState.Data);
         }
 
-        void Update()
+        protected void Update()
         {
-            if (get_talker)
+            if (get_talker && GameObject.Find(talkerToFind) != null)
             {
-                if (GameObject.Find(talkerToFind) != null)
-                {
-                    get_talker = false;
-                    Talk(lastText, talkerToFind);
-                }
+                get_talker = false;
+                Talk(lastText, talkerToFind);
             }
         }
 
-        public void setCursor(string cursor)
+        public void SetCursor(string cursor)
         {
             if (cursor != current_cursor)
             {
                 if (!locked)
                 {
-                    Cursor.SetCursor(guiprovider.getCursor(cursor), new Vector2(0f, 0f), CursorMode.Auto);
+                    var cursorToSet = guiprovider.getCursor(cursor);
+                    if(cursor != null)
+                    {
+                        Cursor.SetCursor(cursorToSet, new Vector2(0f, 0f), CursorMode.Auto);
+                    }
+                    else
+                    {
+                        Debug.Log("Could not set cursor with name: " + cursor);
+                    }
                 }
                 current_cursor = cursor;
             }
         }
 
-        public void showHand(bool show)
+        public void ShowHand(bool show)
         {
-            if (show)
-                setCursor("over");
-            else
-                setCursor("default");
+            SetCursor(show ? "over" : "default");
         }
 
         public void Talk(string text, int x, int y, Color textColor, Color textBorderColor)
         {
             lastText = text;
-            ShowBubble(generateBubble(text, x, y, textColor, textBorderColor));
+            ShowBubble(GenerateBubble(text, x, y, textColor, textBorderColor));
         }
 
         public void Talk(string text, int x, int y, Color textColor, Color textBorderColor, Color backgroundColor, Color borderColor)
         {
             lastText = text;
-            ShowBubble(generateBubble(text, x, y, textColor, textBorderColor, backgroundColor, borderColor));
+            ShowBubble(GenerateBubble(text, x, y, textColor, textBorderColor, backgroundColor, borderColor));
         }
 
         public void Talk(string text, string talkerName = null)
@@ -99,28 +98,30 @@ namespace uAdventure.Runner
 
                 if (Game.Instance.GameState.IsFirstPerson || PlayerMB.Instance == null)
                 {
-                    bubbleData = generateBubble(player, text);
+                    bubbleData = GenerateBubble(player, text);
                 }
                 else
                 {
-                    talkerObject = getTalker(talkerName);
+                    talkerObject = GetTalker(talkerName);
                     if (talkerObject == null)
                     {
                         return;
                     }
-                    bubbleData = generateBubble(player, text, talkerObject);
+                    bubbleData = GenerateBubble(player, text, talkerObject);
                 }
 
                 ShowBubble(bubbleData);
             }
             else
             {
-                talkerObject = getTalker(talkerName);
+                talkerObject = GetTalker(talkerName);
                 if (talkerObject == null)
+                {
                     return;
+                }
 
                 NPC cha = Game.Instance.GameState.GetCharacter(talkerName);
-                ShowBubble(generateBubble(cha, text, talkerObject));
+                ShowBubble(GenerateBubble(cha, text, talkerObject));
             }
             if (talkerObject)
             {
@@ -134,10 +135,8 @@ namespace uAdventure.Runner
 
         public void ShowBubble(BubbleData data)
         {
-            data.origin = sceneVector2guiVector(data.origin);
-            data.destiny = sceneVector2guiVector(data.destiny);
-
-            //correctBoundaries (data);
+            data.origin = SceneVector2GuiVector(data.origin);
+            data.destiny = SceneVector2GuiVector(data.destiny);
 
             if (bubble != null)
             {
@@ -157,7 +156,9 @@ namespace uAdventure.Runner
                 data.Line = data.Line.Substring(3, data.Line.Length - 3);
             }
             else
+            {
                 bubble = GameObject.Instantiate(Bubble_Prefab);
+            }
 
             bubble.GetComponent<Bubble>().Data = data;
             bubble.transform.SetParent(this.transform);
@@ -165,7 +166,7 @@ namespace uAdventure.Runner
             bubble.transform.localPosition = new Vector3(bubble.transform.localPosition.x, bubble.transform.localPosition.y, 0);
         }
 
-        public void destroyBubbles()
+        public void DestroyBubbles()
         {
             if (bubble != null)
             {
@@ -174,32 +175,38 @@ namespace uAdventure.Runner
                 {
                     var talker = bubbleMB.Data.Talker.GetComponent<Representable>();
                     if (talker)
+                    {
                         talker.Play("stand");
+                    }
                 } 
                 this.bubble.GetComponent<Bubble>().destroy();
             }
         }
-        public BubbleData generateBubble(string text, int x, int y)
-        {
-            return generateBubble(text, x, y, Color.white, Color.black);
-        }
-        public BubbleData generateBubble(string text, int x, int y, Color textColor, Color textOutlineColor)
-        {
-            return generateBubble(text, x, y, false, textColor, textOutlineColor, Color.white, Color.black);
-        }
-        public BubbleData generateBubble(string text, int x, int y, Color textColor, Color textOutlineColor, Color baseColor, Color outlineColor)
-        {
-            return generateBubble(text, x, y, true, textColor, textOutlineColor, baseColor, outlineColor);
-        }
-        private BubbleData generateBubble(string text, int x, int y, bool showBorder, Color textColor, Color textOutlineColor, Color baseColor, Color outlineColor)
-        {
-            var currentScene = FindObjectOfType<SceneMB>();
 
-            var destiny = currentScene.ToWorldSize(new Vector2(x, y));
-            var bubbleData = new BubbleData(text, destiny, destiny - new Vector3(0, -15, 0));
+        protected static BubbleData GenerateBubble(string text, int x, int y)
+        {
+            return GenerateBubble(text, x, y, Color.white, Color.black);
+        }
 
-            bubbleData.TextColor = textColor;
-            bubbleData.TextOutlineColor = textOutlineColor;
+        protected static BubbleData GenerateBubble(string text, int x, int y, Color textColor, Color textOutlineColor)
+        {
+            return GenerateBubble(text, x, y, false, textColor, textOutlineColor, Color.white, Color.black);
+        }
+
+        protected static BubbleData GenerateBubble(string text, int x, int y, Color textColor, Color textOutlineColor, Color baseColor, Color outlineColor)
+        {
+            return GenerateBubble(text, x, y, true, textColor, textOutlineColor, baseColor, outlineColor);
+        }
+
+        protected static BubbleData GenerateBubble(string text, int x, int y, bool showBorder, Color textColor, Color textOutlineColor, Color baseColor, Color outlineColor)
+        {
+            var destiny = SceneMB.ToWorldSize(new Vector2(x, y));
+            var bubbleData = new BubbleData(text, destiny, destiny - new Vector3(0, -15, 0))
+            {
+                TextColor = textColor,
+                TextOutlineColor = textOutlineColor
+            };
+
             if (showBorder)
             {
                 bubbleData.BaseColor = baseColor;
@@ -209,45 +216,46 @@ namespace uAdventure.Runner
             return bubbleData;
         }
 
-        public BubbleData generateBubble(NPC cha, string text, GameObject talker = null)
+        protected static BubbleData GenerateBubble(NPC cha, string text, GameObject talker = null)
         {
-            BubbleData bubble = new BubbleData(text, new Vector2(40, 60), new Vector2(40, 45), talker);
-
-            bubble.TextColor = cha.getTextFrontColor();
-            bubble.TextOutlineColor = cha.getTextBorderColor();
-            bubble.BaseColor = cha.getBubbleBkgColor();
-            bubble.OutlineColor = cha.getBubbleBorderColor();
+            var newBubble = new BubbleData(text, new Vector2(40, 60), new Vector2(40, 45), talker)
+            {
+                TextColor = cha.getTextFrontColor(),
+                TextOutlineColor = cha.getTextBorderColor(),
+                BaseColor = cha.getBubbleBkgColor(),
+                OutlineColor = cha.getBubbleBorderColor()
+            };
 
             if (talker != null)
             {
                 Vector2 position = talker.transform.position;
 
-                bubble.Origin = position;
-                bubble.Destiny = position + new Vector2(0, talker.transform.lossyScale.y * 0.6f);
+                newBubble.Origin = position;
+                newBubble.Destiny = position + new Vector2(0, talker.transform.lossyScale.y * 0.6f);
             }
             else
             {
-                bubble.Origin = Camera.main.transform.position;
-                bubble.Destiny = Camera.main.transform.position + new Vector3(0, 15, 0);
+                newBubble.Origin = Camera.main.transform.position;
+                newBubble.Destiny = Camera.main.transform.position + new Vector3(0, 15, 0);
             }
 
-            return bubble;
+            return newBubble;
         }
 
-        public void lockCursor()
+        public void LockCursor()
         {
             locked = true;
         }
 
-        public void releaseCursor()
+        public void ReleaseCursor()
         {
             locked = false;
             var toPut = current_cursor;
             current_cursor = null;
-            setCursor(toPut);
+            SetCursor(toPut);
         }
 
-        private Vector2 sceneVector2guiVector(Vector2 v)
+        private Vector2 SceneVector2GuiVector(Vector2 v)
         {
             // Convert it to ViewPort
             v = Camera.main.WorldToViewportPoint(v);
@@ -260,13 +268,7 @@ namespace uAdventure.Runner
             return v;
         }
 
-        private void correctBoundaries(BubbleData bubble)
-        {
-            if (bubble.destiny.x <= 125f) bubble.destiny.x = 125f;
-            else if (bubble.destiny.x >= (800f - 125f)) bubble.destiny.x = (800f - 125f);
-        }
-
-        private GameObject getTalker(string talker)
+        private GameObject GetTalker(string talker)
         {
             GameObject ret = GameObject.Find(talker);
 
@@ -279,7 +281,7 @@ namespace uAdventure.Runner
             return ret;
         }
 
-        public void showConfigMenu()
+        public void ShowConfigMenu()
         {
             this.Config_Menu_Ref.SetActive(!Config_Menu_Ref.activeSelf);
         }
@@ -294,14 +296,14 @@ namespace uAdventure.Runner
             Game.Instance.SaveGame();
         }
 
-        public void resetAndExit()
+        public void ResetAndExit()
         {
             PlayerPrefs.DeleteAll();
             PlayerPrefs.Save();
             Application.Quit();
         }
 
-        public void exitApplication()
+        public void ExitApplication()
         {
             Application.Quit();
         }

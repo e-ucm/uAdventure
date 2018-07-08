@@ -22,11 +22,12 @@ namespace uAdventure.Editor
         public CutscenesWindow(Rect aStartPos, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, new GUIContent(TC.get("Element.Name9")), aStyle, aOptions)
         {
-            GUIContent content = new GUIContent();
             // Button
-            content.image = (Texture2D)Resources.Load("EAdventureData/img/icons/cutscenes", typeof(Texture2D));
-            content.text = TC.get("Element.Name9");
-            ButtonContent = content;
+            ButtonContent = new GUIContent()
+            {
+                image = Resources.Load<Texture2D>("EAdventureData/img/icons/cutscenes"),
+                text = "Element.Name9"
+            };
 
             cutscenesWindowAppearance = new CutscenesWindowAppearance(aStartPos, new GUIContent(TC.get("Cutscene.App")), "Window");
             cutscenesWindowDocumentation = new CutscenesWindowDocumentation(aStartPos, new GUIContent(TC.get("Cutscene.Doc")), "Window");

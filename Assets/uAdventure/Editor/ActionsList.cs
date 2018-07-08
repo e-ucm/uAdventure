@@ -23,8 +23,8 @@ public class ActionsList : ScriptableObject {
     {
         appearances = ScriptableObject.CreateInstance<AppearanceEditor>();
 
-        conditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/conditions-24x24", typeof(Texture2D));
-        noConditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/no-conditions-24x24", typeof(Texture2D));
+        conditionsTex = Resources.Load<Texture2D>("EAdventureData/img/icons/conditions-24x24");
+        noConditionsTex = Resources.Load<Texture2D>("EAdventureData/img/icons/no-conditions-24x24");
 
         actionsList = new DataControlList()
         {

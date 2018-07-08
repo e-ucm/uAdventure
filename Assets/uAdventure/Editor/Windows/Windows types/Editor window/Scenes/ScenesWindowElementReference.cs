@@ -12,9 +12,9 @@ namespace uAdventure.Editor
     {
         private class ReferenceList : DataControlList
         {
-            private Texture2D conditionsTex, noConditionsTex;
+            private readonly Texture2D conditionsTex, noConditionsTex;
 
-            private Dictionary<Type, Texture2D> icons;
+            private readonly Dictionary<Type, Texture2D> icons;
 
             public ReferencesListDataControl ReferencesListDataControl
             {
@@ -95,7 +95,9 @@ namespace uAdventure.Editor
                                 var type = erdc.getReferencedElementDataControl().GetType();
                                 if (icons.ContainsKey(type)) icon = icons[type];
                                 if (icon != null)
+                                {
                                     GUI.Label(iconSpace, icons[type]);
+                                }
                                 GUI.Label(icon != null ? nameSpace : columnRect, erdc.getElementId());
                             }
                             break;
@@ -104,8 +106,8 @@ namespace uAdventure.Editor
                             {
                                 if (GUI.Button(columnRect, erdc == null ? noConditionsTex : erdc.getConditions().getBlocksCount() > 0 ? conditionsTex : noConditionsTex))
                                 {
-                                    ConditionEditorWindow window =
-                                            (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
+                                    this.reorderableList.index = row;
+                                    ConditionEditorWindow window = ScriptableObject.CreateInstance<ConditionEditorWindow>();
                                     window.Init(erdc.getConditions());
                                 }
                             }
@@ -118,6 +120,10 @@ namespace uAdventure.Editor
             {
                 DataControl.deleteElement(((ElementContainer)GetChilds(DataControl)[index]).getErdc(), false);
                 OnChanged(reorderableList);
+                if(onRemoveCallback != null)
+                {
+                    onRemoveCallback(reorderableList);
+                }
             }
 
             protected override void OnDuplicate()
@@ -128,12 +134,7 @@ namespace uAdventure.Editor
 
         }
 
-
-        private int currentIndex = -1;
-        private SceneDataControl currentScene;
-
-        private ReferenceList referenceList;
-        private SceneDataControl workingScene;
+        private readonly ReferenceList referenceList;
 
         public ScenesWindowElementReference(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, SceneEditor sceneEditor,
             params GUILayoutOption[] aOptions)
@@ -146,6 +147,10 @@ namespace uAdventure.Editor
                 onSelectCallback = (list) =>
                 {
                     sceneEditor.SelectedElement = (referenceList.list[list.index] as ElementContainer).getErdc();
+                },
+                onRemoveCallback = (list) =>
+                {
+                    sceneEditor.SelectedElement = null;
                 }
             };
 
@@ -164,15 +169,14 @@ namespace uAdventure.Editor
 
         }
 
+        public override void OnSceneSelected(SceneDataControl scene)
+        {
+            base.OnSceneSelected(scene);
+            referenceList.ReferencesListDataControl = scene.getReferencesList();
+        }
+
         protected override void DrawInspector()
         {
-            var prevWorkingScene = workingScene;
-            workingScene = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[GameRources.GetInstance().selectedSceneIndex];
-            if (workingScene != prevWorkingScene)
-            {
-                referenceList.ReferencesListDataControl = workingScene.getReferencesList();
-            }
-
             referenceList.DoList(160);
             GUILayout.Space(20);
         }
@@ -228,7 +232,7 @@ namespace uAdventure.Editor
                 }
             }
 
-            public static Rect GetUnscaledRect(DataControl elem)
+            public static Sprite GetSprite(DataControl elem)
             {
                 Sprite sprite = null;
                 if (elem is PlayerDataControl)
@@ -255,6 +259,13 @@ namespace uAdventure.Editor
                         sprite = Controller.ResourceManager.getSprite((referencedElement as AtrezzoDataControl).getPreviewImage());
                     }
                 }
+
+                return sprite;
+            }
+
+            public static Rect GetUnscaledRect(DataControl elem)
+            {
+                var sprite = GetSprite(elem);
 
                 if (!sprite)
                     return new Rect(Vector2.zero, new Vector2(100f, 100f));
@@ -283,7 +294,21 @@ namespace uAdventure.Editor
                     case EventType.MouseDown:
                         var rect = GetElementRect(elemRef);
                         if (GUIUtility.hotControl == 0)
-                            selected = rect.Contains(Event.current.mousePosition) || rect.ToPoints().ToList().FindIndex(p => (p - Event.current.mousePosition).magnitude <= 10f) != -1;
+                        {
+                            var rectContains = rect.Contains(Event.current.mousePosition);
+                            var textureContains = rectContains;
+                            if (rectContains)
+                            {
+                                var sprite = GetSprite(elemRef);
+                                float x = (Event.current.mousePosition.x - rect.x) / rect.width;
+                                float y = (Event.current.mousePosition.y - rect.y) / rect.height;
+                                textureContains = sprite != null && sprite.texture != null 
+                                    && sprite.texture.GetPixel((int) (x * sprite.texture.width), sprite.texture.height - (int) (y * sprite.texture.height)).a > 0;
+                            }
+                            var anyHandleContains = rect.ToPoints().ToList().FindIndex(p => (p - Event.current.mousePosition).magnitude <= 10f) != -1;
+
+                            selected = textureContains || anyHandleContains;
+                        }
                         break;
                 }
 

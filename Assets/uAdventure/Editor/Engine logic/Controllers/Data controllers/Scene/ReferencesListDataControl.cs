@@ -339,12 +339,18 @@ namespace uAdventure.Editor
                     List<string> elements = new List<string>();
                     var utils = AddRefUtils[type];
                     foreach (var t in utils.validElementTypes)
+                    {
                         elements.AddRange(controller.IdentifierSummary.getIds(t));
+                    }
 
-                    if(elements.Count != 0)
-                        controller.ShowInputDialog(TC.get(utils.title), TC.get(utils.message), elements.ToArray(), (o,s) => performAddElement(type, s));
+                    if (elements.Count != 0)
+                    {
+                        controller.ShowInputDialog(TC.get(utils.title), TC.get(utils.message), elements.ToArray(), (o, s) => performAddElement(type, s));
+                    }
                     else
+                    {
                         controller.ShowErrorDialog(TC.get(utils.title), TC.get(utils.errorMessage));
+                    }
                 }
                 else
                 {
@@ -363,17 +369,9 @@ namespace uAdventure.Editor
             if (elementType != null)
             {
                 ElementReference newElementReference = new ElementReference(id, 50, 50);
-                var scene = sceneDataControl.getContent() as Scene;
-                switch (type)
-                {
-                    case Controller.ITEM_REFERENCE: scene.addItemReference(newElementReference); break;
-                    case Controller.NPC_REFERENCE: scene.addCharacterReference(newElementReference); break;
-                    case Controller.ATREZZO_REFERENCE: scene.addAtrezzoReference(newElementReference); break;
-                }
-
                 int counter = count(newElementReference);
-                ElementReferenceDataControl erdc = new ElementReferenceDataControl(sceneDataControl, newElementReference, type, counter);
                 getReferencesList(elementType).Add(newElementReference);
+                ElementReferenceDataControl erdc = new ElementReferenceDataControl(sceneDataControl, newElementReference, type, counter);
                 ElementContainer ec = new ElementContainer(erdc, -1, null);
                 lastElementContainer = ec;
                 reassignLayerAllReferencesDataControl(insertInOrder(ec, false));
@@ -385,8 +383,10 @@ namespace uAdventure.Editor
             for (int i = index; i < allReferencesDataControl.Count; i++)
             {
                 allReferencesDataControl[i].setLayer(i);
-                if (allReferencesDataControl[i].isPlayer()) 
+                if (allReferencesDataControl[i].isPlayer())
+                {
                     playerPositionInAllReferences = i;
+                }
             }
 
         }
@@ -402,11 +402,8 @@ namespace uAdventure.Editor
 
             if (dataControl != null)
             {
-                int index = 0;
-                for (index = 0; index < allReferencesDataControl.Count; index++)
-                    if (!allReferencesDataControl[index].isPlayer())
-                        if (allReferencesDataControl[index].getErdc().Equals(dataControl))
-                            break;
+                int index = allReferencesDataControl.FindIndex(e => !e.isPlayer() && e.getErdc() == dataControl);
+
                 if (index >= 0 && index < allReferencesDataControl.Count)
                 {
                     allReferencesDataControl.RemoveAt(index);
@@ -441,11 +438,15 @@ namespace uAdventure.Editor
         {
             var elementRef = (ElementReference)element.getErdc().getContent();
             if (elementRef == null)
+            {
                 return;
+            }
 
             var type = controller.IdentifierSummary.getType(elementRef.getTargetId());
             if (type == null)
+            {
                 return;
+            }
 
             getReferencesList(type).Add(elementRef);
             allReferencesDataControl.Insert(element.getLayer(), element);
@@ -513,40 +514,35 @@ namespace uAdventure.Editor
 
         public override void updateVarFlagSummary(VarFlagSummary varFlagSummary)
         {
-
             foreach (ElementContainer element in allReferencesDataControl)
             {
                 if (!element.isPlayer())
+                {
                     element.getErdc().updateVarFlagSummary(varFlagSummary);
+                }
             }
         }
 
 
         public override bool isValid(string currentPath, List<string> incidences)
         {
-
             return true;
         }
 
 
         public override int countAssetReferences(string assetPath)
         {
-
             return 0;
         }
 
 
         public override void getAssetReferences(List<string> assetPaths, List<int> assetTypes)
         {
-
-            // Do nothing
         }
 
 
         public override void deleteAssetReferences(string assetPath)
         {
-
-            // Do nothing
         }
 
 
@@ -582,15 +578,21 @@ namespace uAdventure.Editor
             {
                 // If we cant find the id type, we try to remove it from them all just in case
                 foreach (var kv in typeReferenceList)
+                {
                     deleteIdentifierFromReferenceList(kv.Value, id);
+                }
             }
             else
+            {
                 deleteIdentifierFromReferenceList(getReferencesList(type), id);
+            }
 
             foreach (ElementContainer element in allReferencesDataControl)
             {
                 if (element.getErdc() != null)
+                {
                     element.getErdc().deleteIdentifierReferences(id);
+                }
             }
         }
 
@@ -605,7 +607,9 @@ namespace uAdventure.Editor
                     list.RemoveAt(i);
                 }
                 else
+                {
                     i++;
+                }
             }
         }
 
@@ -621,7 +625,9 @@ namespace uAdventure.Editor
                     allReferencesDataControl.RemoveAt(i);
                 }
                 else
+                {
                     i++;
+                }
             }
         }
 
@@ -634,13 +640,7 @@ namespace uAdventure.Editor
 
         public bool containsDataControl(ElementReferenceDataControl dataControl)
         {
-
-            foreach (ElementContainer container in allReferencesDataControl)
-            {
-                if (!container.isPlayer() && container.getErdc() == dataControl)
-                    return true;
-            }
-            return false;
+            return allReferencesDataControl.Any(e => !e.isPlayer() && e.getErdc() == dataControl);
         }
 
         /**
@@ -679,14 +679,7 @@ namespace uAdventure.Editor
          */
         public string[] getAllReferencesId()
         {
-
-            string[] cont = new string[allReferencesDataControl.Count];
-            for (int i = 0; i < cont.Length; i++)
-                if (allReferencesDataControl[i].isPlayer())
-                    cont[i] = "Player";
-                else
-                    cont[i] = allReferencesDataControl[i].getErdc().getElementId();
-            return cont;
+            return allReferencesDataControl.ConvertAll(e => e.isPlayer() ? "Player" : e.getErdc().getElementId()).ToArray();
         }
 
         public int getPlayerPosition()
@@ -756,13 +749,11 @@ namespace uAdventure.Editor
 
         public override void recursiveSearch()
         {
-            foreach (var ec in getAllReferencesDataControl())
-                ec.getErdc().recursiveSearch();
+            allReferencesDataControl.ForEach(e => e.recursiveSearch());
         }
 
         public void setPlayerPositionInAllReferences(int playerPositionInAllReferences)
         {
-
             this.playerPositionInAllReferences = playerPositionInAllReferences;
         }
 
@@ -770,12 +761,11 @@ namespace uAdventure.Editor
         public override List<Searchable> getPathToDataControl(Searchable dataControl)
         {
 
-            List<Searchable> list = new List<Searchable>();
-            foreach (ElementContainer container in allReferencesDataControl)
-            {
-                if (container.getErdc() != null)
-                    list.Add(container.getErdc());
-            }
+            List<Searchable> list = allReferencesDataControl
+                .Where(e => e.getErdc() != null)
+                .Select(e => e.getErdc() as Searchable)
+                .ToList();
+
             return getPathFromChild(dataControl, list);
         }
     }

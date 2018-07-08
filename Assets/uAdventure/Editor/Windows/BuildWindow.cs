@@ -19,7 +19,7 @@ public class BuildWindow : EditorWindow {
         return newWindow;
     }
 
-    private void OnEnable()
+    protected void OnEnable()
     {
         pathSelector = new FileChooser()
         {
@@ -35,7 +35,7 @@ public class BuildWindow : EditorWindow {
         webGLIcon = new GUIContent("WebGL", EditorGUIUtility.IconContent("BuildSettings.WebGL").image);
     }
 
-    private void OnGUI()
+    protected void OnGUI()
     {
         GUILayout.Label("Platforms", "OL title", new GUILayoutOption[0]);
         GUILayout.BeginHorizontal();
@@ -48,9 +48,9 @@ public class BuildWindow : EditorWindow {
         GUILayout.EndHorizontal();
 
         GUILayout.Label("Folder", "OL title", new GUILayoutOption[0]);
-        pathSelector.Path = BuildConfigs.path;
+        pathSelector.Path = BuildConfigs.path ?? "";
         pathSelector.DoLayout(GUILayout.ExpandWidth(true));
-        BuildConfigs.path = pathSelector.Path;
+        BuildConfigs.path = pathSelector.Path.Replace("\\", "/");
 
         GUILayout.Label("Information", "OL title", new GUILayoutOption[0]);
         GUILayout.BeginHorizontal();

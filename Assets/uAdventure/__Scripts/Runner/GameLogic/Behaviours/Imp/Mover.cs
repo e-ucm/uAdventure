@@ -56,27 +56,13 @@ namespace uAdventure.Runner
         private OnMovementFinished onMovementFinished;
         private OnMovementCancelled onMovementCancelled;
 
-
-        /*  ## ANIMATION METHOD ##
-         * 
-         * private Animation current_anim;
-         * 
-         * Texture2D tmp = current_anim.getFrame(0).getImage(false,false,0).texture;
-            update_ratio = current_anim.getFrame(0).getTime();//Duration/1000f;
-         * 
-         * return (current_anim.getFrame(current_frame).getImage(false,false,0).texture.height) * context.getScale();
-         * 
-         * current_frame = (current_frame + 1) % current_anim.getFrames().Count;
-            Texture2D tmp = current_anim.getFrame(current_frame).getImage(false,false,0).texture;
-            update_ratio = current_anim.getFrame(current_frame).getTime();
-         * 
-         */
-
         protected void Start()
         {
             representable = GetComponent<Representable>();
             if (representable)
+            {
                 representable.Play("stand");
+            }
         }
 
         protected void Update()
@@ -161,7 +147,6 @@ namespace uAdventure.Runner
         public void MoveInstant(Vector2 point)
         {
             AbortCurrentMovement();
-            //this.transform.localPosition = new Vector3 (point.x, point.y + this.transform.localScale.y/2,-context.getLayer());
             representable.setPosition(point);
         }
 
@@ -179,7 +164,9 @@ namespace uAdventure.Runner
                 moves.Clear();
                 // Notify the chidls
                 if(onMovementCancelled != null)
+                {
                     onMovementCancelled(data);
+                }
 
                 onMovementCancelled = null;
                 onMovementFinished = null;
@@ -220,7 +207,9 @@ namespace uAdventure.Runner
                         moving = false;
                         representable.Play("stand");
                         if(onMovementFinished != null)
+                        {
                             onMovementFinished(data);
+                        }
                     }
                 }
             }

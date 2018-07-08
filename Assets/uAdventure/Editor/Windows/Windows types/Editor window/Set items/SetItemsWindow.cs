@@ -27,10 +27,11 @@ namespace uAdventure.Editor
         public SetItemsWindow(Rect aStartPos, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, new GUIContent(TC.get("Element.Name59")), aStyle, aOptions)
         {
-            var c = new GUIContent();
-            c.image = (Texture2D)Resources.Load("EAdventureData/img/icons/Atrezzo-List-1", typeof(Texture2D));
-            c.text = TC.get("Element.Name59");
-            ButtonContent = c;
+            ButtonContent = new GUIContent()
+            {
+                image = Resources.Load<Texture2D>("EAdventureData/img/icons/Atrezzo-List-1"),
+                text = "Element.Name59"
+            };
 
             setItemsWindowApperance = new SetItemsWindowApperance(aStartPos, new GUIContent(TC.get("Atrezzo.LookPanelTitle")), "Window");
             setItemsWindowDocumentation = new SetItemsWindowDocumentation(aStartPos, new GUIContent(TC.get("Atrezzo.DocPanelTitle")), "Window");

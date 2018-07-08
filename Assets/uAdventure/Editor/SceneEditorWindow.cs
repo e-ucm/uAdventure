@@ -22,9 +22,13 @@ namespace uAdventure.Editor
 
         private DataControl selectedElement;
 
+        public virtual void OnSceneSelected(SceneDataControl scene)
+        {
+            sceneEditor.Scene = scene;
+        }
+
         public override void DrawPreview(Rect rect)
         {
-            sceneEditor.Scene = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[GameRources.GetInstance().selectedSceneIndex];
             sceneEditor.Draw(rect);
         }
 
@@ -32,7 +36,10 @@ namespace uAdventure.Editor
         {
             var any = false;
             // We only draw the inspector if we have an element selected and we have components to draw
-            if(selectedElement != null) sceneEditor.DoCallForWholeElement(selectedElement, _ => any = true);
+            if (selectedElement != null)
+            {
+                sceneEditor.DoCallForWholeElement(selectedElement, _ => any = true);
+            }
 
             return selectedElement != null && any;
         }

@@ -20,10 +20,11 @@ namespace uAdventure.Editor
         public ConversationWindow(Rect aStartPos, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, new GUIContent(TC.get("Element.Name31")), aStyle, aOptions)
         {
-            var c = new GUIContent();
-            c.image = (Texture2D)Resources.Load("EAdventureData/img/icons/conversations", typeof(Texture2D));
-            c.text = TC.get("Element.Name31");
-            ButtonContent = c;
+            ButtonContent = new GUIContent()
+            {
+                image = Resources.Load<Texture2D>("EAdventureData/img/icons/conversations"),
+                text = "Element.Name31"
+            };
 
             conversationWindows = new Dictionary<Conversation, ConversationEditorWindow>();
 
@@ -39,7 +40,9 @@ namespace uAdventure.Editor
                 || conversationIndex >= Controller.Instance.ChapterList.getSelectedChapterDataControl()
                     .getConversationsList()
                     .getConversations().Count)
+            {
                 return null;
+            }
 
             var conversation = Controller
                 .Instance.ChapterList.getSelectedChapterDataControl()
@@ -48,7 +51,9 @@ namespace uAdventure.Editor
                 .getConversation();
 
             if (conversationWindows.ContainsKey(conversation) && conversationWindows[conversation] == null)
+            {
                 conversationWindows.Remove(conversation);
+            }
 
             if (!conversationWindows.ContainsKey(conversation) && createIfNotExists)
             {
@@ -66,7 +71,6 @@ namespace uAdventure.Editor
         {
             GameRources.GetInstance().selectedConversationIndex = r.index;
             EditorWindowBase.WantsMouseMove = true;
-            // Create the editor GetConversationEditor(r.index, true);
         }
         protected override void OnButton()
         {

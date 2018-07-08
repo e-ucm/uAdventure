@@ -32,8 +32,8 @@ namespace uAdventure.Editor
             : base(aStartPos, aContent, aStyle, aOptions)
         {
 
-            conditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/conditions-24x24", typeof(Texture2D));
-            noConditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/no-conditions-24x24", typeof(Texture2D));
+            conditionsTex = Resources.Load<Texture2D>("EAdventureData/img/icons/conditions-24x24");
+            noConditionsTex = Resources.Load<Texture2D>("EAdventureData/img/icons/no-conditions-24x24");
 
             appearanceEditor = ScriptableObject.CreateInstance<AppearanceEditor>();
             appearanceEditor.height = 160;

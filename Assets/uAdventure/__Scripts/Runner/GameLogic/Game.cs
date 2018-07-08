@@ -183,12 +183,12 @@ namespace uAdventure.Runner
                 if (Time.timeScale == 0)
                 {
                     Time.timeScale = 1;
-                    GUIManager.Instance.showConfigMenu();
+                    GUIManager.Instance.ShowConfigMenu();
                 }
                 else if (!isSomethingRunning())
                 {
                     Time.timeScale = 0;
-                    GUIManager.Instance.showConfigMenu();
+                    GUIManager.Instance.ShowConfigMenu();
                 }
             }
         }
@@ -267,7 +267,7 @@ namespace uAdventure.Runner
         private bool Interacted()
         {
             guistate = GUIState.NOTHING;
-            GUIManager.Instance.destroyBubbles();
+            GUIManager.Instance.DestroyBubbles();
             if (executeStack.Count > 0)
             {
                 return Execute(executeStack.Peek().Key);
@@ -357,6 +357,7 @@ namespace uAdventure.Runner
         public IRunnerChapterTarget RunTarget(string scene_id, int transition_time = 0, int transition_type = 0, Interactuable notifyObject = null, bool trace = true)
         {
             Debug.Log("Run target: " + scene_id);
+            GUIManager.Instance.ShowHand(false);
             MenuMB.Instance.hide(true);
             if (runnerTarget != null){
                 runnerTarget.Destroy(transition_time / 1000f);

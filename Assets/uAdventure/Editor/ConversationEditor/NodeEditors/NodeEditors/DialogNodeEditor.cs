@@ -79,8 +79,8 @@ namespace uAdventure.Editor
             if (Controller.Instance.SelectedChapterDataControl!= null)
                 npc.AddRange(Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCsIDs());
 
-            conditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/conditions-24x24", typeof(Texture2D));
-            noConditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/no-conditions-24x24", typeof(Texture2D));
+            conditionsTex = Resources.Load<Texture2D>("EAdventureData/img/icons/conditions-24x24");
+            noConditionsTex = Resources.Load<Texture2D>("EAdventureData/img/icons/no-conditions-24x24");
 
             effectTex = (Texture2D)Resources.Load("EAdventureData/img/icons/effects/32x32/has-macro", typeof(Texture2D));
             noEffectTex = (Texture2D)Resources.Load("EAdventureData/img/icons/effects/32x32/macro", typeof(Texture2D));
