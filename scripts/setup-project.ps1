@@ -20,10 +20,15 @@ $project_path = "$($pwd)\\Assets\\uAdventure"
 $assets_folder = "$($pwd)\\BuildProject\\\uAdventurePackage\\\uAdventurePackage\\Assets\\uAdventure"
 $build_folder = "$($pwd)\\BuildProject\\uAdventureEditor\\uAdventureEditor\\bin\\Release"
 
+New-Item -ItemType directory -Path "$($assets_folder)" -Force 2>&1 > $null
+New-Item -ItemType directory -Path "$($assets_folder)\\Plugins" -Force 2>&1 > $null
+New-Item -ItemType directory -Path "$($assets_folder)\\Editor" -Force 2>&1 > $null
+New-Item -ItemType directory -Path "$($assets_folder)\\Editor\\Plugins" -Force 2>&1 > $null
+
 # Plugins Folder
 Copy-Item -Path "$($project_path)\\Plugins" -Destination "$($assets_folder)\\" -Recurse -Force
 # Tracker Folder
-Remove-Item -Path "$($assets_folder)\\Plugins\\unity-tracker" -Recurse -Force 
+Remove-Item -Path "$($assets_folder)\\Plugins\\unity-tracker" -Recurse -Force  2>&1 > $null
 # Replace Tracker folder and files
 New-Item -ItemType directory -Path "$($assets_folder)\\Plugins\\unity-tracker" -Force 2>&1 > $null
 Copy-Item "$($build_folder)\\UnityTracker.dll" -Destination "$($assets_folder)\\Plugins\\unity-tracker\\" -Force
