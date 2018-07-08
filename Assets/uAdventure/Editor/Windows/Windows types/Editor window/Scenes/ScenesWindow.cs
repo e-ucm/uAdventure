@@ -53,6 +53,21 @@ namespace uAdventure.Editor
             };
 
             sceneEditor = new SceneEditor();
+            sceneEditor.onSelectElement += (element) =>
+            {
+                if(sceneEditor.SelectedElement == null)
+                {
+                    return;
+                }
+
+                switch (sceneEditor.SelectedElement.ToString())
+                {
+                    case "uAdventure.Editor.ExitDataControl": this.OpenedWindow = ScenesWindowType.Exits; break;
+                    case "uAdventure.Editor.ElementReferenceDataControl": this.OpenedWindow = ScenesWindowType.ElementRefrence; break;
+                    case "uAdventure.Editor.BarrierDataControl": this.OpenedWindow = ScenesWindowType.Barriers; break;
+                    case "uAdventure.Editor.ActiveAreaDataControl": this.OpenedWindow = ScenesWindowType.ActiveAreas; break;
+                }
+            };
 
             // Chapter preview subwindow
             chapterPreview = new ChapterPreview(rect, new GUIContent(""), "Window")
@@ -87,9 +102,6 @@ namespace uAdventure.Editor
 
         public override void Draw(int aID)
         {
-            /*dataControlList.SetData(Controller.Instance.SelectedChapterDataControl.getScenesList(),
-                sceneList => (sceneList as ScenesListDataControl).getScenes().Cast<DataControl>().ToList());*/
-
             dataControlList.index = GameRources.GetInstance().selectedSceneIndex;
             // SceneEditor population
             if (GameRources.GetInstance().selectedSceneIndex != -1)
@@ -145,7 +157,17 @@ namespace uAdventure.Editor
 
         public void ShowItemWindowView(int s)
         {
-            GameRources.GetInstance().selectedSceneIndex = s;
+            if(GameRources.GetInstance().selectedSceneIndex != s)
+            {
+                foreach (var sceneEditorWindow in Childs.Values
+                    .Where(w => w is SceneEditorWindow)
+                    .Cast<SceneEditorWindow>())
+                {
+                    sceneEditorWindow.OnSceneSelected(dataControlList.list[s] as SceneDataControl);
+                }
+                GameRources.GetInstance().selectedSceneIndex = s;
+            }
+
         }
 
         // ---------------------------------------------
@@ -173,18 +195,18 @@ namespace uAdventure.Editor
             private const float SpaceHeight = 600f;
             private Rect space;
 
-            private Dictionary<string, Color> sceneColors;
+            private readonly Dictionary<string, Color> sceneColors;
 
-            private Dictionary<string, Vector2> positions;
-            private Dictionary<string, Texture2D> images;
-            private Dictionary<string, Vector2> sizes;
+            private readonly Dictionary<string, Vector2> positions;
+            private readonly Dictionary<string, Texture2D> images;
+            private readonly Dictionary<string, Vector2> sizes;
 
-            private Texture2D noBackground;
+            private readonly Texture2D noBackground;
 
             public delegate void OnSelectElementDelegate(DataControl selected);
             public event OnSelectElementDelegate OnSelectElement;
 
-            private DataControlList sceneList;
+            private readonly DataControlList sceneList;
 
             public ChapterPreview(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
             {
@@ -271,7 +293,6 @@ namespace uAdventure.Editor
                 foreach (var scene in Controller.Instance.ChapterList.getSelectedChapterDataControl().getScenesList().getScenes())
                 {
                     DrawScene(scene);
-                    //DoSceneControl(scene);
                 }
 
                 foreach (var scene in Controller.Instance.ChapterList.getSelectedChapterDataControl().getScenesList().getScenes())
@@ -316,6 +337,10 @@ namespace uAdventure.Editor
                 if (GUIUtility.hotControl != prevHot)
                 {
                     sceneList.index = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes().IndexOf(scene);
+                    if(Event.current.clickCount == 2)
+                    {
+                        OnSelectElement(scene);
+                    }
                 }
 
             }
@@ -337,7 +362,7 @@ namespace uAdventure.Editor
                 var nextScene = scenes.getScenes()[index];
                 var sceneRect = AdaptToViewport(GetSceneRect(nextScene), space);
                 
-                Vector2 origin = Center(polygon), destination = Vector2.zero;
+                Vector2 origin = Center(polygon), destination;
                 if (exit.hasDestinyPosition())
                 {
                     destination = new Vector2(exit.getDestinyPositionX(), exit.getDestinyPositionY());
@@ -445,7 +470,7 @@ namespace uAdventure.Editor
                     }
 
                     sizes.Add(background, previewSize);
-                    Color color = Color.black;
+                    Color color;
                     try
                     {
                         var pixel = scenePreview.GetPixel(scenePreview.width / 2, scenePreview.height / 2);
@@ -538,7 +563,9 @@ namespace uAdventure.Editor
 
                             // If the exit points to a cutscene it normally is out of the array
                             if (index < 0 || index >= scenes.getScenes().Count)
+                            {
                                 continue;
+                            }
 
                             var nextScene = scenes.getScenes()[index];
 
@@ -546,7 +573,7 @@ namespace uAdventure.Editor
                             if (!present.ContainsKey(t))
                             {
                                 present.Add(t, true);
-                                graph.Edges.Add(new Edge(node, sceneToNode[nextScene]) /*{ Length = 2 }*/);
+                                graph.Edges.Add(new Edge(node, sceneToNode[nextScene]));
 
                                 var exitOrigin = GetExitArea(scene, exit).ToRect().center;
                                 var originRect = GetSceneRect(scene);
@@ -556,14 +583,14 @@ namespace uAdventure.Editor
                                 pos.y = Mathf.Clamp01(pos.y / originRect.height);
 
                                 // Positioning constraints
-                                if (pos.x < 0.3) 
+                                if (pos.x < 0.3)
+                                {
                                     settings.AddLeftRightConstraint(t.Item2, t.Item1);
-                                /*if (pos.y < 0.3)
-                                    settings.AddUpDownConstraint(t.Item2, t.Item1);*/
+                                }
                                 if (pos.x > 0.7)
+                                {
                                     settings.AddLeftRightConstraint(t.Item1, t.Item2);
-                                /*if (pos.y > 0.7)
-                                    settings.AddUpDownConstraint(t.Item1, t.Item2);*/
+                                }
                             }
                         }
                     }
@@ -579,8 +606,6 @@ namespace uAdventure.Editor
                     foreach (var scene in scenes.getScenes())
                     {
                         var n = sceneToNode[scene];
-                        //Debug.Log(n.Width);
-                        //sizes[scene.getPreviewBackground()] = new Vector2((float)n.Width, (float)n.Height);
                         positions[scene.getId()] = TransformPoint(new Vector2((float)(n.Center.X - n.Width / 2f), (float)(n.Center.Y + n.Height / 2f)), graphRect, canvasRect, true);
                     }
                 }
@@ -593,10 +618,12 @@ namespace uAdventure.Editor
             Vector2 TransformPoint(Vector2 point, Rect from, Rect to, bool invertY)
             {
                 float absoluteX = (point.x - from.x) / from.width,
-                    absoluteY = (point.y - from.y) / from.height;
+                    absoluteY   = (point.y - from.y) / from.height;
 
-                if(invertY)
+                if (invertY)
+                {
                     absoluteY = 1 - absoluteY;
+                }
 
                 return new Vector2(absoluteX * to.width + to.x, absoluteY * to.height + to.y);
             }

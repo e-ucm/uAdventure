@@ -39,7 +39,7 @@ public class AppearanceEditor : Editor {
 
     private DataControlList appearanceList;
 
-    private void Awake()
+    protected void Awake()
     {
         conditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/conditions-24x24", typeof(Texture2D));
         noConditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/no-conditions-24x24", typeof(Texture2D));
@@ -72,22 +72,24 @@ public class AppearanceEditor : Editor {
                 switch (col) 
                 {
                     case 0:
-                        EditorGUI.LabelField(rect, "Resources " + (index + 1));
-                        /*if (index == appearanceList.index)
+                        if (index == appearanceList.index)
                         {
                             EditorGUI.BeginChangeCheck();
-                            var newname = EditorGUI.TextField(rect, resources.getName());
-                            if(EditorGUI.EndChangeCheck())
+                            var newname = EditorGUI.TextField(rect, "Resources " + (index + 1), resources.getName());
+                            if (EditorGUI.EndChangeCheck())
+                            {
                                 resources.renameElement(newname);
+                            }
                         }
                         else
                         {
-                            EditorGUI.LabelField(rect, resources.getName());
-                        }*/
+                            EditorGUI.LabelField(rect, "Resources " + (index + 1) + ": " + resources.getName());
+                        }
                         break;
                     case 1:
                         if (GUI.Button(rect, resources.getConditions().getBlocksCount() > 0 ? conditionsTex : noConditionsTex))
                         {
+                            appearanceList.index = index;
                             ConditionEditorWindow window = CreateInstance<ConditionEditorWindow>();
                             window.Init(resources.getConditions());
                         }

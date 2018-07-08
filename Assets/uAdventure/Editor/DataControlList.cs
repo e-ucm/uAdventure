@@ -34,7 +34,9 @@ namespace uAdventure.Editor
 
             this.list = this.childs;
             if (this.list.Count <= this.index)
+            {
                 this.index = -1;
+            }
         }
 
         public DataControlList() : base(new List<DataControl>(), typeof(DataControl), true, true)

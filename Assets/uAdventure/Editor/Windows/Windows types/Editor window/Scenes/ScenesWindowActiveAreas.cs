@@ -14,7 +14,6 @@ namespace uAdventure.Editor
         private readonly Texture2D conditionsTex, noConditionsTex;
         
         private readonly DataControlList activeAreasList;
-        private SceneDataControl workingScene;
 
         public ScenesWindowActiveAreas(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, SceneEditor sceneEditor,
             params GUILayoutOption[] aOptions)
@@ -23,8 +22,8 @@ namespace uAdventure.Editor
             new ActiveAreaActionsComponent(Rect.zero, new GUIContent(""), aStyle);
             new ActiveAreaDescriptionsComponent(Rect.zero, new GUIContent(""), aStyle);
 
-            conditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/conditions-24x24", typeof(Texture2D));
-            noConditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/no-conditions-24x24", typeof(Texture2D));
+            conditionsTex = Resources.Load<Texture2D>("EAdventureData/img/icons/conditions-24x24");
+            noConditionsTex = Resources.Load<Texture2D>("EAdventureData/img/icons/no-conditions-24x24");
 
             activeAreasList = new DataControlList()
             {
@@ -76,7 +75,11 @@ namespace uAdventure.Editor
                 },
                 onSelectCallback = (list) =>
                 {
-                    sceneEditor.SelectedElement = activeAreasList.list[list.index] as ActiveAreaDataControl;
+                    sceneEditor.SelectedElement = activeAreasList.list[list.index] as ExitDataControl;
+                },
+                onRemoveCallback = (list) =>
+                {
+                    sceneEditor.SelectedElement = null;
                 }
             };
 
@@ -93,16 +96,15 @@ namespace uAdventure.Editor
             };
         }
 
+        public override void OnSceneSelected(SceneDataControl scene)
+        {
+            base.OnSceneSelected(scene);
+            activeAreasList.SetData(scene.getActiveAreasList(),
+                (dc) => (dc as ActiveAreasListDataControl).getActiveAreas().Cast<DataControl>().ToList());
+        }
+
         protected override void DrawInspector()
         {
-            var prevWorkingScene = workingScene;
-            workingScene = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[GameRources.GetInstance().selectedSceneIndex];
-            if (workingScene != prevWorkingScene)
-            {
-                activeAreasList.SetData(workingScene.getActiveAreasList(),
-                    (dc) => (dc as ActiveAreasListDataControl).getActiveAreas().Cast<DataControl>().ToList());
-            }
-
             activeAreasList.DoList(160);
             GUILayout.Space(20);
         }
