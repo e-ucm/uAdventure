@@ -49,9 +49,10 @@ namespace uAdventure.Runner
 
         private string path = "";
         LoadingType type = LoadingType.RESOURCES_LOAD;
-        private Dictionary<string, Texture2DHolder> images;
-        private Dictionary<string, eAnim> animations;
-        private Dictionary<string, Core.Animation> otherAnimations;
+        private readonly Dictionary<string, Texture2DHolder> images;
+        private readonly Dictionary<string, AudioHolder> audios;
+        private readonly Dictionary<string, eAnim> animations;
+        private readonly Dictionary<string, Core.Animation> otherAnimations;
 
         public string Path
         {
@@ -85,6 +86,7 @@ namespace uAdventure.Runner
         internal ResourceManager(LoadingType loadingType)
         {
             this.images = new Dictionary<string, Texture2DHolder>();
+            this.audios = new Dictionary<string, AudioHolder>();
             this.animations = new Dictionary<string, eAnim>();
             this.otherAnimations = new Dictionary<string, Core.Animation>();
 
@@ -158,6 +160,44 @@ namespace uAdventure.Runner
                         Debug.Log(uri + " loaded from defaults...");
                         images.Add(uri, holder);
                         return holder.Texture;
+                    }
+                    else
+                    {
+                        Debug.LogWarning("Unable to load " + uri);
+                        return null;
+                    }
+                }
+            }
+        }
+
+        public AudioClip getAudio(string uri)
+        {
+            if (string.IsNullOrEmpty(uri))
+            {
+                return null;
+            }
+
+            if (audios.ContainsKey(uri))
+            {
+                return audios[uri].AudioClip;
+            }
+            else
+            {
+                AudioHolder holder = new AudioHolder(fixPath(uri), type);
+                if (holder.Loaded())
+                {
+                    audios.Add(uri, holder);
+                    return holder.AudioClip;
+                }
+                else
+                {
+                    // Load from defaults
+                    holder = new AudioHolder(defaultPath(uri), type);
+                    if (holder.Loaded())
+                    {
+                        Debug.Log(uri + " loaded from defaults...");
+                        audios.Add(uri, holder);
+                        return holder.AudioClip;
                     }
                     else
                     {

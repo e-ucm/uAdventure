@@ -202,7 +202,7 @@ namespace uAdventure.Runner
             {
                 rend.material.mainTexture = texture;
             }
-            var worldSize = Scene.ToWorldSize(Size);
+            var worldSize = SceneMB.ToWorldSize(Size);
             // Mirror
             worldSize.Scale(new Vector3((mirror ? -1 : 1), 1, 1));
             // Set
@@ -409,7 +409,6 @@ namespace uAdventure.Runner
 
         protected virtual void Update()
         {
-            Debug.Log(gameObject.name + " : " + resourceType);
             if (resourceType == ResourceType.ANIMATION && eAnim != null)
             {
                 timeElapsedInCurrentFrame += Time.deltaTime;
