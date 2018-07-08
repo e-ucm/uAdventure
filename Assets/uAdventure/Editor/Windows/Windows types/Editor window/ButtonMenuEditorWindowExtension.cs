@@ -26,33 +26,39 @@ namespace uAdventure.Editor
             }
         }
 
-        public ButtonMenuEditorWindowExtension(Rect rect, params GUILayoutOption[] aOptions) : this(rect, null, null, aOptions) { }
-        public ButtonMenuEditorWindowExtension(Rect rect, GUIStyle style, params GUILayoutOption[] aOptions) : this(rect, null, style, aOptions) { }
-        public ButtonMenuEditorWindowExtension(Rect rect, GUIContent content, params GUILayoutOption[] aOptions) : this(rect, content, null, aOptions) { }
-        public ButtonMenuEditorWindowExtension(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] aOptions) : base(rect, content, style, aOptions)
+        protected ButtonMenuEditorWindowExtension(Rect rect, params GUILayoutOption[] aOptions) : this(rect, null, null, aOptions) { }
+        protected ButtonMenuEditorWindowExtension(Rect rect, GUIStyle style, params GUILayoutOption[] options) : this(rect, null, style, options) { }
+        protected ButtonMenuEditorWindowExtension(Rect rect, GUIContent content, params GUILayoutOption[] options) : this(rect, content, null, options) { }
+        protected ButtonMenuEditorWindowExtension(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
         {
             UseAnimation = true;
             extended = new AnimBool(false);
         }
 
-        public override void DrawLeftPanelContent(Rect rect, GUIStyle aStyle)
+        public override void DrawLeftPanelContent(Rect rect, GUIStyle style)
         {
             var bv = new Vector2(ButtonHeight, 0);
             var buttonRect = new Rect(rect.position, bv + new Vector2(0, rect.width));
             var menuRect = new Rect(rect.position + bv, rect.size - bv);
 
-            if(DrawButton(buttonRect, aStyle))
+            if(DrawButton(buttonRect, style))
+            {
                 OnButton();
-            DrawMenu(menuRect, aStyle);
+            }
+            DrawMenu(menuRect, style);
         }
 
-        public override void LayoutDrawLeftPanelContent(GUIStyle aStyle, params GUILayoutOption[] aOptions)
+        public override void LayoutDrawLeftPanelContent(GUIStyle style, params GUILayoutOption[] options)
         {
-            if (LayoutDrawButton(aStyle, aOptions))
+            if (LayoutDrawButton(style, options))
+            {
                 OnButton();
+            }
 
             if (!UseAnimation || EditorGUILayout.BeginFadeGroup(extended.faded))
-                LayoutDrawMenu(aStyle, aOptions);
+            {
+                LayoutDrawMenu(style, options);
+            }
 
             if (UseAnimation)
             {
@@ -69,15 +75,15 @@ namespace uAdventure.Editor
         // Button part
         protected float buttonHeight;
         public float ButtonHeight { get { return buttonHeight; } set { buttonHeight = value; UpdateTotalHeight(); } }
-        public abstract bool DrawButton(Rect rect, GUIStyle aStyle);
-        public abstract bool LayoutDrawButton(GUIStyle aStyle, params GUILayoutOption[] aOptions);
+        public abstract bool DrawButton(Rect rect, GUIStyle style);
+        public abstract bool LayoutDrawButton(GUIStyle style, params GUILayoutOption[] options);
         public virtual bool LayoutDrawButton() { return LayoutDrawButton("Button"); }
 
         // Menu part
         protected float menuHeight;
         public float MenuHeight { get { return menuHeight; } set { menuHeight = value; UpdateTotalHeight(); } }
-        public abstract void DrawMenu(Rect rect, GUIStyle aStyle);
-        public abstract void LayoutDrawMenu(GUIStyle aStyle, params GUILayoutOption[] aOptions);
+        public abstract void DrawMenu(Rect rect, GUIStyle style);
+        public abstract void LayoutDrawMenu(GUIStyle style, params GUILayoutOption[] options);
         public virtual void LayoutDrawMenu() { LayoutDrawMenu(null); }
 
         // OnButton

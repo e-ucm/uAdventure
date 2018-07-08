@@ -21,10 +21,11 @@ namespace uAdventure.Editor
         public CharactersWindow(Rect aStartPos, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, new GUIContent(TC.get("Element.Name27")), aStyle, aOptions)
         {
-            var c = new GUIContent();
-            c.image = (Texture2D)Resources.Load("EAdventureData/img/icons/npcs", typeof(Texture2D));
-            c.text = TC.get("Element.Name27");
-            ButtonContent = c;
+            ButtonContent = new GUIContent()
+            {
+                image = Resources.Load<Texture2D>("EAdventureData/img/icons/npcs"),
+                text = "Element.Name27"
+            };
 
             charactersWindowActions = new CharactersWindowActions(aStartPos, new GUIContent(TC.get("NPC.ActionsPanelTitle")), "Window");
             charactersWindowAppearance = new CharactersWindowAppearance(aStartPos, new GUIContent(TC.get("NPC.LookPanelTitle")), "Window");
@@ -35,8 +36,6 @@ namespace uAdventure.Editor
             AddTab(TC.get("NPC.Documentation"), CharactersWindowType.Documentation, charactersWindowDocumentation);
             AddTab(TC.get("NPC.DialogPanelTitle"), CharactersWindowType.DialogConfiguration, charactersWindowDialogConfiguration);
             AddTab(TC.get("NPC.ActionsPanelTitle"), CharactersWindowType.Action, charactersWindowActions);
-
-            //DefaultOpenedWindow = CharactersWindowType.Appearance;
         }
 
         // Two methods responsible for showing right window content 

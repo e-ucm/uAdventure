@@ -10,13 +10,12 @@ namespace uAdventure.Editor
 {
     public abstract class DataControlListEditorWindowExtension : ButtonMenuEditorWindowExtension
     {
-
         protected DataControlList dataControlList;
 
-        public DataControlListEditorWindowExtension(Rect rect, params GUILayoutOption[] options) : this(rect, null, null, options) { }
-        public DataControlListEditorWindowExtension(Rect rect, GUIContent content, params GUILayoutOption[] options) : this(rect, content, null, options) { }
-        public DataControlListEditorWindowExtension(Rect rect, GUIStyle style, params GUILayoutOption[] options) : this(rect, null, style, options) { }
-        public DataControlListEditorWindowExtension(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
+        protected DataControlListEditorWindowExtension(Rect rect, params GUILayoutOption[] options) : this(rect, null, null, options) { }
+        protected DataControlListEditorWindowExtension(Rect rect, GUIContent content, params GUILayoutOption[] options) : this(rect, content, null, options) { }
+        protected DataControlListEditorWindowExtension(Rect rect, GUIStyle style, params GUILayoutOption[] options) : this(rect, null, style, options) { }
+        protected DataControlListEditorWindowExtension(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
         {
 
             dataControlList = new DataControlList()
@@ -29,23 +28,53 @@ namespace uAdventure.Editor
                 drawElementCallback = OnDrawElement,
                 onSelectCallback = OnSelect
             };
+            
+            dataControlList.onRemoveCallback = (list) => 
+            {
+                list.index = -1;
+                OnSelect(list);
+            };
+
         }
         
         public override bool DrawButton(Rect rect, GUIStyle style)
         {
-            if (style == null) style = "Button";
-            var r = GUI.Button(rect, ButtonContent, style);
-            if (r) OnRequestMainView(this);
-            return r;
+            var buttonKey = ButtonContent.text;
+            ButtonContent.text = buttonKey.Traslate();
+
+            if (style == null)
+            {
+                style = "Button";
+            }
+
+            var buttonPressed = GUI.Button(rect, ButtonContent, style);
+            if (buttonPressed)
+            {
+                OnRequestMainView(this);
+            }
+
+            ButtonContent.text = buttonKey;
+            return buttonPressed;
         }
 
         public override bool LayoutDrawButton(GUIStyle style, params GUILayoutOption[] options)
         {
-            if (style == null) style = "Button";
+            var buttonKey = ButtonContent.text;
+            ButtonContent.text = buttonKey.Traslate();
 
-            var r = GUILayout.Button(ButtonContent, style, options);
-            if (r) OnRequestMainView(this);
-            return r;
+            if (style == null)
+            {
+                style = "Button";
+            }
+
+            var buttonPressed = GUILayout.Button(ButtonContent, style, options);
+            if (buttonPressed)
+            {
+                OnRequestMainView(this);
+            }
+
+            ButtonContent.text = buttonKey;
+            return buttonPressed;
         }
 
         protected override void OnButton()

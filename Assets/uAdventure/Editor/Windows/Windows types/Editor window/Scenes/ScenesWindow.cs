@@ -43,14 +43,14 @@ namespace uAdventure.Editor
         public ScenesWindow(Rect rect, GUIStyle style, params GUILayoutOption[] options)
             : base(rect, new GUIContent(TC.get("Element.Name1")), style, options)
         {
-            var content = new GUIContent();
-
             new RectangleComponentEditor(Rect.zero, new GUIContent(""), style);
 
             // Button
-            content.image = (Texture2D) Resources.Load("EAdventureData/img/icons/scenes", typeof(Texture2D));
-            content.text = TC.get("Element.Name1");
-            ButtonContent = content;
+            ButtonContent = new GUIContent()
+            {
+                image = Resources.Load<Texture2D>("EAdventureData/img/icons/scenes"),
+                text = "Element.Name1"
+            };
 
             sceneEditor = new SceneEditor();
 

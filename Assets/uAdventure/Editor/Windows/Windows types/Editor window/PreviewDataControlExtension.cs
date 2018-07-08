@@ -11,14 +11,14 @@ namespace uAdventure.Editor
     public abstract class PreviewDataControlExtension : TabsEditorWindowExtension
     {
 
-        private GUIContent[] displayModes;
+        private readonly GUIContent[] displayModes;
         private static int selectedDisplayMode = 0;
 
         private Vector2 scroll;
 
-        private GUIStyle scrollBackground;
+        private readonly GUIStyle scrollBackground;
 
-        public PreviewDataControlExtension(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
+        protected PreviewDataControlExtension(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
         {
             var size0Img = (Texture2D)Resources.Load("EAdventureData/img/icons/size0", typeof(Texture2D));
             var size1Img = (Texture2D)Resources.Load("EAdventureData/img/icons/size1", typeof(Texture2D));
@@ -52,7 +52,7 @@ namespace uAdventure.Editor
                 case 0: Display(1, false); break;
                 case 1: Display(4, true); break;
                 case 2: Display(2, true); break;
-            };
+            }
             GUI.backgroundColor = new Color(0.5f, 0.5f, 0.5f);
             EditorGUILayout.EndScrollView();
             GUI.backgroundColor = oldBackgroundColor;
@@ -89,8 +89,7 @@ namespace uAdventure.Editor
                 rect = GetPreviewRect(-1);
 
                 float columnWidth = Mathf.RoundToInt(rect.width / (float)columns);
-                float columnHeight = 25f;
-                
+                float columnHeight;
 
                 for (int index = 0; index < dataControlList.list.Count; index++)
                 {
@@ -146,7 +145,9 @@ namespace uAdventure.Editor
             var element = dataControlList.list[index] as DataControl;
             var content = element.getContent() as HasId;
             if (content == null)
+            {
                 return "---";
+            }
 
             return content.getId();
         }

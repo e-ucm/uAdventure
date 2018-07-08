@@ -107,6 +107,10 @@ namespace uAdventure.Editor
         protected virtual void OnRemove()
         {
             dataControl.deleteElement(childs[index], false);
+            if(onRemoveCallback != null)
+            {
+                onRemoveCallback(this.reorderableList);
+            }
             OnChanged(reorderableList);
         }
 

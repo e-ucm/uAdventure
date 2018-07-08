@@ -21,10 +21,11 @@ namespace uAdventure.Editor
         public ItemsWindow(Rect aStartPos, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, new GUIContent(TC.get("Element.Name18")), aStyle, aOptions)
         {
-            var c = new GUIContent();
-            c.image = (Texture2D)Resources.Load("EAdventureData/img/icons/items", typeof(Texture2D));
-            c.text = TC.get("Element.Name18");
-            this.ButtonContent = c;
+            ButtonContent = new GUIContent()
+            {
+                image = Resources.Load<Texture2D>("EAdventureData/img/icons/items"),
+                text = "Element.Name18"
+            };
 
             itemsWindowActions = new ItemsWindowActions(aStartPos, new GUIContent(TC.get("Item.ActionsPanelTitle")), "Window");
             itemsWindowAppearance = new ItemsWindowAppearance(aStartPos, new GUIContent(TC.get("Item.LookPanelTitle")), "Window");
