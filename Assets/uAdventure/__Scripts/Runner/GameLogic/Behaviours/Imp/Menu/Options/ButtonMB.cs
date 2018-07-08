@@ -31,7 +31,7 @@ namespace uAdventure.Runner
         public IActionReceiver Receiver { get; set; }
 
         // Use this for initialization
-        void Start()
+        protected void Start()
         {
             spriteRenderer = GetComponent<SpriteRenderer>();
 
@@ -88,8 +88,9 @@ namespace uAdventure.Runner
             this.interactable = state;
         }
 
-        public InteractuableResult Interacted(PointerEventData eventData = null)
+        public InteractuableResult Interacted(PointerEventData pointerData = null)
         {
+            GUIManager.Instance.ShowHand(false);
             MenuMB.Instance.hide(true);
             if (Receiver != null)
             {
@@ -102,7 +103,7 @@ namespace uAdventure.Runner
             return InteractuableResult.DOES_SOMETHING;
         }
 
-        void OnGUI()
+        protected void OnGUI()
         {
             if (showText)
             {
@@ -121,24 +122,30 @@ namespace uAdventure.Runner
         {
             showText = true;
             transform.parent.GetComponent<OptionMB>().Highlight = true;
-            if (this.action.getType() == Action.CUSTOM)
-                spriteRenderer.sprite = Game.Instance.ResourceManager.getSprite(resource.getAssetPath("buttonOver"));
-            else
-                spriteRenderer.sprite = Game.Instance.ResourceManager.getSprite(resource.getAssetPath(DescriptorData.HIGHLIGHTED_BUTTON));
+            ChangeButtonSprite(DescriptorData.HIGHLIGHTED_BUTTON, "buttonOver");
 
-            GUIManager.Instance.showHand(true);
+            GUIManager.Instance.ShowHand(true);
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
             showText = false;
             transform.parent.GetComponent<OptionMB>().Highlight = false;
-            if (this.action.getType() == Action.CUSTOM)
-                spriteRenderer.sprite = Game.Instance.ResourceManager.getSprite(resource.getAssetPath("buttonNormal"));
-            else
-                spriteRenderer.sprite = Game.Instance.ResourceManager.getSprite(resource.getAssetPath(DescriptorData.NORMAL_BUTTON));
+            ChangeButtonSprite(DescriptorData.NORMAL_BUTTON, "buttonNormal");
 
-            GUIManager.Instance.showHand(false);
+            GUIManager.Instance.ShowHand(false);
+        }
+
+        private void ChangeButtonSprite(string normal, string custom)
+        {
+            if (this.action.getType() == Action.CUSTOM)
+            {
+                spriteRenderer.sprite = Game.Instance.ResourceManager.getSprite(resource.getAssetPath(custom));
+            }
+            else
+            {
+                spriteRenderer.sprite = Game.Instance.ResourceManager.getSprite(resource.getAssetPath(normal));
+            }
         }
     }
 }
