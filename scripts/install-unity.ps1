@@ -15,10 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ################################################################################
-
 $BASE_URL="http://netstorage.unity3d.com/unity"
-$HASH="21ae32b5a9cb"
-$VERSION="2017.4.3f1"
+$HASH="c24f30193bac"
+$VERSION="2017.4.6f1"
 
 $unitysetup = "UnitySetup64.exe"
 $unitysetupargs = "/S"
