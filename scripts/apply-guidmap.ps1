@@ -26,25 +26,28 @@ $unity = "C:\\Program Files\\Unity\\Editor\\Unity.exe"
 $arguments = "-batchmode -force-free -nographics -silent-crashes -logFile $($log_file) -projectPath $($project_path) -quit -executeMethod $($fix_guids_method) $($guid_file)"
 
 Write-Output "Applying GUIDMap to $($project_path)"
-$process = Start-Process $unity $arguments -Wait 
+$process = Start-Process $unity $arguments -Wait -PassThru
 
-$error_code = 0
-If ( $process.ExitCode -eq 0 ) {
-    Write-Output "GUIDMap applied successfully."
+$logContent = Get-Content $log_file
+Write-Output "Logs from build: \n $($logContent)"
+
+If ( $process.ExitCode -eq 0 ) 
+{
+    If ( $logContent -contains "*Scripts have compiler errors.*") 
+    {
+        Write-Error "Scripts have compiler errors!"
+        exit 1
+    }
+    Else 
+    {
+        Write-Output "GUIDMap applied successfully."
+    }
 }
-Else {
-    Write-Output "GUIDMap application failed. Exited with $($process.ExitCode)."
-    $error_code = $process.ExitCode
+Else 
+{
+    Write-Error "GUIDMap application failed. Exited with $($process.ExitCode)."
+    exit $process.ExitCode
 }
-
-Write-Output 'Logs from application'
-Get-Content $log_file
-
-# Re-copy resources folder
-# Copy-Item -Path "$($pwd)\\$($project)\\Assets\\Resources" -Destination "$($project_path)\\Assets\\" -Recurse -Force -Confirm
-# Copy-Item -Path "$($pwd)\\$($project)\\Assets\\Editor\\Resources" -Destination "$($project_path)\\Editor\\Assets\\" -Recurse -Force -Confirm
 
 # Here we should test for missing scripts!
-
-Write-Output "Finishing with code $($error_code)"
-exit $error_code
+exit 0
