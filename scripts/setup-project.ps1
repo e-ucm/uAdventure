@@ -26,7 +26,7 @@ function Resolve-Error
 
     if ($code -ne 0) 
     {
-        Write-Error "Error ($$(code)) setting up the project: \n $errorLog"
+        Write-Error "Error ($($code)) setting up the project: `r`n $errorLog"
         exit $code
     }
 }

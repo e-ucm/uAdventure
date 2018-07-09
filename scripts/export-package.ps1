@@ -45,7 +45,7 @@ Write-Output "Creating package for $($asset_path)"
 $process = Start-Process $unity $arguments -Wait -PassThru
 
 $logContent = Get-Content $log_file
-Write-Output "Logs from build: \n $($logContent)"
+Write-Output "Logs from build: `r`n $($logContent)"
     
 If ( $process.ExitCode -eq 0 ) 
 {

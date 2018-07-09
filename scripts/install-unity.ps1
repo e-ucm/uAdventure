@@ -26,12 +26,14 @@ $package = "Windows64EditorInstaller/UnitySetup64-$($VERSION).exe";
 $url = "$BASE_URL/$HASH/$package"
 
 Write-Output "Downloading from $($url): "
-Invoke-WebRequest -o $unitysetup $url 2>&1 > $downloadLog
-if ($LastExitCode -ne 0)
+try {
+    Invoke-WebRequest -o $unitysetup $url 2>&1 > $downloadLog
+} 
+catch
 {
-    Write-Output "Download failed! (Code $($LastExitCode))"
-    Write-Output "Log: \n $downloadLog"
-    exit $LastExitCode
+    Write-Error "Download failed!"
+    Write-Error "Message: `r`n $($_.Exception.Message)"
+    exit 1
 }
 
 Write-Output "Installing $($unitysetup)"
@@ -39,21 +41,21 @@ $process = Start-Process $unitysetup $unitysetupargs -Wait -PassThru
 if ($process.ExitCode -ne 0)
 {
     Write-Error "Installation failed! (Code $($process.ExitCode))"
-    exit $process.ExitCode
+    exit 1
 }
 
 7z x .\scripts\license.7z -p"$($env:license_password)" 2>&1 > $zipLog
-if ($LastExitCode  -ne 0)
+if ($LastExitCode -ne 0)
 {
     Write-Error "Unzip license failed! (Code $($LastExitCode))"
-    Write-Output "Log: \n $zipLog"
-    exit $LastExitCode
+    Write-Output "Log: `r`n $zipLog"
+    exit 1
 }
 
 .\install-license.ps1 2>&1 > $installLicenseLog
 if ($LastExitCode  -ne 0)
 {
     Write-Error "Install license failed! (Code $($LastExitCode))"
-    Write-Output "Log: \n $installLicenseLog"
+    Write-Output "Log: `r`n $installLicenseLog"
     exit $LastExitCode
 }
