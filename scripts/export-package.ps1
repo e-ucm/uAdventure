@@ -24,11 +24,13 @@ $package_project_path = "$($project_path)\BuildProject\uAdventurePackage\uAdvent
 $export_directory="$($pwd)\\Build"
 $log_file = "$($export_directory)\\unity.log"
 
-If (!$package) {
+If (!$package) 
+{
   $export_path="$($export_directory)/$($project).unitypackage"
   $asset_path="Assets/$($project)"
 }
-Else {
+Else 
+{
   $export_path="$($export_directory)/$($project).$($package).unitypackage"
   $asset_path="Assets/$($package)"
 }
@@ -39,23 +41,37 @@ New-Item -ItemType directory -Path $export_directory
 $unity = "C:\\Program Files\\Unity\\Editor\\Unity.exe"
 $arguments = "-batchmode -force-free -nographics -silent-crashes -logFile $($log_file) -projectPath $($package_project_path) -quit -exportPackage ""$($asset_path)"" ""$($export_path)"""
 
-
 Write-Output "Creating package for $($asset_path)"
-$process = Start-Process $unity $arguments -Wait 
+$process = Start-Process $unity $arguments -Wait -PassThru
 
-$error_code = 0
-If ( $process.ExitCode -eq 0 ) {
-    Write-Output "Created package successfully."
+$logContent = Get-Content $log_file
+Write-Output "Logs from build: `r`n $($logContent)"
+    
+If ( $process.ExitCode -eq 0 ) 
+{
+    If ( $logContent -contains "*Scripts have compiler errors.*") 
+    {
+        Write-Error "Scripts have compiler errors!"
+        exit 1
+    }
+    Else 
+    {
+        Write-Output "Created package successfully at $($export_path)."
+    }
 }
-Else {
-    Write-Output "Creating package failed. Exited with $($process.ExitCode)."
-    $error_code = $process.ExitCode
+Else 
+{
+    Write-Error "Creating package failed. Exited with $($process.ExitCode)."
+    exit $process.ExitCode
 }
 
-Write-Output 'Logs from build'
-Get-Content $log_file
 Write-Output 'Export dir:'
 Get-ChildItem $export_directory
 
-Write-Output "Finishing with code $($error_code)"
-exit $error_code
+if (-not (Test-Path $export_path))
+{
+    Write-Error "Package not found at $($export_path)."
+    exit 1
+}
+
+exit 0

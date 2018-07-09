@@ -28,21 +28,37 @@ $arguments = "-batchmode -force-free -nographics -silent-crashes -logFile $($log
 Write-Output "Creating Exchange dir"
 New-Item -ItemType directory -Path $exchange_folder
 Write-Output "Creating GUIDMap for $($project_path)"
-$process = Start-Process $unity $arguments -Wait 
+$process = Start-Process $unity $arguments -Wait -PassThru
 
-$error_code = 0
-If ( $process.ExitCode -eq 0 ) {
-    Write-Output "GUIDMap created at $($guid_file)."
+$logContent = Get-Content $log_file
+Write-Output "Logs from build: `r`n $($logContent)"
+
+If ( $process.ExitCode -eq 0 ) 
+{
+    If ( $logContent -contains "*Scripts have compiler errors.*") 
+    {
+        Write-Error "Scripts have compiler errors!"
+        exit 1
+    }
+    Else 
+    {
+        Write-Output "GUIDMap created at $($guid_file)."
+    }
 }
-Else {
-    Write-Output "GUIDMap creation failed. Exited with $($process.ExitCode)."
-    $error_code = $process.ExitCode
+Else 
+{
+    Write-Error "GUIDMap creation failed. Exited with $($process.ExitCode)."
+    exit $process.ExitCode
 }
 
-Write-Output 'Logs from build'
-Get-Content $log_file
 Write-Output 'Exchange dir:'
 Get-ChildItem $exchange_folder
 
-Write-Output "Finishing with code $($error_code)"
-exit $error_code
+if (-not (Test-Path $guid_file))
+{
+    Write-Error "GUIDMap not found at $($guid_file)."
+    exit 1
+}
+
+Write-Output "GUIDMap creation success."
+exit 0
