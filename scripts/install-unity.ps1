@@ -27,7 +27,7 @@ $url = "$BASE_URL/$HASH/$package"
 
 Write-Output "Downloading from $($url): "
 try {
-    Invoke-WebRequest -o $unitysetup $url 2>&1 > $downloadLog
+    $downloadLog = & Invoke-WebRequest -o $unitysetup $url 2>&1
 } 
 catch
 {
@@ -44,7 +44,8 @@ if ($process.ExitCode -ne 0)
     exit 1
 }
 
-7z x .\scripts\license.7z -p"$($env:license_password)" 2>&1 > $zipLog
+Write-Output "Unzipping Unity License"
+$zipLog = & 7z x .\scripts\license.7z -p"$($env:license_password)" 2>&1
 if ($LastExitCode -ne 0)
 {
     Write-Error "Unzip license failed! (Code $($LastExitCode))"
@@ -52,7 +53,7 @@ if ($LastExitCode -ne 0)
     exit 1
 }
 
-.\install-license.ps1 2>&1 > $installLicenseLog
+$installLicenseLog = & .\install-license.ps1 2>&1
 if ($LastExitCode  -ne 0)
 {
     Write-Error "Install license failed! (Code $($LastExitCode))"
