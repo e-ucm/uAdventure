@@ -40,16 +40,14 @@ before_build:
 after_build:
   - ps: . .\scripts\setup-project.ps1
   - ps: . .\scripts\apply-guidmap.ps1
+  - ps: . .\scripts\export-package.ps1 uAdventure
 
 #---------------------------------#
 #       tests configuration       #
 #---------------------------------#
 
 test_script:
-  - ps: . .\scripts\setup-project.ps1
-
-after_test:
-  - ps: . .\scripts\export-package.ps1 uAdventure
+  - ps: . .\scripts\run-test.ps1
 
 #---------------------------------#
 #      artifacts configuration    #
