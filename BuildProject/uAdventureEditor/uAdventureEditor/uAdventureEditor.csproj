@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
     <Reference Include="C:\Program Files\Unity\Editor\Data\Managed\**\*.dll" Exclude="C:\Program Files\Unity\Editor\Data\Managed\ExCSS.Unity.dll" />
     <Reference Include="C:\Program Files\Unity\Editor\Data\UnityExtensions\Unity\GUISystem\Standalone\**\*.dll" />
+    <Reference Include="C:\Program Files\Unity\Editor\Data\UnityExtensions\Unity\TestRunner\**\*.dll" Exclude="C:\Program Files\Unity\Editor\Data\UnityExtensions\Unity\TestRunner\portable\nunit.framework.dll"/>
     <Reference Include="$(MSBuildProjectDirectory)\..\..\..\Assets\uAdventure\Plugins\**\*.dll" />
     <Reference Include="$(MSBuildProjectDirectory)\..\..\..\Assets\uAdventure\Editor\Plugins\**\*.dll" />
   </ItemGroup>
