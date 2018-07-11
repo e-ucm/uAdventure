@@ -48,8 +48,32 @@ Else
     exit $process.ExitCode
 }
 
+Write-Output 'Exhange dir:'
+Get-ChildItem $exchange_folder
+
+if (-not (Test-Path $test_file))
+{
+    Write-Error "Tests result not found at $($test_file)."
+    exit 1
+}
+
 # upload results to AppVeyor
-$wc = New-Object 'System.Net.WebClient'
-$wc.UploadFile("https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)", $test_file)
+Write-Output 'Uploading test results to AppVeyor...'
+try {
+    $wc = New-Object 'System.Net.WebClient'
+    $wc.UploadFile("https://ci.appveyor.com/api/testresults/nunit3/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\Exchange\testresults.xml))
+
+    if ($?) {
+        Write-Output 'Success!'
+    } 
+    else {
+        Write-Error "Error! (Code $($LastExitCode)"
+        exit 1
+    }
+}
+catch {
+    Write-Error $error.exception.message
+    exit 1
+}
 
 exit 0

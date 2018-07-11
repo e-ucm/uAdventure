@@ -1362,16 +1362,11 @@ namespace uAdventure.Editor
          * 
          * @return True if a file was loaded successfully, false otherwise
          */
-        private bool LoadFile(string path = null)
+        public bool LoadFile(string path = null)
         {
 			Debug.Log ("Loading file");
             bool fileLoaded = false; 
             bool localLoaded = path == null;
-            //bool hasIncedence = false;
-            /*try
-            { */
-            //LoadingScreen loadingScreen = new LoadingScreen(TextConstants.getText( "Operation.LoadProject" ), getLoadingImage( ), mainWindow);
-            // If some file was selected
                 
             AdventureData loadedAdventureData = null;
             DirectoryInfo directory = null;
