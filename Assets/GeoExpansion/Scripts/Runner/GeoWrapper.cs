@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 using uAdventure.Core;
 using MapzenGo.Models;
 using uAdventure.Runner;
@@ -17,7 +16,7 @@ namespace uAdventure.Geo
         private ExtElemReferenceTransformManager transformManager;
         private Representable mb;
 
-        void Start()
+        protected void Start()
         {
 
             GameObject base_prefab = null;
@@ -29,8 +28,9 @@ namespace uAdventure.Geo
             if (base_prefab != null)
             {
                 GameObject ret = GameObject.Instantiate(base_prefab);
-                ret.GetComponent<Representable>().Context = context;
-                ret.GetComponent<Representable>().Element = Element;
+                mb = ret.GetComponent<Representable>();
+                mb.Context = context;
+                mb.Element = Element;
                 ret.transform.SetParent(transform);
                 ret.transform.localPosition = Vector3.zero;
             }
@@ -42,7 +42,7 @@ namespace uAdventure.Geo
         }
 
         // Update is called once per frame
-        void Update()
+        protected void Update()
         {
             transformManager.Update();
             if(mb is Interactuable)
@@ -52,11 +52,13 @@ namespace uAdventure.Geo
             }
         }
 
-        void OnDestroy()
+        protected void OnDestroy()
         {
             var ua = uAdventurePlugin.FindObjectOfType<uAdventurePlugin>();
-            if(ua)
+            if (ua)
+            {
                 ua.ReleaseElement(Reference);
+            }
         }
     }
 

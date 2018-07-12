@@ -43,13 +43,13 @@ namespace uAdventure.Editor
             base.ShowAsDropDown(buttonRect, windowSize);
         }
 
-        private void OnDisable()
+        protected void OnDisable()
         {
             DrawerParametersMenu.s_LastClosedTime = DateTime.Now.Ticks / 10000L;
             DrawerParametersMenu.s_DrawerParametersMenu = null;
         }
 
-        void OnGUI()
+        protected void OnGUI()
         {
             if(ExtElemReference != null && ExtElemReference.TransformManagerDescriptor != null)
             {

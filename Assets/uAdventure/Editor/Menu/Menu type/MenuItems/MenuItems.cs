@@ -165,7 +165,7 @@ namespace uAdventure.Editor
 
         public void OnCliked()
         {
-            Controller.Instance.buildGame();
+            Controller.Instance.BuildGame();
         }
     }
     
@@ -183,7 +183,7 @@ namespace uAdventure.Editor
 
         public void OnCliked()
         {
-            Controller.Instance.buildGame(Controller.EXPORT_WINDOWS);
+            Controller.Instance.BuildGame(Controller.EXPORT_WINDOWS);
         }
     }
     public class BuildProjectLinux : IMenuItem
@@ -200,7 +200,7 @@ namespace uAdventure.Editor
 
         public void OnCliked()
         {
-            Controller.Instance.buildGame(Controller.EXPORT_LINUX);
+            Controller.Instance.BuildGame(Controller.EXPORT_LINUX);
         }
     }
     public class BuildProjectMacOsX : IMenuItem
@@ -217,7 +217,7 @@ namespace uAdventure.Editor
 
         public void OnCliked()
         {
-            Controller.Instance.buildGame(Controller.EXPORT_MACOSX);
+            Controller.Instance.BuildGame(Controller.EXPORT_MACOSX);
         }
     }
     public class BuildProjectStandalone : IMenuItem
@@ -234,7 +234,7 @@ namespace uAdventure.Editor
 
         public void OnCliked()
         {
-            Controller.Instance.buildGame(Controller.EXPORT_STANDALONE);
+            Controller.Instance.BuildGame(Controller.EXPORT_STANDALONE);
         }
     }
     public class BuildProjectAndroid : IMenuItem
@@ -251,7 +251,7 @@ namespace uAdventure.Editor
 
         public void OnCliked()
         {
-            Controller.Instance.buildGame(Controller.EXPORT_ANDROID);
+            Controller.Instance.BuildGame(Controller.EXPORT_ANDROID);
         }
     }
     public class BuildProjectIOS : IMenuItem
@@ -268,7 +268,7 @@ namespace uAdventure.Editor
 
         public void OnCliked()
         {
-            Controller.Instance.buildGame(Controller.EXPORT_IOS);
+            Controller.Instance.BuildGame(Controller.EXPORT_IOS);
         }
     }
     public class BuildProjectWebGL : IMenuItem
@@ -285,7 +285,7 @@ namespace uAdventure.Editor
 
         public void OnCliked()
         {
-            Controller.Instance.buildGame(Controller.EXPORT_WEBGL);
+            Controller.Instance.BuildGame(Controller.EXPORT_WEBGL);
         }
     }
     public class BuildProjectMobile : IMenuItem
@@ -302,7 +302,7 @@ namespace uAdventure.Editor
 
         public void OnCliked()
         {
-            Controller.Instance.buildGame(Controller.EXPORT_MOBILE);
+            Controller.Instance.BuildGame(Controller.EXPORT_MOBILE);
         }
     }
     public class BuildProjectAll : IMenuItem
@@ -319,7 +319,7 @@ namespace uAdventure.Editor
 
         public void OnCliked()
         {
-            Controller.Instance.buildGame(Controller.EXPORT_ALL);
+            Controller.Instance.BuildGame(Controller.EXPORT_ALL);
         }
     }
 

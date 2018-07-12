@@ -10,8 +10,8 @@ namespace uAdventure.Editor
     public class ConversationEditor : CollapsibleGraphEditor<GraphConversation, ConversationNode>
     {
         private bool elegibleForClick = false;
-        private Dictionary<ConversationNode, ConversationNodeEditor> editors = new Dictionary<ConversationNode, ConversationNodeEditor>();
-        private GUIContent[] options = new GUIContent[] { new GUIContent("Cancel asignation"), new GUIContent("Create/Dialog Node"), new GUIContent("Create/Option Node") };
+        private readonly Dictionary<ConversationNode, ConversationNodeEditor> editors = new Dictionary<ConversationNode, ConversationNodeEditor>();
+        private readonly GUIContent[] options = { new GUIContent("Cancel asignation"), new GUIContent("Create/Dialog Node"), new GUIContent("Create/Option Node") };
 
         protected override ConversationNode[] ChildsFor(GraphConversation Content, ConversationNode parent)
         {
@@ -289,12 +289,7 @@ namespace uAdventure.Editor
 		 *  PROPERTIES
 		 * *****************/
         private ConversationEditor conversationEditor;
-        private GraphConversation conversation; 
-        public GraphConversation Conversation
-        {
-            get { return conversation; }
-            set { this.conversation = value; }
-        }
+        public GraphConversation Conversation { get; set; }
         
 
         /*******************************
@@ -303,7 +298,7 @@ namespace uAdventure.Editor
         public void Init(GraphConversationDataControl conversation) { Init((GraphConversation)conversation.getConversation()); }
         public void Init(GraphConversation conversation)
         {
-            this.conversation = conversation;
+            Conversation = conversation;
 
             ConversationNodeEditorFactory.Intance.ResetInstance();
             conversationEditor = CreateInstance<ConversationEditor>();
@@ -319,16 +314,17 @@ namespace uAdventure.Editor
 		 * Window behaviours
 		 * ******************/
 
-        void OnGUI()
+        protected void OnGUI()
         {
-            if (conversation == null)
+            if (Conversation == null)
+            {
                 this.Close();
+            }
             
             this.wantsMouseMove = true;
-
-            ConversationNode nodoInicial = conversation.getRootNode();
+            
             GUILayout.BeginVertical(GUILayout.Height(20));
-            conversation.setId(EditorGUILayout.TextField(TC.get("Conversation.Title"), conversation.getId(),
+            Conversation.setId(EditorGUILayout.TextField(TC.get("Conversation.Title"), Conversation.getId(),
                 GUILayout.ExpandWidth(true)));
             GUILayout.EndVertical();
 

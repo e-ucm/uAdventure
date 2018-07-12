@@ -33,20 +33,6 @@ namespace uAdventure.Editor
 		private static bool stylesInited = false;
 		private static GUIStyle closeStyle, collapseStyle, conditionStyle, eitherConditionStyle;
 
-        private static Texture2D MakeTex(int width, int height, Color col)
-        {
-            Color[] pix = new Color[width * height];
-
-            for (int i = 0; i < pix.Length; i++)
-                pix[i] = col;
-
-            Texture2D result = new Texture2D(width, height);
-            result.SetPixels(pix);
-            result.Apply();
-
-            return result;
-        }
-
 		static void InitStyles(){
 			if (!stylesInited) {
 				if (closeStyle == null)
@@ -74,13 +60,13 @@ namespace uAdventure.Editor
 				if (conditionStyle == null)
 				{
 					conditionStyle = new GUIStyle(GUI.skin.box);
-					conditionStyle.normal.background = MakeTex(1, 1, new Color(0.627f, 0.627f, 0.627f));
+					conditionStyle.normal.background = TextureUtil.MakeTex(1, 1, new Color(0.627f, 0.627f, 0.627f));
 				}
 
 				if (eitherConditionStyle == null)
 				{
 					eitherConditionStyle = new GUIStyle(GUI.skin.box);
-					eitherConditionStyle.normal.background = MakeTex(1, 1, new Color(0.568f, 0.568f, 0.568f));
+					eitherConditionStyle.normal.background = TextureUtil.MakeTex(1, 1, new Color(0.568f, 0.568f, 0.568f));
 					eitherConditionStyle.padding.left = 15;
 				}
 				stylesInited = true;

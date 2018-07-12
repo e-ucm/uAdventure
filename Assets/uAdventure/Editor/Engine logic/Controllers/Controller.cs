@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System; 
 using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
@@ -446,12 +446,6 @@ namespace uAdventure.Editor
         private string currentZipName;
 
         /**
-         * The name of the current project
-         * info.
-         */
-        private string currentProjectName;
-
-        /**
          * The data of the adventure being edited.
          */
         private AdventureDataControl adventureDataControl;
@@ -466,28 +460,11 @@ namespace uAdventure.Editor
          */
         private string languageFile;
 
-        // private LoadingScreen loadingScreen;
-
-        private string lastDialogDirectory;
-
-        /*private bool isTempFile = false;
-
-        public bool isTempFile( ) {
-            return isTempFile;
-        }*/
-
         private ChapterListDataControl chaptersController = new ChapterListDataControl();
 
         private Controller()
         {
             chaptersController = new ChapterListDataControl();
-        }
-
-        // ABSOLUTE?
-        private string getCurrentExportSaveFolder()
-        {
-
-            return ReleaseFolders.EXPORTS_FOLDER;
         }
 
         // ABSOLUTE?
@@ -662,7 +639,6 @@ namespace uAdventure.Editor
             // Inits the controller with empty data
             currentZipFile = null;
             currentZipName = null;
-            currentProjectName = null;
 
             dataModified_F = false;
 
@@ -860,7 +836,7 @@ namespace uAdventure.Editor
             }
 
             if (fileCreated)
-                AssetsController.resetCache();
+                AssetsController.ResetCache();
 
             return fileCreated;
         }
@@ -966,7 +942,7 @@ namespace uAdventure.Editor
                 // Init project properties (empty)
                 ProjectConfigData.init();
 
-                AssetsController.createFolderStructure();
+                AssetsController.CreateFolderStructure();
                 AssetsController.addSpecialAssets();
                 AssetsController.copyAssets(currentZipFile, new DirectoryInfo("Assets/uAdventure/Resources").FullName);
 
@@ -996,12 +972,6 @@ namespace uAdventure.Editor
                 }
                 else
                     fileCreated = false;
-            }
-
-            if (fileCreated)
-            {
-                ConfigData.fileLoaded(currentZipFile);
-                // Feedback
             }
 
             return fileCreated;
@@ -1098,7 +1068,7 @@ namespace uAdventure.Editor
 
                 // Create the folders and add the assets
                 EditorUtility.DisplayProgressBar("Creating new Adventure", "Creating folder structure", 0.4f);
-                AssetsController.createFolderStructure();
+                AssetsController.CreateFolderStructure();
                 EditorUtility.DisplayProgressBar("Creating new Adventure", "Adding special assets", 0.6f);
                 AssetsController.addSpecialAssets();
                 AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
@@ -1117,9 +1087,8 @@ namespace uAdventure.Editor
 
                     if (selectedFile != null && !selectedFile.Exists)
                         selectedFile.Create().Close();
-
-                    ConfigData.fileLoaded(currentZipFile);
-                    AssetsController.resetCache();
+                    
+                    AssetsController.ResetCache();
                     // The file was saved
                     fileCreated = true;
                     Loaded = true;
@@ -1416,7 +1385,7 @@ namespace uAdventure.Editor
 
                     // Import the proyect
                     EditorUtility.DisplayProgressBar("Importing project", "Creating folder structure", 0);
-                    AssetsController.createFolderStructure();
+                    AssetsController.CreateFolderStructure();
                     EditorUtility.DisplayProgressBar("Importing project", "Adding special assets...", 0.25f);
                     AssetsController.addSpecialAssets();
                     AssetsController.copyAllFiles(new DirectoryInfo(path).FullName, currentZipFile);
@@ -1459,8 +1428,7 @@ namespace uAdventure.Editor
             //if the file was loaded, update the RecentFiles list:
             if (fileLoaded)
             {
-                ConfigData.fileLoaded(currentZipFile);
-                AssetsController.resetCache();
+                AssetsController.ResetCache();
                 if (!localLoaded)
                 {
                     // Save to store the upgrades
@@ -1557,7 +1525,7 @@ namespace uAdventure.Editor
                         }
 
                         // Set the new file and path
-                        AssetsController.createFolderStructure();
+                        AssetsController.CreateFolderStructure();
                     }
                     else
                     {
@@ -1612,11 +1580,10 @@ namespace uAdventure.Editor
             if (fileSaved)
             {
                 //TODO: implement
-                ConfigData.fileLoaded(currentZipFile);
                 Debug.Log(currentZipFile);
                 ProjectConfigData.storeToXML();
 
-                AssetsController.resetCache();
+                AssetsController.ResetCache();
                 // also, look for adaptation and assessment folder, and delete them
                 DirectoryInfo currentAssessFolder = new DirectoryInfo(Path.Combine(currentZipFile, "assessment"));
                 if (currentAssessFolder.Exists)
@@ -1917,48 +1884,27 @@ namespace uAdventure.Editor
 
         //        }
         //    }
-        public bool buildGame()
+        public bool BuildGame()
         {
-            return buildGame(String.Empty, -1);
+            return BuildGame(String.Empty, -1);
         }
 
-        public bool buildGame(int mode)
+        public bool BuildGame(int mode)
         {
-            return buildGame("Games/" + currentZipName, mode);
+            return BuildGame("Games/" + currentZipName, mode);
         }
         
 
-        public bool buildGame(string targetFilePath, int mode)
+        public bool BuildGame(string targetFilePath, int mode)
         {
 
             bool buildGame = true;
             bool exported = false;
             buildGame = saveFile(false);
-            //TODO: testing
-            //if (dataModified_F)
-            //{
-
-            //    //int option = mainWindow.showConfirmDialog(TC.get("Operation.SaveChangesTitle"), TC.get("Operation.SaveChangesMessage"));
-
-            //    //// If the data must be saved, load the new file only if the save was succesful
-            //    //if (option == JOptionPane.YES_OPTION)
-            //    exportGame = saveFile(true);
-
-            //    //// If the data must not be saved, load the new data directly
-            //    //else if (option == JOptionPane.NO_OPTION)
-            //    //    exportGame = true;
-
-            //    //// Cancel the action if selected
-            //    //else if (option == JOptionPane.CANCEL_OPTION)
-            //    //    exportGame = false;
-            //}
 
             if (buildGame)
             {
                 string selectedPath = targetFilePath;
-                //TODO: implementation
-                //if (selectedPath == null)
-                //    selectedPath = mainWindow.showSaveDialog(getCurrentExportSaveFolder(), new EADFileFilter());
                 
                 if (mode == -1)
                 {
@@ -1969,6 +1915,9 @@ namespace uAdventure.Editor
                 {
                     // Get filename.
                     var path = EditorUtility.SaveFolderPanel("Choose Location of Built Game", "", "");
+                    var exportConfig = BuildConfigs.Instanciate();
+                    exportConfig.path = path;
+                    DoBuild(exportConfig);
                 }
             }
 
@@ -1979,10 +1928,10 @@ namespace uAdventure.Editor
         {
             var args = e as ExportConfigSelectedEventArgs;
             Debug.Log("Config selected.");
-            doBuild(args.exportConfig);
+            DoBuild(args.exportConfig);
         }
 
-        public class BuildConfigs
+        public static class BuildConfigs
         {
             public static bool BuildWindows,
                 BuildLinux,
@@ -2089,7 +2038,7 @@ namespace uAdventure.Editor
             return name.Split(' ')[0];
         }
 
-        private void doBuild(BuildConfig config)
+        private void DoBuild(BuildConfig config)
         {
             var activeTarget = EditorUserBuildSettings.activeBuildTarget;
             var activeGroup = EditorUserBuildSettings.selectedBuildTargetGroup;
@@ -2998,33 +2947,33 @@ namespace uAdventure.Editor
             }
         }
 
-        ///**
-        // * Deletes a given asset from the script, removing all occurrences.
-        // * 
-        // * @param assetPath
-        // *            Path of the asset (relative to the ZIP), without suffix in
-        // *            case of an animation or set of slides
-        // */
-        //public void deleteAssetReferences(string assetPath)
-        //{
+        /**
+         * Deletes a given asset from the script, removing all occurrences.
+         * 
+         * @param assetPath
+         *            Path of the asset (relative to the ZIP), without suffix in
+         *            case of an animation or set of slides
+         */
+        public void deleteAssetReferences(string assetPath)
+        {
 
-        //    adventureDataControl.deleteAssetReferences(assetPath);
-        //    chaptersController.deleteAssetReferences(assetPath);
+            adventureDataControl.deleteAssetReferences(assetPath);
+            chaptersController.deleteAssetReferences(assetPath);
 
-        //    // Add references in images and sounds in eaa files
-        //    List<string> assetPaths = new ArrayList<string>();
-        //    List<Integer> assetTypes = new ArrayList<Integer>();
-        //    getAssetReferences(assetPaths, assetTypes);
+            // Add references in images and sounds in eaa files
+            List<string> assetPaths = new List<string>();
+            List<int> assetTypes = new List<int>();
+            getAssetReferences(assetPaths, assetTypes);
 
-        //    for (int i = 0; i < assetPaths.size(); i++)
-        //    {
-        //        if (assetPaths.get(i).toLowerCase().endsWith(".eaa"))
-        //        {
-        //            deleteAssetReferencesInEAA(assetPaths.get(i), assetPath);
-        //        }
-        //    }
+            /*for (int i = 0; i < assetPath.Length; i++)
+            {
+                if (assetPaths[i].ToLower().EndsWith(".eaa"))
+                {
+                    deleteAssetReferencesInEAA(assetPaths[i], assetPath);
+                }
+            }*/
 
-        //}
+        }
         
 
 
@@ -3147,7 +3096,7 @@ namespace uAdventure.Editor
         }
         public void ShowInputDialog(string title, string message, string defaultValue, object token, DialogReceiverInterface receiver)
         {
-            var inputDialog = new InputDialog();
+            var inputDialog = ScriptableObject.CreateInstance<InputDialog>();
             inputDialog.Init(receiver, token, title, message, defaultValue);
         }
 
@@ -3159,7 +3108,7 @@ namespace uAdventure.Editor
 
         public void ShowInputDialog(string title, string message, object[] selectionValues, object token, DialogReceiverInterface receiver)
         {
-            var inputDialog = new ChooseObjectDialog();
+            var inputDialog = ScriptableObject.CreateInstance<ChooseObjectDialog>();
             string[] values;
             if(selectionValues is string[])
             {
@@ -3409,14 +3358,12 @@ namespace uAdventure.Editor
         {
             public delegate void HandleInputCallback(object sender, string input);
             public delegate void CancelInputCallback(object sender);
-
-            private object sender;
+            
             private event HandleInputCallback HandleInput;
             private event CancelInputCallback CancelInput;
 
             public InputReceiver(object sender, HandleInputCallback handleInput, CancelInputCallback cancelInput = null)
             {
-                this.sender = sender;
                 this.HandleInput = handleInput;
                 this.CancelInput = cancelInput;
             }
@@ -3424,13 +3371,17 @@ namespace uAdventure.Editor
             public void OnDialogCanceled(object workingObject = null)
             {
                 if(CancelInput != null)
+                {
                     CancelInput(workingObject);
+                }
             }
 
             public void OnDialogOk(string message, object workingObject = null, object workingObjectSecond = null)
             {
                 if(HandleInput != null)
+                {
                     HandleInput(workingObject, message);
+                }
             }
 
         }
@@ -3440,7 +3391,9 @@ namespace uAdventure.Editor
         public static void OpenWelcomeWindow()
         {
             if (!Language.Initialized)
+            {
                 Language.Initialize();
+            }
 
             var window = EditorWindow.GetWindow(typeof(WelcomeWindow));
             window.Show();
@@ -3450,8 +3403,10 @@ namespace uAdventure.Editor
         [UnityEditor.MenuItem("uAdventure/Editor", priority = 2)]
         public static void OpenEditorWindow()
         {
-            if(!Language.Initialized)
+            if (!Language.Initialized)
+            {
                 Language.Initialize();
+            }
 
             var window = EditorWindow.GetWindow(typeof(EditorWindowBase));
             window.Show();

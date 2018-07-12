@@ -1,10 +1,8 @@
-﻿using UnityEngine;
-
-namespace uAdventure.Editor
+﻿namespace uAdventure.Editor
 {
     public class MusicFileOpenDialog : BaseFileOpenDialog
     {
-        public virtual void Init(DialogReceiverInterface e, FileType fType)
+        public override void Init(DialogReceiverInterface e, FileType fType)
         {
             fileFilter = "mp3";
             base.Init(e, fType);
@@ -18,7 +16,6 @@ namespace uAdventure.Editor
 
         protected override void FileSelectionNotPerfromed()
         {
-            Debug.Log("NIc nie wybrałeś");
             reference.OnDialogCanceled();
         }
     }

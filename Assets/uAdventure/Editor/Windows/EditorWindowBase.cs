@@ -49,7 +49,6 @@ namespace uAdventure.Editor
             editMenu,
             adventureMenu,
             chaptersMenu,
-            runMenu,
             configurationMenu,
             aboutMenu;
 
@@ -64,8 +63,6 @@ namespace uAdventure.Editor
         private static Texture2D undoTexture = null;
         
         private static Texture2D adaptationTexture = null;
-        
-        private static GUIContent leftMenuContentAdaptation;
 
         private List<EditorWindowExtension> extensions;
         private EditorWindowExtension extensionSelected;
@@ -111,33 +108,35 @@ namespace uAdventure.Editor
             }
             else
             {
-                EditorUtility.DisplayDialog("Main scene not found!", "Main Scene was not found! Please open \"_Scene1\" in scenes folder before playing the game.", "Understood!");
+                var title = "EditorWindow.MainSceneNotFound.Title".Traslate();
+                var body = "EditorWindow.MainSceneNotFound.Body".Traslate();
+                var ok = "GeneralText.OK".Traslate();
+                EditorUtility.DisplayDialog(title, body, ok);
             }
 
 
             if (!redoTexture)
             {
-                redoTexture = (Texture2D)Resources.Load("EAdventureData/img/icons/redo", typeof(Texture2D));
+                redoTexture = Resources.Load<Texture2D>("EAdventureData/img/icons/redo");
             }
             if (!undoTexture)
             {
-                undoTexture = (Texture2D)Resources.Load("EAdventureData/img/icons/undo", typeof(Texture2D));
+                undoTexture = Resources.Load<Texture2D>("EAdventureData/img/icons/undo");
             }
             if (!adaptationTexture)
             {
-                adaptationTexture = (Texture2D)Resources.Load("EAdventureData/img/icons/adaptationProfiles", typeof(Texture2D));
+                adaptationTexture = Resources.Load<Texture2D>("EAdventureData/img/icons/adaptationProfiles");
             }
 			
 			fileMenu = new FileMenu();
 			editMenu = new EditMenu();
 			adventureMenu = new AdventureMenu();
 			chaptersMenu = new ChaptersMenu();
-			runMenu = new RunMenu();
 			configurationMenu = new ConfigurationMenu();
 			aboutMenu = new AboutMenu();
         }
 
-        private void OnDestroy()
+        protected void OnDestroy()
         {
             if(thisWindowReference == this)
             {
@@ -204,8 +203,10 @@ namespace uAdventure.Editor
             thisWindowReference.InitWindows();
         }
 
-		void InitWindows(){
-			if (chapterWindow == null) {
+		void InitWindows()
+        {
+			if (chapterWindow == null)
+            {
 				zeroRect = new Rect(0, 0, 0, 0);    
 				chapterWindow = new ChapterWindow(zeroRect, new GUIContent(TC.get("Element.Name0")), "Window");
                 thisWindowReference.openedWindow = EditorWindowType.Chapter;
@@ -213,14 +214,15 @@ namespace uAdventure.Editor
                 // Extensions of the editor
                 extensions = EditorWindowBaseExtensionFactory.Instance.CreateAllExistingExtensions(zeroRect, "Window");
 
-				var ops = new GUILayoutOption[] {
+				var ops = new GUILayoutOption[] 
+                {
 					GUILayout.ExpandWidth(true),
 					GUILayout.ExpandHeight(true)
 				};
 				foreach (var e in extensions)
 				{
 					e.Options = ops;
-					e.OnRequestMainView += (thisWindowReference as EditorWindowBase).RequestMainView;
+					e.OnRequestMainView += thisWindowReference.RequestMainView;
 					e.OnRequestRepaint += Repaint;
                     e.EndWindows = EndWindows;
                     e.BeginWindows = BeginWindows;
@@ -228,7 +230,7 @@ namespace uAdventure.Editor
 			}
 		}
 
-        void OnGUI()
+        protected void OnGUI()
 		{
             this.wantsMouseMove = WantsMouseMove;
 
@@ -269,7 +271,7 @@ namespace uAdventure.Editor
             if (Controller.Instance.Loaded)
             {
                 EditorGUILayout.BeginHorizontal(GUILayout.ExpandWidth(true));
-                var leftMenuRect = EditorGUILayout.BeginVertical(GUILayout.Width(LEFT_MENU_WIDTH), GUILayout.ExpandHeight(true));
+                EditorGUILayout.BeginVertical(GUILayout.Width(LEFT_MENU_WIDTH), GUILayout.ExpandHeight(true));
 
                 scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
 
@@ -297,19 +299,18 @@ namespace uAdventure.Editor
                         break;
                     default:
                         if (extensionSelected != null)
+                        {
                             m_Window = extensionSelected;
+                        }
                         break;
                 }
 
                 if (m_Window != null)
                 {
-                    if (Event.current.type == EventType.Repaint)
+                    if (Event.current.type == EventType.Repaint && m_Window.Rect != windowArea)
                     {
-                        if (m_Window.Rect != windowArea)
-                        {
-                            m_Window.Rect = windowArea;
-                            extensions.ForEach(e => e.Rect = windowArea);
-                        }
+                        m_Window.Rect = windowArea;
+                        extensions.ForEach(e => e.Rect = windowArea);
                     }
                     m_Window.OnGUI();
                 }
@@ -319,20 +320,25 @@ namespace uAdventure.Editor
             }
             else
             {
-                GUILayout.Label("Adventure not loaded.");
-                if (GUILayout.Button("Open Welcome Window"))
+                GUILayout.Label("EditorWindow.NotLoaded".Traslate());
+                if (GUILayout.Button("EditorWindow.OpenWelcome".Traslate()))
                 {
                     Controller.OpenWelcomeWindow();
                 }
-                if (GUILayout.Button("Reload"))
+                if (GUILayout.Button("EditorWindow.Reload".Traslate()))
                 {
                     Controller.ResetInstance();
                     Controller.Instance.Init();
                     EditorWindowBase.RefreshWindows();
                 }
-                if (GUILayout.Button("New"))
+                if (GUILayout.Button("GeneralText.New".Traslate()))
                 {
-                    if (EditorUtility.DisplayDialog("Warning", "Creating a new adventure deletes all previous existing files. Do you want to continue?", "Yes", "No"))
+                    var title = "EditorWindow.CreateNew.Title".Traslate();
+                    var body = "EditorWindow.CreateNew.Body".Traslate();
+                    var yes = "GeneralText.Yes".Traslate();
+                    var no = "GeneralText.No".Traslate();
+
+                    if (EditorUtility.DisplayDialog(title, body, yes, no))
                     {
                         Controller.Instance.NewAdventure(Controller.FILE_ADVENTURE_1STPERSON_PLAYER);
                         Controller.OpenEditorWindow();
@@ -347,18 +353,6 @@ namespace uAdventure.Editor
             openedWindow = type_;
         }
 
-        void RedoAction()
-        {
-            Debug.Log("redo clicked");
-            Controller.Instance.RedoTool();
-        }
-
-        void UndoAction()
-        {
-            Debug.Log("undo clicked");
-            Controller.Instance.UndoTool();
-        }
-
         void RequestMainView(EditorWindowExtension who)
         {
             extensionSelected = who;
@@ -368,8 +362,10 @@ namespace uAdventure.Editor
 
         internal static void LanguageChanged()
         {
-			if(thisWindowReference)
-				thisWindowReference.OnEnable();
+            if (thisWindowReference)
+            {
+                thisWindowReference.OnEnable();
+            }
         }
     }
 }

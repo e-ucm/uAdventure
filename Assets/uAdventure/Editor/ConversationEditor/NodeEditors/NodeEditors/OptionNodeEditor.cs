@@ -9,35 +9,30 @@ namespace uAdventure.Editor
 {
     public class OptionNodeEditor : ConversationNodeEditor
     {
-
         private OptionConversationNode myNode;
         private Vector2 scroll = new Vector2(0, 0);
-        private List<string> npc;
 
-        private bool collapsed = false;
-        public bool Collapsed { get { return collapsed; } set { collapsed = value; } }
+        private readonly Texture2D conditionsTex, noConditionsTex, effectTex, noEffectTex, linkTex, noLinkTex, answerTex, shuffleTex, questionTex;
+        private readonly GUISkin noBackgroundSkin;
+        private readonly GUIStyle closeStyle;
+        private readonly GUIContent answerContent, questionContent, shuffleContent;
 
-        private Rect window = new Rect(0, 0, 100, 0), collapsedWindow = new Rect(0, 0, 150, 43);
+        private ConversationEditor parent;
+
         public Rect Window
         {
             get
             {
-                if (collapsed) return new Rect(window.x, window.y, collapsedWindow.width, collapsedWindow.height);
-                else return window;
+                return new Rect(myNode.getEditorX(), myNode.getEditorY(), myNode.getEditorWidth(), myNode.getEditorHeight());
             }
             set
             {
                 myNode.setEditorX((int)value.x);
                 myNode.setEditorY((int)value.y);
-                if (collapsed) window = new Rect(value.x, value.y, collapsedWindow.width, collapsedWindow.height);
-                else window = value;
+                myNode.setEditorWidth((int)value.width);
+                myNode.setEditorHeight((int)value.height);
             }
         }
-
-        Texture2D conditionsTex, noConditionsTex, effectTex, noEffectTex, linkTex, noLinkTex, tmpTex, answerTex, shuffleTex, questionTex;
-        GUISkin noBackgroundSkin, defaultSkin;
-        GUIStyle closeStyle;
-        GUIContent answerContent, questionContent, shuffleContent;
 
         public OptionNodeEditor()
         {
@@ -46,26 +41,34 @@ namespace uAdventure.Editor
             conditionsTex = Resources.Load<Texture2D>("EAdventureData/img/icons/conditions-24x24");
             noConditionsTex = Resources.Load<Texture2D>("EAdventureData/img/icons/no-conditions-24x24");
 
-            linkTex = (Texture2D)Resources.Load("EAdventureData/img/icons/linkNode", typeof(Texture2D));
-            noLinkTex = (Texture2D)Resources.Load("EAdventureData/img/icons/deleteNodeLink", typeof(Texture2D));
+            linkTex = Resources.Load<Texture2D>("EAdventureData/img/icons/linkNode");
+            noLinkTex = Resources.Load<Texture2D>("EAdventureData/img/icons/deleteNodeLink");
 
-            effectTex = (Texture2D)Resources.Load("EAdventureData/img/icons/effects/32x32/has-macro", typeof(Texture2D));
-            noEffectTex = (Texture2D)Resources.Load("EAdventureData/img/icons/effects/32x32/macro", typeof(Texture2D));
+            effectTex = Resources.Load<Texture2D>("EAdventureData/img/icons/effects/32x32/has-macro");
+            noEffectTex = Resources.Load<Texture2D>("EAdventureData/img/icons/effects/32x32/macro");
 
-            answerTex = (Texture2D)Resources.Load("EAdventureData/img/icons/answer", typeof(Texture2D));
-            questionTex = (Texture2D)Resources.Load("EAdventureData/img/icons/question", typeof(Texture2D));
-            shuffleTex = (Texture2D)Resources.Load("EAdventureData/img/icons/shuffle", typeof(Texture2D));
+            answerTex = Resources.Load<Texture2D>("EAdventureData/img/icons/answer");
+            questionTex = Resources.Load<Texture2D>("EAdventureData/img/icons/question");
+            shuffleTex = Resources.Load<Texture2D>("EAdventureData/img/icons/shuffle");
 
             answerContent = new GUIContent(answerTex);
             questionContent = new GUIContent(questionTex);
             shuffleContent = new GUIContent(shuffleTex);
 
-            noBackgroundSkin = (GUISkin)Resources.Load("EAdventureData/skin/EditorNoBackgroundSkin", typeof(GUISkin));
+            noBackgroundSkin = Resources.Load<GUISkin>("EAdventureData/skin/EditorNoBackgroundSkin");
             noBackgroundSkin.button.margin = new RectOffset(1, 1, 1, 1);
             noBackgroundSkin.button.padding = new RectOffset(0, 0, 0, 0);
+            
+            closeStyle = new GUIStyle(GUI.skin.button)
+            {
+                padding = new RectOffset(0, 0, 0, 0),
+                margin = new RectOffset(0, 5, 2, 0)
+            };
+            closeStyle.normal.textColor = Color.red;
+            closeStyle.focused.textColor = Color.red;
+            closeStyle.active.textColor = Color.red;
+            closeStyle.hover.textColor = Color.red;
         }
-
-        ConversationEditor parent;
 
         public void setParent(ConversationEditor parent)
         {
@@ -74,20 +77,11 @@ namespace uAdventure.Editor
 
         public void draw()
         {
-            if (closeStyle == null)
+
+            GUIStyle style = new GUIStyle()
             {
-                closeStyle = new GUIStyle(GUI.skin.button);
-                closeStyle.padding = new RectOffset(0, 0, 0, 0);
-                closeStyle.margin = new RectOffset(0, 5, 2, 0);
-                closeStyle.normal.textColor = Color.red;
-                closeStyle.focused.textColor = Color.red;
-                closeStyle.active.textColor = Color.red;
-                closeStyle.hover.textColor = Color.red;
-            }
-
-            GUIStyle style = new GUIStyle();
-            style.padding = new RectOffset(5, 5, 5, 5);
-
+                padding = new RectOffset(5, 5, 5, 5)
+            };
             EditorGUILayout.BeginVertical();
             // Options configuration
             EditorGUILayout.BeginHorizontal();
@@ -111,7 +105,7 @@ namespace uAdventure.Editor
 				GUI.Label (lastRect, " Required for analytics", guistyle);
 			}
 			GUILayout.EndHorizontal ();
-            bool infoShown = false;
+
             if (myNode.getLineCount() > 0)
             {
                 bool isScrolling = false;
@@ -131,29 +125,11 @@ namespace uAdventure.Editor
 					myNode.getLine (i).setXApiCorrect (EditorGUILayout.Toggle(myNode.getLine (i).getXApiCorrect (), GUILayout.Width(15)));
 					GUILayout.Space (5);
 
-                    tmpTex = (myNode.getLine(i).getConditions().GetConditionsList().Count > 0
-                        ? conditionsTex
-                        : noConditionsTex);
-
-                    if (GUILayout.Button(tmpTex, noBackgroundSkin.button, GUILayout.Width(15), GUILayout.Height(15)))
-                    {
-                        ConditionEditorWindow window = (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
-                        window.Init(myNode.getLine(i).getConditions());
-                    }
-
-                    if (GUILayout.Button(linkTex, noBackgroundSkin.button, GUILayout.Width(15), GUILayout.Height(15)))
-                    {
-                        parent.StartSetChild(this.myNode, i);
-                    }
-
-
-                    if (GUILayout.Button("X", closeStyle, GUILayout.Width(15), GUILayout.Height(15)))
+                    if (DrawLineOptions(i, myNode.getLine(i).getConditions()))
                     {
                         myNode.removeLine(i);
-                        myNode.removeChild(i);
-                    };
+                    }
                     EditorGUILayout.EndHorizontal();
-
                 }
 
                 // Timer
@@ -162,41 +138,29 @@ namespace uAdventure.Editor
                 EditorGUIUtility.labelWidth = 0;
                 if (EditorGUILayout.Toggle("Timeout: ", myNode.Timeout >= 0))
                 {
-                    if(myNode.Timeout < 0)
+                    if (myNode.Timeout < 0)
+                    {
                         parent.addChild(this.myNode, new DialogueConversationNode());
+                    }
 
                     myNode.Timeout = Mathf.Clamp(EditorGUILayout.FloatField(myNode.Timeout), 0, float.MaxValue);
-
                     GUILayout.Space(5);
-
-                    tmpTex = (myNode.TimeoutConditions.GetConditionsList().Count > 0
-                        ? conditionsTex
-                        : noConditionsTex);
-                    
-                    if (GUILayout.Button(tmpTex, noBackgroundSkin.button, GUILayout.Width(15), GUILayout.Height(15)))
-                    {
-                        ConditionEditorWindow window = (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
-                        window.Init(myNode.TimeoutConditions);
-                    }
-
-                    if (GUILayout.Button(linkTex, noBackgroundSkin.button, GUILayout.Width(15), GUILayout.Height(15)))
-                    {
-                        parent.StartSetChild(this.myNode, myNode.getLineCount());
-                    }
-
-                    if (GUILayout.Button("X", closeStyle, GUILayout.Width(15), GUILayout.Height(15)))
+                    if (DrawLineOptions(myNode.getChildCount(), myNode.TimeoutConditions)) 
                     {
                         myNode.Timeout = -1f;
-                        myNode.removeChild(myNode.getChildCount());
-                    };
+                    }
                 }
                 else
+                {
                     myNode.Timeout = -1f;
+                }
                 
                 EditorGUILayout.EndHorizontal();
                 
                 if (isScrolling)
+                {
                     EditorGUILayout.EndScrollView();
+                }
             }
 
             EditorGUILayout.BeginHorizontal();
@@ -206,18 +170,40 @@ namespace uAdventure.Editor
             {
                 myNode.addLine(new ConversationLine("Player", ""));
                 parent.addChild(this.myNode, new DialogueConversationNode());
-            };
+            }
 
-            tmpTex = (myNode.getEffects().getEffects().Count > 0
-                ? effectTex
-                : noEffectTex);
-            if (GUILayout.Button(tmpTex, noBackgroundSkin.button, GUILayout.Width(24), GUILayout.Height(24)))
+            var hasEffects = myNode.getEffects().getEffects().Count > 0;
+            if (GUILayout.Button(hasEffects ? effectTex : noEffectTex, noBackgroundSkin.button, GUILayout.Width(24), GUILayout.Height(24)))
             {
                 EffectEditorWindow window = (EffectEditorWindow)ScriptableObject.CreateInstance(typeof(EffectEditorWindow));
                 window.Init(myNode.getEffects());
             }
             EditorGUILayout.EndHorizontal();
             EditorGUILayout.EndVertical();
+        }
+
+        private bool DrawLineOptions(int optionIndex, Conditions conditions)
+        {
+            var hasConditions = conditions.GetConditionsList().Count > 0;
+
+            if (GUILayout.Button(hasConditions ? conditionsTex : noConditionsTex, noBackgroundSkin.button, GUILayout.Width(15), GUILayout.Height(15)))
+            {
+                ConditionEditorWindow window = (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
+                window.Init(conditions);
+            }
+
+            var hasLink = myNode.getChild(optionIndex) != null;
+            if (GUILayout.Button(hasLink ? linkTex : noLinkTex, noBackgroundSkin.button, GUILayout.Width(15), GUILayout.Height(15)))
+            {
+                parent.StartSetChild(this.myNode, optionIndex);
+            }
+
+            if (GUILayout.Button("X", closeStyle, GUILayout.Width(15), GUILayout.Height(15)))
+            {
+                myNode.removeChild(optionIndex);
+                return true;
+            }
+            return false;
         }
 
         public ConversationNode Node { get { return myNode; } set { myNode = value as OptionConversationNode; } }

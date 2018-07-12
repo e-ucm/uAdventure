@@ -227,12 +227,6 @@ namespace uAdventure.Editor
             controller.AddTool(tool);
         }
 
-        public void imageChangeNotify(string imagePath)
-        {
-
-            this.referencesListDataControl.changeImagePlayerPath(imagePath);
-        }
-
         /**
          * Sets the new documentation of the scene.
          * 

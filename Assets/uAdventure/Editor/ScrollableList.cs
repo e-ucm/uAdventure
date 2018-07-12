@@ -202,9 +202,6 @@ public class ScrollableList
         }
         else if (this.displayAddButton || this.displayRemoveButton)
         {
-            var add = reorderableList.displayAdd;
-            var rem = reorderableList.displayRemove;
-
             reorderableList.displayAdd = displayAddButton;
             reorderableList.displayRemove = displayRemoveButton;
             ReorderableList.defaultBehaviours.DrawFooter(footerRect, reorderableList);

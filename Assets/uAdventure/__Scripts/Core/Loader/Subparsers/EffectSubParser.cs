@@ -16,8 +16,11 @@ namespace uAdventure.Core
 			var chapter = parameters [0] as Chapter;
 			var effects = element.Name == "macro" ? new Macro (element.GetAttribute("id")) : new Effects ();
 
-			if(effects is Macro)
-				((Macro)effects).setDocumentation(element.InnerText);
+            var macro = effects as Macro;
+			if(macro != null)
+            {
+                macro.setDocumentation(element.InnerText);
+            }
 			
             string tmpArgVal;
             int x = 0;
@@ -25,7 +28,6 @@ namespace uAdventure.Core
             string path = "";
             string id = "";
             bool animated = false, addeffect = true;
-            List<IEffect> effectlist;
 
             IEffect currentEffect = null;
 

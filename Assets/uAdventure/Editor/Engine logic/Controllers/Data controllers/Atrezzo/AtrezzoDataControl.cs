@@ -183,20 +183,23 @@ namespace uAdventure.Editor
         }
 
 
-        public override string renameElement(string name)
+        public override string renameElement(string newName)
         {
             string oldAtrezzoId = atrezzo.getId();
             string references = controller.countIdentifierReferences(oldAtrezzoId).ToString();
 
             // Ask for confirmation 
-            if (name != null || controller.ShowStrictConfirmDialog(TC.get("Operation.RenameAtrezzoTitle"), TC.get("Operation.RenameElementWarning", new string[] { oldAtrezzoId, references })))
+            if (newName != null || controller.ShowStrictConfirmDialog(TC.get("Operation.RenameAtrezzoTitle"), TC.get("Operation.RenameElementWarning", new string[] { oldAtrezzoId, references })))
             {
                 // Show a dialog asking for the new atrezzo item id
-                string newAtrezzoId = name;
-                if (name == null)
-                    controller.ShowInputDialog(TC.get("Operation.RenameAtrezzoTitle"), TC.get("Operation.RenameAtrezzoMessage"), oldAtrezzoId, (o,s) => performRenameElement(s));
+                if (newName == null)
+                {
+                    controller.ShowInputDialog(TC.get("Operation.RenameAtrezzoTitle"), TC.get("Operation.RenameAtrezzoMessage"), oldAtrezzoId, (o, s) => performRenameElement(s));
+                }
                 else
-                    return performRenameElement(name);
+                {
+                    return performRenameElement(newName);
+                }
             }
 
             return null;
@@ -208,7 +211,9 @@ namespace uAdventure.Editor
 
             // If some value was typed and the identifiers are different
             if (!controller.isElementIdValid(newAtrezzoId))
+            {
                 newAtrezzoId = controller.makeElementValid(newAtrezzoId);
+            }
 
             atrezzo.setId(newAtrezzoId);
             controller.replaceIdentifierReferences(oldAtrezzoId, newAtrezzoId);

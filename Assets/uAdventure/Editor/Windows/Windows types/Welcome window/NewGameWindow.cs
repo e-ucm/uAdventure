@@ -16,26 +16,18 @@ namespace uAdventure.Editor
             TPS = 1
         };
 
-        private string selectedGameProjectPath = "";
-
         public Vector2 scrollPositionButtons;
         public Vector2 scrollPositionInfo;
-        private Texture2D newGameButtonFPSImage = null;
-        private Texture2D newGameButtonTPSImage = null;
-        private Texture2D newGameScreenFPSImage = null;
-        private Texture2D newGameScreenTPSImage = null;
-        private Rect screenRect;
+        private readonly Texture2D newGameButtonFPSImage = null;
+        private readonly Texture2D newGameButtonTPSImage = null;
+        private readonly Texture2D newGameScreenFPSImage = null;
+        private readonly Texture2D newGameScreenTPSImage = null;
         private Rect bottomButtonRect;
 
-        private string infoFPS =
-            "You have selected to create a new adventure in 1st person mode (player is not shown). \nThere is no avatar for the player.\nThe player explores the game himself, and transitions between scenes are instantaneous.\n Usually these games are designed using photos to configure the scenes.\nHence the playerinteracts in first person with a very real-looking world, in which you can turn or go back in the scene bi clicking left, right, down, etc.";
-
-        private string infoTPS =
-            "You have selected to create a new adventure in 3rd person mode (player is visible).\n The player is represented by an avatar, which is drawn onto the game all the time.\nIt needs some time to go from place to place, and when he speaks the text is displayed just over his head.";
-
+        private readonly string infoFPS = "StartDialog.NewAdventure-TransparentMode.Description";
+        private readonly string infoTPS = "StartDialog.NewAdventure-VisibleMode.Description";
+        
         public static GameType selectedGameType;
-
-        private string newGameName;
 
         public NewGameWindow(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
@@ -50,8 +42,7 @@ namespace uAdventure.Editor
         {
             var windowWidth = Rect.width;
             var windowHeight = Rect.height;
-
-            screenRect = new Rect(0.01f * windowWidth, 0.5f * windowHeight, 0.98f * windowWidth, 0.4f * windowHeight);
+            
             bottomButtonRect = new Rect(0.8f * windowWidth, 0.9f * windowHeight, 0.15f * windowWidth, 0.1f * windowHeight);
 
             GUILayout.BeginHorizontal();
@@ -72,12 +63,12 @@ namespace uAdventure.Editor
                     GUILayout.Height(0.8f * windowHeight));
                 if (selectedGameType == GameType.FPS)
                 {
-                    GUILayout.Label(infoFPS);
+                    GUILayout.Label(infoFPS.Traslate());
                     GUILayout.Box(newGameScreenFPSImage);
                 }
                 else
                 {
-                    GUILayout.Label(infoTPS);
+                    GUILayout.Label(infoTPS.Traslate());
                     GUILayout.Box(newGameScreenTPSImage);
                 }
                 GUILayout.EndScrollView();
@@ -89,20 +80,21 @@ namespace uAdventure.Editor
             
             if (GUILayout.Button("New"))
             {
-                startNewGame();
+                CreateNewAdventure();
             }
 
             GUILayout.EndHorizontal();
             GUILayout.EndArea();
         }
 
-        private void startNewGame()
+        private void CreateNewAdventure()
         {
-
-            int type = -1;
+            int type;
             switch (selectedGameType)
             {
                 default:
+                    Debug.LogError("Wrong adventure type selected");
+                    return;
                 case GameType.FPS: type = Controller.FILE_ADVENTURE_1STPERSON_PLAYER; break;
                 case GameType.TPS: type = Controller.FILE_ADVENTURE_3RDPERSON_PLAYER; break;
             }
@@ -112,35 +104,6 @@ namespace uAdventure.Editor
                 Controller.Instance.NewAdventure(type);
                 Controller.OpenEditorWindow();
                 EditorWindowBase.RefreshWindows();
-            }
-        }
-
-        private void old_startNewGame()
-        {
-            int type = -1;
-            switch (selectedGameType)
-            {
-                default:
-                case GameType.FPS: type = Controller.FILE_ADVENTURE_1STPERSON_PLAYER; break;
-                case GameType.TPS: type = Controller.FILE_ADVENTURE_3RDPERSON_PLAYER; break;
-            }
-            
-			var result = EditorUtility.SaveFilePanel ("Select project file", "C:\\", "New project", "ead");
-
-			if (result != "")
-            {
-				FileInfo fileInfo = new FileInfo(result);
-				if (fileInfo.Exists)
-                {
-                    // Insert code to read the stream here.
-					selectedGameProjectPath = fileInfo.DirectoryName;
-                    if(GameRources.CreateGameProject(selectedGameProjectPath, type))
-                    {
-                        GameRources.LoadGameProject(selectedGameProjectPath);
-                        Controller.OpenEditorWindow();
-                    }
-                }
-
             }
         }
     }

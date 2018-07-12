@@ -12,16 +12,14 @@ namespace uAdventure.Editor
         /* Scene controller that contains this element reference(used to extract
            * the id of the scene).
            */
-        private SceneDataControl sceneDataControl;
+        private readonly SceneDataControl sceneDataControl;
 
-        private Trajectory trajectory;
+        private readonly Trajectory trajectory;
 
         /**
          * Contained node.
          */
-        private Trajectory.Node node;
-
-        private bool initial;
+        private readonly Trajectory.Node node;
 
         /**
          * Constructor.
@@ -33,11 +31,9 @@ namespace uAdventure.Editor
          */
         public NodeDataControl(SceneDataControl sceneDataControl, Trajectory.Node node, Trajectory trajectory)
         {
-
             this.sceneDataControl = sceneDataControl;
             this.node = node;
             this.trajectory = trajectory;
-            initial = false;
         }
 
         /**
@@ -47,7 +43,6 @@ namespace uAdventure.Editor
          */
         public string getParentSceneId()
         {
-
             return sceneDataControl.getId();
         }
 
@@ -58,7 +53,6 @@ namespace uAdventure.Editor
          */
         public int getX()
         {
-
             return node.getX();
         }
 
@@ -69,7 +63,6 @@ namespace uAdventure.Editor
          */
         public int getY()
         {
-
             return node.getY();
         }
 
@@ -85,88 +78,72 @@ namespace uAdventure.Editor
          */
         public void setNode(int x, int y, float scale)
         {
-
             controller.AddTool(new SetNodeValuesTool(node, trajectory, x, y, scale));
         }
 
 
         public override System.Object getContent()
         {
-
             return node;
         }
 
 
         public override int[] getAddableElements()
         {
-
             return new int[] { };
         }
 
 
         public override bool canAddElement(int type)
         {
-
             return false;
         }
 
 
         public override bool canBeDeleted()
         {
-
             return true;
         }
 
 
         public override bool canBeMoved()
         {
-
             return true;
         }
 
 
         public override bool canBeRenamed()
         {
-
             return false;
         }
 
 
         public override bool addElement(int type, string id)
         {
-
-            bool elementAdded = false;
-            return elementAdded;
+            return false;
         }
 
 
         public override bool deleteElement(DataControl dataControl, bool askConfirmation)
         {
-
-            bool elementDeleted = false;
-            return elementDeleted;
+            return false;
         }
 
 
         public override bool moveElementUp(DataControl dataControl)
         {
-
-            bool elementMoved = false;
-            return elementMoved;
+            return false;
         }
 
 
         public override bool moveElementDown(DataControl dataControl)
         {
-
-            bool elementMoved = false;
-            return elementMoved;
+            return false;
         }
 
 
-        public override string renameElement(string name)
+        public override string renameElement(string newName)
         {
-
             return null;
         }
 
@@ -195,43 +172,32 @@ namespace uAdventure.Editor
 
         public override void getAssetReferences(List<string> assetPaths, List<int> assetTypes)
         {
-
-            // DO nothing
         }
 
 
         public override void deleteAssetReferences(string assetPath)
         {
-
-            // Delete the references from the actions
-            // Do nothing
         }
 
 
         public override int countIdentifierReferences(string id)
         {
-
             return 0;
         }
 
 
         public override void replaceIdentifierReferences(string oldId, string newId)
         {
-
-            //actionsListDataControl.replaceIdentifierReferences( oldId, newId );
         }
 
 
         public override void deleteIdentifierReferences(string id)
         {
-
-            //actionsListDataControl.deleteIdentifierReferences( id );
         }
 
 
         public override bool canBeDuplicated()
         {
-
             return true;
         }
 
@@ -262,9 +228,13 @@ namespace uAdventure.Editor
         {
             var was = isInitial();
             if (was && !initial)
+            {
                 trajectory.setInitial(trajectory.getNodes()[0].getID());
+            }
             else if (!was && initial)
+            {
                 trajectory.setInitial(node.getID());
+            }
         }
 
         public bool isInitial()

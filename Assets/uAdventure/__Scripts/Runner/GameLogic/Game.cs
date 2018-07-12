@@ -48,9 +48,6 @@ namespace uAdventure.Runner
         private GameState game_state;
         private uAdventureRaycaster uAdventureRaycaster;
 
-        // Tracking
-        IChapterTarget alternative;
-
         // GUI
         public GameObject Blur_Prefab;
         private GUISkin skin;
@@ -330,8 +327,6 @@ namespace uAdventure.Runner
 
         private void trackSceneChange(IChapterTarget target)
         {
-            alternative = null;
-
             if (!string.IsNullOrEmpty(target.getXApiClass()) && target.getXApiClass() == "accesible")
             {
                 TrackerAsset.Instance.Accessible.Accessed(target.getId(), ExParsers.ParseEnum<AccessibleTracker.Accessible>(target.getXApiType()));

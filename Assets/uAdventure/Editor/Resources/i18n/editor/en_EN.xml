@@ -323,7 +323,7 @@ In the game you can define conditions based on the value of the variables.</entr
 <entry key="BarriersList.SelectInitialNode">Select initial node</entry>
 <entry key="Inventory.TopAndBottom">Top and bottom</entry>
 <entry key="SPEP.ShowPlayer">Player</entry>
-<entry key="StartDialog.NewAdventure-VisibleMode.Description"> You have selected to create a new adventure in 3rd person mode (player is visible).</entry>
+<entry key="StartDialog.NewAdventure-VisibleMode.Description">You have selected to create a new adventure in 3rd person mode (player is visible).\n The player is represented by an avatar, which is drawn onto the game all the time.\nIt needs some time to go from place to place, and when he speaks the text is displayed just over his head.</entry>
 <entry key="Tools.Undo">Undo</entry>
 <entry key="ConversationLine.PlayerName">Player</entry>
 <entry key="Operation.RenameSceneTitle">Rename scene</entry>
@@ -566,7 +566,7 @@ named 'descriptor.xml' or 'chapterXX.xml' where XX is a number.</entry>
 <entry key="LOMES.Educational.CognitiveProcess32">Produce</entry>
 <entry key="LOMES.Educational.CognitiveProcess31">Practise</entry>
 <entry key="LOMES.Educational.CognitiveProcess30">Plan</entry>
-<entry key="StartDialog.NewAdventure-TransparentMode.Description"> You have selected to create a new adventure in 1st person mode (player is not shown).</entry>
+<entry key="StartDialog.NewAdventure-TransparentMode.Description">You have selected to create a new adventure in 1st person mode (player is not shown). \nThere is no avatar for the player.\nThe player explores the game himself, and transitions between scenes are instantaneous.\n Usually these games are designed using photos to configure the scenes.\nHence the playerinteracts in first person with a very real-looking world, in which you can turn or go back in the scene bi clicking left, right, down, etc.</entry>
 <entry key="LOM.LifeCycle.Version">Version</entry>
 <entry key="LOM.Duration.Seconds">Seconds</entry>
 <entry key="Search.Concept">Concept</entry>
@@ -2137,10 +2137,24 @@ In the game you can define conditions based on the value of the variables.</entr
 <entry key="Orientation.S">Down</entry>
 <entry key="Orientation.W">Left</entry>
 <entry key="Orientation.E">Right</entry>
-  
+
+<entry key="SceneEditor.PlayerTrajectory.None">None</entry>
+<entry key="SceneEditor.PlayerTrajectory.Edit">Edit tool</entry>
+<entry key="SceneEditor.PlayerTrajectory.AddSide">Add sides tool</entry>
+<entry key="SceneEditor.PlayerTrajectory.StartNode">Select start node tool</entry>
+<entry key="SceneEditor.PlayerTrajectory.Delete">Delete tool</entry>
+
 <entry key="MenuAdventure.SaveMode">Save configuration</entry>
 <entry key="MenuAdventure.AutoSave.Checkbox">Save the game automatically?</entry>
 <entry key="MenuAdventure.SaveOnSuspend.Checkbox">Save on suspend? (Useful for mobile devices)</entry>
+
+<entry key="EditorWindow.MainSceneNotFound.Title">Main scene not found!</entry>
+<entry key="EditorWindow.MainSceneNotFound.Body">Main Scene was not found! Please open \"_Scene1\" in scenes folder before playing the game.</entry>
+<entry key="EditorWindow.NotLoaded">Adventure not loaded</entry>
+<entry key="EditorWindow.OpenWelcome">Open Welcome Window</entry>
+<entry key="EditorWindow.Reload">Reload</entry>
+<entry key="EditorWindow.CreateNew.Title">Warning!</entry>
+<entry key="EditorWindow.CreateNew.Body">Creating a new adventure deletes all previous existing files. Do you want to continue?</entry>
 
 <!-- Analytics -->
 <entry key="Analytics.Title">Analytics</entry>

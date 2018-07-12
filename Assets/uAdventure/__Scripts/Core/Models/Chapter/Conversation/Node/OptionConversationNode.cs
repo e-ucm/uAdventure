@@ -208,7 +208,7 @@ namespace uAdventure.Core
             {
                 var tmp = timerChild;
                 timerChild = null;
-                return timerChild;
+                return tmp;
             }
             else
             {

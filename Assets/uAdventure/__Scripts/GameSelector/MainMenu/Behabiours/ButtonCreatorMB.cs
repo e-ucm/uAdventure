@@ -13,14 +13,14 @@ namespace uAdventure.GameSelector
 
         string[] directories;
 
-        void Start()
+        protected void Start()
         {
-            /*directories = System.IO.Directory.GetDirectories(ResourceManager.Instance.getCurrentDirectory()
-            + System.IO.Path.DirectorySeparatorChar + "Games" + System.IO.Path.DirectorySeparatorChar);*/
+            directories = System.IO.Directory.GetDirectories(Game.Instance.ResourceManager.getCurrentDirectory()
+                + System.IO.Path.DirectorySeparatorChar + "Games" + System.IO.Path.DirectorySeparatorChar);
         }
 
         string[] rendered_directories;
-        void Update()
+        protected void Update()
         {
             if (rendered_directories != directories)
             {

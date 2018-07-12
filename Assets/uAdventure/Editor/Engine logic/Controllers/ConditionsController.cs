@@ -616,8 +616,7 @@ namespace uAdventure.Editor
                 ConditionOwner owner = (ConditionOwner)currentContext[CONDITION_OWNER];
                 if (owner.getOwnerType() == Controller.GLOBAL_STATE)
                 {
-                    string ownerId = owner.getOwnerName();
-
+                    //string ownerId = owner.getOwnerName();
                     //ConditionRestrictions restrictions = new ConditionRestrictions( new string[] { ownerId } );
                     //ConditionRestrictions restrictions = new ConditionRestrictions(exceptions(ownerId));
                     //currentContext.Add(CONDITION_RESTRICTIONS, restrictions);

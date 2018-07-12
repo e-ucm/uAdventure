@@ -12,13 +12,13 @@ namespace uAdventure.Editor
     {
         private static MilestoneEditorWindow editor;
         public enum MilestoneType { SCENE, ITEM, CHARACTER, COMPLETABLE, CONDITION };
-        private string[] milestonetypes =
+        private readonly string[] milestonetypes =
         {
-            "Scene has been visited"
-            ,"Player interacts with Item"
-            ,"Player interacts with character"
-            ,"A completable has been completed"
-            ,"A condition is true"
+            "Scene has been visited",
+            "Player interacts with Item",
+            "Player interacts with character",
+            "A completable has been completed",
+            "A condition is true"
         };
 
         GUIStyle conditionStyle, eitherConditionStyle, closeStyle, collapseStyle;
@@ -40,19 +40,19 @@ namespace uAdventure.Editor
             window.ShowAsDropDown(rect, new Vector2(Mathf.Max(rect.width, 250), 300));
         }
 
-        void OnGUI()
+        protected void OnGUI()
         {
 
             if (conditionStyle == null)
             {
                 conditionStyle = new GUIStyle(GUI.skin.box);
-                conditionStyle.normal.background = MakeTex(1, 1, new Color(0.627f, 0.627f, 0.627f));
+                conditionStyle.normal.background = TextureUtil.MakeTex(1, 1, new Color(0.627f, 0.627f, 0.627f));
             }
 
             if (eitherConditionStyle == null)
             {
                 eitherConditionStyle = new GUIStyle(GUI.skin.box);
-                eitherConditionStyle.normal.background = MakeTex(1, 1, new Color(0.568f, 0.568f, 0.568f));
+                eitherConditionStyle.normal.background = TextureUtil.MakeTex(1, 1, new Color(0.568f, 0.568f, 0.568f));
                 eitherConditionStyle.padding.left = 15;
             }
 
@@ -80,10 +80,10 @@ namespace uAdventure.Editor
 
             using (new GUILayout.VerticalScope())
             {
-                var antiguo = Milestone.getType();
+                var previous = Milestone.getType();
                 GUILayout.Label("The milestone will be reached when");
                 Milestone.setType((Completable.Milestone.MilestoneType)EditorGUILayout.Popup((int)Milestone.getType(), milestonetypes));
-                if (antiguo != Milestone.getType())
+                if (previous != Milestone.getType())
                 {
                     Milestone.setId("");
                 }
@@ -104,7 +104,9 @@ namespace uAdventure.Editor
                         break;
                     case Completable.Milestone.MilestoneType.CONDITION:
                         if (Milestone.getConditions() == null)
+                        {
                             Milestone.setConditions(new ConditionsController(new Conditions()));
+                        }
 
                         using (new GUILayout.VerticalScope(conditionStyle))
                         {
@@ -117,9 +119,7 @@ namespace uAdventure.Editor
                             //##################################################################################
                             //############################### CONDITION HANDLING ###############################
                             //##################################################################################
-
-                            var toRemove = new List<Condition>();
-                            var listsToRemove = new List<List<Condition>>();
+                            
                             var conditions = Milestone.getConditions().Conditions;
                             ConditionEditorWindow.LayoutConditionEditor(conditions);
 
@@ -147,20 +147,6 @@ namespace uAdventure.Editor
 
             var newId = ids[EditorGUILayout.Popup(label, Mathf.Max(0, Array.IndexOf(ids, milestone.getId())), ids)];
             Milestone.setId(newId);
-        }
-
-        private static Texture2D MakeTex(int width, int height, Color col)
-        {
-            Color[] pix = new Color[width * height];
-
-            for (int i = 0; i < pix.Length; i++)
-                pix[i] = col;
-
-            Texture2D result = new Texture2D(width, height);
-            result.SetPixels(pix);
-            result.Apply();
-
-            return result;
         }
     }
 }

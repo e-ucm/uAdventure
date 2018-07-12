@@ -1,10 +1,8 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
-using System.Linq;
 
 using uAdventure.Core;
-using System;
 
 namespace uAdventure.Editor
 {
@@ -12,44 +10,46 @@ namespace uAdventure.Editor
     {
         private static readonly Vector2 initialSize = new Vector2(200, 50);
         private static GUIContent buttonContent = new GUIContent();
-        private Dictionary<IEffect, EffectEditor> editors = new Dictionary<IEffect, EffectEditor>();
+        private readonly Dictionary<IEffect, EffectEditor> editors = new Dictionary<IEffect, EffectEditor>();
         private GUIStyle conditionStyle, eitherConditionStyle;
-        private Dictionary<string, Texture2D> icons = new Dictionary<string, Texture2D>();
+        private readonly Dictionary<string, Texture2D> icons = new Dictionary<string, Texture2D>();
 
         public override void Init(Effects content)
         {
             if (conditionStyle == null)
             {
                 conditionStyle = new GUIStyle(GUI.skin.box);
-                conditionStyle.normal.background = MakeTex(1, 1, new Color(0.627f, 0.627f, 0.627f));
+                conditionStyle.normal.background = TextureUtil.MakeTex(1, 1, new Color(0.627f, 0.627f, 0.627f));
             }
 
             if (eitherConditionStyle == null)
             {
                 eitherConditionStyle = new GUIStyle(GUI.skin.box);
-                eitherConditionStyle.normal.background = MakeTex(1, 1, new Color(0.568f, 0.568f, 0.568f));
+                eitherConditionStyle.normal.background = TextureUtil.MakeTex(1, 1, new Color(0.568f, 0.568f, 0.568f));
                 eitherConditionStyle.padding.left = 15;
             }
 
             base.Init(content);
         }
 
-        protected override IEffect[] ChildsFor(Effects effects, IEffect parent)
+        protected override IEffect[] ChildsFor(Effects Content, IEffect parent)
         {
-            var index = effects.FindIndex(parent.Equals);
-            return index == effects.Count - 1 ? new IEffect[0] : new IEffect[1] { effects[index + 1] };
+            var index = Content.FindIndex(parent.Equals);
+            return index == Content.Count - 1 ? new IEffect[0] : new IEffect[1] { Content[index + 1] };
         }
 
-        protected override void DeleteNode(Effects effects, IEffect effect)
+        protected override void DeleteNode(Effects content, IEffect node)
         {
-            effects.Remove(effect);
-            if(Selection.Contains(effect))
-                Selection.Remove(effect);
+            content.Remove(node);
+            if (Selection.Contains(node))
+            {
+                Selection.Remove(node);
+            }
         }
 
-        protected override void DrawOpenNodeContent(Effects effects, IEffect effect)
+        protected override void DrawOpenNodeContent(Effects content, IEffect node)
         {
-            var abstractEffect = effect as AbstractEffect;
+            var abstractEffect = node as AbstractEffect;
 
             if (abstractEffect != null)
             {
@@ -63,9 +63,7 @@ namespace uAdventure.Editor
                 //##################################################################################
                 //############################### CONDITION HANDLING ###############################
                 //##################################################################################
-
-                var toRemove = new List<Condition>();
-                var listsToRemove = new List<List<Condition>>();
+                
                 var conditions = abstractEffect.getConditions();
                 ConditionEditorWindow.LayoutConditionEditor(conditions);
 
@@ -75,55 +73,59 @@ namespace uAdventure.Editor
             }
             var prevLabelSize = EditorGUIUtility.labelWidth;
             EditorGUIUtility.labelWidth = 75;
-            if (editors.ContainsKey(effect))
-                editors[effect].draw(); 
+            if (editors.ContainsKey(node))
+            {
+                editors[node].draw();
+            }
             EditorGUIUtility.labelWidth = prevLabelSize;
         }
 
-        protected override IEffect[] GetNodes(Effects effects)
+        protected override IEffect[] GetNodes(Effects Content)
         {
-            return effects.ToArray();
+            return Content.ToArray();
         }
 
-        private bool CreateAndInitEffectEditor(Effects effects, IEffect effect)
+        private bool CreateAndInitEffectEditor(Effects content, IEffect node)
         {
-            var editor = EffectEditorFactory.Intance.createEffectEditorFor(effect);
-            if (editor.manages(effect))
-                editor.Effect = effect;
-            editor.Window = new Rect(new Vector2(50, 50), initialSize);
+            var editor = EffectEditorFactory.Intance.createEffectEditorFor(node);
             if (editor == null)
             {
-                Debug.LogWarning("No effect editor available for: " + effect.getType().ToString());
+                Debug.LogWarning("No effect editor available for: " + node.getType().ToString());
                 return false;
             }
 
-            var index = effects.IndexOf(effect);
+            if (editor.manages(node))
+            {
+                editor.Effect = node;
+            }
+            editor.Window = new Rect(new Vector2(50, 50), initialSize);
+
+            var index = content.IndexOf(node);
             if (index > 0)
             {
                 var pos = editor.Window;
-                var parentPos = editors[effects[index - 1]].Window;
+                var parentPos = editors[content[index - 1]].Window;
                 pos.position = parentPos.position + new Vector2(parentPos.size.x + 50, 0);
                 editor.Window = pos;
             }
 
-            editors[effect] = editor;
+            editors[node] = editor;
             return true;
         }
 
-        protected override Rect GetOpenedNodeRect(Effects effects, IEffect effect)
+        protected override Rect GetOpenedNodeRect(Effects content, IEffect node)
         {
-            if (!editors.ContainsKey(effect))
+            if (!editors.ContainsKey(node) && !CreateAndInitEffectEditor(content, node))
             {
-                if(!CreateAndInitEffectEditor(effects, effect))
-                    return Rect.zero;
+                return Rect.zero;
             }
 
-            return editors[effect].Window;
+            return editors[node].Window;
         }
 
-        protected override string GetTitle(Effects effects, IEffect effect)
+        protected override string GetTitle(Effects Content, IEffect node)
         {
-            return effect.getType().ToString();
+            return node.getType().ToString();
         }
 
         protected override GUIContent OpenButtonText(Effects content, IEffect node)
@@ -139,92 +141,82 @@ namespace uAdventure.Editor
             return buttonContent;
         }
 
-        protected override void DrawNodeControls(Effects effects, IEffect effect)
+        protected override void DrawNodeControls(Effects content, IEffect node)
         {
             EffectEditor editor = null;
-            editors.TryGetValue(effect, out editor);
+            editors.TryGetValue(node, out editor);
 
             string[] editorNames = EffectEditorFactory.Intance.CurrentEffectEditors;
-            int preEditorSelected = EffectEditorFactory.Intance.EffectEditorIndex(effect);
+            int preEditorSelected = EffectEditorFactory.Intance.EffectEditorIndex(node);
             int editorSelected = EditorGUILayout.Popup(preEditorSelected, editorNames);
 
 
             if (preEditorSelected != editorSelected)
             {
                 editor = EffectEditorFactory.Intance.createEffectEditorFor(editorNames[editorSelected]);
-                editor.Window = editors[effect].Window;
+                editor.Window = editors[node].Window;
                 editors[editor.Effect] = editor;
-                collapsedState[editor.Effect] = collapsedState[effect];
-                collapsedState.Remove(effect);
+                collapsedState[editor.Effect] = collapsedState[node];
+                collapsedState.Remove(node);
 
-                if (editor.manages(effect))
-                    editor.Effect = effect;
+                if (editor.manages(node))
+                {
+                    editor.Effect = node;
+                }
                 else
                 {
                     // Re insert the conditions
-                    var abstractEffect = effect as AbstractEffect;
+                    var abstractEffect = node as AbstractEffect;
                     if (abstractEffect != null && editor.Effect is AbstractEffect)
                     {
                         (editor.Effect as AbstractEffect).setConditions(abstractEffect.getConditions());
                     }
                     // Replace the effect
-                    effects[effects.IndexOf(effect)] = editor.Effect;
+                    content[content.IndexOf(node)] = editor.Effect;
                 }
             }
 
-            base.DrawNodeControls(effects, effect);
+            base.DrawNodeControls(content, node);
         }
 
-        protected override void SetNodeChild(Effects effects, IEffect effect, int slot, IEffect child)
+        protected override void SetNodeChild(Effects content, IEffect node, int slot, IEffect child)
         {
-            var index = effects.IndexOf(effect) + 1;
-            var childIndex = effects.IndexOf(child);
+            var index = content.IndexOf(node) + 1;
+            var childIndex = content.IndexOf(child);
             while (index < childIndex)
             {
-                effects.RemoveAt(index);
+                content.RemoveAt(index);
                 ++index;
             }
         }
 
-        protected override void SetNodePosition(Effects effects, IEffect effect, Vector2 position)
+        protected override void SetNodePosition(Effects content, IEffect node, Vector2 position)
         {
-            if (!editors.ContainsKey(effect))
+            if (!editors.ContainsKey(node))
+            {
                 return;
+            }
 
-            var rect = editors[effect].Window;
+            var rect = editors[node].Window;
             rect.position = position;
-            editors[effect].Window = rect;
+            editors[node].Window = rect;
         }
 
-        protected override void SetNodeSize(Effects effects, IEffect effect, Vector2 size)
+        protected override void SetNodeSize(Effects content, IEffect node, Vector2 size)
         {
-            if (!editors.ContainsKey(effect))
+            if (!editors.ContainsKey(node))
+            {
                 return;
+            }
 
-            var rect = editors[effect].Window;
+            var rect = editors[node].Window;
             rect.size = size;
-            editors[effect].Window = rect;
-        }
-
-        // AUX METHODS
-        private static Texture2D MakeTex(int width, int height, Color col)
-        {
-            Color[] pix = new Color[width * height];
-
-            for (int i = 0; i < pix.Length; i++)
-                pix[i] = col;
-
-            Texture2D result = new Texture2D(width, height);
-            result.SetPixels(pix);
-            result.Apply();
-
-            return result;
+            editors[node].Window = rect;
         }
     }
 
     public class EffectEditorWindow : EditorWindow
     {
-        private static EffectEditorWindow editor;
         private EffectsEditor effectsEditor;
         private Effects effects;
 
@@ -232,7 +224,7 @@ namespace uAdventure.Editor
 
         public void Init(Effects e)
         {
-            editor = EditorWindow.GetWindow<EffectEditorWindow>();
+            EditorWindow.GetWindow<EffectEditorWindow>();
             effects = e;
             effectsEditor = CreateInstance<EffectsEditor>();
             effectsEditor.Repaint = Repaint;
@@ -249,7 +241,7 @@ namespace uAdventure.Editor
             Init(e.getEffectsDirectly());
         }
 
-        void OnGUI()
+        protected void OnGUI()
         {
             if (effects == null) {
                 Close(); 

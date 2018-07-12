@@ -100,14 +100,14 @@ namespace uAdventure.Editor
         private static CharacterAnimationsGroup[] groups;
         private static CharacterAnimationType[] types;
 
-        private Dictionary<CharacterAnimationType, AnimationField> fields = new Dictionary<CharacterAnimationType, AnimationField>();
-        private Dictionary<CharacterAnimationType, Texture2D> textures = new Dictionary<CharacterAnimationType, Texture2D>();
+        private readonly Dictionary<CharacterAnimationType, AnimationField> fields = new Dictionary<CharacterAnimationType, AnimationField>();
+        private readonly Dictionary<CharacterAnimationType, Texture2D> textures = new Dictionary<CharacterAnimationType, Texture2D>();
         
         private CharacterAnimationsGroup selectedAnimationGroup;
 
         private NPCDataControl workingCharacter;
 
-        private AppearanceEditor appearanceEditor;
+        private readonly AppearanceEditor appearanceEditor;
 
         public CharactersWindowAppearance(Rect aStartPos, GUIContent aContent, GUIStyle aStyle,
             params GUILayoutOption[] aOptions)
@@ -120,9 +120,13 @@ namespace uAdventure.Editor
             appearanceEditor.onAppearanceSelected = RefreshPathInformation;
 
             if(groups == null)
+            {
                 groups = Enum.GetValues(typeof(CharacterAnimationsGroup)).Cast<CharacterAnimationsGroup>().ToArray();
+            }
             if(types == null)
+            {
                 types = Enum.GetValues(typeof(CharacterAnimationType)).Cast<CharacterAnimationType>().ToArray();
+            }
             
             foreach(var animationType in types)
             {
@@ -171,14 +175,22 @@ namespace uAdventure.Editor
 
             var player = Controller.Instance.SelectedChapterDataControl.getPlayer();
             if (Target is NodeDataControl || IsPlayer)
+            {
                 workingCharacter = player;
+            }
             else if (Target is NPCDataControl)
+            {
                 workingCharacter = Target as NPCDataControl;
+            }
             else
+            {
                 workingCharacter = Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[GameRources.GetInstance().selectedCharacterIndex];
+            }
 
             if (workingCharacter != prevWorkingChar)
+            {
                 RefreshPathInformation(workingCharacter);
+            }
 
             // Appearance table
             appearanceEditor.Data = workingCharacter;
@@ -206,7 +218,10 @@ namespace uAdventure.Editor
                 EditorGUILayout.EndHorizontal();
             }
 
-            if (texture) GUI.DrawTexture(GUILayoutUtility.GetRect(0, 0, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true)), texture, ScaleMode.ScaleToFit);
+            if (texture)
+            {
+                GUI.DrawTexture(GUILayoutUtility.GetRect(0, 0, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true)), texture, ScaleMode.ScaleToFit);
+            }
 
             EditorGUILayout.EndVertical();
         }
@@ -214,7 +229,7 @@ namespace uAdventure.Editor
         public override void DrawPreview(Rect rect)
         {
             GUILayout.BeginHorizontal();
-            if (Target != null)
+            if (Target != null && !IsPlayer)
             {
                 var npc = Target as NPCDataControl;
                 var preview = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_STAND_DOWN);

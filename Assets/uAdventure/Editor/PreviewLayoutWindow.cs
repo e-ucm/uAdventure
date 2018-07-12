@@ -1,8 +1,6 @@
 ﻿using MoreLinq;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using uAdventure.Core;
 using UnityEditor;
 using UnityEngine;
@@ -18,15 +16,14 @@ namespace uAdventure.Editor
         // ##################### CONSTRUCTOR & DESTRUCTOR ######################
 
         /** Constructor */
-        public PreviewLayoutWindow(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
+        protected PreviewLayoutWindow(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
         {
             sceneSkin = EditorGUIUtility.GetBuiltinSkin(EditorSkin.Inspector);
-
             DoUpdate = false;
         }
-        
+
         /** Callback for window destroy */
-        void OnDestroy()
+        protected void OnDestroy()
         {
             DoUpdate = false;
         }
@@ -34,7 +31,7 @@ namespace uAdventure.Editor
         // ######################### ATTRIBUTES ##########################
 
         /** Skin used to store the scene window GUISkin from Unity */
-        private GUISkin sceneSkin;
+        private readonly GUISkin sceneSkin;
 
         /** Callback delegate for the update */
         private EditorApplication.CallbackFunction callback = null;
@@ -43,10 +40,14 @@ namespace uAdventure.Editor
         private static Rect previewRect;
 
         private Vector3 velocity;
-        private float time = 1f;
+        private readonly float time = 1f;
+        private bool windowInited = false;
+        private Rect areaRect;
+        private Vector2 scroll;
+        private bool useScroll = false;
 
         // ######################## PROPERTIES ###########################
-        
+
         /** Position of the preview inspector window */
         private Vector3 PreviewInspectorPosition
         {
@@ -84,14 +85,12 @@ namespace uAdventure.Editor
                 }
             }
         }
-
-        private bool d = false;
-        private bool Dragging { get { return d; } set { d = value; } }
+        
+        private bool Dragging { get; set; }
 
         // ######################## MAIN FUNCTIONS ########################
 
         /** Update is called from the UnityEditor and is used to move (animating) the preview inspector inside of the window */
-        private int checkMouse = 0;
         protected virtual void ApplicationUpdate()
         {
             if (Dragging)
@@ -116,15 +115,6 @@ namespace uAdventure.Editor
             }
         }
 
-        bool windowInited = false;
-
-        public override void OnGUI()
-        {
-            base.OnGUI();
-        }
-
-        private Rect areaRect;
-
         /** Called to draw the main Extension window content */
         public override void Draw(int aID)
         {
@@ -143,7 +133,6 @@ namespace uAdventure.Editor
                     auxRect.y += 30; auxRect.height -= 60;
 
                     previewRect = auxRect;
-                    //previewRect.position += areaRect.position;
 
                     if (!windowInited)
                     {
@@ -193,23 +182,31 @@ namespace uAdventure.Editor
                         // Change the skin to the scene skin to draw it black
                         var prevSkin = GUI.skin;
                         GUI.skin = sceneSkin;
-
-                        var prevType = Event.current.type;
+                        
                         var maxHeight = viewport.height- 25f;
 
                         windowRect.height = Mathf.Clamp(windowRect.height, 0, maxHeight);
                         // Create the preview inspector window
                         var newWindowRect = GUILayout.Window(9999, windowRect, (i) =>
                         {
-                            if (Event.current.type == EventType.Layout) useScroll = windowRect.height >= maxHeight;
+                            if (Event.current.type == EventType.Layout)
+                            {
+                                useScroll = windowRect.height >= maxHeight;
+                            }
 
-                            if (useScroll) scroll = EditorGUILayout.BeginScrollView(scroll, GUILayout.Height(maxHeight));
+                            if (useScroll)
+                            {
+                                scroll = EditorGUILayout.BeginScrollView(scroll, GUILayout.Height(maxHeight));
+                            }
                             DrawPreviewInspector();
-                            if (useScroll) EditorGUILayout.EndScrollView();
+                            if (useScroll)
+                            {
+                                EditorGUILayout.EndScrollView();
+                            }
 
                             var prevHot = GUIUtility.hotControl;
                             GUI.DragWindow();
-                            if(prevHot != GUIUtility.hotControl)
+                            if (prevHot != GUIUtility.hotControl)
                             {
                                 Dragging = true;
                                 DoUpdate = true;
@@ -252,10 +249,6 @@ namespace uAdventure.Editor
             EditorGUILayout.EndVertical();
             
         }
-
-        private Vector2 scroll;
-
-        private bool useScroll = false;
         
         /** Called to draw the content before the preview area */
         protected virtual void DrawInspector() { }
@@ -296,7 +289,8 @@ namespace uAdventure.Editor
 
         private KeyValuePair<Corner, Vector3> GetDesiredCorner(Rect windowRect, Rect holderRect)
         {
-            return GetCorners(windowRect, holderRect).ToList().MinBy(corner => Vector2.Distance(windowRect.position, corner.Value));
+            return GetCorners(windowRect, holderRect)
+                .MinBy(corner => Vector2.Distance(windowRect.position, corner.Value));
         }
 
     }

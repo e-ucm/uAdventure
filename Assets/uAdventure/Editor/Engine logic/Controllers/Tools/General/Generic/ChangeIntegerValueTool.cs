@@ -3,128 +3,96 @@ using System.Collections;
 using System.Reflection;
 
 using uAdventure.Core;
+using System;
 
 namespace uAdventure.Editor
 {
-    /**
-     * Generic tool that uses introspection to change an int value
-     */
-
-    public class ChangeIntegerValueTool : Tool
+    public class ChangeValueTool<O, T> : Tool
     {
-
-        protected MethodInfo get;
-
-        protected MethodInfo set;
-
-        protected string getName;
-
-        protected string setName;
-
-        protected int oldValue;
-
-        protected int newValue;
-
-        protected System.Object data;
-
+        protected O data;
+        protected Func<T> get;
+        protected Action<T> set;
+        protected T oldValue;
+        protected T newValue;
         protected bool updateTree;
-
         protected bool updatePanel;
 
-        /**
-         * Default constructor. Will update panel but not tree
-         * 
-         * @param data
-         *            The System.Object which data is to be modified
-         * @param newValue
-         *            The new Value (int)
-         * @param getMethodName
-         *            The name of the get method. Must follow this pattern: public
-         *            int getMethodName()
-         * @param setMethodName
-         *            The name of the set method. Must follow this pattern: public *
-         *            setMethodName( int )
-         */
+        public ChangeValueTool(O data, T newValue, string propertyName) :
+            this(data, newValue, propertyName, false, true)
+        {
+        }
 
-        public ChangeIntegerValueTool(System.Object data, int newValue, string getMethodName, string setMethodName) :
+        public ChangeValueTool(O data, T newValue, string propertyName, bool updateTree,
+            bool updatePanel)
+        {
+            var type = data != null ? data.GetType() : typeof(O);
+            var property = type.GetProperty(propertyName);
+
+            if (property != null && typeof(T).IsAssignableFrom(property.PropertyType))
+            {
+                Init(data, newValue, property.GetGetMethod(), property.GetSetMethod(), updateTree, updatePanel);
+            }
+        }
+
+        public ChangeValueTool(O data, T newValue, string getMethodName, string setMethodName) :
             this(data, newValue, getMethodName, setMethodName, false, true)
         {
         }
 
-        public ChangeIntegerValueTool(System.Object data, int newValue, string getMethodName, string setMethodName, bool updateTree,
+        public ChangeValueTool(O data, T newValue, string getMethodName, string setMethodName, bool updateTree,
             bool updatePanel)
         {
+            var type = data != null ? data.GetType() : typeof(O);
 
+            var getter = type.GetMethod(getMethodName);
+            var setter = type.GetMethod(setMethodName);
+
+            if (typeof(T).IsAssignableFrom(getter.ReturnType) && setter.GetParameters().Length == 1 && typeof(T).IsAssignableFrom(setter.GetParameters()[0].ParameterType))
+            {
+                Init(data, newValue, getter, setter, updateTree, updatePanel);
+            }
+        }
+
+        protected void Init(O data, T newValue, MethodInfo getter, MethodInfo setter, bool updateTree, bool updatePanel)
+        {
             this.data = data;
             this.newValue = newValue;
             this.updatePanel = updatePanel;
             this.updateTree = updateTree;
-            //try
-            //{
-            set = data.GetType().GetMethod(setMethodName);
-            get = data.GetType().GetMethod(getMethodName);
-            this.getName = getMethodName;
-            this.setName = setMethodName;
-            if (get.ReturnType != typeof(int))
-            {
-                get = set = null;
-                getName = setName = null;
-            }
-            //}
-            //catch( SecurityException e ) {
-            //    get = set = null;
-            //    getName = setName = null;
-            //    ReportDialog.GenerateErrorReport( e, false, Language.GetText( "Error.Title" ) );
-            //}
-            //catch( NoSuchMethodException e ) {
-            //    get = set = null;
-            //    getName = setName = null;
-            //    ReportDialog.GenerateErrorReport( e, false, Language.GetText( "Error.Title" ) );
-            //}
+
+            this.get = (Func<T>)Delegate.CreateDelegate(typeof(Func<T>), data, getter);
+            this.set = (Action<T>)Delegate.CreateDelegate(typeof(Action<T>), data, setter);
 
         }
 
-
         public override bool canRedo()
         {
-
             return true;
         }
 
         public override bool canUndo()
         {
-
             return true;
         }
 
         public override bool combine(Tool other)
         {
-
             return false;
         }
 
-
         public override bool doTool()
         {
-
             bool done = false;
             if (get != null && set != null)
             {
-                // Get the old value
-                //try
-                //{
-                oldValue = (int)get.Invoke(data, null);
-                if (newValue != null && oldValue == null || newValue == null && oldValue != null ||
-                    (newValue != null && oldValue != null && !oldValue.Equals(newValue)))
+                oldValue = get();
+                var isNull = oldValue == null;
+                if (isNull && newValue != null || !isNull && !oldValue.Equals(newValue))
                 {
-                    set.Invoke(data, new System.Object[] { newValue });
+                    set(newValue);
+                    Update(updateTree, updatePanel);
                     done = true;
                 }
-                //}
-                //catch (Exception e)
-                //{
-                //    ReportDialog.GenerateErrorReport(e, false, Language.GetText("Error.Title"));
-                //}
 
             }
             return done;
@@ -133,21 +101,13 @@ namespace uAdventure.Editor
 
         public override bool redoTool()
         {
-
             bool done = false;
-            //try
-            //{
-            set.Invoke(data, new System.Object[] { newValue });
-            if (updateTree)
-                Controller.Instance.updateStructure();
-            if (updatePanel)
-                Controller.Instance.updatePanel();
-            done = true;
-            //}
-            //catch (Exception e)
-            //{
-            //    ReportDialog.GenerateErrorReport(e, false, Language.GetText("Error.Title"));
-            //}
+            if (get != null && set != null)
+            {
+                set(newValue);
+                Update(updateTree, updatePanel);
+                done = true;
+            }
             return done;
         }
 
@@ -155,347 +115,94 @@ namespace uAdventure.Editor
         {
 
             bool done = false;
-            //try
-            //{
-            set.Invoke(data, new System.Object[] { oldValue });
-            if (updateTree)
-                Controller.Instance.updateStructure();
-            if (updatePanel)
-                Controller.Instance.updatePanel();
-            done = true;
-            //}
-            //catch (Exception e)
-            //{
-            //    ReportDialog.GenerateErrorReport(e, false, Language.GetText("Error.Title"));
-            //}
+            if (get != null && set != null)
+            {
+                set(oldValue);
+                Update(updateTree, updatePanel);
+                done = true;
+            }
             return done;
+        }
+
+        private static void Update(bool updateTree, bool updatePanel)
+        {
+            if (updateTree)
+            {
+                Controller.Instance.updateStructure();
+            }
+            if (updatePanel)
+            {
+                Controller.Instance.updatePanel();
+            }
         }
     }
 
-
-
-    public class ChangeFloatValueTool : Tool
+    public class ChangeIntegerValueTool : ChangeValueTool<object, int>
     {
-
-        protected MethodInfo get;
-
-        protected MethodInfo set;
-
-        protected string getName;
-
-        protected string setName;
-
-        protected float oldValue;
-
-        protected float newValue;
-
-        protected System.Object data;
-
-        protected bool updateTree;
-
-        protected bool updatePanel;
-
-        /**
-         * Default constructor. Will update panel but not tree
-         * 
-         * @param data
-         *            The System.Object which data is to be modified
-         * @param newValue
-         *            The new Value (int)
-         * @param getMethodName
-         *            The name of the get method. Must follow this pattern: public
-         *            int getMethodName()
-         * @param setMethodName
-         *            The name of the set method. Must follow this pattern: public *
-         *            setMethodName( int )
-         */
-
-        public ChangeFloatValueTool(System.Object data, float newValue, string getMethodName, string setMethodName) :
-            this(data, newValue, getMethodName, setMethodName, false, true)
+        public ChangeIntegerValueTool(object data, int newValue, string propertyName)
+            : base(data, newValue, propertyName)
         {
         }
 
-        public ChangeFloatValueTool(System.Object data, float newValue, string getMethodName, string setMethodName, bool updateTree,
-            bool updatePanel)
+        public ChangeIntegerValueTool(object data, int newValue, string propertyName, bool updateTree,
+            bool updatePanel) : base(data, newValue, propertyName, updateTree, updatePanel)
         {
-
-            this.data = data;
-            this.newValue = newValue;
-            this.updatePanel = updatePanel;
-            this.updateTree = updateTree;
-            //try
-            //{
-            set = data.GetType().GetMethod(setMethodName);
-            get = data.GetType().GetMethod(getMethodName);
-            this.getName = getMethodName;
-            this.setName = setMethodName;
-            if (get.ReturnType != typeof(float))
-            {
-                get = set = null;
-                getName = setName = null;
-            }
-            //}
-            //catch( SecurityException e ) {
-            //    get = set = null;
-            //    getName = setName = null;
-            //    ReportDialog.GenerateErrorReport( e, false, Language.GetText( "Error.Title" ) );
-            //}
-            //catch( NoSuchMethodException e ) {
-            //    get = set = null;
-            //    getName = setName = null;
-            //    ReportDialog.GenerateErrorReport( e, false, Language.GetText( "Error.Title" ) );
-            //}
-
         }
 
-
-        public override bool canRedo()
+        public ChangeIntegerValueTool(object data, int newValue, string getMethodName, string setMethodName) 
+            : base(data, newValue, getMethodName, setMethodName)
         {
-
-            return true;
         }
 
-        public override bool canUndo()
+        public ChangeIntegerValueTool(object data, int newValue, string getMethodName, string setMethodName, bool updateTree,
+            bool updatePanel) : base(data, newValue, getMethodName, setMethodName, updateTree, updatePanel)
         {
-
-            return true;
-        }
-
-        public override bool combine(Tool other)
-        {
-
-            return false;
-        }
-
-
-        public override bool doTool()
-        {
-
-            bool done = false;
-            if (get != null && set != null)
-            {
-                // Get the old value
-                //try
-                //{
-                oldValue = (float)get.Invoke(data, null);
-                if (newValue != null && oldValue == null || newValue == null && oldValue != null ||
-                    (newValue != null && oldValue != null && !oldValue.Equals(newValue)))
-                {
-                    set.Invoke(data, new System.Object[] { newValue });
-                    done = true;
-                }
-                //}
-                //catch (Exception e)
-                //{
-                //    ReportDialog.GenerateErrorReport(e, false, Language.GetText("Error.Title"));
-                //}
-
-            }
-            return done;
-
-        }
-
-        public override bool redoTool()
-        {
-
-            bool done = false;
-            //try
-            //{
-            set.Invoke(data, new System.Object[] { newValue });
-            if (updateTree)
-                Controller.Instance.updateStructure();
-            if (updatePanel)
-                Controller.Instance.updatePanel();
-            done = true;
-            //}
-            //catch (Exception e)
-            //{
-            //    ReportDialog.GenerateErrorReport(e, false, Language.GetText("Error.Title"));
-            //}
-            return done;
-        }
-
-        public override bool undoTool()
-        {
-
-            bool done = false;
-            //try
-            //{
-            set.Invoke(data, new System.Object[] { oldValue });
-            if (updateTree)
-                Controller.Instance.updateStructure();
-            if (updatePanel)
-                Controller.Instance.updatePanel();
-            done = true;
-            //}
-            //catch (Exception e)
-            //{
-            //    ReportDialog.GenerateErrorReport(e, false, Language.GetText("Error.Title"));
-            //}
-            return done;
         }
     }
 
-
-    public class ChangeEnumValueTool : Tool
+    public class ChangeFloatValueTool : ChangeValueTool<object, float>
     {
-
-        protected MethodInfo get;
-
-        protected MethodInfo set;
-
-        protected string getName;
-
-        protected string setName;
-
-        protected System.Enum oldValue;
-
-        protected System.Enum newValue;
-
-        protected System.Object data;
-
-        protected bool updateTree;
-
-        protected bool updatePanel;
-
-        /**
-         * Default constructor. Will update panel but not tree
-         * 
-         * @param data
-         *            The System.Object which data is to be modified
-         * @param newValue
-         *            The new Value (int)
-         * @param getMethodName
-         *            The name of the get method. Must follow this pattern: public
-         *            int getMethodName()
-         * @param setMethodName
-         *            The name of the set method. Must follow this pattern: public *
-         *            setMethodName( int )
-         */
-
-        public ChangeEnumValueTool(System.Object data, System.Enum newValue, string getMethodName, string setMethodName) :
-            this(data, newValue, getMethodName, setMethodName, false, true)
+        public ChangeFloatValueTool(object data, float newValue, string propertyName)
+            : base(data, newValue, propertyName)
         {
         }
 
-        public ChangeEnumValueTool(System.Object data, System.Enum newValue, string getMethodName, string setMethodName, bool updateTree,
-            bool updatePanel)
+        public ChangeFloatValueTool(object data, float newValue, string propertyName, bool updateTree,
+            bool updatePanel) : base(data, newValue, propertyName, updateTree, updatePanel)
         {
-
-            this.data = data;
-            this.newValue = newValue;
-            this.updatePanel = updatePanel;
-            this.updateTree = updateTree;
-            //try
-            //{
-            set = data.GetType().GetMethod(setMethodName);
-            get = data.GetType().GetMethod(getMethodName);
-            this.getName = getMethodName;
-            this.setName = setMethodName;
-            if (!get.ReturnType.IsSubclassOf(typeof(System.Enum)))
-            {
-                get = set = null;
-                getName = setName = null;
-            }
-            //}
-            //catch( SecurityException e ) {
-            //    get = set = null;
-            //    getName = setName = null;
-            //    ReportDialog.GenerateErrorReport( e, false, Language.GetText( "Error.Title" ) );
-            //}
-            //catch( NoSuchMethodException e ) {
-            //    get = set = null;
-            //    getName = setName = null;
-            //    ReportDialog.GenerateErrorReport( e, false, Language.GetText( "Error.Title" ) );
-            //}
-
         }
 
-
-        public override bool canRedo()
+        public ChangeFloatValueTool(object data, float newValue, string getMethodName, string setMethodName)
+            : base(data, newValue, getMethodName, setMethodName)
         {
-
-            return true;
         }
 
-        public override bool canUndo()
+        public ChangeFloatValueTool(object data, float newValue, string getMethodName, string setMethodName, bool updateTree,
+            bool updatePanel) : base(data, newValue, getMethodName, setMethodName, updateTree, updatePanel)
         {
+        }
+    }
 
-            return true;
+    public class ChangeEnumValueTool : ChangeValueTool<object, Enum>
+    {
+        public ChangeEnumValueTool(object data, Enum newValue, string propertyName)
+            : base(data, newValue, propertyName)
+        {
         }
 
-        public override bool combine(Tool other)
+        public ChangeEnumValueTool(object data, Enum newValue, string propertyName, bool updateTree,
+            bool updatePanel) : base(data, newValue, propertyName, updateTree, updatePanel)
         {
-
-            return false;
         }
 
-
-        public override bool doTool()
+        public ChangeEnumValueTool(object data, Enum newValue, string getMethodName, string setMethodName)
+            : base(data, newValue, getMethodName, setMethodName)
         {
-
-            bool done = false;
-            if (get != null && set != null)
-            {
-                // Get the old value
-                //try
-                //{
-                oldValue = (System.Enum)get.Invoke(data, null);
-                if (newValue != null && oldValue == null || newValue == null && oldValue != null ||
-                    (newValue != null && oldValue != null && !oldValue.Equals(newValue)))
-                {
-                    set.Invoke(data, new System.Object[] { newValue });
-                    done = true;
-                }
-                //}
-                //catch (Exception e)
-                //{
-                //    ReportDialog.GenerateErrorReport(e, false, Language.GetText("Error.Title"));
-                //}
-
-            }
-            return done;
-
         }
 
-        public override bool redoTool()
+        public ChangeEnumValueTool(object data, Enum newValue, string getMethodName, string setMethodName, bool updateTree,
+            bool updatePanel) : base(data, newValue, getMethodName, setMethodName, updateTree, updatePanel)
         {
-
-            bool done = false;
-            //try
-            //{
-            set.Invoke(data, new System.Object[] { newValue });
-            if (updateTree)
-                Controller.Instance.updateStructure();
-            if (updatePanel)
-                Controller.Instance.updatePanel();
-            done = true;
-            //}
-            //catch (Exception e)
-            //{
-            //    ReportDialog.GenerateErrorReport(e, false, Language.GetText("Error.Title"));
-            //}
-            return done;
-        }
-
-        public override bool undoTool()
-        {
-
-            bool done = false;
-            //try
-            //{
-            set.Invoke(data, new System.Object[] { oldValue });
-            if (updateTree)
-                Controller.Instance.updateStructure();
-            if (updatePanel)
-                Controller.Instance.updatePanel();
-            done = true;
-            //}
-            //catch (Exception e)
-            //{
-            //    ReportDialog.GenerateErrorReport(e, false, Language.GetText("Error.Title"));
-            //}
-            return done;
         }
     }
 }

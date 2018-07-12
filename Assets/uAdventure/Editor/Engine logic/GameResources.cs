@@ -44,19 +44,16 @@ namespace uAdventure.Editor
 
         public static bool NewGame(int type)
         {
-            List<Incidence> list = new List<Incidence>(), adventureList = new List<Incidence>();
             return Controller.Instance.NewAdventure(type);
         }
 
         public static bool CreateGameProject(string selectedGameProjectPath, int type)
         {
-            List<Incidence> list = new List<Incidence>(), adventureList = new List<Incidence>();
             return Controller.Instance.newFile(selectedGameProjectPath, type);
         }
 
         public static void LoadGameProject(string selectedGameProjectPath)
         {
-            List<Incidence> list = new List<Incidence>(), adventureList = new List<Incidence>();
             Controller.Instance.Init(selectedGameProjectPath);
         }
 

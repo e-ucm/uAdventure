@@ -40,22 +40,22 @@ namespace uAdventure.Editor
 		 * *****************/
 
         // Main vars
-        private Dictionary<int, N> nodes = new Dictionary<int, N>();
+        private readonly Dictionary<int, N> nodes = new Dictionary<int, N>();
         private GUIStyle selectedStyle;
+        
+        protected readonly Color blue  = new Color(0.3f, 0.3f, 0.9f);
+        protected readonly Color red   = new Color(0.9f, 0.1f, 0.1f);
+        protected readonly Color green = new Color(0.3f, 0.7f, 0.4f);
 
         int nodespositioned = 0;
 
         // Graph control
         private int hovering = -1;
-        private N hoveringNode = default(N);
-        private int focusing = -1;
 
         // Graph management
-        private bool reinitWindows = false;
-        private Rect baseRect = new Rect(10, 10, 25, 25);
         protected int lookingChildSlot = -1;
         protected N lookingChildNode = default(N);
-        private Dictionary<N, bool> loopCheck = new Dictionary<N, bool>();
+        private readonly Dictionary<N, bool> loopCheck = new Dictionary<N, bool>();
 
         // Graph scroll
         private Rect scrollRect = new Rect(0, 0, 1000, 1000);
@@ -66,9 +66,7 @@ namespace uAdventure.Editor
         private List<N> selection = new List<N>();
         private Vector2 startPoint;
 
-        NodePositioner positioner;
-
-        private void Awake()
+        protected void Awake()
         {
             Repaint = base.Repaint;
         }
@@ -86,34 +84,14 @@ namespace uAdventure.Editor
 
             ConversationNodeEditorFactory.Intance.ResetInstance();
             
-            InitWindows();
         }
 
-        private void InitWindows()
-        {
-            N[] nodes = GetNodes(Content);
-            if (nodes.Length == 0)
-                return;
-
-            /*N current_node = nodes[0];
-
-            loopCheck.Clear();
-
-            this.positioner = new NodePositioner(nodes.Length - 1, new Rect(0,0, 1280, 720));
-            InitWindowsRecursive(current_node);*/
-        }
         private void InitWindowsRecursive(N node)
         {
             if (!loopCheck.ContainsKey(node))
             {
                 loopCheck.Add(node, true);
-
-                //Rect current = new Rect (previous.x + previous.width + 35, previous.y, 150, 0);
-
-                Rect current = GetNodeRect(Content, node);
-                if (current.x == -1)
-                    current = positioner.getRectFor(nodespositioned);
-
+                
                 nodespositioned++;
 
                 var childs = ChildsFor(Content, node);
@@ -136,14 +114,8 @@ namespace uAdventure.Editor
                 return;
             }
 
-            if (reinitWindows)
-            {
-                InitWindows();
-                reinitWindows = false;
-            }
-
             // Print the toolbar
-            var lastRect = DoToolbar();
+            DoToolbar();
 
             var rect = GUILayoutUtility.GetRect(0, 0, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
 
@@ -200,21 +172,7 @@ namespace uAdventure.Editor
 
             // Scroll area
             scrollRect = new Rect(0, 0, maxX, maxY);
-            /*float scrolled = 0;
-            if(rect.Contains(Event.current.mousePosition) && Event.current.type == EventType.ScrollWheel)
-            {
-                scrolled = -Event.current.delta.y * 0.03f;
-                Event.current.Use();
-            }
-            */
             scroll = GUI.BeginScrollView(rect, scroll, scrollRect);
-
-            /*var prevMatrix = GUI.matrix;
-            GUI.matrix = graphMatrix;
-            if (scrolled != 0f)
-            {
-                GUIUtility.ScaleAroundPivot(new Vector2(1 + scrolled, 1 + scrolled), Event.current.mousePosition);
-            }*/
 
             // Clear mouse hover
             if (Event.current.type == EventType.MouseMove)
@@ -223,7 +181,6 @@ namespace uAdventure.Editor
                     this.Repaint();
 
                 hovering = -1;
-                hoveringNode = default(N);
             }
 
             // Background
@@ -237,10 +194,8 @@ namespace uAdventure.Editor
                     foreach (var n in selection)
                     {
                         var nodeRect = GetNodeRect(Content, n);
-                        GUI.Box(GetNodeRect(Content, n), "", selectedStyle);
+                        GUI.Box(nodeRect, "", selectedStyle);
                     }
-
-                //drawSlots(sequence);
 
                 if (Event.current.type == EventType.Repaint)
                 {
@@ -250,8 +205,6 @@ namespace uAdventure.Editor
             EndWindows();
 
             OnAfterDrawWindows();
-            /*graphMatrix = GUI.matrix;
-            GUI.matrix = prevMatrix;*/
             GUI.EndScrollView();
         }
 
@@ -286,32 +239,25 @@ namespace uAdventure.Editor
                     break;
                 case EventType.MouseDown:
                     {
-                        if (Event.current.button == 0)
+                        // Selecting
+                        if (Event.current.button == 0 && GUIUtility.hotControl == 0)
                         {
-                            // Selecting
-                            if (GUIUtility.hotControl == 0)
-                            {
-                                // Start selecting
-                                GUIUtility.hotControl = this.GetHashCode();
-                                startPoint = Event.current.mousePosition;
-                                selection.Clear();
-                                Event.current.Use();
-                            }
+                            // Start selecting
+                            GUIUtility.hotControl = this.GetHashCode();
+                            startPoint = Event.current.mousePosition;
+                            selection.Clear();
+                            Event.current.Use();
                         }
                     }
                     break;
                 case EventType.MouseUp:
                     {
-                        if (Event.current.button == 0)
+                        if (Event.current.button == 0 && GUIUtility.hotControl == this.GetHashCode())
                         {
-                            if (GUIUtility.hotControl == this.GetHashCode())
-                            {
-                                GUIUtility.hotControl = 0;
+                            GUIUtility.hotControl = 0;
 
-                                UpdateSelection();
-                                Event.current.Use();
-                            }
-
+                            UpdateSelection();
+                            Event.current.Use();
                         }
                     }
                     break;
@@ -418,14 +364,12 @@ namespace uAdventure.Editor
                 midCorner = Vector2.Lerp(midCorner, (start + end) / 2f, superacionHorizontal);
 
                 Vector2 staCornerT1 = staCorner + new Vector2(1, 0) * wr.width / 1.5f;
-                Vector2 staCornerT2 = staCorner + new Vector2(-1, 0) * wr.width / 1.5f;
-                Vector2 endCornerT1 = endCorner + new Vector2(1, 0) * wr2.width / 1.5f;
+                Vector2 staCornerT2;
+                Vector2 endCornerT1;
                 Vector2 endCornerT2 = endCorner + new Vector2(-1, 0) * wr2.width / 1.5f;
-
-                var aux = staCorner;
+                
                 var fus = Mathf.Clamp01(Mathf.Max(upDown * (staCorner.y - endCorner.y) + 2 * sep, 100 + 2 * sep - (staCorner.x - endCorner.x)) / 100);
-
-
+                
                 staCorner = Vector2.Lerp(staCorner, midCorner, fus);
                 endCorner = Vector2.Lerp(endCorner, midCorner, fus);
 
@@ -486,16 +430,16 @@ namespace uAdventure.Editor
         {
             loopCheck.Clear();
 
-            var nodes = GetNodes(Content);
-            if(nodes.Length > 0)
+            var contentNodes = GetNodes(Content);
+            if(contentNodes.Length > 0)
             {
                 Rect from = new Rect(0, 0, 0, 50f);
-                Rect to = GetNodeRect(Content, nodes[0]);
+                Rect to = GetNodeRect(Content, contentNodes[0]);
                 CurveFromTo(from, to, new Color(0.8f, 0.5f, 0.1f));
             }
 
             // Draw the rest of the lines in red
-            foreach (N n in nodes)
+            foreach (N n in contentNodes)
             {
                 if (!loopCheck.ContainsKey(n))
                 {
@@ -514,16 +458,26 @@ namespace uAdventure.Editor
                         var isLookingThis = n.Equals(lookingChildNode) && lookingChildSlot == i;
                         if (isLookingThis)
                         {
-                            var b = new Color(0.3f, 0.3f, 0.9f);
-                            if (hovering != -1) CurveFromTo(fromRect, GetNodeRect(Content, this.nodes[hovering]), b);
-                            else CurveFromTo(fromRect, new Rect(Event.current.mousePosition, Vector2.one), b);
+                            if (hovering != -1)
+                            {
+                                CurveFromTo(fromRect, GetNodeRect(Content, this.nodes[hovering]), blue);
+                            }
+                            else
+                            {
+                                CurveFromTo(fromRect, new Rect(Event.current.mousePosition, Vector2.one), blue);
+                            }
                         }
                         if (childs[i] != null)
                         {
-                            var r = new Color(0.9f, 0.1f, 0.1f);
                             Rect to = GetNodeRect(Content, childs[i]);
-                            if (isLookingThis) CurveFromTo(fromRect, to, r);
-                            else CurveFromTo(fromRect, to, l);
+                            if (isLookingThis)
+                            {
+                                CurveFromTo(fromRect, to, red);
+                            }
+                            else
+                            {
+                                CurveFromTo(fromRect, to, green);
+                            }
                         }
                     }
                         
@@ -543,7 +497,9 @@ namespace uAdventure.Editor
 
             var rect = GetNodeRect(Content, node);
             if (Event.current.type == EventType.Layout)
+            {
                 rect.height = 0; // Reset the height for layouting
+            }
 
             var newRect = GUILayout.Window(node.GetHashCode(), rect, NodeWindow, GetTitle(Content, node), GUILayout.MinWidth(150));
             SetNodeRect(Content, node, newRect);
@@ -569,10 +525,6 @@ namespace uAdventure.Editor
             }
         }
 
-        Color s = new Color(0.4f, 0.4f, 0.5f),
-            l = new Color(0.3f, 0.7f, 0.4f),
-            r = new Color(0.8f, 0.2f, 0.2f);
-
         /**********************
 		 * Node windows
 		 *********************/
@@ -597,11 +549,9 @@ namespace uAdventure.Editor
                         }
 
                         hovering = id;
-                        hoveringNode = myNode;
                     }
                     break;
                 case EventType.MouseDown:
-                    if (hovering == id) focusing = hovering;
                     if (lookingChildSlot != -1)
                     {
                         SetNodeChild(Content, lookingChildNode, lookingChildSlot, myNode);
@@ -667,27 +617,27 @@ namespace uAdventure.Editor
                 case EventType.MouseDown:
 
                     // Left button
-                    if (Event.current.button == 0)
+                    if (Event.current.button == 0 && hovering == id)
                     {
-                        if (hovering == id)
+                        toSelect = false;
+                        if (Event.current.control)
                         {
-                            toSelect = false;
-                            focusing = hovering;
-                            if (Event.current.control)
+                            if (selection.Contains(myNode))
                             {
-                                if (selection.Contains(myNode))
-                                    selection.Remove(myNode);
-                                else
-                                    selection.Add(myNode);
+                                selection.Remove(myNode);
                             }
                             else
                             {
-                                toSelect = true;
-                                if (!selection.Contains(myNode))
-                                {
-                                    selection.Clear();
-                                    selection.Add(myNode);
-                                }
+                                selection.Add(myNode);
+                            }
+                        }
+                        else
+                        {
+                            toSelect = true;
+                            if (!selection.Contains(myNode))
+                            {
+                                selection.Clear();
+                                selection.Add(myNode);
                             }
                         }
                     }
@@ -738,8 +688,8 @@ namespace uAdventure.Editor
 
     public abstract class CollapsibleGraphEditor<T, N> : GraphEditor<T, N>
     {
-        private static readonly Vector2 CollapsedSize = new Vector2(200, 50);
-        private static GUIContent openButton = new GUIContent();
+        private readonly Vector2 CollapsedSize = new Vector2(200, 50);
+        private readonly GUIContent openButton = new GUIContent();
         private GUIStyle closeStyle, collapseStyle, buttonstyle;
         protected Dictionary<N, bool> collapsedState;
 
@@ -754,9 +704,11 @@ namespace uAdventure.Editor
         {
             if (closeStyle == null)
             {
-                closeStyle = new GUIStyle(GUI.skin.button);
-                closeStyle.padding = new RectOffset(0, 0, 0, 0);
-                closeStyle.margin = new RectOffset(0, 5, 2, 0);
+                closeStyle = new GUIStyle(GUI.skin.button)
+                {
+                    padding = new RectOffset(0, 0, 0, 0),
+                    margin = new RectOffset(0, 5, 2, 0)
+                };
                 closeStyle.normal.textColor = Color.red;
                 closeStyle.focused.textColor = Color.red;
                 closeStyle.active.textColor = Color.red;
@@ -765,9 +717,11 @@ namespace uAdventure.Editor
 
             if (collapseStyle == null)
             {
-                collapseStyle = new GUIStyle(GUI.skin.button);
-                collapseStyle.padding = new RectOffset(0, 0, 0, 0);
-                collapseStyle.margin = new RectOffset(0, 5, 2, 0);
+                collapseStyle = new GUIStyle(GUI.skin.button)
+                {
+                    padding = new RectOffset(0, 0, 0, 0),
+                    margin = new RectOffset(0, 5, 2, 0)
+                };
                 collapseStyle.normal.textColor = Color.blue;
                 collapseStyle.focused.textColor = Color.blue;
                 collapseStyle.active.textColor = Color.blue;
@@ -776,9 +730,11 @@ namespace uAdventure.Editor
 
             if (buttonstyle == null)
             {
-                buttonstyle = new GUIStyle();
-                buttonstyle.padding = new RectOffset(5, 5, 5, 5);
-                buttonstyle.wordWrap = true;
+                buttonstyle = new GUIStyle()
+                {
+                    padding = new RectOffset(5, 5, 5, 5),
+                    wordWrap = true
+                };
             }
         }
 
@@ -792,7 +748,9 @@ namespace uAdventure.Editor
 
                 GUILayout.BeginHorizontal();
                 if (GUI.Button(btrect, bttext))
+                {
                     collapsedState[node] = false;
+                }
                 GUILayout.EndHorizontal();
             }
             else
@@ -824,23 +782,27 @@ namespace uAdventure.Editor
             return openButton;
         }
 
-        private bool IsCollapsed(T Content, N node)
+        protected virtual bool IsCollapsed(T Content, N node)
         {
-            return collapsedState.ContainsKey(node) ? collapsedState[node] : true;
+            return !collapsedState.ContainsKey(node) || collapsedState[node];
         }
 
         protected override void SetNodeRect(T Content, N node, Rect rect)
         {
             SetNodePosition(Content, node, rect.position);
             if (!IsCollapsed(Content, node))
+            {
                 SetNodeSize(Content, node, rect.size);
+            }
         }
 
         protected override Rect GetNodeRect(T Content, N node)
         {
             var rect = GetOpenedNodeRect(Content, node);
             if(IsCollapsed(Content, node))
+            {
                 rect.size = CollapsedSize;
+            }
             return rect;
         }
 

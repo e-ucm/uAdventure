@@ -345,10 +345,8 @@ namespace uAdventure.Editor
 
             // Take the complete node
             ConversationNode node = (ConversationNode)nodeView;
-
-            // Show a edit effects dialog with a new effects controller
-            //TODO: implement 
-            //new EffectsDialog(new EffectsController(node.getEffects()));
+            var effectsEditor = ScriptableObject.CreateInstance<EffectsEditor>();
+            effectsEditor.Init(node.getEffects());
         }
 
 
@@ -416,16 +414,7 @@ namespace uAdventure.Editor
 
         public bool editLineAudioPath(ConversationNodeView selectedNode, int selectedRow)
         {
-
-            //try
-            //{
             return controller.AddTool(new SelectLineAudioPathTool(((ConversationNode)selectedNode).getLine(selectedRow)));
-            //}
-            //catch (CloneNotSupportedException e)
-            //{
-            //    ReportDialog.GenerateErrorReport(new Exception("Could not clone resources"), false, TC.get("Error.Title"));
-            //    return false;
-            //}
         }
 
         /**

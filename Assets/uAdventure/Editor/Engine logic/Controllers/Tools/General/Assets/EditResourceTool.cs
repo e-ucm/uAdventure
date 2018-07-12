@@ -33,7 +33,7 @@ namespace uAdventure.Editor
 
             bool done = false;
 
-            AssetsController.addSingleAsset(assetsInformation[index].category, filename, destinyAssetName, true);
+            AssetsController.AddSingleAsset(assetsInformation[index].category, filename, destinyAssetName, true);
             // Dirty fix?
             string selectedAsset = destinyAssetName == null ? (new FileInfo(filename)).FullName : destinyAssetName;
             // If a file was selected
@@ -41,9 +41,9 @@ namespace uAdventure.Editor
             {
 
                 // Take the index of the selected asset
-                string[] assetFilenames = AssetsController.getAssetFilenames(assetsInformation[index].category,
+                string[] assetFilenames = AssetsController.GetAssetFilenames(assetsInformation[index].category,
                     assetsInformation[index].filter);
-                string[] assetPaths = AssetsController.getAssetsList(assetsInformation[index].category,
+                string[] assetPaths = AssetsController.GetAssetsList(assetsInformation[index].category,
                     assetsInformation[index].filter);
                 int assetIndex = -1;
                 for (int i = 0; i < assetFilenames.Length; i++)

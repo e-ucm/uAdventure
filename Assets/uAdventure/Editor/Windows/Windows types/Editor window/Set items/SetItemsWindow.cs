@@ -13,16 +13,9 @@ namespace uAdventure.Editor
     public class SetItemsWindow : PreviewDataControlExtension
     {
         private enum SetItemsWindowType { Appearance, Documentation }
-
-        private static SetItemsWindowType openedWindow = SetItemsWindowType.Appearance;
+        
         private static SetItemsWindowApperance setItemsWindowApperance;
         private static SetItemsWindowDocumentation setItemsWindowDocumentation;
-        
-        // Flag determining visibility of concrete item information
-        private bool isConcreteItemVisible = false;
-
-        private static GUISkin selectedButtonSkin;
-        private static GUISkin defaultSkin;
 
         public SetItemsWindow(Rect aStartPos, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, new GUIContent(TC.get("Element.Name59")), aStyle, aOptions)
@@ -35,29 +28,20 @@ namespace uAdventure.Editor
 
             setItemsWindowApperance = new SetItemsWindowApperance(aStartPos, new GUIContent(TC.get("Atrezzo.LookPanelTitle")), "Window");
             setItemsWindowDocumentation = new SetItemsWindowDocumentation(aStartPos, new GUIContent(TC.get("Atrezzo.DocPanelTitle")), "Window");
-            
-            selectedButtonSkin = Resources.Load<GUISkin>("EAdventureData/skin/ButtonSelected");
 
             AddTab(TC.get("Atrezzo.LookPanelTitle"), SetItemsWindowType.Appearance, setItemsWindowApperance);
             AddTab(TC.get("Atrezzo.DocPanelTitle"), SetItemsWindowType.Documentation, setItemsWindowDocumentation);
-        }
-
-        void OnWindowTypeChanged(SetItemsWindowType type_)
-        {
-            openedWindow = type_;
         }
 
         // Two methods responsible for showing right window content 
         // - concrete item info or base window view
         public void ShowBaseWindowView()
         {
-            isConcreteItemVisible = false;
             GameRources.GetInstance().selectedSetItemIndex = -1;
         }
 
         public void ShowItemWindowView(int o)
         {
-            isConcreteItemVisible = true;
             GameRources.GetInstance().selectedSetItemIndex = o;
         }
 

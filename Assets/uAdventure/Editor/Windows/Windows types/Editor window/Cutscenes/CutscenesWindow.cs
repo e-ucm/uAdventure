@@ -13,11 +13,8 @@ namespace uAdventure.Editor
     public class CutscenesWindow : PreviewDataControlExtension
     {
         private enum CutscenesWindowType { Appearance, Documentation, EndConfiguration }
-
-        private static CutscenesWindowType openedWindow = CutscenesWindowType.Appearance;
+        
         private static CutscenesWindowAppearance cutscenesWindowAppearance;
-        private static CutscenesWindowDocumentation cutscenesWindowDocumentation;
-        private static CutscenesWindowEndConfiguration cutscenesWindowEndConfiguration;
 
         public CutscenesWindow(Rect aStartPos, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, new GUIContent(TC.get("Element.Name9")), aStyle, aOptions)
@@ -30,8 +27,8 @@ namespace uAdventure.Editor
             };
 
             cutscenesWindowAppearance = new CutscenesWindowAppearance(aStartPos, new GUIContent(TC.get("Cutscene.App")), "Window");
-            cutscenesWindowDocumentation = new CutscenesWindowDocumentation(aStartPos, new GUIContent(TC.get("Cutscene.Doc")), "Window");
-            cutscenesWindowEndConfiguration = new CutscenesWindowEndConfiguration(aStartPos, new GUIContent(TC.get("Cutscene.CutsceneEnd")), "Window");
+            var cutscenesWindowDocumentation = new CutscenesWindowDocumentation(aStartPos, new GUIContent(TC.get("Cutscene.Doc")), "Window");
+            var cutscenesWindowEndConfiguration = new CutscenesWindowEndConfiguration(aStartPos, new GUIContent(TC.get("Cutscene.CutsceneEnd")), "Window");
 
             AddTab(TC.get("Cutscene.App"), CutscenesWindowType.Appearance, cutscenesWindowAppearance);
             AddTab(TC.get("Cutscene.Doc"), CutscenesWindowType.Documentation, cutscenesWindowDocumentation);

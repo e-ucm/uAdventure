@@ -21,7 +21,6 @@ namespace uAdventure.Geo
 
         private bool ready = false;
         private MapScene mapScene;
-        private LocationService locationService;
 
         public List<MapElement> MapElements {
             get
@@ -79,14 +78,13 @@ namespace uAdventure.Geo
         // ---------------------------
         private TransformData bkCameraTransform;
         
-        void Awake()
+        protected void Awake()
         {
             uAdventurePlugin.MapSceneMB = this;
         }
 
-        void Start()
+        protected void Start()
         {
-            //Physics.gravity = this.transform.rotation * Physics.gravity;
             bkCameraTransform = Camera.main.transform.Backup();
 
             // Start the gps just in case is not
@@ -103,7 +101,7 @@ namespace uAdventure.Geo
 
         private Vector2d lastUpdatedPosition;
 
-        void Update()
+        protected void Update()
         {
             if(Input.location.status == LocationServiceStatus.Running && Input.location.lastData.timestamp != 0 && Input.location.lastData.latitude != 0)
             {
@@ -112,6 +110,7 @@ namespace uAdventure.Geo
                     && (GM.LatLonToMeters(lastUpdatedPosition) - GM.LatLonToMeters(inputLatLon)).sqrMagnitude >= 1f)
                 {
                     ready = true;
+                    lastUpdatedPosition = inputLatLon;
                     if (GM.SeparationInMeters(geoCharacter.LatLon, inputLatLon) > 150) geoCharacter.LatLon = inputLatLon;
                     else geoCharacter.MoveTo(inputLatLon);
                 }

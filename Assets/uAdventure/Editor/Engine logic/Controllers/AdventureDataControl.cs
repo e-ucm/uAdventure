@@ -13,39 +13,12 @@ namespace uAdventure.Editor
      */
     public class AdventureDataControl
     {
-
-
+        
         /**
          * The whole data of the adventure
          */
-        private AdventureData adventureData;
+        private readonly AdventureData adventureData;
 
-        ///**
-        // * Controller for LOM data (only required when exporting games to LOM)
-        // */
-        //private LOMDataControl lomController;
-
-        ///**
-        // * Controller for IMS data (only required when exporting games to SCORM)
-        // */
-        //private IMSDataControl imsController;
-
-        ///**
-        // * Controller for LOM-ES data (require to export games as ODE)
-        // */
-        //private LOMESDataControl lomesController;
-
-        /**
-         * Assessment file data controller
-         */
-        //private AssessmentProfilesDataControl assessmentProfilesDataControl;
-        /**
-         * Adaptation file data controller
-         */
-        //private AdaptationProfilesDataControl adaptationProfilesDataControl;
-        /**
-         * Constructs the data control with the adventureData
-         */
         public AdventureDataControl(AdventureData data) : this()
         {
             adventureData = data;
@@ -116,13 +89,11 @@ namespace uAdventure.Editor
 
         public bool isCursorTypeAllowed(string type)
         {
-
             return isCursorTypeAllowed(DescriptorData.getCursorTypeIndex(type));
         }
 
         public bool isCursorTypeAllowed(int type)
         {
-
             return DescriptorData.typeAllowed[adventureData.getGUIType()][type];
         }
 
@@ -153,7 +124,6 @@ namespace uAdventure.Editor
          */
         public string getTitle()
         {
-
             return adventureData.getTitle();
         }
 
@@ -164,7 +134,6 @@ namespace uAdventure.Editor
          */
         public string getDescription()
         {
-
             return adventureData.getDescription();
         }
 
@@ -175,7 +144,6 @@ namespace uAdventure.Editor
          */
         public int getGUIType()
         {
-
             return adventureData.getGUIType();
         }
 
@@ -186,7 +154,6 @@ namespace uAdventure.Editor
          */
         public List<Chapter> getChapters()
         {
-
             return adventureData.getChapters();
         }
 
@@ -216,7 +183,6 @@ namespace uAdventure.Editor
          */
         public void setTitle(string title)
         {
-
             Tool tool = new ChangeTitleTool(adventureData, title);
             Controller.Instance.AddTool(tool);
         }
@@ -235,21 +201,10 @@ namespace uAdventure.Editor
         }
 
         /**
-         * Shows the GUI style selection dialog.
-         */
-        public void showGUIStylesDialog()
-        {
-
-            // Show the dialog
-            // new GUIStylesDialog(adventureData.getGUIType());
-        }
-
-        /**
          * @return the playerMode
          */
         public int getPlayerMode()
         {
-
             return adventureData.getPlayerMode();
         }
 
@@ -259,26 +214,22 @@ namespace uAdventure.Editor
          */
         public void setPlayerMode(int playerMode)
         {
-
-            Tool tool = new ChangeIntegerValueTool(adventureData, playerMode, "getPlayerMode", "setPlayerMode");
+            Tool tool = new ChangeValueTool<AdventureData, int>(adventureData, playerMode, "getPlayerMode", "setPlayerMode");
             Controller.Instance.AddTool(tool);
         }
 
         public List<CustomCursor> getCursors()
         {
-
             return adventureData.getCursors();
         }
 
         public List<CustomButton> getButtons()
         {
-
             return adventureData.getButtons();
         }
 
         public List<CustomArrow> getArrows()
         {
-
             return adventureData.getArrows();
         }
 
@@ -297,7 +248,6 @@ namespace uAdventure.Editor
 
         public string getCursorPath(int type)
         {
-
             return getCursorPath(DescriptorData.getCursorTypeString(type));
         }
 
@@ -322,15 +272,7 @@ namespace uAdventure.Editor
 
         public void editCursorPath(int t)
         {
-
-            //try
-            //{
             Controller.Instance.AddTool(new SelectCursorPathTool(adventureData, t));
-            //}
-            //catch (CloneNotSupportedException e)
-            //{
-            //    ReportDialog.GenerateErrorReport(e, false, "Could not clone cursor-adventureData");
-            //}
         }
 
         public string getArrowPath(string type)
@@ -363,67 +305,6 @@ namespace uAdventure.Editor
                 Controller.Instance.AddTool(new DeleteArrowTool(adventureData, position));
             }
         }
-
-        ///**
-        // * @return the lomController
-        // */
-        //public LOMDataControl getLomController()
-        //{
-
-        //    return lomController;
-        //}
-
-        ///**
-        // * @param lomController
-        // *            the lomController to set
-        // */
-        //public void setLomController(LOMDataControl lomController)
-        //{
-
-        //    this.lomController = lomController;
-        //}
-
-        ///**
-        // * @return the imsController
-        // */
-        //public IMSDataControl getImsController()
-        //{
-
-        //    return imsController;
-        //}
-
-        ///**
-        // * @return the lomesController
-        // */
-        //public LOMESDataControl getLOMESController()
-        //{
-
-        //    return lomesController;
-        //}
-
-        ///**
-        // * @param imsController
-        // *            the imsController to set
-        // */
-        //public void setImsController(IMSDataControl imsController)
-        //{
-
-        //    this.imsController = imsController;
-        //}
-
-        /**
-         * @return the assessmentRulesListDataControl
-         */
-        /*public AssessmentProfilesDataControl getAssessmentRulesListDataControl( ) {
-            return assessmentProfilesDataControl;
-        }*/
-
-        /**
-         * @return the adaptationRulesListDataControl
-         */
-        /*public AdaptationProfilesDataControl getAdaptationRulesListDataControl( ) {
-            return adaptationProfilesDataControl;
-        }*/
 
         public bool isCommentaries()
         {
@@ -470,7 +351,7 @@ namespace uAdventure.Editor
         public void setGraphicConfig(int graphicConfig)
         {
 
-            Tool tool = new ChangeIntegerValueTool(adventureData, graphicConfig, "getGraphicConfig", "setGraphicConfig");
+            Tool tool = new ChangeValueTool<AdventureData, int>(adventureData, graphicConfig, "getGraphicConfig", "setGraphicConfig");
             Controller.Instance.AddTool(tool);
         }
 
@@ -502,27 +383,12 @@ namespace uAdventure.Editor
 
         public void editButtonPath(string action, string type)
         {
-
-            //try
-            //{
             Controller.Instance.AddTool(new SelectButtonTool(adventureData, action, type));
-            //}
-            //catch (CloneNotSupportedException e)
-            //{
-            //    ReportDialog.GenerateErrorReport(e, false, "Could not clone resources: buttons");
-            //}
         }
 
         public void editArrowPath(string type)
         {
-            //try
-            //{
             Controller.Instance.AddTool(new SelectArrowTool(adventureData, type));
-            //}
-            //catch (CloneNotSupportedException e)
-            //{
-            //    ReportDialog.GenerateErrorReport(e, false, "Could not clone resources: arrows");
-            //}
         }
 
         public int getInventoryPosition()
@@ -534,7 +400,7 @@ namespace uAdventure.Editor
         public void setInventoryPosition(int inventoryPosition)
         {
 
-            Controller.Instance.AddTool(new ChangeIntegerValueTool(adventureData, inventoryPosition, "getInventoryPosition", "setInventoryPosition"));
+            Controller.Instance.AddTool(new ChangeValueTool<AdventureData, int>(adventureData, inventoryPosition, "getInventoryPosition", "setInventoryPosition"));
         }
 
         public int countAssetReferences(string assetPath)
@@ -565,7 +431,7 @@ namespace uAdventure.Editor
         public void setGUIStyleDialog(int optionSelected)
         {
 
-            Tool tool = new ChangeIntegerValueTool(adventureData, optionSelected, "getGUIType", "setGUIType");
+            Tool tool = new ChangeValueTool<AdventureData, int>(adventureData, optionSelected, "getGUIType", "setGUIType");
             Controller.Instance.AddTool(tool);
 
         }
@@ -650,12 +516,11 @@ namespace uAdventure.Editor
         private void checkContextualButtons(string action, string type)
         {
             string useGrabPath = adventureData.getButtonPathFromEditor(DescriptorData.USE_GRAB_BUTTON, type);
-            if (useGrabPath != null && !useGrabPath.Equals(""))
+            var hasUseGrabPath = !string.IsNullOrEmpty(useGrabPath);
+            var hasCustomButtonForUseGrabPath = hasUseGrabPath && string.IsNullOrEmpty(adventureData.getButtonPathFromEditor(action, type));
+            if (hasUseGrabPath && hasCustomButtonForUseGrabPath)
             {
-                if (adventureData.getButtonPathFromEditor(action, type) == null || adventureData.getButtonPathFromEditor(action, type).Equals(""))
-                {
-                    adventureData.addButton(action, type, useGrabPath);
-                }
+                adventureData.addButton(action, type, useGrabPath);
             }
         }
     }

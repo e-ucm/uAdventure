@@ -12,8 +12,6 @@ namespace uAdventure.Editor
 
         private bool showStartDialog_F;
 
-        private RecentFiles recentFiles;
-
         private static ConfigData instance;
 
         private string configFile;
@@ -400,8 +398,6 @@ namespace uAdventure.Editor
             if (instance.projectsPath != null)
                 configuration.SetProperty("EffectSelectorTab", instance.effectSelectorTab.ToString());
 
-            instance.recentFiles.fillProperties(configuration);
-
             // Store the configuration into a file
             try
             {
@@ -464,7 +460,6 @@ namespace uAdventure.Editor
                     ReleaseFolders.setProjectsPath(projectsPath);
 
                 effectSelectorTab = ExParsers.ParseDefault(configuration.GetProperty("EffectSelectorTab"), 0);
-                recentFiles = new RecentFiles(configuration);
             }
             catch (FileNotFoundException)
             {
@@ -499,38 +494,6 @@ namespace uAdventure.Editor
             {
                 loadingImage = "Assets/uAdventure/Resources/" + ReleaseFolders.IMAGE_LOADING_DIR + " / " + Controller.Instance.getDefaultLanguage() + "/Editor2D-Loading.png";
             }
-            if (exportsPath == null)
-            {
-
-            }
-            if (projectsPath == null)
-            {
-
-            }
-            if (reportsPath == null)
-            {
-
-            }
-            if (recentFiles == null)
-            {
-                recentFiles = new RecentFiles(new Properties(instance.configFile));
-            }
-
-        }
-
-        public static void fileLoaded(string file)
-        {
-            instance.recentFiles.fileLoaded(file);
-        }
-
-        public static string[][] getRecentFilesInfo(int r)
-        {
-            return instance.recentFiles.getRecentFilesInfo(r);
-        }
-
-        public static string[][] getRecentFilesInfo(int l, int r)
-        {
-            return instance.recentFiles.getRecentFilesInfo(l, r);
         }
 
         /**

@@ -11,10 +11,8 @@ namespace uAdventure.Editor
     {
         private SceneDataControl workingScene;
 
-        private Texture2D backgroundPreview = null, foregroundPreview = null;
-
-        private AppearanceEditor appearanceEditor;
-        private FileChooser background, foreground, music;
+        private readonly AppearanceEditor appearanceEditor;
+        private readonly FileChooser background, foreground, music;
 
         public ScenesWindowAppearance(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, SceneEditor sceneEditor, params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, sceneEditor, aOptions)
@@ -47,8 +45,6 @@ namespace uAdventure.Editor
 
         protected override void DrawInspector()
         {
-
-            var previousWorkingItem = workingScene;
             workingScene = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[GameRources.GetInstance().selectedSceneIndex];
 
             // Appearance table

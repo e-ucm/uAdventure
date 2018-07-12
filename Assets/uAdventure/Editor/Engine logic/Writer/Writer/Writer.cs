@@ -92,19 +92,6 @@ namespace uAdventure.Editor
             else
                 DOMWriterUtility.DOMWrite(doc, adventureData);
 
-            // TODO re-add indentation
-            //indentDOM(mainNode, 0);
-
-            // Create the necessary elements for export the DOM into a XML file
-            //transformer = tFactory.newTransformer();
-            //transformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, "descriptor.dtd");
-
-            // Create the output buffer, write the DOM and close it
-            //fout = new FileOutputStream(folderName + "/descriptor.xml");
-            //writeFile = new OutputStreamWriter(fout, "UTF-8");
-            //transformer.transform(new DOMSource(doc), new StreamResult(writeFile));
-            //writeFile.close();
-            //fout.close();
             doc.Save(folderName + "/descriptor.xml");
             /** ******** END WRITING THE DESCRIPTOR ********** */
 
@@ -121,37 +108,12 @@ namespace uAdventure.Editor
                 typeChapter = doc.CreateDocumentType("eAdventure", "SYSTEM", "eadventure.dtd", null);
                 doc.AppendChild(declaration);
                 doc.AppendChild(typeChapter);
-                // Pick the main node of the chapter
-
-                // TODO FIX THIS and use normal domwriter
-
-                var chapterwriter = new ChapterDOMWriter();
 
                 DOMWriterUtility.DOMWrite(doc, chapter);
-
-                // TODO re-add indentation
-                //indentDOM(mainNode, 0);
-
-                //TODO: testing
-                //doc = new XmlDocument();
-
-                // Create the necessary elements for export the DOM into a XML file
-                //transformer = tFactory.newTransformer();
-                //transformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, "eadventure.dtd");
-
-                // Create the output buffer, write the DOM and close it
-                //fout = new FileOutputStream(folderName + "/chapter" + chapterIndex++ + ".xml");
-                //writeFile = new OutputStreamWriter(fout, "UTF-8");
-                //transformer.transform(new DOMSource(doc), new StreamResult(writeFile));
-                //writeFile.close();
-                //fout.close();
 
                 doc.Save(folderName + "/chapter" + chapterIndex++ + ".xml");
             }
             /** ******** END WRITING THE CHAPTERS ********** */
-
-            // Update the zip files
-            //File.umount( );
             dataSaved = true;
             return dataSaved;
         }

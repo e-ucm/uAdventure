@@ -97,7 +97,7 @@ namespace uAdventure.Editor
         private Vector3 scale;
         private float rotation;
         private ExtElemReference reference;
-        private float interactionRange;
+        private float interactionRange; 
 
         public Texture2D Texture { get; set; }
         public Type ForType { get { return typeof(GeoPositionedTransformManager); } }
@@ -136,6 +136,7 @@ namespace uAdventure.Editor
                 else if (scale is Vector3) this.scale = (Vector3)scale;
             }
 
+
             object rotation;
             parameters.TryGetValue("rotation", out rotation);
             if (rotation == null) parameters.TryGetValue("Rotation", out rotation);
@@ -143,6 +144,8 @@ namespace uAdventure.Editor
             if (rotation != null)
             {
                 if (rotation is float) this.rotation = ((float)rotation);
+
+                Debug.Log("Rotation is not used in edit mode, but its value is: " + this.rotation);
             }
 
             object interactionRange;
@@ -159,7 +162,7 @@ namespace uAdventure.Editor
         {
             UpdateValues();
             var center = map.PixelToRelative(GM.MetersToPixels(GM.LatLonToMeters(position.x, position.y), map.Zoom)).ToVector2();
-            if(Texture != null)
+            if (Texture != null)
             {
                 var size = new Vector2(Texture.width, Texture.height);
 
@@ -169,9 +172,7 @@ namespace uAdventure.Editor
                 var pixelsSize = GM.MetersToPixels(GM.PixelsToMeters(new Vector2d(size.x * scale.x, size.y * scale.y), 19), map.Zoom);
                 var midWidthHeight = pixelsSize.ToVector2() / 2f;
                 var textRect = ExtensionRect.FromCorners(center - midWidthHeight, center + midWidthHeight);
-
-                /*var areaRect = textRect.Intersection(area);
-                GUI.DrawTextureWithTexCoords(areaRect, i, textRect.ToTexCoords(areaRect));*/
+                
                 GUI.DrawTexture(textRect, Texture);
 
                 Handles.BeginGUI();
@@ -238,6 +239,8 @@ namespace uAdventure.Editor
             if (rotation != null)
             {
                 if (rotation is float) this.rotation = ((float)rotation);
+
+                Debug.Log("Rotation is not used in edit mode, but its value is: " + this.rotation);
             }
         }
 
@@ -335,6 +338,8 @@ namespace uAdventure.Editor
             if (rotation != null)
             {
                 if (rotation is float) this.rotation = ((float)rotation);
+
+                Debug.Log("Rotation is not used in edit mode, but its value is: " + this.rotation);
             }
 
             object rotateAround;
@@ -344,6 +349,8 @@ namespace uAdventure.Editor
             if (rotateAround != null)
             {
                 if (rotateAround is bool) this.rotateAround = ((bool)rotateAround);
+
+                Debug.Log("RotateAround is not used in edit mode, but its value is: " + this.rotateAround);
             }
         }
 
@@ -372,9 +379,7 @@ namespace uAdventure.Editor
                 var pixelsSize = GM.MetersToPixels(GM.PixelsToMeters(new Vector2d(size.x * scale.x, size.y * scale.y), 19), map.Zoom);
                 var midWidthHeight = pixelsSize.ToVector2() / 2f;
                 var textRect = ExtensionRect.FromCorners(center - midWidthHeight, center + midWidthHeight);
-
-                /*var areaRect = textRect.Intersection(area);
-                GUI.DrawTextureWithTexCoords(areaRect, i, textRect.ToTexCoords(areaRect));*/
+                
                 GUI.DrawTexture(textRect, Texture);
             }
         }

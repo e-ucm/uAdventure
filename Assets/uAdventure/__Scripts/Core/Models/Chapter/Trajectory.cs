@@ -263,9 +263,9 @@ namespace uAdventure.Core
         public class Side : ICloneable
         {
 
-            private string idStart;
+            private readonly string idStart;
 
-            private string idEnd;
+            private readonly string idEnd;
 
             private float length = 1;
 
@@ -321,7 +321,12 @@ namespace uAdventure.Core
             public override bool Equals(object obj)
             {
                 var side = obj as Side;
-                return side != null ? side.idStart == idStart && side.idEnd == idEnd : false;
+                return side != null && side.idStart == idStart && side.idEnd == idEnd;
+            }
+
+            public override int GetHashCode()
+            {
+                return idStart.GetHashCode() + idEnd.GetHashCode();
             }
         }
 

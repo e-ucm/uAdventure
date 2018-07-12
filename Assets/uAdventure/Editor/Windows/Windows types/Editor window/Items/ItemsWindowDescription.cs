@@ -39,7 +39,7 @@ namespace uAdventure.Editor
         public override void Draw(int aID)
         {
 
-            workingItem = Target != null ? Target as ItemDataControl : Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[GameRources.GetInstance().selectedItemIndex];
+            workingItem = Target as ItemDataControl ?? Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[GameRources.GetInstance().selectedItemIndex];
 
 
             // -------------
@@ -50,7 +50,9 @@ namespace uAdventure.Editor
             EditorGUI.BeginChangeCheck();
             var fullItemDescription = GUILayout.TextArea(workingItem.getDocumentation() ?? string.Empty);
             if (EditorGUI.EndChangeCheck())
+            {
                 workingItem.setDocumentation(fullItemDescription);
+            }
 
 
             // -------------
@@ -68,7 +70,9 @@ namespace uAdventure.Editor
             EditorGUI.BeginChangeCheck();
             var dragdropToogle = EditorGUILayout.Toggle(dragdropLabel, workingItem.isReturnsWhenDragged());
             if (EditorGUI.EndChangeCheck())
+            {
                 workingItem.setReturnsWhenDragged(dragdropToogle);
+            }
             GUILayout.Space(20);
 
             // -------------
@@ -78,7 +82,9 @@ namespace uAdventure.Editor
             var selectedBehaviourType = EditorGUILayout.Popup(TC.get("Behaviour"), (int)workingItem.getBehaviour(), behaviourTypes.Select(bt => TC.get(bt)).ToArray());
             Item.BehaviourType type = (selectedBehaviourType == 0 ? Item.BehaviourType.NORMAL : Item.BehaviourType.FIRST_ACTION);
             if (EditorGUI.EndChangeCheck())
+            {
                 workingItem.setBehaviour(type);
+            }
             EditorGUILayout.HelpBox(TC.get(behaviourTypesDescription[selectedBehaviourType]), MessageType.Info);
             GUILayout.Space(20);
 
@@ -88,7 +94,9 @@ namespace uAdventure.Editor
             EditorGUI.BeginChangeCheck();
             var transitionTime = Math.Max(EditorGUILayout.LongField(transitionLabel, workingItem.getResourcesTransitionTime()), 0);
             if (EditorGUI.EndChangeCheck())
+            {
                 workingItem.setResourcesTransitionTime(transitionTime);
+            }
 
         }
     }

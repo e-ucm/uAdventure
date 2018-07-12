@@ -87,16 +87,12 @@ namespace MapzenGo.Models.Settings.Editor
                        HelperExtention.GetOrCreateSObjectReturn(ref _settingBoundary, PATH_SAVE_SCRIPTABLE_OBJECT);
             }
         }
-
-        private SettingsLayers settingElement;
-
-        private int viewIndex = 1;
+        
+        
         private int tab = 0;
         private Vector2 scrollPos = Vector2.zero;
 
         public List<string> UsingType = new List<string>();
-
-        Material currentObject = null;
 
         public static GUIStyle GuiTitleSize(int fontSize, TextAnchor anchor, Color color)
         {
@@ -121,7 +117,7 @@ namespace MapzenGo.Models.Settings.Editor
             content.tooltip = "Setting Type";
             window.titleContent = content;
         }
-        void OnEnable()
+        protected void OnEnable()
         {
             SetupSettings();
         }
@@ -187,9 +183,8 @@ namespace MapzenGo.Models.Settings.Editor
         }
 
 
-        void OnGUI()
+        protected void OnGUI()
         {
-            //return;
             tab = GUILayout.Toolbar(tab, new string[] { "BUILDING", "ROAD", "LANDUSE", "WATER", "BOUNDARY", "EARTH", "PLACES", "POI" });
             switch (tab)
             {
@@ -1146,31 +1141,6 @@ namespace MapzenGo.Models.Settings.Editor
             }
             EditorGUILayout.EndVertical();
         }
-
-        /* void CreateNewItemList()
-    {
-        viewIndex = 1;
-        settingElement = Create();
-        if (settingElement)
-        {
-            BuildingFactorySettings.SettingsBuildings = new List<BuildingSettings>();
-            LanduseFactorySettings.SettingsLanduse = new List<LanduseSettings>();
-            RoadFactorySettings.SettingsRoad = new List<RoadSettings>();
-            WaterFactorySettings.SettingsWater = new List<WaterSettings>();
-            BoundaryFactorySettings.SettingsBoundary = new List<BoundarySettings>();
-
-            string relPath = AssetDatabase.GetAssetPath(settingElement);
-            EditorPrefs.SetString("ObjectPath", relPath);
-        }
-    }
-    public SettingsLayersLayers Create()
-    {
-        SettingsLayersLayers asset = ScriptableObject.CreateInstance<SettingsLayersLayers>();
-
-        AssetDatabase.CreateAsset(asset, PATH_SAVE_SCRIPTABLE_OBJECT);
-        AssetDatabase.SaveAssets();
-        return asset;
-    }*/
 
         public void DisplayErrorMEssage(string message, MessageType type = MessageType.Error)
         {

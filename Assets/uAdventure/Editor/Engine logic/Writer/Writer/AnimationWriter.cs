@@ -15,10 +15,10 @@ namespace uAdventure.Editor
 
         }
 
-        public static bool writeAnimation(string filename, Animation animation)
+        public static bool WriteAnimation(string filename, Animation animation)
         {
             bool dataSaved = false;
-            XmlDocument doc = doc = new XmlDocument();
+            XmlDocument doc = new XmlDocument();
             
             // Declaration, encoding, version, etc
             XmlDeclaration declaration = doc.CreateXmlDeclaration("1.0", "UTF-8", "no");

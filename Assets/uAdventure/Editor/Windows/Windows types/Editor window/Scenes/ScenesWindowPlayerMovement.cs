@@ -10,11 +10,9 @@ namespace uAdventure.Editor
     public class ScenesWindowPlayerMovement : SceneEditorWindow
     {
         public enum PlayerMode { NoPlayer, InitialPosition, Trajectory }
-        private GUIContent[] tools;
-        private static Rect previewRect;
+        private readonly GUIContent[] tools;
         private SceneDataControl workingScene;
         private static TrajectoryComponent trajectoryComponent;
-        private static InfluenceComponent influenceComponent;
         private int action = 0;
 
         public ScenesWindowPlayerMovement(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, SceneEditor sceneEditor,
@@ -29,7 +27,8 @@ namespace uAdventure.Editor
             };
             if (Controller.Instance.playerMode() == DescriptorData.MODE_PLAYER_3RDPERSON)
             {
-                influenceComponent = new InfluenceComponent(Rect.zero, new GUIContent(""), aStyle);
+                // Creating this component registers it in the scene editor
+                new InfluenceComponent(Rect.zero, new GUIContent(""), aStyle);
             }
 
             sceneEditor.TypeEnabling[typeof(Player)] = false;
@@ -39,11 +38,11 @@ namespace uAdventure.Editor
 
             tools = new GUIContent[]
             {
-                new GUIContent("None"), // TODO language
-                new GUIContent(Resources.Load<Texture2D>("EAdventureData/img/icons/nodeEdit")),
-                new GUIContent(Resources.Load<Texture2D>("EAdventureData/img/icons/sideEdit")),
-                new GUIContent(Resources.Load<Texture2D>("EAdventureData/img/icons/selectStartNode")),
-                new GUIContent(Resources.Load<Texture2D>("EAdventureData/img/icons/deleteTool"))
+                new GUIContent("SceneEditor.PlayerTrajectory.None"), 
+                new GUIContent(Resources.Load<Texture2D>("EAdventureData/img/icons/nodeEdit"), "SceneEditor.PlayerTrajectory.Edit"),
+                new GUIContent(Resources.Load<Texture2D>("EAdventureData/img/icons/sideEdit"), "SceneEditor.PlayerTrajectory.AddSide"),
+                new GUIContent(Resources.Load<Texture2D>("EAdventureData/img/icons/selectStartNode"), "SceneEditor.PlayerTrajectory.StartNode"),
+                new GUIContent(Resources.Load<Texture2D>("EAdventureData/img/icons/deleteTool"), "SceneEditor.PlayerTrajectory.Delete")
             };
         }
         
@@ -63,17 +62,13 @@ namespace uAdventure.Editor
             switch (playerMode)
             {
                 case PlayerMode.NoPlayer: // No Player
-                    {
-                    }
                     break;
                 case PlayerMode.InitialPosition: // No trajectory
-                    {
-
-                    }
                     break;
                 case PlayerMode.Trajectory: // Trajectory
                     {
-                        trajectoryComponent.Action = GUILayout.Toolbar(action, tools);
+                        trajectoryComponent.Action = GUILayout.Toolbar(action, tools
+                            .Select(t => t.image ? new GUIContent(t.image, t.tooltip.Traslate()) : new GUIContent(t.text.Traslate())).ToArray());
                     }
                     break;
             }
@@ -121,6 +116,8 @@ namespace uAdventure.Editor
             switch (val)
             {
                 default:
+                    Debug.LogError("Wrong player mode: " + val);
+                    break;
                 case PlayerMode.NoPlayer:
                     workingScene.changeAllowPlayerLayer(false);
                     break;
@@ -184,7 +181,7 @@ namespace uAdventure.Editor
                 return null;
             }
 
-            private static Rect getElementBoundaries(DataControl target)
+            private static Rect GetElementBoundaries(DataControl target)
             {
 
                 if (target is ElementReferenceDataControl)
@@ -209,7 +206,7 @@ namespace uAdventure.Editor
                 return Rect.zero;
             }
 
-            private static RectInt fixToBoundaries(Vector2 oldSize, RectInt rect, Rect boundaries)
+            private static RectInt FixToBoundaries(RectInt rect, Rect boundaries)
             {
                 var otherCorner = rect.position + rect.size;
 
@@ -244,7 +241,7 @@ namespace uAdventure.Editor
 
                 if (influence != null)
                 {
-                    var boundaries = getElementBoundaries(Target);
+                    var boundaries = GetElementBoundaries(Target);
 
                     EditorGUI.BeginChangeCheck();
                     var rect = influence.ScreenRect(boundaries);
@@ -257,7 +254,7 @@ namespace uAdventure.Editor
                     var newRect = EditorGUILayout.RectIntField("Influence", new RectInt((int)rect.x, (int)rect.y, (int)rect.width, (int)rect.height));
                     if (EditorGUI.EndChangeCheck())
                     {
-                        var fixedRect = fixToBoundaries(rect.size, newRect, boundaries);
+                        var fixedRect = FixToBoundaries(newRect, boundaries);
                         influence.setInfluenceArea(fixedRect.x, fixedRect.y, fixedRect.width, fixedRect.height);
                     }
                 }
@@ -284,7 +281,7 @@ namespace uAdventure.Editor
                         var influenceArea = getIngluenceArea(Target);
                         if (influenceArea == null)
                             return false;
-                        var boundaries = getElementBoundaries(Target);
+                        var boundaries = GetElementBoundaries(Target);
 
                         var rect = influenceArea.ScreenRect(boundaries)
                             .AdjustToViewport(SceneEditor.Current.Size.x, SceneEditor.Current.Size.y, SceneEditor.Current.Viewport);
@@ -314,7 +311,7 @@ namespace uAdventure.Editor
                 if (influenceArea == null)
                     return;
 
-                var boundaries = getElementBoundaries(Target);
+                var boundaries = GetElementBoundaries(Target);
                 var rect = influenceArea.ScreenRect(boundaries);
 
                 if (!influenceArea.hasInfluenceArea())
@@ -322,8 +319,7 @@ namespace uAdventure.Editor
                     rect.position -= new Vector2(20, 20);
                     rect.size = boundaries.size + new Vector2(40, 40);
                 }
-
-                var originalSize = rect.size;
+                
                 rect = rect.AdjustToViewport(SceneEditor.Current.Size.x, SceneEditor.Current.Size.y, SceneEditor.Current.Viewport);
 
                 EditorGUI.BeginChangeCheck();
@@ -342,7 +338,7 @@ namespace uAdventure.Editor
                     var original = newRect.ViewportToScreen(SceneEditor.Current.Size.x, SceneEditor.Current.Size.y, SceneEditor.Current.Viewport);
 
                     original.position -= boundaries.position;
-                    var rectFixed = fixToBoundaries(originalSize, new RectInt((int)original.x, (int)original.y, (int)original.width, (int)original.height), boundaries);
+                    var rectFixed = FixToBoundaries(new RectInt((int)original.x, (int)original.y, (int)original.width, (int)original.height), boundaries);
                     // And then we set the values in the reference
                     influenceArea.setInfluenceArea(rectFixed.x, rectFixed.y, rectFixed.width, rectFixed.height);
                 }
@@ -365,7 +361,6 @@ namespace uAdventure.Editor
             {
                 if(Target is PlayerDataControl)
                 {
-                    var target = Target as PlayerDataControl;
                     var workingScene = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                         GameRources.GetInstance().selectedSceneIndex];
 
@@ -501,7 +496,7 @@ namespace uAdventure.Editor
         [EditorComponent(typeof(SideDataControl), Name = "Side", Order = 0)]
         public class SideComponent : AbstractEditorComponent
         {
-            private GUIContent lengthContent;
+            private readonly GUIContent lengthContent;
             public SideComponent(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
             {
                 lengthContent = new GUIContent();
@@ -509,7 +504,7 @@ namespace uAdventure.Editor
 
             public override void Draw(int aID) {}
 
-            private Rect[] getEditingRects(SideDataControl side)
+            private Rect[] GetEditingRects(SideDataControl side)
             {
                 var p1 = GetPivot(side.getStart());
                 var p2 = GetPivot(side.getEnd());
@@ -533,9 +528,11 @@ namespace uAdventure.Editor
                 {
                     if (SceneEditor.Current.SelectedElement == Target)
                     {
-                        var rects = getEditingRects(side);
+                        var rects = GetEditingRects(side);
                         if (rects.Any(r => r.Contains(Event.current.mousePosition)))
+                        {
                             return true;
+                        }
                     }
                     var selected = DistanceToPoint(side, Event.current.mousePosition) < 8;
                     if(SceneEditor.Current.SelectedElement != Target && selected)
@@ -570,9 +567,7 @@ namespace uAdventure.Editor
             public override void OnDrawingGizmosSelected()
             {
                 var side = Target as SideDataControl;
-                var rects = getEditingRects(side);
-                var p1 = GetPivot(side.getStart());
-                var p2 = GetPivot(side.getEnd());
+                var rects = GetEditingRects(side);
 
                 EditorGUI.BeginChangeCheck();
                 var newlength = EditorGUI.FloatField(rects[0], side.getLength());
@@ -581,14 +576,11 @@ namespace uAdventure.Editor
                     side.setLength(newlength);
                 }
 
-                if (side.getLength() != side.getRealLength())
+                if (side.getLength() != side.getRealLength() && GUI.Button(rects[1], "X"))
                 {
-                    if (GUI.Button(rects[1], "X"))
-                    {
-                        side.setLength(side.getRealLength());
-                        GUIUtility.hotControl = 0;
-                        GUIUtility.keyboardControl = 0;
-                    }
+                    side.setLength(side.getRealLength());
+                    GUIUtility.hotControl = 0;
+                    GUIUtility.keyboardControl = 0;
                 }
                 if (GUIUtility.hotControl == this.GetHashCode())
                 {
@@ -636,21 +628,23 @@ namespace uAdventure.Editor
                                 pos.y = (pos.y / SceneEditor.Current.Viewport.size.y) * SceneEditor.Current.Size.y;
                                 trajectory.addNode(Mathf.RoundToInt(pos.x), Mathf.RoundToInt(pos.y));
                             }
-                            else if (isSide)
-                            {
-
-                            }
                             break;
 
                         // Pariring
                         case 2:
                             if (isNode)
                             {
-                                if (pairing == null) pairing = node;
+                                if (pairing == null)
+                                {
+                                    pairing = node;
+                                } 
                                 else
                                 {
-                                    var duplicated = trajectory.getSides().Find(s => (s.getStart() == pairing && s.getEnd() == node) || (s.getEnd() == pairing && s.getStart() == node)) != null;
-                                    if (!duplicated) trajectory.addSide(pairing, node);
+                                    var duplicated = trajectory.getSides().Find(s => IsPairingStartOrEnd(s, node)) != null;
+                                    if (!duplicated)
+                                    {
+                                        trajectory.addSide(pairing, node);
+                                    }
                                     pairing = null;
                                 }
                             }
@@ -683,6 +677,11 @@ namespace uAdventure.Editor
                 {
                     HandleUtil.DrawPolyLine(new Vector2[] { GetPivot(pairing), Event.current.mousePosition }, false, SceneEditor.GetColor(Color.white), 3f);
                 }
+            }
+
+            private bool IsPairingStartOrEnd(SideDataControl s, NodeDataControl node)
+            {
+                return (s.getStart() == pairing && s.getEnd() == node) || (s.getEnd() == pairing && s.getStart() == node);
             }
 
             public override void Draw(int aID) {}

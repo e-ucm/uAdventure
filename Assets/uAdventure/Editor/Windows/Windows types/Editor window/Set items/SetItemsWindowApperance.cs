@@ -11,22 +11,14 @@ namespace uAdventure.Editor
     [EditorComponent(typeof(AtrezzoDataControl), Name = "Atrezzo.LookPanelTitle", Order = 10)]
     public class SetItemsWindowApperance : AbstractEditorComponentWithPreview
     {
-
-        private Texture2D imageTex = null;
-
-        private FileChooser image;
-        
-        private AppearanceEditor appearanceEditor;
-
-        private static List<ResourcesDataControl> emptyList;
+        private readonly FileChooser image;
+        private readonly AppearanceEditor appearanceEditor;
 
         public SetItemsWindowApperance(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
         {
-
             appearanceEditor = ScriptableObject.CreateInstance<AppearanceEditor>();
             appearanceEditor.height = 160;
-            appearanceEditor.onAppearanceSelected = RefreshPathInformation;
 
             // File selectors
 
@@ -48,40 +40,55 @@ namespace uAdventure.Editor
             GUILayout.Space(10);
 
             EditorGUI.BeginChangeCheck();
-
-            string previousValue = image.Path = workingAtrezzo.getPreviewImage();
+            image.Path = workingAtrezzo.getPreviewImage();
             image.DoLayout(GUILayout.ExpandWidth(true));
-            if (previousValue != image.Path) workingAtrezzo.setImage(image.Path);
-
-
             if (EditorGUI.EndChangeCheck())
             {
-                RefreshPathInformation(workingAtrezzo);
+                workingAtrezzo.setImage(image.Path);
             }
         }
 
         public override void DrawPreview(Rect rect)
         {
-            var elem = Target != null ? Target as AtrezzoDataControl : Controller.Instance.SelectedChapterDataControl.getAtrezzoList().getAtrezzoList()[GameRources.GetInstance().selectedSetItemIndex];
-            var imagePath = elem.getPreviewImage();
-            var imageTex = string.IsNullOrEmpty(imagePath) ? null : Controller.ResourceManager.getImage(imagePath);
-
-            GUI.DrawTexture(rect, imageTex, ScaleMode.ScaleToFit);
+            var imageTex = GetAtrezzoImage();
+            if (imageTex)
+            {
+                GUI.DrawTexture(rect, imageTex, ScaleMode.ScaleToFit);
+            }
         }
 
         public override void OnRender(Rect viewport)
         {
-            var imagePath = (Target as AtrezzoDataControl).getPreviewImage();
-            var imageTex = string.IsNullOrEmpty(imagePath) ? null : Controller.ResourceManager.getImage(imagePath);
-
-            var rect = GetViewportRect(new Rect(new Vector2(-0.5f * imageTex.width, -imageTex.height), new Vector2(imageTex.width, imageTex.height)), viewport);
-            GUI.DrawTexture(rect, imageTex, ScaleMode.ScaleToFit);
+            var imageTex = GetAtrezzoImage();
+            if (imageTex)
+            {
+                var rect = GetViewportRect(new Rect(new Vector2(-0.5f * imageTex.width, -imageTex.height), new Vector2(imageTex.width, imageTex.height)), viewport);
+                GUI.DrawTexture(rect, imageTex, ScaleMode.ScaleToFit);
+            }
         }
 
-        private void RefreshPathInformation(DataControlWithResources data)
+        private AtrezzoDataControl GetAtrezzo()
         {
-            var imagePath = (data as AtrezzoDataControl).getPreviewImage();
-            imageTex = string.IsNullOrEmpty(imagePath) ? null : Controller.ResourceManager.getImage(imagePath);
+            var atrezzo = Target as AtrezzoDataControl;
+            if(atrezzo == null)
+            {
+                atrezzo = Controller.Instance.SelectedChapterDataControl.getAtrezzoList().getAtrezzoList()[GameRources.GetInstance().selectedSetItemIndex];
+            }
+            return atrezzo;
+        }
+
+        private Texture2D GetAtrezzoImage()
+        {
+            var atrezzo = GetAtrezzo();
+            if (atrezzo != null)
+            {
+                var imagePath = atrezzo.getPreviewImage();
+                if (!string.IsNullOrEmpty(imagePath))
+                {
+                    return Controller.ResourceManager.getImage(imagePath);
+                }
+            }
+            return null;
         }
     }
 }

@@ -1,9 +1,6 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 using uAdventure.Core;
-using System;
-using System.Collections.Generic;
 
 namespace uAdventure.Runner
 {
@@ -27,7 +24,6 @@ namespace uAdventure.Runner
         protected bool mirror;
 
         // Texture
-        private int hasovertex = -1;
         private Texture2D texture;
 
         private ResourceType resourceType = ResourceType.TEXTURE;

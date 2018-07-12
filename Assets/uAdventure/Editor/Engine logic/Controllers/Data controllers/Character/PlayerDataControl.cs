@@ -24,22 +24,6 @@ namespace uAdventure.Editor
             this.player = player;
         }
 
-        /**
-         * Notify to all scenes that the player image has been changed
-         */
-        public void playerImageChange()
-        {
-
-            string preview = getPreviewImage();
-            if (preview != null)
-            {
-                foreach (SceneDataControl scene in Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes())
-                {
-                    scene.imageChangeNotify(preview);
-                }
-            }
-        }
-
 
         public override System.Object getContent()
         {

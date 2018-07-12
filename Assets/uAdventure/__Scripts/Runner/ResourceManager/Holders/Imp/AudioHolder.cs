@@ -5,11 +5,9 @@ namespace uAdventure.Runner
 {
     public class AudioHolder : Resource
     {
-        private readonly string path;
         private readonly AudioClip audioClip;
-        private readonly ResourceManager.LoadingType type;
         
-        private bool loaded = false;
+        private readonly bool loaded = false;
 
         public AudioClip AudioClip
         {
@@ -22,11 +20,9 @@ namespace uAdventure.Runner
         public AudioHolder(string path, ResourceManager.LoadingType type)
         {
             loaded = true;
-            this.type = type;
             switch (type)
             {
                 case ResourceManager.LoadingType.RESOURCES_LOAD:
-                    this.path = path;
                     audioClip = LoadAudio(path, type);
                     break;
                 case ResourceManager.LoadingType.SYSTEM_IO:

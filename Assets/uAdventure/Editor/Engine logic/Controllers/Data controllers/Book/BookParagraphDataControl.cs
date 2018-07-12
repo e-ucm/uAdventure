@@ -118,8 +118,8 @@ namespace uAdventure.Editor
             if (selectedAsset != null)
             {
                 // Take the index of the selected asset
-                string[] assetFilenames = AssetsController.getAssetFilenames(AssetsConstants.CATEGORY_IMAGE);
-                string[] assetPaths = AssetsController.getAssetsList(AssetsConstants.CATEGORY_IMAGE);
+                string[] assetFilenames = AssetsController.GetAssetFilenames(AssetsConstants.CATEGORY_IMAGE);
+                string[] assetPaths = AssetsController.GetAssetsList(AssetsConstants.CATEGORY_IMAGE);
                 int assetIndex = -1;
                 for (int i = 0; i < assetFilenames.Length; i++)
                     if (assetFilenames[i].Equals(selectedAsset))
@@ -138,8 +138,8 @@ namespace uAdventure.Editor
         {
 
             // Get the list of assets from the ZIP file
-            string[] assetFilenames = AssetsController.getAssetFilenames(AssetsConstants.CATEGORY_IMAGE);
-            string[] assetPaths = AssetsController.getAssetsList(AssetsConstants.CATEGORY_IMAGE);
+            string[] assetFilenames = AssetsController.GetAssetFilenames(AssetsConstants.CATEGORY_IMAGE);
+            string[] assetPaths = AssetsController.GetAssetsList(AssetsConstants.CATEGORY_IMAGE);
 
             // If the list of assets is empty, show an error message
             if (assetFilenames.Length == 0)

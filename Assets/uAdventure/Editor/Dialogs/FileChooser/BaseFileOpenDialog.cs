@@ -165,7 +165,7 @@ public abstract class BaseFileOpenDialog : EditorWindow
 
         protected void CopySelectedAssset()
         {
-            returnPath = AssetsController.addSingleAsset(fileType.GetAssetCategory(), selectedAssetPath);
+            returnPath = AssetsController.AddSingleAsset(fileType.GetAssetCategory(), selectedAssetPath);
         }
 
         protected abstract void ChoosedCorrectFile();

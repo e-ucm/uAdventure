@@ -12,19 +12,19 @@ namespace uAdventure.Editor
     {
 
         /**
-             * Contained item.
-             */
-        private Item item;
+         * Contained item.
+         */
+        private readonly Item item;
 
         /**
          * Actions list controller.
          */
-        private ActionsListDataControl actionsListDataControl;
+        private readonly ActionsListDataControl actionsListDataControl;
 
         /**
          * Controller for descriptions
          */
-        private DescriptionsController descriptionController;
+        private readonly DescriptionsController descriptionController;
 
         /**
          * Constructor.
@@ -47,7 +47,9 @@ namespace uAdventure.Editor
             // Create the subcontrollers
             resourcesDataControlList = new List<ResourcesDataControl>();
             foreach (ResourcesUni resources in resourcesList)
+            {
                 resourcesDataControlList.Add(new ResourcesDataControl(resources, Controller.ITEM));
+            }
 
             actionsListDataControl = new ActionsListDataControl(item.getActions(), this);
 
@@ -138,7 +140,11 @@ namespace uAdventure.Editor
 
         public void setReturnsWhenDragged(bool returnsWhenDragged)
         {
-            item.setReturnsWhenDragged(returnsWhenDragged);
+            if (returnsWhenDragged != item.isReturnsWhenDragged())
+            {
+                Controller.Instance.AddTool(new ChangeBooleanValueTool(item, returnsWhenDragged, "isReturnsWhenDragged", "setReturnsWhenDragged"));
+                Controller.Instance.DataModified();
+            }
         }
 
         public bool isReturnsWhenDragged()
@@ -248,20 +254,24 @@ namespace uAdventure.Editor
         }
 
 
-        public override string renameElement(string name)
+        public override string renameElement(string newName)
         {
             string oldItemId = item.getId();
             string references = controller.countIdentifierReferences(oldItemId).ToString();
 
             // Ask for confirmation
-            if (name != null || controller.ShowStrictConfirmDialog(TC.get("Operation.RenameItemTitle"), TC.get("Operation.RenameElementWarning", new string[] { oldItemId, references })))
+            if (newName != null || controller.ShowStrictConfirmDialog(TC.get("Operation.RenameItemTitle"), TC.get("Operation.RenameElementWarning", new string[] { oldItemId, references })))
             {
 
                 // Show a dialog asking for the new item id
-                if (name == null)
-                    controller.ShowInputDialog(TC.get("Operation.RenameItemTitle"), TC.get("Operation.RenameItemMessage"), oldItemId, (o,s) => performRenameElement(s));
+                if (newName == null)
+                {
+                    controller.ShowInputDialog(TC.get("Operation.RenameItemTitle"), TC.get("Operation.RenameItemMessage"), oldItemId, (o, s) => performRenameElement(s));
+                }
                 else
-                    return performRenameElement(name);
+                {
+                    return performRenameElement(newName);
+                }
             }
 
             return null;
@@ -274,7 +284,9 @@ namespace uAdventure.Editor
 
             // If some value was typed and the identifiers are different
             if (!controller.isElementIdValid(newItemId))
+            {
                 newItemId = controller.makeElementValid(newItemId);
+            }
 
             item.setId(newItemId);
             controller.replaceIdentifierReferences(oldItemId, newItemId);
@@ -296,7 +308,9 @@ namespace uAdventure.Editor
 
             // Iterate through the resources
             foreach (ResourcesDataControl resourcesDataControl in resourcesDataControlList)
+            {
                 resourcesDataControl.updateVarFlagSummary(varFlagSummary);
+            }
         }
 
 
@@ -329,7 +343,9 @@ namespace uAdventure.Editor
 
             // Iterate through the resources
             foreach (ResourcesDataControl resourcesDataControl in resourcesDataControlList)
+            {
                 count += resourcesDataControl.countAssetReferences(assetPath);
+            }
 
             // Add the references in the actions
             count += actionsListDataControl.countAssetReferences(assetPath);
@@ -346,7 +362,9 @@ namespace uAdventure.Editor
 
             // Iterate through the resources
             foreach (ResourcesDataControl resourcesDataControl in resourcesDataControlList)
+            {
                 resourcesDataControl.getAssetReferences(assetPaths, assetTypes);
+            }
 
             // Add the references in the actions
             actionsListDataControl.getAssetReferences(assetPaths, assetTypes);
@@ -361,7 +379,9 @@ namespace uAdventure.Editor
 
             // Iterate through the resources
             foreach (ResourcesDataControl resourcesDataControl in resourcesDataControlList)
+            {
                 resourcesDataControl.deleteAssetReferences(assetPath);
+            }
 
             // Delete the references from the actions
             actionsListDataControl.deleteAssetReferences(assetPath);
@@ -424,10 +444,14 @@ namespace uAdventure.Editor
 
             List<Searchable> path = getPathFromChild(dataControl, resourcesDataControlList.Cast<Searchable>().ToList());
             if (path != null)
+            {
                 return path;
+            }
             path = getPathFromChild(dataControl, this.descriptionController);
             if (path != null)
+            {
                 return path;
+            }
             path = getPathFromChild(dataControl, actionsListDataControl);
             return path;
         }

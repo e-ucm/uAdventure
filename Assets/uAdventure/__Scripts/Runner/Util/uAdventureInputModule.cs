@@ -43,40 +43,37 @@ namespace uAdventure.Runner
 
         private bool ShouldIgnoreEventsOnNoFocus()
         {
-            switch (SystemInfo.operatingSystemFamily)
-            {
-                case OperatingSystemFamily.Windows:
-                case OperatingSystemFamily.Linux:
-                case OperatingSystemFamily.MacOSX:
-//#if UNITY_EDITOR
-//                    if (UnityEditor.EditorApplication.isRemoteConnected)
-//                        return false;
-//#endif
-                    return true;
-                default:
-                    return false;
-            }
+            // Nothing to do so far, this was related to remote connection
+            return false;
         }
 
         public override void Process()
         {
             if (!eventSystem.isFocused && ShouldIgnoreEventsOnNoFocus())
+            {
                 return;
+            }
 
             bool usedEvent = SendUpdateEventToSelectedObject();
 
             if (eventSystem.sendNavigationEvents)
             {
                 if (!usedEvent)
+                {
                     usedEvent |= SendMoveEventToSelectedObject();
+                }
 
                 if (!usedEvent)
+                {
                     SendSubmitEventToSelectedObject();
+                }
             }
 
             // touch needs to take precedence because of the mouse emulation layer
             if (!ProcessTouchEvents() && input.mousePresent)
+            {
                 ProcessMouseEvent();
+            }
         }
 
         private bool ProcessTouchEvents()
@@ -100,7 +97,9 @@ namespace uAdventure.Runner
                     ProcessDrag(pointer);
                 }
                 else
+                {
                     RemovePointerData(pointer);
+                }
             }
             return input.touchCount > 0;
         }
@@ -169,9 +168,9 @@ namespace uAdventure.Runner
 
                 // didnt find a press handler... search for a click handler
                 if (newPressed == null)
+                {
                     newPressed = ExecuteEvents.GetEventHandler<IPointerClickHandler>(currentOverGo);
-
-                // Debug.Log("Pressed: " + newPressed);
+                }
 
                 float time = Time.unscaledTime;
 
@@ -179,9 +178,13 @@ namespace uAdventure.Runner
                 {
                     var diffTime = time - pointerEvent.clickTime;
                     if (diffTime < 0.3f)
+                    {
                         ++pointerEvent.clickCount;
+                    }
                     else
+                    {
                         pointerEvent.clickCount = 1;
+                    }
 
                     pointerEvent.clickTime = time;
                 }
@@ -203,7 +206,6 @@ namespace uAdventure.Runner
 
                     if (pointerEvent.pointerDrag != null)
                     {
-                        bool give = true;
                         // If it executes the initialice potential drag, but doesnt use it, we release it
                         if (ExecuteEvents.Execute(pointerEvent.pointerDrag, pointerEvent, s_ConfirmWantsDragHandler) && !pointerEvent.used)
                         {
@@ -221,10 +223,7 @@ namespace uAdventure.Runner
             // PointerUp notification
             if (released)
             {
-                // Debug.Log("Executing pressup on: " + pointer.pointerPress);
                 ExecuteEvents.Execute(pointerEvent.pointerPress, pointerEvent, ExecuteEvents.pointerUpHandler);
-
-                // Debug.Log("KeyCode: " + pointer.eventData.keyCode);
                 
                 PointerClickAndDrop(pointerEvent);
 
@@ -233,7 +232,9 @@ namespace uAdventure.Runner
                 pointerEvent.rawPointerPress = null;
 
                 if (pointerEvent.pointerDrag != null && pointerEvent.dragging)
+                {
                     ExecuteEvents.Execute(pointerEvent.pointerDrag, pointerEvent, ExecuteEvents.endDragHandler);
+                }
 
                 pointerEvent.dragging = false;
                 pointerEvent.pointerDrag = null;
@@ -270,9 +271,9 @@ namespace uAdventure.Runner
 
                 // didnt find a press handler... search for a click handler
                 if (newPressed == null)
+                {
                     newPressed = ExecuteEvents.GetEventHandler<IPointerClickHandler>(currentOverGo);
-
-                // Debug.Log("Pressed: " + newPressed);
+                }
 
                 float time = Time.unscaledTime;
 
@@ -280,9 +281,13 @@ namespace uAdventure.Runner
                 {
                     var diffTime = time - pointerEvent.clickTime;
                     if (diffTime < 0.3f)
+                    {
                         ++pointerEvent.clickCount;
+                    }
                     else
+                    {
                         pointerEvent.clickCount = 1;
+                    }
 
                     pointerEvent.clickTime = time;
                 }
@@ -304,7 +309,6 @@ namespace uAdventure.Runner
 
                     if (pointerEvent.pointerDrag != null)
                     {
-                        bool give = true;
                         // If it executes the initialice potential drag, but doesnt use it, we release it
                         if (ExecuteEvents.Execute(pointerEvent.pointerDrag, pointerEvent, s_ConfirmWantsDragHandler) && !pointerEvent.used)
                         {
@@ -322,10 +326,7 @@ namespace uAdventure.Runner
             // PointerUp notification
             if (data.ReleasedThisFrame())
             {
-                // Debug.Log("Executing pressup on: " + pointer.pointerPress);
                 ExecuteEvents.Execute(pointerEvent.pointerPress, pointerEvent, ExecuteEvents.pointerUpHandler);
-
-                // Debug.Log("KeyCode: " + pointer.eventData.keyCode);
 
                 PointerClickAndDrop(pointerEvent);
 
@@ -334,7 +335,9 @@ namespace uAdventure.Runner
                 pointerEvent.rawPointerPress = null;
 
                 if (pointerEvent.pointerDrag != null && pointerEvent.dragging)
+                {
                     ExecuteEvents.Execute(pointerEvent.pointerDrag, pointerEvent, ExecuteEvents.endDragHandler);
+                }
 
                 pointerEvent.dragging = false;
                 pointerEvent.pointerDrag = null;

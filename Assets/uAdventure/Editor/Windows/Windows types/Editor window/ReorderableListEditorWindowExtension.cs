@@ -8,23 +8,10 @@ namespace uAdventure.Editor
 {
     public abstract class ReorderableListEditorWindowExtension : ButtonMenuEditorWindowExtension
     {
-        /*public override bool Selected
-        {
-            get
-            {
-                return base.Selected;
-            }
-
-            set
-            {
-                extended.target = value;
-                base.Selected = value;
-            }
-        }*/
 
         protected ReorderableList reorderableList;
         protected List<string> options;
-        protected List<string> Options {
+        protected List<string> CreationOptions {
             get
             {
                 return options;
@@ -66,10 +53,10 @@ namespace uAdventure.Editor
             }
         }
 
-        public ReorderableListEditorWindowExtension(Rect rect, params GUILayoutOption[] options) : this(rect, null, null, options) { }
-        public ReorderableListEditorWindowExtension(Rect rect, GUIContent content, params GUILayoutOption[] options) : this(rect, content, null, options) { }
-        public ReorderableListEditorWindowExtension(Rect rect, GUIStyle style, params GUILayoutOption[] options) : this(rect, null, style, options) { }
-        public ReorderableListEditorWindowExtension(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
+        protected ReorderableListEditorWindowExtension(Rect rect, params GUILayoutOption[] options) : this(rect, null, null, options) { }
+        protected ReorderableListEditorWindowExtension(Rect rect, GUIContent content, params GUILayoutOption[] options) : this(rect, content, null, options) { }
+        protected ReorderableListEditorWindowExtension(Rect rect, GUIStyle style, params GUILayoutOption[] options) : this(rect, null, style, options) { }
+        protected ReorderableListEditorWindowExtension(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
         {
             elements = new List<string>();
 
@@ -79,7 +66,6 @@ namespace uAdventure.Editor
             reorderableList.drawHeaderCallback += DrawHeader;
 
             reorderableList.footerHeight = 10;
-            //reorderableList.drawFooterCallback += DrawFooter;
 
             reorderableList.elementHeight = 30;
             reorderableList.drawElementCallback += DrawElement;
@@ -88,7 +74,7 @@ namespace uAdventure.Editor
 			reorderableList.onRemoveCallback += removeCallback;
             reorderableList.onReorderCallback += OnReorder;
 
-            Options = new List<string>();
+            CreationOptions = new List<string>();
             OnSelect(reorderableList);
         }
 
@@ -140,10 +126,13 @@ namespace uAdventure.Editor
         protected virtual void DrawElement(Rect rect, int index, bool active, bool focused)
         {
 			if (index == -1)
-				return;
+            {
+                return;
+            }
 
 			// Backup for selection change
-			if (flushed && reorderableList.index == index) {
+			if (flushed && reorderableList.index == index)
+            {
 				editingIndex = index;
 				flushed = false;
 				editingName = reorderableList.list [editingIndex] as string;
@@ -154,14 +143,19 @@ namespace uAdventure.Editor
 				GUI.SetNextControlName ("editingField");
 				editingName = EditorGUI.TextField(rect, editingName);
 				if (GUI.GetNameOfFocusedControl () == "editingField" 
-					&& !(Event.current.type == EventType.KeyUp && Event.current.keyCode == KeyCode.Return)) {
+					&& !(Event.current.type == EventType.KeyUp && Event.current.keyCode == KeyCode.Return))
+                {
 					// If the field is selected
 					flushed = false;
-				} else if (!flushed) {
+				}
+                else if (!flushed)
+                {
 					// Name changing
 					flushed = true;
-					if(editingName != reorderableList.list [editingIndex])
-						OnElementNameChanged(reorderableList, editingIndex, editingName);
+					if(editingName != (string) reorderableList.list[editingIndex])
+                    {
+                        OnElementNameChanged(reorderableList, editingIndex, editingName);
+                    }
 					editingIndex = -1;
 				}
             }
@@ -190,7 +184,8 @@ namespace uAdventure.Editor
 		private void removeCallback(ReorderableList r){
 			OnRemove (r);
 			var tmp = r.index;
-			if (tmp < r.list.Count - 1) {
+			if (tmp < r.list.Count - 1)
+            {
 				r.index = -1;
 				OnSelect (r);
 				r.index = tmp;

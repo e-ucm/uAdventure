@@ -156,10 +156,10 @@ namespace uAdventure.Editor
         {
 
             if (!(dataControl is GraphConversationDataControl))
+            {
                 return false;
+            }
 
-            //try
-            //{
             GraphConversation newElement = (GraphConversation)(((GraphConversation)(dataControl.getContent())).Clone());
             string id = newElement.getId();
             int i = 1;
@@ -173,8 +173,9 @@ namespace uAdventure.Editor
             conversationsDataControlList.Add(new GraphConversationDataControl(newElement));
             controller.IdentifierSummary.deleteId<Conversation>(id);
 
+            /*
             string oldId = ((GraphConversation)(dataControl.getContent())).getId();
-            /*bool posConfigured = ConversationConfigData.isConversationConfig( oldId );
+            bool posConfigured = ConversationConfigData.isConversationConfig( oldId );
             if (posConfigured) {
                 for (int j = 0; j < newElement.getAllNodes( ).size( ); j++) {
                     int centerX = ConversationConfigData.getNodeX( oldId, j

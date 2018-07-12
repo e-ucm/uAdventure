@@ -165,12 +165,14 @@ namespace uAdventure.Geo
 
         public GeoPositionedTransformManagerDescriptor()
         {
-            ParameterDescription = new Dictionary<string, Geo.ParameterDescription>();
-            ParameterDescription.Add("Position", new Geo.ParameterDescription(typeof(Vector2d), Vector2d.zero));
-            ParameterDescription.Add("Scale", new Geo.ParameterDescription(typeof(Vector3), Vector3.one));
-            ParameterDescription.Add("Rotation", new Geo.ParameterDescription(typeof(float), 0f));
-            ParameterDescription.Add("InteractionRange", new Geo.ParameterDescription(typeof(float), 25f)); // 25 metros
-            ParameterDescription.Add("RevealOnlyOnRange", new Geo.ParameterDescription(typeof(bool), true));
+            ParameterDescription = new Dictionary<string, Geo.ParameterDescription>
+            {
+                { "Position", new Geo.ParameterDescription(typeof(Vector2d), Vector2d.zero) },
+                { "Scale", new Geo.ParameterDescription(typeof(Vector3), Vector3.one) },
+                { "Rotation", new Geo.ParameterDescription(typeof(float), 0f) },
+                { "InteractionRange", new Geo.ParameterDescription(typeof(float), 25f) }, // 25 metros
+                { "RevealOnlyOnRange", new Geo.ParameterDescription(typeof(bool), true) }
+            };
         }
 
         public string Name { get { return "World positioned"; } }
@@ -183,10 +185,12 @@ namespace uAdventure.Geo
 
         public ScreenPositionedTransformManagerDescriptor()
         {
-            ParameterDescription = new Dictionary<string, Geo.ParameterDescription>();
-            ParameterDescription.Add("Position", new Geo.ParameterDescription(typeof(Vector2d), Vector2d.zero));
-            ParameterDescription.Add("Scale", new Geo.ParameterDescription(typeof(Vector3), Vector3.one));
-            ParameterDescription.Add("Rotation", new Geo.ParameterDescription(typeof(float), 0f));
+            ParameterDescription = new Dictionary<string, Geo.ParameterDescription>
+            {
+                { "Position", new Geo.ParameterDescription(typeof(Vector2d), Vector2d.zero) },
+                { "Scale", new Geo.ParameterDescription(typeof(Vector3), Vector3.one) },
+                { "Rotation", new Geo.ParameterDescription(typeof(float), 0f) }
+            };
         }
 
         public string Name { get { return "Screen positioned"; } }
@@ -199,12 +203,14 @@ namespace uAdventure.Geo
 
         public RadialCenterTransformManagerDescriptor()
         {
-            ParameterDescription = new Dictionary<string, Geo.ParameterDescription>();
-            ParameterDescription.Add("Degree", new Geo.ParameterDescription(typeof(float), 0f));
-            ParameterDescription.Add("Distance", new Geo.ParameterDescription(typeof(float), 50f));
-            ParameterDescription.Add("Scale", new Geo.ParameterDescription(typeof(Vector3), Vector3.one));
-            ParameterDescription.Add("Rotation", new Geo.ParameterDescription(typeof(float), 0f));
-            ParameterDescription.Add("RotateAround", new Geo.ParameterDescription(typeof(bool), true));
+            ParameterDescription = new Dictionary<string, Geo.ParameterDescription>
+            {
+                { "Degree", new Geo.ParameterDescription(typeof(float), 0f) },
+                { "Distance", new Geo.ParameterDescription(typeof(float), 50f) },
+                { "Scale", new Geo.ParameterDescription(typeof(Vector3), Vector3.one) },
+                { "Rotation", new Geo.ParameterDescription(typeof(float), 0f) },
+                { "RotateAround", new Geo.ParameterDescription(typeof(bool), true) }
+            };
         }
 
         public string Name { get { return "Radial to center positioned"; } }
@@ -239,7 +245,6 @@ namespace uAdventure.Geo
         private GeoWrapper wrapper;
         private Representable representable;
         private Transform transform;
-        private Interactuable interactuable;
 
         public void Configure(Dictionary<string, object> parameters)
         {
@@ -250,6 +255,11 @@ namespace uAdventure.Geo
 
         public void Update()
         {
+            if (!wrapper)
+            {
+                GameObject.DestroyImmediate(transform.gameObject);
+            }
+
             var ray = Camera.main.ScreenPointToRay(new Vector2(0, 0));
             transform.position = ray.origin + ray.direction * 10f;
             transform.rotation = Camera.main.transform.rotation;

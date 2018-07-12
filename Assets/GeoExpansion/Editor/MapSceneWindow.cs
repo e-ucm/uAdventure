@@ -10,6 +10,7 @@ using UnityEditor;
 using System.Linq;
 using MapzenGo.Helpers;
 using MapzenGo.Models.Settings.Editor;
+using MoreLinq;
 
 namespace uAdventure.Geo
 {
@@ -35,12 +36,12 @@ namespace uAdventure.Geo
 
         public MapSceneWindow(Rect aStartPos, GUIStyle aStyle, params GUILayoutOption[] aOptions) : base(aStartPos, new GUIContent("Map Scenes"), aStyle, aOptions)
         {
-            var bc = new GUIContent();
-            bc.image = (Texture2D)Resources.Load("EAdventureData/img/icons/map", typeof(Texture2D));
-            bc.text = "MapScenes";  //TC.get("Element.Name1");
-            ButtonContent = bc;
+            ButtonContent = new GUIContent()
+            {
+                image = Resources.Load<Texture2D>("EAdventureData/img/icons/map"),
+                text = "Map Scenes"
+            };
             
-
             Init();
         }
 
@@ -91,19 +92,16 @@ namespace uAdventure.Geo
             mapElementReorderableList.list = mapScene.Elements;
             var elementsWidth = 150;
             mapElementReorderableList.elementHeight = mapElementReorderableList.list.Count == 0 ? 20 : 70;
-            var rect = EditorGUILayout.BeginVertical(GUILayout.Width(elementsWidth), GUILayout.ExpandHeight(true));
+            EditorGUILayout.BeginVertical(GUILayout.Width(elementsWidth), GUILayout.ExpandHeight(true));
             mapElementReorderableList.DoLayoutList();
             EditorGUILayout.EndVertical();
 
             var mapRect = EditorGUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
             // Map drawing
-            if (map.DrawMap(mapRect))
+            if (map.DrawMap(mapRect) && movingReference != null)
             {
-                if (movingReference != null)
-                {
-                    this.positionManagers[movingReference].Repositionate(map, mapRect);
-                    movingReference = null;
-                }
+                this.positionManagers[movingReference].Repositionate(map, mapRect);
+                movingReference = null;
             }
 
             if (movingReference != null && Event.current.type == EventType.Repaint)
@@ -112,7 +110,6 @@ namespace uAdventure.Geo
             }
 
             mapScene.LatLon = map.Center;
-            //geometriesReorderableList.index = map.selectedGeometry != null ? geometries.IndexOf(map.selectedGeometry) : -1;
             EditorGUILayout.EndVertical();
             EditorGUILayout.EndHorizontal();
 
@@ -150,7 +147,7 @@ namespace uAdventure.Geo
                     var image = previewImage.Invoke(extElem, null) as string;
                     if (image != null)
                     {
-                        guiMapPositionManager.Texture = AssetsController.getImage(image).texture;
+                        guiMapPositionManager.Texture = Controller.ResourceManager.getImage(image);
                     }
                 }
             }
@@ -230,23 +227,11 @@ namespace uAdventure.Geo
         //  MapScene elements management
         // -----------------------------
 
-        private void OnAddElement()
-        {
-
-        }
-
-        private void OnDrawMapElementsHeader(Rect rect)
-        {
-
-        }
-
-
-        Rect typePopupRect = new Rect(0, 2, 110, 15);
-        Rect typeConfigRect = new Rect(111, 2, 15, 15);
-        Rect infoRect = new Rect(9, 20, 150, 15);
-        Rect centerButtonRect = new Rect(0, 40, 75, 15);
-        Rect editButtonRect = new Rect(75, 40, 75, 15);
-        Rect positionRect = new Rect(0, 2, 150, 15);
+        private readonly Rect typePopupRect = new Rect(0, 2, 110, 15);
+        private readonly Rect typeConfigRect = new Rect(111, 2, 15, 15);
+        private readonly Rect infoRect = new Rect(9, 20, 150, 15);
+        private readonly Rect centerButtonRect = new Rect(0, 40, 75, 15);
+        private readonly Rect editButtonRect = new Rect(75, 40, 75, 15);
 
         private void DrawMapElementsHeader(Rect rect)
         {
@@ -259,19 +244,8 @@ namespace uAdventure.Geo
             MapElement mapElement = (MapElement)mapElementReorderableList.list[index];
 
             EditorGUI.LabelField(infoRect.GUIAdapt(rect), mapElement.getTargetId());
-
-            //geo.Type = (GMLGeometry.GeometryType)EditorGUI.EnumPopup(typePopupRect.GUIAdapt(rect), geo.Type);
-            var center = map.Center;
-            if (mapElement is GeoReference)
-            {
-                var geoReference = mapElement as GeoReference;
-                var geoElement = Controller.Instance.SelectedChapterDataControl.getObjects<GeoElement>().Find(e => e.Id == geoReference.getTargetId());
-                if (geoElement != null && geoElement.Geometry.Points.Count > 0)
-                {
-                    center = geoElement.Geometry.Center;
-                }
-            }
-            else if (mapElement is ExtElemReference)
+            
+            if (mapElement is ExtElemReference)
             {
                 var extReference = mapElement as ExtElemReference;
 
@@ -291,7 +265,6 @@ namespace uAdventure.Geo
                 {
                     if (GUI.Button(typeConfigRect.GUIAdapt(rect), "*"))
                     {
-                        //DrawerParametersMenu.s_SpriteEditor = this;
                         var o = DrawerParametersMenu.ShowAtPosition(typeConfigRect.GUIAdapt(rect));
                         DrawerParametersMenu.s_DrawerParametersMenu.ExtElemReference = extReference;
                         if (o) GUIUtility.ExitGUI();
@@ -304,40 +277,12 @@ namespace uAdventure.Geo
                 }
             }
 
-            /*if (GUI.Button(centerButtonRect.GUIAdapt(rect), "Center"))
-            {
-                map.Center = center;
-            }*/
-
-            /*if (GUI.Button(editButtonRect.GUIAdapt(rect), editing != geo ? "Unlocked" : "Locked"))
-            {
-                editing = editing == geo ? null : geo;
-            }*/
-
             if (GUI.Button(editButtonRect.GUIAdapt(rect), "Conditions"))
             {
                 ConditionEditorWindow window =
                     (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
                 window.Init(mapElement.Conditions);
             }
-        }
-
-        private object findExternalReferenceById(string id)
-        {
-            // TODO extend here
-            var item = Controller.Instance.SelectedChapterDataControl.getItemsList().getItems().Find(i => i.getId() == id);
-            if (item != null)
-                return item;
-
-            var atrezzo = Controller.Instance.SelectedChapterDataControl.getAtrezzoList().getAtrezzoList().Find(a => a.getId() == id);
-            if (atrezzo != null)
-                return atrezzo;
-
-            var npc = Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPC(id);
-            if (npc != null)
-                return npc;
-
-            return null;
         }
 
         public List<DataControlWithResources> getAllElements()
@@ -354,10 +299,9 @@ namespace uAdventure.Geo
         private Dictionary<string, string> getObjectIDReferences()
         {
             Dictionary<string, string> objects = new Dictionary<string, string>();
-            // TODO extend here
-            Controller.Instance.SelectedChapterDataControl.getItemsList().getItems().ForEach(i => objects.Add("Item/" + i.getId(), i.getId()));
-            Controller.Instance.SelectedChapterDataControl.getAtrezzoList().getAtrezzoList().ForEach(a => objects.Add("Atrezzo/" + a.getId(), a.getId()));
-            Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs().ForEach(npc => objects.Add("Character/" + npc.getId(), npc.getId()));
+            Controller.Instance.IdentifierSummary.getIds<Core.Item>().ForEach(i => objects.Add("Item/" + i, i));
+            Controller.Instance.IdentifierSummary.getIds<Core.Atrezzo>().ForEach(a => objects.Add("Atrezzo/" + a, a));
+            Controller.Instance.IdentifierSummary.getIds<Core.NPC>().ForEach(c => objects.Add("Character/" + c, c));
 
             return objects;
         }
@@ -370,7 +314,7 @@ namespace uAdventure.Geo
             mapElements.ForEach(me =>
             {
                 menu.AddItem(new GUIContent("GeoElement/" + me.Id), false, (id) =>
-              {
+                {
                     mapScene.Elements.Add(new GeoReference(id as string));
                     UpdateMapResources();
                 }, me.Id);

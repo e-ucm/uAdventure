@@ -9,30 +9,33 @@ namespace uAdventure.Editor
     public class ActionDataControl : DataControlWithResources
     {
 
+        private static readonly System.Type[] allTypes = { typeof(ActiveArea), typeof(NPC), typeof(Item) };
+        private static readonly System.Type[] itemBasedTypes = { typeof(NPC), typeof(Item) };
+
         /**
          * Contained action structure.
          */
-        private Action action;
+        private readonly Action action;
 
         /**
          * Type of the action.
          */
-        private int actionType;
+        private readonly int actionType;
 
         /**
          * Conditions controller.
          */
-        private ConditionsController conditionsController;
+        private readonly ConditionsController conditionsController;
 
         /**
          * Effects controller
          */
-        private EffectsController effectsController;
+        private readonly EffectsController effectsController;
 
         /**
          * Not-Effects controller
          */
-        private EffectsController notEffectsController;
+        private readonly EffectsController notEffectsController;
 
         /**
          * Contructor.
@@ -210,24 +213,21 @@ namespace uAdventure.Editor
 
             string[] elements = null;
 
-            if (action.getType() == Action.USE_WITH)
-                elements = controller.IdentifierSummary.getItemAndActiveAreaIds();
-            else if (action.getType() == Action.GIVE_TO)
-                elements = controller.IdentifierSummary.getNPCIds();
-            else if (action.getType() == Action.DRAG_TO)
-                elements = controller.IdentifierSummary.getItemActiveAreaNPCIds();
-            else if (action.getType() == Action.CUSTOM_INTERACT)
+            switch (action.getType())
             {
-                string[] temp1 = controller.IdentifierSummary.getNPCIds();
-                string[] temp2 = controller.IdentifierSummary.getItemAndActiveAreaIds();
-                elements = new string[temp1.Length + temp2.Length];
-                for (int i = 0; i < elements.Length; i++)
-                {
-                    if (i < temp1.Length)
-                        elements[i] = temp1[i];
-                    else
-                        elements[i] = temp2[i - temp1.Length];
-                }
+                default:
+                    Debug.LogError("Wrong action type: " + action.getType());
+                    break;
+                case Action.GIVE_TO:
+                    elements = controller.IdentifierSummary.getIds<NPC>();
+                    break;
+                case Action.USE_WITH:
+                    elements = controller.IdentifierSummary.combineIds(itemBasedTypes);
+                    break;
+                case Action.DRAG_TO:
+                case Action.CUSTOM_INTERACT:
+                    elements = controller.IdentifierSummary.combineIds(allTypes);
+                    break;
             }
 
             return elements;

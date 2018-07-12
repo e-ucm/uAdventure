@@ -12,11 +12,8 @@ namespace uAdventure.Editor
     public class ItemsWindow : PreviewDataControlExtension 
     {
         private enum ItemsWindowType { Appearance, DescriptionConfig, Actions }
-
-        private static ItemsWindowType openedWindow = ItemsWindowType.Appearance;
-        private static ItemsWindowActions itemsWindowActions;
+        
         private static ItemsWindowAppearance itemsWindowAppearance;
-        private static ItemsWindowDescription itemsWindowDescription;
 
         public ItemsWindow(Rect aStartPos, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, new GUIContent(TC.get("Element.Name18")), aStyle, aOptions)
@@ -27,9 +24,9 @@ namespace uAdventure.Editor
                 text = "Element.Name18"
             };
 
-            itemsWindowActions = new ItemsWindowActions(aStartPos, new GUIContent(TC.get("Item.ActionsPanelTitle")), "Window");
+            var itemsWindowActions = new ItemsWindowActions(aStartPos, new GUIContent(TC.get("Item.ActionsPanelTitle")), "Window");
             itemsWindowAppearance = new ItemsWindowAppearance(aStartPos, new GUIContent(TC.get("Item.LookPanelTitle")), "Window");
-            itemsWindowDescription = new ItemsWindowDescription(aStartPos, new GUIContent(TC.get("Item.DocPanelTitle")), "Window");
+            var itemsWindowDescription = new ItemsWindowDescription(aStartPos, new GUIContent(TC.get("Item.DocPanelTitle")), "Window");
 
             AddTab(TC.get("Item.LookPanelTitle"), ItemsWindowType.Appearance, itemsWindowAppearance);
             AddTab(TC.get("Item.ActionsPanelTitle"), ItemsWindowType.Actions, itemsWindowActions);
@@ -46,11 +43,6 @@ namespace uAdventure.Editor
         public void ShowItemWindowView(int o)
         {
             GameRources.GetInstance().selectedItemIndex = o;
-        }
-
-        void OnWindowTypeChanged(ItemsWindowType type_)
-        {
-            openedWindow = type_;
         }
         
         protected override void OnSelect(ReorderableList r)

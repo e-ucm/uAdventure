@@ -24,7 +24,7 @@ namespace uAdventure.Editor
 
         private WindowType openedWindow;
 
-        public static ChapterVarAndFlagsEditor s_DrawerParametersMenu;
+        public static ChapterVarAndFlagsEditor s_ChapterVarAndFlagsEditor;
         private static long s_LastClosedTime;
 
         private ColumnList variablesAndFlagsList;
@@ -40,15 +40,21 @@ namespace uAdventure.Editor
                 {
                     Event.current.Use();
                 }
-                if (ChapterVarAndFlagsEditor.s_DrawerParametersMenu == null)
+                if (ChapterVarAndFlagsEditor.s_ChapterVarAndFlagsEditor == null)
                 {
-                    ChapterVarAndFlagsEditor.s_DrawerParametersMenu = ScriptableObject.CreateInstance<ChapterVarAndFlagsEditor>();
+                    ChapterVarAndFlagsEditor.s_ChapterVarAndFlagsEditor = ScriptableObject.CreateInstance<ChapterVarAndFlagsEditor>();
                 }
-                ChapterVarAndFlagsEditor.s_DrawerParametersMenu.Init(buttonRect);
+                ChapterVarAndFlagsEditor.s_ChapterVarAndFlagsEditor.Init(buttonRect);
 
                 return true;
             }
             return false;
+        }
+
+        protected void OnDisable()
+        {
+            ChapterVarAndFlagsEditor.s_LastClosedTime = DateTime.Now.Ticks / 10000L;
+            ChapterVarAndFlagsEditor.s_ChapterVarAndFlagsEditor = null;
         }
 
         private void Init(Rect buttonRect)

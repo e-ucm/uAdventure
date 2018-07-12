@@ -106,6 +106,8 @@ namespace uAdventure.Editor
         public const string EADVETURE_CONTENT_FOLDER = "EAdventureData";
 
         public const string BASE_DIR = "CurrentGame/";
+        
+        private static List<string> pathsToReimport;
 
         /**
          * Static class. Private constructor.
@@ -116,17 +118,11 @@ namespace uAdventure.Editor
 
         }
 
-        //private static VideoCache videoCache = new AssetsController.VideoCache( );
-
-        private static Dictionary<string, FileInfo> tempFiles = new Dictionary<string, FileInfo>();
-
-        public static void resetCache()
+        public static void ResetCache()
         {
-            //Reset tempFiles
-            tempFiles = new Dictionary<string, FileInfo>();
         }
 
-        public static string[] categoryFolders()
+        public static string[] CategoryFolders()
         {
 
             string[] folders = new string[AssetsConstants.CATEGORIES_COUNT];
@@ -141,11 +137,11 @@ namespace uAdventure.Editor
          * Creates the initial structure of asset folders
          */
 
-        public static void createFolderStructure()
+        public static void CreateFolderStructure()
         {
             DirectoryInfo projectDir = new DirectoryInfo(Controller.Instance.ProjectFolder);
             Debug.Log("CREATE: " + projectDir.FullName);
-            string[] folders = categoryFolders();
+            string[] folders = CategoryFolders();
             for (int i = 0; i < folders.Length; i++)
             {
                 projectDir.CreateSubdirectory(folders[i]);
@@ -218,10 +214,10 @@ namespace uAdventure.Editor
          * @return List of assets of the given category
          */
 
-        public static string[] getAssetFilenames(int assetsCategory)
+        public static string[] GetAssetFilenames(int assetsCategory)
         {
 
-            return getAssetFilenames(assetsCategory, FILTER_NONE);
+            return GetAssetFilenames(assetsCategory, FILTER_NONE);
         }
 
         /**
@@ -235,7 +231,7 @@ namespace uAdventure.Editor
          * @return List of assets of the given category
          */
 
-        public static string[] getAssetFilenames(int assetsCategory, int filter)
+        public static string[] GetAssetFilenames(int assetsCategory, int filter)
         {
 
             string[] assetsList = new string[] { };
@@ -249,15 +245,14 @@ namespace uAdventure.Editor
             FileInfo[] fileList = categoryFolder.GetFiles(getAssetsFileFilter(assetsCategory, filter));
 
             // If the array is not empty
-            if (fileList != null)
+            if (fileList != null && assetsCategory != AssetsConstants.CATEGORY_STYLED_TEXT)
             {
                 // Copy the relative paths to the string array
                 // If is styled text, remove referenced files (folder) when present
-                if (assetsCategory != AssetsConstants.CATEGORY_STYLED_TEXT)
+                assetsList = new string[fileList.Length];
+                for (int i = 0; i < fileList.Length; i++)
                 {
-                    assetsList = new string[fileList.Length];
-                    for (int i = 0; i < fileList.Length; i++)
-                        assetsList[i] = fileList[i].Name;
+                    assetsList[i] = fileList[i].Name;
                 }
             }
 
@@ -274,10 +269,10 @@ namespace uAdventure.Editor
          *         opened ZIP file
          */
 
-        public static string[] getAssetsList(int assetsCategory)
+        public static string[] GetAssetsList(int assetsCategory)
         {
 
-            return getAssetsList(assetsCategory, FILTER_NONE);
+            return GetAssetsList(assetsCategory, FILTER_NONE);
         }
 
         /**
@@ -292,7 +287,7 @@ namespace uAdventure.Editor
          *         relative to the opened ZIP file
          */
 
-        public static string[] getAssetsList(int assetsCategory, int filter)
+        public static string[] GetAssetsList(int assetsCategory, int filter)
         {
 
             string[] assetsList = new string[] { };
@@ -338,53 +333,23 @@ namespace uAdventure.Editor
             return assetsList;
         }
 
-        /**
-         * Returns an image corresponding to the given file path (relative to the
-         * ZIP).
-         * 
-         * @param imagePath
-         *            Path to the image, relative to the ZIP file
-         * @return Image for the given file
-         */
-
-        [Obsolete("Use ResourceManager instead")]
-        public static Sprite getImage(string imagePath)
+        public static string AddSingleAsset(int assetsCategory, string assetPath)
         {
-            return Controller.ResourceManager.getSprite(imagePath);
+            return AddSingleAsset(assetsCategory, assetPath, true);
         }
 
-        /**
-         * Returns an image corresponding to the given file path (relative to the
-         * ZIP).
-         * 
-         * @param imagePath
-         *            Path to the image, relative to the ZIP file
-         * @return Image for the given file
-         */
-
-        [Obsolete("Use ResourceManager instead")]
-        public static Texture2D getImageTexture(string imagePath)
+        public static string AddSingleAsset(int assetsCategory, string assetPath, bool checkIfAssetExists)
         {
-            return Controller.ResourceManager.getImage(imagePath);
+            return AddSingleAsset(assetsCategory, assetPath, null, checkIfAssetExists);
         }
 
-
-        public static string addSingleAsset(int assetsCategory, string assetPath)
-        {
-            return addSingleAsset(assetsCategory, assetPath, true);
-        }
-
-        public static string addSingleAsset(int assetsCategory, string assetPath, bool checkIfAssetExists)
-        {
-            return addSingleAsset(assetsCategory, assetPath, null, checkIfAssetExists);
-        }
-
-        public static string addSingleAsset(int assetsCategory, string assetPath, string destinyAssetName,
+        public static string AddSingleAsset(int assetsCategory, string assetPath, string destinyAssetName,
             bool checkIfAssetExists)
         {
             string assetTypeDir = getCategoryFolder(assetsCategory);
 
-            DirectoryInfo path = new DirectoryInfo(DIR_PREFIX + "/" + assetTypeDir);
+            var localPath = DIR_PREFIX + "/" + assetTypeDir;
+            DirectoryInfo path = new DirectoryInfo(localPath);
             if (!Directory.Exists(path.FullName))
             {
                 Directory.CreateDirectory(path.FullName);
@@ -407,17 +372,19 @@ namespace uAdventure.Editor
                 {
                     AssetsController.copyAllFiles(Path.GetDirectoryName(assetPath), path.FullName);
                 }
-                AssetDatabase.ImportAsset(path.FullName, ImportAssetOptions.ForceUpdate | ImportAssetOptions.ForceSynchronousImport);
+                
+                // File doesnt exist
+                returnPath = assetTypeDir + "/" + nameOnly;
+                var localAsset = localPath + "/" + nameOnly;
+
+                AssetDatabase.ImportAsset(localAsset, ImportAssetOptions.ForceUpdate | ImportAssetOptions.ForceSynchronousImport);
                 AssetDatabase.Refresh();
                 if(assetsCategory == AssetsConstants.CATEGORY_IMAGE)
                 {
-                    // Force unload
-                    var image = Controller.ResourceManager.getImage(assetPath);
+                    // Force unload 
+                    var image = Controller.ResourceManager.getImage(returnPath);
                     Resources.UnloadAsset(image);
                 }
-
-                // File doesnt exist
-                returnPath = assetTypeDir + "/" + nameOnly;
             }
             else
             {
@@ -427,155 +394,95 @@ namespace uAdventure.Editor
             return returnPath;
 
         }
+        
 
-        ////    private static bool addStyledText(string assetPath, string destinyAssetName, File categoryFolder)
-        ////    {
+        /**
+         * Deletes the given asset from the ZIP, asking for confirmation to the
+         * user.
+         * 
+         * @param assetPath
+         *            Path to the asset file to delete, relative to the ZIP file.
+         * @return True if the file was deleted, false otherwise
+         */
+        public static bool DeleteAsset(string assetPath)
+        {
 
-        ////        bool assetsAdded = true;
+            // Delete the asset and store if it has been deleted
+            bool assetDeleted = DeleteAsset(assetPath, true);
 
-        ////        try
-        ////        {
-        ////            File sourceFile = new File(assetPath);
-        ////            File destinyFile = new File(categoryFolder, destinyAssetName == null ? sourceFile.getName() : destinyAssetName);
+            // If the asset was deleted, delete the references in the adventure
+            Controller controller = Controller.Instance;
+            if (assetDeleted)
+            {
+                // Delete the references to the asset
+                controller.deleteAssetReferences(assetPath);
+            }
 
-        ////            // Read sourceFile content
-        ////            BufferedReader r = new BufferedReader(new FileReader(sourceFile));
-        ////            string html = "";
-        ////            string line = null;
-        ////            while ((line = r.readLine()) != null)
-        ////            {
-        ////                html += line + "\n";
-        ////            }
-        ////            r.close();
+            return assetDeleted;
+        }
 
-        ////            // Look for css sheet
-        ////            if (html.indexOf("<link rel=\"stylesheet\"") != -1)
-        ////            {
-        ////                string cssFile = html.Substring(html.indexOf("href=\"") + 6, html.indexOf('"', html.indexOf("href=\"") + 8));
-        ////                File sourceCssFile = new File(sourceFile.getParent(), cssFile);
-        ////                File destinyCssFile = new File(categoryFolder, cssFile);
-        ////                assetsAdded = sourceCssFile.CopyTo(destinyCssFile);
+        /**
+         * Deletes the given asset from the ZIP.
+         * 
+         * @param assetPath
+         *            Path to the asset file to delete, relative to the ZIP file
+         * @param askForConfirmation
+         *            If true, asks the user for confirmation to delete
+         * @return True if the asset was deleted, false otherwise
+         */
+        public static bool DeleteAsset(string assetPath, bool askForConfirmation)
+        {
 
-        ////            }
+            bool assetDeleted = false;
 
-        ////            // Look for images
-        ////            string htmlProcessed = new string(html);
-        ////            while (assetsAdded && htmlProcessed.indexOf("src=\"") != -1)
-        ////            {
-        ////                htmlProcessed = htmlProcessed.Substring(htmlProcessed.indexOf("src=\"") + 5, htmlProcessed.Length - 1);
-        ////                string imgName = htmlProcessed.Substring(0, htmlProcessed.indexOf('"'));
-        ////                // Copy image to project folder
-        ////                File sourceImgFile = new File(sourceFile.getParent(), imgName);
-        ////                File destinyImgFile = new File(categoryFolder, imgName);
-        ////                assetsAdded = sourceImgFile.CopyTo(destinyImgFile);
-        ////            }
+            // Count the references, if it is an animation, remove the suffix to do the search
+            string references = Controller.Instance.countAssetReferences(assetPath).ToString();
 
-        ////            assetsAdded = sourceFile.CopyTo(destinyFile);
-        ////            /*BufferedWriter w = new BufferedWriter( new FileWriter( destinyFile ) );
-        ////            w.write( html.replaceAll( "src=\"", "src=\"" + folderName ) );
-        ////            w.close( );*/
+            var fileInfo = new FileInfo(assetPath);
 
-        ////        }
-        ////        catch (FileNotFoundException e)
-        ////        {
-        ////            assetsAdded = false;
-        ////        }
-        ////        catch (IOException e)
-        ////        {
-        ////            assetsAdded = false;
-        ////        }
+            // If the asset must be deleted (when the user is not asked, or is asked and answers "Yes")
+            if (!askForConfirmation || Controller.Instance.ShowStrictConfirmDialog( TC.get("Assets.DeleteAsset"),  TC.get("Assets.DeleteAssetWarning", new string[] { fileInfo.Name, references })))
+            {
 
-        ////        return assetsAdded;
+                // If it is an animation, delete all the files
+                if (assetPath.StartsWith(CATEGORY_ANIMATION_FOLDER))
+                {
+                    // Set "assetDeleted" to true, to perform an AND operation with each result
+                    assetDeleted = true;
 
-        ////    }
+                    // Prepare the root of the animation path and the suffix
+                    assetPath = assetPath.RemoveFromEnd(fileInfo.Extension);
 
-        ////    /**
-        ////     * Deletes the given asset from the ZIP, asking for confirmation to the
-        ////     * user.
-        ////     * 
-        ////     * @param assetPath
-        ////     *            Path to the asset file to delete, relative to the ZIP file.
-        ////     * @return True if the file was deleted, false otherwise
-        ////     */
-        ////    public static bool deleteAsset(string assetPath)
-        ////    {
+                    // While the last image has not been read
+                    var animation = Loader.LoadAnimation(assetPath, Controller.ResourceManager, new List<Incidence>());
+                    if(animation != null)
+                    {
+                        foreach (var frame in animation.getFrames())
+                        {
+                            var framePath = frame.getUri();
+                            if (!string.IsNullOrEmpty(framePath))
+                            {
+                                DeleteAsset(framePath);
+                            }
+                            var soundPath = frame.getSoundUri();
+                            if (!string.IsNullOrEmpty(soundPath))
+                            {
+                                DeleteAsset(soundPath);
+                            }
+                        }
+                    }
+                }
 
-        ////        // Delete the asset and store if it has been deleted
-        ////        bool assetDeleted = deleteAsset(assetPath, true);
+                // If it is not an animation, just delete the file
+                else
+                {
+                    var path = "Assets/uAdventure/CurrentGame/" + assetPath;
+                    assetDeleted = AssetDatabase.DeleteAsset(path);
+                }
+            }
 
-        ////        // If the asset was deleted, delete the references in the adventure
-        ////        Controller controller = Controller.getInstance();
-        ////        if (assetDeleted)
-        ////        {
-        ////            // Delete the references to the asset
-        ////            if (assetPath.StartsWith(CATEGORY_ANIMATION_FOLDER))
-        ////                controller.deleteAssetReferences(removeSuffix(assetPath));
-        ////            else
-        ////                controller.deleteAssetReferences(assetPath);
-        ////        }
-
-        ////        return assetDeleted;
-        ////    }
-
-        ////    /**
-        ////     * Deletes the given asset from the ZIP.
-        ////     * 
-        ////     * @param assetPath
-        ////     *            Path to the asset file to delete, relative to the ZIP file
-        ////     * @param askForConfirmation
-        ////     *            If true, asks the user for confirmation to delete
-        ////     * @return True if the asset was deleted, false otherwise
-        ////     */
-        ////    public static bool deleteAsset(string assetPath, bool askForConfirmation)
-        ////    {
-
-        ////        bool assetDeleted = false;
-
-        ////        // Count the references, if it is an animation, remove the suffix to do the search
-        ////        string references = null;
-        ////        if (assetPath.StartsWith(CATEGORY_ANIMATION_FOLDER))
-        ////            references = string.valueOf(Controller.getInstance().countAssetReferences(removeSuffix(assetPath)));
-        ////        else
-        ////            references = string.valueOf(Controller.getInstance().countAssetReferences(assetPath));
-
-        ////        // If the asset must be deleted (when the user is not asked, or is asked and answers "Yes")
-        ////        if (!askForConfirmation || Controller.getInstance().showStrictConfirmDialog( TC.get("Assets.DeleteAsset"),  TC.get("Assets.DeleteAssetWarning", new string[] { getFilename(assetPath), references })))
-        ////        {
-
-        ////            // If it is an animation, delete all the files
-        ////            if (assetPath.StartsWith(CATEGORY_ANIMATION_FOLDER))
-        ////            {
-        ////                // Set "assetDeleted" to true, to perform an AND operation with each result
-        ////                assetDeleted = true;
-
-        ////                // Prepare the root of the animation path and the suffix
-        ////                string extension = getExtension(assetPath);
-        ////                assetPath = removeSuffix(assetPath);
-
-        ////                // While the last image has not been read
-        ////                bool end = false;
-        ////                for (int i = 1; i < 100 && !end; i++)
-        ////                {
-        ////                    // Open the file to be deleted
-        ////                    File animationFrameFile = new File(Controller.getInstance().getProjectFolder(), assetPath + string.format("_%02d.", i) + extension);
-
-        ////                    // If the file exists, delete it
-        ////                    if (animationFrameFile.Exists)
-        ////                        assetDeleted &= animationFrameFile.delete();
-
-        ////                    // If it doesn't exist, stop deleting data
-        ////                    else
-        ////                        end = true;
-        ////                }
-        ////            }
-
-        ////            // If it is not an animation, just delete the file
-        ////            else
-        ////                assetDeleted = new File(Controller.getInstance().getProjectFolder(), assetPath).delete();
-        ////        }
-
-        ////        return assetDeleted;
-        ////    }
+            return assetDeleted;
+        }
 
         private static void ImportAssets(string[] paths)
         {
@@ -812,7 +719,6 @@ namespace uAdventure.Editor
 
                 // Take the instance of the controller, and the filename of the asset
                 FileInfo file = new FileInfo(Path.Combine(controller.ProjectFolder, assetPath));
-                //Debug.Log(controller.getProjectFolder() + " | " + assetPath + " | " + file.FullName);
                 if (assetCategory == AssetsConstants.CATEGORY_ANIMATION)
                 {
                     file = new FileInfo(Path.Combine(controller.ProjectFolder, assetPath + "_01.png"));
@@ -835,7 +741,7 @@ namespace uAdventure.Editor
                 if (assetValid && (assetCategory == AssetsConstants.CATEGORY_BACKGROUND || assetCategory == AssetsConstants.CATEGORY_ICON))
                 {
                     // Take the data from the file
-                    Sprite image = getImage(assetPath);
+                    Sprite image = Controller.ResourceManager.getSprite(assetPath);
                     int width = (int)image.rect.width;
                     int height = (int)image.rect.height;
 
@@ -845,7 +751,7 @@ namespace uAdventure.Editor
                     // The background files must have a size of at least 800x600
                     if (assetCategory == AssetsConstants.CATEGORY_BACKGROUND && (width < AssetsImageDimensions.BACKGROUND_MAX_WIDTH || height < AssetsImageDimensions.BACKGROUND_MAX_HEIGHT))
                     {
-                        // message =  TC.get("BackgroundAssets.ErrorBackgroundSize", fileInformation);
+                        message =  TC.get("BackgroundAssets.ErrorBackgroundSize", fileInformation);
                         assetValid = false;
                         notPresent = false;
                     }
@@ -853,7 +759,7 @@ namespace uAdventure.Editor
                     // The icon files must have a size of 80x48
                     else if (assetCategory == AssetsConstants.CATEGORY_ICON && (width != AssetsImageDimensions.ICON_MAX_WIDTH || height != AssetsImageDimensions.ICON_MAX_HEIGHT))
                     {
-                        //message =  TC.get("IconAssets.ErrorIconSize", fileInformation);
+                        message =  TC.get("IconAssets.ErrorIconSize", fileInformation);
                         assetValid = false;
                         notPresent = false;
                     }
@@ -1018,18 +924,6 @@ namespace uAdventure.Editor
         ////        }
         ////        return assetChooser;
         ////    }
-        
-
-        // TODO: TMP - delte iT
-        public class FileFilter
-        {
-            public string getAssetsFileFilter(int assetsCategory, int filter)
-            {
-                return string.Empty;
-            }
-        }
-
-        private static List<string> pathsToReimport;
 
         internal static void FixImportSpecialCharacters(string assetFolder)
         {
@@ -1150,7 +1044,6 @@ namespace uAdventure.Editor
         [Obsolete]
         private static void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs)
         {
-            //Debug.Log(sourceDirName + " ||| " + destDirName);
             // Get the subdirectories for the specified directory.
             DirectoryInfo dir = new DirectoryInfo(sourceDirName);
 
@@ -1165,8 +1058,7 @@ namespace uAdventure.Editor
             // If the destination directory doesn't exist, create it.
             if (!Directory.Exists(destDirName))
             {
-                DirectoryInfo i = Directory.CreateDirectory(destDirName);
-                // Debug.Log("Create: " + destDirName);
+                Directory.CreateDirectory(destDirName);
             }
 
             // Get the files in the directory and copy them to the new location.
@@ -1177,7 +1069,6 @@ namespace uAdventure.Editor
                     continue;
 
                 string temppath = Path.Combine(destDirName, file.Name);
-                //Debug.Log("CopyTo: " + temppath);
                 file.CopyTo(temppath, false);
 
                 // In case of animation
@@ -1201,7 +1092,6 @@ namespace uAdventure.Editor
                 foreach (DirectoryInfo subdir in dirs)
                 {
                     string temppath = Path.Combine(destDirName, subdir.Name);
-                    //Debug.Log("temppath: " + temppath);
                     DirectoryCopy(subdir.FullName, temppath, copySubDirs);
                 }
             }

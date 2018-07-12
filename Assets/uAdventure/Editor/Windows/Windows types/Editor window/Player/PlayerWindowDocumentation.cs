@@ -7,8 +7,6 @@ namespace uAdventure.Editor
     [EditorComponent(typeof(PlayerDataControl), Name = "Atrezzo.DocPanelTitle", Order = 20)]
     public class PlayerWindowDocumentation : AbstractEditorComponent
     {
-        private string documentation, documentationLast;
-
         public PlayerWindowDocumentation(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
         {
@@ -23,7 +21,9 @@ namespace uAdventure.Editor
             EditorGUI.BeginChangeCheck();
             var documentation = GUILayout.TextArea(workingPlayer.getDocumentation() ?? string.Empty, GUILayout.ExpandHeight(true));
             if (EditorGUI.EndChangeCheck())
+            {
                 workingPlayer.setDocumentation(documentation);
+            }
         }
     }
 }

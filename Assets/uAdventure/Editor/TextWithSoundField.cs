@@ -4,33 +4,37 @@ using uAdventure.Core;
 using UnityEditor;
 using UnityEngine;
 
-public class TextWithSoundField : FileChooser {
-
-    private Texture2D audioTex, noAudioTex;
-
-    public string Content { get; set; }
-
-    public TextWithSoundField() : base()
+namespace uAdventure.Editor
+{
+    public class TextWithSoundField : FileChooser
     {
-        noAudioTex = Resources.Load<Texture2D>("EAdventureData/img/icons/noAudio");
-        audioTex = Resources.Load<Texture2D>("EAdventureData/img/icons/audio");
-    }
 
-    public override void DoLayout(params GUILayoutOption[] options)
-    {
-        var rect = EditorGUILayout.BeginHorizontal(options);
+        private readonly Texture2D audioTex, noAudioTex;
+
+        public string Content { get; set; }
+
+        public TextWithSoundField() : base()
         {
-            Content = EditorGUILayout.TextField(Label, Content, GUILayout.ExpandWidth(true));
-            drawAudioPath();
-            drawSelect();
-            drawClear();
+            noAudioTex = Resources.Load<Texture2D>("EAdventureData/img/icons/noAudio");
+            audioTex = Resources.Load<Texture2D>("EAdventureData/img/icons/audio");
         }
-        EditorGUILayout.EndHorizontal();
-    }
 
-    protected void drawAudioPath()
-    {
-        GUI.DrawTexture(GUILayoutUtility.GetRect(0, 0, GUILayout.Height(audioTex.height), GUILayout.Width(audioTex.width)), string.IsNullOrEmpty(Path) ? noAudioTex : audioTex);
-        EditorGUILayout.LabelField(string.IsNullOrEmpty(Path) ? TC.get("Conversations.NoAudio") : Path, GUILayout.Width(120));
+        public override void DoLayout(params GUILayoutOption[] options)
+        {
+            EditorGUILayout.BeginHorizontal(options);
+            {
+                Content = EditorGUILayout.TextField(Label, Content, GUILayout.ExpandWidth(true));
+                DrawAudioPath();
+                DrawSelect();
+                DrawClear();
+            }
+            EditorGUILayout.EndHorizontal();
+        }
+
+        protected void DrawAudioPath()
+        {
+            GUI.DrawTexture(GUILayoutUtility.GetRect(0, 0, GUILayout.Height(audioTex.height), GUILayout.Width(audioTex.width)), string.IsNullOrEmpty(Path) ? noAudioTex : audioTex);
+            EditorGUILayout.LabelField(string.IsNullOrEmpty(Path) ? TC.get("Conversations.NoAudio") : Path, GUILayout.Width(120));
+        }
     }
 }

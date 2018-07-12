@@ -27,8 +27,7 @@ namespace uAdventure.Geo
         private Vector2 location;
         private bool editing;
         private GeoElement element;
-        private string[] menus;
-        private Texture2D imagePreview;
+        private readonly string[] menus = { "Position", "Attributes", "Actions" };
 
         /* ----------------------------------
          * GUI ELEMENTS
@@ -39,12 +38,11 @@ namespace uAdventure.Geo
 
         public GeoElementWindow(Rect aStartPos, GUIStyle aStyle, params GUILayoutOption[] aOptions) : base(aStartPos, new GUIContent("Geo Elements"), aStyle, aOptions)
         {
-            var bc = new GUIContent();
-            bc.image = (Texture2D)Resources.Load("EAdventureData/img/icons/poi", typeof(Texture2D));
-            bc.text = "GeoElements";  //TC.get("Element.Name1");
-            ButtonContent = bc;
-            
-            menus = new string[] { "Position", "Attributes", "Actions" };
+            ButtonContent = new GUIContent
+            {
+                image = Resources.Load<Texture2D>("EAdventureData/img/icons/poi"),
+                text = "GeoElements"
+            };
 
             Init();
         }
@@ -60,12 +58,14 @@ namespace uAdventure.Geo
             map.Repaint += Repaint;
             map.Zoom = 19;
 
-            actionsList = new ReorderableList(new List<GeoAction>(), typeof(GeoAction));
-            actionsList.headerHeight = 40;
-            actionsList.elementHeight = 60;
-            actionsList.drawHeaderCallback = DrawActionsHeader;
-            actionsList.drawElementCallback = DrawActionElement;
-            actionsList.onAddDropdownCallback = OnAddActionDropdown;
+            actionsList = new ReorderableList(new List<GeoAction>(), typeof(GeoAction))
+            {
+                headerHeight = 40,
+                elementHeight = 60,
+                drawHeaderCallback = DrawActionsHeader,
+                drawElementCallback = DrawActionElement,
+                onAddDropdownCallback = OnAddActionDropdown
+            };
         }
 
         private void DrawActionsHeader(Rect r)
@@ -103,21 +103,21 @@ namespace uAdventure.Geo
             {
                 var specialized = action as ExitAction;
                 specialized.OnlyFromInside = EditorGUILayout.Toggle("Only from inside", specialized.OnlyFromInside);
-
             }
             if (action is InspectAction)
             {
                 var specialized = action as InspectAction;
                 specialized.Inside = EditorGUILayout.Toggle("On range", specialized.Inside);
-
             }
             if (action is LookToAction)
             {
                 var specialized = action as LookToAction;
                 specialized.Inside = EditorGUILayout.Toggle("On range", specialized.Inside);
                 specialized.Center = EditorGUILayout.Toggle("Look to center", specialized.Center);
-                if(!specialized.Center)
+                if (!specialized.Center)
+                {
                     specialized.Direction = EditorGUILayout.Vector2Field("Look to direction", specialized.Direction);
+                }
             }
 
             GUILayout.EndVertical();
@@ -147,7 +147,9 @@ namespace uAdventure.Geo
         {
             var menu = new GenericMenu();
             foreach(var a in GeoActionsFactory.Instance.AvaliableActions)
+            {
                 menu.AddItem(new GUIContent(a.Value), false, (t) => element.Actions.Add(GeoActionsFactory.Instance.CreateActionFor(t as Type)), a.Key);
+            }
             menu.ShowAsContext();
         }
 
@@ -197,22 +199,20 @@ namespace uAdventure.Geo
 
                         // Location control
                         location = EditorGUILayout.Vector2Field("Location", location);
-                        var lastRect = GUILayoutUtility.GetLastRect();
                         if (location != map.Center.ToVector2())
+                        {
                             map.Center = new Vector2d(location.x, location.y);
-
+                        }
 
                         // Map drawing
-                        if(editing)
-                            map.selectedGeometry = element.Geometry;
-
-                        if (map.DrawMap(GUILayoutUtility.GetRect(0,0, GUILayout.ExpandHeight(true), GUILayout.ExpandWidth(true))))
+                        if (editing)
                         {
-                            Debug.Log(map.GeoMousePosition);
-                            if (element != null && editing)
-                            {
-                                element.Geometry.AddPoint(map.GeoMousePosition);
-                            }
+                            map.selectedGeometry = element.Geometry;
+                        }
+
+                        if (map.DrawMap(GUILayoutUtility.GetRect(0,0, GUILayout.ExpandHeight(true), GUILayout.ExpandWidth(true))) && element != null && editing)
+                        {
+                            element.Geometry.AddPoint(map.GeoMousePosition);
                         }
                         
                         location = map.Center.ToVector2();
@@ -235,10 +235,6 @@ namespace uAdventure.Geo
                         
                         GUILayout.Label("Element image");
                         GUILayout.BeginHorizontal();
-                       /* if (GUILayout.Button(clearImg, GUILayout.Width(0.1f * windowWidth)))
-                        {
-                            foregroundMaskPath = "";
-                        }*/
                         GUILayout.Box(element.Image, GUILayout.Width(0.78f * m_Rect.width));
                         if (GUILayout.Button(TC.get("Buttons.Select"), GUILayout.Width(0.2f * m_Rect.width)))
                         {
@@ -292,8 +288,10 @@ namespace uAdventure.Geo
         protected override void OnSelect(ReorderableList r)
         {
             selectedElement = r.index;
-            if(r.index >= 0 )
+            if(r.index >= 0)
+            {
                 Center(Controller.Instance.SelectedChapterDataControl.getObjects<GeoElement>()[selectedElement]);
+            }
         }
 
         protected override void OnUpdateList(ReorderableList r)
@@ -325,7 +323,7 @@ namespace uAdventure.Geo
             {
                 case AssetType.Image:
                     ImageFileOpenDialog backgroundDialog =
-                    (ImageFileOpenDialog)ScriptableObject.CreateInstance(typeof(ImageFileOpenDialog));
+                        (ImageFileOpenDialog)ScriptableObject.CreateInstance(typeof(ImageFileOpenDialog));
                     backgroundDialog.Init(this, FileType.ITEM_IMAGE);
                     break;
             }
@@ -340,8 +338,6 @@ namespace uAdventure.Geo
                     element.Image = message;
                     Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
                        GameRources.GetInstance().selectedSceneIndex].setPreviewBackground(message);
-                    if (element.Image != null && !element.Image.Equals(""))
-                        imagePreview = AssetsController.getImage(element.Image).texture;
                     break;
             }
         }

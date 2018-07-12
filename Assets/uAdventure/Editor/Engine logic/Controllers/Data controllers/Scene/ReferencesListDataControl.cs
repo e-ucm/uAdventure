@@ -90,11 +90,6 @@ namespace uAdventure.Editor
         public const int NO_PLAYER = -1;
 
         /**
-         * Tell us if the player image path has been changed
-         */
-        private bool imagePathHasChanged;
-
-        /**
          * Constructor.
          * 
          * @param sceneDataControl
@@ -117,7 +112,6 @@ namespace uAdventure.Editor
             this.allReferencesDataControl = new List<ElementContainer>();
             this.lastElementContainer = null;
             this.playerPositionInAllReferences = NO_PLAYER;
-            this.imagePathHasChanged = false;
             // Check if one of references has layer -1: if it is true, it means that element references has no layer. 
             // Create subcontrollers
 
@@ -730,19 +724,6 @@ namespace uAdventure.Editor
                 int layer = insertInOrder(ec, true);
                 reassignLayerAllReferencesDataControl(layer);
                 sceneDataControl.setPlayerLayer(layer);
-            }
-
-        }
-
-        public void changeImagePlayerPath(string imagePath)
-        {
-
-            this.playerImagePath = imagePath;
-            this.imagePathHasChanged = true;
-            if (allReferencesDataControl.Count == 0)
-            {
-                playerPositionInAllReferences = 0;
-                reassignLayerAllReferencesDataControl(insertInOrder(new ElementContainer(null, 0, Controller.ResourceManager.getSprite(this.playerImagePath)), true));
             }
         }
 

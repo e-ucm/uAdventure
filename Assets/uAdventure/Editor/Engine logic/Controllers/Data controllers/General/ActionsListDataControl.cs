@@ -239,7 +239,6 @@ namespace uAdventure.Editor
                             message = TC.get("CustomAction.MessageSelectInteraction");
                             break;
                         case Controller.ACTION_USE_WITH:
-                            var itemActiveAreas = new List<string>();
                             validTypes = new System.Type[] { typeof(Item), typeof(ActiveArea) };
                             actionType = Action.USE_WITH;
                             message = TC.get("Action.MessageSelectItem");
@@ -305,7 +304,9 @@ namespace uAdventure.Editor
 
             // If an action was added, create a controller and store it
             if (newAction != null)
+            {
                 performAddAction(newAction);
+            }
 
             return newAction != null;
         }
@@ -432,7 +433,7 @@ namespace uAdventure.Editor
         }
 
 
-        public override string renameElement(string name)
+        public override string renameElement(string newName)
         {
 
             return null;
@@ -579,7 +580,7 @@ namespace uAdventure.Editor
 
         private class ActionsListReceiver : DialogReceiverInterface
         {
-            private ActionsListDataControl actionsListDataControl;
+            private readonly ActionsListDataControl actionsListDataControl;
             public System.Func<string, Action> ConfigureAction;
 
             public ActionsListReceiver(ActionsListDataControl actionsListDataControl)
@@ -587,7 +588,7 @@ namespace uAdventure.Editor
                 this.actionsListDataControl = actionsListDataControl;
             }
 
-            public void OnDialogCanceled(object workingObject = null) { }
+            public void OnDialogCanceled(object workingObject = null) { /* Nothing to do on cancel so far */ }
 
             public void OnDialogOk(string message, object workingObject = null, object workingObjectSecond = null)
             {
