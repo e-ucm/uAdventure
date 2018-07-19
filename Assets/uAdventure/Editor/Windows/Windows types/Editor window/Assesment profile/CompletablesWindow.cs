@@ -24,12 +24,11 @@ namespace uAdventure.Editor
         public CompletablesWindow(Rect aStartPos, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, new GUIContent(TC.get("Analytics.Title")), aStyle, aOptions)
         {
-            var buttonContent = new GUIContent()
+            ButtonContent = new GUIContent()
             {
                 image = Resources.Load<Texture2D>("EAdventureData/img/icons/assessmentProfiles"),
-                text = TC.get("Analytics.Title")
+                text = "Analytics.Title"
             };
-            ButtonContent = buttonContent;
 
             completablesList = new DataControlList()
             {

@@ -21,7 +21,7 @@ namespace uAdventure.Editor
         private string[] transitionTypeName;
         private Texture2D[] transitionTypeTexture;
 
-        private readonly static GUISkin defaultSkin = GUI.skin;
+        private static GUISkin defaultSkin;
         private static GUISkin noBackgroundSkin;
         private static GUISkin selectedFrameSkin;
 
@@ -43,6 +43,7 @@ namespace uAdventure.Editor
 
         protected void OnEnable()
         {
+            defaultSkin = GUI.skin;
             titleStyle = new GUIStyle()
             {
                 fontStyle = FontStyle.Bold,
@@ -368,9 +369,10 @@ namespace uAdventure.Editor
 
         public void OnDialogOk(string message, object workingObject = null, object workingObjectSecond = null)
         {
-            if (workingObject is FileType)
+            if (workingObject != null && workingObject is FileType)
             {
-                switch ((FileType)workingObject)
+                var fileType = (FileType)workingObject;
+                switch (fileType)
                 {
                     case FileType.FRAME_IMAGE:
                         OnFrameImageChanged(message);
@@ -384,7 +386,7 @@ namespace uAdventure.Editor
 
         public void OnDialogCanceled(object workingObject = null)
         {
-
+            // Nothing to do
         }
     }
 }

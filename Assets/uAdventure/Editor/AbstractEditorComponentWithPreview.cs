@@ -28,9 +28,20 @@ namespace uAdventure.Editor
             }
         }
 
-        public DataControl Target { get; set; }
+        private DataControl target;
+        public DataControl Target { get { return target; } set
+            {
+                if (value != target)
+                {
+                    target = value;
+                    OnTargetChanged();
+                }
+            }
+        }
 
         public bool Collapsed { get; set; }
+
+        protected virtual void OnTargetChanged() { }
 
         public virtual void OnDrawingGizmos() {}
 

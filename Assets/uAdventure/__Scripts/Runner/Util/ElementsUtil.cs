@@ -8,6 +8,11 @@ namespace uAdventure.Runner
 {
     public static class ElementsUtil
     {
+        public static IEnumerable<ResourcesUni> Checked(this IEnumerable<ResourcesUni> elements)
+        {
+            return elements.Where(e => ConditionChecker.check(e.getConditions()));
+        }
+
         public static IEnumerable<ElementReference> Checked(this IEnumerable<ElementReference> elements)
         {
             return elements.Where(e => ConditionChecker.check(e.getConditions()));

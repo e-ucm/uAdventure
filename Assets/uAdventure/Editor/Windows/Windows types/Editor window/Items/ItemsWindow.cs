@@ -32,22 +32,10 @@ namespace uAdventure.Editor
             AddTab(TC.get("Item.ActionsPanelTitle"), ItemsWindowType.Actions, itemsWindowActions);
             AddTab(TC.get("Item.DocPanelTitle"), ItemsWindowType.DescriptionConfig, itemsWindowDescription);
         }
-
-        // Two methods responsible for showing right window content 
-        // - concrete item info or base window view
-        public void ShowBaseWindowView()
-        {
-            GameRources.GetInstance().selectedItemIndex = -1;
-        }
-
-        public void ShowItemWindowView(int o)
-        {
-            GameRources.GetInstance().selectedItemIndex = o;
-        }
         
         protected override void OnSelect(ReorderableList r)
         {
-            ShowItemWindowView(r.index);
+            GameRources.GetInstance().selectedItemIndex = r.index;
         }
 
 
@@ -56,7 +44,7 @@ namespace uAdventure.Editor
             base.OnButton();
             dataControlList.SetData(Controller.Instance.SelectedChapterDataControl.getItemsList(),
                 sceneList => (sceneList as ItemsListDataControl).getItems().Cast<DataControl>().ToList());
-            ShowBaseWindowView();
+            GameRources.GetInstance().selectedItemIndex = -1;
         }
 
         protected override void OnDrawMainPreview(Rect rect, int index)

@@ -26,9 +26,11 @@ namespace uAdventure.Editor
             params GUILayoutOption[] aOptions)
             : base(aStartPos, new GUIContent(TC.get("AdvancedFeatures.Title")), aStyle, aOptions)
         {
-            var c = new GUIContent(TC.get("AdvancedFeatures.Title"), 
-                Resources.Load<Texture2D>("EAdventureData/img/icons/advanced"));
-            ButtonContent = c;
+            ButtonContent = new GUIContent
+            {
+                text = "AdvancedFeatures.Title",
+                image = Resources.Load<Texture2D>("EAdventureData/img/icons/advanced")
+            };
 
             windows = new BaseWindow[3]
             {
