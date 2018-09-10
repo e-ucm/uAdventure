@@ -23,7 +23,7 @@ namespace uAdventure.Editor
 
         public FileChooser()
         {
-            delTex = (Texture2D)Resources.Load("EAdventureData/img/icons/deleteContent", typeof(Texture2D));
+            delTex = Resources.Load<Texture2D>("EAdventureData/img/icons/deleteContent");
             Path = "";
             AllowEditingPath = false;
             ShowClear = true;
@@ -33,16 +33,30 @@ namespace uAdventure.Editor
 
         public virtual void DoLayout(params GUILayoutOption[] options)
         {
-            EditorGUILayout.BeginHorizontal(options);
+            using (new EditorGUILayout.HorizontalScope(options))
             {
-                DrawPath();
-                DrawSelect();
-                DrawClear();
+                DrawPathLayout();
+                DrawSelectLayout();
+                DrawClearLayout();
             }
-            EditorGUILayout.EndHorizontal();
         }
 
-        protected virtual void DrawPath()
+        public virtual void Do(Rect rect)
+        {
+            var selectWidth = GUI.skin.button.CalcSize(new GUIContent(TC.get("Buttons.Select"))).x;
+            var clearWidth  = delTex.width + 10f;
+            var pathWidth   = rect.width - selectWidth - clearWidth;
+
+            var pathRect    = new Rect(rect.x, rect.y, pathWidth, rect.height);
+            var selectRect  = new Rect(pathRect.xMax, rect.y, selectWidth, rect.height);
+            var clearRect   = new Rect(selectRect.xMax, rect.y, clearWidth, rect.height);
+
+            DrawPath(pathRect);
+            DrawSelect(selectRect);
+            DrawClear(clearRect);
+        }
+
+        protected virtual void DrawPathLayout()
         {
             EditorGUILayout.LabelField(Label, GUILayout.MaxWidth(EditorGUIUtility.labelWidth));
             using (new EditorGUI.DisabledScope(!AllowEditingPath))
@@ -51,7 +65,7 @@ namespace uAdventure.Editor
             }
         }
 
-        protected virtual void DrawSelect()
+        protected virtual void DrawSelectLayout()
         {
             if (GUILayout.Button(TC.get("Buttons.Select"), GUILayout.Width(GUI.skin.button.CalcSize(new GUIContent(TC.get("Buttons.Select"))).x)))
             {
@@ -59,13 +73,46 @@ namespace uAdventure.Editor
             }
         }
 
-        protected virtual void DrawClear()
+        protected virtual void DrawClearLayout()
         {
             if (ShowClear)
             {
                 using (new EditorGUI.DisabledScope(Empty.Equals(Path)))
                 {
                     if (GUILayout.Button(delTex, GUILayout.Width(delTex.width + 10f)))
+                    {
+                        Path = Empty;
+                    }
+                }
+            }
+        }
+
+        protected virtual void DrawPath(Rect rect)
+        {
+            var labelRect = new Rect(rect.x, rect.y, string.IsNullOrEmpty(Label) ? 0 : EditorGUIUtility.labelWidth, rect.height);
+            EditorGUI.LabelField(labelRect, Label);
+            using (new EditorGUI.DisabledScope(!AllowEditingPath))
+            {
+                var pathRect = new Rect(labelRect.xMax, rect.y, rect.width, rect.height);
+                Path = EditorGUI.TextField(pathRect, Path);
+            }
+        }
+
+        protected virtual void DrawSelect(Rect rect)
+        {
+            if (GUI.Button(rect, TC.get("Buttons.Select")))
+            {
+                ShowAssetChooser(FileType);
+            }
+        }
+
+        protected virtual void DrawClear(Rect rect)
+        {
+            if (ShowClear)
+            {
+                using (new EditorGUI.DisabledScope(Empty.Equals(Path)))
+                {
+                    if (GUI.Button(rect, delTex))
                     {
                         Path = Empty;
                     }
@@ -136,6 +183,7 @@ namespace uAdventure.Editor
 
         public void OnDialogCanceled(object workingObject = null)
         {
+            // Nothing to do on cancel
         }
 
         public virtual void OnDialogOk(string message, object workingObject = null, object workingObjectSecond = null)

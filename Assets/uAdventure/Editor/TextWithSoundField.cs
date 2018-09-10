@@ -25,8 +25,8 @@ namespace uAdventure.Editor
             {
                 Content = EditorGUILayout.TextField(Label, Content, GUILayout.ExpandWidth(true));
                 DrawAudioPath();
-                DrawSelect();
-                DrawClear();
+                DrawSelectLayout();
+                DrawClearLayout();
             }
             EditorGUILayout.EndHorizontal();
         }

@@ -234,6 +234,19 @@ namespace uAdventure.Runner
                                 var toRemove = Game.Instance.GameState.FindElement<Item>(con.getTargetId());
                                 InventoryManager.Instance.RemoveElement(toRemove);
                                 break;
+                            case EffectType.TRIGGER_BOOK:
+                                if (times_runed == 0)
+                                {
+                                    if (InventoryManager.Instance.Opened)
+                                    {
+                                        InventoryManager.Instance.Close();
+                                    }
+                                    TriggerBookEffect triggerBookEffect = (TriggerBookEffect)effect;
+                                    Game.Instance.ShowBook(triggerBookEffect.getTargetId());
+                                }
+                                runs_once = false;
+                                forcewait = Game.Instance.ShowingBook;
+                                break;
                             case EffectType.CUSTOM_EFFECT:
                                 runs_once = false;
                                 if(times_runed == 0)

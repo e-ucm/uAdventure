@@ -317,6 +317,13 @@ namespace uAdventure.Editor
  
                 EditorGUILayout.EndVertical();
                 EditorGUILayout.EndHorizontal();
+
+
+                var unclippedDrawReceiver = m_Window as IUnclippedDrawReceiver;
+                if (unclippedDrawReceiver != null)
+                {
+                    unclippedDrawReceiver.UnclippedDraw(windowArea);
+                }
             }
             else
             {

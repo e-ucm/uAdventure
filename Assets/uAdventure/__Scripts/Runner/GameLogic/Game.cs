@@ -14,7 +14,8 @@ namespace uAdventure.Runner
 {
     public enum GUIState
     {
-        GAME_SELECTION, LOADING_GAME, NOTHING, TALK_PLAYER, TALK_CHARACTER, OPTIONS_MENU, ANSWERS_MENU
+        GAME_SELECTION, LOADING_GAME, NOTHING, TALK_PLAYER, TALK_CHARACTER, OPTIONS_MENU, ANSWERS_MENU,
+        BOOK
     }
 
     public class Game : MonoBehaviour, IPointerClickHandler
@@ -57,6 +58,8 @@ namespace uAdventure.Runner
         private ConversationNodeHolder guioptions;
         private float elapsedTime;
         private bool doTimeOut;
+        private Book openedBook;
+        private BookDrawer bookDrawer;
 
         public delegate void ExecutionEvent(object interactuable);
 
@@ -124,6 +127,8 @@ namespace uAdventure.Runner
             adventure.Parse("descriptor.xml");
             game_state = new GameState(data);
             CompletablesController.Instance.SetCompletables(GameState.GetCompletables());
+
+            bookDrawer = new BookDrawer(ResourceManager);
         }
 
 
@@ -263,8 +268,11 @@ namespace uAdventure.Runner
 
         private bool Interacted()
         {
-            guistate = GUIState.NOTHING;
-            GUIManager.Instance.DestroyBubbles();
+            if(guistate != GUIState.BOOK)
+            {
+                guistate = GUIState.NOTHING;
+                GUIManager.Instance.DestroyBubbles();
+            }
             if (executeStack.Count > 0)
             {
                 return Execute(executeStack.Peek().Key);
@@ -395,6 +403,7 @@ namespace uAdventure.Runner
             if (scene != null)
                 RunTarget(scene.getId());
         }
+
         #endregion Rendering
         //#################################################################
         //#################################################################
@@ -464,19 +473,42 @@ namespace uAdventure.Runner
             GUIManager.Instance.Talk(text, character);
         }
 
+        public void ShowBook(string bookId)
+        {
+            guistate = GUIState.BOOK;
+            bookDrawer.Book = GameState.FindElement<Book>(bookId);
+            bookDrawer.RefreshResources();
+        }
+
+        public bool ShowingBook
+        {
+            get
+            {
+                return bookDrawer.Book != null;
+            }
+        }
+
         protected void OnGUI()
         {
-            float guiscale = Screen.width / 800f;
-            skin.box.fontSize = Mathf.RoundToInt(guiscale * 20);
-            skin.button.fontSize = Mathf.RoundToInt(guiscale * 20);
-            skin.label.fontSize = Mathf.RoundToInt(guiscale * 20);
-            skin.GetStyle("optionLabel").fontSize = Mathf.RoundToInt(guiscale * 36);
-            skin.GetStyle("talk_player").fontSize = Mathf.RoundToInt(guiscale * 20);
-            skin.GetStyle("emptyProgressBar").fontSize = Mathf.RoundToInt(guiscale * 20);
 
             switch (guistate)
             {
+                case GUIState.BOOK:
+                    if(ShowingBook)
+                    {
+                        bookDrawer.Draw(new Rect(Vector2.zero, new Vector2(Screen.width, Screen.height)));
+                    }
+                    break;
                 case GUIState.ANSWERS_MENU:
+
+                    float guiscale = Screen.width / 800f;
+                    skin.box.fontSize = Mathf.RoundToInt(guiscale * 20);
+                    skin.button.fontSize = Mathf.RoundToInt(guiscale * 20);
+                    skin.label.fontSize = Mathf.RoundToInt(guiscale * 20);
+                    skin.GetStyle("optionLabel").fontSize = Mathf.RoundToInt(guiscale * 36);
+                    skin.GetStyle("talk_player").fontSize = Mathf.RoundToInt(guiscale * 20);
+                    skin.GetStyle("emptyProgressBar").fontSize = Mathf.RoundToInt(guiscale * 20);
+
                     GUILayout.BeginArea(new Rect(Screen.width * 0.1f, Screen.height * 0.1f, Screen.width * 0.8f, Screen.height * 0.8f));
                     GUILayout.BeginVertical();
                     OptionConversationNode options = (OptionConversationNode)guioptions.getNode();

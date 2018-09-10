@@ -138,7 +138,7 @@ namespace uAdventure.Editor
 
             // Add thew new book
             Book newBook = new Book(bookId);
-            newBook.setType(Controller.BOOK);
+            newBook.setType(Book.TYPE_PARAGRAPHS);
 
             // Set default background
             ResourcesUni resources = new ResourcesUni();

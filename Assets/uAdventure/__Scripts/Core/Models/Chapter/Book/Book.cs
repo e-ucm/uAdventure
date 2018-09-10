@@ -103,12 +103,13 @@ namespace uAdventure.Core
          */
         public Book(string id)
         {
-
             this.id = id;
             this.type = TYPE_PARAGRAPHS;
             resources = new List<ResourcesUni>();
             paragraphs = new List<BookParagraph>();
             pages = new List<BookPage>();
+            previousPageVector2 = new Vector2(20, 507);
+            nextPageVector2 = new Vector2(707, 507);
         }
 
         /**

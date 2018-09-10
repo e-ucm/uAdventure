@@ -25,10 +25,10 @@ namespace uAdventure.Editor
                     Path = newFilePath;
                     newFilePath = string.Empty;
                 }
-                DrawPath();
-                DrawSelect();
+                DrawPathLayout();
+                DrawSelectLayout();
                 DrawView();
-                DrawClear();
+                DrawClearLayout();
             }
             EditorGUILayout.EndHorizontal();
             GUI.changed = initialPath != Path || frameChanged;

@@ -10,19 +10,13 @@ namespace uAdventure.Editor
     {
         private BookDataControl workingBook;
 
-        private Texture2D clearImg = null;
-        
-        private static Rect tableRect;
-        private static Rect previewRect;
-        private static Rect infoPreviewRect;
-
         private Texture2D backgroundPreview;
         private Texture2D leftNormalArrow, rightNormalArrow, leftOverArrow, rightOverArrow;
 
-        private AppearanceEditor appearanceEditor;
+        private readonly AppearanceEditor appearanceEditor;
+        private readonly FileChooser background, left, left_over, right, right_over;
 
-        private FileChooser background, left, left_over, right, right_over;
-
+        private int SelectedArrow = -1;
 
         public BooksWindowAppearance(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
@@ -74,10 +68,18 @@ namespace uAdventure.Editor
         {
             EditorGUI.BeginChangeCheck();
             arrow.Path = workingBook.getArrowImagePath(arrowOrientation, arrowState);
+            if (string.IsNullOrEmpty(arrow.Path))
+            {
+                arrow.Path = arrow.Empty;
+                workingBook.setArrowImagePath(arrowOrientation, arrowState, arrow.Path);
+                RefreshPathInformation(workingBook);
+            }
+
             arrow.DoLayout(GUILayout.ExpandWidth(true));
             if (EditorGUI.EndChangeCheck())
             {
                 workingBook.setArrowImagePath(arrowOrientation, arrowState, arrow.Path);
+                RefreshPathInformation(workingBook);
             }
         }
 
@@ -94,10 +96,10 @@ namespace uAdventure.Editor
             var backgroundPath = book.getPreviewImage();
             backgroundPreview = !string.IsNullOrEmpty(backgroundPath) ? Controller.ResourceManager.getImage(backgroundPath) : null;
 
-            leftNormalArrow = LoadArrowTexture(book,    BookDataControl.ARROW_LEFT, BookDataControl.ARROW_NORMAL);
-            rightNormalArrow = LoadArrowTexture(book,   BookDataControl.ARROW_RIGHT, BookDataControl.ARROW_NORMAL);
-            leftOverArrow = LoadArrowTexture(book,      BookDataControl.ARROW_LEFT, BookDataControl.ARROW_OVER);
-            rightOverArrow = LoadArrowTexture(book,     BookDataControl.ARROW_RIGHT, BookDataControl.ARROW_OVER);
+            leftNormalArrow  = LoadArrowTexture(book, BookDataControl.ARROW_LEFT, BookDataControl.ARROW_NORMAL);
+            rightNormalArrow = LoadArrowTexture(book, BookDataControl.ARROW_RIGHT, BookDataControl.ARROW_NORMAL);
+            leftOverArrow    = LoadArrowTexture(book, BookDataControl.ARROW_LEFT, BookDataControl.ARROW_OVER);
+            rightOverArrow   = LoadArrowTexture(book, BookDataControl.ARROW_RIGHT, BookDataControl.ARROW_OVER);
         }
 
         protected override void DrawInspector()
@@ -115,7 +117,9 @@ namespace uAdventure.Editor
             background.Path = workingBook.getPreviewImage();
             background.DoLayout();
             if (EditorGUI.EndChangeCheck())
+            {
                 workingBook.setPreviewImage(background.Path);
+            }
 
             // Arrows
             GUILayout.BeginHorizontal();
@@ -128,76 +132,103 @@ namespace uAdventure.Editor
             GUILayout.EndHorizontal();
         }
 
-        private int SelectedArrow = -1;
 
-        private Vector2 offset;
-
-        public override void DrawPreview(Rect rect)
+        private static Vector2 DoArrow(Vector2 position, Texture2D image, Texture2D imageOver, Rect viewport, bool flip, out bool selected, int controlId)
         {
-            // We first fix the ratio of the rect
-            var viewport = rect.AdjustToRatio(800f / 600f);
-            GUI.DrawTexture(viewport, backgroundPreview, ScaleMode.ScaleToFit);
-
-            Rect leftArrowRect = Rect.zero, rightArrowRect = Rect.zero;
-
-            // Draw the left arrow
-            if (leftNormalArrow)
+            var imageSize = new Vector2(image.width, image.height);
+            var buttonRect = new Rect(position, imageSize);
+            buttonRect = buttonRect.AdjustToViewport(800, 600, viewport);
+            var mouseRect = buttonRect;
+            if (flip)
             {
-                leftArrowRect = new Rect(workingBook.getPreviousPagePosition(), new Vector2(leftNormalArrow.width, leftNormalArrow.height)).AdjustToViewport(800f, 600f, viewport);
-                GUI.DrawTexture(leftArrowRect, leftNormalArrow, ScaleMode.ScaleToFit);
+                buttonRect.x += buttonRect.width;
+                buttonRect.width = -buttonRect.width;
             }
 
-            // Draw the right arrow
-            if (rightNormalArrow)
-            {
-                rightArrowRect = new Rect(workingBook.getNextPagePosition(), new Vector2(rightNormalArrow.width, rightNormalArrow.height)).AdjustToViewport(800f, 600f, viewport);
-                GUI.DrawTexture(rightArrowRect, rightNormalArrow, ScaleMode.ScaleToFit);
-            }
+            var isOver = mouseRect.Contains(Event.current.mousePosition);
+            GUI.DrawTexture(buttonRect, isOver ? imageOver : image);
 
+            selected = false;
             switch (Event.current.type)
             {
                 case EventType.MouseDown:
-                    if (leftArrowRect.Contains(Event.current.mousePosition))
-                    {
-                        GUIUtility.hotControl = leftNormalArrow.GetInstanceID();
-                        SelectedArrow = BookDataControl.ARROW_LEFT;
 
-                    }else if (rightArrowRect.Contains(Event.current.mousePosition))
+                    if (isOver && Event.current.isMouse && Event.current.type == EventType.MouseDown && Event.current.button == 0)
                     {
-                        GUIUtility.hotControl = rightNormalArrow.GetInstanceID();
-                        SelectedArrow = BookDataControl.ARROW_RIGHT;
-                    }
-                    else
-                    {
-                        SelectedArrow = -1;
+                        GUIUtility.hotControl = controlId;
+                        selected = true;
+                        Event.current.Use();
                     }
                     break;
 
                 case EventType.MouseUp:
-                    if (GUIUtility.hotControl == leftNormalArrow.GetInstanceID())
-                    {
-                        GUIUtility.hotControl = 0;
-                    }
-                    if (rightNormalArrow && GUIUtility.hotControl == rightNormalArrow.GetInstanceID())
+                    if (image && GUIUtility.hotControl == controlId)
                     {
                         GUIUtility.hotControl = 0;
                     }
                     break;
 
                 case EventType.MouseDrag:
-                    if (GUIUtility.hotControl == leftNormalArrow.GetInstanceID())
+                    if (image && GUIUtility.hotControl == controlId)
                     {
-                        leftArrowRect.position += Event.current.delta;
-                        workingBook.setPreviousPagePosition(rect.ViewportToScreen(800f, 600f, SceneEditor.Current.Viewport).position);
-                    }
-                    if (rightNormalArrow && GUIUtility.hotControl == rightNormalArrow.GetInstanceID())
-                    {
-                        leftArrowRect.position += Event.current.delta;
+                        buttonRect.position += Event.current.delta;
+                        GUI.changed = true;
+                        Event.current.Use();
                     }
                     break;
             }
 
+            if (flip)
+            {
+                buttonRect.width = -buttonRect.width;
+                buttonRect.x -= buttonRect.width;
+            }
 
+            buttonRect = buttonRect.ViewportToScreen(800, 600, viewport);
+            return buttonRect.position;
+        }
+
+        public override void DrawPreview(Rect rect)
+        {
+            // We first fix the ratio of the rect
+            var viewport = rect.AdjustToRatio(800f / 600f);
+            GUI.DrawTexture(viewport, backgroundPreview, ScaleMode.ScaleToFit);
+            
+            bool selected;
+            if(Event.current.type == EventType.MouseDown)
+            {
+                SelectedArrow = -1;
+            }
+
+            // Draw the left arrow
+            if (leftNormalArrow)
+            {
+                EditorGUI.BeginChangeCheck();
+                var leftArrowPos = DoArrow(workingBook.getPreviousPagePosition(), leftNormalArrow, leftOverArrow, viewport, false, out selected, "Arrow left".GetHashCode());
+                if (EditorGUI.EndChangeCheck())
+                {
+                    workingBook.setPreviousPagePosition(leftArrowPos);
+                }
+                if (selected)
+                {
+                    SelectedArrow = BookDataControl.ARROW_LEFT;
+                }
+            }
+
+            if (rightNormalArrow)
+            {
+                EditorGUI.BeginChangeCheck();
+                var isDefault = workingBook.getArrowImagePath(BookDataControl.ARROW_RIGHT, BookDataControl.ARROW_NORMAL) == SpecialAssetPaths.ASSET_DEFAULT_ARROW_NORMAL_RIGHT;
+                var rightArrowPos = DoArrow(workingBook.getNextPagePosition(), rightNormalArrow, rightOverArrow, viewport, isDefault, out selected, "Arrow right".GetHashCode());
+                if (EditorGUI.EndChangeCheck())
+                {
+                    workingBook.setNextPagePosition(rightArrowPos);
+                }
+                if (selected)
+                {
+                    SelectedArrow = BookDataControl.ARROW_RIGHT;
+                }
+            }
         }
 
         protected override bool HasToDrawPreviewInspector()

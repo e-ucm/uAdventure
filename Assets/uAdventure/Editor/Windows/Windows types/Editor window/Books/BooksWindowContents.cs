@@ -4,351 +4,159 @@ using System.Collections;
 using UnityEditor;
 
 using uAdventure.Core;
+using System.Linq;
+using uAdventure.Runner;
+using System.Collections.Generic;
 
 namespace uAdventure.Editor
 {
-    public class BooksWindowContents : LayoutWindow, DialogReceiverInterface
+    public class BooksWindowContents : AbstractEditorComponentWithPreview, IUnclippedDrawReceiver
     {
-        private Texture2D addTex = null;
-        private Texture2D moveUpTex, moveDownTex = null;
-        private Texture2D clearTex = null;
+        private readonly Dictionary<int, Texture2D> elementIcons;
+        private readonly Dictionary<int, string> elementTitles;
 
-        private Texture2D titleParagraphTex = null;
-        private Texture2D textParagraphTex = null;
-        private Texture2D bulletParagraphTex = null;
-        private Texture2D imageParagraphTex = null;
+        private readonly DataControlList bookContentsList;
 
-        // Variables for storing paragraph type information
-        private Texture2D tmpTexture = null;
-        private string tmpParagraphTypeName = "";
+        private readonly FileChooser imageChooser;
+        private readonly BookDrawer bookDrawer;
 
-        private static Vector2 scrollPosition;
-
-        private static GUISkin selectedElementSkin;
-        private static GUISkin defaultSkin;
-        private static GUISkin noBackgroundSkin;
-
-        private static Rect tableRect;
-        private static Rect previewRect;
-        private Rect rightPanelRect;
-
-        private int selectedElement;
-
-        private string editableFieldContent = "";
-
-        private AddParagraphMenu addMenu;
-
-        private int tmpType;
+        private Rect previewRect;
 
         public BooksWindowContents(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
         {
-            clearTex = (Texture2D)Resources.Load("EAdventureData/img/icons/deleteContent", typeof(Texture2D));
-            addTex = (Texture2D)Resources.Load("EAdventureData/img/icons/addNode", typeof(Texture2D));
-            moveUpTex = (Texture2D)Resources.Load("EAdventureData/img/icons/moveNodeUp", typeof(Texture2D));
-            moveDownTex = (Texture2D)Resources.Load("EAdventureData/img/icons/moveNodeDown", typeof(Texture2D));
 
-            titleParagraphTex =
-                (Texture2D)Resources.Load("EAdventureData/img/icons/titleBookParagraph", typeof(Texture2D));
-            textParagraphTex =
-                (Texture2D)Resources.Load("EAdventureData/img/icons/bulletBookParagraph", typeof(Texture2D));
-            bulletParagraphTex =
-                (Texture2D)Resources.Load("EAdventureData/img/icons/bulletBookParagraph", typeof(Texture2D));
-            imageParagraphTex =
-                (Texture2D)Resources.Load("EAdventureData/img/icons/imageBookParagraph", typeof(Texture2D));
-
-            selectedElementSkin = Resources.Load<GUISkin>("EAdventureData/skin/EditorLeftMenuItemSkinConcreteOptions");
-            noBackgroundSkin = Resources.Load<GUISkin>("EAdventureData/skin/EditorNoBackgroundSkin");
-            
-            selectedElement = -1;
-
-            addMenu = new AddParagraphMenu();
-        }
-
-        public override void Draw(int aID)
-        {
-            var windowWidth = m_Rect.width;
-            var windowHeight = m_Rect.height;
-
-            tableRect = new Rect(0f, 0.1f * windowHeight, 0.9f * windowWidth, windowHeight * 0.33f);
-            rightPanelRect = new Rect(0.9f * windowWidth, 0.1f * windowHeight, 0.08f * windowWidth, 0.33f * windowHeight);
-            previewRect = new Rect(0f, 0.5f * windowHeight, windowWidth, windowHeight * 0.45f);
-
-            GUILayout.BeginArea(tableRect);
-            GUILayout.BeginHorizontal();
-            GUILayout.Box(TC.get("BookParagraphsList.ParagraphType"), GUILayout.Width(windowWidth * 0.19f));
-            GUILayout.Box(TC.get("BookParagraphsList.Content"), GUILayout.Width(windowWidth * 0.69f));
-            GUILayout.EndHorizontal();
-
-            scrollPosition = GUILayout.BeginScrollView(scrollPosition);
-            for (int i = 0;
-                i <
-                Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
-                    GameRources.GetInstance().selectedBookIndex].getBookParagraphsList().getBookParagraphs().Count;
-                i++)
+            elementTitles = new Dictionary<int, string>
             {
-                GUI.skin = noBackgroundSkin;
-                if (i == selectedElement)
-                    GUI.skin = selectedElementSkin;
+                { Controller.BOOK_TITLE_PARAGRAPH,  "Element.Name14" },
+                { Controller.BOOK_TEXT_PARAGRAPH,   "Element.Name15" },
+                { Controller.BOOK_BULLET_PARAGRAPH, "Element.Name16" },
+                { Controller.BOOK_IMAGE_PARAGRAPH,  "Element.Name17" }
+            };
 
-                GUILayout.BeginHorizontal();
-                tmpType = Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
-                    GameRources.GetInstance().selectedBookIndex].getBookParagraphsList().getBookParagraphs()[
-                        i].getType();
-                switch (tmpType)
+            elementIcons = new Dictionary<int, Texture2D>
+            {
+                { Controller.BOOK_TITLE_PARAGRAPH,  Resources.Load<Texture2D>("EAdventureData/img/icons/titleBookParagraph") },
+                { Controller.BOOK_TEXT_PARAGRAPH,   Resources.Load<Texture2D>("EAdventureData/img/icons/textBookParagraph") },
+                { Controller.BOOK_BULLET_PARAGRAPH, Resources.Load<Texture2D>("EAdventureData/img/icons/bulletBookParagraph") },
+                { Controller.BOOK_IMAGE_PARAGRAPH,  Resources.Load<Texture2D>("EAdventureData/img/icons/imageBookParagraph") }
+            };
+
+            imageChooser = new FileChooser
+            {
+                Label = "",
+                FileType = FileType.BOOK_IMAGE_PARAGRAPH
+            };
+
+            bookContentsList = new DataControlList
+            {
+                Columns =
                 {
-                    case Controller.BOOK_TITLE_PARAGRAPH:
-                        tmpTexture = titleParagraphTex;
-                        tmpParagraphTypeName = TC.get("Element.Name14");
-                        break;
-                    case Controller.BOOK_BULLET_PARAGRAPH:
-                        tmpTexture = bulletParagraphTex;
-                        tmpParagraphTypeName = TC.get("Element.Name16");
-                        break;
-                    case Controller.BOOK_TEXT_PARAGRAPH:
-                        tmpTexture = textParagraphTex;
-                        tmpParagraphTypeName = TC.get("Element.Name15");
-                        break;
-                    case Controller.BOOK_IMAGE_PARAGRAPH:
-                        tmpTexture = imageParagraphTex;
-                        tmpParagraphTypeName = TC.get("Element.Name1");
-                        break;
-                }
-
-                if (GUILayout.Button(new GUIContent(tmpParagraphTypeName, tmpTexture),
-                    GUILayout.Width(windowWidth * 0.19f), GUILayout.MaxHeight(0.05f * windowHeight)))
-                {
-                    selectedElement = i;
-                }
-
-                if (selectedElement != i)
-                {
-
-                    if (
-                        GUILayout.Button(
-                            Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
-                                GameRources.GetInstance().selectedBookIndex].getBookParagraphsList().getBookParagraphs()
-                                [
-                                    i].getParagraphContent(),
-                            GUILayout.Width(windowWidth * 0.69f)))
+                    new ColumnList.Column
                     {
-                        selectedElement = i;
+                        Text = "BookParagraphsList.ParagraphType",
+                        SizeOptions = new GUILayoutOption[] { GUILayout.Width(150) }
+                    },
+                    new ColumnList.Column
+                    {
+                        Text = "BookParagraphsList.Content",
+                        SizeOptions = new GUILayoutOption[] { GUILayout.ExpandWidth(true) }
+                    }
+                },
+                drawCell = (rect, row, column, isActive, isFocused) =>
+                {
+                    var content = bookContentsList.list[row] as BookParagraphDataControl;
+                    switch (column)
+                    {
+                        default:
+                            Debug.LogError("Column number out of bounds");
+                            break;
+                        case 0:
+                            {
+                                var height = rect.height;
+                                var icon = elementIcons[content.getType()];
+                                var text = elementTitles[content.getType()].Traslate();
+                                var imageRect = new Rect(1, 1, icon.width, icon.height).GUIAdapt(rect);
+                                var titleRect = new Rect(height, 0, rect.width - height, height).GUIAdapt(rect);
+
+                                GUI.DrawTexture(imageRect, icon, ScaleMode.ScaleAndCrop);
+                                GUI.Label(titleRect, text);
+                            }
+                            break;
+                        case 1:
+                            {
+                                if (isActive)
+                                {
+                                    var isImage = content.getType() == Controller.BOOK_IMAGE_PARAGRAPH;
+                                    if (isImage)
+                                    {
+                                        EditorGUI.BeginChangeCheck();
+                                        imageChooser.Path = content.getParagraphContent();
+                                        imageChooser.Do(rect);
+                                        if (EditorGUI.EndChangeCheck())
+                                        {
+                                            content.setParagraphImagePath(imageChooser.Path);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        EditorGUI.BeginChangeCheck();
+                                        var newContent = GUI.TextArea(rect, content.getParagraphContent());
+                                        if (EditorGUI.EndChangeCheck())
+                                        {
+                                            content.setParagraphTextContent(newContent);
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    GUI.Label(rect, content.getParagraphContent());
+                                }
+                            }
+                            break;
                     }
                 }
-                else
-                {
-                    if (tmpType == Controller.BOOK_IMAGE_PARAGRAPH)
-                    {
-                        if (GUILayout.Button(clearTex, GUILayout.MaxWidth(0.09f * windowWidth)))
-                        {
-                        }
-                        if (GUILayout.Button(TC.get("Buttons.Select"), GUILayout.MaxWidth(0.20f * windowWidth)))
-                        {
-                            ImageFileOpenDialog imageDialog =
-                                (ImageFileOpenDialog)ScriptableObject.CreateInstance(typeof(ImageFileOpenDialog));
-                            imageDialog.Init(this, FileType.BOOK_IMAGE_PARAGRAPH);
-                        }
-                        GUILayout.Box(Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
-                            GameRources.GetInstance().selectedBookIndex].getBookParagraphsList().getBookParagraphs()[
-                                i].getParagraphContent(), GUILayout.MaxWidth(0.4f * windowWidth));
-                    }
-                    else
-                    {
-                        editableFieldContent =
-                            Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
-                                GameRources.GetInstance().selectedBookIndex].getBookParagraphsList().getBookParagraphs()[
-                                    i].getParagraphContent();
-                        editableFieldContent = GUILayout.TextField(editableFieldContent, GUILayout.Width(0.69f * windowWidth));
-                        Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
-                            GameRources.GetInstance().selectedBookIndex].getBookParagraphsList().getBookParagraphs()[
-                                i].setParagraphTextContent(editableFieldContent);
-                    }
+            };
 
-                }
+            bookDrawer = new BookDrawer(Controller.ResourceManager);
+        }
 
-                GUILayout.EndHorizontal();
-                GUI.skin = defaultSkin;
-            }
-            GUILayout.EndScrollView();
-            GUILayout.EndArea();
+        protected override void DrawInspector()
+        {
+            bookContentsList.DoList(240);
+        }
 
-            /*
-            * Right panel
-            */
-            GUILayout.BeginArea(rightPanelRect);
-            GUI.skin = noBackgroundSkin;
-            if (GUILayout.Button(addTex, GUILayout.MaxWidth(0.08f * windowWidth)))
+        protected override bool HasToDrawPreviewInspector() { return false; }
+
+        public override void DrawPreview(Rect rect)
+        {
+            previewRect = rect;
+
+            previewRect.position = GUIUtility.GUIToScreenPoint(rect.position);
+        }
+        
+        protected override void OnTargetChanged()
+        {
+            if (Target != null || GameRources.GetInstance().selectedBookIndex >= 0)
             {
-                addMenu.menu.ShowAsContext();
+                var workingBook = Target as BookDataControl ?? Controller.Instance.SelectedChapterDataControl
+                    .getBooksList().getBooks()[GameRources.GetInstance().selectedBookIndex];
+
+                bookDrawer.Book = workingBook.getContent() as Book;
+                bookContentsList.SetData(workingBook.getBookParagraphsList(),
+                    (content) => content != null ? (content as BookParagraphsListDataControl).getBookParagraphs().Cast<DataControl>().ToList() : new List<DataControl>());
             }
-            if (GUILayout.Button(moveUpTex, GUILayout.MaxWidth(0.08f * windowWidth)))
+            else
             {
-                Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
-                    GameRources.GetInstance().selectedBookIndex].getBookParagraphsList().moveElementUp(
-                        Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
-                            GameRources.GetInstance().selectedBookIndex].getBookParagraphsList().getBookParagraphs()[
-                                selectedElement]);
-            }
-            if (GUILayout.Button(moveDownTex, GUILayout.MaxWidth(0.08f * windowWidth)))
-            {
-                Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
-                    GameRources.GetInstance().selectedBookIndex].getBookParagraphsList().moveElementDown(
-                        Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
-                            GameRources.GetInstance().selectedBookIndex].getBookParagraphsList().getBookParagraphs()[
-                                selectedElement]);
-            }
-            if (GUILayout.Button(clearTex, GUILayout.MaxWidth(0.08f * windowWidth)))
-            {
-                Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
-                    GameRources.GetInstance().selectedBookIndex].getBookParagraphsList().deleteElement(
-                        Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
-                            GameRources.GetInstance().selectedBookIndex].getBookParagraphsList().getBookParagraphs()[
-                                selectedElement], false);
-            }
-            GUI.skin = defaultSkin;
-            GUILayout.EndArea();
-        }
-
-        public void OnDialogOk(string message, object workingObject = null, object workingObjectSecond = null)
-        {
-            if (workingObject is FileType)
-            {
-                switch ((FileType)workingObject)
-                {
-                    case FileType.BOOK_IMAGE_PARAGRAPH:
-                        Controller.Instance                            .AddTool(
-                                new ChangeParagraphContentTool(
-                                    Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
-                                        GameRources.GetInstance().selectedBookIndex].getBookParagraphsList()
-                                        .getBookParagraphsList()[selectedElement], message));
-                        break;
-                }
+                bookDrawer.Book = null;
+                bookContentsList.SetData(null, _ =>  new List<DataControl>());
             }
         }
 
-        public void OnDialogCanceled(object workingObject = null)
+        public void UnclippedDraw(Rect rect)
         {
+            previewRect.position = previewRect.position - GUIUtility.GUIToScreenPoint(Vector2.zero);
+            bookDrawer.Draw(previewRect);
         }
     }
-
-
-    #region Add paragraphs options
-    class AddParagraphMenu : WindowMenuContainer
-    {
-        private AddTitleParagraph titleParagraph;
-        private AddBulletParagraph bulletParagraph;
-        private AddTextParagraph textParagraph;
-        private AddImageParagraph imageParagraph;
-
-        public AddParagraphMenu()
-        {
-            SetMenuItems();
-        }
-
-        protected override void Callback(object obj)
-        {
-            if ((obj as AddTitleParagraph) != null)
-                titleParagraph.OnCliked();
-            else if ((obj as AddBulletParagraph) != null)
-                bulletParagraph.OnCliked();
-            else if ((obj as AddTextParagraph) != null)
-                textParagraph.OnCliked();
-            else if ((obj as AddImageParagraph) != null)
-                imageParagraph.OnCliked();
-        }
-
-        protected override void SetMenuItems()
-        {
-            menu = new GenericMenu();
-
-            titleParagraph = new AddTitleParagraph(TC.get("TreeNode.AddElement14"));
-            bulletParagraph = new AddBulletParagraph(TC.get("TreeNode.AddElement16"));
-            textParagraph = new AddTextParagraph(TC.get("TreeNode.AddElement15"));
-            imageParagraph = new AddImageParagraph(TC.get("TreeNode.AddElement17"));
-
-            menu.AddItem(new GUIContent(titleParagraph.Label), false, Callback, titleParagraph);
-            menu.AddItem(new GUIContent(bulletParagraph.Label), false, Callback, bulletParagraph);
-            menu.AddItem(new GUIContent(textParagraph.Label), false, Callback, textParagraph);
-            menu.AddItem(new GUIContent(imageParagraph.Label), false, Callback, imageParagraph);
-        }
-    }
-
-    public class AddTitleParagraph : IMenuItem
-    {
-        public AddTitleParagraph(string name_)
-        {
-            this.Label = name_;
-        }
-
-        public string Label
-        {
-            get; set;
-        }
-
-        public void OnCliked()
-        {
-            Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
-                GameRources.GetInstance().selectedBookIndex].getBookParagraphsList()
-                .addElement(Controller.BOOK_TITLE_PARAGRAPH, String.Empty);
-        }
-    }
-
-    public class AddBulletParagraph : IMenuItem
-    {
-        public AddBulletParagraph(string name_)
-        {
-            this.Label = name_;
-        }
-
-        public string Label
-        {
-            get; set;
-        }
-
-        public void OnCliked()
-        {
-            Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
-                GameRources.GetInstance().selectedBookIndex].getBookParagraphsList()
-                .addElement(Controller.BOOK_BULLET_PARAGRAPH, String.Empty);
-        }
-    }
-
-    public class AddTextParagraph : IMenuItem
-    {
-        public AddTextParagraph(string name_)
-        {
-            this.Label = name_;
-        }
-
-        public string Label
-        {
-            get; set;
-        }
-
-        public void OnCliked()
-        {
-            Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
-                GameRources.GetInstance().selectedBookIndex].getBookParagraphsList()
-                .addElement(Controller.BOOK_TEXT_PARAGRAPH, String.Empty);
-        }
-    }
-
-    public class AddImageParagraph : IMenuItem
-    {
-        public AddImageParagraph(string name_)
-        {
-            this.Label = name_;
-        }
-
-        public string Label { get; set; }
-
-        public void OnCliked()
-        {
-            Controller.Instance.SelectedChapterDataControl.getBooksList().getBooks()[
-                GameRources.GetInstance().selectedBookIndex].getBookParagraphsList()
-                .addElement(Controller.BOOK_IMAGE_PARAGRAPH, String.Empty);
-        }
-    }
-
-    #endregion
 }

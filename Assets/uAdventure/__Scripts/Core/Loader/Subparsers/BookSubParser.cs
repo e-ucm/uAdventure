@@ -18,10 +18,7 @@ namespace uAdventure.Core
                 documentations = element.SelectNodes("documentations"),
                 texts = element.SelectNodes("text"),
                 pagess = element.SelectNodes("pages"),
-                pages,
-                titles,
-                bullets,
-                imgs;
+                pages;
 
             string bookId = "";
             string xPrevious = "", xNext = "", yPrevious = "", yNext = "";
@@ -38,8 +35,8 @@ namespace uAdventure.Core
             {
                 try
                 {
-                    int x = int.Parse(xPrevious);
-                    int y = int.Parse(yPrevious);
+                    float x = float.Parse(xPrevious);
+                    float y = float.Parse(yPrevious);
                     book.setPreviousPageVector2(new Vector2(x, y));
                 }
                 catch
@@ -51,8 +48,8 @@ namespace uAdventure.Core
             {
                 try
                 {
-                    int x = int.Parse(xNext);
-                    int y = int.Parse(yNext);
+                    float x = float.Parse(xNext);
+                    float y = float.Parse(yNext);
                     book.setNextPageVector2(new Vector2(x, y));
                 }
                 catch
@@ -73,54 +70,30 @@ namespace uAdventure.Core
                 book.setDocumentation(currentstring.ToString().Trim());
             }
 
-            foreach (XmlElement el in texts)
+            foreach (XmlElement text in texts)
             {
                 book.setType(Book.TYPE_PARAGRAPHS);
-                string currentstring_ = el.InnerText;
-                // Add the new text paragraph
-                if (currentstring_ != null &&
-                    currentstring_.ToString().Trim().Replace("\t", "").Replace("\n", "").Length > 0)
-                    book.addParagraph(new BookParagraph(BookParagraph.TEXT,
-                        currentstring_.ToString().Trim().Replace("\t", "")));
-
-                titles = el.SelectNodes("title");
-                foreach (XmlElement ell in titles)
+                foreach (XmlNode child in text.ChildNodes)
                 {
-                    string currentstring = ell.InnerText;
-                    if (currentstring != null &&
-                        currentstring.ToString().Trim().Replace("\t", "").Replace("\n", "").Length > 0)
-                        book.addParagraph(new BookParagraph(BookParagraph.TITLE,
-                            currentstring.ToString().Trim().Replace("\t", "")));
-                }
-
-                bullets = el.SelectNodes("bullet");
-                foreach (XmlElement ell in bullets)
-                {
-                    string currentstring = ell.InnerText;
-                    if (currentstring != null &&
-                        currentstring.ToString().Trim().Replace("\t", "").Replace("\n", "").Length > 0)
-                        book.addParagraph(new BookParagraph(BookParagraph.BULLET,
-                            currentstring.ToString().Trim().Replace("\t", "")));
-                }
-
-                imgs = el.SelectNodes("img");
-                foreach (XmlElement ell in imgs)
-                {
-                    string currentstring = ell.InnerText;
-                    // Add the new text paragraph
-                    if (currentstring.ToString().Trim().Replace("\t", "").Replace("\n", "").Length > 0)
+                    if (child is XmlText)
                     {
-                        book.addParagraph(new BookParagraph(BookParagraph.TEXT,
-                            currentstring.ToString().Trim().Replace("\t", "")));
-                        currentstring = string.Empty;
+                        var childText = child.InnerText;
+                        if (!string.IsNullOrEmpty(childText.Replace("\t\n", "")))
+                        {
+                            book.addParagraph(new BookParagraph(BookParagraph.TEXT, childText.Trim().Replace("\t", "")));
+                        }
                     }
-
-					string path = ell.GetAttribute("src");
-                    // Add the new image paragraph
-                    book.addParagraph(new BookParagraph(BookParagraph.IMAGE, path));
+                    else if (child is XmlElement)
+                    {
+                        var paragraph = DOMParserUtility.DOMParse(child, parameters) as BookParagraph;
+                        if (paragraph != null)
+                        {
+                            book.addParagraph(paragraph);
+                        }
+                    }
                 }
-
             }
+
             foreach (XmlElement el in pagess)
             {
                 book.setType(Book.TYPE_PAGES);
@@ -155,6 +128,34 @@ namespace uAdventure.Core
             }
 
 			return book;
+        }
+    }
+
+    [DOMParser("title")]
+    public class TitleSubParser : IDOMParser
+    {
+        public object DOMParse(XmlElement element, params object[] parameters)
+        {
+            return new BookParagraph(BookParagraph.TITLE, element.InnerText.Trim().Replace("\t", ""));
+        }
+    }
+
+    [DOMParser("bullet")]
+    public class BulletSubParser : IDOMParser
+    {
+        public object DOMParse(XmlElement element, params object[] parameters)
+        {
+            return new BookParagraph(BookParagraph.BULLET, element.InnerText.Trim().Replace("\t", ""));
+        }
+    }
+
+    [DOMParser("img")]
+    public class ImageSubParser : IDOMParser
+    {
+        public object DOMParse(XmlElement element, params object[] parameters)
+        {
+            string path = element.GetAttribute("src");
+            return new BookParagraph(BookParagraph.IMAGE, path);
         }
     }
 }

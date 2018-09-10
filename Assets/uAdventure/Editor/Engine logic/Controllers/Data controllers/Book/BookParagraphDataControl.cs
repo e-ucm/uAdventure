@@ -80,95 +80,13 @@ namespace uAdventure.Editor
          */
         public void setParagraphTextContent(string content)
         {
-
             Controller.Instance.AddTool(new ChangeParagraphContentTool(bookParagraph, content));
         }
 
-        /**
-         * Shows a dialog to choose a new path for the given asset.
-         * 
-         * @param index
-         *            Index of the asset
-         */
-        public void editImagePath()
+        public void setParagraphImagePath(string uri)
         {
-
-            // Get the list of assets from the ZIP file
-            string selectedAsset = null;
-            //TODO: implement
-            //AssetChooser chooser = AssetsController.getAssetChooser(AssetsConstants.CATEGORY_IMAGE, AssetsController.FILTER_NONE);
-            //int option = chooser.showAssetChooser(controller.peekWindow());
-            ////In case the asset was selected from the zip file
-            //if (option == AssetChooser.ASSET_FROM_ZIP)
-            //{
-            //    selectedAsset = chooser.getSelectedAsset();
-            //}
-
-            ////In case the asset was not in the zip file: first add it
-            //else if (option == AssetChooser.ASSET_FROM_OUTSIDE)
-            //{
-            //    bool added = AssetsController.addSingleAsset(AssetsConstants.CATEGORY_IMAGE, chooser.getSelectedFile().getAbsolutePath());
-            //    if (added)
-            //    {
-            //        selectedAsset = chooser.getSelectedFile().getName();
-            //    }
-            //}
-
-            // If a file was selected
-            if (selectedAsset != null)
-            {
-                // Take the index of the selected asset
-                string[] assetFilenames = AssetsController.GetAssetFilenames(AssetsConstants.CATEGORY_IMAGE);
-                string[] assetPaths = AssetsController.GetAssetsList(AssetsConstants.CATEGORY_IMAGE);
-                int assetIndex = -1;
-                for (int i = 0; i < assetFilenames.Length; i++)
-                    if (assetFilenames[i].Equals(selectedAsset))
-                        assetIndex = i;
-
-                Controller.Instance.AddTool(new ChangeParagraphContentTool(bookParagraph, assetPaths[assetIndex]));
-
-            }
+            Controller.Instance.AddTool(new ChangeParagraphContentTool(bookParagraph, uri));
         }
-
-        /**
-         * Sets the new path for the paragraph. This method must be used only with
-         * image paragraphs.
-         */
-        public void setImageParagraphContent()
-        {
-
-            // Get the list of assets from the ZIP file
-            string[] assetFilenames = AssetsController.GetAssetFilenames(AssetsConstants.CATEGORY_IMAGE);
-            string[] assetPaths = AssetsController.GetAssetsList(AssetsConstants.CATEGORY_IMAGE);
-
-            // If the list of assets is empty, show an error message
-            if (assetFilenames.Length == 0)
-                controller.ShowErrorDialog(TC.get("Resources.EditAsset"), TC.get("Resources.ErrorNoAssets"));
-
-            // If not empty, select one of them
-            else
-            {
-                // Let the user choose between the assets
-                controller.ShowInputDialog(TC.get("Resources.EditAsset"), TC.get("Resources.EditAssetMessage"), assetFilenames, performSetImageParagraphContent);
-            }
-        }
-
-        private void performSetImageParagraphContent(object sender, string selectedAsset)
-        {
-            // Take the index of the selected asset
-            Controller.Instance.AddTool(new ChangeParagraphContentTool(bookParagraph, selectedAsset));
-        }
-
-        /**
-         * Deletes the content of the image paragraph. This method must be used only
-         * with image paragraphs.
-         */
-        public void deleteImageParagraphContent()
-        {
-
-            Controller.Instance.AddTool(new ChangeParagraphContentTool(bookParagraph, ""));
-        }
-
 
         public override System.Object getContent()
         {

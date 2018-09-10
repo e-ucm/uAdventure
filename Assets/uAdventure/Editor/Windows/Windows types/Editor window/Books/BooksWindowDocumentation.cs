@@ -16,14 +16,14 @@ namespace uAdventure.Editor
         public override void Draw(int aID)
         {
             var workingBook = Controller.Instance.ChapterList.getSelectedChapterData().getBooks()[GameRources.GetInstance().selectedBookIndex];
-
-            GUILayout.Space(20);
+            
             GUILayout.Label(TC.get("Book.Documentation"));
-            GUILayout.Space(20);
             EditorGUI.BeginChangeCheck();
-            var documentation = GUILayout.TextArea(workingBook.getDocumentation(), GUILayout.MinHeight(0.4f * m_Rect.height));
+            var documentation = GUILayout.TextArea(workingBook.getDocumentation(), GUILayout.ExpandHeight(true));
             if (EditorGUI.EndChangeCheck())
+            {
                 workingBook.setDocumentation(documentation);
+            }
         }
     }
 }

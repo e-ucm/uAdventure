@@ -150,29 +150,32 @@ namespace uAdventure.Editor
 
         public override void DoList(float height)
         {
-            var content = dataControl.getContent();
-            if (content != null)
+            if(dataControl != null)
             {
-                if (content is Array)
+                var content = dataControl.getContent();
+                if (content != null)
                 {
-                    if (((Array)content).Length != reorderableList.list.Count)
-                        OnChanged(reorderableList);
-                }
-                else if (content is IList)
-                {
-                    if (((IList)content).Count != reorderableList.list.Count)
-                        OnChanged(reorderableList);
-                }
-                /* This has obvious performance issues
-                else if (content is IEnumerable)
-                {
-                    var count = 0;
-                    foreach (var _ in (IEnumerable)content)
-                        ++count;
+                    if (content is Array)
+                    {
+                        if (((Array)content).Length != reorderableList.list.Count)
+                            OnChanged(reorderableList);
+                    }
+                    else if (content is IList)
+                    {
+                        if (((IList)content).Count != reorderableList.list.Count)
+                            OnChanged(reorderableList);
+                    }
+                    /* This has obvious performance issues
+                    else if (content is IEnumerable)
+                    {
+                        var count = 0;
+                        foreach (var _ in (IEnumerable)content)
+                            ++count;
 
-                    if (count != reorderableList.list.Count)
-                        OnChanged(reorderableList);
-                }*/
+                        if (count != reorderableList.list.Count)
+                            OnChanged(reorderableList);
+                    }*/
+                }
             }
 
             base.DoList(height);
