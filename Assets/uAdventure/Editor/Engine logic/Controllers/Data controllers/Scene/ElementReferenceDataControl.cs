@@ -468,7 +468,7 @@ namespace uAdventure.Editor
 
         public void SetOrientation(Runner.Orientation value)
         {
-            Controller.Instance.AddTool(new ChangeEnumValueTool(elementReference, value, "GetOrientation", "SetOrientation"));
+            Controller.Instance.AddTool(new ChangeValueTool<ElementReference, Runner.Orientation>(elementReference, value, "GetOrientation", "SetOrientation"));
         }
 
 
