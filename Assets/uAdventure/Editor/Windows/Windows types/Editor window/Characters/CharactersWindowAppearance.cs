@@ -254,20 +254,28 @@ namespace uAdventure.Editor
             }
             
             var npc = Target as NPCDataControl;
-            var previewPath = string.Empty;
+            var orientation = uAdventure.Runner.Orientation.S;
             if (SceneEditor.ElementReference != null)
             {
-                previewPath = npc.getPreviewImage(SceneEditor.ElementReference.GetOrientation());
+                orientation = SceneEditor.ElementReference.GetOrientation();
             }
-            else
+            if (npc != null)
             {
-                previewPath = npc.getPreviewImage();
-            }
-            if (!string.IsNullOrEmpty(previewPath))
-            {
-                var preview = Controller.ResourceManager.getImage(previewPath);
-                var rect = GetViewportRect(new Rect(new Vector2(-0.5f * preview.width, -preview.height), new Vector2(preview.width, preview.height)), viewport);
-                GUI.DrawTexture(rect, preview, ScaleMode.ScaleToFit);
+                var resourceOrientation = "";
+                switch (orientation)
+                {
+                    case Runner.Orientation.S: resourceOrientation = NPC.RESOURCE_TYPE_STAND_DOWN;  break;
+                    case Runner.Orientation.N: resourceOrientation = NPC.RESOURCE_TYPE_STAND_UP;    break;
+                    case Runner.Orientation.O: resourceOrientation = NPC.RESOURCE_TYPE_STAND_LEFT;  break;
+                    case Runner.Orientation.E: resourceOrientation = NPC.RESOURCE_TYPE_STAND_RIGHT; break;
+                }
+
+                var preview = LoadCharacterTexturePreview(npc, resourceOrientation);
+                if (preview)
+                {
+                    var rect = GetViewportRect(new Rect(new Vector2(-0.5f * preview.width, -preview.height), new Vector2(preview.width, preview.height)), viewport);
+                    GUI.DrawTexture(rect, preview, ScaleMode.ScaleToFit);
+                }
             }
         }
     }

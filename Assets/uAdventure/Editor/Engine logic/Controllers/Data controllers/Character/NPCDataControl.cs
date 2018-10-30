@@ -1,9 +1,9 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
 using uAdventure.Core;
+using uAdventure.Runner;
 
 namespace uAdventure.Editor
 {
@@ -34,6 +34,8 @@ namespace uAdventure.Editor
          */
         private readonly DescriptionsController descriptionController;
 
+        private readonly Dictionary<Orientation, Animation> previewAnimations;
+
         /**
          * Constructor
          * 
@@ -61,6 +63,8 @@ namespace uAdventure.Editor
 
             descriptionController = new DescriptionsController(npc.getDescriptions());
 
+            previewAnimations = new Dictionary<Orientation, Animation>();
+            ReloadPreviewAnimations();
         }
 
         /**
@@ -83,13 +87,27 @@ namespace uAdventure.Editor
         public string getPreviewImage() { return getPreviewImage(Runner.Orientation.E); }
         public string getPreviewImage(Runner.Orientation orientation)
         {
+            return previewAnimations[orientation] != null && previewAnimations[orientation].getFrames().Count > 0 ? previewAnimations[orientation].getFrame(0).getUri() : null;
+        }
+
+        private void ReloadPreviewAnimations()
+        {
+            previewAnimations[Orientation.E] = LoadPreviewAnimation(Orientation.E);
+            previewAnimations[Orientation.N] = LoadPreviewAnimation(Orientation.N);
+            previewAnimations[Orientation.O] = LoadPreviewAnimation(Orientation.O);
+            previewAnimations[Orientation.S] = LoadPreviewAnimation(Orientation.S);
+        }
+
+        private Animation LoadPreviewAnimation(Orientation orientation)
+        {
             string previewImagePath = getExistingPreviewImagePath(orientation);
             if (!string.IsNullOrEmpty(previewImagePath))
             {
                 var incidences = new List<Incidence>();
-                var animation = Loader.LoadAnimation(previewImagePath, Controller.ResourceManager, incidences);
-                return animation != null && animation.getFrames().Count > 0 ? animation.getFrame(0).getUri() : null;
+                var previewAnimation = Loader.LoadAnimation(previewImagePath, Controller.ResourceManager, incidences);
+                return previewAnimation;
             }
+
             return null;
         }
 
@@ -177,7 +195,7 @@ namespace uAdventure.Editor
          * 
          * @return Text front color
          */
-        public Color getTextFrontColor()
+        public UnityEngine.Color getTextFrontColor()
         {
             return npc.getTextFrontColor();
         }
@@ -187,7 +205,7 @@ namespace uAdventure.Editor
          * 
          * @return Text front color
          */
-        public Color getTextBorderColor()
+        public UnityEngine.Color getTextBorderColor()
         {
             return npc.getTextBorderColor();
         }
@@ -209,7 +227,7 @@ namespace uAdventure.Editor
          * @param textFrontColor
          *            New text front color
          */
-        public void setTextFrontColor(Color textFrontColor)
+        public void setTextFrontColor(UnityEngine.Color textFrontColor)
         {
             npc.setTextFrontColor(textFrontColor);
         }
@@ -220,18 +238,18 @@ namespace uAdventure.Editor
          * @param textBorderColor
          *            New text border color
          */
-        public void setTextBorderColor(Color textBorderColor)
+        public void setTextBorderColor(UnityEngine.Color textBorderColor)
         {
 
             npc.setTextBorderColor(textBorderColor);
         }
 
-        public void setBubbleBkgColor(Color bubbleBkgColor)
+        public void setBubbleBkgColor(UnityEngine.Color bubbleBkgColor)
         {
             npc.setBubbleBkgColor(bubbleBkgColor);
         }
 
-        public void setBubbleBorderColor(Color bubbleBorderColor)
+        public void setBubbleBorderColor(UnityEngine.Color bubbleBorderColor)
         {
             npc.setBubbleBorderColor(bubbleBorderColor);
         }
@@ -550,7 +568,6 @@ namespace uAdventure.Editor
 
         public override void recursiveSearch()
         {
-
             check(this.getDocumentation(), TC.get("Search.Documentation"));
             check(this.getId(), "ID");
             check(this.getVoice(), TC.get("Search.NPCVoice"));
@@ -572,6 +589,9 @@ namespace uAdventure.Editor
         public void addAnimationPath(string animation, string path)
         {
             resourcesDataControlList[selectedResources].addAsset(animation, path);
+
+            // Reload the preview in case it's been changed
+            ReloadPreviewAnimations();
         }
 
 
@@ -590,12 +610,12 @@ namespace uAdventure.Editor
             }
         }
 
-        public Color getBubbleBorderColor()
+        public UnityEngine.Color getBubbleBorderColor()
         {
             return npc.getBubbleBorderColor();
         }
 
-        public Color getBubbleBkgColor()
+        public UnityEngine.Color getBubbleBkgColor()
         {
             return npc.getBubbleBkgColor();
         }

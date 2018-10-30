@@ -6,12 +6,13 @@
   </description>
   <configuration keepShowing="no" keyboard-navigation="disabled" defaultClickAction="showDetails" perspective="regular" dragBehaviour="considerNonTargets" autosave="no" save-on-suspend="no">
     <gui type="contextual" inventoryPosition="top_bottom" />
-    <mode playerTransparent="yes" />
+    <mode playerTransparent="no" />
     <graphics mode="windowed" />
   </configuration>
   <contents>
     <chapter path="chapter1.xml">
-      <title>ChapterTitle</title>
+      <title>
+      </title>
       <description>
       </description>
     </chapter>

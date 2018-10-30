@@ -4,7 +4,7 @@
   <player>
     <resources name="No name">
       <asset type="standup" uri="assets/special/EmptyAnimation" />
-      <asset type="standdown" uri="assets/special/EmptyAnimation" />
+      <asset type="standdown" uri="assets/animation/LookingDown.eaa.xml" />
       <asset type="standright" uri="assets/special/EmptyAnimation" />
       <asset type="standleft" uri="assets/special/EmptyAnimation" />
       <asset type="speakup" uri="assets/special/EmptyAnimation" />
@@ -32,7 +32,7 @@
     </description>
     <voice name="" synthesizeAlways="no" />
   </player>
-  <scene id="SceneId" start="yes" playerLayer="-1" playerScale="1" class="accesible" type="area">
+  <scene id="SceneId" start="yes" playerLayer="-1" playerScale="0.09458704" class="accesible" type="area">
     <documentation>
     </documentation>
     <resources name="No name">
@@ -40,6 +40,6 @@
     </resources>
     <name>
     </name>
-    <default-initial-position x="400" y="300" />
+    <default-initial-position x="280" y="379" />
   </scene>
 </eAdventure>
