@@ -366,12 +366,7 @@ namespace uAdventure.Editor
             {
                 var destination = destinationPath;
                 File.Copy(assetPath, destination, true);
-                File.SetAttributes(assetPath, FileAttributes.Normal);
-
-                if (assetsCategory == AssetsConstants.CATEGORY_ANIMATION)
-                {
-                    AssetsController.copyAllFiles(Path.GetDirectoryName(assetPath), path.FullName);
-                }
+                File.SetAttributes(destination, FileAttributes.Normal);
                 
                 // File doesnt exist
                 returnPath = assetTypeDir + "/" + nameOnly;
@@ -384,6 +379,30 @@ namespace uAdventure.Editor
                     // Force unload 
                     var image = Controller.ResourceManager.getImage(returnPath);
                     Resources.UnloadAsset(image);
+                }
+
+                if (assetsCategory == AssetsConstants.CATEGORY_ANIMATION)
+                {
+                    var animation = Loader.LoadAnimation(returnPath, Controller.ResourceManager, new List<Incidence>());
+                    if(animation != null)
+                    {
+                        var regularBasePath = assetPath.Replace("\\", "/");
+                        var sourceAnimationBasePath = regularBasePath.Substring(0, regularBasePath.LastIndexOf("assets/animation"));
+                        foreach (var frame in animation.getFrames())
+                        {
+                            var frameName = frame.getUri().Substring(frame.getUri().LastIndexOf("/") + 1);
+                            var framePath = (sourceAnimationBasePath + frame.getUri()).Replace("/", "\\");
+                            var destinationFramePath = Path.Combine(path.FullName, frameName);
+                            File.Copy(framePath, destinationFramePath, true);
+                            File.SetAttributes(destinationFramePath, FileAttributes.Normal);
+                            AssetDatabase.ImportAsset(destinationFramePath, ImportAssetOptions.ForceUpdate | ImportAssetOptions.ForceSynchronousImport);
+                            AssetDatabase.Refresh();
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogError("The selected animation couldn't be loaded so the frames couldn't be copied.");
+                    }
                 }
             }
             else
@@ -962,7 +981,7 @@ namespace uAdventure.Editor
                 {
                     string text = File.ReadAllText(assetPath);
                     text = RemoveDiacritics(text);
-                    text = text.Replace(".eaa", ".eaa.xml");
+                    text = text.Replace(".eaa\"", ".eaa.xml\"");
                     WriteAllTextWithFlush(assetPath, text);
                     pathsToReimport.Add(assetPath);
                 }
@@ -1081,7 +1100,7 @@ namespace uAdventure.Editor
                 if (file.Extension.ToLowerInvariant() == ".xml")
                 {
                     string text = File.ReadAllText(temppath);
-                    text = text.Replace(".eaa", ".eaa.xml");
+                    text = text.Replace(".eaa\"", ".eaa.xml\"");
                     File.WriteAllText(temppath, text);
                 }
             }

@@ -153,8 +153,30 @@ public abstract class BaseFileOpenDialog : EditorWindow
 
 				if (isValid)
                 {
-                    // Insert code to read the stream here.
-                    ChoosedCorrectFile();
+                    var formats = this.fileFilter.Split(',');
+                    var validFormat = false;
+                    foreach (var format in formats)
+                    {
+                        if (selectedAssetPath.EndsWith(format))
+                        {
+                            validFormat = true;
+                            break;
+                        }
+                    }
+
+                    if (validFormat)
+                    {
+                        // Insert code to read the stream here.
+                        ChoosedCorrectFile();
+                    }
+                    else
+                    {
+                        Controller.Instance.ShowErrorDialog("Wrong file format!", "The selected file format is not valid!");
+                    }
+                }
+                else
+                {
+                    Controller.Instance.ShowErrorDialog("Wrong file!", "The selected file is not valid!");
                 }
             }
             else
