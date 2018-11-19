@@ -161,7 +161,7 @@ namespace uAdventure.Editor
         [EditorComponent(typeof(ElementReferenceDataControl), typeof(ActiveAreaDataControl), typeof(ExitDataControl), Name = "Influence Area", Order = 1)]
         public class InfluenceComponent : AbstractEditorComponent
         {
-            private static InfluenceAreaDataControl getIngluenceArea(DataControl target)
+            private static InfluenceAreaDataControl getInfluenceArea(DataControl target)
             {
                 if (target is ElementReferenceDataControl)
                 {
@@ -237,7 +237,7 @@ namespace uAdventure.Editor
                     return;
                 }
 
-                var influence = getIngluenceArea(Target);
+                var influence = getInfluenceArea(Target);
 
                 if (influence != null)
                 {
@@ -251,6 +251,7 @@ namespace uAdventure.Editor
                         rect.position -= new Vector2(20, 20);
                         rect.size = boundaries.size + new Vector2(40, 40);
                     }
+
                     var newRect = EditorGUILayout.RectIntField("Influence", new RectInt((int)rect.x, (int)rect.y, (int)rect.width, (int)rect.height));
                     if (EditorGUI.EndChangeCheck())
                     {
@@ -278,13 +279,20 @@ namespace uAdventure.Editor
                 {
                     case EventType.MouseDown:
                         // Calculate the influenceAreaRect
-                        var influenceArea = getIngluenceArea(Target);
+                        var influenceArea = getInfluenceArea(Target);
                         if (influenceArea == null)
                             return false;
-                        var boundaries = GetElementBoundaries(Target);
 
-                        var rect = influenceArea.ScreenRect(boundaries)
-                            .AdjustToViewport(SceneEditor.Current.Size.x, SceneEditor.Current.Size.y, SceneEditor.Current.Viewport);
+                        var boundaries = GetElementBoundaries(Target);
+                        var rect = influenceArea.ScreenRect(boundaries);
+
+                        if (!influenceArea.hasInfluenceArea())
+                        {
+                            rect.position -= new Vector2(20, 20);
+                            rect.size = boundaries.size + new Vector2(40, 40);
+                        }
+
+                        rect = rect.AdjustToViewport(SceneEditor.Current.Size.x, SceneEditor.Current.Size.y, SceneEditor.Current.Viewport);
 
                         // See if its selected (only if it was previously selected)
                         if (GUIUtility.hotControl == 0)
@@ -307,7 +315,7 @@ namespace uAdventure.Editor
                 }
 
                 wasSelected = Target;
-                var influenceArea = getIngluenceArea(Target);
+                var influenceArea = getInfluenceArea(Target);
                 if (influenceArea == null)
                     return;
 
