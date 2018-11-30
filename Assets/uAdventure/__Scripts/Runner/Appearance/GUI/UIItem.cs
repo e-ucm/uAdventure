@@ -13,6 +13,7 @@ namespace uAdventure.Runner
 
         private bool isInteractive;
         private int targetActionType;
+        private Texture2D cursor;
 
         protected override void Start()
         {
@@ -82,14 +83,43 @@ namespace uAdventure.Runner
             Interacted(eventData);
         }
 
+        private void ManuallyCopyTexture(Texture2D origin, Texture2D destination)
+        {
+            int destX = destination.width, destY = destination.height;
+            for (int i = 0; i < destX; ++i)
+            {
+                for (int j = 0; j < destY; ++j)
+                {
+                    destination.SetPixel(i, j, origin.GetPixel((int)(((float)i / destX) * origin.width), (int)(((float)j / destY) * origin.height)));
+                }
+            }
+
+            cursor.Apply();
+        }
+
         public void ActionSelected(Action action)
         {
             switch (action.getType())
             {
                 case Action.GIVE_TO:
                 case Action.USE_WITH:
-                    var texture = sprite.texture;
-                    Cursor.SetCursor(texture, new Vector2(texture.width, texture.height) / 2f, CursorMode.Auto);
+                    // The texture that is already shown is either the icon or
+                    if (!cursor)
+                    {
+                        cursor = new Texture2D(64, 64, TextureFormat.RGBA32, false, true);
+                        try
+                        {
+                            var texture = sprite.texture;
+                            ManuallyCopyTexture(texture, cursor);
+                        }
+                        catch
+                        {
+                            var texture = Transparent.CreateReadableTexture(sprite.texture);
+                            ManuallyCopyTexture(texture, cursor);
+                        }
+                    }
+
+                    Cursor.SetCursor(cursor, new Vector2(cursor.width, cursor.height) / 2f, CursorMode.ForceSoftware);
                     GUIManager.Instance.LockCursor();
                     uAdventureInputModule.LookingForTarget = this.gameObject;
                     targetActionType = action.getType();

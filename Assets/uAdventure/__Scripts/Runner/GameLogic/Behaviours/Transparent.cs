@@ -80,7 +80,7 @@ namespace uAdventure.Runner
             return texture;
         }
 
-        private Texture2D CreateReadableTexture(Texture2D texture)
+        public static Texture2D CreateReadableTexture(Texture2D texture)
         {
             // Create a temporary RenderTexture of the same size as the texture
             RenderTexture tmp = RenderTexture.GetTemporary(
