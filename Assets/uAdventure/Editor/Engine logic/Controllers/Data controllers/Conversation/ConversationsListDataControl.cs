@@ -114,26 +114,84 @@ namespace uAdventure.Editor
         }
 
 
-        public override bool addElement(int type, string conversationId)
+        public override bool addElement(int type, string conversationID)
         {
+            return addElement(type, conversationID, true);
+        }
+        public bool addElement(int type, string conversationID, bool createTalkToAction)
+        {
+            return addElement(type, conversationID, true, null, null);
+        }
 
+        public bool addElement(int type, string conversationID, bool createTalkToAction, object caller, Controller.InputReceiver.HandleInputCallback callback)
+        {
             bool elementAdded = false;
 
             if (type == Controller.CONVERSATION_GRAPH)
             {
 
                 // Show a dialog asking for the conversation id
-                if (string.IsNullOrEmpty(conversationId))
-                    controller.ShowInputDialog(TC.get("Operation.AddConversationTitle"), TC.get("Operation.AddConversationMessage"), TC.get("Operation.AddConversationDefaultValue"), performAddElement);
+                if (string.IsNullOrEmpty(conversationID))
+                {
+                    controller.ShowInputDialog(TC.get("Operation.AddConversationTitle"), TC.get("Operation.AddConversationMessage"),
+                        TC.get("Operation.AddConversationDefaultValue"), (sender, id) =>
+                        {
+                            performAddElement(sender, id);
+                            if (createTalkToAction)
+                            {
+                                CreateTalkToAction(id, caller, callback);
+                            }
+                            else
+                            {
+                                callback(caller, id);
+                            }
+                        });
+
+                }
                 else
                 {
-                    performAddElement(null, conversationId);
+                    performAddElement(null, conversationID);
+                    if (createTalkToAction)
+                    {
+                        CreateTalkToAction(conversationID, caller, callback);
+                    }
+                    else
+                    {
+                        callback(caller, conversationID);
+                    }
                     elementAdded = true;
                     controller.DataModified();
                 }
             }
 
             return elementAdded;
+        }
+
+        private void CreateTalkToAction(string conversationId, object caller = null, Controller.InputReceiver.HandleInputCallback callback = null)
+        {
+            // Create a talk-to action
+            var npcs = controller.SelectedChapterDataControl.getNPCsList().getNPCsIDs();
+            var targets = npcs.ToList();
+            var none = "--- None ---";
+            targets.Insert(0, none);
+            controller.ShowInputDialog("Create talk to action?", "Select a character where the conversation will appear" +
+                " as a \"talk to...\" action. (The action will be automatically created)", targets.ToArray(), (secondSender, npcId) =>
+                {
+                    if (npcId != none)
+                    {
+                        var npcIndex = controller.SelectedChapterDataControl.getNPCsList().getNPCIndexByID(npcId);
+                        var npc = controller.SelectedChapterDataControl.getNPCsList().getNPCs()[npcIndex];
+
+                        npc.getActionsList().addElement(Controller.ACTION_TALK_TO, conversationId);
+                        npc.getActionsList().getActions().Last().setDocumentation("Created with target conversation: " + conversationId);
+
+                        if(callback != null)
+                        {
+                            callback(caller, conversationId);
+                        }
+
+                    }
+                }, null);
         }
 
         private void performAddElement(object sender, string conversationId)

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace uAdventure.Editor
 {
-    [EditorWindowExtension(60, typeof(Player))]
+    [EditorWindowExtension(60, typeof(PlayerDataControl))]
     public class PlayerWindow : DefaultButtonMenuEditorWindowExtension
     {        
         private readonly List<LayoutWindow> tabs;

@@ -203,7 +203,20 @@ namespace uAdventure.Editor
             thisWindowReference.InitWindows();
         }
 
-		void InitWindows()
+        public static void SelectElement(List<Searchable> path)
+        {
+            var extension = EditorWindowBaseExtensionFactory.Instance.GetExistingExtensionFor(path.First().GetType(), 
+                thisWindowReference.extensions);
+
+            
+            if (extension != null)
+            {
+                thisWindowReference.RequestMainView(extension);
+                extension.SelectElement(path);
+            }
+        }
+
+        void InitWindows()
         {
 			if (chapterWindow == null)
             {

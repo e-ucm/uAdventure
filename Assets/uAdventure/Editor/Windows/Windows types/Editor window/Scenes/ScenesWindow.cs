@@ -13,7 +13,7 @@ using Microsoft.Msagl.Core.Geometry;
 
 namespace uAdventure.Editor
 {
-    [EditorWindowExtension(10, typeof(Scene))]
+    [EditorWindowExtension(10, typeof(SceneDataControl))]
     public class ScenesWindow : TabsEditorWindowExtension
     {
         private enum ScenesWindowType

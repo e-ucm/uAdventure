@@ -9,13 +9,12 @@ using System;
 
 namespace uAdventure.Editor
 {
-    [EditorWindowExtension(70, typeof(Conversation))]
+    [EditorWindowExtension(70, typeof(ConversationDataControl), typeof(GraphConversationDataControl))]
     public class ConversationWindow : PreviewDataControlExtension
     {
-        //private ConversationEditorWindow convEditor;
         private enum ConversationWindowTabs { Preview };
 
-        private Dictionary<Conversation, ConversationEditorWindow> conversationWindows;
+        private readonly Dictionary<Conversation, ConversationEditorWindow> conversationWindows;
 
         public ConversationWindow(Rect aStartPos, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, new GUIContent(TC.get("Element.Name31")), aStyle, aOptions)

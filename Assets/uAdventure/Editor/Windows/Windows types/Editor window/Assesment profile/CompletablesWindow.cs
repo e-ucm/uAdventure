@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace uAdventure.Editor
 {
-    [EditorWindowExtension(200, typeof(Completable))]
+    [EditorWindowExtension(200, typeof(CompletableDataControl))]
     public class CompletablesWindow : DefaultButtonMenuEditorWindowExtension
     {
         private readonly string[] endOptions = { TC.get("Analytics.EndOptions.FinalScene"), TC.get("Analytics.EndOptions.AllLevels") };

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace uAdventure.Editor
 {
@@ -18,6 +19,7 @@ namespace uAdventure.Editor
         public float ContentHeight { get; set; }
         public abstract void DrawLeftPanelContent(Rect rect, GUIStyle style);
         public abstract void LayoutDrawLeftPanelContent(GUIStyle style, params GUILayoutOption[] options);
+        public virtual void SelectElement(List<Searchable> path) { }
     }
 
 }

@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace uAdventure.Editor
 {
-    [EditorWindowExtension(20, typeof(Cutscene), typeof(Videoscene), typeof(Slidescene))]
+    [EditorWindowExtension(20, typeof(CutsceneDataControl))]
     public class CutscenesWindow : PreviewDataControlExtension
     {
         private enum CutscenesWindowType { Appearance, Documentation, EndConfiguration }

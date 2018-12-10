@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace uAdventure.Editor
 {
-    [EditorWindowExtension(80, typeof(Book))]
+    [EditorWindowExtension(80, typeof(BookDataControl))]
     public class BooksWindow : PreviewDataControlExtension, IUnclippedDrawReceiver
     {
         private enum BookWindowType { Appearance, Content, Documentation }

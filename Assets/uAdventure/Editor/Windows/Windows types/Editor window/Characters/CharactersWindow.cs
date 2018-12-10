@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace uAdventure.Editor
 {
-    [EditorWindowExtension(50, typeof(NPC))]
+    [EditorWindowExtension(50, typeof(NPCDataControl))]
     public class CharactersWindow : PreviewDataControlExtension
     {
         private enum CharactersWindowType { Action, Appearance, DialogConfiguration, Documentation }

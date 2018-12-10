@@ -64,52 +64,71 @@ public class ActionsList : ScriptableObject {
                 switch (column)
                 {
                     case 0:
-                        var name = action.getContent() is CustomAction ? ((CustomAction)action.getContent()).getName() : action.getTypeName();
-                        if (action.hasIdTarget())
                         {
+                            var name = action.getContent() is CustomAction ? ((CustomAction)action.getContent()).getName() : action.getTypeName();
+
                             var leftHalf = new Rect(rect);
                             leftHalf.width /= 2f;
                             var rightHalf = new Rect(leftHalf);
                             rightHalf.x += leftHalf.width;
-                            rightHalf.height = 25;
-                            EditorGUI.LabelField(leftHalf, name);
-                            if (!isActive)
-                            {
-                                EditorGUI.LabelField(rightHalf, !string.IsNullOrEmpty(action.getIdTarget()) ? action.getIdTarget() : "---");
-                            }
-                            else
-                            {
-                                EditorGUI.BeginChangeCheck();
-                                string selected = string.Empty;
-                                string[] choices = new string[0];
-                                switch ((action.getContent() as Action).getType())
-                                {
-                                    case Action.DRAG_TO:
-                                    case Action.CUSTOM_INTERACT:
-                                        choices = Controller.Instance.IdentifierSummary.combineIds(new System.Type[] { typeof(Item), typeof(NPC), typeof(ActiveArea) });
-                                        break;
-                                    case Action.GIVE_TO:
-                                        choices = Controller.Instance.IdentifierSummary.getIds<NPC>();
-                                        break;
-                                    case Action.USE_WITH:
-                                        choices = Controller.Instance.IdentifierSummary.combineIds(new System.Type[] { typeof(Item), typeof(ActiveArea) });
-                                        break;
-                                }
 
-                                var selectedIndex = EditorGUI.Popup(rightHalf, System.Array.FindIndex(choices, action.getIdTarget().Equals), choices);
-                                if (EditorGUI.EndChangeCheck())
+                            if (action.hasIdTarget())
+                            {
+                                rightHalf.height = 25;
+                                EditorGUI.LabelField(leftHalf, name);
+                                if (!isActive)
                                 {
-                                    if (selectedIndex >= 0 && selectedIndex < choices.Length)
+                                    EditorGUI.LabelField(rightHalf, !string.IsNullOrEmpty(action.getIdTarget()) ? action.getIdTarget() : "---");
+                                }
+                                else
+                                {
+                                    EditorGUI.BeginChangeCheck();
+                                    string selected = string.Empty;
+                                    string[] choices = new string[0];
+                                    switch ((action.getContent() as Action).getType())
                                     {
-                                        selected = choices[selectedIndex];
-                                        action.setIdTarget(selected);
+                                        case Action.DRAG_TO:
+                                        case Action.CUSTOM_INTERACT:
+                                            choices = Controller.Instance.IdentifierSummary.combineIds(new System.Type[] { typeof(Item), typeof(NPC), typeof(ActiveArea) });
+                                            break;
+                                        case Action.GIVE_TO:
+                                            choices = Controller.Instance.IdentifierSummary.getIds<NPC>();
+                                            break;
+                                        case Action.USE_WITH:
+                                            choices = Controller.Instance.IdentifierSummary.combineIds(new System.Type[] { typeof(Item), typeof(ActiveArea) });
+                                            break;
+                                    }
+
+                                    var selectedIndex = EditorGUI.Popup(rightHalf, System.Array.FindIndex(choices, action.getIdTarget().Equals), choices);
+                                    if (EditorGUI.EndChangeCheck())
+                                    {
+                                        if (selectedIndex >= 0 && selectedIndex < choices.Length)
+                                        {
+                                            selected = choices[selectedIndex];
+                                            action.setIdTarget(selected);
+                                        }
                                     }
                                 }
                             }
-                        }
-                        else
-                        {
-                            EditorGUI.LabelField(rect, name);
+                            else if (action.getType() == Controller.ACTION_TALK_TO)
+                            {
+                                EditorGUI.LabelField(leftHalf, name);
+                                var triggerConversationEffect = action.getEffects().getEffects().Find(e => e is TriggerConversationEffect) as TriggerConversationEffect;
+                                if (triggerConversationEffect != null)
+                                {
+                                    var conversationId = triggerConversationEffect.getTargetId();
+                                    if (GUI.Button(rightHalf, "Open"))
+                                    {
+                                        var conversationsList = Controller.Instance.SelectedChapterDataControl.getConversationsList();
+                                        var conversation = conversationsList.getConversations().Find(c => c.getId() == conversationId);
+                                        Controller.Instance.SelectElement(conversation);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                EditorGUI.LabelField(rect, name);
+                            }
                         }
                         break;
                     case 1:

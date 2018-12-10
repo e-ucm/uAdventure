@@ -34,6 +34,18 @@ namespace uAdventure.Editor
             return r;
         }
 
+        public EditorWindowExtension GetExistingExtensionFor(Type type, List<EditorWindowExtension> existingExtensions)
+        {
+            if (knownExtensions.ContainsKey(type))
+            {
+                return existingExtensions.Find(e => e.GetType() == knownExtensions[type]);
+            }
+            else
+            {
+                return null;
+            }
+        }
+
         private static Dictionary<Type, Type> knownExtensions;
         private static Dictionary<Type, int> priorities;
 

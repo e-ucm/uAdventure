@@ -202,22 +202,40 @@ namespace uAdventure.Editor
                 case Controller.ACTION_TALK_TO:
 
                     string[] conversations = controller.IdentifierSummary.getIds<Conversation>();
-                    if (conversations.Length > 0)
+                    if (id != null && conversations.Contains(id))
                     {
-                        controller.ShowInputDialog(TC.get("TalkToAction.MessageSelectConversation"), TC.get("TalkToAction.MessageSelectConversation"), conversations, null,
-                            new ActionsListReceiver(this)
-                            {
-                                ConfigureAction = (selectedID) =>
-                                {
-                                    var action = new Action(Action.TALK_TO);
-                                    action.getEffects().Add(new TriggerConversationEffect(selectedID));
-                                    return action;
-                                }
-                            });
-                        return true;
+                        newAction = new Action(Action.TALK_TO);
+                        newAction.getEffects().Add(new TriggerConversationEffect(id));
                     }
                     else
-                        controller.ShowErrorDialog(TC.get("Action.OperationAddAction"), TC.get("Action.ErrorNoItems"));
+                    {
+                        var options = conversations.ToList();
+                        var newConversation = "--- New ---";
+                        options.Insert(0, newConversation);
+                        controller.ShowInputDialog(TC.get("TalkToAction.MessageSelectConversation"), TC.get("TalkToAction.MessageSelectConversation"), options.ToArray(), (nothing, conversationId) =>
+                        {
+                            var action = new Action(Action.TALK_TO);
+                            if (conversationId == newConversation)
+                            {
+                                var conversationList = controller.SelectedChapterDataControl.getConversationsList();
+                                conversationList.addElement(Controller.CONVERSATION_GRAPH, null, false, this, (sender, newConversationId) =>
+                                {
+                                    action.getEffects().Add(new TriggerConversationEffect(newConversationId));
+                                    performAddAction(action);
+                                    if(controller.ShowStrictConfirmDialog("Open conversation?", "Do you want to open the new conversation?"))
+                                    {
+                                        controller.SelectElement(conversationList.getConversations().Last());
+                                    }
+                                });
+                            }
+                            else
+                            {
+                                action.getEffects().Add(new TriggerConversationEffect(conversationId));
+                                performAddAction(action);
+                            }
+                        });
+                        return true;
+                    }
 
                     break;
 

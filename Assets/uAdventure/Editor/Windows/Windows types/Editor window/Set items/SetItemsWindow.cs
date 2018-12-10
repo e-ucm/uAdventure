@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace uAdventure.Editor
 {
-    [EditorWindowExtension(40, typeof(Atrezzo))]
+    [EditorWindowExtension(40, typeof(AtrezzoDataControl))]
     public class SetItemsWindow : PreviewDataControlExtension
     {
         private enum SetItemsWindowType { Appearance, Documentation }

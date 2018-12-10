@@ -153,6 +153,24 @@ namespace uAdventure.Editor
         }
 
         protected abstract void OnDrawMainPreview(Rect rect, int index);
+
+        public override void SelectElement(List<Searchable> path)
+        {
+            // On button forces data to refresh
+            OnButton();
+
+            var toSelect = path[0];
+            for (int i = 0; i < dataControlList.list.Count; i++)
+            {
+                if(dataControlList.list[i] == toSelect)
+                {
+                    dataControlList.index = i;
+                    break;
+                }
+            }
+
+            OnSelect(dataControlList.reorderableList);
+        }
     }
 }
 

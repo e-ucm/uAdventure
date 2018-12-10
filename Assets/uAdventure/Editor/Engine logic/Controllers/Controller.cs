@@ -3295,6 +3295,13 @@ namespace uAdventure.Editor
             }
         }
 
+
+        public void SelectElement(Searchable element)
+        {
+            var path = SelectedChapterDataControl.getPathToDataControl(element);
+            EditorWindowBase.SelectElement(path);
+        }
+
         //public void search()
         //{
 
