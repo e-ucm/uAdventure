@@ -220,7 +220,18 @@ namespace uAdventure.Runner
             {
                 var preInteractSize = executeStack.Count;
                 var toExecute = executeStack.Peek();
-                if (toExecute.Key.Interacted() == InteractuableResult.REQUIRES_MORE_INTERACTION)
+                var requiresMore = false;
+
+                try
+                {
+                    requiresMore = toExecute.Key.Interacted() == InteractuableResult.REQUIRES_MORE_INTERACTION;
+                }
+                catch (System.Exception ex)
+                {
+                    Debug.Log("Interacted execution exception: " + ex.Message);
+                }
+
+                if (requiresMore)
                 {
                     uAdventureRaycaster.Instance.Override = this.gameObject;
                     return true;
