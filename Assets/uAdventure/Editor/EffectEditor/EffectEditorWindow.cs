@@ -221,9 +221,13 @@ namespace uAdventure.Editor
         private Effects effects;
 
         public Vector2 scrollPosition = Vector2.zero;
+        private GUIContent addButton;
 
         public void Init(Effects e)
         {
+            var addTex = Resources.Load<Texture2D>("EAdventureData/img/icons/addNode");
+            addButton = new GUIContent(addTex);
+
             EditorWindow.GetWindow<EffectEditorWindow>();
             effects = e;
             effectsEditor = CreateInstance<EffectsEditor>();
@@ -250,13 +254,29 @@ namespace uAdventure.Editor
 			}
             this.wantsMouseMove = true;
 
-            GUILayout.BeginVertical(GUILayout.Height(20));
-            GUILayout.BeginHorizontal();
+            var buttonRect = new Rect(position.width - 100, position.height - 100, 80, 80);
+            var lastEvent = Event.current.type;
+            var eventUsed = false;
+            if (buttonRect.Contains(Event.current.mousePosition)
+                && Event.current.type != EventType.Repaint
+                && Event.current.type != EventType.Layout)
+            {
+                eventUsed = true;
+                Event.current.Use();
+            }
 
-            if (GUILayout.Button("New Effect"))
+            effectsEditor.OnInspectorGUI();
+
+            if (eventUsed)
+            {
+                Event.current.type = lastEvent; 
+            }
+
+            
+            if (GUI.Button(buttonRect, addButton))
             {
                 var names = EffectEditorFactory.Intance.CurrentEffectEditors;
-                if(names.Length > 0)
+                if (names.Length > 0)
                 {
                     Controller.Instance.ShowInputDialog(TC.get("Effects.SelectEffectType"), TC.get("Effects.SelectEffectType"),
                        EffectEditorFactory.Intance.CurrentEffectEditors, (sender, selected) =>
@@ -269,13 +289,8 @@ namespace uAdventure.Editor
                 {
                     EditorUtility.DisplayDialog("Cant create", "No effects available!", "Ok");
                 }
-                    
-            }
 
-            GUILayout.EndHorizontal();
-            GUILayout.EndVertical();
-            
-            effectsEditor.OnInspectorGUI();
+            }
         }
     }
 }
