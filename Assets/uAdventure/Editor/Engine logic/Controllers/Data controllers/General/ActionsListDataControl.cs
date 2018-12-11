@@ -269,7 +269,16 @@ namespace uAdventure.Editor
                     }
 
                     // If the list has elements, show the dialog with the options
-                    auxCreateInteractiveAction(message, actionType, validTypes, (selectedTarget) => new Action(actionType, selectedTarget));
+                    auxCreateInteractiveAction(message, actionType, validTypes, (selectedTarget) =>
+                    {
+                        var action = new Action(actionType, selectedTarget);
+                        var parentItem = parent as ItemDataControl;
+                        if(parentItem != null && controller.ShowStrictConfirmDialog("Consume item?", "Do you want the item to be removed from the inventory in the action?"))
+                        {
+                            action.Effects.Add(new ConsumeObjectEffect(parentItem.getId()));
+                        }
+                        return action;
+                    });
                     break;
             }
 
