@@ -11,7 +11,7 @@ namespace uAdventure.Editor
         void OnPreprocessTexture()
         {
             string lowerCaseAssetPath = assetPath.ToLower();
-            bool isuAdventureAsset = lowerCaseAssetPath.Contains("/uadventure/");
+            bool isuAdventureAsset = lowerCaseAssetPath.Contains("/uadventure/") && !lowerCaseAssetPath.Contains("/editor/");
             bool shouldMakeItSprite = isuAdventureAsset && categories.Any(c => lowerCaseAssetPath.Contains(c));
 
             if (shouldMakeItSprite)

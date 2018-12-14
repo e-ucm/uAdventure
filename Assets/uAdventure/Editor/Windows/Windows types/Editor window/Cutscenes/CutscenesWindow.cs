@@ -22,9 +22,11 @@ namespace uAdventure.Editor
             // Button
             ButtonContent = new GUIContent()
             {
-                image = Resources.Load<Texture2D>("EAdventureData/img/icons/cutscenes"),
+                image = Resources.Load<Texture2D>("Skin/icon/cutscenes"),
                 text = "Element.Name9"
             };
+
+            buttonStyle = "uaBtnLO";
 
             cutscenesWindowAppearance = new CutscenesWindowAppearance(aStartPos, new GUIContent(TC.get("Cutscene.App")), "Window");
             var cutscenesWindowDocumentation = new CutscenesWindowDocumentation(aStartPos, new GUIContent(TC.get("Cutscene.Doc")), "Window");

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace uAdventure.Editor
 {
-    [EditorWindowExtension(60, typeof(PlayerDataControl))]
+    [EditorWindowExtension(10, typeof(PlayerDataControl))]
     public class PlayerWindow : DefaultButtonMenuEditorWindowExtension
     {        
         private readonly List<LayoutWindow> tabs;
@@ -17,9 +17,11 @@ namespace uAdventure.Editor
         {
             ButtonContent = new GUIContent()
             {
-                image = Resources.Load<Texture2D>("EAdventureData/img/icons/player"),
+                image = Resources.Load<Texture2D>("Skin/icon/player"),
                 text = "Element.Name26"
             };
+
+            buttonStyle = "uaBtnLO";
 
             openedWindow = 0;
 

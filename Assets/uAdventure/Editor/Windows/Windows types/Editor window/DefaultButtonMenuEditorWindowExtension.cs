@@ -5,6 +5,8 @@ namespace uAdventure.Editor
 {
     public abstract class DefaultButtonMenuEditorWindowExtension : ButtonMenuEditorWindowExtension
     {
+        protected string buttonStyle;
+
         protected DefaultButtonMenuEditorWindowExtension(Rect rect, params GUILayoutOption[] options) : this(rect, null, null, options) { }
         protected DefaultButtonMenuEditorWindowExtension(Rect rect, GUIContent content, params GUILayoutOption[] options) : this(rect, content, null, options) { }
         protected DefaultButtonMenuEditorWindowExtension(Rect rect, GUIStyle style, params GUILayoutOption[] options) : this(rect, null, style, options) { }
@@ -12,39 +14,64 @@ namespace uAdventure.Editor
         {
             UseAnimation = false;
         }
-
         public override bool DrawButton(Rect rect, GUIStyle style)
         {
-            var previousText = ButtonContent.text;
-            ButtonContent.text = ButtonContent.text.Traslate();
+            var buttonKey = ButtonContent.text; 
+            ButtonContent.text = "  " + buttonKey.Traslate();
+            var currentSkin = GUI.skin;
+
             if (style == null)
             {
-                style = "Button";
+                if (!string.IsNullOrEmpty(buttonStyle))
+                {
+                    GUI.skin = uASkin;
+                    style = buttonStyle;
+                }
+                else
+                {
+                    style = "Button";
+                }
             }
-            var r = GUI.Button(rect, ButtonContent, style);
-            if (r)
+
+            var buttonPressed = GUI.Button(rect, ButtonContent, style);
+            GUI.skin = currentSkin;
+            if (buttonPressed)
             {
                 OnRequestMainView(this);
             }
-            ButtonContent.text = previousText;
-            return r;
+
+            ButtonContent.text = buttonKey;
+            return buttonPressed;
         }
 
         public override bool LayoutDrawButton(GUIStyle style, params GUILayoutOption[] options)
         {
-            var previousText = ButtonContent.text;
-            ButtonContent.text = ButtonContent.text.Traslate();
+            var buttonKey = ButtonContent.text;
+            ButtonContent.text = "  " + buttonKey.Traslate();
+            var currentSkin = GUI.skin;
+
             if (style == null)
             {
-                style = "Button";
+                if (!string.IsNullOrEmpty(buttonStyle))
+                {
+                    GUI.skin = uASkin;
+                    style = buttonStyle;
+                }
+                else
+                {
+                    style = "Button";
+                }
             }
-            var r = GUILayout.Button(ButtonContent, style, options);
-            if (r)
+
+            var buttonPressed = GUILayout.Button(ButtonContent, style, options);
+            GUI.skin = currentSkin;
+            if (buttonPressed)
             {
                 OnRequestMainView(this);
             }
-            ButtonContent.text = previousText;
-            return r;
+
+            ButtonContent.text = buttonKey;
+            return buttonPressed;
         }
 
         public override void DrawMenu(Rect rect, GUIStyle style) { }

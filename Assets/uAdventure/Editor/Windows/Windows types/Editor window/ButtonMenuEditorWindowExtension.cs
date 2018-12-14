@@ -12,6 +12,8 @@ namespace uAdventure.Editor
         public GUIContent ButtonContent { get; set; }
         protected bool UseAnimation { get; set; }
 
+        protected GUISkin uASkin;
+
         public override bool Selected
         {
             get
@@ -33,6 +35,7 @@ namespace uAdventure.Editor
         {
             UseAnimation = true;
             extended = new AnimBool(false);
+            uASkin = Resources.Load<GUISkin>("Skin/uASkin");
         }
 
         public override void DrawLeftPanelContent(Rect rect, GUIStyle style)

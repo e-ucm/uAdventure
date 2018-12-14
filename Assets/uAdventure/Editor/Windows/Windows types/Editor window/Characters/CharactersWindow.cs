@@ -23,9 +23,11 @@ namespace uAdventure.Editor
         {
             ButtonContent = new GUIContent()
             {
-                image = Resources.Load<Texture2D>("EAdventureData/img/icons/npcs"),
+                image = Resources.Load<Texture2D>("Skin/icon/characters"),
                 text = "Element.Name27"
             };
+
+            buttonStyle = "uaBtnO";
 
             charactersWindowActions = new CharactersWindowActions(aStartPos, new GUIContent(TC.get("NPC.ActionsPanelTitle")), "Window");
             charactersWindowAppearance = new CharactersWindowAppearance(aStartPos, new GUIContent(TC.get("NPC.LookPanelTitle")), "Window");

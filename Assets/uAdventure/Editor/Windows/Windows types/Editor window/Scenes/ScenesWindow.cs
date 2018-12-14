@@ -13,7 +13,7 @@ using Microsoft.Msagl.Core.Geometry;
 
 namespace uAdventure.Editor
 {
-    [EditorWindowExtension(10, typeof(SceneDataControl))]
+    [EditorWindowExtension(15, typeof(SceneDataControl))]
     public class ScenesWindow : TabsEditorWindowExtension
     {
         private enum ScenesWindowType
@@ -48,9 +48,11 @@ namespace uAdventure.Editor
             // Button
             ButtonContent = new GUIContent()
             {
-                image = Resources.Load<Texture2D>("EAdventureData/img/icons/scenes"),
+                image = Resources.Load<Texture2D>("Skin/icon/scenes"),
                 text = "Element.Name1"
             };
+
+            buttonStyle = "uaBtnLO";
 
             sceneEditor = new SceneEditor();
             sceneEditor.onSelectElement += (element) =>

@@ -21,9 +21,11 @@ namespace uAdventure.Editor
         {
             ButtonContent = new GUIContent()
             {
-                image = Resources.Load<Texture2D>("EAdventureData/img/icons/conversations"),
+                image = Resources.Load<Texture2D>("Skin/icon/conversation"),
                 text = "Element.Name31"
             };
+
+            buttonStyle = "uaBtnR";
 
             conversationWindows = new Dictionary<Conversation, ConversationEditorWindow>();
 

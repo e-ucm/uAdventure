@@ -26,9 +26,11 @@ namespace uAdventure.Editor
         {
             ButtonContent = new GUIContent()
             {
-                image = Resources.Load<Texture2D>("EAdventureData/img/icons/assessmentProfiles"),
+                image = Resources.Load<Texture2D>("Skin/icon/analytics"),
                 text = "Analytics.Title"
             };
+
+            buttonStyle = "uaBtnS";
 
             completablesList = new DataControlList()
             {

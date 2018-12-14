@@ -12,6 +12,8 @@ namespace uAdventure.Editor
     {
         protected DataControlList dataControlList;
 
+        protected string buttonStyle;
+
         protected DataControlListEditorWindowExtension(Rect rect, params GUILayoutOption[] options) : this(rect, null, null, options) { }
         protected DataControlListEditorWindowExtension(Rect rect, GUIContent content, params GUILayoutOption[] options) : this(rect, content, null, options) { }
         protected DataControlListEditorWindowExtension(Rect rect, GUIStyle style, params GUILayoutOption[] options) : this(rect, null, style, options) { }
@@ -40,14 +42,24 @@ namespace uAdventure.Editor
         public override bool DrawButton(Rect rect, GUIStyle style)
         {
             var buttonKey = ButtonContent.text;
-            ButtonContent.text = buttonKey.Traslate();
+            ButtonContent.text = "  " + buttonKey.Traslate();
+            var currentSkin = GUI.skin;
 
             if (style == null)
             {
-                style = "Button";
+                if (!string.IsNullOrEmpty(buttonStyle))
+                {
+                    GUI.skin = uASkin;
+                    style = buttonStyle;
+                }
+                else
+                {
+                    style = "Button";
+                }
             }
 
             var buttonPressed = GUI.Button(rect, ButtonContent, style);
+            GUI.skin = currentSkin;
             if (buttonPressed)
             {
                 OnRequestMainView(this);
@@ -60,14 +72,24 @@ namespace uAdventure.Editor
         public override bool LayoutDrawButton(GUIStyle style, params GUILayoutOption[] options)
         {
             var buttonKey = ButtonContent.text;
-            ButtonContent.text = buttonKey.Traslate();
+            ButtonContent.text = "  " + buttonKey.Traslate();
+            var currentSkin = GUI.skin;
 
             if (style == null)
             {
-                style = "Button";
+                if (!string.IsNullOrEmpty(buttonStyle))
+                {
+                    GUI.skin = uASkin;
+                    style = buttonStyle;
+                }
+                else
+                {
+                    style = "Button";
+                }
             }
 
             var buttonPressed = GUILayout.Button(ButtonContent, style, options);
+            GUI.skin = currentSkin;
             if (buttonPressed)
             {
                 OnRequestMainView(this);

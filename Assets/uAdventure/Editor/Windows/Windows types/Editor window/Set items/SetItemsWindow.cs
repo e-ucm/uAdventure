@@ -22,9 +22,11 @@ namespace uAdventure.Editor
         {
             ButtonContent = new GUIContent()
             {
-                image = Resources.Load<Texture2D>("EAdventureData/img/icons/Atrezzo-List-1"),
+                image = Resources.Load<Texture2D>("Skin/icon/decoration"),
                 text = "Element.Name59"
             };
+
+            buttonStyle = "uaBtnO";
 
             setItemsWindowApperance = new SetItemsWindowApperance(aStartPos, new GUIContent(TC.get("Atrezzo.LookPanelTitle")), "Window");
             setItemsWindowDocumentation = new SetItemsWindowDocumentation(aStartPos, new GUIContent(TC.get("Atrezzo.DocPanelTitle")), "Window");

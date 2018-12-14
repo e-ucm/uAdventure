@@ -20,9 +20,11 @@ namespace uAdventure.Editor
         {
             ButtonContent = new GUIContent()
             {
-                image = Resources.Load<Texture2D>("EAdventureData/img/icons/items"),
+                image = Resources.Load<Texture2D>("Skin/icon/items"),
                 text = "Element.Name18"
             };
+
+            buttonStyle = "uaBtnO";
 
             var itemsWindowActions = new ItemsWindowActions(aStartPos, new GUIContent(TC.get("Item.ActionsPanelTitle")), "Window");
             itemsWindowAppearance = new ItemsWindowAppearance(aStartPos, new GUIContent(TC.get("Item.LookPanelTitle")), "Window");

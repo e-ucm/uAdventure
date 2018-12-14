@@ -122,9 +122,10 @@ public class ScrollableList
 
         // Header
         DoListHeader(GUILayoutUtility.GetRect(0, headerHeight, GUILayout.ExpandWidth(true)));
-        
+
         // Scroll calculation
-        var scrollRect = GUILayoutUtility.GetRect(0, height - (headerHeight + footerHeight), GUILayout.ExpandWidth(true));
+        var style = ReorderableList.defaultBehaviours != null ? ReorderableList.defaultBehaviours.boxBackground : "";
+        var scrollRect = GUILayoutUtility.GetRect(0, height - (headerHeight + footerHeight), style, GUILayout.ExpandWidth(true));
         scrollRect.y -= 2;
         var desiredHeight = Mathf.Max(elementHeight, elementHeight * reorderableList.list.Count);
         var insideRect = new Rect(0, 0, scrollRect.width - (desiredHeight > scrollRect.height ? 15 : 0), desiredHeight);
@@ -169,7 +170,7 @@ public class ScrollableList
         }
         
         // Footer
-        DoListFooter(GUILayoutUtility.GetRect(0, footerHeight, GUILayout.ExpandWidth(true)));
+        DoListFooter(GUILayoutUtility.GetRect(0, footerHeight, ReorderableList.defaultBehaviours.footerBackground, GUILayout.ExpandWidth(true)));
     }
 
     private void DoListHeader(Rect headerRect)

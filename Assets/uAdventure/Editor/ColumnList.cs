@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace uAdventure.Editor
 {
-    public class ColumnList : ScrollableList
+    public class ColumnList : DecoratedScrollableList
     {
         private float[] columnPercent;
         private static GUILayoutOption[] defaultColumnBehaviour = new GUILayoutOption[] { GUILayout.ExpandWidth(true) };

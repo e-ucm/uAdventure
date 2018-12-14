@@ -29,8 +29,10 @@ namespace uAdventure.Editor
             ButtonContent = new GUIContent
             {
                 text = "AdvancedFeatures.Title",
-                image = Resources.Load<Texture2D>("EAdventureData/img/icons/advanced")
+                image = Resources.Load<Texture2D>("Skin/icon/advanced_features")
             };
+
+            buttonStyle = "uaBtnS";
 
             windows = new BaseWindow[3]
             {
