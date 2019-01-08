@@ -125,7 +125,30 @@ namespace uAdventure.Editor
 
         public void setPreviewBackground(string path)
         {
-            resourcesDataControlList[selectedResources].addAsset("background", path);
+            var background = Controller.ResourceManager.getSprite(path);
+            bool set = true;
+            if (background)
+            {
+                var foreground = Controller.ResourceManager.getSprite(getPreviewForeground());
+                if (foreground && (foreground.texture.width != background.texture.width || foreground.texture.height != background.texture.height))
+                {
+                    if(Controller.Instance.ShowStrictConfirmDialog("Incompatible background", "The selected background dimensions " +
+                            "are not the same as the foreground, if you select this background the foreground will be removed. Do you want to continue?"))
+                    {
+                        resourcesDataControlList[selectedResources].addAsset("foreground", "");
+                    }
+                    else
+                    {
+                        set = false;
+                    }
+                }
+            }
+
+            if (set)
+            {
+                resourcesDataControlList[selectedResources].addAsset("background", path);
+
+            }
         }
 
         public string getPreviewForeground()
@@ -136,7 +159,23 @@ namespace uAdventure.Editor
 
         public void setPreviewForeground(string path)
         {
-            resourcesDataControlList[selectedResources].addAsset("foreground", path);
+            var foreground = Controller.ResourceManager.getSprite(path);
+            bool set = true;
+            if (foreground)
+            {
+                var background = Controller.ResourceManager.getSprite(getPreviewForeground());
+                if (background && (foreground.texture.width != background.texture.width || foreground.texture.height != background.texture.height))
+                {
+                    Controller.Instance.ShowErrorDialog("Incompatible foreground", "The selected foreground dimensions " +
+                               "are not the same as the background");
+                    set = false;
+                }
+            }
+
+            if (set)
+            {
+                resourcesDataControlList[selectedResources].addAsset("foreground", path);
+            }
         }
 
         public string getPreviewMusic()
