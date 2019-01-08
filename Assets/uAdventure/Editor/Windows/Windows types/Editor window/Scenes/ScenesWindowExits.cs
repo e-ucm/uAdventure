@@ -275,6 +275,13 @@ namespace uAdventure.Editor
 
             public override void Draw(int aID)
             {
+
+                if (Controller.Instance.playerMode() != Controller.FILE_ADVENTURE_3RDPERSON_PLAYER)
+                {
+                    EditorGUILayout.HelpBox("In first person mode there is no destination position.", MessageType.Info); // TODO LANG
+                    return;
+                }
+
                 var exit = Target as ExitDataControl;
 
 
