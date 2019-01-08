@@ -115,6 +115,8 @@ namespace uAdventure.Editor
         {
             IsPlayer = false;
 
+            PreviewTitle = "Character.Preview".Traslate();
+
             appearanceEditor = ScriptableObject.CreateInstance<AppearanceEditor>();
             appearanceEditor.height = 160;
             appearanceEditor.onAppearanceSelected = RefreshPathInformation;

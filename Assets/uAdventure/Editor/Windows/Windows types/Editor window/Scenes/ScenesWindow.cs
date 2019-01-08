@@ -212,6 +212,8 @@ namespace uAdventure.Editor
             {
                 ProjectConfigData.addConsumer(this);
 
+                PreviewTitle = "Chapter.Preview".Traslate();
+
                 noBackground = Controller.ResourceManager.getImage(SpecialAssetPaths.ASSET_EMPTY_BACKGROUND);
 
                 sceneColors = new Dictionary<string, Color>();
@@ -269,7 +271,7 @@ namespace uAdventure.Editor
             {
                 GUILayout.Space(10);
                 GUILayout.BeginHorizontal("preToolbar");
-                GUILayout.Label(TC.get("ImageAssets.Preview"), "preToolbar", GUILayout.ExpandWidth(true));
+                GUILayout.Label("Chapter.Preview".Traslate(), "preToolbar", GUILayout.ExpandWidth(true));
                 GUILayout.FlexibleSpace();
                 if (GUILayout.Button("Layout", "preButton"))
                 {

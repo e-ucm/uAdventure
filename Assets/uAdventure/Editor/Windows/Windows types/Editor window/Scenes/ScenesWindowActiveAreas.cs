@@ -22,6 +22,8 @@ namespace uAdventure.Editor
             new ActiveAreaActionsComponent(Rect.zero, new GUIContent(""), aStyle);
             new ActiveAreaDescriptionsComponent(Rect.zero, new GUIContent(""), aStyle);
 
+            PreviewTitle = "Scene.Preview".Traslate();
+
             conditionsTex = Resources.Load<Texture2D>("EAdventureData/img/icons/conditions-24x24");
             noConditionsTex = Resources.Load<Texture2D>("EAdventureData/img/icons/no-conditions-24x24");
 

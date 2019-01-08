@@ -20,6 +20,8 @@ namespace uAdventure.Editor
             appearanceEditor = ScriptableObject.CreateInstance<AppearanceEditor>();
             appearanceEditor.height = 160;
 
+            PreviewTitle = "Atrezzo.Preview".Traslate();
+
             // File selectors
 
             image = new FileChooser()

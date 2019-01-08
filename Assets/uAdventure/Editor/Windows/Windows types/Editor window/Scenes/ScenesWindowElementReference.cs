@@ -141,6 +141,7 @@ namespace uAdventure.Editor
             : base(aStartPos, aContent, aStyle, sceneEditor, aOptions)
         {
             new ReferenceComponent(Rect.zero, new GUIContent(""), aStyle);
+            PreviewTitle = "Scene.Preview".Traslate();
 
             referenceList = new ReferenceList()
             {

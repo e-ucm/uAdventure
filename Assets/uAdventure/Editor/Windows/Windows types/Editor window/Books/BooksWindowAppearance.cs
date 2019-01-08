@@ -26,6 +26,7 @@ namespace uAdventure.Editor
             appearanceEditor.height = 160;
             appearanceEditor.onAppearanceSelected = RefreshPathInformation;
 
+            PreviewTitle = "BackgroundAssets.Preview".Traslate();
 
             background = new FileChooser()
             {

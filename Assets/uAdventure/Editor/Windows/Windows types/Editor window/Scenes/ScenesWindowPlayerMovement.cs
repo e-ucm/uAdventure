@@ -21,6 +21,7 @@ namespace uAdventure.Editor
         {
             new PlayerInitialPositionComponent(Rect.zero, new GUIContent(), null);
             new SideComponent(Rect.zero, new GUIContent(), null);
+            PreviewTitle = "PlayerMovement.Preview".Traslate();
             trajectoryComponent = new TrajectoryComponent(Rect.zero, new GUIContent(), null)
             {
                 Action = -1

@@ -2123,6 +2123,12 @@ In the game you can define conditions based on the value of the variables.</entr
 <entry key="ConversationEditor.SetChild">Set child</entry>
 <entry key="ConversationEditor.Option">Option</entry>
 <entry key="ConversationEditor.AddOptionChild">Add Option / Add Child</entry>
+
+<entry key="Chapter.Preview">Preview of the chapter scenes</entry>
+<entry key="Slidescenes.Preview">Preview of the slidescene</entry>
+<entry key="Videoscenes.Preview">Preview of the videoscene</entry>
+<entry key="Character.Preview">Graphical preview of the character views</entry>
+<entry key="PlayerMovement.Preview">Preview of the player movement</entry>
   
 <entry key="AddObjectToInventory.Description">Adds the item to the inventory</entry>
 <entry key="RemoveObjectFromInventory.Description">Removes the item from the inventory</entry>

@@ -62,6 +62,7 @@ namespace uAdventure.Editor
             */
             if (cutscene.isVideoscene())
             {
+                PreviewTitle = "Videoscenes.Preview".Traslate();
                 // Background chooser
                 EditorGUI.BeginChangeCheck();
                 video.Path = cutscene.getPathToVideo();
@@ -83,6 +84,7 @@ namespace uAdventure.Editor
             */
             else
             {
+                PreviewTitle = "Slidescenes.Preview".Traslate();
                 // Background chooser
                 EditorGUI.BeginChangeCheck();
                 slides.Path = cutscene.getPathToSlides();

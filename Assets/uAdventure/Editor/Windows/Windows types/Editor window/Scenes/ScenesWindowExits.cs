@@ -37,6 +37,7 @@ namespace uAdventure.Editor
 
             conditionsTex = Resources.Load<Texture2D>("EAdventureData/img/icons/conditions-24x24");
             noConditionsTex = Resources.Load<Texture2D>("EAdventureData/img/icons/no-conditions-24x24");
+            PreviewTitle = "Scene.Preview".Traslate();
 
             exitsList = new DataControlList()
             {

@@ -15,11 +15,9 @@ namespace uAdventure.Editor
         private Color fontFrontColor, fontBorderColor, bubbleBcgColor, bubbleBorderColor;
 
         private bool shouldShowSpeechBubble;
+        private readonly GUIStyle previewTextStyle;
 
-        private GUISkin skinDefault;
-        private GUIStyle previewTextStyle;
-
-        private Texture2D bckImage = null;
+        private readonly Texture2D bckImage = null;
 
         public CharactersWindowDialogConfiguration(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
@@ -31,6 +29,7 @@ namespace uAdventure.Editor
             previewTextStyle.alignment = TextAnchor.MiddleCenter;
             previewTextStyle.border = new RectOffset(32, 32, 32, 32);
             previewTextStyle.padding = new RectOffset(32, 32, 32, 32);
+            PreviewTitle = "FormattedTextAssets.Preview".Traslate();
         }
 
         protected override void DrawInspector()

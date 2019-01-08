@@ -25,7 +25,7 @@ namespace uAdventure.Editor
         public BooksWindowContents(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
         {
-
+            PreviewTitle = "Book.Preview".Traslate();
             elementTitles = new Dictionary<int, string>
             {
                 { Controller.BOOK_TITLE_PARAGRAPH,  "Element.Name14" },

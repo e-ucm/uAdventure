@@ -20,6 +20,7 @@ namespace uAdventure.Editor
             appearanceEditor = ScriptableObject.CreateInstance<AppearanceEditor>();
             appearanceEditor.height = 160;
             appearanceEditor.onAppearanceSelected = sceneEditor.RefreshSceneResources;
+            PreviewTitle = "Scene.Preview".Traslate();
 
             // Fields
             background = new FileChooser()
