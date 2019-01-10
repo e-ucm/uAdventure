@@ -46,6 +46,9 @@ namespace uAdventure.Core
          */
         public const string RESOURCE_TYPE_MUSIC = "bgmusic";
 
+        public const int DEFAULT_PLAYER_X = AssetsImageDimensions.BACKGROUND_MAX_WIDTH / 2;
+        public const int DEFAULT_PLAYER_Y = 3 * AssetsImageDimensions.BACKGROUND_MAX_HEIGHT / 4;
+
         /**
          * Default X position for the player
          */
@@ -109,8 +112,8 @@ namespace uAdventure.Core
          */
         public Scene(string id) : base(GeneralSceneSceneType.SCENE, id)
         {
-            defaultX = AssetsImageDimensions.BACKGROUND_MAX_WIDTH / 2;
-            defaultY = AssetsImageDimensions.BACKGROUND_MAX_HEIGHT / 2;
+            defaultX = DEFAULT_PLAYER_X;
+            defaultY = DEFAULT_PLAYER_Y;
             exits = new List<Exit>();
             itemReferences = new List<ElementReference>();
             atrezzoReferences = new List<ElementReference>();

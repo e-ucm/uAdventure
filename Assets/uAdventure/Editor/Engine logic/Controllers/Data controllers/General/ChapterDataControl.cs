@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 using uAdventure.Core;
+using System.Linq;
 
 namespace uAdventure.Editor
 {
@@ -650,6 +651,26 @@ namespace uAdventure.Editor
         public List<T> getObjects<T>()
         {
             return chapter.getObjects<T>();
+        }
+
+        public List<DataControl> getDataControls()
+        {
+            var dataControlList = new List<DataControl>();
+            dataControlList.AddRange(getAtrezzoList().getAtrezzoList().Cast<DataControl>());
+            dataControlList.AddRange(getBooksList().getBooks().Cast<DataControl>());
+            dataControlList.AddRange(getConversationsList().getConversations().Cast<DataControl>());
+            dataControlList.AddRange(getCutscenesList().getCutscenes().Cast<DataControl>());
+            dataControlList.AddRange(getItemsList().getItems().Cast<DataControl>());
+            dataControlList.AddRange(getNPCsList().getNPCs().Cast<DataControl>());
+            dataControlList.AddRange(getItemsList().getItems().Cast<DataControl>());
+            dataControlList.AddRange(getScenesList().getScenes().Cast<DataControl>());
+            dataControlList.AddRange(getCompletables().getCompletables().Cast<DataControl>());
+            return dataControlList;
+        }
+
+        public List<DataControl> getDataControls<T>()
+        {
+            return getDataControls().FindAll(d => d is T);
         }
 
         public override void recursiveSearch()

@@ -37,7 +37,6 @@ namespace uAdventure.Editor
 
             conditionsTex = Resources.Load<Texture2D>("EAdventureData/img/icons/conditions-24x24");
             noConditionsTex = Resources.Load<Texture2D>("EAdventureData/img/icons/no-conditions-24x24");
-            PreviewTitle = "Scene.Preview".Traslate();
 
             exitsList = new DataControlList()
             {
@@ -261,10 +260,8 @@ namespace uAdventure.Editor
         [EditorComponent(typeof(ExitDataControl), Name = "ExitsList.PlayerPosition", Order = 2)]
         public class ExitPlayerPositionComponent : AbstractEditorComponent
         {
-            private Texture2D conditionsTex, noConditionsTex;
-            private SceneEditor localSceneEditor;
-            private Trajectory.Node playerDestination;
-            private List<DataControl> elements;
+            private readonly SceneEditor localSceneEditor;
+            private readonly Trajectory.Node playerDestination;
 
             public ExitPlayerPositionComponent(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
             {
@@ -287,8 +284,25 @@ namespace uAdventure.Editor
 
                 EditorGUI.BeginChangeCheck();
                 var has = EditorGUILayout.Toggle(TC.get("NextSceneCell.UsePosition"), exit.hasDestinyPosition());
+                var scene = exit.getSceneDataControl();
+
                 if (EditorGUI.EndChangeCheck())
-                    exit.setDestinyPosition(has ? 400 : int.MinValue, has ? 300 : int.MinValue);
+                {
+                    var scenes = Controller.Instance.SelectedChapterDataControl.getScenesList();
+                    var destinationScene = scenes.getScenes()[scenes.getSceneIndexByID(exit.getNextSceneId())] ?? scene;
+
+                    var defPlayerPos = destinationScene.getDefaultInitialPosition();
+                    exit.setDestinyPosition(has ? (int)defPlayerPos.x : int.MinValue, has ? (int)defPlayerPos.y : int.MinValue);
+
+                    if (has)
+                    {
+                        var scale = destinationScene.getPlayerAppropiateScale();
+                        if (scale != 1)
+                        {
+                            exit.setDestinyScale(scale);
+                        }
+                    }
+                }
 
                 if (!has)
                 {
@@ -299,19 +313,26 @@ namespace uAdventure.Editor
                 EditorGUI.BeginChangeCheck();
                 var newPos = EditorGUILayout.Vector2Field(TC.get("Inventory.Position"), new Vector2(exit.getDestinyPositionX(), exit.getDestinyPositionY()));
                 if (EditorGUI.EndChangeCheck())
+                {
                     exit.setDestinyPosition(Mathf.RoundToInt(newPos.x), Mathf.RoundToInt(newPos.y));
+                }
 
                 EditorGUI.BeginChangeCheck();
                 bool useDestinyScale = EditorGUILayout.Toggle("Use destiny scale", exit.getDestinyScale() >= 0); // TODO LANG
                 if (EditorGUI.EndChangeCheck())
-                    exit.setDestinyScale(useDestinyScale ? 1f : float.MinValue);
+                {
+                    var sceneScale = (scene != null ? scene.getPlayerAppropiateScale() : 1f);
+                    exit.setDestinyScale(useDestinyScale ? sceneScale : float.MinValue);
+                }
 
                 if (useDestinyScale)
                 {
                     EditorGUI.BeginChangeCheck();
                     var newScale = Mathf.Max(0.001f, EditorGUILayout.FloatField(TC.get("SceneLocation.Scale"), exit.getDestinyScale()));
                     if (EditorGUI.EndChangeCheck())
+                    {
                         exit.setDestinyScale(newScale);
+                    }
                 }
                 else
                 {
@@ -332,9 +353,10 @@ namespace uAdventure.Editor
                 
                 localSceneEditor.Draw(GUILayoutUtility.GetRect(0, 200, GUILayout.ExpandWidth(true)));
                 exit.setDestinyPosition(playerDestination.getX(), playerDestination.getY());
-                if(useDestinyScale)
+                if (useDestinyScale)
+                {
                     exit.setDestinyScale(playerDestination.getScale());
-
+                }
             }
         }
     }

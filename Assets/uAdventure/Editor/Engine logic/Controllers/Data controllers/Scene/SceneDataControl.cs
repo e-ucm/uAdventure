@@ -5,6 +5,7 @@ using System.Linq;
 using Object = UnityEngine.Object;
 
 using uAdventure.Core;
+using UnityEngine;
 
 namespace uAdventure.Editor
 {
@@ -65,6 +66,11 @@ namespace uAdventure.Editor
             activeAreasListDataControl = new ActiveAreasListDataControl(this, scene.getActiveAreas());
             barriersListDataControl = new BarriersListDataControl(this, scene.getBarriers());
             trajectoryDataControl = new TrajectoryDataControl(this, scene.getTrajectory());
+            
+            if (isPlayerAtDefaultPosition())
+            {
+                setPlayerScale(getPlayerAppropiateScale());
+            }
         }
 
         /**
@@ -125,12 +131,24 @@ namespace uAdventure.Editor
 
         public void setPreviewBackground(string path)
         {
-            var background = Controller.ResourceManager.getSprite(path);
+            var background = Controller.ResourceManager.getImage(path);
+            Vector2 previousBackgroundSize = new Vector2(AssetsImageDimensions.BACKGROUND_MAX_WIDTH, AssetsImageDimensions.BACKGROUND_MAX_HEIGHT);
             bool set = true;
+            bool maintainRelative = true;
             if (background)
             {
-                var foreground = Controller.ResourceManager.getSprite(getPreviewForeground());
-                if (foreground && (foreground.texture.width != background.texture.width || foreground.texture.height != background.texture.height))
+                var previousBackground = Controller.ResourceManager.getImage(getPreviewBackground());
+                previousBackgroundSize = new Vector2(previousBackground.width, previousBackground.height);
+
+                if ((previousBackground.width != background.width || previousBackground.height != background.height) && 
+                    !Controller.Instance.ShowStrictConfirmDialog("Different Size", "The selected background dimensions " +
+                               "are not the same as the previous background, do you want the elements to maintain its relative position and scale?"))
+                {
+                    maintainRelative = false;
+                }
+
+                var foreground = Controller.ResourceManager.getImage(getPreviewForeground());
+                if (foreground && (foreground.width != background.width || foreground.height != background.height))
                 {
                     if(Controller.Instance.ShowStrictConfirmDialog("Incompatible background", "The selected background dimensions " +
                             "are not the same as the foreground, if you select this background the foreground will be removed. Do you want to continue?"))
@@ -146,8 +164,76 @@ namespace uAdventure.Editor
 
             if (set)
             {
+                var wasAtDefaultPosition = isPlayerAtDefaultPosition();
                 resourcesDataControlList[selectedResources].addAsset("background", path);
 
+                if (maintainRelative && background)
+                {
+                    // References
+                    foreach(var reference in referencesListDataControl.getRefferences())
+                    {
+                        reference.setElementPosition((int)(reference.getElementX() * background.width / previousBackgroundSize.x),
+                            (int)(reference.getElementY() * background.height / previousBackgroundSize.y));
+                        reference.setElementScale(reference.getElementScale() * background.height / previousBackgroundSize.y);
+                    }
+
+                    // Areas
+                    var nbr = new Vector2(background.width, background.height);
+                    exitsListDataControl.getExits().ForEach(e => adaptRectangle(e.getRectangle(), previousBackgroundSize, nbr));
+                    activeAreasListDataControl.getActiveAreas().ForEach(e => adaptRectangle(e.getRectangle(), previousBackgroundSize, nbr));
+                    barriersListDataControl.getBarriers().ForEach(e => adaptRectangle(e.getRectangle(), previousBackgroundSize, nbr));
+
+                    // Player
+                    if(getPlayerLayer() != -2)
+                    {
+                        if(getTrajectory() != null && getTrajectory().hasTrajectory())
+                        {
+                            foreach(var node in getTrajectory().getNodes())
+                            {
+                                node.setNode((int)(node.getX() * background.width / previousBackgroundSize.x),
+                                    (int)(node.getY() * background.height / previousBackgroundSize.y),
+                                    node.getScale() * background.height / previousBackgroundSize.y);
+                            }
+                        }
+                        else
+                        {
+                            setDefaultInitialPosition((int)(getDefaultInitialPositionX() * background.width / previousBackgroundSize.x),
+                                (int)(getDefaultInitialPositionY() * background.height / previousBackgroundSize.y));
+                            setPlayerScale(getPlayerScale() * background.height / previousBackgroundSize.y);
+                        }
+                    }
+
+                }
+                else if (wasAtDefaultPosition)
+                {
+                    setPlayerScale(getPlayerAppropiateScale());
+                    var newDefaultPosition = getDefaultInitialPosition();
+                    setDefaultInitialPosition((int) newDefaultPosition.x, (int) newDefaultPosition.y);
+                }
+
+            }
+        }
+
+        private void adaptRectangle(Rectangle rectangle, Vector2 oldSize, Vector2 newSize)
+        {
+            var points = rectangle.getPoints();
+
+            if(rectangle.isRectangular())
+            {
+                points = rectangle.ToRect().ToPoints().ToList();
+            }
+
+            points = points.ConvertAll(p => new Vector2((p.x / oldSize.x) * newSize.x, (p.y / oldSize.y) * newSize.y));
+
+            if(rectangle.isRectangular())
+            {
+                var rect = points.ToArray().ToRect();
+                rectangle.setValues((int)rect.x, (int)rect.y, (int)rect.width, (int)rect.height);
+            }
+            else
+            {
+                rectangle.getPoints().Clear();
+                rectangle.getPoints().AddRange(points);
             }
         }
 
@@ -675,6 +761,76 @@ namespace uAdventure.Editor
             if (path != null)
                 return path;
             return getPathFromChild(dataControl, trajectoryDataControl);
+        }
+
+        public bool isPlayerAtDefaultPosition()
+        {
+            // If no player or trajectory mode
+            if(scene.getPlayerLayer() == -2 || (getTrajectory() != null && getTrajectory().hasTrajectory()))
+            {
+                // It is not in default state
+                return false;
+            }
+
+            Vector2 defaultPosition = getDefaultInitialPosition();
+
+            return defaultPosition.x == getDefaultInitialPositionX() && defaultPosition.y == getDefaultInitialPositionY();
+        }
+
+        public Vector2 getDefaultInitialPosition()
+        {
+
+            var background = Controller.ResourceManager.getImage(getPreviewBackground());
+            if (background != null)
+            {
+                return new Vector2(background.width / 2, 3 * background.height / 4);
+            }
+
+            return new Vector2(Scene.DEFAULT_PLAYER_X, Scene.DEFAULT_PLAYER_Y);
+        }
+
+        public float getPlayerAppropiateScale()
+        {
+            return getElementAppropiateScale(controller.SelectedChapterDataControl.getPlayer());
+        }
+
+        public float getElementAppropiateScale(DataControlWithResources dataControl)
+        {
+            var background = Controller.ResourceManager.getImage(getPreviewBackground());
+
+            var npc = dataControl as NPCDataControl;
+            var item = dataControl as ItemDataControl;
+            var atrezzo = dataControl as AtrezzoDataControl;
+
+            Texture2D image = null;
+
+            if (npc != null)
+            {
+                image = Controller.ResourceManager.getImage(npc.getPreviewImage());
+            }
+            else if (item != null)
+            {
+                image = Controller.ResourceManager.getImage(item.getPreviewImage());
+            }
+            else if(atrezzo != null)
+            {
+                image = Controller.ResourceManager.getImage(atrezzo.getPreviewImage());
+            }
+
+            if (image && background)
+            {
+                var imageToBackgroundRatio = background.height / (float)image.height;
+                if (imageToBackgroundRatio < 1.2)
+                {
+                    return imageToBackgroundRatio / 1.2f;
+                }
+                else if (imageToBackgroundRatio > 10)
+                {
+                    return imageToBackgroundRatio / 10f;
+                }
+            }
+
+            return 1;
         }
     }
 }

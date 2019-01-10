@@ -257,6 +257,11 @@ namespace uAdventure.Editor
         }
         public List<ElementReferenceDataControl> getRefferences(Type t)
         {
+            if(t == null)
+            {
+                return allReferencesDataControl.ConvertAll(e => e.getErdc());
+            }
+
             List<ElementReferenceDataControl> list = new List<ElementReferenceDataControl>();
             var ids = controller.IdentifierSummary;
             foreach (ElementContainer element in allReferencesDataControl)
@@ -366,6 +371,9 @@ namespace uAdventure.Editor
                 int counter = count(newElementReference);
                 getReferencesList(elementType).Add(newElementReference);
                 ElementReferenceDataControl erdc = new ElementReferenceDataControl(sceneDataControl, newElementReference, type, counter);
+                var defaultPos = sceneDataControl.getDefaultInitialPosition();
+                erdc.setElementPosition((int)defaultPos.x, (int)defaultPos.y);
+                erdc.setElementScale(sceneDataControl.getElementAppropiateScale(erdc.getReferencedElementDataControl() as DataControlWithResources));
                 ElementContainer ec = new ElementContainer(erdc, -1, null);
                 lastElementContainer = ec;
                 reassignLayerAllReferencesDataControl(insertInOrder(ec, false));
