@@ -67,7 +67,7 @@ namespace uAdventure.Editor
             barriersListDataControl = new BarriersListDataControl(this, scene.getBarriers());
             trajectoryDataControl = new TrajectoryDataControl(this, scene.getTrajectory());
             
-            if (isPlayerAtDefaultPosition())
+            if (Controller.Instance.playerMode() == Controller.FILE_ADVENTURE_3RDPERSON_PLAYER && isPlayerAtDefaultPosition())
             {
                 setPlayerScale(getPlayerAppropiateScale());
             }
@@ -164,7 +164,7 @@ namespace uAdventure.Editor
 
             if (set)
             {
-                var wasAtDefaultPosition = isPlayerAtDefaultPosition();
+                var wasAtDefaultPosition = Controller.Instance.playerMode() == Controller.FILE_ADVENTURE_3RDPERSON_PLAYER && isPlayerAtDefaultPosition();
                 resourcesDataControlList[selectedResources].addAsset("background", path);
 
                 if (maintainRelative && background)
@@ -184,7 +184,7 @@ namespace uAdventure.Editor
                     barriersListDataControl.getBarriers().ForEach(e => adaptRectangle(e.getRectangle(), previousBackgroundSize, nbr));
 
                     // Player
-                    if(getPlayerLayer() != -2)
+                    if(Controller.Instance.playerMode() == Controller.FILE_ADVENTURE_3RDPERSON_PLAYER && getPlayerLayer() != -2)
                     {
                         if(getTrajectory() != null && getTrajectory().hasTrajectory())
                         {
