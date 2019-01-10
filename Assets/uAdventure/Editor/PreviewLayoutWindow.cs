@@ -19,7 +19,8 @@ namespace uAdventure.Editor
         protected PreviewLayoutWindow(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
         {
             sceneSkin = EditorGUIUtility.GetBuiltinSkin(EditorSkin.Inspector);
-            DoUpdate = false;
+            DoUpdate = false; 
+            PreviewTitle = "ImageAssets.Preview".Traslate();
         }
 
         /** Callback for window destroy */
@@ -87,6 +88,8 @@ namespace uAdventure.Editor
         }
         
         private bool Dragging { get; set; }
+
+        protected string PreviewTitle { get; set; }
 
         // ######################## MAIN FUNCTIONS ########################
 
@@ -257,7 +260,7 @@ namespace uAdventure.Editor
         protected virtual void DrawPreviewHeader()
         {
             GUILayout.Space(10);
-            GUILayout.Label(TC.get("ImageAssets.Preview"), "preToolbar", GUILayout.ExpandWidth(true));
+            GUILayout.Label(PreviewTitle, "preToolbar", GUILayout.ExpandWidth(true));
         }
 
         /** Called to draw the preview content */
