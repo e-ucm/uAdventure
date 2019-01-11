@@ -35,6 +35,7 @@ build:
 # scripts to run before build
 before_build:
   - ps: . .\scripts\create-guidmap.ps1
+  - ps: Remove-Item ".\\uAdventure\\Assets\\uAdventure\\Plugins\\unity-tracker\\csharp-tracker\\TrackerAssetUnitTests" -Force -Recurse
 
 # scripts to run after build
 after_build:
