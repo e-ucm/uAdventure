@@ -41,8 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildProjectDirectory)\..\..\..\Assets\uAdventure\Plugins\unity-tracker\**\*.cs"
-        Exclude="$(MSBuildProjectDirectory)\..\..\..\Assets\uAdventure\Plugins\unity-tracker\csharp-tracker\AssetManager\RageAssetManager\Properties\AssemblyInfo.cs"
-        Exclude="$(MSBuildProjectDirectory)\..\..\..\Assets\uAdventure\Plugins\unity-tracker\csharp-tracker\TrackerAssetUnitTests\*.*">
+        Exclude="$(MSBuildProjectDirectory)\..\..\..\Assets\uAdventure\Plugins\unity-tracker\csharp-tracker\AssetManager\RageAssetManager\Properties\AssemblyInfo.cs;$(MSBuildProjectDirectory)\..\..\..\Assets\uAdventure\Plugins\unity-tracker\csharp-tracker\TrackerAssetUnitTests\*.*">
       <Link>Plugins\unity-tracker\%(RecursiveDir)%(FileName)</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
