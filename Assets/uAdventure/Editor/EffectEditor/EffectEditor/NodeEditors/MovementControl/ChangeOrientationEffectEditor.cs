@@ -10,7 +10,6 @@ namespace uAdventure.Editor
 {
     public class ChangeOrientationEffectEditor : EffectEditor
     {
-        private readonly Type[] types = { typeof(NPC) };
         private readonly int[] orientationValues;
         private readonly string[] orientationTexts;
 
@@ -32,7 +31,7 @@ namespace uAdventure.Editor
 
         public ChangeOrientationEffectEditor()
         {
-            var ids = Controller.Instance.IdentifierSummary.combineIds(types);
+            var ids = Controller.Instance.IdentifierSummary.getIds<NPC>();
             this.effect = new ChangeOrientationEffect(ids.FirstOrDefault(), Runner.Orientation.S);
 
             var orientations = Enum.GetValues(typeof(Runner.Orientation));
@@ -42,8 +41,8 @@ namespace uAdventure.Editor
 
         public void draw()
         {
-            var ids = Controller.Instance.VarFlagSummary.getFlags();
-            effect.setTargetId(ids[EditorGUILayout.Popup(TC.get("Condition.FlagID"), Array.IndexOf(ids, effect.getTargetId()), ids)]);
+            var ids = Controller.Instance.IdentifierSummary.getIds<NPC>();
+            effect.setTargetId(ids[EditorGUILayout.Popup(TC.get("Element.Name28"), Array.IndexOf(ids, effect.getTargetId()), ids)]);
 
             EditorGUI.BeginChangeCheck();
             var orientationLabel = TC.get("ElementReference.Orientation");
@@ -56,13 +55,13 @@ namespace uAdventure.Editor
         }
 
         public IEffect Effect { get { return effect; } set { effect = value as ChangeOrientationEffect; } }
-        public string EffectName { get { return TC.get("ActivateEffect.Title"); } }
+        public string EffectName { get { return TC.get("ChangeOrientationEffect.Title"); } }
 
         public bool Usable
         {
             get
             {
-                return Controller.Instance.IdentifierSummary.combineIds(types).Any();
+                return Controller.Instance.IdentifierSummary.getIds<NPC>().Any();
             }
         }
 

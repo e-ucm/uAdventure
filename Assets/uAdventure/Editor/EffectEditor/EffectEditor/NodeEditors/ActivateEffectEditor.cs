@@ -9,20 +9,18 @@ namespace uAdventure.Editor
 {
     public class ActivateEffectEditor : EffectEditor
     {
-        private bool collapsed = false;
-        public bool Collapsed { get { return collapsed; } set { collapsed = value; } }
+        public bool Collapsed { get; set; }
         private Rect window = new Rect(0, 0, 300, 0);
-        private string[] flags;
         public Rect Window
         {
             get
             {
-                if (collapsed) return new Rect(window.x, window.y, 50, 30);
+                if (Collapsed) return new Rect(window.x, window.y, 50, 30);
                 else return window;
             }
             set
             {
-                if (collapsed) window = new Rect(value.x, value.y, window.width, window.height);
+                if (Collapsed) window = new Rect(value.x, value.y, window.width, window.height);
                 else window = value;
             }
         }
@@ -31,13 +29,13 @@ namespace uAdventure.Editor
 
         public ActivateEffectEditor()
         {
-            flags = Controller.Instance.VarFlagSummary.getFlags();
+            var flags = Controller.Instance.VarFlagSummary.getFlags();
             this.effect = new ActivateEffect(flags.Length > 0 ? flags[0] : "");
         }
 
         public void draw()
         {
-            flags = Controller.Instance.VarFlagSummary.getFlags();
+            var flags = Controller.Instance.VarFlagSummary.getFlags();
             effect.setTargetId(flags[EditorGUILayout.Popup(TC.get("Condition.FlagID"), Array.IndexOf(flags, effect.getTargetId()), flags)]);
             EditorGUILayout.HelpBox(TC.get("ActivateEffect.Description"), MessageType.Info);
         }

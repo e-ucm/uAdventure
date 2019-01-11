@@ -89,7 +89,7 @@ namespace uAdventure.Editor
             CreateSceneEditorTab<ScenesWindowActiveAreas>(rect, new GUIContent(TC.get("ActiveAreasList.Title")), "Window", ScenesWindowType.ActiveAreas, sceneEditor);
             CreateSceneEditorTab<ScenesWindowExits>(rect, new GUIContent(TC.get("ExitsList.Title")), "Window", ScenesWindowType.Exits, sceneEditor);
             
-            if (Controller.Instance.playerMode() == DescriptorData.MODE_PLAYER_3RDPERSON)
+            if (Controller.Instance.PlayerMode== DescriptorData.MODE_PLAYER_3RDPERSON)
             {
                 CreateSceneEditorTab<ScenesWindowBarriers>(rect, new GUIContent(TC.get("BarriersList.Title")), "Window", ScenesWindowType.Barriers, sceneEditor);
                 CreateSceneEditorTab<ScenesWindowPlayerMovement>(rect, new GUIContent(TC.get("Trajectory.Title")), "Window", ScenesWindowType.PlayerMovement, sceneEditor);
@@ -119,7 +119,7 @@ namespace uAdventure.Editor
                 allElements.AddRange(scene.getExitsList().getExits().Cast<DataControl>());
 
                 var playerMode = ScenesWindowPlayerMovement.PlayerMode.NoPlayer;
-                if(Controller.Instance.playerMode() == Controller.FILE_ADVENTURE_3RDPERSON_PLAYER)
+                if(Controller.Instance.PlayerMode== Controller.FILE_ADVENTURE_3RDPERSON_PLAYER)
                 {
                     allElements.AddRange(scene.getBarriersList().getBarriers().Cast<DataControl>());
                     playerMode = ScenesWindowPlayerMovement.GetScenePlayerMode(scene);

@@ -26,7 +26,7 @@ namespace uAdventure.Editor
             {
                 Action = -1
             };
-            if (Controller.Instance.playerMode() == DescriptorData.MODE_PLAYER_3RDPERSON)
+            if (Controller.Instance.PlayerMode== DescriptorData.MODE_PLAYER_3RDPERSON)
             {
                 // Creating this component registers it in the scene editor
                 new InfluenceComponent(Rect.zero, new GUIContent(""), aStyle);

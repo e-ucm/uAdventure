@@ -501,9 +501,12 @@ namespace uAdventure.Editor
             GameRources.GetInstance().Reset();
         }
 
-        public int playerMode()
+        public int PlayerMode
         {
-            return adventureDataControl.getPlayerMode();
+            get
+            {
+                return adventureDataControl.getPlayerMode();
+            }
         }
 
         private bool CheckLayers()

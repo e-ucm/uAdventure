@@ -125,7 +125,7 @@ namespace uAdventure.Editor
 
         protected override string GetTitle(Effects Content, IEffect node)
         {
-            return node.getType().ToString();
+            return editors[node].EffectName;
         }
 
         protected override GUIContent OpenButtonText(Effects content, IEffect node)

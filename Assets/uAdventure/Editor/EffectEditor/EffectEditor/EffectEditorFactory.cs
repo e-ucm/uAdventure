@@ -32,44 +32,36 @@ namespace uAdventure.Editor
 
     public class EffectEditorFactoryImp : EffectEditorFactory
     {
+        private readonly List<System.Type> types;
+        private readonly List<EffectEditor> effectEditors;
 
-        private List<System.Type> types;
-        private List<EffectEditor> effectEditors;
-        private EffectEditor defaultEffectEditor;
+        private readonly IEnumerable<EffectEditor> usableEffects;
+        private readonly IEnumerable<string> usableEffectNames;
 
         public EffectEditorFactoryImp()
         {
-            this.effectEditors = new List<EffectEditor>();
+            var effectEditorType = typeof(EffectEditor);
+            types = System.AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(s => s.GetTypes())
+                .Where(p => !p.IsInterface && effectEditorType.IsAssignableFrom(p) && !p.IsAbstract)
+                .ToList();
 
-            if (types == null)
-            {
-                types = System.AppDomain.CurrentDomain.GetAssemblies().SelectMany(s => s.GetTypes()).Where(p => typeof(EffectEditor).IsAssignableFrom(p) && !p.IsAbstract).ToList();
-                types.Remove(typeof(EffectEditor));
-            }
-
-            foreach (System.Type t in types)
-            {
-                var instance = (EffectEditor)System.Activator.CreateInstance(t);
-                if(instance.Usable)
-                    this.effectEditors.Add(instance);
-            }
+            effectEditors = types.ConvertAll(t => (EffectEditor)System.Activator.CreateInstance(t));
+            usableEffects = effectEditors.Where(e => e.Usable);
+            usableEffectNames = usableEffects.Select(e => e.EffectName);
         }
 
         public override string[] CurrentEffectEditors
         {
             get
             {
-                string[] descriptors = new string[effectEditors.Count + 1];
-                for (int i = 0; i < effectEditors.Count; i++)
-                    descriptors[i] = effectEditors[i].EffectName;
-                return descriptors;
+                return usableEffectNames.ToArray();
             }
         }
 
 
         public override EffectEditor createEffectEditorFor(string effectName)
         {
-            Debug.Log("Create: " + effectName);
             var effectEditor = effectEditors.Find(e => e.EffectName.Equals(effectName, System.StringComparison.InvariantCultureIgnoreCase));
             if (effectEditor != null)
             {
@@ -80,24 +72,21 @@ namespace uAdventure.Editor
 
         public override EffectEditor createEffectEditorFor(IEffect effect)
         {
-            foreach (EffectEditor effectEditor in effectEditors)
-                if (effectEditor.manages(effect))
-                    return effectEditor.clone();
+            var effectEditor = effectEditors.Find(e => e.manages(effect));
+            if (effectEditor != null)
+            {
+                return effectEditor.clone();
+            }
 
             return null;
         }
 
         public override int EffectEditorIndex(IEffect effect)
         {
-
-            int i = 0;
-            foreach (EffectEditor effectEditor in effectEditors)
-                if (effectEditor.manages(effect))
-                    return i;
-                else
-                    i++;
-
-            return 0;
+            return Mathf.Max(0, usableEffects
+                .Select((e,i) => new { Editor = e, Index = i})
+                .First(e => e.Editor.manages(effect))
+                .Index);
         }
     }
 }

@@ -24,7 +24,7 @@ namespace uAdventure.Editor
             openedWindow = 0;
 
             tabs = new List<LayoutWindow>();
-            if (Controller.Instance.playerMode() == Controller.FILE_ADVENTURE_3RDPERSON_PLAYER)
+            if (Controller.Instance.PlayerMode== Controller.FILE_ADVENTURE_3RDPERSON_PLAYER)
             {
                 AddTab(new CharactersWindowAppearance(aStartPos, new GUIContent(TC.get("NPC.LookPanelTitle")), "Window") { IsPlayer = true });
             }

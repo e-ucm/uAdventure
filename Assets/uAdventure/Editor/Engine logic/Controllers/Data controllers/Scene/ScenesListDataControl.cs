@@ -189,7 +189,13 @@ namespace uAdventure.Editor
             // Add thew new scene
             Scene newScene = new Scene(id);
             scenesList.Add(newScene);
-            scenesDataControlList.Add(new SceneDataControl(newScene, controller.getPlayerImagePath()));
+            var sceneDataControl = new SceneDataControl(newScene, controller.getPlayerImagePath());
+            scenesDataControlList.Add(sceneDataControl);
+            if (Controller.Instance.PlayerMode == Controller.FILE_ADVENTURE_3RDPERSON_PLAYER && sceneDataControl.isPlayerAtDefaultPosition())
+            {
+                sceneDataControl.setPlayerScale(sceneDataControl.getPlayerAppropiateScale());
+            }
+
             controller.IdentifierSummary.addId<Scene>(id);
             controller.DataModified();
         }

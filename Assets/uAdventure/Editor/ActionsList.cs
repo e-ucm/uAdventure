@@ -137,7 +137,7 @@ public class ActionsList : ScriptableObject {
                         if (EditorGUI.EndChangeCheck()) action.setDocumentation(documentation);
                         break;
                     case 2:
-                        if (Controller.Instance.playerMode() == Controller.FILE_ADVENTURE_1STPERSON_PLAYER)
+                        if (Controller.Instance.PlayerMode== Controller.FILE_ADVENTURE_1STPERSON_PLAYER)
                         {
                             EditorGUI.LabelField(rect, TC.get("ActionsList.NotRelevant"));
                         }

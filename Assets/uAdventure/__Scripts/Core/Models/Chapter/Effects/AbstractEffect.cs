@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using System.Collections;
+using System.Text.RegularExpressions;
 
 namespace uAdventure.Core
 {
@@ -60,9 +61,15 @@ namespace uAdventure.Core
         protected virtual string ToEffectString()
         {
             var name = getType().ToString().Replace("_", " ").ToLower();
-            if (typeof(HasTargetId).IsAssignableFrom(GetType()))
+            if(getType() == EffectType.CUSTOM_EFFECT)
             {
-                var targetId = (this as HasTargetId).getTargetId();
+                name = Regex.Replace(GetType().Name.RemoveFromEnd("Effect"), "(\\B[A-Z])", " $1").ToLower();
+            }
+
+            var hasTargetId = this as HasTargetId;
+            if (hasTargetId != null)
+            {
+                var targetId = hasTargetId.getTargetId();
                 return name + " '" + targetId + "'";
             }
             return name;

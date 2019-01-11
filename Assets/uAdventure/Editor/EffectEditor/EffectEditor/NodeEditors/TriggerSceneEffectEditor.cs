@@ -9,25 +9,21 @@ namespace uAdventure.Editor
 {
     public class TriggerSceneEffectEditor : EffectEditor
     {
-        private bool collapsed = false;
-        public bool Collapsed { get { return collapsed; } set { collapsed = value; } }
+        public bool Collapsed { get; set; }
         private Rect window = new Rect(0, 0, 300, 0);
         private string[] scenes;
-        private SceneEditor localSceneEditor;
-        private Trajectory.Node playerDestination;
-        private List<DataControl> elements;
+        private readonly SceneEditor localSceneEditor;
+        private readonly Trajectory.Node playerDestination;
 
         public Rect Window
         {
             get
             {
-                if (collapsed) return new Rect(window.x, window.y, 50, 30);
-                else return window;
+                return Collapsed ? new Rect(window.x, window.y, 50, 30) : window;
             }
             set
             {
-                if (collapsed) window = new Rect(value.x, value.y, window.width, window.height);
-                else window = value;
+                window = Collapsed ? new Rect(value.x, value.y, window.width, window.height) : value;
             }
         }
 
@@ -36,8 +32,12 @@ namespace uAdventure.Editor
         public TriggerSceneEffectEditor()
         {
             scenes = Controller.Instance.IdentifierSummary.getIds<IChapterTarget>();
-            this.effect = new TriggerSceneEffect(scenes[0], 400, 300);
-            this.effect.DestinyScale = 1;
+            this.effect = new TriggerSceneEffect(scenes[0], 400, 300)
+            {
+                DestinyScale = 1
+            };
+
+            SetDestinyScene(0);
 
             localSceneEditor = new SceneEditor();
             playerDestination = new Trajectory.Node("", 0, 0, 1f);
@@ -47,48 +47,78 @@ namespace uAdventure.Editor
         public virtual void draw()
         {
             scenes = Controller.Instance.IdentifierSummary.getIds<IChapterTarget>();
+            EditorGUI.BeginChangeCheck();
             var sceneIndex = EditorGUILayout.Popup(TC.get("Element.Name2"), Array.IndexOf(scenes, effect.getTargetId()), scenes);
-            effect.setTargetId(scenes[sceneIndex]);
+            if (EditorGUI.EndChangeCheck())
+            {
+                SetDestinyScene(sceneIndex);
+            }
+
             if (sceneIndex == -1)
             {
-                EditorGUILayout.HelpBox("Please select a valid destination!", MessageType.Error);
+                EditorGUILayout.HelpBox("TriggerSceneEffectEditor.ValidDestination".Traslate(), MessageType.Error);
                 return;
             }
             
             var scenesList = Controller.Instance.SelectedChapterDataControl.getScenesList();
             // If the selected scene IS a scene (not a cutscene or any other type)
-            if(sceneIndex < scenesList.getScenes().Count)
+            if(Controller.Instance.PlayerMode == Controller.FILE_ADVENTURE_3RDPERSON_PLAYER && sceneIndex < scenesList.getScenes().Count)
             {
                 var pos = EditorGUILayout.Vector2IntField(TC.get("Inventory.Position"), new Vector2Int(effect.getX(), effect.getY()));
                 effect.setPosition(pos.x, pos.y);
 
                 EditorGUI.BeginChangeCheck();
-                bool useDestinyScale = EditorGUILayout.Toggle("Use destiny scale", effect.DestinyScale >= 0); // TODO LANG
+                bool useDestinyScale = EditorGUILayout.Toggle("TriggerSceneEffectEditor.UseScale".Traslate(), effect.DestinyScale >= 0);
                 if (EditorGUI.EndChangeCheck())
+                {
                     effect.DestinyScale = useDestinyScale ? 1f : float.MinValue;
+                }
 
                 if (useDestinyScale)
                 {
                     EditorGUI.BeginChangeCheck();
                     var newScale = Mathf.Max(0.001f, EditorGUILayout.FloatField(TC.get("SceneLocation.Scale"), effect.DestinyScale));
                     if (EditorGUI.EndChangeCheck())
+                    {
                         effect.DestinyScale = newScale;
+                    }
                 }
                 else
                 {
-                    EditorGUILayout.HelpBox("The player size will stay as before entering the exit.", MessageType.Info); // TODO LANG
+                    EditorGUILayout.HelpBox("TriggerSceneEffectEditor.SizeMaintained".Traslate(), MessageType.Info);
                 }
 
                 localSceneEditor.Components = EditorWindowBase.Components;
                 localSceneEditor.Scene = scenesList.getScenes()[sceneIndex];
-                playerDestination.setValues(effect.getX(), effect.getY(), effect.DestinyScale);
+                playerDestination.setValues(effect.getX(), effect.getY(), useDestinyScale ? effect.DestinyScale : 1f);
+
+                var previousScale = playerDestination.getScale();
 
                 localSceneEditor.Draw(GUILayoutUtility.GetRect(0, 200, GUILayout.ExpandWidth(true)));
                 effect.setPosition(playerDestination.getX(), playerDestination.getY());
-                effect.DestinyScale = playerDestination.getScale(); 
+                if(previousScale != playerDestination.getScale())
+                {
+                    effect.DestinyScale = playerDestination.getScale();
+                }
             }
 
             EditorGUILayout.HelpBox(TC.get("TriggerSceneEffect.Description"), MessageType.Info);
+        }
+
+        private void SetDestinyScene(int sceneIndex)
+        {
+            effect.setTargetId(scenes[sceneIndex]);
+
+            var scenesListDataControl = Controller.Instance.SelectedChapterDataControl.getScenesList();
+            var sceneDataControlIndex = scenesListDataControl.getSceneIndexByID(scenes[sceneIndex]);
+            if (sceneDataControlIndex != -1)
+            {
+                var destinationScene = scenesListDataControl.getScenes()[sceneDataControlIndex];
+                var defPlayerPos = destinationScene.getDefaultInitialPosition();
+                effect.setPosition((int)defPlayerPos.x, (int)defPlayerPos.y);
+                var defScale = destinationScene.getPlayerAppropiateScale();
+                effect.DestinyScale = defScale != 1 ? defScale : float.MinValue;
+            }
         }
 
         public IEffect Effect { get { return effect; } set { effect = value as TriggerSceneEffect; } }

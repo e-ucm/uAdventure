@@ -2133,6 +2133,10 @@ In the game you can define conditions based on the value of the variables.</entr
 <entry key="AddObjectToInventory.Description">Adds the item to the inventory</entry>
 <entry key="RemoveObjectFromInventory.Description">Removes the item from the inventory</entry>
   
+<entry key="TriggerSceneEffectEditor.ValidDestination">Please select a valid destination!</entry>
+<entry key="TriggerSceneEffectEditor.UseScale">Use destiny scale</entry>
+<entry key="TriggerSceneEffectEditor.SizeMaintained">The player size will stay as before entering the exit.</entry>
+  
 <entry key="RemoveElementEffect.Title">Remove element</entry>
 <entry key="RemoveElementEffect.Description">Removes the element(s) from the current scene</entry>
 <entry key="Scene.NoPlayer">Hide player</entry>
