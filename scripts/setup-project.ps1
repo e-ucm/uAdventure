@@ -40,6 +40,8 @@ Resolve-Error $LastExitCode $errorLog
 $errorLog = & New-Item -ItemType directory -Path "$($assets_folder)\\Editor\\Plugins" -Force 2>&1
 Resolve-Error $LastExitCode $errorLog
 
+# DLL Plugins
+Get-ChildItem -Path "$($project_path)\\Plugins" -Include *.dll -Recurse | Copy-Item -Destination "$($assets_folder)\\Plugins\\"
 # Tracker Folder
 $errorLog = & Remove-Item -Path "$($assets_folder)\\Plugins\\unity-tracker" -Recurse -Force 2>&1
 Resolve-Error $LastExitCode $errorLog
