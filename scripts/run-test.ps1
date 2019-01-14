@@ -44,8 +44,7 @@ If ( $process.ExitCode -eq 0 )
 }
 Else 
 {
-    Write-Error "Run tests failed. Exited with $($process.ExitCode)."
-    exit $process.ExitCode
+    Write-Error "Tests not passed. Exited with $($process.ExitCode)."
 }
 
 Write-Output 'Exhange dir:'
@@ -58,7 +57,7 @@ if (-not (Test-Path $test_file))
 }
 
 # upload results to AppVeyor
-Write-Output 'Uploading test results to AppVeyor...'
+Write-Output "Uploading test results to AppVeyor... (APPVEYOR JOB ID: $($env:APPVEYOR_JOB_ID)"
 try {
     $wc = New-Object 'System.Net.WebClient'
     $wc.UploadFile("https://ci.appveyor.com/api/testresults/nunit3/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\Exchange\testresults.xml))
