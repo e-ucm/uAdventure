@@ -60,7 +60,9 @@ if (-not (Test-Path $test_file))
 Write-Output "Uploading test results to AppVeyor... (APPVEYOR JOB ID: $($env:APPVEYOR_JOB_ID)"
 try {
     $wc = New-Object 'System.Net.WebClient'
-    $wc.UploadFile("https://ci.appveyor.com/api/testresults/nunit3/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\Exchange\testresults.xml))
+    $rawResponse = $wc.UploadFile("https://ci.appveyor.com/api/testresults/nunit3/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\Exchange\testresults.xml))
+    
+    Write-Output "Remote Response: $([System.Text.Encoding]::ASCII.GetString($rawResponse))"
 
     if ($?) {
         Write-Output 'Success!'
