@@ -40,9 +40,6 @@ Resolve-Error $LastExitCode $errorLog
 $errorLog = & New-Item -ItemType directory -Path "$($assets_folder)\\Editor\\Plugins" -Force 2>&1
 Resolve-Error $LastExitCode $errorLog
 
-# Plugins Folder
-$errorLog = & Copy-Item -Path "$($project_path)\\Plugins" -Destination "$($assets_folder)\\" -Recurse -Force 2>&1
-Resolve-Error $LastExitCode $errorLog
 # Tracker Folder
 $errorLog = & Remove-Item -Path "$($assets_folder)\\Plugins\\unity-tracker" -Recurse -Force 2>&1
 Resolve-Error $LastExitCode $errorLog
@@ -57,6 +54,8 @@ $errorLog = & Copy-Item "$($project_path)\\Plugins\\unity-tracker\\Tracker.prefa
 Resolve-Error $LastExitCode $errorLog
 # Core and Runner File
 $errorLog = & Copy-Item "$($build_folder)\\uAdventureScripts.dll" -Destination "$($assets_folder)\\Plugins\\uAdventureScripts.dll" 2>&1
+# Core and Runner File
+$errorLog = & Copy-Item "$($build_folder)\\uAdventurePlugins.dll" -Destination "$($assets_folder)\\Plugins\\uAdventurePlugins.dll" 2>&1
 Resolve-Error $LastExitCode $errorLog
 # Animations Folder
 $errorLog = & Copy-Item -Path "$($project_path)\\Animations" -Destination "$($assets_folder)\\" -Recurse -Force 2>&1
