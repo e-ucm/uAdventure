@@ -68,7 +68,7 @@ try {
     $fileHeader.FileName = 'testresults.xml'
     $fileContent = [System.Net.Http.StreamContent]::new($FileStream)
     $fileContent.Headers.ContentDisposition = $fileHeader
-    $fileContent.Headers.ContentType = [System.Net.Http.Headers.MediaTypeHeaderValue]::Parse("text/plain")
+    $fileContent.Headers.ContentType = [System.Net.Http.Headers.MediaTypeHeaderValue]::Parse("text/xml")
     $multipartContent.Add($fileContent)
     
     $Response = Invoke-WebRequest -Uri "https://ci.appveyor.com/api/testresults/nunit3/$($env:APPVEYOR_JOB_ID)" -Body $multipartContent -Method 'POST'
