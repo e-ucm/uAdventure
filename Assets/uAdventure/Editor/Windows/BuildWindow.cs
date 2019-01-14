@@ -4,6 +4,7 @@ using uAdventure;
 using uAdventure.Editor;
 using System;
 using BuildConfigs = uAdventure.Editor.Controller.BuildConfigs;
+using System.IO;
 
 public class BuildWindow : EditorWindow {
 
@@ -16,6 +17,10 @@ public class BuildWindow : EditorWindow {
     {
         var newWindow = CreateInstance<BuildWindow>();
         newWindow.Show();
+        if (!Directory.Exists("./Builds/"))
+        {
+            Directory.CreateDirectory("./Builds/");
+        }
         return newWindow;
     }
 
@@ -48,7 +53,7 @@ public class BuildWindow : EditorWindow {
         GUILayout.EndHorizontal();
 
         GUILayout.Label("Folder", "OL title", new GUILayoutOption[0]);
-        pathSelector.Path = BuildConfigs.path ?? "";
+        pathSelector.Path = BuildConfigs.path ?? Path.GetFullPath("./Builds/");
         pathSelector.DoLayout(GUILayout.ExpandWidth(true));
         BuildConfigs.path = pathSelector.Path.Replace("\\", "/");
 

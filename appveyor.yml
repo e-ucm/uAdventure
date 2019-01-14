@@ -48,7 +48,10 @@ after_build:
 
 test_script:
   - ps: . .\scripts\run-test.ps1
-
+  
+on_finish:
+  - sh: |
+      find "$APPVEYOR_BUILD_FOLDER" -type f -name 'testresults.xml' -print0 | xargs -0 -I '{}' curl -F 'file=@{}' "https://ci.appveyor.com/api/testresults/nunit3/$APPVEYOR_JOB_ID"
 #---------------------------------#
 #      artifacts configuration    #
 #---------------------------------#

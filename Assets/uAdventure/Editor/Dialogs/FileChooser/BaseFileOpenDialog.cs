@@ -153,14 +153,18 @@ public abstract class BaseFileOpenDialog : EditorWindow
 
 				if (isValid)
                 {
-                    var formats = this.fileFilter.Split(',');
-                    var validFormat = false;
-                    foreach (var format in formats)
+                    var validFormat = true;
+                    if (!string.IsNullOrEmpty(fileFilter))
                     {
-                        if (selectedAssetPath.EndsWith(format))
+                        var formats = this.fileFilter.Split(',');
+                        validFormat = false;
+                        foreach (var format in formats)
                         {
-                            validFormat = true;
-                            break;
+                            if (selectedAssetPath.EndsWith(format))
+                            {
+                                validFormat = true;
+                                break;
+                            }
                         }
                     }
 
