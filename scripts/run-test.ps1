@@ -59,13 +59,23 @@ if (-not (Test-Path $test_file))
 # upload results to AppVeyor
 Write-Output "Uploading test results to AppVeyor... (APPVEYOR JOB ID: $($env:APPVEYOR_JOB_ID)"
 try {
-    $wc = New-Object 'System.Net.WebClient'
-    $rawResponse = $wc.UploadFile("https://ci.appveyor.com/api/testresults/nunit3/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\Exchange\testresults.xml))
+
+    $multipartContent = [System.Net.Http.MultipartFormDataContent]::new()
+    $multipartFile = (Resolve-Path ".\Exchange\testresults.xml")
+    $FileStream = [System.IO.FileStream]::new($multipartFile, [System.IO.FileMode]::Open)
+    $fileHeader = [System.Net.Http.Headers.ContentDispositionHeaderValue]::new("form-data")
+    $fileHeader.Name = "fileName"
+    $fileHeader.FileName = 'testresults.xml'
+    $fileContent = [System.Net.Http.StreamContent]::new($FileStream)
+    $fileContent.Headers.ContentDisposition = $fileHeader
+    $fileContent.Headers.ContentType = [System.Net.Http.Headers.MediaTypeHeaderValue]::Parse("text/plain")
+    $multipartContent.Add($fileContent)
     
-    Write-Output "Remote Response: $([System.Text.Encoding]::ASCII.GetString($rawResponse))"
+    $Response = Invoke-WebRequest -Uri "https://ci.appveyor.com/api/testresults/nunit3/$($env:APPVEYOR_JOB_ID)" -Body $multipartContent -Method 'POST'
 
     if ($?) {
         Write-Output 'Success!'
+        Write-Output "Remote Response: $($response.Content)"
     } 
     else {
         Write-Error "Error! (Code $($LastExitCode)"
