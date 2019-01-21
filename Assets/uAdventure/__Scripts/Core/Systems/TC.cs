@@ -259,14 +259,15 @@ namespace uAdventure.Core
 
         public static string get(string identifier)
         {
-
             string text = null;
 
             if (guistrings != null && guistrings.ContainsKey(identifier))
+            {
                 text = guistrings[identifier];
+            }
             else
             {
-                text = "Error";
+                text = identifier;
                 Console.WriteLine("Identifier \"" + identifier + "\" not found");
             }
 

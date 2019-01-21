@@ -70,7 +70,7 @@ namespace uAdventure.Editor
         public DialogNodeEditor()
         {
             myNode = new DialogueConversationNode();
-            npc = new List<string> { "Player" };
+            npc = new List<string> { TC.get("ConversationLine.PlayerName") };
             if (Controller.Instance.SelectedChapterDataControl!= null)
             {
                 npc.AddRange(Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCsIDs());
@@ -134,7 +134,10 @@ namespace uAdventure.Editor
                     EditorGUILayout.BeginHorizontal();
                     
                     EditorGUIUtility.labelWidth = GUI.skin.label.CalcSize(new GUIContent(TC.get("ConversationEditor.Speaker"))).x;
-                    line.setName(npc[EditorGUILayout.Popup(TC.get("ConversationEditor.Speaker"), npc.IndexOf(line.getName()), npc.ToArray())]);
+
+                    var speaker = line.getName().Equals("Player") ? 0 : npc.IndexOf(line.getName());
+                    var newSpeaker = EditorGUILayout.Popup(TC.get("ConversationEditor.Speaker"), speaker, npc.ToArray());
+                    line.setName(newSpeaker == 0 ? "Player" : npc[newSpeaker]);
                     
                     // Bubble type extraction
                     var matched = ExString.Default(Regex.Match(line.getText(), @"^#([^\s]+)").Groups[1].Value, "-");
@@ -188,7 +191,7 @@ namespace uAdventure.Editor
             Rect btrect = GUILayoutUtility.GetRect(bttext, style);
             if (GUI.Button(btrect, bttext))
             {
-                myNode.addLine(new ConversationLine(TC.get("ConversationLine.PlayerName"), ""));
+                myNode.addLine(new ConversationLine("Player", ""));
             }
 
             EditorGUILayout.HelpBox(TC.get("ConversationEditor.NodeOption"), MessageType.None);
