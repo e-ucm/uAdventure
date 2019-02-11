@@ -6,7 +6,7 @@
   </description>
   <configuration keepShowing="no" keyboard-navigation="disabled" defaultClickAction="showDetails" perspective="regular" dragBehaviour="considerNonTargets" autosave="no" save-on-suspend="no">
     <gui type="contextual" inventoryPosition="top_bottom" />
-    <mode playerTransparent="no" />
+    <mode playerTransparent="yes" />
     <graphics mode="windowed" />
   </configuration>
   <contents>
