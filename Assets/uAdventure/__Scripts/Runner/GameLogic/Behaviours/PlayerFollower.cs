@@ -19,7 +19,6 @@ namespace uAdventure.Runner
                 if (background != value)
                 {
                     background = value;
-                    init = false;
                 }
             }
         }
@@ -28,6 +27,11 @@ namespace uAdventure.Runner
         protected void Start()
         {
             follow = !Game.Instance.GameState.IsFirstPerson;
+        }
+
+        public void Init()
+        {
+            init = false;
         }
 
         public void SettleInstant()
@@ -42,10 +46,6 @@ namespace uAdventure.Runner
             if (PlayerMB.Instance)
             {
                 transform.position = PlayerMB.Instance.transform.position;
-            }
-            else
-            {
-                transform.position = Background.transform.position; // Point it to the center
             }
 
             FixInside(transform, Background, z);

@@ -373,16 +373,27 @@ namespace uAdventure.Runner
             Debug.Log("Run target: " + scene_id);
             GUIManager.Instance.ShowHand(false);
             MenuMB.Instance.hide(true);
-            if (runnerTarget != null){
-                runnerTarget.Destroy(transition_time / 1000f);
-            }
 
-            // Here we connect with the IChapterTargetFactory and create an IRunnerChapterTarget
             IChapterTarget target = GameState.GetChapterTarget(scene_id);
 
-            runnerTarget = RunnerChapterTargetFactory.Instance.Instantiate(target);
-            runnerTarget.Data = target;
-            GameState.CurrentTarget = target.getId();
+            if (scene_id == GameState.CurrentTarget)
+            {
+                // TODO TRANSITIONS
+                runnerTarget.RenderScene();
+            }
+            else
+            {
+                if (runnerTarget != null)
+                {
+                    runnerTarget.Destroy(transition_time / 1000f);
+                }
+
+                // Here we connect with the IChapterTargetFactory and create an IRunnerChapterTarget
+
+                runnerTarget = RunnerChapterTargetFactory.Instance.Instantiate(target);
+                runnerTarget.Data = target;
+                GameState.CurrentTarget = target.getId();
+            }
 
             if (!trace)
             {

@@ -43,6 +43,7 @@ namespace uAdventure.Runner
         private Transform exitsHolder, activeAreasHolder, referencesHolder, background, foreground;
         private bool interactuable;
         private bool ready;
+        private bool firstRender = true;
         private bool dragging;
         private Vector2 endDragSpeed;
         private Dictionary<Representable, float> heights;
@@ -307,6 +308,7 @@ namespace uAdventure.Runner
 
         public void RenderScene()
         {
+            ready = false;
             this.transform.position = new Vector3(0, 0, 0);
             LoadParents();
             switch (SceneData.getType())
@@ -445,6 +447,7 @@ namespace uAdventure.Runner
                     }
                     break;
             }
+            firstRender = false;
         }
 
         private void LoadBackgroundMusic(ResourcesUni sr)
@@ -572,6 +575,13 @@ namespace uAdventure.Runner
                 if (playerFollower)
                 {
                     playerFollower.Background = background.gameObject;
+
+                    if (firstRender)
+                    {
+                        playerFollower.Init();
+                    }
+
+                    playerFollower.SettleInstant();
                 }
             }
 

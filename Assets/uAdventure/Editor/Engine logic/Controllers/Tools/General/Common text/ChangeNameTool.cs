@@ -16,10 +16,10 @@ namespace uAdventure.Editor
 
         private Controller controller;
 
-        public ChangeNameTool(Named scene, string name)
+        public ChangeNameTool(Named named, string name)
         {
 
-            this.named = scene;
+            this.named = named;
             this.name = name;
             this.controller = Controller.Instance;
         }
