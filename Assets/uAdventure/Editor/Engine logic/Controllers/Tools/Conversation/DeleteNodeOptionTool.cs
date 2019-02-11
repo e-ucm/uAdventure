@@ -16,7 +16,7 @@ namespace uAdventure.Editor
             this.linkIndex = optionIndex;
         }
 
-        public DeleteNodeOptionTool(ConversationNodeView parent, int optionIndex) : base(parent)
+        public DeleteNodeOptionTool(ConversationNodeDataControl parent, int optionIndex) : base(parent)
         {
 
             this.confirmText = TC.get("Conversation.ConfirmationDeleteOption");

@@ -303,22 +303,6 @@ namespace uAdventure.Core
             this.conditions = conditions;
         }
 
-        /*
-        @Override
-            public Object clone() throws CloneNotSupportedException
-        {
-
-            ConversationLine cl = (ConversationLine) super.clone( );
-            cl.audioPath = ( audioPath != null ? new string(audioPath ) : null );
-                cl.name = ( name != null ? new string(name ) : null );
-                cl.synthesizerVoice = synthesizerVoice;
-                cl.text = ( text != null ? new string(text ) : null );
-                cl.conditions = ( conditions != null ? (Conditions) conditions.clone( ) : null );
-                cl.keepShowing = keepShowing;
-                return cl;
-            }
-            */
-
         public bool isKeepShowing()
         {
 

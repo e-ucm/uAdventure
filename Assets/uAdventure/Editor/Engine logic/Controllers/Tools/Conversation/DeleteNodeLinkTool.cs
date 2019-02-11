@@ -18,7 +18,7 @@ namespace uAdventure.Editor
 
         protected string confirmText;
 
-        public DeleteNodeLinkTool(ConversationNodeView nodeView) : this((ConversationNode)nodeView)
+        public DeleteNodeLinkTool(ConversationNodeDataControl nodeView) : this((ConversationNode)nodeView)
         {
         }
 
