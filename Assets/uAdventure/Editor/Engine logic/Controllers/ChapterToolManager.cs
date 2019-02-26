@@ -46,29 +46,11 @@ namespace uAdventure.Editor
         {
             if (localToolManagers.Count == 0)
             {
-                bool added = globalToolManager.addTool(execute, tool);
-                if( added)
-                {
-                    Debug.Log("[ToolManager] Global Tool Manager: Tool \"" + tool.getToolName() + "\" ADDED");
-                }
-                else
-                {
-                    Debug.Log("[ToolManager] Global Tool Manager: Tool \"" + tool.getToolName() + "\" NOT ADDED");
-                }
-                return added;
+                return globalToolManager.addTool(execute, tool);
             }
             else
             {
-                bool added = localToolManagers.Peek().addTool(execute, tool);
-                if( added)
-                {
-                    Debug.Log("[ToolManager] Local Tool Manager: Tool \"" + tool.getToolName() + "\" ADDED");
-                }
-                else
-                {
-                    Debug.Log("[ToolManager] Local Tool Manager: Tool \"" + tool.getToolName() + "\" NOT ADDED");
-                }
-                return added;
+                return localToolManagers.Peek().addTool(execute, tool);
             }
         }
 
