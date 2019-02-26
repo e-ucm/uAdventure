@@ -167,6 +167,11 @@ namespace uAdventure.Editor
                 editors[node].Window = rect;
             }
         }
+
+        protected override void MoveNodes(ConversationDataControl Content, IEnumerable<ConversationNodeDataControl> nodes, Vector2 delta)
+        {
+            Content.moveNodes(nodes.First(), nodes.ToList(), new Vector2Int(Mathf.RoundToInt(delta.x), Mathf.RoundToInt(delta.y)));
+        }
     }
 
     public class ConversationEditorWindow : EditorWindow

@@ -28,6 +28,7 @@ namespace uAdventure.Editor
         protected abstract N[] GetNodes(T Content);
         protected abstract N[] ChildsFor(T Content, N parent);
         protected abstract void SetNodeRect(T Content, N node, Rect rect);
+        protected abstract void MoveNodes(T Content, IEnumerable<N> nodes, Vector2 delta);
         protected abstract Rect GetNodeRect(T Content, N node);
         protected abstract string GetTitle(T Content, N node);
         protected abstract void DrawNodeContent(T content, N node);
@@ -516,26 +517,19 @@ namespace uAdventure.Editor
             rects[node] = newRect;
             if(Event.current.type != EventType.Layout)
             {
-                SetNodeRect(Content, node, rects[node]);
-            }
-
-            if (newRect.position != rect.position)
-            {
-                var delta = newRect.position - rect.position;
-                rect.position += delta;
-                if (selection.Contains(node))
+                if (newRect.position != rect.position)
                 {
+                    var delta = newRect.position - rect.position;
+                    MoveNodes(Content, selection, delta);
+
                     foreach (var n in selection.Where(o => !o.Equals(node)))
                     {
-                        var selectedNodeRect = GetNodeRect(Content, n);
-                        selectedNodeRect.position += delta;
-                        SetNodeRect(Content, n, selectedNodeRect);
-
-                        var repaintRect = GetNodeRect(Content, n);
-                        GUILayout.Window(n.GetHashCode(), repaintRect, NodeWindow, GetTitle(Content, node), GUILayout.MinWidth(150));
-                        repaintRect.height = selectedNodeRect.height;
-                        SetNodeRect(Content, n, repaintRect);
+                        GUILayout.Window(n.GetHashCode(), GetNodeRect(Content, n), NodeWindow, GetTitle(Content, node), GUILayout.MinWidth(150));
                     }
+                }
+                else
+                {
+                    SetNodeRect(Content, node, rects[node]);
                 }
             }
         }

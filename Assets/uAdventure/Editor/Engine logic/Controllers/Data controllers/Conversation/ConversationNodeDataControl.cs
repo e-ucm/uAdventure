@@ -370,7 +370,7 @@ namespace uAdventure.Editor
         }
 
 
-        private class ChangeNodeRectTool : Tool
+        public class ChangeNodeRectTool : Tool
         {
             private readonly RectInt oldPos;
             private RectInt newPos;

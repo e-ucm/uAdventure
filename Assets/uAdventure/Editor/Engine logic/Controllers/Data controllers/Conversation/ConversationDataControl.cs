@@ -568,6 +568,107 @@ namespace uAdventure.Editor
                 return result;
             }
         }
+
+        public virtual bool moveNodes(ConversationNodeDataControl grabbed, List<ConversationNodeDataControl> selection, Vector2Int alpha)
+        {
+            return controller.AddTool(new MoveNodesTool(this, grabbed, selection, alpha));
+        }
+
+        private class MoveNodesTool : Tool
+        {
+            private readonly ConversationNodeDataControl grabbed;
+            private readonly Dictionary<ConversationNodeDataControl, Tool> subTools;
+            private readonly ConversationDataControl content;
+
+            public MoveNodesTool(ConversationDataControl content, ConversationNodeDataControl grabbed, List<ConversationNodeDataControl> selection, Vector2Int alpha)
+            {
+                this.content = content;
+                this.grabbed = grabbed;
+                this.subTools = CreateTools(selection, alpha);
+            }
+
+            private Dictionary<ConversationNodeDataControl, Tool> CreateTools(List<ConversationNodeDataControl> selection, Vector2Int alpha)
+            {
+                var tools = new Dictionary<ConversationNodeDataControl, Tool>();
+
+                selection.ForEach(n =>
+                {
+                    var rect = n.getEditorRect();
+                    rect.position += alpha;
+                    tools.Add(n, new ConversationNodeDataControl.ChangeNodeRectTool(n, rect));
+                });
+
+                return tools;
+            }
+
+            public override bool canRedo()
+            {
+                return subTools.All(kv => kv.Value.canRedo());
+            }
+
+            public override bool canUndo()
+            {
+                return subTools.All(kv => kv.Value.canUndo());
+            }
+
+            public override bool combine(Tool other)
+            {
+                var combined = false;
+                var otherMove = other as MoveNodesTool;
+                if(otherMove != null && grabbed == otherMove.grabbed && ContainSameKeys(subTools, otherMove.subTools))
+                {
+                    foreach(var kvSubTool in otherMove.subTools)
+                    {
+                        if (!subTools[kvSubTool.Key].combine(kvSubTool.Value))
+                        {
+                            return false;
+                        }
+                    }
+                    combined = true;
+                }
+
+                return combined;
+            }
+
+            bool ContainSameKeys(Dictionary<ConversationNodeDataControl, Tool> a, Dictionary<ConversationNodeDataControl, Tool> b)
+            {
+                return a.Keys.Count == b.Keys.Count && a.Keys.All(k => b.ContainsKey(k));
+            }
+
+            public override bool doTool()
+            {
+                if (subTools == null)
+                {
+                    return false;
+                }
+
+                return subTools.All(kv => kv.Value.doTool());
+            }
+
+            public override bool redoTool()
+            {
+                if (subTools == null)
+                {
+                    return false;
+                }
+
+                return subTools.All(kv => kv.Value.redoTool());
+            }
+
+            public override bool undoTool()
+            {
+                if (subTools == null)
+                {
+                    return false;
+                }
+
+                subTools.Reverse();
+                var result = subTools.All(kv => kv.Value.undoTool());
+                subTools.Reverse();
+
+                return result;
+            }
+        }
     }
 
 }
