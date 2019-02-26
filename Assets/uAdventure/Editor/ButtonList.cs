@@ -41,6 +41,18 @@ namespace uAdventure.Editor
 
         private void OnDrawFooter(Rect rect)
         {
+            // Update footerheight
+            if (this.footerHeight == 0 && buttons.Count > 0)
+            {
+                this.footerHeight = 13f;
+                this.Repaint();
+            }
+            else if (this.footerHeight > 0 && buttons.Count == 0)
+            {
+                this.footerHeight = 0;
+                this.Repaint();
+            }
+
             float xMax = rect.xMax;
             float num = xMax - (buttonWidth + defaults.buttonLeftMargin) * buttons.Count;
 

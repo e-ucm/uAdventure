@@ -156,8 +156,7 @@ namespace uAdventure.Editor
                 editor = EffectEditorFactory.Intance.createEffectEditorFor(editorNames[editorSelected]);
                 editor.Window = editors[node].Window;
                 editors[editor.Effect] = editor;
-                collapsedState[editor.Effect] = collapsedState[node];
-                collapsedState.Remove(node);
+                SetCollapsed(content, editor.Effect, IsCollapsed(content, node));
 
                 if (editor.manages(node))
                 {

@@ -196,8 +196,9 @@ namespace uAdventure.Core
             {
                 throw new Exception("You can only replace the first child");
             }
-
-            return nextNode = node;
+            var previousChild = nextNode;
+            nextNode = node;
+            return previousChild;
         }
     }
 }

@@ -445,12 +445,9 @@ namespace uAdventure.Runner
 
         public void showOptions(ConversationNodeHolder options)
         {
-            if (options.getNode().getType() == ConversationNodeViewEnum.OPTION)
+            var optionsNode = options.getNode() as OptionConversationNode;
+            if (optionsNode != null)
             {
-                var optionsNode = options.getNode() as OptionConversationNode;
-                if (optionsNode == null) // It must contain an OptionConversationNode
-                    return;
-
                 // Disable the UI interactivity
                 uAdventureRaycaster.Instance.enabled = false;
 

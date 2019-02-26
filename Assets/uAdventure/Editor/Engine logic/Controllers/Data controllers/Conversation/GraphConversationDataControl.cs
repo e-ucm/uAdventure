@@ -61,18 +61,7 @@ namespace uAdventure.Editor
 
         public override int[] getAddableNodes(ConversationNodeDataControl node)
         {
-
-            int[] addableNodes = null;
-            /*
-            // Dialogue nodes can add both dialogue and option nodes
-            if (node.getType() == ConversationNodeViewEnum.DIALOGUE)
-                addableNodes = new int[] { (int)ConversationNodeViewEnum.DIALOGUE, (int)ConversationNodeViewEnum.OPTION };
-
-            // Option nodes can only add dialogue nodes
-            else if (node.getType() == ConversationNodeViewEnum.OPTION)
-                addableNodes = new int[] { (int)ConversationNodeViewEnum.DIALOGUE };
-                */
-            return addableNodes;
+            return node.getAddableNodes();
         }
 
 
@@ -313,19 +302,14 @@ namespace uAdventure.Editor
             throw new NotImplementedException();
         }
 
-        public override bool linkNode(ConversationNodeDataControl fatherView, ConversationNodeDataControl childView)
+        public override bool linkNode(ConversationNodeDataControl fatherView, int nodeType, int position)
         {
-            throw new NotImplementedException();
+            return Controller.Instance.AddTool(new ConversationNodeDataControl.LinkConversationNodeTool(this, fatherView, nodeType, position));
         }
 
         public override bool linkNode(ConversationNodeDataControl fatherView, ConversationNodeDataControl childView, int position)
         {
-            throw new NotImplementedException();
-        }
-
-        public override bool deleteNode(ConversationNodeDataControl nodeView)
-        {
-            throw new NotImplementedException();
+            return Controller.Instance.AddTool(new ConversationNodeDataControl.LinkConversationNodeTool(this, fatherView, childView, position));
         }
 
         public override void setConversation(Conversation conversation)

@@ -17,7 +17,7 @@ namespace uAdventure.Editor
 
         protected override bool canLinkNode(ConversationNodeDataControl child)
         {
-            return true;
+            return child != this;
         }
 
         protected override void lineAdded(int v, object data) {}
@@ -28,25 +28,51 @@ namespace uAdventure.Editor
 
         protected override object lineRemoved(int lineIndex) { return null; }
         
-        protected override bool addChild(ConversationNodeDataControl child, ref object data)
+        protected override bool addChild(int index, ConversationNodeDataControl child, ref object data)
         {
             bool added = false;
-            if (getChildCount() < 1 && canLinkNode(child))
+            if(index == 0 && canLinkNode(child))
             {
                 added = true;
-                dialogConversationNode.addChild(child.getContent() as ConversationNode);
+                if (getChildCount() < 1)
+                {
+                    dialogConversationNode.addChild(child.getContent() as ConversationNode);
+                }
+                else
+                {
+                    var grandchild = conversationNode.getChild(0);
+                    var newChild = child.getContent() as ConversationNode;
+                    dialogConversationNode.replaceChild(index, newChild);
+                    if(newChild.getChildCount() > 0)
+                    {
+                        newChild.replaceChild(0, grandchild);
+                    }
+                    else
+                    {
+                        newChild.addChild(grandchild);
+                        UnityEngine.Debug.Log("A child was added without checking consistence");
+                    }
+                }
             }
             return added;
         }
 
-        protected override bool removeChild(ConversationNodeDataControl child, ref object data)
+        protected override bool removeChild(int index, ConversationNodeDataControl child, ref object data)
         {
             bool removed = false;
-            var childIndex = getChilds().IndexOf(child);
 
-            if (childIndex != -1)
+            if (index == 0 && conversationNode.getChildCount() > 0)
             {
-                data = conversationNode.removeChild(childIndex);
+                if(conversationNode.getChild(index).getChildCount() > 0 && canLinkNode(child.getChilds()[0]))
+                {
+                    // We set the niece as child
+                    data = conversationNode.replaceChild(index, conversationNode.getChild(index).getChild(0));
+                }
+                else
+                {
+                    data = conversationNode.removeChild(index);
+                }
+                removed = true;
             }
 
             return removed;

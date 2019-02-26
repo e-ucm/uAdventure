@@ -1,16 +1,18 @@
 ﻿using UnityEngine;
 using UnityEditor;
-using System.Collections;
 using System.Collections.Generic;
 
 using uAdventure.Core;
+using System.Text.RegularExpressions;
+using System.Linq;
+using UniRx;
+using System;
 
 namespace uAdventure.Editor
 {
     public class OptionNodeEditor : ConversationNodeEditor
     {
-        private OptionConversationNode myNode;
-        private Vector2 scroll = new Vector2(0, 0);
+        private OptionNodeDataControl myNode;
 
         private readonly Texture2D conditionsTex, noConditionsTex, effectTex, noEffectTex, linkTex, noLinkTex, answerTex, shuffleTex, questionTex;
         private readonly GUISkin noBackgroundSkin;
@@ -18,26 +20,24 @@ namespace uAdventure.Editor
         private readonly GUIContent answerContent, questionContent, shuffleContent;
 
         private ConversationEditor parent;
+        private readonly DataControlList linesList;
+        private IDisposable disposable;
 
         public Rect Window
         {
             get
             {
-                return new Rect(myNode.getEditorX(), myNode.getEditorY(), myNode.getEditorWidth(), myNode.getEditorHeight());
+                return myNode.getEditorRect().ToRect();
             }
             set
             {
-                myNode.setEditorX((int)value.x);
-                myNode.setEditorY((int)value.y);
-                myNode.setEditorWidth((int)value.width);
-                myNode.setEditorHeight((int)value.height);
+                value.width = Mathf.Max(value.width, 200);
+                myNode.setEditorRect(value.ToRectInt());
             }
         }
 
         public OptionNodeEditor()
         {
-            myNode = new OptionConversationNode();
-
             conditionsTex = Resources.Load<Texture2D>("EAdventureData/img/icons/conditions-24x24");
             noConditionsTex = Resources.Load<Texture2D>("EAdventureData/img/icons/no-conditions-24x24");
 
@@ -68,151 +68,221 @@ namespace uAdventure.Editor
             closeStyle.focused.textColor = Color.red;
             closeStyle.active.textColor = Color.red;
             closeStyle.hover.textColor = Color.red;
+
+            linesList = new DataControlList
+            {
+                Columns = new List<ColumnList.Column>
+                {
+                    new ColumnList.Column
+                    {
+                        Text = "",
+                        SizeOptions = new GUILayoutOption[]{ GUILayout.MaxWidth(20) }
+                    },
+                    new ColumnList.Column
+                    {
+                        Text = "Text",
+                        SizeOptions = new GUILayoutOption[]{ GUILayout.ExpandWidth(true), GUILayout.MinWidth(100) }
+                    },
+                    new ColumnList.Column
+                    {
+                        Text = "¿✓?",
+                        SizeOptions = new GUILayoutOption[]{ GUILayout.MaxWidth(25) }
+                    },
+                    new ColumnList.Column
+                    {
+                        Text = "Cond.",
+                        SizeOptions = new GUILayoutOption[]{ GUILayout.MaxWidth(25) }
+                    },
+                    new ColumnList.Column
+                    {
+                        Text = "Child",
+                        SizeOptions = new GUILayoutOption[]{ GUILayout.MaxWidth(25) }
+                    }
+                },
+                drawCell = (rect, index, column, isActive, isFocused) =>
+                {
+                    var line = this.linesList.list[index] as ConversationLineDataControl;
+                    switch (column)
+                    {
+                        case 0: GUI.Label(rect, index.ToString()); break;
+                        case 1: // Text
+                            EditorGUI.BeginChangeCheck();
+                            var newText = EditorGUI.TextField(rect, line.getText());
+                            if (EditorGUI.EndChangeCheck())
+                            {
+                                line.setText(newText);
+                            }
+                            break;
+                        case 2: // Correct
+                            DoCorrectEditor(rect, line);
+                            break;
+                        case 3: // Conditions
+                            DoConditionsEditor(rect, line.getConditions());
+                            break;
+                        case 4: // Child
+                            DoChildEditor(rect, index);
+                            break;
+                    }
+                }
+            };
+        }
+
+        private void DoChildEditor(Rect rect, int index)
+        {
+            if (myNode.getChilds().Count <= index)
+            {
+                return;
+            }
+
+            var hasLink = myNode.getChilds()[index] != null;
+            if (GUI.Button(rect, hasLink ? linkTex : noLinkTex, noBackgroundSkin.button))
+            {
+                parent.StartSetChild(this.myNode, index);
+            }
+        }
+
+        private void DoConditionsEditor(Rect rect, ConditionsController conditions)
+        {
+            var hasConditions = conditions.getBlocksCount() > 0;
+            if (GUI.Button(rect, hasConditions ? conditionsTex : noConditionsTex, noBackgroundSkin.button))
+            {
+                ConditionEditorWindow window = (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
+                window.Init(conditions);
+            }
+        }
+
+        private static void DoCorrectEditor(Rect rect, ConversationLineDataControl line)
+        {
+            EditorGUI.BeginChangeCheck();
+            var correct = EditorGUI.Toggle(rect, line.getXApiCorrect());
+            if (EditorGUI.EndChangeCheck())
+            {
+                line.setXApiCorrect(correct);
+            }
         }
 
         public void setParent(ConversationEditor parent)
         {
             this.parent = parent;
+            if (Node == null || !parent.Content.getAllNodes().Contains(Node))
+            {
+                Node = parent.Content.getNodeDataControl(new OptionConversationNode()) as OptionNodeDataControl;
+            }
         }
 
         public void draw()
         {
-
-            GUIStyle style = new GUIStyle()
+            using (new GUILayout.VerticalScope())
             {
-                padding = new RectOffset(5, 5, 5, 5)
-            };
-            EditorGUILayout.BeginVertical();
-            // Options configuration
-            EditorGUILayout.BeginHorizontal();
-            questionContent.tooltip = TC.get("Conversation.KeepShowing");
-            myNode.setKeepShowing(GUILayout.Toggle(myNode.isKeepShowing(), questionContent, "Button"));
-            shuffleContent.tooltip = TC.get("Conversation.OptionRandomly");
-            myNode.setRandom(GUILayout.Toggle(myNode.isRandom(), shuffleContent, "Button"));
-            answerContent.tooltip = TC.get("Conversation.ShowUserOption");
-            myNode.setShowUserOption(GUILayout.Toggle(myNode.isShowUserOption(), answerContent, "Button"));
-            EditorGUILayout.EndHorizontal();
-
-            EditorGUILayout.HelpBox(TC.get("ConversationEditor.AtLeastOne"), MessageType.None);
-			GUILayout.BeginHorizontal ();
-			GUILayout.Label("Question ID: ");
-			//Controller.getInstance ().getIdentifierSummary ().add
-			myNode.setXApiQuestion(EditorGUILayout.TextField(myNode.getXApiQuestion()));
-			if (myNode.getXApiQuestion () == "") {
-				var lastRect = GUILayoutUtility.GetLastRect ();
-				var guistyle = new GUIStyle (GUI.skin.label);
-				guistyle.normal.textColor = Color.gray;
-				GUI.Label (lastRect, " Required for analytics", guistyle);
-			}
-			GUILayout.EndHorizontal ();
-
-            if (myNode.getLineCount() > 0)
-            {
-                bool isScrolling = false;
-
-                if (myNode.getLineCount() > 10)
+                // Options configuration
+                using (new GUILayout.HorizontalScope())
                 {
-                    scroll = EditorGUILayout.BeginScrollView(scroll, GUILayout.MinWidth(360), GUILayout.Height(190));
-                    isScrolling = true;
-                }
-
-                for (int i = 0; i < myNode.getLineCount(); i++)
-                {
-                    EditorGUILayout.BeginHorizontal();
-
-					EditorGUIUtility.labelWidth = GUI.skin.label.CalcSize(new GUIContent((i+1) + ": ")).x;
-					myNode.getLine(i).setText(EditorGUILayout.TextField((i+1) + ": ", myNode.getLine(i).getText(), GUILayout.ExpandWidth(true)));
-					myNode.getLine (i).setXApiCorrect (EditorGUILayout.Toggle(myNode.getLine (i).getXApiCorrect (), GUILayout.Width(15)));
-					GUILayout.Space (5);
-
-                    if (DrawLineOptions(i, myNode.getLine(i).getConditions()))
+                    // KeepShowing
+                    questionContent.tooltip = TC.get("Conversation.KeepShowing");
+                    EditorGUI.BeginChangeCheck();
+                    var keepShowing = GUILayout.Toggle(myNode.KeepShowing, questionContent, "Button");
+                    if (EditorGUI.EndChangeCheck())
                     {
-                        myNode.removeLine(i);
+                        myNode.KeepShowing = keepShowing;
                     }
-                    EditorGUILayout.EndHorizontal();
+
+                    // KeepShowing
+                    shuffleContent.tooltip = TC.get("Conversation.OptionRandomly");
+                    EditorGUI.BeginChangeCheck();
+                    var random = GUILayout.Toggle(myNode.Random, shuffleContent, "Button");
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        myNode.Random = random;
+                    }
+
+                    // Show User Option
+                    answerContent.tooltip = TC.get("Conversation.ShowUserOption");
+                    EditorGUI.BeginChangeCheck();
+                    var showUserOption = GUILayout.Toggle(myNode.ShowUserOption, answerContent, "Button");
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        myNode.ShowUserOption = showUserOption;
+                    }
                 }
+
+                EditorGUILayout.HelpBox(TC.get("ConversationEditor.AtLeastOne"), MessageType.None);
+
+                using (new GUILayout.HorizontalScope())
+                {
+                    GUILayout.Label("Question ID: ");
+                    EditorGUI.BeginChangeCheck();
+                    var newXApiQuestion = EditorGUILayout.TextField(myNode.getXApiQuestion());
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        myNode.setXApiQuestion(newXApiQuestion);
+                    }
+
+                    if (myNode.getXApiQuestion() == "")
+                    {
+                        var lastRect = GUILayoutUtility.GetLastRect();
+                        var guistyle = new GUIStyle(GUI.skin.label);
+                        guistyle.normal.textColor = Color.gray;
+                        GUI.Label(lastRect, " Required for analytics", guistyle);
+                    }
+                }
+
+                var min = linesList.headerHeight + linesList.footerHeight + linesList.elementHeight + 5;
+                linesList.DoList(Mathf.Max(min, Mathf.Min(150, linesList.elementHeight * (linesList.count-1) + min)));
 
                 // Timer
-
-                EditorGUILayout.BeginHorizontal();
-                EditorGUIUtility.labelWidth = 0;
-                if (EditorGUILayout.Toggle("Timeout: ", myNode.Timeout >= 0))
+                using (new GUILayout.HorizontalScope())
                 {
-                    if (myNode.Timeout < 0)
+                    if (EditorGUILayout.Toggle("Timeout: ", myNode.Timeout >= 0))
                     {
-                        parent.addChild(this.myNode, new DialogueConversationNode());
+                        myNode.Timeout = Mathf.Clamp(EditorGUILayout.FloatField(myNode.Timeout), 0.1f, float.MaxValue);
+                        GUILayout.Space(5);
+                        DoConditionsEditor(GUILayoutUtility.GetRect(15,15), myNode.TimeoutConditions);
+                        DoChildEditor(GUILayoutUtility.GetRect(15, 15), myNode.getChildCount() - 1);
                     }
-
-                    myNode.Timeout = Mathf.Clamp(EditorGUILayout.FloatField(myNode.Timeout), 0, float.MaxValue);
-                    GUILayout.Space(5);
-                    if (DrawLineOptions(myNode.getChildCount(), myNode.TimeoutConditions)) 
+                    else
                     {
                         myNode.Timeout = -1f;
                     }
                 }
-                else
-                {
-                    myNode.Timeout = -1f;
-                }
-                
-                EditorGUILayout.EndHorizontal();
-                
-                if (isScrolling)
-                {
-                    EditorGUILayout.EndScrollView();
-                }
-            }
 
-            EditorGUILayout.BeginHorizontal();
-            GUIContent bttext = new GUIContent(TC.get("ConversationEditor.AddOptionChild"));
-            Rect btrect = GUILayoutUtility.GetRect(bttext, style);
-            if (GUI.Button(btrect, bttext))
-            {
-                myNode.addLine(new ConversationLine("Player", ""));
-                parent.addChild(this.myNode, new DialogueConversationNode());
+                using (new GUILayout.HorizontalScope())
+                {
+                    var hasEffects = myNode.getEffects().getEffects().Count > 0;
+                    if (GUILayout.Button(hasEffects ? effectTex : noEffectTex, noBackgroundSkin.button, GUILayout.Width(24), GUILayout.Height(24)))
+                    {
+                        EffectEditorWindow window = (EffectEditorWindow)ScriptableObject.CreateInstance(typeof(EffectEditorWindow));
+                        window.Init(myNode.getEffects());
+                    }
+                }
             }
-
-            var hasEffects = myNode.getEffects().getEffects().Count > 0;
-            if (GUILayout.Button(hasEffects ? effectTex : noEffectTex, noBackgroundSkin.button, GUILayout.Width(24), GUILayout.Height(24)))
-            {
-                EffectEditorWindow window = (EffectEditorWindow)ScriptableObject.CreateInstance(typeof(EffectEditorWindow));
-                window.Init(myNode.getEffects());
-            }
-            EditorGUILayout.EndHorizontal();
-            EditorGUILayout.EndVertical();
+            
         }
 
-        private bool DrawLineOptions(int optionIndex, Conditions conditions)
+        public ConversationNodeDataControl Node { get { return myNode; }
+            set
+            {
+                if (disposable != null)
+                {
+                    disposable.Dispose();
+                }
+
+                myNode = value as OptionNodeDataControl;
+                disposable = myNode.Subscribe(_ => UpdateList());
+                UpdateList();
+            }
+        }
+
+        private void UpdateList()
         {
-            var hasConditions = conditions.GetConditionsList().Count > 0;
-
-            if (GUILayout.Button(hasConditions ? conditionsTex : noConditionsTex, noBackgroundSkin.button, GUILayout.Width(15), GUILayout.Height(15)))
-            {
-                ConditionEditorWindow window = (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
-                window.Init(conditions);
-            }
-
-            var hasLink = myNode.getChild(optionIndex) != null;
-            if (GUILayout.Button(hasLink ? linkTex : noLinkTex, noBackgroundSkin.button, GUILayout.Width(15), GUILayout.Height(15)))
-            {
-                parent.StartSetChild(this.myNode, optionIndex);
-            }
-
-            if (GUILayout.Button("X", closeStyle, GUILayout.Width(15), GUILayout.Height(15)))
-            {
-                myNode.removeChild(optionIndex);
-                return true;
-            }
-            return false;
+            linesList.SetData(myNode, (node) => (node as ConversationNodeDataControl).getLines().Cast<DataControl>().ToList());
         }
 
-        public ConversationNode Node { get { return myNode; } set { myNode = value as OptionConversationNode; } }
         public string NodeName { get { return "Option"; } }
         public ConversationNodeEditor clone() { return new OptionNodeEditor(); }
 
-        public bool manages(ConversationNode c)
+        public bool manages(ConversationNodeDataControl c)
         {
-            return c.GetType() == myNode.GetType();
+            return c is OptionNodeDataControl;
         }
     }
 }

@@ -21,7 +21,7 @@ namespace uAdventure.Editor
         public BaseWindow.VoidMethodDelegate EndWindows;
         public new BaseWindow.VoidMethodDelegate Repaint;
 
-        protected T Content { get; set; }
+        public T Content { get; protected set; }
         /*******************
 		 *  PROPERTIES
 		 * *****************/
@@ -448,15 +448,17 @@ namespace uAdventure.Editor
                     Rect from = GetNodeRect(Content, n);
 
                     var childs = ChildsFor(Content, n);
-                    int childcount = childs.Length;
+
+                    var isLookingThis = n.Equals(lookingChildNode);
+                    int childcount = isLookingThis ? Mathf.Max(childs.Length, lookingChildSlot + 1) : childs.Length;
 
                     float h = from.height / (childcount * 1.0f);
 
                     for (int i = 0; i < childcount; i++)
                     {
                         Rect fromRect = SumRect(from, new Rect(0, h * i, 0, h - from.height));
-                        var isLookingThis = n.Equals(lookingChildNode) && lookingChildSlot == i;
-                        if (isLookingThis)
+                        var isCurrentChild = isLookingThis && lookingChildSlot == i;
+                        if (isCurrentChild)
                         {
                             if (hovering != -1)
                             {
@@ -464,13 +466,13 @@ namespace uAdventure.Editor
                             }
                             else
                             {
-                                CurveFromTo(fromRect, new Rect(Event.current.mousePosition, Vector2.one), blue);
+                                CurveFromTo(fromRect, new Rect(Event.current.mousePosition, new Vector2(150, 0)), blue);
                             }
                         }
-                        if (childs[i] != null)
+                        if (i < childs.Length && childs[i] != null)
                         {
                             Rect to = GetNodeRect(Content, childs[i]);
-                            if (isLookingThis)
+                            if (isCurrentChild)
                             {
                                 CurveFromTo(fromRect, to, red);
                             }
@@ -491,18 +493,31 @@ namespace uAdventure.Editor
             GetNodes(Content).ForEach(n => CreateWindow(n));
         }
 
-        void CreateWindow(N node)
+        private Dictionary<N, Rect> rects = new Dictionary<N, Rect>();
+
+        protected virtual void CreateWindow(N node)
         {
             nodes[node.GetHashCode()] = node;
+            if (!rects.ContainsKey(node))
+            {
+                rects.Add(node, GetNodeRect(Content, node));
+            }
 
-            var rect = GetNodeRect(Content, node);
+            var rect = rects[node];
+
             if (Event.current.type == EventType.Layout)
             {
+                rect = GetNodeRect(Content, node);
                 rect.height = 0; // Reset the height for layouting
+                rects[node] = rect;
             }
 
             var newRect = GUILayout.Window(node.GetHashCode(), rect, NodeWindow, GetTitle(Content, node), GUILayout.MinWidth(150));
-            SetNodeRect(Content, node, newRect);
+            rects[node] = newRect;
+            if(Event.current.type != EventType.Layout)
+            {
+                SetNodeRect(Content, node, rects[node]);
+            }
 
             if (newRect.position != rect.position)
             {
@@ -691,7 +706,8 @@ namespace uAdventure.Editor
         private readonly Vector2 CollapsedSize = new Vector2(200, 50);
         private readonly GUIContent openButton = new GUIContent();
         private GUIStyle closeStyle, collapseStyle, buttonstyle;
-        protected Dictionary<N, bool> collapsedState;
+        private Dictionary<N, bool> collapsedState;
+        private N open;
 
         public override void Init(T content)
         {
@@ -738,6 +754,16 @@ namespace uAdventure.Editor
             }
         }
 
+        protected override void CreateWindow(N node)
+        {
+            base.CreateWindow(node);
+            if (open != null && open.Equals(node) && Event.current.type != EventType.Layout)
+            {
+                SetCollapsed(Content, node, false);
+                open = default(N);
+            }
+        }
+
         protected override void DrawNodeContent(T content, N node)
         {
 
@@ -749,7 +775,7 @@ namespace uAdventure.Editor
                 GUILayout.BeginHorizontal();
                 if (GUI.Button(btrect, bttext))
                 {
-                    collapsedState[node] = false;
+                    open = node;
                 }
                 GUILayout.EndHorizontal();
             }
@@ -769,7 +795,7 @@ namespace uAdventure.Editor
         {
             if (GUILayout.Button("-", collapseStyle, GUILayout.Width(15), GUILayout.Height(15)))
             {
-                collapsedState[node] = true;
+                SetCollapsed(Content, node, true);
             }
             if (GUILayout.Button("X", closeStyle, GUILayout.Width(15), GUILayout.Height(15)))
             {
@@ -780,6 +806,11 @@ namespace uAdventure.Editor
         {
             openButton.text = TC.get("GeneralText.Open");
             return openButton;
+        }
+
+        protected virtual void SetCollapsed(T Content, N node, bool collapsed)
+        {
+            collapsedState[node] = collapsed;
         }
 
         protected virtual bool IsCollapsed(T Content, N node)

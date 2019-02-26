@@ -75,7 +75,7 @@ namespace uAdventure.Editor
 
             // If the node is a DialogueNode write the lines one after another, and then the child (or the mark if it is no
             // child)
-            if (currentNode.getType() == ConversationNodeViewEnum.DIALOGUE)
+            if (currentNode is DialogueConversationNode)
             {
 
                 // For each line of the node
@@ -158,7 +158,7 @@ namespace uAdventure.Editor
             }
 
             // If the node is a OptionNode write a "response" element, and inside it a "option" element with its content
-            else if (currentNode.getType() == ConversationNodeViewEnum.OPTION)
+            else if (currentNode is OptionConversationNode)
             {
                 // Create the "response" element
                 XmlElement response = document.CreateElement("response");
@@ -249,6 +249,10 @@ namespace uAdventure.Editor
                     if (node.getEditorY() != -1)
                     {
                         nodeElement.SetAttribute("editor-y", node.getEditorY().ToString());
+                    }
+                    if (node.getEditorCollapsed())
+                    {
+                        nodeElement.SetAttribute("editor-collapsed", "yes");
                     }
                     // For each line of the node
                     for (int j = 0; j < node.getLineCount(); j++)
@@ -373,10 +377,14 @@ namespace uAdventure.Editor
                     {
                         nodeElement.SetAttribute("editor-y", node.getEditorY().ToString());
                     }
+                    if (node.getEditorCollapsed())
+                    {
+                        nodeElement.SetAttribute("editor-collapsed", "yes");
+                    }
                     // Adds the x position of the options conversations node
-                    nodeElement.SetAttribute("x", optionConversationNode.getX().ToString());
+                    nodeElement.SetAttribute("x", optionConversationNode.getEditorX().ToString());
                     // Adds a random attribute if "preListening" is activate in conversation node data
-                    nodeElement.SetAttribute("y", optionConversationNode.getY().ToString());
+                    nodeElement.SetAttribute("y", optionConversationNode.getEditorY().ToString());
 
                     // For each line of the node
                     for (int j = 0; j < node.getLineCount(); j++)
