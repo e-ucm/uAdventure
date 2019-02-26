@@ -330,13 +330,36 @@ namespace uAdventure.Core
             this.preListening = preHearing;
         }
 
+        public void setBottomPosition()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void setTopPosition()
+        {
+            throw new NotImplementedException();
+        }
+
         public override ConversationNode replaceChild(int index, ConversationNode node)
         {
             if (index > getChildCount())
+            {
                 throw new Exception("Replacing out of bounds!");
+            }
 
-            optionNodes[index] = node;
-            return optionNodes[index] = node;
+            if (optionNodes.Count == index)
+            {
+                var previousChild = timerChild;
+                timerChild = node;
+                return previousChild;
+            }
+            else
+            {
+                var previousChild = optionNodes[index];
+                optionNodes[index] = node;
+                return previousChild;
+            }
+
         }
     }
 }

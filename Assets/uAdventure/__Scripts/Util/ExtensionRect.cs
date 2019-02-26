@@ -293,4 +293,18 @@ public static class ExtensionRect
 
         return aa;
     }
+
+    public static Rect ToRect(this RectInt rect)
+    {
+        return new Rect(rect.x, rect.y, rect.width, rect.height);
+    }
+    public static RectInt ToRectInt(this Rect rect)
+    {
+        return new RectInt(Mathf.RoundToInt(rect.x), Mathf.RoundToInt(rect.y), Mathf.RoundToInt(rect.width), Mathf.RoundToInt(rect.height));
+    }
+
+    public static bool IsSameRect(this RectInt rect, RectInt other)
+    {
+        return rect.position == other.position && rect.size == other.size;
+    }
 }

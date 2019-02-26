@@ -15,6 +15,8 @@ namespace uAdventure.Core
           */
         public GraphConversation(string conversationName) : base(Conversation.GRAPH, conversationName, new DialogueConversationNode())
         {
+            getRootNode().setEditorX(50);
+            getRootNode().setEditorY(50);
         }
 
         /**
@@ -59,14 +61,6 @@ namespace uAdventure.Core
 
             return nodes;
         }
-        /*
-        @Override
-        public Object clone() throws CloneNotSupportedException
-        {
-
-            GraphConversation gc = (GraphConversation) super.clone( );
-            return gc;
-        }*/
 
         public override object Clone()
         {

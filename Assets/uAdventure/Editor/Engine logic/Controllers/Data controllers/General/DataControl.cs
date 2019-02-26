@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 
 using uAdventure.Core;
+using UniRx;
+using System;
 
 namespace uAdventure.Editor
 {
@@ -11,8 +13,9 @@ namespace uAdventure.Editor
      * elements of the script. Each class must hold the element that is going to be
      * checked.
      */
-    public abstract class DataControl : Searchable
+    public abstract class DataControl : Searchable, IObservable<DataControl>
     {
+        private readonly List<DataControlDisposable> disposables;
 
         /**
          * Link to the main controller.
@@ -26,7 +29,7 @@ namespace uAdventure.Editor
          */
         protected DataControl()
         {
-
+            disposables = new List<DataControlDisposable>();
             controller = Controller.Instance;
         }
 
@@ -293,6 +296,7 @@ namespace uAdventure.Editor
             controller.replaceIdentifierReferences(oldId, newId);
             controller.IdentifierSummary.deleteId<T>(oldId);
             controller.IdentifierSummary.addId<T>(newId);
+            Changed();
 
             return newId;
         }
@@ -309,5 +313,40 @@ namespace uAdventure.Editor
 				}
 			}
 		}
+
+        protected void Changed()
+        {
+            disposables.ForEach(d => d.Observer.OnNext(this));
+        }
+
+        public IDisposable Subscribe(IObserver<DataControl> observer)
+        {
+            return new DataControlDisposable(this, observer);
+        }
+
+        public sealed class DataControlDisposable : IDisposable
+        {
+            private readonly IObserver<DataControl> observer;
+            private readonly DataControl toObserve;
+
+            public DataControlDisposable(DataControl toObserve, IObserver<DataControl> observer)
+            {
+                this.toObserve = toObserve;
+                toObserve.disposables.Add(this);
+                this.observer = observer;
+            }
+
+            ~DataControlDisposable()
+            {
+                Dispose();
+            }
+
+            public void Dispose()
+            {
+                toObserve.disposables.Remove(this);
+            }
+
+            public IObserver<DataControl> Observer { get { return observer; } }
+        }
     }
 }

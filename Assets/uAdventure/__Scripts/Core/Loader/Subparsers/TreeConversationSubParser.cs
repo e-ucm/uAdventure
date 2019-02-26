@@ -246,7 +246,9 @@ namespace uAdventure.Core
                 }
 
                 // Create a new OptionNode, and link it to the current node
-                ConversationNode nuevoNodoOpcion = new OptionConversationNode(random, keepShowing, showUserOption, preListening, x, y);
+                ConversationNode nuevoNodoOpcion = new OptionConversationNode(random, keepShowing, showUserOption, preListening);
+                nuevoNodoOpcion.setEditorX(x);
+                nuevoNodoOpcion.setEditorY(y);
                 currentNode.addChild(nuevoNodoOpcion);
 
                 // Change the actual node for the option node recently created

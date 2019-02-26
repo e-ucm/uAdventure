@@ -10,6 +10,7 @@ namespace uAdventure.Core
      */
     public abstract class ConversationNode : ICloneable
     {
+        private bool editorCollapsed;
         private int xEditor;
         private int yEditor;
         private int wEditor;
@@ -24,6 +25,7 @@ namespace uAdventure.Core
 
         protected ConversationNode()
         {
+            this.editorCollapsed = false;
             this.xEditor = -1;
             this.yEditor = -1;
             this.wEditor = 150;
@@ -175,6 +177,16 @@ namespace uAdventure.Core
         {
 
             return getLine(line).getSynthesizerVoice();
+        }
+
+        public bool getEditorCollapsed()
+        {
+            return editorCollapsed;
+        }
+
+        public void setEditorCollapsed(bool editorCollapsed)
+        {
+            this.editorCollapsed = editorCollapsed;
         }
 
         public int getEditorX()
