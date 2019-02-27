@@ -23,44 +23,57 @@ namespace uAdventure.Runner
 
         public bool Update(IChapterTarget target)
         {
-            var isSceneType = Milestone.getType() == Completable.Milestone.MilestoneType.SCENE;
-            var isTargetedScene = Milestone.getId() == target.getId();
+            bool hasBeenUpdated = false;
 
-            if (!Reached && isSceneType && isTargetedScene)
+            if (!Reached)
             {
-                Reached = true;
-            }
+                var isSceneType = Milestone.getType() == Completable.Milestone.MilestoneType.SCENE;
+                var isTargetedScene = Milestone.getId() == target.getId();
 
-            return Reached;
+                if (isSceneType && isTargetedScene)
+                {
+                    Reached = true;
+                    hasBeenUpdated = true;
+                }
+            }
+            
+            return hasBeenUpdated;
         }
 
         public bool Update(Interactuable interactuable, string interaction = null, string targetId = null)
         {
-            bool isTargetType = false;
+            bool hasBeenUpdated = false;
 
-            switch (interactuable.GetType().ToString())
+            if (!Reached)
             {
-                case "CharacterMB":
+                bool isTargetType = false;
+
+                if (interactuable is CharacterMB)
+                {
                     isTargetType = Milestone.getType() == Completable.Milestone.MilestoneType.CHARACTER;
-                    break;
-                case "ObjectMB":
+                }
+                else if (interactuable is ObjectMB)
+                {
                     isTargetType = Milestone.getType() == Completable.Milestone.MilestoneType.ITEM;
-                    break;
+                }
+
+                var representable = (interactuable as MonoBehaviour).GetComponent<Representable>();
+                var isTargetedElement = Milestone.getId() == representable.Element.getId();
+
+                if (isTargetType && isTargetedElement)
+                {
+                    Reached = true;
+                    hasBeenUpdated = true;
+                }
             }
 
-            var representable = (interactuable as MonoBehaviour).GetComponent<Representable>();
-            var isTargetedElement = Milestone.getId() == representable.Element.getId();
-
-            if (!Reached && isTargetType && isTargetedElement)
-            {
-                Reached = true;
-            }
-
-            return Reached;
+            return hasBeenUpdated;
         }
 
         public bool Update()
         {
+            bool hasBeenUpdated = false;
+
             if (!Reached)
             {
                 switch (Milestone.getType())
@@ -73,9 +86,14 @@ namespace uAdventure.Runner
                         Reached = ConditionChecker.check(Milestone.getConditions());
                         break;
                 }
+
+                if (Reached)
+                {
+                    hasBeenUpdated = true;
+                }
             }
 
-            return Reached;
+            return hasBeenUpdated;
         }
 
         public void Reset()
@@ -105,17 +123,23 @@ namespace uAdventure.Runner
             get
             {
                 float progress = 0f;
-                var progressType = Completable.getProgress().getType();
-                switch (progressType)
+                if (Completed)
                 {
-                    case Completable.Progress.ProgressType.SUM:
-                        progress = progressControllers.Average(m => m.Reached ? 1f : 0f);
-                        break;
-                    case Completable.Progress.ProgressType.SPECIFIC:
-                        progress = progressControllers
-                            .Where(milestone => milestone.Reached)
-                            .Max(milestone => milestone.Milestone.getProgress());
-                        break;
+                    progress = 1f;
+                }else
+                {
+                    var progressType = Completable.getProgress().getType();
+                    switch (progressType)
+                    {
+                        case Completable.Progress.ProgressType.SUM:
+                            progress = progressControllers.Average(m => m.Reached ? 1f : 0f);
+                            break;
+                        case Completable.Progress.ProgressType.SPECIFIC:
+                            progress = progressControllers
+                                .Where(milestone => milestone.Reached)
+                                .Max(milestone => milestone.Milestone.getProgress());
+                            break;
+                    }
                 }
 
                 return progress;
@@ -142,6 +166,11 @@ namespace uAdventure.Runner
                 .getProgress()
                 .getMilestones()
                 .ConvertAll(c => new MilestoneController(c));
+        }
+
+        public bool UpdateMilestones()
+        {
+            return UpdateMilestones(milestone => milestone.Update());
         }
 
         private bool UpdateMilestones(Func<MilestoneController, bool> updateFunction)
@@ -181,17 +210,13 @@ namespace uAdventure.Runner
                     completed = updateFunction(End);
                     if (completed)
                     {
+                        CompletablesController.Instance.TrackProgressed(this);
                         CompletablesController.Instance.TrackCompleted(this, DateTime.Now - startTime);
                     }
                 }
             }
 
             return completed;
-        }
-
-        public bool UpdateMilestones()
-        {
-            return UpdateMilestones(milestone => milestone.Update());
         }
 
         public bool UpdateMilestones(IChapterTarget target)
@@ -262,21 +287,23 @@ namespace uAdventure.Runner
 
         public void Reset()
         {
-            if (Start != null)
-            {
-                Start.Reset();
-            }
+            if (Completable.getRepeatable()) {
+                if (Start != null)
+                {
+                    Start.Reset();
+                }
 
-            if (End != null)
-            {
-                End.Reset();
-            }
+                if (End != null)
+                {
+                    End.Reset();
+                }
 
-            completed = false;
+                completed = false;
 
-            foreach (var milestoneController in progressControllers)
-            {
-                milestoneController.Reset();
+                foreach (var milestoneController in progressControllers)
+                {
+                    milestoneController.Reset();
+                }
             }
         }
     }
@@ -330,9 +357,17 @@ namespace uAdventure.Runner
                 foreach (var completableController in completableControllers)
                 {
                     somethingCompleted |= updatefunction(completableController);
+
+                }
+
+                if (somethingCompleted)
+                {
+                    CompletableCompleted();
                 }
             }
             while (somethingCompleted);
+
+
 
             RestartFinished();
         }
@@ -350,6 +385,11 @@ namespace uAdventure.Runner
         public void ElementInteracted(Interactuable interactuable, string interaction, string targetId)
         {
             UpdateCompletables(completableController => completableController.UpdateMilestones(interactuable, interaction, targetId));
+        }
+
+        public void CompletableCompleted()
+        {
+            UpdateCompletables(completableController => completableController.UpdateMilestones());
         }
 
         public void TrackStarted(CompletableController completableController)
@@ -385,7 +425,10 @@ namespace uAdventure.Runner
         {
             foreach (var completableController in completableControllers)
             {
-                completableController.Reset();
+                if (completableController.Completed)
+                {
+                    completableController.Reset();
+                }
             }
         }
 

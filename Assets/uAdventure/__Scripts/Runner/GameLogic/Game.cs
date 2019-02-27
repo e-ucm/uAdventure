@@ -395,7 +395,7 @@ namespace uAdventure.Runner
                 GameState.CurrentTarget = target.getId();
             }
 
-            if (!trace)
+            if (trace)
             {
                 trackSceneChange(target);
             }

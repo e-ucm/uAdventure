@@ -183,24 +183,49 @@ namespace uAdventure.Editor
         }
     }
 
-    public class ChangeEnumValueTool : ChangeValueTool<object, Enum>
+    public static class ChangeEnumValueTool
     {
-        public ChangeEnumValueTool(object data, Enum newValue, string propertyName)
+        public static ChangeEnumValueTool<E> Create<E>(object data, E newValue, string propertyName)
+        {
+            return new ChangeEnumValueTool<E>(data, newValue, propertyName);
+        }
+
+        public static ChangeEnumValueTool<E> Create<E>(object data, E newValue, string getMethodName, string setMethodName)
+        {
+            return new ChangeEnumValueTool<E>(data, newValue, getMethodName, setMethodName);
+        }
+
+        public static ChangeEnumValueTool<E> Create<E>(object data, E newValue, string propertyName, bool updateTree,
+            bool updatePanel)
+        {
+            return new ChangeEnumValueTool<E>(data, newValue, propertyName, updateTree, updatePanel);
+        }
+
+        public static ChangeEnumValueTool<E> Create<E>(object data, E newValue, string getMethodName, string setMethodName, 
+            bool updateTree, bool updatePanel)
+        {
+            return new ChangeEnumValueTool<E>(data, newValue, getMethodName, setMethodName, updateTree, updatePanel);
+        }
+    }
+
+    public class ChangeEnumValueTool<E> : ChangeValueTool<object, E>
+    {
+        public ChangeEnumValueTool(object data, E newValue, string propertyName)
             : base(data, newValue, propertyName)
         {
         }
 
-        public ChangeEnumValueTool(object data, Enum newValue, string propertyName, bool updateTree,
+        public ChangeEnumValueTool(object data, E newValue, string propertyName, bool updateTree,
             bool updatePanel) : base(data, newValue, propertyName, updateTree, updatePanel)
         {
         }
 
-        public ChangeEnumValueTool(object data, Enum newValue, string getMethodName, string setMethodName)
+        public ChangeEnumValueTool(object data, E newValue, string getMethodName, string setMethodName)
             : base(data, newValue, getMethodName, setMethodName)
         {
         }
 
-        public ChangeEnumValueTool(object data, Enum newValue, string getMethodName, string setMethodName, bool updateTree,
+        public ChangeEnumValueTool(object data, E newValue, string getMethodName, string setMethodName, bool updateTree,
             bool updatePanel) : base(data, newValue, getMethodName, setMethodName, updateTree, updatePanel)
         {
         }

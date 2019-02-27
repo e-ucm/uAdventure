@@ -82,7 +82,7 @@ namespace uAdventure.Editor
 
         public void setType(Completable.Milestone.MilestoneType type)
         {
-            Controller.Instance.AddTool(new ChangeEnumValueTool(milestone, type, "getType", "setType"));
+            Controller.Instance.AddTool(ChangeEnumValueTool.Create(milestone, type, "getType", "setType"));
         }
 
         public string getId()
@@ -277,7 +277,7 @@ namespace uAdventure.Editor
 
         public void setType(Completable.Progress.ProgressType type)
         {
-            Controller.Instance.AddTool(new ChangeEnumValueTool(progress, type, "getType", "setType"));
+            Controller.Instance.AddTool(ChangeEnumValueTool.Create(progress, type, "getType", "setType"));
         }
     }
 
@@ -297,8 +297,6 @@ namespace uAdventure.Editor
             this.endDataControl = new MilestoneDataControl(completable.getEnd());
             this.progressDataControl = new ProgressDataControl(completable.getProgress());
             this.scoreDataControl = new ScoreDataControl(completable.getScore());
-
-            Controller.Instance.IdentifierSummary.addId<Completable>(completable.getId());
         }
 
         public override bool addElement(int type, string id) { return false; }
@@ -413,6 +411,16 @@ namespace uAdventure.Editor
         public ScoreDataControl getScore()
         {
             return scoreDataControl;
+        }
+
+        public bool getRepeatable()
+        {
+            return completable.getRepeatable();
+        }
+
+        public void setRepeatable(bool repeatable)
+        {
+            completable.setRepeatable(repeatable);
         }
     }
 }

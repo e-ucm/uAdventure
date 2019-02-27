@@ -226,6 +226,8 @@ namespace uAdventure.Core
 
         private Progress progress = new Progress();
 
+        private bool repeatable = false;
+
         //#################################################
         //#################### GETTERS ####################
         //#################################################
@@ -258,6 +260,11 @@ namespace uAdventure.Core
         public Milestone getEnd()
         {
             return end;
+        }
+
+        public bool getRepeatable()
+        {
+            return repeatable;
         }
         #endregion getters
         //#################################################
@@ -292,6 +299,11 @@ namespace uAdventure.Core
         public void setEnd(Milestone end)
         {
             this.end = end;
+        }
+
+        public void setRepeatable(bool repeatable)
+        {
+            this.repeatable = repeatable;
         }
         #endregion setters
         //#################################################

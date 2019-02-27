@@ -17,6 +17,8 @@ namespace uAdventure.Core
 
 			completable.setId(element.GetAttribute("id"));
 
+            completable.setRepeatable(element.GetAttribute("repeatable") == "true");
+
             switch (element.GetAttribute("type"))
             {
                 case "combat": completable.setType(Completable.TYPE_COMBAT); break;
