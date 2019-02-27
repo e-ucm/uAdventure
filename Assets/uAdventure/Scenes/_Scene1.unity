@@ -507,11 +507,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rawCopy: 1
-  flushInterval: -1
+  flushInterval: 1
   checkInterval: 3
-  storageType: net
-  traceFormat: xapi
-  host: https://rage-test.e-ucm.es/api/proxy/gleaner/collector/
+  storageType: local
+  traceFormat: csv
+  host: http://localhost
   trackingCode: 
   debug: 1
   username: 
