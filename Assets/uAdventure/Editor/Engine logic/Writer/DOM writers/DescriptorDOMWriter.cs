@@ -208,6 +208,21 @@ namespace uAdventure.Editor
             playerModeElement.SetAttribute("playerTransparent", isPlayerTransparent ? "yes" : "no");
             configurationNode.AppendChild(playerModeElement);
 
+            //Tracker config element
+            XmlElement trackerConfigElement = doc.CreateElement("tracker");
+
+            trackerConfigElement.SetAttribute("rawCopy", adventureData.getTrackerConfig().getRawCopy() ? "yes" : "no");
+
+            trackerConfigElement.SetAttribute("storageType", adventureData.getTrackerConfig().getStorageType().ToString());
+            trackerConfigElement.SetAttribute("traceFormat", adventureData.getTrackerConfig().getTraceFormat().ToString());
+
+            trackerConfigElement.SetAttribute("host", adventureData.getTrackerConfig().getHost());
+            trackerConfigElement.SetAttribute("trackingCode", adventureData.getTrackerConfig().getTrackingCode());
+
+            trackerConfigElement.SetAttribute("debug", adventureData.getTrackerConfig().getDebug() ? "yes" : "no");
+
+            configurationNode.AppendChild(trackerConfigElement);
+
             //Graphic config element
             XmlElement graphicConfigElement = doc.CreateElement("graphics");
             var graphicsMode = "fullscreen"; // GRAPHICS_FULLSCREEN
