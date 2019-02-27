@@ -33,7 +33,7 @@ namespace uAdventure.Editor
             condition = c as GlobalStateCondition;
 
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(TC.get("Condition.GlobalStateID"));
+            //EditorGUILayout.LabelField(TC.get("Condition.GlobalStateID"));
             if (Avaiable)
             {
                 int index = Array.IndexOf(states, c.getId());

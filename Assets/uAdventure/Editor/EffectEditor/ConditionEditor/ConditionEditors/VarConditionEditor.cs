@@ -24,7 +24,7 @@ namespace uAdventure.Editor
             condition = c as VarCondition;
 
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(TC.get("Condition.VarID"));
+            //EditorGUILayout.LabelField(TC.get("Condition.VarID"));
 
             if (Avaiable)
             {

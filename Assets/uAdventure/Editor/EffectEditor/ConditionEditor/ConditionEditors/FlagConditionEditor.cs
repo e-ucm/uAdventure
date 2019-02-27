@@ -24,7 +24,7 @@ namespace uAdventure.Editor
             condition = c as FlagCondition;
 
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(TC.get("Condition.FlagID"));
+            //EditorGUILayout.LabelField(TC.get("Condition.FlagID"));
 
             if (Avaiable)
             {
