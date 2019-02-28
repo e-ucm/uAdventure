@@ -8,19 +8,29 @@ namespace uAdventure.Core
      * Abstract class that comprises all the possible nodes for a conversation.
      * Initially, two classes implement this interface: DialogueNode and OptionNode
      */
-    public abstract class ConversationNode : ConversationNodeView, ICloneable
+    public abstract class ConversationNode : ICloneable
     {
+        private bool editorCollapsed;
         private int xEditor;
         private int yEditor;
         private int wEditor;
         private int hEditor;
+        /**
+         * Effect to be triggered when the node has finished
+         */
+        private Effects effects;
 
-        public ConversationNode()
+        private bool effectConsumed = false;
+
+
+        protected ConversationNode()
         {
+            this.editorCollapsed = false;
             this.xEditor = -1;
             this.yEditor = -1;
             this.wEditor = 150;
             this.hEditor = 150;
+            this.effects = new Effects();
         }
 
         /**
@@ -31,16 +41,6 @@ namespace uAdventure.Core
          * @return The child conversation node selected
          */
         public abstract ConversationNode getChild(int index);
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see es.eucm.eadventure.common.data.chapterdata.conversation.node.ConversationNodeView#getChildView(int)
-         */
-        public ConversationNodeView getChildView(int index)
-        {
-            return getChild(index);
-        }
 
         /**
          * Adds a new child to the node, in the last position
@@ -159,34 +159,6 @@ namespace uAdventure.Core
          */
         public abstract ConversationLine removeLine(int index);
 
-        /**
-         * Sets the effects triggered when the conversation is finished (only
-         * terminal nodes accept effects)
-         * 
-         * @param effects
-         *            New effects
-         */
-        public abstract void setEffects(Effects effects);
-
-        /**
-         * Returns the effect triggered when the conversation is finished
-         * 
-         * @return The effect held by the node if it is terminal, null otherwise
-         */
-        public abstract Effects getEffects();
-
-        /**
-         * Returns if the node has a valid effect set
-         * 
-         * @return True if the node has an effect (even if empty), false otherwise
-         */
-        public abstract bool hasValidEffect();
-
-        public abstract void consumeEffect();
-
-        public abstract void resetEffect();
-
-        public abstract bool isEffectConsumed();
 
         /**
          * Set the voice for synthesize the specified line
@@ -207,19 +179,15 @@ namespace uAdventure.Core
             return getLine(line).getSynthesizerVoice();
         }
 
-        /**
-         * This method is only used in OptionConversationNode. Make the options to
-         * appear randomly
-         */
-        //public abstract void doRandom();
-        /*@Override
-        public Object clone() throws CloneNotSupportedException
+        public bool getEditorCollapsed()
         {
+            return editorCollapsed;
+        }
 
-            ConversationNode cn = (ConversationNode) super.clone( );
-            return cn;
-        }*/
-
+        public void setEditorCollapsed(bool editorCollapsed)
+        {
+            this.editorCollapsed = editorCollapsed;
+        }
 
         public int getEditorX()
         {
@@ -277,18 +245,69 @@ namespace uAdventure.Core
             this.hEditor = hEditor;
         }
 
+        public virtual bool hasEffects()
+        {
 
-        public abstract ConversationNodeViewEnum getType();
+            return hasValidEffect() && !effects.IsEmpty();
+        }
+
+        /**
+         * Sets the effects triggered when the conversation is finished (only
+         * terminal nodes accept effects)
+         * 
+         * @param effects
+         *            New effects
+         */
+        public virtual void setEffects(Effects effects)
+        {
+            this.effects = effects;
+        }
+
+        /**
+         * Returns the effect triggered when the conversation is finished
+         * 
+         * @return The effect held by the node if it is terminal, null otherwise
+         */
+        public virtual Effects getEffects()
+        {
+            return effects;
+        }
+
+        public virtual void consumeEffect()
+        {
+
+            effectConsumed = true;
+        }
+
+        public virtual bool isEffectConsumed()
+        {
+
+            return effectConsumed;
+        }
+
+        public virtual void resetEffect()
+        {
+
+            effectConsumed = false;
+        }
+
+        public virtual bool hasValidEffect()
+        {
+
+            return effects != null;
+        }
+
         public abstract bool isTerminal();
         public abstract int getChildCount();
         public abstract int getLineCount();
-        public abstract bool hasEffects();
         public abstract Conditions getLineConditions(int index);
         public abstract ConversationLine getConversationLine(int index);
 
         public virtual object Clone()
         {
             ConversationNode cn = (ConversationNode)this.MemberwiseClone();
+            cn.effectConsumed = effectConsumed;
+            cn.effects = (effects != null ? (Effects)effects.Clone() : null);
             return cn;
         }
     }

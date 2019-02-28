@@ -45,9 +45,13 @@ namespace uAdventure.Editor
         {
 
             if (bottomPosition)
+            {
                 optionNode.setBottomPosition();
+            }
             else
+            {
                 optionNode.setTopPosition();
+            }
 
             Controller.Instance.updatePanel();
             return true;
@@ -63,11 +67,15 @@ namespace uAdventure.Editor
 
         public override bool undoTool()
         {
-
             if (bottomPosition)
+            {
                 optionNode.setTopPosition();
+            }
             else
+            {
                 optionNode.setBottomPosition();
+            }
+
             Controller.Instance.updatePanel();
             return true;
         }

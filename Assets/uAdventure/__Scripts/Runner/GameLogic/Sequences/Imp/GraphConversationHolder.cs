@@ -29,19 +29,18 @@ namespace uAdventure.Runner
 
             if (node != null)
             {
-                switch (node.getType())
+                if(node is DialogueConversationNode)
                 {
-                    case ConversationNodeViewEnum.DIALOGUE:
-                        var dialog = node as DialogueConversationNode;
-                        this.additional_effects = new EffectHolder(dialog.getEffects());
-                        this.child = 0;
-                        break;
-                    case ConversationNodeViewEnum.OPTION:
-                        var option = node as OptionConversationNode;
-                        this.additional_effects = new EffectHolder(option.getEffects());
-                        this.child = -2;
-                        this.showOption = option.isShowUserOption();
-                        break;
+                    var dialog = node as DialogueConversationNode;
+                    this.additional_effects = new EffectHolder(dialog.getEffects());
+                    this.child = 0;
+                }
+                else if (node is OptionConversationNode)
+                {
+                    var option = node as OptionConversationNode;
+                    this.additional_effects = new EffectHolder(option.getEffects());
+                    this.child = -2;
+                    this.showOption = option.isShowUserOption();
                 }
             }
         }
@@ -52,50 +51,54 @@ namespace uAdventure.Runner
             ConversationLine l;
 
             if (node != null)
-                switch (node.getType())
-                {
-                    case ConversationNodeViewEnum.DIALOGUE:
-                        while (current_line < node.getLineCount() && !forcewait)
-                        {
-                            l = node.getLine(current_line);
-                            if (ConditionChecker.check(l.getConditions()))
-                            {
-                                forcewait = true;
-                                Game.Instance.Talk(l.getText(), l.getName());
-                            }
-                            current_line++;
-                        }
-                        if (!forcewait && additional_effects != null && additional_effects.effects.Count > 0)
-                            forcewait = additional_effects.execute();
+            {
 
-                        break;
-                    case ConversationNodeViewEnum.OPTION:
-                        if (this.child == -2)
+                if (node is DialogueConversationNode)
+                {
+                    while (current_line < node.getLineCount() && !forcewait)
+                    {
+                        l = node.getLine(current_line);
+                        if (ConditionChecker.check(l.getConditions()))
                         {
-                            if (isTracePending)
-                            {
-                                EndTrace();
-                            }
-                            
-                            Game.Instance.showOptions(this);
                             forcewait = true;
-                        }
-                        else if (showOption)
-                        {
-                            l = node.getLine(child);
                             Game.Instance.Talk(l.getText(), l.getName());
-                            forcewait = true;
-                            showOption = false;
                         }
-                        else
-                        {
-                            if (additional_effects != null)
-                                forcewait = additional_effects.execute();
-                            else
-                                forcewait = false;
-                        }
-                        break;
+                        current_line++;
+                    }
+
+                    if (!forcewait && additional_effects != null && additional_effects.effects.Count > 0)
+                    {
+                        forcewait = additional_effects.execute();
+                    }
                 }
+                else if (node is OptionConversationNode)
+                {
+                    if (this.child == -2)
+                    {
+                        if (isTracePending)
+                        {
+                            EndTrace();
+                        }
+
+                        Game.Instance.showOptions(this);
+                        forcewait = true;
+                    }
+                    else if (showOption)
+                    {
+                        l = node.getLine(child);
+                        Game.Instance.Talk(l.getText(), l.getName());
+                        forcewait = true;
+                        showOption = false;
+                    }
+                    else
+                    {
+                        if (additional_effects != null)
+                            forcewait = additional_effects.execute();
+                        else
+                            forcewait = false;
+                    }
+                }
+            }
 
             return forcewait;
         }

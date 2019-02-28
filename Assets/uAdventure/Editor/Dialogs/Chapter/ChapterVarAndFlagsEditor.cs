@@ -140,14 +140,11 @@ namespace uAdventure.Editor
             var windowHeight = position.height;
 
             // Initialization
-            if (!inited || varFlagSummary != Controller.Instance.VarFlagSummary)
+            if ((!inited || varFlagSummary != Controller.Instance.VarFlagSummary) && Controller.Instance.Loaded)
             {
-                if (Controller.Instance.Loaded)
-                {
-                    RefreshList();
-                    inited = true;
-                    varFlagSummary = Controller.Instance.VarFlagSummary;
-                }
+                RefreshList();
+                inited = true;
+                varFlagSummary = Controller.Instance.VarFlagSummary;
             }
             
             /*

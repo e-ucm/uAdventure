@@ -38,19 +38,19 @@ namespace uAdventure.Core
          *            Node (must be a DialogueNode) to check
          * @return True if the node has a "go-back" tag, false otherwise
          */
-        public static bool thereIsGoBackTag(ConversationNodeView node)
+        public static bool thereIsGoBackTag(ConversationNode node)
         {
 
             bool goBackTag = false;
 
             // Perform the check only if the node is a DialogueNode and it has a child
-            if (node.getType() == ConversationNodeViewEnum.DIALOGUE && node.getChildCount() > 0)
+            if (node is DialogueConversationNode && node.getChildCount() > 0)
             {
-                ConversationNodeView possibleFather = node.getChildView(0);
+                ConversationNode possibleFather = node.getChild(0);
 
                 // For each child of the possible father node, check if it match with the possible child
                 for (int i = 0; i < possibleFather.getChildCount(); i++)
-                    if (possibleFather.getChildView(i) == node)
+                    if (possibleFather.getChild(i) == node)
                         goBackTag = true;
             }
 

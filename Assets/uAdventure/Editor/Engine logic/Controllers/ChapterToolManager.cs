@@ -13,13 +13,13 @@ namespace uAdventure.Editor
         * Global tool manager. For undo/redo in main window (real changes in the
         * data structure)
         */
-        private ToolManager globalToolManager;
+        private readonly ToolManager globalToolManager;
 
         /**
          * Local tool managers. For undo/redo in dialogs (This will only reflect
          * temporal changes, not real changes in data)
          */
-        private Stack<ToolManager> localToolManagers;
+        private readonly Stack<ToolManager> localToolManagers;
 
         public ChapterToolManager()
         {
@@ -46,21 +46,11 @@ namespace uAdventure.Editor
         {
             if (localToolManagers.Count == 0)
             {
-                bool added = globalToolManager.addTool(execute, tool);
-                /*if( added )
-                    System.out.println( "[ToolManager] Global Tool Manager: Tool \"" + tool.getToolName( ) + "\" ADDED" );
-                else
-                    System.out.println( "[ToolManager] Global Tool Manager: Tool \"" + tool.getToolName( ) + "\" NOT ADDED" );*/
-                return added;
+                return globalToolManager.addTool(execute, tool);
             }
             else
             {
-                bool added = localToolManagers.Peek().addTool(execute, tool);
-                /*if( added )
-                    System.out.println( "[ToolManager] Local Tool Manager: Tool \"" + tool.getToolName( ) + "\" ADDED" );
-                else
-                    System.out.println( "[ToolManager] Local Tool Manager: Tool \"" + tool.getToolName( ) + "\" NOT ADDED" );*/
-                return added;
+                return localToolManagers.Peek().addTool(execute, tool);
             }
         }
 
@@ -69,12 +59,12 @@ namespace uAdventure.Editor
             if (localToolManagers.Count == 0)
             {
                 globalToolManager.undoTool();
-                //System.out.println( "[ToolManager] Global Tool Manager: Undo Performed" );
+                Debug.Log("[ToolManager] Global Tool Manager: Undo Performed" );
             }
             else
             {
                 localToolManagers.Peek().undoTool();
-                //System.out.println( "[ToolManager] Local Tool Manager: Undo Performed" );
+                Debug.Log("[ToolManager] Local Tool Manager: Undo Performed" );
             }
         }
 
@@ -84,12 +74,12 @@ namespace uAdventure.Editor
             if (localToolManagers.Count == 0)
             {
                 globalToolManager.redoTool();
-                //System.out.println( "[ToolManager] Global Tool Manager: Redo Performed" );
+                Debug.Log("[ToolManager] Global Tool Manager: Redo Performed" );
             }
             else
             {
                 localToolManagers.Peek().redoTool();
-                //System.out.println( "[ToolManager] Local Tool Manager: Redo Performed" );
+                Debug.Log("[ToolManager] Local Tool Manager: Redo Performed" );
             }
         }
 
@@ -97,7 +87,7 @@ namespace uAdventure.Editor
         {
 
             localToolManagers.Push(new ToolManager(false));
-            //System.out.println( "[ToolManager] Local Tool Manager PUSHED: Total local tool managers = " + localToolManagers.size( ) );
+            Debug.Log("[ToolManager] Local Tool Manager PUSHED: Total local tool managers = " + localToolManagers.Count);
         }
 
         public void popLocalToolManager()
@@ -106,11 +96,11 @@ namespace uAdventure.Editor
             if (localToolManagers.Count != 0)
             {
                 localToolManagers.Pop();
-                //System.out.println( "[ToolManager] Local Tool Manager POPED: Total local tool managers = " + localToolManagers.size( ) );
+                Debug.Log("[ToolManager] Local Tool Manager POPED: Total local tool managers = " + localToolManagers.Count);
             }
             else
             {
-                //System.out.println( "[ToolManager] Local Tool Manager Could NOT be POPED: Total local tool managers = " + localToolManagers.size( ) );
+                Debug.Log("[ToolManager] Local Tool Manager Could NOT be POPED: Total local tool managers = " + localToolManagers.Count);
             }
         }
 

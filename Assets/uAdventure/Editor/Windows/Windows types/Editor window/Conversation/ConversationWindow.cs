@@ -14,7 +14,7 @@ namespace uAdventure.Editor
     {
         private enum ConversationWindowTabs { Preview };
 
-        private readonly Dictionary<Conversation, ConversationEditorWindow> conversationWindows;
+        private readonly Dictionary<ConversationDataControl, ConversationEditorWindow> conversationWindows;
 
         public ConversationWindow(Rect aStartPos, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, new GUIContent(TC.get("Element.Name31")), aStyle, aOptions)
@@ -25,7 +25,7 @@ namespace uAdventure.Editor
                 text = "Element.Name31"
             };
 
-            conversationWindows = new Dictionary<Conversation, ConversationEditorWindow>();
+            conversationWindows = new Dictionary<ConversationDataControl, ConversationEditorWindow>();
 
             DefaultOpenedWindow = ConversationWindowTabs.Preview;
             OpenedWindow = ConversationWindowTabs.Preview;
@@ -46,8 +46,7 @@ namespace uAdventure.Editor
             var conversation = Controller
                 .Instance.ChapterList.getSelectedChapterDataControl()
                 .getConversationsList()
-                .getConversations()[conversationIndex]
-                .getConversation();
+                .getConversations()[conversationIndex];
 
             if (conversationWindows.ContainsKey(conversation) && conversationWindows[conversation] == null)
             {
@@ -57,7 +56,7 @@ namespace uAdventure.Editor
             if (!conversationWindows.ContainsKey(conversation) && createIfNotExists)
             {
                 ConversationEditorWindow convEditor = EditorWindow.GetWindow<ConversationEditorWindow>();
-                convEditor.Init(conversation as GraphConversation);
+                convEditor.Init(conversation);
                 conversationWindows.Add(conversation, convEditor);
             }
 
@@ -109,7 +108,7 @@ namespace uAdventure.Editor
                 conversationEditor.BeginWindows = () => BeginWindows();
                 conversationEditor.EndWindows = () => EndWindows();
                 conversationEditor.Repaint = () => Repaint();
-                conversationEditor.Init(workingConversation.getConversation() as GraphConversation);
+                conversationEditor.Init(workingConversation);
             }
             
             EditorGUI.BeginChangeCheck();

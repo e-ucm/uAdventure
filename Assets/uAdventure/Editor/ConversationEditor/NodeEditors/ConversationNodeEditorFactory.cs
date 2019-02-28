@@ -21,9 +21,9 @@ namespace uAdventure.Editor
         }
 
         public abstract string[] CurrentConversationNodeEditors { get; }
-        public abstract ConversationNodeEditor createConversationNodeEditorFor(string nodeName);
-        public abstract ConversationNodeEditor createConversationNodeEditorFor(ConversationNode node);
-        public abstract int ConversationNodeEditorIndex(ConversationNode node);
+        public abstract ConversationNodeEditor createConversationNodeEditorFor(ConversationDataControl conversation, string nodeName);
+        public abstract ConversationNodeEditor createConversationNodeEditorFor(ConversationDataControl conversation, ConversationNodeDataControl node);
+        public abstract int ConversationNodeEditorIndex(ConversationNodeDataControl node);
         public void ResetInstance()
         {
             instance = new ConversationNodeEditorFactoryImp();
@@ -59,13 +59,15 @@ namespace uAdventure.Editor
             {
                 string[] descriptors = new string[nodeEditors.Count + 1];
                 for (int i = 0; i < nodeEditors.Count; i++)
+                {
                     descriptors[i] = nodeEditors[i].NodeName;
+                }
                 return descriptors;
             }
         }
 
 
-        public override ConversationNodeEditor createConversationNodeEditorFor(string nodeName)
+        public override ConversationNodeEditor createConversationNodeEditorFor(ConversationDataControl conversation, string nodeName)
         {
             foreach (ConversationNodeEditor nodeEditor in nodeEditors)
             {
@@ -77,26 +79,17 @@ namespace uAdventure.Editor
             return null;
         }
 
-        public override ConversationNodeEditor createConversationNodeEditorFor(ConversationNode node)
+        public override ConversationNodeEditor createConversationNodeEditorFor(ConversationDataControl conversation, ConversationNodeDataControl node)
         {
-            foreach (ConversationNodeEditor nodeEditor in nodeEditors)
-                if (nodeEditor.manages(node))
-                    return nodeEditor.clone();
-
-            return null;
+            return nodeEditors
+                .Where(ne => ne.manages(node))
+                .Select(ne => ne.clone())
+                .FirstOrDefault();
         }
 
-        public override int ConversationNodeEditorIndex(ConversationNode node)
+        public override int ConversationNodeEditorIndex(ConversationNodeDataControl node)
         {
-
-            int i = 0;
-            foreach (ConversationNodeEditor nodeEditor in nodeEditors)
-                if (nodeEditor.manages(node))
-                    return i;
-                else
-                    i++;
-
-            return 0;
+            return nodeEditors.FindIndex(ne => ne.manages(node));
         }
     }
 }

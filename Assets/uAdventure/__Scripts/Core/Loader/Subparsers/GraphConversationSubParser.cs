@@ -35,11 +35,6 @@ namespace uAdventure.Core
         private List<List<int>> nodeLinks;
 
         /**
-         * Current effect (of the current node)
-         */
-        private Effects currentEffects;
-
-        /**
          * Name of the last non-player character read, "NPC" is no name were found
          */
         private string characterName;
@@ -78,6 +73,11 @@ namespace uAdventure.Core
          * v1.4 - Graphical Position of nodes in editor
          */
         private int editorX, editorY;
+        
+        /**
+         * uAdventure v1 the editor is now collapsible
+         */
+        private bool editorCollapsed;
 
         /**
          * Check if each conversation line will wait until user interacts
@@ -117,31 +117,27 @@ namespace uAdventure.Core
 				//If there is a "editor-x" and "editor-y" attributes     
 				editorX = Mathf.Max(-1, ExParsers.ParseDefault(el.GetAttribute("editor-x"), -1));
 				editorY = Mathf.Max(-1, ExParsers.ParseDefault(el.GetAttribute("editor-y"), -1));
+                editorCollapsed = ExString.EqualsDefault(el.GetAttribute("editor-collapsed"), "yes", false);
 
-				//If there is a "waitUserInteraction" attribute, store if the lines will wait until user interacts
-				keepShowingDialogue = ExString.EqualsDefault(el.GetAttribute("waitUserInteraction"), "yes", false);
+                //If there is a "waitUserInteraction" attribute, store if the lines will wait until user interacts
+                keepShowingDialogue = ExString.EqualsDefault(el.GetAttribute("waitUserInteraction"), "yes", false);
 
 				// Node effects
 				end_conversation = el.SelectSingleNode("end-conversation");
-				if (end_conversation != null) effects = end_conversation.SelectSingleNode("effect");
-				else					      effects = el.SelectSingleNode("effect");
+                if (end_conversation != null)
+                {
+                    effects = end_conversation.SelectSingleNode("effect");
+                }
+                else
+                {
+                    effects = el.SelectSingleNode("effect");
+                }
 
 				var parsedEffects = DOMParserUtility.DOMParse (effects, parameters) as Effects ?? new Effects ();
 
                 if (el.Name == "dialogue-node")
                 {
 					currentNode = new DialogueConversationNode(keepShowingDialogue);
-					currentNode.setEditorX(editorX);
-					currentNode.setEditorY(editorY);
-                    // Create a new vector for the links of the current node
-                    currentLinks = new List<int>();
-					parseLines(currentNode, el, parameters);
-
-					currentNode.setEffects (parsedEffects);
-
-                    // Add the current node to the node list, and the set of children references into the node links
-                    graphNodes.Add(currentNode);
-                    nodeLinks.Add(currentLinks);
 
                 }
                 else if (el.Name == "option-node")
@@ -151,17 +147,25 @@ namespace uAdventure.Core
                     keepShowing = ExString.EqualsDefault(el.GetAttribute("keepShowing"), "yes", false);
                     preListening = ExString.EqualsDefault(el.GetAttribute("preListening"), "yes", false) || editorX >= 0 || editorY >= 0;
 
-					currentNode = new OptionConversationNode(random, keepShowing, showUserOption, preListening, editorX, editorY);
-                    currentNode.setEditorX(editorX);
-                    currentNode.setEditorY(editorY);
+                    var optionConversationNode = new OptionConversationNode(random, keepShowing, showUserOption, preListening);
+                    currentNode = optionConversationNode;
 
                     //XAPI ELEMENTS
-                    ((OptionConversationNode)currentNode).setXApiQuestion(el.GetAttribute("question"));
+                    optionConversationNode.setXApiQuestion(el.GetAttribute("question"));
                     //END OF XAPI
+                }
+
+                if (currentNode != null)
+                {
+                    // Node editor properties
+                    currentNode.setEditorX(editorX);
+                    currentNode.setEditorY(editorY);
+                    currentNode.setEditorCollapsed(editorCollapsed);
+
                     // Create a new vector for the links of the current node
                     currentLinks = new List<int>();
-					parseLines(currentNode, el, parameters);
-					currentNode.setEffects (parsedEffects);
+                    parseLines(currentNode, el, parameters);
+                    currentNode.setEffects(parsedEffects);
 
                     // Add the current node to the node list, and the set of children references into the node links
                     graphNodes.Add(currentNode);
@@ -189,7 +193,9 @@ namespace uAdventure.Core
 
                 // For each reference, insert the referenced node into the father node
                 for (int j = 0; j < links.Count; j++)
+                {
                     node.addChild(graphNodes[links[j]]);
+                }
             }
         }
 
@@ -250,7 +256,9 @@ namespace uAdventure.Core
                         ((OptionConversationNode)currentNode).TimeoutConditions = currentConditions;
                     }
                     else
+                    {
                         currentNode.getLine(currentNode.getLineCount() - 1).setConditions(currentConditions);
+                    }
                 }
                 else if (ell.Name == "child")
                 {
@@ -270,10 +278,14 @@ namespace uAdventure.Core
                     addline = false;
                 }
                 else
+                {
                     addline = false;
+                }
 
                 if (addline)
+                {
                     node.addLine(conversationLine);
+                }
             }
         }
     }

@@ -3,6 +3,7 @@ using UnityEditor;
 using System.Collections.Generic;
 
 using uAdventure.Core;
+using System;
 
 namespace uAdventure.Editor
 {
@@ -156,8 +157,7 @@ namespace uAdventure.Editor
                 editor = EffectEditorFactory.Intance.createEffectEditorFor(editorNames[editorSelected]);
                 editor.Window = editors[node].Window;
                 editors[editor.Effect] = editor;
-                collapsedState[editor.Effect] = collapsedState[node];
-                collapsedState.Remove(node);
+                SetCollapsed(content, editor.Effect, IsCollapsed(content, node));
 
                 if (editor.manages(node))
                 {
@@ -212,6 +212,16 @@ namespace uAdventure.Editor
             var rect = editors[node].Window;
             rect.size = size;
             editors[node].Window = rect;
+        }
+
+        protected override void MoveNodes(Effects Content, IEnumerable<IEffect> nodes, Vector2 delta)
+        {
+            foreach(var node in nodes)
+            {
+                var rect = editors[node].Window;
+                rect.position += delta;
+                editors[node].Window = rect;
+            }
         }
     }
 

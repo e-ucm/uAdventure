@@ -1,6 +1,4 @@
 ﻿using System;
-using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace uAdventure.Core
@@ -26,13 +24,6 @@ namespace uAdventure.Core
         private ConversationNode nextNode;
 
         /**
-         * Effect to be triggered when the node has finished (if it's terminal)
-         */
-        private Effects effects;
-
-        private bool effectConsumed = false;
-
-        /**
          * Store if stop the line until the user decides.
          */
         private bool keepShowing;
@@ -52,20 +43,7 @@ namespace uAdventure.Core
 
             dialogue = new List<ConversationLine>();
             nextNode = null;
-            effects = new Effects();
             this.keepShowing = waitUserInteraction;
-        }
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see es.eucm.eadventure.common.data.chapterdata.conversation.node.ConversationNodeView#getType()
-         */
-
-        public override ConversationNodeViewEnum getType()
-        {
-
-            return ConversationNodeViewEnum.DIALOGUE;
         }
 
         /*
@@ -113,19 +91,14 @@ namespace uAdventure.Core
                 throw new System.Exception();
 
             nextNode = child;
-            //TODO MODIFIED
-            //effects.clear( );
         }
 
         public override void addChild(int index, ConversationNode child)
         {
-
             if (index != 0 || nextNode != null)
                 throw new System.Exception();
 
             nextNode = child;
-            //TODO MODIFIED
-            //effects.clear( );
         }
 
         public override ConversationNode removeChild(int index)
@@ -171,80 +144,10 @@ namespace uAdventure.Core
 
         public override ConversationLine removeLine(int index)
         {
-            // WORKAROUND
             ConversationLine tmp = dialogue[index];
             dialogue.RemoveAt(index);
             return tmp;
         }
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see es.eucm.eadventure.common.data.chapterdata.conversation.node.ConversationNodeView#hasEffects()
-         */
-
-        public override bool hasEffects()
-        {
-
-            return hasValidEffect() && !effects.IsEmpty();
-        }
-
-        public override void setEffects(Effects effects)
-        {
-
-            this.effects = effects;
-        }
-
-        public override Effects getEffects()
-        {
-
-            return effects;
-        }
-
-        public override void consumeEffect()
-        {
-
-            effectConsumed = true;
-        }
-
-        public override bool isEffectConsumed()
-        {
-
-            return effectConsumed;
-        }
-
-        public override void resetEffect()
-        {
-
-            effectConsumed = false;
-        }
-
-        public override bool hasValidEffect()
-        {
-
-            return effects != null;
-        }
-
-        /*
-        @Override
-        public Object clone() throws CloneNotSupportedException
-        {
-
-            DialogueConversationNode dcn = (DialogueConversationNode) super.clone( );
-            if( dialogue != null ) {
-                dcn.dialogue = new List<ConversationLine>();
-                for (ConversationLine cl : dialogue)
-                    dcn.dialogue.add((ConversationLine)cl.clone());
-            }
-            dcn.effectConsumed = effectConsumed;
-            dcn.effects = ( effects != null ? (Effects) effects.clone( ) : null );
-            //dcn.nextNode = (nextNode != null ? (ConversationNode) nextNode.clone() : null);
-            dcn.nextNode = null;
-            dcn.terminal = terminal;
-            dcn.keepShowing = keepShowing;
-            return dcn;
-        }*/
-
         public override object Clone()
         {
             DialogueConversationNode dcn = (DialogueConversationNode)base.Clone();
@@ -252,12 +155,11 @@ namespace uAdventure.Core
             {
                 dcn.dialogue = new List<ConversationLine>();
                 foreach (ConversationLine cl in dialogue)
+                {
                     dcn.dialogue.Add((ConversationLine)cl.Clone());
+                }
             }
-            dcn.effectConsumed = effectConsumed;
-            dcn.effects = (effects != null ? (Effects)effects.Clone() : null);
-            //dcn.nextNode = (nextNode != null ? (ConversationNode) nextNode.clone() : null);
-            dcn.nextNode = null;
+            dcn.nextNode = (nextNode != null ? (ConversationNode) nextNode.Clone() : null);
             dcn.keepShowing = keepShowing;
             return dcn;
         }
@@ -291,9 +193,12 @@ namespace uAdventure.Core
         public override ConversationNode replaceChild(int index, ConversationNode node)
         {
             if (index > 0)
+            {
                 throw new Exception("You can only replace the first child");
-
-            return nextNode = node;
+            }
+            var previousChild = nextNode;
+            nextNode = node;
+            return previousChild;
         }
     }
 }

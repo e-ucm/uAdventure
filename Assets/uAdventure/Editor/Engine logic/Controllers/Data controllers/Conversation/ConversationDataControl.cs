@@ -3,11 +3,36 @@ using System.Collections;
 using System.Collections.Generic;
 
 using uAdventure.Core;
+using System;
+using System.Linq;
+using UnityEditor;
 
 namespace uAdventure.Editor
 {
     public abstract class ConversationDataControl : DataControl
     {
+        protected Conversation conversation;
+
+        private readonly Dictionary<ConversationNode, ConversationNodeDataControl> dataControls;
+
+        protected ConversationDataControl(Conversation conversation)
+        {
+            this.conversation = conversation;
+            dataControls = new Dictionary<ConversationNode, ConversationNodeDataControl>();
+            dataControls.Add(conversation.getRootNode(), ConversationNodeDataControlFactory.Instance
+                .CreateDataControlFor(this, conversation.getRootNode()));
+        }
+
+        public ConversationNodeDataControl getNodeDataControl(ConversationNode node)
+        {
+            if (!dataControls.ContainsKey(node))
+            {
+                dataControls.Add(node, ConversationNodeDataControlFactory.Instance
+                    .CreateDataControlFor(this, node));
+            }
+
+            return dataControls[node];
+        }
 
         /**
         * Returns the type of the contained conversation.
@@ -21,14 +46,34 @@ namespace uAdventure.Editor
          * 
          * @return Id of the contained conversation
          */
-        public abstract string getId();
+        public virtual string getId()
+        {
+            return conversation.getId();
+        }
+
+        /**
+         * Returns the id of the contained conversation.
+         * 
+         * @return Id of the contained conversation
+         */
+        public virtual void setId(string newId)
+        {
+            controller.AddTool(new ChangeIdTool(conversation, newId));
+        }
 
         /**
          * Returns the root node of the conversation.
          * 
          * @return Root node
          */
-        public abstract ConversationNodeView getRootNode();
+        public abstract ConversationNodeDataControl getRootNode();
+
+        /**
+         * Sets the rootNode
+         * 
+         * @return Root node
+         */
+        public abstract void setRootNode();
 
         /**
          * Returns the number of lines that has the conversation.
@@ -44,7 +89,7 @@ namespace uAdventure.Editor
          *            Node which we want to know what kind of node can be added
          * @return Array of node types that can be added
          */
-        public abstract int[] getAddableNodes(ConversationNodeView nodeView);
+        public abstract int[] getAddableNodes(ConversationNodeDataControl nodeView);
 
         /**
          * Returns if it is possible to add a child to the given node
@@ -56,30 +101,7 @@ namespace uAdventure.Editor
          * @return True if a child can be added (get NodeTypes with
          *         getAddeableNodes( ConversationalNode )), false otherwise
          */
-        public abstract bool canAddChild(ConversationNodeView nodeView, int nodeType);
-
-        /**
-         * Returns if it is possible to link the given node
-         * 
-         * @param nodeView
-         *            Node to be linked
-         * @return True if the node initially can be linked to another one, false
-         *         otherwise
-         */
-        public abstract bool canLinkNode(ConversationNodeView nodeView);
-
-        public abstract bool canDeleteLink(ConversationNodeView nodeView);
-
-        /**
-         * Returns if it is possible to link a given node with another one
-         * 
-         * @param fatherView
-         *            Node to act as the father
-         * @param childView
-         *            Node to act as the child
-         * @return True if node2 can be attached to node1, false otherwise
-         */
-        public abstract bool canLinkNodeTo(ConversationNodeView fatherView, ConversationNodeView childView);
+        public abstract bool canAddChild(ConversationNodeDataControl nodeView, int nodeType);
 
         /**
          * Returns if it is possible to delete the given node
@@ -88,7 +110,7 @@ namespace uAdventure.Editor
          *            Node to be deleted
          * @return True if the node can be deleted, false otherwise
          */
-        public abstract bool canDeleteNode(ConversationNodeView nodeView);
+        public abstract bool canDeleteNode(ConversationNodeDataControl nodeView);
 
         /**
          * Returns if it is possible to move the given node
@@ -97,7 +119,7 @@ namespace uAdventure.Editor
          *            Node to be moved
          * @return True if the node initially can be moved, false otherwise
          */
-        public abstract bool canMoveNode(ConversationNodeView nodeView);
+        public abstract bool canMoveNode(ConversationNodeDataControl nodeView);
 
         /**
          * Returns if it is possible to move the given node to a child position of
@@ -110,21 +132,33 @@ namespace uAdventure.Editor
          * @return True if node can be moved as a child of host node, false
          *         otherwise
          */
-        public abstract bool canMoveNodeTo(ConversationNodeView nodeView, ConversationNodeView hostNodeView);
+        public abstract bool canMoveNodeTo(ConversationNodeDataControl nodeView, ConversationNodeDataControl hostNodeView);
 
         /**
-         * Adds a new child of the indicated type, to the given node
+         * Links the two given nodes, as father and child
          * 
-         * @param nodeView
-         *            Node in which the child will be placed
-         * @param nodeType
-         *            Type of node to be added
-         * @return True if a node was added, false otherwise
+         * @param fatherView
+         *            Father node (first selected node)
+         * @param childView
+         *            Child node (second selected node)
+         * @return True if the nodes had been successfully linked, false otherwise
          */
-        public bool addChild(ConversationNodeView nodeView, int nodeType, Dictionary<ConversationNodeView, List<ConditionsController>> allConditions)
+        public virtual bool addNode(ConversationNodeDataControl fatherView, int nodeType)
         {
-
-            return controller.AddTool(new AddConversationNodeTool(nodeView, nodeType, allConditions));
+            return controller.AddTool(new ConversationNodeDataControl.AddRemoveConversationNodeTool(nodeType, fatherView));
+        }
+        /**
+         * Links the two given nodes, as father and child
+         * 
+         * @param fatherView
+         *            Father node (first selected node)
+         * @param childView
+         *            Child node (second selected node)
+         * @return True if the nodes had been successfully linked, false otherwise
+         */
+        public virtual bool addNode(ConversationNodeDataControl fatherView, int nodeType, int position)
+        {
+            return controller.AddTool(new ConversationNodeDataControl.AddRemoveConversationNodeTool(nodeType, fatherView, position));
         }
 
         /**
@@ -136,7 +170,18 @@ namespace uAdventure.Editor
          *            Child node (second selected node)
          * @return True if the nodes had been successfully linked, false otherwise
          */
-        public abstract bool linkNode(ConversationNodeView fatherView, ConversationNodeView childView);
+        public abstract bool linkNode(ConversationNodeDataControl fatherView, int nodeType, int position);
+
+        /**
+         * Links the two given nodes, as father and child
+         * 
+         * @param fatherView
+         *            Father node (first selected node)
+         * @param childView
+         *            Child node (second selected node)
+         * @return True if the nodes had been successfully linked, false otherwise
+         */
+        public abstract bool linkNode(ConversationNodeDataControl fatherView, ConversationNodeDataControl childView, int position);
 
         /**
          * Deletes the given node in the conversation
@@ -145,7 +190,122 @@ namespace uAdventure.Editor
          *            Node to be deleted
          * @return True if the node was successfully deleted, false otherwise
          */
-        public abstract bool deleteNode(ConversationNodeView nodeView);
+        public virtual bool deleteNode(ConversationNodeDataControl nodeView)
+        {
+            return controller.AddTool(new DeleteNodeTool(this, nodeView));
+        }
+
+        private class DeleteNodeTool : Tool
+        {
+            private readonly List<ConversationNodeDataControl.AddRemoveConversationNodeTool> subTools;
+            private readonly ConversationNodeDataControl toRemove;
+            private readonly ConversationDataControl content;
+            private bool isRoot = false;
+
+            public DeleteNodeTool(ConversationDataControl content, ConversationNodeDataControl node)
+            {
+                this.content = content;
+                this.toRemove = node;
+                this.subTools = CreateTools();
+            }
+
+            private List<ConversationNodeDataControl.AddRemoveConversationNodeTool> CreateTools()
+            {
+
+                if (toRemove.getChildCount() > 1 && !Controller.Instance.ShowStrictConfirmDialog("Forbidden!", "Deleting this node will keep only the first child (the rest nodes will be deleted!). Continue?"))
+                {
+                    return null;
+                }
+
+                if (toRemove == content.getRootNode())
+                {
+                    if (toRemove.getChildCount() == 0)
+                    {
+                        Controller.Instance.ShowErrorDialog("Forbidden!", "Deleting the last node is forbidden!");
+                        return null;
+                    }
+
+                    isRoot = true;
+                }
+
+
+                var tools = from node in content.getAllNodes()
+                            from child in node.getChilds().Select((n, i) => new { n, i })
+                            orderby child.i descending
+                            where child.n == toRemove
+                            select new ConversationNodeDataControl.AddRemoveConversationNodeTool(node, child.i);
+
+                return tools.ToList();
+            }
+
+            public override bool canRedo()
+            {
+                return true;
+            }
+
+            public override bool canUndo()
+            {
+                return true;
+            }
+
+            public override bool combine(Tool other)
+            {
+                return false;
+            }
+
+            public override bool doTool()
+            {
+                if(subTools == null)
+                {
+                    return false;
+                }
+
+                if (isRoot)
+                {
+                    var conversation = content.getConversation();
+                    conversation.setRootNode(conversation.getRootNode().getChild(0));
+                }
+
+                return subTools.All(t => t.doTool());
+            }
+
+            public override bool redoTool()
+            {
+                if (subTools == null)
+                {
+                    return false;
+                }
+
+                if (isRoot)
+                {
+                    var conversation = content.getConversation();
+                    conversation.setRootNode(conversation.getRootNode().getChild(0));
+                }
+
+                return subTools.All(t => t.redoTool());
+            }
+
+            public override bool undoTool()
+            {
+                if (subTools == null)
+                {
+                    return false;
+                }
+
+                if (isRoot)
+                {
+                    var conversation = content.getConversation();
+                    conversation.setRootNode(toRemove.getContent() as ConversationNode);
+                }
+
+                subTools.Reverse();
+                var result = subTools.All(t => t.undoTool());
+                subTools.Reverse();
+
+                return result;
+            }
+        }
+
 
         /**
          * Moves the given node to a child position of the given host node
@@ -156,7 +316,7 @@ namespace uAdventure.Editor
          *            Node that will act as host
          * @return True if the node was succesfully moved, false otherwise
          */
-        public abstract bool moveNode(ConversationNodeView nodeView, ConversationNodeView hostNodeView);
+        public abstract bool moveNode(ConversationNodeDataControl nodeView, ConversationNodeDataControl hostNodeView);
 
         /**
          * Default getter for the data contained
@@ -174,132 +334,7 @@ namespace uAdventure.Editor
         public abstract void setConversation(Conversation conversation);
 
         public abstract void updateAllConditions();
-
-        /**
-         * Adds a line in the given node, with the given name and a default text.
-         * 
-         * @param nodeView
-         *            Node in which the line must be placed
-         * @param lineIndex
-         *            Index in which the line will be placed
-         * @param name
-         *            Name of the line
-         * @param node
-         *            The list with the conditions controllers for current node
-         * 
-         */
-        public void addNodeLine(ConversationNodeView nodeView, int lineIndex, string name, List<ConditionsController> node)
-        {
-
-            controller.AddTool(new AddNodeLineTool(nodeView, lineIndex, name, node));
-        }
-
-        /**
-         * Sets a new name in the given line of the node.
-         * 
-         * @param nodeView
-         *            Node in which the line is placed
-         * @param lineIndex
-         *            Index of the line to modify
-         * @param name
-         *            New name for the line
-         */
-        public void setNodeLineName(ConversationNodeView nodeView, int lineIndex, string name)
-        {
-
-            // Take the complete node
-            ConversationNode node = (ConversationNode)nodeView;
-
-            controller.AddTool(new ChangeNameTool(node.getLine(lineIndex), name));
-        }
-
-        /**
-         * Sets a new text in the given line of the node.
-         * 
-         * @param nodeView
-         *            Node in which the line is placed
-         * @param lineIndex
-         *            Index of the line to modify
-         * @param text
-         *            New text for the line
-         */
-        public void setNodeLineText(ConversationNodeView nodeView, int lineIndex, string text)
-        {
-
-            // Take the complete node
-            ConversationNode node = (ConversationNode)nodeView;
-            controller.AddTool(new ChangeStringValueTool(node.getLine(lineIndex), text, "getText", "setText"));
-        }
-
-        /**
-         * Sets a new audio path in the given line of the node.
-         * 
-         * @param nodeView
-         *            Node in which the line is placed
-         * @param lineIndex
-         *            Index of the line to modify
-         * @param audioPath
-         *            New audio path for the line
-         */
-        public void setNodeLineAudioPath(ConversationNodeView nodeView, int lineIndex, string audioPath)
-        {
-
-            // Take the complete node
-            ConversationNode node = (ConversationNode)nodeView;
-
-            // Set the new text for the line if the value has changed
-            if (!node.hasAudioPath(lineIndex) || !node.getAudioPath(lineIndex).Equals(audioPath))
-            {
-                controller.AddTool(new ChangeStringValueTool(node.getLine(lineIndex), audioPath, "getAudioPath", "setAudioPath"));
-            }
-        }
-
-        /**
-         * Moves a line up in the list of the given node.
-         * 
-         * @param nodeView
-         *            Node which holds the line
-         * @param lineIndex
-         *            Index of the line to move
-         * @return True if the line was moved, false otherwise
-         */
-        public bool moveNodeLineUp(ConversationNodeView nodeView, int lineIndex)
-        {
-
-            return controller.AddTool(new MoveNodeLineTool(nodeView, lineIndex, MoveNodeLineTool.UP));
-        }
-
-        /**
-         * Moves a line down in the list of the given node.
-         * 
-         * @param nodeView
-         *            Node which holds the line
-         * @param lineIndex
-         *            Index of the line to move
-         * @return True if the line was moved, false otherwise
-         */
-        public bool moveNodeLineDown(ConversationNodeView nodeView, int lineIndex)
-        {
-
-            return controller.AddTool(new MoveNodeLineTool(nodeView, lineIndex, MoveNodeLineTool.DOWN));
-        }
-
-        /**
-         * Deletes a line in the given node.
-         * 
-         * @param nodeView
-         *            Node in which the line will be deleted
-         * @param lineIndex
-         *            Index of the line to delete
-         * @param node
-         *            The list with the conditions controllers of the given node
-         * 
-         */
-        public void deleteNodeLine(ConversationNodeView nodeView, int lineIndex, List<ConditionsController> node)
-        {
-
-            controller.AddTool(new DeleteNodeLineTool(nodeView, lineIndex, node));
-        }
+        
 
         /**
          * Deletes the link with the child node. This method should only be used
@@ -310,45 +345,11 @@ namespace uAdventure.Editor
          *            Dialogue node to delete the link
          * @return True if the link was deleted, false otherwise
          */
-        public bool deleteNodeLink(ConversationNodeView nodeView)
+        public bool deleteNodeLink(ConversationNodeDataControl nodeView)
         {
 
-            return controller.AddTool(new DeleteNodeLinkTool(nodeView));
+            return controller.AddTool(new ConversationNodeDataControl.DeleteNodeLinkTool(nodeView));
         }
-
-        /**
-         * Deletes the given option in the node. This method should only be used
-         * with option nodes, for it deletes the child node along the option. To
-         * delete the links on dialogue nodes, use the method <i>deleteNodeLink</i>
-         * instead.
-         * 
-         * @param nodeView
-         *            Option node to delete the option
-         * @param optionIndex
-         *            Index of the option to be deleted
-         * @return True if the option was deleted, false otherwise
-         */
-        public bool deleteNodeOption(ConversationNodeView nodeView, int optionIndex)
-        {
-
-            return controller.AddTool(new DeleteNodeOptionTool(nodeView, optionIndex));
-        }
-
-        /**
-         * Shows the GUI to edit the effects of the node.
-         * 
-         * @param nodeView
-         *            Node whose effects we want to modify
-         */
-        public void editNodeEffects(ConversationNodeView nodeView)
-        {
-
-            // Take the complete node
-            ConversationNode node = (ConversationNode)nodeView;
-            var effectsEditor = ScriptableObject.CreateInstance<EffectsEditor>();
-            effectsEditor.Init(node.getEffects());
-        }
-
 
         public override int[] getAddableElements()
         {
@@ -412,241 +413,262 @@ namespace uAdventure.Editor
             return false;
         }
 
-        public bool editLineAudioPath(ConversationNodeView selectedNode, int selectedRow)
+        public override bool isValid(string currentPath, List<string> incidences)
         {
-            return controller.AddTool(new SelectLineAudioPathTool(((ConversationNode)selectedNode).getLine(selectedRow)));
+            return getAllNodes().All(n => n.isValid(currentPath, incidences));
         }
 
-        /**
-         * Change the randomly in the selected node.
-         * 
-         * @param selectedNode
-         *            The node in which will be the actions
-         * 
-         */
-        public void setRandomlyOptions(ConversationNodeView selectedNode)
-        {
+        public abstract List<ConversationNodeDataControl> getAllNodes();
 
-            ConversationNode node = (ConversationNode)selectedNode;
-            //Change the randomly of showing of options
-            controller.AddTool(new ChangeBooleanValueTool(node, !((OptionConversationNode)node).isRandom(), "isRandom", "setRandom"));
+
+
+        private static int countNodeReferences(ConversationNodeDataControl root, ConversationNodeDataControl lookup)
+        {
+            return countNodeReferences(root, lookup, new List<ConversationNodeDataControl> { root });
         }
 
-        /**
-         * Change the keep showing option in the selected node, for option conversation node
-         * 
-         * @param selectedNode
-         *            The node in which will be the actions
-         * 
-         */
-        public void setKeepShowingOptionNodeOptions(ConversationNodeView selectedNode)
+        private static int countNodeReferences(ConversationNodeDataControl actual, ConversationNodeDataControl lookup, List<ConversationNodeDataControl> visited)
         {
-
-            ConversationNode node = (ConversationNode)selectedNode;
-            controller.AddTool(new ChangeBooleanValueTool(node, !((OptionConversationNode)node).isKeepShowing(), "isKeepShowing", "setKeepShowing"));
-        }
-
-        /**
-         * Select the position of the options node (top or bottom)
-         * 
-         * @param selectedNode
-         * @param bottomPosition
-         *          if true, the option will appear at the bottom, if false, the options will appear at the top
-         */
-        public void setOptionPositions(ConversationNodeView selectedNode, bool bottomPosition)
-        {
-            ConversationNode node = (ConversationNode)selectedNode;
-            controller.AddTool(new OptionsPositionTool(((OptionConversationNode)node), bottomPosition));
-        }
-
-        /**
-         * Change the show user option in the selected node.
-         * 
-         * @param selectedNode
-         *            The node in which will be the actions
-         * 
-         */
-        public void setShowUserOptionOptions(ConversationNodeView selectedNode)
-        {
-
-            ConversationNode node = (ConversationNode)selectedNode;
-            controller.AddTool(new ChangeBooleanValueTool(node, !((OptionConversationNode)node).isShowUserOption(), "isShowUserOption", "setShowUserOption"));
-        }
-
-        /**
-         * Change the wait user interaction option in the selected node, for dialogue node
-         * 
-         * @param selectedNode
-         *            The node in which will be the actions
-         * 
-         */
-        public void setKeepShowingDialogueOptions(ConversationNodeView selectedNode)
-        {
-
-            ConversationNode node = (ConversationNode)selectedNode;
-            controller.AddTool(new ChangeBooleanValueTool(node, !((DialogueConversationNode)node).isKeepShowing(), "isKeepShowing", "setKeepShowing"));
-        }
-
-
-        /**
-         * Change the pre-hearing option in the selected option node
-         * 
-         * @param selectedNode
-         *            The node in which will be the actions
-         * 
-         */
-        public void setPreListeningOptions(ConversationNodeView selectedNode)
-        {
-
-            ConversationNode node = (ConversationNode)selectedNode;
-            controller.AddTool(new ChangeBooleanValueTool(node, !((OptionConversationNode)node).isPreListening(), "isPreListening", "setPreListening"));
-        }
-
-
-        /**
-         * Check if in selectedNode is active the random option
-         * 
-         * @param selectedNode
-         *            The node in which will it ask
-         * @return
-         */
-        public bool isRandomActivate(ConversationNodeView selectedNode)
-        {
-
-            ConversationNode node = (ConversationNode)selectedNode;
-            return ((OptionConversationNode)node).isRandom();
-        }
-
-        /**
-         * Check if in selectedNode is active the keep showing the previous conversation line, for option node
-         * 
-         * @param selectedNode
-         *            The node in which will it ask
-         * @return
-         */
-        public bool isKeepShowingOptionsNodeActivate(ConversationNodeView selectedNode)
-        {
-
-            ConversationNode node = (ConversationNode)selectedNode;
-            return ((OptionConversationNode)node).isKeepShowing();
-        }
-
-
-        /**
-         * Check if in selectedNode is active the show user response option
-         * 
-         * @param selectedNode
-         *            The node in which will it ask
-         * @return
-         */
-        public bool isShowUserOptionActivate(ConversationNodeView selectedNode)
-        {
-
-            ConversationNode node = (ConversationNode)selectedNode;
-            return ((OptionConversationNode)node).isShowUserOption();
-        }
-
-        /**
-         * Check if in selectedNode is active the pre-hearing option
-         * 
-         * @param selectedNode
-         *            The node in which will it ask
-         * @return
-         */
-        public bool isPreListeningActivate(ConversationNodeView selectedNode)
-        {
-
-            ConversationNode node = (ConversationNode)selectedNode;
-            return ((OptionConversationNode)node).isPreListening();
-        }
-
-        /**
-         * Check if in selectedNode is active the show user response option, for dialogue node
-         * 
-         * @param selectedNode
-         *            The node in which will it ask
-         * @return
-         */
-        public bool isKeepShowingDialogueActivate(ConversationNodeView selectedNode)
-        {
-
-            ConversationNode node = (ConversationNode)selectedNode;
-            return ((DialogueConversationNode)node).isKeepShowing();
-        }
-
-        public int getEditorX(ConversationNodeView selectedNode)
-        {
-            ConversationNode node = (ConversationNode)selectedNode;
-            return node.getEditorX();
-        }
-
-        public int getEditorY(ConversationNodeView selectedNode)
-        {
-            ConversationNode node = (ConversationNode)selectedNode;
-            return node.getEditorY();
-        }
-
-        public void setEditorX(ConversationNodeView selectedNode, int x)
-        {
-            ConversationNode node = (ConversationNode)selectedNode;
-
-            if (x != node.getEditorX())
+            var i = 0;
+            if (!visited.Contains(actual))
             {
-                node.setEditorX(x);
-                Controller.Instance.DataModified();
-            }
-
-        }
-
-        public void setEditorY(ConversationNodeView selectedNode, int y)
-        {
-            ConversationNode node = (ConversationNode)selectedNode;
-            if (y != node.getEditorY())
-            {
-                node.setEditorY(y);
-                Controller.Instance.DataModified();
-            }
-        }
-
-
-        /**
-         * An options node cannot be empty
-         * 
-         * @param node
-         * @param currentPath
-         * @param incidences
-         * @return
-         */
-        protected static bool isValidNode(ConversationNode node, string currentPath, List<string> incidences, List<ConversationNode> visitedNodes)
-        {
-
-            bool valid = true;
-
-            if (visitedNodes == null)
-                visitedNodes = new List<ConversationNode>();
-
-            if (!visitedNodes.Contains(node))
-            {
-                visitedNodes.Add(node);
-                if (node.getType() == ConversationNodeViewEnum.OPTION && node.getLineCount() == 0)
+                visited.Add(actual);
+                foreach (var child in actual.getChilds())
                 {
-                    if (incidences != null && currentPath != null)
-                        incidences.Add(currentPath + " >> " + TC.get("Operation.AdventureConsistencyErrorEmptyOptionsNode"));
-                    valid = false;
-                }
-                else
-                {
-                    for (int i = 0; i < node.getChildCount(); i++)
+                    if (child == lookup || child.getContent() == lookup.getContent())
                     {
-                        valid &= isValidNode(node.getChild(i), currentPath, incidences, visitedNodes);
-                        if (!valid)
-                            break;
+                        i++;
                     }
+
+                    i += countNodeReferences(child, lookup, visited);
                 }
+
             }
-            return valid;
+            return i;
         }
 
-        public abstract List<ConversationNodeView> getAllNodes();
+        public virtual bool replaceNode(ConversationNodeDataControl oldNode, ConversationNodeDataControl newNode)
+        {
+            if (newNode != null && oldNode != null && oldNode != newNode)
+            {
+                return controller.AddTool(new ReplaceNodeTool(this, oldNode, newNode));
+            }
+            return false;
+        }
+
+
+
+        private class ReplaceNodeTool : Tool
+        {
+            private readonly List<Tool> subTools;
+            private readonly ConversationNodeDataControl oldNode, newNode;
+            private readonly ConversationDataControl content;
+            private bool isRoot = false;
+
+            public ReplaceNodeTool(ConversationDataControl content, ConversationNodeDataControl oldNode, ConversationNodeDataControl newNode)
+            {
+                this.content = content;
+                this.oldNode = oldNode;
+                this.newNode = newNode;
+                this.subTools = CreateTools();
+            }
+
+            private List<Tool> CreateTools()
+            {
+
+                if (oldNode.getChildCount() > 1 && !Controller.Instance.ShowStrictConfirmDialog("Forbidden!", "Replacing this node will keep only the first child (the rest nodes will be deleted!). Continue?"))
+                {
+                    return null;
+                }
+
+                var tools = from node in content.getAllNodes()
+                            from child in node.getChilds().Select((n, i) => new { n, i })
+                            where child.n == oldNode
+                            select (Tool) new ConversationNodeDataControl.LinkConversationNodeTool(content, node, newNode, child.i);
+
+                var toolsList = tools.ToList();
+
+                if (oldNode.getChildCount() > 0)
+                {
+                    toolsList.Add(new ConversationNodeDataControl.AddRemoveConversationNodeTool(newNode, oldNode.getChilds()[0], 0));
+                }
+
+                if (oldNode == content.getRootNode())
+                {
+                    isRoot = true;
+                }
+
+                return toolsList;
+            }
+
+            public override bool canRedo()
+            {
+                return true;
+            }
+
+            public override bool canUndo()
+            {
+                return true;
+            }
+
+            public override bool combine(Tool other)
+            {
+                return false;
+            }
+
+            public override bool doTool()
+            {
+                if (subTools == null)
+                {
+                    return false;
+                }
+
+                if (isRoot)
+                {
+                    var conversation = content.getConversation();
+                    conversation.setRootNode(newNode.getContent() as ConversationNode);
+                }
+
+                return subTools.All(t => t.doTool());
+            }
+
+            public override bool redoTool()
+            {
+                if (subTools == null)
+                {
+                    return false;
+                }
+
+                if (isRoot)
+                {
+                    var conversation = content.getConversation();
+                    conversation.setRootNode(conversation.getRootNode().getChild(0));
+                }
+
+                return subTools.All(t => t.redoTool());
+            }
+
+            public override bool undoTool()
+            {
+                if (subTools == null)
+                {
+                    return false;
+                }
+
+                if (isRoot)
+                {
+                    var conversation = content.getConversation();
+                    conversation.setRootNode(oldNode.getContent() as ConversationNode);
+                }
+
+                subTools.Reverse();
+                var result = subTools.All(t => t.undoTool());
+                subTools.Reverse();
+
+                return result;
+            }
+        }
+
+        public virtual bool moveNodes(ConversationNodeDataControl grabbed, List<ConversationNodeDataControl> selection, Vector2Int alpha)
+        {
+            return controller.AddTool(new MoveNodesTool(this, grabbed, selection, alpha));
+        }
+
+        private class MoveNodesTool : Tool
+        {
+            private readonly ConversationNodeDataControl grabbed;
+            private readonly Dictionary<ConversationNodeDataControl, Tool> subTools;
+            private readonly ConversationDataControl content;
+
+            public MoveNodesTool(ConversationDataControl content, ConversationNodeDataControl grabbed, List<ConversationNodeDataControl> selection, Vector2Int alpha)
+            {
+                this.content = content;
+                this.grabbed = grabbed;
+                this.subTools = CreateTools(selection, alpha);
+            }
+
+            private Dictionary<ConversationNodeDataControl, Tool> CreateTools(List<ConversationNodeDataControl> selection, Vector2Int alpha)
+            {
+                var tools = new Dictionary<ConversationNodeDataControl, Tool>();
+
+                selection.ForEach(n =>
+                {
+                    var rect = n.getEditorRect();
+                    rect.position += alpha;
+                    tools.Add(n, new ConversationNodeDataControl.ChangeNodeRectTool(n, rect));
+                });
+
+                return tools;
+            }
+
+            public override bool canRedo()
+            {
+                return subTools.All(kv => kv.Value.canRedo());
+            }
+
+            public override bool canUndo()
+            {
+                return subTools.All(kv => kv.Value.canUndo());
+            }
+
+            public override bool combine(Tool other)
+            {
+                var combined = false;
+                var otherMove = other as MoveNodesTool;
+                if(otherMove != null && grabbed == otherMove.grabbed && ContainSameKeys(subTools, otherMove.subTools))
+                {
+                    foreach(var kvSubTool in otherMove.subTools)
+                    {
+                        if (!subTools[kvSubTool.Key].combine(kvSubTool.Value))
+                        {
+                            return false;
+                        }
+                    }
+                    combined = true;
+                }
+
+                return combined;
+            }
+
+            bool ContainSameKeys(Dictionary<ConversationNodeDataControl, Tool> a, Dictionary<ConversationNodeDataControl, Tool> b)
+            {
+                return a.Keys.Count == b.Keys.Count && a.Keys.All(k => b.ContainsKey(k));
+            }
+
+            public override bool doTool()
+            {
+                if (subTools == null)
+                {
+                    return false;
+                }
+
+                return subTools.All(kv => kv.Value.doTool());
+            }
+
+            public override bool redoTool()
+            {
+                if (subTools == null)
+                {
+                    return false;
+                }
+
+                return subTools.All(kv => kv.Value.redoTool());
+            }
+
+            public override bool undoTool()
+            {
+                if (subTools == null)
+                {
+                    return false;
+                }
+
+                subTools.Reverse();
+                var result = subTools.All(kv => kv.Value.undoTool());
+                subTools.Reverse();
+
+                return result;
+            }
+        }
     }
+
 }

@@ -496,7 +496,14 @@ namespace uAdventure.Editor
         public static void ResetInstance()
         {
             controllerInstance = null;
-            EditorApplication.playModeStateChanged -= controllerInstance.OnPlay;
+            try
+            {
+                EditorApplication.playModeStateChanged -= controllerInstance.OnPlay;
+            }
+            catch
+            {
+                Debug.Log("Failed to unsubscrlibe onPlay");
+            }
 
             GameRources.GetInstance().Reset();
         }

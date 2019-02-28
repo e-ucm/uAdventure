@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using uAdventure.Core;
 using System.Text.RegularExpressions;
 using System.Linq;
+using UniRx;
+using System;
 
 namespace uAdventure.Editor
 {
@@ -44,9 +46,11 @@ namespace uAdventure.Editor
             }
         };
 
-        private DialogueConversationNode myNode;
-        private Vector2 scroll;
-        private readonly List<string> npc;
+        private readonly DataControlList linesList;
+        private DialogNodeDataControl myNode;
+        private IDisposable disposable;
+
+        private ConversationEditor parent;
 
         private readonly Texture2D conditionsTex, noConditionsTex, effectTex, noEffectTex;
         private readonly GUISkin noBackgroundSkin;
@@ -56,25 +60,16 @@ namespace uAdventure.Editor
         {
             get
             {
-                return new Rect(myNode.getEditorX(), myNode.getEditorY(), myNode.getEditorWidth(), myNode.getEditorHeight());
+                return myNode.getEditorRect().ToRect();
             }
             set
             {
-                myNode.setEditorX((int)value.x);
-                myNode.setEditorY((int)value.y);
-                myNode.setEditorWidth((int)value.width);
-                myNode.setEditorHeight((int)value.height);
+                value.width = Mathf.Max(value.width, 200);
+                myNode.setEditorRect(value.ToRectInt());
             }
         }
-
         public DialogNodeEditor()
         {
-            myNode = new DialogueConversationNode();
-            npc = new List<string> { TC.get("ConversationLine.PlayerName") };
-            if (Controller.Instance.SelectedChapterDataControl!= null)
-            {
-                npc.AddRange(Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCsIDs());
-            }
 
             conditionsTex = Resources.Load<Texture2D>("EAdventureData/img/icons/conditions-24x24");
             noConditionsTex = Resources.Load<Texture2D>("EAdventureData/img/icons/no-conditions-24x24");
@@ -100,137 +95,190 @@ namespace uAdventure.Editor
             {
                 padding = new RectOffset(5, 5, 5, 5)
             };
-        }
 
-        ConversationEditor parent;
+            linesList = new DataControlList
+            {
+                Columns = new List<ColumnList.Column>
+                {
+                    new ColumnList.Column
+                    {
+                        Text = "Speaker",
+                        SizeOptions = new GUILayoutOption[]{ GUILayout.MaxWidth(60) }
+                    },
+                    new ColumnList.Column
+                    {
+                        Text = "Emote",
+                        SizeOptions = new GUILayoutOption[]{ GUILayout.MaxWidth(30) }
+                    },
+                    new ColumnList.Column
+                    {
+                        Text = "Line",
+                        SizeOptions = new GUILayoutOption[]{ GUILayout.MinWidth(250), GUILayout.ExpandWidth(true)  }
+                    },
+                    new ColumnList.Column
+                    {
+                        Text = "Cond.",
+                        SizeOptions = new GUILayoutOption[]{ GUILayout.MaxWidth(30) }
+                    }
+                },
+                drawCell = (rect, index, column, isActive, isFocused) =>
+                {
+                    var line = this.linesList.list[index] as ConversationLineDataControl;
+                    BubbleType bubbleType = GetBubbleType(line);
+                    var text = line.getText();
+                    // Extract the bubble type
+                    if (bubbleType.Identifier != "-")
+                    {
+                        text = text.Remove(0, bubbleType.Identifier.Length + 2);
+                    }
+
+                    switch (column)
+                    {
+                        case 0: // Speaker
+
+                            var npc = new List<string> { TC.get("ConversationLine.PlayerName") };
+                            npc.AddRange(Controller.Instance.IdentifierSummary.getIds<NPC>());
+
+                            var speaker = line.getName().Equals("Player") ? 0 : npc.IndexOf(line.getName());
+                            EditorGUI.BeginChangeCheck();
+                            var newSpeaker = EditorGUI.Popup(rect, speaker, npc.ToArray());
+                            if (EditorGUI.EndChangeCheck())
+                            {
+                                var newSpeakerName = newSpeaker == 0 ? "Player" : npc[newSpeaker];
+                                line.setName(newSpeakerName);
+                            }
+                            break;
+
+                        case 1: // Bubble type
+                            // Control
+                            if (GUI.Button(rect, bubbleType.Identifier))
+                            {
+                                bubbleType = BubbleTypes.FirstOrDefault(b => bubbleType.Next == b.Identifier);
+                                // Reinsert the bubble type
+                                if (bubbleType.Identifier != "-")
+                                {
+                                    text = "#" + bubbleType.Identifier + " " + text;
+                                }
+                                line.setText(text);
+                            }
+
+                            break;
+                        case 2: // Text
+                            EditorGUI.BeginChangeCheck();
+                            var newText = EditorGUI.TextField(rect, text);
+                            if(EditorGUI.EndChangeCheck())
+                            {
+                                // Reinsert the bubble type
+                                if (bubbleType.Identifier != "-")
+                                {
+                                    newText = "#" + bubbleType.Identifier + " " + newText;
+                                }
+                                line.setText(newText);
+                            }
+                            break;
+                        case 3: // Conditions
+                            var hasConditions = line.getConditions().getBlocksCount() > 0;
+                            if (GUI.Button(rect, hasConditions ? conditionsTex : noConditionsTex, noBackgroundSkin.button))
+                            {
+                                ConditionEditorWindow window = (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
+                                window.Init(line.getConditions());
+                            }
+                            break;
+                    }
+                }
+            };
+        }
         public void setParent(ConversationEditor parent)
         {
             this.parent = parent;
+            if (Node == null || !parent.Content.getAllNodes().Contains(Node))
+            {
+                Node = parent.Content.getNodeDataControl(new DialogueConversationNode()) as DialogNodeDataControl;
+            }
         }
 
         public void draw()
         {
-
-            GUIStyle style = new GUIStyle()
+            using (new GUILayout.VerticalScope())
             {
-                padding = new RectOffset(5, 5, 5, 5)
-            };
-            EditorGUILayout.BeginVertical();
+                EditorGUILayout.HelpBox(TC.get("ConversationEditor.AtLeastOne"), MessageType.None);
 
-            EditorGUILayout.HelpBox(TC.get("ConversationEditor.AtLeastOne"), MessageType.None);
-            if (myNode.getLineCount() > 0)
-            {
-                bool isScrolling = false;
+                var min = linesList.headerHeight + linesList.footerHeight + linesList.elementHeight + 5;
+                linesList.DoList(Mathf.Max(min, Mathf.Min(200, linesList.elementHeight * (linesList.count - 1) + min)));
 
-                if (myNode.getLineCount() > 10)
+                EditorGUILayout.HelpBox(TC.get("ConversationEditor.NodeOption"), MessageType.None);
+
+                using (new GUILayout.HorizontalScope())
                 {
-                    scroll = EditorGUILayout.BeginScrollView(scroll, GUILayout.MinWidth(360), GUILayout.Height(190));
-                    isScrolling = true;
-                }
-
-                for (int i = 0; i < myNode.getLineCount(); i++)
-                {
-                    var line = myNode.getLine(i);
-                    EditorGUILayout.BeginHorizontal();
-                    
-                    EditorGUIUtility.labelWidth = GUI.skin.label.CalcSize(new GUIContent(TC.get("ConversationEditor.Speaker"))).x;
-
-                    var speaker = line.getName().Equals("Player") ? 0 : npc.IndexOf(line.getName());
-                    var newSpeaker = EditorGUILayout.Popup(TC.get("ConversationEditor.Speaker"), speaker, npc.ToArray());
-                    line.setName(newSpeaker == 0 ? "Player" : npc[newSpeaker]);
-                    
-                    // Bubble type extraction
-                    var matched = ExString.Default(Regex.Match(line.getText(), @"^#([^\s]+)").Groups[1].Value, "-");
-                    var bubbleType = BubbleTypes.FirstOrDefault(b => matched == b.Identifier);
-                    if (string.IsNullOrEmpty(bubbleType.Identifier))
+                    using (new EditorGUI.DisabledGroupScope(myNode.getChildCount() > 0 || myNode.getAddableNodes().Length == 0))
                     {
-                        bubbleType = new BubbleType(matched);
+                        if (GUILayout.Button(TC.get("ConversationEditor.CreateChild")))
+                        {
+                            var options = new List<GUIContent>();
+                            foreach (var addable in Node.getAddableNodes())
+                            {
+                                options.Add(new GUIContent("Create " + TC.get("Element.Name" + addable)));
+                            }
+
+                            EditorUtility.DisplayCustomMenu(new Rect(Event.current.mousePosition, Vector2.one), options.ToArray(), -1, (param, ops, selected) =>
+                            {
+                                var option = Node.getAddableNodes()[selected];
+                                parent.Content.addNode(myNode, option);
+                            }, Event.current.mousePosition);
+                        }
                     }
 
-                    if (bubbleType.Identifier != "-")
-                        line.setText(line.getText().Remove(0, matched.Length + 2));
-                    
-                    // Bubble type control
-                    if (GUILayout.Button(bubbleType.Identifier, GUILayout.Width(19), GUILayout.Height(14)))
+                    if (GUILayout.Button(TC.get("ConversationEditor.SetChild")))
                     {
-                        bubbleType = BubbleTypes.FirstOrDefault(b => bubbleType.Next == b.Identifier);
+                        parent.StartSetChild(this.myNode, 0);
                     }
 
-                    EditorGUIUtility.labelWidth = GUI.skin.label.CalcSize(new GUIContent(TC.get("ConversationEditor.Line"))).x;
-                    line.setText(EditorGUILayout.TextField(TC.get("ConversationEditor.Line"), line.getText(), GUILayout.Width(200)));
-
-                    // Bubble type reinsert
-                    if (bubbleType.Identifier != "-")
+                    var hasEffects = myNode.getEffects().getEffects().Count > 0;
+                    if (GUILayout.Button(hasEffects ? effectTex : noEffectTex, noBackgroundSkin.button, GUILayout.Width(24), GUILayout.Height(24)))
                     {
-                        line.setText("#" + bubbleType.Identifier + " " + line.getText());
+                        EffectEditorWindow window = (EffectEditorWindow)ScriptableObject.CreateInstance(typeof(EffectEditorWindow));
+                        window.Init(myNode.getEffects());
                     }
-
-                    var hasConditions = line.getConditions().GetConditionsList().Count > 0;
-
-                    if (GUILayout.Button(hasConditions ? conditionsTex : noConditionsTex, noBackgroundSkin.button, GUILayout.Width(15), GUILayout.Height(15)))
-                    {
-                        ConditionEditorWindow window = (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
-                        window.Init(line.getConditions());
-                    }
-
-                    if (GUILayout.Button("X", closeStyle, GUILayout.Width(15), GUILayout.Height(15)))
-                    {
-                        myNode.removeLine(i);
-                    }
-                    EditorGUILayout.EndHorizontal();
-
-                }
-                if (isScrolling)
-                {
-                    EditorGUILayout.EndScrollView();
                 }
             }
-
-
-            GUIContent bttext = new GUIContent(TC.get("ConversationLine.DefaultText"));
-            Rect btrect = GUILayoutUtility.GetRect(bttext, style);
-            if (GUI.Button(btrect, bttext))
-            {
-                myNode.addLine(new ConversationLine("Player", ""));
-            }
-
-            EditorGUILayout.HelpBox(TC.get("ConversationEditor.NodeOption"), MessageType.None);
-
-            EditorGUILayout.BeginHorizontal();
-            GUI.enabled = (myNode.getChildCount() == 0) || myNode.getType() == ConversationNodeViewEnum.OPTION;
-            bttext = new GUIContent(TC.get("ConversationEditor.CreateChild"));
-            btrect = GUILayoutUtility.GetRect(bttext, buttonstyle);
-            if (GUI.Button(btrect, bttext))
-            {
-                parent.addChild(myNode, new DialogueConversationNode());
-            }
-            GUI.enabled = true;
-
-            bttext = new GUIContent(TC.get("ConversationEditor.SetChild"));
-            btrect = GUILayoutUtility.GetRect(bttext, buttonstyle);
-            if (GUI.Button(btrect, bttext))
-            {
-                parent.StartSetChild(this.myNode, 0);
-            }
-
-            var hasEffects = myNode.getEffects().getEffects().Count > 0;
-            if (GUILayout.Button(hasEffects ? effectTex : noEffectTex, noBackgroundSkin.button, GUILayout.Width(24), GUILayout.Height(24)))
-            {
-                EffectEditorWindow window = (EffectEditorWindow)ScriptableObject.CreateInstance(typeof(EffectEditorWindow));
-                window.Init(myNode.getEffects());
-            }
-
-            GUILayout.EndHorizontal();
-            EditorGUILayout.EndVertical();
         }
 
-        public ConversationNode Node { get { return myNode; } set { myNode = value as DialogueConversationNode; } }
+        public ConversationNodeDataControl Node { get { return myNode; }
+            set {
+                if (disposable != null)
+                {
+                    disposable.Dispose();
+                }
+
+                myNode = value as DialogNodeDataControl;
+                disposable = myNode.Subscribe(_ => UpdateList());
+                UpdateList();
+            }
+        }
+
+        private void UpdateList()
+        {
+            linesList.SetData(myNode, (node) => (node as ConversationNodeDataControl).getLines().Cast<DataControl>().ToList());
+        }
+
         public string NodeName { get { return "Dialog"; } }
         public ConversationNodeEditor clone() { return new DialogNodeEditor(); }
 
-        public bool manages(ConversationNode c)
+        public bool manages(ConversationNodeDataControl c)
         {
-            return c.GetType() == myNode.GetType();
+            return c is DialogNodeDataControl;
+        }
+
+        private static BubbleType GetBubbleType(ConversationLineDataControl line)
+        {
+            var matched = ExString.Default(Regex.Match(line.getText(), @"^#([^\s]+)").Groups[1].Value, "-");
+            var bubbleType = BubbleTypes.FirstOrDefault(b => matched == b.Identifier);
+            if (string.IsNullOrEmpty(bubbleType.Identifier))
+            {
+                bubbleType = new BubbleType(matched);
+            }
+
+            return bubbleType;
         }
     }
 }

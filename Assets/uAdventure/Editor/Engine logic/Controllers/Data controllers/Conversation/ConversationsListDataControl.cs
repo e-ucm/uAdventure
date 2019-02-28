@@ -247,8 +247,8 @@ namespace uAdventure.Editor
             for (int j = 0; j < g.getAllNodes().Count; j++)
             {
 
-                int centerX = g.getEditorX(g.getAllNodes()[j]);
-                int centerY = g.getEditorY(g.getAllNodes()[j]);
+                int centerX = g.getAllNodes()[j].getEditorRect().x;
+                int centerY = g.getAllNodes()[j].getEditorRect().y;
                 newElement.getAllNodes()[j].setEditorX(centerX);
                 newElement.getAllNodes()[j].setEditorY(centerY);
             }

@@ -33,13 +33,6 @@ namespace uAdventure.Core
          */
         private List<ConversationNode> optionNodes;
 
-        private bool effectConsumed = false;
-
-        /**
-         * Effect to be triggered when the node has finished
-         */
-        private Effects effects;
-
         /**
          * Show the options randomly
          */
@@ -59,17 +52,6 @@ namespace uAdventure.Core
          * Pre-listening the conversation line
          */
         private bool preListening;
-
-        /**
-         * The position to be painted the option nodes
-         */
-        private int x, y;
-
-        private const int DEFAULT_OPTION_NODE_POSITION_X = 10;
-
-        private const int DEFAULT_OPTION_NODE__UPPER_POSITION_Y = 10;
-
-        private const int DEFAULT_OPTION_NODE__BOTTOM_POSITION_Y = 480;
 
         private float timeout = -1f;
 
@@ -94,10 +76,17 @@ namespace uAdventure.Core
         /**
          * Constructor
          */
-
-        public OptionConversationNode(bool random, bool keepShowing, bool showUserOption, bool preHearing, int x, int y)
+        public OptionConversationNode()
+            : this(false, false, false, false)
         {
+        }
 
+        /**
+         * Constructor
+         */
+
+        public OptionConversationNode(bool random, bool keepShowing, bool showUserOption, bool preHearing) : base()
+        {
             options = new List<ConversationLine>();
             optionNodes = new List<ConversationNode>();
             this.random = random;
@@ -106,28 +95,8 @@ namespace uAdventure.Core
             this.preListening = preHearing;
             this.timeout = -1f;
             this.timeoutConditions = new Conditions();
-            // the position of the option has been set, use it
-            if (x > 0 && y > 0)
-            {
-                this.x = x;
-                this.y = y;
-            } // if the positions hasn't been set, select the bottom position
-            else
-            {
-                this.x = DEFAULT_OPTION_NODE_POSITION_X;
-                this.y = DEFAULT_OPTION_NODE__BOTTOM_POSITION_Y;
-            }
-            effects = new Effects();
         }
 
-        /**
-         * Constructor
-         */
-
-        public OptionConversationNode()
-            : this(false, false, false, false, DEFAULT_OPTION_NODE_POSITION_X, DEFAULT_OPTION_NODE__BOTTOM_POSITION_Y)
-        {
-        }
 
         /*
          * the xApi question for the option node
@@ -138,17 +107,6 @@ namespace uAdventure.Core
         public string getXApiQuestion()
         {
             return xapiQuestion;
-        }
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see es.eucm.eadventure.engine.engine.data.conversation.node.Node#getType()
-         */
-
-        public override ConversationNodeViewEnum getType()
-        {
-            return ConversationNodeViewEnum.OPTION;
         }
 
         /*
@@ -253,52 +211,6 @@ namespace uAdventure.Core
             return item;
         }
 
-        /*
-         * (non-Javadoc)
-         * 
-         * @see es.eucm.eadventure.common.data.chapterdata.conversation.node.ConversationNodeView#hasEffects()
-         */
-
-        public override bool hasEffects()
-        {
-
-            return hasValidEffect() && !effects.IsEmpty();
-        }
-
-        public override void setEffects(Effects effects)
-        {
-            this.effects = effects;
-        }
-
-        public override Effects getEffects()
-        {
-
-            return effects;
-        }
-
-        public override void consumeEffect()
-        {
-
-            effectConsumed = true;
-        }
-
-        public override bool isEffectConsumed()
-        {
-
-            return effectConsumed;
-        }
-
-        public override void resetEffect()
-        {
-
-            effectConsumed = false;
-        }
-
-        public override bool hasValidEffect()
-        {
-
-            return effects != null;
-        }
 
         /**
          * Change randomly the position of the options.
@@ -338,47 +250,17 @@ namespace uAdventure.Core
         public float Timeout { get { return timeout; } set { timeout = value; } }
         public Conditions TimeoutConditions { get { return timeoutConditions; } set { timeoutConditions = value; } }
 
-        /*
-        @Override
-        public Object clone() throws CloneNotSupportedException
-        {
-
-            OptionConversationNode ocn = (OptionConversationNode) super.clone( );
-            ocn.effectConsumed = effectConsumed;
-            ocn.effects = ( effects != null ? (Effects) effects.clone( ) : null );
-            /*		if (optionNodes != null) {
-                        ocn.optionNodes = new List<ConversationNode>();
-                        for (ConversationNode cn : optionNodes)
-                            ocn.optionNodes.add((ConversationNode) cn.clone());
-                    }*/ /*
-            ocn.optionNodes = new List<ConversationNode>( );
-            if( options != null ) {
-                ocn.options = new List<ConversationLine>( );
-                for( ConversationLine cl : options )
-                    ocn.options.add( (ConversationLine) cl.clone( ) );
-            }
-    ocn.random = random;
-            ocn.keepShowing = keepShowing;
-            ocn.showUserOption = showUserOption;
-            return ocn;
-        }*/
-
         public override object Clone()
         {
             OptionConversationNode ocn = (OptionConversationNode)base.Clone();
-            ocn.effectConsumed = effectConsumed;
-            ocn.effects = (effects != null ? (Effects)effects.Clone() : null);
-            /*		if (optionNodes != null) {
-                        ocn.optionNodes = new ArrayList<ConversationNode>();
-                        for (ConversationNode cn : optionNodes)
-                            ocn.optionNodes.add((ConversationNode) cn.clone());
-                    }*/
             ocn.optionNodes = new List<ConversationNode>();
             if (options != null)
             {
                 ocn.options = new List<ConversationLine>();
                 foreach (ConversationLine cl in options)
+                {
                     ocn.options.Add((ConversationLine)cl.Clone());
+                }
             }
             ocn.random = random;
             ocn.keepShowing = keepShowing;
@@ -448,48 +330,36 @@ namespace uAdventure.Core
             this.preListening = preHearing;
         }
 
-        public bool isTopPosition()
+        public void setBottomPosition()
         {
-
-            return y == DEFAULT_OPTION_NODE__UPPER_POSITION_Y;
-        }
-
-        public bool isBottomPosition()
-        {
-
-            return y == DEFAULT_OPTION_NODE__BOTTOM_POSITION_Y;
+            throw new NotImplementedException();
         }
 
         public void setTopPosition()
         {
-
-            y = DEFAULT_OPTION_NODE__UPPER_POSITION_Y;
+            throw new NotImplementedException();
         }
 
-        public void setBottomPosition()
-        {
-
-            y = DEFAULT_OPTION_NODE__BOTTOM_POSITION_Y;
-        }
-
-        public int getX()
-        {
-
-            return x;
-        }
-
-        public int getY()
-        {
-
-            return y;
-        }
         public override ConversationNode replaceChild(int index, ConversationNode node)
         {
             if (index > getChildCount())
+            {
                 throw new Exception("Replacing out of bounds!");
+            }
 
-            optionNodes[index] = node;
-            return optionNodes[index] = node;
+            if (optionNodes.Count == index)
+            {
+                var previousChild = timerChild;
+                timerChild = node;
+                return previousChild;
+            }
+            else
+            {
+                var previousChild = optionNodes[index];
+                optionNodes[index] = node;
+                return previousChild;
+            }
+
         }
     }
 }
