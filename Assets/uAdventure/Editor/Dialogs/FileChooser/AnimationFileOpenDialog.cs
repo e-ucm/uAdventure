@@ -7,7 +7,7 @@ namespace uAdventure.Editor
 
         override public void Init(DialogReceiverInterface e, FileType fType)
         {
-            basePath = "Assets/uAdventure/Resources/CurrentGame/animation/";
+            basePath = "Assets/uAdventure/Resources/CurrentGame/assets/animation/";
             fileFilter = "eaa.xml";
             base.Init(e, fType);
         }
