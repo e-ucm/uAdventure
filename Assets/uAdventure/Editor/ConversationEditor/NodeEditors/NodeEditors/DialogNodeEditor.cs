@@ -49,7 +49,6 @@ namespace uAdventure.Editor
         private readonly DataControlList linesList;
         private DialogNodeDataControl myNode;
         private IDisposable disposable;
-        private readonly List<string> npc;
 
         private ConversationEditor parent;
 
@@ -71,11 +70,6 @@ namespace uAdventure.Editor
         }
         public DialogNodeEditor()
         {
-            npc = new List<string> { TC.get("ConversationLine.PlayerName") };
-            if (Controller.Instance.SelectedChapterDataControl!= null)
-            {
-                npc.AddRange(Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCsIDs());
-            }
 
             conditionsTex = Resources.Load<Texture2D>("EAdventureData/img/icons/conditions-24x24");
             noConditionsTex = Resources.Load<Texture2D>("EAdventureData/img/icons/no-conditions-24x24");
@@ -141,6 +135,10 @@ namespace uAdventure.Editor
                     switch (column)
                     {
                         case 0: // Speaker
+
+                            var npc = new List<string> { TC.get("ConversationLine.PlayerName") };
+                            npc.AddRange(Controller.Instance.IdentifierSummary.getIds<NPC>());
+
                             var speaker = line.getName().Equals("Player") ? 0 : npc.IndexOf(line.getName());
                             EditorGUI.BeginChangeCheck();
                             var newSpeaker = EditorGUI.Popup(rect, speaker, npc.ToArray());
