@@ -160,6 +160,7 @@ namespace uAdventure.Editor
 
         public override void updateVarFlagSummary(VarFlagSummary varFlagSummary)
         {
+            ConditionsController.updateVarFlagSummary(varFlagSummary, conversationLineConditionsController.Conditions);
         }
 
 
