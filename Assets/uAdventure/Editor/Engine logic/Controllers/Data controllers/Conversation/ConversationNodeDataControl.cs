@@ -204,6 +204,8 @@ namespace uAdventure.Editor
         public override void updateVarFlagSummary(VarFlagSummary varFlagSummary)
         {
             conversationLines.ForEach(l => l.updateVarFlagSummary(varFlagSummary));
+
+            EffectsController.updateVarFlagSummary(varFlagSummary, effectsController.getEffectsDirectly());
         }
 
 
