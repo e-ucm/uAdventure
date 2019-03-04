@@ -3,6 +3,8 @@
 
     <xsl:output method="xml"/>
 
+<!--  GRAB: Since uAdventure grab action is performed through effects (as conversations) -->
+  <!-- When it has no effects, we add a new effects node with remove and generate -->
     <xsl:template match="grab[not(effect)]">
         <xsl:copy>
             <xsl:apply-templates select="node()|@*"/>
@@ -13,8 +15,9 @@
                 <condition/>
             </effect>
         </xsl:copy>
-    </xsl:template> 
+    </xsl:template>
 
+  <!-- When it has effects, we append the remove and generate at the end  -->
     <xsl:template match="grab/effect">
         <xsl:copy>
             <xsl:apply-templates select="node()|@*"/>
@@ -24,7 +27,17 @@
             <condition/>
         </xsl:copy>
     </xsl:template>
+<!--  END GRAB -->
 
+<!--  PLAYERLAYER: Player layers with -2 value can be used in third person games to hide the character -->
+  <!--  When we find this value, but there's a trajectory in the scene, we change it to -1 -->
+    <xsl:template match="scene[./trajectory]/@playerLayer[. = '-2']">
+      <xsl:attribute name="{name()}">
+        <xsl:text>-1</xsl:text>
+      </xsl:attribute>
+    </xsl:template>
+<!-- END PLAYERLAYER -->
+  
     <xsl:template match="node()|@*">
         <xsl:copy>
             <xsl:apply-templates select="node()|@*"/>
