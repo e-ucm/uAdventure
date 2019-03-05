@@ -66,7 +66,9 @@ namespace uAdventure.Core
                 foreach (ActiveArea activeArea in scene.getActiveAreas())
                 {
                     if (activeArea.getId() != null && !activeArea.getId().Equals(""))
+                    {
                         addId<ActiveArea>(activeArea.getId());
+                    }
                 }
             }            
             
@@ -88,7 +90,9 @@ namespace uAdventure.Core
                 string name = profile.getName();
                 addAssessmentProfileId(name);
                 foreach (AssessmentRule rule in profile.getRules())
+                {
                     this.addAssessmentRuleId(rule.getId(), name);
+                }
             }
 
             // Add adaptation rules ids and asssessmnet profiles ids
@@ -97,7 +101,9 @@ namespace uAdventure.Core
                 string name = profile.getName();
                 addAdaptationProfileId(name);
                 foreach (AdaptationRule rule in profile.getRules())
+                {
                     this.addAdaptationRuleId(rule.getId(), name);
+                }
             }
 
         }
@@ -127,24 +133,38 @@ namespace uAdventure.Core
 
         public void addId(System.Type t, string id){
 			if(!globalIdentifiers.ContainsKey (id))
-				globalIdentifiers.Add(id, t);
+            {
+                globalIdentifiers.Add(id, t);
+            }
 
-			if (!typeGroups.ContainsKey (t))
-				typeGroups.Add (t, new List<string> ());
+            if (!typeGroups.ContainsKey (t))
+            {
+                typeGroups.Add (t, new List<string> ());
+            }
 
-			if (!typeGroups [t].Contains (id))
-				typeGroups [t].Add (id);
+            if (!typeGroups [t].Contains (id))
+            {
+                typeGroups [t].Add (id);
+            }
 
             foreach (var i in t.GetInterfaces())
+            {
                 if (typeGroups.ContainsKey(i))
+                {
                     typeGroups.Remove(i);
+                }
+            }
 
-            
+
             foreach (var kv in typeGroups)
             {
                 if (t.IsSubclassOf(kv.Key))
+                {
                     if (!typeGroups[kv.Key].Contains(id))
+                    {
                         typeGroups[kv.Key].Add(id);
+                    }
+                }
             }
         }
 
@@ -155,7 +175,9 @@ namespace uAdventure.Core
         public string[] getIds(Type t)
         {
             if (typeGroups.ContainsKey(t))
+            {
                 return typeGroups[t].ToArray();
+            }
 
             if (t.IsInterface)
             {
@@ -163,7 +185,9 @@ namespace uAdventure.Core
                 foreach(var kv in typeGroups)
                 {
                     if (t.IsAssignableFrom(kv.Key))
+                    {
                         allInterfaceIds.AddRange(kv.Value);
+                    }
                 }
                 typeGroups[t] = allInterfaceIds;
             }
@@ -173,7 +197,9 @@ namespace uAdventure.Core
                 foreach (var kv in typeGroups)
                 {
                     if (kv.Key.IsSubclassOf(t))
+                    {
                         allTypeIds.AddRange(kv.Value);
+                    }
                 }
                 typeGroups[t] = allTypeIds;
             }
@@ -191,18 +217,29 @@ namespace uAdventure.Core
                 globalIdentifiers.Remove(id);
                 var t = typeof(T);
                 if (typeGroups.ContainsKey(t) && typeGroups[t].Contains(id))
+                {
                     typeGroups[t].Remove(id);
+                }
+
                 if (t.IsInterface)
                 {
                     foreach (var kv in typeGroups)
+                    {
                         if (t.IsAssignableFrom(kv.Key) && kv.Value.Contains(id))
+                        {
                             kv.Value.Remove(id);
+                        }
+                    }
                 }
                 else
                 {
                     foreach (var kv in typeGroups)
+                    {
                         if ((t.IsSubclassOf(kv.Key) || kv.Key.IsSubclassOf(t)) && kv.Value.Contains(id))
+                        {
                             kv.Value.Remove(id);
+                        }
+                    }
                 }
             }
 		}
@@ -384,7 +421,9 @@ namespace uAdventure.Core
 			foreach (string id in getIds<Macro> ())
             {
                 if (!id.Equals(exception))
+                {
                     macroIds.Add(id);
+                }
             }
             return macroIds.ToArray();
         }
@@ -846,10 +885,14 @@ namespace uAdventure.Core
 		public string[] groupIds(System.Type t){
 			var complete = new List<string> ();
 			foreach (var kv in typeGroups)
-				if (t.IsAssignableFrom (kv.Key))
-					complete.AddRange (kv.Value);
+            {
+                if (t.IsAssignableFrom (kv.Key))
+                {
+                    complete.AddRange (kv.Value);
+                }
+            }
 
-			return complete.ToArray ();
+            return complete.ToArray ();
 		}
 
         public string[] combineIds(System.Type[] types)

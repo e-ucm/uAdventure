@@ -61,7 +61,9 @@ public static class ExtensionRect
     public static Vector2[] Extend(this Vector2[] points, float radius)
     {
         if (Mathf.Approximately(radius, 0))
+        {
             return points;
+        }
 
         Path polygon = points.ToList().ConvertAll(p => new IntPoint(p.x, p.y));
 
@@ -75,7 +77,9 @@ public static class ExtensionRect
         var r = solution.Count > 0 ? solution[0].ConvertAll(p => new Vector2(p.X, p.Y)) : new List<Vector2>();
 
         if (r.Count > 0)
+        {
             r.Add(r[0]);
+        }
 
         return r.ToArray();
     }
@@ -94,7 +98,9 @@ public static class ExtensionRect
         {
             if (((originPoints[i].y > 0) != (originPoints[(i + 1) % originPoints.Count].y > 0))
             && ((originPoints[i].y > 0) == (originPoints[i].y * originPoints[(i + 1) % originPoints.Count].x > originPoints[(i + 1) % originPoints.Count].y * originPoints[i].x)))
+            {
                 inside = !inside;
+            }
         }
 
         return inside;
@@ -108,7 +114,9 @@ public static class ExtensionRect
     public static bool InsideEdgeRange(this Vector2[] points, Vector2 point, float radius, bool closed)
     {
         if (points.Length <= 1) // If there are not edges, no sense to do it...
+        {
             return false;
+        }
 
         Vector2 closestPoin = Vector2.zero;
         int l = closed ? points.Length - 1 : 0;
@@ -118,7 +126,9 @@ public static class ExtensionRect
             closestPoin = uAdventure.Runner.LineHandler.GetClosestPointOnLineSegment(points[l], points[i], point);
             l = i;
             if ((closestPoin - point).sqrMagnitude <= sqrRadius)
+            {
                 return true;
+            }
         }
         return false;
     }
@@ -134,8 +144,14 @@ public static class ExtensionRect
         var originalCenter = r.center;
 
         var myRatio = r.width / r.height;
-        if(myRatio > ratio) r.width = r.height * ratio;
-        else r.height = r.width / ratio;
+        if(myRatio > ratio)
+        {
+            r.width = r.height * ratio;
+        }
+        else
+        {
+            r.height = r.width / ratio;
+        }
 
         r.center = originalCenter;
         return r;
@@ -289,7 +305,9 @@ public static class ExtensionRect
         var center = points.Aggregate((v1, v2) => v1 + v2) / points.Length;
         var adjust = -center + trajectory.closestPoint(center);
         foreach (var p in points)
+        {
             pointsList.Add(p + adjust);
+        }
 
         return aa;
     }

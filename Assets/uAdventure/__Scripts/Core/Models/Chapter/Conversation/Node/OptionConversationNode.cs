@@ -141,7 +141,9 @@ namespace uAdventure.Core
         public override void addChild(ConversationNode child)
         {
             if (getLineCount() > optionNodes.Count)
+            {
                 optionNodes.Add(child);
+            }
             else
             {
                 timerChild = child;

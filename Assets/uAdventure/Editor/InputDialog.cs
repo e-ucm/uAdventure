@@ -54,7 +54,9 @@ namespace uAdventure.Editor
             GUILayout.BeginHorizontal();
             {
                 if (string.IsNullOrEmpty(value))
+                {
                     GUI.enabled = false;
+                }
 
                 if (GUILayout.Button(TC.get("GeneralText.OK")))
                 {

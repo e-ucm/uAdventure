@@ -134,7 +134,11 @@ public class ActionsList : ScriptableObject {
                     case 1:
                         EditorGUI.BeginChangeCheck();
                         var documentation = EditorGUI.TextArea(rect, action.getDocumentation() ?? string.Empty);
-                        if (EditorGUI.EndChangeCheck()) action.setDocumentation(documentation);
+                        if (EditorGUI.EndChangeCheck())
+                        {
+                            action.setDocumentation(documentation);
+                        }
+
                         break;
                     case 2:
                         if (Controller.Instance.PlayerMode== Controller.FILE_ADVENTURE_1STPERSON_PLAYER)
@@ -150,11 +154,19 @@ public class ActionsList : ScriptableObject {
 
                             EditorGUI.BeginChangeCheck();
                             var needsToGo = EditorGUI.Toggle(leftHalf, action.getNeedsGoTo());
-                            if (EditorGUI.EndChangeCheck()) action.setNeedsGoTo(needsToGo);
+                            if (EditorGUI.EndChangeCheck())
+                            {
+                                action.setNeedsGoTo(needsToGo);
+                            }
 
                             EditorGUI.BeginChangeCheck();
                             var distance = EditorGUI.IntField(rightHalf, action.getKeepDistance());
-                            if (EditorGUI.EndChangeCheck()) action.setKeepDistance(distance); ;
+                            if (EditorGUI.EndChangeCheck())
+                            {
+                                action.setKeepDistance(distance);
+                            }
+
+                            ;
                         }
                         break;
                     case 3:

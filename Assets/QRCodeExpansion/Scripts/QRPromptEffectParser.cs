@@ -18,7 +18,9 @@ namespace uAdventure.QR
             qrPrompt.PromptMessage = element.SelectSingleNode("message").InnerText;
 
             foreach (var listElem in element.SelectNodes("qr-id"))
+            {
                 qrPrompt.ValidIds.Add((listElem as XmlElement).InnerText);
+            }
 
             return qrPrompt;
         }

@@ -17,7 +17,9 @@ namespace uAdventure.Runner
         {
             shader = this.GetComponent<Renderer>().material;
             if (style == GlowingStyle.FLASH)
+            {
                 shader.SetColor("_Color", new Color(1, 1, 1, 1));
+            }
         }
 
 

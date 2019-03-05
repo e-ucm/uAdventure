@@ -74,7 +74,10 @@ namespace uAdventure.Editor
             {
                 SetNodeValuesTool crvt = (SetNodeValuesTool)other;
                 if (crvt.node != node)
+                {
                     return false;
+                }
+
                 newX = crvt.newX;
                 newY = crvt.newY;
                 newScale = crvt.newScale;
@@ -89,6 +92,7 @@ namespace uAdventure.Editor
         {
             node.setValues(newX, newY, newScale);
             if (newX != oldX || newY != oldY)
+            {
                 foreach (Trajectory.Side side in trajectory.getSides())
                 {
 
@@ -100,10 +104,15 @@ namespace uAdventure.Editor
                         float y = start.getY() - end.getY();
                         var newLength = new Vector2(x,y).magnitude;
                         if (Mathf.Approximately(side.getLength(), side.getRealLength()))
+                        {
                             side.setLenght(newLength);
+                        }
+
                         side.setRealLength(newLength);
                     }
                 }
+            }
+
             return true;
         }
 
@@ -113,6 +122,7 @@ namespace uAdventure.Editor
 
             node.setValues(newX, newY, newScale);
             if (newX != oldX || newY != oldY)
+            {
                 foreach (Trajectory.Side side in trajectory.getSides())
                 {
                     if (side.getIDEnd().Equals(node.getID()) || side.getIDStart().Equals(node.getID()))
@@ -123,10 +133,15 @@ namespace uAdventure.Editor
                         float y = start.getY() - end.getY();
                         var newLength = new Vector2(x, y).magnitude;
                         if (Mathf.Approximately(side.getLength(), side.getRealLength()))
+                        {
                             side.setLenght(newLength);
+                        }
+
                         side.setRealLength(newLength);
                     }
                 }
+            }
+
             Controller.Instance.updatePanel();
             return true;
         }
@@ -138,6 +153,7 @@ namespace uAdventure.Editor
             node.setValues(oldX, oldY, oldScale);
             bool isEnd;
             if (newX != oldX || newY != oldY)
+            {
                 foreach (Trajectory.Side side in trajectory.getSides())
                 {
                     isEnd = side.getIDEnd().Equals(node.getID());
@@ -151,6 +167,7 @@ namespace uAdventure.Editor
                         side.setLenght(isEnd ? oldLength[side.getIDStart()] : oldLength[side.getIDEnd()]);
                     }
                 }
+            }
 
             Controller.Instance.updatePanel();
             return true;

@@ -54,12 +54,16 @@ namespace uAdventure.Editor
 
             // Add a new resource if the list is empty
             if (resourcesList.Count == 0)
+            {
                 resourcesList.Add(new ResourcesUni());
+            }
 
             // Create the subcontrollers
             resourcesDataControlList = new List<ResourcesDataControl>();
             foreach (ResourcesUni resources in resourcesList)
+            {
                 resourcesDataControlList.Add(new ResourcesDataControl(resources, Controller.SCENE));
+            }
 
             exitsListDataControl = new ExitsListDataControl(this, scene.getExits());
             referencesListDataControl = new ReferencesListDataControl(playerImagePath, this);
@@ -368,9 +372,13 @@ namespace uAdventure.Editor
         {
 
             if (scene.hasDefaultPosition())
+            {
                 controller.AddTool(new ChangeNSDestinyPositionTool(scene, Int32.MinValue, Int32.MinValue));
+            }
             else
+            {
                 controller.AddTool(new ChangeNSDestinyPositionTool(scene, AssetsImageDimensions.BACKGROUND_MAX_WIDTH / 2, AssetsImageDimensions.BACKGROUND_MAX_HEIGHT / 2));
+            }
         }
 
         /**
@@ -499,10 +507,13 @@ namespace uAdventure.Editor
 
                 // Show a dialog asking for the new scene id
                 if (name == null)
+                {
                     controller.ShowInputDialog(TC.get("Operation.RenameSceneTitle"), TC.get("Operation.RenameSceneMessage"), oldSceneId, (o,s) => performRenameElement<Scene>(s));
+                }
                 else
+                {
                     return performRenameElement<Scene>(name);
-
+                }
             }
 
             return null;
@@ -520,8 +531,9 @@ namespace uAdventure.Editor
             //trajectoryDataControl.updateVarFlagSummary( varFlagSummary );
             // Iterate through the resources
             foreach (ResourcesDataControl resourcesDataControl in resourcesDataControlList)
+            {
                 resourcesDataControl.updateVarFlagSummary(varFlagSummary);
-
+            }
         }
 
 
@@ -553,7 +565,9 @@ namespace uAdventure.Editor
 
             // Iterate through the resources
             foreach (ResourcesDataControl resourcesDataControl in resourcesDataControlList)
+            {
                 count += resourcesDataControl.countAssetReferences(assetPath);
+            }
 
             // Increase the counter with the references in the exits
             count += exitsListDataControl.countAssetReferences(assetPath);
@@ -571,8 +585,9 @@ namespace uAdventure.Editor
 
             // Iterate through the resources
             foreach (ResourcesDataControl resourcesDataControl in resourcesDataControlList)
+            {
                 resourcesDataControl.getAssetReferences(assetPaths, assetTypes);
-
+            }
         }
 
 
@@ -581,7 +596,9 @@ namespace uAdventure.Editor
 
             // Iterate through the resources
             foreach (ResourcesDataControl resourcesDataControl in resourcesDataControlList)
+            {
                 resourcesDataControl.deleteAssetReferences(assetPath);
+            }
 
             // Delete the references in the exits
             exitsListDataControl.deleteAssetReferences(assetPath);
@@ -742,19 +759,34 @@ namespace uAdventure.Editor
 
             List<Searchable> path = getPathFromChild(dataControl, resourcesDataControlList.Cast<System.Object>().ToList());
             if (path != null)
+            {
                 return path;
+            }
+
             path = getPathFromChild(dataControl, exitsListDataControl);
             if (path != null)
+            {
                 return path;
+            }
+
             path = getPathFromChild(dataControl, referencesListDataControl);
             if (path != null)
+            {
                 return path;
+            }
+
             path = getPathFromChild(dataControl, activeAreasListDataControl);
             if (path != null)
+            {
                 return path;
+            }
+
             path = getPathFromChild(dataControl, barriersListDataControl);
             if (path != null)
+            {
                 return path;
+            }
+
             return getPathFromChild(dataControl, trajectoryDataControl);
         }
 

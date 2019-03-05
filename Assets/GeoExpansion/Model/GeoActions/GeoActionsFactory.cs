@@ -14,7 +14,9 @@ namespace uAdventure.Geo
             get
             {
                 if (instance == null)
+                {
                     instance = new GeoActionsFactory();
+                }
 
                 return instance;
             }

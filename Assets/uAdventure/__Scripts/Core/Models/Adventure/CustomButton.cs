@@ -94,7 +94,10 @@ namespace uAdventure.Core
         {
 
             if (o == null || !(o is CustomButton))
+            {
                 return false;
+            }
+
             CustomButton button = (CustomButton)o;
             if (button.action.Equals(action) && button.type.Equals(type))
             {

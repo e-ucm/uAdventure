@@ -674,21 +674,33 @@ namespace uAdventure.Core
             foreach (CustomButton cb in buttons)
             {
                 if (cb.getPath().Equals(path))
+                {
                     count++;
+                }
+
                 if (cb.getSoundPath().Equals(path))
+                {
                     count++;
+                }
             }
             foreach (CustomArrow a in arrows)
             {
                 if (a.getPath().Equals(path))
+                {
                     count++;
+                }
+
                 if (a.getSoundPath().Equals(path))
+                {
                     count++;
+                }
             }
             foreach (CustomCursor cc in cursors)
             {
                 if (cc.getPath().Equals(path))
+                {
                     count++;
+                }
             }
 
             return count;
@@ -740,7 +752,9 @@ namespace uAdventure.Core
         {
 
             if (assetPath == null)
+            {
                 return;
+            }
 
             bool found = false;
             foreach (string path in assetPaths)
@@ -990,26 +1004,34 @@ namespace uAdventure.Core
             {
                 dd.buttons = new List<CustomButton>();
                 foreach (CustomButton cb in buttons)
+                {
                     dd.buttons.Add((CustomButton)cb.Clone());
+                }
             }
             dd.commentaries = commentaries;
             if (contents != null)
             {
                 dd.contents = new List<ChapterSummary>();
                 foreach (ChapterSummary cs in contents)
+                {
                     dd.contents.Add((ChapterSummary)cs.Clone());
+                }
             }
             if (cursors != null)
             {
                 dd.cursors = new List<CustomCursor>();
                 foreach (CustomCursor cc in cursors)
+                {
                     dd.cursors.Add((CustomCursor)cc.Clone());
+                }
             }
             if (arrows != null)
             {
                 dd.arrows = new List<CustomArrow>();
                 foreach (CustomArrow ca in arrows)
+                {
                     dd.arrows.Add((CustomArrow)ca.Clone());
+                }
             }
             dd.description = (description != null ? description : null);
             dd.graphicConfig = graphicConfig;

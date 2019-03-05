@@ -24,9 +24,13 @@ namespace uAdventure.Editor
             // Create the root node
 
             if (cutscene.getType() == GeneralScene.GeneralSceneSceneType.SLIDESCENE)
+            {
                 return "slidescene";
+            }
             else if (cutscene.getType() == GeneralScene.GeneralSceneSceneType.VIDEOSCENE)
+            {
                 return "videoscene";
+            }
 
             return "";
         }
@@ -43,9 +47,13 @@ namespace uAdventure.Editor
             if (cutscene.getType() == GeneralScene.GeneralSceneSceneType.VIDEOSCENE)
             {
                 if (((Videoscene)cutscene).isCanSkip())
+                {
                     cutsceneElement.SetAttribute("canSkip", "yes");
+                }
                 else
+                {
                     cutsceneElement.SetAttribute("canSkip", "no");
+                }
             }
 
             // Set the attributes
@@ -53,9 +61,13 @@ namespace uAdventure.Editor
 
 
             if (options.Any(o => o is CIP && (o as CIP).TargetId.Equals(cutscene.getId())))
+            {
                 cutsceneElement.SetAttribute("start", "yes");
+            }
             else
+            {
                 cutsceneElement.SetAttribute("start", "no");
+            }
 
             if (cutscene.getNext() == Cutscene.NEWSCENE)
             {
@@ -69,11 +81,17 @@ namespace uAdventure.Editor
             }
 
             if (cutscene.getNext() == Cutscene.GOBACK)
+            {
                 cutsceneElement.SetAttribute("next", "go-back");
+            }
             else if (cutscene.getNext() == Cutscene.ENDCHAPTER)
+            {
                 cutsceneElement.SetAttribute("next", "end-chapter");
+            }
             else if (cutscene.getNext() == Cutscene.NEWSCENE)
+            {
                 cutsceneElement.SetAttribute("next", "new-scene");
+            }
 
             cutsceneElement.SetAttribute("class", cutscene.getXApiClass());
             cutsceneElement.SetAttribute("type", cutscene.getXApiType());

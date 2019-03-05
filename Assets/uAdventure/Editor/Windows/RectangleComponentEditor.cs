@@ -148,7 +148,16 @@ namespace uAdventure.Editor
                 var pointControlId = GUIUtility.GetControlID("Rectangle Point".GetHashCode(), FocusType.Passive, new Rect(point, new Vector2(10,10)));
                 switch (Event.current.GetTypeForControl(pointControlId))
                 {
-                    case EventType.Repaint: if (rectangleArea.isRectangular()) HandleUtil.DrawSquare(point, 10f, Color.yellow, Color.black); else HandleUtil.DrawPoint(point, 4.5f, Color.cyan, Color.black); break;
+                    case EventType.Repaint: if (rectangleArea.isRectangular())
+                        {
+                            HandleUtil.DrawSquare(point, 10f, Color.yellow, Color.black);
+                        }
+                        else
+                        {
+                            HandleUtil.DrawPoint(point, 4.5f, Color.cyan, Color.black);
+                        }
+
+                        break;
                     case EventType.MouseDown:
                         switch (ActionSelected)
                         {

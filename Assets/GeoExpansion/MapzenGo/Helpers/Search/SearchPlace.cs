@@ -18,13 +18,19 @@ namespace MapzenGo.Helpers.Search
         void OnEnable()
         {
 #if UNITY_EDITOR
-            if (!Application.isPlaying) return;
+            if (!Application.isPlaying)
+            {
+                return;
+            }
 #endif
         }
         void Start()
         {
 #if UNITY_EDITOR
-            if (!Application.isPlaying) return;
+            if (!Application.isPlaying)
+            {
+                return;
+            }
 
 #endif
         }

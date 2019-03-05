@@ -29,7 +29,10 @@ public class JSONObject
         get
         {
             if (list == null)
+            {
                 return -1;
+            }
+
             return list.Count;
         }
     }
@@ -253,24 +256,36 @@ public class JSONObject
                         while (++offset < str.Length)
                         {
                             if (System.Array.IndexOf<char>(WHITESPACE, str[offset]) > -1)
+                            {
                                 continue;
+                            }
+
                             if (str[offset] == '\"')
                             {
                                 if (openQuote)
                                 {
                                     if (!inProp && depth == 0 && type == Type.OBJECT)
+                                    {
                                         propName = str.Substring(token_tmp + 1, offset - token_tmp - 1);
+                                    }
+
                                     openQuote = false;
                                 }
                                 else
                                 {
                                     if (depth == 0 && type == Type.OBJECT)
+                                    {
                                         token_tmp = offset;
+                                    }
+
                                     openQuote = true;
                                 }
                             }
                             if (openQuote)
+                            {
                                 continue;
+                            }
+
                             if (type == Type.OBJECT && depth == 0)
                             {
                                 if (str[offset] == ':')
@@ -296,7 +311,10 @@ public class JSONObject
                                 if (inner.Length > 0)
                                 {
                                     if (type == Type.OBJECT)
+                                    {
                                         keys.Add(propName);
+                                    }
+
                                     list.Add(new JSONObject(inner));
                                 }
                                 token_tmp = offset + 1;
@@ -305,9 +323,15 @@ public class JSONObject
                     }
                 }
             }
-            else type = Type.NULL;
+            else
+            {
+                type = Type.NULL;
+            }
         }
-        else type = Type.NULL;	//If the string is missing, this is a null
+        else
+        {
+            type = Type.NULL;	//If the string is missing, this is a null
+        }
     }
     #endregion
     public bool IsNumber { get { return type == Type.NUMBER; } }
@@ -329,7 +353,9 @@ public class JSONObject
             {
                 type = JSONObject.Type.ARRAY;		//Congratulations, son, you're an ARRAY now
                 if (list == null)
+                {
                     list = new List<JSONObject>();
+                }
             }
             list.Add(obj);
         }
@@ -349,10 +375,15 @@ public class JSONObject
                 if (type == Type.ARRAY)
                 {
                     for (int i = 0; i < list.Count; i++)
+                    {
                         keys.Add(i + "");
+                    }
                 }
                 else if (list == null)
+                {
                     list = new List<JSONObject>();
+                }
+
                 type = JSONObject.Type.OBJECT;		//Congratulations, son, you're an OBJECT now
             }
             keys.Add(name);
@@ -398,7 +429,11 @@ public class JSONObject
                 return true;
             }
         }
-        if (fail != null) fail.Invoke(name);
+        if (fail != null)
+        {
+            fail.Invoke(name);
+        }
+
         return false;
     }
 #if USEFLOAT
@@ -428,7 +463,11 @@ public class JSONObject
                 return true;
             }
         }
-        if (fail != null) fail.Invoke(name);
+        if (fail != null)
+        {
+            fail.Invoke(name);
+        }
+
         return false;
     }
     public bool GetField(ref int field, string name, int fallback)
@@ -448,7 +487,11 @@ public class JSONObject
                 return true;
             }
         }
-        if (fail != null) fail.Invoke(name);
+        if (fail != null)
+        {
+            fail.Invoke(name);
+        }
+
         return false;
     }
     public bool GetField(ref uint field, string name, uint fallback)
@@ -468,7 +511,11 @@ public class JSONObject
                 return true;
             }
         }
-        if (fail != null) fail.Invoke(name);
+        if (fail != null)
+        {
+            fail.Invoke(name);
+        }
+
         return false;
     }
     public bool GetField(ref string field, string name, string fallback)
@@ -488,7 +535,11 @@ public class JSONObject
                 return true;
             }
         }
-        if (fail != null) fail.Invoke(name);
+        if (fail != null)
+        {
+            fail.Invoke(name);
+        }
+
         return false;
     }
     public void GetField(string name, GetFieldResponse response, FieldNotFound fail = null)
@@ -502,38 +553,66 @@ public class JSONObject
                 return;
             }
         }
-        if (fail != null) fail.Invoke(name);
+        if (fail != null)
+        {
+            fail.Invoke(name);
+        }
     }
     public JSONObject GetField(string name)
     {
         if (type == JSONObject.Type.OBJECT)
+        {
             for (int i = 0; i < keys.Count; i++)
+            {
                 if ((string)keys[i] == name)
+                {
                     return (JSONObject)list[i];
+                }
+            }
+        }
+
         return null;
     }
     public bool HasFields(string[] names)
     {
         foreach (string name in names)
+        {
             if (!keys.Contains(name))
+            {
                 return false;
+            }
+        }
+
         return true;
     }
     public bool HasField(string name)
     {
         if (type == JSONObject.Type.OBJECT)
+        {
             for (int i = 0; i < keys.Count; i++)
+            {
                 if ((string)keys[i] == name)
+                {
                     return true;
+                }
+            }
+        }
+
         return false;
     }
     public void Clear()
     {
         type = JSONObject.Type.NULL;
         if (list != null)
+        {
             list.Clear();
+        }
+
         if (keys != null)
+        {
             keys.Clear();
+        }
+
         str = "";
         n = 0;
         b = false;
@@ -557,7 +636,9 @@ public class JSONObject
     static void MergeRecur(JSONObject left, JSONObject right)
     {
         if (left.type == JSONObject.Type.NULL)
+        {
             left.Absorb(right);
+        }
         else if (left.type == Type.OBJECT && right.type == Type.OBJECT)
         {
             for (int i = 0; i < right.list.Count; i++)
@@ -566,16 +647,24 @@ public class JSONObject
                 if (right[i].isContainer)
                 {
                     if (left.HasField(key))
+                    {
                         MergeRecur(left[key], right[i]);
+                    }
                     else
+                    {
                         left.AddField(key, right[i]);
+                    }
                 }
                 else
                 {
                     if (left.HasField(key))
+                    {
                         left.SetField(key, right[i]);
+                    }
                     else
+                    {
                         left.AddField(key, right[i]);
+                    }
                 }
             }
         }
@@ -591,7 +680,9 @@ public class JSONObject
                 if (left[i].type == right[i].type)
                 {			//Only overwrite with the same type
                     if (left[i].isContainer)
+                    {
                         MergeRecur(left[i], right[i]);
+                    }
                     else
                     {
                         left[i] = right[i];
@@ -628,14 +719,23 @@ public class JSONObject
                     str = NaN;
 #else
                 if (double.IsInfinity(n))
+                {
                     str = INFINITY;
+                }
                 else if (double.IsNegativeInfinity(n))
+                {
                     str = NEGINFINITY;
+                }
                 else if (double.IsNaN(n))
+                {
                     str = NaN;
+                }
 #endif
                 else
+                {
                     str += n;
+                }
+
                 break;
 
             case JSONObject.Type.OBJECT:
@@ -644,7 +744,9 @@ public class JSONObject
                 {
 #if(PRETTY)	//for a bit more readability, comment the define above to disable system-wide
                     if (pretty)
+                    {
                         str += "\n";
+                    }
 #endif
                     for (int i = 0; i < list.Count; i++)
                     {
@@ -654,20 +756,28 @@ public class JSONObject
                         {
 #if(PRETTY)
                             if (pretty)
+                            {
                                 for (int j = 0; j < depth; j++)
+                                {
                                     str += "\t"; //for a bit more readability
+                                }
+                            }
 #endif
                             str += "\"" + key + "\":";
                             str += obj.print(depth, pretty) + ",";
 #if(PRETTY)
                             if (pretty)
+                            {
                                 str += "\n";
+                            }
 #endif
                         }
                     }
 #if(PRETTY)
                     if (pretty)
+                    {
                         str = str.Substring(0, str.Length - 1);		//BOP: This line shows up twice on purpose: once to remove the \n if readable is true and once to remove the comma
+                    }
 #endif
                     str = str.Substring(0, str.Length - 1);
                 }
@@ -676,7 +786,9 @@ public class JSONObject
                 {
                     str += "\n";
                     for (int j = 0; j < depth - 1; j++)
+                    {
                         str += "\t"; //for a bit more readability
+                    }
                 }
 #endif
                 str += "}";
@@ -687,7 +799,9 @@ public class JSONObject
                 {
 #if(PRETTY)
                     if (pretty)
+                    {
                         str += "\n"; //for a bit more readability
+                    }
 #endif
                     foreach (JSONObject obj in list)
                     {
@@ -695,19 +809,27 @@ public class JSONObject
                         {
 #if(PRETTY)
                             if (pretty)
+                            {
                                 for (int j = 0; j < depth; j++)
+                                {
                                     str += "\t"; //for a bit more readability
+                                }
+                            }
 #endif
                             str += obj.print(depth, pretty) + ",";
 #if(PRETTY)
                             if (pretty)
+                            {
                                 str += "\n"; //for a bit more readability
+                            }
 #endif
                         }
                     }
 #if(PRETTY)
                     if (pretty)
+                    {
                         str = str.Substring(0, str.Length - 1);	//BOP: This line shows up twice on purpose: once to remove the \n if readable is true and once to remove the comma
+                    }
 #endif
                     str = str.Substring(0, str.Length - 1);
                 }
@@ -716,16 +838,23 @@ public class JSONObject
                 {
                     str += "\n";
                     for (int j = 0; j < depth - 1; j++)
+                    {
                         str += "\t"; //for a bit more readability
+                    }
                 }
 #endif
                 str += "]";
                 break;
             case Type.BOOL:
                 if (b)
+                {
                     str = "true";
+                }
                 else
+                {
                     str = "false";
+                }
+
                 break;
             case Type.NULL:
                 str = "null";
@@ -741,10 +870,16 @@ public class JSONObject
         {
             string key = i + "";
             if (obj.type == Type.OBJECT)
+            {
                 key = obj.keys[i];
+            }
+
             string val = obj.list[i].ToString();
             if (obj.list[i].type == Type.STRING)
+            {
                 val = val.Replace("\"", "");
+            }
+
             form.AddField(key, val);
         }
         return form;
@@ -753,13 +888,21 @@ public class JSONObject
     {
         get
         {
-            if (list.Count > index) return (JSONObject)list[index];
-            else return null;
+            if (list.Count > index)
+            {
+                return (JSONObject)list[index];
+            }
+            else
+            {
+                return null;
+            }
         }
         set
         {
             if (list.Count > index)
+            {
                 list[index] = value;
+            }
         }
     }
     public JSONObject this[string index]
@@ -799,7 +942,11 @@ public class JSONObject
             }
             return result;
         }
-        else Debug.LogWarning("Tried to turn non-Object JSONObject into a dictionary");
+        else
+        {
+            Debug.LogWarning("Tried to turn non-Object JSONObject into a dictionary");
+        }
+
         return null;
     }
     public static implicit operator bool(JSONObject o)

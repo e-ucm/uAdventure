@@ -28,7 +28,11 @@ namespace uAdventure.Runner
         bool showLog = false;
         void OnGUI()
         {
-            if (GUILayout.Button("Show/Hide log", GUILayout.Width(Screen.width), GUILayout.Height(50))) showLog = !showLog;
+            if (GUILayout.Button("Show/Hide log", GUILayout.Width(Screen.width), GUILayout.Height(50)))
+            {
+                showLog = !showLog;
+            }
+
             if (showLog)
             {
 

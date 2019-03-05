@@ -52,7 +52,10 @@ namespace uAdventure.Runner
                     alpha += 0.05f;
                     colorChilds(new Color(1, 1, 1, alpha));
                     if (alpha >= 1)
+                    {
                         fading = Fading.NONE;
+                    }
+
                     break;
                 case Fading.FADE_OUT:
                     alpha -= 0.05f;
@@ -185,7 +188,9 @@ namespace uAdventure.Runner
                 foreach (Transform t2 in t1)
                 {
                     if (t2.GetComponent<Renderer>() != null)
+                    {
                         t2.GetComponent<Renderer>().material.color = color;
+                    }
                 }
             }
         }

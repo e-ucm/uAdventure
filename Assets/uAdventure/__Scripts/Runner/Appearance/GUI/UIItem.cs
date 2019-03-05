@@ -19,7 +19,9 @@ namespace uAdventure.Runner
         {
             base.Start();
             if (!base.SetTexture(Item.RESOURCE_TYPE_ICON))
+            {
                 base.SetTexture(Item.RESOURCE_TYPE_IMAGE);
+            }
         }
 
 
@@ -133,7 +135,9 @@ namespace uAdventure.Runner
         public void OnTargetSelected(PointerEventData data)
         {
             if (data.hovered.Count == 0)
+            {
                 return;
+            }
 
             var target = data.dragging ? data.pointerCurrentRaycast.gameObject : data.pointerPress;
             GUIManager.Instance.ReleaseCursor();

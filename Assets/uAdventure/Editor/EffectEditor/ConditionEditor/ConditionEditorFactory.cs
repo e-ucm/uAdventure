@@ -15,7 +15,10 @@ namespace uAdventure.Editor
             get
             {
                 if (instance == null)
+                {
                     instance = new ConditionEditorFactoryImp();
+                }
+
                 return instance;
             }
         }
@@ -61,7 +64,10 @@ namespace uAdventure.Editor
             {
                 List<string> descriptors = new List<string>();
                 foreach (ConditionEditor editor in editors)
+                {
                     descriptors.Add(editor.conditionName());
+                }
+
                 return descriptors.ToArray();
             }
         }
@@ -92,10 +98,16 @@ namespace uAdventure.Editor
 
             int i = 0;
             foreach (ConditionEditor editor in editors)
+            {
                 if (editor.manages(condition))
+                {
                     return i;
+                }
                 else
+                {
                     i++;
+                }
+            }
 
             return 0;
         }

@@ -127,31 +127,42 @@ public class DescriptionsEditor : Editor {
         prevPath = nameField.Path = descriptionData.getNameSoundPath();
         nameField.DoLayout();
         if (prevContent != nameField.Content)
+        {
             descriptionData.setName(nameField.Content);
+        }
+
         if (prevPath != nameField.Path)
+        {
             descriptionData.setNameSoundPath(nameField.Path);
+        }
 
         // Brief field
         prevContent = briefField.Content = descriptionData.getDescription();
         prevPath = briefField.Path = descriptionData.getDescriptionSoundPath();
         briefField.DoLayout();
         if (prevContent != briefField.Content)
+        {
             descriptionData.setDescription(briefField.Content);
+        }
+
         if (prevPath != briefField.Path)
+        {
             descriptionData.setDescriptionSoundPath(briefField.Path);
+        }
 
         // Full field
         prevContent = fullField.Content = descriptionData.getDetailedDescription();
         prevPath = fullField.Path = descriptionData.getDetailedDescriptionSoundPath();
         fullField.DoLayout();
         if (prevContent != fullField.Content)
+        {
             descriptionData.setDetailedDescription(fullField.Content);
+        }
+
         if (prevPath != fullField.Path)
+        {
             descriptionData.setDetailedDescriptionSoundPath(fullField.Path);
-
-
-
-
+        }
     }
 
 }

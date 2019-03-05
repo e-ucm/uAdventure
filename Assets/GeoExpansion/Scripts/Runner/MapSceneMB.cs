@@ -89,13 +89,19 @@ namespace uAdventure.Geo
 
             // Start the gps just in case is not
             if (GPSController.Instance.IsStarted())
+            {
                 GPSController.Instance.Start();
+            }
 
             // If the location is valid
             if(GPSController.Instance.IsLocationValid())
+            {
                 geoCharacter.LatLon = new Vector2d(Input.location.lastData.latitude, Input.location.lastData.longitude);
+            }
             else // if not, just put the character in the center of the map
+            {
                 geoCharacter.LatLon = new Vector2d(tileManager.Latitude, tileManager.Longitude);
+            }
         }
 
 
@@ -111,8 +117,14 @@ namespace uAdventure.Geo
                 {
                     ready = true;
                     lastUpdatedPosition = inputLatLon;
-                    if (GM.SeparationInMeters(geoCharacter.LatLon, inputLatLon) > 150) geoCharacter.LatLon = inputLatLon;
-                    else geoCharacter.MoveTo(inputLatLon);
+                    if (GM.SeparationInMeters(geoCharacter.LatLon, inputLatLon) > 150)
+                    {
+                        geoCharacter.LatLon = inputLatLon;
+                    }
+                    else
+                    {
+                        geoCharacter.MoveTo(inputLatLon);
+                    }
                 }
                 
             }

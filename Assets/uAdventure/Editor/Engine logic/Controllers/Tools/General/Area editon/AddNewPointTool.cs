@@ -75,13 +75,24 @@ namespace uAdventure.Editor
                 foreach (Vector2 point in rectangle.getPoints())
                 {
                     if (point.x > maxX)
+                    {
                         maxX = (int)point.x;
+                    }
+
                     if (point.x < minX)
+                    {
                         minX = (int)point.x;
+                    }
+
                     if (point.y > maxY)
+                    {
                         maxY = (int)point.y;
+                    }
+
                     if (point.y < minY)
+                    {
                         minY = (int)point.y;
+                    }
                 }
                 newInfluenceArea = new InfluenceArea();
                 newInfluenceArea.setX(-20);

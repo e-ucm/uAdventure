@@ -43,7 +43,9 @@ namespace uAdventure.Editor
             // Create subcontrollers
             activeAreasDataControlList = new List<ActiveAreaDataControl>();
             foreach (ActiveArea activeArea in activeAreasList)
+            {
                 activeAreasDataControlList.Add(new ActiveAreaDataControl(sceneDataControl, activeArea));
+            }
         }
 
         /**
@@ -134,8 +136,10 @@ namespace uAdventure.Editor
             {
                 // Show a dialog asking for the item id
                 if (string.IsNullOrEmpty(id))
+                {
                     controller.ShowInputDialog(TC.get("Operation.AddItemTitle"), TC.get("Operation.AddItemMessage"),
                         TC.get("Operation.AddItemDefaultValue"), performAddElement);
+                }
                 else
                 {
                     performAddElement(null, id);
@@ -149,7 +153,9 @@ namespace uAdventure.Editor
         private void performAddElement(object sender, string id)
         {
             if (!controller.isElementIdValid(id))
+            {
                 id = controller.makeElementValid(id);
+            }
 
             ActiveArea newActiveArea = new ActiveArea(id, true, 220, 220, 100, 100);
             activeAreasList.Add(newActiveArea);
@@ -171,7 +177,9 @@ namespace uAdventure.Editor
         {
 
             if (!(dataControl is ActiveAreaDataControl))
+            {
                 return false;
+            }
 
 
             ActiveArea newElement = (ActiveArea)(((ActiveArea)(dataControl.getContent())).Clone());
@@ -271,7 +279,9 @@ namespace uAdventure.Editor
 
             // Iterate through each activeArea
             foreach (ActiveAreaDataControl activeAreaDataControl in activeAreasDataControlList)
+            {
                 activeAreaDataControl.updateVarFlagSummary(varFlagSummary);
+            }
         }
 
 
@@ -298,7 +308,9 @@ namespace uAdventure.Editor
 
             // Iterate through each activeArea
             foreach (ActiveAreaDataControl activeAreaDataControl in activeAreasDataControlList)
+            {
                 count += activeAreaDataControl.countAssetReferences(assetPath);
+            }
 
             return count;
         }
@@ -308,8 +320,9 @@ namespace uAdventure.Editor
         {
 
             foreach (ActiveAreaDataControl activeAreaDataControl in activeAreasDataControlList)
+            {
                 activeAreaDataControl.getAssetReferences(assetPaths, assetTypes);
-
+            }
         }
 
 
@@ -318,7 +331,9 @@ namespace uAdventure.Editor
 
             // Iterate through each activeArea
             foreach (ActiveAreaDataControl activeAreaDataControl in activeAreasDataControlList)
+            {
                 activeAreaDataControl.deleteAssetReferences(assetPath);
+            }
         }
 
 
@@ -329,7 +344,9 @@ namespace uAdventure.Editor
 
             // Iterate through each activeArea
             foreach (ActiveAreaDataControl activeAreaDataControl in activeAreasDataControlList)
+            {
                 count += activeAreaDataControl.countIdentifierReferences(id);
+            }
 
             return count;
         }
@@ -340,7 +357,9 @@ namespace uAdventure.Editor
 
             // Iterate through each activeArea
             foreach (ActiveAreaDataControl activeAreaDataControl in activeAreasDataControlList)
+            {
                 activeAreaDataControl.replaceIdentifierReferences(oldId, newId);
+            }
         }
 
 
@@ -349,8 +368,9 @@ namespace uAdventure.Editor
 
             // Spread the call to every activeArea
             foreach (ActiveAreaDataControl activeAreaDataControl in activeAreasDataControlList)
+            {
                 activeAreaDataControl.deleteIdentifierReferences(id);
-
+            }
         }
 
 
@@ -377,7 +397,9 @@ namespace uAdventure.Editor
         {
 
             foreach (DataControl dc in this.activeAreasDataControlList)
+            {
                 dc.recursiveSearch();
+            }
         }
 
         public SceneDataControl getSceneDataControl()

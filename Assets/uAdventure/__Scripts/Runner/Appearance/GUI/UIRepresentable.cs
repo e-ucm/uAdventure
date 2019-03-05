@@ -35,7 +35,9 @@ namespace uAdventure.Runner
         protected void CheckResources()
         {
             if (Element == null)
+            {
                 return;
+            }
 
             resource = Element.getResources().Find(res => ConditionChecker.check(res.getConditions()));
         }

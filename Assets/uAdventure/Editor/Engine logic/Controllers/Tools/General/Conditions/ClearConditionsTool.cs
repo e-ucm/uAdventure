@@ -55,7 +55,9 @@ namespace uAdventure.Editor
                 return true;
             }
             else
+            {
                 return false;
+            }
         }
 
         public override bool redoTool()
@@ -74,7 +76,10 @@ namespace uAdventure.Editor
                 Controller.Instance.updatePanel();
             }
             else
+            {
                 return false;
+            }
+
             return true;
         }
     }

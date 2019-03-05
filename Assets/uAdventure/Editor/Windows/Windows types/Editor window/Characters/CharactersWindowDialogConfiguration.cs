@@ -44,8 +44,10 @@ namespace uAdventure.Editor
             EditorGUI.BeginChangeCheck();
             shouldShowSpeechBubble = GUILayout.Toggle(shouldShowSpeechBubble, TC.get("Player.ShowsSpeechBubble"));
             if (EditorGUI.EndChangeCheck())
+            {
                 workingCharacter.setShowsSpeechBubbles(shouldShowSpeechBubble);
-            
+            }
+
 
             // Font Color
             EditorGUI.BeginChangeCheck();

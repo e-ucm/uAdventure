@@ -370,7 +370,9 @@ namespace uAdventure.Editor
             foreach (CustomButton cb in adventureData.getButtons())
             {
                 if (cb.getType().Equals(type) && cb.getAction().Equals(action))
+                {
                     return cb.getPath();
+                }
             }
             return null;
         }

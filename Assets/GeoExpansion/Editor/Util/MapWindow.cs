@@ -92,7 +92,9 @@ namespace uAdventure.Geo
         protected void OnGUI()
         {
             if (addressDropdown == null)
+            {
                 Init();
+            }
 
             var prevAddress = address;
             address = addressDropdown.LayoutBegin();
@@ -127,8 +129,15 @@ namespace uAdventure.Geo
                     switch (editing.Type)
                     {
                         case GMLGeometry.GeometryType.Point:
-                            if (editing.Points.Count == 1) editing.Points[0] = map.GeoMousePosition;
-                            else editing.Points.Add(map.GeoMousePosition);
+                            if (editing.Points.Count == 1)
+                            {
+                                editing.Points[0] = map.GeoMousePosition;
+                            }
+                            else
+                            {
+                                editing.Points.Add(map.GeoMousePosition);
+                            }
+
                             break;
                         case GMLGeometry.GeometryType.LineString:
                             editing.Points.Add(map.GeoMousePosition);
@@ -188,8 +197,12 @@ namespace uAdventure.Geo
                 // If new Location is selected from the dropdown
                 lastSearch = address = addressDropdown.Value;
                 foreach (var l in place.DataStructure.dataChache)
+                {
                     if (l.label == address)
+                    {
                         location = l.coordinates;
+                    }
+                }
 
                 var geometry = new GMLGeometry();
                 geometry.Type = GMLGeometry.GeometryType.Polygon;
@@ -197,7 +210,9 @@ namespace uAdventure.Geo
                 var points = 5f;
                 var radius = 0.00005;
                 for (float i = 0; i < 5; i++)
+                {
                     geometry.Points.Add(new Vector2d(location.x + radius * Mathf.Sin(i * 2f * Mathf.PI / points) * 1.33333f, location.y + radius * Mathf.Cos(i * 2f * Mathf.PI / points)));
+                }
 
 
                 geometries.Add(geometry);
@@ -222,7 +237,10 @@ namespace uAdventure.Geo
             {
                 var addresses = new List<string>();
                 foreach (var r in place.DataStructure.dataChache)
+                {
                     addresses.Add(r.label);
+                }
+
                 addressDropdown.Elements = addresses;
                 Repaint();
             }

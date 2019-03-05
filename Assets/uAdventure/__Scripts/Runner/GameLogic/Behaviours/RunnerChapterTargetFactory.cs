@@ -42,7 +42,9 @@ namespace uAdventure.Runner
                 foreach(var type in GetTypesWith<ChapterTargetFactoryAttribute>(true))
                 {
                     if (!type.GetInterfaces().Contains(typeof(IChapterTargetFactory)))
+                    {
                         continue;
+                    }
 
                     // Is something out there??
                     IChapterTargetFactory runningInstance = (IChapterTargetFactory) GameObject.FindObjectOfType(type);

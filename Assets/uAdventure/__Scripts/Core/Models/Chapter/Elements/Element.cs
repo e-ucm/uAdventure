@@ -163,9 +163,13 @@ namespace uAdventure.Core
         {
 
             if (actions == null)
+            {
                 return 0;
+            }
             else
+            {
                 return actions.Count;
+            }
         }
 
         /**

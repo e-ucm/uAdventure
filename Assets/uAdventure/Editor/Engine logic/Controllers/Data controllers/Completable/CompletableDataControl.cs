@@ -27,7 +27,10 @@ namespace uAdventure.Editor
         {
             int occurrences = 0;
             if (id.Equals(milestone.getId(), StringComparison.InvariantCultureIgnoreCase))
+            {
                 ++occurrences;
+            }
+
             return conditionsController.countIdentifierReferences(id) + occurrences;
         }
         public override void deleteAssetReferences(string assetPath) { }
@@ -35,7 +38,10 @@ namespace uAdventure.Editor
         public override void deleteIdentifierReferences(string id)
         {
             if (id.Equals(milestone.getId(), StringComparison.InvariantCultureIgnoreCase))
+            {
                 milestone.setId("");
+            }
+
             conditionsController.deleteIdentifierReferences(id);
         }
         public override int[] getAddableElements() { return new int[0]; }
@@ -65,7 +71,10 @@ namespace uAdventure.Editor
         public override void replaceIdentifierReferences(string oldId, string newId)
         {
             if (oldId.Equals(milestone.getId(), StringComparison.InvariantCultureIgnoreCase))
+            {
                 milestone.setId(newId);
+            }
+
             conditionsController.replaceIdentifierReferences(oldId, newId);
         }
 
@@ -135,7 +144,9 @@ namespace uAdventure.Editor
         public override bool addElement(int type, string id)
         {
             if (!canAddElement(type))
+            {
                 return false;
+            }
 
             var milestone = new Completable.Milestone();
             progress.addMilestone(milestone);
@@ -158,7 +169,9 @@ namespace uAdventure.Editor
         public override bool deleteElement(DataControl dataControl, bool askConfirmation)
         {
             if (!(dataControl is MilestoneDataControl))
+            {
                 return false;
+            }
 
             var milestone = dataControl as MilestoneDataControl;
             if (milestoneDataControls.Contains(milestone))
@@ -180,7 +193,9 @@ namespace uAdventure.Editor
         public override void getAssetReferences(List<string> assetPaths, List<int> assetTypes)
         {
             foreach(var m in milestoneDataControls)
+            {
                 m.getAssetReferences(assetPaths, assetTypes);
+            }
         }
         public override object getContent() { return progress; }
 
@@ -198,17 +213,23 @@ namespace uAdventure.Editor
         {
             // Continue only if dataControl is a Milestone
             if (!(dataControl is MilestoneDataControl))
+            {
                 return false;
+            }
 
             // Continue only if the dataControl belongs to my set
             var milestone = dataControl as MilestoneDataControl;
             if (!milestoneDataControls.Contains(milestone))
+            {
                 return false;
+            }
 
             // Continue only if its not the last one
             var index = milestoneDataControls.IndexOf(milestone);
             if (index == milestoneDataControls.Count - 1)
+            {
                 return false;
+            }
 
             milestoneDataControls.RemoveAt(index);
             milestoneDataControls.Insert(index + 1, milestone);
@@ -224,17 +245,23 @@ namespace uAdventure.Editor
         {
             // Continue only if dataControl is a Milestone
             if (!(dataControl is MilestoneDataControl))
+            {
                 return false;
+            }
 
             // Continue only if the dataControl belongs to my set
             var milestone = dataControl as MilestoneDataControl;
             if (!milestoneDataControls.Contains(milestone))
+            {
                 return false;
+            }
 
             // Continue only if its not the first one
             var index = milestoneDataControls.IndexOf(milestone);
             if (index == 0)
+            {
                 return false;
+            }
 
             milestoneDataControls.RemoveAt(index);
             milestoneDataControls.Insert(index - 1, milestone);
@@ -256,13 +283,17 @@ namespace uAdventure.Editor
         public override void replaceIdentifierReferences(string oldId, string newId)
         {
             foreach(var m in milestoneDataControls)
+            {
                 m.replaceIdentifierReferences(oldId, newId);
+            }
         }
 
         public override void updateVarFlagSummary(VarFlagSummary varFlagSummary)
         {
             foreach (var m in milestoneDataControls)
+            {
                 m.updateVarFlagSummary(varFlagSummary);
+            }
         }
 
         public List<MilestoneDataControl> getMilestones()
@@ -312,7 +343,10 @@ namespace uAdventure.Editor
         {
             int occurrences = 0;
             if (id.Equals(completable.getId(), StringComparison.InvariantCultureIgnoreCase))
+            {
                 ++occurrences;
+            }
+
             return startDataControl.countIdentifierReferences(id) + endDataControl.countIdentifierReferences(id) + progressDataControl.countIdentifierReferences(id) + occurrences;
         }
         public override void deleteAssetReferences(string assetPath) { }
@@ -320,7 +354,9 @@ namespace uAdventure.Editor
         public override void deleteIdentifierReferences(string id)
         {
             if (id.Equals(completable.getId(), StringComparison.InvariantCultureIgnoreCase))
+            {
                 completable.setId("");
+            }
 
             startDataControl.deleteIdentifierReferences(id);
             endDataControl.deleteIdentifierReferences(id);
@@ -357,7 +393,9 @@ namespace uAdventure.Editor
         {
             string oldSceneId = completable.getId();
             if (oldSceneId == newName)
+            {
                 return newName;
+            }
 
             string references = controller.countIdentifierReferences(oldSceneId).ToString();
 
@@ -367,9 +405,13 @@ namespace uAdventure.Editor
 
                 // Show a dialog asking for the new scene id
                 if (newName == null)
+                {
                     controller.ShowInputDialog(TC.get("Operation.RenameSceneTitle"), TC.get("Operation.RenameSceneMessage"), oldSceneId, (o, s) => performRenameElement<Completable>(s));
+                }
                 else
+                {
                     return performRenameElement<Completable>(newName);
+                }
             }
 
             return null;
@@ -378,7 +420,9 @@ namespace uAdventure.Editor
         public override void replaceIdentifierReferences(string oldId, string newId)
         {
             if (oldId.Equals(completable.getId(), StringComparison.InvariantCultureIgnoreCase))
+            {
                 completable.setId(newId);
+            }
 
             startDataControl.replaceIdentifierReferences(oldId, newId);
             endDataControl.replaceIdentifierReferences(oldId, newId);

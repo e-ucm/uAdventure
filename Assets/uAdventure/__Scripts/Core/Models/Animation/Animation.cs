@@ -149,7 +149,10 @@ namespace uAdventure.Core
         {
 
             if (frames.Count <= i || i < 0)
+            {
                 return null;
+            }
+
             return frames[i];
         }
 
@@ -164,7 +167,10 @@ namespace uAdventure.Core
         {
 
             if (frames.Count <= i - 1 || i < 0)
+            {
                 return null;
+            }
+
             return transitions[i + 1];
         }
 
@@ -204,9 +210,14 @@ namespace uAdventure.Core
         {
 
             if (after >= frames.Count || after < 0)
+            {
                 after = frames.Count - 1;
+            }
+
             if (frame == null)
+            {
                 frame = new Frame();
+            }
 
             frame = (Frame)frame.Clone();
 
@@ -246,7 +257,9 @@ namespace uAdventure.Core
         {
 
             if (ind < frames.Count && ind > 0)
+            {
                 Swap(frames, ind, ind - 1);
+            }
         }
 
         /**
@@ -262,7 +275,9 @@ namespace uAdventure.Core
         public void moveRight(int ind)
         {
             if (ind < frames.Count - 1 && ind >= 0)
+            {
                 Swap(frames, ind, ind + 1);
+            }
         }
 
         /**
@@ -275,7 +290,10 @@ namespace uAdventure.Core
         {
 
             if (frames.Count <= index)
+            {
                 return;
+            }
+
             frames.RemoveAt(index);
             transitions.RemoveAt(index + 1);
         }
@@ -488,21 +506,29 @@ namespace uAdventure.Core
 
             //elapsedTime = elapsedTime % getTotalTime();
             if (!slides)
+            {
                 return elapsedTime;
+            }
 
             long tempTime = 0;
             int temp = ++skippedFrames;
             for (int i = 0; i < frames.Count; i++)
             {
                 if (frames[i].isWaitforclick())
+                {
                     temp--;
+                }
+
                 if (frames[i].getTime() > elapsedTime || (frames[i].isWaitforclick() && temp < 1))
                 {
                     return tempTime + frames[i].getTime();
                 }
                 tempTime += frames[i].getTime();
                 if (i == frames.Count - 1)
+                {
                     return 0;
+                }
+
                 elapsedTime -= frames[i].getTime();
                 if (transitions[i + 1].getTime() > elapsedTime)
                 {
@@ -569,7 +595,9 @@ namespace uAdventure.Core
 
             this.animationPath = animationPath;
             foreach (Frame frame in frames)
+            {
                 frame.setAbsolutePath(animationPath);
+            }
         }
 
         public string getAboslutePath()
@@ -600,15 +628,22 @@ namespace uAdventure.Core
             for (int i = 0; i < frames.Count; i++)
             {
                 if (frames[i].isWaitforclick())
+                {
                     temp2++;
+                }
             }
             if (!slides || temp2 <= skippedFrames)
+            {
                 elapsedTime = elapsedTime % getTotalTime();
+            }
 
             for (int i = 0; i < frames.Count; i++)
             {
                 if (frames[i].isWaitforclick())
+                {
                     temp--;
+                }
+
                 if (frames[i].getTime() > elapsedTime || (frames[i].isWaitforclick() && temp < 0 && slides))
                 {
                     if (lastSoundFrame != i)
@@ -620,14 +655,19 @@ namespace uAdventure.Core
                     return frames[i].getDocumentation();
                 }
                 if (i == frames.Count - 1)
+                {
                     return null;
+                }
+
                 elapsedTime -= frames[i].getTime();
                 if (transitions[i + 1].getTime() > elapsedTime && useTransitions)
                 {
                     return null;
                 }
                 if (useTransitions)
+                {
                     elapsedTime -= transitions[i + 1].getTime();
+                }
             }
             return null;
         }
@@ -640,7 +680,9 @@ namespace uAdventure.Core
             {
                 a.frames = new List<Frame>();
                 foreach (Frame f in frames)
+                {
                     a.frames.Add((Frame)f.Clone());
+                }
             }
             a.fullscreen = fullscreen;
             a.id = (id != null ? id : null);
@@ -649,7 +691,9 @@ namespace uAdventure.Core
             {
                 a.resources = new List<ResourcesUni>();
                 foreach (ResourcesUni r in resources)
+                {
                     a.resources.Add((ResourcesUni)r.Clone());
+                }
             }
             a.skippedFrames = skippedFrames;
             a.slides = slides;
@@ -657,7 +701,9 @@ namespace uAdventure.Core
             {
                 a.transitions = new List<Transition>();
                 foreach (Transition t in transitions)
+                {
                     a.transitions.Add((Transition)t.Clone());
+                }
             }
             a.useTransitions = useTransitions;
             return a;

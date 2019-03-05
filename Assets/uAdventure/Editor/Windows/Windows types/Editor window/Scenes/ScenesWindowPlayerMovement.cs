@@ -58,7 +58,10 @@ namespace uAdventure.Editor
             var playerMode = GetScenePlayerMode(workingScene);
             var playerModeTexts = new string[] { TC.get("Scene.NoPlayer"), TC.get("Scene.UseInitialPosition"), TC.get("Scene.UseTrajectory") };
             playerMode = (PlayerMode) GUILayout.Toolbar((int) playerMode, playerModeTexts);
-            if (EditorGUI.EndChangeCheck()) OnPlayerModeChange(playerMode);
+            if (EditorGUI.EndChangeCheck())
+            {
+                OnPlayerModeChange(playerMode);
+            }
 
             switch (playerMode)
             {
@@ -91,7 +94,9 @@ namespace uAdventure.Editor
         public override void Draw(int aID)
         {
             foreach (var elem in sceneEditor.Elements)
+            {
                 sceneEditor.TypeEnabling[elem.GetType()] = false;
+            }
 
             sceneEditor.TypeEnabling[typeof(PlayerDataControl)] = true;
             sceneEditor.TypeEnabling[typeof(TrajectoryDataControl)] = true;
@@ -103,7 +108,9 @@ namespace uAdventure.Editor
             trajectoryComponent.Action = -1;
 
             foreach (var elem in sceneEditor.Elements)
+            {
                 sceneEditor.TypeEnabling[elem.GetType()] = true;
+            }
 
             sceneEditor.TypeEnabling[typeof(PlayerDataControl)] = false;
             sceneEditor.TypeEnabling[typeof(TrajectoryDataControl)] = false;
@@ -167,7 +174,11 @@ namespace uAdventure.Editor
                 if (target is ElementReferenceDataControl)
                 {
                     var elemRef = target as ElementReferenceDataControl;
-                    if (elemRef.getType() == Controller.ATREZZO) return null;
+                    if (elemRef.getType() == Controller.ATREZZO)
+                    {
+                        return null;
+                    }
+
                     return elemRef.getInfluenceArea();
                 }
                 else if (target is ActiveAreaDataControl)
@@ -282,7 +293,9 @@ namespace uAdventure.Editor
                         // Calculate the influenceAreaRect
                         var influenceArea = getInfluenceArea(Target);
                         if (influenceArea == null)
+                        {
                             return false;
+                        }
 
                         var boundaries = GetElementBoundaries(Target);
                         var rect = influenceArea.ScreenRect(boundaries);
@@ -297,10 +310,14 @@ namespace uAdventure.Editor
 
                         // See if its selected (only if it was previously selected)
                         if (GUIUtility.hotControl == 0)
+                        {
                             selected = (wasSelected == Target) && (rect.Contains(Event.current.mousePosition) || rect.ToPoints().ToList().FindIndex(p => (p - Event.current.mousePosition).magnitude <= 10f) != -1);
+                        }
 
                         if (wasSelected == Target)
+                        {
                             wasSelected = null;
+                        }
 
                         break;
                 }
@@ -318,7 +335,9 @@ namespace uAdventure.Editor
                 wasSelected = Target;
                 var influenceArea = getInfluenceArea(Target);
                 if (influenceArea == null)
+                {
                     return;
+                }
 
                 var boundaries = GetElementBoundaries(Target);
                 var rect = influenceArea.ScreenRect(boundaries);
@@ -375,11 +394,17 @@ namespace uAdventure.Editor
 
                     EditorGUI.BeginChangeCheck();
                     var newPos = EditorGUILayout.Vector2Field("Position", new Vector2(workingScene.getDefaultInitialPositionX(), workingScene.getDefaultInitialPositionY()));
-                    if (EditorGUI.EndChangeCheck()) workingScene.setDefaultInitialPosition(Mathf.RoundToInt(newPos.x), Mathf.RoundToInt(newPos.y));
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        workingScene.setDefaultInitialPosition(Mathf.RoundToInt(newPos.x), Mathf.RoundToInt(newPos.y));
+                    }
 
                     EditorGUI.BeginChangeCheck();
                     var newScale = EditorGUILayout.FloatField("Scale", workingScene.getPlayerScale());
-                    if (EditorGUI.EndChangeCheck()) workingScene.setPlayerScale(newScale);
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        workingScene.setPlayerScale(newScale);
+                    }
                 }
                 else if(Target is NodeDataControl)
                 {
@@ -387,11 +412,17 @@ namespace uAdventure.Editor
 
                     EditorGUI.BeginChangeCheck();
                     var newPos = EditorGUILayout.Vector2Field("Position", new Vector2(target.getX(), target.getY()));
-                    if (EditorGUI.EndChangeCheck()) target.setNode(Mathf.RoundToInt(newPos.x), Mathf.RoundToInt(newPos.y), target.getScale());
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        target.setNode(Mathf.RoundToInt(newPos.x), Mathf.RoundToInt(newPos.y), target.getScale());
+                    }
 
                     EditorGUI.BeginChangeCheck();
                     var newScale = EditorGUILayout.FloatField("Scale", target.getScale());
-                    if (EditorGUI.EndChangeCheck()) target.setNode(target.getX(), target.getY(), newScale);
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        target.setNode(target.getX(), target.getY(), newScale);
+                    }
                 }
 
             }
@@ -429,7 +460,10 @@ namespace uAdventure.Editor
                     case EventType.MouseDown:
                         var rect = ScenesWindowElementReference.ReferenceComponent.GetElementRect(Target);
                         if (GUIUtility.hotControl == 0)
+                        {
                             selected = rect.Contains(Event.current.mousePosition) || (rect.ToPoints().ToList().FindIndex(p => (p - Event.current.mousePosition).magnitude <= 10f) != -1);
+                        }
+
                         break;
                 }
 

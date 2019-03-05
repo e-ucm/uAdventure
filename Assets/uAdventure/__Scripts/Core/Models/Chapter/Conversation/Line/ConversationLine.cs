@@ -242,8 +242,9 @@ namespace uAdventure.Core
 
             //if audioPath is not null, store the conversation line 
             if (audioPath != null)
+            {
                 AllElementsWithAssets.addAsset(this);
-
+            }
         }
 
         /**

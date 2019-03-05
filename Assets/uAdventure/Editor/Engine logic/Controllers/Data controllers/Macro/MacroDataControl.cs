@@ -43,7 +43,10 @@ namespace uAdventure.Editor
             {
                 var oldId = macro.getId();
                 if (!controller.isElementIdValid(val))
+                {
                     val = controller.makeElementValid(val);
+                }
+
                 macro.setId(val);
 
                 controller.replaceIdentifierReferences(oldId, val);
@@ -194,9 +197,13 @@ namespace uAdventure.Editor
             {
                 if (name == null)
                     // Show a dialog asking for the new item id
+                {
                     controller.ShowInputDialog(TC.get("Operation.RenameMacroTitle"), TC.get("Operation.RenameMacroMessage"), oldItemId, (o,s) => performRenameElement<Macro>(s));
+                }
                 else
+                {
                     return performRenameElement<Macro>(name);
+                }
             }
 
             return null;

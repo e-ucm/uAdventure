@@ -15,7 +15,9 @@ namespace QRCoder
             var size = ModulesPerSideFromVersion(version);
             this.ModuleMatrix = new List<BitArray>();
             for (var i = 0; i < size; i++)
+            {
                 this.ModuleMatrix.Add(new BitArray(size));
+            }
         }
         
         public int Version { get; private set; }

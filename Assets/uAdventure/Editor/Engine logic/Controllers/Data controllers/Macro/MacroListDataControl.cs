@@ -32,7 +32,9 @@ namespace uAdventure.Editor
             // Create subcontrollers
             macrosDataControlList = new List<MacroDataControl>();
             foreach (Macro macro in macrosList)
+            {
                 macrosDataControlList.Add(new MacroDataControl(macro));
+            }
         }
 
         /**
@@ -71,7 +73,9 @@ namespace uAdventure.Editor
             // Create the list for the macros
             macrosInfo = new string[macrosList.Count][];
             for (int i = 0; i < macrosList.Count; i++)
+            {
                 macrosInfo[i] = new string[2];
+            }
 
             // Fill the array with the info
             for (int i = 0; i < macrosList.Count; i++)
@@ -153,7 +157,9 @@ namespace uAdventure.Editor
             {
                 // Show a dialog asking for the macro id
                 if (macroId == null)
+                {
                     controller.ShowInputDialog(TC.get("Operation.AddMacroTitle"), TC.get("Operation.AddMacroMessage"), TC.get("Operation.AddMacroDefaultValue"), performAddElement);
+                }
                 else
                 {
                     performAddElement(null, macroId);
@@ -167,7 +173,9 @@ namespace uAdventure.Editor
         private void performAddElement(object sender, string macroId)
         {
             if (!controller.isElementIdValid(macroId))
+            {
                 macroId = controller.makeElementValid(macroId);
+            }
 
             // Add thew new macro
             Macro newMacro = new Macro(macroId);
@@ -182,7 +190,9 @@ namespace uAdventure.Editor
         {
 
             if (!(dataControl is MacroDataControl))
+            {
                 return false;
+            }
 
             Macro newElement = (Macro)(((Macro)(dataControl.getContent())).Clone());
             string id = newElement.getId();
@@ -288,7 +298,9 @@ namespace uAdventure.Editor
 
             // Iterate through each macro
             foreach (MacroDataControl macroDataControl in macrosDataControlList)
+            {
                 macroDataControl.updateVarFlagSummary(varFlagSummary);
+            }
         }
 
 
@@ -318,7 +330,9 @@ namespace uAdventure.Editor
 
             // Iterate through each macro
             foreach (MacroDataControl macroDataControl in macrosDataControlList)
+            {
                 count += macroDataControl.countAssetReferences(assetPath);
+            }
 
             return count;
         }
@@ -329,7 +343,9 @@ namespace uAdventure.Editor
 
             // Iterate through each macro
             foreach (MacroDataControl macroDataControl in macrosDataControlList)
+            {
                 macroDataControl.getAssetReferences(assetPaths, assetTypes);
+            }
         }
 
 
@@ -338,7 +354,9 @@ namespace uAdventure.Editor
 
             // Iterate through each macro
             foreach (MacroDataControl macroDataControl in macrosDataControlList)
+            {
                 macroDataControl.deleteAssetReferences(assetPath);
+            }
         }
 
 
@@ -349,7 +367,9 @@ namespace uAdventure.Editor
 
             // Iterate through each macro
             foreach (MacroDataControl macroDataControl in macrosDataControlList)
+            {
                 count += macroDataControl.countIdentifierReferences(id);
+            }
 
             return count;
         }
@@ -360,7 +380,9 @@ namespace uAdventure.Editor
 
             // Iterate through each macro
             foreach (MacroDataControl macroDataControl in macrosDataControlList)
+            {
                 macroDataControl.replaceIdentifierReferences(oldId, newId);
+            }
         }
 
 
@@ -369,7 +391,9 @@ namespace uAdventure.Editor
 
             // Spread the call to every macro
             foreach (MacroDataControl macroDataControl in macrosDataControlList)
+            {
                 macroDataControl.deleteIdentifierReferences(id);
+            }
         }
 
 
@@ -384,7 +408,9 @@ namespace uAdventure.Editor
         {
 
             foreach (DataControl dc in this.macrosDataControlList)
+            {
                 dc.recursiveSearch();
+            }
         }
 
 

@@ -47,7 +47,11 @@ namespace uAdventure.Geo
                 var elems = getObjectIDReferences();
 
                 var menu = new GenericMenu();
-                foreach(var elem in elems) menu.AddItem(new GUIContent(elem.Key), false, (v) => effect.Steps.Add(new NavigationStep(v as string)), elem.Value);
+                foreach(var elem in elems)
+                {
+                    menu.AddItem(new GUIContent(elem.Key), false, (v) => effect.Steps.Add(new NavigationStep(v as string)), elem.Value);
+                }
+
                 menu.ShowAsContext();
             };
 
@@ -62,13 +66,25 @@ namespace uAdventure.Geo
         {
             get
             {
-                if (Collapsed) return new Rect(window.x, window.y, 50, 30);
-                else return window;
+                if (Collapsed)
+                {
+                    return new Rect(window.x, window.y, 50, 30);
+                }
+                else
+                {
+                    return window;
+                }
             }
             set
             {
-                if (Collapsed) window = new Rect(value.x, value.y, window.width, window.height);
-                else window = value;
+                if (Collapsed)
+                {
+                    window = new Rect(value.x, value.y, window.width, window.height);
+                }
+                else
+                {
+                    window = value;
+                }
             }
         }
 

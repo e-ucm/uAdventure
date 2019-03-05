@@ -40,7 +40,9 @@ namespace uAdventure.QR
         public void OnQRCode(string content)
         {
             if (qr != null)
+            {
                 return;
+            }
 
             bool blackList = QRPromptEffect.SelectionType == QRPromptEffect.ListType.BlackList;
             bool contained = QRPromptEffect.ValidIds.Contains(content);
@@ -57,7 +59,10 @@ namespace uAdventure.QR
                     {
                         effects.Add(new SpeakPlayerEffect(qr.Content));
                     }
-                    foreach(var effect in qr.Effects.getEffects()) effects.Add(effect);
+                    foreach(var effect in qr.Effects.getEffects())
+                    {
+                        effects.Add(effect);
+                    }
 
                     effectHolder = new EffectHolder(effects);
                     this.transform.GetChild(0).gameObject.SetActive(false);
@@ -80,7 +85,10 @@ namespace uAdventure.QR
             {
                 force_wait = effectHolder.execute();
                 if (!force_wait)
+                {
                     finished = true;
+                }
+
                 //DestroyImmediate(this.gameObject);
             }
 

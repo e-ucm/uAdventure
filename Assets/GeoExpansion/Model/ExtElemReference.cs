@@ -108,7 +108,10 @@ namespace uAdventure.Geo
             get
             {
                 if (instance == null)
+                {
                     instance = new TransformManagerDescriptorFactory();
+                }
+
                 return instance;
             }
         }
@@ -145,7 +148,10 @@ namespace uAdventure.Geo
             get
             {
                 if (instance == null)
+                {
                     instance = new ExtElemReferenceTransformManagerFactory();
+                }
+
                 return instance;
             }
         }
@@ -375,7 +381,10 @@ namespace uAdventure.Geo
                         particles.transform.localPosition = childTransform.localPosition;
                         childTransform.gameObject.GetComponent<Renderer>().enabled = true;
                     }
-                    if (interactuable != null) childTransform.GetComponent<Collider>().enabled = true;
+                    if (interactuable != null)
+                    {
+                        childTransform.GetComponent<Collider>().enabled = true;
+                    }
                 }
             }
             else if (!hidden)
@@ -384,8 +393,15 @@ namespace uAdventure.Geo
                 particles.gameObject.SetActive(false);
                 particles.time = 0;
                 particles.Stop();
-                if (revealOnRange) childTransform.gameObject.GetComponent<Renderer>().enabled = false;
-                if (interactuable != null) childTransform.GetComponent<Collider>().enabled = false;
+                if (revealOnRange)
+                {
+                    childTransform.gameObject.GetComponent<Renderer>().enabled = false;
+                }
+
+                if (interactuable != null)
+                {
+                    childTransform.GetComponent<Collider>().enabled = false;
+                }
             }
         }
     }

@@ -12,7 +12,9 @@ namespace uAdventure.GameSelector
             get
             {
                 if (instance == null)
+                {
                     instance = new LoaderController();
+                }
 
                 return instance;
             }

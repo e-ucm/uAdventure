@@ -390,13 +390,24 @@ namespace uAdventure.Editor
             configuration.SetProperty("LoadingImage", instance.loadingImage);
             
             if (instance.exportsPath != null)
+            {
                 configuration.SetProperty("ExportsDirectory", instance.exportsPath);
+            }
+
             if (instance.reportsPath != null)
+            {
                 configuration.SetProperty("ReportsDirectory", instance.reportsPath);
+            }
+
             if (instance.projectsPath != null)
+            {
                 configuration.SetProperty("ProjectsDirectory", instance.projectsPath);
+            }
+
             if (instance.projectsPath != null)
+            {
                 configuration.SetProperty("EffectSelectorTab", instance.effectSelectorTab.ToString());
+            }
 
             // Store the configuration into a file
             try
@@ -443,21 +454,37 @@ namespace uAdventure.Editor
 
                 debugOptions = new DebugSettings();
                 if (configuration.GetProperty("PaintBoundingAreas") != null)
+                {
                     debugOptions.setPaintBoundingAreas(bool.Parse(configuration.GetProperty("PaintBoundingAreas")));
+                }
+
                 if (configuration.GetProperty("PaintGrid") != null)
+                {
                     debugOptions.setPaintGrid(bool.Parse(configuration.GetProperty("PaintGrid")));
+                }
+
                 if (configuration.GetProperty("PaintHotSpots") != null)
+                {
                     debugOptions.setPaintHotSpots(bool.Parse(configuration.GetProperty("PaintHotSpots")));
+                }
 
                 exportsPath = configuration.GetProperty("ExportsDirectory");
                 if (exportsPath != null)
+                {
                     ReleaseFolders.setExportsPath(exportsPath);
+                }
+
                 reportsPath = configuration.GetProperty("ReportsDirectory");
                 if (reportsPath != null)
+                {
                     ReleaseFolders.setReportsPath(reportsPath);
+                }
+
                 projectsPath = configuration.GetProperty("ProjectsDirectory");
                 if (projectsPath != null)
+                {
                     ReleaseFolders.setProjectsPath(projectsPath);
+                }
 
                 effectSelectorTab = ExParsers.ParseDefault(configuration.GetProperty("EffectSelectorTab"), 0);
             }
@@ -480,7 +507,9 @@ namespace uAdventure.Editor
         {
 
             if (debugOptions == null)
+            {
                 debugOptions = new DebugSettings();
+            }
 
             if (languageFile == null)
             {

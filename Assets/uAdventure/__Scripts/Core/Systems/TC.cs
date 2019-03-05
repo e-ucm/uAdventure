@@ -168,7 +168,10 @@ namespace uAdventure.Core
                 foreach (string key in newstrings.KeySet)
                 {
                     if (guistrings.ContainsKey(key))
+                    {
                         guistrings.Remove(key);
+                    }
+
                     guistrings.Add(key, newstrings.GetProperty(key));
                 }
             }
@@ -333,7 +336,9 @@ namespace uAdventure.Core
             {
                 text = guistrings[identifier];
                 for (int i = 0; i < parameters.Length; i++)
+                {
                     text = text.Replace("{#" + i + "}", parameters[i]);
+                }
             }
             else
             {

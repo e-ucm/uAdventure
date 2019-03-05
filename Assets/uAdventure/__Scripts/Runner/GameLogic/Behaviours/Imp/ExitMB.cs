@@ -28,17 +28,25 @@ namespace uAdventure.Runner
                 effects.AddRange(ed.getEffects());
 
                 if (Game.Instance.GameState.IsCutscene(ed.getNextSceneId()))
+                {
                     effects.Add(new TriggerCutsceneEffect(ed.getNextSceneId()));
+                }
                 else
+                {
                     effects.Add(new TriggerSceneEffect(ed.getNextSceneId(), ed.getDestinyX(), ed.getDestinyY(), ed.getDestinyScale(), ed.getTransitionTime(), ed.getTransitionType()));
+                }
 
                 if (ed.getPostEffects() != null)
+                {
                     effects.AddRange(ed.getPostEffects());
+                }
             }
             else
             {
                 if (ed.isHasNotEffects())
+                {
                     effects.AddRange(ed.getNotEffects());
+                }
             }
 
             var effectHolder = new EffectHolder(effects);
@@ -60,7 +68,9 @@ namespace uAdventure.Runner
                 if (ConditionChecker.check(ed.getConditions()))
                 {
                     if (targetOnExit.getXApiType() == "menu")
+                    {
                         TrackerAsset.Instance.Alternative.Selected(targetOnExit.getId(), ed.getNextSceneId(), AlternativeTracker.Alternative.Menu);
+                    }
                     else
                     {
                         TrackerAsset.Instance.setSuccess(true);
@@ -82,12 +92,16 @@ namespace uAdventure.Runner
 
             // If no exited, accesible doesnt matter
             if (!exited)
+            {
                 return;
+            }
 
             // If no destination accesible doesnt matter
             var destination = Game.Instance.GameState.GetChapterTarget(ed.getNextSceneId());
             if (destination == null)
+            {
                 return;
+            }
 
             if ("accesible".Equals(destination.getXApiClass(), IgnoreCase))
             {

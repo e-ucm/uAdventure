@@ -30,7 +30,9 @@ public class AppearanceEditor : Editor {
                 appearanceList.SetData(dataControl, (data) => (data as DataControlWithResources).getResources().Cast<DataControl>().ToList());
                 appearanceList.index = dataControl.getSelectedResources();
                 if (onAppearanceSelected != null)
+                {
                     onAppearanceSelected(dataControl);
+                }
             }
         }
     }
@@ -98,10 +100,16 @@ public class AppearanceEditor : Editor {
             },
             onSelectCallback = (list) =>
             {
-                if (list.index == -1) list.index = 0;
+                if (list.index == -1)
+                {
+                    list.index = 0;
+                }
+
                 dataControl.setSelectedResources(list.index);
                 if (onAppearanceSelected != null)
+                {
                     onAppearanceSelected(dataControl);
+                }
             }
         };
     }

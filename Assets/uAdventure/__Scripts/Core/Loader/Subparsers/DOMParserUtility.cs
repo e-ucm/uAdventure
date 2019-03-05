@@ -17,9 +17,11 @@ namespace uAdventure.Core
 		public static object DOMParse(XmlNode el, params object[] parameters)
 		{
 			if (el is XmlElement)
-				return DOMParse (el as XmlElement, parameters);
+            {
+                return DOMParse (el as XmlElement, parameters);
+            }
 
-			return null;
+            return null;
 		}
 
         /// <summary>
@@ -30,14 +32,22 @@ namespace uAdventure.Core
         public static object DOMParse(XmlElement el, params object[] parameters)
         {
 			if (el == null)
-				return null;
+            {
+                return null;
+            }
 
             var parser = GetParserFor(el.Name);
-            if (parser != null) return parser.DOMParse(el, parameters);
+            if (parser != null)
+            {
+                return parser.DOMParse(el, parameters);
+            }
             else
             {
                 if (el.Name == "adaptation" || el.Name == "assessment")
+                {
                     return null;
+                }
+
                 throw new Exception("Parser not found for the desired name: " + el.Name);
             }
         }
@@ -76,11 +86,19 @@ namespace uAdventure.Core
 		public static T DOMParse<T>(XmlElement el, params object[] parameters)
         {
 			if (el == null)
-				return default(T);
-			
+            {
+                return default(T);
+            }
+
             var parser = GetParserFor(typeof(T));
-            if (parser != null) return (T)parser.DOMParse(el, parameters);
-            else throw new Exception("Parser not found for the desired type: "+ typeof(T));
+            if (parser != null)
+            {
+                return (T)parser.DOMParse(el, parameters);
+            }
+            else
+            {
+                throw new Exception("Parser not found for the desired type: "+ typeof(T));
+            }
         }
 
         /// <summary>
@@ -143,10 +161,14 @@ namespace uAdventure.Core
         private static void init()
         {
             if (knownTypeParsers == null)
+            {
                 knownTypeParsers = new Dictionary<Type, IDOMParser>();
+            }
 
             if (knownNameParsers == null)
+            {
                 knownNameParsers = new Dictionary<string, IDOMParser>();
+            }
         }
 
         private static void fillParsers()
@@ -163,12 +185,20 @@ namespace uAdventure.Core
                     var dwattr = attr as DOMParserAttribute;
                     
                     foreach (var writterType in dwattr.Types)
+                    {
                         if (!knownTypeParsers.ContainsKey(writterType))
+                        {
                             knownTypeParsers.Add(writterType, instance);
+                        }
+                    }
 
                     foreach (var writterType in dwattr.Names)
+                    {
                         if (!knownNameParsers.ContainsKey(writterType))
+                        {
                             knownNameParsers.Add(writterType, instance);
+                        }
+                    }
                 }
             }
         }

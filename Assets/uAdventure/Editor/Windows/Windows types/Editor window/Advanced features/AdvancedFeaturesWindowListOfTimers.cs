@@ -52,17 +52,29 @@ namespace uAdventure.Editor
                         case 0:
                             EditorGUI.BeginChangeCheck();
                             var id = EditorGUI.DelayedTextField(rect, timer.getDisplayName());
-                            if (EditorGUI.EndChangeCheck()) timer.setDisplayName(id);
+                            if (EditorGUI.EndChangeCheck())
+                            {
+                                timer.setDisplayName(id);
+                            }
+
                             break;
                         case 1:
                             EditorGUI.BeginChangeCheck();
                             var time = System.Math.Max(0, EditorGUI.LongField(rect, timer.getTime()));
-                            if (EditorGUI.EndChangeCheck()) timer.setTime(time);
+                            if (EditorGUI.EndChangeCheck())
+                            {
+                                timer.setTime(time);
+                            }
+
                             break;
                         case 2:
                             EditorGUI.BeginChangeCheck();
                             var showTime = EditorGUI.Toggle(rect, timer.isShowTime());
-                            if (EditorGUI.EndChangeCheck()) timer.setShowTime(showTime);
+                            if (EditorGUI.EndChangeCheck())
+                            {
+                                timer.setShowTime(showTime);
+                            }
+
                             break;
 
                     }
@@ -87,24 +99,37 @@ namespace uAdventure.Editor
 
                 EditorGUI.BeginChangeCheck();
                 var showTime = EditorGUILayout.BeginToggleGroup(TC.get("TimersList.Display"), workingTimer.isShowTime());
-                if (EditorGUI.EndChangeCheck()) workingTimer.setShowTime(showTime);
+                if (EditorGUI.EndChangeCheck())
+                {
+                    workingTimer.setShowTime(showTime);
+                }
+
                 {
                     EditorGUI.indentLevel++;
 
                     // Display name
                     EditorGUI.BeginChangeCheck();
                     var id = EditorGUILayout.TextField(TC.get("Item.Name"), workingTimer.getDisplayName());
-                    if (EditorGUI.EndChangeCheck()) workingTimer.setDisplayName(id);
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        workingTimer.setDisplayName(id);
+                    }
 
                     // CountDown
                     EditorGUI.BeginChangeCheck();
                     var countDown = EditorGUILayout.ToggleLeft(TC.get("Timer.CountDown"), workingTimer.isCountDown());
-                    if (EditorGUI.EndChangeCheck()) workingTimer.setCountDown(countDown);
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        workingTimer.setCountDown(countDown);
+                    }
 
                     // Show when stopped
                     EditorGUI.BeginChangeCheck();
                     var shownWhenStopped = EditorGUILayout.ToggleLeft(TC.get("Timer.ShowWhenStopped"), workingTimer.isShowWhenStopped());
-                    if (EditorGUI.EndChangeCheck()) workingTimer.setShowWhenStopped(shownWhenStopped);
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        workingTimer.setShowWhenStopped(shownWhenStopped);
+                    }
 
                     EditorGUI.indentLevel--;
                 }
@@ -121,14 +146,20 @@ namespace uAdventure.Editor
                     // Show when stopped
                     EditorGUI.BeginChangeCheck();
                     var multipleStarts = EditorGUILayout.ToggleLeft(TC.get("Timer.MultipleStarts"), workingTimer.isMultipleStarts());
-                    if (EditorGUI.EndChangeCheck()) workingTimer.setMultipleStarts(multipleStarts);
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        workingTimer.setMultipleStarts(multipleStarts);
+                    }
 
                     EditorGUILayout.HelpBox(TC.get("Timer.MultipleStartsDesc"), MessageType.Info);
 
                     // Show when stopped
                     EditorGUI.BeginChangeCheck();
                     var runsInLoop = EditorGUILayout.ToggleLeft(TC.get("Timer.RunsInLoop"), workingTimer.isRunsInLoop());
-                    if (EditorGUI.EndChangeCheck()) workingTimer.setRunsInLoop(runsInLoop);
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        workingTimer.setRunsInLoop(runsInLoop);
+                    }
 
                     EditorGUILayout.HelpBox(TC.get("Timer.RunsInLoopDesc"), MessageType.Info);
 
@@ -160,7 +191,10 @@ namespace uAdventure.Editor
 
                     EditorGUI.BeginChangeCheck();
                     var usesEndCondition = EditorGUILayout.BeginToggleGroup(TC.get("Timer.UsesEndConditionShort"), workingTimer.isUsesEndCondition());
-                    if (EditorGUI.EndChangeCheck()) workingTimer.setUsesEndCondition(usesEndCondition);
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        workingTimer.setUsesEndCondition(usesEndCondition);
+                    }
 
                     if (GUILayout.Button(TC.get("GeneralText.EditEndConditions")))
                     {
@@ -205,7 +239,9 @@ namespace uAdventure.Editor
                 EditorGUI.BeginChangeCheck();
                 var newDocumentation= GUILayout.TextArea(workingTimer.getDocumentation() ?? string.Empty, GUILayout.ExpandHeight(true));
                 if (EditorGUI.EndChangeCheck())
+                {
                     workingTimer.setDocumentation(newDocumentation);
+                }
             }
         }
     }

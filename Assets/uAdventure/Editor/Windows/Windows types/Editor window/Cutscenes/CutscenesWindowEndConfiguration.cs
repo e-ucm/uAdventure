@@ -58,7 +58,9 @@ namespace uAdventure.Editor
             GUILayout.FlexibleSpace();
             EditorGUILayout.EndHorizontal();
             if (selectedOption != selectedOptionLast)
+            {
                 current.setNext(selectedOption);
+            }
 
             GUILayout.Space(20);
             EditorGUI.indentLevel++;
@@ -69,7 +71,9 @@ namespace uAdventure.Editor
                 selectedSceneNextLast = allTargets.IndexOf(current.getNextSceneId());
                 selectedSceneNext = EditorGUILayout.Popup(TC.get("NextScene.Title"), selectedSceneNextLast, allTargets.ToArray());
                 if (selectedSceneNext != selectedSceneNextLast)
+                {
                     current.setNextSceneId(allTargets[selectedSceneNext]);
+                }
 
                 if (GUILayout.Button(TC.get("GeneralText.EditEffects")))
                 {
@@ -82,13 +86,16 @@ namespace uAdventure.Editor
                 selectedTransitionTypeLast = current.getTransitionType();
                 selectedTransitionType = EditorGUILayout.Popup(TC.get("NextScene.Transition"), selectedTransitionTypeLast, transitionTypes);
                 if (selectedTransitionType != selectedTransitionTypeLast)
+                {
                     current.setTransitionType(selectedTransitionType);
+                }
 
                 timeLast = current.getTransitionTime();
                 time = Mathf.Clamp(EditorGUILayout.IntField(TC.get("NextScene.TransitionTime"), timeLast), 0, 1000);
                 if (!time.Equals(timeLast))
+                {
                     current.setTransitionTime(time);
-
+                }
             }
             EditorGUI.indentLevel--;
         }
@@ -98,7 +105,10 @@ namespace uAdventure.Editor
             var all = Controller.Instance.ChapterList.getSelectedChapterData().getObjects();
 
             var names = new List<object>();
-            foreach (var e in all) names.Add(e);
+            foreach (var e in all)
+            {
+                names.Add(e);
+            }
 
             return names.FindAll(o => o is IChapterTarget).ConvertAll(o => (o as IChapterTarget).getId());
         }

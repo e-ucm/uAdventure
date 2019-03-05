@@ -29,7 +29,9 @@ namespace uAdventure.Editor{
 
                 // Show a dialog asking for the scene id
                 if (string.IsNullOrEmpty(id))
+                {
                     controller.ShowInputDialog(TC.get("Operation.AddSceneTitle"), TC.get("Operation.AddSceneMessage"), TC.get("Operation.AddSceneDefaultValue"), performAddElement);
+                }
                 else
                 {
                     performAddElement(null, id);
@@ -46,7 +48,9 @@ namespace uAdventure.Editor{
 
             // If some value was typed and the identifier is valid
             if (!controller.isElementIdValid(id))
+            {
                 id = controller.makeElementValid(id);
+            }
 
             // Add thew new scene
             Completable newCompletable = new Completable();
@@ -75,7 +79,9 @@ namespace uAdventure.Editor{
         public override bool deleteElement(DataControl dataControl, bool askConfirmation)
         {
             if (!(dataControl is CompletableDataControl))
+            {
                 return false;
+            }
 
             var completable = dataControl as CompletableDataControl;
             if (completableDataControls.Contains(completable))
@@ -97,7 +103,9 @@ namespace uAdventure.Editor{
         public override void getAssetReferences(List<string> assetPaths, List<int> assetTypes)
         {
             foreach (var c in completableDataControls)
+            {
                 c.getAssetReferences(assetPaths, assetTypes);
+            }
         }
         public override object getContent() { return completables; }
 
@@ -115,17 +123,23 @@ namespace uAdventure.Editor{
         {
             // Continue only if dataControl is a Milestone
             if (!(dataControl is CompletableDataControl))
+            {
                 return false;
+            }
 
             // Continue only if the dataControl belongs to my set
             var completable = dataControl as CompletableDataControl;
             if (!completableDataControls.Contains(completable))
+            {
                 return false;
+            }
 
             // Continue only if its not the last one
             var index = completableDataControls.IndexOf(completable);
             if (index == completableDataControls.Count - 1)
+            {
                 return false;
+            }
 
             completableDataControls.RemoveAt(index);
             completableDataControls.Insert(index + 1, completable);
@@ -138,17 +152,23 @@ namespace uAdventure.Editor{
         {
             // Continue only if dataControl is a Milestone
             if (!(dataControl is CompletableDataControl))
+            {
                 return false;
+            }
 
             // Continue only if the dataControl belongs to my set
             var completable = dataControl as CompletableDataControl;
             if (!completableDataControls.Contains(completable))
+            {
                 return false;
+            }
 
             // Continue only if its not the last one
             var index = completableDataControls.IndexOf(completable);
             if (index == 0)
+            {
                 return false;
+            }
 
             completableDataControls.RemoveAt(index);
             completableDataControls.Insert(index - 1, completable);
@@ -167,13 +187,17 @@ namespace uAdventure.Editor{
         public override void replaceIdentifierReferences(string oldId, string newId)
         {
             foreach (var c in completableDataControls)
+            {
                 c.replaceIdentifierReferences(oldId, newId);
+            }
         }
 
         public override void updateVarFlagSummary(VarFlagSummary varFlagSummary)
         {
             foreach (var c in completableDataControls)
+            {
                 c.updateVarFlagSummary(varFlagSummary);
+            }
         }
 
         public List<CompletableDataControl> getCompletables()
@@ -243,7 +267,9 @@ namespace uAdventure.Editor{
         public override bool deleteElement(DataControl dataControl, bool askConfirmation)
         {
             if (!(dataControl is ScoreDataControl))
+            {
                 return false;
+            }
 
             var score = dataControl as ScoreDataControl;
             if (scoreDataControls.Contains(score))
@@ -258,14 +284,19 @@ namespace uAdventure.Editor{
         public override void deleteIdentifierReferences(string id)
         {
             if (id.Equals(score.getId()))
+            {
                 score.setId("");
+            }
+
             scoreDataControls.ForEach(s => s.deleteIdentifierReferences(id));
         }
         public override int[] getAddableElements() { return score.getMethod() != Completable.Score.ScoreMethod.SINGLE ? new int[1] { Controller.SCORE } : new int[0]; }
         public override void getAssetReferences(List<string> assetPaths, List<int> assetTypes)
         {
             foreach (var s in scoreDataControls)
+            {
                 s.getAssetReferences(assetPaths, assetTypes);
+            }
         }
         public override object getContent() { return score; }
 
@@ -283,17 +314,23 @@ namespace uAdventure.Editor{
         {
             // Continue only if dataControl is a Milestone
             if (!(dataControl is ScoreDataControl))
+            {
                 return false;
+            }
 
             // Continue only if the dataControl belongs to my set
             var score = dataControl as ScoreDataControl;
             if (!scoreDataControls.Contains(score))
+            {
                 return false;
+            }
 
             // Continue only if its not the last one
             var index = scoreDataControls.IndexOf(score);
             if (index == 0)
+            {
                 return false;
+            }
 
             scoreDataControls.RemoveAt(index);
             scoreDataControls.Insert(index + 1, score);
@@ -306,17 +343,23 @@ namespace uAdventure.Editor{
         {
             // Continue only if dataControl is a Milestone
             if (!(dataControl is ScoreDataControl))
+            {
                 return false;
+            }
 
             // Continue only if the dataControl belongs to my set
             var score = dataControl as ScoreDataControl;
             if (!scoreDataControls.Contains(score))
+            {
                 return false;
+            }
 
             // Continue only if its not the last one
             var index = scoreDataControls.IndexOf(score);
             if (index == 0)
+            {
                 return false;
+            }
 
             scoreDataControls.RemoveAt(index);
             scoreDataControls.Insert(index - 1, score);
@@ -335,16 +378,22 @@ namespace uAdventure.Editor{
         public override void replaceIdentifierReferences(string oldId, string newId)
         {
             if (oldId.Equals(score.getId()))
+            {
                 score.setId(newId);
+            }
 
             foreach (var s in scoreDataControls)
+            {
                 s.replaceIdentifierReferences(oldId, newId);
+            }
         }
 
         public override void updateVarFlagSummary(VarFlagSummary varFlagSummary)
         {
             foreach (var s in scoreDataControls)
+            {
                 s.updateVarFlagSummary(varFlagSummary);
+            }
         }
 
         public List<ScoreDataControl> getScores()
@@ -357,7 +406,9 @@ namespace uAdventure.Editor{
             if(getMethod() != scoreMethod)
             {
                 if (scoreMethod != Completable.Score.ScoreMethod.SINGLE)
+                {
                     score.setId("");
+                }
                 else
                 {
                     score.setSubScores(new List<Completable.Score>());

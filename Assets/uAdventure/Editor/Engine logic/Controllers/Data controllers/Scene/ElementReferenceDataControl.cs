@@ -54,7 +54,9 @@ namespace uAdventure.Editor
             this.type = type;
             this.visible = true;
             if (type == Controller.ITEM_REFERENCE || type == Controller.NPC_REFERENCE)
+            {
                 this.influenceAreaDataControl = new InfluenceAreaDataControl(sceneDataControl, elementReference.getInfluenceArea(), this);
+            }
 
             // Create subcontrollers
             Dictionary<string, ConditionsController.ConditionContextProperty> context1 = new Dictionary<string, ConditionsController.ConditionContextProperty>();
@@ -338,7 +340,10 @@ namespace uAdventure.Editor
         {
 
             if (elementReference.getTargetId().Equals(oldId))
+            {
                 elementReference.setTargetId(newId);
+            }
+
             conditionsController.replaceIdentifierReferences(oldId, newId);
         }
 

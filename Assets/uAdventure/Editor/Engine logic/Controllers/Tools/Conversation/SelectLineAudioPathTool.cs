@@ -25,7 +25,10 @@ namespace uAdventure.Editor
 
             ResourcesUni resources = new ResourcesUni();
             if (line.getAudioPath() != null)
+            {
                 resources.addAsset(AUDIO_STR, line.getAudioPath());
+            }
+
             return resources;
         }
 
@@ -42,7 +45,9 @@ namespace uAdventure.Editor
 
             bool done = base.undoTool();
             if (!done)
+            {
                 return false;
+            }
             else
             {
                 line.setAudioPath(resources.getAssetPath(AUDIO_STR));
@@ -58,7 +63,9 @@ namespace uAdventure.Editor
 
             bool done = base.redoTool();
             if (!done)
+            {
                 return false;
+            }
             else
             {
                 line.setAudioPath(resources.getAssetPath(AUDIO_STR));
@@ -73,7 +80,9 @@ namespace uAdventure.Editor
 
             bool done = base.doTool();
             if (!done)
+            {
                 return false;
+            }
             else
             {
                 line.setAudioPath(resources.getAssetPath(AUDIO_STR));

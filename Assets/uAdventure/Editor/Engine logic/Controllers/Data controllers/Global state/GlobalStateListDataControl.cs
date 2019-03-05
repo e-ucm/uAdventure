@@ -35,7 +35,9 @@ namespace uAdventure.Editor
             // Create subcontrollers
             globalStatesDataControlList = new List<GlobalStateDataControl>();
             foreach (GlobalState globalState in globalStatesList)
+            {
                 globalStatesDataControlList.Add(new GlobalStateDataControl(globalState));
+            }
         }
 
         /**
@@ -74,7 +76,9 @@ namespace uAdventure.Editor
             // Create the list for the globalStates
             globalStatesInfo = new string[globalStatesList.Count][];
             for (int i = 0; i < globalStatesList.Count; i++)
+            {
                 globalStatesInfo[i] = new string[2];
+            }
 
             // Fill the array with the info
             for (int i = 0; i < globalStatesList.Count; i++)
@@ -157,7 +161,9 @@ namespace uAdventure.Editor
 
                 // Show a dialog asking for the globalState id
                 if (string.IsNullOrEmpty(globalStateId))
+                {
                     controller.ShowInputDialog(TC.get("Operation.AddGlobalStateTitle"), TC.get("Operation.AddGlobalStateMessage"), TC.get("Operation.AddGlobalStateDefaultValue"), performAddElement);
+                }
                 // If some value was typed and the identifier is valid
                 else
                 {
@@ -172,7 +178,9 @@ namespace uAdventure.Editor
         private void performAddElement(object sender, string globalStateId)
         {
             if (!controller.isElementIdValid(globalStateId))
+            {
                 globalStateId = controller.makeElementValid(globalStateId);
+            }
 
             // Add thew new globalState
             GlobalState newGlobalState = new GlobalState(globalStateId);
@@ -187,7 +195,9 @@ namespace uAdventure.Editor
         {
 
             if (!(dataControl is GlobalStateDataControl))
+            {
                 return false;
+            }
 
             GlobalState newElement = (GlobalState)(((GlobalState)(dataControl.getContent())).Clone());
             string id = newElement.getId();
@@ -292,7 +302,9 @@ namespace uAdventure.Editor
 
             // Iterate through each globalState
             foreach (GlobalStateDataControl globalStateDataControl in globalStatesDataControlList)
+            {
                 globalStateDataControl.updateVarFlagSummary(varFlagSummary);
+            }
         }
 
 
@@ -322,7 +334,9 @@ namespace uAdventure.Editor
 
             // Iterate through each globalState
             foreach (GlobalStateDataControl globalStateDataControl in globalStatesDataControlList)
+            {
                 count += globalStateDataControl.countAssetReferences(assetPath);
+            }
 
             return count;
         }
@@ -333,7 +347,9 @@ namespace uAdventure.Editor
 
             // Iterate through each globalState
             foreach (GlobalStateDataControl globalStateDataControl in globalStatesDataControlList)
+            {
                 globalStateDataControl.getAssetReferences(assetPaths, assetTypes);
+            }
         }
 
 
@@ -342,7 +358,9 @@ namespace uAdventure.Editor
 
             // Iterate through each globalState
             foreach (GlobalStateDataControl globalStateDataControl in globalStatesDataControlList)
+            {
                 globalStateDataControl.deleteAssetReferences(assetPath);
+            }
         }
 
 
@@ -353,7 +371,9 @@ namespace uAdventure.Editor
 
             // Iterate through each globalState
             foreach (GlobalStateDataControl globalStateDataControl in globalStatesDataControlList)
+            {
                 count += globalStateDataControl.countIdentifierReferences(id);
+            }
 
             return count;
         }
@@ -364,7 +384,9 @@ namespace uAdventure.Editor
 
             // Iterate through each globalState
             foreach (GlobalStateDataControl globalStateDataControl in globalStatesDataControlList)
+            {
                 globalStateDataControl.replaceIdentifierReferences(oldId, newId);
+            }
         }
 
 
@@ -391,7 +413,9 @@ namespace uAdventure.Editor
         {
 
             foreach (DataControl dc in this.globalStatesDataControlList)
+            {
                 dc.recursiveSearch();
+            }
         }
 
 

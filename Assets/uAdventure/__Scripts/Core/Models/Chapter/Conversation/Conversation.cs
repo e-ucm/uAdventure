@@ -130,9 +130,14 @@ namespace uAdventure.Core
             {
                 ConversationNode child = null;
                 if (i == -1)
+                {
                     child = firstNode;
+                }
                 else
+                {
                     child = firstNode.getChild(i);
+                }
+
                 // Check the child is not in the list yet
                 bool isInList = false;
                 foreach (ConversationNode aNode in nodes)
@@ -186,7 +191,9 @@ namespace uAdventure.Core
                     cloned.addChild(tempCloned);
 
                     if (!visited.Contains(temp.getChild(i)) && !nodes.Contains(temp.getChild(i)))
+                    {
                         nodes.Add(temp.getChild(i));
+                    }
                 }
             }
             return c;

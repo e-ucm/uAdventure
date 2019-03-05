@@ -56,13 +56,19 @@ namespace uAdventure.Editor
                     assetsInformation = new AssetInformation[] { new AssetInformation("Resources.DescriptionSceneBackground", "background", true, AssetsConstants.CATEGORY_BACKGROUND, AssetsController.FILTER_JPG), new AssetInformation("Resources.DescriptionSceneForeground", "foreground", false, AssetsConstants.CATEGORY_BACKGROUND, AssetsController.FILTER_PNG), /*new AssetInformation( TextConstants.getText( "Resources.DescriptionSceneHardMap" ), "hardmap", false, AssetsController.CATEGORY_BACKGROUND, AssetsController.FILTER_PNG ), */new AssetInformation("Resources.DescriptionSceneMusic", "bgmusic", false, AssetsConstants.CATEGORY_AUDIO, AssetsController.FILTER_NONE) };
 
                     if (!resources.existAsset("background"))
+                    {
                         resources.addAsset("background", SpecialAssetPaths.ASSET_EMPTY_BACKGROUND);
+                    }
+
                     break;
                 case Controller.CUTSCENE_SLIDES:
                     assetsInformation = new AssetInformation[] { new AssetInformation("Resources.DescriptionSlidesceneSlides", "slides", true, AssetsConstants.CATEGORY_ANIMATION, AssetsController.FILTER_JPG), new AssetInformation("Resources.DescriptionSceneMusic", "bgmusic", false, AssetsConstants.CATEGORY_AUDIO, AssetsController.FILTER_NONE) };
 
                     if (!resources.existAsset("slides"))
+                    {
                         resources.addAsset("slides", SpecialAssetPaths.ASSET_EMPTY_ANIMATION);
+                    }
+
                     break;
                 case Controller.ACTION_CUSTOM:
                 case Controller.ACTION_CUSTOM_INTERACT:
@@ -75,7 +81,9 @@ namespace uAdventure.Editor
                     foreach (string asset in assets)
                     {
                         if (!resources.existAsset(asset))
+                        {
                             resources.addAsset(asset, SpecialAssetPaths.ASSET_EMPTY_ANIMATION);
+                        }
                     }
 
                     break;
@@ -90,7 +98,10 @@ namespace uAdventure.Editor
                         new AssetInformation( "Resources.ArrowRightOver", "arrowRightOver", false, AssetsConstants.CATEGORY_ARROW_BOOK, AssetsController.FILTER_PNG) };
 
                     if (!resources.existAsset("background"))
+                    {
                         resources.addAsset("background", SpecialAssetPaths.ASSET_EMPTY_BACKGROUND);
+                    }
+
                     break;
                 case Controller.ITEM:
                     assetsInformation = new AssetInformation[] { new AssetInformation(  "Resources.DescriptionItemImage" , "image", true, AssetsConstants.CATEGORY_IMAGE, AssetsController.FILTER_NONE ), new AssetInformation( "Resources.DescriptionItemIcon" , "icon", false, AssetsConstants.CATEGORY_ICON, AssetsController.FILTER_NONE )
@@ -98,9 +109,15 @@ namespace uAdventure.Editor
                     imageIconMap = new Dictionary<string, string>();
                     imageIconMap.Add("icon", "image");
                     if(!resources.existAsset("image"))
+                    {
                         resources.addAsset("image", SpecialAssetPaths.ASSET_EMPTY_IMAGE);
+                    }
+
                     if (!resources.existAsset("icon"))
+                    {
                         resources.addAsset("icon", SpecialAssetPaths.ASSET_EMPTY_ICON);
+                    }
+
                     break;
                 case Controller.PLAYER:
                 case Controller.NPC:
@@ -130,14 +147,19 @@ namespace uAdventure.Editor
                     })
                     {
                         if (!resources.existAsset(asset))
+                        {
                             resources.addAsset(asset, SpecialAssetPaths.ASSET_EMPTY_ANIMATION);
+                        }
                     }
 
                     break;
                 case Controller.ATREZZO:
                     assetsInformation = new AssetInformation[] { new AssetInformation("Resources.DescriptionItemImage", "image", true, AssetsConstants.CATEGORY_IMAGE, AssetsController.FILTER_NONE) };
                     if (!resources.existAsset("image"))
+                    {
                         resources.addAsset("image", SpecialAssetPaths.ASSET_EMPTY_IMAGE);
+                    }
+
                     break;
             }
 
@@ -386,8 +408,12 @@ namespace uAdventure.Editor
 
             // Search in the types of the resources
             foreach (string type in resources.getAssetTypes())
+            {
                 if (resources.getAssetPath(type).Equals(assetPath))
+                {
                     count++;
+                }
+            }
 
             return count;
         }
@@ -495,9 +521,13 @@ namespace uAdventure.Editor
         {
 
             if (assetsGroups == null)
+            {
                 return 1;
+            }
             else
+            {
                 return assetsGroups.Length;
+            }
         }
 
         public string getGroupInfo(int i)
@@ -515,7 +545,10 @@ namespace uAdventure.Editor
         {
 
             if (assetsGroups == null)
+            {
                 return asset;
+            }
+
             return assetsGroups[group][asset];
         }
 
@@ -523,7 +556,10 @@ namespace uAdventure.Editor
         {
 
             if (imageIconMap == null)
+            {
                 return false;
+            }
+
             return imageIconMap[assetsInformation[i].name] != null;
         }
 
@@ -534,7 +570,9 @@ namespace uAdventure.Editor
             for (int j = 0; j < assetsInformation.Length; j++)
             {
                 if (assetsInformation[j].name.Equals(name))
+                {
                     return j;
+                }
             }
             return -1;
         }
@@ -611,9 +649,14 @@ namespace uAdventure.Editor
 
             string s;
             if (n < 10)
+            {
                 s = "0";
+            }
             else
+            {
                 s = "";
+            }
+
             s = s + n;
             return s;
         }

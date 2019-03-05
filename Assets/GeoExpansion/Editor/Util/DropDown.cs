@@ -66,7 +66,10 @@ public class DropDown {
         var r = false;
         if (showDropdown)
         {
-            if (eventUsed) Event.current.type = lastEvent;
+            if (eventUsed)
+            {
+                Event.current.type = lastEvent;
+            }
 
             GUI.skin = dropdownskin;
             // Show Scrollview

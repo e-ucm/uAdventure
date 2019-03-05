@@ -20,9 +20,20 @@ namespace uAdventure.Geo
         {
 
             GameObject base_prefab = null;
-            if (Element is Atrezzo) base_prefab = Atrezzo_Prefab;
-            if (Element is NPC) base_prefab = Character_Prefab;
-            if (Element is Item) base_prefab = Object_Prefab;
+            if (Element is Atrezzo)
+            {
+                base_prefab = Atrezzo_Prefab;
+            }
+
+            if (Element is NPC)
+            {
+                base_prefab = Character_Prefab;
+            }
+
+            if (Element is Item)
+            {
+                base_prefab = Object_Prefab;
+            }
 
             var context = new ElementReference(Reference.getTargetId(), 0, 0);
             if (base_prefab != null)

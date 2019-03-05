@@ -35,7 +35,9 @@ namespace MapzenGo.Models
         protected override IEnumerator CreateRoutine(Tile tile, Action<bool> finished)
         {
             if (!(tile.Data.HasField(XmlTag) && tile.Data[XmlTag].HasField("features")))
+            {
                 yield break;
+            }
 
             foreach (var entity in tile.Data[XmlTag]["features"].list.Where(x => Query(x)).SelectMany(geo => Create(tile, geo)))
             {
@@ -54,7 +56,9 @@ namespace MapzenGo.Models
             var kind = geo["properties"]["kind"].str.ConvertToPoiType();
 
             if (!FactorySettings.HasSettingsFor(kind))
+            {
                 yield break;
+            }
 
             var typeSettings = FactorySettings.GetSettingsFor<PoiSettings>(kind);
 
@@ -83,7 +87,10 @@ namespace MapzenGo.Models
         {
             poi.Id = geo["properties"]["id"].ToString();
             if (geo["properties"].HasField("name"))
+            {
                 poi.Name = geo["properties"]["name"].str;
+            }
+
             poi.Type = geo["type"].str;
             poi.Kind = geo["properties"]["kind"].str;
             poi.name = "poi";

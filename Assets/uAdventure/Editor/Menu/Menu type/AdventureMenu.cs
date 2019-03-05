@@ -21,15 +21,25 @@ namespace uAdventure.Editor
         protected override void Callback(object obj)
         {
             if ((obj as CheckAdventureConsistencyMenuItem) != null)
+            {
                 consistency.OnCliked();
+            }
             else if ((obj as EditAdventureDataMenuItem) != null)
+            {
                 editAdventureData.OnCliked();
+            }
             else if ((obj as VisualisationMenuItem) != null)
+            {
                 visualisation.OnCliked();
+            }
             else if ((obj as ConvertToMenuItem) != null)
+            {
                 convertTo.OnCliked();
+            }
             else if ((obj as DeleteUnusedDataMenuItem) != null)
+            {
                 deleteUnused.OnCliked();
+            }
         }
 
         protected override void SetMenuItems()

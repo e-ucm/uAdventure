@@ -97,7 +97,9 @@ namespace uAdventure.Core
         public static void Initialize()
         {
             if (Initialized)
+            {
                 return;
+            }
 
             LanguageNames = new List<string>();
             LanguageTexts = new Dictionary<string, string>();

@@ -137,9 +137,15 @@ namespace uAdventure.Editor
             //{
             set.Invoke(data, new object[] { newValue });
             if (updateTree)
+            {
                 Controller.Instance.updateStructure();
+            }
+
             if (updatePanel)
+            {
                 Controller.Instance.updatePanel();
+            }
+
             done = true;
             //}
             //catch (Exception e)
@@ -157,9 +163,15 @@ namespace uAdventure.Editor
             //{
             set.Invoke(data, new object[] { oldValue });
             if (updateTree)
+            {
                 Controller.Instance.updateStructure();
+            }
+
             if (updatePanel)
+            {
                 Controller.Instance.updatePanel();
+            }
+
             done = true;
             //}
             //catch (Exception e)

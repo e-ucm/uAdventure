@@ -281,9 +281,15 @@ namespace uAdventure.Core
             AssessmentRule ar = (AssessmentRule)this.MemberwiseClone();
             ar.concept = (concept != null ? concept : null);
             if (conditions != null)
+            {
                 ar.conditions = (Conditions)conditions.Clone();
+            }
+
             if (effect != null)
+            {
                 ar.effect = (AssessmentEffect)effect.Clone();
+            }
+
             ar.id = (id != null ? id : null);
             ar.importance = importance;
             ar.repeatRule = repeatRule;

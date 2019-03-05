@@ -33,7 +33,9 @@ namespace uAdventure.Editor
             // Create subcontrollers
             atrezzoDataControlList = new List<AtrezzoDataControl>();
             foreach (Atrezzo atrezzo in atrezzoList)
+            {
                 atrezzoDataControlList.Add(new AtrezzoDataControl(atrezzo));
+            }
         }
 
         /**
@@ -73,11 +75,15 @@ namespace uAdventure.Editor
             // Create the list for the items
             atrezzoInfo = new string[atrezzoList.Count][];
             for (int i = 0; i < atrezzoList.Count; i++)
+            {
                 atrezzoInfo[i] = new string[1];
+            }
 
             // Fill the array with the info
             for (int i = 0; i < atrezzoList.Count; i++)
+            {
                 atrezzoInfo[i][0] = atrezzoList[i].getId();
+            }
 
             return atrezzoInfo;
         }
@@ -91,7 +97,10 @@ namespace uAdventure.Editor
 
             // Fill the array with the info
             for (int i = 0; i < atrezzoList.Count; i++)
+            {
                 atrezzoInfo[i] = atrezzoList[i].getId();
+            }
+
             return atrezzoInfo;
         }
 
@@ -100,7 +109,9 @@ namespace uAdventure.Editor
             for (int i = 0; i < atrezzoList.Count; i++)
             {
                 if (atrezzoList[i].getId().Equals(id))
+                {
                     return i;
+                }
             }
             return -1;
         }
@@ -113,7 +124,9 @@ namespace uAdventure.Editor
             {
                 // Show a dialog asking for the item id
                 if (string.IsNullOrEmpty(atrezzoId))
+                {
                     controller.ShowInputDialog(TC.get("Operation.AddAtrezzoTitle"), TC.get("Operation.AddAtrezzoMessage"), TC.get("Operation.AddAtrezzoDefaultValue"), performAddElement);
+                }
                 else
                 {
                     elementAdded = true;
@@ -128,7 +141,9 @@ namespace uAdventure.Editor
         {
             // If some value was typed and the identifier is valid
             if (!controller.isElementIdValid(atrezzoId))
+            {
                 atrezzoId = controller.makeElementValid(atrezzoId);
+            }
 
             // Add thew new item
             Atrezzo newAtrezzo = new Atrezzo(atrezzoId);
@@ -143,13 +158,17 @@ namespace uAdventure.Editor
         {
 
             if (!(dataControl is AtrezzoDataControl))
+            {
                 return false;
+            }
 
             Atrezzo newElement = (Atrezzo)(((Atrezzo)(dataControl.getContent())).Clone());
 			string id = newElement.getId();
 			if (!controller.isElementIdValid(id))
-				id = controller.makeElementValid(id);
-			
+            {
+                id = controller.makeElementValid(id);
+            }
+
             newElement.setId(id);
             atrezzoList.Add(newElement);
             atrezzoDataControlList.Add(new AtrezzoDataControl(newElement));
@@ -209,7 +228,9 @@ namespace uAdventure.Editor
 
             // Iterate through each atrezzo item
             foreach (AtrezzoDataControl atrezzoDataControl in atrezzoDataControlList)
+            {
                 count += atrezzoDataControl.countAssetReferences(assetPath);
+            }
 
             return count;
         }
@@ -222,7 +243,9 @@ namespace uAdventure.Editor
 
             // Iterate through each atrezzo item
             foreach (AtrezzoDataControl atrezzoDataControl in atrezzoDataControlList)
+            {
                 count += atrezzoDataControl.countIdentifierReferences(id);
+            }
 
             return count;
 
@@ -234,8 +257,9 @@ namespace uAdventure.Editor
 
             // Iterate through each atrezzo item
             foreach (AtrezzoDataControl atrezzoDataControl in atrezzoDataControlList)
+            {
                 atrezzoDataControl.deleteIdentifierReferences(assetPath);
-
+            }
         }
 
 
@@ -282,8 +306,9 @@ namespace uAdventure.Editor
 
             // Iterate through each atrezzo item
             foreach (AtrezzoDataControl atrezzoDataControl in atrezzoDataControlList)
+            {
                 atrezzoDataControl.getAssetReferences(assetPaths, assetTypes);
-
+            }
         }
 
 
@@ -369,7 +394,9 @@ namespace uAdventure.Editor
 
             // Iterate through each item
             foreach (AtrezzoDataControl atrezzoDataControl in atrezzoDataControlList)
+            {
                 atrezzoDataControl.replaceIdentifierReferences(oldId, newId);
+            }
         }
 
 
@@ -378,7 +405,9 @@ namespace uAdventure.Editor
 
             // Iterate through each item
             foreach (AtrezzoDataControl atrezzoDataControl in atrezzoDataControlList)
+            {
                 atrezzoDataControl.updateVarFlagSummary(varFlagSummary);
+            }
         }
 
 
@@ -386,7 +415,9 @@ namespace uAdventure.Editor
         {
 
             foreach (DataControl dc in this.atrezzoDataControlList)
+            {
                 dc.recursiveSearch();
+            }
         }
 
 

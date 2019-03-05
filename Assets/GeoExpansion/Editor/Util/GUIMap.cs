@@ -86,7 +86,9 @@ namespace uAdventure.Geo
             var delta = new Vector2d(Event.current.delta.x, Event.current.delta.y);
 
             if (Event.current.type != EventType.Layout)
+            {
                 GeoMousePosition = GM.MetersToLatLon(GM.PixelsToMeters(RelativeToAbsolute(mousePos), Zoom));
+            }
 
             switch (Event.current.type)
             {
@@ -155,9 +157,16 @@ namespace uAdventure.Geo
                                 var pixels = LatLonToPixels(selectedGeometry.Points);
 
                                 // If there's a point, move the point
-                                if (selectedPoint != -1) pixels[selectedPoint] += delta;
+                                if (selectedPoint != -1)
+                                {
+                                    pixels[selectedPoint] += delta;
+                                }
                                 // Otherwise, move the pixel
-                                else pixels = pixels.ConvertAll(p => p + delta);
+                                else
+                                {
+                                    pixels = pixels.ConvertAll(p => p + delta);
+                                }
+
                                 // Then update the points
                                 selectedGeometry.Points = PixelsToLatLon(pixels);
                             }
@@ -215,7 +224,11 @@ namespace uAdventure.Geo
             {
                 for (double y = topLeftCorner.y; y <= bottomRightCorner.y; y++)
                 {
-                    var tp = TileProvider.GetTile(new Vector3d(x, y, Zoom), (texture) => { if (Repaint != null) Repaint(); });
+                    var tp = TileProvider.GetTile(new Vector3d(x, y, Zoom), (texture) => { if (Repaint != null)
+                        {
+                            Repaint();
+                        }
+                    });
                     var tileBounds = GM.TileBounds(new Vector2d(x, y), Zoom);
                     var tileRect = ExtensionRect.FromCorners(
                         GM.MetersToPixels(tileBounds.Min, Zoom).ToVector2(),
@@ -224,7 +237,9 @@ namespace uAdventure.Geo
                     var windowRect = new Rect(tileRect.position + PATR.ToVector2(), tileRect.size);
                     var areaRect = windowRect.Intersection(area);
                     if (areaRect.width < 0 || areaRect.height < 0)
+                    {
                         continue;
+                    }
 
                     GUI.DrawTextureWithTexCoords(areaRect, tp.Texture, windowRect.ToTexCoords(areaRect));
                 }
@@ -238,7 +253,9 @@ namespace uAdventure.Geo
                 // Convert from lat lon to pixel relative to the rect
                 List<Vector2d> points = PixelsToRelative(LatLonToPixels(g.Points));
                 if (points.Count == 0)
+                {
                     continue;
+                }
 
 
                 Handles.BeginGUI();
@@ -367,7 +384,9 @@ namespace uAdventure.Geo
             var r = solution.Count > 0 ? solution[0].ConvertAll(p => new Vector2(p.X, p.Y)) : new List<Vector2>();
 
             if (r.Count > 0)
+            {
                 r.Add(r[0]);
+            }
 
             return r;
         }

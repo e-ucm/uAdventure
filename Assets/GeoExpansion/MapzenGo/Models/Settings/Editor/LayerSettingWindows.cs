@@ -462,7 +462,10 @@ namespace MapzenGo.Models.Settings.Editor
 
                         EditorGUILayout.EndHorizontal();
 
-                        if (RoadFactorySettings.SettingsRoad.Count > ind && RoadFactorySettings.SettingsRoad[ind].showContent) ShowRoadElement(RoadFactorySettings.SettingsRoad[ind]);
+                        if (RoadFactorySettings.SettingsRoad.Count > ind && RoadFactorySettings.SettingsRoad[ind].showContent)
+                        {
+                            ShowRoadElement(RoadFactorySettings.SettingsRoad[ind]);
+                        }
 
                         EditorGUILayout.Separator();
                     }
@@ -986,13 +989,20 @@ namespace MapzenGo.Models.Settings.Editor
                 element.Type = (BuildingType)EditorGUILayout.EnumPopup("Type Building:", element.Type);
                 if (GUI.changed && saveKind != element.Type)
                 {
-                    if (UsingType.Contains("bt_" + saveKind.ToString())) UsingType.Remove("bt_" + saveKind.ToString());
+                    if (UsingType.Contains("bt_" + saveKind.ToString()))
+                    {
+                        UsingType.Remove("bt_" + saveKind.ToString());
+                    }
+
                     UsingType.Add("bt_" + element.Type.ToString());
                 }
 
                 element.Material = (Material)EditorGUILayout.ObjectField("Material", element.Material, typeof(Material), false);
 
-                if (element.Material == null) DisplayErrorMEssage("Not setting material");
+                if (element.Material == null)
+                {
+                    DisplayErrorMEssage("Not setting material");
+                }
 
 
                 element.IsVolumetric = EditorGUILayout.Toggle("IsVolumetric", element.IsVolumetric);
@@ -1014,7 +1024,11 @@ namespace MapzenGo.Models.Settings.Editor
 
                 if (GUI.changed && saveKind != element.Type)
                 {
-                    if (UsingType.Contains("rt_" + saveKind.ToString())) UsingType.Remove("rt_" + saveKind.ToString());
+                    if (UsingType.Contains("rt_" + saveKind.ToString()))
+                    {
+                        UsingType.Remove("rt_" + saveKind.ToString());
+                    }
+
                     UsingType.Add("rt_" + element.Type.ToString());
                 }
 
@@ -1024,7 +1038,11 @@ namespace MapzenGo.Models.Settings.Editor
                 }
                 element.Material = (Material)EditorGUILayout.ObjectField("Material", element.Material, typeof(Material), false);
 
-                if (element.Material == null) DisplayErrorMEssage("Not setting material");
+                if (element.Material == null)
+                {
+                    DisplayErrorMEssage("Not setting material");
+                }
+
                 element.Width = EditorGUILayout.FloatField("Road Width", element.Width);
             }
             EditorGUILayout.EndVertical();
@@ -1038,13 +1056,20 @@ namespace MapzenGo.Models.Settings.Editor
 
                 if (GUI.changed && saveKind != element.Type)
                 {
-                    if (UsingType.Contains("lt_" + saveKind.ToString())) UsingType.Remove("lt_" + saveKind.ToString());
+                    if (UsingType.Contains("lt_" + saveKind.ToString()))
+                    {
+                        UsingType.Remove("lt_" + saveKind.ToString());
+                    }
+
                     UsingType.Add("lt_" + element.Type.ToString());
                 }
 
                 element.Material = (Material)EditorGUILayout.ObjectField("Material", element.Material, typeof(Material), false);
 
-                if (element.Material == null) DisplayErrorMEssage("Not setting material");
+                if (element.Material == null)
+                {
+                    DisplayErrorMEssage("Not setting material");
+                }
             }
             EditorGUILayout.EndVertical();
         }
@@ -1056,13 +1081,20 @@ namespace MapzenGo.Models.Settings.Editor
                 element.Type = (WaterType)EditorGUILayout.EnumPopup("Type Landuse:", element.Type);
                 if (GUI.changed && saveKind != element.Type)
                 {
-                    if (UsingType.Contains("wt_" + saveKind.ToString())) UsingType.Remove("wt_" + saveKind.ToString());
+                    if (UsingType.Contains("wt_" + saveKind.ToString()))
+                    {
+                        UsingType.Remove("wt_" + saveKind.ToString());
+                    }
+
                     UsingType.Add("wt_" + element.Type.ToString());
                 }
 
                 element.Material = (Material)EditorGUILayout.ObjectField("Material", element.Material, typeof(Material), false);
 
-                if (element.Material == null) DisplayErrorMEssage("Not setting material");
+                if (element.Material == null)
+                {
+                    DisplayErrorMEssage("Not setting material");
+                }
             }
             EditorGUILayout.EndVertical();
         }
@@ -1075,13 +1107,20 @@ namespace MapzenGo.Models.Settings.Editor
                 element.Type = (EarthType)EditorGUILayout.EnumPopup("Type Earth:", element.Type);
                 if (GUI.changed && saveKind != element.Type)
                 {
-                    if (UsingType.Contains("et_" + saveKind.ToString())) UsingType.Remove("et_" + saveKind.ToString());
+                    if (UsingType.Contains("et_" + saveKind.ToString()))
+                    {
+                        UsingType.Remove("et_" + saveKind.ToString());
+                    }
+
                     UsingType.Add("et_" + element.Type.ToString());
                 }
 
                 element.Material = (Material)EditorGUILayout.ObjectField("Material", element.Material, typeof(Material), false);
 
-                if (element.Material == null) DisplayErrorMEssage("Not setting material");
+                if (element.Material == null)
+                {
+                    DisplayErrorMEssage("Not setting material");
+                }
             }
             EditorGUILayout.EndVertical();
         }
@@ -1094,7 +1133,11 @@ namespace MapzenGo.Models.Settings.Editor
                 element.Type = (PlaceType)EditorGUILayout.EnumPopup("Type Place:", element.Type);
                 if (GUI.changed && saveKind != element.Type)
                 {
-                    if (UsingType.Contains("pt_" + saveKind.ToString())) UsingType.Remove("pt_" + saveKind.ToString());
+                    if (UsingType.Contains("pt_" + saveKind.ToString()))
+                    {
+                        UsingType.Remove("pt_" + saveKind.ToString());
+                    }
+
                     UsingType.Add("pt_" + element.Type.ToString());
                 }
 
@@ -1113,7 +1156,11 @@ namespace MapzenGo.Models.Settings.Editor
                 element.Type = (PoiType)EditorGUILayout.EnumPopup("Type Poi:", element.Type);
                 if (GUI.changed && saveKind != element.Type)
                 {
-                    if (UsingType.Contains("pot_" + saveKind.ToString())) UsingType.Remove("pot_" + saveKind.ToString());
+                    if (UsingType.Contains("pot_" + saveKind.ToString()))
+                    {
+                        UsingType.Remove("pot_" + saveKind.ToString());
+                    }
+
                     UsingType.Add("pot_" + element.Type.ToString());
                 }
 
@@ -1130,13 +1177,21 @@ namespace MapzenGo.Models.Settings.Editor
                 element.Type = (BoundaryType)EditorGUILayout.EnumPopup("Type Boundary:", element.Type);
                 if (GUI.changed && saveKind != element.Type)
                 {
-                    if (UsingType.Contains("bt_" + saveKind.ToString())) UsingType.Remove("bt_" + saveKind.ToString());
+                    if (UsingType.Contains("bt_" + saveKind.ToString()))
+                    {
+                        UsingType.Remove("bt_" + saveKind.ToString());
+                    }
+
                     UsingType.Add("bt_" + element.Type.ToString());
                 }
 
                 element.Material = (Material)EditorGUILayout.ObjectField("Material", element.Material, typeof(Material), false);
 
-                if (element.Material == null) DisplayErrorMEssage("Not setting material");
+                if (element.Material == null)
+                {
+                    DisplayErrorMEssage("Not setting material");
+                }
+
                 element.Width = EditorGUILayout.FloatField("Boundary Width", element.Width);
             }
             EditorGUILayout.EndVertical();

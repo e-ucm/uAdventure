@@ -46,7 +46,9 @@ namespace uAdventure.Editor
             // Create subcontrollers
             barriersDataControlList = new List<BarrierDataControl>();
             foreach (Barrier barrier in barriersList)
+            {
                 barriersDataControlList.Add(new BarrierDataControl(sceneDataControl, barrier));
+            }
 
             id = barriersList.Count + 1;
         }
@@ -157,7 +159,9 @@ namespace uAdventure.Editor
         {
 
             if (!(dataControl is BarrierDataControl))
+            {
                 return false;
+            }
 
             Barrier newElement = (Barrier)(((Barrier)(dataControl.getContent())).Clone());
 
@@ -241,7 +245,9 @@ namespace uAdventure.Editor
 
             // Iterate through each activeArea
             foreach (BarrierDataControl barrierDataControl in barriersDataControlList)
+            {
                 barrierDataControl.updateVarFlagSummary(varFlagSummary);
+            }
         }
 
 
@@ -308,7 +314,9 @@ namespace uAdventure.Editor
 
             // Iterate through each activeArea
             foreach (BarrierDataControl barrierDataControl in barriersDataControlList)
+            {
                 count += barrierDataControl.countIdentifierReferences(id);
+            }
 
             return count;
         }
@@ -319,7 +327,9 @@ namespace uAdventure.Editor
 
             // Iterate through each activeArea
             foreach (BarrierDataControl barrierDataControl in barriersDataControlList)
+            {
                 barrierDataControl.replaceIdentifierReferences(oldId, newId);
+            }
         }
 
 
@@ -328,8 +338,9 @@ namespace uAdventure.Editor
 
             // Spread the call to every activeArea
             foreach (BarrierDataControl barrierDataControl in barriersDataControlList)
+            {
                 barrierDataControl.deleteIdentifierReferences(id);
-
+            }
         }
 
 
@@ -362,7 +373,9 @@ namespace uAdventure.Editor
         {
 
             foreach (DataControl dc in this.barriersDataControlList)
+            {
                 dc.recursiveSearch();
+            }
         }
 
         public TrajectoryDataControl getParentSceneTrajectory()

@@ -18,13 +18,25 @@ namespace uAdventure.Editor
         {
             get
             {
-                if (collapsed) return new Rect(window.x, window.y, 50, 30);
-                else return window;
+                if (collapsed)
+                {
+                    return new Rect(window.x, window.y, 50, 30);
+                }
+                else
+                {
+                    return window;
+                }
             }
             set
             {
-                if (collapsed) window = new Rect(value.x, value.y, window.width, window.height);
-                else window = value;
+                if (collapsed)
+                {
+                    window = new Rect(value.x, value.y, window.width, window.height);
+                }
+                else
+                {
+                    window = value;
+                }
             }
         }
         
@@ -38,7 +50,9 @@ namespace uAdventure.Editor
 
             var npcs = Controller.Instance.IdentifierSummary.getIds<NPC>();
             if(npcs != null && npcs.Length > 0)
+            {
                 this.effect = new SpeakCharEffect(npcs[0], "");
+            }
         }
 
         public void draw()

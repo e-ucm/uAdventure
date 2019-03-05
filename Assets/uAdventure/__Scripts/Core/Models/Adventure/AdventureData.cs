@@ -89,10 +89,15 @@ namespace uAdventure.Core
             {
                 string[] apn = chapters[i].getAdaptationProfilesNames();
                 if (apn.Length > 0)
+                {
                     return true;
+                }
+
                 string[] aspn = chapters[i].getAssessmentProfilesNames();
                 if (aspn.Length > 0)
+                {
                     return true;
+                }
             }
 
             return false;
@@ -119,19 +124,31 @@ namespace uAdventure.Core
             AdventureData ad = (AdventureData)base.Clone();
             ad.buttons = new List<CustomButton>();
             foreach (CustomButton cb in buttons)
+            {
                 ad.buttons.Add((CustomButton)cb.Clone());
+            }
+
             foreach (CustomArrow ca in arrows)
+            {
                 ad.arrows.Add((CustomArrow)ca.Clone());
+            }
+
             //ad.chapters = new List<Chapter>();
             //for (Chapter c : chapters)
             //	ad.chapters.Add((Chapter) c.Clone());
             ad.commentaries = commentaries;
             ad.contents = new List<ChapterSummary>();
             foreach (ChapterSummary cs in contents)
+            {
                 ad.contents.Add((ChapterSummary)cs.Clone());
+            }
+
             ad.cursors = new List<CustomCursor>();
             foreach (CustomCursor cc in cursors)
+            {
                 ad.cursors.Add((CustomCursor)cc.Clone());
+            }
+
             ad.description = description;
             ad.guiCustomized = guiCustomized;
             ad.guiType = guiType;

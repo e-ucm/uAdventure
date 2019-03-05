@@ -28,7 +28,9 @@ namespace uAdventure.Runner
         public bool CheckTransparency(RaycastHit raycastHit)
         {
             if (!m_renderer || !m_renderer.material || !m_renderer.material.mainTexture)
+            {
                 return false;
+            }
 
             var texture = GetReadableTexture((Texture2D) m_renderer.material.mainTexture);
 
@@ -59,9 +61,13 @@ namespace uAdventure.Runner
             var textureId = texture.GetInstanceID();
 
             if (isReadable.ContainsKey(textureId))
+            {
                 return texture;
+            }
             else if (readableVersions.ContainsKey(textureId))
+            {
                 return readableVersions[textureId];
+            }
             else
             {
                 try

@@ -87,7 +87,9 @@ namespace uAdventure.Editor
 
             // If it was the last one, show an error message
             else
+            {
                 Controller.Instance.ShowErrorDialog(TC.get("Operation.DeleteResourcesTitle"), TC.get("Operation.DeleteResourcesErrorLastResources"));
+            }
 
             return elementDeleted;
         }
@@ -98,7 +100,10 @@ namespace uAdventure.Editor
 
             bool redone = doTool();
             if (redone)
+            {
                 Controller.Instance.updatePanel();
+            }
+
             return redone;
         }
 

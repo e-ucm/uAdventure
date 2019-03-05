@@ -21,11 +21,15 @@ namespace uAdventure.Core
 
             // DOCUMENTATION
             if (documentation != null)
+            {
                 atrezzo.setDocumentation(documentation.InnerText);
+            }
 
             // RESOURCES
             foreach (var res in DOMParserUtility.DOMParse<ResourcesUni>(resourcess, parameters))
+            {
                 atrezzo.addResources(res);
+            }
 
             // DESCRIPTIONS
             atrezzo.setDescriptions(DOMParserUtility.DOMParse<Description>(descriptions, parameters).ToList());

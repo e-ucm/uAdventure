@@ -19,8 +19,10 @@ namespace uAdventure.Core
             Barrier barrier = new Barrier(generateId(), x, y, width, height);
 
             if (element.SelectSingleNode("documentation") != null)
+            {
                 barrier.setDocumentation(element.SelectSingleNode("documentation").InnerText);
-            
+            }
+
             barrier.setConditions (DOMParserUtility.DOMParse (element.SelectSingleNode("condition"), parameters) as Conditions ?? new Conditions());
 
             return barrier;

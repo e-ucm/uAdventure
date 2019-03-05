@@ -367,14 +367,18 @@ namespace uAdventure.Core
         {
 
             if (rectangular)
+            {
                 return x;
+            }
             else
             {
                 int minX = int.MaxValue;
                 foreach (Vector2 point in points)
                 {
                     if (point.x < minX)
+                    {
                         minX = (int)point.x;
+                    }
                 }
                 return minX;
             }
@@ -389,14 +393,18 @@ namespace uAdventure.Core
         {
 
             if (rectangular)
+            {
                 return y;
+            }
             else
             {
                 int minY = int.MaxValue;
                 foreach (Vector2 point in points)
                 {
                     if (point.y < minY)
+                    {
                         minY = (int)point.y;
+                    }
                 }
                 return minY;
             }
@@ -411,7 +419,9 @@ namespace uAdventure.Core
         {
 
             if (rectangular)
+            {
                 return width;
+            }
             else
             {
                 int maxX = int.MinValue;
@@ -419,9 +429,14 @@ namespace uAdventure.Core
                 foreach (Vector2 point in points)
                 {
                     if (point.x > maxX)
+                    {
                         maxX = (int)point.x;
+                    }
+
                     if (point.x < minX)
+                    {
                         minX = (int)point.x;
+                    }
                 }
                 return maxX - minX;
 
@@ -437,7 +452,9 @@ namespace uAdventure.Core
         {
 
             if (rectangular)
+            {
                 return height;
+            }
             else
             {
                 int maxY = int.MinValue;
@@ -445,9 +462,14 @@ namespace uAdventure.Core
                 foreach (Vector2 point in points)
                 {
                     if (point.y > maxY)
+                    {
                         maxY = (int)point.y;
+                    }
+
                     if (point.y < minY)
+                    {
                         minY = (int)point.y;
+                    }
                 }
                 return maxY - minY;
             }
@@ -552,7 +574,9 @@ namespace uAdventure.Core
         {
 
             if (rectangular)
+            {
                 return x > getX0() && x < getX1() && y > getY0() && y < getY1();
+            }
             else
             {
                 return PolygonHelper.ContainsPoint(getPoints(), new Vector2(x, y));
@@ -727,7 +751,9 @@ e.transitionType = new int(transitionType );
             {
                 e.nextScenes = new List<NextScene>();
                 foreach (NextScene ns in nextScenes)
+                {
                     e.nextScenes.Add((NextScene)ns.Clone());
+                }
             }
             e.influenceArea = (influenceArea != null ? (InfluenceArea)influenceArea.Clone() : null);
             e.width = width;
@@ -738,7 +764,9 @@ e.transitionType = new int(transitionType );
             {
                 e.points = new List<Vector2>();
                 foreach (Vector2 p in points)
+                {
                     e.points.Add(new Vector2(p.x, p.y));
+                }
             }
             e.conditions = (conditions != null ? (Conditions)conditions.Clone() : null);
             e.effects = (effects != null ? (Effects)effects.Clone() : null);

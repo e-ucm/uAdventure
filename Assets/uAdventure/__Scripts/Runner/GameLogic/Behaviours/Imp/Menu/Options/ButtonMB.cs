@@ -69,9 +69,13 @@ namespace uAdventure.Runner
 
             Sprite tmp;
             if (this.action.getType() == Action.CUSTOM)
+            {
                 tmp = Game.Instance.ResourceManager.getSprite(resource.getAssetPath("buttonNormal"));
+            }
             else
+            {
                 tmp = Game.Instance.ResourceManager.getSprite(resource.getAssetPath(DescriptorData.NORMAL_BUTTON));
+            }
 
             spriteRenderer.sprite = tmp;
             this.gameObject.AddComponent<PolygonCollider2D>();

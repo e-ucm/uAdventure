@@ -68,7 +68,9 @@ namespace uAdventure.Editor
 
             bool done = base.undoTool();
             if (!done)
+            {
                 return false;
+            }
             else
             {
                 for (int i = 0; i < adventureData.getButtons().Count; i++)
@@ -99,10 +101,15 @@ namespace uAdventure.Editor
         {
 
             if (removed)
+            {
                 adventureData.addButton(action, type, "");
+            }
+
             bool done = base.redoTool();
             if (!done)
+            {
                 return false;
+            }
             else
             {
                 for (int i = 0; i < adventureData.getButtons().Count; i++)
@@ -140,7 +147,9 @@ namespace uAdventure.Editor
             }
             bool done = base.doTool();
             if (!done)
+            {
                 return false;
+            }
             else
             {
                 setButton(action, type, resources.getAssetPath(action + "#" + type));
@@ -156,10 +165,15 @@ namespace uAdventure.Editor
             foreach (CustomButton cb in adventureData.getButtons())
             {
                 if (cb.Equals(button))
+                {
                     temp = cb;
+                }
             }
             if (temp != null)
+            {
                 adventureData.getButtons().Remove(temp);
+            }
+
             adventureData.addButton(button);
         }
     }

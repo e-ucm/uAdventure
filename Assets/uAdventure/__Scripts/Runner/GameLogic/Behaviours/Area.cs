@@ -66,16 +66,24 @@ namespace uAdventure.Runner
                 foreach (Vector2 v in element.getPoints())
                 {
                     if (v.x < minx)
+                    {
                         minx = v.x;
+                    }
 
                     if (v.x > maxx)
+                    {
                         maxx = v.x;
+                    }
 
                     if (v.y < miny)
+                    {
                         miny = v.y;
+                    }
 
                     if (v.y > maxy)
+                    {
                         maxy = v.y;
+                    }
                 }
 
                 minx = (minx + (maxx - minx) / 2) / 10;

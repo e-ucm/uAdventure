@@ -28,8 +28,10 @@ public class ZipUtil
 	static void zip_ExtractProgress(object sender, ExtractProgressEventArgs e)
 	{
 		if(e.EventType == ZipProgressEventType.Extracting_AfterExtractEntry)
-			progress = (float)e.EntriesExtracted / (float)e.EntriesTotal;
-	}
+        {
+            progress = (float)e.EntriesExtracted / (float)e.EntriesTotal;
+        }
+    }
 #endif
 
 	public static void Unzip (string zipFilePath, string location)

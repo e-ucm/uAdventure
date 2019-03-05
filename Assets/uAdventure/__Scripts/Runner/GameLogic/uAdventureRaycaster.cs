@@ -26,7 +26,9 @@ namespace uAdventure.Runner
         public override void Raycast(PointerEventData eventData, List<RaycastResult> resultAppendList)
         {
             if (Disabled)
+            {
                 return;
+            }
 
             if (Override != null)
             {
@@ -45,7 +47,9 @@ namespace uAdventure.Runner
             }
 
             if (eventCamera == null)
+            {
                 return;
+            }
 
             Ray ray;
             float distanceToClipPlane;

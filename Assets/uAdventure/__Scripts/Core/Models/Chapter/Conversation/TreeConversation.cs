@@ -50,8 +50,12 @@ namespace uAdventure.Core
 
                 // For each child of the possible father node, check if it match with the possible child
                 for (int i = 0; i < possibleFather.getChildCount(); i++)
+                {
                     if (possibleFather.getChild(i) == node)
+                    {
                         goBackTag = true;
+                    }
+                }
             }
 
             return goBackTag;

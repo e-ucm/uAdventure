@@ -15,9 +15,11 @@ namespace uAdventure.Core
 			Item parsedObject = new Item(element.GetAttribute("id"));
 
             if (element.SelectSingleNode("documentation") != null)
+            {
                 parsedObject.setDocumentation(element.SelectSingleNode("documentation").InnerText);
-			
-			switch(element.GetAttribute("behaviour")){
+            }
+
+            switch(element.GetAttribute("behaviour")){
 				case "atrezzo": parsedObject.setBehaviour(Item.BehaviourType.ATREZZO); break;
 				case "first-action": parsedObject.setBehaviour(Item.BehaviourType.FIRST_ACTION); break;
 				default: parsedObject.setBehaviour(Item.BehaviourType.NORMAL); break;
@@ -28,18 +30,24 @@ namespace uAdventure.Core
 
 			// RESOURCES
 			foreach(var res in DOMParserUtility.DOMParse <ResourcesUni> (element.SelectNodes("resources"), parameters))
-				parsedObject.addResources (res);
+            {
+                parsedObject.addResources (res);
+            }
 
-			// DESCRIPTIONS
+            // DESCRIPTIONS
 			parsedObject.setDescriptions(DOMParserUtility.DOMParse<Description>(element.SelectNodes ("description"), parameters).ToList());
 
 			// ACTIONS
 			var actionsNode = element.SelectSingleNode("actions");
 			if(actionsNode != null)
-				foreach(var res in DOMParserUtility.DOMParse <Action> (actionsNode.ChildNodes, parameters))
-					parsedObject.addAction (res);
+            {
+                foreach(var res in DOMParserUtility.DOMParse <Action> (actionsNode.ChildNodes, parameters))
+                {
+                    parsedObject.addAction (res);
+                }
+            }
 
-			return parsedObject;
+            return parsedObject;
         }
     }
 }

@@ -102,9 +102,13 @@ namespace uAdventure.Runner
                         videoPlayer.source = VideoSource.VideoClip;
                         videoPlayer.clip = Resources.Load<VideoClip>(path);
                         if (videoPlayer.clip)
+                        {
                             videoPlayer.targetTexture = new RenderTexture((int)videoPlayer.clip.width, (int)videoPlayer.clip.height, 16, RenderTextureFormat.RGB565);
+                        }
                         else
+                        {
                             videoPlayer.targetTexture = new RenderTexture(Screen.width, Screen.height, 16, RenderTextureFormat.RGB565);
+                        }
                     }
 
                     if (videoPlayer.source == VideoSource.VideoClip && videoPlayer.clip == null)

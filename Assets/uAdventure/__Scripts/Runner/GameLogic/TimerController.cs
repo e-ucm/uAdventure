@@ -58,7 +58,10 @@ namespace uAdventure.Runner
                 // Update the timer states
                 var newTimerStates = new Dictionary<Timer, TimerState>();
                 foreach (var timer in value)
+                {
                     newTimerStates.Add(timer, timerState.ContainsKey(timer) ? timerState[timer] : TimerState.New);
+                }
+
                 timerState = newTimerStates;
 
                 this.timers = value;
@@ -86,20 +89,28 @@ namespace uAdventure.Runner
             foreach (var timer in timers)
             {
                 if (!runningTimers.ContainsKey(timer))
+                {
                     continue;
-                
+                }
+
                 TimerVars timerVars = runningTimers[timer];
                 switch (timerVars.type)
                 {
                     case TimerType.Normal:
                         timerVars.currentTime += Time.deltaTime;
                         if (timerVars.currentTime >= timerVars.maxTime)
+                        {
                             FinalizeTimer(timerVars.timer);
+                        }
+
                         break;
                     case TimerType.Countdown:
                         timerVars.currentTime -= Time.deltaTime;
                         if (timerVars.currentTime <= 0)
+                        {
                             FinalizeTimer(timerVars.timer);
+                        }
+
                         break;
                 }
             }
@@ -113,7 +124,10 @@ namespace uAdventure.Runner
             while (finalizationQueue.Count > 0)
             {
                 if (Game.Instance.isSomethingRunning())
+                {
                     break;
+                }
+
                 Game.Instance.Execute(finalizationQueue.Dequeue());
             }
         }
@@ -123,7 +137,10 @@ namespace uAdventure.Runner
             if (timer.isShowTime())
             {
                 if (!timerObject.ContainsKey(timer))
+                {
                     timerObject[timer] = Instantiate(timerPrefab, timersContainer.transform);
+                }
+
                 var uiTimerController = timerObject[timer].GetComponent<UITimerController>();
                 uiTimerController.Timer = timer;
                 uiTimerController.Running = true;
@@ -186,7 +203,9 @@ namespace uAdventure.Runner
             }
 
             if(timer.getPostEffects() != null)
+            {
                 finalizationQueue.Enqueue(new EffectHolder(timer.getPostEffects()));
+            }
 
             // Destroy the visualization
             if (timerObject.ContainsKey(timer))
@@ -207,14 +226,18 @@ namespace uAdventure.Runner
             {
                 // Finished timers dont restart
                 if (timerState[timer] == TimerState.Finished)
+                {
                     continue;
+                }
 
                 if (!IsRunning(timer))
                 {
                     if (timer.isShowTime() && timer.isShowWhenStopped())
                     {
                         if (!timerObject.ContainsKey(timer))
+                        {
                             timerObject[timer] = Instantiate(timerPrefab, timersContainer.transform);
+                        }
 
                         var uiTimerController = timerObject[timer].GetComponent<UITimerController>();
                         uiTimerController.Timer = timer;

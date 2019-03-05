@@ -42,7 +42,9 @@ namespace uAdventure.Editor
             // Create subcontrollers
             exitsDataControlList = new List<ExitDataControl>();
             foreach (Exit exit in exitsList)
+            {
                 exitsDataControlList.Add(new ExitDataControl(sceneDataControl, exit));
+            }
         }
 
         /**
@@ -133,9 +135,13 @@ namespace uAdventure.Editor
                 {
                     string[] generalScenes = controller.IdentifierSummary.groupIds<IChapterTarget>();
                     if (generalScenes.Length != 0)
+                    {
                         controller.ShowInputDialog(TC.get("ExitsList.AddExit"), TC.get("Exit.TargetScene"), generalScenes, performAddExit);
+                    }
                     else
+                    {
                         controller.ShowErrorDialog(TC.get("ExitsList.AddExit"), TC.get("ExitsList.NoScenesError"));
+                    }
                 }
                 else
                 {
@@ -169,7 +175,9 @@ namespace uAdventure.Editor
         {
 
             if (!(dataControl is ExitDataControl))
+            {
                 return false;
+            }
 
 
             Exit newElement = (Exit)(((Exit)(dataControl.getContent())).Clone());
@@ -251,7 +259,9 @@ namespace uAdventure.Editor
 
             // Iterate through each exit
             foreach (ExitDataControl exitDataControl in exitsDataControlList)
+            {
                 exitDataControl.updateVarFlagSummary(varFlagSummary);
+            }
         }
 
 
@@ -278,7 +288,9 @@ namespace uAdventure.Editor
 
             // Iterate through each exit
             foreach (ExitDataControl exitDataControl in exitsDataControlList)
+            {
                 count += exitDataControl.countAssetReferences(assetPath);
+            }
 
             return count;
         }
@@ -289,7 +301,9 @@ namespace uAdventure.Editor
 
             // Iterate through each exit
             foreach (ExitDataControl exitDataControl in exitsDataControlList)
+            {
                 exitDataControl.getAssetReferences(assetPaths, assetTypes);
+            }
         }
 
 
@@ -298,7 +312,9 @@ namespace uAdventure.Editor
 
             // Iterate through each exit
             foreach (ExitDataControl exitDataControl in exitsDataControlList)
+            {
                 exitDataControl.deleteAssetReferences(assetPath);
+            }
         }
 
 
@@ -309,7 +325,9 @@ namespace uAdventure.Editor
 
             // Iterate through each exit
             foreach (ExitDataControl exitDataControl in exitsDataControlList)
+            {
                 count += exitDataControl.countIdentifierReferences(id);
+            }
 
             return count;
         }
@@ -320,7 +338,9 @@ namespace uAdventure.Editor
 
             // Iterate through each exit
             foreach (ExitDataControl exitDataControl in exitsDataControlList)
+            {
                 exitDataControl.replaceIdentifierReferences(oldId, newId);
+            }
         }
 
 
@@ -329,7 +349,9 @@ namespace uAdventure.Editor
 
             // Spread the call to every exit
             foreach (ExitDataControl exitDataControl in exitsDataControlList)
+            {
                 exitDataControl.deleteIdentifierReferences(id);
+            }
 
             int i = 0;
             while (i < exitsList.Count)
@@ -340,7 +362,9 @@ namespace uAdventure.Editor
                     exitsDataControlList.RemoveAt(i);
                 }
                 else
+                {
                     i++;
+                }
             }
         }
 
@@ -368,7 +392,9 @@ namespace uAdventure.Editor
         {
 
             foreach (DataControl dc in this.exitsDataControlList)
+            {
                 dc.recursiveSearch();
+            }
         }
 
         public SceneDataControl getSceneDataControl()

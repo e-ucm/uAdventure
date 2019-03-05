@@ -75,7 +75,9 @@ namespace uAdventure.Core
             {
                 ae.properties = new List<AssessmentProperty>();
                 foreach (AssessmentProperty ap in properties)
+                {
                     ae.properties.Add((AssessmentProperty)ap.Clone());
+                }
             }
             ae.text = (text != null ? text : null);
             return ae;

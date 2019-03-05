@@ -75,7 +75,9 @@ namespace uAdventure.Core
             override public string ToString()
             {
                 if (string.IsNullOrEmpty(id) && conditions == null)
+                {
                     return "Not specified yet";
+                }
 
                 string s = "When ";
 
@@ -192,7 +194,9 @@ namespace uAdventure.Core
             public void addSubScore(Score score)
             {
                 if (this.scores == null)
+                {
                     this.scores = new List<Score>();
+                }
 
                 this.scores.Add(score);
             }

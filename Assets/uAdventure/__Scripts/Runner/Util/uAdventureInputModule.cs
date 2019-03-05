@@ -83,7 +83,9 @@ namespace uAdventure.Runner
                 Touch touch = input.GetTouch(i);
 
                 if (touch.type == TouchType.Indirect)
+                {
                     continue;
+                }
 
                 bool released;
                 bool pressed;

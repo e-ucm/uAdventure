@@ -78,14 +78,18 @@ namespace uAdventure.Geo
 
 
             if (placeSearcher == null)
+            {
                 Init();
+            }
 
             placeSearcher.LayoutBegin();
 
             // Location control
             mapScene.LatLon = EditorGUILayout.Vector2Field("Location", mapScene.LatLon.ToVector2()).ToVector2d();
             if (mapScene.LatLon != map.Center)
+            {
                 map.Center = mapScene.LatLon;
+            }
 
             EditorGUILayout.BeginHorizontal();
             // Map Elements
@@ -267,7 +271,10 @@ namespace uAdventure.Geo
                     {
                         var o = DrawerParametersMenu.ShowAtPosition(typeConfigRect.GUIAdapt(rect));
                         DrawerParametersMenu.s_DrawerParametersMenu.ExtElemReference = extReference;
-                        if (o) GUIUtility.ExitGUI();
+                        if (o)
+                        {
+                            GUIUtility.ExitGUI();
+                        }
                     }
                 }
 

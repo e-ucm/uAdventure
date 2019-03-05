@@ -285,7 +285,9 @@ namespace uAdventure.Core
 
             // If it is not, show an error message
             else
+            {
                 Debug.LogError("Error: Trying to delete a nonexistent flag");
+            }
         }
 
         /**
@@ -363,7 +365,9 @@ namespace uAdventure.Core
 
             // If it is not, show an error message
             else
+            {
                 Debug.LogError("Error: Trying to delete a nonexistent var");
+            }
         }
 
         /**

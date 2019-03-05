@@ -127,9 +127,13 @@ namespace uAdventure.Core
                 {
                     string response = tmpArgVal;
                     if (response.Equals("yes"))
+                    {
                         synthesizerVoice = true;
+                    }
                     else
+                    {
                         synthesizerVoice = false;
+                    }
                 }
 
                 // Store the read string into the current node, and then delete the string. The trim is performed so we
@@ -162,9 +166,13 @@ namespace uAdventure.Core
                 {
                     string response = tmpArgVal;
                     if (response.Equals("yes"))
+                    {
                         synthesizerVoice = true;
+                    }
                     else
+                    {
                         synthesizerVoice = false;
+                    }
                 }
 
                 // Store the read string into the current node, and then delete the string. The trim is performed so we
@@ -187,9 +195,13 @@ namespace uAdventure.Core
                 if (!string.IsNullOrEmpty(tmpArgVal))
                 {
                     if (tmpArgVal.Equals("yes"))
+                    {
                         random = true;
+                    }
                     else
+                    {
                         random = false;
+                    }
                 }
 
                 //If there is a "keepShowing" attribute, keep the previous conversation line showing
@@ -197,9 +209,13 @@ namespace uAdventure.Core
                 if (!string.IsNullOrEmpty(tmpArgVal))
                 {
                     if (tmpArgVal.Equals("yes"))
+                    {
                         keepShowing = true;
+                    }
                     else
+                    {
                         keepShowing = false;
+                    }
                 }
 
                 //If there is a "showUserOption" attribute, identify if show the user response at option node
@@ -207,9 +223,13 @@ namespace uAdventure.Core
                 if (!string.IsNullOrEmpty(tmpArgVal))
                 {
                     if (tmpArgVal.Equals("yes"))
+                    {
                         showUserOption = true;
+                    }
                     else
+                    {
                         showUserOption = false;
+                    }
                 }
 
 
@@ -218,9 +238,13 @@ namespace uAdventure.Core
                 if (!string.IsNullOrEmpty(tmpArgVal))
                 {
                     if (tmpArgVal.Equals("yes"))
+                    {
                         preListening = true;
+                    }
                     else
+                    {
                         preListening = false;
+                    }
                 }
 
                 //If there is a "x" and "y" attributes with the position where the option node has to be painted,
@@ -228,9 +252,13 @@ namespace uAdventure.Core
                 if (!string.IsNullOrEmpty(tmpArgVal))
                 {
                     if (tmpArgVal.Equals("yes"))
+                    {
                         preListening = true;
+                    }
                     else
+                    {
                         preListening = false;
+                    }
                 }
 
                 //If there is a "x" and "y" attributes with the position where the option node has to be painted

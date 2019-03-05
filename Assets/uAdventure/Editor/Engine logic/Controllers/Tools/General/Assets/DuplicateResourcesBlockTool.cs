@@ -63,7 +63,9 @@ namespace uAdventure.Editor
         {
 
             if (!(dataControl is ResourcesDataControl))
+            {
                 return false;
+            }
 
             newElement = (ResourcesUni)(((ResourcesUni)(dataControl.getContent())));
             newDataControl = new ResourcesDataControl(newElement, ((ResourcesDataControl)dataControl).getResourcesType());

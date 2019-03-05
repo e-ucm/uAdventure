@@ -248,7 +248,10 @@ namespace uAdventure.Editor
                             case 0: GUI.Label(cellRect, scene.getId()); break;
                             case 1:
                                 if (GUI.Button(cellRect, TC.get("GeneralText.Edit")))
+                                {
                                     GameRources.GetInstance().selectedSceneIndex = row;
+                                }
+
                                 break;
                         }
                     }
@@ -300,7 +303,9 @@ namespace uAdventure.Editor
                 foreach (var scene in Controller.Instance.ChapterList.getSelectedChapterDataControl().getScenesList().getScenes())
                 {
                     foreach (var exit in scene.getExitsList().getExits())
+                    {
                         DrawExit(scene, exit);
+                    }
                 }
             }
 
@@ -354,7 +359,9 @@ namespace uAdventure.Editor
 
                 // If the exit points to a cutscene it normally is out of the array
                 if (index < 0 || index > scenes.getScenes().Count)
+                {
                     return;
+                }
 
                 var polygon = AdaptToViewport(GetExitArea(scene, exit), space);
                 var c = sceneColors[scene.getId()];
@@ -517,7 +524,10 @@ namespace uAdventure.Editor
             {
                 Vector2 sum = Vector2.zero;
                 for (int i = 0; i < polygon.Length; i++)
+                {
                     sum += polygon[i];
+                }
+
                 return sum / polygon.Length;
             }
 

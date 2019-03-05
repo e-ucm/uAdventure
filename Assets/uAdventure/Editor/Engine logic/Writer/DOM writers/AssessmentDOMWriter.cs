@@ -46,11 +46,15 @@ namespace uAdventure.Editor
                 assessmentNode.SetAttribute("show-report-at-end", "no");
             }
             if (!profile.isShowReportAtEnd() || !profile.isSendByEmail())
+            {
                 assessmentNode.SetAttribute("send-to-email", "");
+            }
             else
             {
                 if (profile.getEmail() == null || !profile.getEmail().Contains("@"))
+                {
                     assessmentNode.SetAttribute("send-to-email", "");
+                }
                 else
                 {
                     assessmentNode.SetAttribute("send-to-email", profile.getEmail());
@@ -190,7 +194,10 @@ namespace uAdventure.Editor
                         propertyElement.SetAttribute("id", property.getId());
                         propertyElement.SetAttribute("value", property.getValue());
                         if (property.getVarName() != null)
+                        {
                             propertyElement.SetAttribute("varName", property.getVarName());
+                        }
+
                         effectNode.AppendChild(propertyElement);
                     }
                     //Append the effect

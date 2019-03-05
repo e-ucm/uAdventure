@@ -34,7 +34,9 @@ namespace MapzenGo.Models.Factories
         {
             var kind = geo["properties"]["kind"].str.ConvertToRoadType();
             if (!FactorySettings.HasSettingsFor(kind) && !JustDrawEverythingFam)
+            {
                 yield break;
+            }
 
             var typeSettings = FactorySettings.GetSettingsFor<RoadSettings>(kind);
 
@@ -67,7 +69,9 @@ namespace MapzenGo.Models.Factories
                 road.Kind = geo["properties"]["kind"].str;
                 road.SortKey = (int)geo["properties"]["sort_rank"].f;
                 if (geo["properties"].HasField("name"))
+                {
                     road.Name = geo["properties"]["name"].str;
+                }
 
                 road.transform.position += Vector3.up * road.SortKey / 100;
                 yield return road;
@@ -116,7 +120,9 @@ namespace MapzenGo.Models.Factories
             road.Kind = geo["properties"]["kind"].str;
             road.SortKey = (int)geo["properties"]["sort_rank"].f;
             if (geo["properties"].HasField("name"))
+            {
                 road.Name = geo["properties"]["name"].str;
+            }
         }
 
         protected override GameObject CreateLayer(Tile tile, List<JSONObject> geoList)
@@ -128,10 +134,14 @@ namespace MapzenGo.Models.Factories
             {
                 var kind = geo["properties"]["kind"].str.ConvertToRoadType();
                 if (!FactorySettings.HasSettingsFor(kind) && !JustDrawEverythingFam)
+                {
                     continue;
+                }
 
                 if (!_meshes.ContainsKey(kind))
+                {
                     _meshes.Add(kind, new MeshData());
+                }
 
                 var settings = FactorySettings.GetSettingsFor<RoadSettings>(kind);
                 var roadEnds = new List<Vector3>();
@@ -206,7 +216,9 @@ namespace MapzenGo.Models.Factories
                 var p2 = list[i];
                 var p3 = p2;
                 if (i + 1 < list.Count)
+                {
                     p3 = list[i + 1];
+                }
 
                 if (lastPos == Vector3.zero)
                 {

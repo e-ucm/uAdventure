@@ -89,7 +89,9 @@ namespace uAdventure.Geo
         public static void setGeopoint(this TrackerAsset t, float lat, float lon)
         {
             if (TR == null)
+            {
                 TR = new ExtensionTransformations();
+            }
 
             t.setVar(Extension.Geopoint.ToString().ToLower(), lat + "," + lon);
         }

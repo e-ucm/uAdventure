@@ -93,9 +93,14 @@ namespace uAdventure.Editor
                 elementWithTargetId.setTargetId(id);
                 done = true;
                 if (updateTree)
+                {
                     controller.updateStructure();
+                }
+
                 if (reloadPanel)
+                {
                     controller.updatePanel();
+                }
             }
             return done;
         }
@@ -116,9 +121,14 @@ namespace uAdventure.Editor
             oldId = id;
             id = temp;
             if (updateTree)
+            {
                 controller.updateStructure();
+            }
+
             if (reloadPanel)
+            {
                 controller.updatePanel();
+            }
 
             return true;
         }

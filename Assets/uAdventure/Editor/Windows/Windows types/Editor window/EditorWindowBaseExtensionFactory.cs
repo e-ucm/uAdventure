@@ -29,7 +29,9 @@ namespace uAdventure.Editor
             LoadExtensions();
             var r = new List<EditorWindowExtension>();
             foreach (var t in knownExtensions.Values.Distinct().OrderBy(t => priorities[t]))
+            {
                 r.Add((EditorWindowExtension)Activator.CreateInstance(t, windowRect, style, options));
+            }
 
             return r;
         }
@@ -72,8 +74,12 @@ namespace uAdventure.Editor
                     var ewea = attr as EditorWindowExtensionAttribute;
                     priorities.Add(extension, ewea.Priority);
                     foreach (var extensionType in ewea.Types)
+                    {
                         if (!knownExtensions.ContainsKey(extensionType))
+                        {
                             knownExtensions.Add(extensionType, extension);
+                        }
+                    }
                 }
             }
         }

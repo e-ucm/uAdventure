@@ -15,7 +15,10 @@ namespace uAdventure.Editor
             get
             {
                 if (instance == null)
+                {
                     instance = new EffectEditorFactoryImp();
+                }
+
                 return instance;
             }
         }

@@ -23,18 +23,24 @@ namespace MapzenGo.Helpers
 
             int n = m_points.Count;
             if (n < 3)
+            {
                 return indices.ToArray();
+            }
 
             int[] V = new int[n];
             if (Area() > 0)
             {
                 for (int v = 0; v < n; v++)
+                {
                     V[v] = v;
+                }
             }
             else
             {
                 for (int v = 0; v < n; v++)
+                {
                     V[v] = (n - 1) - v;
+                }
             }
 
             int nv = n;
@@ -42,17 +48,27 @@ namespace MapzenGo.Helpers
             for (int m = 0, v = nv - 1; nv > 2; )
             {
                 if ((count--) <= 0)
+                {
                     return indices.ToArray();
+                }
 
                 int u = v;
                 if (nv <= u)
+                {
                     u = 0;
+                }
+
                 v = u + 1;
                 if (nv <= v)
+                {
                     v = 0;
+                }
+
                 int w = v + 1;
                 if (nv <= w)
+                {
                     w = 0;
+                }
 
                 if (Snip(u, v, w, nv, V))
                 {
@@ -65,7 +81,10 @@ namespace MapzenGo.Helpers
                     indices.Add(c);
                     m++;
                     for (s = v, t = v + 1; t < nv; s++, t++)
+                    {
                         V[s] = V[t];
+                    }
+
                     nv--;
                     count = 2 * nv;
                 }
@@ -95,14 +114,22 @@ namespace MapzenGo.Helpers
             Vector3 B = m_points[V[v]];
             Vector3 C = m_points[V[w]];
             if (Mathf.Epsilon > (((B.x - A.x) * (C.z - A.z)) - ((B.z - A.z) * (C.x - A.x))))
+            {
                 return false;
+            }
+
             for (p = 0; p < n; p++)
             {
                 if ((p == u) || (p == v) || (p == w))
+                {
                     continue;
+                }
+
                 Vector3 P = m_points[V[p]];
                 if (InsideTriangle(A, B, C, P))
+                {
                     return false;
+                }
             }
             return true;
         }

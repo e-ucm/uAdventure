@@ -63,13 +63,17 @@ namespace uAdventure.Runner
                         foreach (KeyValuePair<int, string> name in ActionNameWrapper.Names)
                         {
                             if (name.Value != "")
+                            {
                                 ids.Add(name.Value, name.Key);
+                            }
                         }
 
                         foreach (KeyValuePair<int, string> name in ActionNameWrapper.AuxNames)
                         {
                             if (name.Value != "" && !ids.ContainsKey(name.Value))
+                            {
                                 ids.Add(name.Value, name.Key);
+                            }
                         }
                     }
                     return ids;
@@ -192,29 +196,43 @@ namespace uAdventure.Runner
             }
 
             if (data.getCursors().Count == 0)
+            {
                 loadDefaultCursors();
+            }
         }
 
         public ResourcesUni getButton(Action action)
         {
             if (buttons.ContainsKey(action.getType()))
+            {
                 return buttons[action.getType()];
+            }
             else
+            {
                 return null;
+            }
         }
         public ResourcesUni getButton(int action)
         {
             if (buttons.ContainsKey(action))
+            {
                 return buttons[action];
+            }
             else
+            {
                 return null;
+            }
         }
         public ResourcesUni getButton(string action)
         {
             if (ActionNameWrapper.IDs.ContainsKey(action) && buttons.ContainsKey(ActionNameWrapper.IDs[action]))
+            {
                 return buttons[ActionNameWrapper.IDs[action]];
+            }
             else
+            {
                 return null;
+            }
         }
 
         public Texture2D getCursor(string cursor)
@@ -229,7 +247,10 @@ namespace uAdventure.Runner
                 else
                 {
                     if (!cursores.ContainsKey("default"))
+                    {
                         cursores.Add("default", Game.Instance.ResourceManager.getImage(data.getCursorPath("default")));
+                    }
+
                     cursores.Add(cursor, cursores["default"]);
                 }
             }

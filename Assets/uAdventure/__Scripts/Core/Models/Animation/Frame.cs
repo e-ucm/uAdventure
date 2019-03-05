@@ -349,7 +349,9 @@ namespace uAdventure.Core
             {
                 f.resources = new List<ResourcesUni>();
                 foreach (ResourcesUni r in resources)
+                {
                     f.resources.Add((ResourcesUni)r.Clone());
+                }
             }
             f.time = time;
             f.type = type;

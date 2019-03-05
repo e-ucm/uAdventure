@@ -25,7 +25,9 @@ namespace uAdventure.Editor
         private void OnEnable()
         {
             if(!thisWindowReference)
+            {
                 thisWindowReference = this;
+            }
             else
             {
                 DestroyImmediate(this);
@@ -33,7 +35,9 @@ namespace uAdventure.Editor
             }
 
             if (!Language.Initialized)
+            {
                 Language.Initialize();
+            }
 
             openedWindow = WelcomeWindowType.New;
 

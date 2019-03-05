@@ -69,7 +69,9 @@ namespace uAdventure.Editor
                 backgroundPreviewTex.height - rightArrowTex.height - MARGIN);
 
             if (bookRef.getPreviousPagePosition() == Vector2.zero && bookRef.getNextPagePosition() == Vector2.zero)
+            {
                 SetDefaultArrowsPosition();
+            }
 
             CalculateArrowsPosition();
 
@@ -89,9 +91,13 @@ namespace uAdventure.Editor
                         dragging = true;
                         startPos = currentPos;
                         if (leftArrowRect.Contains(Event.current.mousePosition))
+                        {
                             arrowDragged = ArrowType.Left;
+                        }
                         else
+                        {
                             arrowDragged = ArrowType.Right;
+                        }
                     }
 
                 }

@@ -47,8 +47,12 @@ namespace uAdventure.Editor
                     assetsInformation[index].filter);
                 int assetIndex = -1;
                 for (int i = 0; i < assetFilenames.Length; i++)
+                {
                     if (assetFilenames[i].Equals(selectedAsset))
+                    {
                         assetIndex = i;
+                    }
+                }
 
                 // check if the asset is "standright" or "standleft" in order to modify the attr assetNecessary
                 // for the assetInformation
@@ -60,7 +64,9 @@ namespace uAdventure.Editor
                         for (int i = 0; i < assetsInformation.Length; i++)
                         {
                             if (assetsInformation[i].name.Equals("standleft"))
+                            {
                                 assetsInformation[i].assetNecessary = false;
+                            }
                         }
                     }
                     //if is not art necessary and is 3rd person game, look for "standleft", if this asset is 
@@ -105,7 +111,9 @@ namespace uAdventure.Editor
                 bool changeFilter = false;
                 string specialPath = AssetsController.CATEGORY_SPECIAL_ASSETS + "/" + "EmptyAnimation.eaa";
                 if (filename.Contains("EmptyAnimation"))
+                {
                     changeFilter = true;
+                }
 
                 resources.addAsset(assetsInformation[index].name, changeFilter ? specialPath : assetPaths[assetIndex]);
                 done = true;

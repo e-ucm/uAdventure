@@ -17,7 +17,9 @@ namespace uAdventure.Runner
         public TrajectoryHandler(Trajectory trajectory)
         {
             if (trajectory == null)
+            {
                 return;
+            }
 
             this.trajectory = trajectory;
 
@@ -118,13 +120,19 @@ namespace uAdventure.Runner
             foreach (LineHandler handler in lines)
             {
                 if (origin_line == null && handler.contains(origin))
+                {
                     origin_line = handler;
+                }
 
                 if (destiny_line == null && handler.contains(destiny))
+                {
                     destiny_line = handler;
+                }
 
                 if (origin_line != null && destiny_line != null)
+                {
                     break;
+                }
             }
 
             Vector2 closest = Vector2.zero;
@@ -135,12 +143,14 @@ namespace uAdventure.Runner
             }
 
             if (closest != Vector2.zero)
+            {
                 ret.Add(new MovementPoint()
                 {
                     destination = closest,
                     scale = origin_line.getScaleFor(closest),
                     distance = (closest - origin).magnitude
                 });
+            }
 
             if (origin_line != null && destiny_line != null)
             {
@@ -219,6 +229,7 @@ namespace uAdventure.Runner
                 foreach (LineHandler line in current.getNeighborLines())
                 {
                     if (!stickered.ContainsKey(line))
+                    {
                         if (costs.ContainsKey(line))
                         {
                             if (costs[line] > current_cost)
@@ -230,6 +241,7 @@ namespace uAdventure.Runner
                         {
                             costs.Add(line, current_cost);
                         }
+                    }
                 }
 
                 //obtenemos la mas corta
@@ -293,9 +305,13 @@ namespace uAdventure.Runner
             bool ret = false;
 
             if (origin == destiny)
+            {
                 ret = true;
+            }
             else if (visited[origin])
+            {
                 ret = false;
+            }
             else
             {
                 visited[origin] = true;
@@ -481,8 +497,14 @@ namespace uAdventure.Runner
                 // Then we add the neightbor lines to expand
                 foreach (var side in current.getNeighborLines())
                 {
-                    if (opened.ContainsKey(side) && opened[side]) continue;
-                    else toOpen.Enqueue(side);
+                    if (opened.ContainsKey(side) && opened[side])
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        toOpen.Enqueue(side);
+                    }
                 }
             }
 
@@ -509,7 +531,9 @@ namespace uAdventure.Runner
             foreach(var node in original.getNodes())
             {
                 if (!Inside(LineHandler.nodeToVector2(node), blockingObject))
+                {
                     trajectory.addNode(node.getID(), node.getX(), node.getY(), node.getScale());
+                }
             }
 
             // Then we add the sides
@@ -538,7 +562,9 @@ namespace uAdventure.Runner
             var endInside = outputTrajectory.getNodeForId(side.getIDEnd()) == null;
 
             if (startInside && endInside)
+            {
                 return;
+            }
 
             Vector2 start = LineHandler.nodeToVector2(startNode),
                 end = LineHandler.nodeToVector2(endNode);
@@ -575,7 +601,9 @@ namespace uAdventure.Runner
         public static Vector2 ClosestPoint(Vector2 point, Vector2[] points)
         {
             if (points.Length == 0)
+            {
                 return Vector2.zero;
+            }
 
             float distance;
             float maxDistance = float.MaxValue;
@@ -657,7 +685,9 @@ namespace uAdventure.Runner
                     // Check the times it cuts with the axis
                     if (((points[i].y > 0) != (points[(i + 1) % points.Count].y > 0))
                     && ((points[i].y > 0) == (points[i].y * points[(i + 1) % points.Count].x > points[(i + 1) % points.Count].y * points[i].x)))
+                    {
                         inside = !inside;
+                    }
                 }
                 return inside;
             }

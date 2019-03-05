@@ -22,11 +22,16 @@ namespace uAdventure.Runner
         private void Init()
         {
             if (Timer.getTime() > int.MaxValue)
+            {
                 Debug.LogWarning("The time is bigger than the 'int' container!");
+            }
 
             timeFormatter = new DateTime(0);
 
-            if (Timer.isCountDown()) timeFormatter = new DateTime(Timer.getTime() * TimeSpan.TicksPerSecond, DateTimeKind.Local);
+            if (Timer.isCountDown())
+            {
+                timeFormatter = new DateTime(Timer.getTime() * TimeSpan.TicksPerSecond, DateTimeKind.Local);
+            }
 
             UpdateView();
         }
@@ -36,12 +41,19 @@ namespace uAdventure.Runner
             if (Running)
             {
                 if(Timer.isCountDown())
+                {
                     timeFormatter = timeFormatter - new TimeSpan(Math.Min((long) (Time.deltaTime * 1000) * TimeSpan.TicksPerMillisecond, timeFormatter.Ticks));
+                }
                 else
+                {
                     timeFormatter = timeFormatter.AddSeconds(Time.deltaTime);
+                }
 
                 if (timeFormatter == new DateTime(0))
+                {
                     Running = false;
+                }
+
                 UpdateView();
             }
 

@@ -16,7 +16,9 @@ namespace uAdventure.Editor
         public VarConditionEditor()
         {
             if (Avaiable)
+            {
                 condition = new VarCondition(Controller.Instance.VarFlagSummary.getVars()[0], 4, 0);
+            }
         }
 
         public void draw(Condition c)

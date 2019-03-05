@@ -51,7 +51,10 @@ namespace uAdventure.Editor
             {
                 ChangeRectangleValueTool crvt = (ChangeRectangleValueTool)other;
                 if (crvt.rectangle != rectangle)
+                {
                     return false;
+                }
+
                 if (crvt.isChangePos() && isChangePos())
                 {
                     x = crvt.x;
@@ -100,7 +103,10 @@ namespace uAdventure.Editor
         {
 
             if (x == oldX && y == oldY)
+            {
                 return true;
+            }
+
             return false;
         }
 
@@ -108,7 +114,10 @@ namespace uAdventure.Editor
         {
 
             if (width == oldWidth && height == oldHeight)
+            {
                 return true;
+            }
+
             return false;
         }
     }

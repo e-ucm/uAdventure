@@ -186,7 +186,10 @@ namespace uAdventure.Editor
             SelectResourceTool tool = new SelectResourceTool(resources, assetsInformation, resourcesType, index);
             tool.doTool();
             if (tool.resources.existAsset("marihuanhell"))
+            {
                 assetPath = tool.resources.getAssetPath("marihuanhell");
+            }
+
             //}
             //catch (CloneNotSupportedException e)
             //{

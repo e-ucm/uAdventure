@@ -41,10 +41,20 @@ namespace uAdventure.Core
                     case "activate":
                     case "deactivate":
                         tmpArgVal = effect.GetAttribute("flag");
-                        if (!string.IsNullOrEmpty(tmpArgVal)) chapter.addFlag(tmpArgVal);
+                        if (!string.IsNullOrEmpty(tmpArgVal))
+                        {
+                            chapter.addFlag(tmpArgVal);
+                        }
 
-                        if (effect.Name == "activate") currentEffect = new ActivateEffect(tmpArgVal);
-                        else                           currentEffect = new DeactivateEffect(tmpArgVal);
+                        if (effect.Name == "activate")
+                        {
+                            currentEffect = new ActivateEffect(tmpArgVal);
+                        }
+                        else
+                        {
+                            currentEffect = new DeactivateEffect(tmpArgVal);
+                        }
+
                         break;
                     case "set-value":
                     case "increment":
@@ -53,11 +63,17 @@ namespace uAdventure.Core
 						int value = ExParsers.ParseDefault(effect.GetAttribute("value"), 0);
 
                         if (effect.Name == "set-value")
+                        {
                             currentEffect = new SetValueEffect(var, value);
+                        }
                         else if (effect.Name == "increment")
+                        {
                             currentEffect = new IncrementVarEffect(var, value);
+                        }
                         else
+                        {
                             currentEffect = new DecrementVarEffect(var, value);
+                        }
 
                         chapter.addVar(var);
                         break;
@@ -153,15 +169,29 @@ namespace uAdventure.Core
                         if (!string.IsNullOrEmpty(tmpArgVal))
                         {
                             if (tmpArgVal.Equals("none"))
+                            {
                                 type = HighlightItemEffect.NO_HIGHLIGHT;
+                            }
+
                             if (tmpArgVal.Equals("green"))
+                            {
                                 type = HighlightItemEffect.HIGHLIGHT_GREEN;
+                            }
+
                             if (tmpArgVal.Equals("red"))
+                            {
                                 type = HighlightItemEffect.HIGHLIGHT_RED;
+                            }
+
                             if (tmpArgVal.Equals("blue"))
+                            {
                                 type = HighlightItemEffect.HIGHLIGHT_BLUE;
+                            }
+
                             if (tmpArgVal.Equals("border"))
+                            {
                                 type = HighlightItemEffect.HIGHLIGHT_BORDER;
+                            }
                         }
                         currentEffect = new HighlightItemEffect(id, type, animated);
                         break;
@@ -188,7 +218,10 @@ namespace uAdventure.Core
 						var currentConditions = DOMParserUtility.DOMParse (effect, parameters) as Conditions ?? new Conditions();
                         var lastEffect = effects[effects.Count - 1] as AbstractEffect;
                         if(lastEffect != null)
+                        {
                             lastEffect.setConditions(currentConditions);
+                        }
+
                         break;
                     case "documentation":
                         addeffect = false;
@@ -196,13 +229,18 @@ namespace uAdventure.Core
 				default:
 						currentEffect = DOMParserUtility.DOMParse (effect, parameters) as IEffect;
 						addeffect = currentEffect != null;
-						if(!addeffect) Debug.LogWarning("EFFECT NOT SUPPORTED: " + effect.Name);
+						if(!addeffect)
+                        {
+                            Debug.LogWarning("EFFECT NOT SUPPORTED: " + effect.Name);
+                        }
 
                         break;
                 }
 
                 if (addeffect)
-					effects.Add(currentEffect);
+                {
+                    effects.Add(currentEffect);
+                }
             }
 
 			return effects;

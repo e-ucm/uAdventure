@@ -24,13 +24,25 @@ namespace uAdventure.Editor
         {
             get
             {
-                if (collapsed) return new Rect(window.x, window.y, 50, 30);
-                else return window;
+                if (collapsed)
+                {
+                    return new Rect(window.x, window.y, 50, 30);
+                }
+                else
+                {
+                    return window;
+                }
             }
             set
             {
-                if (collapsed) window = new Rect(value.x, value.y, window.width, window.height);
-                else window = value;
+                if (collapsed)
+                {
+                    window = new Rect(value.x, value.y, window.width, window.height);
+                }
+                else
+                {
+                    window = value;
+                }
             }
         }
 

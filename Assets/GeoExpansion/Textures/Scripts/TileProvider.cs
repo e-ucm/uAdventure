@@ -55,7 +55,9 @@ public class TileProvider {
     public static TilePromise GetTile(Vector3d tileZoom, Action<Texture2D> callback)
     {
         if (tileCache == null)
+        {
             tileCache = new Dictionary<Vector3d, TilePromise>();
+        }
 
         var url = TileServiceUrls[(int)TileService] + tileZoom.z + "/" + tileZoom.x + "/" + tileZoom.y + ".png";
         if (tileCache.ContainsKey(tileZoom))

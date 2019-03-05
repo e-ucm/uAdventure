@@ -560,14 +560,18 @@ namespace uAdventure.Core
             {
                 ap.flags = new List<string>();
                 foreach (string s in flags)
+                {
                     ap.flags.Add((s != null ? s : null));
+                }
             }
             ap.name = (name != null ? name : null);
             if (rules != null)
             {
                 ap.rules = new List<AssessmentRule>();
                 foreach (AssessmentRule ar in rules)
+                {
                     ap.rules.Add((AssessmentRule)ar.Clone());
+                }
             }
             ap.sendByEmail = sendByEmail;
             ap.showReportAtEnd = showReportAtEnd;

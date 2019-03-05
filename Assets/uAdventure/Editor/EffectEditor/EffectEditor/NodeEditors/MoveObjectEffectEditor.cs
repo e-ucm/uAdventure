@@ -16,7 +16,9 @@ namespace uAdventure.Editor
         {
             var items = Controller.Instance.IdentifierSummary.getIds<Item>();
             if (items != null && items.Length > 0 && effect == null)
+            {
                 this.effect = new MoveObjectEffect(items[0], 300, 300, 1.0f, false, 1, 1);
+            }
         }
 
         public override void draw()

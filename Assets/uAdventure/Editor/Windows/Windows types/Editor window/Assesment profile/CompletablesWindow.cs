@@ -66,15 +66,24 @@ namespace uAdventure.Editor
                             break;
                         case 1:
                             if (GUI.Button(rect, completable.getStart().getContent().ToString()))
+                            {
                                 MilestoneEditorWindow.ShowMilestoneEditor(rect, completable.getStart());
+                            }
+
                             break;
                         case 2:
                             if (GUI.Button(rect, completable.getEnd().getContent().ToString()))
+                            {
                                 MilestoneEditorWindow.ShowMilestoneEditor(rect, completable.getEnd());
+                            }
+
                             break;
                         case 3:
                             if (GUI.Button(rect, TC.get("Analytics.Completable.Define")))
+                            {
                                 ProgressEditorWindow.ShowProgressEditor(rect, completable.getProgress());
+                            }
+
                             break;
                         case 4:
                             {

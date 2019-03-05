@@ -52,7 +52,9 @@ namespace uAdventure.Editor
         {
 
             if (trajectory.getInitial() != null && trajectory.getInitial().getID().Equals(nodeDataControl.getID()))
+            {
                 return false;
+            }
 
             trajectory.setInitial(nodeDataControl.getID());
 

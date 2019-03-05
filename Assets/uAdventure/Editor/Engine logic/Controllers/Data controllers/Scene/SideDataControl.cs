@@ -202,7 +202,9 @@ namespace uAdventure.Editor
             foreach (NodeDataControl ndc in trajectoryDataControl.getNodes())
             {
                 if (ndc.getID().Equals(side.getIDStart()))
+                {
                     return ndc;
+                }
             }
             return null;
         }
@@ -213,7 +215,9 @@ namespace uAdventure.Editor
             foreach (NodeDataControl ndc in trajectoryDataControl.getNodes())
             {
                 if (ndc.getID().Equals(side.getIDEnd()))
+                {
                     return ndc;
+                }
             }
             return null;
         }

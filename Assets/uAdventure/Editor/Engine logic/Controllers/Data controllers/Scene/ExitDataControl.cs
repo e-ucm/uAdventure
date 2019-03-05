@@ -242,11 +242,19 @@ namespace uAdventure.Editor
 
             ConditionsController.updateVarFlagSummary(varFlagSummary, exit.getConditions());
             if (exit.getEffects() != null)
+            {
                 EffectsController.updateVarFlagSummary(varFlagSummary, exit.getEffects());
+            }
+
             if (exit.getPostEffects() != null)
+            {
                 EffectsController.updateVarFlagSummary(varFlagSummary, exit.getPostEffects());
+            }
+
             if (exit.getNotEffects() != null)
+            {
                 EffectsController.updateVarFlagSummary(varFlagSummary, exit.getNotEffects());
+            }
         }
 
 
@@ -256,11 +264,19 @@ namespace uAdventure.Editor
             bool valid = true;
 
             if (exit.getEffects() != null)
+            {
                 valid &= EffectsController.isValid(currentPath + " >> " + TC.get("Element.Effects"), incidences, exit.getEffects());
+            }
+
             if (exit.getPostEffects() != null)
+            {
                 valid &= EffectsController.isValid(currentPath + " >> " + TC.get("Element.PostEffects"), incidences, exit.getPostEffects());
+            }
+
             if (exit.getNotEffects() != null)
+            {
                 valid &= EffectsController.isValid(currentPath + " >> " + TC.get("Element.NotEffects"), incidences, exit.getNotEffects());
+            }
 
             return valid;
         }
@@ -274,11 +290,20 @@ namespace uAdventure.Editor
             assetsRefs += exitLookDataControl.countAssetReferences(assetPath);
 
             if (exit.getEffects() != null)
+            {
                 assetsRefs += EffectsController.countAssetReferences(assetPath, exit.getEffects());
+            }
+
             if (exit.getPostEffects() != null)
+            {
                 assetsRefs += EffectsController.countAssetReferences(assetPath, exit.getPostEffects());
+            }
+
             if (exit.getNotEffects() != null)
+            {
                 assetsRefs += EffectsController.countAssetReferences(assetPath, exit.getNotEffects());
+            }
+
             return assetsRefs;
 
         }
@@ -289,11 +314,19 @@ namespace uAdventure.Editor
 
             exitLookDataControl.deleteAssetReferences(assetPath);
             if (exit.getEffects() != null)
+            {
                 EffectsController.deleteAssetReferences(assetPath, exit.getEffects());
+            }
+
             if (exit.getPostEffects() != null)
+            {
                 EffectsController.deleteAssetReferences(assetPath, exit.getPostEffects());
+            }
+
             if (exit.getNotEffects() != null)
+            {
                 EffectsController.deleteAssetReferences(assetPath, exit.getNotEffects());
+            }
         }
 
 
@@ -303,7 +336,10 @@ namespace uAdventure.Editor
             int count = 0;
 
             if (id.Equals(exit.getNextSceneId()))
+            {
                 count = 1;
+            }
+
             count += EffectsController.countIdentifierReferences(id, exit.getEffects());
             count += EffectsController.countIdentifierReferences(id, exit.getPostEffects());
             count += EffectsController.countIdentifierReferences(id, exit.getNotEffects());
@@ -316,7 +352,10 @@ namespace uAdventure.Editor
         {
 
             if (oldId.Equals(exit.getNextSceneId()))
+            {
                 exit.setNextSceneId(newId);
+            }
+
             EffectsController.replaceIdentifierReferences(oldId, newId, exit.getEffects());
             EffectsController.replaceIdentifierReferences(oldId, newId, exit.getPostEffects());
             EffectsController.replaceIdentifierReferences(oldId, newId, exit.getNotEffects());
@@ -332,7 +371,9 @@ namespace uAdventure.Editor
             EffectsController.deleteIdentifierReferences(id, exit.getNotEffects());
             conditionsController.deleteIdentifierReferences(id);
             if (id.Equals(exit.getNextSceneId()))
+            {
                 exit.setNextSceneId(null);
+            }
         }
 
         /**
@@ -369,7 +410,10 @@ namespace uAdventure.Editor
             //        check( this.getDocumentation( ), TC.get( "Search.Documentation" ) );
             //        check( this.getExitLookDataControl( ).getCustomizedText( ), TC.get( "Search.CustomizedText" ) );
             if (exitLookDataControl != null)
+            {
                 exitLookDataControl.recursiveSearch();
+            }
+
             for (int i = 0; i < this.getEffects().getEffectCount(); i++)
             {
                 check(this.getEffects().getEffectInfo(i), TC.get("Search.Effect"));
@@ -411,7 +455,10 @@ namespace uAdventure.Editor
         {
 
             if (exit.getPoints().Count > 0)
+            {
                 return exit.getPoints()[exit.getPoints().Count - 1];
+            }
+
             return Vector2.zero;
         }
 
@@ -519,9 +566,13 @@ namespace uAdventure.Editor
         {
 
             if (exit.hasPlayerPosition())
+            {
                 controller.AddTool(new ChangeNSDestinyPositionTool(exit, int.MinValue, int.MinValue));
+            }
             else
+            {
                 controller.AddTool(new ChangeNSDestinyPositionTool(exit, 0, 0));
+            }
         }
 
         /**

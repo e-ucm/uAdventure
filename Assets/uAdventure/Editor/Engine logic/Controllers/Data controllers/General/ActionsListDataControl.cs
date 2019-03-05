@@ -44,9 +44,13 @@ namespace uAdventure.Editor
                     actionsDataControlList.Add(new CustomActionDataControl((CustomAction)action));
                 }
                 else if (action.getType() == Action.TALK_TO)
+                {
                     actionsDataControlList.Add(new ActionDataControl(action, ((NPCDataControl)parent).getId()));
+                }
                 else
+                {
                     actionsDataControlList.Add(new ActionDataControl(action));
+                }
             }
         }
 
@@ -87,7 +91,9 @@ namespace uAdventure.Editor
             // Create the list for the actions
             actionsInfo = new string[actionsList.Count][];
             for (int i = 0; i < actionsList.Count; i++)
+            {
                 actionsInfo[i] = new string[3];
+            }
 
             // Fill the array with the info
             for (int i = 0; i < actionsList.Count; i++)
@@ -95,33 +101,59 @@ namespace uAdventure.Editor
                 Action action = actionsList[i];
 
                 if (action.getType() == Action.EXAMINE)
+                {
                     actionsInfo[i][0] = TC.get("ActionsList.ExamineAction");
+                }
                 else if (action.getType() == Action.GRAB)
+                {
                     actionsInfo[i][0] = TC.get("ActionsList.GrabAction");
+                }
                 else if (action.getType() == Action.CUSTOM)
+                {
                     actionsInfo[i][0] = TC.get("ActionsList.CustomAction", ((CustomAction)action).getName());
+                }
                 else if (action.getType() == Action.GIVE_TO)
+                {
                     actionsInfo[i][0] = TC.get("ActionsList.GiveToAction", action.getTargetId());
+                }
                 else if (action.getType() == Action.USE_WITH)
+                {
                     actionsInfo[i][0] = TC.get("ActionsList.UseWithAction", action.getTargetId());
+                }
                 else if (action.getType() == Action.CUSTOM_INTERACT)
+                {
                     actionsInfo[i][0] = TC.get("ActionsList.CustomInteractAction", action.getTargetId());
+                }
                 else if (action.getType() == Action.USE)
+                {
                     actionsInfo[i][0] = TC.get("ActionsList.UseAction");
+                }
                 else if (action.getType() == Action.TALK_TO)
+                {
                     actionsInfo[i][0] = TC.get("ActionsList.TalkToAction");
+                }
                 else if (action.getType() == Action.DRAG_TO)
+                {
                     actionsInfo[i][0] = TC.get("ActionsList.DragToAction");
+                }
 
                 if (action.getConditions().IsEmpty())
+                {
                     actionsInfo[i][1] = TC.get("GeneralText.No");
+                }
                 else
+                {
                     actionsInfo[i][1] = TC.get("GeneralText.Yes");
+                }
 
                 if (action.getEffects().IsEmpty())
+                {
                     actionsInfo[i][2] = TC.get("GeneralText.No");
+                }
                 else
+                {
                     actionsInfo[i][2] = TC.get("GeneralText.Yes");
+                }
             }
 
             return actionsInfo;
@@ -138,11 +170,20 @@ namespace uAdventure.Editor
         public override int[] getAddableElements()
         {
             if (parent is ItemDataControl)
+            {
                 return new int[] { Controller.ACTION_EXAMINE, Controller.ACTION_GRAB, Controller.ACTION_USE, Controller.ACTION_CUSTOM_INTERACT, Controller.ACTION_USE_WITH, Controller.ACTION_GIVE_TO, Controller.ACTION_DRAG_TO };
+            }
+
             if (parent is NPCDataControl)
+            {
                 return new int[] { Controller.ACTION_EXAMINE, Controller.ACTION_USE, Controller.ACTION_CUSTOM, Controller.ACTION_TALK_TO, Controller.ACTION_DRAG_TO };
+            }
+
             if (parent is ActiveAreaDataControl)
+            {
                 return new int[] { Controller.ACTION_EXAMINE, Controller.ACTION_USE, Controller.ACTION_CUSTOM };
+            }
+
             return new int[] { Controller.ACTION_EXAMINE, Controller.ACTION_GRAB, Controller.ACTION_USE, Controller.ACTION_CUSTOM, Controller.ACTION_USE_WITH, Controller.ACTION_GIVE_TO, Controller.ACTION_TALK_TO };
         }
 
@@ -288,7 +329,9 @@ namespace uAdventure.Editor
                 controller.ShowInputDialog(TC.get("CustomAction.GetNameTitle"), TC.get("CustomAction.GetNameMessage"), (sender, name) =>
                 {
                     if (string.IsNullOrEmpty(name))
+                    {
                         name = "NONAME_" + Random.Range(0, 1000);
+                    }
 
                     string[] options = { TC.get("Element.Action"), TC.get("Element.Interaction") };
                     controller.ShowInputDialog(TC.get("CustomAction.SelectTypeMessage"), TC.get("CustomAction.SelectTypeTitle"), options, (sender2, optionSelected) =>
@@ -321,8 +364,10 @@ namespace uAdventure.Editor
                 controller.ShowInputDialog(TC.get("CustomAction.GetNameTitle"), TC.get("CustomAction.GetNameMessage"), (sender, name) =>
                 {
                     if (string.IsNullOrEmpty(name))
+                    {
                         name = "NONAME_" + Random.Range(0, 1000);
-                    
+                    }
+
                     var customAction = new CustomAction(Action.CUSTOM);
                     customAction.setName(name);
                     performAddAction(customAction);
@@ -361,16 +406,23 @@ namespace uAdventure.Editor
                     });
             }
             else
+            {
                 controller.ShowErrorDialog(TC.get("Action.OperationAddAction"), TC.get("Action.ErrorNoItems"));
+            }
         }
 
         private void performAddAction(Action newAction)
         {
             getActionsList().Add(newAction);
             if (newAction.getType() == Action.CUSTOM || newAction.getType() == Action.CUSTOM_INTERACT)
+            {
                 getActions().Add(new CustomActionDataControl((CustomAction)newAction));
+            }
             else
+            {
                 getActions().Add(new ActionDataControl(newAction));
+            }
+
             controller.DataModified();
         }
 
@@ -395,7 +447,9 @@ namespace uAdventure.Editor
         {
 
             if (!(dataControl is ActionDataControl))
+            {
                 return false;
+            }
 
 
             Action newElement;
@@ -472,7 +526,9 @@ namespace uAdventure.Editor
 
             // Iterate through each action
             foreach (ActionDataControl actionDataControl in actionsDataControlList)
+            {
                 actionDataControl.updateVarFlagSummary(varFlagSummary);
+            }
         }
 
 
@@ -499,7 +555,9 @@ namespace uAdventure.Editor
 
             // Iterate through each action
             foreach (ActionDataControl actionDataControl in actionsDataControlList)
+            {
                 count += actionDataControl.countAssetReferences(assetPath);
+            }
 
             return count;
         }
@@ -510,7 +568,9 @@ namespace uAdventure.Editor
 
             // Iterate through each action
             foreach (ActionDataControl actionDataControl in actionsDataControlList)
+            {
                 actionDataControl.getAssetReferences(assetPaths, assetTypes);
+            }
         }
 
 
@@ -519,7 +579,9 @@ namespace uAdventure.Editor
 
             // Iterate through each action
             foreach (ActionDataControl actionDataControl in actionsDataControlList)
+            {
                 actionDataControl.deleteAssetReferences(assetPath);
+            }
         }
 
 
@@ -530,7 +592,9 @@ namespace uAdventure.Editor
 
             // Iterate through each action
             foreach (ActionDataControl actionDataControl in actionsDataControlList)
+            {
                 count += actionDataControl.countIdentifierReferences(id);
+            }
 
             return count;
         }
@@ -541,7 +605,9 @@ namespace uAdventure.Editor
 
             // Iterate through each action
             foreach (ActionDataControl actionDataControl in actionsDataControlList)
+            {
                 actionDataControl.replaceIdentifierReferences(oldId, newId);
+            }
         }
 
 
@@ -589,7 +655,9 @@ namespace uAdventure.Editor
         {
 
             foreach (DataControl dc in this.actionsDataControlList)
+            {
                 dc.recursiveSearch();
+            }
         }
 
 

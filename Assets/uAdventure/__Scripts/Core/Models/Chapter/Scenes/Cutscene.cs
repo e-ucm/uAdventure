@@ -109,9 +109,13 @@ namespace uAdventure.Core
         {
 
             if (endScene)
+            {
                 this.next = ENDCHAPTER;
+            }
             else
+            {
                 this.next = GOBACK;
+            }
         }
 
         /**

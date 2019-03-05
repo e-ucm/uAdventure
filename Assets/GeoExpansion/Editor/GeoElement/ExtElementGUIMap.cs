@@ -18,7 +18,10 @@ namespace uAdventure.Editor
             get
             {
                 if (instance == null)
+                {
                     instance = new ExtElemReferenceGUIMapPositionManagerFactory();
+                }
+
                 return instance;
             }
         }
@@ -116,45 +119,78 @@ namespace uAdventure.Editor
 
             object position;
             parameters.TryGetValue("position", out position);
-            if (position == null) parameters.TryGetValue("Position", out position);
+            if (position == null)
+            {
+                parameters.TryGetValue("Position", out position);
+            }
 
             if (position != null)
             {
-                if (position is Vector2d) this.position = (Vector2d)position;
-                else if (position is Vector2) this.position = ((Vector2)position).ToVector2d();
+                if (position is Vector2d)
+                {
+                    this.position = (Vector2d)position;
+                }
+                else if (position is Vector2)
+                {
+                    this.position = ((Vector2)position).ToVector2d();
+                }
             }
 
 
             object scale;
             parameters.TryGetValue("scale", out scale);
-            if (scale == null) parameters.TryGetValue("Scale", out scale);
+            if (scale == null)
+            {
+                parameters.TryGetValue("Scale", out scale);
+            }
 
             if (scale != null)
             {
-                if (scale is float) this.scale = Vector3.one * ((float)scale);
-                else if (scale is Vector2) this.scale = new Vector3(((Vector2)scale).x, ((Vector2)scale).y, ((Vector2)scale).x);
-                else if (scale is Vector3) this.scale = (Vector3)scale;
+                if (scale is float)
+                {
+                    this.scale = Vector3.one * ((float)scale);
+                }
+                else if (scale is Vector2)
+                {
+                    this.scale = new Vector3(((Vector2)scale).x, ((Vector2)scale).y, ((Vector2)scale).x);
+                }
+                else if (scale is Vector3)
+                {
+                    this.scale = (Vector3)scale;
+                }
             }
 
 
             object rotation;
             parameters.TryGetValue("rotation", out rotation);
-            if (rotation == null) parameters.TryGetValue("Rotation", out rotation);
+            if (rotation == null)
+            {
+                parameters.TryGetValue("Rotation", out rotation);
+            }
 
             if (rotation != null)
             {
-                if (rotation is float) this.rotation = ((float)rotation);
+                if (rotation is float)
+                {
+                    this.rotation = ((float)rotation);
+                }
 
                 Debug.Log("Rotation is not used in edit mode, but its value is: " + this.rotation);
             }
 
             object interactionRange;
             parameters.TryGetValue("interactionRange", out interactionRange);
-            if (interactionRange == null) parameters.TryGetValue("InteractionRange", out interactionRange);
+            if (interactionRange == null)
+            {
+                parameters.TryGetValue("InteractionRange", out interactionRange);
+            }
 
             if (interactionRange != null)
             {
-                if (interactionRange is float) this.interactionRange = ((float)interactionRange);
+                if (interactionRange is float)
+                {
+                    this.interactionRange = ((float)interactionRange);
+                }
             }
         }
 
@@ -188,7 +224,9 @@ namespace uAdventure.Editor
         public void Repositionate(GUIMap map, Rect area)
         {
             if (!reference.TransformManagerParameters.ContainsKey("Position"))
+            {
                 reference.TransformManagerParameters.Add("Position", Vector2d.zero);
+            }
 
             reference.TransformManagerParameters["Position"] = map.GeoMousePosition;
         }
@@ -212,33 +250,60 @@ namespace uAdventure.Editor
             var parameters = reference.TransformManagerParameters;
             object position;
             parameters.TryGetValue("position", out position);
-            if (position == null) parameters.TryGetValue("Position", out position);
+            if (position == null)
+            {
+                parameters.TryGetValue("Position", out position);
+            }
 
             if (position != null)
             {
-                if (position is Vector2d) this.position = ((Vector2d)position).ToVector2();
-                else if (position is Vector2) this.position = (Vector2)position;
+                if (position is Vector2d)
+                {
+                    this.position = ((Vector2d)position).ToVector2();
+                }
+                else if (position is Vector2)
+                {
+                    this.position = (Vector2)position;
+                }
             }
 
 
             object scale;
             parameters.TryGetValue("scale", out scale);
-            if (scale == null) parameters.TryGetValue("Scale", out scale);
+            if (scale == null)
+            {
+                parameters.TryGetValue("Scale", out scale);
+            }
 
             if (scale != null)
             {
-                if (scale is float) this.scale = Vector3.one * ((float)scale);
-                else if (scale is Vector2) this.scale = new Vector3(((Vector2)scale).x, ((Vector2)scale).y, ((Vector2)scale).x);
-                else if (scale is Vector3) this.scale = (Vector3)scale;
+                if (scale is float)
+                {
+                    this.scale = Vector3.one * ((float)scale);
+                }
+                else if (scale is Vector2)
+                {
+                    this.scale = new Vector3(((Vector2)scale).x, ((Vector2)scale).y, ((Vector2)scale).x);
+                }
+                else if (scale is Vector3)
+                {
+                    this.scale = (Vector3)scale;
+                }
             }
 
             object rotation;
             parameters.TryGetValue("rotation", out rotation);
-            if (rotation == null) parameters.TryGetValue("Rotation", out rotation);
+            if (rotation == null)
+            {
+                parameters.TryGetValue("Rotation", out rotation);
+            }
 
             if (rotation != null)
             {
-                if (rotation is float) this.rotation = ((float)rotation);
+                if (rotation is float)
+                {
+                    this.rotation = ((float)rotation);
+                }
 
                 Debug.Log("Rotation is not used in edit mode, but its value is: " + this.rotation);
             }
@@ -265,7 +330,9 @@ namespace uAdventure.Editor
         public void Repositionate(GUIMap map, Rect area)
         {
             if (!reference.TransformManagerParameters.ContainsKey("Position"))
+            {
                 reference.TransformManagerParameters.Add("Position", Vector2.zero);
+            }
 
             var elemMapPosition = Event.current.mousePosition - area.position;
             
@@ -304,51 +371,87 @@ namespace uAdventure.Editor
 
             object degree;
             parameters.TryGetValue("degree", out degree);
-            if (degree == null) parameters.TryGetValue("Degree", out degree);
+            if (degree == null)
+            {
+                parameters.TryGetValue("Degree", out degree);
+            }
 
             if (degree != null)
             {
-                if (degree is float) this.degree = ((float)degree);
+                if (degree is float)
+                {
+                    this.degree = ((float)degree);
+                }
             }
 
             object distance;
             parameters.TryGetValue("distance", out distance);
-            if (distance == null) parameters.TryGetValue("Distance", out distance);
+            if (distance == null)
+            {
+                parameters.TryGetValue("Distance", out distance);
+            }
 
             if (distance != null)
             {
-                if (distance is float) this.distance = ((float)distance);
+                if (distance is float)
+                {
+                    this.distance = ((float)distance);
+                }
             }
             
             object scale;
             parameters.TryGetValue("scale", out scale);
-            if (scale == null) parameters.TryGetValue("Scale", out scale);
+            if (scale == null)
+            {
+                parameters.TryGetValue("Scale", out scale);
+            }
 
             if (scale != null)
             {
-                if (scale is float) this.scale = Vector3.one * ((float)scale);
-                else if (scale is Vector2) this.scale = new Vector3(((Vector2)scale).x, ((Vector2)scale).y, ((Vector2)scale).x);
-                else if (scale is Vector3) this.scale = (Vector3)scale;
+                if (scale is float)
+                {
+                    this.scale = Vector3.one * ((float)scale);
+                }
+                else if (scale is Vector2)
+                {
+                    this.scale = new Vector3(((Vector2)scale).x, ((Vector2)scale).y, ((Vector2)scale).x);
+                }
+                else if (scale is Vector3)
+                {
+                    this.scale = (Vector3)scale;
+                }
             }
 
             object rotation;
             parameters.TryGetValue("rotation", out rotation);
-            if (rotation == null) parameters.TryGetValue("Rotation", out rotation);
+            if (rotation == null)
+            {
+                parameters.TryGetValue("Rotation", out rotation);
+            }
 
             if (rotation != null)
             {
-                if (rotation is float) this.rotation = ((float)rotation);
+                if (rotation is float)
+                {
+                    this.rotation = ((float)rotation);
+                }
 
                 Debug.Log("Rotation is not used in edit mode, but its value is: " + this.rotation);
             }
 
             object rotateAround;
             parameters.TryGetValue("rotateAround", out rotateAround);
-            if (rotateAround == null) parameters.TryGetValue("RotateAround", out rotateAround);
+            if (rotateAround == null)
+            {
+                parameters.TryGetValue("RotateAround", out rotateAround);
+            }
 
             if (rotateAround != null)
             {
-                if (rotateAround is bool) this.rotateAround = ((bool)rotateAround);
+                if (rotateAround is bool)
+                {
+                    this.rotateAround = ((bool)rotateAround);
+                }
 
                 Debug.Log("RotateAround is not used in edit mode, but its value is: " + this.rotateAround);
             }
@@ -388,7 +491,10 @@ namespace uAdventure.Editor
         {
             var centerMouseVector = (map.GeoMousePosition - map.Center).normalized;
             float angle = Vector3.Angle(new Vector3(0.0f, 1.0f, 0.0f), new Vector3((float)centerMouseVector.x, (float)centerMouseVector.y, 0.0f));
-            if (centerMouseVector.x < 0.0f) angle = 360.0f - angle;
+            if (centerMouseVector.x < 0.0f)
+            {
+                angle = 360.0f - angle;
+            }
 
             reference.TransformManagerParameters["Degree"] = angle;
         }

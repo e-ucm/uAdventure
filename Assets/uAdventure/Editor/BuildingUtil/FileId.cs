@@ -236,7 +236,10 @@ namespace uAdventure.Editor
 
             var fileInfo = new System.IO.FileInfo(outputPath);
             if (!System.IO.Directory.Exists(fileInfo.DirectoryName))
+            {
                 System.IO.Directory.CreateDirectory(fileInfo.DirectoryName);
+            }
+
             System.IO.File.WriteAllText(outputPath, String.Join("\n", guids.Select(kv => kv.Value.Key + "," + Compute(kv.Key) + "," + kv.Value.Value).ToArray()));
         }
 
@@ -296,7 +299,9 @@ namespace uAdventure.Editor
             {
                 AssetDatabase.StartAssetEditing();
                 foreach (string path in paths)
+                {
                     AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate | ImportAssetOptions.ImportRecursive);
+                }
             }
             finally
             {

@@ -184,7 +184,9 @@ namespace uAdventure.Editor
 
                 // Store the incidence
                 if (incidences != null)
+                {
                     incidences.Add(currentPath + " >> " + TC.get("Operation.AdventureConsistencyErrorBookParagraph"));
+                }
             }
 
             return valid;

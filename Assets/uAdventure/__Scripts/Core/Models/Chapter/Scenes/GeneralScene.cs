@@ -256,7 +256,9 @@ namespace uAdventure.Core
             {
                 gs.resources = new List<ResourcesUni>();
                 foreach (ResourcesUni r in resources)
+                {
                     gs.resources.Add((ResourcesUni)r.Clone());
+                }
             }
             gs.type = type;
             return gs;

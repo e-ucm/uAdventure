@@ -88,7 +88,9 @@ namespace uAdventure.Geo
 
             navigating = true;
             if (Steps.Count > 0)
+            {
                 currentStep = Steps[0];
+            }
 
             SaveNavigation();
         }
@@ -218,7 +220,9 @@ namespace uAdventure.Geo
 
             var mb = GetReference(currentStep.Reference);
             if (mb == null)
+            {
                 return false; // If the element is not there, just try to skip it
+            }
             else if (mb is GeoWrapper)
             {
                 var wrap = mb as GeoWrapper;
@@ -247,7 +251,10 @@ namespace uAdventure.Geo
                     && (!GPSController.Instance.IsStarted() || geomb.Element.Geometry.InsideInfluence(Input.location.lastData.LatLonD()))
                     && (GPSController.Instance.IsStarted() || character);
             }
-            else return false;
+            else
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -269,7 +276,9 @@ namespace uAdventure.Geo
             {
                 // If this is the first time we deal with this step, lets say we are in the 0
                 if (!completedElementsForStep.ContainsKey(currentStep))
+                {
                     completedElementsForStep.Add(currentStep, 0);
+                }
 
                 // Add one
                 completedElementsForStep[currentStep]++;
@@ -342,8 +351,14 @@ namespace uAdventure.Geo
             var notCompleted = steps
                 .FindAll(e => !stepCompleted[e] && !double.IsNaN(GetElementPosition(e.Reference).x)); // Filter the completed
 
-            if (notCompleted.Count > 0) return notCompleted.FindMin(s => GM.SeparationInMeters(GetElementPosition(s.Reference), latLon)); // Order the rest to distance
-            else return null;
+            if (notCompleted.Count > 0)
+            {
+                return notCompleted.FindMin(s => GM.SeparationInMeters(GetElementPosition(s.Reference), latLon)); // Order the rest to distance
+            }
+            else
+            {
+                return null;
+            }
         }
 
         /// <summary>
@@ -354,7 +369,10 @@ namespace uAdventure.Geo
         private Vector2d GetElementPosition(string reference)
         {
             var mb = GetReference(reference);
-            if (mb == null) return new Vector2d(double.NaN, double.NaN);
+            if (mb == null)
+            {
+                return new Vector2d(double.NaN, double.NaN);
+            }
 
             if(mb is GeoElementMB)
             {

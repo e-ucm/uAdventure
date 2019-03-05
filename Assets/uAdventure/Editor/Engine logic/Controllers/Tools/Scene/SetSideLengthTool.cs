@@ -40,7 +40,10 @@ namespace uAdventure.Editor
             {
                 SetSideLengthTool crvt = (SetSideLengthTool)other;
                 if (crvt.side != side)
+                {
                     return false;
+                }
+
                 value = crvt.value;
                 timeStamp = crvt.timeStamp;
                 return true;

@@ -33,7 +33,9 @@ namespace uAdventure.Editor
             // Create the subcontrollers
             npcsDataControlList = new List<NPCDataControl>();
             foreach (NPC npc in npcsList)
+            {
                 npcsDataControlList.Add(new NPCDataControl(npc));
+            }
         }
 
         /**
@@ -72,7 +74,9 @@ namespace uAdventure.Editor
             // Create the list for the characters
             npcsInfo = new string[npcsList.Count][];
             for (int i = 0; i < npcsList.Count; i++)
+            {
                 npcsInfo[i] = new string[2];
+            }
 
             // Fill the array with the info
             for (int i = 0; i < npcsList.Count; i++)
@@ -102,7 +106,9 @@ namespace uAdventure.Editor
             for (int i = 0; i < npcsList.Count; i++)
             {
                 if (npcsList[i].getId().Equals(id))
+                {
                     return i;
+                }
             }
             return -1;
         }
@@ -160,7 +166,9 @@ namespace uAdventure.Editor
 
                 // Show a dialog asking for the character id
                 if (string.IsNullOrEmpty(npcId))
+                {
                     controller.ShowInputDialog(TC.get("Operation.AddNPCTitle"), TC.get("Operation.AddNPCMessage"), TC.get("Operation.AddNPCDefaultValue"), performAddElement);
+                }
                 else
                 {
                     controller.DataModified();
@@ -177,7 +185,9 @@ namespace uAdventure.Editor
         {
             // If some value was typed and the identifier is valid
             if (!controller.isElementIdValid(npcId))
+            {
                 npcId = controller.makeElementValid(npcId);
+            }
 
             // Add thew new character
             NPC newNPC = new NPC(npcId);
@@ -191,15 +201,19 @@ namespace uAdventure.Editor
         {
 
             if (!(dataControl is NPCDataControl))
+            {
                 return false;
+            }
 
 
             NPC newElement = (NPC)(((NPC)(dataControl.getContent())).Clone());
 			string id = newElement.getId();
 
 			if (!controller.isElementIdValid (id))
-				id = controller.makeElementValid (id);
-			
+            {
+                id = controller.makeElementValid (id);
+            }
+
             newElement.setId(id);
             npcsList.Add(newElement);
             npcsDataControlList.Add(new NPCDataControl(newElement));
@@ -295,7 +309,9 @@ namespace uAdventure.Editor
 
             // Iterate through each character
             foreach (NPCDataControl npcDataControl in npcsDataControlList)
+            {
                 npcDataControl.updateVarFlagSummary(varFlagSummary);
+            }
         }
 
 
@@ -325,7 +341,9 @@ namespace uAdventure.Editor
 
             // Iterate through each character
             foreach (NPCDataControl npcDataControl in npcsDataControlList)
+            {
                 count += npcDataControl.countAssetReferences(assetPath);
+            }
 
             return count;
         }
@@ -336,7 +354,9 @@ namespace uAdventure.Editor
 
             // Iterate through each item
             foreach (NPCDataControl npcDataControl in npcsDataControlList)
+            {
                 npcDataControl.getAssetReferences(assetPaths, assetTypes);
+            }
         }
 
 
@@ -345,7 +365,9 @@ namespace uAdventure.Editor
 
             // Iterate through each character
             foreach (NPCDataControl npcDataControl in npcsDataControlList)
+            {
                 npcDataControl.deleteAssetReferences(assetPath);
+            }
         }
 
 
@@ -356,7 +378,9 @@ namespace uAdventure.Editor
 
             // Iterate through each character
             foreach (NPCDataControl npcDataControl in npcsDataControlList)
+            {
                 count += npcDataControl.countIdentifierReferences(id);
+            }
 
             return count;
         }
@@ -367,7 +391,9 @@ namespace uAdventure.Editor
 
             // Iterate through each character
             foreach (NPCDataControl npcDataControl in npcsDataControlList)
+            {
                 npcDataControl.replaceIdentifierReferences(oldId, newId);
+            }
         }
 
 
@@ -376,7 +402,9 @@ namespace uAdventure.Editor
 
             // Spread the call to every character
             foreach (NPCDataControl npcDataControl in npcsDataControlList)
+            {
                 npcDataControl.deleteIdentifierReferences(id);
+            }
         }
 
 
@@ -408,7 +436,9 @@ namespace uAdventure.Editor
             foreach (NPC npc in npcsList)
             {
                 if (npc.getId().Equals(id))
+                {
                     return npc;
+                }
             }
             return null;
 

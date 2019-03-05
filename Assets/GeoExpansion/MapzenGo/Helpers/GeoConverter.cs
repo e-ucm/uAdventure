@@ -127,8 +127,13 @@ namespace MapzenGo.Helpers
         public static double ZoomForPixelSize(double pixelSize)
         {
             for (var i = 0; i < 30; i++)
+            {
                 if (pixelSize > Resolution(i))
+                {
                     return i != 0 ? i - 1 : 0;
+                }
+            }
+
             throw new InvalidOperationException();
         }
 

@@ -24,9 +24,14 @@ namespace uAdventure.Editor
 
             resultSet.Clear();
             if (caseSensitive)
+            {
                 Searchable.searchedText = text;
+            }
             else
+            {
                 Searchable.searchedText = text.ToLower();
+            }
+
             Searchable.caseSensitive = caseSensitive;
             Searchable.fullMatch = fullMatch;
             this.recursiveSearch();
@@ -45,7 +50,9 @@ namespace uAdventure.Editor
                 resultSet.Add(this, places);
             }
             if (!places.Contains(where))
-                places.Add(where);
+            {
+                places.Add(@where);
+            }
         }
 
         protected void check(string value, string desc)
@@ -56,16 +63,24 @@ namespace uAdventure.Editor
                 if (!fullMatch)
                 {
                     if (!caseSensitive && value.ToLower().Contains(searchedText))
+                    {
                         addResult(desc);
+                    }
                     else if (caseSensitive && value.Contains(searchedText))
+                    {
                         addResult(desc);
+                    }
                 }
                 else
                 {
                     if (!caseSensitive && value.ToLower().Equals(searchedText))
+                    {
                         addResult(desc);
+                    }
                     else if (caseSensitive && value.Equals(searchedText))
+                    {
                         addResult(desc);
+                    }
                 }
             }
         }
@@ -79,13 +94,21 @@ namespace uAdventure.Editor
                 {
                     Dictionary<string, string> properties = conditions.getCondition(i, j);
                     if (properties.ContainsKey(ConditionsController.CONDITION_ID))
+                    {
                         check(properties[ConditionsController.CONDITION_ID], desc + " (ID)");
+                    }
+
                     if (properties.ContainsKey(ConditionsController.CONDITION_STATE))
                         // CHECK!!!
+                    {
                         check(properties[ConditionsController.CONDITION_STATE], desc + " ()");
+                    }
+
                     if (properties.ContainsKey(ConditionsController.CONDITION_VALUE))
                         // CHECK!!!
+                    {
                         check(properties[ConditionsController.CONDITION_VALUE], desc + " ()");
+                    }
                 }
             }
         }

@@ -54,7 +54,11 @@ namespace MapzenGo.Models
             var layers = new List<string>();
             foreach (var plugin in _plugins.OfType<Factory>())
             {
-                if (layers.Contains(plugin.XmlTag)) continue;
+                if (layers.Contains(plugin.XmlTag))
+                {
+                    continue;
+                }
+
                 layers.Add(plugin.XmlTag);
             }
             _mapzenLayers = string.Join(",", layers.ToArray());
@@ -69,7 +73,9 @@ namespace MapzenGo.Models
 
             var zoomFolder = CacheFolderPath.Format(tile.Zoom);
             if (!Directory.Exists(zoomFolder))
+            {
                 Directory.CreateDirectory(zoomFolder);
+            }
 
             var tilePath = Path.Combine(zoomFolder, _mapzenLayers.Replace(',', '_') + "_" + tile.TileTms.x + "_" + tile.TileTms.y);
             if (File.Exists(tilePath))
@@ -107,8 +113,10 @@ namespace MapzenGo.Models
             heavyMethod.ObserveOnMainThread().Subscribe(mapData =>
             {
                 if (tile) // checks if tile still exists and haven't destroyed yet
+                {
                     tile.Data = mapData;
-                
+                }
+
                 finished(true);
             });
         }

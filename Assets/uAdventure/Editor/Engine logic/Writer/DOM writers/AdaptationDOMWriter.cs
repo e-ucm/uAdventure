@@ -79,9 +79,14 @@ namespace uAdventure.Editor
                     if (initialState.isFlag(i))
                     {
                         if (AdaptedState.isActivateOp(initialState.getAction(i)))
+                        {
                             actionFlag = doc.CreateElement("activate");
+                        }
+
                         if (AdaptedState.isDeactivateOp(initialState.getAction(i)))
+                        {
                             actionFlag = doc.CreateElement("deactivate");
+                        }
 
                         actionFlag.SetAttribute("flag", initialState.getFlagVar(i));
                     }
@@ -89,11 +94,17 @@ namespace uAdventure.Editor
                     {
                         if (AdaptedState.isSetValueOp(initialState.getAction(i)))
                             // get only the title of the operation
+                        {
                             actionFlag = doc.CreateElement("set-value");
+                        }
                         else if (AdaptedState.isIncrementOp(initialState.getAction(i)))
+                        {
                             actionFlag = doc.CreateElement("increment");
+                        }
                         else if (AdaptedState.isDecrementOp(initialState.getAction(i)))
+                        {
                             actionFlag = doc.CreateElement("decrement");
+                        }
 
                         //set the name of the current var
                         actionFlag.SetAttribute("var", initialState.getFlagVar(i));
@@ -117,9 +128,14 @@ namespace uAdventure.Editor
                 //Append rule description
                 XmlNode descriptionNode = doc.CreateElement("ruleDescription");
                 if (rule.getDescription() != null)
+                {
                     descriptionNode.AppendChild(doc.CreateTextNode(rule.getDescription()));
+                }
                 else
+                {
                     descriptionNode.AppendChild(doc.CreateTextNode(""));
+                }
+
                 ruleNode.AppendChild(descriptionNode);
 
                 //Append uol-state
@@ -155,9 +171,15 @@ namespace uAdventure.Editor
                         if (rule.getAdaptedState().isFlag(i))
                         {
                             if (AdaptedState.isActivateOp(rule.getAdaptedState().getAction(i)))
+                            {
                                 actionFlag = doc.CreateElement("activate");
+                            }
+
                             if (AdaptedState.isDeactivateOp(rule.getAdaptedState().getAction(i)))
+                            {
                                 actionFlag = doc.CreateElement("deactivate");
+                            }
+
                             actionFlag.SetAttribute("flag", rule.getAdaptedState().getFlagVar(i));
 
                         }
@@ -166,15 +188,21 @@ namespace uAdventure.Editor
                             // check if this operation is "set-value"
                             if (AdaptedState.isSetValueOp(rule.getAdaptedState().getAction(i)))
                                 // get only the title of the operation
+                            {
                                 actionFlag = doc.CreateElement("set-value");
+                            }
                             // check if this operation is "increment"
                             else if (AdaptedState.isIncrementOp(rule.getAdaptedState().getAction(i)))
                                 // get only the title of the operation
+                            {
                                 actionFlag = doc.CreateElement("increment");
+                            }
                             // check if this operation is "decrement"
                             else if (AdaptedState.isDecrementOp(rule.getAdaptedState().getAction(i)))
                                 // get only the title of the operation
+                            {
                                 actionFlag = doc.CreateElement("decrement");
+                            }
 
                             //set the name of the current var
                             actionFlag.SetAttribute("var", rule.getAdaptedState().getFlagVar(i));

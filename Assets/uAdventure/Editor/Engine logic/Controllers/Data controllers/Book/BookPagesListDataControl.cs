@@ -93,8 +93,13 @@ namespace uAdventure.Editor
 
             // Spread the call to the pages
             foreach (BookPage bookPage in bookPagesList)
+            {
                 if (bookPage.getUri().Equals(assetPath) && (bookPage.getType() == BookPage.TYPE_RESOURCE || bookPage.getType() == BookPage.TYPE_IMAGE))
+                {
                     count++;
+                }
+            }
+
             return count;
         }
 
@@ -123,9 +128,13 @@ namespace uAdventure.Editor
                         int last = assetPaths.Count;
                         assetPaths.Insert(last, uri);
                         if (bookPage.getType() == BookPage.TYPE_RESOURCE)
+                        {
                             assetTypes.Insert(last, AssetsConstants.CATEGORY_STYLED_TEXT);
+                        }
                         else if (bookPage.getType() == BookPage.TYPE_IMAGE)
+                        {
                             assetTypes.Insert(last, AssetsConstants.CATEGORY_IMAGE);
+                        }
                     }
                 }
             }
@@ -138,12 +147,17 @@ namespace uAdventure.Editor
 
             //Spread the call to the paragraphs
             foreach (BookPage bookPage in bookPagesList)
+            {
                 if (bookPage.getUri().Equals(assetPath) && (bookPage.getType() == BookPage.TYPE_RESOURCE || bookPage.getType() == BookPage.TYPE_IMAGE))
+                {
                     toRemove.Add(bookPage);
+                }
+            }
 
             foreach (BookPage bookPage in toRemove)
+            {
                 bookPagesList.Remove(bookPage);
-
+            }
         }
 
         public BookPage changeCurrentPage(int page)
@@ -163,7 +177,9 @@ namespace uAdventure.Editor
 
             string selectedAsset = null;
             if (selectedPage < 0 || selectedPage >= bookPagesList.Count)
+            {
                 return false;
+            }
             ////TODO: implement
             //AssetChooser chooser = AssetsController.getAssetChooser(AssetsConstants.CATEGORY_STYLED_TEXT, AssetsController.FILTER_NONE);
             //int option = chooser.showAssetChooser(Controller.getInstance().peekWindow());
@@ -218,7 +234,9 @@ namespace uAdventure.Editor
 
             string selectedAsset = null;
             if (selectedPage < 0 || selectedPage >= bookPagesList.Count)
+            {
                 return false;
+            }
             ////TODO: implement
             //AssetChooser chooser = AssetsController.getAssetChooser(AssetsConstants.CATEGORY_IMAGE, AssetsController.FILTER_NONE);
             //int option = chooser.showAssetChooser(Controller.getInstance().peekWindow());
@@ -362,7 +380,9 @@ namespace uAdventure.Editor
                 {
                     isPageValid = false;
                     if (incidences != null)
+                    {
                         incidences.Add(bookParagraphPath + " >> " + TC.get("Operation.AdventureConsistencyErrorBookPage"));
+                    }
                 }
                 valid &= isPageValid;
 
@@ -376,9 +396,13 @@ namespace uAdventure.Editor
         {
 
             if (selectedPage >= 0 && selectedPage < bookPagesList.Count)
+            {
                 return bookPagesList[selectedPage];
+            }
             else
+            {
                 return null;
+            }
         }
 
         public int getIndexSelectedPage()

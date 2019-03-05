@@ -115,9 +115,13 @@ namespace uAdventure.Editor
             // Create and append the voice name and if is alwaysSynthesizer
             voiceNode.SetAttribute("name", character.getVoice());
             if (character.isAlwaysSynthesizer())
+            {
                 voiceNode.SetAttribute("synthesizeAlways", "yes");
+            }
             else
+            {
                 voiceNode.SetAttribute("synthesizeAlways", "no");
+            }
 
             // Append the voice tag
 

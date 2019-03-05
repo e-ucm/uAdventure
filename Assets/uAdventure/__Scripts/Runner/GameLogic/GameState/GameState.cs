@@ -392,12 +392,16 @@ namespace uAdventure.Runner
                 if(varFlagChangeAmbits.Count > 0)
                 {
                     foreach(var varChange in currentAmbit)
+                    {
                         varFlagChangeAmbits.Peek().Add(varChange);
+                    }
                 }
                 else
                 {
                     foreach (var varChange in currentAmbit)
+                    {
                         TrackerAsset.Instance.setVar(varChange.Key, varChange.Value);
+                    }
                 }
             }
 

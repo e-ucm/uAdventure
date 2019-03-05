@@ -272,7 +272,9 @@ namespace uAdventure.Core
             foreach (AssessmentProfile profile in assessmentProfiles)
             {
                 if (profile.getName().Equals(assessmentName))
+                {
                     return profile;
+                }
             }
             return null;
         }
@@ -288,7 +290,9 @@ namespace uAdventure.Core
             foreach (AdaptationProfile profile in adaptationProfiles)
             {
                 if (profile.getName().Equals(adaptationName))
+                {
                     return profile;
+                }
             }
             return null;
         }
@@ -303,7 +307,10 @@ namespace uAdventure.Core
 
             string[] names = new string[adaptationProfiles.Count];
             for (int i = 0; i < adaptationProfiles.Count; i++)
+            {
                 names[i] = adaptationProfiles[i].getName();
+            }
+
             return names;
         }
 
@@ -317,7 +324,10 @@ namespace uAdventure.Core
 
             string[] names = new string[assessmentProfiles.Count];
             for (int i = 0; i < assessmentProfiles.Count; i++)
+            {
                 names[i] = assessmentProfiles[i].getName();
+            }
+
             return names;
         }
 

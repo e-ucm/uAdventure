@@ -233,7 +233,9 @@ namespace uAdventure.Editor
                 return getEffectInfo(effect);
             }
             else
+            {
                 return null;
+            }
         }
 
         /**
@@ -284,19 +286,29 @@ namespace uAdventure.Editor
                         icon = (Sprite)Resources.Load("img/icons/effects/16x16/activate.png", typeof(Sprite));
                         if (((SpeakPlayerEffect)effect).getAudioPath() != null &&
                             !((SpeakPlayerEffect)effect).getAudioPath().Equals(""))
+                        {
                             icon =
                                 (Sprite)
-                                    Resources.Load("img/icons/effects/16x16/speak-player-withsound.png", typeof(Sprite));
+                                Resources.Load("img/icons/effects/16x16/speak-player-withsound.png", typeof(Sprite));
+                        }
                         else
+                        {
                             icon = (Sprite)Resources.Load("img/icons/effects/16x16/speak-player.png", typeof(Sprite));
+                        }
+
                         break;
                     case EffectType.SPEAK_CHAR:
                         if (((SpeakCharEffect)effect).getAudioPath() != null &&
                             !((SpeakCharEffect)effect).getAudioPath().Equals(""))
+                        {
                             icon =
                                 (Sprite)Resources.Load("img/icons/effects/16x16/speak-npc-withsound.png", typeof(Sprite));
+                        }
                         else
+                        {
                             icon = (Sprite)Resources.Load("img/icons/effects/16x16/speak-npc.png", typeof(Sprite));
+                        }
+
                         break;
                     case EffectType.TRIGGER_BOOK:
                         icon = (Sprite)Resources.Load("img/icons/effects/16x16/trigger-book.png", typeof(Sprite));
@@ -334,10 +346,15 @@ namespace uAdventure.Editor
                     case EffectType.SHOW_TEXT:
                         if (((ShowTextEffect)effect).getAudioPath() != null &&
                             !((ShowTextEffect)effect).getAudioPath().Equals(""))
+                        {
                             icon =
                                 (Sprite)Resources.Load("img/icons/effects/16x16/show-text-withsound.png", typeof(Sprite));
+                        }
                         else
+                        {
                             icon = (Sprite)Resources.Load("img/icons/effects/16x16/show-text.png", typeof(Sprite));
+                        }
+
                         break;
                     case EffectType.HIGHLIGHT_ITEM:
                         icon = (Sprite)Resources.Load("img/icons/effects/16x16/highlight-item.png", typeof(Sprite));
@@ -443,9 +460,15 @@ namespace uAdventure.Editor
                     string posInfo = "";
                     string negInfo = "";
                     if (randomEffect.getPositiveEffect() != null)
+                    {
                         posInfo = getEffectInfo(randomEffect.getPositiveEffect());
+                    }
+
                     if (randomEffect.getNegativeEffect() != null)
+                    {
                         negInfo = getEffectInfo(randomEffect.getNegativeEffect());
+                    }
+
                     effectInfo = "Effect.RandomInfo" + randomEffect.getProbability() + " " +
                                  (100 - randomEffect.getProbability()) + " " + posInfo + " " + negInfo;
                     break;
@@ -461,15 +484,30 @@ namespace uAdventure.Editor
                 case EffectType.HIGHLIGHT_ITEM:
                     HighlightItemEffect highlightItemEffect = (HighlightItemEffect)effect;
                     if (highlightItemEffect.getHighlightType() == HighlightItemEffect.NO_HIGHLIGHT)
+                    {
                         effectInfo = "Effect.NoHighlightItemInfo" + " " + highlightItemEffect.getTargetId();
+                    }
+
                     if (highlightItemEffect.getHighlightType() == HighlightItemEffect.HIGHLIGHT_BLUE)
+                    {
                         effectInfo = "Effect.BlueHighlightItemInfo" + " " + highlightItemEffect.getTargetId();
+                    }
+
                     if (highlightItemEffect.getHighlightType() == HighlightItemEffect.HIGHLIGHT_GREEN)
+                    {
                         effectInfo = "Effect.GreenHighlightItemInfo" + " " + highlightItemEffect.getTargetId();
+                    }
+
                     if (highlightItemEffect.getHighlightType() == HighlightItemEffect.HIGHLIGHT_RED)
+                    {
                         effectInfo = "Effect.RedHighlightItemInfo" + " " + highlightItemEffect.getTargetId();
+                    }
+
                     if (highlightItemEffect.getHighlightType() == HighlightItemEffect.HIGHLIGHT_BORDER)
+                    {
                         effectInfo = "Effect.BorderHighlightItemInfo" + " " + highlightItemEffect.getTargetId();
+                    }
+
                     break;
                 case EffectType.MOVE_OBJECT:
                     MoveObjectEffect moveObjectEffect = (MoveObjectEffect)effect;
@@ -522,9 +560,14 @@ namespace uAdventure.Editor
                     IEffect firstEffect = null;
                     IEffect secondEffect = null;
                     if (effectProperties.ContainsKey(EFFECT_PROPERTY_FIRST_EFFECT))
+                    {
                         firstEffect = (IEffect)effectProperties[EFFECT_PROPERTY_FIRST_EFFECT];
+                    }
+
                     if (effectProperties.ContainsKey(EFFECT_PROPERTY_SECOND_EFFECT))
+                    {
                         secondEffect = (IEffect)effectProperties[EFFECT_PROPERTY_SECOND_EFFECT];
+                    }
 
                     RandomEffect randomEffect = new RandomEffect(50);
                     if (effectProperties.ContainsKey(EffectsController.EFFECT_PROPERTY_PROBABILITY))
@@ -533,9 +576,15 @@ namespace uAdventure.Editor
                             int.Parse((string)effectProperties[EFFECT_PROPERTY_PROBABILITY]));
                     }
                     if (firstEffect != null)
+                    {
                         randomEffect.setPositiveEffect(firstEffect);
+                    }
+
                     if (secondEffect != null)
+                    {
                         randomEffect.setNegativeEffect(secondEffect);
+                    }
+
                     newEffect = randomEffect;
                 }
                 effectAdded = controller.AddTool(new AddEffectTool(effects, newEffect, conditionsList));
@@ -566,51 +615,75 @@ namespace uAdventure.Editor
             string text = (string)effectProperties[EFFECT_PROPERTY_TEXT];
             int value = 0;
             if (effectProperties.ContainsKey(EFFECT_PROPERTY_VALUE))
+            {
                 value = int.Parse((string)effectProperties[EFFECT_PROPERTY_VALUE]);
+            }
 
             int x = 0;
             if (effectProperties.ContainsKey(EFFECT_PROPERTY_X))
+            {
                 x = int.Parse((string)effectProperties[EFFECT_PROPERTY_X]);
+            }
 
             int y = 0;
             if (effectProperties.ContainsKey(EFFECT_PROPERTY_Y))
+            {
                 y = int.Parse((string)effectProperties[EFFECT_PROPERTY_Y]);
+            }
 
             bool background = false;
             if (effectProperties.ContainsKey(EFFECT_PROPERTY_BACKGROUND))
+            {
                 background = bool.Parse((string)effectProperties[EFFECT_PROPERTY_BACKGROUND]);
+            }
 
             int time = 0;
             if (effectProperties.ContainsKey(EFFECT_PROPERTY_TIME))
+            {
                 time = int.Parse((string)effectProperties[EFFECT_PROPERTY_TIME]);
+            }
 
             Color frontColor = default(Color);
             if (effectProperties.ContainsKey(EFFECT_PROPERTY_FRONT_COLOR))
+            {
                 ColorUtility.TryParseHtmlString((string)effectProperties[EFFECT_PROPERTY_FRONT_COLOR], out frontColor);
+            }
 
             Color borderColor = default(Color);
             if (effectProperties.ContainsKey(EFFECT_PROPERTY_BORDER_COLOR))
+            {
                 ColorUtility.TryParseHtmlString((string)effectProperties[EFFECT_PROPERTY_BORDER_COLOR], out borderColor);
+            }
 
             int type = 0;
             if (effectProperties.ContainsKey(EFFECT_PROPERTY_HIGHLIGHT_TYPE))
+            {
                 type = (int)effectProperties[EFFECT_PROPERTY_HIGHLIGHT_TYPE];
+            }
 
             bool animated = false;
             if (effectProperties.ContainsKey(EFFECT_PROPERTY_ANIMATED))
+            {
                 animated = (bool)effectProperties[EFFECT_PROPERTY_ANIMATED];
+            }
 
             float scale = 1.0f;
             if (effectProperties.ContainsKey(EFFECT_PROPERTY_SCALE))
+            {
                 scale = (float)effectProperties[EFFECT_PROPERTY_SCALE];
+            }
 
             int translationSpeed = 20;
             if (effectProperties.ContainsKey(EFFECT_PROPERTY_TRANSLATION_SPEED))
+            {
                 translationSpeed = (int)effectProperties[EFFECT_PROPERTY_TRANSLATION_SPEED];
+            }
 
             int scaleSpeed = 20;
             if (effectProperties.ContainsKey(EFFECT_PROPERTY_SCALE_SPEED))
+            {
                 scaleSpeed = (int)effectProperties[EFFECT_PROPERTY_SCALE_SPEED];
+            }
 
             switch (selectedType)
             {
@@ -858,7 +931,9 @@ namespace uAdventure.Editor
             if (effectType != EffectType.RANDOM_EFFECT)
                 // TODO: implement visual version of effect checker
                 //newProperties = EffectDialog.showEditEffectDialog(this, effectType, currentValues);
+            {
                 newProperties = null;
+            }
             else
             {
                 RandomEffect randomEffect = (RandomEffect)effect;
@@ -993,7 +1068,9 @@ namespace uAdventure.Editor
 
             // UPdate conditions
             if(effect is AbstractEffect)
+            {
                 ConditionsController.updateVarFlagSummary(varFlagSummary, ((AbstractEffect)effect).getConditions());
+            }
         }
 
         /**
@@ -1028,7 +1105,9 @@ namespace uAdventure.Editor
 
                     // Store the incidence
                     if (incidences != null)
+                    {
                         incidences.Add(currentPath);
+                    }
                 }
 
                 // If the effect is a sound without asset, set as invalid
@@ -1038,7 +1117,9 @@ namespace uAdventure.Editor
 
                     // Store the incidence
                     if (incidences != null)
+                    {
                         incidences.Add(currentPath);
+                    }
                 }
 
                 // If random effect
@@ -1048,9 +1129,15 @@ namespace uAdventure.Editor
                     RandomEffect randomEffect = (RandomEffect)effect;
                     Effects e = new Effects();
                     if (randomEffect.getPositiveEffect() != null)
+                    {
                         e.Add(randomEffect.getPositiveEffect());
+                    }
+
                     if (randomEffect.getNegativeEffect() != null)
+                    {
                         e.Add(randomEffect.getNegativeEffect());
+                    }
+
                     EffectsController.isValid(currentPath, incidences, e);
 
                 }
@@ -1086,7 +1173,9 @@ namespace uAdventure.Editor
                     (type == EffectType.PLAY_SOUND && ((PlaySoundEffect)effect).getPath().Equals(assetPath))
                     || type == EffectType.SPEAK_CHAR && ((SpeakCharEffect)effect).getAudioPath().Equals(assetPath)
                     || type == EffectType.SPEAK_PLAYER && ((SpeakPlayerEffect)effect).getAudioPath().Equals(assetPath))
+                {
                     count++;
+                }
 
                 // If random effect
                 else if (type == EffectType.RANDOM_EFFECT)
@@ -1095,9 +1184,15 @@ namespace uAdventure.Editor
                     RandomEffect randomEffect = (RandomEffect)effect;
                     Effects e = new Effects();
                     if (randomEffect.getPositiveEffect() != null)
+                    {
                         e.Add(randomEffect.getPositiveEffect());
+                    }
+
                     if (randomEffect.getNegativeEffect() != null)
+                    {
                         e.Add(randomEffect.getNegativeEffect());
+                    }
+
                     count += EffectsController.countAssetReferences(assetPath, e);
 
                 }
@@ -1171,9 +1266,14 @@ namespace uAdventure.Editor
                     RandomEffect randomEffect = (RandomEffect)effect;
                     Effects e = new Effects();
                     if (randomEffect.getPositiveEffect() != null)
+                    {
                         e.Add(randomEffect.getPositiveEffect());
+                    }
+
                     if (randomEffect.getNegativeEffect() != null)
+                    {
                         e.Add(randomEffect.getNegativeEffect());
+                    }
 
                     EffectsController.getAssetReferences(assetPaths, assetTypes, e);
                 }
@@ -1265,9 +1365,15 @@ namespace uAdventure.Editor
                     RandomEffect randomEffect = (RandomEffect)effect;
                     Effects e = new Effects();
                     if (randomEffect.getPositiveEffect() != null)
+                    {
                         e.Add(randomEffect.getPositiveEffect());
+                    }
+
                     if (randomEffect.getNegativeEffect() != null)
+                    {
                         e.Add(randomEffect.getNegativeEffect());
+                    }
+
                     EffectsController.deleteAssetReferences(assetPath, e);
                 }
             }
@@ -1301,13 +1407,21 @@ namespace uAdventure.Editor
                     RandomEffect randomEffect = (RandomEffect)effect;
                     Effects e = new Effects();
                     if (randomEffect.getPositiveEffect() != null)
+                    {
                         e.Add(randomEffect.getPositiveEffect());
+                    }
+
                     if (randomEffect.getNegativeEffect() != null)
+                    {
                         e.Add(randomEffect.getNegativeEffect());
+                    }
+
                     EffectsController.countIdentifierReferences(id, e);
                 }
                 else if (effect is HasTargetId && ((HasTargetId)effect).getTargetId().Equals(id))
+                {
                     count++;
+                }
 
                 if(effect is AbstractEffect)
                 {
@@ -1340,7 +1454,9 @@ namespace uAdventure.Editor
                 is HasTargetId)
                 {
                     if (((HasTargetId)effect).getTargetId().Equals(oldId))
+                    {
                         ((HasTargetId)effect).setTargetId(newId);
+                    }
                 }
                 else
                 if (effect.getType() == EffectType.RANDOM_EFFECT)
@@ -1348,9 +1464,15 @@ namespace uAdventure.Editor
                     RandomEffect randomEffect = (RandomEffect)effect;
                     Effects e = new Effects();
                     if (randomEffect.getPositiveEffect() != null)
+                    {
                         e.Add(randomEffect.getPositiveEffect());
+                    }
+
                     if (randomEffect.getNegativeEffect() != null)
+                    {
                         e.Add(randomEffect.getNegativeEffect());
+                    }
+
                     EffectsController.replaceIdentifierReferences(oldId, newId, e);
                 }
 
@@ -1425,10 +1547,13 @@ namespace uAdventure.Editor
 
                 // Delete the effect, or increase the counter
                 if (deleteEffect)
+                {
                     effects.getEffects().RemoveAt(i);
+                }
                 else
+                {
                     i++;
-
+                }
             }
         }
 

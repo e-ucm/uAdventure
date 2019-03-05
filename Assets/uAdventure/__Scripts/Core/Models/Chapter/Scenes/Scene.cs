@@ -349,7 +349,9 @@ namespace uAdventure.Core
 
             this.allowPlayerLayer = allowPlayerLayer;
             if (!allowPlayerLayer)
+            {
                 playerLayer = PLAYER_NO_ALLOWED;
+            }
         }
 
         /**
@@ -374,8 +376,9 @@ namespace uAdventure.Core
 
             this.playerLayer = playerLayer;
             if( playerLayer == PLAYER_NO_ALLOWED )
+            {
                 allowPlayerLayer = false;
-
+            }
         }
 
         public void setPlayerScale(float scale)
@@ -409,26 +412,34 @@ namespace uAdventure.Core
             {
                 s.activeAreas = new List<ActiveArea>();
                 foreach (ActiveArea aa in activeAreas)
+                {
                     s.activeAreas.Add((ActiveArea)aa.Clone());
+                }
             }
             s.allowPlayerLayer = allowPlayerLayer;
             if (atrezzoReferences != null)
             {
                 s.atrezzoReferences = new List<ElementReference>();
                 foreach (ElementReference er in atrezzoReferences)
+                {
                     s.atrezzoReferences.Add((ElementReference)er.Clone());
+                }
             }
             if (barriers != null)
             {
                 s.barriers = new List<Barrier>();
                 foreach (Barrier b in barriers)
+                {
                     s.barriers.Add((Barrier)b.Clone());
+                }
             }
             if (characterReferences != null)
             {
                 s.characterReferences = new List<ElementReference>();
                 foreach (ElementReference er in characterReferences)
+                {
                     s.characterReferences.Add((ElementReference)er.Clone());
+                }
             }
             s.defaultX = defaultX;
             s.defaultY = defaultY;
@@ -436,13 +447,17 @@ namespace uAdventure.Core
             {
                 s.exits = new List<Exit>();
                 foreach (Exit e in exits)
+                {
                     s.exits.Add((Exit)e.Clone());
+                }
             }
             if (itemReferences != null)
             {
                 s.itemReferences = new List<ElementReference>();
                 foreach (ElementReference er in itemReferences)
+                {
                     s.itemReferences.Add((ElementReference)er.Clone());
+                }
             }
             s.playerLayer = playerLayer;
             s.playerScale = playerScale;

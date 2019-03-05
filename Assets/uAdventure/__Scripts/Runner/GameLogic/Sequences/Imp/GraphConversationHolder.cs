@@ -93,9 +93,13 @@ namespace uAdventure.Runner
                     else
                     {
                         if (additional_effects != null)
+                        {
                             forcewait = additional_effects.execute();
+                        }
                         else
+                        {
                             forcewait = false;
+                        }
                     }
                 }
             }
@@ -163,7 +167,9 @@ namespace uAdventure.Runner
             bool forcewait = false;
 
             if (current == null)
+            {
                 current = nodes[0];
+            }
 
             while (!forcewait)
             {
@@ -178,7 +184,9 @@ namespace uAdventure.Runner
                     if (current.TracePending)
                     {
                         if (tracePendingNode != null)
+                        {
                             tracePendingNode.EndTrace();
+                        }
 
                         tracePendingNode = current;
                     }
@@ -187,14 +195,19 @@ namespace uAdventure.Runner
                     if (current == null)
                     {
                         if(tracePendingNode != null)
+                        {
                             tracePendingNode.EndTrace();
+                        }
+
                         break;
                     }
                 }
             }
 
             if (!forcewait)
+            {
                 this.current = null;
+            }
 
             return forcewait;
         }

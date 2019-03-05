@@ -66,9 +66,16 @@ namespace uAdventure.Editor
                                 var selected = sceneNames.ToList().IndexOf(element.getNextSceneId());
                                 EditorGUI.BeginChangeCheck();
                                 var newId = sceneNames[EditorGUI.Popup(columnRect, selected == -1 ? 0 : selected, sceneNames)];
-                                if (EditorGUI.EndChangeCheck()) element.setNextSceneId(newId == "---" ? "" : newId);
+                                if (EditorGUI.EndChangeCheck())
+                                {
+                                    element.setNextSceneId(newId == "---" ? "" : newId);
+                                }
                             }
-                            else GUI.Label(columnRect, element.getNextSceneId());
+                            else
+                            {
+                                GUI.Label(columnRect, element.getNextSceneId());
+                            }
+
                             break;
                         case 1:
                             if (GUI.Button(columnRect, element.getConditions().getBlocksCount() > 0 ? conditionsTex : noConditionsTex))
@@ -141,12 +148,18 @@ namespace uAdventure.Editor
                 // Transition type
                 EditorGUI.BeginChangeCheck();
                 var newtype = EditorGUILayout.Popup(TC.get("NextScene.Transition"), exit.getTransitionType(), transitionTypes);
-                if (EditorGUI.EndChangeCheck()) exit.setTransitionType(newtype);
+                if (EditorGUI.EndChangeCheck())
+                {
+                    exit.setTransitionType(newtype);
+                }
 
                 // Transition time
                 EditorGUI.BeginChangeCheck();
                 var newtime = EditorGUILayout.IntField(TC.get("NextScene.TransitionTime"), exit.getTransitionTime());
-                if (EditorGUI.EndChangeCheck()) exit.setTransitionTime(newtime);
+                if (EditorGUI.EndChangeCheck())
+                {
+                    exit.setTransitionTime(newtime);
+                }
             }
         }
 
@@ -243,7 +256,10 @@ namespace uAdventure.Editor
                 // HasNotEffets
                 EditorGUI.BeginChangeCheck();
                 var hasNotEffects = EditorGUILayout.BeginToggleGroup(TC.get("Exit.ActiveWhenConditionsArent"), exit.isHasNotEffects());
-                if (EditorGUI.EndChangeCheck()) exit.setHasNotEffects(hasNotEffects);
+                if (EditorGUI.EndChangeCheck())
+                {
+                    exit.setHasNotEffects(hasNotEffects);
+                }
 
                 // Not Effects
                 if (GUILayout.Button(TC.get("Exit.EditNotEffects")))

@@ -55,76 +55,112 @@ namespace UnityEngine {
 
         public static double Min(double a, double b) {
             if (a < b)
+            {
                 return a;
+            }
             else
+            {
                 return b;
+            }
         }
 
         public static double Min(params double[] values) {
             int length = values.Length;
             if (length == 0)
+            {
                 return 0.0d;
+            }
+
             double num = values[0];
             for (int index = 1; index < length; ++index) {
                 if (values[index] < num)
+                {
                     num = values[index];
+                }
             }
             return num;
         }
 
         public static int Min(int a, int b) {
             if (a < b)
+            {
                 return a;
+            }
             else
+            {
                 return b;
+            }
         }
 
         public static int Min(params int[] values) {
             int length = values.Length;
             if (length == 0)
+            {
                 return 0;
+            }
+
             int num = values[0];
             for (int index = 1; index < length; ++index) {
                 if (values[index] < num)
+                {
                     num = values[index];
+                }
             }
             return num;
         }
 
         public static double Max(double a, double b) {
             if (a > b)
+            {
                 return a;
+            }
             else
+            {
                 return b;
+            }
         }
 
         public static double Max(params double[] values) {
             int length = values.Length;
             if (length == 0)
+            {
                 return 0d;
+            }
+
             double num = values[0];
             for (int index = 1; index < length; ++index) {
                 if ((double)values[index] > (double)num)
+                {
                     num = values[index];
+                }
             }
             return num;
         }
 
         public static int Max(int a, int b) {
             if (a > b)
+            {
                 return a;
+            }
             else
+            {
                 return b;
+            }
         }
 
         public static int Max(params int[] values) {
             int length = values.Length;
             if (length == 0)
+            {
                 return 0;
+            }
+
             int num = values[0];
             for (int index = 1; index < length; ++index) {
                 if (values[index] > num)
+                {
                     num = values[index];
+                }
             }
             return num;
         }
@@ -179,27 +215,44 @@ namespace UnityEngine {
 
         public static double Clamp(double value, double min, double max) {
             if (value < min)
+            {
                 value = min;
+            }
             else if (value > max)
+            {
                 value = max;
+            }
+
             return value;
         }
 
         public static int Clamp(int value, int min, int max) {
             if (value < min)
+            {
                 value = min;
+            }
             else if (value > max)
+            {
                 value = max;
+            }
+
             return value;
         }
 
         public static double Clamp01(double value) {
             if (value < 0.0)
+            {
                 return 0.0d;
+            }
+
             if (value > 1.0)
+            {
                 return 1d;
+            }
             else
+            {
                 return value;
+            }
         }
 
         public static double Lerp(double from, double to, double t) {
@@ -209,15 +262,22 @@ namespace UnityEngine {
         public static double LerpAngle(double a, double b, double t) {
             double num = Mathd.Repeat(b - a, 360d);
             if (num > 180.0d)
+            {
                 num -= 360d;
+            }
+
             return a + num * Mathd.Clamp01(t);
         }
 
         public static double MoveTowards(double current, double target, double maxDelta) {
             if (Mathd.Abs(target - current) <= maxDelta)
+            {
                 return target;
+            }
             else
+            {
                 return current + Mathd.Sign(target - current) * maxDelta;
+            }
         }
 
         public static double MoveTowardsAngle(double current, double target, double maxDelta) {
@@ -234,19 +294,30 @@ namespace UnityEngine {
         public static double Gamma(double value, double absmax, double gamma) {
             bool flag = false;
             if (value < 0.0)
+            {
                 flag = true;
+            }
+
             double num1 = Mathd.Abs(value);
             if (num1 > absmax) {
                 if (flag)
+                {
                     return -num1;
+                }
                 else
+                {
                     return num1;
+                }
             } else {
                 double num2 = Mathd.Pow(num1 / absmax, gamma) * absmax;
                 if (flag)
+                {
                     return -num2;
+                }
                 else
+                {
                     return num2;
+                }
             }
         }
 
@@ -313,28 +384,47 @@ namespace UnityEngine {
         public static double InverseLerp(double from, double to, double value) {
             if (from < to) {
                 if (value < from)
+                {
                     return 0d;
+                }
+
                 if (value > to)
+                {
                     return 1d;
+                }
+
                 value -= from;
                 value /= to - from;
                 return value;
             } else {
                 if (from <= to)
+                {
                     return 0d;
+                }
+
                 if (value < to)
+                {
                     return 1d;
+                }
+
                 if (value > from)
+                {
                     return 0d;
+                }
                 else
-                    return (1.0d - (value - to) / (from - to));
+                {
+                    return (1.0d - (value - to) / (@from - to));
+                }
             }
         }
 
         public static double DeltaAngle(double current, double target) {
             double num = Mathd.Repeat(target - current, 360d);
             if (num > 180.0d)
+            {
                 num -= 360d;
+            }
+
             return num;
         }
 
@@ -345,7 +435,10 @@ namespace UnityEngine {
             double num4 = p4.y - p3.y;
             double num5 = num1 * num4 - num2 * num3;
             if (num5 == 0.0d)
+            {
                 return false;
+            }
+
             double num6 = p3.x - p1.x;
             double num7 = p3.y - p1.y;
             double num8 = (num6 * num4 - num7 * num3) / num5;
@@ -360,15 +453,24 @@ namespace UnityEngine {
             double num4 = p4.y - p3.y;
             double num5 = (num1 * num4 - num2 * num3);
             if (num5 == 0.0d)
+            {
                 return false;
+            }
+
             double num6 = p3.x - p1.x;
             double num7 = p3.y - p1.y;
             double num8 = (num6 * num4 - num7 * num3) / num5;
             if (num8 < 0.0d || num8 > 1.0d)
+            {
                 return false;
+            }
+
             double num9 = (num6 * num2 - num7 * num1) / num5;
             if (num9 < 0.0d || num9 > 1.0d)
+            {
                 return false;
+            }
+
             result = new Vector2d(p1.x + num8 * num1, p1.y + num8 * num2);
             return true;
         }

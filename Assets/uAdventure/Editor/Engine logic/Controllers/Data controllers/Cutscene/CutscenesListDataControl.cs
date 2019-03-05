@@ -35,7 +35,9 @@ namespace uAdventure.Editor
             // Create subcontrollers
             cutscenesDataControlList = new List<CutsceneDataControl>();
             foreach (Cutscene cutscene in cutscenesList)
+            {
                 cutscenesDataControlList.Add(new CutsceneDataControl(cutscene));
+            }
         }
 
         /**
@@ -77,7 +79,9 @@ namespace uAdventure.Editor
             // Create the list for the cutscenes
             cutscenesInfo = new string[cutscenesList.Count][];
             for (int i = 0; i < cutscenesList.Count; i++)
+            {
                 cutscenesInfo[i] = new string[2];
+            }
 
             // Fill the array with the info
             for (int i = 0; i < cutscenesList.Count; i++)
@@ -85,10 +89,13 @@ namespace uAdventure.Editor
                 Cutscene cutscene = cutscenesList[i];
                 cutscenesInfo[i][0] = cutscene.getId();
                 if (cutscene.getType() == GeneralScene.GeneralSceneSceneType.SLIDESCENE)
+                {
                     cutscenesInfo[i][1] = TC.get("CutscenesList.Slidescene");
+                }
                 else if (cutscene.getType() == GeneralScene.GeneralSceneSceneType.VIDEOSCENE)
+                {
                     cutscenesInfo[i][1] = TC.get("CutscenesList.Videoscene");
-
+                }
             }
 
             return cutscenesInfo;
@@ -111,7 +118,9 @@ namespace uAdventure.Editor
             for (int i = 0; i < cutscenesList.Count; i++)
             {
                 if (cutscenesList[i].getId().Equals(id))
+                {
                     return i;
+                }
             }
             return -1;
         }
@@ -164,8 +173,10 @@ namespace uAdventure.Editor
             bool elementAdded = false;
 
             if (string.IsNullOrEmpty(cutsceneId))
+            {
                 controller.ShowInputDialog(TC.get("Operation.AddCutsceneTitle"),
-                        TC.get("Operation.AddCutsceneMessage"), TC.get("Operation.AddCutsceneDefaultValue"), (o,s) => performCreateCutscene(type, s));
+                    TC.get("Operation.AddCutsceneMessage"), TC.get("Operation.AddCutsceneDefaultValue"), (o,s) => performCreateCutscene(type, s));
+            }
             else
             {
                 performCreateCutscene(type, cutsceneId);
@@ -179,7 +190,10 @@ namespace uAdventure.Editor
         {
             // If some value was typed and the identifier is valid
             if (!controller.isElementIdValid(cutsceneId))
+            {
                 cutsceneId = controller.makeElementValid(cutsceneId);
+            }
+
             Cutscene newCutscene = null;
 
             // Create the new cutscene
@@ -239,7 +253,9 @@ namespace uAdventure.Editor
 
             // If this is the last scene, it can't be deleted
             else
+            {
                 controller.ShowErrorDialog(TC.get("Operation.DeleteElementTitle"), TC.get("Operation.ErrorLastScene"));
+            }
 
             return elementDeleted;
         }
@@ -301,7 +317,9 @@ namespace uAdventure.Editor
 
             // Iterate through each cutscene
             foreach (CutsceneDataControl cutsceneDataControl in cutscenesDataControlList)
+            {
                 cutsceneDataControl.updateVarFlagSummary(varFlagSummary);
+            }
         }
 
 
@@ -331,7 +349,9 @@ namespace uAdventure.Editor
 
             // Iterate through each cutscene
             foreach (CutsceneDataControl cutsceneDataControl in cutscenesDataControlList)
+            {
                 count += cutsceneDataControl.countAssetReferences(assetPath);
+            }
 
             return count;
         }
@@ -342,7 +362,9 @@ namespace uAdventure.Editor
 
             // Iterate through each cutscene
             foreach (CutsceneDataControl cutsceneDataControl in cutscenesDataControlList)
+            {
                 cutsceneDataControl.getAssetReferences(assetPaths, assetTypes);
+            }
         }
 
 
@@ -351,7 +373,9 @@ namespace uAdventure.Editor
 
             // Iterate through each cutscene
             foreach (CutsceneDataControl cutsceneDataControl in cutscenesDataControlList)
+            {
                 cutsceneDataControl.deleteAssetReferences(assetPath);
+            }
         }
 
 
@@ -362,7 +386,9 @@ namespace uAdventure.Editor
 
             // Iterate through each cutscene
             foreach (CutsceneDataControl cutsceneDataControl in cutscenesDataControlList)
+            {
                 count += cutsceneDataControl.countIdentifierReferences(id);
+            }
 
             return count;
         }
@@ -373,7 +399,9 @@ namespace uAdventure.Editor
 
             // Iterate through each cutscene
             foreach (CutsceneDataControl cutsceneDataControl in cutscenesDataControlList)
+            {
                 cutsceneDataControl.replaceIdentifierReferences(oldId, newId);
+            }
         }
 
 
@@ -382,7 +410,9 @@ namespace uAdventure.Editor
 
             // Spread the call to every cutscene
             foreach (CutsceneDataControl cutsceneDataControl in cutscenesDataControlList)
+            {
                 cutsceneDataControl.deleteIdentifierReferences(id);
+            }
         }
 
 
@@ -395,22 +425,32 @@ namespace uAdventure.Editor
 		public override bool duplicateElement (DataControl dataControl)
 		{
 			if (!(dataControl is CutsceneDataControl))
-				return false;
+            {
+                return false;
+            }
 
-			var cutscene = dataControl.getContent ();
+            var cutscene = dataControl.getContent ();
 			Cutscene clone = null;
 			if (cutscene is Videoscene)
-				clone = (Videoscene)((Videoscene)cutscene).Clone ();
-			else if (cutscene is Slidescene)
-				clone = (Slidescene)((Slidescene)cutscene).Clone ();
-			else
-				return false;
+            {
+                clone = (Videoscene)((Videoscene)cutscene).Clone ();
+            }
+            else if (cutscene is Slidescene)
+            {
+                clone = (Slidescene)((Slidescene)cutscene).Clone ();
+            }
+            else
+            {
+                return false;
+            }
 
-			string id = clone.getId ();
+            string id = clone.getId ();
 			if (!controller.isElementIdValid(id))
-				id = controller.makeElementValid(id);
+            {
+                id = controller.makeElementValid(id);
+            }
 
-			clone.setId(id);
+            clone.setId(id);
 			cutscenesList.Add(clone);
 			cutscenesDataControlList.Add(new CutsceneDataControl(clone));
 			controller.IdentifierSummary.deleteId<Cutscene>(id);
@@ -422,7 +462,9 @@ namespace uAdventure.Editor
         {
 
             foreach (DataControl dc in this.cutscenesDataControlList)
+            {
                 dc.recursiveSearch();
+            }
         }
 
 

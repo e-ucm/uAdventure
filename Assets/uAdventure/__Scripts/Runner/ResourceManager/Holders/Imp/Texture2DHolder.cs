@@ -99,7 +99,9 @@ namespace uAdventure.Runner
                         Debug.Log("No se pudo cargar: " + this.path);
                     }
                     else
+                    {
                         loaded = true;
+                    }
 
                     break;
                 case ResourceManager.LoadingType.SYSTEM_IO:
@@ -131,7 +133,9 @@ namespace uAdventure.Runner
             if (Application.platform != RuntimePlatform.WebGLPlayer)
             {
                 if (System.IO.File.Exists(filePath))
+                {
                     fileData = System.IO.File.ReadAllBytes(filePath);
+                }
             }
 
             return fileData;

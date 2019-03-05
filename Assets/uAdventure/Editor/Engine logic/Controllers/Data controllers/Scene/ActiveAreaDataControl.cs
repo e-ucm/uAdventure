@@ -245,8 +245,10 @@ namespace uAdventure.Editor
 
                 // Show a dialog asking for the new scene id
                 if (newName == null)
+                {
                     controller.ShowInputDialog(TC.get("Operation.RenameSceneTitle"), 
                         TC.get("Operation.RenameSceneMessage"), oldSceneId, (o,s) => performRenameElement<ActiveArea>(s));
+                }
                 else
                 {
                     performRenameElement<ActiveArea>(newName);
@@ -255,7 +257,10 @@ namespace uAdventure.Editor
             }
 
             if (elementRenamed)
+            {
                 return oldSceneId;
+            }
+
             return null;
         }
 
@@ -395,7 +400,10 @@ namespace uAdventure.Editor
         {
 
             if (activeArea.getPoints().Count > 0)
+            {
                 return activeArea.getPoints()[activeArea.getPoints().Count - 1];
+            }
+
             return Vector2.zero;
         }
 
@@ -449,7 +457,10 @@ namespace uAdventure.Editor
         {
             List<Searchable> path = getPathFromChild(dataControl, actionsListDataControl);
             if (path != null)
+            {
                 return path;
+            }
+
             path = getPathFromChild(dataControl, this.descriptionsController);
             return path;
         }

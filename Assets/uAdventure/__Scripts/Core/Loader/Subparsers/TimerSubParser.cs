@@ -30,9 +30,11 @@ namespace uAdventure.Core
             timer.setShowWhenStopped(showWhenStopped);
 
             if (element.SelectSingleNode("documentation") != null)
+            {
                 timer.setDocumentation(element.SelectSingleNode("documentation").InnerText);
+            }
 
-			timer.setInitCond(DOMParserUtility.DOMParse<Conditions>(element.SelectSingleNode("init-condition"), parameters) ?? new Conditions());
+            timer.setInitCond(DOMParserUtility.DOMParse<Conditions>(element.SelectSingleNode("init-condition"), parameters) ?? new Conditions());
 			timer.setEndCond(DOMParserUtility.DOMParse<Conditions>(element.SelectSingleNode("end-condition"), parameters)   ?? new Conditions());
 			timer.setEffects(DOMParserUtility.DOMParse<Effects>(element.SelectSingleNode("effect"), parameters) 			?? new Effects());
 			timer.setPostEffects(DOMParserUtility.DOMParse<Effects>(element.SelectSingleNode("post-effect"), parameters) 	?? new Effects());

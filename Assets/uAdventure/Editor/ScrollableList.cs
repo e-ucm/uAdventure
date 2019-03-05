@@ -84,23 +84,59 @@ public class ScrollableList
 
     private void UpdateCallbacks(ReorderableList reorderableList)
     {
-        if (onReorderCallback != null) reorderableList.onReorderCallback = OnReorderCallback;
-        else reorderableList.onReorderCallback = null;
+        if (onReorderCallback != null)
+        {
+            reorderableList.onReorderCallback = OnReorderCallback;
+        }
+        else
+        {
+            reorderableList.onReorderCallback = null;
+        }
 
-        if (onSelectCallback != null) reorderableList.onSelectCallback = OnSelectCallback;
-        else reorderableList.onSelectCallback = null;
+        if (onSelectCallback != null)
+        {
+            reorderableList.onSelectCallback = OnSelectCallback;
+        }
+        else
+        {
+            reorderableList.onSelectCallback = null;
+        }
 
-        if (onAddDropdownCallback != null) reorderableList.onAddDropdownCallback = OnAddDropdownCallback;
-        else reorderableList.onAddDropdownCallback = null;
+        if (onAddDropdownCallback != null)
+        {
+            reorderableList.onAddDropdownCallback = OnAddDropdownCallback;
+        }
+        else
+        {
+            reorderableList.onAddDropdownCallback = null;
+        }
 
-        if (onChangedCallback != null) reorderableList.onChangedCallback = OnChangedCallback;
-        else reorderableList.onChangedCallback = null;
-        
-        if (elementHeightCallback != null) reorderableList.elementHeightCallback = OnElementHeightCallback;
-        else reorderableList.elementHeightCallback = null;
-        
-        if (drawElementCallback != null) reorderableList.drawElementCallback = OnElementCallback;
-        else reorderableList.drawElementCallback = null;
+        if (onChangedCallback != null)
+        {
+            reorderableList.onChangedCallback = OnChangedCallback;
+        }
+        else
+        {
+            reorderableList.onChangedCallback = null;
+        }
+
+        if (elementHeightCallback != null)
+        {
+            reorderableList.elementHeightCallback = OnElementHeightCallback;
+        }
+        else
+        {
+            reorderableList.elementHeightCallback = null;
+        }
+
+        if (drawElementCallback != null)
+        {
+            reorderableList.drawElementCallback = OnElementCallback;
+        }
+        else
+        {
+            reorderableList.drawElementCallback = null;
+        }
     }
 
     #endregion
@@ -149,11 +185,17 @@ public class ScrollableList
 
             // Detect if scroll has happened
             if (scrollRect.height >= insideRect.height)
+            {
                 hasScrolled = false;
+            }
             else if (scrollPos.y == insideRect.height - scrollRect.height && Event.current.delta.y > 0)
+            {
                 hasScrolled = false;
+            }
             else if (scrollPos.y == 0 && Event.current.delta.y < 0)
+            {
                 hasScrolled = false;
+            }
 
             // If no real scroll has been performed, we release the event
             if(!hasScrolled) { Event.current.type = wasType; }

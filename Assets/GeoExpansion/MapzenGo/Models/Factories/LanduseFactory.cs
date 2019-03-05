@@ -36,15 +36,21 @@ namespace MapzenGo.Models.Factories
             var kind = geo["properties"]["kind"].str.ConvertToLanduseType();
 
             if (!FactorySettings.HasSettingsFor(kind) && !JustDrawEverythingFam)
+            {
                 yield break;
+            }
 
             var bb = geo["geometry"]["coordinates"].list[0]; //this is wrong but cant fix it now
             if (bb == null || bb.list == null)
+            {
                 yield break;
+            }
 
             var count = bb.list.Count - 1;
             if (count < 3)
+            {
                 yield break;
+            }
 
             var inp = new InputGeometry(count);
             for (var i = 0; i < count; i++)
@@ -84,11 +90,15 @@ namespace MapzenGo.Models.Factories
             {
                 var kind = geo["properties"]["kind"].str.ConvertToLanduseType();
                 if (!FactorySettings.HasSettingsFor(kind) && !JustDrawEverythingFam)
+                {
                     continue;
+                }
 
                 //var typeSettings = FactorySettings.GetSettingsFor<LanduseSettings>(kind);
                 if (!_meshes.ContainsKey(kind))
+                {
                     _meshes.Add(kind, new MeshData());
+                }
 
                 //foreach (var bb in geo["geometry"]["coordinates"].list)
                 //{
@@ -96,7 +106,9 @@ namespace MapzenGo.Models.Factories
                 var count = bb.list.Count - 1;
 
                 if (count < 3)
+                {
                     continue;
+                }
 
                 var inp = new InputGeometry(count);
 
@@ -142,7 +154,10 @@ namespace MapzenGo.Models.Factories
         {
             landuse.name = "landuse " + geo["properties"]["id"].ToString();
             if (geo["properties"].HasField("name"))
+            {
                 landuse.Name = geo["properties"]["name"].str;
+            }
+
             landuse.Id = geo["properties"]["id"].ToString();
             landuse.Type = geo["type"].str;
             landuse.SortKey = (int)geo["properties"]["sort_key"].f;

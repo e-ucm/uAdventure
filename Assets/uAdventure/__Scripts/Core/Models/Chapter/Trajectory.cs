@@ -44,7 +44,10 @@ namespace uAdventure.Core
         {
 
             if (idStart.Equals(idEnd))
+            {
                 return null;
+            }
+
             Side side = new Side(idStart, idEnd);
             Node a = getNodeForId(idStart);
             Node b = getNodeForId(idEnd);
@@ -54,8 +57,10 @@ namespace uAdventure.Core
                 int y = a.getY() - b.getY();
                 int realLength = Mathf.RoundToInt(new Vector2(x,y).magnitude);
                 if (length == -1)
+                {
                     length = realLength;
-                
+                }
+
                 side.setRealLength(realLength);
                 side.setLenght(length);
             }
@@ -82,16 +87,22 @@ namespace uAdventure.Core
                     {
                         Side side = sides[i];
                         if (side.getIDEnd().Equals(node.getID()) || side.getIDStart().Equals(node.getID()))
+                        {
                             sides.RemoveAt(i);
+                        }
                         else
+                        {
                             i++;
+                        }
                     }
                     nodes.Remove(nodes[index]);
                 }
             }
 
             if (initial.getID().Equals(node.getID()))
+            {
                 initial = null;
+            }
 
             /*if( nodes.contains( node ) ) {
                 node = nodes.get( nodes.indexOf( node ) );
@@ -119,9 +130,13 @@ namespace uAdventure.Core
                     {
                         Side side = sides[i];
                         if (side.getIDEnd().Equals(n.getID()) || side.getIDStart().Equals(n.getID()))
+                        {
                             sides.RemoveAt(i);
+                        }
                         else
+                        {
                             i++;
+                        }
                     }
                     nodes.Remove(n);
                     break;
@@ -334,11 +349,16 @@ namespace uAdventure.Core
         {
 
             if (id == null)
+            {
                 return null;
+            }
+
             foreach (Node node in nodes)
             {
                 if (id.Equals(node.getID()))
+                {
                     return node;
+                }
             }
             return null;
         }
@@ -361,7 +381,9 @@ namespace uAdventure.Core
             if (initial == null)
             {
                 if (nodes.Count > 0)
+                {
                     initial = nodes[0];
+                }
             }
             connected.Add(initial);
             int i = 0;
@@ -375,13 +397,17 @@ namespace uAdventure.Core
                     {
                         Node node = this.getNodeForId(side.getIDStart());
                         if (node != null && !connected.Contains(node))
+                        {
                             connected.Add(node);
+                        }
                     }
                     if (side.getIDStart().Equals(temp.getID()))
                     {
                         Node node = this.getNodeForId(side.getIDEnd());
                         if (node != null && !connected.Contains(node))
+                        {
                             connected.Add(node);
+                        }
                     }
                 }
             }
@@ -394,16 +420,24 @@ namespace uAdventure.Core
                     while (j < sides.Count)
                     {
                         if (sides[j].getIDEnd().Equals(nodes[i].getID()))
+                        {
                             sides.RemoveAt(j);
+                        }
                         else if (sides[j].getIDStart().Equals(nodes[i].getID()))
+                        {
                             sides.RemoveAt(j);
+                        }
                         else
+                        {
                             j++;
+                        }
                     }
                     nodes.RemoveAt(i);
                 }
                 else
+                {
                     i++;
+                }
             }
         }
 
@@ -420,7 +454,9 @@ namespace uAdventure.Core
                 foreach (Node n in nodes)
                 {
                     if (n.getID().Equals(initialId))
+                    {
                         t.nodes.Add(t.initial);
+                    }
                     else
                     {
                         string oldId = n.getID();

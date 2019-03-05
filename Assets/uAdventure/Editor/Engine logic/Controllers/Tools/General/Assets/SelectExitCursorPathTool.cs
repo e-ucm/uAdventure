@@ -39,7 +39,9 @@ namespace uAdventure.Editor
 
             bool done = base.undoTool();
             if (!done)
+            {
                 return false;
+            }
             else
             {
                 exitLook.setCursorPath(resources.getAssetPath(CURSOR_STR));
@@ -54,7 +56,9 @@ namespace uAdventure.Editor
 
             bool done = base.redoTool();
             if (!done)
+            {
                 return false;
+            }
             else
             {
                 exitLook.setCursorPath(resources.getAssetPath(CURSOR_STR));
@@ -69,7 +73,9 @@ namespace uAdventure.Editor
 
             bool done = base.doTool();
             if (!done)
+            {
                 return false;
+            }
             else
             {
                 exitLook.setCursorPath(resources.getAssetPath(CURSOR_STR));

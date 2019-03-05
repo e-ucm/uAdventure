@@ -101,12 +101,18 @@ namespace uAdventure.Core
             {
                 // Return the FIRST initial scene stored
                 for (int i = 0; i < getGeneralScenes().Count && initialGeneralScene == null; i++)
+                {
                     if (getGeneralScenes()[i].isInitialScene())
+                    {
                         initialGeneralScene = getGeneralScenes()[i];
+                    }
+                }
 
                 // If there is no initial scene, return the first scene
                 if (initialGeneralScene == null)
+                {
                     initialGeneralScene = getGeneralScenes()[0];
+                }
             }
 
             return initialGeneralScene;
@@ -374,8 +380,12 @@ namespace uAdventure.Core
             Scene selectedScene = null;
 
 			foreach (Scene scene in getScenes ())
+            {
                 if (scene.getId().Equals(sceneId))
+                {
                     selectedScene = scene;
+                }
+            }
 
             return selectedScene;
         }
@@ -394,11 +404,13 @@ namespace uAdventure.Core
             Cutscene selectedScene = null;
 
 			foreach (Cutscene scene in getCutscenes())
+            {
                 if (scene.getId().Equals(sceneId))
                 {
                     selectedScene = scene;
                     break;
                 }
+            }
 
             return selectedScene;
         }
@@ -417,8 +429,12 @@ namespace uAdventure.Core
             Item selectedItem = null;
 
 			foreach (Item item in getItems ())
+            {
                 if (item.getId().Equals(itemId))
+                {
                     selectedItem = item;
+                }
+            }
 
             return selectedItem;
         }
@@ -437,8 +453,12 @@ namespace uAdventure.Core
             Atrezzo selectedAtrezzo = null;
 
 			foreach (Atrezzo at in getObjects<Atrezzo> ())
+            {
                 if (at.getId().Equals(atrezzoId))
+                {
                     selectedAtrezzo = at;
+                }
+            }
 
             return selectedAtrezzo;
         }
@@ -457,8 +477,12 @@ namespace uAdventure.Core
             NPC selectedNPC = null;
 
 			foreach (NPC npc in getCharacters())
+            {
                 if (npc.getId().Equals(npcId))
+                {
                     selectedNPC = npc;
+                }
+            }
 
             return selectedNPC;
         }
@@ -477,8 +501,12 @@ namespace uAdventure.Core
             GlobalState selectedGlobalState = null;
 
 			foreach (GlobalState gs in getGlobalStates ())
+            {
                 if (gs.getId().Equals(globalStateId))
+                {
                     selectedGlobalState = gs;
+                }
+            }
 
             return selectedGlobalState;
         }
@@ -497,8 +525,12 @@ namespace uAdventure.Core
             Macro selectedMacro = null;
 
 			foreach (Macro m in getMacros ())
+            {
                 if (m.getId().Equals(macroId))
+                {
                     selectedMacro = m;
+                }
+            }
 
             return selectedMacro;
         }
@@ -561,7 +593,9 @@ namespace uAdventure.Core
         {
 
             if (!flags.Contains(flag))
+            {
                 flags.Add(flag);
+            }
         }
 
         /**
@@ -575,7 +609,9 @@ namespace uAdventure.Core
         {
 
             if (!vars.Contains(var))
+            {
                 vars.Add(var);
+            }
         }
 
         /**
@@ -592,7 +628,9 @@ namespace uAdventure.Core
 
             GeneralScene scene = getScene(generalSceneId);
             if (scene == null)
+            {
                 scene = getCutscene(generalSceneId);
+            }
 
             return scene;
         }
@@ -632,8 +670,12 @@ namespace uAdventure.Core
             Book selectedbook = null;
 
 			foreach (Book book in getBooks ())
+            {
                 if (book.getId().Equals(bookId))
+                {
                     selectedbook = book;
+                }
+            }
 
             return selectedbook;
         }
@@ -652,8 +694,12 @@ namespace uAdventure.Core
             Conversation selectedConversation = null;
 
 			foreach (Conversation conversation in getConversations())
+            {
                 if (conversation.getId().Equals(conversationId))
+                {
                     selectedConversation = conversation;
+                }
+            }
 
             return selectedConversation;
         }
@@ -739,8 +785,12 @@ namespace uAdventure.Core
             Completable selectedCompletable = null;
 
 			foreach (Completable completable in getCompletables ())
+            {
                 if (completable.getId().Equals(id))
+                {
                     selectedCompletable = completable;
+                }
+            }
 
             return selectedCompletable;
         }
@@ -784,9 +834,13 @@ namespace uAdventure.Core
             {
                 var exists = new List<T>(getObjects().FindAll(o => o is T).Cast<T>());
                 if (exists.Count == 0)
+                {
                     extensionObjects.Add(typeof(T), new List<T>());
+                }
                 else
+                {
                     return exists;
+                }
             }
 
             return extensionObjects[typeof(T)] as List<T>;
@@ -815,7 +869,9 @@ namespace uAdventure.Core
             var listType = typeof(List<>).MakeGenericType(t);
                 
             if (!extensionObjects.ContainsKey(t))
+            {
                 extensionObjects.Add(t, Activator.CreateInstance(listType) as IList);
+            }
 
             return extensionObjects[t] as IList;
         }
@@ -833,7 +889,9 @@ namespace uAdventure.Core
             {
                 c.flags = new List<string>();
                 foreach (string s in flags)
+                {
                     c.flags.Add(s);
+                }
             }
             c.initialScene = (initialScene != null ? initialScene : null);
             c.player = (player != null ? (Player)player.Clone() : null);
@@ -841,20 +899,26 @@ namespace uAdventure.Core
             {
                 c.vars = new List<string>();
                 foreach (string s in vars)
+                {
                     c.vars.Add(s);
+                }
             }
             if (assessmentProfiles != null)
             {
                 c.assessmentProfiles = new List<AssessmentProfile>();
                 foreach (AssessmentProfile ap in assessmentProfiles)
+                {
                     c.assessmentProfiles.Add(ap);
+                }
             }
 
             if (adaptationProfiles != null)
             {
                 c.adaptationProfiles = new List<AdaptationProfile>();
                 foreach (AdaptationProfile ap in adaptationProfiles)
+                {
                     c.adaptationProfiles.Add(ap);
+                }
             }
 
             if (extensionObjects != null)
@@ -868,9 +932,13 @@ namespace uAdventure.Core
                     foreach(var o in eo.Value)
                     {
                         if (o is ICloneable)
+                        {
                             l.Add((o as ICloneable).Clone());
+                        }
                         else
+                        {
                             l.Add(o);
+                        }
                     }
 
                     c.extensionObjects.Add(eo.Key, l);

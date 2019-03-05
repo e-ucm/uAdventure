@@ -83,7 +83,9 @@ namespace uAdventure.Core
         {
 
             if (effectBlock >= 0 && effectBlock < effects.Count)
+            {
                 effects[effectBlock].setText(text);
+            }
         }
 
         /**
@@ -97,7 +99,9 @@ namespace uAdventure.Core
         {
 
             if (effectBlock >= 0 && effectBlock < effects.Count)
+            {
                 effects[effectBlock].getAssessmentProperties().Add(property);
+            }
         }
 
         /**
@@ -111,7 +115,10 @@ namespace uAdventure.Core
         {
 
             if (effectBlock >= 0 && effectBlock < effects.Count)
+            {
                 return effects[effectBlock].getAssessmentProperties()[property];
+            }
+
             return null;
         }
 
@@ -125,21 +132,28 @@ namespace uAdventure.Core
         {
 
             if (effectBlock >= 0 && effectBlock < effects.Count)
+            {
                 effects[effectBlock].setMinTime(time);
+            }
         }
 
         public void setMaxTime(int time, int effectBlock)
         {
 
             if (effectBlock >= 0 && effectBlock < effects.Count)
+            {
                 effects[effectBlock].setMaxTime(time);
+            }
         }
 
         public int getMinTime(int effectBlock)
         {
 
             if (effectBlock >= 0 && effectBlock < effects.Count)
+            {
                 return effects[effectBlock].getMinTime();
+            }
+
             return int.MinValue;
         }
 
@@ -147,7 +161,10 @@ namespace uAdventure.Core
         {
 
             if (effectBlock >= 0 && effectBlock < effects.Count)
+            {
                 return effects[effectBlock].getMaxTime();
+            }
+
             return int.MaxValue;
         }
 
@@ -369,7 +386,9 @@ namespace uAdventure.Core
             {
                 tar.effects = new List<TimedAssessmentEffect>();
                 foreach (TimedAssessmentEffect tae in effects)
+                {
                     tar.effects.Add((TimedAssessmentEffect)tae.Clone());
+                }
             }
             tar.startTime = startTime;
             tar.elapsedTime = elapsedTime;

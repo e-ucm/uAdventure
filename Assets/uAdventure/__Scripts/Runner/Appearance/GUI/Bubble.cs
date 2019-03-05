@@ -85,7 +85,9 @@ namespace uAdventure.Runner
                     completed = 1f - (Vector2.Distance(destination, finalPosition) / distance);
 
                     if (float.IsNaN(completed))
+                    {
                         completed = 1f;
+                    }
 
                     setAlpha(completed);
                     setScale(completed);

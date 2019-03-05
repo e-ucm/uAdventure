@@ -83,14 +83,18 @@ namespace uAdventure.Core
         {
 
             if (rectangular)
+            {
                 return x;
+            }
             else
             {
                 int minX = int.MaxValue;
                 foreach (Vector2 Vector2 in Vector2s)
                 {
                     if (Vector2.x < minX)
+                    {
                         minX = (int)Vector2.x;
+                    }
                 }
                 return minX;
             }
@@ -105,14 +109,18 @@ namespace uAdventure.Core
         {
 
             if (rectangular)
+            {
                 return y;
+            }
             else
             {
                 int minY = int.MaxValue;
                 foreach (Vector2 Vector2 in Vector2s)
                 {
                     if (Vector2.y < minY)
+                    {
                         minY = (int)Vector2.y;
+                    }
                 }
                 return minY;
             }
@@ -127,7 +135,9 @@ namespace uAdventure.Core
         {
 
             if (rectangular)
+            {
                 return width;
+            }
             else
             {
                 int maxX = int.MinValue;
@@ -135,9 +145,14 @@ namespace uAdventure.Core
                 foreach (Vector2 Vector2 in Vector2s)
                 {
                     if (Vector2.x > maxX)
+                    {
                         maxX = (int)Vector2.x;
+                    }
+
                     if (Vector2.x < minX)
+                    {
                         minX = (int)Vector2.x;
+                    }
                 }
                 return maxX - minX;
 
@@ -153,7 +168,9 @@ namespace uAdventure.Core
         {
 
             if (rectangular)
+            {
                 return height;
+            }
             else
             {
                 int maxY = int.MinValue;
@@ -161,9 +178,14 @@ namespace uAdventure.Core
                 foreach (Vector2 Vector2 in Vector2s)
                 {
                     if ((int)Vector2.y > maxY)
+                    {
                         maxY = (int)Vector2.y;
+                    }
+
                     if ((int)Vector2.y < minY)
+                    {
                         minY = (int)Vector2.y;
+                    }
                 }
                 return maxY - minY;
             }
@@ -283,7 +305,10 @@ namespace uAdventure.Core
             aa.rectangular = rectangular;
             aa.Vector2s = (Vector2s != null ? new List<Vector2>() : null);
             foreach (Vector2 p in Vector2s)
+            {
                 aa.Vector2s.Add(new Vector2(p.x, p.y));
+            }
+
             return aa;
         }
     }

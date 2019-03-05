@@ -545,7 +545,9 @@ namespace uAdventure.Editor
                         for (int i = 0; i < layers.arraySize; i++)
                         {
                             if (i == layerPos)
+                            {
                                 continue;
+                            }
 
                             if (layers.GetArrayElementAtIndex(i).stringValue == layerName)
                             {
@@ -555,7 +557,9 @@ namespace uAdventure.Editor
                         }
                     }
                 } else
+                {
                     hasUINotTargetableLayer = true;
+                }
 
                 if(wronglyFoundAt != -1 && EditorUtility.DisplayDialog("Layer wrongly located", "uAdventure requires " + layerName + " at layer " + layerPos +
                     ". Do you want it to move it to position 9 automatically?", "Yes", "No"))
@@ -665,7 +669,9 @@ namespace uAdventure.Editor
                         Loaded = LoadFile(absolutePath.Substring(0, absolutePath.Length - 4));
                     }
                     else if (projectFile.Exists)
+                    {
                         Loaded = LoadFile(projectFile.FullName);
+                    }
                 }
             }
             else
@@ -835,7 +841,9 @@ namespace uAdventure.Editor
 
             if (fileType == Controller.FILE_ADVENTURE_1STPERSON_PLAYER ||
                 fileType == Controller.FILE_ADVENTURE_3RDPERSON_PLAYER)
+            {
                 fileCreated = newAdventureFile(gamePath, fileType);
+            }
             else if (fileType == Controller.FILE_ASSESSMENT)
             {
                 //fileCreated = newAssessmentFile();
@@ -846,7 +854,9 @@ namespace uAdventure.Editor
             }
 
             if (fileCreated)
+            {
                 AssetsController.ResetCache();
+            }
 
             return fileCreated;
         }
@@ -940,9 +950,13 @@ namespace uAdventure.Editor
 
                 int playerMode = -1;
                 if (fileType == FILE_ADVENTURE_3RDPERSON_PLAYER)
+                {
                     playerMode = DescriptorData.MODE_PLAYER_3RDPERSON;
+                }
                 else if (fileType == FILE_ADVENTURE_1STPERSON_PLAYER)
+                {
                     playerMode = DescriptorData.MODE_PLAYER_1STPERSON;
+                }
 
 
                 adventureDataControl = new AdventureDataControl(TC.get("DefaultValue.AdventureTitle"), "ChapterTitle", TC.get("DefaultValue.SceneId"), playerMode);
@@ -970,7 +984,9 @@ namespace uAdventure.Editor
                     try
                     {
                         if (selectedFile != null && !selectedFile.Exists)
+                        {
                             selectedFile.Create().Close();
+                        }
                     }
                     catch (IOException)
                     {
@@ -981,7 +997,9 @@ namespace uAdventure.Editor
 
                 }
                 else
+                {
                     fileCreated = false;
+                }
             }
 
             return fileCreated;
@@ -998,7 +1016,9 @@ namespace uAdventure.Editor
         public void DeleteDirectory(string targetDir)
         {
             if (!Directory.Exists(targetDir))
+            {
                 return;
+            }
 
             File.SetAttributes(targetDir, FileAttributes.Normal);
 
@@ -1063,9 +1083,13 @@ namespace uAdventure.Editor
 
                 int playerMode = -1;
                 if (fileType == FILE_ADVENTURE_3RDPERSON_PLAYER)
+                {
                     playerMode = DescriptorData.MODE_PLAYER_3RDPERSON;
-                else if (fileType == FILE_ADVENTURE_1STPERSON_PLAYER) 
+                }
+                else if (fileType == FILE_ADVENTURE_1STPERSON_PLAYER)
+                {
                     playerMode = DescriptorData.MODE_PLAYER_1STPERSON;
+                }
 
 
                 EditorUtility.DisplayProgressBar("Creating new Adventure", "Creating model", 0.1f);
@@ -1096,8 +1120,10 @@ namespace uAdventure.Editor
                     Thread.Sleep(1);
 
                     if (selectedFile != null && !selectedFile.Exists)
+                    {
                         selectedFile.Create().Close();
-                    
+                    }
+
                     AssetsController.ResetCache();
                     // The file was saved
                     fileCreated = true;
@@ -1105,7 +1131,9 @@ namespace uAdventure.Editor
                     EditorUtility.DisplayProgressBar("Creating new Adventure", "Done!", 1f);
                 }
                 else
+                {
                     fileCreated = false;
+                }
 
                 Save();
                 EditorUtility.ClearProgressBar();
@@ -1523,7 +1551,9 @@ namespace uAdventure.Editor
                     if (isValidTargetProject(newFile))
                     {
                         if (!newFile.Exists)
+                        {
                             System.IO.File.Create(newFile.FullName).Close();
+                        }
 
                         // If this is a "Save as" operation, copy the assets from the old file to the new one
                         if (saveAs)
@@ -1547,7 +1577,9 @@ namespace uAdventure.Editor
 
                 // If no file was selected, don't save the data
                 else
+                {
                     saveFile = false;
+                }
             }
 
             // If the data must be saved
@@ -1562,8 +1594,10 @@ namespace uAdventure.Editor
 
                 // If the data is not valid, show an error message
                 if (!valid)
+                {
                     Debug.LogError(TC.get("Operation.AdventureConsistencyTitle") + "\n" +
                                    TC.get("Operation.AdventurInconsistentWarning"));
+                }
 
                 // Control the version number
                 string newValue = increaseVersionNumber(adventureDataControl.getAdventureData().getVersionNumber());
@@ -1575,7 +1609,9 @@ namespace uAdventure.Editor
                 {
                     FileInfo eapFile = new FileInfo(currentZipFile + ".eap");
                     if (!eapFile.Exists)
+                    {
                         File.Create(eapFile.FullName).Close();
+                    }
 
                     // Set modified to false and update the window title
                     dataModified_F = false;
@@ -1600,7 +1636,10 @@ namespace uAdventure.Editor
                 {
                     FileInfo[] files = currentAssessFolder.GetFiles();
                     for (int x = 0; x < files.Length; x++)
+                    {
                         files[x].Delete();
+                    }
+
                     currentAssessFolder.Delete(true);
                 }
                 DirectoryInfo currentAdaptFolder = new DirectoryInfo(Path.Combine(currentZipFile, "adaptation"));
@@ -1608,7 +1647,10 @@ namespace uAdventure.Editor
                 {
                     FileInfo[] files = currentAdaptFolder.GetFiles();
                     for (int x = 0; x < files.Length; x++)
+                    {
                         files[x].Delete();
+                    }
+
                     currentAdaptFolder.Delete();
                 }
             }
@@ -1639,7 +1681,10 @@ namespace uAdventure.Editor
                 aux[0] = '1';
                 aux[1] = '0';
                 for (int i = 2; i < aux.Length; i++)
+                {
                     aux[i] = digits[i - 1];
+                }
+
                 return new string(aux);
 
             }
@@ -2121,7 +2166,9 @@ namespace uAdventure.Editor
             EditorUtility.ClearProgressBar();
 
             if (activeTarget != EditorUserBuildSettings.activeBuildTarget || activeGroup != EditorUserBuildSettings.selectedBuildTargetGroup)
+            {
                 EditorUserBuildSettings.SwitchActiveBuildTarget(activeGroup, activeTarget);
+            }
         }
 
         private static readonly string WINDOWS64_FFMPEG_URL = "https://github.com/e-ucm/uAdventure-FFMPEG/releases/download/1/ffmpeg-3.4.2-win64.zip";
@@ -2154,7 +2201,10 @@ namespace uAdventure.Editor
                 }
 
                 if (www.progress != 1f)
+                {
                     return;
+                }
+
                 // Write the zip file
                 File.WriteAllBytes(ffmpegPath + "/ffmpeg.zip", www.bytes);
                 // Unzip it
@@ -2179,7 +2229,9 @@ namespace uAdventure.Editor
                 var projectPath = Directory.GetCurrentDirectory().Replace("\\", "/");
                 var ffmpegPath = projectPath + "/FFMPEG";
                 if (!Directory.Exists(ffmpegPath))
+                {
                     Directory.CreateDirectory(ffmpegPath);
+                }
 
                 System.Action convert = () =>
                 {
@@ -2195,12 +2247,20 @@ namespace uAdventure.Editor
                             {
 
                                 if (SystemInfo.operatingSystem.Contains("64bit"))
+                                {
                                     DownloadFFMPEG(WINDOWS64_FFMPEG_URL, convert);
+                                }
                                 else
+                                {
                                     DownloadFFMPEG(WINDOWS32_FFMPEG_URL, convert);
+                                }
                             }
                         }                            
-                        else convert();
+                        else
+                        {
+                            convert();
+                        }
+
                         break;
 
                     case OperatingSystemFamily.MacOSX:
@@ -2211,7 +2271,11 @@ namespace uAdventure.Editor
                                 DownloadFFMPEG(MACOSX64_FFMPEG_URL, convert);
                             }
                         }
-                        else convert();
+                        else
+                        {
+                            convert();
+                        }
+
                         break;
 
                     default:
@@ -2257,7 +2321,9 @@ namespace uAdventure.Editor
                 while (!processTemp.HasExited) { }
                 var error = processTemp.StandardError.ReadToEnd();
                 if (processTemp.ExitCode != 0 && !string.IsNullOrEmpty(error))
+                {
                     EditorUtility.DisplayDialog("Error", error, "continue...");
+                }
                 else if(error.Length > 7)
                 {
                     var framesText = error.Substring(6, 6).Trim();
@@ -2303,15 +2369,19 @@ namespace uAdventure.Editor
                     var output = processTemp.StandardError.ReadLine();
                     // Return the current frame
                     if(!string.IsNullOrEmpty(output))
+                    {
                         yield return ExParsers.ParseDefault(output.Substring(6, 6).Trim(), -1);
+                    }
                 }
                 if (processTemp.ExitCode != 0)
                 {
                     EditorUtility.DisplayDialog("Error", processTemp.StandardError.ReadToEnd(), "continue...");
                 }
             }
-            else Debug.Log("Couldn't start the process");
-
+            else
+            {
+                Debug.Log("Couldn't start the process");
+            }
         }
 
         public static void ConvertVideos(string pathToBuiltProject)
@@ -2320,7 +2390,10 @@ namespace uAdventure.Editor
             var source = new DirectoryInfo(UnityEngine.Application.dataPath + "/uAdventure/Resources/CurrentGame/assets/video");
 
             if (!Directory.Exists(outFolder))
+            {
                 Directory.CreateDirectory(outFolder);
+            }
+
             var toConvert = source.GetFiles();
             var i = 0;
             EditorUtility.DisplayProgressBar("Converting", "Converting videos...", 0f);
@@ -2329,7 +2402,10 @@ namespace uAdventure.Editor
             {
                 ++i;
                 if (fi.Extension == ".meta")
+                {
                     continue;
+                }
+
                 EditorUtility.DisplayProgressBar("Converting", "Converting videos...", i / (float) toConvert.Length);
                 var outName = outFolder + Path.GetFileNameWithoutExtension(fi.Name) + ".webm";
                 var count = GetFrameCount(fi);
@@ -2665,21 +2741,40 @@ namespace uAdventure.Editor
 
         public string makeElementValid(string elementId)
         {
-            if (elementId == null) elementId = "new";
+            if (elementId == null)
+            {
+                elementId = "new";
+            }
+
             var clean = elementId.Replace(" ", "").Replace("'"," ");
             while (clean != "" && !char.IsLetter(clean[0]))
+            {
                 clean.Remove(0, 1);
-            if (clean == "") clean = "new";
+            }
+
+            if (clean == "")
+            {
+                clean = "new";
+            }
 
             if (clean.Equals(Player.IDENTIFIER) || clean.Equals(TC.get("ConversationLine.PlayerName")))
+            {
                 clean = "new";
-            
+            }
+
             while (IdentifierSummary.existsId(clean))
             {
                 int lastN = 0;
                 for (Match match = Regex.Match(clean, @"\d+$"); match.Success; match = match.NextMatch())
+                {
                     lastN = int.Parse(match.Value, NumberFormatInfo.InvariantInfo); // do something with it
-                if (lastN == 0) clean += "0";
+                }
+
+                if (lastN == 0)
+                {
+                    clean += "0";
+                }
+
                 clean = clean.Substring(0, clean.Length - ("" + lastN).Length);
                 lastN++;
                 clean = clean + lastN;
@@ -2781,8 +2876,12 @@ namespace uAdventure.Editor
 
             // Search for the image in the list, comparing the identifiers
             foreach (SceneDataControl scene in SelectedChapterDataControl.getScenesList().getScenes())
+            {
                 if (sceneId.Equals(scene.getId()))
+                {
                     sceneImagePath = scene.getPreviewBackground();
+                }
+            }
 
             return sceneImagePath;
         }
@@ -2801,8 +2900,12 @@ namespace uAdventure.Editor
 
             // Search for the image in the list, comparing the identifiers
             foreach (SceneDataControl scene in SelectedChapterDataControl.getScenesList().getScenes())
+            {
                 if (sceneId.Equals(scene.getId()) && scene.getTrajectory().hasTrajectory())
+                {
                     trajectory = (Trajectory)scene.getTrajectory().getContent();
+                }
+            }
 
             return trajectory;
         }
@@ -2816,9 +2919,13 @@ namespace uAdventure.Editor
         {
 
             if (SelectedChapterDataControl!= null)
+            {
                 return SelectedChapterDataControl.getPlayer().getPreviewImage();
+            }
             else
+            {
                 return null;
+            }
         }
 
         /**
@@ -2836,17 +2943,30 @@ namespace uAdventure.Editor
 
             // Search for the image in the items, comparing the identifiers
             foreach (ItemDataControl item in SelectedChapterDataControl.getItemsList().getItems())
+            {
                 if (elementId.Equals(item.getId()))
+                {
                     elementImage = item.getPreviewImage();
+                }
+            }
 
             // Search for the image in the characters, comparing the identifiers
             foreach (NPCDataControl npc in SelectedChapterDataControl.getNPCsList().getNPCs())
+            {
                 if (elementId.Equals(npc.getId()))
+                {
                     elementImage = npc.getPreviewImage();
+                }
+            }
+
             // Search for the image in the items, comparing the identifiers
             foreach (AtrezzoDataControl atrezzo in SelectedChapterDataControl.getAtrezzoList().getAtrezzoList())
+            {
                 if (elementId.Equals(atrezzo.getId()))
+                {
                     elementImage = atrezzo.getPreviewImage();
+                }
+            }
 
             return elementImage;
         }
@@ -3128,7 +3248,9 @@ namespace uAdventure.Editor
             {
                 values = new string[selectionValues.Length];
                 for (int i = 0; i < selectionValues.Length; ++i)
+                {
                     values[i] = selectionValues[i].ToString();
+                }
             }
 
             inputDialog.Init(receiver, token, title, message, values);
@@ -3255,13 +3377,17 @@ namespace uAdventure.Editor
             // if there isn't file, load the default file
             FileInfo fichero = new FileInfo(dirImageLoading);
             if (!fichero.Exists)
+            {
                 dirImageLoading = ReleaseFolders.IMAGE_LOADING_DIR + "/" + getDefaultLanguage() + "/Editor2D-Loading.png";
+            }
 
             //about file route
             string dirAboutFile = ReleaseFolders.LANGUAGE_DIR_EDITOR + "/" + ReleaseFolders.getAboutFilePath(language);
             FileInfo fichero2 = new FileInfo(dirAboutFile);
             if (!fichero2.Exists)
+            {
                 dirAboutFile = ReleaseFolders.LANGUAGE_DIR_EDITOR + "/" + ReleaseFolders.getDefaultAboutFilePath();
+            }
 
             ConfigData.setLanguangeFile(ReleaseFolders.getLanguageFilePath(language), dirAboutFile, dirImageLoading);
 

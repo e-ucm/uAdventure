@@ -18,9 +18,13 @@ namespace uAdventure.Editor
         protected override void Callback(object obj)
         {
             if ((obj as RunDebugMenuItem) != null)
+            {
                 debug.OnCliked();
+            }
             else if ((obj as RunNormalMenuItem) != null)
+            {
                 normal.OnCliked();
+            }
         }
 
         protected override void SetMenuItems()

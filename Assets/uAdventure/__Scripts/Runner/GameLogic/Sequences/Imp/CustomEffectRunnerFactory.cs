@@ -46,8 +46,12 @@ namespace uAdventure.Runner
                     var dwattr = attr as CustomEffectRunnerAttribute;
                     // Try create an instance with the Activator
                     foreach (var writterType in dwattr.Types)
+                    {
                         if (!knownRunners.ContainsKey(writterType))
+                        {
                             knownRunners.Add(writterType, runnerType);
+                        }
+                    }
                 }
             }
         }

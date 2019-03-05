@@ -18,9 +18,13 @@ namespace uAdventure.Editor
         protected override void Callback(object obj)
         {
             if ((obj as AboutEAMenuItem) != null)
+            {
                 about.OnCliked();
+            }
             else if ((obj as AboutEASendMenuItem) != null)
+            {
                 send.OnCliked();
+            }
         }
 
         protected override void SetMenuItems()

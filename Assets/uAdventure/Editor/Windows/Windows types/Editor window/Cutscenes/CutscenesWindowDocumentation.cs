@@ -24,24 +24,31 @@ namespace uAdventure.Editor
             EditorGUI.BeginChangeCheck();
             var sceneclass = EditorGUILayout.TextField(new GUIContent("xAPI Class"), current.getXApiClass());
             if (EditorGUI.EndChangeCheck())
+            {
                 current.setXApiClass(sceneclass);
-            
+            }
+
             EditorGUI.BeginChangeCheck();
             var scenetype = EditorGUILayout.TextField(new GUIContent("xAPI Type"), current.getXApiType());
             if (EditorGUI.EndChangeCheck())
+            {
                 current.setXApiType(scenetype);
+            }
 
             EditorGUI.BeginChangeCheck();
             var nameOfCutscene = EditorGUILayout.TextField(TC.get("Cutscene.Name"), current.getName());
             if (EditorGUI.EndChangeCheck())
+            {
                 current.setName(nameOfCutscene);
+            }
 
             EditorGUI.BeginChangeCheck();
             EditorGUILayout.PrefixLabel(TC.get("Cutscene.Documentation"));
             var description = EditorGUILayout.TextArea(current.getDocumentation(), GUILayout.ExpandHeight(true));
             if(EditorGUI.EndChangeCheck())
+            {
                 current.setDocumentation(description);
-
+            }
         }
     }
 }

@@ -48,7 +48,10 @@ namespace uAdventure.Editor
         {
 
             if (oldScrollable == newScrollable)
+            {
                 return false;
+            }
+
             bookPage.setScrollable(newScrollable);
             return true;
         }
