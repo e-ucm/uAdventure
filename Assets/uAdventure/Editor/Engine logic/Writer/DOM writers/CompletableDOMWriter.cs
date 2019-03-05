@@ -63,11 +63,14 @@ namespace uAdventure.Editor
             }
 
             if (completable.getProgress() != null)
+            {
                 completableNode.AppendChild(CompletableDOMWriter.buildProgressDOM(completable.getProgress()));
+            }
 
             if (completable.getScore() != null)
+            {
                 completableNode.AppendChild(CompletableDOMWriter.buildScoreDOM(completable.getScore()));
-            
+            }
         }
 
         public static XmlElement buildMilestoneDOM(Completable.Milestone milestone, string elementName = "milestone")
@@ -86,7 +89,9 @@ namespace uAdventure.Editor
             }
 
             if (milestone.getProgress() >= 0)
+            {
                 milestoneNode.SetAttribute("progress", milestone.getProgress().ToString());
+            }
 
             return milestoneNode;
         }

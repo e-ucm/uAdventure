@@ -41,17 +41,25 @@ namespace uAdventure.Editor
 
             // Add a new resource if the list is empty
             if (resourcesList.Count == 0)
+            {
                 resourcesList.Add(new ResourcesUni());
+            }
 
             // Create the subcontrollers
             resourcesDataControlList = new List<ResourcesDataControl>();
             foreach (ResourcesUni resources in resourcesList)
+            {
                 resourcesDataControlList.Add(new ResourcesDataControl(resources, Controller.BOOK));
+            }
 
             if (book.getType() == Book.TYPE_PARAGRAPHS)
+            {
                 bookParagraphsListDataControl = new BookParagraphsListDataControl(book.getParagraphs());
+            }
             else if (book.getType() == Book.TYPE_PAGES)
+            {
                 bookPagesListDataControl = new BookPagesListDataControl(book.getPageURLs(), this);
+            }
         }
 
         /**
@@ -361,7 +369,9 @@ namespace uAdventure.Editor
                 // Show a dialog asking for the new book id
                 string newBookId = name;
                 if (name == null)
+                {
                     controller.ShowInputDialog(TC.get("Operation.RenameBookTitle"), TC.get("Operation.RenameBookMessage"), oldBookId, (o,s) => performRenameElement(s));
+                }
                 else
                 {
                     controller.DataModified();
@@ -377,7 +387,9 @@ namespace uAdventure.Editor
             string oldBookId = book.getId();
             // If some value was typed and the identifiers are different
             if (!controller.isElementIdValid(newBookId))
+            {
                 newBookId = controller.makeElementValid(newBookId);
+            }
 
             book.setId(newBookId);
             controller.replaceIdentifierReferences(oldBookId, newBookId);
@@ -409,9 +421,13 @@ namespace uAdventure.Editor
 
             // Spread the call to the paragraphs
             if (book.getType() == Book.TYPE_PARAGRAPHS)
+            {
                 valid &= bookParagraphsListDataControl.isValid(currentPath, incidences);
+            }
             else if (book.getType() == Book.TYPE_PAGES)
+            {
                 valid &= bookPagesListDataControl.isValid(currentPath, incidences);
+            }
 
             return valid;
         }
@@ -424,13 +440,20 @@ namespace uAdventure.Editor
 
             // Iterate through the resources
             foreach (ResourcesDataControl resourcesDataControl in resourcesDataControlList)
+            {
                 count += resourcesDataControl.countAssetReferences(assetPath);
+            }
 
             // Spread the call to the paragraphs/pages
             if (book.getType() == Book.TYPE_PARAGRAPHS)
+            {
                 count += bookParagraphsListDataControl.countAssetReferences(assetPath);
+            }
             else if (book.getType() == Book.TYPE_PAGES)
+            {
                 count += bookPagesListDataControl.countAssetReferences(assetPath);
+            }
+
             return count;
         }
 
@@ -440,13 +463,19 @@ namespace uAdventure.Editor
 
             // Iterate through the resources
             foreach (ResourcesDataControl resourcesDataControl in resourcesDataControlList)
+            {
                 resourcesDataControl.getAssetReferences(assetPaths, assetTypes);
+            }
 
             // Spread the call to the paragraphs/pages
             if (book.getType() == Book.TYPE_PARAGRAPHS)
+            {
                 bookParagraphsListDataControl.getAssetReferences(assetPaths, assetTypes);
+            }
             else if (book.getType() == Book.TYPE_PAGES)
+            {
                 bookPagesListDataControl.getAssetReferences(assetPaths, assetTypes);
+            }
         }
 
 
@@ -455,13 +484,19 @@ namespace uAdventure.Editor
 
             // Iterate through the resources
             foreach (ResourcesDataControl resourcesDataControl in resourcesDataControlList)
+            {
                 resourcesDataControl.deleteAssetReferences(assetPath);
+            }
 
             // Spread the call to the paragraphs/pages
             if (book.getType() == Book.TYPE_PARAGRAPHS)
+            {
                 bookParagraphsListDataControl.deleteAssetReferences(assetPath);
+            }
             else if (book.getType() == Book.TYPE_PAGES)
+            {
                 bookPagesListDataControl.deleteAssetReferences(assetPath);
+            }
         }
 
 
@@ -505,9 +540,15 @@ namespace uAdventure.Editor
             check(this.getDocumentation(), TC.get("Search.Documentation"));
             check(this.getId(), "ID");
             if (this.getBookParagraphsList() != null)
+            {
                 this.getBookParagraphsList().recursiveSearch();
+            }
+
             if (this.getBookPagesList() != null)
+            {
                 this.getBookPagesList().recursiveSearch();
+            }
+
             check(this.getPreviewImage(), TC.get("Search.PreviewImage"));
         }
 
@@ -517,10 +558,16 @@ namespace uAdventure.Editor
 
             List<Searchable> path = getPathFromChild(dataControl, resourcesDataControlList.Cast<Searchable>().ToList());
             if (path != null)
+            {
                 return path;
+            }
+
             path = getPathFromChild(dataControl, bookParagraphsListDataControl);
             if (path != null)
+            {
                 return path;
+            }
+
             return getPathFromSearchableChild(dataControl, bookPagesListDataControl);
         }
 

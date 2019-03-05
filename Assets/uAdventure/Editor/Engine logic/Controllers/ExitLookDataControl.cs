@@ -13,7 +13,10 @@ namespace uAdventure.Editor
         {
 
             if (nextScene.getExitLook() == null)
+            {
                 nextScene.setExitLook(new ExitLook());
+            }
+
             this.exitLook = nextScene.getExitLook();
         }
 
@@ -21,7 +24,10 @@ namespace uAdventure.Editor
         {
 
             if (exit.getDefaultExitLook() == null)
+            {
                 exit.setDefaultExitLook(new ExitLook());
+            }
+
             this.exitLook = exit.getDefaultExitLook();
         }
 
@@ -39,7 +45,10 @@ namespace uAdventure.Editor
 
             string text = null;
             if (exitLook != null && exitLook.getExitText() != null)
+            {
                 text = exitLook.getExitText();
+            }
+
             return text;
         }
 
@@ -49,7 +58,10 @@ namespace uAdventure.Editor
 
             string text = null;
             if (exitLook != null && exitLook.getSoundPath() != null)
+            {
                 text = exitLook.getSoundPath();
+            }
+
             return text;
         }
 
@@ -67,7 +79,10 @@ namespace uAdventure.Editor
 
             string text = null;
             if (exitLook != null && exitLook.getCursorPath() != null)
+            {
                 text = exitLook.getCursorPath();
+            }
+
             return text;
         }
 
@@ -110,23 +125,31 @@ namespace uAdventure.Editor
         {
 
             if (exitLook.getCursorPath() != null && exitLook.getCursorPath().Equals(assetPath))
+            {
                 return 1;
+            }
             else if (exitLook.getSoundPath() != null && exitLook.getSoundPath().Equals(assetPath))
+            {
                 return 1;
+            }
             else
+            {
                 return 0;
-
+            }
         }
 
         public void deleteAssetReferences(string assetPath)
         {
 
             if (exitLook.getCursorPath() != null && exitLook.getCursorPath().Equals(assetPath))
+            {
                 exitLook.setCursorPath("");
+            }
 
             if (exitLook.getSoundPath() != null && exitLook.getSoundPath().Equals(assetPath))
+            {
                 exitLook.setSoundPath("");
-
+            }
         }
 
         public void setSoundPath(string soundPath)

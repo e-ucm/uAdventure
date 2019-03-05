@@ -69,7 +69,9 @@ namespace uAdventure.Editor
                     }
                 }
                 foreach (Side side in trajectory.getSides())
+                {
                     sideDataControlList.Add(new SideDataControl(sceneDataControl, this, side));
+                }
             }
         }
 
@@ -211,7 +213,9 @@ namespace uAdventure.Editor
         {
 
             if (startNode == endNode)
+            {
                 return false;
+            }
 
             string sID = startNode.getID(), eID = endNode.getID();
 
@@ -248,7 +252,9 @@ namespace uAdventure.Editor
                     return true;
                 }
                 else
+                {
                     return false;
+                }
             }
             if (dataControl is SideDataControl && sideDataControlList.Contains((SideDataControl)dataControl))
             {
@@ -440,7 +446,10 @@ namespace uAdventure.Editor
 
             List<Searchable> path = getPathFromChild(dataControl, nodeDataControlList.Cast<System.Object>().ToList());
             if (path != null)
+            {
                 return path;
+            }
+
             return getPathFromChild(dataControl, sideDataControlList.Cast<System.Object>().ToList());
         }
     }

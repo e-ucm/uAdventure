@@ -17,7 +17,9 @@ namespace uAdventure.QR
             elem.SetAttribute("selection-type", qrPromptEffect.SelectionType.ToString());
             AddNode(node, "message", qrPromptEffect.PromptMessage);
             foreach (var qr in qrPromptEffect.ValidIds)
+            {
                 AddNode(node, "qr-id", qr);
+            }
         }
 
         protected override string GetElementNameFor(object target)

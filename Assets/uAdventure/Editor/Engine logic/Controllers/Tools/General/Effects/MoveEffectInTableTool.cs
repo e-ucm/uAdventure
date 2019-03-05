@@ -74,9 +74,14 @@ namespace uAdventure.Editor
         {
 
             if (mode == MODE_UP)
+            {
                 newIndex = moveUp();
+            }
             else if (mode == MODE_DOWN)
+            {
                 newIndex = moveDown();
+            }
+
             return (newIndex != -1);
         }
 
@@ -85,12 +90,19 @@ namespace uAdventure.Editor
 
             bool done = false;
             if (mode == MODE_UP)
+            {
                 done = moveUp() != -1;
+            }
             else if (mode == MODE_DOWN)
+            {
                 done = moveDown() != -1;
+            }
 
             if (done)
+            {
                 Controller.Instance.updatePanel();
+            }
+
             return done;
         }
 
@@ -115,7 +127,10 @@ namespace uAdventure.Editor
             }
 
             if (done)
+            {
                 Controller.Instance.updatePanel();
+            }
+
             return done;
 
         }

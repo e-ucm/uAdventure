@@ -54,11 +54,18 @@ namespace uAdventure.Editor
             {
                 bookPage.setType(newType);
                 if (newType == BookPage.TYPE_RESOURCE)
+                {
                     bookPage.setUri("");
+                }
                 else if (newType == BookPage.TYPE_IMAGE)
+                {
                     bookPage.setUri("");
+                }
                 else
+                {
                     bookPage.setUri("http://www.");
+                }
+
                 return true;
             }
             return false;
@@ -70,11 +77,18 @@ namespace uAdventure.Editor
 
             bookPage.setType(newType);
             if (newType == BookPage.TYPE_RESOURCE)
+            {
                 bookPage.setUri("");
+            }
             else if (newType == BookPage.TYPE_IMAGE)
+            {
                 bookPage.setUri("");
+            }
             else
+            {
                 bookPage.setUri("http://www.");
+            }
+
             Controller.Instance.updatePanel();
             return true;
         }

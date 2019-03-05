@@ -51,12 +51,20 @@ namespace uAdventure.Editor
                         case 0:
                             EditorGUI.BeginChangeCheck();
                             var id = EditorGUI.DelayedTextField(rect, globalState.getId());
-                            if (EditorGUI.EndChangeCheck()) globalState.setId(id);
+                            if (EditorGUI.EndChangeCheck())
+                            {
+                                globalState.setId(id);
+                            }
+
                             break;
                         case 1:
                             EditorGUI.BeginChangeCheck();
                             var documentation = EditorGUI.TextArea(rect, globalState.getDocumentation() ?? string.Empty);
-                            if (EditorGUI.EndChangeCheck()) globalState.setDocumentation(documentation);
+                            if (EditorGUI.EndChangeCheck())
+                            {
+                                globalState.setDocumentation(documentation);
+                            }
+
                             break;
                         case 2:
                             if (GUI.Button(rect, globalState.getController().getBlocksCount() > 0 ? conditionsTex : noConditionsTex))

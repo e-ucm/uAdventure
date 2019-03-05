@@ -93,7 +93,11 @@ namespace uAdventure.Editor
                             {
                                 Texture2D icon = null;
                                 var type = erdc.getReferencedElementDataControl().GetType();
-                                if (icons.ContainsKey(type)) icon = icons[type];
+                                if (icons.ContainsKey(type))
+                                {
+                                    icon = icons[type];
+                                }
+
                                 if (icon != null)
                                 {
                                     GUI.Label(iconSpace, icons[type]);
@@ -269,7 +273,9 @@ namespace uAdventure.Editor
                 var sprite = GetSprite(elem);
 
                 if (!sprite)
+                {
                     return new Rect(Vector2.zero, new Vector2(100f, 100f));
+                }
 
                 return new Rect(Vector2.zero, new Vector2(sprite.texture.width, sprite.texture.height));
             }

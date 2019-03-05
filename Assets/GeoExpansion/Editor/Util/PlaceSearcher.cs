@@ -120,7 +120,10 @@ namespace uAdventure.Geo
             {
                 var addresses = new List<string>();
                 foreach (var r in place.DataStructure.dataChache)
+                {
                     addresses.Add(r.label);
+                }
+
                 addressDropdown.Elements = addresses;
                 // Request the repaint of the element
                 OnRequestRepaint();

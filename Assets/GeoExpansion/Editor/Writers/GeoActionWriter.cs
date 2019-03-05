@@ -14,22 +14,34 @@ namespace uAdventure.Editor
             var geoAction = target as GeoAction;
 
             if(!geoAction.Conditions.IsEmpty())
+            {
                 DOMWriterUtility.DOMWrite(node, geoAction.Conditions);
+            }
 
             if (!geoAction.Effects.IsEmpty())
+            {
                 DOMWriterUtility.DOMWrite(node, geoAction.Effects);
+            }
 
             if (geoAction is ExitAction)
+            {
                 FillNode(node, geoAction as ExitAction, options);
+            }
 
             if (geoAction is EnterAction)
+            {
                 FillNode(node, geoAction as EnterAction, options);
+            }
 
             if (geoAction is LookToAction)
+            {
                 FillNode(node, geoAction as LookToAction, options);
+            }
 
             if (geoAction is InspectAction)
+            {
                 FillNode(node, geoAction as InspectAction, options);
+            }
         }
 
         protected void FillNode(XmlNode node, ExitAction target, params IDOMWriterParam[] options)
@@ -73,13 +85,24 @@ namespace uAdventure.Editor
         protected override string GetElementNameFor(object target)
         {
             if (target is ExitAction)
+            {
                 return "exit-action";
+            }
+
             if (target is EnterAction)
+            {
                 return "enter-action";
+            }
+
             if (target is LookToAction)
+            {
                 return "lookto-action";
+            }
+
             if (target is InspectAction)
+            {
                 return "inspect-action";
+            }
 
             return "";
         }

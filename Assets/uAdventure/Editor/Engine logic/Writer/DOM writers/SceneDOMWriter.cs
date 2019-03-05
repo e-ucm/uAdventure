@@ -44,9 +44,13 @@ namespace uAdventure.Editor
             sceneElement.SetAttribute("id", scene.getId());
             
             if (options.Any(o => o is CIP && (o as CIP).TargetId.Equals(scene.getId())))
+            {
                 sceneElement.SetAttribute("start", "yes");
+            }
             else
+            {
                 sceneElement.SetAttribute("start", "no");
+            }
 
             sceneElement.SetAttribute("playerLayer", scene.getPlayerLayer().ToString());
             sceneElement.SetAttribute("playerScale", scene.getPlayerScale().ToString());
@@ -133,14 +137,24 @@ namespace uAdventure.Editor
                     {
                         XmlElement exitLook = doc.CreateElement("exit-look");
                         if (defaultLook.getExitText() != null)
+                        {
                             exitLook.SetAttribute("text", defaultLook.getExitText());
+                        }
+
                         if (defaultLook.getCursorPath() != null)
+                        {
                             exitLook.SetAttribute("cursor-path", defaultLook.getCursorPath());
+                        }
+
                         if (defaultLook.getSoundPath() != null)
+                        {
                             exitLook.SetAttribute("sound-path", defaultLook.getSoundPath());
+                        }
 
                         if (defaultLook.getExitText() != null || defaultLook.getCursorPath() != null)
+                        {
                             exitElement.AppendChild(exitLook);
+                        }
                     }
 
                     // Append the next-scene structures
@@ -173,22 +187,37 @@ namespace uAdventure.Editor
                             Debug.Log("SAVE 154: " + look.getExitText());
                             XmlElement exitLook = doc.CreateElement("exit-look");
                             if (look.getExitText() != null)
+                            {
                                 exitLook.SetAttribute("text", look.getExitText());
+                            }
+
                             if (look.getCursorPath() != null)
+                            {
                                 exitLook.SetAttribute("cursor-path", look.getCursorPath());
+                            }
+
                             if (look.getSoundPath() != null)
+                            {
                                 exitLook.SetAttribute("sound-path", look.getSoundPath());
+                            }
+
                             if (look.getExitText() != null || look.getCursorPath() != null)
+                            {
                                 nextSceneElement.AppendChild(exitLook);
+                            }
                         }
 
                         OrderedDictionary nextSceneEffects = new OrderedDictionary();
 
                         if (nextScene.getEffects() != null && !nextScene.getEffects().IsEmpty())
+                        {
                             nextSceneEffects.Add(EffectsDOMWriter.EFFECTS, nextScene.getEffects());
+                        }
 
                         if (nextScene.getPostEffects() != null && !nextScene.getPostEffects().IsEmpty())
+                        {
                             nextSceneEffects.Add(EffectsDOMWriter.POST_EFFECTS, nextScene.getPostEffects());
+                        }
 
                         // Append the next scene
                         DOMWriterUtility.DOMWrite(nextSceneElement, nextSceneEffects, DOMWriterUtility.DontCreateElement());
@@ -215,13 +244,19 @@ namespace uAdventure.Editor
                     OrderedDictionary effectsTypes = new OrderedDictionary();
 
                     if (exit.getEffects() != null && !exit.getEffects().IsEmpty())
+                    {
                         effectsTypes.Add(EffectsDOMWriter.EFFECTS, exit.getEffects());
+                    }
 
                     if (exit.getPostEffects() != null && !exit.getPostEffects().IsEmpty())
+                    {
                         effectsTypes.Add(EffectsDOMWriter.POST_EFFECTS, exit.getPostEffects());
+                    }
 
                     if (exit.getNotEffects() != null && !exit.getNotEffects().IsEmpty())
+                    {
                         effectsTypes.Add(EffectsDOMWriter.NOT_EFFECTS, exit.getNotEffects());
+                    }
 
 
                     DOMWriterUtility.DOMWrite(exitElement, effectsTypes, DOMWriterUtility.DontCreateElement());
@@ -248,7 +283,10 @@ namespace uAdventure.Editor
                     itemReferenceElement.SetAttribute("y", itemReference.getY().ToString());
                     itemReferenceElement.SetAttribute("scale", itemReference.getScale().ToString());
                     if (itemReference.getLayer() != -1)
+                    {
                         itemReferenceElement.SetAttribute("layer", itemReference.getLayer().ToString());
+                    }
+
                     if (itemReference.getInfluenceArea().isExists())
                     {
                         itemReferenceElement.SetAttribute("hasInfluenceArea", "yes");
@@ -300,7 +338,10 @@ namespace uAdventure.Editor
                     npcReferenceElement.SetAttribute("scale", characterReference.getScale().ToString());
                     npcReferenceElement.SetAttribute("orientation", ((int)characterReference.GetOrientation()).ToString());
                     if (characterReference.getLayer() != -1)
+                    {
                         npcReferenceElement.SetAttribute("layer", characterReference.getLayer().ToString());
+                    }
+
                     if (characterReference.getInfluenceArea().isExists())
                     {
                         npcReferenceElement.SetAttribute("hasInfluenceArea", "yes");
@@ -347,7 +388,10 @@ namespace uAdventure.Editor
                     // Create the active area element
                     XmlElement aaElement = doc.CreateElement("active-area");
                     if (activeArea.getId() != null)
+                    {
                         aaElement.SetAttribute("id", activeArea.getId());
+                    }
+
                     aaElement.SetAttribute("rectangular", (activeArea.isRectangular() ? "yes" : "no"));
                     aaElement.SetAttribute("x", activeArea.getX().ToString());
                     aaElement.SetAttribute("y", activeArea.getY().ToString());
@@ -369,11 +413,19 @@ namespace uAdventure.Editor
 
                     // Behavior
                     if (activeArea.getBehaviour() == Item.BehaviourType.NORMAL)
+                    {
                         aaElement.SetAttribute("behaviour", "normal");
+                    }
+
                     if (activeArea.getBehaviour() == Item.BehaviourType.ATREZZO)
+                    {
                         aaElement.SetAttribute("behaviour", "atrezzo");
+                    }
+
                     if (activeArea.getBehaviour() == Item.BehaviourType.FIRST_ACTION)
+                    {
                         aaElement.SetAttribute("behaviour", "first-action");
+                    }
 
                     // Append the documentation (if avalaible)
                     if (activeArea.getDocumentation() != null)
@@ -507,7 +559,9 @@ namespace uAdventure.Editor
                     atrezzoReferenceElement.SetAttribute("y", atrezzoReference.getY().ToString());
                     atrezzoReferenceElement.SetAttribute("scale", atrezzoReference.getScale().ToString());
                     if (atrezzoReference.getLayer() != -1)
+                    {
                         atrezzoReferenceElement.SetAttribute("layer", atrezzoReference.getLayer().ToString());
+                    }
 
                     // Append the documentation (if avalaible)
                     if (atrezzoReference.getDocumentation() != null)

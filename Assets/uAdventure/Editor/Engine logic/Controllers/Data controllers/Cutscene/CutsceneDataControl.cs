@@ -46,12 +46,16 @@ namespace uAdventure.Editor
 
             // Add a new resource if the list is empty
             if (resourcesList.Count == 0)
+            {
                 resourcesList.Add(new ResourcesUni());
+            }
 
             // Create the subcontrollers
             resourcesDataControlList = new List<ResourcesDataControl>();
             foreach (ResourcesUni resources in resourcesList)
+            {
                 resourcesDataControlList.Add(new ResourcesDataControl(resources, cutsceneType));
+            }
         }
 
         /**
@@ -263,7 +267,9 @@ namespace uAdventure.Editor
                 // Show a dialog asking for the new cutscnee id
                 string newCutsceneId = name;
                 if (name == null)
+                {
                     controller.ShowInputDialog(TC.get("Operation.RenameCutsceneTitle"), TC.get("Operation.RenameCutsceneMessage"), oldCutsceneId, (o,s) => performRenameElement(s));
+                }
                 else
                 {
                     controller.DataModified();
@@ -280,7 +286,9 @@ namespace uAdventure.Editor
 
             // If some value was typed and the identifiers are different
             if (!controller.isElementIdValid(newCutsceneId))
+            {
                 newCutsceneId = controller.makeElementValid(newCutsceneId);
+            }
 
             cutscene.setId(newCutsceneId);
             controller.replaceIdentifierReferences(oldCutsceneId, newCutsceneId);
@@ -297,7 +305,9 @@ namespace uAdventure.Editor
             EffectsController.updateVarFlagSummary(varFlagSummary, cutscene.getEffects());
             // Iterate through the resources
             foreach (ResourcesDataControl resourcesDataControl in resourcesDataControlList)
+            {
                 resourcesDataControl.updateVarFlagSummary(varFlagSummary);
+            }
         }
 
 
@@ -326,7 +336,9 @@ namespace uAdventure.Editor
 
             // Iterate through the resources
             foreach (ResourcesDataControl resourcesDataControl in resourcesDataControlList)
+            {
                 count += resourcesDataControl.countAssetReferences(assetPath);
+            }
 
             count += EffectsController.countAssetReferences(assetPath, cutscene.getEffects());
 
@@ -339,7 +351,9 @@ namespace uAdventure.Editor
 
             // Iterate through the resources
             foreach (ResourcesDataControl resourcesDataControl in resourcesDataControlList)
+            {
                 resourcesDataControl.getAssetReferences(assetPaths, assetTypes);
+            }
 
             EffectsController.getAssetReferences(assetPaths, assetTypes, cutscene.getEffects());
 
@@ -351,7 +365,9 @@ namespace uAdventure.Editor
 
             // Iterate through the resources
             foreach (ResourcesDataControl resourcesDataControl in resourcesDataControlList)
+            {
                 resourcesDataControl.deleteAssetReferences(assetPath);
+            }
 
             EffectsController.deleteAssetReferences(assetPath, cutscene.getEffects());
         }
@@ -365,7 +381,9 @@ namespace uAdventure.Editor
             if (cutscene.getTargetId() != null)
             {
                 if (cutscene.getTargetId().Equals(id))
+                {
                     count++;
+                }
             }
 
             count += EffectsController.countIdentifierReferences(id, cutscene.getEffects());
@@ -377,7 +395,9 @@ namespace uAdventure.Editor
         public override void replaceIdentifierReferences(string oldId, string newId)
         {
             if (cutscene.getNext() == Cutscene.NEWSCENE && cutscene.getTargetId().Equals(oldId))
+            {
                 cutscene.setTargetId(newId);
+            }
 
             EffectsController.replaceIdentifierReferences(oldId, newId, cutscene.getEffects());
         }
@@ -388,7 +408,9 @@ namespace uAdventure.Editor
 
             EffectsController.deleteIdentifierReferences(id, cutscene.getEffects());
             if (cutscene.getNext() == Cutscene.NEWSCENE && cutscene.getTargetId().Equals(id))
+            {
                 cutscene.setNext(Cutscene.GOBACK);
+            }
         }
 
 
@@ -493,7 +515,9 @@ namespace uAdventure.Editor
             if (cutscene.getTargetId() == null || cutscene.getTargetId().Equals(""))
 			{
 				if(chapterTargets.Length > 0)
-					cutscene.setTargetId(chapterTargets[0]);
+                {
+                    cutscene.setTargetId(chapterTargets[0]);
+                }
             }
             else
             {
@@ -501,10 +525,14 @@ namespace uAdventure.Editor
 				for (int i = 0; i < chapterTargets.Length; i++)
                 {
 					if (chapterTargets[i].Equals(cutscene.getTargetId()))
+                    {
                         exists = true;
+                    }
                 }
                 if (!exists)
-					cutscene.setTargetId(chapterTargets[0]);
+                {
+                    cutscene.setTargetId(chapterTargets[0]);
+                }
             }
         }
 
@@ -558,9 +586,13 @@ namespace uAdventure.Editor
         {
 
             if (cutscene.hasPlayerPosition())
+            {
                 controller.AddTool(new ChangeNSDestinyPositionTool(cutscene, int.MinValue, int.MinValue));
+            }
             else
+            {
                 controller.AddTool(new ChangeNSDestinyPositionTool(cutscene, AssetsImageDimensions.BACKGROUND_MAX_WIDTH / 2, AssetsImageDimensions.BACKGROUND_MAX_HEIGHT / 2));
+            }
         }
 
         /**
@@ -619,15 +651,21 @@ namespace uAdventure.Editor
         public bool getCanSkip()
         {
             if (isVideoscene())
+            {
                 return ((Videoscene)cutscene).isCanSkip();
+            }
             else
+            {
                 return false;
+            }
         }
 
         public void setCanSkip(bool canSkip)
         {
             if (isVideoscene())
+            {
                 ((Videoscene)cutscene).setCanSkip(canSkip);
+            }
         }
 
         /**

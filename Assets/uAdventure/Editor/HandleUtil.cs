@@ -12,7 +12,9 @@ public static class HandleUtil {
         Vector2 oldPointValue = Vector2.zero;
 
         if (Event.current.type == EventType.Repaint)
+        {
             drawPolygon(points);
+        }
 
         for (int i = 0; i < points.Length; i++)
         {
@@ -184,7 +186,9 @@ public static class HandleUtil {
         Handles.color = color;
         Handles.DrawAAPolyLine(width, V2ToV3(points));
         if (closed)
+        {
             Handles.DrawAAPolyLine(width, V2ToV3(new Vector2[] { points[0], points[points.Length - 1] }));
+        }
     }
 
     /// <summary>

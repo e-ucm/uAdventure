@@ -60,9 +60,15 @@ namespace uAdventure.Editor
                             {
                                 EditorGUI.BeginChangeCheck();
                                 var newId = EditorGUI.DelayedTextField(columnRect, element.getId());
-                                if (EditorGUI.EndChangeCheck()) element.renameElement(newId);
+                                if (EditorGUI.EndChangeCheck())
+                                {
+                                    element.renameElement(newId);
+                                }
                             }
-                            else GUI.Label(columnRect, element.getId());
+                            else
+                            {
+                                GUI.Label(columnRect, element.getId());
+                            }
 
                             break;
                         case 2:
@@ -165,7 +171,10 @@ namespace uAdventure.Editor
                 var selectedBehaviourType = EditorGUILayout.Popup(TC.get("Behaviour"), (int)workingActiveArea.getBehaviour(), behaviourTypes.Select(bt => TC.get(bt)).ToArray());
                 Item.BehaviourType type = (selectedBehaviourType == 0 ? Item.BehaviourType.NORMAL : Item.BehaviourType.FIRST_ACTION);
                 if (EditorGUI.EndChangeCheck())
+                {
                     workingActiveArea.setBehaviour(type);
+                }
+
                 EditorGUILayout.HelpBox(TC.get(behaviourTypesDescription[selectedBehaviourType]), MessageType.Info);
                 GUILayout.Space(20);
             }

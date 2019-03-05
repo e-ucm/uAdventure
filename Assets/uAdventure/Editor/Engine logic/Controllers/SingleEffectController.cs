@@ -16,7 +16,10 @@ namespace uAdventure.Editor
 
             Effects effects = new Effects();
             if (effect != null)
+            {
                 effects.Add(effect);
+            }
+
             return effects;
         }
 
@@ -46,7 +49,10 @@ namespace uAdventure.Editor
         {
 
             if (getEffectCount() > 0)
+            {
                 return getEffectInfo(0);
+            }
+
             return null;
         }
 
@@ -115,7 +121,9 @@ namespace uAdventure.Editor
         public void deleteEffect()
         {
             if (getEffectCount() > 0)
+            {
                 deleteEffect(0);
+            }
         }
 
         /**
@@ -129,18 +137,26 @@ namespace uAdventure.Editor
         {
 
             if (getEffectCount() > 0)
+            {
                 return editEffect(0);
+            }
             else
+            {
                 return addEffect();
+            }
         }
 
         public IEffect getEffect()
         {
 
             if (getEffectCount() > 0)
+            {
                 return effects.getEffects()[0];
+            }
             else
+            {
                 return null;
+            }
         }
     }
 }

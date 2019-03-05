@@ -246,10 +246,16 @@ namespace uAdventure.Editor
 
             List<Searchable> path = getPathFromChild(dataControl, globalStatesListDataControl);
             if (path != null)
+            {
                 return path;
+            }
+
             path = getPathFromChild(dataControl, timersListDataControl);
             if (path != null)
+            {
                 return path;
+            }
+
             return getPathFromChild(dataControl, macrosListDataControl);
         }
 

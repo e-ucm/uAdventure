@@ -22,27 +22,35 @@ namespace uAdventure.Editor
             EditorGUI.BeginChangeCheck();
             var newClass = EditorGUILayout.TextField(new GUIContent("xAPI Class"), sceneObject.getXApiClass());
             if (EditorGUI.EndChangeCheck())
+            {
                 sceneObject.setXApiClass(newClass);
+            }
 
             // Xapi Type
             EditorGUI.BeginChangeCheck();
             var newType = EditorGUILayout.TextField(new GUIContent("xAPI Type"), sceneObject.getXApiType());
             if (EditorGUI.EndChangeCheck())
+            {
                 sceneObject.setXApiType(newType);
+            }
 
 
             // Name
             EditorGUI.BeginChangeCheck();
             var newName = EditorGUILayout.TextField(TC.get("Scene.Name"), workingScene.getName());
             if (EditorGUI.EndChangeCheck())
+            {
                 workingScene.setName(newName);
+            }
 
             // Documentation
             EditorGUI.BeginChangeCheck();
             EditorGUILayout.LabelField(TC.get("Scene.Documentation"));
             var newDescription = EditorGUILayout.TextArea(workingScene.getDocumentation(), GUILayout.ExpandHeight(true));
             if (EditorGUI.EndChangeCheck())
+            {
                 workingScene.setDocumentation(newDescription);
+            }
         }
     }
 }

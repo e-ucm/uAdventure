@@ -88,9 +88,13 @@ namespace uAdventure.Editor
             doc.AppendChild(typeDescriptor);
 
             if (!valid)
+            {
                 DOMWriterUtility.DOMWrite(doc, adventureData, new DescriptorDOMWriter.InvalidAdventureDataControlParam());
+            }
             else
+            {
                 DOMWriterUtility.DOMWrite(doc, adventureData);
+            }
 
             doc.Save(folderName + "/descriptor.xml");
             /** ******** END WRITING THE DESCRIPTOR ********** */
@@ -203,7 +207,9 @@ namespace uAdventure.Editor
 
             // If this node has some element, add the indention for the closing tag
             if (!isEmptyOfElements)
+            {
                 nodeDOM.AppendChild(document.CreateTextNode("\n" + getTab(depth)));
+            }
         }
 
         private static bool writeWebPage(string tempDir, string loName, bool windowed, string mainClass, bool debugerScorm)
@@ -564,7 +570,10 @@ namespace uAdventure.Editor
 
             string tab = "";
             for (int i = 0; i < tabulations; i++)
+            {
                 tab += "\t";
+            }
+
             return tab;
         }
     }

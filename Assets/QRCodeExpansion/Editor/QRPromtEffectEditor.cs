@@ -65,13 +65,25 @@ namespace uAdventure.QR
         {
             get
             {
-                if (Collapsed) return new Rect(window.x, window.y, 50, 30);
-                else return window;
+                if (Collapsed)
+                {
+                    return new Rect(window.x, window.y, 50, 30);
+                }
+                else
+                {
+                    return window;
+                }
             }
             set
             {
-                if (Collapsed) window = new Rect(value.x, value.y, window.width, window.height);
-                else window = value;
+                if (Collapsed)
+                {
+                    window = new Rect(value.x, value.y, window.width, window.height);
+                }
+                else
+                {
+                    window = value;
+                }
             }
         }
         public IEffect Effect

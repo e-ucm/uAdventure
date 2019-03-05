@@ -34,7 +34,9 @@ namespace uAdventure.Editor
             EditorGUI.BeginChangeCheck();
             var fullItemDescription = GUILayout.TextArea(workingCharacter.getDocumentation() ?? string.Empty);
             if (EditorGUI.EndChangeCheck())
+            {
                 workingCharacter.setDocumentation(fullItemDescription);
+            }
 
 
             // -------------

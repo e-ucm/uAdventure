@@ -48,12 +48,20 @@ namespace uAdventure.Editor
                         case 0:
                             EditorGUI.BeginChangeCheck();
                             var id = EditorGUI.DelayedTextField(rect, macro.getId());
-                            if (EditorGUI.EndChangeCheck()) macro.setId(id);
+                            if (EditorGUI.EndChangeCheck())
+                            {
+                                macro.setId(id);
+                            }
+
                             break;
                         case 1:
                             EditorGUI.BeginChangeCheck();
                             var documentation = EditorGUI.TextArea(rect, macro.getDocumentation() ?? string.Empty);
-                            if (EditorGUI.EndChangeCheck()) macro.setDocumentation(documentation);
+                            if (EditorGUI.EndChangeCheck())
+                            {
+                                macro.setDocumentation(documentation);
+                            }
+
                             break;
                         case 2:
                             if (GUI.Button(rect, TC.get("GeneralText.EditEffects")))

@@ -23,7 +23,9 @@ namespace uAdventure.Editor
             EditorGUI.BeginChangeCheck();
             var documentation = GUILayout.TextArea(workingAtrezzo.getDocumentation() ?? string.Empty, GUILayout.ExpandHeight(true));
             if (EditorGUI.EndChangeCheck())
+            {
                 workingAtrezzo.setDocumentation(documentation);
+            }
         }
     }
 }

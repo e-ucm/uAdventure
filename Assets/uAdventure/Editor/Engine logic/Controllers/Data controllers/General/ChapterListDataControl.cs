@@ -57,7 +57,10 @@ namespace uAdventure.Editor
                 //Debug.Log(chapter);
             }
             if (chapters.Count > 0)
+            {
                 setSelectedChapterInternal(0);
+            }
+
             this.chapters = chapters;
         }
 
@@ -76,12 +79,19 @@ namespace uAdventure.Editor
                 {
                     selectedChapter = 0;
                     if (identifierSummary == null)
+                    {
                         identifierSummary = new IdentifierSummary(getSelectedChapterData());
+                    }
                     else
+                    {
                         identifierSummary.loadIdentifiers(getSelectedChapterData());
+                    }
 
                     if (varFlagSummary == null)
+                    {
                         varFlagSummary = new VarFlagSummary();
+                    }
+
                     getSelectedChapterDataControl().updateVarFlagSummary(varFlagSummary);
                 }
                 else
@@ -108,7 +118,9 @@ namespace uAdventure.Editor
         public Chapter getSelectedChapterData()
         {
             if (chapterDataControlList == null || selectedChapter < 0 || selectedChapter >= chapterDataControlList.Count)
+            {
                 return null;
+            }
 
             return (Chapter)chapterDataControlList[selectedChapter].getContent();
         }
@@ -192,9 +204,13 @@ namespace uAdventure.Editor
         {
 
             if (chapterDataControlList.Count != 0)
+            {
                 return chapterDataControlList[selectedChapter];
+            }
             else
+            {
                 return null;
+            }
         }
 
         public void addPlayerToAllScenesChapters()
@@ -442,7 +458,9 @@ namespace uAdventure.Editor
 
             // Delete the asset in all the chapters
             foreach (ChapterDataControl chapterDataControl in chapterDataControlList)
+            {
                 chapterDataControl.deleteAssetReferences(assetPath);
+            }
         }
 
         /**
@@ -455,7 +473,10 @@ namespace uAdventure.Editor
         {
 
             if (getSelectedChapterDataControl() != null)
+            {
                 getSelectedChapterDataControl().deleteIdentifierReferences(id);
+            }
+
             //  else
             //    this.identifierSummary.deleteAssessmentRuleId( id );
         }
@@ -476,7 +497,9 @@ namespace uAdventure.Editor
                     chapterToolManagers[getSelectedChapter()].addTool(false, tool);
                 }
                 else
+                {
                     chapterToolManagers[getSelectedChapter()].addTool(false, tool);
+                }
             }
 
             return done;
@@ -540,7 +563,9 @@ namespace uAdventure.Editor
             {
                 Chapter chapter = (Chapter)chapterDataControl.getContent();
                 if (chapter.getTitle().Equals(chapterTitle))
+                {
                     return true;
+                }
             }
             return false;
         }

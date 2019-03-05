@@ -34,7 +34,9 @@ namespace uAdventure.Editor
             // Create subcontrollers
             timersDataControlList = new List<TimerDataControl>();
             foreach (Timer timer in timersList)
+            {
                 timersDataControlList.Add(new TimerDataControl(timer));
+            }
         }
 
         /**
@@ -77,7 +79,9 @@ namespace uAdventure.Editor
             // Create the list for the timers info
             timersInfo = new string[timersList.Count][];
             for (int i = 0; i < timersList.Count; i++)
+            {
                 timersInfo[i] = new string[6];
+            }
 
             // Fill the array with the info
             for (int i = 0; i < timersList.Count; i++)
@@ -199,7 +203,9 @@ namespace uAdventure.Editor
         {
 
             if (!(dataControl is TimerDataControl))
+            {
                 return false;
+            }
 
 
             Timer newElement = (Timer)(((Timer)(dataControl.getContent())).Clone());
@@ -307,7 +313,9 @@ namespace uAdventure.Editor
 
             // Iterate through each timer
             foreach (TimerDataControl timerDataControl in timersDataControlList)
+            {
                 timerDataControl.updateVarFlagSummary(varFlagSummary);
+            }
         }
 
 
@@ -337,7 +345,9 @@ namespace uAdventure.Editor
 
             // Iterate through each timer
             foreach (TimerDataControl timerDataControl in timersDataControlList)
+            {
                 count += timerDataControl.countAssetReferences(assetPath);
+            }
 
             return count;
         }
@@ -358,7 +368,9 @@ namespace uAdventure.Editor
 
             // Iterate through each timer
             foreach (TimerDataControl timerDataControl in timersDataControlList)
+            {
                 timerDataControl.deleteAssetReferences(assetPath);
+            }
         }
 
 
@@ -369,7 +381,9 @@ namespace uAdventure.Editor
 
             // Iterate through each timer
             foreach (TimerDataControl cutsceneDataControl in timersDataControlList)
+            {
                 count += cutsceneDataControl.countIdentifierReferences(id);
+            }
 
             return count;
         }
@@ -380,7 +394,9 @@ namespace uAdventure.Editor
 
             // Iterate through each timer
             foreach (TimerDataControl timerDataControl in timersDataControlList)
+            {
                 timerDataControl.replaceIdentifierReferences(oldId, newId);
+            }
         }
 
 
@@ -389,7 +405,9 @@ namespace uAdventure.Editor
 
             // Spread the call to every timer
             foreach (TimerDataControl timerDataControl in timersDataControlList)
+            {
                 timerDataControl.deleteIdentifierReferences(id);
+            }
         }
 
 
@@ -404,7 +422,9 @@ namespace uAdventure.Editor
         {
 
             foreach (DataControl dc in this.timersDataControlList)
+            {
                 dc.recursiveSearch();
+            }
         }
 
 

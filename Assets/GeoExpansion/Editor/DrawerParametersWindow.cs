@@ -58,7 +58,9 @@ namespace uAdventure.Editor
                 foreach (var param in ExtElemReference.TransformManagerDescriptor.ParameterDescription)
                 {
                     if (!ExtElemReference.TransformManagerParameters.ContainsKey(param.Key))
+                    {
                         ExtElemReference.TransformManagerParameters.Add(param.Key, param.Value.DefaultValue);
+                    }
 
                     if (param.Value.Type == typeof(float))
                     {

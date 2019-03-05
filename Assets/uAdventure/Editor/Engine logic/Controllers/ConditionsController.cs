@@ -94,34 +94,55 @@ namespace uAdventure.Editor
             int state = Condition.NO_STATE;
 
             if (stringState.Equals(STATE_VALUES[0]))
+            {
                 state = FlagCondition.FLAG_ACTIVE;
+            }
 
             else if (stringState.Equals(STATE_VALUES[1]))
+            {
                 state = FlagCondition.FLAG_INACTIVE;
+            }
 
             else if (stringState.Equals(STATE_VALUES[2]))
+            {
                 state = VarCondition.VAR_GREATER_THAN;
+            }
 
             else if (stringState.Equals(STATE_VALUES[3]))
+            {
                 state = VarCondition.VAR_GREATER_EQUALS_THAN;
+            }
 
             else if (stringState.Equals(STATE_VALUES[4]))
+            {
                 state = VarCondition.VAR_LESS_THAN;
+            }
 
             else if (stringState.Equals(STATE_VALUES[5]))
+            {
                 state = VarCondition.VAR_LESS_EQUALS_THAN;
+            }
 
             else if (stringState.Equals(STATE_VALUES[6]))
+            {
                 state = VarCondition.VAR_EQUALS;
+            }
 
             else if (stringState.Equals(STATE_VALUES[7]))
+            {
                 state = VarCondition.VAR_NOT_EQUALS;
+            }
 
             else if (stringState.Equals(STATE_VALUES[8]))
+            {
                 state = GlobalStateCondition.GS_SATISFIED;
+            }
 
             else if (stringState.Equals(STATE_VALUES[9]))
+            {
                 state = GlobalStateCondition.GS_NOT_SATISFIED;
+            }
+
             return state;
         }
 
@@ -130,11 +151,20 @@ namespace uAdventure.Editor
 
             int newTypeInt = -1;
             if (newType.Equals(ConditionsController.CONDITION_TYPE_FLAG))
+            {
                 newTypeInt = Condition.FLAG_CONDITION;
+            }
+
             if (newType.Equals(ConditionsController.CONDITION_TYPE_VAR))
+            {
                 newTypeInt = Condition.VAR_CONDITION;
+            }
+
             if (newType.Equals(ConditionsController.CONDITION_TYPE_GS))
+            {
                 newTypeInt = Condition.GLOBAL_STATE_CONDITION;
+            }
+
             return newTypeInt;
         }
 
@@ -155,9 +185,13 @@ namespace uAdventure.Editor
             foreach (Condition condition in conditions.GetSimpleConditions())
             {
                 if (condition.getType() == Condition.FLAG_CONDITION)
+                {
                     varFlagSummary.addFlagReference(condition.getId());
+                }
                 else if (condition.getType() == Condition.VAR_CONDITION)
+                {
                     varFlagSummary.addVarReference(condition.getId());
+                }
             }
 
             // Then add the references from the either blocks
@@ -166,9 +200,13 @@ namespace uAdventure.Editor
                 foreach (Condition condition in conditions.GetEitherConditions(i))
                 {
                     if (condition.getType() == Condition.FLAG_CONDITION)
+                    {
                         varFlagSummary.addFlagReference(condition.getId());
+                    }
                     else if (condition.getType() == Condition.VAR_CONDITION)
+                    {
                         varFlagSummary.addVarReference(condition.getId());
+                    }
                 }
             }
         }
@@ -350,7 +388,9 @@ namespace uAdventure.Editor
 
             // Check index
             if (index1 < 0 || index1 >= conditions.Size())
+            {
                 return -1;
+            }
 
             return conditions.Get(index1).Count;
         }
@@ -437,7 +477,9 @@ namespace uAdventure.Editor
                     }
                 }
                 if (c.Count == 0)
+                {
                     conditions.GetConditionsList().Remove(c);
+                }
             }
         }
 
@@ -456,7 +498,9 @@ namespace uAdventure.Editor
                 for (int j = 0; j < conditions.Get(i).Count; j++)
                 {
                     if (conditions.Get(i)[j].getId().Equals(oldId))
+                    {
                         conditions.Get(i)[j].setId(newId);
+                    }
                 }
             }
 
@@ -479,7 +523,9 @@ namespace uAdventure.Editor
                 for (int j = 0; j < conditions.Get(i).Count; j++)
                 {
                     if (conditions.Get(i)[j].getId().Equals(id))
+                    {
                         count++;
+                    }
                 }
             }
 
@@ -493,12 +539,16 @@ namespace uAdventure.Editor
 
             // Check index
             if (index1 < 0 || index1 >= conditions.Size())
+            {
                 return null;
+            }
 
             var conditionsList = conditions.Get(index1);
             // Check index2
             if (index2 < 0 || index2 >= conditionsList.Count)
+            {
                 return null;
+            }
 
             Condition condition = conditionsList[index2];
             // Put ID
@@ -549,13 +599,19 @@ namespace uAdventure.Editor
         {
 
             if (index1 < 0 || index1 > conditions.Size())
+            {
                 return false;
+            }
 
             if (conditionType == null || conditionId == null || conditionState == null)
+            {
                 return false;
+            }
 
             if (conditionType.Equals(ConditionsController.CONDITION_TYPE_VAR) && value == null)
+            {
                 return false;
+            }
 
             return
                 Controller.Instance                    .AddTool(new AddConditionTool(conditions, index1, index2, conditionType, conditionId, conditionState,

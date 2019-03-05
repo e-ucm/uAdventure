@@ -76,7 +76,9 @@ namespace uAdventure.Editor
             music.Path = workingScene.getPreviewMusic();
             music.DoLayout();
             if (EditorGUI.EndChangeCheck())
+            {
                 workingScene.setPreviewMusic(music.Path);
+            }
         }
     }
 }

@@ -126,7 +126,9 @@ namespace uAdventure.Editor
         {
             this.list = childs = getChilds(dataControl);
             while (this.index >= this.list.Count)
+            {
                 this.index--;
+            }
         }
 
         int previousSelection = -1;
@@ -158,12 +160,16 @@ namespace uAdventure.Editor
                     if (content is Array)
                     {
                         if (((Array)content).Length != reorderableList.list.Count)
+                        {
                             OnChanged(reorderableList);
+                        }
                     }
                     else if (content is IList)
                     {
                         if (((IList)content).Count != reorderableList.list.Count)
+                        {
                             OnChanged(reorderableList);
+                        }
                     }
                     /* This has obvious performance issues
                     else if (content is IEnumerable)

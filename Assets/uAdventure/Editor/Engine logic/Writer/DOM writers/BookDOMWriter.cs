@@ -119,11 +119,20 @@ namespace uAdventure.Editor
                         pageElement.SetAttribute("scrollable", (page.getScrollable() ? "yes" : "no"));
                         pageElement.SetAttribute("margin", page.getMargin().ToString());
                         if (page.getMarginEnd() != 0)
+                        {
                             pageElement.SetAttribute("marginEnd", page.getMarginEnd().ToString());
+                        }
+
                         if (page.getMarginTop() != 0)
+                        {
                             pageElement.SetAttribute("marginTop", page.getMarginTop().ToString());
+                        }
+
                         if (page.getMarginBottom() != 0)
+                        {
                             pageElement.SetAttribute("marginBottom", page.getMarginBottom().ToString());
+                        }
+
                         pageElement.SetAttribute("uri", page.getUri());
                         switch (page.getType())
                         {

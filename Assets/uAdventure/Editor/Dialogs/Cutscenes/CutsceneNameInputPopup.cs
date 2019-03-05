@@ -44,9 +44,13 @@ namespace uAdventure.Editor
             {
                 value = "assets/animation/" + value + ".eaa.xml";
                 if (isCharacterCutscene)
+                {
                     reference.OnDialogOk(value, this, type);
+                }
                 else
+                {
                     reference.OnDialogOk(value, this);
+                }
 
                 this.Close();
             }

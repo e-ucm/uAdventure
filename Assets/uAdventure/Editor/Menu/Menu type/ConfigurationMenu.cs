@@ -26,25 +26,45 @@ namespace uAdventure.Editor
         protected override void Callback(object obj)
         {
             if ((obj as SetLanguageDeutschMenuItem) != null)
+            {
                 setLanguageDeutsch.OnCliked();
+            }
             else if ((obj as SetLanguageEnglishMenuItem) != null)
+            {
                 setLanguageEnglish.OnCliked();
+            }
             else if ((obj as SetLanguageSpanishMenuItem) != null)
+            {
                 setLanguageSpanish.OnCliked();
+            }
             else if ((obj as SetLanguageGalegoMenuItem) != null)
+            {
                 setLanguageGalego.OnCliked();
+            }
             else if ((obj as SetLanguageItalianoMenuItem) != null)
+            {
                 setLanguageItaliano.OnCliked();
+            }
             else if ((obj as SetLanguagePortugeseMenuItem) != null)
+            {
                 setLanguagePortugese.OnCliked();
+            }
             else if ((obj as SetLanguagePortugeseBrazilMenuItem) != null)
+            {
                 setLanguagePortugeseBrazil.OnCliked();
+            }
             else if ((obj as SetLanguageRomaniaMenuItem) != null)
+            {
                 setLanguageRomania.OnCliked();
+            }
             else if ((obj as SetLanguageRussiaMenuItem) != null)
+            {
                 setLanguageRussia.OnCliked();
+            }
             else if ((obj as SetLanguageChinaMenuItem) != null)
+            {
                 setLanguageChina.OnCliked();
+            }
         }
 
         protected override void SetMenuItems()

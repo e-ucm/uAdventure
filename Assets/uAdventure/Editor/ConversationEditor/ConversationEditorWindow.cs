@@ -87,8 +87,14 @@ namespace uAdventure.Editor
                 editor = ConversationNodeEditorFactory.Intance.createConversationNodeEditorFor(content, editorNames[editorSelected]);
                 editor.setParent(this);
                 editor.Window = prevRect;
-                if (firstEditor) editor.Node = node;
-                else setNode(content, node, editor.Node);
+                if (firstEditor)
+                {
+                    editor.Node = node;
+                }
+                else
+                {
+                    setNode(content, node, editor.Node);
+                }
 
                 editors.Remove(node);
                 editors[editor.Node] = editor;

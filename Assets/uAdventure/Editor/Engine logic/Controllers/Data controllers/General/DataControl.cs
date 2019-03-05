@@ -61,7 +61,9 @@ namespace uAdventure.Editor
 
             // If at least one type of element can be added, return true
             foreach (int type in addableElements)
+            {
                 canAddElements = canAddElements || canAddElement(type);
+            }
 
             return canAddElements;
         }
@@ -290,7 +292,9 @@ namespace uAdventure.Editor
 
             // If some value was typed and the identifiers are different
             if (!controller.isElementIdValid(newId))
+            {
                 newId = controller.makeElementValid(newId);
+            }
 
             elem.setId(newId);
             controller.replaceIdentifierReferences(oldId, newId);
@@ -307,9 +311,16 @@ namespace uAdventure.Editor
 			var direction = fromPos > toPos ? -1 : 1;
 			if (fromPos != -1) {
 				while (fromPos != toPos) {
-					if (direction > 0) moveElementDown (element);
-					else moveElementUp (element);
-					fromPos += direction;
+					if (direction > 0)
+                    {
+                        moveElementDown (element);
+                    }
+                    else
+                    {
+                        moveElementUp (element);
+                    }
+
+                    fromPos += direction;
 				}
 			}
 		}

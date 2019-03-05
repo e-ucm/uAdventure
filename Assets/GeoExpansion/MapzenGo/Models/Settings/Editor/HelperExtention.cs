@@ -15,7 +15,10 @@ namespace MapzenGo.Models.Settings.Editor
         public static void GetOrCreateSObject<T>(ref T scriptebleObject, string pathSaveScriptableObject,string nameScriptableObject, Action action = null) where T : ScriptableObject
         {
             var path = pathSaveScriptableObject + nameScriptableObject;
-            if (!Directory.Exists(pathSaveScriptableObject)) Directory.CreateDirectory(pathSaveScriptableObject);
+            if (!Directory.Exists(pathSaveScriptableObject))
+            {
+                Directory.CreateDirectory(pathSaveScriptableObject);
+            }
 
             if (File.Exists(Path.Combine(Environment.CurrentDirectory, path)))
             {
@@ -26,12 +29,18 @@ namespace MapzenGo.Models.Settings.Editor
                 scriptebleObject = ScriptableObject.CreateInstance<T>();
                 AssetDatabase.CreateAsset(scriptebleObject, path);
                 AssetDatabase.SaveAssets();
-                if (action != null) action();
+                if (action != null)
+                {
+                    action();
+                }
             }
         }
         public static T GetOrCreateSObjectReturn<T>(ref T scriptebleObject, string pathSaveScriptableObject, Action action = null) where T : ScriptableObject
         {
-            if (!Directory.Exists(pathSaveScriptableObject)) Directory.CreateDirectory(pathSaveScriptableObject);
+            if (!Directory.Exists(pathSaveScriptableObject))
+            {
+                Directory.CreateDirectory(pathSaveScriptableObject);
+            }
 
             var path = pathSaveScriptableObject + typeof(T).Name + ".asset";
             if (File.Exists(Path.Combine(Environment.CurrentDirectory, path)))
@@ -45,7 +54,10 @@ namespace MapzenGo.Models.Settings.Editor
                 scriptebleObject = ScriptableObject.CreateInstance<T>();
                 AssetDatabase.CreateAsset(scriptebleObject, path);
                 AssetDatabase.SaveAssets();
-                if (action != null) action();
+                if (action != null)
+                {
+                    action();
+                }
             }
             return scriptebleObject;
         }

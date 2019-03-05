@@ -33,7 +33,9 @@ namespace uAdventure.Editor
             // Create subcontrollers
             itemsDataControlList = new List<ItemDataControl>();
             foreach (Item item in itemsList)
+            {
                 itemsDataControlList.Add(new ItemDataControl(item));
+            }
         }
 
         /**
@@ -76,7 +78,9 @@ namespace uAdventure.Editor
             for (int i = 0; i < itemsList.Count; i++)
             {
                 if (itemsList[i].getId().Equals(id))
+                {
                     return i;
+                }
             }
             return -1;
         }
@@ -95,7 +99,9 @@ namespace uAdventure.Editor
             // Create the list for the items
             itemsInfo = new string[itemsList.Count][];
             for (int i = 0; i < itemsList.Count; i++)
+            {
                 itemsInfo[i] = new string[2];
+            }
 
             // Fill the array with the info
             for (int i = 0; i < itemsList.Count; i++)
@@ -159,7 +165,9 @@ namespace uAdventure.Editor
             if (type == Controller.ITEM)
             {
                 if (string.IsNullOrEmpty(itemId))
+                {
                     controller.ShowInputDialog(TC.get("Operation.AddItemTitle"), TC.get("Operation.AddItemMessage"), TC.get("Operation.AddItemDefaultValue"), performAddElement);
+                }
                 else
                 {
                     performAddElement(null, itemId);
@@ -173,7 +181,9 @@ namespace uAdventure.Editor
         private void performAddElement(object sender, string itemId)
         {
             if (!controller.isElementIdValid(itemId))
+            {
                 itemId = controller.makeElementValid(itemId);
+            }
 
             Item newItem = new Item(itemId);
             itemsList.Add(newItem);
@@ -186,15 +196,19 @@ namespace uAdventure.Editor
         {
 
             if (!(dataControl is ItemDataControl))
+            {
                 return false;
+            }
 
 
             Item newElement = (Item)(((Item)(dataControl.getContent())).Clone());
             string id = newElement.getId();
 
 			if (!controller.isElementIdValid(id))
-				id = controller.makeElementValid(id);
-			
+            {
+                id = controller.makeElementValid(id);
+            }
+
             newElement.setId(id);
             itemsList.Add(newElement);
             itemsDataControlList.Add(new ItemDataControl(newElement));
@@ -290,7 +304,9 @@ namespace uAdventure.Editor
 
             // Iterate through each item
             foreach (ItemDataControl itemDataControl in itemsDataControlList)
+            {
                 itemDataControl.updateVarFlagSummary(varFlagSummary);
+            }
         }
 
 
@@ -320,7 +336,9 @@ namespace uAdventure.Editor
 
             // Iterate through each item
             foreach (ItemDataControl itemDataControl in itemsDataControlList)
+            {
                 count += itemDataControl.countAssetReferences(assetPath);
+            }
 
             return count;
         }
@@ -331,7 +349,9 @@ namespace uAdventure.Editor
 
             // Iterate through each item
             foreach (ItemDataControl itemDataControl in itemsDataControlList)
+            {
                 itemDataControl.getAssetReferences(assetPaths, assetTypes);
+            }
         }
 
 
@@ -340,7 +360,9 @@ namespace uAdventure.Editor
 
             // Iterate through each item
             foreach (ItemDataControl itemDataControl in itemsDataControlList)
+            {
                 itemDataControl.deleteAssetReferences(assetPath);
+            }
         }
 
 
@@ -351,7 +373,9 @@ namespace uAdventure.Editor
 
             // Iterate through each item
             foreach (ItemDataControl itemDataControl in itemsDataControlList)
+            {
                 count += itemDataControl.countIdentifierReferences(id);
+            }
 
             return count;
         }
@@ -362,7 +386,9 @@ namespace uAdventure.Editor
 
             // Iterate through each item
             foreach (ItemDataControl itemDataControl in itemsDataControlList)
+            {
                 itemDataControl.replaceIdentifierReferences(oldId, newId);
+            }
         }
 
 
@@ -371,7 +397,9 @@ namespace uAdventure.Editor
 
             // Spread the call to every item
             foreach (ItemDataControl itemDataControl in itemsDataControlList)
+            {
                 itemDataControl.deleteIdentifierReferences(id);
+            }
         }
 
 
@@ -387,7 +415,9 @@ namespace uAdventure.Editor
         {
 
             foreach (DataControl dc in this.itemsDataControlList)
+            {
                 dc.recursiveSearch();
+            }
         }
 
 

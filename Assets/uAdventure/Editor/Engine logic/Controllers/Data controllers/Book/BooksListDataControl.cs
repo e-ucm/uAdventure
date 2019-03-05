@@ -34,7 +34,9 @@ namespace uAdventure.Editor
             // Create the subcontrollers
             booksDataControlList = new List<BookDataControl>();
             foreach (Book book in booksList)
+            {
                 booksDataControlList.Add(new BookDataControl(book));
+            }
         }
 
         /**
@@ -109,7 +111,9 @@ namespace uAdventure.Editor
             string[] tmp = new string[booksList.Count];
 
             for (int i = 0; i < booksList.Count; i++)
+            {
                 tmp[i] = booksList[i].getId();
+            }
 
             return tmp;
         }
@@ -120,7 +124,9 @@ namespace uAdventure.Editor
             
             // Show a dialog asking for the book id
             if (string.IsNullOrEmpty(bookId))
+            {
                 controller.ShowInputDialog(TC.get("Operation.AddBookTitle"), TC.get("Operation.AddBookMessage"), TC.get("Operation.AddBookDefaultValue"), performAddBook);
+            }
             else
             {
                 performAddBook(null, bookId);
@@ -134,7 +140,9 @@ namespace uAdventure.Editor
         {
             // If some value was typed and the identifier is valid
             if (!controller.isElementIdValid(bookId))
+            {
                 bookId = controller.makeElementValid(bookId);
+            }
 
             // Add thew new book
             Book newBook = new Book(bookId);
@@ -158,15 +166,19 @@ namespace uAdventure.Editor
         {
 
             if (!(dataControl is BookDataControl))
+            {
                 return false;
+            }
 
 
             Book newElement = (Book)(((Book)(dataControl.getContent())).Clone());
 			string id = newElement.getId();
 
 			if (!controller.isElementIdValid(id))
-				id = controller.makeElementValid(id);
-			
+            {
+                id = controller.makeElementValid(id);
+            }
+
             newElement.setId(id);
             booksList.Add(newElement);
             booksDataControlList.Add(new BookDataControl(newElement));
@@ -291,7 +303,9 @@ namespace uAdventure.Editor
 
             // Iterate through the books
             foreach (BookDataControl bookDataControl in booksDataControlList)
+            {
                 count += bookDataControl.countAssetReferences(assetPath);
+            }
 
             return count;
         }
@@ -302,7 +316,9 @@ namespace uAdventure.Editor
 
             // Iterate through the books
             foreach (BookDataControl bookDataControl in booksDataControlList)
+            {
                 bookDataControl.getAssetReferences(assetPaths, assetTypes);
+            }
         }
 
 
@@ -311,7 +327,9 @@ namespace uAdventure.Editor
 
             // Iterate through the books
             foreach (BookDataControl bookDataControl in booksDataControlList)
+            {
                 bookDataControl.deleteAssetReferences(assetPath);
+            }
         }
 
 
@@ -347,7 +365,9 @@ namespace uAdventure.Editor
         {
 
             foreach (DataControl dc in this.booksDataControlList)
+            {
                 dc.recursiveSearch();
+            }
         }
 
 

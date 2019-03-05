@@ -64,7 +64,10 @@ namespace uAdventure.Editor
             {
                 ChangeElementReferenceTool crvt = (ChangeElementReferenceTool)other;
                 if (crvt.elementReference != elementReference)
+                {
                     return false;
+                }
+
                 if (crvt.changePosition && changePosition)
                 {
                     x = crvt.x;

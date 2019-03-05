@@ -128,15 +128,24 @@ namespace uAdventure.Editor
             EditorGUILayout.PrefixLabel(TC.get("Animation.GeneralInfo"), GUIStyle.none, titleStyle);
             EditorGUI.BeginChangeCheck();
             documentationTextContent = EditorGUILayout.TextField(TC.get("Animation.Documentation"), documentationTextContent);
-            if (EditorGUI.EndChangeCheck()) workingAnimation.setDocumentation(documentationTextContent);
+            if (EditorGUI.EndChangeCheck())
+            {
+                workingAnimation.setDocumentation(documentationTextContent);
+            }
 
             EditorGUI.BeginChangeCheck();
             useTransitonFlag = EditorGUILayout.Toggle(TC.get("Animation.UseTransitions"), useTransitonFlag);
-            if (EditorGUI.EndChangeCheck()) OnUseTransitonFlagLastChanged(useTransitonFlag);
+            if (EditorGUI.EndChangeCheck())
+            {
+                OnUseTransitonFlagLastChanged(useTransitonFlag);
+            }
 
             EditorGUI.BeginChangeCheck();
             slidesAnimationFlag = EditorGUILayout.Toggle(TC.get("Animation.Slides"), slidesAnimationFlag);
-            if(EditorGUI.EndChangeCheck()) OnSlidesAnimationFlagLastChanged(slidesAnimationFlag);
+            if(EditorGUI.EndChangeCheck())
+            {
+                OnSlidesAnimationFlagLastChanged(slidesAnimationFlag);
+            }
 
             /*
              * Transition panel
@@ -148,7 +157,9 @@ namespace uAdventure.Editor
             for (int i = 0; i < workingAnimation.getFrames().Count; i++)
             {
                 if (selectedFrame == i)
+                {
                     GUI.skin = selectedFrameSkin;
+                }
 
                 var frame = workingAnimation.getFrame(i);
                 var image = Controller.ResourceManager.getImage(frame.getUri());
@@ -226,12 +237,18 @@ namespace uAdventure.Editor
 
             EditorGUI.BeginChangeCheck();
             frameDocumentation = EditorGUILayout.TextField(TC.get("Animation.Documentation"), frameDocumentation);
-            if (EditorGUI.EndChangeCheck()) OnFrameDocumentationChanged(frameDocumentation);
+            if (EditorGUI.EndChangeCheck())
+            {
+                OnFrameDocumentationChanged(frameDocumentation);
+            }
 
             EditorGUI.BeginChangeCheck();
             animationDuration = EditorGUILayout.LongField(TC.get("Animation.Duration"), animationDuration);
-            if (EditorGUI.EndChangeCheck()) OnFrameDurationChanged(animationDuration);
-            
+            if (EditorGUI.EndChangeCheck())
+            {
+                OnFrameDurationChanged(animationDuration);
+            }
+
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.PrefixLabel(TC.get("Animation.Image"));
             if (GUILayout.Button(clearImg, GUILayout.Width(clearImg.width + 20)))
@@ -264,11 +281,17 @@ namespace uAdventure.Editor
             EditorGUILayout.PrefixLabel(TC.get("NextScene.Transition"), GUIStyle.none, titleStyle);
             EditorGUI.BeginChangeCheck();
             transitionDuration = EditorGUILayout.LongField(TC.get("Animation.Duration"), transitionDuration);
-            if (EditorGUI.EndChangeCheck()) OnTransitionDurationChanged(transitionDuration);
+            if (EditorGUI.EndChangeCheck())
+            {
+                OnTransitionDurationChanged(transitionDuration);
+            }
 
             EditorGUI.BeginChangeCheck();
             transitionType = EditorGUILayout.Popup(TC.get("Conditions.Type"), transitionType, transitionTypeName); // TODO create a type in TC for transition 
-            if (EditorGUI.EndChangeCheck()) OnTransitionTypeChanged(transitionType);
+            if (EditorGUI.EndChangeCheck())
+            {
+                OnTransitionTypeChanged(transitionType);
+            }
 
             GUILayout.FlexibleSpace();
 

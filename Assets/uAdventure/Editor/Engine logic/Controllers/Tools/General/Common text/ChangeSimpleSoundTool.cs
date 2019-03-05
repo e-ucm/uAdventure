@@ -49,7 +49,9 @@ namespace uAdventure.Editor
 
             bool done = base.doTool();
             if (!done)
+            {
                 return false;
+            }
             else
             {
 
@@ -68,7 +70,9 @@ namespace uAdventure.Editor
 
             bool done = base.redoTool();
             if (!done)
+            {
                 return false;
+            }
             else
             {
                 objectWithSound.setSoundPath(resources.getAssetPath(AUDIO_STR));
@@ -84,7 +88,9 @@ namespace uAdventure.Editor
 
             bool done = base.undoTool();
             if (!done)
+            {
                 return false;
+            }
             else
             {
 

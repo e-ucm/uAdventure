@@ -27,7 +27,10 @@ namespace uAdventure.Editor
 
             this.resourcesList = customAction.getResources();
             if (this.resourcesList.Count == 0)
+            {
                 this.resourcesList.Add(new ResourcesUni());
+            }
+
             selectedResources = 0;
 
             resourcesDataControlList = new List<ResourcesDataControl>();

@@ -73,7 +73,9 @@ namespace uAdventure.Editor
         protected override void OnButton()
         {
             if(!this.Selected)
+            {
                 EditorWindowBase.WantsMouseMove = false;
+            }
 
             dataControlList.index = -1;
             dataControlList.SetData(Controller.Instance.SelectedChapterDataControl.getConversationsList(),
@@ -114,7 +116,9 @@ namespace uAdventure.Editor
             EditorGUI.BeginChangeCheck();
             var newId = EditorGUILayout.TextField(TC.get("Conversation.Title"), workingConversation.getId());
             if (EditorGUI.EndChangeCheck())
+            {
                 workingConversation.getConversation().setId(newId);
+            }
         }
 
         public override void Draw(int aID)

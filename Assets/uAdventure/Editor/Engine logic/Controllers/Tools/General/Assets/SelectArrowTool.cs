@@ -66,7 +66,9 @@ namespace uAdventure.Editor
 
             bool done = base.undoTool();
             if (!done)
+            {
                 return false;
+            }
             else
             {
                 for (int i = 0; i < adventureData.getArrows().Count; i++)
@@ -74,7 +76,9 @@ namespace uAdventure.Editor
                     if (adventureData.getArrows()[i].getType().Equals(type))
                     {
                         if (removed)
+                        {
                             adventureData.getArrows().RemoveAt(i);
+                        }
                         else
                         {
                             adventureData.getArrows()[i].setPath(resources.getAssetPath(type));
@@ -94,10 +98,15 @@ namespace uAdventure.Editor
         {
 
             if (removed)
+            {
                 adventureData.addArrow(type, "");
+            }
+
             bool done = base.redoTool();
             if (!done)
+            {
                 return false;
+            }
             else
             {
                 for (int i = 0; i < adventureData.getArrows().Count; i++)
@@ -135,7 +144,9 @@ namespace uAdventure.Editor
             }
             bool done = base.doTool();
             if (!done)
+            {
                 return false;
+            }
             else
             {
                 setArrow(type, resources.getAssetPath(type));
@@ -151,10 +162,15 @@ namespace uAdventure.Editor
             foreach (CustomArrow cb in adventureData.getArrows())
             {
                 if (cb.Equals(arrow))
+                {
                     temp = cb;
+                }
             }
             if (temp != null)
+            {
                 adventureData.getArrows().Remove(temp);
+            }
+
             adventureData.addArrow(arrow);
         }
     }

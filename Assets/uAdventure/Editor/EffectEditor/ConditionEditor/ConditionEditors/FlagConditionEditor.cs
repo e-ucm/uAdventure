@@ -16,7 +16,9 @@ namespace uAdventure.Editor
         public FlagConditionEditor()
         {
             if (Avaiable)
+            {
                 condition = new FlagCondition(Controller.Instance.VarFlagSummary.getFlags()[0]);
+            }
         }
 
         public void draw(Condition c)

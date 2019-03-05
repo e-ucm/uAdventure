@@ -52,12 +52,16 @@ namespace uAdventure.Editor
 
             // Add a new resource if the list is empty
             if (resourcesList.Count == 0)
+            {
                 resourcesList.Add(new ResourcesUni());
+            }
 
             // Create the subcontrollers
             resourcesDataControlList = new List<ResourcesDataControl>();
             foreach (ResourcesUni resources in resourcesList)
+            {
                 resourcesDataControlList.Add(new ResourcesDataControl(resources, Controller.NPC));
+            }
 
             actionsListDataControl = new ActionsListDataControl(npc.getActions(), this);
 
@@ -440,8 +444,9 @@ namespace uAdventure.Editor
             descriptionController.updateVarFlagSummary(varFlagSummary);
             // Iterate through the resources
             foreach (ResourcesDataControl resourcesDataControl in resourcesDataControlList)
+            {
                 resourcesDataControl.updateVarFlagSummary(varFlagSummary);
-
+            }
         }
 
 
@@ -473,7 +478,9 @@ namespace uAdventure.Editor
 
             // Iterate through the resources
             foreach (ResourcesDataControl resourcesDataControl in resourcesDataControlList)
+            {
                 count += resourcesDataControl.countAssetReferences(assetPath);
+            }
 
             // Add the references in the actions
             count += actionsListDataControl.countAssetReferences(assetPath);
@@ -490,7 +497,9 @@ namespace uAdventure.Editor
 
             // Iterate through the resources
             foreach (ResourcesDataControl resourcesDataControl in resourcesDataControlList)
+            {
                 resourcesDataControl.getAssetReferences(assetPaths, assetTypes);
+            }
 
             // Add the references in the actions
             actionsListDataControl.getAssetReferences(assetPaths, assetTypes);
@@ -504,7 +513,9 @@ namespace uAdventure.Editor
 
             // Iterate through the resources
             foreach (ResourcesDataControl resourcesDataControl in resourcesDataControlList)
+            {
                 resourcesDataControl.deleteAssetReferences(assetPath);
+            }
 
             // Delete the references from the actions
             actionsListDataControl.deleteAssetReferences(assetPath);
@@ -519,7 +530,9 @@ namespace uAdventure.Editor
             int count = 0;
             // Iterate through the resources
             foreach (ResourcesDataControl resourcesDataControl in resourcesDataControlList)
+            {
                 resourcesDataControl.countIdentifierReferences(id);
+            }
 
             count += actionsListDataControl.countIdentifierReferences(id);
             //1.4
@@ -533,7 +546,9 @@ namespace uAdventure.Editor
 
             // Iterate through the resources
             foreach (ResourcesDataControl resourcesDataControl in resourcesDataControlList)
+            {
                 resourcesDataControl.replaceIdentifierReferences(oldId, newId);
+            }
 
             actionsListDataControl.replaceIdentifierReferences(oldId, newId);
             descriptionController.replaceIdentifierReferences(oldId, newId);
@@ -545,7 +560,9 @@ namespace uAdventure.Editor
 
             // Iterate through the resources
             foreach (ResourcesDataControl resourcesDataControl in resourcesDataControlList)
+            {
                 resourcesDataControl.deleteIdentifierReferences(id);
+            }
 
             actionsListDataControl.deleteIdentifierReferences(id);
             //1.4
@@ -638,10 +655,16 @@ namespace uAdventure.Editor
 
             List<Searchable> path = getPathFromChild(dataControl, resourcesDataControlList.Cast<Searchable>().ToList());
             if (path != null)
+            {
                 return path;
+            }
+
             path = getPathFromChild(dataControl, descriptionController);
             if (path != null)
+            {
                 return path;
+            }
+
             return getPathFromChild(dataControl, actionsListDataControl);
         }
 

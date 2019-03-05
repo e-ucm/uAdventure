@@ -9,7 +9,9 @@ namespace uAdventure.Editor
         public static void OpenAdventureWindow()
         {
             if (!Language.Initialized)
+            {
                 Language.Initialize();
+            }
 
             var window = ScriptableObject.CreateInstance<AdventureWindow>();
             window.ShowUtility();

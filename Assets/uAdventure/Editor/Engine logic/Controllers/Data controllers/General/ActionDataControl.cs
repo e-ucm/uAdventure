@@ -363,12 +363,17 @@ namespace uAdventure.Editor
             // Update the flag summary with the effects of the action
             EffectsController.updateVarFlagSummary(varFlagSummary, action.getEffects());
             if (action.getNotEffects() != null)
+            {
                 EffectsController.updateVarFlagSummary(varFlagSummary, action.getNotEffects());
+            }
+
             ConditionsController.updateVarFlagSummary(varFlagSummary, action.getConditions());
             if (action.getType() == Action.CUSTOM_INTERACT || action.getType() == Action.CUSTOM)
             {
                 foreach (ResourcesDataControl resourcesDataControl in resourcesDataControlList)
+                {
                     resourcesDataControl.updateVarFlagSummary(varFlagSummary);
+                }
             }
         }
 
@@ -403,7 +408,9 @@ namespace uAdventure.Editor
             {
                 // Iterate through the resources
                 foreach (ResourcesDataControl resourcesDataControl in resourcesDataControlList)
+                {
                     count += resourcesDataControl.countAssetReferences(assetPath);
+                }
             }
             // Return the asset references from the effects
             count += EffectsController.countAssetReferences(assetPath, action.getEffects());
@@ -419,7 +426,9 @@ namespace uAdventure.Editor
             {
                 // Iterate through the resources
                 foreach (ResourcesDataControl resourcesDataControl in resourcesDataControlList)
+                {
                     resourcesDataControl.deleteAssetReferences(assetPath);
+                }
             }
             EffectsController.deleteAssetReferences(assetPath, action.getEffects());
             EffectsController.deleteAssetReferences(assetPath, action.getNotEffects());
@@ -434,13 +443,17 @@ namespace uAdventure.Editor
 
             // If the action references to the given identifier, increase the counter
             if ((action.getType() == Action.GIVE_TO || action.getType() == Action.USE_WITH || action.getType() == Action.DRAG_TO || action.getType() == Action.CUSTOM_INTERACT) && action.getTargetId().Equals(id))
+            {
                 count++;
+            }
 
             if (action.getType() == Action.CUSTOM_INTERACT || action.getType() == Action.CUSTOM)
             {
                 // Iterate through the resources
                 foreach (ResourcesDataControl resourcesDataControl in resourcesDataControlList)
+                {
                     resourcesDataControl.countIdentifierReferences(id);
+                }
             }
 
             // Add to the counter the references in the effects block
@@ -460,11 +473,15 @@ namespace uAdventure.Editor
             {
                 // Iterate through the resources
                 foreach (ResourcesDataControl resourcesDataControl in resourcesDataControlList)
+                {
                     resourcesDataControl.replaceIdentifierReferences(oldId, newId);
+                }
             }
             // Only the "Give to" and "Use with" have item references
             if ((action.getType() == Action.GIVE_TO || action.getType() == Action.USE_WITH || action.getType() == Action.DRAG_TO || action.getType() == Action.CUSTOM_INTERACT) && action.getTargetId().Equals(oldId))
+            {
                 action.setTargetId(newId);
+            }
 
             EffectsController.replaceIdentifierReferences(oldId, newId, action.getEffects());
             EffectsController.replaceIdentifierReferences(oldId, newId, action.getNotEffects());
@@ -479,7 +496,9 @@ namespace uAdventure.Editor
             {
                 // Iterate through the resources
                 foreach (ResourcesDataControl resourcesDataControl in resourcesDataControlList)
+                {
                     resourcesDataControl.deleteIdentifierReferences(id);
+                }
             }
 
             EffectsController.deleteIdentifierReferences(id, action.getEffects());
@@ -495,7 +514,10 @@ namespace uAdventure.Editor
 
             // Iterate through the resources
             foreach (ResourcesDataControl resourcesDataControl in resourcesDataControlList)
+            {
                 resourcesDataControl.getAssetReferences(assetPaths, assetTypes);
+            }
+
             EffectsController.getAssetReferences(assetPaths, assetTypes, action.getEffects());
             EffectsController.getAssetReferences(assetPaths, assetTypes, action.getNotEffects());
             //   EffectsController.getAssetReferences( assetPaths, assetTypes, action.getClickEffects( ) );

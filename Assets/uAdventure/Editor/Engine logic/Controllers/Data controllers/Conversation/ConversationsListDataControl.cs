@@ -36,7 +36,9 @@ namespace uAdventure.Editor
             foreach (Conversation conversation in conversationsList)
             {
                 if (conversation.getType() == Conversation.GRAPH)
+                {
                     conversationsDataControlList.Add(new GraphConversationDataControl((GraphConversation)conversation));
+                }
             }
         }
 
@@ -66,7 +68,9 @@ namespace uAdventure.Editor
         {
             string[] tmp = new string[conversationsList.Count];
             for (int i = 0; i < conversationsList.Count; i++)
+            {
                 tmp[i] = conversationsList[i].getId();
+            }
 
             return tmp;
         }
@@ -198,7 +202,9 @@ namespace uAdventure.Editor
         {
             // If some value was typed and the identifier is valid
             if (!controller.isElementIdValid(conversationId))
+            {
                 conversationId = controller.makeElementValid(conversationId);
+            }
 
             Conversation newConversation = new GraphConversation(conversationId);
             ConversationDataControl newConversationDataControl = new GraphConversationDataControl((GraphConversation)newConversation);
@@ -345,7 +351,9 @@ namespace uAdventure.Editor
 
             // Iterate through each conversation
             foreach (ConversationDataControl conversationDataControl in conversationsDataControlList)
+            {
                 conversationDataControl.updateVarFlagSummary(varFlagSummary);
+            }
         }
 
 
@@ -375,7 +383,9 @@ namespace uAdventure.Editor
 
             // Iterate through each conversation
             foreach (ConversationDataControl conversationDataControl in conversationsDataControlList)
+            {
                 count += conversationDataControl.countAssetReferences(assetPath);
+            }
 
             return count;
         }
@@ -386,7 +396,9 @@ namespace uAdventure.Editor
 
             // Iterate through each conversation
             foreach (ConversationDataControl conversationDataControl in conversationsDataControlList)
+            {
                 conversationDataControl.getAssetReferences(assetPaths, assetTypes);
+            }
         }
 
 
@@ -395,7 +407,9 @@ namespace uAdventure.Editor
 
             // Iterate through each conversation
             foreach (ConversationDataControl conversationDataControl in conversationsDataControlList)
+            {
                 conversationDataControl.deleteAssetReferences(assetPath);
+            }
         }
 
 
@@ -406,7 +420,9 @@ namespace uAdventure.Editor
 
             // Iterate through each conversation
             foreach (ConversationDataControl conversationDataControl in conversationsDataControlList)
+            {
                 count += conversationDataControl.countIdentifierReferences(id);
+            }
 
             return count;
         }
@@ -417,7 +433,9 @@ namespace uAdventure.Editor
 
             // Iterate through each conversation
             foreach (ConversationDataControl conversationDataControl in conversationsDataControlList)
+            {
                 conversationDataControl.replaceIdentifierReferences(oldId, newId);
+            }
         }
 
 
@@ -426,7 +444,9 @@ namespace uAdventure.Editor
 
             // Spread the call to every conversation
             foreach (ConversationDataControl conversationDataControl in conversationsDataControlList)
+            {
                 conversationDataControl.deleteIdentifierReferences(id);
+            }
         }
 
 
@@ -459,7 +479,9 @@ namespace uAdventure.Editor
         {
 
             foreach (ConversationDataControl dc in this.conversationsDataControlList)
+            {
                 dc.recursiveSearch();
+            }
         }
 
 

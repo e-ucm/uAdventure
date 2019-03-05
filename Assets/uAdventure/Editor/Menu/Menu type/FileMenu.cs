@@ -39,7 +39,9 @@ namespace uAdventure.Editor
             //    loadProject.OnCliked();
             //else
             if ((obj as SaveProjectMenuItem) != null)
+            {
                 saveProject.OnCliked();
+            }
             //else if ((obj as SaveProjectAsMenuItem) != null)
             //    saveProjectAs.OnCliked();
             //else if ((obj as LOMMetadataEditorMenuItem) != null)
@@ -50,16 +52,46 @@ namespace uAdventure.Editor
             //    scorm.OnCliked();
             //else if ((obj as ExportProjectMenuItem) != null)
             //    exportProject.OnCliked();
-            else if ((obj as BuildProjectEadMenuItem) != null) buildProject.OnCliked();
-            else if ((obj as BuildProjectWindows) != null) buildProjectWindows.OnCliked();
-            else if ((obj as BuildProjectMacOsX) != null) buildProjectMacOsX.OnCliked();
-            else if ((obj as BuildProjectLinux) != null) buildProjectLinux.OnCliked();
-            else if ((obj as BuildProjectStandalone) != null) buildProjectStandalone.OnCliked();
-            else if ((obj as BuildProjectAndroid) != null) buildProjectAndroid.OnCliked();
-            else if ((obj as BuildProjectIOS) != null) buildProjectIOS.OnCliked();
-            else if ((obj as BuildProjectWebGL) != null) buildProjectWebGL.OnCliked();
-            else if ((obj as BuildProjectMobile) != null) buildProjectMobile.OnCliked();
-            else if ((obj as BuildProjectAll) != null) buildProjectAll.OnCliked();
+            else if ((obj as BuildProjectEadMenuItem) != null)
+            {
+                buildProject.OnCliked();
+            }
+            else if ((obj as BuildProjectWindows) != null)
+            {
+                buildProjectWindows.OnCliked();
+            }
+            else if ((obj as BuildProjectMacOsX) != null)
+            {
+                buildProjectMacOsX.OnCliked();
+            }
+            else if ((obj as BuildProjectLinux) != null)
+            {
+                buildProjectLinux.OnCliked();
+            }
+            else if ((obj as BuildProjectStandalone) != null)
+            {
+                buildProjectStandalone.OnCliked();
+            }
+            else if ((obj as BuildProjectAndroid) != null)
+            {
+                buildProjectAndroid.OnCliked();
+            }
+            else if ((obj as BuildProjectIOS) != null)
+            {
+                buildProjectIOS.OnCliked();
+            }
+            else if ((obj as BuildProjectWebGL) != null)
+            {
+                buildProjectWebGL.OnCliked();
+            }
+            else if ((obj as BuildProjectMobile) != null)
+            {
+                buildProjectMobile.OnCliked();
+            }
+            else if ((obj as BuildProjectAll) != null)
+            {
+                buildProjectAll.OnCliked();
+            }
         }
 
         protected override void SetMenuItems()

@@ -41,9 +41,13 @@ namespace uAdventure.Editor
         protected override string GetElementNameFor(object target)
         {
             if (target is Macro)
+            {
                 return MACRO;
+            }
             else if(target is Effects)
+            {
                 return EFFECTS;
+            }
 
             return "";
         }
@@ -51,9 +55,13 @@ namespace uAdventure.Editor
         protected override void FillNode(XmlNode node, object target, params IDOMWriterParam[] options)
         {
             if (target is Macro)
+            {
                 FillNode(node, target as Macro, options);
+            }
             else if (target is Effects)
+            {
                 FillNode(node, target as Effects, options);
+            }
         }
 
         protected void FillNode(XmlNode node, Effects effects, params IDOMWriterParam[] options)
@@ -94,7 +102,9 @@ namespace uAdventure.Editor
                 else
                 {
                     if (effect.getType() != EffectType.RANDOM_EFFECT)
+                    {
                         effectElement = buildEffectNode(effect, doc);
+                    }
                     else
                     {
                         RandomEffect randomEffect = (RandomEffect)effect;
@@ -186,7 +196,10 @@ namespace uAdventure.Editor
                     SpeakPlayerEffect speakPlayerEffect = (SpeakPlayerEffect)effect;
                     effectElement = doc.CreateElement("speak-player");
                     if (speakPlayerEffect.getAudioPath() != null && !speakPlayerEffect.getAudioPath().Equals(""))
+                    {
                         effectElement.SetAttribute("uri", speakPlayerEffect.getAudioPath());
+                    }
+
                     effectElement.AppendChild(doc.CreateTextNode(speakPlayerEffect.getLine()));
                     break;
                 case EffectType.SPEAK_CHAR:
@@ -194,7 +207,10 @@ namespace uAdventure.Editor
                     effectElement = doc.CreateElement("speak-char");
                     effectElement.SetAttribute("idTarget", speakCharEffect.getTargetId());
                     if (speakCharEffect.getAudioPath() != null && !speakCharEffect.getAudioPath().Equals(""))
+                    {
                         effectElement.SetAttribute("uri", speakCharEffect.getAudioPath());
+                    }
+
                     effectElement.AppendChild(doc.CreateTextNode(speakCharEffect.getLine()));
                     break;
                 case EffectType.TRIGGER_BOOK:
@@ -206,7 +222,10 @@ namespace uAdventure.Editor
                     PlaySoundEffect playSoundEffect = (PlaySoundEffect)effect;
                     effectElement = doc.CreateElement("play-sound");
                     if (!playSoundEffect.isBackground())
+                    {
                         effectElement.SetAttribute("background", "no");
+                    }
+
                     effectElement.SetAttribute("uri", playSoundEffect.getPath());
                     break;
                 case EffectType.PLAY_ANIMATION:

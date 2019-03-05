@@ -59,7 +59,9 @@ namespace uAdventure.Editor
 
             // Add the adaptation and assessment active profiles
             if (!chapter.getAdaptationName().Equals(""))
+            {
                 chapterNode.SetAttribute("adaptProfile", chapter.getAdaptationName());
+            }
 
             // Create and append the assessment configuration
             if (!chapter.getAssessmentName().Equals(""))

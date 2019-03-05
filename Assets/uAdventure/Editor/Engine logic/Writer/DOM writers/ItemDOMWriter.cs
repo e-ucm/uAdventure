@@ -39,11 +39,20 @@ namespace uAdventure.Editor
 
             //v1.4
             if (item.getBehaviour() == Item.BehaviourType.NORMAL)
+            {
                 itemElement.SetAttribute("behaviour", "normal");
+            }
+
             if (item.getBehaviour() == Item.BehaviourType.ATREZZO)
+            {
                 itemElement.SetAttribute("behaviour", "atrezzo");
+            }
+
             if (item.getBehaviour() == Item.BehaviourType.FIRST_ACTION)
+            {
                 itemElement.SetAttribute("behaviour", "first-action");
+            }
+
             itemElement.SetAttribute("resources-transition-time", item.getResourcesTransitionTime().ToString());
             //v1.4
 

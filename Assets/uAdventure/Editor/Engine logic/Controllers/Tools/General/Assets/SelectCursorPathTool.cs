@@ -62,7 +62,9 @@ namespace uAdventure.Editor
 
             bool done = base.undoTool();
             if (!done)
+            {
                 return false;
+            }
             else
             {
                 for (int i = 0; i < adventureData.getCursors().Count; i++)
@@ -75,7 +77,10 @@ namespace uAdventure.Editor
                             //adventureData.addCursor( type, "" );
                         }
                         else
+                        {
                             adventureData.getCursors()[i].setPath(resources.getAssetPath(type));
+                        }
+
                         break;
 
                     }
@@ -93,9 +98,14 @@ namespace uAdventure.Editor
 
             bool done = base.redoTool();
             if (added)
+            {
                 adventureData.addCursor(type, "");
+            }
+
             if (!done)
+            {
                 return false;
+            }
             else
             {
                 for (int i = 0; i < adventureData.getCursors().Count; i++)
@@ -125,7 +135,9 @@ namespace uAdventure.Editor
             }
             bool done = base.doTool();
             if (!done)
+            {
                 return false;
+            }
             else
             {
                 for (int i = 0; i < adventureData.getCursors().Count; i++)

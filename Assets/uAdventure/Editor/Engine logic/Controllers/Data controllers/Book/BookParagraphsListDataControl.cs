@@ -33,7 +33,9 @@ namespace uAdventure.Editor
             // Create the subcontrollers
             bookParagraphsDataControlList = new List<BookParagraphDataControl>();
             foreach (BookParagraph bookParagraph in bookParagraphsList)
+            {
                 bookParagraphsDataControlList.Add(new BookParagraphDataControl(bookParagraph));
+            }
         }
 
         /**
@@ -73,7 +75,9 @@ namespace uAdventure.Editor
             // Create the list for the book paragraphs
             bookParagraphsInfo = new string[bookParagraphsList.Count][];
             for (int i = 0; i < bookParagraphsList.Count; i++)
+            {
                 bookParagraphsInfo[i] = new string[3];
+            }
 
             // Fill the array with the info
             for (int i = 0; i < bookParagraphsList.Count; i++)
@@ -81,18 +85,30 @@ namespace uAdventure.Editor
                 BookParagraph bookParagraph = bookParagraphsList[i];
 
                 if (bookParagraph.getType() == BookParagraph.TEXT)
+                {
                     bookParagraphsInfo[i][0] = TC.get("BookParagraphsList.TextParagraph", (i + 1).ToString());
+                }
                 else if (bookParagraph.getType() == BookParagraph.TITLE)
+                {
                     bookParagraphsInfo[i][0] = TC.get("BookParagraphsList.TitleParagraph", (i + 1).ToString());
+                }
                 else if (bookParagraph.getType() == BookParagraph.BULLET)
+                {
                     bookParagraphsInfo[i][0] = TC.get("BookParagraphsList.BulletParagraph", (i + 1).ToString());
+                }
                 else if (bookParagraph.getType() == BookParagraph.IMAGE)
+                {
                     bookParagraphsInfo[i][0] = TC.get("BookParagraphsList.ImageParagraph", (i + 1).ToString());
+                }
 
                 if (bookParagraph.getType() != BookParagraph.IMAGE)
+                {
                     bookParagraphsInfo[i][1] = TC.get("BookParagraphsList.WordCount", (bookParagraph.getContent().Split(' ').Length.ToString()));
+                }
                 else
+                {
                     bookParagraphsInfo[i][1] = TC.get("BookParagraphsList.NotApplicable");
+                }
             }
 
             return bookParagraphsInfo;
@@ -148,16 +164,24 @@ namespace uAdventure.Editor
             BookParagraph newBookParagraph = null;
 
             if (type == Controller.BOOK_TITLE_PARAGRAPH)
+            {
                 newBookParagraph = new BookParagraph(BookParagraph.TITLE);
+            }
 
             else if (type == Controller.BOOK_TEXT_PARAGRAPH)
+            {
                 newBookParagraph = new BookParagraph(BookParagraph.TEXT);
+            }
 
             else if (type == Controller.BOOK_BULLET_PARAGRAPH)
+            {
                 newBookParagraph = new BookParagraph(BookParagraph.BULLET);
+            }
 
             else if (type == Controller.BOOK_IMAGE_PARAGRAPH)
+            {
                 newBookParagraph = new BookParagraph(BookParagraph.IMAGE);
+            }
 
             // If a paragraph was added, add the controller to the list
             if (newBookParagraph != null)
@@ -265,7 +289,9 @@ namespace uAdventure.Editor
 
             // Spread the call to the paragraphs
             foreach (BookParagraphDataControl bookParagraphDataControl in bookParagraphsDataControlList)
+            {
                 count += bookParagraphDataControl.countAssetReferences(assetPath);
+            }
 
             return count;
         }
@@ -276,7 +302,9 @@ namespace uAdventure.Editor
 
             // Spread the call to the paragraphs
             foreach (BookParagraphDataControl bookParagraphDataControl in bookParagraphsDataControlList)
+            {
                 bookParagraphDataControl.getAssetReferences(assetPaths, assetTypes);
+            }
         }
 
 
@@ -285,7 +313,9 @@ namespace uAdventure.Editor
 
             // Spread the call to the paragraphs
             foreach (BookParagraphDataControl bookParagraphDataControl in bookParagraphsDataControlList)
+            {
                 bookParagraphDataControl.deleteAssetReferences(assetPath);
+            }
         }
 
 
@@ -321,7 +351,9 @@ namespace uAdventure.Editor
         {
 
             foreach (DataControl dc in bookParagraphsDataControlList)
+            {
                 dc.recursiveSearch();
+            }
         }
 
         public List<BookParagraph> getBookParagraphsList()

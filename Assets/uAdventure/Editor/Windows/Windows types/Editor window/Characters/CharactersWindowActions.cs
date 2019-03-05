@@ -24,7 +24,10 @@ namespace uAdventure.Editor
         {
             var workingCharacter = Target != null ? Target as NPCDataControl : Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                     GameRources.GetInstance().selectedCharacterIndex];
-            if (Target != null) m_Rect.height = 300;
+            if (Target != null)
+            {
+                m_Rect.height = 300;
+            }
 
             actionsList.ActionsListDataControl = workingCharacter.getActionsList();
             actionsList.DoList(m_Rect.height - 60f);

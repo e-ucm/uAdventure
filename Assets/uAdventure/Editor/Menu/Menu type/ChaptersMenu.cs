@@ -36,17 +36,29 @@ namespace uAdventure.Editor
         protected override void Callback(object obj)
         {
             if ((obj as AddChapterMenuItem) != null)
+            {
                 add.OnCliked();
+            }
             else if ((obj as DeleteChapterMenuItem) != null)
+            {
                 delete.OnCliked();
+            }
             else if ((obj as ImportChapterMenuItem) != null)
+            {
                 import.OnCliked();
+            }
             else if ((obj as MoveUpChapterMenuItem) != null)
+            {
                 moveUp.OnCliked();
+            }
             else if ((obj as MoveDownChapterMenuItem) != null)
+            {
                 moveDown.OnCliked();
+            }
             else if ((obj as EditFlagsVariablesMenuItem) != null)
+            {
                 variablesFlags.OnCliked();
+            }
             else if ((obj is int))
             {
                 if ((int)obj != Controller.Instance.ChapterList.getSelectedChapter())
@@ -72,7 +84,10 @@ namespace uAdventure.Editor
             menu.AddItem(new GUIContent(add.Label), false, Callback, add);
             //Delte button is only visible for more than 1 chapter
             if (Controller.Instance.ChapterList.getChaptersCount() > 1)
+            {
                 menu.AddItem(new GUIContent(delete.Label), false, Callback, delete);
+            }
+
             menu.AddItem(new GUIContent(import.Label), false, Callback, import);
             menu.AddSeparator("");
             menu.AddItem(new GUIContent(moveUp.Label), false, Callback, moveUp);

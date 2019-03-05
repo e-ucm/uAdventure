@@ -122,9 +122,14 @@ namespace uAdventure.Editor
             {
                 RandomEffect randomEffect = (RandomEffect)effect;
                 if (randomEffect.getPositiveEffect() != null)
+                {
                     updateVarFlagSummary(randomEffect.getPositiveEffect());
+                }
+
                 if (randomEffect.getNegativeEffect() != null)
+                {
                     updateVarFlagSummary(randomEffect.getNegativeEffect());
+                }
             }
         }
 
@@ -170,9 +175,14 @@ namespace uAdventure.Editor
             {
                 RandomEffect randomEffect = (RandomEffect)effect;
                 if (randomEffect.getPositiveEffect() != null)
+                {
                     undoUpdateVarFlagSummary(randomEffect.getPositiveEffect());
+                }
+
                 if (randomEffect.getNegativeEffect() != null)
+                {
                     undoUpdateVarFlagSummary(randomEffect.getNegativeEffect());
+                }
             }
         }
     }

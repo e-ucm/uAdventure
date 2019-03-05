@@ -310,7 +310,9 @@ namespace uAdventure.Editor
                     assetsList = new string[fileList.Length];
                     for (int i = 0; i < fileList.Length; i++)
                         //assetsList[i] = fileList[i].getEnclEntryName( );
+                    {
                         assetsList[i] = getCategoryFolder(assetsCategory) + "/" + fileList[i].Name;
+                    }
                 }
                 else
                 {
@@ -506,12 +508,17 @@ namespace uAdventure.Editor
         private static void ImportAssets(string[] paths)
         {
             foreach (string path in paths)
+            {
                 AssetDatabase.WriteImportSettingsIfDirty(path);
+            }
+
             try
             {
                 AssetDatabase.StartAssetEditing();
                 foreach (string path in paths)
+                {
                     AssetDatabase.ImportAsset(path);
+                }
             }
             finally
             {
@@ -1000,14 +1007,18 @@ namespace uAdventure.Editor
 
             // delete any existing backups
             if (File.Exists(backup))
+            {
                 File.Delete(backup);
+            }
 
             // get the bytes
             var data = Encoding.UTF8.GetBytes(contents);
 
             // write the data to a temp file
             using (var tempFile = File.Create(tempPath, 4096, FileOptions.WriteThrough))
+            {
                 tempFile.Write(data, 0, data.Length);
+            }
 
             // replace the contents
             File.Replace(tempPath, path, backup);
@@ -1085,7 +1096,9 @@ namespace uAdventure.Editor
             foreach (FileInfo file in files)
             {
                 if (!file.IsuAdventureRelevant())
+                {
                     continue;
+                }
 
                 string temppath = Path.Combine(destDirName, file.Name);
                 file.CopyTo(temppath, false);

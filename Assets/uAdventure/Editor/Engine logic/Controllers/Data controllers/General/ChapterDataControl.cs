@@ -548,7 +548,9 @@ namespace uAdventure.Editor
 
             // Count the initial scene
             if (chapter.getTargetId().Equals(id))
+            {
                 count++;
+            }
 
             // Spread the call to the rest of the elements
             count += scenesListDataControl.countIdentifierReferences(id);
@@ -571,7 +573,9 @@ namespace uAdventure.Editor
 
             // If the initial scene identifier has changed, update it
             if (chapter.getTargetId().Equals(oldId))
+            {
                 chapter.setTargetId(newId);
+            }
 
             // Spread the call to the rest of the elements
             scenesListDataControl.replaceIdentifierReferences(oldId, newId);
@@ -594,8 +598,10 @@ namespace uAdventure.Editor
 			if (chapter.getTargetId ().Equals (id)) {
 				var newTarget = (IChapterTarget)controller.SelectedChapterDataControl .getObjects ().Find (o => o is IChapterTarget);
 				if(newTarget!= null)
-					chapter.setTargetId(newTarget.getId ());
-			}
+                {
+                    chapter.setTargetId(newTarget.getId ());
+                }
+            }
             // Spread the call to the rest of the elements
             scenesListDataControl.deleteIdentifierReferences(id);
             cutscenesListDataControl.deleteIdentifierReferences(id);
@@ -764,31 +770,58 @@ namespace uAdventure.Editor
             List<Searchable> path;
             path = getPathFromChild(dataControl, scenesListDataControl);
             if (path != null)
+            {
                 return path;
+            }
+
             path = getPathFromChild(dataControl, cutscenesListDataControl);
             if (path != null)
+            {
                 return path;
+            }
+
             path = getPathFromChild(dataControl, booksListDataControl);
             if (path != null)
+            {
                 return path;
+            }
+
             path = getPathFromChild(dataControl, itemsListDataControl);
             if (path != null)
+            {
                 return path;
+            }
+
             path = getPathFromChild(dataControl, atrezzoListDataControl);
             if (path != null)
+            {
                 return path;
+            }
+
             path = getPathFromChild(dataControl, npcsListDataControl);
             if (path != null)
+            {
                 return path;
+            }
+
             path = getPathFromChild(dataControl, playerDataControl);
             if (path != null)
+            {
                 return path;
+            }
+
             path = getPathFromChild(dataControl, conversationsListDataControl);
             if (path != null)
+            {
                 return path;
+            }
+
             path = getPathFromChild(dataControl, advancedFeaturesDataControl);
             if (path != null)
+            {
                 return path;
+            }
+
             //path = getPathFromChild(dataControl, assessmentProfilesDataControl);
             //if (path != null)
             //    return path;

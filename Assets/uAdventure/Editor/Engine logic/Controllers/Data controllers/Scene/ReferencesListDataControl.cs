@@ -138,9 +138,14 @@ namespace uAdventure.Editor
             {
                 int layer;
                 if (sceneDataControl.getPlayerLayer() == Scene.PLAYER_WITHOUT_LAYER)
+                {
                     layer = 0;
+                }
                 else
+                {
                     layer = sceneDataControl.getPlayerLayer();
+                }
+
                 reassignLayerAllReferencesDataControl(insertInOrder(new ElementContainer(null, layer, Controller.ResourceManager.getSprite(this.playerImagePath)), true));
             }
         }
@@ -157,7 +162,9 @@ namespace uAdventure.Editor
         private List<ElementReference> getReferencesList(Type t)
         {
             if (!typeReferenceList.ContainsKey(t))
+            {
                 typeReferenceList.Add(t, new List<ElementReference>());
+            }
 
             return typeReferenceList[t];
         }
@@ -231,7 +238,9 @@ namespace uAdventure.Editor
             {
                 allReferencesDataControl.Add(element);
                 if (!hasLayer)
+                {
                     reassignLayerAllReferencesDataControl(Math.Max(0, i - 1));
+                }
             }
             return Math.Max(0, i - 1);
         }
@@ -556,7 +565,9 @@ namespace uAdventure.Editor
             foreach (ElementContainer element in allReferencesDataControl)
             {
                 if (!element.isPlayer())
+                {
                     count += element.getErdc().countIdentifierReferences(id);
+                }
             }
             return count;
         }
@@ -568,7 +579,9 @@ namespace uAdventure.Editor
             foreach (ElementContainer element in allReferencesDataControl)
             {
                 if (!element.isPlayer())
+                {
                     element.getErdc().replaceIdentifierReferences(oldId, newId);
+                }
             }
         }
 

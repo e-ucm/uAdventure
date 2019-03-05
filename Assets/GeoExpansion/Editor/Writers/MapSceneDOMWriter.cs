@@ -23,9 +23,13 @@ namespace uAdventure.Geo
             element.SetAttribute("center", mapScene.LatLon.ToString());
 
             if (options.Any(o => o is CIP && (o as CIP).TargetId.Equals(mapScene.getId())))
+            {
                 element.SetAttribute("start", "yes");
+            }
             else
+            {
                 element.SetAttribute("start", "no");
+            }
 
             foreach (var mapElement in mapScene.Elements)
             {

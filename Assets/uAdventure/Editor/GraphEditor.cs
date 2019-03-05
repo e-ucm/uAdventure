@@ -79,7 +79,9 @@ namespace uAdventure.Editor
         {
 
             if (selectedStyle == null)
+            {
                 selectedStyle = Resources.Load<GUISkin>("resplandor").box;
+            }
 
             Content = content;
 
@@ -139,7 +141,10 @@ namespace uAdventure.Editor
                 if (GUILayout.Button("Variables and flags", "toolbarButton", GUILayout.Width(150)))
                 {
                     var o = ChapterVarAndFlagsEditor.ShowAtPosition(GUILayoutUtility.GetLastRect().Move(new Vector2(5, 40)));
-                    if (o) GUIUtility.ExitGUI();
+                    if (o)
+                    {
+                        GUIUtility.ExitGUI();
+                    }
                 }
             }
 
@@ -179,7 +184,9 @@ namespace uAdventure.Editor
             if (Event.current.type == EventType.MouseMove)
             {
                 if (hovering != -1)
+                {
                     this.Repaint();
+                }
 
                 hovering = -1;
             }
@@ -192,11 +199,13 @@ namespace uAdventure.Editor
                 CreateWindows();
 
                 if (Event.current.type == EventType.Repaint)
+                {
                     foreach (var n in selection)
                     {
                         var nodeRect = GetNodeRect(Content, n);
                         GUI.Box(nodeRect, "", selectedStyle);
                     }
+                }
 
                 if (Event.current.type == EventType.Repaint)
                 {
@@ -392,7 +401,10 @@ namespace uAdventure.Editor
                     Handles.DrawBezier(staCorner, endCorner, staCornerT2, endCornerT1, color, null, 3);
                 }
                 else
+                {
                     points.RemoveAt(points.Count - 1);
+                }
+
                 points.AddRange(Handles.MakeBezierPoints(endCorner, end, midCornerT2, endTangent, 3));
                 Handles.DrawBezier(endCorner, end, midCornerT2, endTangent, color, null, 3);
 
@@ -590,7 +602,9 @@ namespace uAdventure.Editor
             var myNode = nodes[id];
 
             if (!IsResizable(Content, myNode))
+            {
                 return;
+            }
 
             var rect = GetNodeRect(Content, myNode);
             var resizeRect = new Rect(new Vector2(rect.width - 10, 0), new Vector2(10, rect.width));
@@ -611,7 +625,9 @@ namespace uAdventure.Editor
                 SetNodeRect(Content, myNode, rect);
                 this.Repaint();
                 if (Event.current.type == EventType.MouseUp)
+                {
                     EditorGUIUtility.hotControl = 0;
+                }
             }
 
         }

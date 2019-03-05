@@ -42,16 +42,22 @@ namespace uAdventure.Editor
             if (done)
             {
                 if (undoList.Count == 0)
+                {
                     undoList.Add(tool);
+                }
                 else
                 {
                     Tool last = undoList[undoList.Count - 1];
                     if (last.getTimeStamp() < tool.getTimeStamp() - 1500 || !last.combine(tool))
+                    {
                         undoList.Add(tool);
+                    }
                 }
                 redoList.Clear();
                 if (notifyController)
+                {
                     Controller.Instance.DataModified();
+                }
 
                 if (!tool.canUndo())
                 {
@@ -72,9 +78,14 @@ namespace uAdventure.Editor
                 if (undone)
                 {
                     if (temp.canRedo())
+                    {
                         redoList.Add(temp);
+                    }
                     else
+                    {
                         redoList.Clear();
+                    }
+
                     return true;
                 }
             }

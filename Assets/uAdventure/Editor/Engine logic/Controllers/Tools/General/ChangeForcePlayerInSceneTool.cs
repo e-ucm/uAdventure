@@ -58,9 +58,13 @@ namespace uAdventure.Editor
         private void action(bool allow, int playerLayer)
         {
             if (!allow)
+            {
                 scene.setPlayerLayer(Scene.PLAYER_NO_ALLOWED);
+            }
             else
+            {
                 scene.setPlayerLayer(playerLayer);
+            }
 
             //if it is not allow that the player has layer, delete it in all references container
             if (allow)

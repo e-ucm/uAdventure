@@ -23,7 +23,10 @@ namespace uAdventure.Editor
         {
             var workingItem = Target != null ? Target as ItemDataControl : Controller.Instance.SelectedChapterDataControl.getItemsList().getItems()[
                     GameRources.GetInstance().selectedItemIndex];
-            if (Target != null) m_Rect.height = 300;
+            if (Target != null)
+            {
+                m_Rect.height = 300;
+            }
 
             actionsList.ActionsListDataControl = workingItem.getActionsList();
             actionsList.DoList(m_Rect.height - 60f);

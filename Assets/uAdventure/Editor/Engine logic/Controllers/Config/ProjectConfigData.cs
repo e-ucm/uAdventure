@@ -42,7 +42,10 @@ namespace uAdventure.Editor
         public static void storeToXML()
         {
             if (properties == null)
+            {
                 properties = new Properties(Controller.Instance.ProjectFolder+ "/" + FILE_NAME);
+            }
+
             properties.Save();
         }
 
@@ -54,7 +57,9 @@ namespace uAdventure.Editor
                 return properties.GetProperty(key);
             }
             else
+            {
                 return null;
+            }
         }
 
         public static void setProperty(string key, string value)

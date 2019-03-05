@@ -24,7 +24,9 @@ namespace uAdventure.Editor
             if (attr != null)
             {
                 foreach (var t in attr.Types)
+                {
                     EditorWindowBase.RegisterComponent(t, this);
+                }
             }
         }
 

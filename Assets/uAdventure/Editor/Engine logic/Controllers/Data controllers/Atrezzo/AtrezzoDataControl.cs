@@ -31,13 +31,16 @@ namespace uAdventure.Editor
 
             // Add a new resource if the list is empty
             if (resourcesList.Count == 0)
+            {
                 resourcesList.Add(new ResourcesUni());
+            }
 
             // Create the subcontrollers
             resourcesDataControlList = new List<ResourcesDataControl>();
             foreach (ResourcesUni resources in resourcesList)
+            {
                 resourcesDataControlList.Add(new ResourcesDataControl(resources, Controller.ATREZZO));
-
+            }
         }
 
         public void setDocumentation(string documentation)
@@ -229,8 +232,9 @@ namespace uAdventure.Editor
 
             // Iterate through the resources
             foreach (ResourcesDataControl resourcesDataControl in resourcesDataControlList)
+            {
                 resourcesDataControl.updateVarFlagSummary(varFlagSummary);
-
+            }
         }
 
 
@@ -257,7 +261,9 @@ namespace uAdventure.Editor
 
             // Iterate through the resources
             foreach (ResourcesDataControl resourcesDataControl in resourcesDataControlList)
+            {
                 count += resourcesDataControl.countAssetReferences(assetPath);
+            }
 
             return count;
         }
@@ -268,8 +274,9 @@ namespace uAdventure.Editor
 
             // Iterate through the resources
             foreach (ResourcesDataControl resourcesDataControl in resourcesDataControlList)
+            {
                 resourcesDataControl.getAssetReferences(assetPaths, assetTypes);
-
+            }
         }
 
 
@@ -278,7 +285,9 @@ namespace uAdventure.Editor
 
             // Iterate through the resources
             foreach (ResourcesDataControl resourcesDataControl in resourcesDataControlList)
+            {
                 resourcesDataControl.deleteAssetReferences(assetPath);
+            }
         }
 
 
@@ -288,7 +297,10 @@ namespace uAdventure.Editor
             int count = 0;
             // Iterate through the resources
             foreach (ResourcesDataControl resourcesDataControl in resourcesDataControlList)
+            {
                 count += resourcesDataControl.countIdentifierReferences(id);
+            }
+
             return count;
         }
 
@@ -298,7 +310,9 @@ namespace uAdventure.Editor
 
             // Iterate through the resources
             foreach (ResourcesDataControl resourcesDataControl in resourcesDataControlList)
+            {
                 resourcesDataControl.replaceIdentifierReferences(oldId, newId);
+            }
         }
 
 
@@ -307,7 +321,9 @@ namespace uAdventure.Editor
 
             // Iterate through the resources
             foreach (ResourcesDataControl resourcesDataControl in resourcesDataControlList)
+            {
                 resourcesDataControl.deleteIdentifierReferences(id);
+            }
         }
 
 

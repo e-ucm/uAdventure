@@ -105,13 +105,18 @@ namespace uAdventure.Editor
             var element = dataControlList.list[index] as DataControl;
             var content = element.getContent() as HasId;
             if (content == null)
+            {
                 return;
+            }
 
             if (element.canBeRenamed() && isActive)
             {
                 EditorGUI.BeginChangeCheck();
                 var newName = EditorGUI.DelayedTextField(cellRect, content.getId());
-                if (EditorGUI.EndChangeCheck()) element.renameElement(newName);
+                if (EditorGUI.EndChangeCheck())
+                {
+                    element.renameElement(newName);
+                }
             }
             else
             {

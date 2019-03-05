@@ -59,7 +59,10 @@ namespace uAdventure.Editor
         {
 
             if (oldContent != null && oldContent.Equals(newContent))
+            {
                 return false;
+            }
+
             bookParagraph.setContent(newContent);
             return true;
         }

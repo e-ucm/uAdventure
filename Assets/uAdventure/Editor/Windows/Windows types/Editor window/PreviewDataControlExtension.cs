@@ -64,10 +64,14 @@ namespace uAdventure.Editor
         private Rect GetPreviewRect(int index)
         {
             if (rects == null)
+            {
                 rects = new Dictionary<int, Rect>();
+            }
 
             if (rects.ContainsKey(index))
+            {
                 return rects[index];
+            }
 
             return Rect.zero;
         }
@@ -75,7 +79,9 @@ namespace uAdventure.Editor
         private void SetPreviewRect(int index, Rect rect)
         {
             if (rects == null)
+            {
                 rects = new Dictionary<int, Rect>();
+            }
 
             rects[index] = rect;
         }
@@ -85,7 +91,11 @@ namespace uAdventure.Editor
         {
             var rect = EditorGUILayout.BeginVertical(GUILayout.Width(m_Rect.width - 32));
             {
-                if (Event.current.type == EventType.Repaint) SetPreviewRect(-1, rect);
+                if (Event.current.type == EventType.Repaint)
+                {
+                    SetPreviewRect(-1, rect);
+                }
+
                 rect = GetPreviewRect(-1);
 
                 float columnWidth = Mathf.RoundToInt(rect.width / (float)columns);
@@ -93,7 +103,11 @@ namespace uAdventure.Editor
 
                 for (int index = 0; index < dataControlList.list.Count; index++)
                 {
-                    if(index % columns == 0) EditorGUILayout.BeginHorizontal();
+                    if(index % columns == 0)
+                    {
+                        EditorGUILayout.BeginHorizontal();
+                    }
+
                     {
                         if (preview)
                         {
@@ -103,7 +117,11 @@ namespace uAdventure.Editor
                             var previewRect = GUILayoutUtility.GetRect(columnWidth, columnHeight - 25, "preBackground", GUILayout.MaxWidth(columnWidth));
                             // If its an repaint event we store the rect
                             previewRect.height += 25f;
-                            if (Event.current.type == EventType.Repaint) SetPreviewRect(index, previewRect);
+                            if (Event.current.type == EventType.Repaint)
+                            {
+                                SetPreviewRect(index, previewRect);
+                            }
+
                             previewRect = GetPreviewRect(index);
                             GUILayout.BeginArea(previewRect, new GUIStyle("preBackground"));
                             {

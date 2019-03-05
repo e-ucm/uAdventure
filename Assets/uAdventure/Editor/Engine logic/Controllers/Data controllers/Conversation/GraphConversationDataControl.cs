@@ -53,7 +53,9 @@ namespace uAdventure.Editor
             // Take all the nodes, and add the line count of each one
             List<ConversationNodeDataControl> nodes = getAllNodes();
             foreach (ConversationNodeDataControl node in nodes)
+            {
                 lineCount += node.getLineCount();
+            }
 
             return lineCount;
         }
@@ -126,7 +128,9 @@ namespace uAdventure.Editor
 
             // Copy the data
             foreach (ConversationNode node in nodes)
+            {
                 dataControls.Add(getNodeDataControl(node));
+            }
 
             return dataControls;
         }
@@ -188,7 +192,9 @@ namespace uAdventure.Editor
                 // Show a dialog asking for the new conversation id
                 string newConversationId = name;
                 if (name == null)
+                {
                     controller.ShowInputDialog(TC.get("Operation.RenameConversationTitle"), TC.get("Operation.RenameConversationMessage"), oldConversationId, (o,s) => performRenameElement(s));
+                }
                 else
                 {
                     return performRenameElement(newConversationId);
@@ -205,7 +211,9 @@ namespace uAdventure.Editor
 
             // If some value was typed and the identifiers are different
             if (!controller.isElementIdValid(newConversationId))
+            {
                 newConversationId = controller.makeElementValid(newConversationId);
+            }
 
             graphConversation.setId(newConversationId);
             controller.replaceIdentifierReferences(oldConversationId, newConversationId);
@@ -287,7 +295,10 @@ namespace uAdventure.Editor
         {
             List<Searchable> path = getPathFromChild(dataControl, this.getAllNodes().Cast<Searchable>().ToList());
             if (path != null)
+            {
                 return path;
+            }
+
             if (dataControl == this)
             {
                 path = new List<Searchable>();

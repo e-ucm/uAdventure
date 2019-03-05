@@ -34,7 +34,9 @@ namespace uAdventure.Editor
             // Create subcontrollers
             scenesDataControlList = new List<SceneDataControl>();
             foreach (Scene scene in scenesList)
+            {
                 scenesDataControlList.Add(new SceneDataControl(scene, playerImagePath));
+            }
         }
 
         /**
@@ -109,7 +111,9 @@ namespace uAdventure.Editor
             for (int i = 0; i < scenesList.Count; i++)
             {
                 if (scenesList[i].getId().Equals(id))
+                {
                     return i;
+                }
             }
             return -1;
         }
@@ -167,7 +171,9 @@ namespace uAdventure.Editor
 
                 // Show a dialog asking for the scene id
                 if (string.IsNullOrEmpty(sceneId))
+                {
                     controller.ShowInputDialog(TC.get("Operation.AddSceneTitle"), TC.get("Operation.AddSceneMessage"), TC.get("Operation.AddSceneDefaultValue"), performAddElement);
+                }
                 else
                 {
                     performAddElement(null, sceneId);
@@ -184,7 +190,9 @@ namespace uAdventure.Editor
 
             // If some value was typed and the identifier is valid
             if (!controller.isElementIdValid(id))
+            {
                 id = controller.makeElementValid(id);
+            }
 
             // Add thew new scene
             Scene newScene = new Scene(id);
@@ -205,15 +213,19 @@ namespace uAdventure.Editor
         {
 
             if (!(dataControl is SceneDataControl))
+            {
                 return false;
+            }
 
 
-			Scene newElement = (Scene)(((Scene)(dataControl.getContent())).Clone());
+            Scene newElement = (Scene)(((Scene)(dataControl.getContent())).Clone());
 
 			string id = newElement.getId ();
 			if (!controller.isElementIdValid(id))
-				id = controller.makeElementValid(id);
-			
+            {
+                id = controller.makeElementValid(id);
+            }
+
             newElement.setId(id);
             scenesList.Add(newElement);
             scenesDataControlList.Add(new SceneDataControl(newElement, controller.getPlayerImagePath()));
@@ -259,7 +271,9 @@ namespace uAdventure.Editor
 
             // If this is the last scene, it can't be deleted
             else
+            {
                 controller.ShowErrorDialog(TC.get("Operation.DeleteElementTitle"), TC.get("Operation.ErrorLastScene"));
+            }
 
             return elementDeleted;
         }
@@ -321,7 +335,9 @@ namespace uAdventure.Editor
 
             // Iterate through each scene
             foreach (SceneDataControl sceneDataControl in scenesDataControlList)
+            {
                 sceneDataControl.updateVarFlagSummary(varFlagSummary);
+            }
         }
 
 
@@ -351,7 +367,9 @@ namespace uAdventure.Editor
 
             // Iterate through each scene
             foreach (SceneDataControl sceneDataControl in scenesDataControlList)
+            {
                 count += sceneDataControl.countAssetReferences(assetPath);
+            }
 
             return count;
         }
@@ -362,7 +380,9 @@ namespace uAdventure.Editor
 
             // Iterate through each scnee
             foreach (SceneDataControl sceneDataControl in scenesDataControlList)
+            {
                 sceneDataControl.getAssetReferences(assetPaths, assetTypes);
+            }
         }
 
 
@@ -371,7 +391,9 @@ namespace uAdventure.Editor
 
             // Iterate through each scene
             foreach (SceneDataControl sceneDataControl in scenesDataControlList)
+            {
                 sceneDataControl.deleteAssetReferences(assetPath);
+            }
         }
 
 
@@ -384,7 +406,10 @@ namespace uAdventure.Editor
             foreach (SceneDataControl sceneDataControl in scenesDataControlList)
             {
                 if (sceneDataControl.getName().Equals(id))
+                {
                     count++;
+                }
+
                 count += sceneDataControl.countIdentifierReferences(id);
             }
 
@@ -397,7 +422,9 @@ namespace uAdventure.Editor
 
             // Iterate through each scene
             foreach (SceneDataControl sceneDataControl in scenesDataControlList)
+            {
                 sceneDataControl.replaceIdentifierReferences(oldId, newId);
+            }
         }
 
 
@@ -406,7 +433,9 @@ namespace uAdventure.Editor
 
             // Spread the call to every scene
             foreach (SceneDataControl sceneDataControl in scenesDataControlList)
+            {
                 sceneDataControl.deleteIdentifierReferences(id);
+            }
         }
 
 
@@ -423,7 +452,9 @@ namespace uAdventure.Editor
         {
 
             foreach (SceneDataControl sceneDataControl in scenesDataControlList)
+            {
                 sceneDataControl.addPlayerInReferenceList();
+            }
         }
 
         /**
@@ -433,7 +464,9 @@ namespace uAdventure.Editor
         {
 
             foreach (SceneDataControl sceneDataControl in scenesDataControlList)
+            {
                 sceneDataControl.deletePlayerInReferenceList();
+            }
         }
 
 
@@ -441,7 +474,9 @@ namespace uAdventure.Editor
         {
 
             foreach (DataControl dc in this.scenesDataControlList)
+            {
                 dc.recursiveSearch();
+            }
         }
 
 

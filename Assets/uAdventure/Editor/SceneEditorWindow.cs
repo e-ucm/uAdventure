@@ -47,7 +47,9 @@ namespace uAdventure.Editor
         protected override void DrawPreviewInspector()
         {
             if (sceneEditor.SelectedElement == null)
+            {
                 return;
+            }
 
             sceneEditor.OnInspectorGUI();
         }

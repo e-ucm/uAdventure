@@ -99,7 +99,9 @@ namespace uAdventure.Editor
                     {
                         var block = conditions.Get(index1);
                         if (index2 < 0 || index2 > block.Count)
+                        {
                             return false;
+                        }
 
                         if (index2 == conditions.Size())
                         {

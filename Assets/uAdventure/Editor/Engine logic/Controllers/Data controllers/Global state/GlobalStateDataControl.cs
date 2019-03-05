@@ -43,7 +43,10 @@ namespace uAdventure.Editor
             {
                 var oldId = globalState.getId();
                 if (!controller.isElementIdValid(val))
+                {
                     val = controller.makeElementValid(val);
+                }
+
                 globalState.setId(val);
 
                 controller.replaceIdentifierReferences(oldId, val);
@@ -193,9 +196,13 @@ namespace uAdventure.Editor
             {
                 // Show a dialog asking for the new item id
                 if (name == null)
+                {
                     Controller.Instance.ShowInputDialog(TC.get("Operation.RenameGlobalStateTitle"), TC.get("Operation.RenameGlobalStateMessage"), oldItemId, (o,s) => performRenameElement(s));
+                }
                 else
+                {
                     return performRenameElement(name);
+                }
             }
 
 			return null;
@@ -206,7 +213,9 @@ namespace uAdventure.Editor
             string oldGlobalStateId = getId();
             // If some value was typed and the identifiers are different
             if (Controller.Instance.isElementIdValid(newGlobalStateId))
+            {
                 newGlobalStateId = Controller.Instance.makeElementValid(newGlobalStateId);
+            }
 
             globalState.setId(newGlobalStateId);
             Controller.Instance.replaceIdentifierReferences(oldGlobalStateId, newGlobalStateId);
