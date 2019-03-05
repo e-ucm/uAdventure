@@ -21,26 +21,47 @@ namespace uAdventure.Editor
             EditorGUI.BeginChangeCheck();
             var newRawCopy = EditorGUILayout.Toggle(new GUIContent("Raw Copy"), trackerConfig.getRawCopy());
             if (EditorGUI.EndChangeCheck())
+            {
                 trackerConfig.setRawCopy(newRawCopy);
+            }
 
             // Xapi Type
-            trackerConfig.setStorageType((TrackerConfig.StorageType)EditorGUILayout.EnumPopup(new GUIContent("Storage Type"), trackerConfig.getStorageType()));
+            trackerConfig.setStorageType((TrackerConfig.StorageType)EditorGUILayout.EnumPopup("Storage Type", trackerConfig.getStorageType()));
 
             // Xapi Type
-            trackerConfig.setTraceFormat((TrackerConfig.TraceFormat)EditorGUILayout.EnumPopup(new GUIContent("Trace Format"), trackerConfig.getTraceFormat()));
+            trackerConfig.setTraceFormat((TrackerConfig.TraceFormat)EditorGUILayout.EnumPopup("Trace Format", trackerConfig.getTraceFormat()));
 
 
             // Name
             EditorGUI.BeginChangeCheck();
             var newHost = EditorGUILayout.TextField(TC.get("Tracker.Host"), trackerConfig.getHost());
             if (EditorGUI.EndChangeCheck())
+            {
                 trackerConfig.setHost(newHost);
+            }
 
             // Name
             EditorGUI.BeginChangeCheck();
             var newTrackingCode = EditorGUILayout.TextField(TC.get("Tracker.TrackingCode"), trackerConfig.getTrackingCode());
             if (EditorGUI.EndChangeCheck())
+            {
                 trackerConfig.setTrackingCode(newTrackingCode);
+            }
+
+            // Name
+            EditorGUI.BeginChangeCheck();
+            var newFlushInterval = EditorGUILayout.IntField(TC.get("Tracker.FlushInterval"), trackerConfig.getFlushInterval());
+            if (EditorGUI.EndChangeCheck())
+            {
+                trackerConfig.setFlushInterval(newFlushInterval);
+            }
+
+            EditorGUI.BeginChangeCheck();
+            var newDebug = EditorGUILayout.Toggle(TC.get("Tracker.Debug"), trackerConfig.getDebug());
+            if (EditorGUI.EndChangeCheck())
+            {
+                trackerConfig.setDebug(newDebug);
+            }
         }
     }
 }

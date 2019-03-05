@@ -10,8 +10,8 @@ namespace uAdventure.Editor
 {
     public class CompletablesWindow : LayoutWindow
     {
-        private readonly string[] endOptions = { TC.get("Analytics.EndOptions.FinalScene"), TC.get("Analytics.EndOptions.AllLevels") };
-        private readonly string[] progressOptions = { TC.get("Analytics.ProgressOptions.NumberOfLevels"), TC.get("Analytics.ProgressOptions.Manual") };
+        private readonly string[] endOptions = { TC.get("Analytics.EndOptions.FinalScene")/*, TC.get("Analytics.EndOptions.AllLevels")*/ };
+        private readonly string[] progressOptions = { TC.get("Analytics.ProgressOptions.NumberOfLevels")/*, TC.get("Analytics.ProgressOptions.Manual")*/ };
         private readonly DataControlList completablesList;
 
         private int end = 0;
@@ -50,7 +50,8 @@ namespace uAdventure.Editor
                     },
                     new ColumnList.Column()
                     {
-                        Text = TC.get("Repeatable")
+                        Text = TC.get("Repeatable"),
+                        SizeOptions = new GUILayoutOption[] { GUILayout.Width(70) }
                     }
                 },
                 drawCell = (rect, row, column, isActive, isFocused) =>
@@ -86,7 +87,7 @@ namespace uAdventure.Editor
                             }
                             break;
                         case 5:
-                            completable.setRepeatable(GUI.Toggle(rect, completable.getRepeatable(), "Can be repeated?"));
+                            completable.setRepeatable(GUI.Toggle(rect, completable.getRepeatable(), "?"));
                             break;
                     }
                 }
@@ -137,9 +138,9 @@ namespace uAdventure.Editor
                     }
                     EditorGUI.BeginChangeCheck();
                     var newSwitchOn = switchOn[EditorGUI.Popup(rects[2], Mathf.Max(0, Array.IndexOf(switchOn, score.getId())), switchOn)];
-                    if (EditorGUI.EndChangeCheck())
+                    if (EditorGUI.EndChangeCheck() || score.getId() == null)
                     {
-                        score.renameElement(newSwitchOn);
+                        score.setId(newSwitchOn);
                     }
 
                     break;
@@ -169,7 +170,7 @@ namespace uAdventure.Editor
 
             completables = Controller.Instance.SelectedChapterDataControl.getCompletables();
             completablesList.SetData(completables, (c) => (c as CompletableListDataControl).getCompletables().Cast<DataControl>().ToList());
-            completablesList.DoList(windowHeight - 130);
+            completablesList.DoList(windowHeight - 150);
         }
     }
 
