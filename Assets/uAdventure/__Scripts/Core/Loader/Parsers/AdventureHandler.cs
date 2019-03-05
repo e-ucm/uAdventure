@@ -148,7 +148,7 @@ namespace uAdventure.Core
 
             adventureData.getTrackerConfig().setHost(trackerConfig.GetAttribute("host"));
             adventureData.getTrackerConfig().setTrackingCode(trackerConfig.GetAttribute("trackingCode"));
-            adventureData.getTrackerConfig().setRawCopy(trackerConfig.GetAttribute("debug") == "yes");
+            adventureData.getTrackerConfig().setDebug(trackerConfig.GetAttribute("debug") == "yes");
 
             tmpString = trackerConfig.GetAttribute("storageType");
             if (!string.IsNullOrEmpty(tmpString))

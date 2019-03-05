@@ -27,14 +27,31 @@ namespace uAdventure.Runner
 
             if (!Reached)
             {
-                var isSceneType = Milestone.getType() == Completable.Milestone.MilestoneType.SCENE;
-                var isTargetedScene = Milestone.getId() == target.getId();
-
-                if (isSceneType && isTargetedScene)
+                switch (Milestone.getType())
                 {
-                    Reached = true;
-                    hasBeenUpdated = true;
+                    case Completable.Milestone.MilestoneType.SCENE:
+                        var isTargetedScene = Milestone.getId() == target.getId();
+
+                        if (isTargetedScene)
+                        {
+                            Reached = true;
+                            hasBeenUpdated = true;
+                        }
+                        break;
+                    case Completable.Milestone.MilestoneType.ENDING:
+                        if(target is Cutscene)
+                        {
+                            if (((Cutscene)target).isEndScene())
+                            {
+                                Reached = true;
+                                hasBeenUpdated = true;
+                            }
+                        }
+                        break;
+                    default:
+                        break;
                 }
+                
             }
             
             return hasBeenUpdated;
@@ -151,7 +168,7 @@ namespace uAdventure.Runner
             get
             {
                 var score = CalculateScore(Completable.getScore());
-                return Mathf.Clamp01(score / 10f);
+                return score; //TODO: enable this? Mathf.Clamp01(score / 10f);
             }
         }
 
@@ -395,7 +412,8 @@ namespace uAdventure.Runner
         public void TrackStarted(CompletableController completableController)
         {
             var completableId   = completableController.Completable.getId();
-            var completableType = (CompletableTracker.Completable)completableController.Completable.getType();
+            var completableType = (CompletableTracker.Completable)completableController.Completable.getType()-1;
+            
 
             TrackerAsset.Instance.Completable.Initialized(completableId, completableType);
             TrackerAsset.Instance.Completable.Progressed(completableId, completableType, 0);
@@ -404,7 +422,7 @@ namespace uAdventure.Runner
         public void TrackProgressed(CompletableController completableController)
         {
             var completableId       = completableController.Completable.getId();
-            var completableType     = (CompletableTracker.Completable)completableController.Completable.getType();
+            var completableType     = (CompletableTracker.Completable)completableController.Completable.getType()-1;
             var completableProgress = completableController.Progress;
 
             TrackerAsset.Instance.Completable.Progressed(completableId, completableType, completableProgress);
@@ -414,7 +432,7 @@ namespace uAdventure.Runner
         public void TrackCompleted(CompletableController completableController, TimeSpan timeElapsed)
         {
             var completableId    = completableController.Completable.getId();
-            var completableType  = (CompletableTracker.Completable)completableController.Completable.getType();
+            var completableType  = (CompletableTracker.Completable)completableController.Completable.getType()-1;
             var completableScore = completableController.Score;
             
             TrackerAsset.Instance.setVar("time", timeElapsed.TotalSeconds);

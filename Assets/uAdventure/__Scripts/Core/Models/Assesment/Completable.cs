@@ -14,7 +14,7 @@ namespace uAdventure.Core
     {
         public class Milestone : HasId, HasTargetId
         {
-            public enum MilestoneType { SCENE, ITEM, CHARACTER, COMPLETABLE, CONDITION };
+            public enum MilestoneType { SCENE, ITEM, CHARACTER, COMPLETABLE, CONDITION, ENDING };
 
             private MilestoneType type;
             private string id = "";
@@ -95,6 +95,9 @@ namespace uAdventure.Core
                         break;
                     case MilestoneType.CONDITION:
                         s += "a condition is satisfied";
+                        break;
+                    case MilestoneType.ENDING:
+                        //ENDING is special case, not showing
                         break;
                     default:
                         s = "Not specified yet";
