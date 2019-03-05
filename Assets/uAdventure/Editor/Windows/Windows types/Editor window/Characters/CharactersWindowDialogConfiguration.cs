@@ -91,87 +91,27 @@ namespace uAdventure.Editor
 
             if (showBackground)
             {
-                DrawBackgroundBorder(rect, content, background, borderColor, style);
-                DrawBackground(rect, content, background, backgroundColor, style);
+                GUIUtil.DrawBackgroundBorder(rect, content, background, borderColor, style);
+                GUIUtil.DrawBackground(rect, content, background, backgroundColor, style);
             }
 
-            DrawTextBorder(rect, content, fontBorder, style);
-            DrawText(rect, content, fontColor, style);
-        }
-
-        private static void DrawBackgroundBorder(Rect rect, GUIContent content, Texture2D texture, Color borderColor,  GUIStyle style)
-        {
-            var preColor = GUI.backgroundColor;
-            GUI.backgroundColor = borderColor;
-            style.normal.background = texture;
-            style.normal.textColor = new Color(0, 0, 0, 0);
-
-            if(Event.current.type == EventType.Repaint)
-            {
-                style.Draw(new Rect(rect.x, rect.y - 3, rect.width, rect.height), content, false, false, false, false);
-                style.Draw(new Rect(rect.x - 3, rect.y, rect.width, rect.height), content, false, false, false, false);
-                style.Draw(new Rect(rect.x, rect.y + 3, rect.width, rect.height), content, false, false, false, false);
-                style.Draw(new Rect(rect.x + 3, rect.y, rect.width, rect.height), content, false, false, false, false);
-            }
-            
-            GUI.backgroundColor = preColor;
-            style.normal.background = null;
-        }
-
-        private static void DrawBackground(Rect rect, GUIContent content, Texture2D texture, Color backgroundColor, GUIStyle style)
-        {
-            var preColor = GUI.backgroundColor;
-            GUI.backgroundColor = backgroundColor;
-
-            style.normal.background = texture;
-            style.normal.textColor = new Color(0, 0, 0, 0);
-            if (Event.current.type == EventType.Repaint)
-            {
-                style.Draw(rect, content, false, false, false, false);
-            }
-
-            GUI.backgroundColor = preColor;
-            style.normal.background = null;
-        }
-
-
-        private static void DrawTextBorder(Rect rect, GUIContent content, Color fontBorder, GUIStyle style)
-        {
-            style.normal.textColor = fontBorder;
-
-            if (Event.current.type == EventType.Repaint)
-            {
-                style.Draw(new Rect(rect.x, rect.y - 2, rect.width, rect.height), content, false, false, false, false);
-                style.Draw(new Rect(rect.x - 2, rect.y, rect.width, rect.height), content, false, false, false, false);
-                style.Draw(new Rect(rect.x, rect.y + 2, rect.width, rect.height), content, false, false, false, false);
-                style.Draw(new Rect(rect.x + 2, rect.y, rect.width, rect.height), content, false, false, false, false);
-
-                style.Draw(new Rect(rect.x - 1, rect.y - 1, rect.width, rect.height), content, false, false, false, false);
-                style.Draw(new Rect(rect.x + 1, rect.y - 1, rect.width, rect.height), content, false, false, false, false);
-                style.Draw(new Rect(rect.x - 1, rect.y + 1, rect.width, rect.height), content, false, false, false, false);
-                style.Draw(new Rect(rect.x + 1, rect.y + 1, rect.width, rect.height), content, false, false, false, false);
-            }
-        }
-
-        private static void DrawText(Rect rect, GUIContent content, Color fontColor, GUIStyle style)
-        {
-            style.normal.textColor = fontColor;
-
-            if (Event.current.type == EventType.Repaint)
-            {
-                style.Draw(rect, content, false, false, false, false);
-            }
+            GUIUtil.DrawTextBorder(rect, content, fontBorder, style);
+            GUIUtil.DrawText(rect, content, fontColor, style);
         }
 
         public override void DrawPreview(Rect rect)
         {
-            GUILayout.BeginVertical();
-            GUILayout.FlexibleSpace();
-            GUILayout.BeginHorizontal(); GUILayout.FlexibleSpace();
-            DrawPreview(new GUIContent(TC.get("GeneralText.PreviewText")), shouldShowSpeechBubble, bckImage, bubbleBcgColor, bubbleBorderColor, fontFrontColor, fontBorderColor, previewTextStyle);
-            GUILayout.FlexibleSpace(); GUILayout.EndHorizontal();
-            GUILayout.FlexibleSpace();
-            GUILayout.EndVertical();
+            using (new GUILayout.VerticalScope())
+            {
+                GUILayout.FlexibleSpace();
+                using (new GUILayout.HorizontalScope())
+                {
+                    GUILayout.FlexibleSpace();
+                    DrawPreview(new GUIContent(TC.get("GeneralText.PreviewText")), shouldShowSpeechBubble, bckImage, bubbleBcgColor, bubbleBorderColor, fontFrontColor, fontBorderColor, previewTextStyle);
+                    GUILayout.FlexibleSpace();
+                }
+                GUILayout.FlexibleSpace();
+            }
         }
     }
 }

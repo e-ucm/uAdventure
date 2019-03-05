@@ -450,6 +450,7 @@ namespace uAdventure.Runner
             {
                 // Disable the UI interactivity
                 uAdventureRaycaster.Instance.enabled = false;
+                InventoryManager.Instance.Show = false;
 
                 // Enable blurred background
                 blur = GameObject.Instantiate(Blur_Prefab);
@@ -520,49 +521,58 @@ namespace uAdventure.Runner
                     break;
                 case GUIState.ANSWERS_MENU:
 
-                    float guiscale = Screen.width / 800f;
-                    skin.box.fontSize = Mathf.RoundToInt(guiscale * 20);
-                    skin.button.fontSize = Mathf.RoundToInt(guiscale * 20);
-                    skin.label.fontSize = Mathf.RoundToInt(guiscale * 20);
-                    skin.GetStyle("optionLabel").fontSize = Mathf.RoundToInt(guiscale * 36);
-                    skin.GetStyle("talk_player").fontSize = Mathf.RoundToInt(guiscale * 20);
-                    skin.GetStyle("emptyProgressBar").fontSize = Mathf.RoundToInt(guiscale * 20);
-
-                    GUILayout.BeginArea(new Rect(Screen.width * 0.1f, Screen.height * 0.1f, Screen.width * 0.8f, Screen.height * 0.8f));
-                    GUILayout.BeginVertical();
-                    OptionConversationNode options = (OptionConversationNode)guioptions.getNode();
-
-                    if (options.isKeepShowing())
+                    using(new GUIUtil.SkinScope(skin))
                     {
-                        var text = GUIManager.Instance.Last;
-                        if (text[0] == '#')
-                            text = text.Remove(0, Mathf.Max(0, text.IndexOf(' ') + 1));
-                        GUILayout.Label(text, "optionLabel");
-                    }
-                    foreach (var i in order)
-                    {
-                        ConversationLine ono = options.getLine(i);
-                        if (ConditionChecker.check(options.getLineConditions(i)) && GUILayout.Button(ono.getText(), skin.button))
+                        float guiscale = Screen.width / 800f;
+                        skin.box.fontSize = Mathf.RoundToInt(guiscale * 20);
+                        skin.button.fontSize = Mathf.RoundToInt(guiscale * 20);
+                        skin.label.fontSize = Mathf.RoundToInt(guiscale * 20);
+                        skin.GetStyle("optionLabel").fontSize = Mathf.RoundToInt(guiscale * 36);
+                        skin.GetStyle("talk_player").fontSize = Mathf.RoundToInt(guiscale * 20);
+                        skin.GetStyle("emptyProgressBar").fontSize = Mathf.RoundToInt(guiscale * 20);
+
+                        using (new GUILayout.AreaScope(new Rect(Screen.width * 0.1f, Screen.height * 0.1f, Screen.width * 0.8f, Screen.height * 0.8f)))
                         {
-                            OptionSelected(i);
+                            using (new GUILayout.VerticalScope())
+                            {
+                                OptionConversationNode options = (OptionConversationNode)guioptions.getNode();
+
+                                if (options.isKeepShowing())
+                                {
+                                    var text = GUIManager.Instance.Last;
+                                    if (text[0] == '#')
+                                        text = text.Remove(0, Mathf.Max(0, text.IndexOf(' ') + 1));
+
+                                    var textContent = new GUIContent(text);
+                                    var textRect = GUILayoutUtility.GetRect(textContent, "optionLabel");
+
+                                    GUIUtil.DrawTextBorder(textRect, textContent, Color.black, "optionLabel");
+                                    GUIUtil.DrawText(textRect, textContent, ((GUIStyle)"optionLabel").normal.textColor, "optionLabel");
+                                }
+                                foreach (var i in order)
+                                {
+                                    ConversationLine ono = options.getLine(i);
+                                    if (ConditionChecker.check(options.getLineConditions(i)) && GUILayout.Button(ono.getText()))
+                                    {
+                                        OptionSelected(i);
+                                    }
+                                }
+
+                                if (doTimeOut)
+                                {
+                                    if (Event.current.type == EventType.Repaint && elapsedTime > options.Timeout)
+                                    {
+                                        OptionSelected(options.getChildCount() - 1);
+                                    }
+
+                                    var timeLeft = Mathf.Max(0, options.Timeout - elapsedTime);
+                                    var timeLeftText = Mathf.Round(timeLeft * 10) / 10 + " s";
+                                    GUILayout.FlexibleSpace();
+                                    DrawProgressBar(GUILayoutUtility.GetRect(0, 0, "emptyProgressBar", GUILayout.ExpandWidth(true), GUILayout.Height(50)), timeLeftText, 1 - (elapsedTime / options.Timeout));
+                                }
+                            }
                         }
                     }
-
-                    if(doTimeOut)
-                    {
-                        if(Event.current.type == EventType.Repaint && elapsedTime > options.Timeout)
-                        {
-                            OptionSelected(options.getChildCount()-1);
-                        }
-
-                        var timeLeft = Mathf.Max(0, options.Timeout - elapsedTime);
-                        var timeLeftText = Mathf.Round(timeLeft * 10) / 10 + " s";
-                        GUILayout.FlexibleSpace();
-                        DrawProgressBar(GUILayoutUtility.GetRect(0, 0, "emptyProgressBar", GUILayout.ExpandWidth(true), GUILayout.Height(50)), timeLeftText, 1 - (elapsedTime / options.Timeout));
-                    }
-
-                    GUILayout.EndVertical();
-                    GUILayout.EndArea();
                     break;
                 default: break;
             }
@@ -574,6 +584,7 @@ namespace uAdventure.Runner
             GameObject.Destroy(blur);
             guioptions.clicked(i);
             uAdventureRaycaster.Instance.enabled = true;
+            InventoryManager.Instance.Show = true;
             Interacted();
         }
 
@@ -582,29 +593,25 @@ namespace uAdventure.Runner
             var pos = rect.position;
             var size = rect.size;
 
-            var bcSkin = GUI.skin;
-            GUI.skin = skin;
-
-            progress = Mathf.Clamp01(progress);
-
-            // draw the background:
-            GUI.BeginGroup(new Rect(pos.x, pos.y, size.x, size.y));
+            using (new GUIUtil.SkinScope(skin))
             {
-                var backgroundRect = new Rect(0, 0, size.x, size.y);
-                GUI.Box(backgroundRect, new GUIContent(), "emptyProgressBar");
+                progress = Mathf.Clamp01(progress);
 
-                // draw the filled-in part:
-                GUI.BeginGroup(new Rect(0, 0, size.x * progress, size.y));
+                // draw the background:
+                using (new GUI.GroupScope(new Rect(pos.x, pos.y, size.x, size.y)))
                 {
-                    GUI.Box(new Rect(0, 0, size.x, size.y), new GUIContent(), "fullProgressBar");
+                    var backgroundRect = new Rect(0, 0, size.x, size.y);
+                    GUI.Box(backgroundRect, new GUIContent(), "emptyProgressBar");
+
+                    // draw the filled-in part:
+                    using(new GUI.GroupScope(new Rect(0, 0, size.x * progress, size.y)))
+                    {
+                        GUI.Box(new Rect(0, 0, size.x, size.y), new GUIContent(), "fullProgressBar");
+                    }
+
+                    GUI.Label(backgroundRect, text, "textProgressBar");
                 }
-                GUI.EndGroup();
-
-                GUI.Label(backgroundRect, text, "textProgressBar");
             }
-            GUI.EndGroup();
-
-            GUI.skin = bcSkin;
         }
 
         #endregion Misc

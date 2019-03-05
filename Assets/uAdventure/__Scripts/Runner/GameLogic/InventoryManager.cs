@@ -4,9 +4,8 @@ using uAdventure.Core;
 
 namespace uAdventure.Runner
 {
-    public class InventoryManager : MonoBehaviour
+    public class InventoryManager : Singleton<InventoryManager>
     {
-        public static InventoryManager Instance { get; protected set; }
 
         // Editable fields
         [SerializeField]
@@ -70,8 +69,6 @@ namespace uAdventure.Runner
         {
             if (InventoryManager.Instance)
                 Debug.LogWarning("Multiple inventory managers have been found!");
-
-            InventoryManager.Instance = this;
 
             var inventoryGO = GameObject.Instantiate(inventoryPrefab, inventoryHolder.transform);
             inventory = inventoryGO.GetComponent<Inventory>();
