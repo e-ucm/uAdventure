@@ -91,9 +91,14 @@ namespace MapzenGo.Models
 
             var rect = GM.TileBounds(CenterTms, Zoom);
             if(!RealisticTileSize)
+            {
                 transform.localScale = Vector3.one * (float)(TileSize / rect.Width);
+            }
+
             if (MapMaterial == null)
+            {
                 MapMaterial = Resources.Load<Material>("Ground");
+            }
         }
 
         public virtual void ReloadPlugins<T>() where T : Plugin
@@ -143,7 +148,10 @@ namespace MapzenGo.Models
                 {
                     var v = new Vector2d(tms.x + i, tms.y + j);
                     if (Tiles.ContainsKey(v))
+                    {
                         continue;
+                    }
+
                     StartCoroutine(CreateTile(v, center));
                 }
             }
@@ -208,7 +216,10 @@ namespace MapzenGo.Models
 
                 _player.localPosition -= difInUnity;
                 if(RealisticTileSize)
+                {
                     difInUnity.Scale(new Vector3(1/transform.lossyScale.x, 1/transform.lossyScale.y, 1/transform.lossyScale.z));
+                }
+
                 Camera.main.transform.position -= difInUnity;
             }
             else
@@ -264,7 +275,11 @@ namespace MapzenGo.Models
             var pluginsToStart = new List<T>();
             foreach (var plugin in todo)
             {
-                if (doing.Contains(plugin)) continue;
+                if (doing.Contains(plugin))
+                {
+                    continue;
+                }
+
                 // Check dependencies
                 if (plugin.Dependencies.All(dependencie => !todo.Contains(dependencie)))
                 {
@@ -281,7 +296,9 @@ namespace MapzenGo.Models
                     doing.Remove(pluginDone);
 
                     if (success)
+                    {
                         ContinuePlugins(todo, doing, whatToDo);
+                    }
                 });
             }
         }
@@ -291,14 +308,23 @@ namespace MapzenGo.Models
             var dif = _player.transform.localPosition.ToVector2xz();
             var tileDif = Vector2.zero;
             if (dif.x < Math.Min(_centerCollider.xMin, _centerCollider.xMax))
+            {
                 tileDif.x = -1;
+            }
             else if (dif.x > Math.Max(_centerCollider.xMin, _centerCollider.xMax))
+            {
                 tileDif.x = 1;
+            }
 
             if (dif.y < Math.Min(_centerCollider.yMin, _centerCollider.yMax))
+            {
                 tileDif.y = 1;
+            }
             else if (dif.y > Math.Max(_centerCollider.yMin, _centerCollider.yMax))
+            {
                 tileDif.y = -1; //invert axis  TMS vs unity
+            }
+
             return tileDif;
         }
     }

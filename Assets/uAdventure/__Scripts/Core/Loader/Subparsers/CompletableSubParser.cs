@@ -149,10 +149,12 @@ namespace uAdventure.Core
                 XmlNode subscores = element.SelectSingleNode("sub-scores");
 
                 if (subscores != null)
+                {
                     foreach (XmlElement subscore in subscores.ChildNodes)
                     {
-						score.addSubScore(parseScore(subscore, parameters));
+                        score.addSubScore(parseScore(subscore, parameters));
                     }
+                }
             }
 
             return score;

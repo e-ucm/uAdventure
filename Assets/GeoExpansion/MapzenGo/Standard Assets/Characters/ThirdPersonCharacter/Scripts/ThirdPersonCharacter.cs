@@ -52,8 +52,12 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 			// convert the world relative moveInput vector into a local-relative
 			// turn amount and forward amount required to head in the desired
 			// direction.
-			if (move.magnitude > 1f) move.Normalize();
-			move = transform.InverseTransformDirection(move);
+			if (move.magnitude > 1f)
+            {
+                move.Normalize();
+            }
+
+            move = transform.InverseTransformDirection(move);
 			CheckGroundStatus();
 			move = Vector3.ProjectOnPlane(move, m_GroundNormal);
 			m_TurnAmount = Mathf.Atan2(move.x, move.z);
@@ -83,8 +87,12 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 		{
 			if (m_IsGrounded && crouch)
 			{
-				if (m_Crouching) return;
-				m_Capsule.height = m_Capsule.height / 2f;
+				if (m_Crouching)
+                {
+                    return;
+                }
+
+                m_Capsule.height = m_Capsule.height / 2f;
 				m_Capsule.center = m_Capsule.center / 2f;
 				m_Crouching = true;
 			}
@@ -216,8 +224,11 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 				m_GroundNormal = hitInfo.normal;
 				m_IsGrounded = true;
                 if (m_Animator == null)
+                {
                     Start();
-				m_Animator.applyRootMotion = true;
+                }
+
+                m_Animator.applyRootMotion = true;
 			}
 			else
 			{

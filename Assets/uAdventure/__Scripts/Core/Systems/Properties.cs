@@ -25,9 +25,13 @@ namespace uAdventure.Core
             set
             {
                 if (!list.ContainsKey(field))
+                {
                     list.Add(field, value);
+                }
                 else
+                {
                     list[field] = value;
+                }
             }
         }
 
@@ -57,15 +61,22 @@ namespace uAdventure.Core
             this.filename = filename;
             
             if (!System.IO.File.Exists(filename))
+            {
                 System.IO.File.Create(filename).Close();
+            }
 
             System.IO.StreamWriter file = new System.IO.StreamWriter(filename);
             file.WriteLine("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><!DOCTYPE properties SYSTEM \"http://java.sun.com/dtd/properties.dtd\">");
             file.WriteLine("<properties>");
             file.WriteLine("<comment> Project Configuration </comment>");
             foreach (string prop in list.Keys.ToArray())
+            {
                 if (!string.IsNullOrEmpty(list[prop]))
+                {
                     file.WriteLine("<entry key=\"" + prop + "\">" + list[prop] + "</entry>");
+                }
+            }
+
             file.Write("</properties>");
             file.Close();
         }
@@ -80,9 +91,13 @@ namespace uAdventure.Core
             this.filename = filename;
             list = new Dictionary<string, string>();
             if (System.IO.File.Exists(filename))
+            {
                 LoadFromFile(filename);
+            }
             else
+            {
                 System.IO.File.Create(filename).Close();
+            }
         }
 
         private void LoadFromFile(string file)
@@ -98,12 +113,17 @@ namespace uAdventure.Core
                         while (reader.MoveToNextAttribute()) // Read the attributes.
                         {
                             if (reader.Name.Equals("key"))
+                            {
                                 key = reader.Value;
+                            }
                         }
                         break;
                     case XmlNodeType.Text: //Display the text in each element.
                         if (!key.Equals(""))
+                        {
                             value = reader.Value;
+                        }
+
                         break;
                     case XmlNodeType.EndElement: //Display the end of the element.
                         break;

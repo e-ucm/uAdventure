@@ -118,7 +118,9 @@ namespace MapzenGo.Models.Factories
             {
                 var kind = geo["properties"]["kind"].str.ConvertToBoundaryType();
                 if (!_settings.HasSettingsFor(kind))
+                {
                     continue;
+                }
 
                 var settings = _settings.GetSettingsFor<BoundarySettings>(kind);
                 var roadEnds = new List<Vector3>();
@@ -165,7 +167,9 @@ namespace MapzenGo.Models.Factories
                 var p2 = list[i];
                 var p3 = p2;
                 if (i + 1 < list.Count)
+                {
                     p3 = list[i + 1];
+                }
 
                 if (lastPos == Vector3.zero)
                 {
@@ -212,7 +216,9 @@ namespace MapzenGo.Models.Factories
         {
             boundary.name = "boundary " + geo["properties"]["id"].ToString();
             if (geo["properties"].HasField("name"))
+            {
                 boundary.Name = geo["properties"]["name"].str;
+            }
 
             boundary.Id = geo["properties"]["id"].ToString();
             boundary.Type = geo["type"].str;

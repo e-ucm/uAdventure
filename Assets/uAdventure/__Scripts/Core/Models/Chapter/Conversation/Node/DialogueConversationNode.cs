@@ -70,7 +70,9 @@ namespace uAdventure.Core
             int childCount = 0;
 
             if (nextNode != null)
+            {
                 childCount++;
+            }
 
             return childCount;
         }
@@ -79,7 +81,9 @@ namespace uAdventure.Core
         {
 
             if (index != 0)
+            {
                 throw new System.Exception();
+            }
 
             return nextNode;
         }
@@ -88,7 +92,9 @@ namespace uAdventure.Core
         {
 
             if (nextNode != null)
+            {
                 throw new System.Exception();
+            }
 
             nextNode = child;
         }
@@ -96,7 +102,9 @@ namespace uAdventure.Core
         public override void addChild(int index, ConversationNode child)
         {
             if (index != 0 || nextNode != null)
+            {
                 throw new System.Exception();
+            }
 
             nextNode = child;
         }
@@ -105,7 +113,9 @@ namespace uAdventure.Core
         {
 
             if (index != 0 || nextNode == null)
+            {
                 throw new System.Exception();
+            }
 
             ConversationNode deletedChild = nextNode;
             nextNode = null;

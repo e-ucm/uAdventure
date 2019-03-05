@@ -45,17 +45,23 @@ namespace uAdventure.Geo
         {
             debugLatLong = zone.Center.ToVector2();
             if (!GPSController.Instance.IsStarted())
+            {
                 GPSController.Instance.Start();
+            }
 
             if (GPSController.Instance.IsLocationValid())
+            {
                 debugLatLong = new Vector2(Input.location.lastData.latitude, Input.location.lastData.longitude);
+            }
         }
         
 
         void Update()
         {
             if (Game.Instance.isSomethingRunning())
+            {
                 return; // We have to respect if something is running, like a conversation or an effect
+            }
 
             if(GPSController.Instance.IsLocationValid())
             {

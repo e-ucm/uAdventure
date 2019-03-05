@@ -81,9 +81,14 @@ namespace uAdventure.Core
             this.name = name;
             this.rules = rules;
             if (initialState == null)
+            {
                 this.initialState = new AdaptedState();
+            }
             else
+            {
                 this.initialState = initialState;
+            }
+
             flags = new List<string>();
             vars = new List<string>();
             this.scorm2004 = scorm2004;
@@ -475,15 +480,24 @@ namespace uAdventure.Core
             AdaptationProfile ap = (AdaptationProfile)this.MemberwiseClone();
             ap.flags = new List<string>();
             foreach (string s in flags)
+            {
                 ap.flags.Add((s != null ? s : null));
+            }
+
             ap.initialState = (AdaptedState)initialState.Clone();
             ap.name = (name != null ? name : null);
             ap.rules = new List<AdaptationRule>();
             foreach (AdaptationRule ar in rules)
+            {
                 ap.rules.Add((AdaptationRule)ar.Clone());
+            }
+
             ap.vars = new List<string>();
             foreach (string s in vars)
+            {
                 ap.vars.Add((s != null ? s : null));
+            }
+
             ap.scorm12 = scorm12;
             ap.scorm2004 = scorm2004;
             return ap;

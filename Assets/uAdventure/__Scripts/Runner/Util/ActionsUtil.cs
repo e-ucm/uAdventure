@@ -39,7 +39,9 @@ namespace uAdventure.Runner
             var unrestricted = actions.Checked().Distinct();
 
             if (restricted != null)
+            {
                 return unrestricted.Restrict(restricted);
+            }
 
             return unrestricted;
         }
@@ -55,9 +57,14 @@ namespace uAdventure.Runner
                 {
                     var textToShow = description.getDetailedDescription();
                     if (string.IsNullOrEmpty(textToShow))
+                    {
                         textToShow = description.getDescription();
+                    }
+
                     if (string.IsNullOrEmpty(textToShow))
+                    {
                         textToShow = description.getName();
+                    }
 
                     // Only add the examine if there's text to show
                     if (!string.IsNullOrEmpty(textToShow))

@@ -22,8 +22,15 @@ public class GMLGeometry
         switch (Type)
         {
             case GMLGeometry.GeometryType.Point:
-                if (Points.Count == 1) Points[0] = point;
-                else Points.Add(point);
+                if (Points.Count == 1)
+                {
+                    Points[0] = point;
+                }
+                else
+                {
+                    Points.Add(point);
+                }
+
                 break;
             case GMLGeometry.GeometryType.LineString:
                 Points.Add(point);
@@ -94,7 +101,9 @@ public class GMLGeometry
                 {
                     if (((originPoints[i].y > 0) != (originPoints[(i + 1) % originPoints.Count].y > 0))
                     && ((originPoints[i].y > 0) == (originPoints[i].y * originPoints[(i + 1) % originPoints.Count].x > originPoints[(i + 1) % originPoints.Count].y * originPoints[i].x)))
+                    {
                         inside = !inside;
+                    }
                 }
                 break;
             default:
@@ -114,7 +123,9 @@ public class GMLGeometry
     private static bool InsideEdgeRange(List<Vector2d> points, Vector2d point, float radius)
     {
         if (points.Count <= 1) // If there are not edges, no sense to do it...
+        {
             return false;
+        }
 
         Vector2d closestPoin = Vector2d.zero;
         int l = points.Count - 1;
@@ -124,7 +135,9 @@ public class GMLGeometry
             //Debug.Log(GM.SeparationInMeters(closestPoin, point));
             l = i;
             if (GM.SeparationInMeters(closestPoin, point) <= radius)
+            {
                 return true;
+            }
         }
         return false;
     }
@@ -168,9 +181,13 @@ public class GMLGeometry
         get
         {
             if (Points.Count == 0)
+            {
                 return Vector2d.zero;
+            }
             else if (Points.Count == 1)
+            {
                 return Points[0];
+            }
 
             return Points.Aggregate(new Vector2d(), (p, n) => p + n) / Points.Count;
         }

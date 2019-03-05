@@ -173,9 +173,13 @@ namespace UnityEngine
             Vector2d vector2 = target - current;
             double magnitude = vector2.magnitude;
             if (magnitude <= maxDistanceDelta || magnitude == 0.0d)
+            {
                 return target;
+            }
             else
+            {
                 return current + vector2 / magnitude * maxDistanceDelta;
+            }
         }
 
         public static Vector2d Scale(Vector2d a, Vector2d b)
@@ -193,9 +197,13 @@ namespace UnityEngine
         {
             double magnitude = this.magnitude;
             if (magnitude > 9.99999974737875E-06)
+            {
                 this = this / magnitude;
+            }
             else
+            {
                 this = Vector2d.zero;
+            }
         }
 
         public override string ToString()
@@ -238,12 +246,19 @@ namespace UnityEngine
         public override bool Equals(object other)
         {
             if (!(other is Vector2d))
+            {
                 return false;
+            }
+
             Vector2d vector2d = (Vector2d)other;
             if (this.x.Equals(vector2d.x))
+            {
                 return this.y.Equals(vector2d.y);
+            }
             else
+            {
                 return false;
+            }
         }
 
         public static double Dot(Vector2d lhs, Vector2d rhs)
@@ -264,9 +279,13 @@ namespace UnityEngine
         public static Vector2d ClampMagnitude(Vector2d vector, double maxLength)
         {
             if (vector.sqrMagnitude > maxLength * maxLength)
+            {
                 return vector.normalized * maxLength;
+            }
             else
+            {
                 return vector;
+            }
         }
 
         public static double SqrMagnitude(Vector2d a)

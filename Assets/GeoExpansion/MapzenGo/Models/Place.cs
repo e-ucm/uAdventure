@@ -25,9 +25,13 @@ namespace MapzenGo.Models
         public void Update()
         {
             if (_target == null)
+            {
                 Destroy(gameObject);
+            }
             else
+            {
                 transform.position = Camera.main.WorldToScreenPoint(_target.position);
+            }
         }
     }
 }

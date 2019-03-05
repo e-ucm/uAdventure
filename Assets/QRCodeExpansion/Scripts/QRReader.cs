@@ -59,12 +59,19 @@ namespace dZine4D.Misc.QR
             camTexture = new WebCamTexture(W, H);
 
             if (OutputRenderer != null)
+            {
                 OutputRenderer.material.mainTexture = camTexture;
+            }
+
             if (OutputImage != null)
+            {
                 OutputImage.texture = camTexture;
+            }
 
             if (EnableOnAwake)
+            {
                 EnableReader();
+            }
 
             qrThread = new Thread(DecodeQR);
             qrThread.Start();
@@ -82,7 +89,10 @@ namespace dZine4D.Misc.QR
         public void DisableReader()
         {
             if (!isReaderEnabled)
+            {
                 return;
+            }
+
             isReaderEnabled = false;
 
             LastResult = string.Empty;
@@ -109,7 +119,9 @@ namespace dZine4D.Misc.QR
         void Update()
         {
             if (!isReaderEnabled)
+            {
                 return;
+            }
 
             if (cameraFeedGrab == null)
             {
@@ -120,10 +132,14 @@ namespace dZine4D.Misc.QR
             {
                 prevResult = LastResult;
                 if (OnQrCodeDetected != null)
+                {
                     OnQrCodeDetected.Invoke(prevResult);
+                }
 
                 if (OutputText != null)
+                {
                     OutputText.text = LastResult;
+                }
             }
         }
 
@@ -147,7 +163,9 @@ namespace dZine4D.Misc.QR
             while (true)
             {
                 if (isQuit)
+                {
                     break;
+                }
 
                 if (!isReaderEnabled)
                 {
@@ -180,7 +198,9 @@ namespace dZine4D.Misc.QR
         IEnumerator EnableReaderRoutine()
         {
             if (isReaderEnabled)
+            {
                 yield break;
+            }
 
             LastResult = string.Empty;
             prevResult = string.Empty;

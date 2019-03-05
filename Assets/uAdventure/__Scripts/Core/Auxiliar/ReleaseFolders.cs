@@ -107,8 +107,9 @@ namespace uAdventure.Core
                 return path.Substring(path.Length - 9, path.Length - 4);
             }
             else
+            {
                 return LANGUAGE_DEFAULT;
-
+            }
         }
 
         public static string getAboutFilePath(string s)

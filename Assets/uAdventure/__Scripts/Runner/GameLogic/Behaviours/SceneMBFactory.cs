@@ -13,7 +13,9 @@ namespace uAdventure.Runner
         void Start()
         {
             if (prefab == null)
+            {
                 prefab = Resources.Load<GameObject>("Prefabs/Scene");
+            }
         }
 
         public IRunnerChapterTarget Instantiate(IChapterTarget modelObject)

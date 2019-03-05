@@ -48,12 +48,16 @@ namespace uAdventure.Geo
         public void Start()
         {
             if (!IsStarted())
+            {
                 StartCoroutine(StartLocation());
+            }
 
             // In case is necesary
             // TODO use PlayerPrefs in settings
             if (PlayerPrefs.HasKey("navigating") && PlayerPrefs.GetInt("navigating") == 1)
+            {
                 GameObject.Instantiate(Resources.Load<GameObject>("navigation"));
+            }
 
             if (PlayerPrefs.HasKey("zone_control") && !FindObjectOfType<ZoneControl>())
             {
@@ -67,7 +71,9 @@ namespace uAdventure.Geo
         {
             // First, check if user has location service enabled
             if (!Input.location.isEnabledByUser)
+            {
                 yield break;
+            }
 
             // Start service before querying location
             Input.location.Start(accuracy, update);
@@ -115,12 +121,16 @@ namespace uAdventure.Geo
             timeSinceLastPositionUpdate += Time.deltaTime;
 
             if (time > blinkingTime)
+            {
                 time = time - Mathf.Floor(time / blinkingTime) * blinkingTime;
+            }
 
             if (timeSinceLastPositionUpdate > timeToFlush)
             {
                 if (!geochar)
+                {
                     geochar = FindObjectOfType<GeoPositionedCharacter>();
+                }
 
                 if (IsStarted() || geochar)
                 {
@@ -155,7 +165,9 @@ namespace uAdventure.Geo
             }
 
             if (Event.current.type == EventType.Repaint)
+            {
                 GUI.DrawTexture(new Rect(Screen.width - iconWidth - 5, 5, iconWidth, iconHeight), paintSimbol);
+            }
         }
 
         public bool IsLocationValid()

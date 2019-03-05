@@ -65,7 +65,10 @@ namespace uAdventure.Core
         {
 
             if (o == null || !(o is CustomArrow))
+            {
                 return false;
+            }
+
             CustomArrow arrow = (CustomArrow)o;
             if (arrow.type.Equals(type))
             {

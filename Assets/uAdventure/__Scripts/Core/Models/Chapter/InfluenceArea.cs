@@ -107,7 +107,9 @@ namespace uAdventure.Core
         {
 
             if (x > 0)
+            {
                 this.x = x;
+            }
         }
 
         /**
@@ -127,7 +129,9 @@ namespace uAdventure.Core
         {
 
             if (y > 0)
+            {
                 this.y = y;
+            }
         }
 
         /**
@@ -147,7 +151,9 @@ namespace uAdventure.Core
         {
 
             if (width > 0)
+            {
                 this.width = width;
+            }
         }
 
         /**
@@ -167,7 +173,9 @@ namespace uAdventure.Core
         {
 
             if (height > 0)
+            {
                 this.height = height;
+            }
         }
 
         public void setValues(int x, int y, int width, int height)

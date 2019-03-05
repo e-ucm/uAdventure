@@ -173,7 +173,9 @@ public class GeoElementMB : MonoBehaviour {
     {
         var ua = uAdventurePlugin.FindObjectOfType<uAdventurePlugin>();
         if(ua)
+        {
             ua.ReleaseElement(Reference);
+        }
     }
 
     // ---------------------------------------
@@ -228,7 +230,10 @@ public class GeoElementMB : MonoBehaviour {
 
         public virtual void Update()
         {
-            if (Check()) Execute();
+            if (Check())
+            {
+                Execute();
+            }
         }
 
         protected virtual bool Check()
@@ -406,7 +411,9 @@ public class GeoElementMB : MonoBehaviour {
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                 RaycastHit hit;
                 if (collider.Raycast(ray, out hit, float.MaxValue))
+                {
                     r = true;
+                }
             }
 
             return r;

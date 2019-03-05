@@ -46,9 +46,11 @@ namespace uAdventure.Core
 				fillAssesmentRule (ell, tRule, parameters);
 
 				if (usesEndConditions || tRule.isRepeatRule ())
-					tRule.setUsesEndConditions(usesEndConditions);
-				
-				tRule.setInitConditions(DOMParserUtility.DOMParse (element.SelectSingleNode("init-condition"), parameters) 			as Conditions ?? new Conditions());
+                {
+                    tRule.setUsesEndConditions(usesEndConditions);
+                }
+
+                tRule.setInitConditions(DOMParserUtility.DOMParse (element.SelectSingleNode("init-condition"), parameters) 			as Conditions ?? new Conditions());
 				tRule.setEndConditions(DOMParserUtility.DOMParse (element.SelectSingleNode("end-condition"), parameters)			as Conditions ?? new Conditions());
 
 				foreach (XmlElement ell_ in element.SelectNodes("assessEffect"))
@@ -57,9 +59,13 @@ namespace uAdventure.Core
 					int timeMax = ExParsers.ParseDefault ( ell_.GetAttribute("time-max") , int.MinValue);
 
                     if (timeMin != int.MinValue && timeMax != int.MaxValue)
-						tRule.addEffect(timeMin, timeMax);
+                    {
+                        tRule.addEffect(timeMin, timeMax);
+                    }
                     else
-						tRule.addEffect();
+                    {
+                        tRule.addEffect();
+                    }
                 }
 
 				profile.addRule(tRule);
@@ -84,9 +90,13 @@ namespace uAdventure.Core
 			if (!string.IsNullOrEmpty(tmpArgVal))
 			{
 				for (int j = 0; j < AssessmentRule.N_IMPORTANCE_VALUES; j++)
-					if (tmpArgVal.Equals(AssessmentRule.IMPORTANCE_VALUES[j]))
-						importance = j;
-			}
+                {
+                    if (tmpArgVal.Equals(AssessmentRule.IMPORTANCE_VALUES[j]))
+                    {
+                        importance = j;
+                    }
+                }
+            }
 
 			rule.setId (id);
 			rule.setImportance (importance);
@@ -95,10 +105,16 @@ namespace uAdventure.Core
 			rule.setConditions(DOMParserUtility.DOMParse (element.SelectSingleNode("condition"), parameters) 	as Conditions ?? new Conditions());
 
 			var concept = element.SelectSingleNode ("concept");
-			if (concept != null) rule.setConcept(concept.ToString().Trim());
+			if (concept != null)
+            {
+                rule.setConcept(concept.ToString().Trim());
+            }
 
-			var setText = element.SelectSingleNode("set-text");
-			if (setText != null) rule.setText(setText.InnerText.ToString().Trim());
-		}
+            var setText = element.SelectSingleNode("set-text");
+			if (setText != null)
+            {
+                rule.setText(setText.InnerText.ToString().Trim());
+            }
+        }
     }
 }

@@ -19,7 +19,10 @@ namespace SerializableCollections
 
             var target = property.serializedObject.targetObject;
             var dictionary = fieldInfo.GetValue(target) as IDictionary;
-            if (dictionary == null) return height;
+            if (dictionary == null)
+            {
+                return height;
+            }
 
             return (foldout)
                 ? (dictionary.Count + 1) * 17f
@@ -30,7 +33,10 @@ namespace SerializableCollections
         {
             var target = property.serializedObject.targetObject;
             var dictionary = fieldInfo.GetValue(target) as IDictionary;
-            if (dictionary == null) return;
+            if (dictionary == null)
+            {
+                return;
+            }
 
             foldout = EditorGUI.Foldout(position, foldout, label, true);
             EditorGUI.LabelField(position, label, new GUIContent() { text = "Count:" + dictionary.Count });

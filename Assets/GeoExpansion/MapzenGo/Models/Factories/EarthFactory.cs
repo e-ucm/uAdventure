@@ -49,7 +49,9 @@ namespace MapzenGo.Models.Factories
                 var jo = (bb.list[0].list[0].IsArray) ? bb.list[0] : bb;
                 var count = jo.list.Count - 1;
                 if (count < 3)
+                {
                     continue;
+                }
 
                 var inp = new InputGeometry(count);
 
@@ -77,7 +79,10 @@ namespace MapzenGo.Models.Factories
         {
             earth.Id = geo["properties"]["id"].ToString();
             if (geo["properties"].HasField("name"))
+            {
                 earth.Name = geo["properties"]["name"].str;
+            }
+
             earth.Type = geo["type"].str;
             earth.Kind = geo["properties"]["kind"].str;
             earth.SortKey = (int) geo["properties"]["sort_key"].f;
@@ -97,17 +102,23 @@ namespace MapzenGo.Models.Factories
 
                 //if we dont have a setting defined for that, it'Ll be merged to "unknown" 
                 if (!FactorySettings.HasSettingsFor(kind))
+                {
                     kind = EarthType.Earth;
+                }
 
                 if (!meshes.ContainsKey(kind))
+                {
                     meshes.Add(kind, new MeshData());
+                }
 
                 foreach (var bb in geo["geometry"]["coordinates"].list)
                 {
                     var jo = (bb.list[0].list[0].IsArray) ? bb.list[0] : bb;
                     var count = jo.list.Count - 1;
                     if (count < 3)
+                    {
                         continue;
+                    }
 
                     var inp = new InputGeometry(count);
 

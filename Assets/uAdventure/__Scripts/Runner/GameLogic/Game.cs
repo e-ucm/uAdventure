@@ -135,9 +135,13 @@ namespace uAdventure.Runner
         protected void Start()
         {
             if (!forceScene)
+            {
                 RunTarget(GameState.InitialChapterTarget.getId());
+            }
             else
+            {
                 RunTarget(scene_name);
+            }
 
             uAdventureRaycaster = FindObjectOfType<uAdventureRaycaster>();
             if (!uAdventureRaycaster)
@@ -423,7 +427,9 @@ namespace uAdventure.Runner
             GeneralScene scene = GameState.GetLastScene();
 
             if (scene != null)
+            {
                 RunTarget(scene.getId());
+            }
         }
 
         #endregion Rendering
@@ -541,7 +547,9 @@ namespace uAdventure.Runner
                                 {
                                     var text = GUIManager.Instance.Last;
                                     if (text[0] == '#')
+                                    {
                                         text = text.Remove(0, Mathf.Max(0, text.IndexOf(' ') + 1));
+                                    }
 
                                     var textContent = new GUIContent(text);
                                     var textRect = GUILayoutUtility.GetRect(textContent, "optionLabel");

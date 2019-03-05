@@ -44,9 +44,13 @@ namespace QRCoder
                 {
                     var module = this.QrCodeData.ModuleMatrix[count - ((y + pixelsPerModule) / pixelsPerModule - 1) - 1][(x + pixelsPerModule) / pixelsPerModule - 1];
                     if (module)
+                    {
                         gfx.SetPixels(x, y, pixelsPerModule, pixelsPerModule, darkBrush);
+                    }
                     else
+                    {
                         gfx.SetPixels(x, y, pixelsPerModule, pixelsPerModule, lightBrush);
+                    }
                 }
             }
 

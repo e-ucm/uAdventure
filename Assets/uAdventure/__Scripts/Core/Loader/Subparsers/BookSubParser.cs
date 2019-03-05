@@ -61,7 +61,9 @@ namespace uAdventure.Core
 
             // RESOURCES
             foreach (var res in DOMParserUtility.DOMParse<ResourcesUni>(resourcess, parameters))
+            {
                 book.addResources(res);
+            }
 
 
             foreach (XmlElement el in documentations)

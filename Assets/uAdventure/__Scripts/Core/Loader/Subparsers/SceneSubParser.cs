@@ -53,24 +53,33 @@ namespace uAdventure.Core
             scene.setPlayerScale(playerScale);
 
             if (initialScene)
+            {
                 chapter.setTargetId(sceneId);
+            }
 
-			var name = element.SelectSingleNode ("name");
-			if (name != null) scene.setName(name.InnerText);
+            var name = element.SelectSingleNode ("name");
+			if (name != null)
+            {
+                scene.setName(name.InnerText);
+            }
 
-			var documentation = element.SelectSingleNode ("documentation");
+            var documentation = element.SelectSingleNode ("documentation");
 				if (documentation != null)
-				scene.setDocumentation(documentation.InnerText);
+                {
+                    scene.setDocumentation(documentation.InnerText);
+                }
 
-			//XAPI ELEMENTS
+                //XAPI ELEMENTS
 			scene.setXApiClass(element.GetAttribute("class"));
 			scene.setXApiType(element.GetAttribute("type"));
             //END OF XAPI
 
 			foreach(var res in DOMParserUtility.DOMParse <ResourcesUni> (element.SelectNodes("resources"), parameters))
-				scene.addResources (res);
+            {
+                scene.addResources (res);
+            }
 
-			var defaultsinitialsposition = element.SelectSingleNode ("default-initial-position") as XmlElement;
+            var defaultsinitialsposition = element.SelectSingleNode ("default-initial-position") as XmlElement;
             if (defaultsinitialsposition != null)
             {
 				int x = ExParsers.ParseDefault (defaultsinitialsposition.GetAttribute("x"), int.MinValue), 
@@ -134,9 +143,11 @@ namespace uAdventure.Core
                 }
 
                 if (el.SelectSingleNode("documentation") != null)
+                {
                     currentExit.setDocumentation(el.SelectSingleNode("documentation").InnerText);
+                }
 
-				foreach (XmlElement ell in el.SelectNodes("point"))
+                foreach (XmlElement ell in el.SelectNodes("point"))
 				{
 					currentPoint = new Vector2(
 						ExParsers.ParseDefault (ell.GetAttribute("x"), 0), 
@@ -160,17 +171,24 @@ namespace uAdventure.Core
                         exit.setEffects(nextScene.getEffects());
                         exit.setPostEffects(nextScene.getPostEffects());
                         if (exit.getDefaultExitLook() == null)
+                        {
                             exit.setDefaultExitLook(nextScene.getExitLook());
+                        }
                         else
                         {
                             if (nextScene.getExitLook() != null)
                             {
                                 if (nextScene.getExitLook().getExitText() != null &&
                                     !nextScene.getExitLook().getExitText().Equals(""))
+                                {
                                     exit.getDefaultExitLook().setExitText(nextScene.getExitLook().getExitText());
+                                }
+
                                 if (nextScene.getExitLook().getCursorPath() != null &&
                                     !nextScene.getExitLook().getCursorPath().Equals(""))
+                                {
                                     exit.getDefaultExitLook().setCursorPath(nextScene.getExitLook().getCursorPath());
+                                }
                             }
                         }
                         exit.setHasNotEffects(false);
@@ -224,18 +242,27 @@ namespace uAdventure.Core
             }
 
 			foreach(var activeArea in DOMParserUtility.DOMParse<ActiveArea>(element.SelectNodes("active-areas/active-area"), parameters).ToList())
-				scene.addActiveArea (activeArea);
-				
-			foreach(var barrier in DOMParserUtility.DOMParse<Barrier>(element.SelectNodes("barriers/barrier"), parameters).ToList())
-				scene.addBarrier (barrier);
+            {
+                scene.addActiveArea (activeArea);
+            }
 
-			foreach(var trajectory in DOMParserUtility.DOMParse<Trajectory>(element.SelectNodes("trajectory"), parameters).ToList())
-				scene.setTrajectory (trajectory);
+            foreach(var barrier in DOMParserUtility.DOMParse<Barrier>(element.SelectNodes("barriers/barrier"), parameters).ToList())
+            {
+                scene.addBarrier (barrier);
+            }
+
+            foreach(var trajectory in DOMParserUtility.DOMParse<Trajectory>(element.SelectNodes("trajectory"), parameters).ToList())
+            {
+                scene.setTrajectory (trajectory);
+            }
 
 
-            if (scene != null) TrajectoryFixer.fixTrajectory(scene);
+            if (scene != null)
+            {
+                TrajectoryFixer.fixTrajectory(scene);
+            }
 
-			return scene;
+            return scene;
         }
 
 		private ElementReference parseElementReference(XmlElement element, params object[] parameters){
@@ -264,12 +291,16 @@ namespace uAdventure.Core
 				currentElementReference.setInfluenceArea(influenceArea);
 			}
 			if (scale > 0.001 || scale < -0.001)
-				currentElementReference.setScale(scale);
+            {
+                currentElementReference.setScale(scale);
+            }
 
-			if (element.SelectSingleNode("documentation") != null)
-				currentElementReference.setDocumentation(element.SelectSingleNode("documentation").InnerText);
+            if (element.SelectSingleNode("documentation") != null)
+            {
+                currentElementReference.setDocumentation(element.SelectSingleNode("documentation").InnerText);
+            }
 
-			currentElementReference.setConditions(DOMParserUtility.DOMParse (element.SelectSingleNode("condition"), parameters) as Conditions ?? new Conditions());
+            currentElementReference.setConditions(DOMParserUtility.DOMParse (element.SelectSingleNode("condition"), parameters) as Conditions ?? new Conditions());
 
 			return currentElementReference;
 		}

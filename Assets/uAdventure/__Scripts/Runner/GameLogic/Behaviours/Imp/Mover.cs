@@ -111,7 +111,10 @@ namespace uAdventure.Runner
             if (area.Contains(representable.getPosition(), 0))
             {
                 if(onMovementFinished != null)
+                {
                     onMovementFinished(data);
+                }
+
                 return true;
             }
 
@@ -136,11 +139,15 @@ namespace uAdventure.Runner
             AbortCurrentMovement();
 
             if (points == null)
+            {
                 return;
+            }
 
             moves = new Queue<MovementPoint>(points);
             if (points.Length > 0)
+            {
                 MoveToPoint(moves.Dequeue());
+            }
         }
 
 

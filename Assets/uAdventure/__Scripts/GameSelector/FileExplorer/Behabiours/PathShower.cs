@@ -42,10 +42,14 @@ namespace uAdventure.GameSelector
             //Path = ResourceManager.Instance.getStoragePath();
 
             if (folderimage == null)
+            {
                 folderimage = Resources.Load("GUI/folder") as Sprite;
+            }
 
             if (gameimage == null)
+            {
                 gameimage = Resources.Load("GUI/gamepad") as Sprite;
+            }
 
             addbutton = GameObject.Find("AddGame").GetComponent<Button>();
 
@@ -58,7 +62,10 @@ namespace uAdventure.GameSelector
             string[] splitted = path.Split(System.IO.Path.DirectorySeparatorChar);
             string tmp = splitted[0];
             for (int i = 1; i < splitted.Length - 2; i++)
+            {
                 tmp += System.IO.Path.DirectorySeparatorChar + splitted[i];
+            }
+
             Path = tmp;
         }
 
@@ -75,11 +82,17 @@ namespace uAdventure.GameSelector
 
 
                 foreach (string folder in folders)
+                {
                     addFolder(folder);
+                }
 
                 foreach (string game in files)
+                {
                     if (game.Contains(".jar"))
+                    {
                         addGame(game);
+                    }
+                }
             }
         }
 

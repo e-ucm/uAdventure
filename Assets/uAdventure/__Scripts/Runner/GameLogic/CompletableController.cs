@@ -295,7 +295,9 @@ namespace uAdventure.Runner
             get
             {
                 if (instance == null)
+                {
                     instance = new CompletablesController();
+                }
 
                 return instance;
             }

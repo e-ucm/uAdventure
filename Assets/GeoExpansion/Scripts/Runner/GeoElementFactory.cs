@@ -52,7 +52,9 @@ namespace uAdventure.Geo
             geoElementMB.Tile = tile;
 
             if (!_createdCache.ContainsKey(tile))
+            {
                 _createdCache.Add(tile, new List<GeoElementMB>());
+            }
 
             _createdCache[tile].Add(geoElementMB);
 

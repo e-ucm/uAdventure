@@ -25,21 +25,32 @@ namespace uAdventure.Core
             }
 
             if (element.SelectSingleNode("documentation") != null)
+            {
                 frame.setDocumentation(element.SelectSingleNode("documentation").InnerText);
+            }
 
             frame.setUri(element.GetAttribute("uri"));
 			frame.setWaitforclick (ExString.EqualsDefault(element.GetAttribute ("waitforclick"), "yes", false));
 			frame.setSoundUri(element.GetAttribute("soundUri"));
 
 			var time = element.GetAttribute ("time");
-			if(!string.IsNullOrEmpty (time)) frame.setTime(long.Parse(time));
-			var maxsoundtime = element.GetAttribute ("maxSoundTime");
-			if(!string.IsNullOrEmpty (maxsoundtime))frame.setMaxSoundTime(int.Parse(maxsoundtime));
+			if(!string.IsNullOrEmpty (time))
+            {
+                frame.setTime(long.Parse(time));
+            }
 
-			foreach (var resources in DOMParserUtility.DOMParse<ResourcesUni>(element.SelectNodes("resources"), parameters))
-				frame.addResources(resources);
+            var maxsoundtime = element.GetAttribute ("maxSoundTime");
+			if(!string.IsNullOrEmpty (maxsoundtime))
+            {
+                frame.setMaxSoundTime(int.Parse(maxsoundtime));
+            }
 
-			return frame;
+            foreach (var resources in DOMParserUtility.DOMParse<ResourcesUni>(element.SelectNodes("resources"), parameters))
+            {
+                frame.addResources(resources);
+            }
+
+            return frame;
         }
     }
 }

@@ -130,9 +130,13 @@ namespace uAdventure.Core
         {
 
             if (assets.ContainsKey(type))
+            {
                 return assets[type];
+            }
             else
+            {
                 return null;
+            }
         }
 
         /**

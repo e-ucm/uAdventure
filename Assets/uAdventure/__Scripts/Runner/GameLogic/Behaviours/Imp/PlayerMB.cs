@@ -90,7 +90,9 @@ namespace uAdventure.Runner
             return _ =>
             {
                 if (onExecutionFinished != null)
+                {
                     onExecutionFinished(data.action);
+                }
             };
         }
 

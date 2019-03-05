@@ -77,17 +77,25 @@ namespace uAdventure.Runner
             linedestination.z = camZ;
 
             if (destination.y > 0)
+            {
                 line.eulerAngles = new Vector3(0f, 0f, 90 + Mathf.Acos(destination.normalized.x) * Mathf.Rad2Deg);
+            }
             else
+            {
                 line.eulerAngles = new Vector3(0f, 0f, 90 - Mathf.Acos(destination.normalized.x) * Mathf.Rad2Deg);
+            }
 
             line.localScale = new Vector3(0.05f, destination.magnitude, 1);
 
 
             if (highlight)
+            {
                 destination.z = camZ - 2;
+            }
             else
+            {
                 destination.z = camZ - 1;
+            }
 
             button.localPosition = destination;
             line.localPosition = linedestination;

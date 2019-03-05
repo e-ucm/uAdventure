@@ -16,21 +16,28 @@ namespace uAdventure.Core
 
 			// DOCUMENTATION
 			var doc = element.SelectSingleNode("documentation");
-			if (doc != null) npc.setDocumentation(doc.InnerText);
-			
-			// DESCRIPTIONS
+			if (doc != null)
+            {
+                npc.setDocumentation(doc.InnerText);
+            }
+
+            // DESCRIPTIONS
 			npc.setDescriptions(DOMParserUtility.DOMParse <Description> (element.SelectNodes("description"), parameters).ToList ());
 
 			// RESOURCES
 			foreach(var res in DOMParserUtility.DOMParse <ResourcesUni> (element.SelectNodes("resources"), parameters))
-				npc.addResources (res);
+            {
+                npc.addResources (res);
+            }
 
-			// ACTIONS
+            // ACTIONS
 			var actionsNode = element.SelectSingleNode("actions");
 			if(actionsNode != null)
-				npc.setActions (DOMParserUtility.DOMParse<Action>(actionsNode.ChildNodes, parameters).ToList());
+            {
+                npc.setActions (DOMParserUtility.DOMParse<Action>(actionsNode.ChildNodes, parameters).ToList());
+            }
 
-			// CONVERSATIONS
+            // CONVERSATIONS
 			foreach (XmlElement conversation in element.SelectNodes("conversation-ref"))
 			{
 				string idTarget = conversation.GetAttribute("idTarget");
@@ -67,10 +74,16 @@ namespace uAdventure.Core
                 npc.setBubbleBorderColor(ExParsers.ParseDefault(textcolor.GetAttribute("bubbleBorderColor"), npc.getBubbleBorderColor()));
 
                 var frontcolor = textcolor.SelectSingleNode("frontcolor") as XmlElement;
-                if (frontcolor != null) npc.setTextFrontColor(ExParsers.ParseDefault(frontcolor.GetAttribute("color"), npc.getTextFrontColor()));
+                if (frontcolor != null)
+                {
+                    npc.setTextFrontColor(ExParsers.ParseDefault(frontcolor.GetAttribute("color"), npc.getTextFrontColor()));
+                }
 
                 var bordercolor = textcolor.SelectSingleNode("bordercolor") as XmlElement;
-                if (bordercolor != null) npc.setTextBorderColor(ExParsers.ParseDefault(bordercolor.GetAttribute("color"), npc.getTextBorderColor()));
+                if (bordercolor != null)
+                {
+                    npc.setTextBorderColor(ExParsers.ParseDefault(bordercolor.GetAttribute("color"), npc.getTextBorderColor()));
+                }
             }
         }
 

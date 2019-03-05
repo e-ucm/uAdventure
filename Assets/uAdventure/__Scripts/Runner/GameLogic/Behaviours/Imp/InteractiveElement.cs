@@ -77,8 +77,14 @@ namespace uAdventure.Runner
             if(state != this.interactable)
             {
                 this.interactable = state;
-                if (state) OnPointerEnter();
-                else OnPointerLeave();
+                if (state)
+                {
+                    OnPointerEnter();
+                }
+                else
+                {
+                    OnPointerLeave();
+                }
             }
         }
 
@@ -138,7 +144,9 @@ namespace uAdventure.Runner
             Vector3 pos = Camera.main.ScreenToWorldPoint(pointerPos);
             this.transform.position = new Vector3(pos.x, pos.y, transform.position.z);
             if (eventData != null)
+            {
                 eventData.Use();
+            }
         }
 
         public void OnConfirmWantsDrag(PointerEventData data)
@@ -222,7 +230,9 @@ namespace uAdventure.Runner
             }
 
             if (action == null)
+            {
                 return;
+            }
 
             string actionType = string.Empty;
             switch (action.getType())
@@ -266,7 +276,10 @@ namespace uAdventure.Runner
             {
                 var representable = GetComponent<Representable>();
                 if (representable)
+                {
                     representable.Positionate();
+                }
+
                 this.GetComponent<Collider>().enabled = true;
             }
 

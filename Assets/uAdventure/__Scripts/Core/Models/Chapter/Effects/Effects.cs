@@ -113,7 +113,9 @@ namespace uAdventure.Core
                 e.Clear();
                 //TODO: check if its working
                 foreach (AbstractEffect ef in this)
+                {
                     e.Add((AbstractEffect)ef.Clone());
+                }
             }
             return e;
         }

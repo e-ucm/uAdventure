@@ -152,10 +152,13 @@ namespace uAdventure.Core
             int nFlags = actionsValues.Count;
             allFlagsVars.RemoveAt(row);
             if (row < nFlags - 1)
+            {
                 allFlagsVars.Insert(row, flag);
+            }
             else
+            {
                 allFlagsVars.Add(flag);
-
+            }
         }
 
         public void changeAction(int row)
@@ -167,9 +170,13 @@ namespace uAdventure.Core
                 actionsValues.RemoveAt(row);
 
                 if (row < nFlags - 1)
+                {
                     actionsValues.Insert(row, DEACTIVATE);
+                }
                 else
+                {
                     actionsValues.Add(DEACTIVATE);
+                }
             }
 
             else if (actionsValues[row].Equals(DEACTIVATE))
@@ -177,9 +184,13 @@ namespace uAdventure.Core
                 actionsValues.RemoveAt(row);
 
                 if (row < nFlags - 1)
+                {
                     actionsValues.Insert(row, ACTIVATE);
+                }
                 else
+                {
                     actionsValues.Add(ACTIVATE);
+                }
             }
 
         }
@@ -358,7 +369,10 @@ namespace uAdventure.Core
         {
 
             if (mergeState.initialScene != null)
+            {
                 this.initialScene = mergeState.initialScene;
+            }
+
             if (this.allFlagsVars.Count == 0)
             {
                 this.allFlagsVars = mergeState.allFlagsVars;
@@ -387,9 +401,13 @@ namespace uAdventure.Core
 
             string value = actionsValues[index];
             if (value.Equals(ACTIVATE) || value.Equals(DEACTIVATE))
+            {
                 return true;
+            }
             else
+            {
                 return false;
+            }
         }
 
         /**
@@ -409,9 +427,13 @@ namespace uAdventure.Core
                 if (allFlagsVars[i].Equals(name))
                 {
                     if (this.isFlag(i))
+                    {
                         return true;
+                    }
                     else
+                    {
                         return false;
+                    }
                 }
             }
             return isFlag;
@@ -537,10 +559,16 @@ namespace uAdventure.Core
             AdaptedState ass = (AdaptedState)this.MemberwiseClone();
             ass.actionsValues = new List<string>();
             foreach (string s in actionsValues)
+            {
                 ass.actionsValues.Add((s != null ? s : null));
+            }
+
             ass.allFlagsVars = new List<string>();
             foreach (string s in allFlagsVars)
+            {
                 ass.allFlagsVars.Add((s != null ? s : null));
+            }
+
             ass.initialScene = (initialScene != null ? initialScene : null);
             return ass;
         }

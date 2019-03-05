@@ -15,11 +15,15 @@ namespace uAdventure.Core
             Player player = new Player();
 
             if (element.SelectSingleNode("documentation") != null)
+            {
                 player.setDocumentation(element.SelectSingleNode("documentation").InnerText);
+            }
 
-			// RESOURCES
+            // RESOURCES
 			foreach(var res in DOMParserUtility.DOMParse <ResourcesUni> (element.SelectNodes("resources"), parameters))
-				player.addResources (res);
+            {
+                player.addResources (res);
+            }
 
             // TEXT COLORS
             CharacterSubParser.ParseConversationColors(player, element);

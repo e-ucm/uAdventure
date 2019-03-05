@@ -55,7 +55,9 @@ namespace uAdventure.Core
                 {
                     ConversationNode temp2 = temp.getChild(j);
                     if (!nodes.Contains(temp2))
+                    {
                         nodes.Add(temp2);
+                    }
                 }
             }
 

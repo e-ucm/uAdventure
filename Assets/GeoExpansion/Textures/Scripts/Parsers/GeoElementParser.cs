@@ -81,7 +81,9 @@ namespace uAdventure.Geo
             var points = new List<Vector2d>();
             var zippedPoints = pointList.Split(' ');
             for (int i = 0; i < zippedPoints.Length; i += 2)
+            {
                 points.Add(new Vector2d(double.Parse(zippedPoints[i]), double.Parse(zippedPoints[i + 1])));
+            }
 
             return points;
         }

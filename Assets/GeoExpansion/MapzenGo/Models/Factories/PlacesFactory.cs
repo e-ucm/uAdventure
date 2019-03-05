@@ -36,7 +36,9 @@ namespace MapzenGo.Models
         protected override IEnumerator CreateRoutine(Tile tile, Action<bool> finished)
         {
             if (!(tile.Data.HasField(XmlTag) && tile.Data[XmlTag].HasField("features")))
+            {
                 yield break;
+            }
 
 
             var ql = tile.Data[XmlTag]["features"].list.Where(x => Query(x));
@@ -56,7 +58,9 @@ namespace MapzenGo.Models
         {
             var kind = geo["properties"]["kind"].str.ConvertToPlaceType();
             if (!FactorySettings.HasSettingsFor(kind))
+            {
                 yield break;
+            }
 
             var typeSettings = FactorySettings.GetSettingsFor<PlaceSettings>(kind);
 
@@ -71,7 +75,9 @@ namespace MapzenGo.Models
             place.transform.SetParent(_container.transform, true);
 
             if (geo["properties"].HasField("name"))
+            {
                 place.GetComponentInChildren<Text>().text = geo["properties"]["name"].str;
+            }
 
             var c = geo["geometry"]["coordinates"];
             var dotMerc = GM.LatLonToMeters(c[1].f, c[0].f);
@@ -92,7 +98,10 @@ namespace MapzenGo.Models
         {
             place.Id = geo["properties"]["id"].ToString();
             if (geo["properties"].HasField("name"))
+            {
                 place.Name = geo["properties"]["name"].str;
+            }
+
             place.Type = geo["type"].str;
             place.Kind = geo["properties"]["kind"].str;
             place.name = "place";

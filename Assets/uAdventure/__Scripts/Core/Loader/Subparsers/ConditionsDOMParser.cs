@@ -17,12 +17,16 @@ namespace uAdventure.Core
 			Conditions conditions = element.Name == "global-state" ? new GlobalState (element.GetAttribute("id")) : new Conditions () ;
 
 			foreach (var child in element.ChildNodes)
-				ParseCondition (conditions, child as XmlElement, parameters);
+            {
+                ParseCondition (conditions, child as XmlElement, parameters);
+            }
 
-			if(conditions is GlobalState)
-				((GlobalState)conditions).setDocumentation(element.InnerText);
+            if(conditions is GlobalState)
+            {
+                ((GlobalState)conditions).setDocumentation(element.InnerText);
+            }
 
-			return conditions;
+            return conditions;
         }
 
 		private void ParseCondition(Conditions c, XmlElement element, params object[] parameters){
@@ -53,10 +57,12 @@ namespace uAdventure.Core
 		private Conditions parseEither(XmlElement element, params object[] parameters){
 			var c = new Conditions ();
 
-			foreach (var child in element.ChildNodes) 
-				ParseCondition (c, child as XmlElement, parameters);
+			foreach (var child in element.ChildNodes)
+            {
+                ParseCondition (c, child as XmlElement, parameters);
+            }
 
-			return c;
+            return c;
 		}
 
 		private Condition parseFlag(XmlElement element, params object[] parameters){

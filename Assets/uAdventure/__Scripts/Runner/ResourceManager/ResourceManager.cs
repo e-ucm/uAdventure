@@ -101,10 +101,14 @@ namespace uAdventure.Runner
         public Sprite getSprite(string uri)
         {
             if (uri == null)
+            {
                 return null;
+            }
 
             if (images.ContainsKey(uri))
+            {
                 return images[uri].Sprite;
+            }
             else
             {
                 Texture2DHolder holder = new Texture2DHolder(fixPath(uri), type);
@@ -211,14 +215,18 @@ namespace uAdventure.Runner
         public eAnim getAnimation(string uri)
         {
             if (string.IsNullOrEmpty(uri))
+            {
                 return null;
+            }
             /*if (uri.EndsWith(".eaa"))
                 uri += ".xml";
             else if (!uri.EndsWith(".eaa.xml"))
                 uri += ".eaa.xml";*/
             
             if (animations.ContainsKey(uri))
+            {
                 return animations[uri];
+            }
             else
             {
                 eAnim animation = new eAnim(uri, type);
@@ -228,7 +236,9 @@ namespace uAdventure.Runner
                     return animation;
                 }
                 else
+                {
                     return null;
+                }
             }
         }
 
@@ -254,11 +264,17 @@ namespace uAdventure.Runner
                         return "";
                     }
                     else
+                    {
                         xml = ta.text;
+                    }
+
                     break;
                 case LoadingType.SYSTEM_IO:
                     if(System.IO.File.Exists(uri))
+                    {
                         xml = System.IO.File.ReadAllText(uri);
+                    }
+
                     break;
             }
 
@@ -271,16 +287,26 @@ namespace uAdventure.Runner
             uri = pattern.Replace(uri, "+¦");
 
             if (!uri.StartsWith(Path))
+            {
                 uri = Path + uri;
+            }
 
             if(type == LoadingType.RESOURCES_LOAD)
             {
                 if (uri.StartsWith("Assets/uAdventure/Resources/"))
+                {
                     uri = uri.Remove(0, "Assets/uAdventure/Resources/".Length);
+                }
+
                 if (uri.StartsWith("Assets/Resources/"))
+                {
                     uri = uri.Remove(0, "Assets/Resources/".Length);
+                }
+
                 if (uri.StartsWith("Resources/"))
+                {
                     uri = uri.Remove(0, "Resources/".Length);
+                }
 
                 if (System.IO.Path.HasExtension(uri))
                 {
@@ -305,11 +331,19 @@ namespace uAdventure.Runner
             if (type == LoadingType.RESOURCES_LOAD)
             {
                 if (uri.StartsWith("Assets/uAdventure/Resources/"))
+                {
                     uri = uri.Remove(0, "Assets/uAdventure/Resources/".Length);
+                }
+
                 if (uri.StartsWith("Assets/Resources/"))
+                {
                     uri = uri.Remove(0, "Assets/Resources/".Length);
+                }
+
                 if (uri.StartsWith("Resources/"))
+                {
                     uri = uri.Remove(0, "Resources/".Length);
+                }
 
                 if (System.IO.Path.HasExtension(uri))
                 {
@@ -341,7 +375,9 @@ namespace uAdventure.Runner
             foreach (string f in System.IO.Directory.GetFiles(exportLocation))
             {
                 if (!f.Contains(".xml"))
+                {
                     System.IO.File.Delete(f);
+                }
             }
 
             string[] tmp;
@@ -349,7 +385,9 @@ namespace uAdventure.Runner
             {
                 tmp = f.Split(System.IO.Path.DirectorySeparatorChar);
                 if (tmp[tmp.Length - 1] != "assets" && tmp[tmp.Length - 1] != "gui")
+                {
                     System.IO.Directory.Delete(f, true);
+                }
             }
 
             VideoConverter converter = new VideoConverter();

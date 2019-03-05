@@ -57,14 +57,18 @@ public class GeoPositionedCharacter : MonoBehaviour
         destinationMeters -= latLonMeters;
 
         if (moving && destinationMeters.sqrMagnitude >= minDistanceToWalk * minDistanceToWalk)
+        {
             thirdPersonCharacter.Move(Vector3.ClampMagnitude(new Vector3((float)destinationMeters.x, 0, (float)destinationMeters.y), minDistanceToWalk*3) / (minDistanceToWalk*3), false, false);
+        }
         else if(lastPos ==  transform.position)
         {
             moving = false;
             destination = latLon;
             thirdPersonCharacter.Move(new Vector3(0, 0, 0), false, false);
             if(Input.compass.enabled)
+            {
                 transform.localRotation = Quaternion.Euler(0, Input.compass.trueHeading, 0);
+            }
         }
 
         if (!moving && !GPSController.Instance.IsStarted())

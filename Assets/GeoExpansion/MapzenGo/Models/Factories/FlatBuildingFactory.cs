@@ -61,10 +61,25 @@ namespace MapzenGo.Models.Factories
                     var dotMerc = GM.LatLonToMeters(c[1].f, c[0].f);
                     var localMercPos = dotMerc - tile.Rect.Center;
 
-                    if (localMercPos.x < minx) minx = (float) localMercPos.x;
-                    if (localMercPos.y < miny) miny = (float) localMercPos.y;
-                    if (localMercPos.x > maxx) maxx = (float) localMercPos.x;
-                    if (localMercPos.y > maxy) maxy = (float) localMercPos.y;
+                    if (localMercPos.x < minx)
+                    {
+                        minx = (float) localMercPos.x;
+                    }
+
+                    if (localMercPos.y < miny)
+                    {
+                        miny = (float) localMercPos.y;
+                    }
+
+                    if (localMercPos.x > maxx)
+                    {
+                        maxx = (float) localMercPos.x;
+                    }
+
+                    if (localMercPos.y > maxy)
+                    {
+                        maxy = (float) localMercPos.y;
+                    }
 
                     buildingCorners.Add(localMercPos.ToVector3());
                 }
@@ -101,7 +116,9 @@ namespace MapzenGo.Models.Factories
             {
                 var key = geo["properties"]["id"].ToString();
                 if (_active.Contains(key))
+                {
                     continue;
+                }
 
                 //to prevent duplicate buildings
                 _active.Add(key);
@@ -115,10 +132,14 @@ namespace MapzenGo.Models.Factories
 
                 //if we dont have a setting defined for that, it'Ll be merged to "unknown" 
                 if (!FactorySettings.HasSettingsFor(kind))
+                {
                     kind = BuildingType.Unknown;
+                }
 
                 if (!openList.ContainsKey(kind))
+                {
                     openList.Add(kind, new MeshData());
+                }
 
                 var buildingCorners = new List<Vector3>();
                 //foreach (var bb in geo["geometry"]["coordinates"].list)z
@@ -132,10 +153,25 @@ namespace MapzenGo.Models.Factories
                     var dotMerc = GM.LatLonToMeters(c[1].f, c[0].f);
                     var localMercPos = new Vector2((float)(dotMerc.x - tile.TileCenter.x), (float)(dotMerc.y - tile.TileCenter.y));
 
-                    if (localMercPos.x < minx) minx = localMercPos.x;
-                    if (localMercPos.y < miny) miny = localMercPos.y;
-                    if (localMercPos.x > maxx) maxx = localMercPos.x;
-                    if (localMercPos.y > maxy) maxy = localMercPos.y;
+                    if (localMercPos.x < minx)
+                    {
+                        minx = localMercPos.x;
+                    }
+
+                    if (localMercPos.y < miny)
+                    {
+                        miny = localMercPos.y;
+                    }
+
+                    if (localMercPos.x > maxx)
+                    {
+                        maxx = localMercPos.x;
+                    }
+
+                    if (localMercPos.y > maxy)
+                    {
+                        maxy = localMercPos.y;
+                    }
 
                     buildingCorners.Add(localMercPos.ToVector3xz());
                 }
@@ -190,7 +226,9 @@ namespace MapzenGo.Models.Factories
         {
             building.name = "building " + geo["properties"]["id"].ToString();
             if (geo["properties"].HasField("name"))
+            {
                 building.Name = geo["properties"]["name"].str;
+            }
 
             building.Id = geo["properties"]["id"].ToString();
             building.Type = geo["type"].str;
@@ -204,9 +242,13 @@ namespace MapzenGo.Models.Factories
         {
 
             if (_useTriangulationNet)
+            {
                 CreateRoofTriangulation(corners, data);
+            }
             else
+            {
                 CreateRoofClass(corners, data);
+            }
 
             foreach (var c in corners)
             {

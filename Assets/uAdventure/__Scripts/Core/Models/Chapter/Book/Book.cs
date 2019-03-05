@@ -182,7 +182,9 @@ namespace uAdventure.Core
             pages.Add(page);
             // add the page to the structure that gather all elements with assets (for chapter importation)
             if (uri != null && !uri.Equals(""))
+            {
                 AllElementsWithAssets.addAsset(page);
+            }
         }
 
         /**
@@ -199,7 +201,9 @@ namespace uAdventure.Core
             pages.Add(page);
             // add the page to the structure that gather all elements with assets (for chapter importation)
             if (type != BookPage.TYPE_URL && uri != null && !uri.Equals(""))
+            {
                 AllElementsWithAssets.addAsset(page);
+            }
         }
 
         /**
@@ -216,7 +220,9 @@ namespace uAdventure.Core
             pages.Add(page);
             // add the page to the structure that gather all elements with assets (for chapter importation)
             if (uri != null && !uri.Equals(""))
+            {
                 AllElementsWithAssets.addAsset(page);
+            }
         }
 
         /**
@@ -283,7 +289,9 @@ namespace uAdventure.Core
             paragraphs.Add(paragraph);
             // add the page to the structure that gather all elements with assets (for chapter importation)
             if (paragraph.getType() == BookParagraph.IMAGE)
+            {
                 AllElementsWithAssets.addAsset(paragraph);
+            }
         }
 
         public object Clone()
@@ -295,19 +303,25 @@ namespace uAdventure.Core
             {
                 b.pages = new List<BookPage>();
                 foreach (BookPage bp in pages)
+                {
                     b.pages.Add((BookPage)bp.Clone());
+                }
             }
             if (paragraphs != null)
             {
                 b.paragraphs = new List<BookParagraph>();
                 foreach (BookParagraph bp in paragraphs)
+                {
                     b.paragraphs.Add((BookParagraph)bp.Clone());
+                }
             }
             if (resources != null)
             {
                 b.resources = new List<ResourcesUni>();
                 foreach (ResourcesUni r in resources)
+                {
                     b.resources.Add((ResourcesUni)r.Clone());
+                }
             }
 
             // TODO check this Zero comparision

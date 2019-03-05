@@ -36,7 +36,9 @@ namespace uAdventure.Runner
             {
                 float angle = ToAngle(direction);
                 if (angle >= 90 && angle < 270)
+                {
                     o = Orientation.O;
+                }
             } 
             else
             {
@@ -85,7 +87,9 @@ namespace uAdventure.Runner
             Vector3 cross = Vector3.Cross(horizon, direction);
 
             if (cross.z > 0)
+            {
                 angle = 360 - angle;
+            }
 
             return angle;
         }

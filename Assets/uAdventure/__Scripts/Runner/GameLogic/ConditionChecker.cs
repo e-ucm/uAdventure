@@ -21,7 +21,9 @@ namespace uAdventure.Runner
             foreach (Condition c in conditions.GetSimpleConditions())
             {
                 if (!check(c))
+                {
                     return false;
+                }
             }
 
             for (int i = 0; i < conditions.GetEitherConditionsBlockCount(); i++)
@@ -32,11 +34,15 @@ namespace uAdventure.Runner
                     block |= check(c);
 
                     if (block)
+                    {
                         break;
+                    }
                 }
 
                 if (!block)
+                {
                     return false;
+                }
             }
 
             return true;
@@ -45,9 +51,13 @@ namespace uAdventure.Runner
         public static int check(GlobalState globalstate)
         {
             if (check(globalstate as Conditions))
+            {
                 return GlobalStateCondition.GS_SATISFIED;
+            }
             else
+            {
                 return GlobalStateCondition.GS_NOT_SATISFIED;
+            }
         }
 
         public static bool check(Condition condition)

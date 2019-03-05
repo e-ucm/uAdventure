@@ -49,7 +49,10 @@ namespace uAdventure.Runner
             set
             {
                 MenuMB.Instance.hide(true);
-                if (inventory) inventory.Opened = value;
+                if (inventory)
+                {
+                    inventory.Opened = value;
+                }
             }
         }
 
@@ -61,19 +64,26 @@ namespace uAdventure.Runner
             }
             set
             {
-                if (inventory) inventory.gameObject.SetActive(value);
+                if (inventory)
+                {
+                    inventory.gameObject.SetActive(value);
+                }
             }
         }
 
         private void Start()
         {
             if (InventoryManager.Instance)
+            {
                 Debug.LogWarning("Multiple inventory managers have been found!");
+            }
 
             var inventoryGO = GameObject.Instantiate(inventoryPrefab, inventoryHolder.transform);
             inventory = inventoryGO.GetComponent<Inventory>();
             if (!inventory)
+            {
                 Debug.LogWarning("Inventory gameobject MUST have an Inventory component!");
+            }
 
             elementObjects = new Dictionary<Element, GameObject>();
             inventory.openButton.onClick.AddListener(delegate { Open(); });

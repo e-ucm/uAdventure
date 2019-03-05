@@ -70,7 +70,11 @@ namespace SerializableCollections
         {
             get
             {
-                if (keys == null) keys = new KeyCollection(this);
+                if (keys == null)
+                {
+                    keys = new KeyCollection(this);
+                }
+
                 return keys;
             }
         }
@@ -79,7 +83,11 @@ namespace SerializableCollections
         {
             get
             {
-                if (keys == null) keys = new KeyCollection(this);
+                if (keys == null)
+                {
+                    keys = new KeyCollection(this);
+                }
+
                 return keys;
             }
         }
@@ -88,7 +96,11 @@ namespace SerializableCollections
         {
             get
             {
-                if (values == null) values = new ValueCollection(this);
+                if (values == null)
+                {
+                    values = new ValueCollection(this);
+                }
+
                 return values;
             }
         }
@@ -97,7 +109,11 @@ namespace SerializableCollections
         {
             get
             {
-                if (values == null) values = new ValueCollection(this);
+                if (values == null)
+                {
+                    values = new ValueCollection(this);
+                }
+
                 return values;
             }
         }
@@ -107,7 +123,11 @@ namespace SerializableCollections
             get
             {
                 int i = FindEntry(key);
-                if (i >= 0) return entriesValue[i];
+                if (i >= 0)
+                {
+                    return entriesValue[i];
+                }
+
                 throw new KeyNotFoundException();
             }
             set
@@ -151,7 +171,11 @@ namespace SerializableCollections
         {
             if (count > 0)
             {
-                for (int i = 0; i < buckets.Length; i++) buckets[i] = -1;
+                for (int i = 0; i < buckets.Length; i++)
+                {
+                    buckets[i] = -1;
+                }
+
                 Array.Clear(entriesHashCode, 0, count);
                 Array.Clear(entriesKey, 0, count);
                 Array.Clear(entriesNext, 0, count);
@@ -175,7 +199,10 @@ namespace SerializableCollections
             {
                 for (int i = 0; i < count; i++)
                 {
-                    if (entriesHashCode[i] >= 0 && entriesValue[i] == null) return true;
+                    if (entriesHashCode[i] >= 0 && entriesValue[i] == null)
+                    {
+                        return true;
+                    }
                 }
             }
             else
@@ -183,7 +210,10 @@ namespace SerializableCollections
                 EqualityComparer<TValue> c = EqualityComparer<TValue>.Default;
                 for (int i = 0; i < count; i++)
                 {
-                    if (entriesHashCode[i] >= 0 && c.Equals(entriesValue[i], value)) return true;
+                    if (entriesHashCode[i] >= 0 && c.Equals(entriesValue[i], value))
+                    {
+                        return true;
+                    }
                 }
             }
             return false;
@@ -228,14 +258,20 @@ namespace SerializableCollections
 
         int FindEntry(TKey key)
         {
-            if (key == null) throw new ArgumentNullException("key");
+            if (key == null)
+            {
+                throw new ArgumentNullException("key");
+            }
 
             if (buckets != null)
             {
                 int hashCode = Comparer.GetHashCode(key) & 0x7FFFFFFF;
                 for (int i = buckets[hashCode % buckets.Length]; i >= 0; i = entriesNext[i])
                 {
-                    if (entriesHashCode[i] == hashCode && Comparer.Equals(entriesKey[i], key)) return i;
+                    if (entriesHashCode[i] == hashCode && Comparer.Equals(entriesKey[i], key))
+                    {
+                        return i;
+                    }
                 }
             }
 
@@ -251,7 +287,11 @@ namespace SerializableCollections
         {
             int size = forceSize ? capacity : HashHelpers.GetPrime(capacity);
             buckets = new int[size];
-            for (int i = 0; i < buckets.Length; i++) buckets[i] = -1;
+            for (int i = 0; i < buckets.Length; i++)
+            {
+                buckets[i] = -1;
+            }
+
             entriesHashCode = new int[size];
             entriesKey = new TKey[size];
             entriesNext = new int[size];
@@ -262,8 +302,15 @@ namespace SerializableCollections
 
         void Insert(TKey key, TValue value, bool add)
         {
-            if (key == null) throw new ArgumentNullException("key");
-            if (buckets == null || buckets.Length == 0) Initialize(0);
+            if (key == null)
+            {
+                throw new ArgumentNullException("key");
+            }
+
+            if (buckets == null || buckets.Length == 0)
+            {
+                Initialize(0);
+            }
 
             int hashCode = Comparer.GetHashCode(key) & 0x7FFFFFFF;
             int targetBucket = hashCode % buckets.Length;
@@ -317,7 +364,10 @@ namespace SerializableCollections
         void Resize(int newSize, bool forceNewHashCodes)
         {
             int[] newBuckets = new int[newSize];
-            for (int i = 0; i < newBuckets.Length; i++) newBuckets[i] = -1;
+            for (int i = 0; i < newBuckets.Length; i++)
+            {
+                newBuckets[i] = -1;
+            }
 
             var newEntriesKey = new TKey[newSize];
             var newEntriesValue = new TValue[newSize];
@@ -360,7 +410,10 @@ namespace SerializableCollections
 
         public bool Remove(TKey key)
         {
-            if (key == null) throw new ArgumentNullException("key");
+            if (key == null)
+            {
+                throw new ArgumentNullException("key");
+            }
 
             if (buckets != null)
             {
@@ -547,7 +600,9 @@ namespace SerializableCollections
                     throw new ArgumentNullException("key");
                 }
                 if (value == null && !(default(TValue) == null))
+                {
                     throw new ArgumentNullException("value");
+                }
 
                 try
                 {
@@ -585,7 +640,9 @@ namespace SerializableCollections
             }
 
             if (value == null && !(default(TValue) == null))
+            {
                 throw new ArgumentNullException("value");
+            }
 
             try
             {
@@ -820,7 +877,10 @@ namespace SerializableCollections
 
                 for (int i = 0; i < count; i++)
                 {
-                    if (dictionary.entriesHashCode[i] >= 0) array[index++] = dictionary.entriesKey[i];
+                    if (dictionary.entriesHashCode[i] >= 0)
+                    {
+                        array[index++] = dictionary.entriesKey[i];
+                    }
                 }
             }
 
@@ -909,7 +969,10 @@ namespace SerializableCollections
                     {
                         for (int i = 0; i < count; i++)
                         {
-                            if (dictionary.entriesHashCode[i] >= 0) objects[index++] = (object)dictionary.entriesKey[i];
+                            if (dictionary.entriesHashCode[i] >= 0)
+                            {
+                                objects[index++] = (object)dictionary.entriesKey[i];
+                            }
                         }
                     }
                     catch (ArrayTypeMismatchException)
@@ -1046,7 +1109,10 @@ namespace SerializableCollections
 
                 for (int i = 0; i < count; i++)
                 {
-                    if (dictionary.entriesHashCode[i] >= 0) array[index++] = dictionary.entriesValue[i];
+                    if (dictionary.entriesHashCode[i] >= 0)
+                    {
+                        array[index++] = dictionary.entriesValue[i];
+                    }
                 }
             }
 
@@ -1113,7 +1179,9 @@ namespace SerializableCollections
                 }
 
                 if (array.Length - index < dictionary.Count)
+                {
                     throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
+                }
 
                 TValue[] values = array as TValue[];
                 if (values != null)
@@ -1133,7 +1201,10 @@ namespace SerializableCollections
                     {
                         for (int i = 0; i < count; i++)
                         {
-                            if (dictionary.entriesHashCode[i] >= 0) objects[index++] = dictionary.entriesValue[i];
+                            if (dictionary.entriesHashCode[i] >= 0)
+                            {
+                                objects[index++] = dictionary.entriesValue[i];
+                            }
                         }
                     }
                     catch (ArrayTypeMismatchException)
@@ -1276,12 +1347,17 @@ namespace SerializableCollections
             public static int GetPrime(int min)
             {
                 if (min < 0)
+                {
                     throw new ArgumentException(SR.Arg_HTCapacityOverflow);
+                }
 
                 for (int i = 0; i < primes.Length; i++)
                 {
                     int prime = primes[i];
-                    if (prime >= min) return prime;
+                    if (prime >= min)
+                    {
+                        return prime;
+                    }
                 }
 
                 return min;
@@ -1320,7 +1396,9 @@ namespace SerializableCollections
         public IDictionaryDebugView(IDictionary<K, V> dictionary)
         {
             if (dictionary == null)
+            {
                 throw new ArgumentNullException("dictionary");
+            }
 
             _dict = dictionary;
         }
@@ -1344,7 +1422,9 @@ namespace SerializableCollections
         public DictionaryKeyCollectionDebugView(ICollection<TKey> collection)
         {
             if (collection == null)
+            {
                 throw new ArgumentNullException("collection");
+            }
 
             _collection = collection;
         }
@@ -1368,7 +1448,9 @@ namespace SerializableCollections
         public DictionaryValueCollectionDebugView(ICollection<TValue> collection)
         {
             if (collection == null)
+            {
                 throw new ArgumentNullException("collection");
+            }
 
             _collection = collection;
         }

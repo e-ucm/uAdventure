@@ -10,7 +10,10 @@ namespace uAdventure.Core
         {
             string s = "\n";
             foreach (var item in col)
+            {
                 s += item.ToString() + "\n";
+            }
+
             return s + "\n\n\n";
         }
     }

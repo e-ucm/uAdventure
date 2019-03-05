@@ -127,7 +127,10 @@ namespace uAdventure.Geo
 
             Type t = Type.GetType(type);
             var manager = TransformManagerDescriptorFactory.Instance.AvaliableTransformManagers.Keys.ToList().Find(k => k == t);
-            if ( manager != null ) r = TransformManagerDescriptorFactory.Instance.CreateDescriptor(manager);
+            if ( manager != null )
+            {
+                r = TransformManagerDescriptorFactory.Instance.CreateDescriptor(manager);
+            }
 
             return r;
         }

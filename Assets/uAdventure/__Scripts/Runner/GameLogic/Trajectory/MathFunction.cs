@@ -31,10 +31,14 @@ namespace uAdventure.Runner
             List<Vector2> ret = new List<Vector2>();
 
             if (point.x <= Mathf.Max(v1.x, v2.x) && point.x >= Mathf.Min(v1.x, v2.x))
+            {
                 ret.Add(new Vector2(point.x, getY(point.x)));
+            }
 
             if (point.y <= Mathf.Max(v1.y, v2.y) && point.x >= Mathf.Min(v1.y, v2.y))
+            {
                 ret.Add(new Vector2(getX(point.y), point.y));
+            }
 
             return ret.ToArray();
         }

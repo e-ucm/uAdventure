@@ -19,9 +19,13 @@ namespace uAdventure.Runner
         public static Trajectory.Node commonPoint(LineHandler l1, LineHandler l2)
         {
             if (l1.containsNode(l2.start))
+            {
                 return l2.start;
+            }
             else
+            {
                 return l2.end;
+            }
         }
 
         public static Vector2 nodeToVector2(Trajectory.Node node)
@@ -62,9 +66,13 @@ namespace uAdventure.Runner
         public Trajectory.Node getOtherPoint(Trajectory.Node point)
         {
             if (start == point)
+            {
                 return end;
+            }
             else if (end == point)
+            {
                 return start;
+            }
 
             return null;
         }
@@ -97,7 +105,9 @@ namespace uAdventure.Runner
                         neighbor_nodes.Add(line.end);
                     }
                     else
+                    {
                         neighbor_nodes.Add(line.start);
+                    }
                 }
             }
 

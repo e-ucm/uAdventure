@@ -704,21 +704,30 @@ namespace MapzenGo.Helpers
         public static BuildingType ConvertToBuildingType(this string value)
         {
             if (BuildingTypes.ContainsKey(value))
+            {
                 return BuildingTypes[value];
+            }
+
             return BuildingType.Unknown;
         }
 
         public static LanduseKind ConvertToLanduseType(this string value)
         {
             if (LanduseKinds.ContainsKey(value))
+            {
                 return LanduseKinds[value];
+            }
+
             return LanduseKind.Park;
         }
 
         public static RailwayType ConvertToRailwayType(this string value)
         {
             if (RailwayTypes.ContainsKey(value))
+            {
                 return RailwayTypes[value];
+            }
+
             return RailwayType.Rail;
         }
 
@@ -726,7 +735,10 @@ namespace MapzenGo.Helpers
         public static RoadType ConvertToRoadType(this string value)
         {
             if (RoadTypes.ContainsKey(value))
+            {
                 return RoadTypes[value];
+            }
+
             return RoadType.Path;
         }
 
@@ -734,7 +746,10 @@ namespace MapzenGo.Helpers
         public static WaterType ConvertToWaterType(this string value)
         {
             if (WaterTypes.ContainsKey(value))
+            {
                 return WaterTypes[value];
+            }
+
             return WaterType.Water;
         }
 
@@ -742,28 +757,40 @@ namespace MapzenGo.Helpers
         public static BoundaryType ConvertToBoundaryType(this string value)
         {
             if (BoundaryTypes.ContainsKey(value))
+            {
                 return BoundaryTypes[value];
+            }
+
             return BoundaryType.Unknown;
         }
 
         public static EarthType ConvertToEarthType(this string value)
         {
             if (EarthTypes.ContainsKey(value))
+            {
                 return EarthTypes[value];
+            }
+
             return EarthType.Earth;
         }
 
         public static PlaceType ConvertToPlaceType(this string value)
         {
             if (PlaceTypes.ContainsKey(value))
+            {
                 return PlaceTypes[value];
+            }
+
             return PlaceType.Unknown;
         }
 
         public static PoiType ConvertToPoiType(this string value)
         {
             if (PoiTypes.ContainsKey(value))
+            {
                 return PoiTypes[value];
+            }
+
             return PoiType.Unknown;
         }
 

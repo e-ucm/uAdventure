@@ -34,7 +34,9 @@ namespace uAdventure.Core
 
 			var initialNode = element.SelectSingleNode("initialnode") as XmlElement;
 			if(initialNode != null)
-				trajectory.setInitial(initialNode.GetAttribute("id"));
+            {
+                trajectory.setInitial(initialNode.GetAttribute("id"));
+            }
 
             if (trajectory.getNodes().Count != 0)
             {

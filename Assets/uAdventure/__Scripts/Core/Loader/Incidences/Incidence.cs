@@ -255,7 +255,10 @@ namespace uAdventure.Core
             string affectedResource = profilePath;
             int importance = IMPORTANCE_LOW;
             if (referenced)
+            {
                 importance = IMPORTANCE_MEDIUM;
+            }
+
             return new Incidence(type, affectedArea, affectedResource, importance, message, referenced, exception);
 
         }
@@ -268,7 +271,10 @@ namespace uAdventure.Core
             string affectedResource = profilePath;
             int importance = IMPORTANCE_LOW;
             if (referenced)
+            {
                 importance = IMPORTANCE_MEDIUM;
+            }
+
             return new Incidence(type, affectedArea, affectedResource, importance, message, referenced, exception);
         }
 
@@ -296,7 +302,9 @@ namespace uAdventure.Core
         {
 
             if (incidences != null && incidences.Count > 0)
+            {
                 sortIncidences(incidences, 0);
+            }
         }
 
         private static void sortIncidences(List<Incidence> incidences, int j)

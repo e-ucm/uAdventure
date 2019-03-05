@@ -34,7 +34,9 @@ namespace MapzenGo.Models.Factories
 
                 var b = CreateLayer(tile, tile.Data[XmlTag]["features"].list);
                 if (b) //getting a weird error without this, no idea really
+                {
                     b.transform.SetParent(tile.transform, false);
+                }
             }
             else
             {

@@ -158,7 +158,9 @@ namespace uAdventure.Core
             {
                 ca.resources = new List<ResourcesUni>();
                 foreach (ResourcesUni r in resources)
+                {
                     ca.resources.Add((ResourcesUni)r.Clone());
+                }
             }
             return ca;
         }

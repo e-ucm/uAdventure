@@ -30,7 +30,9 @@ namespace uAdventure.Runner
         {
             this.effect = effect;
             if (effect is AbstractEffect)
+            {
                 conditions = (effect as AbstractEffect).getConditions();
+            }
         }
 
         public bool execute()
@@ -82,7 +84,9 @@ namespace uAdventure.Runner
                                         {
                                             playerContext.setPosition(tse.getX(), tse.getY());
                                             if (tse.DestinyScale > 0)
+                                            {
                                                 playerContext.setScale(tse.DestinyScale);
+                                            }
                                         }
                                         else
                                         {
@@ -105,7 +109,9 @@ namespace uAdventure.Runner
                                     }
                                     bool trace = true;
                                     if (aditional_info.ContainsKey("disable_trace") && (bool)aditional_info["disable_trace"] == true)
+                                    {
                                         trace = false;
+                                    }
 
                                     Game.Instance.RunTarget(tse.getTargetId(), tse.getTransitionTime(), tse.getTransitionType(), null, trace);
                                     waitForLoadPulse = true;
@@ -123,12 +129,16 @@ namespace uAdventure.Runner
                                 if (times_runed > 1) // The first interaction is the run target callback
                                 {
                                     if (aditional_info.ContainsKey("sub_effects_wait"))
+                                    {
                                         forcewait = false;
+                                    }
                                     else
                                     {
                                         InteractuableResult res = ((Interactuable)aditional_info["scene"]).Interacted();
                                         if (res == InteractuableResult.REQUIRES_MORE_INTERACTION)
+                                        {
                                             forcewait = true;
+                                        }
                                         else if (res == InteractuableResult.DOES_SOMETHING)
                                         {
                                             aditional_info["sub_effects_wait"] = true;
@@ -144,8 +154,10 @@ namespace uAdventure.Runner
                                 {
                                     bool trace = true;
                                     if (aditional_info.ContainsKey("disable_trace") && (bool)aditional_info["disable_trace"] == true)
+                                    {
                                         trace = false;
-                                    
+                                    }
+
                                     aditional_info.Add("lastscene", Game.Instance.GameState.CurrentTarget);
                                     aditional_info.Add("scene", Game.Instance.RunTarget(tce.getTargetId(), null, trace));
                                     forcewait = true;
@@ -186,17 +198,25 @@ namespace uAdventure.Runner
                                 {
                                     int pro = re.getProbability(), now = Random.Range(0, 100);
                                     if (aditional_info.ContainsKey("current"))
+                                    {
                                         aditional_info.Remove("current");
+                                    }
 
                                     if (pro <= now)
+                                    {
                                         aditional_info.Add("current", "first");
+                                    }
                                     else
+                                    {
                                         aditional_info.Add("current", "second");
+                                    }
 
                                     forcewait = ((EffectHolderNode)aditional_info[((string)aditional_info["current"])]).execute();
                                 }
                                 else
+                                {
                                     forcewait = ((EffectHolderNode)aditional_info[((string)aditional_info["current"])]).execute();
+                                }
 
                                 break;
                             case EffectType.SET_VALUE:
@@ -261,9 +281,13 @@ namespace uAdventure.Runner
             }
 
             if (!forcewait)
+            {
                 times_runed = 0;
+            }
             else
+            {
                 times_runed++;
+            }
 
             return forcewait;
         }
@@ -291,7 +315,9 @@ namespace uAdventure.Runner
                 foreach (IEffect effect in effects.getEffects())
                 {
                     if (effect != null) // TODO check if this (if) is correct
+                    {
                         this.effects.Add(new EffectHolderNode(effect));
+                    }
                 }
             }
         }
@@ -311,7 +337,9 @@ namespace uAdventure.Runner
             }
 
             if (!forcewait)
+            {
                 lastexecuted = 0;
+            }
 
             return forcewait;
         }
@@ -323,7 +351,9 @@ namespace uAdventure.Runner
                 return InteractuableResult.REQUIRES_MORE_INTERACTION;
             }
             else
+            {
                 return InteractuableResult.DOES_SOMETHING;
+            }
         }
 
         public bool canBeInteracted()

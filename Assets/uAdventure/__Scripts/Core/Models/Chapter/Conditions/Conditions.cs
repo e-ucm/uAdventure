@@ -263,7 +263,11 @@ namespace uAdventure.Core
             
             foreach(var block in conditionsList)
             {
-                if (block.Count > 1) sb.Append("(");
+                if (block.Count > 1)
+                {
+                    sb.Append("(");
+                }
+
                 orList.Clear();
                 foreach (var c in block)
                 {
