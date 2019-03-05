@@ -5,45 +5,19 @@ namespace uAdventure.Runner
 {
     public class Blur : MonoBehaviour
     {
-        public Material AfterBlurMaterial;
-
-        /*private enum BlurState { NONE, GENERATING, GENERATED, SHOWING };
-        private BlurState state;
-
-        Texture2D generated;
-        RenderTexture cameratex;
-
-        Material blurred;*/
-        void Start()
-        {
-            //generated = new Texture2D (1, 1);
-            //blurred = this.GetComponent<Renderer>().material;
-            //cameratex = new RenderTexture (Screen.width, Screen.height, 24);
-            //blurred.SetTexture ("_BumpMap", generated);
-        }
-
         void Update()
         {
-            /*if (state == BlurState.NONE) {
-                Camera.main.targetTexture = cameratex;
-                state = BlurState.GENERATING;
-            } else if (state == BlurState.GENERATING) {
-                generated = cameratex.
-                /*Texture tmp = blurred.GetTexture ("_BumpMap");
-                float size = blurred.GetFloat ("_Size");
-                generated = tmp as Texture2D;
-                if (generated != null)
-                    state = BlurState.GENERATED;
+            var camera = Camera.main;
 
+            var position = camera.transform.position;
+            position.z = transform.position.z;
+            transform.position = position;
 
-            } else if (state == BlurState.GENERATED) {
-                this.GetComponent<Renderer> ().material = AfterBlurMaterial;
-                AfterBlurMaterial.mainTexture = generated;
-                state = BlurState.SHOWING;
-            } else if (state == BlurState.SHOWING) {
+            float cameraHeight = camera.orthographicSize * 2;
+            float cameraWidth = Screen.width * cameraHeight / Screen.height;
+            var scale = new Vector3(cameraWidth, cameraHeight, 1);
 
-
-            }*/
+            transform.localScale = scale;
         }
     }
 }
