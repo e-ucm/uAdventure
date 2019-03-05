@@ -94,7 +94,6 @@ namespace uAdventure.Runner
         {
             Game.instance = this;
             executeStack = new Stack<KeyValuePair<Interactuable, ExecutionEvent>>();
-            LoadTrackerSettings();
 
             skin = Resources.Load("basic") as GUISkin;
 
@@ -125,7 +124,49 @@ namespace uAdventure.Runner
             var incidences = new List<Incidence>();
             AdventureHandler adventure = new AdventureHandler(data, ResourceManager, incidences);
             adventure.Parse("descriptor.xml");
+            PrepareTracker(data.getTrackerConfig());
+
             game_state = new GameState(data);
+
+            //Create Main game completable
+
+            Completable mainGame = new Completable();
+
+            Completable.Milestone gameStart = new Completable.Milestone();
+            gameStart.setType(Completable.Milestone.MilestoneType.SCENE);
+            gameStart.setId(data.getChapters()[0].getInitialChapterTarget().getId());
+            mainGame.setStart(gameStart);
+            mainGame.setId(data.getTitle());
+            mainGame.setType(Completable.TYPE_GAME);
+
+            Completable.Milestone gameEnd = new Completable.Milestone();
+            gameEnd.setType(Completable.Milestone.MilestoneType.ENDING);
+            mainGame.setEnd(gameEnd);
+
+            Completable.Progress gameProgress = new Completable.Progress();
+            gameProgress.setType(Completable.Progress.ProgressType.SUM);
+
+            Completable.Score mainScore = new Completable.Score();
+            mainScore.setMethod(Completable.Score.ScoreMethod.AVERAGE);
+
+            foreach (Completable part in GameState.GetCompletables())
+            {
+                Completable.Milestone tmpMilestone = new Completable.Milestone();
+                tmpMilestone.setType(Completable.Milestone.MilestoneType.COMPLETABLE);
+                tmpMilestone.setId(part.getId());
+                gameProgress.addMilestone(tmpMilestone);
+
+                Completable.Score tmpScore = new Completable.Score();
+                tmpScore.setMethod(Completable.Score.ScoreMethod.SINGLE);
+                tmpScore.setType(Completable.Score.ScoreType.COMPLETABLE);
+                tmpScore.setId(part.getId());
+                mainScore.addSubScore(tmpScore);
+            }
+            mainGame.setProgress(gameProgress);
+            mainGame.setScore(mainScore);
+
+            GameState.GetCompletables().Insert(0, mainGame);
+
             CompletablesController.Instance.SetCompletables(GameState.GetCompletables());
 
             bookDrawer = new BookDrawer(ResourceManager);
@@ -193,6 +234,8 @@ namespace uAdventure.Runner
                     GUIManager.Instance.ShowConfigMenu();
                 }
             }
+
+            checkTrackerFlush();
         }
 
         public void LoadGame()
@@ -307,6 +350,8 @@ namespace uAdventure.Runner
         //################################################################
         #region Tracking
 
+        private float nextFlush = 0;
+        private bool flushRequested = true;
         private void LoadTrackerSettings()
         {
             //Load tracker data
@@ -344,6 +389,84 @@ namespace uAdventure.Runner
             }
         }
 
+        private void PrepareTracker(TrackerConfig config)
+        {
+            string domain = "";
+            int port = 80;
+            bool secure = false;
+
+            try
+            {
+                if (config.getHost() != "")
+                {
+                    string[] splitted = config.getHost().Split('/');
+
+                    if(splitted.Length > 1)
+                    {
+                        string[] host_splitted = splitted[2].Split(':');
+                        if (host_splitted.Length > 0)
+                        {
+                            domain = host_splitted[0];
+                            port = (host_splitted.Length > 1) ? int.Parse(host_splitted[1]) : (splitted[0] == "https:" ? 443 : 80);
+                            secure = splitted[0] == "https:";
+                        }
+                    }
+                }else
+                {
+                    config.setHost("localhost");
+                }
+            }
+            catch (System.Exception e)
+            {
+                Debug.Log("Tracker error: Host bad format");
+            }
+
+            TrackerAsset.TraceFormats format;
+            switch (config.getTraceFormat())
+            {
+                case TrackerConfig.TraceFormat.XAPI:
+                    format = TrackerAsset.TraceFormats.xapi;
+                    break;
+                default:
+                    format = TrackerAsset.TraceFormats.csv;
+                    break;
+            }
+
+            TrackerAsset.StorageTypes storage;
+            switch (config.getStorageType())
+            {
+                case TrackerConfig.StorageType.NET:
+                    storage = TrackerAsset.StorageTypes.net;
+                    break;
+                default:
+                    storage = TrackerAsset.StorageTypes.local;
+                    break;
+            }
+
+            TrackerAssetSettings tracker_settings = new TrackerAssetSettings()
+            {
+                Host = domain,
+                TrackingCode = config.getTrackingCode(),
+                BasePath = "/api",
+                Port = port,
+                Secure = secure,
+                StorageType = storage,
+                TraceFormat = format,
+                BackupStorage = config.getRawCopy()
+            };
+
+            TrackerAsset.Instance.Bridge = new UnityBridge();
+            TrackerAsset.Instance.Settings = tracker_settings;
+
+            /* TODO: login disabled
+             * if (!String.IsNullOrEmpty(username))
+                TrackerAsset.Instance.Login(username, password);
+            */
+
+            TrackerAsset.Instance.Start();
+            this.nextFlush = config.getFlushInterval();
+        }
+
         private void trackSceneChange(IChapterTarget target)
         {
             if (!string.IsNullOrEmpty(target.getXApiClass()) && target.getXApiClass() == "accesible")
@@ -353,6 +476,28 @@ namespace uAdventure.Runner
             }
 
             CompletablesController.Instance.TargetChanged(target);
+        }
+
+        private void checkTrackerFlush()
+        {
+            float delta = Time.deltaTime;
+            if (GameState.Data.getTrackerConfig().getFlushInterval() >= 0)
+            {
+                nextFlush -= delta;
+                if (nextFlush <= 0)
+                {
+                    flushRequested = true;
+                }
+                while (nextFlush <= 0)
+                {
+                    nextFlush += GameState.Data.getTrackerConfig().getFlushInterval();
+                }
+            }
+            if (flushRequested)
+            {
+                flushRequested = false;
+                TrackerAsset.Instance.Flush();
+            }
         }
 
         #endregion Tracking
