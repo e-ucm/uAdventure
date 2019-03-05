@@ -11,6 +11,7 @@ namespace uAdventure.Core
      * @author Javier
      * 
      */
+    [Serializable]
     public class VarCondition : Condition, ICloneable
     {
 
@@ -65,6 +66,7 @@ namespace uAdventure.Core
         /**
          * The value of the var-condition
          */
+        [SerializeField]
         private int value;
 
         /**

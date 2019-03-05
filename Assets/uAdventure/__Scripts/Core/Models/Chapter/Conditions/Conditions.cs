@@ -17,9 +17,67 @@ namespace uAdventure.Core
         protected class ConditionBlockWrapper
         {
             [SerializeField]
-            protected List<Condition> conditions = new List<Condition>();
+            protected List<int> conditionTypes = new List<int>();
+            [SerializeField]
+            protected List<FlagCondition> flagConditions = new List<FlagCondition>();
+            [SerializeField]
+            protected List<VarCondition> varConditions = new List<VarCondition>();
+            [SerializeField]
+            protected List<GlobalStateCondition> globalStateConditions = new List<GlobalStateCondition>();
 
-            public List<Condition> Conditions { get { return conditions; } set { conditions = value; } }
+            public List<Condition> Conditions
+            {
+                get
+                {
+                    var conditions = new List<Condition>();
+                    var flagIndex = 0;
+                    var varIndex = 0;
+                    var globalStateIndex = 0;
+                    foreach (var conditionType in conditionTypes)
+                    {
+                        switch (conditionType)
+                        {
+                            case Condition.FLAG_CONDITION:
+                                conditions.Add(flagConditions[flagIndex]);
+                                flagIndex++;
+                                break;
+                            case Condition.VAR_CONDITION:
+                                conditions.Add(varConditions[varIndex]);
+                                varIndex++;
+                                break;
+                            case Condition.GLOBAL_STATE_CONDITION:
+                                conditions.Add(globalStateConditions[globalStateIndex]);
+                                globalStateIndex++;
+                                break;
+                        }
+                    }
+                    return conditions;
+                }
+                set
+                {
+                    conditionTypes.Clear();
+                    flagConditions.Clear();
+                    varConditions.Clear();
+                    globalStateConditions.Clear();
+
+                    foreach (var condition in value)
+                    {
+                        conditionTypes.Add(condition.getType());
+                        switch(condition.getType())
+                        {
+                            case Condition.FLAG_CONDITION:
+                                flagConditions.Add((FlagCondition)condition);
+                                break;
+                            case Condition.VAR_CONDITION:
+                                varConditions.Add((VarCondition)condition);
+                                break;
+                            case Condition.GLOBAL_STATE_CONDITION:
+                                globalStateConditions.Add((GlobalStateCondition)condition);
+                                break;
+                        }
+                    }
+                }
+            }
         }
 
         /**

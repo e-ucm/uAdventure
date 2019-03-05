@@ -10,6 +10,7 @@ namespace uAdventure.Core
      * @author Javier
      * 
      */
+       [Serializable]
     public class GlobalStateCondition : Condition, ICloneable
     {
 
