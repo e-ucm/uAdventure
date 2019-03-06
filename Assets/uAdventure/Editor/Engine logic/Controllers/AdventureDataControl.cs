@@ -19,12 +19,13 @@ namespace uAdventure.Editor
          */
         private readonly AdventureData adventureData;
 
-        private TrackerConfigDataControl trackerConfigDataControl;
+        private readonly TrackerConfigDataControl trackerConfigDataControl;
 
         public AdventureDataControl(AdventureData data) : this()
         {
             adventureData = data;
             checkContextualButtons();
+            trackerConfigDataControl = new TrackerConfigDataControl(adventureData);
         }
 
         /**

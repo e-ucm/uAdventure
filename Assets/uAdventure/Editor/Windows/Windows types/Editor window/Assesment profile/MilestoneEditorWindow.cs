@@ -124,6 +124,8 @@ namespace uAdventure.Editor
                             ConditionEditorWindow.LayoutConditionEditor(conditions);
 
                             //##################################################################################
+
+                            
                         }
 
                         break;

@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using AssetPackage;
+using System;
 
 namespace uAdventure.Runner
 {
@@ -57,14 +58,15 @@ namespace uAdventure.Runner
             // ALTERNATIVE
             if ("alternative".Equals(targetOnExit.getXApiClass(), IgnoreCase))
             {
+                var parsedType = (AlternativeTracker.Alternative)Enum.Parse(typeof(AlternativeTracker.Alternative), targetOnExit.getXApiType(), true);
                 if (ConditionChecker.check(ed.getConditions()))
                 {
                     if (targetOnExit.getXApiType() == "menu")
-                        TrackerAsset.Instance.Alternative.Selected(targetOnExit.getId(), ed.getNextSceneId(), AlternativeTracker.Alternative.Menu);
+                        TrackerAsset.Instance.Alternative.Selected(targetOnExit.getId(), ed.getNextSceneId(), parsedType);
                     else
                     {
                         TrackerAsset.Instance.setSuccess(true);
-                        TrackerAsset.Instance.Alternative.Selected(targetOnExit.getId(), ed.getNextSceneId());
+                        TrackerAsset.Instance.Alternative.Selected(targetOnExit.getId(), ed.getNextSceneId(), parsedType);
                     }
                 }
                 else
@@ -72,7 +74,7 @@ namespace uAdventure.Runner
                     if (targetOnExit.getXApiType() != "menu")
                     {
                         TrackerAsset.Instance.setSuccess(false);
-                        TrackerAsset.Instance.Alternative.Selected(targetOnExit.getId(), "Incorrect");
+                        TrackerAsset.Instance.Alternative.Selected(targetOnExit.getId(), "Incorrect", parsedType);
                     }
                 }
                 TrackerAsset.Instance.Flush();
