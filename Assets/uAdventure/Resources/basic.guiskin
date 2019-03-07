@@ -67,7 +67,7 @@ MonoBehaviour:
       m_Top: 0
       m_Bottom: 0
     m_Font: {fileID: 12800000, guid: 45d6ddc2db08d534b8bbf861e38e4d68, type: 3}
-    m_FontSize: 23
+    m_FontSize: 24
     m_FontStyle: 0
     m_Alignment: 1
     m_WordWrap: 1
@@ -134,7 +134,7 @@ MonoBehaviour:
       m_Top: 0
       m_Bottom: 0
     m_Font: {fileID: 12800000, guid: 45d6ddc2db08d534b8bbf861e38e4d68, type: 3}
-    m_FontSize: 23
+    m_FontSize: 24
     m_FontStyle: 1
     m_Alignment: 4
     m_WordWrap: 1
@@ -268,7 +268,7 @@ MonoBehaviour:
       m_Top: 0
       m_Bottom: 0
     m_Font: {fileID: 12800000, guid: 45d6ddc2db08d534b8bbf861e38e4d68, type: 3}
-    m_FontSize: 23
+    m_FontSize: 24
     m_FontStyle: 1
     m_Alignment: 4
     m_WordWrap: 1
@@ -1407,7 +1407,7 @@ MonoBehaviour:
       m_Top: 0
       m_Bottom: 0
     m_Font: {fileID: 12800000, guid: 45d6ddc2db08d534b8bbf861e38e4d68, type: 3}
-    m_FontSize: 23
+    m_FontSize: 24
     m_FontStyle: 0
     m_Alignment: 4
     m_WordWrap: 1
@@ -1489,7 +1489,7 @@ MonoBehaviour:
     m_Normal:
       m_Background: {fileID: 0}
       m_ScaledBackgrounds: []
-      m_TextColor: {r: 0.11288929, g: 0.1329973, b: 0.5294118, a: 1}
+      m_TextColor: {r: 1, g: 1, b: 1, a: 1}
     m_Hover:
       m_Background: {fileID: 0}
       m_ScaledBackgrounds: []
@@ -1527,7 +1527,7 @@ MonoBehaviour:
       m_Left: 0
       m_Right: 0
       m_Top: 0
-      m_Bottom: 0
+      m_Bottom: 40
     m_Padding:
       m_Left: 0
       m_Right: 0
@@ -1538,8 +1538,8 @@ MonoBehaviour:
       m_Right: 0
       m_Top: 0
       m_Bottom: 0
-    m_Font: {fileID: 12800000, guid: 1274723e9b21e7445b4649c6405f5f8f, type: 3}
-    m_FontSize: 41
+    m_Font: {fileID: 12800000, guid: 16aed4411efd2014ca22db76a855c2ca, type: 3}
+    m_FontSize: 43
     m_FontStyle: 0
     m_Alignment: 4
     m_WordWrap: 1
@@ -1605,7 +1605,7 @@ MonoBehaviour:
       m_Top: 0
       m_Bottom: 0
     m_Font: {fileID: 12800000, guid: 1274723e9b21e7445b4649c6405f5f8f, type: 3}
-    m_FontSize: 23
+    m_FontSize: 24
     m_FontStyle: 0
     m_Alignment: 4
     m_WordWrap: 1
