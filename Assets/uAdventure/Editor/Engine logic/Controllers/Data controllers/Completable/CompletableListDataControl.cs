@@ -343,8 +343,20 @@ namespace uAdventure.Editor{
 
         public override void updateVarFlagSummary(VarFlagSummary varFlagSummary)
         {
-            foreach (var s in scoreDataControls)
-                s.updateVarFlagSummary(varFlagSummary);
+            if (score.getMethod() == Completable.Score.ScoreMethod.SINGLE)
+            {
+                if (score.getType() == Completable.Score.ScoreType.VARIABLE)
+                {
+                    varFlagSummary.addVarReference(score.getId());
+                }
+            }
+            else
+            {
+                foreach (var s in scoreDataControls)
+                {
+                    s.updateVarFlagSummary(varFlagSummary);
+                }
+            }
         }
 
         public List<ScoreDataControl> getScores()

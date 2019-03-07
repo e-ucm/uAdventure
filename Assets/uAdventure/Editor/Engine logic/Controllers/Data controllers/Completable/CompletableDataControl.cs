@@ -388,6 +388,7 @@ namespace uAdventure.Editor
             startDataControl.updateVarFlagSummary(varFlagSummary);
             endDataControl.updateVarFlagSummary(varFlagSummary);
             progressDataControl.updateVarFlagSummary(varFlagSummary);
+            scoreDataControl.updateVarFlagSummary(varFlagSummary);
         }
 
         public string getId()

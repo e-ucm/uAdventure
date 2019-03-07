@@ -445,6 +445,7 @@ namespace uAdventure.Editor
             playerDataControl.updateVarFlagSummary(varFlagSummary);
             conversationsListDataControl.updateVarFlagSummary(varFlagSummary);
             advancedFeaturesDataControl.updateVarFlagSummary(varFlagSummary);
+            completableListDataControl.updateVarFlagSummary(varFlagSummary);
             //adaptationProfilesDataControl.updateVarFlagSummary(varFlagSummary);
             // assessmentProfilesDataControl.updateVarFlagSummary(varFlagSummary);
         }
@@ -469,6 +470,7 @@ namespace uAdventure.Editor
             valid &= npcsListDataControl.isValid(currentPath, incidences);
             valid &= conversationsListDataControl.isValid(currentPath, incidences);
             valid &= advancedFeaturesDataControl.isValid(currentPath, incidences);
+            valid &= completableListDataControl.isValid(currentPath, incidences);
             //valid &= adaptationProfilesDataControl.isValid(currentPath, incidences);
             ////valid &= assessmentProfilesDataControl.isValid(currentPath, incidences);
 
@@ -497,6 +499,7 @@ namespace uAdventure.Editor
             count += npcsListDataControl.countAssetReferences(assetPath);
             count += conversationsListDataControl.countAssetReferences(assetPath);
             count += advancedFeaturesDataControl.countAssetReferences(assetPath);
+            count += completableListDataControl.countAssetReferences(assetPath);
 
             return count;
         }
@@ -514,6 +517,7 @@ namespace uAdventure.Editor
             npcsListDataControl.getAssetReferences(assetPaths, assetTypes);
             conversationsListDataControl.getAssetReferences(assetPaths, assetTypes);
             advancedFeaturesDataControl.getAssetReferences(assetPaths, assetTypes);
+            completableListDataControl.getAssetReferences(assetPaths, assetTypes);
         }
 
 
@@ -536,6 +540,7 @@ namespace uAdventure.Editor
             npcsListDataControl.deleteAssetReferences(assetPath);
             conversationsListDataControl.deleteAssetReferences(assetPath);
             advancedFeaturesDataControl.deleteAssetReferences(assetPath);
+            completableListDataControl.deleteAssetReferences(assetPath);
             //assessmentProfilesDataControl.deleteAssetReferences( assetPath );
             //adaptationProfilesDataControl.deleteAssetReferences( assetPath );
         }
