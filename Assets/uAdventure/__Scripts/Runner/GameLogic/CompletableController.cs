@@ -74,13 +74,16 @@ namespace uAdventure.Runner
                     isTargetType = Milestone.getType() == Completable.Milestone.MilestoneType.ITEM;
                 }
 
-                var representable = (interactuable as MonoBehaviour).GetComponent<Representable>();
-                var isTargetedElement = Milestone.getId() == representable.Element.getId();
-
-                if (isTargetType && isTargetedElement)
+                var interactiveElement = (interactuable as MonoBehaviour).GetComponent<InteractiveElement>();
+                if (interactiveElement != null)
                 {
-                    Reached = true;
-                    hasBeenUpdated = true;
+                    var isTargetedElement = Milestone.getId() == interactiveElement.Element.getId();
+
+                    if (isTargetType && isTargetedElement)
+                    {
+                        Reached = true;
+                        hasBeenUpdated = true;
+                    }
                 }
             }
 

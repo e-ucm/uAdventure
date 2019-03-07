@@ -18,7 +18,7 @@ namespace uAdventure.Runner
         private readonly Dictionary<EffectHolder, Action> executingAction = new Dictionary<EffectHolder, Action>();
 
         protected Element element;
-        protected Element Element
+        public Element Element
         {
             get
             {
