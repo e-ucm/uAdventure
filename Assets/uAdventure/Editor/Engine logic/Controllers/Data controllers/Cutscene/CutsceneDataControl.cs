@@ -8,7 +8,7 @@ using System;
 
 namespace uAdventure.Editor
 {
-    public class CutsceneDataControl : DataControlWithResources
+    public class CutsceneDataControl : DataControlWithResources, IxAPIConfigurable
     {
         /**
            * Contained cutscene data.
@@ -46,12 +46,32 @@ namespace uAdventure.Editor
 
             // Add a new resource if the list is empty
             if (resourcesList.Count == 0)
+            {
                 resourcesList.Add(new ResourcesUni());
+            }
 
             // Create the subcontrollers
             resourcesDataControlList = new List<ResourcesDataControl>();
             foreach (ResourcesUni resources in resourcesList)
+            {
                 resourcesDataControlList.Add(new ResourcesDataControl(resources, cutsceneType));
+            }
+
+            xApiOptions = new Dictionary<string, List<string>>();
+
+            var accessibleOptions = Enum.GetValues(typeof(AccessibleTracker.Accessible))
+                .Cast<AccessibleTracker.Accessible>()
+                .Select(v => v.ToString().ToLower())
+                .ToList();
+
+            xApiOptions.Add("accesible", accessibleOptions);
+
+            var alternativeOptions = Enum.GetValues(typeof(AlternativeTracker.Alternative))
+                .Cast<AlternativeTracker.Alternative>()
+                .Select(v => v.ToString().ToLower())
+                .ToList();
+
+            xApiOptions.Add("alternative", alternativeOptions);
         }
 
         /**
@@ -627,34 +647,53 @@ namespace uAdventure.Editor
         public void setCanSkip(bool canSkip)
         {
             if (isVideoscene())
-                ((Videoscene)cutscene).setCanSkip(canSkip);
+            {
+                ((Videoscene) cutscene).setCanSkip(canSkip);
+            }
         }
 
-        /**
-        * XAPI variables for learning analytics
-        * 
-        * @return
-        */
-        public string getXApiClass()
+
+
+        private readonly Dictionary<string, List<string>> xApiOptions;
+
+        public List<string> getxAPIValidTypes(string @class)
         {
-            return cutscene.getXApiClass();
+            return xApiOptions[@class];
         }
 
-        public string getXApiType()
+        public List<string> getxAPIValidClasses()
+        {
+            return xApiOptions.Keys.ToList();
+        }
+
+        public string getxAPIType()
         {
             return cutscene.getXApiType();
         }
 
-
-
-        public void setXApiClass(string sceneclass)
+        public string getxAPIClass()
         {
-            cutscene.setXApiClass(sceneclass);
+            return cutscene.getXApiClass();
         }
 
-        public void setXApiType(string scenetype)
+        public void setxAPIType(string type)
         {
-            cutscene.setXApiType(scenetype);
+            if (!xApiOptions.ContainsKey(getxAPIClass()) || !xApiOptions[getxAPIClass()].Contains(type))
+            {
+                return;
+            }
+
+            controller.AddTool(new ChangeStringValueTool(cutscene, type, "getXApiType", "setXApiType"));
+        }
+
+        public void setxAPIClass(string @class)
+        {
+            if (!xApiOptions.ContainsKey(@class))
+            {
+                return;
+            }
+
+            controller.AddTool(new ChangeStringValueTool(cutscene, @class, "getXApiClass", "setXApiClass"));
         }
     }
 }

@@ -50,6 +50,7 @@ namespace uAdventure.Editor
             }
 
             completableNode.SetAttribute("id", completable.getId());
+            completableNode.SetAttribute("repeatable", completable.getRepeatable() ? "true" : "false");
             completableNode.SetAttribute("type", type);
 
             if (completable.getStart() != null)

@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEditor;
-using System.Collections;
 using System;
 
 using uAdventure.Core;
@@ -9,36 +8,35 @@ namespace uAdventure.Editor
 {
     public class FlagConditionEditor : ConditionEditor
     {
-        FlagCondition condition = new FlagCondition("");
-        string[] types = { TC.get("Conditions.Flag.Active"), TC.get("Conditions.Flag.Inactive") };
-        string name = TC.get("Flags.Flag");
+        private FlagCondition condition = new FlagCondition("");
+        private readonly string[] types = { TC.get("Conditions.Flag.Active"), TC.get("Conditions.Flag.Inactive") };
+        private readonly string name = TC.get("Flags.Flag");
 
         public FlagConditionEditor()
         {
-            if (Avaiable)
+            if (Available)
+            {
                 condition = new FlagCondition(Controller.Instance.VarFlagSummary.getFlags()[0]);
+            }
         }
 
         public void draw(Condition c)
         {
             condition = c as FlagCondition;
-
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(TC.get("Condition.FlagID"));
-
-            if (Avaiable)
+            using (new EditorGUILayout.HorizontalScope())
             {
-                var flags = Controller.Instance.VarFlagSummary.getFlags();
-                int index = Array.IndexOf(flags, c.getId());
-                c.setId(flags[EditorGUILayout.Popup(index >= 0 ? index : 0, flags)]);
-                c.setState(EditorGUILayout.Popup(c.getState(), types));
+                if (Available)
+                {
+                    var flags = Controller.Instance.VarFlagSummary.getFlags();
+                    var index = Mathf.Max(0, Array.IndexOf(flags, c.getId()));
+                    c.setId(flags[EditorGUILayout.Popup(index >= 0 ? index : 0, flags)]);
+                    c.setState(EditorGUILayout.Popup(c.getState(), types));
+                }
+                else
+                {
+                    EditorGUILayout.HelpBox(TC.get("Condition.Flag.Warning"), MessageType.Error);
+                }
             }
-            else
-            {
-                EditorGUILayout.HelpBox(TC.get("Condition.Flag.Warning"), MessageType.Error);
-            }
-
-            EditorGUILayout.EndHorizontal();
         }
 
         public bool manages(Condition c)
@@ -58,6 +56,6 @@ namespace uAdventure.Editor
 
         public bool Collapsed { get; set; }
         public Rect Window { get; set; }
-        public bool Avaiable { get { return Controller.Instance.VarFlagSummary.getFlags().Length > 0; } }
+        public bool Available { get { return Controller.Instance.VarFlagSummary.getFlags().Length > 0; } }
     }
 }

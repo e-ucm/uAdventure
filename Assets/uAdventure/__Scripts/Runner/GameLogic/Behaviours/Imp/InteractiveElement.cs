@@ -249,13 +249,23 @@ namespace uAdventure.Runner
             }
 
             Game.Instance.GameState.EndChangeAmbitAsExtensions();
-            switch (Element.GetType().ToString())
-            {
-                case "NPC":        TrackerAsset.Instance.GameObject.Interacted(Element.getId(), GameObjectTracker.TrackedGameObject.Npc);  break;
-                case "Item":       TrackerAsset.Instance.GameObject.Interacted(Element.getId(), GameObjectTracker.TrackedGameObject.Item); break;
-                case "ActiveArea": TrackerAsset.Instance.GameObject.Interacted(Element.getId(), GameObjectTracker.TrackedGameObject.Item); break;
-            }
 
+            if(Element is NPC)
+            {
+                TrackerAsset.Instance.GameObject.Interacted(Element.getId(), GameObjectTracker.TrackedGameObject.Npc);
+            }
+            else if(Element is Item)
+            {
+                TrackerAsset.Instance.GameObject.Interacted(Element.getId(), GameObjectTracker.TrackedGameObject.Item);
+            }
+            else if(Element is ActiveArea)
+            {
+                TrackerAsset.Instance.GameObject.Interacted(Element.getId(), GameObjectTracker.TrackedGameObject.Item);
+            }
+            else
+            {
+                TrackerAsset.Instance.GameObject.Interacted(Element.getId(), GameObjectTracker.TrackedGameObject.GameObject);
+            }
         }
 
         public void OnTargetSelected(PointerEventData data)

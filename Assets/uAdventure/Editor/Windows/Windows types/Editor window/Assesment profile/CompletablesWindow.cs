@@ -8,11 +8,10 @@ using System.Linq;
 
 namespace uAdventure.Editor
 {
-    [EditorWindowExtension(200, typeof(CompletableDataControl))]
-    public class CompletablesWindow : DefaultButtonMenuEditorWindowExtension
+    public class CompletablesWindow : LayoutWindow
     {
-        private readonly string[] endOptions = { TC.get("Analytics.EndOptions.FinalScene"), TC.get("Analytics.EndOptions.AllLevels") };
-        private readonly string[] progressOptions = { TC.get("Analytics.ProgressOptions.NumberOfLevels"), TC.get("Analytics.ProgressOptions.Manual") };
+        private readonly string[] endOptions = { TC.get("Analytics.EndOptions.FinalScene")/*, TC.get("Analytics.EndOptions.AllLevels")*/ };
+        private readonly string[] progressOptions = { TC.get("Analytics.ProgressOptions.NumberOfLevels")/*, TC.get("Analytics.ProgressOptions.Manual")*/ };
         private readonly DataControlList completablesList;
 
         private int end = 0;
@@ -21,15 +20,9 @@ namespace uAdventure.Editor
 
 		private bool Available { get; set; }
 
-        public CompletablesWindow(Rect aStartPos, GUIStyle aStyle, params GUILayoutOption[] aOptions)
-            : base(aStartPos, new GUIContent(TC.get("Analytics.Title")), aStyle, aOptions)
+        public CompletablesWindow(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
+            : base(aStartPos, aContent, aStyle, aOptions)
         {
-            ButtonContent = new GUIContent()
-            {
-                image = Resources.Load<Texture2D>("EAdventureData/img/icons/assessmentProfiles"),
-                text = "Analytics.Title"
-            };
-
             completablesList = new DataControlList()
             {
                 RequestRepaint = Repaint,
@@ -54,6 +47,11 @@ namespace uAdventure.Editor
                     new ColumnList.Column()
                     {
                         Text = TC.get("Analytics.Completable.Score")
+                    },
+                    new ColumnList.Column()
+                    {
+                        Text = TC.get("Repeatable"),
+                        SizeOptions = new GUILayoutOption[] { GUILayout.Width(70) }
                     }
                 },
                 drawCell = (rect, row, column, isActive, isFocused) =>
@@ -87,6 +85,9 @@ namespace uAdventure.Editor
                                     EditorGUI.HelpBox(rect, TC.get("Condition.Var.Warning"), MessageType.Error);
                                 }
                             }
+                            break;
+                        case 5:
+                            completable.setRepeatable(GUI.Toggle(rect, completable.getRepeatable(), "?"));
                             break;
                     }
                 }
@@ -122,14 +123,26 @@ namespace uAdventure.Editor
                     }
                     break;
                 case Completable.Score.ScoreMethod.SINGLE:
-                    score.setType((Completable.Score.ScoreType)EditorGUI.EnumPopup(rects[1], score.getType()));
+                    EditorGUI.BeginChangeCheck();
+                    var newType = (Completable.Score.ScoreType) EditorGUI.EnumPopup(rects[1], score.getType());
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        score.setType(newType);
+                    }
+
                     string[] switchOn = null;
                     switch (score.getType())
                     {
                         case Completable.Score.ScoreType.VARIABLE: switchOn = Controller.Instance.VarFlagSummary.getVars(); break;
                         case Completable.Score.ScoreType.COMPLETABLE: switchOn = Controller.Instance.IdentifierSummary.getIds<Completable>(); break;
                     }
-                    score.renameElement(switchOn[EditorGUI.Popup(rects[2], Mathf.Max(0, Array.IndexOf(switchOn, score.getId())), switchOn)]);
+                    EditorGUI.BeginChangeCheck();
+                    var newSwitchOn = switchOn[EditorGUI.Popup(rects[2], Mathf.Max(0, Array.IndexOf(switchOn, score.getId())), switchOn)];
+                    if (EditorGUI.EndChangeCheck() || score.getId() == null)
+                    {
+                        score.setId(newSwitchOn);
+                    }
+
                     break;
             }
         }
@@ -157,10 +170,8 @@ namespace uAdventure.Editor
 
             completables = Controller.Instance.SelectedChapterDataControl.getCompletables();
             completablesList.SetData(completables, (c) => (c as CompletableListDataControl).getCompletables().Cast<DataControl>().ToList());
-            completablesList.DoList(windowHeight - 130);
+            completablesList.DoList(windowHeight - 150);
         }
-
-        protected override void OnButton() {}
     }
 
     public class CompletableScoreEditorWindow : EditorWindow

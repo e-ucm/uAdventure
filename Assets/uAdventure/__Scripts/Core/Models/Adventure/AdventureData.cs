@@ -19,11 +19,17 @@ namespace uAdventure.Core
         protected List<Chapter> chapters;
 
         /**
+         * Tracker config
+         */
+        protected TrackerConfig trackerConfig;
+
+        /**
          * Default constructor
          */
         public AdventureData() : base()
         {
             this.chapters = new List<Chapter>();
+            this.trackerConfig = new TrackerConfig();
             contents = null;
         }
 
@@ -75,6 +81,16 @@ namespace uAdventure.Core
             {
                 chapters.Add((Chapter)chapter);
             }
+        }
+
+        public TrackerConfig getTrackerConfig()
+        {
+            return this.trackerConfig;
+        }
+
+        public void setTrackerConfig(TrackerConfig trackerConfig)
+        {
+            this.trackerConfig = trackerConfig;
         }
 
         /**

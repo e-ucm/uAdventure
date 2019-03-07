@@ -14,7 +14,7 @@ namespace uAdventure.Core
     {
         public class Milestone : HasId, HasTargetId
         {
-            public enum MilestoneType { SCENE, ITEM, CHARACTER, COMPLETABLE, CONDITION };
+            public enum MilestoneType { SCENE, ITEM, CHARACTER, COMPLETABLE, CONDITION, ENDING };
 
             private MilestoneType type;
             private string id = "";
@@ -95,6 +95,9 @@ namespace uAdventure.Core
                         break;
                     case MilestoneType.CONDITION:
                         s += "a condition is satisfied";
+                        break;
+                    case MilestoneType.ENDING:
+                        //ENDING is special case, not showing
                         break;
                     default:
                         s = "Not specified yet";
@@ -226,6 +229,8 @@ namespace uAdventure.Core
 
         private Progress progress = new Progress();
 
+        private bool repeatable = false;
+
         //#################################################
         //#################### GETTERS ####################
         //#################################################
@@ -258,6 +263,11 @@ namespace uAdventure.Core
         public Milestone getEnd()
         {
             return end;
+        }
+
+        public bool getRepeatable()
+        {
+            return repeatable;
         }
         #endregion getters
         //#################################################
@@ -292,6 +302,11 @@ namespace uAdventure.Core
         public void setEnd(Milestone end)
         {
             this.end = end;
+        }
+
+        public void setRepeatable(bool repeatable)
+        {
+            this.repeatable = repeatable;
         }
         #endregion setters
         //#################################################
