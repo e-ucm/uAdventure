@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace uAdventure.Editor
 {
-    public class SceneDataControl : DataControlWithResources
+    public class SceneDataControl : DataControlWithResources, IxAPIConfigurable
     {
         /**
              * Contained scene data.
@@ -66,6 +66,22 @@ namespace uAdventure.Editor
             activeAreasListDataControl = new ActiveAreasListDataControl(this, scene.getActiveAreas());
             barriersListDataControl = new BarriersListDataControl(this, scene.getBarriers());
             trajectoryDataControl = new TrajectoryDataControl(this, scene.getTrajectory());
+
+            xApiOptions = new Dictionary<string, List<string>>();
+
+            var accessibleOptions = Enum.GetValues(typeof(AccessibleTracker.Accessible))
+                .Cast<AccessibleTracker.Accessible>()
+                .Select(v => v.ToString().ToLower())
+                .ToList();
+
+            xApiOptions.Add("accesible", accessibleOptions);
+
+            var alternativeOptions = Enum.GetValues(typeof(AlternativeTracker.Alternative))
+                .Cast<AlternativeTracker.Alternative>()
+                .Select(v => v.ToString().ToLower())
+                .ToList();
+
+            xApiOptions.Add("alternative", alternativeOptions);
         }
 
         /**
@@ -826,6 +842,50 @@ namespace uAdventure.Editor
             }
 
             return 1;
+        }
+
+
+
+        private readonly Dictionary<string, List<string>> xApiOptions;
+
+        public List<string> getxAPIValidTypes(string @class)
+        {
+            return xApiOptions[@class];
+        }
+
+        public List<string> getxAPIValidClasses()
+        {
+            return xApiOptions.Keys.ToList();
+        }
+
+        public string getxAPIType()
+        {
+            return scene.getXApiType();
+        }
+
+        public string getxAPIClass()
+        {
+            return scene.getXApiClass();
+        }
+
+        public void setxAPIType(string type)
+        {
+            if (!xApiOptions.ContainsKey(getxAPIClass()) || !xApiOptions[getxAPIClass()].Contains(type))
+            {
+                return;
+            }
+
+            controller.AddTool(new ChangeStringValueTool(scene, type, "getXApiType", "setXApiType"));
+        }
+
+        public void setxAPIClass(string @class)
+        {
+            if (!xApiOptions.ContainsKey(@class))
+            {
+                return;
+            }
+
+            controller.AddTool(new ChangeStringValueTool(scene, @class, "getXApiClass", "setXApiClass"));
         }
     }
 }

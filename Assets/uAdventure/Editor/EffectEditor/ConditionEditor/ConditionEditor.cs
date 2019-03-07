@@ -12,7 +12,7 @@ namespace uAdventure.Editor
         string conditionName();
         Condition InstanceManagedCondition();
         bool Collapsed { get; set; }
-        bool Avaiable { get; }
+        bool Available { get; }
         Rect Window { get; set; }
     }
 }

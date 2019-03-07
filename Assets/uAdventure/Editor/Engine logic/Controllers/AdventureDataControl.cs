@@ -25,7 +25,7 @@ namespace uAdventure.Editor
         {
             adventureData = data;
             checkContextualButtons();
-            trackerConfigDataControl = new TrackerConfigDataControl(adventureData);
+            trackerConfigDataControl = new TrackerConfigDataControl(this);
         }
 
         /**
@@ -34,7 +34,7 @@ namespace uAdventure.Editor
         public AdventureDataControl()
         {
             adventureData = new AdventureData();
-            trackerConfigDataControl = new TrackerConfigDataControl(adventureData);
+            trackerConfigDataControl = new TrackerConfigDataControl(this);
         }
 
         /**
@@ -59,7 +59,7 @@ namespace uAdventure.Editor
             var chapter = new Chapter(chapterTitle, sceneId);
             chapter.getObjects<Scene>().Add(new Scene(sceneId));
             adventureData.addChapter(chapter);
-            trackerConfigDataControl = new TrackerConfigDataControl(adventureData);
+            trackerConfigDataControl = new TrackerConfigDataControl(this);
         }
 
         public AdventureDataControl(string adventureTitle, string chapterTitle, string sceneId) :
@@ -90,7 +90,7 @@ namespace uAdventure.Editor
             adventureData.setChapters(chapters);
             adventureData.setGraphicConfig(DescriptorData.GRAPHICS_WINDOWED);
             adventureData.setPlayerMode(DescriptorData.MODE_PLAYER_3RDPERSON);
-            trackerConfigDataControl = new TrackerConfigDataControl(adventureData);
+            trackerConfigDataControl = new TrackerConfigDataControl(this);
         }
 
         public bool isCursorTypeAllowed(string type)

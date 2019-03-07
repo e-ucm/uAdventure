@@ -11,26 +11,10 @@ namespace uAdventure.Editor
     public class CutscenesWindowDocumentation : LayoutWindow
     {
         private CutsceneDataControl current;
-        private readonly Dictionary<string, List<string>> xApiOptions;
 
         public CutscenesWindowDocumentation(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
         {
-            xApiOptions = new Dictionary<string, List<string>>();
-
-            List<string> accessibleOptions = Enum.GetValues(typeof(AccessibleTracker.Accessible))
-                                                 .Cast<AccessibleTracker.Accessible>()
-                                                 .Select(v => v.ToString().ToLower())
-                                                 .ToList();
-
-            xApiOptions.Add("accesible", accessibleOptions);
-
-            List<string> alternativeOptions = Enum.GetValues(typeof(AlternativeTracker.Alternative))
-                                                 .Cast<AlternativeTracker.Alternative>()
-                                                 .Select(v => v.ToString().ToLower())
-                                                 .ToList();
-
-            xApiOptions.Add("alternative", alternativeOptions);
         }
 
 
@@ -38,32 +22,34 @@ namespace uAdventure.Editor
         {
             current = Controller.Instance.ChapterList.getSelectedChapterDataControl().getCutscenesList().getCutscenes()[GameRources.GetInstance().selectedCutsceneIndex];
 
+            var xAPIConfigurable = current as IxAPIConfigurable;
+
             //XApi class
             EditorGUI.BeginChangeCheck();
-            List<string> keys = xApiOptions.Keys.ToList();
-            if (!keys.Contains(current.getXApiClass()))
+            var classes = xAPIConfigurable.getxAPIValidClasses();
+            if (!classes.Contains(xAPIConfigurable.getxAPIClass()))
             {
-                current.setXApiClass(keys[0]);
+                xAPIConfigurable.setxAPIClass(classes[0]);
             }
 
-            var newClass = keys[EditorGUILayout.Popup("xAPI Class", keys.IndexOf(current.getXApiClass()), keys.ToArray())];
+            var newClass = classes[EditorGUILayout.Popup("xAPI Class", classes.IndexOf(xAPIConfigurable.getxAPIClass()), classes.ToArray())];
             if (EditorGUI.EndChangeCheck())
             {
-                current.setXApiClass(newClass);
+                xAPIConfigurable.setxAPIClass(newClass);
             }
 
             // Xapi Type
             EditorGUI.BeginChangeCheck();
-            List<string> types = xApiOptions[current.getXApiClass()];
-            if (!types.Contains(current.getXApiType()))
+            var types = xAPIConfigurable.getxAPIValidTypes(xAPIConfigurable.getxAPIClass());
+            if (!types.Contains(xAPIConfigurable.getxAPIType()))
             {
-                current.setXApiType(types[0]);
+                xAPIConfigurable.setxAPIType(types[0]);
             }
 
-            var newType = types[EditorGUILayout.Popup("xAPI type", types.IndexOf(current.getXApiType()), types.ToArray())];
+            var newType = types[EditorGUILayout.Popup("xAPI type", types.IndexOf(xAPIConfigurable.getxAPIType()), types.ToArray())];
             if (EditorGUI.EndChangeCheck())
             {
-                current.setXApiType(newType);
+                xAPIConfigurable.setxAPIType(newType);
             }
 
 
