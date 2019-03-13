@@ -242,6 +242,7 @@ namespace uAdventure.Runner
         {
             GameState.RestoreFrom("save");
             RunTarget(GameState.CurrentTarget);
+            uAdventureInputModule.LookingForTarget = null;
         }
 
         public void SaveGame()
@@ -318,6 +319,13 @@ namespace uAdventure.Runner
             }
             uAdventureRaycaster.Instance.Override = null;
             return false;
+        }
+
+        public void Reset()
+        {
+            GameState.Reset();
+            RunTarget(GameState.CurrentTarget);
+            uAdventureInputModule.LookingForTarget = null;
         }
 
         private bool Interacted()
@@ -521,7 +529,7 @@ namespace uAdventure.Runner
 
             IChapterTarget target = GameState.GetChapterTarget(scene_id);
 
-            if (scene_id == GameState.CurrentTarget)
+            if (runnerTarget != null && runnerTarget.Data == target && scene_id == GameState.CurrentTarget)
             {
                 // TODO TRANSITIONS
                 runnerTarget.RenderScene();

@@ -23,13 +23,21 @@ namespace uAdventure.Runner
 
         public void AddElement(GameObject element)
         {
-            var addedItemParticle = GameObject.Instantiate(addedItemParticlePrefab, openButton.transform.parent);
-            var itemParticle = addedItemParticle.GetComponent<ItemParticle>();
-            itemParticle.Image = element.GetComponent<Image>().sprite;
+            AddElement(element, true);
+        }
+
+        public void AddElement(GameObject element, bool animate)
+        {
+            if (animate)
+            {
+                var addedItemParticle = GameObject.Instantiate(addedItemParticlePrefab, openButton.transform.parent);
+                var itemParticle = addedItemParticle.GetComponent<ItemParticle>();
+                itemParticle.Image = element.GetComponent<Image>().sprite;
+                openButton.animator.SetTrigger("Highlight");
+            }
 
             element.transform.SetParent(elementHolder.transform);
             element.transform.localScale = Vector3.one;
-            openButton.animator.SetTrigger("Highlight");
         }
 
         public void RemoveElement(GameObject element)

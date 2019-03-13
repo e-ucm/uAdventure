@@ -298,9 +298,7 @@ namespace uAdventure.Runner
 
         public void ResetAndExit()
         {
-            PlayerPrefs.DeleteAll();
-            PlayerPrefs.Save();
-            Application.Quit();
+            Game.Instance.Reset();
         }
 
         public void ExitApplication()

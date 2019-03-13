@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using uAdventure.Core;
 
@@ -44,12 +45,15 @@ namespace uAdventure.Runner
         {
             get
             {
-                return inventory ? inventory.Opened : false;
+                return inventory && inventory.Opened;
             }
             set
             {
                 MenuMB.Instance.hide(true);
-                if (inventory) inventory.Opened = value;
+                if (inventory)
+                {
+                    inventory.Opened = value;
+                }
             }
         }
 
@@ -57,23 +61,35 @@ namespace uAdventure.Runner
         {
             get
             {
-                return inventory ? inventory.gameObject.activeSelf : false;
+                return inventory && inventory.gameObject.activeSelf;
             }
             set
             {
-                if (inventory) inventory.gameObject.SetActive(value);
+                if (inventory)
+                {
+                    inventory.gameObject.SetActive(value);
+                }
             }
         }
 
         private void Start()
         {
             if (InventoryManager.Instance)
+            {
                 Debug.LogWarning("Multiple inventory managers have been found!");
-
-            var inventoryGO = GameObject.Instantiate(inventoryPrefab, inventoryHolder.transform);
-            inventory = inventoryGO.GetComponent<Inventory>();
+            }
+            if (!inventoryPrefab)
+            {
+                Debug.LogWarning("Inventory prefab not set!");
+                return;
+            }
+            var inventoryGo = GameObject.Instantiate(inventoryPrefab, inventoryHolder.transform);
+            inventory = inventoryGo.GetComponent<Inventory>();
             if (!inventory)
+            {
                 Debug.LogWarning("Inventory gameobject MUST have an Inventory component!");
+                return;
+            }
 
             elementObjects = new Dictionary<Element, GameObject>();
             inventory.openButton.onClick.AddListener(delegate { Open(); });
@@ -90,42 +106,75 @@ namespace uAdventure.Runner
             Opened = false;
         }
 
+        public void Restore()
+        {
+            Clear();
+            foreach (var item in Game.Instance.GameState.GetInventoryItems())
+            {
+                var element = Game.Instance.GameState.GetObject(item);
+                AddElementToInventory(element, false);
+            }
+        }
+
+        private void Clear()
+        {
+            var toRemove = elementObjects.Keys.ToList();
+            foreach (var item in toRemove)
+            {
+                RemoveElementFromInventory(item);
+            }
+        }
+
         public void AddElement(Element element)
+        {
+            if (AddElementToInventory(element, true))
+            {
+                // Add the element to the gamestate
+                Game.Instance.GameState.AddInventoryItem(element.getId());
+            }
+        }
+
+        private bool AddElementToInventory(Element element, bool animate)
         {
             if (elementObjects.ContainsKey(element))
             {
                 Debug.LogWarning("Adding the same element to the inventory twice!");
-                return;
+                return false;
             }
             // Create the element instance
             var elementGO = GameObject.Instantiate(elementPrefab);
             elementGO.GetComponent<UIItem>().Element = element;
             elementGO.SendMessage("Start"); // Force start
-
-            // Add the element to the gamestate
-            Game.Instance.GameState.AddInventoryItem(element.getId());
             // Save the element in the cache
             elementObjects.Add(element, elementGO);
             // Add the element to the rendered inventory
-            inventory.AddElement(elementGO);
+            inventory.AddElement(elementGO, animate);
+            return true;
         }
 
         public void RemoveElement(Element element)
         {
+            if (RemoveElementFromInventory(element))
+            {
+                // Remove the element from the gamestate
+                Game.Instance.GameState.RemoveInventoryItem(element.getId());
+            }
+        }
+
+        private bool RemoveElementFromInventory(Element element)
+        {
             if (!elementObjects.ContainsKey(element))
             {
                 Debug.LogWarning("Removing an element not existing in the inventory!");
-                return;
+                return false;
             }
-
-            // Remove the element from the gamestate
-            Game.Instance.GameState.RemoveInventoryItem(element.getId());
             // Remove from the inventory
             inventory.RemoveElement(elementObjects[element]);
             // Destroy the object
             DestroyImmediate(elementObjects[element]);
             // Removing from the refferences
             elementObjects.Remove(element);
+            return true;
         }
     }
 }

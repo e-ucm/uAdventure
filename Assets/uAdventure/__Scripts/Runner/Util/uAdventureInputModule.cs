@@ -27,7 +27,7 @@ namespace uAdventure.Runner
             set
             {
                 lookingForTarget = value;
-                targetSelectedHandler = ExecuteEvents.GetEventHandler<ITargetSelectedHandler>(value);
+                targetSelectedHandler = value == null ? null : ExecuteEvents.GetEventHandler<ITargetSelectedHandler>(value);
             }
         }
 

@@ -29,7 +29,6 @@ namespace uAdventure.Runner
         private readonly AdventureData data;
         [SerializeField]
         private ElementReference playerContext;
-
         [SerializeField]
         private int currentChapter = 0;
         [SerializeField]
@@ -40,21 +39,20 @@ namespace uAdventure.Runner
         private List<string> removedElements;
         [SerializeField]
         private List<string> inventoryItems;
-
         private Dictionary<string, List<ElementReference>> elementContexts;
         private Dictionary<string, int> varFlags;
+        private Stack<List<KeyValuePair<string, int>>> varFlagChangeAmbits;
 
+#region SerializationFields
         [SerializeField]
         private List<string> varFlagKeys;
         [SerializeField]
         private List<int> varFlagValues;
-
         [SerializeField]
         private List<string> elementContextsKeys;
         [SerializeField]
         private List<ContextList> elementContextsValues;
-
-        private Stack<List<KeyValuePair<string, int>>> varFlagChangeAmbits;
+#endregion
 
         public AdventureData Data
         {
@@ -413,6 +411,21 @@ namespace uAdventure.Runner
             }
         }
 
+        public void Reset()
+        {
+            currentChapter = 0;
+            playerContext = null;
+            currentTarget = data.getChapters()[currentChapter].getInitialChapterTarget().getId();
+            lastTarget = null;
+            removedElements.Clear();
+            inventoryItems.Clear();
+            elementContexts.Clear();
+            varFlags.Clear();
+            varFlagChangeAmbits.Clear();
+            
+            InventoryManager.Instance.Restore();
+        }
+
         public void SerializeTo(string field)
         {
             varFlagKeys = varFlags.Keys.ToList();
@@ -439,6 +452,8 @@ namespace uAdventure.Runner
             {
                 elementContexts[elementContextsKeys[i]] = elementContextsValues[i].ElementReferences;
             }
+
+            InventoryManager.Instance.Restore();
         }
     }
 }

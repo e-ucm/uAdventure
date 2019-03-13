@@ -140,21 +140,25 @@ namespace uAdventure.Runner
             
             data.Use();
 
-            if (target != null)
+            if (target == null)
             {
-                string id = target.name;
-                if (id != null)
-                {
-                    var targetAction = Element.getActions()
-                        .Checked()
-                        .Where(a => a.getType() == targetActionType && a.getTargetId() == id)
-                        .FirstOrDefault();
+                return;
+            }
 
-                    if (targetAction != null)
-                    {
-                        Game.Instance.Execute(new EffectHolder(targetAction.Effects));
-                    }
-                }
+            var id = target.name;
+            if (id == null)
+            {
+                return;
+            }
+
+            var targetAction = Element
+                .getActions()
+                .Checked()
+                .FirstOrDefault(a => a.getType() == targetActionType && a.getTargetId() == id);
+
+            if (targetAction != null)
+            {
+                Game.Instance.Execute(new EffectHolder(targetAction.Effects));
             }
         }
     }
