@@ -654,23 +654,14 @@ namespace uAdventure.Editor
 
             Initialized = true;
 
-            if (loadProjectPath != null)
+            var currentGamePath = "Assets/uAdventure/Resources/CurrentGame";
+            var currentGameDir = new DirectoryInfo(currentGamePath);
+            var currentGameProjectFile = new FileInfo(currentGameDir + ".eap");
+            var projectFile = loadProjectPath != null ? new FileInfo(loadProjectPath) : null;
+
+            if (projectFile == null || projectFile.FullName == currentGameProjectFile.FullName || projectFile.FullName == currentGameDir.FullName)
             {
-                FileInfo projectFile = new FileInfo(loadProjectPath);
-                if (projectFile.Exists)
-                {
-                    if (projectFile.FullName.ToLower().EndsWith(".eap"))
-                    {
-                        string absolutePath = projectFile.FullName;
-                        Loaded = LoadFile(absolutePath.Substring(0, absolutePath.Length - 4));
-                    }
-                    else if (projectFile.Exists)
-                        Loaded = LoadFile(projectFile.FullName);
-                }
-            }
-            else
-            {
-                if (!Directory.Exists("Assets/uAdventure/Resources/CurrentGame"))
+                if (!currentGameDir.Exists || currentGameDir.GetFiles().Length == 0)
                 {
                     Debug.Log("No current game found, creating a 1st person view game...");
                     NewAdventure(DescriptorData.MODE_PLAYER_1STPERSON);
@@ -678,6 +669,18 @@ namespace uAdventure.Editor
                 else
                 {
                     Loaded = LoadFile();
+                }
+            }
+            else if (projectFile.Exists)
+            {
+                if (projectFile.FullName.ToLower().EndsWith(".eap"))
+                {
+                    string absolutePath = projectFile.FullName;
+                    Loaded = LoadFile(absolutePath.Substring(0, absolutePath.Length - 4));
+                }
+                else
+                {
+                    Loaded = LoadFile(projectFile.FullName);
                 }
             }
         }

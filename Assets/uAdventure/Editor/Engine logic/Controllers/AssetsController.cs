@@ -974,17 +974,14 @@ namespace uAdventure.Editor
         {
             pathsToReimport = new List<string>();
 
-            foreach(var assetPath in AssetDatabase.GetAllAssetPaths().Where(path => path.StartsWith(assetFolder)))
+            foreach(var assetPath in AssetDatabase.GetAllAssetPaths()
+                .Where(path => path.StartsWith(assetFolder) && path.EndsWith(".xml") && File.Exists(path)))
             {
-                // In case of animation
-                if (assetPath.EndsWith(".xml"))
-                {
-                    string text = File.ReadAllText(assetPath);
-                    text = RemoveDiacritics(text);
-                    text = text.Replace(".eaa\"", ".eaa.xml\"");
-                    WriteAllTextWithFlush(assetPath, text);
-                    pathsToReimport.Add(assetPath);
-                }
+                var text = File.ReadAllText(assetPath);
+                text = RemoveDiacritics(text);
+                text = text.Replace(".eaa\"", ".eaa.xml\"");
+                WriteAllTextWithFlush(assetPath, text);
+                pathsToReimport.Add(assetPath);
             }
 
             ImportAssets(pathsToReimport.ToArray());
