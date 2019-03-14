@@ -108,24 +108,30 @@ namespace uAdventure.Editor{
 
         public override bool isValid(string currentPath, List<string> incidences)
         {
-            throw new NotImplementedException();
+            return completableDataControls.All(c => c.isValid(currentPath, incidences));
         }
 
         public override bool moveElementDown(DataControl dataControl)
         {
             // Continue only if dataControl is a Milestone
             if (!(dataControl is CompletableDataControl))
+            {
                 return false;
+            }
 
             // Continue only if the dataControl belongs to my set
             var completable = dataControl as CompletableDataControl;
             if (!completableDataControls.Contains(completable))
+            {
                 return false;
+            }
 
             // Continue only if its not the last one
             var index = completableDataControls.IndexOf(completable);
             if (index == completableDataControls.Count - 1)
+            {
                 return false;
+            }
 
             completableDataControls.RemoveAt(index);
             completableDataControls.Insert(index + 1, completable);
@@ -265,7 +271,9 @@ namespace uAdventure.Editor{
         public override void getAssetReferences(List<string> assetPaths, List<int> assetTypes)
         {
             foreach (var s in scoreDataControls)
+            {
                 s.getAssetReferences(assetPaths, assetTypes);
+            }
         }
         public override object getContent() { return score; }
 
@@ -276,7 +284,30 @@ namespace uAdventure.Editor{
 
         public override bool isValid(string currentPath, List<string> incidences)
         {
-            throw new NotImplementedException();
+            var valid = score != null;
+
+            if (!valid)
+            {
+                return false;
+            }
+
+            if (score.getMethod() == Completable.Score.ScoreMethod.SINGLE)
+            {
+                valid &= scoreDataControls.Count == 0;
+                if (score.getType() == Completable.Score.ScoreType.COMPLETABLE)
+                {
+                    valid &= controller.IdentifierSummary.getIds<Completable>().Contains(score.getId());
+                }
+
+            }
+            else
+            {
+                valid &= scoreDataControls.Count > 0;
+            }
+
+            valid &= scoreDataControls.All(s => s.isValid(currentPath, incidences));
+
+            return valid;
         }
 
         public override bool moveElementDown(DataControl dataControl)
