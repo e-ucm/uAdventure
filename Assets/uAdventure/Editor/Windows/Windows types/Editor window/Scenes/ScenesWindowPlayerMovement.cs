@@ -58,7 +58,10 @@ namespace uAdventure.Editor
             var playerMode = GetScenePlayerMode(workingScene);
             var playerModeTexts = new string[] { TC.get("Scene.NoPlayer"), TC.get("Scene.UseInitialPosition"), TC.get("Scene.UseTrajectory") };
             playerMode = (PlayerMode) GUILayout.Toolbar((int) playerMode, playerModeTexts);
-            if (EditorGUI.EndChangeCheck()) OnPlayerModeChange(playerMode);
+            if (EditorGUI.EndChangeCheck())
+            {
+                OnPlayerModeChange(playerMode);
+            }
 
             switch (playerMode)
             {
@@ -91,7 +94,9 @@ namespace uAdventure.Editor
         public override void Draw(int aID)
         {
             foreach (var elem in sceneEditor.Elements)
+            {
                 sceneEditor.TypeEnabling[elem.GetType()] = false;
+            }
 
             sceneEditor.TypeEnabling[typeof(PlayerDataControl)] = true;
             sceneEditor.TypeEnabling[typeof(TrajectoryDataControl)] = true;
@@ -103,7 +108,9 @@ namespace uAdventure.Editor
             trajectoryComponent.Action = -1;
 
             foreach (var elem in sceneEditor.Elements)
+            {
                 sceneEditor.TypeEnabling[elem.GetType()] = true;
+            }
 
             sceneEditor.TypeEnabling[typeof(PlayerDataControl)] = false;
             sceneEditor.TypeEnabling[typeof(TrajectoryDataControl)] = false;
@@ -121,12 +128,28 @@ namespace uAdventure.Editor
                     break;
                 case PlayerMode.NoPlayer:
                     workingScene.changeAllowPlayerLayer(false);
+                    sceneEditor.SelectedElement = null;
                     break;
                 case PlayerMode.InitialPosition:
                     {
-                        var trajectory = workingScene.getTrajectory().GetTrajectory();
-                        var initialPos = new Vector2(trajectory.getInitial().getX(), trajectory.getInitial().getY());
-                        var initialScale = trajectory.getInitial().getScale();
+                        var trajectoryDataControl = workingScene.getTrajectory();
+                        var trajectory = trajectoryDataControl.GetTrajectory();
+                        var initialPos = new Vector2(workingScene.getDefaultInitialPositionX(),
+                            workingScene.getDefaultInitialPositionY());
+                        var initialScale = workingScene.getPlayerScale() >= 0 ? workingScene.getPlayerScale() : workingScene.getPlayerAppropiateScale();
+                        if (trajectory != null)
+                        {
+                            initialPos = new Vector2(trajectory.getInitial().getX(), trajectory.getInitial().getY());
+                            initialScale = trajectory.getInitial().getScale();
+
+                            // Swap from any of the selected nodes to the player
+                            if (sceneEditor.SelectedElement != null && trajectoryDataControl.getNodes()
+                                    .Any(sceneEditor.SelectedElement.Equals))
+                            {
+                                sceneEditor.SelectedElement =
+                                    Controller.Instance.SelectedChapterDataControl.getPlayer();
+                            }
+                        }
                         workingScene.setTrajectoryDataControl(new TrajectoryDataControl(workingScene, null));
                         workingScene.setTrajectory(null);
                         workingScene.setDefaultInitialPosition((int)initialPos.x, (int)initialPos.y);
@@ -139,17 +162,25 @@ namespace uAdventure.Editor
                         if (trajectory == null)
                         {
                             trajectory = new Trajectory();
-                            trajectory.addNode("initial", workingScene.getDefaultInitialPositionX(), workingScene.getDefaultInitialPositionY(), workingScene.getPlayerScale());
+                            trajectory.addNode("initial", workingScene.getDefaultInitialPositionX(), 
+                                workingScene.getDefaultInitialPositionY(), workingScene.getPlayerScale());
                             trajectory.setInitial("initial");
                             var tdc = new TrajectoryDataControl(workingScene, trajectory);
                             workingScene.setTrajectoryDataControl(tdc);
                             workingScene.setTrajectory(trajectory);
                         }
+
+
+                        // Swap from player to first node
+                        if (sceneEditor.SelectedElement == Controller.Instance.SelectedChapterDataControl.getPlayer())
+                        {
+                            sceneEditor.SelectedElement = workingScene.getTrajectory().getInitialNode();
+                        }
                     }
                     break;
             }
 
-            if(val != PlayerMode.NoPlayer && !workingScene.isAllowPlayer())
+            if (val != PlayerMode.NoPlayer && !workingScene.isAllowPlayer())
             {
                 workingScene.changeAllowPlayerLayer(true);
             }
