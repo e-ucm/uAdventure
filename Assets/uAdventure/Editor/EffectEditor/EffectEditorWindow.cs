@@ -1,9 +1,8 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
-
+using System.Linq;
 using uAdventure.Core;
-using System;
 
 namespace uAdventure.Editor
 {
@@ -35,8 +34,57 @@ namespace uAdventure.Editor
 
         protected override IEffect[] ChildsFor(Effects Content, IEffect parent)
         {
-            var index = Content.FindIndex(parent.Equals);
-            return index == Content.Count - 1 ? new IEffect[0] : new IEffect[1] { Content[index + 1] };
+            var randomParent = parent as RandomEffect;
+            if (randomParent != null)
+            {
+                return new IEffect[2] { randomParent.getPositiveEffect(), randomParent.getNegativeEffect() };
+            }
+            else
+            {
+                var index = Content.FindIndex(n => IsPartOf(n, parent));
+                return index == Content.Count - 1 ? new IEffect[0] : new IEffect[1] { Content[index + 1] };
+            }
+        }
+
+        private static bool IsPartOf(IEffect parent, IEffect child)
+        {
+            if (parent == child)
+            {
+                return true;
+            }
+
+            var randomParent = parent as RandomEffect;
+            return randomParent != null && (IsPartOf(randomParent.getPositiveEffect(), child) || IsPartOf(randomParent.getNegativeEffect(), child));
+        }
+
+        private static bool IsInsideOf(IEffect effectParent, IEffect node)
+        {
+            var randomParent = effectParent as RandomEffect;
+            return randomParent != null && (randomParent.getNegativeEffect() == node || randomParent.getPositiveEffect() == node);
+        }
+
+        private IEffect GetParentNode(Effects content, IEffect child)
+        {
+            var index = content.IndexOf(child);
+            if (index == 0)
+            {
+                return null;
+            }
+            else if (index > 0)
+            {
+                var parent = content[index - 1];
+                while (parent is RandomEffect)
+                {
+                    parent = (parent as RandomEffect).getPositiveEffect();
+                }
+
+                return parent;
+            }
+            else
+            {
+                var allNodes = GetNodes(content);
+                return allNodes.First(parent => IsInsideOf(parent, child));
+            }
         }
 
         protected override void DeleteNode(Effects content, IEffect node)
@@ -83,7 +131,22 @@ namespace uAdventure.Editor
 
         protected override IEffect[] GetNodes(Effects Content)
         {
-            return Content.ToArray();
+            return Content.SelectMany(GetAllNodesIn).ToArray();
+        }
+
+        private static IEffect[] GetAllNodesIn(IEffect node)
+        {
+            var randomNode = node as RandomEffect;
+            if (randomNode == null)
+            {
+                return new []{node};
+            }
+
+            var nodes = new List<IEffect> { node };
+            nodes.AddRange(GetAllNodesIn(randomNode.getPositiveEffect()));
+            nodes.AddRange(GetAllNodesIn(randomNode.getNegativeEffect()));
+
+            return nodes.ToArray();
         }
 
         private bool CreateAndInitEffectEditor(Effects content, IEffect node)
@@ -100,13 +163,28 @@ namespace uAdventure.Editor
                 editor.Effect = node;
             }
             editor.Window = new Rect(new Vector2(50, 50), initialSize);
-
-            var index = content.IndexOf(node);
-            if (index > 0)
+            
+            var parent = GetParentNode(content, node);
+            if (parent != null)
             {
                 var pos = editor.Window;
-                var parentPos = editors[content[index - 1]].Window;
-                pos.position = parentPos.position + new Vector2(parentPos.size.x + 50, 0);
+                var randomEffect = parent as RandomEffect;
+                if (randomEffect != null && randomEffect != node)
+                {
+                    var parentPos = editors[parent].Window;
+                    pos.position = parentPos.position + new Vector2(parentPos.size.x + 50, 0);
+
+                    if (node == randomEffect.getNegativeEffect())
+                    {
+                        pos.position = pos.position + new Vector2(0, 250);
+                    }
+                }
+                else
+                {
+                    var parentPos = editors[parent].Window;
+                    pos.position = parentPos.position + new Vector2(parentPos.size.x + 50, 0);
+                }
+
                 editor.Window = pos;
             }
 
@@ -172,7 +250,26 @@ namespace uAdventure.Editor
                         (editor.Effect as AbstractEffect).setConditions(abstractEffect.getConditions());
                     }
                     // Replace the effect
-                    content[content.IndexOf(node)] = editor.Effect;
+                    var index = content.IndexOf(node);
+                    if (index == -1)
+                    {
+                        var randomEffect = GetParentNode(content, node) as RandomEffect;
+                        if (randomEffect != null)
+                        {
+                            if (randomEffect.getPositiveEffect() == node)
+                            {
+                                randomEffect.setPositiveEffect(editor.Effect);
+                            }
+                            else if (randomEffect.getNegativeEffect() == node)
+                            {
+                                randomEffect.setNegativeEffect(editor.Effect);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        content[index] = editor.Effect;
+                    }
                 }
             }
 
@@ -181,12 +278,28 @@ namespace uAdventure.Editor
 
         protected override void SetNodeChild(Effects content, IEffect node, int slot, IEffect child)
         {
-            var index = content.IndexOf(node) + 1;
-            var childIndex = content.IndexOf(child);
-            while (index < childIndex)
+            var randomEffect = node as RandomEffect;
+            if (randomEffect != null)
             {
-                content.RemoveAt(index);
-                ++index;
+                switch (slot)
+                {
+                    case 0: // Positive effect
+                        randomEffect.setPositiveEffect(child);
+                        break;
+                    case 1: // Negative effect
+                        randomEffect.setNegativeEffect(child);
+                        break;
+                }
+            }
+            else
+            {
+                var index = content.IndexOf(node) + 1;
+                var childIndex = content.IndexOf(child);
+                while (index < childIndex)
+                {
+                    content.RemoveAt(index);
+                    ++index;
+                }
             }
         }
 
