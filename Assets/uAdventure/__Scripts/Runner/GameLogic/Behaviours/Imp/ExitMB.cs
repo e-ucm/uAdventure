@@ -45,7 +45,7 @@ namespace uAdventure.Runner
             var effectHolder = new EffectHolder(effects);
             if (exited)
             {
-                effectHolder.effects[ed.getEffects().Count].AddAditionalInfo("not_trace", true);
+                effectHolder.effects[ed.getEffects().Count].AddAdditionalInfo("not_trace", true);
             }
 
             return effectHolder;

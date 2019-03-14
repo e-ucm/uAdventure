@@ -502,7 +502,7 @@ namespace uAdventure.Editor
             }
             catch
             {
-                Debug.Log("Failed to unsubscrlibe onPlay");
+                Debug.Log("Failed to unsubscribe to onPlay");
             }
 
             GameRources.GetInstance().Reset();

@@ -937,21 +937,6 @@ namespace uAdventure.Editor
 
                 updateVarFlagSummary(varFlagSummary, effect);
 
-                if (effect.getType() == EffectType.RANDOM_EFFECT)
-                {
-                    RandomEffect randomEffect = (RandomEffect)effect;
-                    if (randomEffect.getNegativeEffect() != null)
-                    {
-                        updateVarFlagSummary(varFlagSummary, randomEffect.getNegativeEffect());
-                    }
-
-                    if (randomEffect.getPositiveEffect() != null)
-                    {
-                        updateVarFlagSummary(varFlagSummary, randomEffect.getPositiveEffect());
-                    }
-
-                }
-
             }
         }
 
@@ -990,10 +975,27 @@ namespace uAdventure.Editor
                 DecrementVarEffect decrementEffect = (DecrementVarEffect)effect;
                 varFlagSummary.addVarReference(decrementEffect.getTargetId());
             }
+            else if (effect.getType() == EffectType.RANDOM_EFFECT)
+            {
+                RandomEffect randomEffect = (RandomEffect)effect;
+                if (randomEffect.getNegativeEffect() != null)
+                {
+                    updateVarFlagSummary(varFlagSummary, randomEffect.getNegativeEffect());
+                }
+
+                if (randomEffect.getPositiveEffect() != null)
+                {
+                    updateVarFlagSummary(varFlagSummary, randomEffect.getPositiveEffect());
+                }
+
+            }
 
             // UPdate conditions
-            if(effect is AbstractEffect)
-                ConditionsController.updateVarFlagSummary(varFlagSummary, ((AbstractEffect)effect).getConditions());
+            var abstractEffect = effect as AbstractEffect;
+            if (abstractEffect != null)
+            {
+                ConditionsController.updateVarFlagSummary(varFlagSummary, abstractEffect.getConditions());
+            }
         }
 
         /**

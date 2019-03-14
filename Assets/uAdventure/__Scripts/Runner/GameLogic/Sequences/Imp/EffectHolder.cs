@@ -10,262 +10,261 @@ namespace uAdventure.Runner
 {
     public class EffectHolderNode
     {
-        IEffect effect;
-        Conditions conditions;
+        private readonly IEffect effect;
+        private readonly Conditions conditions;
 
-        private bool runs_once = true;
-        private int times_runed = 0;
+        private bool runsOnce = true;
+        private int timesRun = 0;
         private bool waitForLoadPulse = false;
 
         private bool validated = false;
-        private bool is_valid = false;
+        private bool isValid = false;
 
-        Dictionary<string, object> aditional_info = new Dictionary<string, object>();
-        public void AddAditionalInfo(string key, object value)
+        readonly Dictionary<string, object> additionalInfo = new Dictionary<string, object>();
+        public void AddAdditionalInfo(string key, object value)
         {
-            aditional_info[key] = value;
+            additionalInfo[key] = value;
         }
 
         public EffectHolderNode(IEffect effect)
         {
             this.effect = effect;
-            if (effect is AbstractEffect)
-                conditions = (effect as AbstractEffect).getConditions();
+            var abstractEffect = effect as AbstractEffect;
+            if (abstractEffect != null)
+            {
+                conditions = abstractEffect.getConditions();
+            }
         }
 
         public bool execute()
         {
-            bool forcewait = false;
-            if (!(runs_once && times_runed > 0) || waitForLoadPulse)
+            var forceWait = false;
+            if (effect != null && (!runsOnce || timesRun == 0 || waitForLoadPulse))
             {
-                if (effect != null)
+                if (!validated)
                 {
-                    if (!validated)
-                    {
-                        is_valid = conditions == null || ConditionChecker.check(conditions);
-                        validated = true;
-                    }
+                    isValid = conditions == null || ConditionChecker.check(conditions);
+                    validated = true;
+                }
 
-                    if (is_valid)
+                if (isValid)
+                {
+                    switch (effect.getType())
                     {
-                        switch (effect.getType())
-                        {
-                            case EffectType.ACTIVATE:
-                                Game.Instance.GameState.SetFlag(((ActivateEffect)effect).getTargetId(), FlagCondition.FLAG_ACTIVE);
-                                break;
-                            case EffectType.DEACTIVATE:
-                                Game.Instance.GameState.SetFlag(((DeactivateEffect)effect).getTargetId(), FlagCondition.FLAG_INACTIVE);
-                                break;
-                            case EffectType.SHOW_TEXT:
-                                var showTextEffect = (ShowTextEffect)effect;
-                                Game.Instance.Talk(showTextEffect.getText(), showTextEffect.getX(), showTextEffect.getY(),
-                                    showTextEffect.getRgbFrontColor(), showTextEffect.getRgbBorderColor());
-                                forcewait = true;
-                                break;
-                            case EffectType.SPEAK_PLAYER:
-                                Game.Instance.Talk(((SpeakPlayerEffect)effect).getLine(), Player.IDENTIFIER);
-                                forcewait = true;
-                                break;
-                            case EffectType.SPEAK_CHAR:
-                                Game.Instance.Talk(((SpeakCharEffect)effect).getLine(), ((SpeakCharEffect)effect).getTargetId());
-                                forcewait = true;
-                                break;
-                            case EffectType.TRIGGER_SCENE:
-                                if (!waitForLoadPulse)
+                        case EffectType.ACTIVATE:
+                            Game.Instance.GameState.SetFlag(((ActivateEffect)effect).getTargetId(), FlagCondition.FLAG_ACTIVE);
+                            break;
+                        case EffectType.DEACTIVATE:
+                            Game.Instance.GameState.SetFlag(((DeactivateEffect)effect).getTargetId(), FlagCondition.FLAG_INACTIVE);
+                            break;
+                        case EffectType.SHOW_TEXT:
+                            var showTextEffect = (ShowTextEffect)effect;
+                            Game.Instance.Talk(showTextEffect.getText(), showTextEffect.getX(), showTextEffect.getY(),
+                                showTextEffect.getRgbFrontColor(), showTextEffect.getRgbBorderColor());
+                            forceWait = true;
+                            break;
+                        case EffectType.SPEAK_PLAYER:
+                            Game.Instance.Talk(((SpeakPlayerEffect)effect).getLine(), Player.IDENTIFIER);
+                            forceWait = true;
+                            break;
+                        case EffectType.SPEAK_CHAR:
+                            Game.Instance.Talk(((SpeakCharEffect)effect).getLine(), ((SpeakCharEffect)effect).getTargetId());
+                            forceWait = true;
+                            break;
+                        case EffectType.TRIGGER_SCENE:
+                            if (!waitForLoadPulse)
+                            {
+                                runsOnce = false;
+                                TriggerSceneEffect tse = ((TriggerSceneEffect)effect);
+                                if (!Game.Instance.GameState.IsFirstPerson)
                                 {
-                                    runs_once = false;
-                                    TriggerSceneEffect tse = ((TriggerSceneEffect)effect);
-                                    if (!Game.Instance.GameState.IsFirstPerson)
+                                    var playerContext = Game.Instance.GameState.PlayerContext;
+                                    if (tse.getX() != int.MinValue || tse.getY() != int.MinValue)
                                     {
-                                        var playerContext = Game.Instance.GameState.PlayerContext;
-                                        if (tse.getX() != int.MinValue || tse.getY() != int.MinValue)
+                                        playerContext.setPosition(tse.getX(), tse.getY());
+                                        if (tse.DestinyScale > 0)
+                                            playerContext.setScale(tse.DestinyScale);
+                                    }
+                                    else
+                                    {
+                                        var targetScene = Game.Instance.GameState.GetChapterTarget(tse.getTargetId()) as Scene;
+                                        if (targetScene != null)
                                         {
-                                            playerContext.setPosition(tse.getX(), tse.getY());
-                                            if (tse.DestinyScale > 0)
-                                                playerContext.setScale(tse.DestinyScale);
-                                        }
-                                        else
-                                        {
-                                            var targetScene = Game.Instance.GameState.GetChapterTarget(tse.getTargetId()) as Scene;
-                                            if (targetScene != null)
+                                            if(targetScene.getTrajectory() != null)
                                             {
-                                                if(targetScene.getTrajectory() != null)
-                                                {
-                                                    var initial = targetScene.getTrajectory().getInitial();
-                                                    playerContext.setPosition(initial.getX(), initial.getY());
-                                                    playerContext.setScale(initial.getScale());
-                                                }
-                                                else
-                                                {
-                                                    playerContext.setPosition(targetScene.getPositionX(), targetScene.getPositionY());
-                                                    playerContext.setScale(targetScene.getPlayerScale());
-                                                }
+                                                var initial = targetScene.getTrajectory().getInitial();
+                                                playerContext.setPosition(initial.getX(), initial.getY());
+                                                playerContext.setScale(initial.getScale());
+                                            }
+                                            else
+                                            {
+                                                playerContext.setPosition(targetScene.getPositionX(), targetScene.getPositionY());
+                                                playerContext.setScale(targetScene.getPlayerScale());
                                             }
                                         }
                                     }
-                                    bool trace = true;
-                                    if (aditional_info.ContainsKey("disable_trace") && (bool)aditional_info["disable_trace"] == true)
-                                        trace = false;
-
-                                    Game.Instance.RunTarget(tse.getTargetId(), tse.getTransitionTime(), tse.getTransitionType(), null, trace);
-                                    waitForLoadPulse = true;
-                                    forcewait = true;
                                 }
+
+                                var trace = !(additionalInfo.ContainsKey("disable_trace") && (bool)additionalInfo["disable_trace"]);
+                                Game.Instance.RunTarget(tse.getTargetId(), tse.getTransitionTime(), tse.getTransitionType(), null, trace);
+                                waitForLoadPulse = true;
+                                forceWait = true;
+                            }
+                            else
+                            {
+                                waitForLoadPulse = false;
+                            }
+                            // DODO make something to wait until the target is ready to prevent undesired effect advance
+                            break;
+                        case EffectType.TRIGGER_CUTSCENE:
+                            runsOnce = false;
+                            TriggerCutsceneEffect tce = (TriggerCutsceneEffect)effect;
+                            if (timesRun > 1) // The first interaction is the run target callback
+                            {
+                                if (additionalInfo.ContainsKey("sub_effects_wait"))
+                                    forceWait = false;
                                 else
                                 {
-                                    waitForLoadPulse = false;
-                                }
-                                // DODO make something to wait until the target is ready to prevent undesired effect advance
-                                break;
-                            case EffectType.TRIGGER_CUTSCENE:
-                                runs_once = false;
-                                TriggerCutsceneEffect tce = (TriggerCutsceneEffect)effect;
-                                if (times_runed > 1) // The first interaction is the run target callback
-                                {
-                                    if (aditional_info.ContainsKey("sub_effects_wait"))
-                                        forcewait = false;
-                                    else
+                                    InteractuableResult res = ((Interactuable)additionalInfo["scene"]).Interacted();
+                                    if (res == InteractuableResult.REQUIRES_MORE_INTERACTION)
+                                        forceWait = true;
+                                    else if (res == InteractuableResult.DOES_SOMETHING)
                                     {
-                                        InteractuableResult res = ((Interactuable)aditional_info["scene"]).Interacted();
-                                        if (res == InteractuableResult.REQUIRES_MORE_INTERACTION)
-                                            forcewait = true;
-                                        else if (res == InteractuableResult.DOES_SOMETHING)
-                                        {
-                                            aditional_info["sub_effects_wait"] = true;
-                                            forcewait = true;
-                                        }
+                                        additionalInfo["sub_effects_wait"] = true;
+                                        forceWait = true;
                                     }
                                 }
-                                else if(times_runed == 1)
-                                {
-                                    forcewait = true;
-                                }
-                                else if (times_runed == 0)
-                                {
-                                    bool trace = true;
-                                    if (aditional_info.ContainsKey("disable_trace") && (bool)aditional_info["disable_trace"] == true)
-                                        trace = false;
+                            }
+                            else if(timesRun == 1)
+                            {
+                                forceWait = true;
+                            }
+                            else if (timesRun == 0)
+                            {
+                                var trace = !(additionalInfo.ContainsKey("disable_trace") && (bool)additionalInfo["disable_trace"]);
+
+                                additionalInfo.Add("lastscene", Game.Instance.GameState.CurrentTarget);
+                                additionalInfo.Add("scene", Game.Instance.RunTarget(tce.getTargetId(), null, trace));
+                                forceWait = true;
+                            }
+
+                            if (!forceWait && ((Cutscene)((IRunnerChapterTarget)additionalInfo["scene"]).Data).getNext() == Cutscene.GOBACK)
+                            {
+                                string last = (string)additionalInfo["lastscene"];
+                                Game.Instance.RunTarget(last);
+                            }
+
+                            break;
+                        case EffectType.TRIGGER_LAST_SCENE:
+                            runsOnce = false;
+                            Game.Instance.SwitchToLastTarget();
+                            break;
+                        case EffectType.TRIGGER_CONVERSATION:
+                            runsOnce = false;
+                            runsOnce = false;
+                            if (timesRun == 0)
+                            {
+                                var tcoe = (TriggerConversationEffect)effect;
+                                this.additionalInfo.Add("conversation", new GraphConversationHolder(Game.Instance.GameState.GetConversation(tcoe.getTargetId())));
+                            }
+                            forceWait = ((GraphConversationHolder)this.additionalInfo["conversation"]).execute();
+                            break;
+                        case EffectType.RANDOM_EFFECT:
+                            RandomEffect re = (RandomEffect)effect;
+
+                            if (timesRun == 0)
+                            {
+                                int pro = re.getProbability(), now = Random.Range(0, 100);
                                     
-                                    aditional_info.Add("lastscene", Game.Instance.GameState.CurrentTarget);
-                                    aditional_info.Add("scene", Game.Instance.RunTarget(tce.getTargetId(), null, trace));
-                                    forcewait = true;
-                                }
-
-                                if (!forcewait && ((Cutscene)((IRunnerChapterTarget)aditional_info["scene"]).Data).getNext() == Cutscene.GOBACK)
+                                if (pro <= now)
                                 {
-                                    string last = (string)aditional_info["lastscene"];
-                                    Game.Instance.RunTarget(last);
-                                }
-
-                                break;
-                            case EffectType.TRIGGER_LAST_SCENE:
-                                runs_once = false;
-                                Game.Instance.SwitchToLastTarget();
-                                break;
-                            case EffectType.TRIGGER_CONVERSATION:
-                                runs_once = false;
-                                runs_once = false;
-                                if (times_runed == 0)
-                                {
-                                    TriggerConversationEffect tcoe = (TriggerConversationEffect)effect;
-                                    this.aditional_info.Add("conversation", new GraphConversationHolder(Game.Instance.GameState.GetConversation(tcoe.getTargetId())));
-                                }
-                                forcewait = ((GraphConversationHolder)this.aditional_info["conversation"]).execute();
-                                break;
-                            case EffectType.RANDOM_EFFECT:
-                                runs_once = false;
-                                RandomEffect re = (RandomEffect)effect;
-
-                                if (!aditional_info.ContainsKey("first"))
-                                {
-                                    aditional_info.Add("first", new EffectHolderNode(re.getPositiveEffect()));
-                                    aditional_info.Add("second", new EffectHolderNode(re.getNegativeEffect()));
-                                }
-
-                                if (times_runed == 0)
-                                {
-                                    int pro = re.getProbability(), now = Random.Range(0, 100);
-                                    if (aditional_info.ContainsKey("current"))
-                                        aditional_info.Remove("current");
-
-                                    if (pro <= now)
-                                        aditional_info.Add("current", "first");
-                                    else
-                                        aditional_info.Add("current", "second");
-
-                                    forcewait = ((EffectHolderNode)aditional_info[((string)aditional_info["current"])]).execute();
-                                }
-                                else
-                                    forcewait = ((EffectHolderNode)aditional_info[((string)aditional_info["current"])]).execute();
-
-                                break;
-                            case EffectType.SET_VALUE:
-                                SetValueEffect sve = (SetValueEffect)effect;
-                                Game.Instance.GameState.SetVariable(sve.getTargetId(), sve.getValue());
-                                break;
-                            case EffectType.INCREMENT_VAR:
-                                IncrementVarEffect ive = (IncrementVarEffect)effect;
-                                Game.Instance.GameState.SetVariable(ive.getTargetId(), Game.Instance.GameState.GetVariable(ive.getTargetId()) + ive.getIncrement());
-                                break;
-                            case EffectType.DECREMENT_VAR:
-                                DecrementVarEffect dve = (DecrementVarEffect)effect;
-                                Game.Instance.GameState.SetVariable(dve.getTargetId(), Game.Instance.GameState.GetVariable(dve.getTargetId()) - dve.getDecrement());
-                                break;
-                            case EffectType.MACRO_REF:
-                                runs_once = false;
-                                if (times_runed == 0)
-                                {
-                                    MacroReferenceEffect mre = (MacroReferenceEffect)effect;
-                                    this.aditional_info.Add("macro", new EffectHolder(Game.Instance.GameState.GetMacro(mre.getTargetId())));
-                                }
-                                forcewait = ((EffectHolder)this.aditional_info["macro"]).execute();
-                                break;
-                            case EffectType.MOVE_OBJECT:
-                                MoveObjectEffect moe = (MoveObjectEffect)effect;
-                                Game.Instance.GameState.Move(moe.getTargetId(), new Vector2(moe.getX(), 600 - moe.getY()) / 10f);
-                                break;
-                            case EffectType.GENERATE_OBJECT:
-                                GenerateObjectEffect gen = (GenerateObjectEffect)effect;
-                                var toAdd = Game.Instance.GameState.FindElement<Item>(gen.getTargetId());
-                                InventoryManager.Instance.AddElement(toAdd);
-                                break;
-                            case EffectType.CONSUME_OBJECT:
-                                ConsumeObjectEffect con = (ConsumeObjectEffect)effect;
-                                var toRemove = Game.Instance.GameState.FindElement<Item>(con.getTargetId());
-                                InventoryManager.Instance.RemoveElement(toRemove);
-                                break;
-                            case EffectType.TRIGGER_BOOK:
-                                if (times_runed == 0)
-                                {
-                                    if (InventoryManager.Instance.Opened)
+                                    if (re.getPositiveEffect() != null)
                                     {
-                                        InventoryManager.Instance.Close();
+                                        additionalInfo.Add("current", new EffectHolderNode(re.getPositiveEffect()));
+                                        runsOnce = false;
                                     }
-                                    TriggerBookEffect triggerBookEffect = (TriggerBookEffect)effect;
-                                    Game.Instance.ShowBook(triggerBookEffect.getTargetId());
                                 }
-                                runs_once = false;
-                                forcewait = Game.Instance.ShowingBook;
-                                break;
-                            case EffectType.CUSTOM_EFFECT:
-                                runs_once = false;
-                                if(times_runed == 0)
+                                else if (re.getNegativeEffect() != null)
                                 {
-                                    this.aditional_info["custom_effect_runner"] = CustomEffectRunnerFactory.Instance.CreateRunnerFor(effect);
+                                    additionalInfo.Add("current", new EffectHolderNode(re.getNegativeEffect()));
+                                    runsOnce = false;
                                 }
-                                forcewait = ((CustomEffectRunner)this.aditional_info["custom_effect_runner"]).execute();
-                                break;
-                        }
+                            }
+
+                            if (additionalInfo.ContainsKey("current"))
+                            {
+                                var subEffectHolder = (EffectHolderNode)additionalInfo["current"];
+                                forceWait = subEffectHolder.execute();
+                                runsOnce = subEffectHolder.runsOnce;
+                            }
+
+                            break;
+                        case EffectType.SET_VALUE:
+                            SetValueEffect sve = (SetValueEffect)effect;
+                            Game.Instance.GameState.SetVariable(sve.getTargetId(), sve.getValue());
+                            break;
+                        case EffectType.INCREMENT_VAR:
+                            IncrementVarEffect ive = (IncrementVarEffect)effect;
+                            Game.Instance.GameState.SetVariable(ive.getTargetId(), Game.Instance.GameState.GetVariable(ive.getTargetId()) + ive.getIncrement());
+                            break;
+                        case EffectType.DECREMENT_VAR:
+                            DecrementVarEffect dve = (DecrementVarEffect)effect;
+                            Game.Instance.GameState.SetVariable(dve.getTargetId(), Game.Instance.GameState.GetVariable(dve.getTargetId()) - dve.getDecrement());
+                            break;
+                        case EffectType.MACRO_REF:
+                            runsOnce = false;
+                            if (timesRun == 0)
+                            {
+                                MacroReferenceEffect mre = (MacroReferenceEffect)effect;
+                                this.additionalInfo.Add("macro", new EffectHolder(Game.Instance.GameState.GetMacro(mre.getTargetId())));
+                            }
+                            forceWait = ((EffectHolder)this.additionalInfo["macro"]).execute();
+                            break;
+                        case EffectType.MOVE_OBJECT:
+                            MoveObjectEffect moe = (MoveObjectEffect)effect;
+                            Game.Instance.GameState.Move(moe.getTargetId(), new Vector2(moe.getX(), 600 - moe.getY()) / 10f);
+                            break;
+                        case EffectType.GENERATE_OBJECT:
+                            GenerateObjectEffect gen = (GenerateObjectEffect)effect;
+                            var toAdd = Game.Instance.GameState.FindElement<Item>(gen.getTargetId());
+                            InventoryManager.Instance.AddElement(toAdd);
+                            break;
+                        case EffectType.CONSUME_OBJECT:
+                            ConsumeObjectEffect con = (ConsumeObjectEffect)effect;
+                            var toRemove = Game.Instance.GameState.FindElement<Item>(con.getTargetId());
+                            InventoryManager.Instance.RemoveElement(toRemove);
+                            break;
+                        case EffectType.TRIGGER_BOOK:
+                            if (timesRun == 0)
+                            {
+                                if (InventoryManager.Instance.Opened)
+                                {
+                                    InventoryManager.Instance.Close();
+                                }
+                                TriggerBookEffect triggerBookEffect = (TriggerBookEffect)effect;
+                                Game.Instance.ShowBook(triggerBookEffect.getTargetId());
+                            }
+                            runsOnce = false;
+                            forceWait = Game.Instance.ShowingBook;
+                            break;
+                        case EffectType.CUSTOM_EFFECT:
+                            runsOnce = false;
+                            if(timesRun == 0)
+                            {
+                                this.additionalInfo["custom_effect_runner"] = CustomEffectRunnerFactory.Instance.CreateRunnerFor(effect);
+                            }
+                            forceWait = ((CustomEffectRunner)this.additionalInfo["custom_effect_runner"]).execute();
+                            break;
                     }
                 }
             }
 
-            if (!forcewait)
-                times_runed = 0;
+            if (!forceWait)
+                timesRun = 0;
             else
-                times_runed++;
+                timesRun++;
 
-            return forcewait;
+            return forceWait;
         }
 
         public bool check()
