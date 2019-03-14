@@ -248,23 +248,28 @@ namespace uAdventure.Editor{
         public override void deleteAssetReferences(string assetPath) { }
         public override bool deleteElement(DataControl dataControl, bool askConfirmation)
         {
-            if (!(dataControl is ScoreDataControl))
-                return false;
-
-            var score = dataControl as ScoreDataControl;
-            if (scoreDataControls.Contains(score))
+            var scoreDataControl = dataControl as ScoreDataControl;
+            if (scoreDataControl == null)
             {
-                scoreDataControls.Remove(score);
-                this.score.getSubScores().Remove(score.getContent() as Completable.Score);
-                return true;
+                return false;
             }
 
-            return false;
+            if (!scoreDataControls.Contains(scoreDataControl))
+            {
+                return false;
+            }
+
+            scoreDataControls.Remove(scoreDataControl);
+            this.score.getSubScores().Remove(scoreDataControl.getContent() as Completable.Score);
+            return true;
+
         }
         public override void deleteIdentifierReferences(string id)
         {
             if (id.Equals(score.getId()))
+            {
                 score.setId("");
+            }
             scoreDataControls.ForEach(s => s.deleteIdentifierReferences(id));
         }
         public override int[] getAddableElements() { return score.getMethod() != Completable.Score.ScoreMethod.SINGLE ? new int[1] { Controller.SCORE } : new int[0]; }
@@ -312,47 +317,59 @@ namespace uAdventure.Editor{
 
         public override bool moveElementDown(DataControl dataControl)
         {
+            var scoreDataControl = dataControl as ScoreDataControl;
             // Continue only if dataControl is a Milestone
-            if (!(dataControl is ScoreDataControl))
+            if (scoreDataControl == null)
+            {
                 return false;
+            }
 
             // Continue only if the dataControl belongs to my set
-            var score = dataControl as ScoreDataControl;
-            if (!scoreDataControls.Contains(score))
+            if (!scoreDataControls.Contains(scoreDataControl))
+            {
                 return false;
+            }
 
             // Continue only if its not the last one
-            var index = scoreDataControls.IndexOf(score);
+            var index = scoreDataControls.IndexOf(scoreDataControl);
             if (index == 0)
+            {
                 return false;
+            }
 
             scoreDataControls.RemoveAt(index);
-            scoreDataControls.Insert(index + 1, score);
+            scoreDataControls.Insert(index + 1, scoreDataControl);
             this.score.getSubScores().RemoveAt(index);
-            this.score.getSubScores().Insert(index + 1, score.getContent() as Completable.Score);
+            this.score.getSubScores().Insert(index + 1, scoreDataControl.getContent() as Completable.Score);
             return true;
         }
 
         public override bool moveElementUp(DataControl dataControl)
         {
+            var scoreDataControl = dataControl as ScoreDataControl;
             // Continue only if dataControl is a Milestone
-            if (!(dataControl is ScoreDataControl))
+            if (scoreDataControl == null)
+            {
                 return false;
+            }
 
             // Continue only if the dataControl belongs to my set
-            var score = dataControl as ScoreDataControl;
-            if (!scoreDataControls.Contains(score))
+            if (!scoreDataControls.Contains(scoreDataControl))
+            {
                 return false;
+            }
 
             // Continue only if its not the last one
-            var index = scoreDataControls.IndexOf(score);
+            var index = scoreDataControls.IndexOf(scoreDataControl);
             if (index == 0)
+            {
                 return false;
+            }
 
             scoreDataControls.RemoveAt(index);
-            scoreDataControls.Insert(index - 1, score);
+            scoreDataControls.Insert(index - 1, scoreDataControl);
             this.score.getSubScores().RemoveAt(index);
-            this.score.getSubScores().Insert(index - 1, score.getContent() as Completable.Score);
+            this.score.getSubScores().Insert(index - 1, scoreDataControl.getContent() as Completable.Score);
             return true;
         }
 
@@ -366,10 +383,14 @@ namespace uAdventure.Editor{
         public override void replaceIdentifierReferences(string oldId, string newId)
         {
             if (oldId.Equals(score.getId()))
+            {
                 score.setId(newId);
+            }
 
             foreach (var s in scoreDataControls)
+            {
                 s.replaceIdentifierReferences(oldId, newId);
+            }
         }
 
         public override void updateVarFlagSummary(VarFlagSummary varFlagSummary)
@@ -397,18 +418,22 @@ namespace uAdventure.Editor{
 
         public void setMethod(Completable.Score.ScoreMethod scoreMethod)
         {
-            if(getMethod() != scoreMethod)
+            if (getMethod() == scoreMethod)
             {
-                if (scoreMethod != Completable.Score.ScoreMethod.SINGLE)
-                    score.setId("");
-                else
-                {
-                    score.setSubScores(new List<Completable.Score>());
-                    scoreDataControls.Clear();
-                }
-
-                Controller.Instance.AddTool(ChangeEnumValueTool.Create(score, scoreMethod, "getMethod", "setMethod"));
+                return;
             }
+
+            if (scoreMethod != Completable.Score.ScoreMethod.SINGLE)
+            {
+                score.setId("");
+            }
+            else
+            {
+                score.setSubScores(new List<Completable.Score>());
+                scoreDataControls.Clear();
+            }
+
+            Controller.Instance.AddTool(ChangeEnumValueTool.Create(score, scoreMethod, "getMethod", "setMethod"));
         }
 
         public Completable.Score.ScoreMethod getMethod()
