@@ -35,8 +35,6 @@ namespace uAdventure.Core
         public RandomEffect(int probability) : base()
         {
             this.probability = probability;
-            positiveEffect = new SpeakPlayerEffect("");
-            negativeEffect = new SpeakPlayerEffect("");
         }
 
         /**

@@ -123,8 +123,14 @@ namespace uAdventure.Core
 
 						Effects randomEffectList = DOMParserUtility.DOMParse<Effects> (effect, parameters);
 
-                        randomEffect.setPositiveEffect(randomEffectList.getEffects()[0]);
-                        randomEffect.setNegativeEffect(randomEffectList.getEffects()[1]);
+                        if (randomEffectList.Count > 0)
+                        {
+                            randomEffect.setPositiveEffect(randomEffectList.getEffects()[0]);
+                            if (randomEffectList.Count > 1)
+                            {
+                                randomEffect.setNegativeEffect(randomEffectList.getEffects()[1]);
+                            }
+                        }
 
                         currentEffect = randomEffect;
                         break;

@@ -1,13 +1,17 @@
 ﻿using System;
+using JetBrains.Annotations;
 using UnityEngine;
 using UnityEditor;
 
 using uAdventure.Core;
+using uAdventure.Geo;
 
 namespace uAdventure.Editor
 {
     public class RandomEffectEditor : EffectEditor
     {
+        private readonly Texture2D addTexture, removeTexture;
+
         private bool collapsed = false;
         public bool Collapsed { get { return collapsed; } set { collapsed = value; } }
         private Rect window = new Rect(0, 0, 300, 0);
@@ -30,11 +34,61 @@ namespace uAdventure.Editor
         public RandomEffectEditor()
         {
             this.effect = new RandomEffect();
+
+            removeTexture = Resources.Load<Texture2D>("EAdventureData/img/icons/deleteContent");
+            addTexture = Resources.Load<Texture2D>("EAdventureData/img/icons/addNode");
         }
 
         public void draw()
         {
             EditorGUILayout.HelpBox(TC.get("RandomEffect.Description"), MessageType.Info);
+            EditorGUI.BeginChangeCheck();
+            var newProbability = EditorGUILayout.IntSlider("RandomEffect.Probability.Description".Traslate(),
+                        effect.getProbability(), 0, 100);
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                effect.setProbability(newProbability);
+            }
+
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                GUILayout.Label("RandomEffect.Positive.Title".Traslate());
+                if (GUILayout.Button(effect.getPositiveEffect() == null ? addTexture : removeTexture, GUILayout.Width(20)))
+                {
+                    if (effect.getPositiveEffect() == null)
+                    {
+                        EffectEditorWindow.CreateEffect(newEffect =>
+                        {
+                            effect.setPositiveEffect(newEffect);
+                        });
+                    }
+                    else
+                    {
+                        effect.setPositiveEffect(null);
+                        effect.setNegativeEffect(null);
+                    }
+                }
+            }
+
+            using (new EditorGUI.DisabledScope(effect.getPositiveEffect() == null))
+            {
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    GUILayout.Label("RandomEffect.Negative.Title".Traslate());
+                    if (GUILayout.Button(effect.getNegativeEffect() == null ? addTexture : removeTexture, GUILayout.Width(20)))
+                    {
+                        if (effect.getNegativeEffect() == null)
+                        {
+                            EffectEditorWindow.CreateEffect(effect.setNegativeEffect);
+                        }
+                        else
+                        {
+                            effect.setNegativeEffect(null);
+                        }
+                    }
+                }
+            }
         }
 
         public IEffect Effect { get { return effect; } set { effect = value as RandomEffect; } }

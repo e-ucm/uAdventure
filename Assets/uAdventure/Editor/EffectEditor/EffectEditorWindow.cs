@@ -3,6 +3,7 @@ using UnityEditor;
 using System.Collections.Generic;
 using System.Linq;
 using uAdventure.Core;
+using uAdventure.Geo;
 
 namespace uAdventure.Editor
 {
@@ -35,13 +36,28 @@ namespace uAdventure.Editor
         protected override IEffect[] ChildsFor(Effects Content, IEffect parent)
         {
             var randomParent = parent as RandomEffect;
-            if (randomParent != null)
+            if (randomParent != null && randomParent.getPositiveEffect() != null)
             {
-                return new IEffect[2] { randomParent.getPositiveEffect(), randomParent.getNegativeEffect() };
+                if (randomParent.getNegativeEffect() == null)
+                {
+                    var parentIndex = Content.FindIndex(n => IsPartOf(n, parent));
+                    if (parentIndex == Content.Count - 1)
+                    {
+                        return new IEffect[1] { randomParent.getPositiveEffect() };
+                    }
+                    else
+                    {
+                        return new IEffect[2] { randomParent.getPositiveEffect(), Content[parentIndex + 1] };
+                    }
+                }
+                else
+                {
+                    return new IEffect[2] { randomParent.getPositiveEffect(), randomParent.getNegativeEffect() };
+                }
             }
             else
             {
-                var index = Content.FindIndex(n => IsPartOf(n, parent));
+                var index = Content.FindIndex(node => IsPartOf(node, parent));
                 return index == Content.Count - 1 ? new IEffect[0] : new IEffect[1] { Content[index + 1] };
             }
         }
@@ -57,7 +73,7 @@ namespace uAdventure.Editor
             return randomParent != null && (IsPartOf(randomParent.getPositiveEffect(), child) || IsPartOf(randomParent.getNegativeEffect(), child));
         }
 
-        private static bool IsInsideOf(IEffect effectParent, IEffect node)
+        private static bool IsDirectlyInsideOf(IEffect effectParent, IEffect node)
         {
             var randomParent = effectParent as RandomEffect;
             return randomParent != null && (randomParent.getNegativeEffect() == node || randomParent.getPositiveEffect() == node);
@@ -73,7 +89,7 @@ namespace uAdventure.Editor
             else if (index > 0)
             {
                 var parent = content[index - 1];
-                while (parent is RandomEffect)
+                while (parent is RandomEffect && (parent as RandomEffect).getPositiveEffect() != null)
                 {
                     parent = (parent as RandomEffect).getPositiveEffect();
                 }
@@ -83,16 +99,37 @@ namespace uAdventure.Editor
             else
             {
                 var allNodes = GetNodes(content);
-                return allNodes.First(parent => IsInsideOf(parent, child));
+                return allNodes.First(parent => IsDirectlyInsideOf(parent, child));
             }
         }
 
         protected override void DeleteNode(Effects content, IEffect node)
         {
-            content.Remove(node);
-            if (Selection.Contains(node))
+            var index = content.IndexOf(node);
+            if (index == -1)
             {
-                Selection.Remove(node);
+                var randomEffect = GetParentNode(content, node) as RandomEffect;
+                if (randomEffect != null)
+                {
+                    if (randomEffect.getPositiveEffect() == node)
+                    {
+                        randomEffect.setPositiveEffect(null);
+                        randomEffect.setNegativeEffect(null);
+                    }
+                    else if (randomEffect.getNegativeEffect() == node)
+                    {
+                        randomEffect.setNegativeEffect(null);
+                    }
+                }
+            }
+            else
+            {
+
+                content.Remove(node);
+                if (Selection.Contains(node))
+                {
+                    Selection.Remove(node);
+                }
             }
         }
 
@@ -143,8 +180,14 @@ namespace uAdventure.Editor
             }
 
             var nodes = new List<IEffect> { node };
-            nodes.AddRange(GetAllNodesIn(randomNode.getPositiveEffect()));
-            nodes.AddRange(GetAllNodesIn(randomNode.getNegativeEffect()));
+            if (randomNode.getPositiveEffect() != null)
+            {
+                nodes.AddRange(GetAllNodesIn(randomNode.getPositiveEffect()));
+                if(randomNode.getNegativeEffect() != null)
+                {
+                    nodes.AddRange(GetAllNodesIn(randomNode.getNegativeEffect()));
+                }
+            }
 
             return nodes.ToArray();
         }
@@ -345,6 +388,7 @@ namespace uAdventure.Editor
 
         public Vector2 scrollPosition = Vector2.zero;
         private GUIContent addButton;
+        protected static EffectEditorWindow current;
 
         public void Init(Effects e)
         {
@@ -370,6 +414,8 @@ namespace uAdventure.Editor
 
         protected void OnGUI()
         {
+            current = this;
+
             if (effects == null) {
                 Close(); 
 				DestroyImmediate (this);
@@ -398,21 +444,34 @@ namespace uAdventure.Editor
             
             if (GUI.Button(buttonRect, addButton))
             {
-                var names = EffectEditorFactory.Intance.CurrentEffectEditors;
-                if (names.Length > 0)
+                CreateEffect((effect) =>
                 {
-                    Controller.Instance.ShowInputDialog(TC.get("Effects.SelectEffectType"), TC.get("Effects.SelectEffectType"),
-                       EffectEditorFactory.Intance.CurrentEffectEditors, (sender, selected) =>
-                       {
-                           effects.Add(EffectEditorFactory.Intance.createEffectEditorFor(selected).Effect);
-                           Repaint();
-                       });
-                }
-                else
-                {
-                    EditorUtility.DisplayDialog("Cant create", "No effects available!", "Ok");
-                }
+                    effects.Add(effect);
+                    Repaint();
+                });
+            }
 
+            current = null;
+        }
+
+        public static void CreateEffect(System.Action<IEffect> action)
+        {
+            var names = EffectEditorFactory.Intance.CurrentEffectEditors;
+            if (names.Length > 0)
+            {
+                Controller.Instance.ShowInputDialog(TC.get("Effects.SelectEffectType"), TC.get("Effects.SelectEffectType"),
+                    EffectEditorFactory.Intance.CurrentEffectEditors, (sender, selected) =>
+                    {
+                        action(EffectEditorFactory.Intance.createEffectEditorFor(selected).Effect);
+                        if (current != null)
+                        {
+                            current.Repaint();
+                        }
+                    });
+            }
+            else
+            {
+                EditorUtility.DisplayDialog("Cant create", "No effects available!", "Ok");
             }
         }
     }

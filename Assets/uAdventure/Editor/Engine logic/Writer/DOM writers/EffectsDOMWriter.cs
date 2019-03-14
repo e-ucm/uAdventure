@@ -93,29 +93,8 @@ namespace uAdventure.Editor
                 }
                 else
                 {
-                    if (effect.getType() != EffectType.RANDOM_EFFECT)
-                        effectElement = buildEffectNode(effect, doc);
-                    else
-                    {
-                        RandomEffect randomEffect = (RandomEffect)effect;
-                        effectElement = doc.CreateElement("random-effect");
-                        effectElement.SetAttribute("probability", randomEffect.getProbability().ToString());
-
-                        XmlElement posEfElement = null;
-                        XmlElement negEfElement = null;
-
-                        if (randomEffect.getPositiveEffect() != null)
-                        {
-                            posEfElement = buildEffectNode(randomEffect.getPositiveEffect(), doc);
-                            effectElement.AppendChild(posEfElement);
-                            if (randomEffect.getNegativeEffect() != null)
-                            {
-                                negEfElement = buildEffectNode(randomEffect.getNegativeEffect(), doc);
-                                effectElement.AppendChild(negEfElement);
-                            }
-                        }
-                    }
                     // Add the effect
+                    effectElement = buildEffectNode(effect, doc);
                     effectsNode.AppendChild(effectElement);
                 }
 
@@ -302,6 +281,25 @@ namespace uAdventure.Editor
                             effectElement.SetAttribute("type", "none");
                             break;
                     }
+                    break;
+                case EffectType.RANDOM_EFFECT:
+                    var randomEffect = (RandomEffect)effect;
+                    effectElement = doc.CreateElement("random-effect");
+                    effectElement.SetAttribute("probability", randomEffect.getProbability().ToString());
+
+                    var subEffects = new Effects();
+                    
+                    if (randomEffect.getPositiveEffect() != null)
+                    {
+                        subEffects.Add(randomEffect.getPositiveEffect());
+                        if (randomEffect.getNegativeEffect() != null)
+                        {
+                            subEffects.Add(randomEffect.getNegativeEffect());
+                        }
+                    }
+
+                    appendEffects(doc, effectElement, subEffects);
+
                     break;
 
             }
