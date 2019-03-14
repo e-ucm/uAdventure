@@ -52,6 +52,9 @@ namespace uAdventure.Core
          *            Root node (start) of the conversation
          */
 
+        //Activator purposes with ITypeGroupable
+        private Conversation() { }
+
         protected Conversation(int conversationType, string conversationId, ConversationNode root)
         {
 

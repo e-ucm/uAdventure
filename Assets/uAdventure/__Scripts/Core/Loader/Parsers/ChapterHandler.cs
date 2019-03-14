@@ -83,7 +83,7 @@ namespace uAdventure.Core
                 if (parsed != null)
                 {
                     var t = parsed.GetType();
-                    // Gropu elements that are ITypeGroupable
+                    // Group elements that are ITypeGroupable
                     if (parsed is ITypeGroupable)
                     {
                         t = (parsed as ITypeGroupable).GetGroupType();

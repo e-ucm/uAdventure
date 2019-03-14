@@ -1,6 +1,5 @@
 ﻿using System;
-using UnityEngine;
-using System.Collections;
+using Random = UnityEngine.Random;
 
 namespace uAdventure.Core
 {
@@ -19,6 +18,11 @@ namespace uAdventure.Core
          * Set if the video can be skipped 
          */
         public bool canSkip = false;
+
+        protected Videoscene() : base(GeneralSceneSceneType.VIDEOSCENE, "VideoScene"+Random.Range(100000, 999999))
+        {
+
+        }
 
         /**
          * Creates a new Videoscene

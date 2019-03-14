@@ -4,6 +4,7 @@ using UnityEditor;
 
 using uAdventure.Core;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace uAdventure.Editor
 {
@@ -47,6 +48,8 @@ namespace uAdventure.Editor
         public virtual void draw()
         {
             scenes = Controller.Instance.IdentifierSummary.getIds<IChapterTarget>();
+            scenes = scenes.Except(Controller.Instance.IdentifierSummary.getIds<Cutscene>()).ToArray();
+
             EditorGUI.BeginChangeCheck();
             var sceneIndex = EditorGUILayout.Popup(TC.get("Element.Name2"), Array.IndexOf(scenes, effect.getTargetId()), scenes);
             if (EditorGUI.EndChangeCheck())

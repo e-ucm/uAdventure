@@ -21,6 +21,11 @@ namespace uAdventure.Core
          */
         // public const string RESOURCE_TYPE_MUSIC = "bgmusic";
 
+
+        protected Slidescene() : base(GeneralSceneSceneType.SLIDESCENE, "Slidescene" + UnityEngine.Random.Range(100000, 999999))
+        {
+
+        }
         /**
          * Creates a new Slidescene
          * 

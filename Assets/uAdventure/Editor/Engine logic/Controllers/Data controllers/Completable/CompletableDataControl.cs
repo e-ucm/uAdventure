@@ -59,7 +59,7 @@ namespace uAdventure.Editor
             switch (milestone.getType())
             {
                 case Completable.Milestone.MilestoneType.SCENE:
-                    valid &= controller.IdentifierSummary.getIds<Scene>().Contains(milestone.getTargetId());
+                    valid &= controller.IdentifierSummary.getIds<IChapterTarget>().Contains(milestone.getTargetId());
                     break;
                 case Completable.Milestone.MilestoneType.CHARACTER:
                     valid &= controller.IdentifierSummary.getIds<NPC>().Contains(milestone.getTargetId());

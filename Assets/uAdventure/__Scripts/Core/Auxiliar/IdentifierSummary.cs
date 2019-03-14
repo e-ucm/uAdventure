@@ -15,6 +15,7 @@ namespace uAdventure.Core
 
 		private Dictionary<string, System.Type> globalIdentifiers;
 		private Dictionary<System.Type, List<string>> typeGroups;
+        private Dictionary<System.Type, List<string>> pureTypeGroups;
 
         /**
          * List of all assessment profile identifiers in the script and its associated assessment rules. 
@@ -37,8 +38,9 @@ namespace uAdventure.Core
             // Create the lists
 			globalIdentifiers = new Dictionary<string, System.Type>();
 			typeGroups = new Dictionary<System.Type, List<string>>();
+            pureTypeGroups = new Dictionary<System.Type, List<string>>();
 
-			assessmentIdentifiers = new Dictionary<string, List<string>> ();
+            assessmentIdentifiers = new Dictionary<string, List<string>> ();
 			adaptationIdentifiers = new Dictionary<string, List<string>> ();
 
             // Fill all the lists
@@ -127,24 +129,43 @@ namespace uAdventure.Core
 
         public void addId(System.Type t, string id){
 			if(!globalIdentifiers.ContainsKey (id))
-				globalIdentifiers.Add(id, t);
+            {
+                globalIdentifiers.Add(id, t);
+            }
+            
+            foreach (var i in t.GetInterfaces())
+            {
+                if (!typeGroups.ContainsKey(i))
+                {
+                    typeGroups.Add(i, new List<string>());
+                }
 
-			if (!typeGroups.ContainsKey (t))
-				typeGroups.Add (t, new List<string> ());
+                if (!typeGroups[i].Contains(id))
+                {
+                    typeGroups[i].Add(id);
+                }
+            }
+
+            if (!pureTypeGroups.ContainsKey(t))
+            {
+                pureTypeGroups.Add(t, new List<string>());
+            }
+
+            if (!pureTypeGroups[t].Contains(id))
+            {
+                pureTypeGroups[t].Add(id);
+            }
+
+            t = getGroupType(t);
+
+            if (!typeGroups.ContainsKey (t))
+            {
+                typeGroups.Add(t, new List<string>());
+            }
 
 			if (!typeGroups [t].Contains (id))
-				typeGroups [t].Add (id);
-
-            foreach (var i in t.GetInterfaces())
-                if (typeGroups.ContainsKey(i))
-                    typeGroups.Remove(i);
-
-            
-            foreach (var kv in typeGroups)
             {
-                if (t.IsSubclassOf(kv.Key))
-                    if (!typeGroups[kv.Key].Contains(id))
-                        typeGroups[kv.Key].Add(id);
+                typeGroups[t].Add(id);
             }
         }
 
@@ -155,193 +176,87 @@ namespace uAdventure.Core
         public string[] getIds(Type t)
         {
             if (typeGroups.ContainsKey(t))
-                return typeGroups[t].ToArray();
-
-            if (t.IsInterface)
             {
-                var allInterfaceIds = new List<string>();
-                foreach(var kv in typeGroups)
-                {
-                    if (t.IsAssignableFrom(kv.Key))
-                        allInterfaceIds.AddRange(kv.Value);
-                }
-                typeGroups[t] = allInterfaceIds;
+                return typeGroups[t].ToArray();
             }
             else
             {
-                var allTypeIds = new List<string>();
-                foreach (var kv in typeGroups)
-                {
-                    if (kv.Key.IsSubclassOf(t))
-                        allTypeIds.AddRange(kv.Value);
-                }
-                typeGroups[t] = allTypeIds;
+                return new string[0];
             }
-
-            return new string[0];
         }
 
-        public string[] getIds<T>(){
+        public string[] getIds<T>()
+        {
 			return getIds(typeof(T));
 		}
+
+        public string[] getPureIds(Type t)
+        {
+            if (pureTypeGroups.ContainsKey(t))
+            {
+                return pureTypeGroups[t].ToArray();
+            }
+            else
+            {
+                return new string[0];
+            }
+        }
+
+        public string[] getPureIds<T>()
+        {
+            return getPureIds(typeof(T));
+        }
 
 		public void deleteId<T>(string id){
 			if (globalIdentifiers.ContainsKey(id))
             {
                 globalIdentifiers.Remove(id);
                 var t = typeof(T);
-                if (typeGroups.ContainsKey(t) && typeGroups[t].Contains(id))
-                    typeGroups[t].Remove(id);
+
                 if (t.IsInterface)
                 {
                     foreach (var kv in typeGroups)
+                    {
                         if (t.IsAssignableFrom(kv.Key) && kv.Value.Contains(id))
+                        {
                             kv.Value.Remove(id);
+                        }
+                    }
                 }
-                else
+
+                t = getGroupType(t);
+                
+                if (pureTypeGroups.ContainsKey(t) && pureTypeGroups[t].Contains(id))
                 {
-                    foreach (var kv in typeGroups)
-                        if ((t.IsSubclassOf(kv.Key) || kv.Key.IsSubclassOf(t)) && kv.Value.Contains(id))
-                            kv.Value.Remove(id);
+                    pureTypeGroups[t].Remove(id);
+                }
+                
+                if (typeGroups.ContainsKey(t) && typeGroups[t].Contains(id))
+                {
+                    typeGroups[t].Remove(id);
                 }
             }
 		}
 
-        /**
-         * Returns whether the given identifier is a scene or not.
-         * 
-         * @param sceneId
-         *            Scene identifier
-         * @return True if the identifier belongs to a scene, false otherwise
-         */
-		[Obsolete("Use isType<T> instead")]
-        public bool isScene(string sceneId)
+        private Type getGroupType(Type t)
         {
-			return isType<Scene>(sceneId);
-        }
+            if (typeof(ITypeGroupable).IsAssignableFrom(t))
+            {
+                try
+                {
+                    var typeGroupable = Activator.CreateInstance(t, true) as ITypeGroupable;
+                    if (typeGroupable != null)
+                    {
+                        t = typeGroupable.GetGroupType();
+                    }
+                }
+                catch
+                {
+                    Debug.LogError("Cannot get groupable type for \"" + t.ToString() + "\": ITypeGroupables must have a default constructor.");
+                }
+            }
 
-        /**
-         * Returns whether the given identifier is a conversation or not.
-         * 
-         * @param sceneId
-         *            Scene identifier
-         * @return True if the identifier belongs to a scene, false otherwise
-         */
-		[Obsolete("Use isType<T> instead")]
-        public bool isConversation(string convId)
-		{
-			return isType<Conversation>(convId);
-        }
-
-        /**
-         * Returns an array of scene identifiers.
-         * 
-         * @return Array of scene identifiers
-         */
-		[Obsolete("Use getIds<T> instead")]
-        public string[] getSceneIds()
-        {
-			return getIds<Scene> ();
-        }
-
-        /**
-         * Returns an array of cutscene identifiers.
-         * 
-         * @return Array of cutscene identifiers
-         */
-		[Obsolete("Use getIds<T> instead")]
-        public string[] getCutsceneIds()
-		{
-			return groupIds<Cutscene> ();
-        }
-
-        /**
-         * Returns all scenes ids (scenes and cutsecene)
-         * 
-         * @return Array of cutscene plus scene identifiers
-         */
-        public string[] getAllSceneIds()
-        {
-			List<string> allScenes = new List<string>(getIds<Cutscene> ());
-			allScenes.AddRange(new List<string>(getIds<Scene>()));
-            return allScenes.ToArray();
-        }
-
-        /**
-         * Returns an array of book identifiers.
-         * 
-         * @return Array of book identifiers
-         */
-		[Obsolete("Use getIds<T> instead")]
-        public string[] getBookIds()
-		{
-			return getIds<Book> ();
-        }
-
-        /**
-         * Returns an array of item identifiers.
-         * 
-         * @return Array of item identifiers
-         */
-		[Obsolete("Use getIds<T> instead")]
-        public string[] getItemIds()
-		{
-			return getIds<Item> ();
-        }
-
-        /**
-         * Returns an array of atrezzo item identifiers.
-         * 
-         * @return Array of atrezzo item identifiers
-         */
-		[Obsolete("Use getIds<T> instead")]
-        public string[] getAtrezzoIds()
-		{
-			return getIds<Atrezzo> ();
-        }
-
-        /**
-         * Returns an array of NPC identifiers.
-         * 
-         * @return Array of NPC identifiers
-         */
-		[Obsolete("Use getIds<T> instead")]
-        public string[] getNPCIds()
-		{
-			return getIds<NPC> ();
-        }
-
-        /**
-         * Returns an array of conversation identifiers.
-         * 
-         * @return Array of conversation identifiers
-         */
-		[Obsolete("Use getIds<T> instead")]
-        public string[] getConversationsIds()
-		{
-			return getIds<Conversation> ();
-        }
-
-        /**
-         * Returns an array of global state identifiers.
-         * 
-         * @return Array of global state identifiers
-         */
-		[Obsolete("Use getIds<T> instead")]
-        public string[] getGlobalStatesIds()
-		{
-			return getIds<GlobalState> ();
-        }
-
-        /**
-         * Returns an array of macro identifiers.
-         * 
-         * @return Array of macro identifiers
-         */
-		[Obsolete("Use getIds<T> instead")]
-        public string[] getMacroIds()
-		{
-			return getIds<Macro> ();
+            return t;
         }
 
         /**
@@ -370,131 +285,6 @@ namespace uAdventure.Core
                 }
             }
             return globalStateIds.ToArray();
-        }
-
-        /**
-         * Returns an array of macro identifiers.
-         * 
-         * @return Array of macro identifiers
-         */
-        public string[] getMacroIds(string exception)
-        {
-
-            List<string> macroIds = new List<string>();
-			foreach (string id in getIds<Macro> ())
-            {
-                if (!id.Equals(exception))
-                    macroIds.Add(id);
-            }
-            return macroIds.ToArray();
-        }
-
-        /**
-         * Adds a new scene id.
-         * 
-         * @param sceneId
-         *            New scene id
-         */
-		[Obsolete("Use addId<T> instead")]
-        public void addSceneId(string sceneId)
-        {
-			addId<Scene> (sceneId);
-        }
-
-        /**
-         * Adds a new cutscene id.
-         * 
-         * @param cutsceneId
-         *            New cutscene id
-         */
-		[Obsolete("Use addId<T> instead")]
-        public void addCutsceneId(string cutsceneId)
-		{
-			addId<Cutscene> (cutsceneId);
-        }
-
-        /**
-         * Adds a new book id.
-         * 
-         * @param bookId
-         *            New book id
-         */
-		[Obsolete("Use addId<T> instead")]
-        public void addBookId(string bookId)
-		{
-			addId<Book> (bookId);
-        }
-
-        /**
-         * Adds a new item id.
-         * 
-         * @param itemId
-         *            New item id
-         */
-		[Obsolete("Use addId<T> instead")]
-        public void addItemId(string itemId)
-		{
-			addId<Item> (itemId);
-        }
-
-        /**
-         * Adds a new atrezzo item id.
-         * 
-         * @param atrezzoId
-         *            New atrezzo item id
-         */
-		[Obsolete("Use addId<T> instead")]
-        public void addAtrezzoId(string atrezzoId)
-		{
-			addId<Atrezzo> (atrezzoId);
-        }
-
-        /**
-         * Adds a new NPC id.
-         * 
-         * @param npcId
-         *            New NPC id
-         */
-		[Obsolete("Use addId<T> instead")]
-        public void addNPCId(string npcId)
-		{
-			addId<NPC> (npcId);
-        }
-
-        /**
-         * Adds a new conversation id.
-         * 
-         * @param conversationId
-         *            New conversation id
-         */
-		[Obsolete("Use addId<T> instead")]
-        public void addConversationId(string conversationId)
-		{
-			addId<Conversation> (conversationId);
-        }
-
-        /**
-         * Adds a new global state id.
-         * 
-         * @param globalStateId
-         *            New conversation id
-         */
-		[Obsolete("Use addId<T> instead")]
-        public void addGlobalStateId(string globalStateId)
-		{
-			addId<GlobalState> (globalStateId);
-        }
-
-        /**
-         * Adds a new macro id.
-         * 
-         * @param macroId
-         *            New macro id
-         */
-		[Obsolete("Use addId<T> instead")]
-        public void addMacroId(string macroId)
-		{
-			addId<Macro> (macroId);
         }
 
         /**
@@ -550,114 +340,6 @@ namespace uAdventure.Core
         {
 			addId<AdaptationProfile> (adaptProfileId);
             this.adaptationIdentifiers.Add(adaptProfileId, new List<string>());
-        }
-
-        /**
-         * Deletes a new scene id.
-         * 
-         * @param sceneId
-         *            Scene id to be deleted
-         */
-		[Obsolete("Use deleteId<T> instead")]
-        public void deleteSceneId(string sceneId)
-        {
-			deleteId<Scene> (sceneId);
-        }
-
-        /**
-         * Deletes a new cutscene id.
-         * 
-         * @param cutsceneId
-         *            Cutscene id to be deleted
-         */
-		[Obsolete("Use deleteId<T> instead")]
-        public void deleteCutsceneId(string cutsceneId)
-		{
-			deleteId<Cutscene> (cutsceneId);
-        }
-
-        /**
-         * Deletes a new book id.
-         * 
-         * @param bookId
-         *            Book id to be deleted
-         */
-		[Obsolete("Use deleteId<T> instead")]
-        public void deleteBookId(string bookId)
-		{
-			deleteId<Book> (bookId);
-        }
-
-        /**
-         * Deletes a new item id.
-         * 
-         * @param itemId
-         *            Item id to be deleted
-         */
-		[Obsolete("Use deleteId<T> instead")]
-        public void deleteItemId(string itemId)
-		{
-			deleteId<Item> (itemId);
-        }
-
-        /**
-         * Deletes a new atrezzo item id.
-         * 
-         * @param atrezzoId
-         *            atrezzo item id to be deleted
-         */
-		[Obsolete("Use deleteId<T> instead")]
-        public void deleteAtrezzoId(string atrezzoId)
-		{
-			deleteId<Atrezzo> (atrezzoId);
-        }
-
-        /**
-         * Deletes a new NPC id.
-         * 
-         * @param npcId
-         *            NPC id to be deleted
-         */
-		[Obsolete("Use deleteId<T> instead")]
-        public void deleteNPCId(string npcId)
-		{
-			deleteId<NPC> (npcId);
-        }
-
-        /**
-         * Deletes a new conversation id.
-         * 
-         * @param conversationId
-         *            Conversation id to be deleted
-         */
-		[Obsolete("Use deleteId<T> instead")]
-        public void deleteConversationId(string conversationId)
-		{
-			deleteId<Conversation> (conversationId);
-        }
-
-        /**
-         * Deletes a new conversation id.
-         * 
-         * @param globalStateId
-         *            Conversation id to be deleted
-         */
-		[Obsolete("Use deleteId<T> instead")]
-        public void deleteGlobalStateId(string globalStateId)
-		{
-			deleteId<GlobalState> (globalStateId);
-        }
-
-        /**
-         * Deletes a macro id.
-         * 
-         * @param macroId
-         *            Macro id to be deleted
-         */
-		[Obsolete("Use deleteId<T> instead")]
-        public void deleteMacroId(string macroId)
-		{
-			deleteId<Macro> (macroId);
         }
 
         /**
