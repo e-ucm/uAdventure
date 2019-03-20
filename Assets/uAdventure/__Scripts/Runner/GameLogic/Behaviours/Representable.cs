@@ -178,7 +178,6 @@ namespace uAdventure.Runner
         {
             rend = this.GetComponent<Renderer>();
             checkResources();
-            Orientation = Orientation.S;
         }
 
         protected void checkResources()
