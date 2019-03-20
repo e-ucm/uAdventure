@@ -157,39 +157,43 @@ namespace uAdventure.Core
 
         public virtual object Clone()
         {
-            Conversation c = (Conversation)this.MemberwiseClone();
-            c.conversationId = (conversationId != null ? conversationId : null);
+            var c = (Conversation)this.MemberwiseClone();
+            c.conversationId = conversationId;
             c.conversationType = conversationType;
 
-            Dictionary<ConversationNode, ConversationNode> clonedNodes =
-                new Dictionary<ConversationNode, ConversationNode>();
+            if (root == null)
+            {
+                c.root = null;
+                return c;
+            }
 
-            c.root = (root != null ? (ConversationNode)root.Clone() : null);
+            c.root = (ConversationNode)root.Clone();
 
-            clonedNodes.Add(root, c.root);
-            List<ConversationNode> nodes = new List<ConversationNode>();
-            List<ConversationNode> visited = new List<ConversationNode>();
-            nodes.Add(root);
+            var clonedNodes = new Dictionary<ConversationNode, ConversationNode> {{root, c.root}};
+            var nodes = new Queue<ConversationNode>();
+            nodes.Enqueue(root);
 
             while (nodes.Count > 0)
             {
-                ConversationNode temp = nodes[0];
-                ConversationNode cloned = clonedNodes[temp];
-                nodes.RemoveAt(0);
-                visited.Add(temp);
+                var original = nodes.Dequeue();
+                var clone = clonedNodes[original];
 
-                for (int i = 0; i < temp.getChildCount(); i++)
+                for (var i = 0; i < original.getChildCount(); i++)
                 {
-                    ConversationNode tempCloned = clonedNodes[temp.getChild(i)];
-                    if (tempCloned == null)
+                    var child = original.getChild(i);
+                    // If the child has not been cloned yet
+                    if (child != null && !clonedNodes.ContainsKey(child))
                     {
-                        tempCloned = (ConversationNode)temp.getChild(i).Clone();
-                        clonedNodes.Add(temp.getChild(i), tempCloned);
+                        // We must create the clone
+                        var clonedChild = (ConversationNode)child.Clone();
+                        clonedNodes.Add(child, clonedChild);
+                        
+                        // And we must clone its children in next iterations
+                        nodes.Enqueue(child);
                     }
-                    cloned.addChild(tempCloned);
 
-                    if (!visited.Contains(temp.getChild(i)) && !nodes.Contains(temp.getChild(i)))
-                        nodes.Add(temp.getChild(i));
+                    // And then we add the child to the current node
+                    clone.addChild(child != null ? clonedNodes[child] : null);
                 }
             }
             return c;
@@ -199,44 +203,5 @@ namespace uAdventure.Core
         {
             return typeof(Conversation);
         }
-
-        /*
-    @Override
-    public Object clone() throws CloneNotSupportedException
-    {
-
-       Conversation c = (Conversation) super.clone( );
-       c.conversationId = ( conversationId != null ? new string(conversationId ) : null );
-       c.conversationType = conversationType;
-
-       HashMap<ConversationNode, ConversationNode> clonedNodes = new HashMap<ConversationNode, ConversationNode>();
-
-    c.root = ( root != null ? (ConversationNode) root.clone( ) : null );
-
-       clonedNodes.put( root, c.root );
-       List<ConversationNode> nodes = new List<ConversationNode>();
-    List<ConversationNode> visited = new List<ConversationNode>();
-    nodes.add( root );
-
-       while( !nodes.isEmpty( ) ) {
-           ConversationNode temp = nodes.get(0);
-    ConversationNode cloned = clonedNodes.get(temp);
-    nodes.remove( 0 );
-           visited.add( temp );
-
-           for( int i = 0; i<temp.getChildCount( ); i++ ) {
-               ConversationNode tempCloned = clonedNodes.get(temp.getChild(i));
-               if( tempCloned == null ) {
-                   tempCloned = (ConversationNode) temp.getChild( i ).clone();
-    clonedNodes.put( temp.getChild( i ), tempCloned );
-               }
-    cloned.addChild( tempCloned );
-
-               if( !visited.contains( temp.getChild( i ) ) && !nodes.contains( temp.getChild( i ) ) )
-                   nodes.add( temp.getChild( i ) );
-           }
-       }
-       return c;
-    }*/
     }
 }

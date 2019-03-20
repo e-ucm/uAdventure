@@ -9,7 +9,7 @@ namespace uAdventure.Core
      * link to another node, of any kind
      */
 
-    public class DialogueConversationNode : ConversationNode, ICloneable
+    public class DialogueConversationNode : ConversationNode
     {
         /* Attributes */
 
@@ -148,20 +148,16 @@ namespace uAdventure.Core
             dialogue.RemoveAt(index);
             return tmp;
         }
-        public override object Clone()
+
+        internal override object Clone()
         {
-            DialogueConversationNode dcn = (DialogueConversationNode)base.Clone();
-            if (dialogue != null)
-            {
-                dcn.dialogue = new List<ConversationLine>();
-                foreach (ConversationLine cl in dialogue)
-                {
-                    dcn.dialogue.Add((ConversationLine)cl.Clone());
-                }
-            }
-            dcn.nextNode = (nextNode != null ? (ConversationNode) nextNode.Clone() : null);
-            dcn.keepShowing = keepShowing;
-            return dcn;
+            var clone = (DialogueConversationNode) base.Clone();
+
+            clone.dialogue = (dialogue != null) ? dialogue.ConvertAll(l => l.Clone() as ConversationLine) : null;
+            clone.nextNode = null;
+            clone.keepShowing = keepShowing;
+
+            return clone;
         }
 
         public override Conditions getLineConditions(int index)

@@ -14,7 +14,7 @@ namespace uAdventure.Core
      * linked with this kind of node
      */
 
-    public class OptionConversationNode : ConversationNode, ICloneable
+    public class OptionConversationNode : ConversationNode
     {
         /* Attributes */
 
@@ -250,21 +250,20 @@ namespace uAdventure.Core
         public float Timeout { get { return timeout; } set { timeout = value; } }
         public Conditions TimeoutConditions { get { return timeoutConditions; } set { timeoutConditions = value; } }
 
-        public override object Clone()
+        internal override object Clone()
         {
-            OptionConversationNode ocn = (OptionConversationNode)base.Clone();
+            var ocn = (OptionConversationNode) base.Clone();
+
             ocn.optionNodes = new List<ConversationNode>();
-            if (options != null)
-            {
-                ocn.options = new List<ConversationLine>();
-                foreach (ConversationLine cl in options)
-                {
-                    ocn.options.Add((ConversationLine)cl.Clone());
-                }
-            }
+            ocn.options = options != null ? options.ConvertAll(o => o.Clone() as ConversationLine) : null;
+
             ocn.random = random;
             ocn.keepShowing = keepShowing;
             ocn.showUserOption = showUserOption;
+            ocn.timeout = timeout;
+            ocn.timeoutConditions = timeoutConditions.Clone() as Conditions;
+            ocn.timerChild = null;
+
             return ocn;
         }
 

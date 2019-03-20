@@ -8,7 +8,7 @@ namespace uAdventure.Core
      * Abstract class that comprises all the possible nodes for a conversation.
      * Initially, two classes implement this interface: DialogueNode and OptionNode
      */
-    public abstract class ConversationNode : ICloneable
+    public abstract class ConversationNode 
     {
         private bool editorCollapsed;
         private int xEditor;
@@ -303,11 +303,16 @@ namespace uAdventure.Core
         public abstract Conditions getLineConditions(int index);
         public abstract ConversationLine getConversationLine(int index);
 
-        public virtual object Clone()
+        /// <summary>
+        /// This method clones the node but leaves the children empty.
+        /// This clone must be used only by Conversation, as the children are managed by it.
+        /// </summary>
+        /// <returns>A cloned node </returns>
+        internal virtual object Clone()
         {
-            ConversationNode cn = (ConversationNode)this.MemberwiseClone();
+            var cn = (ConversationNode)this.MemberwiseClone();
             cn.effectConsumed = effectConsumed;
-            cn.effects = (effects != null ? (Effects)effects.Clone() : null);
+            cn.effects = effects != null ? (Effects)effects.Clone() : null;
             return cn;
         }
     }

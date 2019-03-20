@@ -107,29 +107,12 @@ namespace uAdventure.Core
 
         public virtual object Clone()
         {
-            Effects e = (Effects)this.MemberwiseClone();
-            if (e != null)
+            var e = new Effects();
+            foreach (var ef in this)
             {
-                e.Clear();
-                //TODO: check if its working
-                foreach (AbstractEffect ef in this)
-                    e.Add((AbstractEffect)ef.Clone());
+                e.Add((IEffect) ef.Clone());
             }
             return e;
         }
-
-        /*
-    @Override
-    public Object clone() throws CloneNotSupportedException
-    {
-
-       Effects e = (Effects) super.clone( );
-       if( effects != null ) {
-           e.effects = new List<AbstractEffect>();
-           for (Effect ef : effects)
-               e.effects.add((AbstractEffect)ef.clone());
-       }
-       return e;
-    }*/
     }
 }

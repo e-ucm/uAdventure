@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 namespace uAdventure.Core
 {
@@ -141,7 +142,7 @@ namespace uAdventure.Core
      * This interface defines any individual effect that can be triggered by a
      * player's action during the game.
      */
-    public interface IEffect
+    public interface IEffect : ICloneable
     {
         /**
          * Returns the type of the effect.

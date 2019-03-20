@@ -167,8 +167,16 @@ namespace uAdventure.Runner
         // it executes the ExecuteExit effect that gives back the execution flow.
         public class ExecuteExitEffect : IEffect
         {
-            public ExitMB exitMB;
-            public ExecuteExitEffect(ExitMB exitMB) { this.exitMB = exitMB; }
+            public ExitMB ExitMb { get; set; }
+            public ExecuteExitEffect(ExitMB exitMb) { this.ExitMb = exitMb; }
+
+            public object Clone()
+            {
+                var clone = (ExecuteExitEffect) this.MemberwiseClone();
+                clone.ExitMb = ExitMb;
+                return clone;
+            }
+
             public EffectType getType() { return EffectType.CUSTOM_EFFECT; }
         }
 
@@ -188,14 +196,14 @@ namespace uAdventure.Runner
                 {
                     Game.Instance.GameState.BeginChangeAmbit();
                     targetOnExit = Game.Instance.GameState.GetChapterTarget(Game.Instance.GameState.CurrentTarget);
-                    exitEffects = toRun.exitMB.GetExitEffects(out exit);
+                    exitEffects = toRun.ExitMb.GetExitEffects(out exit);
                 }
 
                 var forceWait = exitEffects.execute();
                 if (!forceWait)
                 {
                     Game.Instance.GameState.EndChangeAmbit();
-                    toRun.exitMB.TrackExit(exit, targetOnExit);
+                    toRun.ExitMb.TrackExit(exit, targetOnExit);
                 }
                 return forceWait;
             }

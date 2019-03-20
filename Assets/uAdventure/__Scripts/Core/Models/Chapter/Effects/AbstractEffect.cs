@@ -5,12 +5,12 @@ using System.Text.RegularExpressions;
 
 namespace uAdventure.Core
 {
-    public abstract class AbstractEffect : IEffect, ICloneable
+    public abstract class AbstractEffect : IEffect
     {
 
         private Conditions conditions;
 
-        public AbstractEffect()
+        protected AbstractEffect()
         {
 
             conditions = new Conditions();
@@ -44,19 +44,10 @@ namespace uAdventure.Core
 
         public virtual object Clone()
         {
-            AbstractEffect absEf = (AbstractEffect)this.MemberwiseClone();
+            var absEf = (AbstractEffect)this.MemberwiseClone();
             absEf.conditions = (Conditions)conditions.Clone();
             return absEf;
         }
-        /*
-    @Override
-    public Object clone() throws CloneNotSupportedException
-    {
-
-       AbstractEffect absEf = (AbstractEffect) super.clone( );
-       absEf.conditions = (Conditions) conditions.clone( );
-      return absEf;
-    }*/
 
         protected virtual string ToEffectString()
         {

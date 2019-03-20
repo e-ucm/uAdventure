@@ -7,6 +7,13 @@ namespace uAdventure.Core
 {
     public class GraphConversation : Conversation, ICloneable
     {
+        protected GraphConversation() : base(Conversation.GRAPH, "GraphConversation" +
+                                                                 UnityEngine.Random.Range(100000, 999999),
+            new DialogueConversationNode())
+        {
+
+        }
+
         /**
           * Graph conversation constructor.
           * 
