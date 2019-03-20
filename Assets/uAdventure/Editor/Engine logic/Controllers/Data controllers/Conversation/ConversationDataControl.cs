@@ -569,9 +569,9 @@ namespace uAdventure.Editor
             }
         }
 
-        public virtual bool moveNodes(ConversationNodeDataControl grabbed, List<ConversationNodeDataControl> selection, Vector2Int alpha)
+        public virtual bool moveNodes(ConversationNodeDataControl grabbed, List<ConversationNodeDataControl> selection, Vector2Int delta)
         {
-            return controller.AddTool(new MoveNodesTool(this, grabbed, selection, alpha));
+            return controller.AddTool(new MoveNodesTool(this, grabbed, selection, delta));
         }
 
         private class MoveNodesTool : Tool

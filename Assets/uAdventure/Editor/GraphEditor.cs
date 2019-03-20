@@ -60,6 +60,7 @@ namespace uAdventure.Editor
 
         // Graph scroll
         private Rect scrollRect = new Rect(0, 0, 1000, 1000);
+        private static readonly Rect spaceRect = new Rect(0, 0, float.MaxValue, float.MaxValue);
         private Vector2 scroll;
 
         // Selection
@@ -509,28 +510,40 @@ namespace uAdventure.Editor
             if (Event.current.type == EventType.Layout)
             {
                 rect = GetNodeRect(Content, node);
-                rect.height = 0; // Reset the height for layouting
+                rect.height = 0; // Reset the height for layout
                 rects[node] = rect;
             }
 
             var newRect = GUILayout.Window(node.GetHashCode(), rect, NodeWindow, GetTitle(Content, node), GUILayout.MinWidth(150));
+            newRect = newRect.TrapInside(spaceRect);
             rects[node] = newRect;
-            if(Event.current.type != EventType.Layout)
+            if (Event.current.type == EventType.Layout)
             {
-                if (newRect.position != rect.position)
-                {
-                    var delta = newRect.position - rect.position;
-                    MoveNodes(Content, selection, delta);
+                return;
+            }
 
-                    foreach (var n in selection.Where(o => !o.Equals(node)))
-                    {
-                        GUILayout.Window(n.GetHashCode(), GetNodeRect(Content, n), NodeWindow, GetTitle(Content, node), GUILayout.MinWidth(150));
-                    }
-                }
-                else
+            // In case any node has been just moved
+            if (newRect.position != rect.position && selection.Contains(node))
+            {
+                var delta = newRect.position - rect.position;
+                
+                foreach (var n in selection.Where(o => !o.Equals(node)))
                 {
-                    SetNodeRect(Content, node, rects[node]);
+                    var trappedDelta = rects[n].Move(delta).TrapInside(spaceRect).position - rects[n].position;
+                    delta = delta.sqrMagnitude > trappedDelta.sqrMagnitude ? trappedDelta : delta;
                 }
+
+                MoveNodes(Content, selection, delta);
+
+                foreach (var n in selection.Where(o => !o.Equals(node)))
+                {
+                    rects[n] = GetNodeRect(Content, n);
+                    GUILayout.Window(n.GetHashCode(), rects[n], NodeWindow, GetTitle(Content, node), GUILayout.MinWidth(150));
+                }
+            }
+            else
+            {
+                SetNodeRect(Content, node, rects[node]);
             }
         }
 
