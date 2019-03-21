@@ -17,12 +17,21 @@ namespace uAdventure.Core
 
             ~SkinScope()
             {
-                Dispose();
+                Dispose(false);
             }
 
             public void Dispose()
             {
-                GUI.skin = previousSkin;
+                Dispose(true);
+                GC.SuppressFinalize(this);
+            }
+
+            protected virtual void Dispose(bool disposing)
+            {
+                if (disposing)
+                {
+                    GUI.skin = previousSkin;
+                }
             }
         }
 
