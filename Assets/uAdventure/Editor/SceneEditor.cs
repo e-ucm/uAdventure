@@ -217,6 +217,11 @@ namespace uAdventure.Editor
 
         public void Draw(Rect rect)
         {
+            if (workingScene == null)
+            {
+                return;
+            }
+
             var previousCurrent = Current;
             Current = this;
 
@@ -249,6 +254,11 @@ namespace uAdventure.Editor
 
         public void OnInspectorGUI()
         {
+            if (workingScene == null)
+            {
+                return;
+            }
+
             var previousCurrent = Current;
             Current = this;
 
@@ -325,6 +335,13 @@ namespace uAdventure.Editor
         public void RefreshSceneResources(DataControlWithResources resources)
         {
             var scene = resources as SceneDataControl;
+
+            if (scene == null)
+            {
+                foregroundPreview = null;
+                lastSelectedResources = -1;
+                return;
+            }
 
             var back = scene.getPreviewBackground();
             var fore = scene.getPreviewForeground();

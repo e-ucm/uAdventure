@@ -187,6 +187,11 @@ public class ActionsList : ScriptableObject {
             }
         };
 
+        actionsList.onRemoveCallback += (list) => 
+        {
+            customAction = null;
+        };
+
         appearances = CreateInstance<AppearanceEditor>();
 
         file = new FileChooser()

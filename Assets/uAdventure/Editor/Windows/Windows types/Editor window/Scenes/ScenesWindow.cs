@@ -159,11 +159,21 @@ namespace uAdventure.Editor
         {
             if(GameRources.GetInstance().selectedSceneIndex != s)
             {
+                var selectedScene = s >= 0 && s < dataControlList.list.Count
+                    ? dataControlList.list[s] as SceneDataControl
+                    : null;
                 foreach (var sceneEditorWindow in Childs.Values
                     .Where(w => w is SceneEditorWindow)
                     .Cast<SceneEditorWindow>())
                 {
-                    sceneEditorWindow.OnSceneSelected(dataControlList.list[s] as SceneDataControl);
+                    try
+                    {
+                        sceneEditorWindow.OnSceneSelected(selectedScene);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.LogError(ex.ToString());
+                    }
                 }
                 GameRources.GetInstance().selectedSceneIndex = s;
             }
