@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Linq;
 using UniRx;
 using System;
+using Microsoft.Msagl.Core.Layout.ProximityOverlapRemoval.ConjugateGradient;
 
 namespace uAdventure.Editor
 {
@@ -146,8 +147,7 @@ namespace uAdventure.Editor
             var hasConditions = conditions.getBlocksCount() > 0;
             if (GUI.Button(rect, hasConditions ? conditionsTex : noConditionsTex, noBackgroundSkin.button))
             {
-                ConditionEditorWindow window = (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
-                window.Init(conditions);
+                ConditionEditorWindow.ShowAtPosition(conditions, new Rect(rect.x + rect.width, rect.y, 0,0));
             }
         }
 

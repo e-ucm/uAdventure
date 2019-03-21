@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using System.Collections;
 using UnityEditor;
 using System.Collections.Generic;
@@ -10,22 +11,71 @@ namespace uAdventure.Editor
 {
     public class ConditionEditorWindow : EditorWindow
     {
-        private static ConditionEditorWindow editor;
+        public static ConditionEditorWindow s_ConditionEditor;
+        private static long s_LastClosedTime;
+
+        private ColumnList variablesAndFlagsList;
+        private VarFlagSummary varFlagSummary;
+        private string filter;
+        private Vector2 scroll;
+
+        private static Conditions lastDestroyConditions;
+
+        internal static bool ShowAtPosition(ConditionsController con, Rect buttonRect)
+        {
+            long num = DateTime.Now.Ticks / 10000L;
+            if (num >= ConditionEditorWindow.s_LastClosedTime + 50L)
+            {
+                if (Event.current != null)
+                {
+                    Event.current.Use();
+                }
+                if (lastDestroyConditions == null || con.Conditions != lastDestroyConditions)
+                {
+                    ConditionEditorWindow.s_ConditionEditor = ScriptableObject.CreateInstance<ConditionEditorWindow>();
+                }
+
+                if (ConditionEditorWindow.s_ConditionEditor.Conditions == con.Conditions)
+                {
+                    DestroyImmediate(ConditionEditorWindow.s_ConditionEditor);
+                    lastDestroyConditions = null;
+                    return false;
+                }
+                ConditionEditorWindow.s_ConditionEditor.Init(con, buttonRect);
+
+                return true;
+            }
+            return false;
+        }
+
+        void OnDestroy()
+        {
+            lastDestroyConditions = Conditions;
+        }
 
         public void Init(ConditionsController con)
         {
-            editor = EditorWindow.GetWindow<ConditionEditorWindow>();
-            editor.Conditions = con.Conditions;
+            s_ConditionEditor = EditorWindow.GetWindow<ConditionEditorWindow>();
+            s_ConditionEditor.Conditions = con.Conditions;
 
             ConditionEditorFactory.Intance.ResetInstance();
         }
 
         public void Init(Conditions con)
         {
-            editor = EditorWindow.GetWindow<ConditionEditorWindow>();
-            editor.Conditions = con;
+            s_ConditionEditor = EditorWindow.GetWindow<ConditionEditorWindow>();
+            s_ConditionEditor.Conditions = con;
 
             ConditionEditorFactory.Intance.ResetInstance();
+        }
+
+        private void Init(ConditionsController con, Rect buttonRect)
+        {
+            s_ConditionEditor.Conditions = con.Conditions;
+            buttonRect.position = GUIUtility.GUIToScreenPoint(buttonRect.position);
+            float y = 305f;
+            Vector2 windowSize = new Vector2(300f, y);
+            base.ShowAsDropDown(buttonRect, windowSize);
         }
 
         public Conditions Conditions { get; set; }
@@ -88,10 +138,14 @@ namespace uAdventure.Editor
             //##################################################################################
             //############################### CONDITION HANDLING ###############################
 			//##################################################################################
-			LayoutConditionEditor(Conditions);
+            using (var scrollView = new GUILayout.ScrollViewScope(scroll, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true)))
+            {
+                scroll = scrollView.scrollPosition;
+                LayoutConditionEditor(Conditions);
+            }
         }
 
-		public static void LayoutConditionEditor(Conditions conditions){
+        public static void LayoutConditionEditor(Conditions conditions){
 
 			InitStyles ();
 			var blocksToRemove = new List<List<Condition>>();

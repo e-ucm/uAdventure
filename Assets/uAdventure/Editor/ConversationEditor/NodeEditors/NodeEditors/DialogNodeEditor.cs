@@ -180,8 +180,7 @@ namespace uAdventure.Editor
                             var hasConditions = line.getConditions().getBlocksCount() > 0;
                             if (GUI.Button(rect, hasConditions ? conditionsTex : noConditionsTex, noBackgroundSkin.button))
                             {
-                                ConditionEditorWindow window = (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
-                                window.Init(line.getConditions());
+                                ConditionEditorWindow.ShowAtPosition(line.getConditions(), new Rect(rect.x + rect.width, rect.y, 0, 0));
                             }
                             break;
                     }
