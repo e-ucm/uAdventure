@@ -216,7 +216,7 @@ public class ActionsList : ScriptableObject {
     }
     
 
-    public void DoList(float height)
+    public void DoList(float height, bool canRequestMoreSpace)
     {
         if(ActionsListDataControl == null)
         {
@@ -224,7 +224,7 @@ public class ActionsList : ScriptableObject {
             return;
         }
          
-        actionsList.DoList(customAction != null ? height - 160 : height);
+        actionsList.DoList(customAction != null && !canRequestMoreSpace ? height - 160 : height);
 
         if (customAction != null)
         {

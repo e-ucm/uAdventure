@@ -11,7 +11,7 @@ namespace uAdventure.Editor
     [EditorComponent(typeof(NPCDataControl), Name = "NPC.ActionsPanelTitle", Order = 10)]
     public class CharactersWindowActions : AbstractEditorComponent
     {
-        private ActionsList actionsList;
+        private readonly ActionsList actionsList;
 
         public CharactersWindowActions(Rect aStartPos, GUIContent aContent, GUIStyle aStyle,
             params GUILayoutOption[] aOptions)
@@ -22,12 +22,17 @@ namespace uAdventure.Editor
 
         public override void Draw(int aID)
         {
-            var workingCharacter = Target != null ? Target as NPCDataControl : Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
+            var isInspector = Target != null;
+            var workingCharacter = isInspector ? Target as NPCDataControl : Controller.Instance.SelectedChapterDataControl.getNPCsList().getNPCs()[
                     GameRources.GetInstance().selectedCharacterIndex];
-            if (Target != null) m_Rect.height = 300;
+
+            if (isInspector)
+            {
+                m_Rect.height = 300;
+            }
 
             actionsList.ActionsListDataControl = workingCharacter.getActionsList();
-            actionsList.DoList(m_Rect.height - 60f);
+            actionsList.DoList(m_Rect.height - 60f, isInspector);
         }
         
     }

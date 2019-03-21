@@ -127,7 +127,7 @@ namespace uAdventure.Editor
                 var workingActiveArea = Target as ActiveAreaDataControl;
                 
                 actionsList.ActionsListDataControl = workingActiveArea.getActionsList();
-                actionsList.DoList(300);
+                actionsList.DoList(300, true);
             }
         }
 
