@@ -772,6 +772,18 @@ namespace uAdventure.Runner
             }
         }
 
+        public void PulseOnTime(EffectHolderNode effect, int time)
+        {
+            this.StartCoroutine(PulseOnTimeCorrutine(effect, time));
+        }
+
+        private IEnumerator PulseOnTimeCorrutine(EffectHolderNode effect, int time)
+        {
+            yield return new WaitForSeconds(time);
+            effect.doPulse();
+            Interacted();
+        }
+
         #endregion Misc
 
     }

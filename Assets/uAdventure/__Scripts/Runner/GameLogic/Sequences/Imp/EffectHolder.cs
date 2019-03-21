@@ -16,6 +16,12 @@ namespace uAdventure.Runner
         private bool runsOnce = true;
         private int timesRun = 0;
         private bool waitForLoadPulse = false;
+        private bool pulsed = false;
+
+        public void doPulse()
+        {
+            this.pulsed = true;
+        }
 
         private bool validated = false;
         private bool isValid = false;
@@ -251,6 +257,18 @@ namespace uAdventure.Runner
                             PlaySoundEffect pse = (PlaySoundEffect)effect;
                             AudioClip audioClip = Game.Instance.ResourceManager.getAudio(pse.getPath());
                             PlayMusicOn(audioClip, Game.Instance);
+                            break;
+                        case EffectType.WAIT_TIME:
+                            WaitTimeEffect wte = (WaitTimeEffect)effect;
+                            runsOnce = false;
+                            if(timesRun == 0)
+                            {
+                                Game.Instance.PulseOnTime(this, wte.getTime());
+                            }
+                            if (!pulsed)
+                            {
+                                forceWait = true;
+                            }
                             break;
                         case EffectType.CUSTOM_EFFECT:
                             runsOnce = false;
