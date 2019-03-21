@@ -48,7 +48,8 @@ namespace uAdventure.Core
                 {
                     string textToAdd = LangTexts.Labels[i].TextValue
                         .Replace("\n", "")
-                        .Replace("  ", "");
+                        .Replace("  ", "")
+                        .Replace('/', '\u2215');
                     guistrings.Add(LangTexts.Labels[i].AttributeKey, textToAdd);
                 }
             }

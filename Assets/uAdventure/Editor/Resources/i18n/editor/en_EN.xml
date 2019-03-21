@@ -2184,7 +2184,7 @@ In the game you can define conditions based on the value of the variables.</entr
 <entry key="Analytics.Completable.Define">Define progress</entry>
   
 <entry key="Analytics.Milestone.Progress">Progress is given by: </entry>
-<entry key="Analytics.Milestone.Progress.Sum">Milestones reached/total</entry>
+<entry key="Analytics.Milestone.Progress.Sum">Milestones reached / total</entry>
 <entry key="Analytics.Milestone.Progress.Max">Max progress of all milestones</entry>
 <entry key="Analytics.Milestone.Time">Time</entry>
 
