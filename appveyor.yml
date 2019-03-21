@@ -69,6 +69,8 @@ artifacts:
 deploy:
     # Deploy to GitHub Releases
   - provider: GitHub
+    auth_token:
+      secure: 3zSsvAIXsHOIjh68YpgvbshUIMS3CbGr91Tz/3/QowMmfSdkgEMgYRG/vv5Np5+k # your encrypted token from GitHub
     artifact: /.*\.unitypackage/          # upload all UnityPackage packages to release assets
     draft: false
     prerelease: false
