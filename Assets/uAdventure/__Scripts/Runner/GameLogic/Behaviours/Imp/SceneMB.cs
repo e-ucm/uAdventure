@@ -687,20 +687,25 @@ namespace uAdventure.Runner
                     triggerScene = new TriggerSceneEffect(cutscene.getTargetId(), int.MinValue, int.MinValue);
                     break;
                 case Cutscene.ENDCHAPTER:
+                    // TODO: When we add more chapters, we must trigger the next chapter instead of quiting que aplication
+                    Application.Quit();
                     break;
             }
 
-            var effects = new Effects
+            if (triggerScene != null)
+            {
+                var effects = new Effects
             {
                 triggerScene
             };
-            var cutsceneEffects = ((Cutscene)SceneData).getEffects();
-            if (cutsceneEffects != null)
-            {
-                effects.AddRange(cutsceneEffects);
-            }
+                var cutsceneEffects = ((Cutscene)SceneData).getEffects();
+                if (cutsceneEffects != null)
+                {
+                    effects.AddRange(cutsceneEffects);
+                }
 
-            Game.Instance.Execute(new EffectHolder(effects));
+                Game.Instance.Execute(new EffectHolder(effects));
+            }
 
             return res;
         }
