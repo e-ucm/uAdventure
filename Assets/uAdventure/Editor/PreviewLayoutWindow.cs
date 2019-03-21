@@ -18,7 +18,6 @@ namespace uAdventure.Editor
         /** Constructor */
         protected PreviewLayoutWindow(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
         {
-            sceneSkin = EditorGUIUtility.GetBuiltinSkin(EditorSkin.Inspector);
             DoUpdate = false; 
             PreviewTitle = "ImageAssets.Preview".Traslate();
         }
@@ -30,10 +29,7 @@ namespace uAdventure.Editor
         }
 
         // ######################### ATTRIBUTES ##########################
-
-        /** Skin used to store the scene window GUISkin from Unity */
-        private readonly GUISkin sceneSkin;
-
+        
         /** Callback delegate for the update */
         private EditorApplication.CallbackFunction callback = null;
         
@@ -182,10 +178,6 @@ namespace uAdventure.Editor
 
                     if (HasToDrawPreviewInspector())
                     {
-                        // Change the skin to the scene skin to draw it black
-                        var prevSkin = GUI.skin;
-                        GUI.skin = sceneSkin;
-                        
                         var maxHeight = viewport.height- 25f;
 
                         windowRect.height = Mathf.Clamp(windowRect.height, 0, maxHeight);
@@ -215,7 +207,7 @@ namespace uAdventure.Editor
                                 DoUpdate = true;
                             }
 
-                        }, "Properties", sceneSkin.window)
+                        }, "Properties")
                         .TrapInside(previewRect);
 
 
@@ -238,9 +230,6 @@ namespace uAdventure.Editor
                             // Otherwise, we just fix the window in the desired corner until it's moved
                             windowRect.position = corner.Value;
                         }
-
-                        // Restore the previous skin
-                        GUI.skin = prevSkin;
                     }
                     
                     EndWindows();
