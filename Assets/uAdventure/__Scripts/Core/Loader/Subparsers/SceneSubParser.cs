@@ -244,7 +244,7 @@ namespace uAdventure.Core
 			int x = ExParsers.ParseDefault (element.GetAttribute ("x"), 0), 
 				y = ExParsers.ParseDefault (element.GetAttribute ("y"), 0);
 
-            Runner.Orientation orientation = (Runner.Orientation) ExParsers.ParseDefault(element.GetAttribute("orientation"), 1);
+            Runner.Orientation orientation = (Runner.Orientation) ExParsers.ParseDefault(element.GetAttribute("orientation"), 2);
 
             float scale = ExParsers.ParseDefault (element.GetAttribute("scale"), NumberFormatInfo.CurrentInfo, 0f);
 			int layer = ExParsers.ParseDefault (element.GetAttribute("layer"), -1);

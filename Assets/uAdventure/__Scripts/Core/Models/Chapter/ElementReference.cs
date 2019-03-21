@@ -84,7 +84,7 @@ namespace uAdventure.Core
             documentation = null;
             conditions = new Conditions();
             influenceArea = new InfluenceArea();
-            orientation = Runner.Orientation.E;
+            orientation = Runner.Orientation.S;
         }
 
         /**

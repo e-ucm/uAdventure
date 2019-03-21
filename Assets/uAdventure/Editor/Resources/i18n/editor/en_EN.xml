@@ -2145,7 +2145,7 @@ In the game you can define conditions based on the value of the variables.</entr
 <entry key="ElementReference.Orientation">Orientation</entry>
 <entry key="Orientation.N">Up</entry>
 <entry key="Orientation.S">Down</entry>
-<entry key="Orientation.W">Left</entry>
+<entry key="Orientation.O">Left</entry>
 <entry key="Orientation.E">Right</entry>
 
 <entry key="SceneEditor.PlayerTrajectory.None">None</entry>
