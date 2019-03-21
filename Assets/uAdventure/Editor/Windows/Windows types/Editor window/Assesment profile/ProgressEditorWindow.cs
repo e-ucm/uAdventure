@@ -18,9 +18,9 @@ namespace uAdventure.Editor
 
         private Completable.Progress.ProgressType currentMode = Completable.Progress.ProgressType.SUM;
 
-        public void Init(ProgressDataControl progress)
+        public void Init(ProgressDataControl progressDataControl)
         {
-            this.progress = progress;
+            this.progress = progressDataControl;
 
             progressList = new DataControlList()
             {
@@ -35,6 +35,11 @@ namespace uAdventure.Editor
                 drawCell = (rect, row, column, isActive, isFocused) =>
                 {
                     var milestone = progressList.list[row] as MilestoneDataControl;
+                    if (milestone == null)
+                    {
+                        return;
+                    }
+
                     switch (column)
                     {
                         default:
@@ -44,7 +49,12 @@ namespace uAdventure.Editor
                             }
                             break;
                         case 1:
-                            milestone.setProgress(EditorGUI.Slider(rect, milestone.getProgress(), 0, 1));
+                            EditorGUI.BeginChangeCheck();
+                            var newProgress = EditorGUI.Slider(rect, "", milestone.getProgress(), 0, 1);
+                            if (EditorGUI.EndChangeCheck())
+                            {
+                                milestone.setProgress(newProgress);
+                            }
                             break;
                     }
                 }
@@ -61,7 +71,14 @@ namespace uAdventure.Editor
         {
             GUILayout.Label("Analytics.Milestone.Progress".Traslate());
 
-            progress.setType((Completable.Progress.ProgressType)EditorGUILayout.Popup((int)progress.getType(), milestoneTypeTexts.Traslate()));
+            EditorGUI.BeginChangeCheck();
+            var newProgressType =
+                (Completable.Progress.ProgressType) EditorGUILayout.Popup((int) progress.getType(),
+                    milestoneTypeTexts.Traslate());
+            if (EditorGUI.EndChangeCheck())
+            {
+                progress.setType(newProgressType);
+            }
 
             if(progress.getType() != currentMode)
             {
@@ -83,7 +100,11 @@ namespace uAdventure.Editor
                 }
             }
 
-            progressList.SetData(progress, (p) => (p as ProgressDataControl).getMilestones().ConvertAll(m => m as DataControl));
+            progressList.SetData(progress, (p) =>
+            {
+                var progressDataControl = p as ProgressDataControl;
+                return progressDataControl == null ? new List<DataControl>() : progressDataControl.getMilestones().ConvertAll(m => m as DataControl);
+            });
             progressList.DoList(position.height - 55);
         }
 
