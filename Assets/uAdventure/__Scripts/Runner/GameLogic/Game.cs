@@ -73,6 +73,11 @@ namespace uAdventure.Runner
             get { return game_state; }
         }
 
+        public IRunnerChapterTarget CurrentTargetRunner
+        {
+            get { return runnerTarget; }
+        }
+
         public ResourceManager ResourceManager { get; private set; }
 
         public string GameName
