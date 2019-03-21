@@ -101,6 +101,11 @@ namespace uAdventure.Editor
         public override void OnSceneSelected(SceneDataControl scene)
         {
             base.OnSceneSelected(scene);
+            if (scene == null)
+            {
+                return;
+            }
+
             activeAreasList.SetData(scene.getActiveAreasList(),
                 (dc) => (dc as ActiveAreasListDataControl).getActiveAreas().Cast<DataControl>().ToList());
         }
@@ -127,7 +132,7 @@ namespace uAdventure.Editor
                 var workingActiveArea = Target as ActiveAreaDataControl;
                 
                 actionsList.ActionsListDataControl = workingActiveArea.getActionsList();
-                actionsList.DoList(300);
+                actionsList.DoList(300, true);
             }
         }
 

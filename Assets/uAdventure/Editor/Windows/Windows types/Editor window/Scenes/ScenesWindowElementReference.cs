@@ -173,7 +173,10 @@ namespace uAdventure.Editor
         public override void OnSceneSelected(SceneDataControl scene)
         {
             base.OnSceneSelected(scene);
-            referenceList.ReferencesListDataControl = scene.getReferencesList();
+            if (scene != null)
+            {
+                referenceList.ReferencesListDataControl = scene.getReferencesList();
+            }
         }
 
         protected override void DrawInspector()
