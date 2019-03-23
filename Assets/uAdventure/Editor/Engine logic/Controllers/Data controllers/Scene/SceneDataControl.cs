@@ -183,9 +183,10 @@ namespace uAdventure.Editor
                     // References
                     foreach(var reference in referencesListDataControl.getRefferences())
                     {
-                        reference.setElementPosition((int)(reference.getElementX() * background.width / previousBackgroundSize.x),
+                        var data = reference.getElementReference();
+                        data.setPosition((int)(reference.getElementX() * background.width / previousBackgroundSize.x),
                             (int)(reference.getElementY() * background.height / previousBackgroundSize.y));
-                        reference.setElementScale(reference.getElementScale() * background.height / previousBackgroundSize.y);
+                        data.setScale(reference.getElementScale() * background.height / previousBackgroundSize.y);
                     }
 
                     // Areas

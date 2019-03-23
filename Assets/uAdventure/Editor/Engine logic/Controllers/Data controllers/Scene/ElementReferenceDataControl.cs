@@ -217,6 +217,21 @@ namespace uAdventure.Editor
             controller.AddTool(new ChangeElementReferenceTool(elementReference, scale));
         }
 
+        /**
+         * Set the position and scale for the element references
+         * 
+         * @param x
+         *            X coordinate for the element reference
+         * @param y
+         *            Y coordinate for the element reference
+         * @param scale
+         *            the scale for the element reference
+         */
+        public void setElementPositionAndScale(int x, int y, float scale)
+        {
+            controller.AddTool(new ChangeElementReferenceTool(elementReference, x, y, scale));
+        }
+
 
         public override System.Object getContent()
         {

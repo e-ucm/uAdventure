@@ -337,8 +337,7 @@ namespace uAdventure.Editor
                     var scale = original.size.magnitude / unscaled.size.magnitude;
 
                     // And then we set the values in the reference
-                    elemRef.setElementPosition(Mathf.RoundToInt(position.x), Mathf.RoundToInt(position.y));
-                    elemRef.setElementScale(scale);
+                    elemRef.setElementPositionAndScale(Mathf.RoundToInt(position.x), Mathf.RoundToInt(position.y), scale);
                 }
 
                 EditorGUI.BeginChangeCheck();
