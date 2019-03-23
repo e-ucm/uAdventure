@@ -16,6 +16,12 @@ namespace uAdventure.Runner
         private bool runsOnce = true;
         private int timesRun = 0;
         private bool waitForLoadPulse = false;
+        private bool pulsed = false;
+
+        public void doPulse()
+        {
+            this.pulsed = true;
+        }
 
         private bool validated = false;
         private bool isValid = false;
@@ -247,6 +253,23 @@ namespace uAdventure.Runner
                             runsOnce = false;
                             forceWait = Game.Instance.ShowingBook;
                             break;
+                        case EffectType.PLAY_SOUND:
+                            PlaySoundEffect pse = (PlaySoundEffect)effect;
+                            AudioClip audioClip = Game.Instance.ResourceManager.getAudio(pse.getPath());
+                            PlayMusicOn(audioClip, Game.Instance);
+                            break;
+                        case EffectType.WAIT_TIME:
+                            WaitTimeEffect wte = (WaitTimeEffect)effect;
+                            runsOnce = false;
+                            if(timesRun == 0)
+                            {
+                                Game.Instance.PulseOnTime(this, wte.getTime());
+                            }
+                            if (!pulsed)
+                            {
+                                forceWait = true;
+                            }
+                            break;
                         case EffectType.CUSTOM_EFFECT:
                             runsOnce = false;
                             if(timesRun == 0)
@@ -270,6 +293,35 @@ namespace uAdventure.Runner
         public bool check()
         {
             return conditions == null || ConditionChecker.check(conditions);
+        }
+
+        private void PlayMusicOn(AudioClip clip, MonoBehaviour player)
+        {
+            if (!clip)
+            {
+                return;
+            }
+
+            player.StartCoroutine(PlayMusicCoroutineOn(clip, player));
+        }
+
+        private IEnumerator PlayMusicCoroutineOn(AudioClip clip, MonoBehaviour player)
+        {
+            if (!clip)
+            {
+                yield return null;
+            }
+
+            GameObject tmp = new GameObject("SoundHolder");
+            tmp.transform.SetParent(player.transform);
+            tmp.transform.localPosition = Vector3.zero;
+            AudioSource tmpaudio = tmp.AddComponent<AudioSource>();
+            tmp.transform.SetParent(Camera.main.transform);
+            tmpaudio.PlayOneShot(clip);
+
+            yield return new WaitWhile(() => tmpaudio.isPlaying);
+
+            Object.DestroyImmediate(tmp);
         }
     }
 

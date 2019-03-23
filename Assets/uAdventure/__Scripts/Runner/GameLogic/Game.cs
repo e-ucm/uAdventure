@@ -73,6 +73,11 @@ namespace uAdventure.Runner
             get { return game_state; }
         }
 
+        public IRunnerChapterTarget CurrentTargetRunner
+        {
+            get { return runnerTarget; }
+        }
+
         public ResourceManager ResourceManager { get; private set; }
 
         public string GameName
@@ -765,6 +770,18 @@ namespace uAdventure.Runner
                     GUI.Label(backgroundRect, text, "textProgressBar");
                 }
             }
+        }
+
+        public void PulseOnTime(EffectHolderNode effect, int time)
+        {
+            this.StartCoroutine(PulseOnTimeCorrutine(effect, time));
+        }
+
+        private IEnumerator PulseOnTimeCorrutine(EffectHolderNode effect, int time)
+        {
+            yield return new WaitForSeconds(time);
+            effect.doPulse();
+            Interacted();
         }
 
         #endregion Misc
