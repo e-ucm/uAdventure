@@ -211,7 +211,9 @@ namespace uAdventure.Runner
                 rend = this.GetComponent<Renderer>();
             }
 
-            transform.localPosition = Scene.ToWorldPosition(getPosition(), Size, RepresentablePivot, z);
+            Vector3 tmp = Scene.ToWorldPosition(getPosition(), Size, RepresentablePivot, z);
+
+            transform.localPosition = tmp;
         }
 
         public void setPosition(Vector2 position)

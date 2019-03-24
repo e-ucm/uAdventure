@@ -333,6 +333,15 @@ namespace uAdventure.Runner
             uAdventureInputModule.LookingForTarget = null;
         }
 
+        public bool ContinueEffectExecution()
+        {
+            if (executeStack.Count > 0)
+            {
+                return Execute(executeStack.Peek().Key);
+            }
+            return false;
+        }
+
         private bool Interacted()
         {
             if(guistate != GUIState.BOOK)

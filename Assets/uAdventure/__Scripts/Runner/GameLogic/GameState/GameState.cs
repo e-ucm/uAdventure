@@ -256,13 +256,29 @@ namespace uAdventure.Runner
             return data.getChapters()[currentChapter].getTimers();
         }
 
-        public void Move(string id, Vector2 position, int time = 0)
+        public void Move(string id, Vector2 position, int speed = 0, EffectHolderNode observer = null)
         {
             GameObject go = GameObject.Find(id);
-            Movable m = go.GetComponent<Movable>();
+            Mover m = go.GetComponent<Mover>();
             if (m != null)
             {
-                m.setPosition(position);
+                if (speed == 0)
+                {
+                    m.MoveInstant(position);
+                }
+                else
+                {
+                    m.MoveFreely(position, observer, data =>
+                    {
+                        EffectHolderNode tmp = (EffectHolderNode)data;
+                        tmp.doPulse();
+                        Game.Instance.ContinueEffectExecution();
+                    }, null);
+                }
+            }else
+            {
+                Representable r = go.GetComponent<Representable>();
+                r.setPosition(position);
             }
         }
 

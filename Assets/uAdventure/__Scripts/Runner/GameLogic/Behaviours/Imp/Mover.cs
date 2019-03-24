@@ -95,6 +95,37 @@ namespace uAdventure.Runner
             }
             return false;
         }
+
+        public bool MoveFreely(Vector2 point)
+        {
+            return MoveFreely(point, null, null, null);
+        }
+
+        public bool MoveFreely(Vector2 point, object data, OnMovementFinished onMovementFinished, OnMovementCancelled onMovementCancelled)
+        {
+            AbortCurrentMovement();
+
+            this.data = data;
+            this.onMovementFinished = onMovementFinished;
+            this.onMovementCancelled = onMovementCancelled;
+
+            MovementPoint[] route = {
+                new MovementPoint(){
+                    destination = point,
+                    distance = (this.representable.getPosition() - origin).magnitude,
+                    scale = this.representable.Context.getScale()
+                }
+            };
+
+            if (route != null && route.Length > 0)
+            {
+                toArea = null;
+                MoveRoute(route);
+                return true;
+            }
+            return false;
+        }
+
         public bool Move(Rectangle area, float distance)
         {
             return Move(area, distance, null, null, null);

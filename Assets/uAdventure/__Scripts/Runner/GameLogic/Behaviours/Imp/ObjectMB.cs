@@ -4,6 +4,7 @@ using uAdventure.Core;
 namespace uAdventure.Runner
 {
     [RequireComponent(typeof(Representable))]
+    [RequireComponent(typeof(Mover))]
     public class ObjectMB : InteractiveElement
     {
         private static readonly int[] availableActions = { Action.CUSTOM, Action.DRAG_TO, Action.EXAMINE, Action.GRAB, Action.USE };

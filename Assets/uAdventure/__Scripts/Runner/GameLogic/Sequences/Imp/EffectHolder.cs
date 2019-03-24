@@ -228,7 +228,36 @@ namespace uAdventure.Runner
                             break;
                         case EffectType.MOVE_OBJECT:
                             MoveObjectEffect moe = (MoveObjectEffect)effect;
-                            Game.Instance.GameState.Move(moe.getTargetId(), new Vector2(moe.getX(), 600 - moe.getY()) / 10f);
+                            runsOnce = !moe.isAnimated();
+
+                            if (timesRun == 0)
+                            {
+                                if (moe.isAnimated())
+                                {
+                                    Game.Instance.GameState.Move(moe.getTargetId(), new Vector2(moe.getX(), moe.getY()), moe.getTranslateSpeed(), this);
+                                }
+                                else
+                                {
+                                    Game.Instance.GameState.Move(moe.getTargetId(), new Vector2(moe.getX(), moe.getY()));
+                                }
+                            }
+                            if (!runsOnce && !pulsed)
+                            {
+                                forceWait = true;
+                            }
+                            break;
+                        case EffectType.MOVE_NPC:
+                            MoveNPCEffect mne = (MoveNPCEffect)effect;
+                            runsOnce = true;
+
+                            if (timesRun == 0)
+                            {
+                                Game.Instance.GameState.Move(mne.getTargetId(), new Vector2(mne.getX(), mne.getY()), 1, this);
+                            }
+                            if (!runsOnce && !pulsed)
+                            {
+                                forceWait = true;
+                            }
                             break;
                         case EffectType.GENERATE_OBJECT:
                             GenerateObjectEffect gen = (GenerateObjectEffect)effect;

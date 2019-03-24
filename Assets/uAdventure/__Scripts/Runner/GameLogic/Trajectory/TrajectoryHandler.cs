@@ -114,24 +114,20 @@ namespace uAdventure.Runner
         {
             List<MovementPoint> ret = new List<MovementPoint>();
 
-            LineHandler origin_line = null, destiny_line = null;
-            foreach (LineHandler handler in lines)
-            {
-                if (origin_line == null && handler.contains(origin))
-                    origin_line = handler;
-
-                if (destiny_line == null && handler.contains(destiny))
-                    destiny_line = handler;
-
-                if (origin_line != null && destiny_line != null)
-                    break;
-            }
+            LineHandler origin_line = containingLine(origin),
+                destiny_line = containingLine(destiny);
 
             Vector2 closest = Vector2.zero;
             if (origin_line == null)
             {
-                closest = closestPoint(PlayerMB.Instance.GetComponent<Representable>().getPosition());
+                closest = closestPoint(origin);
                 origin_line = containingLine(closest);
+            }
+
+            if (destiny_line == null)
+            {
+                destiny = closestPoint(destiny);
+                destiny_line = containingLine(destiny);
             }
 
             if (closest != Vector2.zero)
