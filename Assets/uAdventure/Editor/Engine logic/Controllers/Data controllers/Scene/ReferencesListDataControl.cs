@@ -372,8 +372,8 @@ namespace uAdventure.Editor
                 getReferencesList(elementType).Add(newElementReference);
                 ElementReferenceDataControl erdc = new ElementReferenceDataControl(sceneDataControl, newElementReference, type, counter);
                 var defaultPos = sceneDataControl.getDefaultInitialPosition();
-                erdc.setElementPosition((int)defaultPos.x, (int)defaultPos.y);
-                erdc.setElementScale(sceneDataControl.getElementAppropiateScale(erdc.getReferencedElementDataControl() as DataControlWithResources));
+                newElementReference.setPosition((int)defaultPos.x, (int)defaultPos.y);
+                newElementReference.setScale(sceneDataControl.getElementAppropiateScale(erdc.getReferencedElementDataControl() as DataControlWithResources));
                 ElementContainer ec = new ElementContainer(erdc, -1, null);
                 lastElementContainer = ec;
                 reassignLayerAllReferencesDataControl(insertInOrder(ec, false));

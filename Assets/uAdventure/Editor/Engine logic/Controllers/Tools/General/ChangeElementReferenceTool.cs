@@ -7,18 +7,12 @@ namespace uAdventure.Editor
 {
     public class ChangeElementReferenceTool : Tool
     {
-
-        private ElementReference elementReference;
-
+        private readonly ElementReference elementReference;
         private int x, y;
-
-        private int oldX, oldY;
-
-        private bool changePosition;
-
-        private bool changeScale;
-
-        private float scale, oldScale;
+        private readonly int oldX, oldY;
+        private readonly bool changePosition, changeScale;
+        private float scale;
+        private readonly float oldScale;
 
         public ChangeElementReferenceTool(ElementReference elementReference, int x, int y)
         {
@@ -32,13 +26,27 @@ namespace uAdventure.Editor
             changeScale = false;
         }
 
-        public ChangeElementReferenceTool(ElementReference elementReference2, float scale2)
+        public ChangeElementReferenceTool(ElementReference elementReference, float scale)
         {
 
-            this.elementReference = elementReference2;
-            this.scale = scale2;
-            this.oldScale = elementReference.getScale();
+            this.elementReference = elementReference;
+            this.scale = scale;
+            this.oldScale = this.elementReference.getScale();
             changePosition = false;
+            changeScale = true;
+        }
+
+        public ChangeElementReferenceTool(ElementReference elementReference, int x, int y, float scale)
+        {
+
+            this.elementReference = elementReference;
+            this.x = x;
+            this.y = y;
+            this.scale = scale;
+            this.oldX = elementReference.getX();
+            this.oldY = elementReference.getY();
+            this.oldScale = this.elementReference.getScale();
+            changePosition = true;
             changeScale = true;
         }
 
@@ -59,27 +67,29 @@ namespace uAdventure.Editor
 
         public override bool combine(Tool other)
         {
-
-            if (other is ChangeElementReferenceTool)
+            var combined = false;
+            var otherReferenceTool = other as ChangeElementReferenceTool;
+            if (otherReferenceTool != null)
             {
-                ChangeElementReferenceTool crvt = (ChangeElementReferenceTool)other;
-                if (crvt.elementReference != elementReference)
+                if (otherReferenceTool.elementReference != elementReference)
+                {
                     return false;
-                if (crvt.changePosition && changePosition)
-                {
-                    x = crvt.x;
-                    y = crvt.y;
-                    timeStamp = crvt.timeStamp;
-                    return true;
                 }
-                if (crvt.changeScale && changeScale)
+                if (otherReferenceTool.changePosition && changePosition)
                 {
-                    scale = crvt.scale;
-                    timeStamp = crvt.timeStamp;
-                    return true;
+                    x = otherReferenceTool.x;
+                    y = otherReferenceTool.y;
+                    timeStamp = otherReferenceTool.timeStamp;
+                    combined = true;
+                }
+                if (otherReferenceTool.changeScale && changeScale)
+                {
+                    scale = otherReferenceTool.scale;
+                    timeStamp = otherReferenceTool.timeStamp;
+                    combined = true;
                 }
             }
-            return false;
+            return combined;
         }
 
 
@@ -90,7 +100,7 @@ namespace uAdventure.Editor
             {
                 elementReference.setScale(scale);
             }
-            else if (changePosition)
+            if (changePosition)
             {
                 elementReference.setPosition(x, y);
             }
@@ -113,7 +123,7 @@ namespace uAdventure.Editor
             {
                 elementReference.setScale(scale);
             }
-            else if (changePosition)
+            if (changePosition)
             {
                 elementReference.setPosition(x, y);
             }
@@ -129,7 +139,7 @@ namespace uAdventure.Editor
             {
                 elementReference.setScale(oldScale);
             }
-            else if (changePosition)
+            if (changePosition)
             {
                 elementReference.setPosition(oldX, oldY);
             }

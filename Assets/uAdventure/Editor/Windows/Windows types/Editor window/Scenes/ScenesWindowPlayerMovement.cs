@@ -636,26 +636,60 @@ namespace uAdventure.Editor
         [EditorComponent(typeof(TrajectoryDataControl), Name = "Trajectory", Order = 0)]
         public class TrajectoryComponent : AbstractEditorComponent
         {
-            public int Action { get; set; }
+            private int action = 0;
+
+            private NodeDataControl pairing = null;
+
+            private TrajectoryDataControl previousTrajectoryDataControl;
+            public int Action
+            {
+                get { return action; }
+                set
+                {
+                    if (action == value)
+                    {
+                        return;
+                    }
+
+                    action = value;
+                    if (action != 2 && action >= 0)
+                    {
+                        pairing = null;
+                    }
+                }
+            }
 
             public TrajectoryComponent(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
             {
             }
 
-            private NodeDataControl pairing = null;
-
             public override void OnDrawingGizmos()
             {
                 var trajectory = Target as TrajectoryDataControl;
+                if (trajectory == null)
+                {
+                    return;
+                }
+
+                if (SceneEditor.Current.Disabled && pairing != null)
+                {
+                    pairing = null;
+                }
+
+                if (previousTrajectoryDataControl != trajectory)
+                {
+                    previousTrajectoryDataControl = trajectory;
+                    pairing = null;
+                }
 
                 if (Event.current.type == EventType.MouseDown)
                 {
-                    DataControl selected = SceneEditor.Current.SelectedElement;
-                    NodeDataControl node = selected as NodeDataControl;
-                    SideDataControl side = selected as SideDataControl;
+                    var selected = SceneEditor.Current.SelectedElement;
+                    var node = selected as NodeDataControl;
+                    var side = selected as SideDataControl;
 
-                    bool isNode = node != null && trajectory.getNodes().Contains(node);
-                    bool isSide = side != null && trajectory.getSides().Contains(side);
+                    var isNode = node != null && trajectory.getNodes().Contains(node);
+                    var isSide = side != null && trajectory.getSides().Contains(side);
 
                     switch (Action)
                     {
@@ -687,6 +721,10 @@ namespace uAdventure.Editor
                                     }
                                     pairing = null;
                                 }
+                            }
+                            else
+                            {
+                                pairing = null;
                             }
                             break;
 
