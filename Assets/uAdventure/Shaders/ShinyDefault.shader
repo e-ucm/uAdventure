@@ -6,7 +6,13 @@
      Properties
      {
          [PerRendererData] _MainTex("Sprite Texture", 2D) = "white" {}
+		 [PerRendererData] _SecondTex("Transition Texture", 2D) = "black" {}
+		 [PerRendererData] _SecondSet("Second Texture Set", Int) = 0
          _Color("Tint", Color) = (1,1,1,1)
+	     _DirectionX("Direction X", Range(-1,1)) = 0
+	     _DirectionY("Direction Y", Range(-1,1)) = 0
+		 _Progress("Progress", Range(0,1)) = 0
+		 _Blend("Blend", Range(0,1)) = 0
          _ShineLocation("ShineLocation", Range(0,1)) = 0
          _ShineWidth("ShineWidth", Range(0,1)) = 0
          [MaterialToggle] PixelSnap("Pixel snap", Float) = 0
@@ -66,30 +72,49 @@
      }
  
      sampler2D _MainTex;
+	 sampler2D _SecondTex;
+	 int _SecondSet;
      sampler2D _AlphaTex;
+	 float _DirectionX;
+	 float _DirectionY;
+	 float _Progress;
+	 float _Blend;
      float _AlphaSplitEnabled;
      float _ShineLocation;
      float _ShineWidth;
  
      fixed4 SampleSpriteTexture(float2 uv)
      {
-         fixed4 color = tex2D(_MainTex, uv);
+		 float2 direction = float2(_DirectionX, _DirectionY);
+		 float2 movedUv = uv + direction * _Progress;
+		 float2 otherUv = float2((1 + movedUv.x) % 1, (1 + movedUv.y) % 1);
+
+         fixed4 color1 = tex2D(_MainTex, movedUv);
+		 fixed4 color2 = tex2D(_SecondTex, otherUv);
  
  #if UNITY_TEXTURE_ALPHASPLIT_ALLOWED
-         if (_AlphaSplitEnabled)
-             color.a = tex2D(_AlphaTex, uv).r;
+		 if (_AlphaSplitEnabled) {
+			 color1.a = tex2D(_AlphaTex, movedUv).r;
+			 color2.a = tex2D(_AlphaTex, otherUv).r;
+		 }
  #endif //UNITY_TEXTURE_ALPHASPLIT_ALLOWED
- 
-         
-     
-         
-         float lowLevel = _ShineLocation - _ShineWidth;
-         float highLevel = _ShineLocation + _ShineWidth;
-         float currentDistanceProjection = (uv.x + uv.y) / 2;
-         if (currentDistanceProjection > lowLevel && currentDistanceProjection < highLevel) {
-             float whitePower = 1- (abs(currentDistanceProjection - _ShineLocation ) / _ShineWidth);
-             color.rgb +=  color.a * whitePower;
-         }
+
+		 fixed4 color = lerp(color1, color2, _Blend);
+		 if (_SecondSet == 0) {
+			 color = fixed4(color1.x, color1.y, color1.z, color1.w - _Blend);
+		 }
+
+		 if (movedUv.x < 0 || movedUv.x >= 1 || movedUv.y < 0 || movedUv.y >= 1) {
+			 color = color2; 
+		 }
+
+		 float lowLevel = _ShineLocation - _ShineWidth;
+		 float highLevel = _ShineLocation + _ShineWidth;
+		 float currentDistanceProjection = (uv.x + uv.y) / 2;
+		 if (currentDistanceProjection > lowLevel && currentDistanceProjection < highLevel) {
+			 float whitePower = 1 - (abs(currentDistanceProjection - _ShineLocation) / _ShineWidth);
+			 color.rgb += color.a * whitePower;
+		 }
          
          return color;
      }
