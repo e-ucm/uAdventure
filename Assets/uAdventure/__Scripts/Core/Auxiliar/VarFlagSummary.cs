@@ -111,6 +111,10 @@ namespace uAdventure.Core
 
         public bool addFlag(string flag)
         {
+            if (string.IsNullOrEmpty(flag))
+            {
+                return false;
+            }
 
             bool addedFlag = false;
 
@@ -165,6 +169,10 @@ namespace uAdventure.Core
 
         public bool addVar(string var)
         {
+            if (string.IsNullOrEmpty(var))
+            {
+                return false;
+            }
 
             bool addedVar = false;
 
@@ -219,6 +227,10 @@ namespace uAdventure.Core
 
         public void addReference(string id)
         {
+            if (string.IsNullOrEmpty(id))
+            {
+                return;
+            }
 
             if (flags.Contains(id))
             {
@@ -240,6 +252,10 @@ namespace uAdventure.Core
 
         public void addFlagReference(string flag)
         {
+            if (string.IsNullOrEmpty(flag))
+            {
+                return;
+            }
 
             // Get the index of the flag
             int flagIndex = flags.IndexOf(flag);
@@ -271,6 +287,10 @@ namespace uAdventure.Core
 
         public void deleteFlagReference(string flag)
         {
+            if (string.IsNullOrEmpty(flag))
+            {
+                return;
+            }
 
             // Get the index of the flag
             int flagIndex = flags.IndexOf(flag);
@@ -297,6 +317,10 @@ namespace uAdventure.Core
 
         public void deleteReference(string id)
         {
+            if (string.IsNullOrEmpty(id))
+            {
+                return;
+            }
 
             if (flags.Contains(id))
             {
@@ -318,6 +342,10 @@ namespace uAdventure.Core
 
         public void addVarReference(string var)
         {
+            if (string.IsNullOrEmpty(var))
+            {
+                return;
+            }
 
             // Get the index of the var
             int varIndex = vars.IndexOf(var);
@@ -349,6 +377,10 @@ namespace uAdventure.Core
 
         public void deleteVarReference(string var)
         {
+            if (string.IsNullOrEmpty(var))
+            {
+                return;
+            }
 
             // Get the index of the var
             int varIndex = vars.IndexOf(var);
