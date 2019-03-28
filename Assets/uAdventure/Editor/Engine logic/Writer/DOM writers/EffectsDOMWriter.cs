@@ -227,7 +227,9 @@ namespace uAdventure.Editor
                     effectElement.SetAttribute("idTarget", triggerSceneEffect.getTargetId());
                     effectElement.SetAttribute("x", triggerSceneEffect.getX().ToString());
                     effectElement.SetAttribute("y", triggerSceneEffect.getY().ToString());
-                    if(triggerSceneEffect.DestinyScale >= 0)
+                    effectElement.SetAttribute("transitionTime", triggerSceneEffect.getTransitionTime().ToString());
+                    effectElement.SetAttribute("transitionType", ((int)triggerSceneEffect.getTransitionType()).ToString());
+                    if (triggerSceneEffect.DestinyScale >= 0)
                     {
                         effectElement.SetAttribute("scale", triggerSceneEffect.DestinyScale.ToString());
                     }

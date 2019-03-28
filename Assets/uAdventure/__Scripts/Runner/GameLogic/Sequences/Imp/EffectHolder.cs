@@ -112,7 +112,7 @@ namespace uAdventure.Runner
                                 }
 
                                 var trace = !(additionalInfo.ContainsKey("disable_trace") && (bool)additionalInfo["disable_trace"]);
-                                Game.Instance.RunTarget(tse.getTargetId(), tse.getTransitionTime(), tse.getTransitionType(), null, trace);
+                                Game.Instance.RunTarget(tse.getTargetId(), tse.getTransitionTime(), (int)tse.getTransitionType(), null, trace);
                                 waitForLoadPulse = true;
                                 forceWait = true;
                             }

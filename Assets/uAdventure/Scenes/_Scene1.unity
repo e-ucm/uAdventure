@@ -384,6 +384,8 @@ GameObject:
   - component: {fileID: 703138882}
   - component: {fileID: 703138885}
   - component: {fileID: 703138886}
+  - component: {fileID: 703138884}
+  - component: {fileID: 703138881}
   m_Layer: 0
   m_Name: _MainCamera
   m_TagString: MainCamera
@@ -494,6 +496,18 @@ MonoBehaviour:
   timerPrefab: {fileID: 1644923134168576, guid: f44f4e95c35738a4fab0d0485cef5ef6,
     type: 2}
   timersContainer: {fileID: 510217377}
+--- !u!114 &703138881
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 703138873}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6d3f44709306214f90f86aa2728a696, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  transitionMaterial: {fileID: 2100000, guid: ff94601a01031e74fb5ae7b7ef170107, type: 2}
 --- !u!114 &703138882
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -517,6 +531,40 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefab: {fileID: 198356, guid: 9a591ead623668d469406b2a4c1ab690, type: 2}
+--- !u!23 &703138884
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 703138873}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_Materials:
+  - {fileID: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 0
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
 --- !u!114 &703138885
 MonoBehaviour:
   m_ObjectHideFlags: 0

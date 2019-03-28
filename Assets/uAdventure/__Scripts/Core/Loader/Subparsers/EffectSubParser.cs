@@ -90,11 +90,16 @@ namespace uAdventure.Core
 					
 						x = ExParsers.ParseDefault(effect.GetAttribute("x"), 0);
 						y = ExParsers.ParseDefault(effect.GetAttribute("y"), 0);
-						string scene = effect.GetAttribute("idTarget");
+
+                        string scene = effect.GetAttribute("idTarget");
                         var triggerSceneEffect = new TriggerSceneEffect(scene, x, y)
                         {
                             DestinyScale = ExParsers.ParseDefault(effect.GetAttribute("scale"), float.MinValue)
                         };
+
+                        triggerSceneEffect.setTransitionTime(ExParsers.ParseDefault(effect.GetAttribute("transitionTime"), 0));
+                        triggerSceneEffect.setTransitionType((NextSceneEnumTransitionType)ExParsers.ParseDefault(effect.GetAttribute("transitionType"), 0));
+
                         currentEffect = triggerSceneEffect;
                         break;
 					case "play-animation":

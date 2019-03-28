@@ -6,8 +6,8 @@
      Properties
      {
          [PerRendererData] _MainTex("Sprite Texture", 2D) = "white" {}
-		 [PerRendererData] _SecondTex("Transition Texture", 2D) = "black" {}
-		 [PerRendererData] _SecondSet("Second Texture Set", Int) = 0
+		 [PerRendererData] _TransitionTex("Transition Texture", 2D) = "black" {}
+		 [PerRendererData] _TransitionSet("Second Texture Set", Int) = 0
          _Color("Tint", Color) = (1,1,1,1)
 	     _DirectionX("Direction X", Range(-1,1)) = 0
 	     _DirectionY("Direction Y", Range(-1,1)) = 0
@@ -72,8 +72,8 @@
      }
  
      sampler2D _MainTex;
-	 sampler2D _SecondTex;
-	 int _SecondSet;
+	 sampler2D _TransitionTex;
+	 int _TransitionSet;
      sampler2D _AlphaTex;
 	 float _DirectionX;
 	 float _DirectionY;
@@ -90,7 +90,7 @@
 		 float2 otherUv = float2((1 + movedUv.x) % 1, (1 + movedUv.y) % 1);
 
          fixed4 color1 = tex2D(_MainTex, movedUv);
-		 fixed4 color2 = tex2D(_SecondTex, otherUv);
+		 fixed4 color2 = tex2D(_TransitionTex, otherUv);
  
  #if UNITY_TEXTURE_ALPHASPLIT_ALLOWED
 		 if (_AlphaSplitEnabled) {
@@ -100,7 +100,7 @@
  #endif //UNITY_TEXTURE_ALPHASPLIT_ALLOWED
 
 		 fixed4 color = lerp(color1, color2, _Blend);
-		 if (_SecondSet == 0) {
+		 if (_TransitionSet == 0) {
 			 color = fixed4(color1.x, color1.y, color1.z, color1.w - _Blend);
 		 }
 

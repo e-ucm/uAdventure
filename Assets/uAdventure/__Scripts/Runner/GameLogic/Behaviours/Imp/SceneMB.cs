@@ -11,6 +11,7 @@ using AssetPackage;
 
 namespace uAdventure.Runner
 {
+    [RequireComponent(typeof(TransitionManager))]
     public class SceneMB : MonoBehaviour, IRunnerChapterTarget, IPointerClickHandler, IBeginDragHandler, IEndDragHandler, IDragHandler, IConfirmWantsDrag
     {
         private class HeightLayerComparer : IComparer<Representable>
@@ -55,8 +56,7 @@ namespace uAdventure.Runner
         private TrajectoryHandler trajectoryHandler;
 
         // Transitions
-        private bool fading;
-        private float totalTime, currentTime;
+        private TransitionManager transitionManager;
         private readonly float resistance = 5000f;
 
 
@@ -111,6 +111,8 @@ namespace uAdventure.Runner
         protected void Start()
         {
             this.gameObject.name = SceneData.getId();
+            this.transitionManager = GetComponent<TransitionManager>();
+
             RenderScene();
         }
 
@@ -189,17 +191,6 @@ namespace uAdventure.Runner
 
         protected void FixedUpdate()
         {
-            if (fading)
-            {
-                currentTime -= Time.deltaTime;
-                float alpha = currentTime / totalTime;
-                ColorChilds(transform, new Color(1, 1, 1, alpha));
-                if (alpha <= 0)
-                {
-                    GameObject.Destroy(this.gameObject);
-                }
-            }
-
             if (movieplayer == MovieState.LOADING)
             {
                 if (movie.isError())
@@ -233,22 +224,16 @@ namespace uAdventure.Runner
 
         public void Destroy(float time)
         {
-            if (time != 0f)
-            {
-                totalTime = time;
-                currentTime = time;
-                fading = true;
-                this.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, this.transform.position.z - 10);
-            }
-            else
-            {
-                GameObject.DestroyImmediate(this.gameObject);
-            }
+            GameObject.DestroyImmediate(this.gameObject);
         }
 
         private void LoadParents()
         {
             this.background = this.transform.Find("Background");
+            if (background)
+            {
+                this.transitionManager.UseMaterial(background.GetComponent<MeshRenderer>().material);
+            }
             this.foreground = this.transform.Find("Foreground");
             this.exitsHolder = this.transform.Find("Exits");
             this.activeAreasHolder = this.transform.Find("ActiveAreas");
@@ -587,12 +572,31 @@ namespace uAdventure.Runner
 
         }
 
+        private bool wasDisabled;
         private void SetSlide(int i)
         {
             if (slides != null && i < slides.frames.Count)
             {
-                this.currentSlide = i;
-                SetBackground(slides.frames[currentSlide].Image);
+                var texture = slides.frames[i].Image;
+
+                if (slides.Animation.isUseTransitions() && i > 0)
+                {
+                    var transition = slides.Animation.getTranstionForFrame(currentSlide);
+                    transitionManager.PrepareTransition(transition, texture);
+                    wasDisabled = uAdventureRaycaster.Instance.Disabled;
+                    uAdventureRaycaster.Instance.Disabled = true;
+                    transitionManager.DoTransition((_, t) =>
+                    {
+                        this.currentSlide = i;
+                        SetBackground(t);
+                        uAdventureRaycaster.Instance.Disabled = wasDisabled;
+                    });
+                }
+                else
+                {
+                    this.currentSlide = i;
+                    SetBackground(texture);
+                }
             }
         }
 
@@ -680,11 +684,13 @@ namespace uAdventure.Runner
                     }
                     if(previousTarget != null)
                     {
-                        triggerScene = new TriggerSceneEffect(previousTarget.getId(), int.MinValue, int.MinValue);
+                        triggerScene = new TriggerSceneEffect(previousTarget.getId(), int.MinValue, int.MinValue, 
+                            float.MinValue, cutscene.getTransitionTime(), (int)cutscene.getTransitionType());
                     }
                     break;
                 case Cutscene.NEWSCENE:
-                    triggerScene = new TriggerSceneEffect(cutscene.getTargetId(), int.MinValue, int.MinValue);
+                    triggerScene = new TriggerSceneEffect(cutscene.getTargetId(), int.MinValue, int.MinValue,
+                        float.MinValue, cutscene.getTransitionTime(), (int)cutscene.getTransitionType());
                     break;
                 case Cutscene.ENDCHAPTER:
                     // TODO: When we add more chapters, we must trigger the next chapter instead of quiting que aplication
@@ -694,11 +700,8 @@ namespace uAdventure.Runner
 
             if (triggerScene != null)
             {
-                var effects = new Effects
-            {
-                triggerScene
-            };
-                var cutsceneEffects = ((Cutscene)SceneData).getEffects();
+                var effects = new Effects { triggerScene };
+                var cutsceneEffects = cutscene.getEffects();
                 if (cutsceneEffects != null)
                 {
                     effects.AddRange(cutsceneEffects);

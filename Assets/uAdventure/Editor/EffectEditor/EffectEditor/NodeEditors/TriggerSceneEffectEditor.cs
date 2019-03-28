@@ -15,6 +15,7 @@ namespace uAdventure.Editor
         private string[] scenes;
         private readonly SceneEditor localSceneEditor;
         private readonly Trajectory.Node playerDestination;
+        private readonly string[] transitionTypes;
 
         public Rect Window
         {
@@ -43,6 +44,16 @@ namespace uAdventure.Editor
             localSceneEditor = new SceneEditor();
             playerDestination = new Trajectory.Node("", 0, 0, 1f);
             localSceneEditor.Elements = new List<DataControl>() { new NodeDataControl(null, playerDestination, new Trajectory()) };
+
+            transitionTypes = new string[]
+            {
+                TC.get("NextScene.NoTransition"),
+                TC.get("NextScene.TopToBottom"),
+                TC.get("NextScene.BottomToTop"),
+                TC.get("NextScene.LeftToRight"),
+                TC.get("NextScene.RightToLeft"),
+                TC.get("NextScene.FadeIn")
+            };
         }
 
         public virtual void draw()
@@ -62,7 +73,23 @@ namespace uAdventure.Editor
                 EditorGUILayout.HelpBox("TriggerSceneEffectEditor.ValidDestination".Traslate(), MessageType.Error);
                 return;
             }
-            
+
+            // Transition Type
+            EditorGUI.BeginChangeCheck();
+            var newType = EditorGUILayout.Popup(TC.get("NextScene.Transition"), (int)effect.getTransitionType(), transitionTypes);
+            if (EditorGUI.EndChangeCheck())
+            {
+                effect.setTransitionType((NextSceneEnumTransitionType)newType);
+            }
+
+            // Transition Time
+            EditorGUI.BeginChangeCheck();
+            var time = Mathf.Clamp(EditorGUILayout.IntField(TC.get("NextScene.TransitionTime"), effect.getTransitionTime()), 0, 5000);
+            if (EditorGUI.EndChangeCheck())
+            {
+                effect.setTransitionTime(time);
+            }
+
             var scenesList = Controller.Instance.SelectedChapterDataControl.getScenesList();
             // If the selected scene IS a scene (not a cutscene or any other type)
             if(Controller.Instance.PlayerMode == Controller.FILE_ADVENTURE_3RDPERSON_PLAYER && sceneIndex < scenesList.getScenes().Count)

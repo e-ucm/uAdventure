@@ -468,7 +468,7 @@ namespace uAdventure.Editor
                     Vector2 previewSize = new Vector2(800, 600);
                     if (!images.ContainsKey(background))
                     {
-                        scenePreview = Controller.ResourceManager.getImage(background);
+                        scenePreview = Controller.ResourceManager.getImage(background) ?? Controller.ResourceManager.getImage(SpecialAssetPaths.ASSET_EMPTY_IMAGE);
                         images[background] = scenePreview;
                     }
                     else

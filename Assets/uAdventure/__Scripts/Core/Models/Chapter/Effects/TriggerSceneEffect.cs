@@ -31,7 +31,7 @@ namespace uAdventure.Core
         /**
          * Type of the transition
          */
-        private int transitionType = 0;
+        private NextSceneEnumTransitionType transitionType = 0;
 
         private float destinyScale;
 
@@ -65,7 +65,7 @@ namespace uAdventure.Core
             this.y = y;
             this.DestinyScale = destinyScale;
             this.transitionTime = transitionTime;
-            this.transitionType = transitionType;
+            this.transitionType = (NextSceneEnumTransitionType)transitionType;
         }
 
         public override EffectType getType()
@@ -133,27 +133,25 @@ namespace uAdventure.Core
             this.x = x;
             this.y = y;
         }
-        /*
-        @Override
-        public Object clone() throws CloneNotSupportedException
-        {
-
-            TriggerSceneEffect tse = (TriggerSceneEffect) super.clone( );
-            tse.targetSceneId = ( targetSceneId != null ? new string(targetSceneId ) : null );
-            tse.x = x;
-            tse.y = y;
-            return tse;
-        }*/
 
         public int getTransitionTime()
         {
 
             return transitionTime;
         }
-        public int getTransitionType()
+        public NextSceneEnumTransitionType getTransitionType()
         {
 
             return transitionType;
+        }
+
+        public void setTransitionTime(int transitionTime)
+        {
+            this.transitionTime = transitionTime;
+        }
+        public void setTransitionType(NextSceneEnumTransitionType transitionType)
+        {
+            this.transitionType = transitionType;
         }
     }
 }

@@ -1,10 +1,8 @@
 ﻿using System;
-using UnityEngine;
-using System.Collections;
 
 namespace uAdventure.Core
 {
-    public abstract class Cutscene : GeneralScene, HasTargetId, Positioned, ICloneable, ITypeGroupable
+    public abstract class Cutscene : GeneralScene, HasTargetId, Positioned, ITypeGroupable
     {
         /**
             * The tag for the video
@@ -95,8 +93,7 @@ namespace uAdventure.Core
          */
         public bool isEndScene()
         {
-
-            return (next == ENDCHAPTER);
+            return next == ENDCHAPTER;
         }
 
         /**
@@ -107,11 +104,7 @@ namespace uAdventure.Core
          */
         public void setEndScene(bool endScene)
         {
-
-            if (endScene)
-                this.next = ENDCHAPTER;
-            else
-                this.next = GOBACK;
+            this.next = endScene ? ENDCHAPTER : GOBACK;
         }
 
         /**
@@ -122,7 +115,6 @@ namespace uAdventure.Core
          */
         public bool hasPlayerPosition()
         {
-
             return (destinyX != int.MinValue) && (destinyY != int.MinValue);
         }
 
@@ -135,7 +127,6 @@ namespace uAdventure.Core
          */
         public int getPositionX()
         {
-
             return destinyX;
         }
 
@@ -148,7 +139,6 @@ namespace uAdventure.Core
          */
         public int getPositionY()
         {
-
             return destinyY;
         }
 
@@ -159,7 +149,6 @@ namespace uAdventure.Core
          */
         public Effects getEffects()
         {
-
             return effects;
         }
 
@@ -171,13 +160,11 @@ namespace uAdventure.Core
          */
         public void setTargetId(string nextSceneId)
         {
-
             this.idTarget = nextSceneId;
         }
 
         public string getTargetId()
         {
-
             return idTarget;
         }
 
@@ -191,7 +178,6 @@ namespace uAdventure.Core
          */
         public void setDestinyPosition(int positionX, int positionY)
         {
-
             setPositionX(positionX);
             setPositionY(positionY);
         }
@@ -204,7 +190,6 @@ namespace uAdventure.Core
          */
         public void setPositionX(int positionX)
         {
-
             this.destinyX = positionX;
         }
 
@@ -216,7 +201,6 @@ namespace uAdventure.Core
          */
         public void setPositionY(int positionY)
         {
-
             this.destinyY = positionY;
         }
 
@@ -228,68 +212,48 @@ namespace uAdventure.Core
          */
         public void setEffects(Effects effects)
         {
-
             this.effects = effects;
         }
 
         public NextSceneEnumTransitionType getTransitionType()
         {
-
             return transitionType;
         }
 
         public int getTransitionTime()
         {
-
             return transitionTime;
         }
 
         public void setTransitionType(NextSceneEnumTransitionType transitionType)
         {
-
             this.transitionType = transitionType;
         }
 
         public void setTransitionTime(int transitionTime)
         {
-
             this.transitionTime = transitionTime;
         }
 
         public void setNext(int next)
         {
-
             this.next = next;
         }
 
         public int getNext()
         {
-
             return next;
         }
-        /*
-        @Override
-        public Object clone() throws CloneNotSupportedException
-        {
-
-            Cutscene c = (Cutscene) super.clone( );
-            c.next = next;
-            c.destinyX = destinyX;
-            c.destinyY = destinyY;
-            c.effects = ( effects != null ? (Effects) effects.clone( ) : null );
-            c.idTarget = ( idTarget != null ? new string(idTarget ) : null );
-            return c;
-        }*/
 
         public override object Clone()
         {
-            Cutscene c = (Cutscene)base.Clone();
+            var c = (Cutscene)base.Clone();
             c.next = next;
             c.destinyX = destinyX;
             c.destinyY = destinyY;
             c.effects = (effects != null ? (Effects)effects.Clone() : null);
-            c.idTarget = (idTarget != null ? idTarget : null);
-            return c; ;
+            c.idTarget = idTarget;
+            return c;
         }
 
         public Type GetGroupType()

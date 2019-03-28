@@ -18,6 +18,7 @@ namespace uAdventure.Runner
         BOOK
     }
 
+    [RequireComponent(typeof(TransitionManager))]
     public class Game : MonoBehaviour, IPointerClickHandler
     {
 
@@ -43,11 +44,12 @@ namespace uAdventure.Runner
         public string gamePath = "", gameName = "", scene_name = "";
 
         // Execution
-        private bool waitingRunTarget = false;
+        private bool waitingRunTarget = false, waitingTransition = false;
         private Stack<KeyValuePair<Interactuable, ExecutionEvent>> executeStack;
         private IRunnerChapterTarget runnerTarget;
         private GameState game_state;
         private uAdventureRaycaster uAdventureRaycaster;
+        private TransitionManager transitionManager;
 
         // GUI
         public GameObject Blur_Prefab;
@@ -180,19 +182,25 @@ namespace uAdventure.Runner
 
         protected void Start()
         {
-            if (!forceScene)
-                RunTarget(GameState.InitialChapterTarget.getId());
-            else
-                RunTarget(scene_name);
 
             uAdventureRaycaster = FindObjectOfType<uAdventureRaycaster>();
             if (!uAdventureRaycaster)
             {
-                Debug.LogError("No uAdventure raycaster was found in the scene!");
+                Debug.LogError("No uAdventureRaycaster was found in the scene!");
+            }
+            else
+            {
+                // When clicks are out, i capture them
+                uAdventureRaycaster.Base = this.gameObject;
             }
 
-            // When clicks are out, i capture them
-            uAdventureRaycaster.Base = this.gameObject;
+            transitionManager = GetComponent<TransitionManager>();
+            if (!transitionManager)
+            {
+                Debug.LogError("No TransitionManager was found in the scene!");
+            }
+
+            RunTarget(forceScene ? scene_name : GameState.InitialChapterTarget.getId());
 
             TimerController.Instance.Timers = GameState.GetTimers();
             TimerController.Instance.Run();
@@ -202,7 +210,7 @@ namespace uAdventure.Runner
         public void OnPointerClick(PointerEventData eventData)
         {
             MenuMB.Instance.hide();
-            if (!waitingRunTarget && executeStack.Count > 0 && guistate != GUIState.ANSWERS_MENU)
+            if (!waitingRunTarget && !waitingTransition && executeStack.Count > 0 && guistate != GUIState.ANSWERS_MENU)
             {
                 Interacted();
             }
@@ -213,8 +221,13 @@ namespace uAdventure.Runner
             if (waitingRunTarget && runnerTarget.IsReady)
             {
                 waitingRunTarget = false;
-                uAdventureRaycaster.Instance.Override = null;
-                Interacted();
+                waitingTransition = true;
+                transitionManager.DoTransition((_, __) =>
+                {
+                    waitingTransition = false;
+                    uAdventureRaycaster.Instance.Override = null;
+                    Interacted();
+                });
             }
 
             if (doTimeOut)
@@ -374,6 +387,7 @@ namespace uAdventure.Runner
 
         private float nextFlush = 0;
         private bool flushRequested = true;
+
         private void LoadTrackerSettings()
         {
             //Load tracker data
@@ -543,16 +557,20 @@ namespace uAdventure.Runner
 
             IChapterTarget target = GameState.GetChapterTarget(scene_id);
 
+            var transition = new Transition();
+            transition.setTime(transition_time);
+            transition.setType(transition_type);
+            transitionManager.PrepareTransition(transition);
+
             if (runnerTarget != null && runnerTarget.Data == target && scene_id == GameState.CurrentTarget)
             {
-                // TODO TRANSITIONS
                 runnerTarget.RenderScene();
             }
             else
             {
                 if (runnerTarget != null)
                 {
-                    runnerTarget.Destroy(transition_time / 1000f);
+                    runnerTarget.Destroy();
                 }
 
                 // Here we connect with the IChapterTargetFactory and create an IRunnerChapterTarget

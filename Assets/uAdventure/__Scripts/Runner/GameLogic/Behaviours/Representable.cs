@@ -9,6 +9,7 @@ namespace uAdventure.Runner
         N, E, S, O
     }
 
+    [RequireComponent(typeof(TransitionManager))]
     public class Representable : MonoBehaviour, Movable
     {
         public static readonly Vector2 RepresentablePivot = new Vector2(0.5f, 0f);
