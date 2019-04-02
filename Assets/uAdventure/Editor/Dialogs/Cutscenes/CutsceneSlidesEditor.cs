@@ -86,14 +86,14 @@ namespace uAdventure.Editor
             var incidences = new List<Incidence>();
             workingAnimation = Loader.LoadAnimation(cutsceneFilePath, Controller.ResourceManager, incidences) ?? new Animation(cutsceneFilePath, 40);
 
-            imageChooser = new FileChooser()
+            imageChooser = new FileChooser
             {
                 Empty = SpecialAssetPaths.ASSET_EMPTY_IMAGE,
                 FileType = FileType.FRAME_IMAGE,
                 Label = TC.get("Animation.Image")
             };
 
-            soundChooser = new FileChooser()
+            soundChooser = new FileChooser
             {
                 FileType = FileType.FRAME_MUSIC,
                 Label = TC.get("Animation.Sound")

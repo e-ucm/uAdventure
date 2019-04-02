@@ -30,13 +30,13 @@ namespace uAdventure.Runner
 
         private ResourceType resourceType = ResourceType.TEXTURE;
         private string animationUri;
-        private eAnim eanim = null;
-        private string then = null;
+        private eAnim eanim;
+        private string then;
         private int currentFrame;
         private float currentFrameDuration = 0.5f;
         private float timeElapsedInCurrentFrame = 0;
         private float z = 0;
-        private bool isTransitioning = false;
+        private bool isTransitioning;
 
         private ElementReference context;
         private Orientation orientation;

@@ -62,9 +62,9 @@ namespace uAdventure.Runner
             ResetMaterial();
             transitionMaterial.SetTexture("_TransitionTex", transitionTexture);
 
-            switch ((TransitionType) transition.getType())
+            switch (transition.getType())
             {
-                case TransitionType.NoTransition:
+                default: // TransitionType.NoTransition:
                     FinalizeTransition(transition, transitionTexture, onFinish);
                     yield break;
                 case TransitionType.FadeIn:
