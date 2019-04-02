@@ -549,7 +549,7 @@ namespace uAdventure.Runner
             return RunTarget(scene_id, 0, 0, notifyObject, trace);
         }
 
-        public IRunnerChapterTarget RunTarget(string scene_id, int transition_time = 0, int transition_type = 0, Interactuable notifyObject = null, bool trace = true)
+        public IRunnerChapterTarget RunTarget(string scene_id, int transition_time = 0, TransitionType transition_type = 0, Interactuable notifyObject = null, bool trace = true)
         {
             Debug.Log("Run target: " + scene_id);
             GUIManager.Instance.ShowHand(false);

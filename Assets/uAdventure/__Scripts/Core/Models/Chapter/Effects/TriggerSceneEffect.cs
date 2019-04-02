@@ -31,7 +31,7 @@ namespace uAdventure.Core
         /**
          * Type of the transition
          */
-        private NextSceneEnumTransitionType transitionType = 0;
+        private TransitionType transitionType = 0;
 
         private float destinyScale;
 
@@ -65,7 +65,7 @@ namespace uAdventure.Core
             this.y = y;
             this.DestinyScale = destinyScale;
             this.transitionTime = transitionTime;
-            this.transitionType = (NextSceneEnumTransitionType)transitionType;
+            this.transitionType = (TransitionType)transitionType;
         }
 
         public override EffectType getType()
@@ -139,7 +139,7 @@ namespace uAdventure.Core
 
             return transitionTime;
         }
-        public NextSceneEnumTransitionType getTransitionType()
+        public TransitionType getTransitionType()
         {
 
             return transitionType;
@@ -149,7 +149,7 @@ namespace uAdventure.Core
         {
             this.transitionTime = transitionTime;
         }
-        public void setTransitionType(NextSceneEnumTransitionType transitionType)
+        public void setTransitionType(TransitionType transitionType)
         {
             this.transitionType = transitionType;
         }

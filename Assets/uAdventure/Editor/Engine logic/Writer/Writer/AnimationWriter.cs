@@ -37,7 +37,10 @@ namespace uAdventure.Editor
             // Documentation node
             XmlElement documentation = doc.CreateElement("documentation");
             if (animation.getDocumentation() != null && animation.getDocumentation().Length > 0)
+            {
                 documentation.InnerText = animation.getDocumentation();
+            }
+
             mainNode.AppendChild(documentation);
 
             // Resources in this animation
@@ -63,8 +66,10 @@ namespace uAdventure.Editor
             // File saving
             string name = "Assets/uAdventure/Resources/CurrentGame/" + filename;
             if (!name.EndsWith(".eaa.xml"))
+            {
                 name += ".eaa.xml";
-            
+            }
+
             try
             {
                 // Save
@@ -81,20 +86,9 @@ namespace uAdventure.Editor
 
         private static XmlElement createTransitionElement(Transition t, XmlDocument doc)
         {
-
-            XmlElement element = doc.CreateElement("transition");
-
-            if (t.getType() == Transition.TYPE_NONE)
-                element.SetAttribute("type", "none");
-            else if (t.getType() == Transition.TYPE_FADEIN)
-                element.SetAttribute("type", "fadein");
-            else if (t.getType() == Transition.TYPE_HORIZONTAL)
-                element.SetAttribute("type", "horizontal");
-            else if (t.getType() == Transition.TYPE_VERTICAL)
-                element.SetAttribute("type", "vertical");
-
+            var element = doc.CreateElement("transition");
+            element.SetAttribute("type", ((int)t.getType()).ToString());
             element.SetAttribute("time", "" + t.getTime());
-
             return element;
         }
 
@@ -106,9 +100,13 @@ namespace uAdventure.Editor
             element.SetAttribute("uri", (f.getUri() != null ? f.getUri() : ""));
 
             if (f.getType() == Frame.TYPE_IMAGE)
+            {
                 element.SetAttribute("type", "image");
+            }
             else if (f.getType() == Frame.TYPE_VIDEO)
+            {
                 element.SetAttribute("type", "video");
+            }
 
             element.SetAttribute("time", f.getTime().ToString());
 

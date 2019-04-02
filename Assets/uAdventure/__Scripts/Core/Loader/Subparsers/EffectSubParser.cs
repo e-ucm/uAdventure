@@ -98,7 +98,7 @@ namespace uAdventure.Core
                         };
 
                         triggerSceneEffect.setTransitionTime(ExParsers.ParseDefault(effect.GetAttribute("transitionTime"), 0));
-                        triggerSceneEffect.setTransitionType((NextSceneEnumTransitionType)ExParsers.ParseDefault(effect.GetAttribute("transitionType"), 0));
+                        triggerSceneEffect.setTransitionType((TransitionType)ExParsers.ParseDefault(effect.GetAttribute("transitionType"), 0));
 
                         currentEffect = triggerSceneEffect;
                         break;

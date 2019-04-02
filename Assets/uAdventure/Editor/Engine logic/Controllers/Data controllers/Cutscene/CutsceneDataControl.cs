@@ -546,7 +546,7 @@ namespace uAdventure.Editor
             return cutscene.hasPlayerPosition();
         }
 
-        public NextSceneEnumTransitionType getTransitionType()
+        public TransitionType getTransitionType()
         {
 
             return cutscene.getTransitionType();
@@ -564,7 +564,7 @@ namespace uAdventure.Editor
             Controller.Instance.AddTool(new ChangeIntegerValueTool(cutscene, value, "getTransitionTime", "setTransitionTime"));
         }
 
-        public void setTransitionType(NextSceneEnumTransitionType value)
+        public void setTransitionType(TransitionType value)
         {
 
             Controller.Instance.AddTool(ChangeEnumValueTool.Create(cutscene, value, "getTransitionType", "setTransitionType"));

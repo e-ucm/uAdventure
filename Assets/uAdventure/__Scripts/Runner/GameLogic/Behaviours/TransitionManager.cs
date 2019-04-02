@@ -62,24 +62,24 @@ namespace uAdventure.Runner
             ResetMaterial();
             transitionMaterial.SetTexture("_TransitionTex", transitionTexture);
 
-            switch ((NextSceneEnumTransitionType) transition.getType())
+            switch ((TransitionType) transition.getType())
             {
-                case NextSceneEnumTransitionType.NO_TRANSITION:
+                case TransitionType.NoTransition:
                     FinalizeTransition(transition, transitionTexture, onFinish);
                     yield break;
-                case NextSceneEnumTransitionType.FADE_IN:
+                case TransitionType.FadeIn:
                     fade = true;
                     break;
-                case NextSceneEnumTransitionType.BOTTOM_TO_TOP:
+                case TransitionType.BottomToTop:
                     transitionMaterial.SetFloat("_DirectionY", -1);
                     break;
-                case NextSceneEnumTransitionType.TOP_TO_BOTTOM:
+                case TransitionType.TopToBottom:
                     transitionMaterial.SetFloat("_DirectionY", 1);
                     break;
-                case NextSceneEnumTransitionType.RIGHT_TO_LEFT:
+                case TransitionType.RightToLeft:
                     transitionMaterial.SetFloat("_DirectionX", -1);
                     break;
-                case NextSceneEnumTransitionType.LEFT_TO_RIGHT:
+                case TransitionType.LeftToRight:
                     transitionMaterial.SetFloat("_DirectionX", 1);
                     break;
             }

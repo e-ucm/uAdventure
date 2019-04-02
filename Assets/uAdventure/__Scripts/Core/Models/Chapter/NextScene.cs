@@ -4,10 +4,6 @@ using System.Collections;
 
 namespace uAdventure.Core
 {
-    public enum NextSceneEnumTransitionType
-    {
-        NO_TRANSITION = 0, TOP_TO_BOTTOM = 1, BOTTOM_TO_TOP = 2, LEFT_TO_RIGHT = 3, RIGHT_TO_LEFT = 4, FADE_IN = 5
-    }
     /**
      * This class holds the data of a next scene in eAdventure
      */
@@ -52,7 +48,7 @@ namespace uAdventure.Core
          */
         private ExitLook look;
 
-        private NextSceneEnumTransitionType transitionType;
+        private TransitionType transitionType;
 
         private int transitionTime;
 
@@ -73,7 +69,7 @@ namespace uAdventure.Core
             conditions = new Conditions();
             effects = new Effects();
             postEffects = new Effects();
-            transitionType = NextSceneEnumTransitionType.NO_TRANSITION;
+            transitionType = TransitionType.NoTransition;
             transitionTime = 0;
         }
 
@@ -100,7 +96,7 @@ namespace uAdventure.Core
             conditions = new Conditions();
             effects = new Effects();
             postEffects = new Effects();
-            transitionType = NextSceneEnumTransitionType.NO_TRANSITION;
+            transitionType = TransitionType.NoTransition;
             transitionTime = 0;
         }
 
@@ -335,7 +331,7 @@ namespace uAdventure.Core
             look = exitLook;
         }
 
-        public NextSceneEnumTransitionType getTransitionType()
+        public TransitionType getTransitionType()
         {
 
             return transitionType;
@@ -347,7 +343,7 @@ namespace uAdventure.Core
             return transitionTime;
         }
 
-        public void setTransitionType(NextSceneEnumTransitionType transitionType)
+        public void setTransitionType(TransitionType transitionType)
         {
 
             this.transitionType = transitionType;

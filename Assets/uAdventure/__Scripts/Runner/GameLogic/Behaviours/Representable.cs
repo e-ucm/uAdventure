@@ -18,6 +18,7 @@ namespace uAdventure.Runner
 
         public enum ResourceType { ANIMATION, TEXTURE };
 
+        private TransitionManager transitionManager;
         private Element element;
         private Renderer rend;
         private ResourcesUni resource;
@@ -35,6 +36,7 @@ namespace uAdventure.Runner
         private float currentFrameDuration = 0.5f;
         private float timeElapsedInCurrentFrame = 0;
         private float z = 0;
+        private bool isTransitioning = false;
 
         private ElementReference context;
         private Orientation orientation;
@@ -178,6 +180,8 @@ namespace uAdventure.Runner
         protected virtual void Start()
         {
             rend = this.GetComponent<Renderer>();
+            transitionManager = this.GetComponent<TransitionManager>();
+            transitionManager.UseMaterial(rend.material);
             checkResources();
         }
 
@@ -307,6 +311,12 @@ namespace uAdventure.Runner
             return null;
         }
 
+        protected Texture2D GetFrameTexture(int framenumber)
+        {
+            currentFrame = framenumber % eAnim.frames.Count;
+            return eAnim.frames[currentFrame].Image;
+        }
+
         protected void SetFrame(int framenumber)
         {
             if(eAnim != null)
@@ -323,12 +333,30 @@ namespace uAdventure.Runner
             if (eAnim != null)
             {
                 timeElapsedInCurrentFrame -= currentFrameDuration;
+                Transition transition = null;
+                if (eAnim.Animation.isUseTransitions())
+                {
+                    transition = eAnim.Animation.getTranstionForFrame(currentFrame);
+                }
                 currentFrame++;
                 if (!string.IsNullOrEmpty(then) && currentFrame == eAnim.frames.Count)
                 {
                     Play(then);
                 }
-                SetFrame(currentFrame);
+                else if (transition != null)
+                {
+                    isTransitioning = true;
+                    transitionManager.PrepareTransition(transition, GetFrameTexture(currentFrame));
+                    transitionManager.DoTransition((_, __) =>
+                    {
+                        isTransitioning = false;
+                        SetFrame(currentFrame);
+                    });
+                }
+                else
+                {
+                    SetFrame(currentFrame);
+                }
             }
         }
 
@@ -407,7 +435,7 @@ namespace uAdventure.Runner
 
         protected virtual void Update()
         {
-            if (resourceType == ResourceType.ANIMATION && eAnim != null)
+            if (resourceType == ResourceType.ANIMATION && eAnim != null && !isTransitioning)
             {
                 timeElapsedInCurrentFrame += Time.deltaTime;
                 

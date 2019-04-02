@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.Xml;
+﻿using System.Xml;
 
 namespace uAdventure.Core
 {
@@ -10,13 +8,16 @@ namespace uAdventure.Core
 	{
 		public object DOMParse(XmlElement element, params object[] parameters)
 		{
-			Transition transition = new Transition();
+			var transition = new Transition();
 
 			switch(element.GetAttribute("type")){
-				case "none": 		transition.setType(Transition.TYPE_NONE); break;
-				case "fadein": 		transition.setType(Transition.TYPE_FADEIN); break;
-				case "vertical": 	transition.setType(Transition.TYPE_VERTICAL); break;
-				case "horizontal": 	transition.setType(Transition.TYPE_HORIZONTAL); break;
+				case "none": 		transition.setType(TransitionType.NoTransition); break;
+				case "fadein": 		transition.setType(TransitionType.FadeIn); break;
+				case "vertical": 	transition.setType(TransitionType.TopToBottom); break;
+				case "horizontal": 	transition.setType(TransitionType.LeftToRight); break;
+                default:
+                    transition.setType((TransitionType) ExParsers.ParseDefault(element.GetAttribute("type"), 0));
+                    break;
 			}
 
 			transition.setTime(ExParsers.ParseDefault (element.GetAttribute("time"), 0));

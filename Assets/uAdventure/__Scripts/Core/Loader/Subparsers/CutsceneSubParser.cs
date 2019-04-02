@@ -35,7 +35,7 @@ namespace uAdventure.Core
 			cutscene.setTargetId(element.GetAttribute("idTarget"));
 			cutscene.setPositionX(ExParsers.ParseDefault(element.GetAttribute("destinyX"), int.MinValue));
 			cutscene.setPositionY(ExParsers.ParseDefault(element.GetAttribute("destinyY"), int.MinValue));
-			cutscene.setTransitionType((NextSceneEnumTransitionType)ExParsers.ParseDefault(element.GetAttribute("transitionType"),  0));
+			cutscene.setTransitionType((TransitionType)ExParsers.ParseDefault(element.GetAttribute("transitionType"),  0));
 			cutscene.setTransitionTime(ExParsers.ParseDefault(element.GetAttribute("transitionTime"), 0));
 
             if (element.SelectSingleNode("name") != null)
@@ -68,7 +68,7 @@ namespace uAdventure.Core
 					ExParsers.ParseDefault(element.GetAttribute("destinyX"), int.MinValue),
 					ExParsers.ParseDefault(element.GetAttribute("destinyY"), int.MinValue));
 				
-				currentNextScene.setTransitionType((NextSceneEnumTransitionType)ExParsers.ParseDefault(element.GetAttribute("transitionType"), 0));
+				currentNextScene.setTransitionType((TransitionType)ExParsers.ParseDefault(element.GetAttribute("transitionType"), 0));
 				currentNextScene.setTransitionTime(ExParsers.ParseDefault(element.GetAttribute("transitionTime"), 0));
 				currentNextScene.setConditions(DOMParserUtility.DOMParse (el.SelectSingleNode ("condition"), parameters) as Conditions ?? new Conditions());
 				currentNextScene.setEffects(DOMParserUtility.DOMParse (el.SelectSingleNode ("effect"), parameters) as Effects ?? new Effects());

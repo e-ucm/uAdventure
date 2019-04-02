@@ -26,7 +26,7 @@ namespace uAdventure.Geo
             zc.zoneid = geoElement.Id;
             zc.Save();
 
-            Game.Instance.RunTarget(effect.getTargetId(), effect.getTransitionTime(), (int)effect.getTransitionType());
+            Game.Instance.RunTarget(effect.getTargetId(), effect.getTransitionTime(), effect.getTransitionType());
 
             return false;
         }

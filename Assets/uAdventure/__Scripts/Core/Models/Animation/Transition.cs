@@ -1,6 +1,4 @@
 ﻿using System;
-using UnityEngine;
-using System.Collections;
 
 namespace uAdventure.Core
 {
@@ -11,27 +9,6 @@ namespace uAdventure.Core
     {
 
         /**
-         * The transition does nothing
-         */
-        public const int TYPE_NONE = 0;
-
-        /**
-         * The transition makes the previous frame disappear while the new one
-         * appears
-         */
-        public const int TYPE_FADEIN = 1;
-
-        /**
-         * The transition places the new frame over the old one from left to right
-         */
-        public const int TYPE_VERTICAL = 2;
-
-        /**
-         * The transition places the new frame over the old one from top to bottom
-         */
-        public const int TYPE_HORIZONTAL = 3;
-
-        /**
          * Time (duration) of the transition
          */
         private long time;
@@ -40,16 +17,15 @@ namespace uAdventure.Core
          * Type of the transition: {@link #TYPE_FADEIN}, {@link #TYPE_NONE},
          * {@link #TYPE_HORIZONTAL} or {@link #TYPE_VERTICAL}
          */
-        private int type;
+        private TransitionType type;
 
         /**
          * Creates a new empty transition
          */
         public Transition()
         {
-
             time = 0;
-            type = TYPE_NONE;
+            type = TransitionType.NoTransition;
         }
 
         /**
@@ -59,7 +35,6 @@ namespace uAdventure.Core
          */
         public long getTime()
         {
-
             return time;
         }
 
@@ -71,7 +46,6 @@ namespace uAdventure.Core
          */
         public void setTime(long time)
         {
-
             this.time = time;
         }
 
@@ -80,9 +54,8 @@ namespace uAdventure.Core
          * 
          * @return the type of the transition
          */
-        public int getType()
+        public TransitionType getType()
         {
-
             return type;
         }
 
@@ -92,21 +65,11 @@ namespace uAdventure.Core
          * @param type
          *            The new type of the transition
          */
-        public void setType(int type)
+        public void setType(TransitionType type)
         {
-
             this.type = type;
         }
-        /*
-        @Override
-        public Object clone() throws CloneNotSupportedException
-        {
 
-            Transition t = (Transition) super.clone( );
-            t.time = time;
-            t.type = type;
-            return t;
-        }*/
         public object Clone()
         {
             Transition t = (Transition)this.MemberwiseClone();

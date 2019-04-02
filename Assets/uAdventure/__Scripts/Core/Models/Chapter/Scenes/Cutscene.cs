@@ -29,7 +29,7 @@ namespace uAdventure.Core
 
         private int transitionTime;
 
-        private NextSceneEnumTransitionType transitionType;
+        private TransitionType transitionType;
 
         private int destinyX;
 
@@ -56,7 +56,7 @@ namespace uAdventure.Core
             effects = new Effects();
             destinyX = int.MinValue;
             destinyY = int.MaxValue;
-            transitionType = NextSceneEnumTransitionType.NO_TRANSITION;
+            transitionType = TransitionType.NoTransition;
             transitionTime = 0;
             next = GOBACK;
         }
@@ -215,7 +215,7 @@ namespace uAdventure.Core
             this.effects = effects;
         }
 
-        public NextSceneEnumTransitionType getTransitionType()
+        public TransitionType getTransitionType()
         {
             return transitionType;
         }
@@ -225,7 +225,7 @@ namespace uAdventure.Core
             return transitionTime;
         }
 
-        public void setTransitionType(NextSceneEnumTransitionType transitionType)
+        public void setTransitionType(TransitionType transitionType)
         {
             this.transitionType = transitionType;
         }

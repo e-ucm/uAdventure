@@ -94,7 +94,7 @@ namespace uAdventure.Editor
                 var newType = EditorGUILayout.Popup(TC.get("NextScene.Transition"), (int)current.getTransitionType(), transitionTypes);
                 if (EditorGUI.EndChangeCheck())
                 {
-                    current.setTransitionType((NextSceneEnumTransitionType)newType);
+                    current.setTransitionType((TransitionType)newType);
                 }
 
                 // Transition Time

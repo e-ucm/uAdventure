@@ -195,7 +195,7 @@ namespace uAdventure.Core
 					transitionTime 	= ExParsers.ParseDefault (el.GetAttribute ("transitionTime"), 0);
 
                 currentNextScene = new NextScene(idTarget, x, y);
-                currentNextScene.setTransitionType((NextSceneEnumTransitionType)transitionType);
+                currentNextScene.setTransitionType((TransitionType)transitionType);
                 currentNextScene.setTransitionTime(transitionTime);
 
                 currentNextScene.setExitLook(currentExitLook);
