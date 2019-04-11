@@ -1,6 +1,9 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
+using uAdventure.Runner;
 
-namespace uAdventure.Runner
+namespace uAdventure.Core
 {
     public static class Vector2Util
     {
@@ -88,6 +91,34 @@ namespace uAdventure.Runner
                 angle = 360 - angle;
 
             return angle;
+        }
+
+        public static Vector2 Center(this IEnumerable<Vector2> source)
+        {
+            if (source == null)
+            {
+                throw new System.ArgumentNullException("source");
+            }
+
+            double sumX = 0;
+            double sumY = 0;
+            double count = 0;
+            checked
+            {
+                foreach (var v in source)
+                {
+                    sumX += v.x;
+                    sumY += v.y;
+                    count++;
+                }
+            }
+
+            if (count > 0)
+            {
+                return new Vector2((float)(sumX / count), (float)(sumY / count));
+            }
+            
+            throw new ArgumentException("Average is empty");
         }
     }
 }
