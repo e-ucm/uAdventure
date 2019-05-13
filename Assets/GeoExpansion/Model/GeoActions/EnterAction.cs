@@ -1,10 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 namespace uAdventure.Geo
 {
     public class EnterAction : GeoAction
     {
+        private readonly string[] parameters = new[] { "OnlyFromOutside" };
+
         public EnterAction() : base()
         {
             OnlyFromOutside = true;
@@ -19,6 +22,8 @@ namespace uAdventure.Geo
         }
 
         public bool OnlyFromOutside { get; set; }
+        
+        public override string[] Parameters { get { return parameters; } }
 
         public override object Clone()
         {

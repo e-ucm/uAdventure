@@ -1,9 +1,11 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 using MapzenGo.Helpers;
+using uAdventure.Core;
 
-public class GMLGeometry
+public class GMLGeometry : ICloneable
 {
 
     public enum GeometryType { Point, LineString, Polygon }
@@ -11,11 +13,13 @@ public class GMLGeometry
     public GMLGeometry()
     {
         Points = new List<Vector2d>();
+        Conditions = new Conditions();
     }
 
     public GeometryType Type { get; set; }
     public List<Vector2d> Points { get; set; }
     public float Influence { get; set; }
+    public Conditions Conditions { get; set; }
 
     public void AddPoint(Vector2d point)
     {
@@ -162,6 +166,14 @@ public class GMLGeometry
     public bool InsideInfluence(Vector2d point, float extraMargin)
     {
         return InsideMargin(point, Influence + extraMargin);
+    }
+
+    public object Clone()
+    {
+        var clone = this.MemberwiseClone() as GMLGeometry;
+        clone.Points = Points.ToList();
+        clone.Conditions = Conditions.Clone() as Conditions;
+        return clone;
     }
 
     public Vector2d Center {

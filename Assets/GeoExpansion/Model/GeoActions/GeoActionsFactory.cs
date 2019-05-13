@@ -7,36 +7,33 @@ namespace uAdventure.Geo
 {
     public class GeoActionsFactory
     {
-
         protected static GeoActionsFactory instance;
+        protected List<GeoAction> actionsList;
+        protected Dictionary<Type, string> avaliableActions;
+
         public static GeoActionsFactory Instance
         {
             get
             {
-                if (instance == null)
-                    instance = new GeoActionsFactory();
-
-                return instance;
+                return instance ?? (instance = new GeoActionsFactory());
             }
         }
 
         protected GeoActionsFactory()
         {
-            actionsList = new List<GeoAction>();
-
-            // Add actions here
-            actionsList.Add(new EnterAction());
-            actionsList.Add(new ExitAction());
-            actionsList.Add(new InspectAction());
-            actionsList.Add(new LookToAction());
-            // End add
+            actionsList = new List<GeoAction>
+            {
+                // Add actions here
+                new EnterAction(),
+                new ExitAction(),
+                new InspectAction(),
+                new LookToAction()
+            };
 
             avaliableActions = new Dictionary<Type, string>();
             actionsList.ForEach(a => avaliableActions.Add(a.GetType(), a.Name));
         }
 
-        protected List<GeoAction> actionsList;
-        protected Dictionary<Type, string> avaliableActions;
         public Dictionary<Type, string> AvaliableActions { get { return avaliableActions; } }
 
         public GeoAction CreateActionFor(Type type)

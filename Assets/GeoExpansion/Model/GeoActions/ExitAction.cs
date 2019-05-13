@@ -6,6 +6,8 @@ namespace uAdventure.Geo
 {
     public class ExitAction : GeoAction
     {
+
+        private readonly string[] parameters = new[] { "OnlyFromInside" };
         public ExitAction() : base()
         {
             OnlyFromInside = true;
@@ -18,6 +20,7 @@ namespace uAdventure.Geo
                 return "Exit";
             }
         }
+        public override string[] Parameters { get { return parameters; } }
 
         public bool OnlyFromInside { get; set; }
 

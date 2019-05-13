@@ -207,11 +207,15 @@ namespace uAdventure.Core
             return getPureIds(typeof(T));
         }
 
-		public void deleteId<T>(string id){
+        public void deleteId<T>(string id)
+        {
+            deleteId(typeof(T), id);
+        }
+
+        public void deleteId(Type t, string id){
 			if (globalIdentifiers.ContainsKey(id))
             {
                 globalIdentifiers.Remove(id);
-                var t = typeof(T);
 
                 if (t.IsInterface)
                 {

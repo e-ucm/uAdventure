@@ -6,7 +6,7 @@ using System;
 
 namespace uAdventure.Geo
 {
-    public class MapElement : Documented, HasTargetId, ICloneable
+    public abstract class MapElement : Documented, HasTargetId, ICloneable
     {
         private string targetId;
         private string documentation;
@@ -15,9 +15,7 @@ namespace uAdventure.Geo
 
         public Conditions Conditions { get; set; }
 
-        public MapElement() : this("") { }
-
-        public MapElement(string targetId)
+        protected MapElement(string targetId)
         {
             this.targetId = targetId;
             Conditions = new Conditions();

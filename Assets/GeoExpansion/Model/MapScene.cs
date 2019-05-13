@@ -10,7 +10,7 @@ namespace uAdventure.Geo
         Aerial2D, Ortographic3D, Perspective3D
     };
 
-    public class MapScene : IChapterTarget
+    public class MapScene : IChapterTarget, Documented, HasId
     {
         /**
          * xApi Class
@@ -27,6 +27,7 @@ namespace uAdventure.Geo
         //-------------
         public CameraType CameraType { get; set; }
         public string Id { get; set; }
+        public string Documentation { get; set; }
         public List<MapElement> Elements { get; set; }
         public Vector2d LatLon { get; set; }
 
@@ -54,6 +55,11 @@ namespace uAdventure.Geo
             return Id;
         }
 
+        public void setId(string id)
+        {
+            this.Id = id;
+        }
+
         public string getXApiClass()
         {
             return xapiClass;
@@ -62,6 +68,16 @@ namespace uAdventure.Geo
         public string getXApiType()
         {
             return xapiType;
+        }
+
+        public void setDocumentation(string documentation)
+        {
+            Documentation = documentation;
+        }
+
+        public string getDocumentation()
+        {
+            return Documentation;
         }
     }
 
