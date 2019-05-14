@@ -224,6 +224,7 @@ namespace uAdventure.Runner
                 progress = progress + point.getProgress(player_speed, Time.deltaTime);
                 representable.Context.setScale(point.getScaleAt(progress, originalScale));
                 representable.setPosition(point.getPointAt(progress, origin));
+                representable.Adaptate();
 
                 var isInside = (toArea != null && toArea.Contains(representable.getPosition(), distanceToArea));
 
