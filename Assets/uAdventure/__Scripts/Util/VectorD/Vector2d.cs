@@ -218,7 +218,7 @@ namespace UnityEngine
                 return false;
             }
 
-            var tokens = value.Split(',').Select(t => t.Trim()).ToArray();
+            var tokens = value.Substring(1, value.Length -2).Split(',').Select(t => t.Trim()).ToArray();
             if (tokens.Length != 2)
             {
                 result = zero;
@@ -233,7 +233,7 @@ namespace UnityEngine
             }
 
             result = new Vector2d(first, second);
-            return false;
+            return true;
         }
 
         public override string ToString()

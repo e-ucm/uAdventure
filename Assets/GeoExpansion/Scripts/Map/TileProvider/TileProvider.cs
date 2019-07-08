@@ -100,6 +100,14 @@ namespace uAdventure.Geo
         #region Loaders
         // ##################################
 
+
+        public ITilePromise GetTile(Vector3d tile, Action<ITilePromise> callback)
+        {
+            var defaultTileMeta = publicMeta.Count > 0 ? publicMeta[0] : null;
+            return defaultTileMeta != null ? GetTile(tile, defaultTileMeta, callback) : null;
+        }
+
+
         public ITilePromise GetTile(Vector3d tile, ITileMeta tileMeta, Action<ITilePromise> callback)
         {
             if (!tileCache.ContainsKey(tileMeta))

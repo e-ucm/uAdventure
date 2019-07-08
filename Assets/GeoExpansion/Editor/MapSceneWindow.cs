@@ -62,6 +62,7 @@ namespace uAdventure.Geo
                 var mapScene = GeoController.Instance.MapScenes[GeoController.Instance.SelectedMapScene];
                 mapEditor.Elements = mapScene.Elements.DataControls.Cast<DataControl>().Union(new []{mapScene.GameplayArea}).ToList();
                 mapEditor.Center = mapScene.LatLon;
+                mapEditor.Zoom = mapScene.Zoom;
                 mapEditor.TileMeta = TileProvider.Instance.PublicMetas.First(m => m.Identifier == mapScene.GameplayArea.TileMetaIdentifier);
             }
         }
@@ -87,6 +88,7 @@ namespace uAdventure.Geo
 
             mapEditor.Elements = mapSceneDataControl.Elements.DataControls.Cast<DataControl>().Union(new[] { mapSceneDataControl.GameplayArea }).ToList();
             mapEditor.Center = mapSceneDataControl.LatLon;
+            mapEditor.Zoom = mapSceneDataControl.Zoom;
             mapEditor.Draw(rect);
 
             Event.current.type = eventType;
