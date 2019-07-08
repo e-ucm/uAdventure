@@ -80,7 +80,7 @@ namespace uAdventure.Geo
         {
             var mapSceneDataControl = dataControlList.list[index] as MapSceneDataControl;
             var eventType = Event.current.type;
-            if (Event.current.type != EventType.Layout || Event.current.type != EventType.Repaint)
+            if (Event.current.type != EventType.Layout && Event.current.type != EventType.Repaint)
             {
                 // Force the event ussage to prevent the map interaction
                 Event.current.Use();
@@ -89,6 +89,7 @@ namespace uAdventure.Geo
             mapEditor.Elements = mapSceneDataControl.Elements.DataControls.Cast<DataControl>().Union(new[] { mapSceneDataControl.GameplayArea }).ToList();
             mapEditor.Center = mapSceneDataControl.LatLon;
             mapEditor.Zoom = mapSceneDataControl.Zoom;
+            mapEditor.TileMeta = TileProvider.Instance.GetTileMeta(mapSceneDataControl.GameplayArea.TileMetaIdentifier);
             mapEditor.Draw(rect);
 
             Event.current.type = eventType;

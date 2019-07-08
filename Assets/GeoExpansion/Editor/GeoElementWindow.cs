@@ -81,7 +81,7 @@ namespace uAdventure.Geo
         {
             var geoElementDataControl = dataControlList.list[index] as GeoElementDataControl;
             var eventType = Event.current.type;
-            if (Event.current.type != EventType.Layout || Event.current.type != EventType.Repaint)
+            if (Event.current.type != EventType.Layout && Event.current.type != EventType.Repaint)
             {
                 // Force the event ussage to prevent the map interaction
                 Event.current.Use();
@@ -89,6 +89,7 @@ namespace uAdventure.Geo
             
             mapEditor.Elements[0] = geoElementDataControl;
             mapEditor.Center = geoElementDataControl.GMLGeometries[geoElementDataControl.SelectedGeometry].Center;
+            mapEditor.ZoomToBoundingBox(geoElementDataControl.GMLGeometries[geoElementDataControl.SelectedGeometry].BoundingBox);
             mapEditor.Draw(rect);
 
             Event.current.type = eventType;
