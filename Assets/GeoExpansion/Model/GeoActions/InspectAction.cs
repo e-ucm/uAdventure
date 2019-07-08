@@ -21,7 +21,12 @@ namespace uAdventure.Geo
             }
         }
 
-        public bool Inside { get; set; }
+
+        public bool Inside
+        {
+            get { return (bool)this["Inside"]; }
+            set { this["Inside"] = value; }
+        }
 
         public override string[] Parameters
         {

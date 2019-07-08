@@ -3,6 +3,8 @@ using MapzenGo.Models;
 using UniRx;
 using UnityEngine;
 using System;
+using System.Collections;
+using UnityEngine.Networking;
 
 namespace MapzenGo.Helpers.Search
 {
@@ -15,16 +17,23 @@ namespace MapzenGo.Helpers.Search
         public string namePlaceСache = "";
         public StructSearchData DataStructure;
 
+
         void OnEnable()
         {
 #if UNITY_EDITOR
-            if (!Application.isPlaying) return;
+            if (!Application.isPlaying)
+            {
+                return;
+            }
 #endif
         }
         void Start()
         {
 #if UNITY_EDITOR
-            if (!Application.isPlaying) return;
+            if (!Application.isPlaying)
+            {
+                return;
+            }
 
 #endif
         }
@@ -34,15 +43,23 @@ namespace MapzenGo.Helpers.Search
             if (namePlace != string.Empty && namePlaceСache != namePlace)
             {
                 namePlaceСache = namePlace;
-                ObservableWWW.Get(String.Format(seachUrl, System.Uri.EscapeDataString(namePlaceСache))).Subscribe(
-                    success =>
-                    {
-                        DataProcessingOSM(success);
-                    },
-                    error =>
-                    {
-                        Debug.Log(error);
-                    });
+                StartCoroutine(SearchInOSMCoroutine());
+            }
+        }
+
+
+        IEnumerator SearchInOSMCoroutine()
+        {
+            UnityWebRequest www = UnityWebRequest.Get(String.Format(seachUrl, System.Uri.EscapeDataString(namePlaceСache)));
+            yield return www.SendWebRequest();
+
+            if (www.isNetworkError || www.isHttpError)
+            {
+                Debug.Log(www.error);
+            }
+            else
+            {
+                DataProcessingOSM(www.downloadHandler.text);
             }
         }
 

@@ -29,6 +29,16 @@ namespace uAdventure.Geo
             return Type;
         }
 
+        public ConditionsController Conditions
+        {
+            get { return conditionsController; }
+        }
+
+        public EffectsController Effects
+        {
+            get { return effectsController; }
+        }
+
         public string[] Parameters
         {
             get { return geoAction.Parameters; }

@@ -2,6 +2,8 @@
 // Assembly: UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
 // Assembly location: C:\Program Files (x86)\Unity\Editor\Data\Managed\UnityEngine.dll
 using System;
+using System.Globalization;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace UnityEngine
@@ -196,6 +198,42 @@ namespace UnityEngine
                 this = this / magnitude;
             else
                 this = Vector2d.zero;
+        }
+
+        public static Vector2d Parse(string value)
+        {
+            if (String.IsNullOrEmpty(value)) throw new ArgumentException(value);
+
+            value = value.Substring(1, value.Length - 2);
+            var numbers = value.Split(',').Select(t => double.Parse(t.Trim())).ToArray();
+
+            return new Vector2d(numbers[0], numbers[1]);
+        }
+
+        public static bool TryParse(string value, out Vector2d result)
+        {
+            if (String.IsNullOrEmpty(value) || string.IsNullOrEmpty(value.Trim()) || value.Length < 5 || value[0] != '(' || value[value.Length-1] != ')')
+            {
+                result = zero;
+                return false;
+            }
+
+            var tokens = value.Split(',').Select(t => t.Trim()).ToArray();
+            if (tokens.Length != 2)
+            {
+                result = zero;
+                return false;
+            }
+
+            double first, second;
+            if (!double.TryParse(tokens[0], out first) || !double.TryParse(tokens[1], out second))
+            {
+                result = zero;
+                return false;
+            }
+
+            result = new Vector2d(first, second);
+            return false;
         }
 
         public override string ToString()

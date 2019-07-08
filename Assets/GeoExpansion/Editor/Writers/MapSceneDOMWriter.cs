@@ -20,12 +20,21 @@ namespace uAdventure.Geo
 
             element.SetAttribute("id", mapScene.Id);
             element.SetAttribute("cameraType", mapScene.CameraType.ToString());
+            element.SetAttribute("renderStyle", mapScene.RenderStyle.ToString());
+            element.SetAttribute("tileMetaIdentifier", mapScene.TileMetaIdentifier);
+            element.SetAttribute("usesGameplayArea", mapScene.UsesGameplayArea ? "yes" : "no");
+            element.SetAttribute("gameplayArea", mapScene.GameplayArea.ToString());
             element.SetAttribute("center", mapScene.LatLon.ToString());
+            element.SetAttribute("zoom", mapScene.Zoom.ToString());
 
             if (options.Any(o => o is CIP && (o as CIP).TargetId.Equals(mapScene.getId())))
+            {
                 element.SetAttribute("start", "yes");
+            }
             else
+            {
                 element.SetAttribute("start", "no");
+            }
 
             foreach (var mapElement in mapScene.Elements)
             {

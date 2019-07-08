@@ -112,11 +112,11 @@ namespace uAdventure.Runner
             {
                 if (!string.IsNullOrEmpty(gameName))
                 {
-                    ResourceManager = ResourceManagerFactory.CreateLocal(gameName, useSystemIO ? ResourceManager.LoadingType.SYSTEM_IO : ResourceManager.LoadingType.RESOURCES_LOAD);
+                    ResourceManager = ResourceManagerFactory.CreateLocal(gameName, useSystemIO ? ResourceManager.LoadingType.SystemIO : ResourceManager.LoadingType.ResourcesLoad);
                 }
                 else
                 {
-                    ResourceManager = ResourceManagerFactory.CreateLocal("CurrentGame/", useSystemIO ? ResourceManager.LoadingType.SYSTEM_IO : ResourceManager.LoadingType.RESOURCES_LOAD);
+                    ResourceManager = ResourceManagerFactory.CreateLocal("CurrentGame/", useSystemIO ? ResourceManager.LoadingType.SystemIO : ResourceManager.LoadingType.ResourcesLoad);
                 }
             }
 

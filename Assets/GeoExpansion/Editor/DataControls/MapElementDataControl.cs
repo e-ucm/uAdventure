@@ -8,7 +8,7 @@ using uAdventure.Editor;
 
 namespace uAdventure.Geo
 {
-	public abstract class MapElementDataControl : DataControl, HasTargetId
+	public abstract class MapElementDataControl : DataControl, IElementReference, HasTargetId
     {
         private readonly ConditionsController conditions;
         private readonly MapElement mapElement;
@@ -22,6 +22,13 @@ namespace uAdventure.Geo
         public ConditionsController Conditions
         {
             get { return conditions; }
+        }
+
+        public abstract DataControl ReferencedDataControl { get; }
+
+        public virtual string ReferencedId
+        {
+            get { return mapElement.getTargetId(); }
         }
 
         public override object getContent()

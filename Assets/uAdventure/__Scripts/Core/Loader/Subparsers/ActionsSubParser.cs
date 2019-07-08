@@ -24,8 +24,8 @@ namespace uAdventure.Core
 			Effects clickeffects  = DOMParserUtility.DOMParse<Effects> ((XmlElement)element.SelectSingleNode("click-effect"), parameters) 	?? new Effects();
 			Effects noteffects 	  = DOMParserUtility.DOMParse<Effects> ((XmlElement)element.SelectSingleNode("not-effect"), parameters) 	?? new Effects();
 
-            //Then we instantiate the correct action by name.
-            //We also parse the elements that are unique of that action.
+            // Then we instantiate the correct action by name.
+            // We also parse the elements that are unique of that action.
 			switch (element.Name)
             {
 				case "examine": 	currentAction = new Action(Action.EXAMINE, conditions, effects, noteffects); break;
@@ -46,7 +46,7 @@ namespace uAdventure.Core
                     break;
             }
 
-            //Finally we set al the attributes to the action;
+            // Lastly we set al the attributes to the action
 			currentAction.setConditions(conditions);
 			currentAction.setEffects(effects);
 			currentAction.setNotEffects(noteffects);
@@ -57,29 +57,6 @@ namespace uAdventure.Core
             currentAction.setActivatedClickEffects(activateClickEffects);
 
 			return currentAction;
-        }
-
-
-		private ResourcesUni parseResources(XmlElement resources, params object[] parameters)
-        {
-            XmlNodeList assets;
-
-            var currentResources = new ResourcesUni();
-
-            currentResources.setName(resources.GetAttribute("name"));
-
-            assets = resources.SelectNodes("asset");
-            foreach (XmlElement asset in assets)
-            {
-				string type = asset.GetAttribute("type");
-				string path = asset.GetAttribute("uri");
-
-                currentResources.addAsset(type, path);
-            }
-
-			currentResources.setConditions (DOMParserUtility.DOMParse<Conditions> (resources.SelectSingleNode("condition"), parameters) ?? new Conditions());
-
-            return currentResources;
         }
     }
 }

@@ -6,6 +6,7 @@ using System;
 using uAdventure.Core;
 using System.Collections.Generic;
 using System.Linq;
+using MapzenGo.Helpers;
 
 namespace uAdventure.Editor
 {
@@ -248,7 +249,7 @@ namespace uAdventure.Editor
             GUILayout.EndHorizontal();
         }
 
-        public override void OnRender(Rect viewport)
+        public override void OnRender()
         {
             if (Target is NodeDataControl)
             {
@@ -259,7 +260,8 @@ namespace uAdventure.Editor
             var orientation = uAdventure.Runner.Orientation.S;
             if (SceneEditor.ElementReference != null)
             {
-                orientation = SceneEditor.ElementReference.GetOrientation();
+                var elementReference = SceneEditor.ElementReference as ElementReferenceDataControl;
+                orientation = elementReference.GetOrientation();
             }
             if (npc != null)
             {
@@ -275,8 +277,10 @@ namespace uAdventure.Editor
                 var preview = LoadCharacterTexturePreview(npc, resourceOrientation);
                 if (preview)
                 {
-                    var rect = GetViewportRect(new Rect(new Vector2(-0.5f * preview.width, -preview.height), new Vector2(preview.width, preview.height)), viewport);
-                    GUI.DrawTexture(rect, preview, ScaleMode.ScaleToFit);
+                    var rect = new RectD(new Vector2d(-0.5f * preview.width, -preview.height),
+                        new Vector2d(preview.width, preview.height));
+                    var adaptedRect = ComponentBasedEditor.Generic.ToRelative(rect.ToPoints()).ToRectD().ToRect();
+                    GUI.DrawTexture(adaptedRect, preview, ScaleMode.ScaleToFit);
                 }
             }
         }

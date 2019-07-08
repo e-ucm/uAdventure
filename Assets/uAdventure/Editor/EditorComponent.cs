@@ -36,7 +36,7 @@ public interface EditorComponent
     /// <summary>
     /// Used to render the element.
     /// </summary>
-    void OnRender(Rect viewPort);
+    void OnRender();
 
     /// <summary>
     /// Used to do things after rendering.

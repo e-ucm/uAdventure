@@ -1,10 +1,7 @@
-﻿using UnityEngine;
-using System.Collections;
-
-using uAdventure.Core;
-using System;
+﻿using uAdventure.Core;
 using System.Xml;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace uAdventure.Geo
 {
@@ -12,10 +9,6 @@ namespace uAdventure.Geo
     [DOMParser(typeof(GeoElement))]
     public class GeoElementParser : IDOMParser
     {
-        public GeoElementParser()
-        {
-        }
-
         public object DOMParse(XmlElement element, params object[] parameters)
         {
             GeoElement parsed = new GeoElement(element.Attributes["id"].Value);
@@ -23,67 +16,41 @@ namespace uAdventure.Geo
             foreach(var child in element.ChildNodes)
             {
                 var node = child as XmlNode;
+                var description = new Description();
+                parsed.Descriptions = new List<Description>{description};
                 switch (node.Name)
                 {
+                    case "descriptions":
+                        parsed.Descriptions =
+                            DOMParserUtility.DOMParse<Description>(node.ChildNodes, parameters).DefaultIfEmpty(new Description()).ToList();
+                        break;
                     case "name":
-                        parsed.Name = node.InnerText; break;
-                    case "description":
-                        parsed.FullDescription = node.InnerText; break;
+                        description.setName(node.InnerText); break;
                     case "brief-description":
-                        parsed.BriefDescription = node.InnerText; break;
+                        description.setDescription(node.InnerText); break;
                     case "detailed-description":
-                        parsed.DetailedDescription = node.InnerText; break;
+                        description.setDetailedDescription(node.InnerText); break;
+                    case "geometries":
+                        parsed.Geometries = DOMParserUtility.DOMParse<GMLGeometry>(node.ChildNodes, parameters).DefaultIfEmpty(new GMLGeometry()).ToList(); break;
                     case "geometry":
-                        parsed.Geometry = ParseGeometry(node); break;
+                        parsed.Geometries = new List<GMLGeometry>
+                            {DOMParserUtility.DOMParse<GMLGeometry>(node, parameters)};
+                        break;
                     case "actions":
                         parsed.Actions = ParseActions(node, parameters); break;
+                    case "resources":
+                        parsed.Resources = DOMParserUtility
+                            .DOMParse<ResourcesUni>(element.SelectNodes("resources"), parameters).DefaultIfEmpty(new ResourcesUni()).ToList();
+                        break;
+
                 }
             }
-            // TODO parsed.Image = element.SelectNodes("/image")[0].InnerText;
             return parsed;
         }
 
         private List<GeoAction> ParseActions(XmlNode node, params object[] parameters)
         {
             return DOMParserUtility.DOMParse<GeoAction>(node.ChildNodes, parameters) as List<GeoAction>;
-        }
-
-        private GMLGeometry ParseGeometry(XmlNode node)
-        {
-            var gmlNode = node.FirstChild;
-            
-            var geometry = new GMLGeometry();
-            geometry.Influence = float.Parse((node as XmlElement).GetAttribute("influence"));
-            XmlNode pointsNode;
-            switch (gmlNode.Name)
-            {
-                default:
-                case "Point":
-                    geometry.Type = GMLGeometry.GeometryType.Point;
-                    pointsNode = gmlNode.FirstChild;
-                    break;
-                case "LineString":
-                    geometry.Type = GMLGeometry.GeometryType.LineString;
-                    pointsNode = gmlNode.FirstChild;
-                    break;
-                case "Polygon":
-                    geometry.Type = GMLGeometry.GeometryType.Polygon;
-                    pointsNode = gmlNode.FirstChild.FirstChild.FirstChild; // Polygon -> external -> Ring -> points
-                    break;
-            }
-
-            geometry.Points = UnzipPoints(pointsNode.InnerText);
-            return geometry;
-        }
-
-        private List<Vector2d> UnzipPoints(string pointList)
-        {
-            var points = new List<Vector2d>();
-            var zippedPoints = pointList.Split(' ');
-            for (int i = 0; i < zippedPoints.Length; i += 2)
-                points.Add(new Vector2d(double.Parse(zippedPoints[i]), double.Parse(zippedPoints[i + 1])));
-
-            return points;
         }
     }
 }

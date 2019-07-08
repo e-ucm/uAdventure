@@ -94,22 +94,9 @@ namespace uAdventure.Editor
             };
         }
 
-        internal static Rect[] DivideRect(Rect r, int slices)
-        {
-            Rect[] rects = new Rect[slices];
-            var sliceWidth = r.width / slices;
-            rects[0] = new Rect(r.x, r.y, sliceWidth, r.height);
-            for(int i = 1; i<slices; ++i)
-            {
-                rects[i] = rects[i - 1];
-                rects[i].x += sliceWidth;
-            }
-            return rects;
-        }
-
         public static void ScoreEditor(Rect rect, ScoreDataControl score)
         {
-            var rects = DivideRect(rect, 3);
+            var rects = rect.Divide(3);
 
             score.setMethod((Completable.Score.ScoreMethod)EditorGUI.EnumPopup(rects[0], score.getMethod()));
             switch (score.getMethod())

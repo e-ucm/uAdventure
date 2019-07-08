@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Assets.MapzenGo.Models.Enums;
 using MapzenGo.Models.Enums;
 using UnityEngine;
@@ -622,46 +620,6 @@ namespace MapzenGo.Helpers
         public static int ManhattanTo(this Vector2d v, Vector2d t)
         {
             return (int)Math.Abs(v.x - t.x) + (int)Math.Abs(v.y - t.y);
-        }
-
-        public static Vector2 ToVector2xz(this Vector3 v)
-        {
-            return new Vector2(v.x, v.z);
-        }
-
-        public static Vector3 ToVector3xz(this Vector2 v)
-        {
-            return new Vector3(v.x, 0, v.y);
-        }
-
-        public static Vector2d ToVector2xz(this Vector3d v)
-        {
-            return new Vector2d(v.x, v.z);
-        }
-
-        public static Vector3d ToVector3xz(this Vector2d v)
-        {
-            return new Vector3d(v.x, 0, v.y);
-        }
-
-        public static Vector2 ToVector2(this Vector3d v)
-        {
-            return new Vector2((float)v.x, (float)v.z);
-        }
-
-        public static Vector2 ToVector2(this Vector2d v)
-        {
-            return new Vector2((float)v.x, (float)v.y);
-        }
-
-        public static Vector2d ToVector2d(this Vector2 v)
-        {
-            return new Vector2d(v.x, v.y);
-        }
-
-        public static Vector3 ToVector3(this Vector2d v)
-        {
-            return new Vector3((float)v.x, 0, (float)v.y);
         }
 
         public static Vector2 LatLonToTile(this Vector2 v, int zoom)

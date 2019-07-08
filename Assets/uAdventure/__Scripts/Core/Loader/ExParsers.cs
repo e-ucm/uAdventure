@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using UnityEngine;
 
 namespace uAdventure.Core
@@ -51,6 +52,24 @@ namespace uAdventure.Core
                 return def;
         }
 
+        public static RectD ParseDefault(string toParse, RectD def)
+        {
+            RectD toReturn;
+            if (!string.IsNullOrEmpty(toParse) && RectD.TryParse(toParse, out toReturn))
+                return toReturn;
+            else
+                return def;
+        }
+
+        public static Vector2d ParseDefault(string toParse, Vector2d def)
+        {
+            Vector2d toReturn;
+            if (!string.IsNullOrEmpty(toParse) && Vector2d.TryParse(toParse, out toReturn))
+                return toReturn;
+            else
+                return def;
+        }
+
         public static Color ParseDefault(string toParse, Color def)
         {
             try
@@ -72,6 +91,12 @@ namespace uAdventure.Core
         {
             try
             {
+                var parse = typeof(T).GetMethod("Parse", BindingFlags.Static);
+                if (parse != null)
+                {
+                    value = (string) parse.Invoke(null, new object[] { value });
+                }
+
                 return (T)System.Enum.Parse(typeof(T), value, true);
             }
             catch

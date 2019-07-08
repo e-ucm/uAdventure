@@ -116,7 +116,7 @@ namespace uAdventure.Editor
             GUI.DrawTexture(rect, rect.Contains(Event.current.mousePosition) && imageOverTex ? imageOverTex : imageTex, ScaleMode.ScaleToFit);
         }
 
-        public override void OnRender(Rect viewport)
+        public override void OnRender()
         {
             var item = Target as ItemDataControl;
             RefreshResources(item);
@@ -125,9 +125,11 @@ namespace uAdventure.Editor
             {
                 return;
             }
-            
-            var rect = GetViewportRect(new Rect(new Vector2(-0.5f * imageTex.width, -imageTex.height), new Vector2(imageTex.width, imageTex.height)), viewport);
-            GUI.DrawTexture(rect, rect.Contains(Event.current.mousePosition) && imageOverTex ? imageOverTex : imageTex, ScaleMode.ScaleToFit);
+
+            var rect = new RectD(new Vector2d(-0.5f * imageTex.width, -imageTex.height),
+                new Vector2d(imageTex.width, imageTex.height));
+            var adaptedRect = ComponentBasedEditor.Generic.ToRelative(rect.ToPoints()).ToRectD().ToRect();
+            GUI.DrawTexture(adaptedRect, rect.Contains(Event.current.mousePosition.ToVector2d()) && imageOverTex ? imageOverTex : imageTex, ScaleMode.ScaleToFit);
         }
 
 

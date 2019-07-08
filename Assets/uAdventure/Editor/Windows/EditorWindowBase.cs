@@ -70,12 +70,29 @@ namespace uAdventure.Editor
         private static Rect zeroRect;
         private Rect windowArea;
 
+        private static bool locked;
+
         private void Return(PlayModeStateChange playModeStateChange)
         {
             if(playModeStateChange == PlayModeStateChange.EnteredEditMode)
             {
                 FocusWindowIfItsOpen(GetType());
             }
+        }
+
+        public static bool Locked
+        {
+            get { return locked; }
+        }
+
+        public static void LockWindow()
+        {
+            locked = true;
+        }
+
+        public static void UnlockWindow()
+        {
+            locked = false;
         }
 
         public void OnEnable()
@@ -244,7 +261,20 @@ namespace uAdventure.Editor
 		}
 
         protected void OnGUI()
-		{
+        {
+            if (locked)
+            {
+                GUI.depth = Int32.MaxValue;
+                if (Event.current.type != EventType.Layout && Event.current.type != EventType.Repaint)
+                {
+                    Event.current.Use();
+                }
+            }
+            else
+            {
+                GUI.depth = 0;
+            }
+
             this.wantsMouseMove = WantsMouseMove;
 
             InitWindows ();

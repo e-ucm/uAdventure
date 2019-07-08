@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using uAdventure.Core;
-using System;
 
 namespace uAdventure.Geo
 {
@@ -10,8 +9,16 @@ namespace uAdventure.Geo
         Aerial2D, Ortographic3D, Perspective3D
     };
 
-    public class MapScene : IChapterTarget, Documented, HasId
+    public enum RenderStyle
     {
+        Tile,
+        Vector,
+        Hybrid
+    };
+
+    public class MapScene : IChapterTarget, Named, Documented, HasId
+    {
+
         /**
          * xApi Class
          */
@@ -27,9 +34,15 @@ namespace uAdventure.Geo
         //-------------
         public CameraType CameraType { get; set; }
         public string Id { get; set; }
+        public string Name { get; set; }
         public string Documentation { get; set; }
         public List<MapElement> Elements { get; set; }
         public Vector2d LatLon { get; set; }
+        public int Zoom { get; set; }
+        public string TileMetaIdentifier { get; set; }
+        public RenderStyle RenderStyle { get; set; }
+        public bool UsesGameplayArea { get; set; }
+        public RectD GameplayArea { get; set; }
 
         /// <summary>
         /// Creates a mapScene using the id. Initializing its elements to an empty list.
@@ -78,6 +91,16 @@ namespace uAdventure.Geo
         public string getDocumentation()
         {
             return Documentation;
+        }
+
+        public void setName(string name)
+        {
+            Name = name;
+        }
+
+        public string getName()
+        {
+            return Name;
         }
     }
 

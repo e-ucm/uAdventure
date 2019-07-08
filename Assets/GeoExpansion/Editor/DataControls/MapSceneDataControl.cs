@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using MapzenGo.Helpers;
 using uAdventure.Core;
 using UnityEngine;
 
@@ -13,17 +13,25 @@ namespace uAdventure.Geo
     {
 
         public const int GEO_REFERENCE = 981285;
-
-
+        
         private readonly MapScene mapScene;
 
         private readonly ListDataControl<MapSceneDataControl, MapElementDataControl> mapElementListDataControl;
+
+        private readonly GameplayAreaDataControl gameplaAreaDataControl;
 
         private readonly Dictionary<string, List<string>> xApiOptions;
 
         public MapSceneDataControl(MapScene mapScene)
         {
             this.mapScene = mapScene;
+            this.gameplaAreaDataControl = new GameplayAreaDataControl(this);
+            var mapParametersGatherer = new Action<Action<object>>[]
+            {
+                callback => callback(LatLon),
+                callback => callback(Zoom)
+            };
+
             this.mapElementListDataControl = new ListDataControl<MapSceneDataControl, MapElementDataControl>(this, mapScene.Elements, new ListDataControl<MapSceneDataControl, MapElementDataControl>.ElementFactoryView()
             {
                 Titles   = {{ GEO_REFERENCE, "Operation.AddGeoReferenceTitle" }},
@@ -32,7 +40,7 @@ namespace uAdventure.Geo
                 ElementFactory = new DefaultElementFactory<MapElementDataControl>(new DefaultElementFactory<MapElementDataControl>.ElementCreator()
                 {
                     CreateDataControl = o => new GeoElementRefDataControl(o as GeoReference),
-                    CreateElement = (type, targetId) => new GeoElementRefDataControl(new GeoReference(targetId)),
+                    CreateElement = (type, targetId, _) => new GeoElementRefDataControl(new GeoReference(targetId)),
                     TypeDescriptors = new DefaultElementFactory<MapElementDataControl>.ElementCreator.TypeDescriptor[]
                     {
                         new DefaultElementFactory<MapElementDataControl>.ElementCreator.TypeDescriptor()
@@ -64,7 +72,15 @@ namespace uAdventure.Geo
                 ElementFactory = new DefaultElementFactory<MapElementDataControl>(new DefaultElementFactory<MapElementDataControl>.ElementCreator()
                 {
                     CreateDataControl = o => new ExtElementRefDataControl(o as ExtElemReference),
-                    CreateElement = (type, targetId) => new ExtElementRefDataControl(new ExtElemReference(targetId)),
+                    CreateElement = (type, targetId, extra) =>
+                    {
+                        var extElementRef = new ExtElemReference(targetId);
+                        extElementRef.TransformManagerParameters["Position"] = (Vector2d)extra[0];
+                        var zoom = (int) extra[1];
+                        var pixelScale = GM.MetersToPixels(GM.PixelsToMeters(new Vector2d(1, 1), zoom), 19);
+                        extElementRef.TransformManagerParameters["Scale"] = new Vector3((float)pixelScale.x, (float)pixelScale.y, 1);
+                        return new ExtElementRefDataControl(extElementRef);
+                    },
                     TypeDescriptors = new DefaultElementFactory<MapElementDataControl>.ElementCreator.TypeDescriptor[]
                     {
                         new DefaultElementFactory<MapElementDataControl>.ElementCreator.TypeDescriptor()
@@ -72,6 +88,7 @@ namespace uAdventure.Geo
                             Type = Controller.ITEM_REFERENCE,
                             ContentType = typeof(ExtElemReference),
                             ValidReferenceTypes = new[] { typeof(Item) },
+                            ExtraParameters = mapParametersGatherer,
                             ReferencesId = true
                         },
                         new DefaultElementFactory<MapElementDataControl>.ElementCreator.TypeDescriptor()
@@ -79,6 +96,7 @@ namespace uAdventure.Geo
                             Type = Controller.ATREZZO_REFERENCE,
                             ContentType = typeof(ExtElemReference),
                             ValidReferenceTypes = new[] { typeof(Atrezzo) },
+                            ExtraParameters = mapParametersGatherer,
                             ReferencesId = true
                         },
                         new DefaultElementFactory<MapElementDataControl>.ElementCreator.TypeDescriptor()
@@ -86,6 +104,7 @@ namespace uAdventure.Geo
                             Type = Controller.NPC_REFERENCE,
                             ContentType = typeof(ExtElemReference),
                             ValidReferenceTypes = new[] { typeof(NPC) },
+                            ExtraParameters = mapParametersGatherer,
                             ReferencesId = true
                         }
                     }
@@ -109,6 +128,28 @@ namespace uAdventure.Geo
             xApiOptions.Add("alternative", alternativeOptions);
         }
 
+        public CameraType CameraType
+        {
+            get { return mapScene.CameraType; }
+            set { controller.AddTool(ChangeEnumValueTool.Create(mapScene, value, "CameraType")); }
+        }
+
+        public RenderStyle RenderStyle
+        {
+            get { return mapScene.RenderStyle; }
+            set { controller.AddTool(ChangeEnumValueTool.Create(mapScene, value, "RenderStyle")); }
+        }
+
+        public string Name
+        {
+            get { return mapScene.Name; }
+            set { controller.AddTool(new ChangeNameTool(mapScene, value)); }
+        }
+
+        public GameplayAreaDataControl GameplayArea
+        {
+            get { return gameplaAreaDataControl; }
+        }
 
         public override object getContent()
         {
@@ -196,6 +237,7 @@ namespace uAdventure.Geo
         public string Id
         {
             get { return mapScene.getId(); }
+            set { controller.AddTool(new ChangeIdTool(mapScene, value)); }
         }
 
         public string Documentation
@@ -210,16 +252,16 @@ namespace uAdventure.Geo
             }
         }
 
-        public CameraType CameraType
+        public Vector2d LatLon
         {
-            get { return mapScene.CameraType; }
-            set
-            {
-                if(!CameraType.Equals(mapScene.CameraType, value))
-                {
-                    controller.AddTool(ChangeEnumValueTool.Create(mapScene, value, "CameraType"));
-                }
-            }
+            get { return mapScene.LatLon; }
+            set { controller.AddTool(new ChangeValueTool<MapScene, Vector2d>(mapScene, value, "LatLon")); }
+        }
+
+        public int Zoom
+        {
+            get { return mapScene.Zoom; }
+            set { controller.AddTool(new ChangeValueTool<MapScene, int>(mapScene, value, "Zoom")); }
         }
 
         public List<string> getxAPIValidTypes(string @class)
@@ -252,14 +294,14 @@ namespace uAdventure.Geo
             controller.AddTool(new ChangeStringValueTool(mapScene, type, "getXApiType", "setXApiType"));
         }
 
-        public void setxAPIClass(string @class)
+        public void setxAPIClass(string value)
         {
-            if (!xApiOptions.ContainsKey(@class))
+            if (!xApiOptions.ContainsKey(value))
             {
                 return;
             }
 
-            controller.AddTool(new ChangeStringValueTool(mapScene, @class, "getXApiClass", "setXApiClass"));
+            controller.AddTool(new ChangeStringValueTool(mapScene, value, "getXApiClass", "setXApiClass"));
         }
     }
 }

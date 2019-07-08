@@ -175,9 +175,9 @@ namespace uAdventure.Geo
             };
         }
 
-        public string Name { get { return "World positioned"; } }
+        public string Name { get { return "WorldPositioned"; } }
         public Dictionary<string, ParameterDescription> ParameterDescription { get; private set; }
-        public Type Type { get { return typeof(GeoPositionedTransformManager); } }
+        public Type Type { get { return typeof(GeolocationTransformManager); } }
     }
 
     public class ScreenPositionedTransformManagerDescriptor : ExtElemReferenceTransformManagerDescriptor
@@ -187,15 +187,15 @@ namespace uAdventure.Geo
         {
             ParameterDescription = new Dictionary<string, Geo.ParameterDescription>
             {
-                { "Position", new Geo.ParameterDescription(typeof(Vector2d), Vector2d.zero) },
+                { "Position", new Geo.ParameterDescription(typeof(Vector2), Vector2.zero) },
                 { "Scale", new Geo.ParameterDescription(typeof(Vector3), Vector3.one) },
                 { "Rotation", new Geo.ParameterDescription(typeof(float), 0f) }
             };
         }
 
-        public string Name { get { return "Screen positioned"; } }
+        public string Name { get { return "ScreenPositioned"; } }
         public Dictionary<string, ParameterDescription> ParameterDescription { get; private set; }
-        public Type Type { get { return typeof(ScreenPositionedTransformManager); } }
+        public Type Type { get { return typeof(ScreenTransformManager); } }
     }
 
     public class RadialCenterTransformManagerDescriptor : ExtElemReferenceTransformManagerDescriptor
@@ -213,12 +213,12 @@ namespace uAdventure.Geo
             };
         }
 
-        public string Name { get { return "Radial to center positioned"; } }
+        public string Name { get { return "RadialToCenterPositioned"; } }
         public Dictionary<string, ParameterDescription> ParameterDescription { get; private set; }
-        public Type Type { get { return typeof(RadialCenterTransformManager); } }
+        public Type Type { get { return typeof(RadialTransformManager); } }
     }
 
-    public class ScreenPositionedTransformManager : ExtElemReferenceTransformManager
+    public class ScreenTransformManager : ExtElemReferenceTransformManager
     {
         public Transform ExtElemReferenceTransform
         {
@@ -271,7 +271,7 @@ namespace uAdventure.Geo
         }
     }
 
-    public class RadialCenterTransformManager : ExtElemReferenceTransformManager
+    public class RadialTransformManager : ExtElemReferenceTransformManager
     {
         public ElementReference Context
         {
@@ -310,7 +310,7 @@ namespace uAdventure.Geo
         }
     }
 
-    public class GeoPositionedTransformManager : ExtElemReferenceTransformManager
+    public class GeolocationTransformManager : ExtElemReferenceTransformManager
     {
         public Transform ExtElemReferenceTransform
         {

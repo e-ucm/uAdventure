@@ -93,29 +93,29 @@ namespace uAdventure.Editor
 
         public override void Draw(int aID)
         {
-            foreach (var elem in sceneEditor.Elements)
+            foreach (var elem in componentBasedEditor.Elements)
             {
-                sceneEditor.TypeEnabling[elem.GetType()] = false;
+                componentBasedEditor.TypeEnabling[elem.GetType()] = false;
             }
 
-            sceneEditor.TypeEnabling[typeof(PlayerDataControl)] = true;
-            sceneEditor.TypeEnabling[typeof(TrajectoryDataControl)] = true;
-            sceneEditor.TypeEnabling[typeof(SideDataControl)] = true;
-            sceneEditor.TypeEnabling[typeof(NodeDataControl)] = true;
+            componentBasedEditor.TypeEnabling[typeof(PlayerDataControl)] = true;
+            componentBasedEditor.TypeEnabling[typeof(TrajectoryDataControl)] = true;
+            componentBasedEditor.TypeEnabling[typeof(SideDataControl)] = true;
+            componentBasedEditor.TypeEnabling[typeof(NodeDataControl)] = true;
 
             base.Draw(aID);
             action = trajectoryComponent.Action;
             trajectoryComponent.Action = -1;
 
-            foreach (var elem in sceneEditor.Elements)
+            foreach (var elem in componentBasedEditor.Elements)
             {
-                sceneEditor.TypeEnabling[elem.GetType()] = true;
+                componentBasedEditor.TypeEnabling[elem.GetType()] = true;
             }
 
-            sceneEditor.TypeEnabling[typeof(PlayerDataControl)] = false;
-            sceneEditor.TypeEnabling[typeof(TrajectoryDataControl)] = false;
-            sceneEditor.TypeEnabling[typeof(SideDataControl)] = false;
-            sceneEditor.TypeEnabling[typeof(NodeDataControl)] = false;
+            componentBasedEditor.TypeEnabling[typeof(PlayerDataControl)] = false;
+            componentBasedEditor.TypeEnabling[typeof(TrajectoryDataControl)] = false;
+            componentBasedEditor.TypeEnabling[typeof(SideDataControl)] = false;
+            componentBasedEditor.TypeEnabling[typeof(NodeDataControl)] = false;
         }
 
 
@@ -128,7 +128,7 @@ namespace uAdventure.Editor
                     break;
                 case PlayerMode.NoPlayer:
                     workingScene.changeAllowPlayerLayer(false);
-                    sceneEditor.SelectedElement = null;
+                    componentBasedEditor.SelectedElement = null;
                     break;
                 case PlayerMode.InitialPosition:
                     {
@@ -143,10 +143,10 @@ namespace uAdventure.Editor
                             initialScale = trajectory.getInitial().getScale();
 
                             // Swap from any of the selected nodes to the player
-                            if (sceneEditor.SelectedElement != null && trajectoryDataControl.getNodes()
-                                    .Any(sceneEditor.SelectedElement.Equals))
+                            if (componentBasedEditor.SelectedElement != null && trajectoryDataControl.getNodes()
+                                    .Any(componentBasedEditor.SelectedElement.Equals))
                             {
-                                sceneEditor.SelectedElement =
+                                componentBasedEditor.SelectedElement =
                                     Controller.Instance.SelectedChapterDataControl.getPlayer();
                             }
                         }
@@ -172,9 +172,9 @@ namespace uAdventure.Editor
 
 
                         // Swap from player to first node
-                        if (sceneEditor.SelectedElement == Controller.Instance.SelectedChapterDataControl.getPlayer())
+                        if (componentBasedEditor.SelectedElement == Controller.Instance.SelectedChapterDataControl.getPlayer())
                         {
-                            sceneEditor.SelectedElement = workingScene.getTrajectory().getInitialNode();
+                            componentBasedEditor.SelectedElement = workingScene.getTrajectory().getInitialNode();
                         }
                     }
                     break;
@@ -364,12 +364,12 @@ namespace uAdventure.Editor
 
                 EditorGUI.BeginChangeCheck();
                 var newRect = HandleUtil.HandleRect(influenceArea.GetHashCode() + 1, rect, 10f,
-                    polygon =>
+                    (polygon, over, active) =>
                     {
                         HandleUtil.DrawPolyLine(polygon, true, Color.blue);
                         HandleUtil.DrawPolygon(polygon, new Color(0, 0, 1f, 0.3f));
                     },
-                    point => HandleUtil.DrawSquare(point, 6.5f, Color.yellow, Color.black));
+                    (point, over, active) => HandleUtil.DrawSquare(point, 6.5f, Color.yellow, Color.black));
 
                 newRect = HandleUtil.HandleRectMovement(influenceArea.GetHashCode(), newRect);
 
@@ -474,8 +474,8 @@ namespace uAdventure.Editor
                 // Rect resizing
                 EditorGUI.BeginChangeCheck();
                 var newRect = HandleUtil.HandleFixedRatioRect(Target.GetHashCode() + 1, rect, rect.width / rect.height, 10f, 
-                    polygon => HandleUtil.DrawPolyLine(polygon, true, SceneEditor.GetColor(Color.red)),
-                    point =>   HandleUtil.DrawPoint(point, 4.5f, SceneEditor.GetColor(Color.blue), SceneEditor.GetColor(Color.black)));
+                    (polygon, over, active) => HandleUtil.DrawPolyLine(polygon, true, SceneEditor.GetColor(Color.red)),
+                    (point, over, active) =>   HandleUtil.DrawPoint(point, 4.5f, SceneEditor.GetColor(Color.blue), SceneEditor.GetColor(Color.black)));
                 if (EditorGUI.EndChangeCheck())
                 {
                     var original = newRect.ViewportToScreen(SceneEditor.Current.Size.x, SceneEditor.Current.Size.y, SceneEditor.Current.Viewport);
@@ -505,15 +505,17 @@ namespace uAdventure.Editor
                 if (EditorGUI.EndChangeCheck())
                 {
                     var original = rect.ViewportToScreen(SceneEditor.Current.Size.x, SceneEditor.Current.Size.y, SceneEditor.Current.Viewport);
+                    var rectBase = rect.Base();
                     if (Target is PlayerDataControl)
                     {
+                        rectBase = original.Base();
                         var workingScene = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[GameRources.GetInstance().selectedSceneIndex];
-                        workingScene.setDefaultInitialPosition(Mathf.RoundToInt(original.x + 0.5f * original.width), Mathf.RoundToInt(original.y + original.height));
+                        workingScene.setDefaultInitialPosition(Mathf.RoundToInt(rectBase.x), Mathf.RoundToInt(rectBase.y));
                     }
                     else if (Target is NodeDataControl)
                     {
                         var node = Target as NodeDataControl;
-                        node.setNode(Mathf.RoundToInt(original.x + 0.5f * original.width), Mathf.RoundToInt(original.y + original.height), node.getScale());
+                        node.setNode(Mathf.RoundToInt(rectBase.x), Mathf.RoundToInt(rectBase.y), node.getScale());
                     }
                 }
             }
@@ -586,7 +588,7 @@ namespace uAdventure.Editor
                 return false;
             }
 
-            public override void OnRender(Rect viewport)
+            public override void OnRender()
             {
                 var side = Target as SideDataControl;
                 var p1 = GetPivot(side.getStart());

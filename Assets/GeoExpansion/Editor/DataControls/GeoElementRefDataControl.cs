@@ -13,6 +13,16 @@ namespace uAdventure.Geo
             this.geoReference = geoReference;
         }
 
+        public override DataControl ReferencedDataControl
+        {
+            get
+            {
+                return GeoController.Instance.GeoElements.DataControls.Find(g =>
+                    (g.getContent() as GeoElement).Id.Equals(ReferencedId,
+                        StringComparison.InvariantCultureIgnoreCase));
+            }
+        }
+
         public override bool isValid(string currentPath, List<string> incidences)
         {
             return controller.IdentifierSummary.isType<GeoElement>(geoReference.getTargetId());

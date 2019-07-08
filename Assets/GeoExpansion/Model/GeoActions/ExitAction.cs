@@ -22,7 +22,11 @@ namespace uAdventure.Geo
         }
         public override string[] Parameters { get { return parameters; } }
 
-        public bool OnlyFromInside { get; set; }
+        public bool OnlyFromInside
+        {
+            get { return (bool)this["OnlyFromInside"]; }
+            set { this["OnlyFromInside"] = value; }
+        }
 
         public override object Clone()
         {

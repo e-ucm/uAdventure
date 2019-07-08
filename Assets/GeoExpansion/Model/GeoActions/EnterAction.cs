@@ -21,8 +21,12 @@ namespace uAdventure.Geo
             }
         }
 
-        public bool OnlyFromOutside { get; set; }
-        
+        public bool OnlyFromOutside
+        {
+            get { return (bool)this["OnlyFromOutside"]; }
+            set { this["OnlyFromOutside"] = value; }
+        }
+
         public override string[] Parameters { get { return parameters; } }
 
         public override object Clone()

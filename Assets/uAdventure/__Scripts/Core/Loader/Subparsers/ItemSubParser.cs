@@ -28,7 +28,9 @@ namespace uAdventure.Core
 
 			// RESOURCES
 			foreach(var res in DOMParserUtility.DOMParse <ResourcesUni> (element.SelectNodes("resources"), parameters))
-				parsedObject.addResources (res);
+            {
+                parsedObject.addResources(res);
+            }
 
 			// DESCRIPTIONS
 			parsedObject.setDescriptions(DOMParserUtility.DOMParse<Description>(element.SelectNodes ("description"), parameters).ToList());
@@ -36,8 +38,12 @@ namespace uAdventure.Core
 			// ACTIONS
 			var actionsNode = element.SelectSingleNode("actions");
 			if(actionsNode != null)
-				foreach(var res in DOMParserUtility.DOMParse <Action> (actionsNode.ChildNodes, parameters))
-					parsedObject.addAction (res);
+            {
+                foreach (var res in DOMParserUtility.DOMParse<Action>(actionsNode.ChildNodes, parameters))
+                {
+                    parsedObject.addAction(res);
+                }
+            }
 
 			return parsedObject;
         }

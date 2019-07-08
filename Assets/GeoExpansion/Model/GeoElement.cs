@@ -21,8 +21,10 @@ namespace uAdventure.Geo
         public GeoElement(string id)
         {
             Id = id;
+            resources = new List<ResourcesUni> { new ResourcesUni() };
+            descriptions = new List<Description> { new Description() };
             geometries = new List<GMLGeometry> { new GMLGeometry { Influence = 0 }};
-            Actions = new List<GeoAction>();
+            geoActions = new List<GeoAction>();
         }
 
         public string Id { get { return id; } set { id = value; } }

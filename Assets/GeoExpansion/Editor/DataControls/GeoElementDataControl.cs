@@ -16,12 +16,25 @@ namespace uAdventure.Geo
         private readonly GeoElement geoElement;
         private readonly DescriptionsController descriptionController;
         private readonly ListDataControl<GeoElementDataControl, GeoActionDataControl> geoActionDataControls;
+        private readonly ListDataControl<GeoElementDataControl, GMLGeometryDataControl> geometryDataControls;
+        private int selectedGeometry;
 
         private const int GEO_ELEMENT    = 62345459;
         private const int ENTER_ACTION   = 87234678;
         private const int EXIT_ACTION    = 78234568;
         private const int LOOK_TO_ACTION = 23848923;
         private const int INSPECT_ACTION = 67213469;
+        private const int GEOMETRY       = 24312342;
+
+        public DescriptionsController DescriptionController
+        {
+            get { return descriptionController; }
+        }
+
+        public ListDataControl<GeoElementDataControl, GeoActionDataControl> GeoActions
+        {
+            get { return geoActionDataControls; }
+        }
 
         public GeoElementDataControl(GeoElement geoElement)
         {
@@ -97,7 +110,7 @@ namespace uAdventure.Geo
                             }
                         },
                         CreateDataControl = action => new GeoActionDataControl(action as GeoAction),
-                        CreateElement = (type, id) =>
+                        CreateElement = (type, id, _) =>
                         {
                             switch (type)
                             {
@@ -111,6 +124,53 @@ namespace uAdventure.Geo
                     })
                 }
             });
+
+            geometryDataControls = new ListDataControl<GeoElementDataControl, GMLGeometryDataControl>(this, geoElement.Geometries, new []
+            {
+                new ListDataControl<GeoElementDataControl, GMLGeometryDataControl>.ElementFactoryView()
+                {
+                    Titles      = { { GEOMETRY , "Geo.Create.Title.Geometry" } },
+                    Messages    = { { GEOMETRY , "Geo.Create.Message.Geometry" } },
+                    Errors      = { { GEOMETRY , "Geo.Create.Error.Geometry" } },
+                    ElementFactory = new DefaultElementFactory<GMLGeometryDataControl>(new DefaultElementFactory<GMLGeometryDataControl>.ElementCreator
+                    {
+                        CreateDataControl = geometry => new GMLGeometryDataControl(geometry as GMLGeometry),
+                        CreateElement = (type, id, _) => new GMLGeometryDataControl(new GMLGeometry()),
+                        TypeDescriptors = new []
+                        {
+                            new DefaultElementFactory<GMLGeometryDataControl>.ElementCreator.TypeDescriptor
+                            {
+                                ContentType = typeof(GMLGeometry),
+                                Type = GEOMETRY
+                            } 
+                        }
+                    })
+                } 
+            });
+        }
+
+        public ListDataControl<GeoElementDataControl, GMLGeometryDataControl> GMLGeometries
+        {
+            get { return geometryDataControls; }
+        }
+
+        public int SelectedGeometry
+        {
+            get { return selectedGeometry; }
+            set { this.selectedGeometry = value; }
+        }
+
+        public string Documentation
+        {
+            get
+            {
+                return geoElement.getDocumentation();
+            }
+
+            set
+            {
+                controller.AddTool(new ChangeDocumentationTool(geoElement, value));
+            }
         }
 
         public override bool addElement(int type, string id) { return false; }
@@ -172,7 +232,7 @@ namespace uAdventure.Geo
             var valid = descriptionController.isValid(currentPath, incidences);
             resourcesDataControlList.ForEach(r => valid &= r.isValid(currentPath, incidences));
             valid &= geoActionDataControls.isValid(currentPath, incidences);
-            valid &= geoElement.Geometries.Count > 0 && geoElement.Geometries.All(g => g.Points.Count > 0);
+            valid &= geoElement.Geometries.Count > 0 && geoElement.Geometries.All(g => g.Points.Length > 0);
             return valid;
         }
 

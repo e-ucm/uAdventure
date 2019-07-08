@@ -1,7 +1,5 @@
-using System.Collections;
 using System.Collections.Generic;
 using uAdventure.Core;
-using UnityEngine;
 
 using uAdventure.Editor;
 using System;
@@ -13,14 +11,15 @@ namespace uAdventure.Geo
     public class TransformManagerDataControl : DataControl
     {
         private readonly ExtElemReference extElemReference;
-        private ExtElemReferenceGUIMapPositionManager positionManager;
+        private IGuiMapPositionManager positionManager;
+        private bool registerChanges;
 
         public TransformManagerDataControl(ExtElemReference extElemReference)
         {
             this.extElemReference = extElemReference;
-            this.positionManager = ExtElemReferenceGUIMapPositionManagerFactory.Instance.CreateInstance(extElemReference.TransformManagerDescriptor,
-                this);
-            this.positionManager.Configure(this);
+            registerChanges = false;
+            this.positionManager = GuiMapPositionManagerFactory.Instance.CreateInstance(extElemReference.TransformManagerDescriptor, this);
+            registerChanges = true;
         }
 
         public Dictionary<string, ParameterDescription> ParameterDescription
@@ -28,7 +27,7 @@ namespace uAdventure.Geo
             get { return extElemReference.TransformManagerDescriptor.ParameterDescription; }
         }
 
-        public ExtElemReferenceGUIMapPositionManager TransformManager
+        public IGuiMapPositionManager GUIMapPositionManager
         {
             get { return positionManager; }
         }
@@ -55,8 +54,9 @@ namespace uAdventure.Geo
 
                     extElemReference.TransformManagerDescriptor = descriptor;
                     positionManager =
-                        ExtElemReferenceGUIMapPositionManagerFactory.Instance.CreateInstance(
+                        GuiMapPositionManagerFactory.Instance.CreateInstance(
                             extElemReference.TransformManagerDescriptor, this);
+                    Changed();
                 }
             }
         }
@@ -69,7 +69,23 @@ namespace uAdventure.Geo
         public object this[string parameter]
         {
             get { return extElemReference.TransformManagerParameters[parameter]; }
-            set { controller.AddTool(new ChangeParameterTool(this, new KeyValuePair<string, object>(parameter, value))); }
+            set
+            {
+                if (extElemReference.TransformManagerParameters.ContainsKey(parameter) &&
+                    extElemReference.TransformManagerParameters[parameter].Equals(value))
+                {
+                    return;
+                }
+
+                if (!registerChanges)
+                {
+                    extElemReference.TransformManagerParameters[parameter] = value;
+                }
+                else
+                {
+                    controller.AddTool(new ChangeParameterTool(this, new KeyValuePair<string, object>(parameter, value)));
+                }
+            }
         }
 
         private class ChangeParameterTool : Tool
@@ -86,7 +102,7 @@ namespace uAdventure.Geo
                 this.oldValues = new Dictionary<string, object>();
                 foreach (var kv in newValues)
                 {
-                    oldValues[kv.Key] = transformManagerDataControl[kv.Key];
+                    oldValues[kv.Key] = transformManagerDataControl.ContainsParameter(kv.Key) ? transformManagerDataControl[kv.Key] : null;
                 }
             }
 
@@ -118,6 +134,7 @@ namespace uAdventure.Geo
             public override bool doTool()
             {
                 SetValues(newValues);
+                transformManagerDataControl.Changed();
                 return true;
             }
 
@@ -129,6 +146,7 @@ namespace uAdventure.Geo
             public override bool undoTool()
             {
                 SetValues(oldValues);
+                transformManagerDataControl.Changed();
                 return true;
             }
 
@@ -235,6 +253,11 @@ namespace uAdventure.Geo
         private readonly TransformManagerDataControl transformManagerDataControl;
 
         private int type;
+
+        public override DataControl ReferencedDataControl
+        {
+            get { return getReferencedElementDataControl(); }
+        }
 
         public ExtElementRefDataControl(ExtElemReference extElemReference) : base(extElemReference)
         {

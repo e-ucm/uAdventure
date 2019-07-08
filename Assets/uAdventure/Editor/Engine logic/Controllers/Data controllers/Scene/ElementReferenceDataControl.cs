@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 using uAdventure.Core;
+using System;
 
 namespace uAdventure.Editor
 {
@@ -10,7 +11,7 @@ namespace uAdventure.Editor
      * This class can contain either an ElementReferenceDataControl or its
      * equivalent for the player
      */
-    public class ElementReferenceDataControl : DataControl
+    public class ElementReferenceDataControl : DataControl, IElementReference
     {
 
         /**
@@ -37,6 +38,16 @@ namespace uAdventure.Editor
         private int type;
 
         private bool visible;
+
+        public DataControl ReferencedDataControl
+        {
+            get { return getReferencedElementDataControl(); }
+        }
+
+        public string ReferencedId
+        {
+            get { return elementReference.getTargetId(); }
+        }
 
         /**
          * Contructor.

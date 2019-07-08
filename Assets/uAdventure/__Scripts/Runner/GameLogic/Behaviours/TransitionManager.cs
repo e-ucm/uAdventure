@@ -7,7 +7,6 @@ using Action = System.Action;
 namespace uAdventure.Runner
 {
     [RequireComponent(typeof(MeshRenderer))]
-    [ExecuteInEditMode]
     public class TransitionManager : MonoBehaviour
     {
         [SerializeField] private Material transitionMaterial;

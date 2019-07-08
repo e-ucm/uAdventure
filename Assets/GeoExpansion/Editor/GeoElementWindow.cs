@@ -1,40 +1,28 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System;
 using UnityEditorInternal;
-using UnityEditor;
 using System.Linq;
-using MapzenGo.Helpers;
-using uAdventure.Geo;
-using System.Collections.Generic;
-using MapzenGo.Helpers.Search;
-using MapzenGo.Models.Settings.Editor;
-using uAdventure.Core;
 using uAdventure.Editor;
+using System.Collections.Generic;
+using MapzenGo.Helpers;
+using uAdventure.Core;
 
 namespace uAdventure.Geo
 {
 
-    [EditorWindowExtension(115, typeof(GeoElement))]
-    public class GeoElementWindow : ReorderableListEditorWindowExtension, DialogReceiverInterface
+    [EditorWindowExtension(115, typeof(GeoElementDataControl))]
+    public class GeoElementWindow : PreviewDataControlExtension
     {
-        private int selectedElement;
-
-        /* ---------------------------------
-         * Attributes
-         * -------------------------------- */
-         
-        private Vector2 location;
-        private bool editing;
-        private GeoElement element;
-        private readonly string[] menus = { "Position", "Attributes", "Actions" };
+        public enum GeoElementWindows
+        {
+            Geometry, Description, Actions
+        }
 
         /* ----------------------------------
          * GUI ELEMENTS
          * -----------------------------------*/
-        private PlaceSearcher placeSearcher;
-        private GUIMap map;
-        private ReorderableList actionsList;
+        private readonly MapEditor mapEditor;
+
+        private readonly GeoElementWindowGeometry geometryComponent; 
 
         public GeoElementWindow(Rect aStartPos, GUIStyle aStyle, params GUILayoutOption[] aOptions) : base(aStartPos, new GUIContent("Geo Elements"), aStyle, aOptions)
         {
@@ -44,307 +32,67 @@ namespace uAdventure.Geo
                 text = "GeoElements"
             };
 
-            Init();
-        }
-
-        /* ----------------------------------
-         * INIT: Used for late initialization after constructor
-         * ----------------------------------*/
-        void Init()
-        {
-            placeSearcher = new PlaceSearcher("Address");
-            placeSearcher.OnRequestRepaint += Repaint;
-            map = new GUIMap();
-            map.Repaint += Repaint;
-            map.Zoom = 19;
-
-            actionsList = new ReorderableList(new List<GeoAction>(), typeof(GeoAction))
+            mapEditor = new MapEditor()
             {
-                headerHeight = 40,
-                elementHeight = 60,
-                drawHeaderCallback = DrawActionsHeader,
-                drawElementCallback = DrawActionElement,
-                onAddDropdownCallback = OnAddActionDropdown
+                Components = EditorWindowBase.Components,
+                Elements = new List<DataControl> { null },
+                Repaint = () => Repaint(),
+                PlaceSearcher = { OnRequestRepaint = () => OnRequestRepaint() }
             };
-        }
 
-        private void DrawActionsHeader(Rect r)
-        {
-            GUILayout.BeginArea(new Rect(r.x, r.y, r.width, r.height / 2f));
-            GUILayout.Label("Actions");
-            GUILayout.EndArea();
+            geometryComponent = new GeoElementWindowGeometry(aStartPos, new GUIContent(), aStyle, mapEditor, aOptions);
 
-            GUILayout.BeginArea(new Rect(r.x, r.y + (r.height / 2f), r.width, r.height / 2f), "", "toolbar");
-            GUILayout.BeginHorizontal(); 
-            GUILayout.Label("Name", GUILayout.Width(r.width * 0.2f));
-            GUILayout.Label("Parameters", GUILayout.Width(r.width * 0.6f));
-            GUILayout.Label("C&E", GUILayout.Width(r.width * 0.2f));
-            GUILayout.EndHorizontal();
-            GUILayout.EndArea();
-        }
+            AddTab(TC.get("Geo.GeoElement.GeometryWindow.Title"), GeoElementWindows.Geometry, geometryComponent);
+            AddTab(TC.get("Geo.GeoElement.DescriptionWindow.Title"), GeoElementWindows.Description, new GeoElementWindowDescription(aStartPos, new GUIContent(), aStyle, aOptions));
+            AddTab(TC.get("Geo.GeoElement.ActionsWindow.Title"), GeoElementWindows.Actions, new GeoElementWindowActions(aStartPos, new GUIContent(), aStyle, aOptions));
 
-        private void DrawActionElement(Rect rect, int index, bool isActive, bool isFocused)
-        {
-            GUILayout.BeginArea(rect);
-
-            var action = actionsList.list[index] as GeoAction;
-            GUILayout.BeginHorizontal();
-            GUILayout.Label(action.Name, GUILayout.MaxWidth(rect.width * 0.2f));
-
-            //Action Parameters
-            GUILayout.BeginVertical(GUILayout.MaxWidth(rect.width * 0.6f));
-            
-            if(action is EnterAction)
-            {
-                var specialized = action as EnterAction;
-                specialized.OnlyFromOutside = EditorGUILayout.Toggle("Only from outside", specialized.OnlyFromOutside);
-            }
-            if (action is ExitAction)
-            {
-                var specialized = action as ExitAction;
-                specialized.OnlyFromInside = EditorGUILayout.Toggle("Only from inside", specialized.OnlyFromInside);
-            }
-            if (action is InspectAction)
-            {
-                var specialized = action as InspectAction;
-                specialized.Inside = EditorGUILayout.Toggle("On range", specialized.Inside);
-            }
-            if (action is LookToAction)
-            {
-                var specialized = action as LookToAction;
-                specialized.Inside = EditorGUILayout.Toggle("On range", specialized.Inside);
-                specialized.Center = EditorGUILayout.Toggle("Look to center", specialized.Center);
-                if (!specialized.Center)
-                {
-                    specialized.Direction = EditorGUILayout.Vector2Field("Look to direction", specialized.Direction);
-                }
-            }
-
-            GUILayout.EndVertical();
-
-            // Conditions and effects
-            GUILayout.BeginVertical(GUILayout.MaxWidth(rect.width * 0.2f));
-            if (GUILayout.Button("Conditions"))
-            {
-                ConditionEditorWindow window =
-                    (ConditionEditorWindow)ScriptableObject.CreateInstance(typeof(ConditionEditorWindow));
-                window.Init(action.Conditions);
-            }
-            if(GUILayout.Button("Effects")){
-
-                EffectEditorWindow window =
-                    (EffectEditorWindow)ScriptableObject.CreateInstance(typeof(EffectEditorWindow));
-                window.Init(action.Effects);
-            }
-            GUILayout.EndVertical();
-
-            // End eleemnt
-            GUILayout.EndHorizontal();
-            GUILayout.EndArea();
-        }
-
-        protected virtual void OnAddActionDropdown(Rect r, ReorderableList rl)
-        {
-            var menu = new GenericMenu();
-            foreach(var a in GeoActionsFactory.Instance.AvaliableActions)
-            {
-                menu.AddItem(new GUIContent(a.Value), false, (t) => element.Actions.Add(GeoActionsFactory.Instance.CreateActionFor(t as Type)), a.Key);
-            }
-            menu.ShowAsContext();
         }
 
         /* ----------------------------------
           * ON GUI: Used for drawing the window every unity event
           * ----------------------------------*/
-        int selected = 0;
-        public override void Draw(int aID)
-        {
 
-            if (selectedElement == -1)
-            {
-                GUILayout.Label("Nothing selected");
-                return;
-            }
-
-            element = Controller.Instance.SelectedChapterDataControl.getObjects<GeoElement>()[selectedElement];
-
-
-            actionsList.list = element.Actions;
-            // Set geometries list reference
-            map.Geometries = new List<GMLGeometry>() { element.Geometry };
-
-            selected = GUILayout.Toolbar(selected, menus);
-
-            switch (selected)
-            {
-                case 0: // Map view
-                    {
-                        element.Geometry.Type = (GMLGeometry.GeometryType)EditorGUILayout.EnumPopup("Geometry type", element.Geometry.Type);
-                        EditorGUILayout.LabelField("Points: " + element.Geometry.Points.Count);
-                        element.Geometry.Influence = EditorGUILayout.FloatField("Influence Radius", element.Geometry.Influence);
-
-
-                        if (GUILayout.Button("Center") && element.Geometry.Points.Count > 0)
-                        {
-                            Center(element);
-                        }
-
-                        if (GUILayout.Button(!editing ? "Edit" : "Finish"))
-                        {
-                            editing = !editing;
-                        }
-                        
-                        EditorGUILayout.Separator();
-                        placeSearcher.LayoutBegin();
-
-                        // Location control
-                        location = EditorGUILayout.Vector2Field("Location", location);
-                        if (location != map.Center.ToVector2())
-                        {
-                            map.Center = new Vector2d(location.x, location.y);
-                        }
-
-                        // Map drawing
-                        if (editing)
-                        {
-                            map.selectedGeometry = element.Geometry;
-                        }
-
-                        if (map.DrawMap(GUILayoutUtility.GetRect(0,0, GUILayout.ExpandHeight(true), GUILayout.ExpandWidth(true))) && element != null && editing)
-                        {
-                            element.Geometry.AddPoint(map.GeoMousePosition);
-                        }
-                        
-                        location = map.Center.ToVector2();
-                        
-                        if (placeSearcher.LayoutEnd())
-                        {
-                            // If new Location is selected from the dropdown
-                            location = placeSearcher.LatLon.ToVector2();
-                            Repaint();
-                        }
-                    } break;
-                case 1:
-                    {
-                        GUILayout.Label("Full description");
-                        element.FullDescription = GUILayout.TextArea(element.FullDescription, GUILayout.Height(250));
-                        
-                        element.Name = EditorGUILayout.TextField("Name", element.Name);
-                        element.BriefDescription = EditorGUILayout.TextField("Brief description", element.BriefDescription);
-                        element.DetailedDescription = EditorGUILayout.TextField("Detailed description", element.DetailedDescription);
-                        
-                        GUILayout.Label("Element image");
-                        GUILayout.BeginHorizontal();
-                        GUILayout.Box(element.Image, GUILayout.Width(0.78f * m_Rect.width));
-                        if (GUILayout.Button(TC.get("Buttons.Select"), GUILayout.Width(0.2f * m_Rect.width)))
-                        {
-                            ShowAssetChooser(AssetType.Image);
-                        }
-                        GUILayout.EndHorizontal();
-                    }
-                    break;
-                case 2:
-                    {
-                        actionsList.list = element.Actions;
-                        actionsList.DoList(new Rect(0, 50, m_Rect.width * 0.99f, m_Rect.height));
-                    }
-                    break;
-            }
-
-            
-        }
-
-        protected override void OnAdd(ReorderableList r)
-        {
-            Controller.Instance.SelectedChapterDataControl.getObjects<GeoElement>().Add(new GeoElement("newGeoElement"));
-        }
-
-        protected override void OnAddOption(ReorderableList r, string option) { }
-
-        protected override void OnButton()
-        {
-            reorderableList.index = -1;
-        }
-
-        protected override void OnElementNameChanged(ReorderableList r, int index, string newName)
-        {
-            Controller.Instance.SelectedChapterDataControl.getObjects<GeoElement>()[index].Id = newName;
-        }
-
-        protected override void OnRemove(ReorderableList r)
-        {
-            Controller.Instance.SelectedChapterDataControl.getObjects<GeoElement>().RemoveAt(r.index);
-        }
-
-        protected override void OnReorder(ReorderableList r)
-		{
-			string idToMove = r.list [r.index] as string;
-			var temp = Controller.Instance .SelectedChapterDataControl .getObjects<GeoElement> ();
-			GeoElement toMove = temp.Find (geoElem => geoElem.getId () == idToMove);
-			temp.Remove (toMove);
-			temp.Insert (r.index, toMove);
-        }
 
         protected override void OnSelect(ReorderableList r)
         {
-            selectedElement = r.index;
-            if(r.index >= 0)
+            GeoController.Instance.SelectedGeoElement = r.index;
+            if (GeoController.Instance.SelectedGeoElement >= 0)
             {
-                Center(Controller.Instance.SelectedChapterDataControl.getObjects<GeoElement>()[selectedElement]);
+                var geoElement = GeoController.Instance.GeoElements[GeoController.Instance.SelectedGeoElement];
+
+                mapEditor.Elements[0] = geoElement;
+
+                var geometry = geoElement.GMLGeometries[geoElement.SelectedGeometry];
+                mapEditor.Center = geometry.Center;
+                mapEditor.ZoomToBoundingBox(geometry.Points.ToArray().ToRectD());
             }
         }
 
-        protected override void OnUpdateList(ReorderableList r)
+
+        protected override void OnButton()
         {
-            r.list = Controller.Instance.SelectedChapterDataControl.getObjects<GeoElement>().ConvertAll(s => s.Id);
+            base.OnButton();
+            dataControlList.SetData(GeoController.Instance.GeoElements,
+                geoElementsList => (geoElementsList as ListDataControl<ChapterDataControl, GeoElementDataControl>).DataControls.Cast<DataControl>().ToList());
+            GeoController.Instance.SelectedGeoElement = -1;
         }
 
-        private void Center(GeoElement element)
+        protected override void OnDrawMainPreview(Rect rect, int index)
         {
-            if(element.Geometry.Points.Count > 0)
+            var geoElementDataControl = dataControlList.list[index] as GeoElementDataControl;
+            var eventType = Event.current.type;
+            if (Event.current.type != EventType.Layout || Event.current.type != EventType.Repaint)
             {
-                map.Center = element.Geometry.Center;
-                location = map.Center.ToVector2();
+                // Force the event ussage to prevent the map interaction
+                Event.current.Use();
             }
+            
+            mapEditor.Elements[0] = geoElementDataControl;
+            mapEditor.Center = geoElementDataControl.GMLGeometries[geoElementDataControl.SelectedGeometry].Center;
+            mapEditor.Draw(rect);
 
-        }
-
-        enum AssetType
-        {
-            Image
-        }
-
-        // --------------------------
-        // Dialog methods: show and receive
-        // --------------------------
-        void ShowAssetChooser(AssetType type)
-        {
-            switch (type)
-            {
-                case AssetType.Image:
-                    ImageFileOpenDialog backgroundDialog =
-                        (ImageFileOpenDialog)ScriptableObject.CreateInstance(typeof(ImageFileOpenDialog));
-                    backgroundDialog.Init(this, FileType.ITEM_IMAGE);
-                    break;
-            }
-
-        }
-
-        public void OnDialogOk(string message, object workingObject = null, object workingObjectSecond = null)
-        {
-            switch ((FileType)workingObject)
-            {
-                case FileType.ITEM_IMAGE:
-                    element.Image = message;
-                    Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[
-                       GameRources.GetInstance().selectedSceneIndex].setPreviewBackground(message);
-                    break;
-            }
-        }
-
-        public void OnDialogCanceled(object workingObject = null)
-        {
-            Debug.Log("Canceled");
+            Event.current.type = eventType;
+            geometryComponent.Target = null;
         }
     }
 

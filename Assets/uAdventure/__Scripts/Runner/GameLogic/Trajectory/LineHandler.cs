@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-
 using uAdventure.Core;
 
 namespace uAdventure.Runner
@@ -136,6 +135,10 @@ namespace uAdventure.Runner
             {
                 return A + AB * distance;
             }
+        }
+        public static Vector2d GetClosestPointOnLineSegment(Vector2d A, Vector2d B, Vector2d P)
+        {
+            return GetClosestPointOnLineSegment(A.ToVector2(), B.ToVector2(), P.ToVector2()).ToVector2d();
         }
 
         public float getSegmentDistance(Vector2 from, Vector2 to)

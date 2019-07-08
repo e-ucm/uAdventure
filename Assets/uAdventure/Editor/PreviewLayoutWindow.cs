@@ -20,6 +20,8 @@ namespace uAdventure.Editor
         {
             DoUpdate = false; 
             PreviewTitle = "ImageAssets.Preview".Traslate();
+            Margin = 30;
+            LeaveWindowSpace = true;
         }
 
         /** Callback for window destroy */
@@ -87,6 +89,10 @@ namespace uAdventure.Editor
 
         protected string PreviewTitle { get; set; }
 
+        protected float Margin { get; set; }
+
+        protected bool LeaveWindowSpace { get; set; }
+
         // ######################## MAIN FUNCTIONS ########################
 
         /** Update is called from the UnityEditor and is used to move (animating) the preview inspector inside of the window */
@@ -122,14 +128,14 @@ namespace uAdventure.Editor
             DrawPreviewHeader();
             var auxRect = EditorGUILayout.BeginVertical("preBackground", GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
             {
-
+                
                 if (Event.current.type == EventType.Repaint)
                 {
                     areaRect = auxRect;
 
                     auxRect.position = Vector2.zero;
-                    auxRect.x += 30; auxRect.width -= 60;
-                    auxRect.y += 30; auxRect.height -= 60;
+                    auxRect.x += Margin; auxRect.width -= Margin * 2;
+                    auxRect.y += Margin; auxRect.height -= Margin * 2;
 
                     previewRect = auxRect;
 
@@ -140,7 +146,7 @@ namespace uAdventure.Editor
                         windowInited = true;
                     }
                 }
-
+                
                 GUILayout.BeginArea(areaRect);
                 GUILayout.BeginHorizontal();
                 {
@@ -149,7 +155,7 @@ namespace uAdventure.Editor
                     var viewport = new Rect(previewRect);
 
 
-                    if (HasToDrawPreviewInspector())
+                    if (HasToDrawPreviewInspector() && LeaveWindowSpace)
                     {
                         var corner = GetDesiredCorner(windowRect, previewRect);
                         switch (corner.Key)
