@@ -165,7 +165,7 @@ namespace uAdventure.Editor
                             var npcIndex = npcs.getNPCIndexByID(erdc.getElementId());
                             if (npcIndex != -1)
                             {
-                                imagePath = npcs.getNPCs()[npcIndex].getPreviewImage(erdc.GetOrientation());
+                                imagePath = npcs.getNPCs()[npcIndex].getPreviewImage(erdc.Orientation);
                             }
                         }
                         break;

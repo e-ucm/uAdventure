@@ -37,6 +37,7 @@ namespace uAdventure.Runner
         public delegate void OnMovementCancelled(object data);
 
         private Representable representable;
+        private ScenePositioner scenePositioner;
 
         // Representation
         private float originalScale;
@@ -59,7 +60,8 @@ namespace uAdventure.Runner
         protected void Start()
         {
             representable = GetComponent<Representable>();
-            if (representable)
+            scenePositioner = GetComponent<ScenePositioner>();
+            if (scenePositioner)
             {
                 representable.Play("stand");
             }
@@ -85,8 +87,8 @@ namespace uAdventure.Runner
             this.onMovementFinished = onMovementFinished;
             this.onMovementCancelled = onMovementCancelled;
 
-            var accesible = TrajectoryHandler.GetAccessibleTrajectory(representable.getPosition(), FindObjectOfType<SceneMB>().Trajectory);
-            var route = accesible.route(representable.getPosition(), point);
+            var accesible = TrajectoryHandler.GetAccessibleTrajectory(scenePositioner.Position, FindObjectOfType<SceneMB>().Trajectory);
+            var route = accesible.route(scenePositioner.Position, point);
             if (route != null && route.Length > 0)
             {
                 toArea = null;
@@ -112,8 +114,8 @@ namespace uAdventure.Runner
             MovementPoint[] route = {
                 new MovementPoint(){
                     destination = point,
-                    distance = (this.representable.getPosition() - origin).magnitude,
-                    scale = this.representable.Context.getScale()
+                    distance = (this.scenePositioner.Position - origin).magnitude,
+                    scale = this.scenePositioner.Context.Scale
                 }
             };
 
@@ -139,18 +141,18 @@ namespace uAdventure.Runner
             this.onMovementFinished = onMovementFinished;
             this.onMovementCancelled = onMovementCancelled;
 
-            if (area.Contains(representable.getPosition(), 0))
+            if (area.Contains(scenePositioner.Position, 0))
             {
                 if(onMovementFinished != null)
                     onMovementFinished(data);
                 return true;
             }
 
-            var accesible = TrajectoryHandler.GetAccessibleTrajectory(representable.getPosition(), FindObjectOfType<SceneMB>().Trajectory);
+            var accesible = TrajectoryHandler.GetAccessibleTrajectory(scenePositioner.Position, FindObjectOfType<SceneMB>().Trajectory);
             Vector2[] intersections;
             if (TrajectoryHandler.TrajectoryRectangleIntersections(area, accesible, out intersections))
             {
-                var route = accesible.route(representable.getPosition(), intersections);
+                var route = accesible.route(scenePositioner.Position, intersections);
                 if (route != null && route.Length > 0)
                 {
                     toArea = area;
@@ -178,7 +180,7 @@ namespace uAdventure.Runner
         public void MoveInstant(Vector2 point)
         {
             AbortCurrentMovement();
-            representable.setPosition(point);
+            scenePositioner.Position = point;
         }
 
         // Private movement management methods
@@ -211,8 +213,8 @@ namespace uAdventure.Runner
             progress = 0.0f;
 
             this.point = point;
-            this.origin = representable.getPosition();
-            this.originalScale = representable.Context.getScale();
+            this.origin = scenePositioner.Position;
+            this.originalScale = scenePositioner.Context.Scale;
             representable.Orientation = (point.destination - origin).ToOrientation();
             representable.Play("walk");
         }
@@ -222,10 +224,10 @@ namespace uAdventure.Runner
             if (moving)
             {
                 progress = progress + point.getProgress(player_speed, Time.deltaTime);
-                representable.Context.setScale(point.getScaleAt(progress, originalScale));
-                representable.setPosition(point.getPointAt(progress, origin));
+                scenePositioner.Context.Scale = point.getScaleAt(progress, originalScale);
+                scenePositioner.Position = point.getPointAt(progress, origin);
 
-                var isInside = (toArea != null && toArea.Contains(representable.getPosition(), distanceToArea));
+                var isInside = (toArea != null && toArea.Contains(scenePositioner.Position, distanceToArea));
 
                 if (progress >= 1.0f || isInside)
                 {

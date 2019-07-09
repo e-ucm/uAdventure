@@ -84,8 +84,8 @@ namespace uAdventure.Editor
          * 
          * @return Path to the image, null if not present
          */
-        public string getPreviewImage() { return getPreviewImage(Runner.Orientation.E); }
-        public string getPreviewImage(Runner.Orientation orientation)
+        public string getPreviewImage() { return getPreviewImage(Orientation.E); }
+        public string getPreviewImage(Orientation orientation)
         {
             return previewAnimations[orientation] != null && previewAnimations[orientation].getFrames().Count > 0 ? previewAnimations[orientation].getFrame(0).getUri() : null;
         }
@@ -127,7 +127,7 @@ namespace uAdventure.Editor
             return null;
         }
         // Modified v1.5 to fix a bug with empty animations in eaa format
-        private string getExistingPreviewImagePath(Runner.Orientation orientation = Runner.Orientation.E)
+        private string getExistingPreviewImagePath(Orientation orientation = Orientation.E)
         {
 
             string path = null;
@@ -137,9 +137,9 @@ namespace uAdventure.Editor
                 switch (orientation)
                 {
                     default:                   previews = previewPriorityRight; break;
-                    case Runner.Orientation.N: previews = previewPriorityUp;    break;
-                    case Runner.Orientation.S: previews = previewPriorityDown;  break;
-                    case Runner.Orientation.O: previews = previewPriorityLeft;  break;
+                    case Orientation.N: previews = previewPriorityUp;    break;
+                    case Orientation.S: previews = previewPriorityDown;  break;
+                    case Orientation.O: previews = previewPriorityLeft;  break;
                 }
 
                 // We prioritize the left, the right and the down

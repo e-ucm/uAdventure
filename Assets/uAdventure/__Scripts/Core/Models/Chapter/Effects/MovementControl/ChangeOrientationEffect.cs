@@ -13,7 +13,7 @@ namespace uAdventure.Core
          */
         private string idTarget;
 
-        private Runner.Orientation orientation;
+        private Orientation orientation;
 
         /**
          * Creates a new ConsumeObjectEffect.
@@ -21,7 +21,7 @@ namespace uAdventure.Core
          * @param idTarget
          *            the id of the object to be consumed
          */
-        public ChangeOrientationEffect(string idTarget, Runner.Orientation orientation) : base()
+        public ChangeOrientationEffect(string idTarget, Orientation orientation) : base()
         {
             this.idTarget = idTarget;
             this.orientation = orientation;

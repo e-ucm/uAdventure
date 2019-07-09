@@ -87,6 +87,24 @@ namespace uAdventure.Core
         {
             return (T)System.Enum.Parse(typeof(T), value, true);
         }
+        public static object Parse(string value, Type type)
+        {
+            try
+            {
+                var parse = type.GetMethod("Parse", BindingFlags.Static);
+                if (parse != null)
+                {
+                    value = (string)parse.Invoke(null, new object[] { value });
+                }
+
+                return System.Enum.Parse(type, value, true);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         public static T ParseDefault<T>(string value, T def)
         {
             try

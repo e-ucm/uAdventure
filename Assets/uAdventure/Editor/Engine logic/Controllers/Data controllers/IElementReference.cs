@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿
+using uAdventure.Core;
 
 namespace uAdventure.Editor
 {
@@ -10,5 +8,7 @@ namespace uAdventure.Editor
         DataControl ReferencedDataControl { get; }
 
         string ReferencedId { get; }
+
+        Orientation Orientation { get; set; }
     }
 }

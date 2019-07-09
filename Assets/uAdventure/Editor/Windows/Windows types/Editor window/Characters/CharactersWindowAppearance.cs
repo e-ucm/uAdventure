@@ -257,21 +257,21 @@ namespace uAdventure.Editor
             }
             
             var npc = Target as NPCDataControl;
-            var orientation = uAdventure.Runner.Orientation.S;
+            var orientation = Orientation.S;
             if (SceneEditor.ElementReference != null)
             {
                 var elementReference = SceneEditor.ElementReference as ElementReferenceDataControl;
-                orientation = elementReference.GetOrientation();
+                orientation = elementReference.Orientation;
             }
             if (npc != null)
             {
                 var resourceOrientation = "";
                 switch (orientation)
                 {
-                    case Runner.Orientation.S: resourceOrientation = NPC.RESOURCE_TYPE_STAND_DOWN;  break;
-                    case Runner.Orientation.N: resourceOrientation = NPC.RESOURCE_TYPE_STAND_UP;    break;
-                    case Runner.Orientation.O: resourceOrientation = NPC.RESOURCE_TYPE_STAND_LEFT;  break;
-                    case Runner.Orientation.E: resourceOrientation = NPC.RESOURCE_TYPE_STAND_RIGHT; break;
+                    case Orientation.S: resourceOrientation = NPC.RESOURCE_TYPE_STAND_DOWN;  break;
+                    case Orientation.N: resourceOrientation = NPC.RESOURCE_TYPE_STAND_UP;    break;
+                    case Orientation.O: resourceOrientation = NPC.RESOURCE_TYPE_STAND_LEFT;  break;
+                    case Orientation.E: resourceOrientation = NPC.RESOURCE_TYPE_STAND_RIGHT; break;
                 }
 
                 var preview = LoadCharacterTexturePreview(npc, resourceOrientation);

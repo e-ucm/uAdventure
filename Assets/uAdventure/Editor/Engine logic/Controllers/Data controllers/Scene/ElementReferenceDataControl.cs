@@ -73,7 +73,7 @@ namespace uAdventure.Editor
             ConditionsController.ConditionOwner owner = new ConditionsController.ConditionOwner(type, elementReference.getTargetId(), parent);
             context1.Add(ConditionsController.CONDITION_OWNER, owner);
 
-            conditionsController = new ConditionsController(elementReference.getConditions(), context1);
+            conditionsController = new ConditionsController(elementReference.Conditions, context1);
         }
 
         /**
@@ -213,7 +213,7 @@ namespace uAdventure.Editor
         public float getElementScale()
         {
 
-            return elementReference.getScale();
+            return elementReference.Scale;
         }
 
         /**
@@ -325,7 +325,7 @@ namespace uAdventure.Editor
         {
 
             // Update the flag summary with the conditions
-            ConditionsController.updateVarFlagSummary(varFlagSummary, elementReference.getConditions());
+            ConditionsController.updateVarFlagSummary(varFlagSummary, elementReference.Conditions);
         }
 
 
@@ -487,16 +487,19 @@ namespace uAdventure.Editor
             this.visible = visible;
         }
 
-        public Runner.Orientation GetOrientation()
-        {
-            return elementReference.GetOrientation();
-        }
 
-        public void SetOrientation(Runner.Orientation value)
+        public Orientation Orientation
         {
-            Controller.Instance.AddTool(new ChangeValueTool<ElementReference, Runner.Orientation>(elementReference, value, "GetOrientation", "SetOrientation"));
-        }
+            get
+            {
+                return elementReference.Orientation;
+            }
 
+            set
+            {
+                Controller.Instance.AddTool(new ChangeValueTool<ElementReference, Orientation>(elementReference, value, "Orientation"));
+            }
+        }
 
         public override List<Searchable> getPathToDataControl(Searchable dataControl)
         {

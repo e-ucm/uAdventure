@@ -14,10 +14,10 @@ namespace uAdventure.Runner
     [RequireComponent(typeof(TransitionManager))]
     public class SceneMB : MonoBehaviour, IRunnerChapterTarget, IPointerClickHandler, IBeginDragHandler, IEndDragHandler, IDragHandler, IConfirmWantsDrag
     {
-        private class HeightLayerComparer : IComparer<Representable>
+        private class HeightLayerComparer : IComparer<ScenePositioner>
         {
-            public Dictionary<Representable, float> Heights { get; set; }
-            public int Compare(Representable x, Representable y)
+            public Dictionary<ScenePositioner, float> Heights { get; set; }
+            public int Compare(ScenePositioner x, ScenePositioner y)
             {
                 var order = (int)(Heights[x] - Heights[y]);
                 if (Mathf.Approximately(order, 0))
@@ -47,8 +47,8 @@ namespace uAdventure.Runner
         private bool firstRender = true;
         private bool dragging;
         private Vector2 endDragSpeed;
-        private Dictionary<Representable, float> heights;
-        private SortedList<Representable, float> finalOrder;
+        private Dictionary<ScenePositioner, float> heights;
+        private SortedList<ScenePositioner, float> finalOrder;
 
         // Movements
         private float minZ;
@@ -102,8 +102,8 @@ namespace uAdventure.Runner
         protected void Awake()
         {
             var comparer = new HeightLayerComparer();
-            heights = new Dictionary<Representable, float>();
-            finalOrder = new SortedList<Representable, float>(comparer);
+            heights = new Dictionary<ScenePositioner, float>();
+            finalOrder = new SortedList<ScenePositioner, float>(comparer);
             comparer.Heights = heights;
         }
 
@@ -139,13 +139,13 @@ namespace uAdventure.Runner
 
             // First we categorize the childs
             // (This is not necesary if the childs wont change)
-            var staticChilds = new List<Representable>();
+            var staticChilds = new List<ScenePositioner>();
             heights.Clear();
             finalOrder.Clear();
 
             for (int i = 0; i < referencesHolder.childCount; i++)
             {
-                var representable = referencesHolder.GetChild(i).GetComponent<Representable>();
+                var representable = referencesHolder.GetChild(i).GetComponent<ScenePositioner>();
                 // Not layered element
                 if (representable.Context.getLayer() < 0)
                 {
@@ -166,11 +166,11 @@ namespace uAdventure.Runner
             //  Lower Y elements should also appear on top of higher Y elements.
             //  Since the first rule is more important, to fix this, we simulate the Y coordinate for elements
             //  that have higher Y coordinate, but lower layer. The Y used is the minimum Y for the lower layer elements.
-            var maxY = staticChilds.Any() ? staticChilds.First().getPosition().y : 0;
+            var maxY = staticChilds.Any() ? staticChilds.First().Position.y : 0;
             foreach(var child in staticChilds)
             {
                 // Since we're iterating backwards we carry the minimum to the higher layers
-                maxY = Mathf.Max(maxY, child.getPosition().y);
+                maxY = Mathf.Max(maxY, child.Position.y);
                 // Finally we insert the elements: The layered elements use the simulated Y, whereas the dynamic ones use their real Y.
                 heights[child] = maxY;
                 finalOrder[child] = maxY;
@@ -389,8 +389,8 @@ namespace uAdventure.Runner
 
                             trajectory = new Trajectory();
                             var width = backgroundTexture ? backgroundTexture.width : Screen.width;
-                            trajectory.addNode("leftSide", 0, playerContext.getY(), playerContext.getScale());
-                            trajectory.addNode("rightSide", width, playerContext.getY(), playerContext.getScale());
+                            trajectory.addNode("leftSide", 0, playerContext.getY(), playerContext.Scale);
+                            trajectory.addNode("rightSide", width, playerContext.getY(), playerContext.Scale);
                             trajectory.addSide("leftSide", "rightSide", width);
                         }
 
@@ -399,7 +399,11 @@ namespace uAdventure.Runner
                         Representable player = GameObject.Instantiate(playerPrefab, referencesHolder).GetComponent<Representable>();
                         player.Element = Game.Instance.GameState.Player;
                         player.Context = playerContext;
-                        player.Scene = this;
+
+                        var scenePositioner = player.gameObject.AddComponent<ScenePositioner>();
+                        scenePositioner.Scene = this;
+                        scenePositioner.Representable = player;
+                        scenePositioner.Context = playerContext;
                         // Force the start
                         player.SendMessage("Start");
                         
@@ -492,9 +496,13 @@ namespace uAdventure.Runner
 
             GameObject ret = Instantiate(basePrefab, parent);
             var representable = ret.GetComponent<Representable>();
-            representable.Scene = this;
             representable.Context = context;
             representable.Element = element;
+
+            var scenePositioner = ret.AddComponent<ScenePositioner>();
+            scenePositioner.Context = context;
+            scenePositioner.Representable = representable;
+            scenePositioner.Scene = this;
         }
 
         private void InstanceRectangle<T>(Rectangle context) where T : Rectangle
@@ -633,7 +641,8 @@ namespace uAdventure.Runner
                         var texCoord = hitInfo.textureCoord;
                         texCoord.y = 1 - texCoord.y;
                         texPos.Scale(texCoord);
-                        var accesible = TrajectoryHandler.GetAccessibleTrajectory(PlayerMB.Instance.GetComponent<Representable>().getPosition(), trajectoryHandler);
+                        var positioner = PlayerMB.Instance.GetComponent<ScenePositioner>();
+                        var accesible = TrajectoryHandler.GetAccessibleTrajectory(positioner.Position, trajectoryHandler);
                         PlayerMB.Instance.GetComponent<Mover>().Move(accesible.closestPoint(texPos));
                     }
                     break;

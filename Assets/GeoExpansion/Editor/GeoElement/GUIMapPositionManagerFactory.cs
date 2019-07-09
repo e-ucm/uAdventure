@@ -27,7 +27,7 @@ namespace uAdventure.Geo
             };
         }
 
-        public IGuiMapPositionManager CreateInstance(ExtElemReferenceTransformManagerDescriptor element, TransformManagerDataControl transformManagerDataControl)
+        public IGuiMapPositionManager CreateInstance(ITransformManagerDescriptor element, TransformManagerDataControl transformManagerDataControl)
         {
             var elem = (IGuiMapPositionManager)Activator.CreateInstance(guiMapPositionManagers.Find(g => g.ForType == element.Type).GetType());
             elem.Configure(transformManagerDataControl);

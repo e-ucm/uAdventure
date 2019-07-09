@@ -216,11 +216,11 @@ namespace uAdventure.Geo
             var mb = GetReference(currentStep.Reference);
             if (mb == null)
                 return false; // If the element is not there, just try to skip it
-            else if (mb is GeoWrapper)
+            else if (mb is GeoPositioner)
             {
-                var wrap = mb as GeoWrapper;
-                var position = (Vector2d)wrap.Reference.TransformManagerParameters["Position"];
-                var interactionRange = (float) wrap.Reference.TransformManagerParameters["InteractionRange"];
+                var wrap = mb as GeoPositioner;
+                var position = (Vector2d)wrap.Context.TransformManagerParameters["Position"];
+                var interactionRange = (float) wrap.Context.TransformManagerParameters["InteractionRange"];
                 
                 var distance = GM.SeparationInMeters(position, character.LatLon);
                 var realDistance = GM.SeparationInMeters(position, Input.location.lastData.LatLonD());
@@ -361,10 +361,10 @@ namespace uAdventure.Geo
             {
                 return GetGeoElementPosition((mb as GeoElementMB));
             }
-            else if(mb is GeoWrapper)
+            else if(mb is GeoPositioner)
             {
                 // Only works with geopositioned elements TODO make it compatible with the rest of types
-                return (Vector2d) (mb as GeoWrapper).Reference.TransformManagerParameters["Position"];
+                return (Vector2d) (mb as GeoPositioner).Context.TransformManagerParameters["Position"];
             }
 
             return new Vector2d(double.PositiveInfinity, double.PositiveInfinity);
@@ -381,7 +381,7 @@ namespace uAdventure.Geo
             {
                 referenceCache.Clear();
                 FindObjectsOfType<GeoElementMB>().ToList().ForEach(geoElem => referenceCache.Add(geoElem.Reference.getTargetId(), geoElem));
-                FindObjectsOfType<GeoWrapper>().ToList().ForEach(geoWrap => referenceCache.Add(geoWrap.Reference.getTargetId(), geoWrap));
+                FindObjectsOfType<GeoPositioner>().ToList().ForEach(geoWrap => referenceCache.Add(geoWrap.Context.getTargetId(), geoWrap));
             }
 
             var mb = referenceCache.ContainsKey(reference) ? referenceCache[reference] : null;

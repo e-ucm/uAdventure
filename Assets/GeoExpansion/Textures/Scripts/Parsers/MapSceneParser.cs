@@ -43,7 +43,7 @@ namespace uAdventure.Geo
                     var extElem = new ExtElemReference(targetId);
                     mapElement = extElem;
                     extElem.TransformManagerDescriptor = GetDescriptor(ExString.Default(extElemNode.GetAttribute("transformManager"),
-                        typeof(GeoPositionedTransformManagerDescriptor).FullName));
+                        typeof(GeopositionedDescriptor).FullName));
 
                     foreach(var param in extElem.TransformManagerDescriptor.ParameterDescription)
                     {
@@ -124,9 +124,9 @@ namespace uAdventure.Geo
             return null;
         }
 
-        private ExtElemReferenceTransformManagerDescriptor GetDescriptor(string type)
+        private ITransformManagerDescriptor GetDescriptor(string type)
         {
-            ExtElemReferenceTransformManagerDescriptor r = null;
+            ITransformManagerDescriptor r = null;
 
             Type t = Type.GetType(type);
             var manager = TransformManagerDescriptorFactory.Instance.AvaliableTransformManagers.Keys.ToList().Find(k => k == t);

@@ -6,42 +6,15 @@ using System;
 
 namespace uAdventure.Geo
 {
-    public abstract class MapElement : Documented, HasTargetId, ICloneable
+    public abstract class MapElement : Context
     {
-        private string targetId;
-        private string documentation;
-        
         public int Layer { get; set; }
 
-        public Conditions Conditions { get; set; }
-
-        protected MapElement(string targetId)
+        protected MapElement(string idTarget) : base(idTarget)
         {
-            this.targetId = targetId;
-            Conditions = new Conditions();
-        }
-        
-        public string getTargetId()
-        {
-            return targetId;
         }
 
-        public void setTargetId(string id)
-        {
-            this.targetId = id;
-        }
-
-        public string getDocumentation()
-        {
-            return documentation;
-        }
-
-        public void setDocumentation(string documentation)
-        {
-            this.documentation = documentation;
-        }
-
-        public object Clone()
+        public override object Clone()
         {
             var clone = MemberwiseClone() as MapElement;
             clone.Conditions = Conditions.Clone() as Conditions;

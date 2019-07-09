@@ -126,11 +126,9 @@ namespace uAdventure.Geo
                 {
                     var latlon = IsStarted() ? Input.location.lastData.LatLon() : geochar.LatLon.ToVector2();
                     
-                    TrackerExtension.Movement.Geoposition("player", latlon);
-                    TrackerAsset.Instance.Flush();
-                    timeSinceLastPositionUpdate = 0;
-
-                    Debug.Log(latlon);
+                    //TrackerExtension.Movement.Geoposition("player", latlon);
+                    //TrackerAsset.Instance.Flush();
+                    //timeSinceLastPositionUpdate = 0;
                 }
             }
 

@@ -31,6 +31,12 @@ namespace uAdventure.Geo
             get { return mapElement.getTargetId(); }
         }
 
+        public Orientation Orientation
+        {
+            get;
+            set;
+        }
+
         public override object getContent()
         {
             return mapElement;
