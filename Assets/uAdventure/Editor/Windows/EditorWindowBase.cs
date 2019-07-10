@@ -371,6 +371,11 @@ namespace uAdventure.Editor
             else
             {
                 GUILayout.Label("EditorWindow.NotLoaded".Traslate());
+                if (Controller.Instance.HasError)
+                {
+                    EditorGUILayout.TextArea(Controller.Instance.Error);
+                }
+
                 if (GUILayout.Button("EditorWindow.OpenWelcome".Traslate()))
                 {
                     Controller.OpenWelcomeWindow();
