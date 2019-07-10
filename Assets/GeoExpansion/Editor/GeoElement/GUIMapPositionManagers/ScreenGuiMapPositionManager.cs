@@ -11,8 +11,8 @@ namespace uAdventure.Geo
         private const float gameHeight = 600f;
 
         private Vector2 position;
-        private Vector3 scale;
         private float rotation;
+        private float scale;
 
         public override Type ForType { get { return typeof(ScreenTransformManager); } }
 
@@ -25,13 +25,9 @@ namespace uAdventure.Geo
                 Converters<Vector2d>.Create(v2d => v2d.ToVector2())
             }, "Position", "position");
 
-            scale = parameters.GetValue(scale, new[]
-            {
-                Converters<float>.Create(f => Vector3.one * f),
-                Converters<Vector2>.Create(v2 => new Vector3(v2.x, v2.y, v2.x))
-            }, "Scale", "scale");
-
             rotation = parameters.GetValue(rotation, "Rotation", "rotation");
+
+            scale = parameters.Scale;
         }
 
         public void Draw(GUIMap map, Rect area)
@@ -40,7 +36,7 @@ namespace uAdventure.Geo
             var corner = area.position + new Vector2(position.x * area.width / gameWidth, area.height - (position.y * area.height / gameHeight));
             if (Texture != null)
             {
-                var size = new Vector2(Texture.width * scale.x, Texture.height * scale.y);
+                var size = new Vector2(Texture.width * scale, Texture.height * scale);
                 GUI.DrawTexture(new Rect(corner - new Vector2(size.x / 2f, size.y), size), Texture);
             }
         }
@@ -60,8 +56,9 @@ namespace uAdventure.Geo
         public override Vector2 ToScreenPoint(MapEditor mapEditor, Vector2 point)
         {
             var screen = mapEditor.ScreenRect;
+            var heightRatio = screen.height / gameHeight;
             // First we scale relative to the (0,0) and revert the y
-            var scaled = new Vector2(point.x * scale.x, point.y * scale.y);
+            var scaled = new Vector2((point.x * scale)* heightRatio, (point.y * scale)* heightRatio);
             // Sidely, we calculate the positioner center in the screen (from 0 to 1)
             var positionerCenter01 = new Vector2(position.x / gameWidth, position.y / gameHeight);
             // Then we calculate the positioner center pixel in the screen real position
@@ -73,6 +70,7 @@ namespace uAdventure.Geo
         public override Vector2 FromScreenPoint(MapEditor mapEditor, Vector2 point)
         {
             var screen = mapEditor.ScreenRect;
+            var heightRatio = gameHeight / screen.height;
             // We calculate the positioner center in the screen (from 0 to 1)
             var positionerCenter01 = new Vector2(position.x / gameWidth, position.y / gameHeight);
             // Then we calculate the positioner center pixel in the screen real position
@@ -80,7 +78,7 @@ namespace uAdventure.Geo
             // Then we get the local position
             var localPos = point - positionerCenterPixel;
             // And we return the unscaled version with the Y reverted
-            return new Vector2(localPos.x / scale.x, localPos.y / scale.y);
+            return new Vector2((localPos.x * heightRatio) / scale, (localPos.y * heightRatio) / scale);
         }
     }
 }

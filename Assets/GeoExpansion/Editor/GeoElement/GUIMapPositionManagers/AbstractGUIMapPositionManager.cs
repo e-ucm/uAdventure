@@ -119,13 +119,16 @@ namespace uAdventure.Geo
             var previousLocalRect = previousScreenRect.ToPoints().Select(p => FromScreenPoint(mapEditor, p)).ToArray().ToRect();
             var localRect = newScreenRect.ToPoints().Select(p => FromScreenPoint(mapEditor, p)).ToArray().ToRect();
 
-            var scale = (Vector3)transformManagerDataControl["Scale"];
+            var scale = transformManagerDataControl.Scale;
 
-            var originalSize = new Vector2(previousLocalRect.width / scale.x, previousLocalRect.height / scale.y);
-            var newScale = new Vector3(localRect.width / originalSize.x, localRect.height / originalSize.y, scale.z);
+            var originalWidth = previousLocalRect.width / scale;
+            var newScale = localRect.width / originalWidth;
 
             // And then we set the values in the reference
-            transformManagerDataControl["Scale"] = newScale;
+            if (!Mathf.Approximately(scale, newScale))
+            {
+                transformManagerDataControl.Scale = newScale;
+            }
         }
 
         public Vector2d ToScreenPoint(MapEditor mapEditor, Vector2d point)

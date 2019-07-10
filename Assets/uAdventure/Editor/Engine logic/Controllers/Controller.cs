@@ -13,7 +13,10 @@ using System.Globalization;
 using uAdventure.Runner;
 using UnityEditor.Callbacks;
 using System.Collections;
+using System.Linq;
 using System.Reflection;
+using UnityEditor.IMGUI.Controls;
+using UnityEngine.Experimental.UIElements;
 
 namespace uAdventure.Editor
 {
@@ -612,6 +615,9 @@ namespace uAdventure.Editor
         */
         public void Init(string loadProjectPath = null)
         {
+            HasError = false;
+            Error = "";
+
             Debug.Log("Controller init"); 
             ConfigData.LoadFromXML(ReleaseFolders.configFileEditorRelativePath());
 
@@ -622,6 +628,7 @@ namespace uAdventure.Editor
             // Load the configuration
             //ProjectConfigData.init();
             //SCORMConfigData.init();
+
 
             // Create necessary folders if no created before
             DirectoryInfo projectsFolder = new DirectoryInfo(ReleaseFolders.PROJECTS_FOLDER);
@@ -1338,6 +1345,8 @@ namespace uAdventure.Editor
 
 
         public static ResourceManager ResourceManager { get; private set; }
+        public bool HasError { get; internal set; }
+        public string Error { get; internal set; }
 
         /**
          * Called when the user wants to load data from a file.
@@ -1379,7 +1388,7 @@ namespace uAdventure.Editor
             }
 
             // SI LO CARGO HAGO COSAS
-            if (loadedAdventureData != null)
+            if (loadedAdventureData != null && incidences.Count == 0)
             {
                 // Update the values of the controller
                 currentZipFile = path;
@@ -1405,36 +1414,56 @@ namespace uAdventure.Editor
                     AssetsController.checkAssetFilesConsistency(incidences);
                     Incidence.sortIncidences(incidences);
 
-                    //TODO: implement If there is any incidence
-                    {/*if (incidences.size() > 0)
-                    {
-                        bool abort = fixIncidences(incidences);
-                        if (abort)
-                        {
-                            mainWindow.showInformationDialog(TC.get("Error.LoadAborted.Title"), TC.get("Error.LoadAborted.Message"));
-                            hasIncedence = true;
-                        }
-                    }*/
-                    }
-
                     // Reload the adventure as probably the animations have been replaced
                     EditorUtility.DisplayProgressBar("Importing project", "Finished! Reloading project...", 100);
                     ResourceManager = null;
                     Resources.UnloadUnusedAssets();
-                    ResourceManager = ResourceManagerFactory.CreateLocal();
-                    loadedAdventureData = Loader.LoadAdventureData(ResourceManager, incidences);
-                    loadedAdventureData.setProjectName(currentZipName);
+
+                    if (incidences.Count == 0)
+                    {
+                        ResourceManager = ResourceManagerFactory.CreateLocal();
+                        loadedAdventureData = Loader.LoadAdventureData(ResourceManager, incidences);
+                        loadedAdventureData.setProjectName(currentZipName);
+                    }
                     EditorUtility.ClearProgressBar();
                 }
                     
                 // PARSING
-                adventureDataControl = new AdventureDataControl(loadedAdventureData);
-                chaptersController = new ChapterListDataControl(adventureDataControl.getChapters());
-                ProjectConfigData.LoadFromXML();
+                if (incidences.Count == 0)
+                {
+                    try
+                    {
+                        adventureDataControl = new AdventureDataControl(loadedAdventureData);
+                        chaptersController = new ChapterListDataControl(adventureDataControl.getChapters());
+                        ProjectConfigData.LoadFromXML();
 
-                dataModified_F = false;
-                fileLoaded = true;
+                        dataModified_F = false;
+                        fileLoaded = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        HasError = true;
+                        Error = ex.ToString();
+                    }
+                }
 
+            }
+
+            if (incidences.Count > 0)
+            {
+
+                EditorUtility.DisplayDialog(TC.get("Error.LoadAborted.Title"),
+                    TC.get("Error.LoadAborted.Message"), TC.get("GeneralText.OK"));
+                HasError = true;
+                Error = incidences.Select(i =>
+                    i.getImportance() + " | " + i.getType() + " | " + i.getAffectedArea() + " | " + i.getMessage() +
+                    " | " + i.getAffectedResource() + " | " + i.getException().ToString()).Aggregate((s1,s2) => s1 + "\n" + s2);
+                /*bool abort = fixIncidences(incidences);
+                if (abort)
+                {
+                    mainWindow.showInformationDialog(TC.get("Error.LoadAborted.Title"), TC.get("Error.LoadAborted.Message"));
+                    hasIncedence = true;
+                }*/
             }
 
             //TODO: implement

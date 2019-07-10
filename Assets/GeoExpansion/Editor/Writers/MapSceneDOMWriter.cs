@@ -48,6 +48,8 @@ namespace uAdventure.Geo
             var mapElementNode = Writer.GetDoc().CreateElement("map-element");
             mapElementNode.SetAttribute("targetId", mapElement.getTargetId());
             mapElementNode.SetAttribute("layer", mapElement.Layer.ToString());
+            mapElementNode.SetAttribute("scale", mapElement.Scale.ToString());
+            mapElementNode.SetAttribute("orientation", ((int)mapElement.Orientation).ToString());
             node.AppendChild(mapElementNode);
 
             DOMWriterUtility.DOMWrite(mapElementNode, mapElement.Conditions, options);

@@ -9,6 +9,10 @@ namespace uAdventure.Editor
 
         string ReferencedId { get; }
 
+        bool UsesOrientation { get; }
+
         Orientation Orientation { get; set; }
+
+        float Scale { get; set; }
     }
 }

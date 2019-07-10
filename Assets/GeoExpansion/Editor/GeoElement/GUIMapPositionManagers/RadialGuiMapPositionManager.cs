@@ -11,8 +11,8 @@ namespace uAdventure.Geo
     {
         private float degree;
         private float distance;
-        private Vector3 scale;
         private float rotation;
+        private float scale;
         private bool rotateAround;
 
         public override Type ForType { get { return typeof(RadialTransformManager); } }
@@ -23,13 +23,9 @@ namespace uAdventure.Geo
 
             degree = parameters.GetValue(degree, "Degree", "degree");
             distance = parameters.GetValue(distance, "Distance", "distance");
-            scale = parameters.GetValue(scale, new[]
-            {
-                Converters<float>.Create(f => Vector3.one * f),
-                Converters<Vector2>.Create(v2 => new Vector3(v2.x, v2.y, v2.x))
-            }, "Scale", "scale");
             rotation = parameters.GetValue(rotation, "Rotation", "rotation");
             rotateAround = parameters.GetValue(rotateAround, "RotateAround", "rotateAround");
+            scale = parameters.Scale;
         }
 
         public override Vector2 ToScreenPoint(MapEditor mapEditor, Vector2 point)
@@ -41,7 +37,7 @@ namespace uAdventure.Geo
             var pixelsPos = GM.MetersToPixels(metersPos, mapEditor.Zoom);
             var basePixel = mapEditor.PixelToRelative(pixelsPos).ToVector2();
 
-            var pixelScale = GM.MetersToPixels(GM.PixelsToMeters(new Vector2d(scale.x, scale.y), 19), mapEditor.Zoom);
+            var pixelScale = GM.MetersToPixels(GM.PixelsToMeters(new Vector2d(scale, scale), 19), mapEditor.Zoom);
 
             return basePixel + new Vector2((float)(point.x * pixelScale.x), (float)(point.y * pixelScale.y));
 
@@ -56,7 +52,7 @@ namespace uAdventure.Geo
             var pixelsPos = GM.MetersToPixels(metersPos, mapEditor.Zoom);
             var basePixel = mapEditor.PixelToRelative(pixelsPos).ToVector2();
 
-            var pixelScale = GM.MetersToPixels(GM.PixelsToMeters(new Vector2d(scale.x, scale.y), 19), mapEditor.Zoom);
+            var pixelScale = GM.MetersToPixels(GM.PixelsToMeters(new Vector2d(scale, scale), 19), mapEditor.Zoom);
             var relativePoint = point - basePixel;
 
             return new Vector2((float)(relativePoint.x / pixelScale.x), (float)(relativePoint.y / pixelScale.y));

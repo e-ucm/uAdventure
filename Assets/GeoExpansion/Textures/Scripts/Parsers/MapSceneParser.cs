@@ -61,6 +61,8 @@ namespace uAdventure.Geo
 
                 mapElement.Conditions = DOMParserUtility.DOMParse<Conditions>(mapElementNode.SelectSingleNode("condition") as XmlElement, parameters);
                 mapElement.Layer = ExParsers.ParseDefault(mapElementNode.GetAttribute("layer"), layer);
+                mapElement.Scale = ExParsers.ParseDefault(mapElementNode.GetAttribute("scale"), 1);
+                mapElement.Orientation = (Orientation) ExParsers.ParseDefault(mapElementNode.GetAttribute("orientation"), 2);
                 layer = Mathf.Max(mapElement.Layer, layer) + 1;
                 mapScene.Elements.Add(mapElement);
             }

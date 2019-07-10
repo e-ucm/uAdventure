@@ -11,7 +11,7 @@ namespace uAdventure.Geo
     public class GeolocationGuiMapPositionManager : AbstractGuiMapPositionManager
     {
         private Vector2d position;
-        private Vector3 scale;
+        private float scale;
         private float rotation;
         private float interactionRange;
 
@@ -26,14 +26,10 @@ namespace uAdventure.Geo
                 Converters<Vector2>.Create(v2 => v2.ToVector2d())
             }, "Position", "position");
 
-            scale = parameters.GetValue(scale, new[]
-            {
-                Converters<float>.Create(f => Vector3.one * f),
-                Converters<Vector2>.Create(v2 => new Vector3(v2.x, v2.y, v2.x))
-            }, "Scale", "scale");
-
             rotation = parameters.GetValue(rotation, "Rotation", "rotation");
             interactionRange = parameters.GetValue(interactionRange, "InteractionRange", "interactionRange");
+
+            scale = parameters.Scale;
         }
 
         public override void OnDrawingGizmosSelected(MapEditor mapEditor, Vector2[] points)
@@ -64,7 +60,7 @@ namespace uAdventure.Geo
             // Scale of 1 means 1 pixel is 1 map pixel in scale 19
             // Scale of 2 means 1 pixel is 0.5 map pixel in scale 18
             // and so on...
-            var pixelScale = GM.MetersToPixels(GM.PixelsToMeters(new Vector2d(scale.x, scale.y), 19), mapEditor.Zoom);
+            var pixelScale = GM.MetersToPixels(GM.PixelsToMeters(new Vector2d(scale, scale), 19), mapEditor.Zoom);
 
             var center = mapEditor.PixelToRelative(GM.MetersToPixels(GM.LatLonToMeters(position.x, position.y), mapEditor.Zoom)).ToVector2();
             return center + new Vector2((float)(point.x * pixelScale.x), (float)(point.y * pixelScale.y));
@@ -73,7 +69,7 @@ namespace uAdventure.Geo
         public override Vector2 FromScreenPoint(MapEditor mapEditor, Vector2 point)
         {
             // First we get the scale of the pixels based on the current zoom
-            var pixelScale = GM.MetersToPixels(GM.PixelsToMeters(new Vector2d(scale.x, scale.y), 19), mapEditor.Zoom);
+            var pixelScale = GM.MetersToPixels(GM.PixelsToMeters(new Vector2d(scale, scale), 19), mapEditor.Zoom);
             // Then we calculate the center
             var center = mapEditor.PixelToRelative(GM.MetersToPixels(GM.LatLonToMeters(position.x, position.y), mapEditor.Zoom)).ToVector2();
             // We make the point relative to center

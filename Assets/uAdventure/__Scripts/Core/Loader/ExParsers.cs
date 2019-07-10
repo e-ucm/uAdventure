@@ -87,6 +87,18 @@ namespace uAdventure.Core
         {
             return (T)System.Enum.Parse(typeof(T), value, true);
         }
+
+        public static T ParseDefaultEnum<T>(string value, T def)
+        {
+            try
+            {
+                return (T)System.Enum.Parse(typeof(T), value, true);
+            }
+            catch
+            {
+                return def;
+            }
+        }
         public static object Parse(string value, Type type)
         {
             try
@@ -97,7 +109,7 @@ namespace uAdventure.Core
                     value = (string)parse.Invoke(null, new object[] { value });
                 }
 
-                return System.Enum.Parse(type, value, true);
+                return value;
             }
             catch
             {

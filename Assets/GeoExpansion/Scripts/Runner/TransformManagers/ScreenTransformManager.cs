@@ -18,8 +18,11 @@ namespace uAdventure.Geo
                 transform = value;
                 positioner = transform.gameObject.GetComponent<GeoPositioner>();
                 representable = transform.gameObject.GetComponentInChildren<Representable>();
-                var ls = transform.lossyScale;
-                transform.localScale = new Vector3(1 / ls.x, 1 / ls.y, 1 / ls.z);
+                if (representable != null)
+                {
+                    representable.RepresentableChanged += Adapted;
+                    Adapted();
+                }
             }
         }
 
@@ -44,10 +47,27 @@ namespace uAdventure.Geo
                 GameObject.DestroyImmediate(transform.gameObject);
             }
 
-            var ray = Camera.main.ScreenPointToRay(new Vector2(0, 0));
+            var ray = Camera.main.ScreenPointToRay(PositionToScreenPoint(position));
             transform.position = ray.origin + ray.direction * 10f;
             transform.rotation = Camera.main.transform.rotation;
-            transform.localRotation = Quaternion.Euler(0, rotation, 0);
+        }
+
+        private void Adapted()
+        {
+            var lcs = transform.localScale;
+            var lss = transform.lossyScale;
+            var counterScale = new Vector3(lcs.x / lss.x, lcs.y / lss.y, lcs.z / lss.z);
+            transform.localScale = new Vector3(lcs.x * counterScale.x, lcs.y * counterScale.y, lcs.z * counterScale.z);
+        }
+
+        private Vector2 PositionToScreenPoint(Vector2 position)
+        {
+            var size = representable.Size;
+
+            var position01 = new Vector2(position.x / 800f, 1 - (position.y - size.y/2f) / 600f);
+            var screenPosition = new Vector2(position01.x * Screen.width, position01.y * Screen.height);
+
+            return screenPosition;
         }
     }
 }

@@ -10,25 +10,7 @@ namespace uAdventure.Geo
         public ExtElemReference Context { get; set; }
         public Element Element { get; set; }
         public Tile Tile { get; set; }
-        public Representable Representable
-        {
-            get { return representable; }
-            set
-            {
-                if (representable != value)
-                {
-                    if (representable != null)
-                    {
-                        representable.RepresentableChanged -= Update;
-                    }
-
-                    representable = value;
-                    representable.RepresentableChanged += Update;
-                }
-            }
-        }
-
-        private Representable representable;
+        public Representable Representable { get; set; }
         private ITransformManager transformManager;
 
 
@@ -43,6 +25,11 @@ namespace uAdventure.Geo
         // Update is called once per frame
         protected void Update()
         {
+            if (transformManager == null)
+            {
+                return;
+            }
+
             transformManager.Update();
         }
 

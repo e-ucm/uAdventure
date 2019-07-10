@@ -223,7 +223,7 @@ namespace uAdventure.Editor
                 var newScale = EditorGUILayout.FloatField("Scale", reference.getElementScale());
                 if (EditorGUI.EndChangeCheck()) { reference.setElementScale(newScale); }
 
-                if(reference.UsesOrientation())
+                if(reference.UsesOrientation)
                 {
                     EditorGUI.BeginChangeCheck();
                     var orientationLabel = TC.get("ElementReference.Orientation");

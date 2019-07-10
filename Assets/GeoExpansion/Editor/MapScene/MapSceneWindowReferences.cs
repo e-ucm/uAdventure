@@ -165,10 +165,16 @@ namespace uAdventure.Geo
             private readonly DrawerParametersMenu transformManagerParametersEditor;
             private readonly Texture2D centerTex;
 
+            private readonly int[] orientationValues;
+            private readonly string[] orientationTexts;
+            
             public MapReferenceComponent(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
             {
                 transformManagerParametersEditor = ScriptableObject.CreateInstance<DrawerParametersMenu>();
                 centerTex = Resources.Load<Texture2D>("EAdventureData/img/icons/center-24x24");
+                var orientations = Enum.GetValues(typeof(Orientation));
+                orientationValues = orientations.Cast<int>().ToArray();
+                orientationTexts = orientations.Cast<Orientation>().Select(s => "Orientation." + s.ToString()).ToArray();
             }
 
             public override void Draw(int aID)
@@ -198,6 +204,25 @@ namespace uAdventure.Geo
                         EditorGUILayout.LabelField("Geo.MapElement.Component.Parameters".Traslate());
                         transformManagerParametersEditor.extElementRefDataControl = extElementReference;
                         transformManagerParametersEditor.OnGUI();
+                        EditorGUI.BeginChangeCheck();
+                        var newScale = EditorGUILayout.FloatField(
+                            "Geo.MapElement.Positioner.Attribute.Scale".Traslate(), extElementReference.Scale);
+                        if (EditorGUI.EndChangeCheck())
+                        {
+                            extElementReference.Scale = newScale;
+                        }
+
+                        if (extElementReference.UsesOrientation)
+                        {
+                            EditorGUI.BeginChangeCheck();
+                            var orientationLabel = TC.get("ElementReference.Orientation");
+                            var translatedTexts = orientationTexts.Select(TC.get).ToArray();
+                            var newOrientation = (Orientation)EditorGUILayout.IntPopup(orientationLabel, (int)extElementReference.Orientation, translatedTexts, orientationValues);
+                            if (EditorGUI.EndChangeCheck())
+                            {
+                                extElementReference.Orientation = newOrientation;
+                            }
+                        }
                     }
                 }
                 else

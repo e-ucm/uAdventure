@@ -23,6 +23,14 @@ namespace uAdventure.Geo
             }
         }
 
+        public override bool UsesOrientation
+        {
+            get
+            {
+                return false;
+            }
+        }
+
         public override bool isValid(string currentPath, List<string> incidences)
         {
             return controller.IdentifierSummary.isType<GeoElement>(geoReference.getTargetId());

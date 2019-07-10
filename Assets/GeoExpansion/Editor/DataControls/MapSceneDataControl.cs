@@ -78,7 +78,7 @@ namespace uAdventure.Geo
                         extElementRef.TransformManagerParameters["Position"] = (Vector2d)extra[0];
                         var zoom = (int) extra[1];
                         var pixelScale = GM.MetersToPixels(GM.PixelsToMeters(new Vector2d(1, 1), zoom), 19);
-                        extElementRef.TransformManagerParameters["Scale"] = new Vector3((float)pixelScale.x, (float)pixelScale.y, 1);
+                        extElementRef.Scale = (float)pixelScale.x;
                         return new ExtElementRefDataControl(extElementRef);
                     },
                     TypeDescriptors = new DefaultElementFactory<MapElementDataControl>.ElementCreator.TypeDescriptor[]

@@ -462,12 +462,6 @@ namespace uAdventure.Editor
 
         }
 
-        public bool UsesOrientation()
-        {
-            return type == Controller.NPC_REFERENCE || type == Controller.PLAYER;
-        }
-
-
         public override void recursiveSearch()
         {
             check(this.conditionsController, TC.get("Search.Conditions"));
@@ -487,18 +481,24 @@ namespace uAdventure.Editor
             this.visible = visible;
         }
 
-
-        public Orientation Orientation
+        public bool UsesOrientation
         {
             get
             {
-                return elementReference.Orientation;
+                return type == Controller.NPC_REFERENCE || type == Controller.PLAYER;
             }
+        }
 
-            set
-            {
-                Controller.Instance.AddTool(new ChangeValueTool<ElementReference, Orientation>(elementReference, value, "Orientation"));
-            }
+        public Orientation Orientation
+        {
+            get { return elementReference.Orientation; }
+            set { controller.AddTool(ChangeEnumValueTool.Create(elementReference, value, "Orientation")); }
+        }
+
+        public float Scale
+        {
+            get { return elementReference.Scale; }
+            set { controller.AddTool(new ChangeFloatValueTool(elementReference, value, "Scale")); }
         }
 
         public override List<Searchable> getPathToDataControl(Searchable dataControl)

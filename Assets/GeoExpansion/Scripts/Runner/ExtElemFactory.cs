@@ -60,7 +60,7 @@ namespace uAdventure.Geo
                 yield return null;
             }
 
-            GameObject ret = Instantiate(base_prefab, transform);
+            GameObject ret = Instantiate(base_prefab);
             var representable = ret.GetComponent<Representable>();
             representable.Context = extRef;
             representable.Element = element;
@@ -68,9 +68,9 @@ namespace uAdventure.Geo
             // The geometry is inside of the ti
             var geoWrapper = ret.AddComponent<GeoPositioner>();
             geoWrapper.Tile = tile;
-            geoWrapper.Representable = representable;
             geoWrapper.Context = extRef;
             geoWrapper.Element = element;
+            geoWrapper.Representable = representable;
 
             if (!_createdCache.ContainsKey(tile))
             {
@@ -78,6 +78,7 @@ namespace uAdventure.Geo
             }
 
             _createdCache[tile].Add(geoWrapper);
+            representable.Adaptate();
 
             yield return geoWrapper;
 

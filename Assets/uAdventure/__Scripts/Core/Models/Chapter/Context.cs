@@ -38,7 +38,9 @@ namespace uAdventure.Core
 
         protected Context(string idTarget)
         {
+            this.scale = 1;
             this.idTarget = idTarget;
+            this.conditions = new Conditions();
         }
 
         public string TargetId

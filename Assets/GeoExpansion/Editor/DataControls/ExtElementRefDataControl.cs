@@ -10,13 +10,15 @@ namespace uAdventure.Geo
 {
     public class TransformManagerDataControl : DataControl
     {
+        private readonly ExtElementRefDataControl extElemReferencedataControl;
         private readonly ExtElemReference extElemReference;
         private IGuiMapPositionManager positionManager;
         private bool registerChanges;
 
-        public TransformManagerDataControl(ExtElemReference extElemReference)
+        public TransformManagerDataControl(ExtElementRefDataControl extElemReferencedataControl)
         {
-            this.extElemReference = extElemReference;
+            this.extElemReferencedataControl = extElemReferencedataControl;
+            this.extElemReference = extElemReferencedataControl.getContent() as ExtElemReference;
             registerChanges = false;
             this.positionManager = GuiMapPositionManagerFactory.Instance.CreateInstance(extElemReference.TransformManagerDescriptor, this);
             registerChanges = true;
@@ -35,6 +37,18 @@ namespace uAdventure.Geo
         public string[] ValidPositionManagers
         {
             get { return TransformManagerDescriptorFactory.Instance.AvaliableTransformManagers.Select(kv => kv.Value).ToArray(); }
+        }
+
+        public float Scale
+        {
+            get { return extElemReferencedataControl.Scale; }
+            set { extElemReferencedataControl.Scale = value; }
+        }
+
+        public Orientation Orientation
+        {
+            get { return extElemReference.Orientation; }
+            set { extElemReference.Orientation = value; }
         }
 
         public string PositionManagerName
@@ -262,8 +276,8 @@ namespace uAdventure.Geo
         public ExtElementRefDataControl(ExtElemReference extElemReference) : base(extElemReference)
         {
             this.extElemReference = extElemReference;
-            this.transformManagerDataControl = new TransformManagerDataControl(extElemReference);
             type = getReferenceType(extElemReference.getTargetId());
+            this.transformManagerDataControl = new TransformManagerDataControl(this);
         }
 
         private static int getReferenceType(string id)
@@ -288,6 +302,14 @@ namespace uAdventure.Geo
         public TransformManagerDataControl TransformManager
         {
             get { return transformManagerDataControl; }
+        }
+
+        public override bool UsesOrientation
+        {
+            get
+            {
+                return type == Controller.NPC_REFERENCE || type == Controller.PLAYER;
+            }
         }
 
         public override void setTargetId(string id)
