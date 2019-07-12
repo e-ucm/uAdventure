@@ -1001,6 +1001,7 @@ namespace uAdventure.Editor
         public void Save()
         {
             Writer.writeData("Assets/uAdventure/Resources/CurrentGame", adventureDataControl, true);
+            ProjectConfigData.storeToXML();
             UnityEditor.AssetDatabase.Refresh();
             dataModified_F = false;
         }

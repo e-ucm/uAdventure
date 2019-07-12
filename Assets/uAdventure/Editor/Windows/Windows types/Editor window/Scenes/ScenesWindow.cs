@@ -3,20 +3,13 @@ using System.Collections.Generic;
 
 using uAdventure.Core;
 using System;
-using System.Globalization;
 using UnityEditorInternal;
 using UnityEditor;
 using System.Linq;
-using Microsoft.Msagl.Core;
 using Microsoft.Msagl.Core.Layout;
 using Microsoft.Msagl.Core.Geometry.Curves;
 using Microsoft.Msagl.Miscellaneous;
 using Microsoft.Msagl.Core.Geometry;
-using Microsoft.Msagl.Core.Routing;
-using Microsoft.Msagl.Layout.Incremental;
-using Microsoft.Msagl.Layout.Initial;
-using Microsoft.Msagl.Prototype.NonOverlappingBoundaries;
-using Rectangle = Microsoft.Msagl.Core.Geometry.Rectangle;
 
 namespace uAdventure.Editor
 {
@@ -35,12 +28,15 @@ namespace uAdventure.Editor
         }
 
         private static ChapterPreview chapterPreview;
-        private readonly SceneEditor sceneEditor;
+
+        private SceneEditor sceneEditor;
+
+        DataControlList sceneList;
 
         private void CreateSceneEditorTab<T>(Rect rect, GUIContent title, GUIStyle style, Enum identifier, SceneEditor sceneEditor) where T : LayoutWindow
         {
-            var sceneEditorTab = (T) Activator.CreateInstance(typeof(T), rect, title, style, sceneEditor, new GUILayoutOption[0]);
-            sceneEditorTab.OnRequestRepaint = Repaint;
+            var sceneEditorTab = (T)Activator.CreateInstance(typeof(T), rect, title, style, sceneEditor, new GUILayoutOption[0]);
+            sceneEditorTab.OnRequestRepaint = () => Repaint();
             AddTab(title.text, identifier, sceneEditorTab);
         }
 
@@ -59,7 +55,7 @@ namespace uAdventure.Editor
             sceneEditor = new SceneEditor();
             sceneEditor.onSelectElement += (element) =>
             {
-                if(sceneEditor.SelectedElement == null)
+                if (sceneEditor.SelectedElement == null)
                 {
                     return;
                 }
@@ -92,8 +88,8 @@ namespace uAdventure.Editor
             CreateSceneEditorTab<ScenesWindowElementReference>(rect, new GUIContent(TC.get("ItemReferencesList.Title")), "Window", ScenesWindowType.ElementReference, sceneEditor);
             CreateSceneEditorTab<ScenesWindowActiveAreas>(rect, new GUIContent(TC.get("ActiveAreasList.Title")), "Window", ScenesWindowType.ActiveAreas, sceneEditor);
             CreateSceneEditorTab<ScenesWindowExits>(rect, new GUIContent(TC.get("ExitsList.Title")), "Window", ScenesWindowType.Exits, sceneEditor);
-            
-            if (Controller.Instance.PlayerMode== DescriptorData.MODE_PLAYER_3RDPERSON)
+
+            if (Controller.Instance.PlayerMode == DescriptorData.MODE_PLAYER_3RDPERSON)
             {
                 CreateSceneEditorTab<ScenesWindowBarriers>(rect, new GUIContent(TC.get("BarriersList.Title")), "Window", ScenesWindowType.Barriers, sceneEditor);
                 CreateSceneEditorTab<ScenesWindowPlayerMovement>(rect, new GUIContent(TC.get("Trajectory.Title")), "Window", ScenesWindowType.PlayerMovement, sceneEditor);
@@ -123,7 +119,7 @@ namespace uAdventure.Editor
                 allElements.AddRange(scene.getExitsList().getExits().Cast<DataControl>());
 
                 var playerMode = ScenesWindowPlayerMovement.PlayerMode.NoPlayer;
-                if(Controller.Instance.PlayerMode== Controller.FILE_ADVENTURE_3RDPERSON_PLAYER)
+                if (Controller.Instance.PlayerMode == Controller.FILE_ADVENTURE_3RDPERSON_PLAYER)
                 {
                     allElements.AddRange(scene.getBarriersList().getBarriers().Cast<DataControl>());
                     playerMode = ScenesWindowPlayerMovement.GetScenePlayerMode(scene);
@@ -145,7 +141,7 @@ namespace uAdventure.Editor
             // Send the callback back
             base.Draw(aID);
         }
-        
+
         protected override void OnDrawMainView(int aID)
         {
             chapterPreview.Rect = this.Rect;
@@ -161,7 +157,7 @@ namespace uAdventure.Editor
 
         public void ShowItemWindowView(int s)
         {
-            if(GameRources.GetInstance().selectedSceneIndex != s)
+            if (GameRources.GetInstance().selectedSceneIndex != s)
             {
                 var selectedScene = s >= 0 && s < dataControlList.list.Count
                     ? dataControlList.list[s] as SceneDataControl
@@ -204,68 +200,18 @@ namespace uAdventure.Editor
 
         private class ChapterPreview : PreviewLayoutWindow, ProjectConfigDataConsumer
         {
-            private const string X = ".X";
-            private const string Y = ".Y";
-
-            private class Positions
-            {
-                private readonly Dictionary<string, Vector2> positions = new Dictionary<string, Vector2>();
-
-                public Vector2 this[string id]
-                {
-                    get
-                    {
-                        if (!positions.ContainsKey(id))
-                        {
-                            var idX = id + X;
-                            var idY = id + Y;
-
-                            if (!ProjectConfigData.existsKey(idX))
-                            {
-                                ProjectConfigData.setProperty(idX, "0");
-                            }
-                            if (!ProjectConfigData.existsKey(idY))
-                            {
-                                ProjectConfigData.setProperty(idY, "0");
-                            }
-                            var x = ProjectConfigData.getProperty(idX);
-                            var y = ProjectConfigData.getProperty(idY);
-                            positions.Add(id, new Vector2(ExParsers.ParseDefault(x, 0), ExParsers.ParseDefault(y, 0)));
-                        }
-
-                        return positions[id];
-                    }
-                    set
-                    {
-                        if (value == this[id]) // this[id] forces positions[id] initialization
-                        {
-                            return;
-                        }
-
-                        positions[id] = value;
-                        ProjectConfigData.setProperty(id + X, value.x.ToString(CultureInfo.InvariantCulture));
-                        ProjectConfigData.setProperty(id + Y, value.y.ToString(CultureInfo.InvariantCulture));
-                    }
-                }
-
-                public void Clear()
-                {
-                    positions.Clear();
-                }
-            }
-
-            private const float SCENE_SCALING = 0.2f;
-            private const float SPACE_WIDTH = 800f;
-            private const float SPACE_HEIGHT = 600f;
+            private const float SceneScaling = 0.2f;
+            private const float SpaceWidth = 800f;
+            private const float SpaceHeight = 600f;
             private Rect space;
 
             private readonly Dictionary<string, Color> sceneColors;
 
+            private readonly Dictionary<string, Vector2> positions;
             private readonly Dictionary<string, Texture2D> images;
             private readonly Dictionary<string, Vector2> sizes;
 
             private readonly Texture2D noBackground;
-            private readonly Positions positions;
 
             public delegate void OnSelectElementDelegate(DataControl selected);
             public event OnSelectElementDelegate OnSelectElement;
@@ -281,7 +227,7 @@ namespace uAdventure.Editor
                 noBackground = Controller.ResourceManager.getImage(SpecialAssetPaths.ASSET_EMPTY_BACKGROUND);
 
                 sceneColors = new Dictionary<string, Color>();
-                positions = new Positions();
+                positions = new Dictionary<string, Vector2>();
                 images = new Dictionary<string, Texture2D>();
                 sizes = new Dictionary<string, Vector2>();
 
@@ -312,16 +258,12 @@ namespace uAdventure.Editor
                             case 0: GUI.Label(cellRect, scene.getId()); break;
                             case 1:
                                 if (GUI.Button(cellRect, TC.get("GeneralText.Edit")))
-                                {
                                     GameRources.GetInstance().selectedSceneIndex = row;
-                                }
-
                                 break;
                         }
                     }
                 };
-                Layout();
-                EditorApplication.update += UpdatePositions;
+
             }
 
             protected override void DrawInspector()
@@ -332,25 +274,24 @@ namespace uAdventure.Editor
                 sceneList.DoList(160);
 
             }
+            private bool inited = false;
 
             protected override void DrawPreviewHeader()
             {
                 GUILayout.Space(10);
-                using(new GUILayout.HorizontalScope("preToolbar"))
+                GUILayout.BeginHorizontal("preToolbar");
+                GUILayout.Label("Chapter.Preview".Traslate(), "preToolbar", GUILayout.ExpandWidth(true));
+                GUILayout.FlexibleSpace();
+                if (GUILayout.Button("Layout", "preButton"))
                 {
-                    GUILayout.Label("Chapter.Preview".Traslate(), "preToolbar", GUILayout.ExpandWidth(true));
-                    GUILayout.FlexibleSpace();
-                    if (GUILayout.Button("Layout", "preButton"))
-                    {
-                        Layout(true);
-                    }
+                    Layout();
                 }
+                GUILayout.EndHorizontal();
             }
+
             public override void DrawPreview(Rect rect)
             {
-                space = rect.AdjustToRatio(SPACE_WIDTH, SPACE_HEIGHT);
-                UpdatePositions();
-
+                space = rect.AdjustToRatio(SpaceWidth, SpaceHeight);
                 foreach (var scene in Controller.Instance.ChapterList.getSelectedChapterDataControl().getScenesList().getScenes())
                 {
                     DrawScene(scene);
@@ -359,9 +300,7 @@ namespace uAdventure.Editor
                 foreach (var scene in Controller.Instance.ChapterList.getSelectedChapterDataControl().getScenesList().getScenes())
                 {
                     foreach (var exit in scene.getExitsList().getExits())
-                    {
                         DrawExit(scene, exit);
-                    }
                 }
             }
 
@@ -387,7 +326,7 @@ namespace uAdventure.Editor
                         break;
                 }
 
-                EditorGUI.DropShadowLabel(new Rect(rect.position - new Vector2(20,0), rect.size), scene.getId());
+                EditorGUI.DropShadowLabel(new Rect(rect.position - new Vector2(20, 0), rect.size), scene.getId());
 
                 var prevHot = GUIUtility.hotControl;
                 EditorGUI.BeginChangeCheck();
@@ -395,31 +334,17 @@ namespace uAdventure.Editor
                 if (EditorGUI.EndChangeCheck())
                 {
                     rect = RevertFromViewport(rect, space);
-                    if (settings != null)
-                    {
-                        var canvasRect = new Rect(0, 0, SPACE_WIDTH, SPACE_HEIGHT);
-                        sceneToNode[scene].BoundingBox = ToGraphRect(rect, canvasRect, graph.BoundingBox);
-                        UpdatePositions();
-                        /*var bounds =
-                            new Microsoft.Msagl.Core.Geometry.Rectangle(100, 100, 100 + rect.width,
-                                100 + rect.height);
+                    positions[scene.getId()] = rect.position;
 
-                        if (!sceneLockPositions.ContainsKey(scene))
-                        {
-                            sceneLockPositions[scene] = settings.CreateLock(sceneToNode[scene], bounds);
-                        }
-
-                        sceneLockPositions[scene].Bounds = bounds;*/
-                    }
-                    else
-                    {
-                        positions[scene.getId()] = rect.position;
-                    }
+                    // Update in the project data
+                    var id = GetScenePropertyId(Controller.Instance.SelectedChapterDataControl, scene);
+                    ProjectConfigData.setProperty(id + ".X", ((int)positions[scene.getId()].x).ToString());
+                    ProjectConfigData.setProperty(id + ".Y", ((int)positions[scene.getId()].y).ToString());
                 }
                 if (GUIUtility.hotControl != prevHot)
                 {
                     sceneList.index = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes().IndexOf(scene);
-                    if(Event.current.clickCount == 2 && OnSelectElement != null)
+                    if (Event.current.clickCount == 2)
                     {
                         OnSelectElement(scene);
                     }
@@ -434,25 +359,17 @@ namespace uAdventure.Editor
 
                 // If the exit points to a cutscene it normally is out of the array
                 if (index < 0 || index > scenes.getScenes().Count)
-                {
                     return;
-                }
 
                 var polygon = AdaptToViewport(GetExitArea(scene, exit), space);
-                if (polygon == null || polygon.Length == 0)
-                {
-                    // If the exit is empty use the scene center itself to prevent errors
-                    polygon = new []{ AdaptToViewport(GetSceneRect(scene), space).center };
-                }
-
                 var c = sceneColors[scene.getId()];
                 c = new Color(c.r, c.g, c.b, 0.8f);
                 HandleUtil.DrawPolygon(polygon, c);
 
                 var nextScene = scenes.getScenes()[index];
                 var sceneRect = AdaptToViewport(GetSceneRect(nextScene), space);
-                
-                Vector2 origin = polygon.Center(), destination;
+
+                Vector2 origin = Center(polygon), destination;
                 if (exit.hasDestinyPosition())
                 {
                     destination = new Vector2(exit.getDestinyPositionX(), exit.getDestinyPositionY());
@@ -461,10 +378,10 @@ namespace uAdventure.Editor
                 }
                 else
                 {
-                    destination = sceneRect.ToPoints().Center();
+                    destination = Center(sceneRect.ToPoints().ToArray());
                 }
-                
-                HandleUtil.DrawPolyLine(new [] { origin, destination }, false, sceneColors[scene.getId()], 4);
+
+                HandleUtil.DrawPolyLine(new Vector2[] { origin, destination }, false, sceneColors[scene.getId()], 4);
 
                 DrawArrowCap(destination, (destination - origin), 15f);
             }
@@ -475,7 +392,7 @@ namespace uAdventure.Editor
                 var rotatedVector = new Vector2(-direction.y, direction.x).normalized;
                 var basePoint = point - (direction.normalized * size);
 
-                Vector3[] capPoints = 
+                Vector3[] capPoints = new Vector3[]
                 {
                     point,
                     basePoint + rotatedVector * halfSide,
@@ -515,23 +432,30 @@ namespace uAdventure.Editor
             {
                 return points.ToList().ConvertAll(p => AdaptToViewport(p, viewport)).ToArray();
             }
+            private Vector2[] RevertFromViewport(Vector2[] points, Rect viewport)
+            {
+                return points.ToList().ConvertAll(p => RevertFromViewport(p, viewport)).ToArray();
+            }
 
             private Vector2 AdaptToViewport(Vector2 point, Rect viewport)
             {
-                return viewport.position + new Vector2(point.x * viewport.width / SPACE_WIDTH, point.y * viewport.height / SPACE_HEIGHT);
+                return viewport.position + new Vector2(point.x * viewport.width / SpaceWidth, point.y * viewport.height / SpaceHeight);
             }
             private Vector2 RevertFromViewport(Vector2 point, Rect viewport)
             {
-                return new Vector2((point.x-viewport.position.x) * SPACE_WIDTH / viewport.width, (point.y-viewport.position.y) * SPACE_HEIGHT / viewport.height);
+                return new Vector2((point.x - viewport.position.x) * SpaceWidth / viewport.width, (point.y - viewport.position.y) * SpaceHeight / viewport.height);
             }
 
             private Rect GetSceneRect(SceneDataControl scene)
             {
-                return GetSceneRect(scene, false);
-            }
+                if (!this.positions.ContainsKey(scene.getId()))
+                {
+                    string id = GetScenePropertyId(Controller.Instance.SelectedChapterDataControl, scene);
+                    string X = ProjectConfigData.getProperty(id + ".X");
+                    string Y = ProjectConfigData.getProperty(id + ".Y");
+                    positions.Add(scene.getId(), new Vector2(ExParsers.ParseDefault(X, 0), ExParsers.ParseDefault(Y, 0)));
+                }
 
-            private Rect GetSceneRect(SceneDataControl scene, bool layoutCall)
-            {
                 var background = scene.getPreviewBackground();
                 if (!sizes.ContainsKey(background))
                 {
@@ -571,22 +495,12 @@ namespace uAdventure.Editor
                     sceneColors[scene.getId()] = color;
                 }
 
-                /*if (!layoutCall && positions[scene.getId()] == Vector2.zero)
-                {
-                    Layout(false);
-                }*/
-
-                return new Rect(positions[scene.getId()], sizes[background] * SCENE_SCALING);
+                return new Rect(positions[scene.getId()], sizes[background] * SceneScaling);
             }
 
             private Vector2[] GetExitArea(SceneDataControl scene, ExitDataControl exit)
             {
-                return GetExitArea(scene, exit, false);
-            }
-
-            private Vector2[] GetExitArea(SceneDataControl scene, ExitDataControl exit, bool layoutCall)
-            {
-                var holder = GetSceneRect(scene, layoutCall);
+                var holder = GetSceneRect(scene);
                 var xRatio = holder.width / images[scene.getPreviewBackground()].width;
                 var yRatio = holder.height / images[scene.getPreviewBackground()].height;
 
@@ -604,6 +518,14 @@ namespace uAdventure.Editor
                 return polygon.ToList().ConvertAll(p => (new Vector2(p.x * xRatio, p.y * yRatio) + holder.position)).ToArray();
             }
 
+            private Vector2 Center(Vector2[] polygon)
+            {
+                Vector2 sum = Vector2.zero;
+                for (int i = 0; i < polygon.Length; i++)
+                    sum += polygon[i];
+                return sum / polygon.Length;
+            }
+
             private string GetScenePropertyId(ChapterDataControl chapter, SceneDataControl scene)
             {
                 var index = Controller.Instance.ChapterList.getChapters().IndexOf(chapter);
@@ -612,76 +534,35 @@ namespace uAdventure.Editor
 
             private void Layout()
             {
-                Layout(true);
-            }
-
-            private GeometryGraph graph;
-            private Dictionary<SceneDataControl, Node> sceneToNode;
-            private Dictionary<SceneDataControl, LockPosition> sceneLockPositions;
-            private CancelToken cancelToken;
-            private FastIncrementalLayoutSettings settings;
-
-            private void Layout(bool repositionateAll)
-            {
-                if (settings != null && repositionateAll)
-                {
-                    settings.ClearLocks();
-                    return;
-                }
-
-                if (cancelToken != null)
-                {
-                    cancelToken.Canceled = true;
-                }
-
                 try
                 {
-
                     var scenes = Controller.Instance.ChapterList.getSelectedChapterDataControl().getScenesList();
-                    // Layout algorithm
-                    settings = new Microsoft.Msagl.Layout.Incremental.FastIncrementalLayoutSettings
-                    {
-                        EdgeRoutingSettings = new EdgeRoutingSettings
-                        {
-                            EdgeRoutingMode = EdgeRoutingMode.StraightLine,
-                            Padding = 10
-                        },
-                        AvoidOverlaps = true,
-                        ApplyForces = false,
-                        RungeKuttaIntegration = true,
-                        NodeSeparation = 10,
-                        PackingMethod = PackingMethod.Compact
-                    };
 
-                    var canvasRect = new Rect(0, 0, SPACE_WIDTH, SPACE_HEIGHT);
+                    // Layout algorithm
+                    var settings = new Microsoft.Msagl.Layout.Layered.SugiyamaLayoutSettings();
+                    settings.MaxAspectRatioEccentricity = 1.6;
+                    settings.NodeSeparation = 10;
+                    settings.PackingMethod = PackingMethod.Compact;
 
                     // Graph
-                    graph = new GeometryGraph
-                    {
-                        BoundingBox = new Microsoft.Msagl.Core.Geometry.Rectangle(0, 0, SPACE_WIDTH, SPACE_HEIGHT)
-                    };
+                    GeometryGraph graph = new GeometryGraph();
+                    graph.BoundingBox = new Microsoft.Msagl.Core.Geometry.Rectangle(0, 0, SpaceWidth, SpaceHeight);
+                    graph.UpdateBoundingBox();
 
-                    sceneToNode = new Dictionary<SceneDataControl, Node>();
-                    sceneLockPositions = new Dictionary<SceneDataControl, LockPosition>();
-                    var present = new Dictionary<Tuple<Node, Node>, bool>();
+                    Dictionary<SceneDataControl, Node> sceneToNode = new Dictionary<SceneDataControl, Node>();
+                    Dictionary<Tuple<Node, Node>, bool> present = new Dictionary<Tuple<Node, Node>, bool>();
 
                     foreach (var scene in scenes.getScenes())
                     {
                         sizes.Remove(scene.getPreviewBackground());
-                        var rect = ToGraphRect(GetSceneRect(scene, true), canvasRect, graph.BoundingBox);
-                        var node = new Node(CurveFactory.CreateRectangle(rect), scene.getId());
-                        /*if (!repositionateAll && rect.LeftBottom != new Point(0,0))
-                        {
-                            sceneLockPositions.Add(scene, settings.CreateLock(node, rect));
-                        }*/
-
+                        var rect = GetSceneRect(scene);
+                        var node = new Node(CurveFactory.CreateRectangle(rect.width, rect.height, new Point()), scene.getId());
                         graph.Nodes.Add(node);
-                        graph.RootCluster.AddChild(node);
                         sceneToNode.Add(scene, node);
                     }
 
                     foreach (var scene in scenes.getScenes())
-                    { 
+                    {
                         var node = sceneToNode[scene];
                         foreach (var exit in scene.getExitsList().getExits())
                         {
@@ -701,32 +582,44 @@ namespace uAdventure.Editor
                                 present.Add(t, true);
                                 graph.Edges.Add(new Edge(node, sceneToNode[nextScene]));
 
-                                var exitOrigin = GetExitArea(scene, exit, true).ToRect().center;
-                                var originRect = GetSceneRect(scene, true);
+                                var exitOrigin = GetExitArea(scene, exit).ToRect().center;
+                                var originRect = GetSceneRect(scene);
 
                                 var pos = exitOrigin - originRect.position;
                                 pos.x = Mathf.Clamp01(pos.x / originRect.width);
                                 pos.y = Mathf.Clamp01(pos.y / originRect.height);
 
                                 // Positioning constraints
-                                /*if (pos.x < 0.3)
+                                if (pos.x < 0.3)
                                 {
-                                    settings.AddStructuralConstraint(new LeftRightConstraint(t.Item2, t.Item1));
+                                    settings.AddLeftRightConstraint(t.Item2, t.Item1);
                                 }
                                 if (pos.x > 0.7)
                                 {
-                                    settings.AddStructuralConstraint(new LeftRightConstraint(t.Item1, t.Item2));
-                                }*/
-
+                                    settings.AddLeftRightConstraint(t.Item1, t.Item2);
+                                }
                             }
                         }
                     }
 
-                    var ir = new InitialLayout(graph, settings);
-                    ir.Run();
 
                     // Do the layouting
-                    UpdatePositions();
+                    LayoutHelpers.CalculateLayout(graph, settings, null);
+
+                    // Extract the results
+                    var graphRect = new Rect((float)graph.Left, (float)graph.Bottom, (float)graph.Width, (float)graph.Height);
+                    var canvasRect = new Rect(0, 0, SpaceWidth, SpaceHeight);
+
+                    foreach (var scene in scenes.getScenes())
+                    {
+                        var n = sceneToNode[scene];
+                        positions[scene.getId()] = TransformPoint(new Vector2((float)(n.Center.X - n.Width / 2f), (float)(n.Center.Y + n.Height / 2f)), graphRect, canvasRect, true);
+
+                        // Update in the project data
+                        var id = GetScenePropertyId(Controller.Instance.SelectedChapterDataControl, scene);
+                        ProjectConfigData.setProperty(id + ".X", ((int)positions[scene.getId()].x).ToString());
+                        ProjectConfigData.setProperty(id + ".Y", ((int)positions[scene.getId()].y).ToString());
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -734,74 +627,10 @@ namespace uAdventure.Editor
                 }
             }
 
-            private void UpdatePositions()
+            Vector2 TransformPoint(Vector2 point, Rect from, Rect to, bool invertY)
             {
-                if (graph != null)
-                {
-                    settings.IncrementalRun(graph);
-
-                    var scenes = Controller.Instance.ChapterList.getSelectedChapterDataControl().getScenesList();
-
-                    // Extract the results
-                    var canvasRect = new Rect(0, 0, SPACE_WIDTH, SPACE_HEIGHT);
-
-                    foreach (var scene in scenes.getScenes())
-                    {
-                        var n = sceneToNode[scene];
-                        var rect = ToSceneRect(n.BoundingBox, graph.BoundingBox, canvasRect);
-                        positions[scene.getId()] = rect.position;
-                    }
-                }
-            }
-
-            private class LeftRightConstraint : IConstraint
-            {
-                private readonly Node[] nodes;
-
-                public LeftRightConstraint(Node left, Node right)
-                {
-                    nodes = new[] {left, right};
-                }
-
-                public IEnumerable<Node> Nodes
-                {
-                    get { return nodes; }
-                }
-
-                public int Level {
-                    get { return 2; }
-                }
-
-                public double Project()
-                {
-                    var displacement = 0;
-
-                    if (nodes[0].BoundingBox.Right > nodes[1].BoundingBox.Left)
-                    {
-                        var origin0 = nodes[0].BoundingBox.Center;
-                        var origin1 = nodes[1].BoundingBox.Center;
-
-                        var tmp = nodes[0].BoundingBox;
-                        nodes[0].BoundingBox = new Microsoft.Msagl.Core.Geometry.Rectangle(nodes[1].BoundingBox.Left - nodes[0].BoundingBox.Width, 
-                            nodes[0].BoundingBox.Top, nodes[1].BoundingBox.Left, nodes[0].BoundingBox.Bottom);
-                        nodes[1].BoundingBox = new Microsoft.Msagl.Core.Geometry.Rectangle(tmp.Right, nodes[1].BoundingBox.Top, 
-                            tmp.Right + nodes[1].BoundingBox.Width, nodes[1].BoundingBox.Bottom);
-
-                        displacement =
-                            Mathf.RoundToInt(
-                                (float) (origin0 - origin1).Length);
-                    }
-
-                    return displacement;
-                }
-            }
-
-            /*Vector2 TransformPoint(Vector2 point, Rect from, Rect to, bool invertY)
-            {
-
-
-                float absoluteX = Mathf.Abs(point.x - from.x) / from.width,
-                    absoluteY   = Mathf.Abs(point.y - from.y) / from.height;
+                float absoluteX = (point.x - from.x) / from.width,
+                    absoluteY = (point.y - from.y) / from.height;
 
                 if (invertY)
                 {
@@ -809,34 +638,6 @@ namespace uAdventure.Editor
                 }
 
                 return new Vector2(absoluteX * to.width + to.x, absoluteY * to.height + to.y);
-            }*/
-
-            Rectangle ToGraphRect(Rect rect, Rect from, Rectangle to)
-            {
-                var absWidth = rect.width / from.width;
-                var absHeight = rect.height / from.height;
-
-                var left = (rect.x - from.x) / from.width;
-                var bottom = 1 - (rect.y - from.y) / from.height - absHeight;
-
-                var x0 = to.Left + left * to.Width;
-                var x1 = x0 + absWidth * to.Width;
-
-                var y0 = to.Bottom + bottom * to.Height;
-                var y1 = y0 + absHeight * to.Height;
-
-                return new Rectangle(x0, y0, x1, y1);
-            }
-
-            Rect ToSceneRect(Rectangle rect, Rectangle from, Rect to)
-            {
-                var absWidth = rect.Width / from.Width;
-                var absHeight = rect.Height / from.Height;
-
-                var left = (rect.Left - from.Left) / from.Width;
-                var top = 1 - (rect.Bottom - from.Bottom) / from.Height - absHeight;
-
-                return new Rect((float) (to.x + left * to.width), (float) (to.y + top * to.height), (float)absWidth * to.width, (float)absHeight * to.height);
             }
         }
     }
