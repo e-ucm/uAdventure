@@ -1,12 +1,10 @@
 ﻿using UnityEngine;
-using System.Collections;
 using UnityEditor;
 using System;
 
 using uAdventure.Core;
 using System.Collections.Generic;
 using System.Linq;
-using MapzenGo.Helpers;
 
 namespace uAdventure.Editor
 {

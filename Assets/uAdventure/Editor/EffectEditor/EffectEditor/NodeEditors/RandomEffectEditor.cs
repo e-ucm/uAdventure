@@ -1,10 +1,7 @@
-﻿using System;
-using JetBrains.Annotations;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEditor;
 
 using uAdventure.Core;
-using uAdventure.Geo;
 
 namespace uAdventure.Editor
 {

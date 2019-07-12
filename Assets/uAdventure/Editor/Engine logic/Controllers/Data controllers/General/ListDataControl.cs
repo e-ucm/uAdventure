@@ -3,11 +3,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using MoreLinq;
 using uAdventure.Core;
-using uAdventure.Geo;
 using UnityEngine;
-using Action = System.Action;
 
 namespace uAdventure.Editor
 {
