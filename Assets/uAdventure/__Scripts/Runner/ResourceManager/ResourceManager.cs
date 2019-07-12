@@ -136,6 +136,11 @@ namespace uAdventure.Runner
 
         public Texture2D getImage(string uri)
         {
+            return getImage(uri, false);
+        }
+
+        public Texture2D getImage(string uri, bool loadFromDefaults)
+        {
             if (string.IsNullOrEmpty(uri))
             {
                 return null;
@@ -153,7 +158,7 @@ namespace uAdventure.Runner
                     images.Add(uri, holder);
                     return holder.Texture;
                 }
-                else
+                else if(loadFromDefaults)
                 {
                     // Load from defaults
                     holder = new Texture2DHolder(defaultPath(uri), type);
@@ -168,6 +173,10 @@ namespace uAdventure.Runner
                         Debug.LogWarning("Unable to load " + uri);
                         return null;
                     }
+                }
+                else
+                {
+                    return null;
                 }
             }
         }

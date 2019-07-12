@@ -13,6 +13,7 @@ namespace uAdventure.Editor
     public class DrawerParametersMenu : EditorWindow {
 
         public ExtElementRefDataControl extElementRefDataControl;
+        private FileChooser textureField;
         
         internal static bool ShowAtPosition(Rect buttonRect)
         {
@@ -42,6 +43,11 @@ namespace uAdventure.Editor
             float y = 145f;
             Vector2 windowSize = new Vector2(300f, y);
             base.ShowAsDropDown(buttonRect, windowSize);
+        }
+
+        protected void OnEnable()
+        {
+            textureField = new FileChooser { FileType = FileType.SET_ITEM_IMAGE };
         }
 
         protected void OnDisable()
@@ -81,6 +87,16 @@ namespace uAdventure.Editor
                     if (param.Value.Type == typeof(bool))
                     {
                         extElementRefDataControl.TransformManager[param.Key] = EditorGUILayout.Toggle(param.Key.Traslate(), (bool)extElementRefDataControl.TransformManager[param.Key]);
+                    }
+
+                    if (param.Value.Type == typeof(string))
+                    {
+                        textureField.Empty = extElementRefDataControl.TransformManager.ParameterDescription[param.Key]
+                            .DefaultValue as string;
+                        textureField.Label = param.Key.Traslate();
+                        textureField.Path = extElementRefDataControl.TransformManager[param.Key] as string;
+                        textureField.DoLayout();
+                        extElementRefDataControl.TransformManager[param.Key] = textureField.Path;
                     }
                 }
             }

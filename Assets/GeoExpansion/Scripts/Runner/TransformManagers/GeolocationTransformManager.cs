@@ -8,6 +8,8 @@ namespace uAdventure.Geo
 {
     public class GeolocationTransformManager : ITransformManager
     {
+        private static GameObject particleSystemPrefab;
+
         public Transform ExtElemReferenceTransform
         {
             get
@@ -16,12 +18,29 @@ namespace uAdventure.Geo
             }
             set
             {
+                if (!particleSystemPrefab)
+                {
+                    particleSystemPrefab = Resources.Load<GameObject>("GeoParticles");
+                }
+
                 transform = value;
+                collider = transform.gameObject.GetComponent<Collider>();
+                renderer = transform.gameObject.GetComponent<Renderer>();
                 positioner = transform.gameObject.GetComponent<GeoPositioner>();
-                particles = transform.gameObject.GetComponentInChildren<ParticleSystem>(true);
+
+                var particlesGo = Object.Instantiate(particleSystemPrefab,transform);
+                particles = particlesGo.GetComponent<ParticleSystem>();
+                material = particles.GetComponent<ParticleSystemRenderer>().material;
+
                 character = GameObject.FindObjectOfType<GeoPositionedCharacter>();
                 interactuable = transform.GetComponentInChildren<Interactuable>();
-                childTransform = transform.GetComponentInChildren<Representable>().gameObject.transform;
+
+                representable = transform.gameObject.GetComponent<Representable>();
+                if (representable != null)
+                {
+                    representable.RepresentableChanged += Adapted;
+                    Adapted();
+                }
             }
         }
 
@@ -33,10 +52,15 @@ namespace uAdventure.Geo
         private float interactionRange;
         private bool revealOnRange;
         private GeoPositioner positioner;
-        private ParticleSystem particles;
+        private Material material;
+        private Texture2D particleTexture;
         private Transform transform;
-        private Transform childTransform;
         private Interactuable interactuable;
+        private Collider collider;
+        private Renderer renderer;
+        private ParticleSystem particles;
+        private Representable representable;
+        private bool shown = true;
 
         public void Configure(Dictionary<string, object> parameters)
         {
@@ -44,41 +68,81 @@ namespace uAdventure.Geo
             rotation = (float)parameters["Rotation"];
             interactionRange = (float)parameters["InteractionRange"];
             revealOnRange = (bool)parameters["RevealOnlyOnRange"];
+            particleTexture = Game.Instance.ResourceManager.getImage(parameters["RevealParticleTexture"] as string);
         }
-        bool hidden = false;
+
+
         public void Update()
         {
+            if (material && material.mainTexture != particleTexture)
+            {
+                material.mainTexture = particleTexture;
+            }
+
             var pos = GM.LatLonToMeters(latLon) - positioner.Tile.Rect.Center;
-            transform.localPosition = new Vector3((float)pos.x, 10, (float)pos.y) - new Vector3(childTransform.localPosition.x, 0, childTransform.localPosition.y);
-            transform.localRotation = Quaternion.Euler(90, 0, 0);
-            childTransform.localRotation = Quaternion.Euler(0, rotation, 0);
+            var basePosition = new Vector3((float) pos.x, 10, (float) pos.y);
+            var centerVector = new Vector3(0, 0, transform.localScale.y/2f);
+            transform.localPosition = basePosition + centerVector;
+            transform.localRotation = Quaternion.Euler(90, rotation, 0);
 
             if (interactionRange <= 0 || GM.SeparationInMeters(character.LatLon, latLon) <= interactionRange)
             {
-                if (hidden)
+                SetShown(true);
+                if (interactuable != null)
                 {
-                    Debug.Log("Unhidden");
-                    hidden = false;
-                    if (revealOnRange)
-                    {
-                        // TODO change this after: https://github.com/e-ucm/unity-tracker/issues/29
-                        TrackerAsset.Instance.setVar("geo_element_" + positioner.Element.getId(), 1);
-                        particles.gameObject.SetActive(true);
-                        particles.Play();
-                        particles.transform.localPosition = childTransform.localPosition;
-                        childTransform.gameObject.GetComponent<Renderer>().enabled = true;
-                    }
-                    if (interactuable != null) childTransform.GetComponent<Collider>().enabled = true;
+                    interactuable.setInteractuable(true);
                 }
             }
-            else if (!hidden)
+            else if (shown)
             {
-                hidden = true;
+                SetShown(false);
+                if (interactuable != null)
+                {
+                    interactuable.setInteractuable(true);
+                }
+            }
+        }
+
+        private void Adapted()
+        {
+            // Position
+            var metersSizeAt0 = representable.Size / (float) GM.GetPixelsPerMeter(0, 19);
+            var pixelScaleAt = (float) GM.GetPixelsPerMeter(latLon.x, 19) / (float)GM.GetPixelsPerMeter(0, 19);
+            transform.localScale = new Vector3(metersSizeAt0.x * pixelScaleAt, metersSizeAt0.y * pixelScaleAt, 1);
+
+        }
+
+        private void SetShown(bool shown)
+        {
+            if (this.shown != shown)
+            {
+                this.shown = shown;
+                if (shown)
+                {
+                    // TODO change this after: https://github.com/e-ucm/unity-tracker/issues/29
+                    TrackerAsset.Instance.setVar("geo_element_" + positioner.Element.getId(), 1);
+                }
+                if (revealOnRange)
+                {
+                    collider.enabled = shown;
+                    renderer.enabled = shown;
+                    SetParticles(shown);
+                }
+            }
+        }
+
+        private void SetParticles(bool enabled)
+        {
+            if (enabled)
+            {
+                particles.gameObject.SetActive(true);
+                particles.Play();
+            }
+            else
+            {
                 particles.gameObject.SetActive(false);
                 particles.time = 0;
                 particles.Stop();
-                if (revealOnRange) childTransform.gameObject.GetComponent<Renderer>().enabled = false;
-                if (interactuable != null) childTransform.GetComponent<Collider>().enabled = false;
             }
         }
     }

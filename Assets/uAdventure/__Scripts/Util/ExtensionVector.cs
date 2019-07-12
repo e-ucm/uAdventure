@@ -27,6 +27,10 @@
         {
             return new Vector2((float)v.x, (float)v.z);
         }
+        public static Vector2d ToVector2d(this Vector3d v)
+        {
+            return new Vector2d((float)v.x, (float)v.y);
+        }
 
         public static Vector2 ToVector2(this Vector2d v)
         {

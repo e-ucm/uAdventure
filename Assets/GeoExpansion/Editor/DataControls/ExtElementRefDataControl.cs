@@ -5,10 +5,11 @@ using uAdventure.Editor;
 using System;
 using System.Linq;
 using MoreLinq;
+using UniRx;
 
 namespace uAdventure.Geo
 {
-    public class TransformManagerDataControl : DataControl
+    public class TransformManagerDataControl : DataControl, IObserver<DataControl>
     {
         private readonly ExtElementRefDataControl extElemReferencedataControl;
         private readonly ExtElemReference extElemReference;
@@ -22,6 +23,7 @@ namespace uAdventure.Geo
             registerChanges = false;
             this.positionManager = GuiMapPositionManagerFactory.Instance.CreateInstance(extElemReference.TransformManagerDescriptor, this);
             registerChanges = true;
+            extElemReferencedataControl.Subscribe(this);
         }
 
         public Dictionary<string, ParameterDescription> ParameterDescription
@@ -258,6 +260,21 @@ namespace uAdventure.Geo
                     check(extElemReference.TransformManagerParameters[parameter.Key] as string, parameter.Key);
                 }
             });
+        }
+
+        public void OnCompleted()
+        {
+            Changed();
+        }
+
+        public void OnError(Exception error)
+        {
+            Changed();
+        }
+
+        public void OnNext(DataControl value)
+        {
+            Changed();
         }
     }
 

@@ -158,7 +158,7 @@ namespace MapzenGo.Models
             tile.TileTms = tileTms;
             tile.TileCenter = rect.Center;
             tile.Material = MapMaterial;
-            tile.Rect = GM.TileBounds(tileTms, Zoom);
+            tile.Rect = rect;
 
             Tiles.Add(tileTms, tile);
             tile.transform.localPosition = (rect.Center - centerInMercator).ToVector3();

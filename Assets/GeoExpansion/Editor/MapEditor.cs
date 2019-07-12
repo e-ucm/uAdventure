@@ -68,11 +68,7 @@ namespace uAdventure.Geo
 
         public float MetersToPixelsAt(Vector2d point, float meters)
         {
-            var center = LatLonToPixel(point);
-            var metersEast = GM.LatLonToMeters(point.x, point.y) + new Vector2d(meters, 0);
-            var east = GM.MetersToPixels(metersEast, Zoom);
-
-            return (float) (east - center).magnitude;
+            return (float) GM.GetPixelsPerMeter(point.x, Zoom) * meters;
         }
 
         public Vector2d LatLonToPixel(Vector2d point)

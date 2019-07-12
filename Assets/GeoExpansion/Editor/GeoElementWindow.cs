@@ -64,7 +64,10 @@ namespace uAdventure.Geo
 
                 var geometry = geoElement.GMLGeometries[geoElement.SelectedGeometry];
                 mapEditor.Center = geometry.Center;
-                mapEditor.ZoomToBoundingBox(geometry.Points.ToArray().ToRectD());
+                if (geometry.Points.Length > 0)
+                {
+                    mapEditor.ZoomToBoundingBox(geometry.Points.ToArray().ToRectD());
+                }
             }
         }
 

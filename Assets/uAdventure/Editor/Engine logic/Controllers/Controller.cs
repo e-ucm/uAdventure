@@ -1439,6 +1439,10 @@ namespace uAdventure.Editor
 
                         dataModified_F = false;
                         fileLoaded = true;
+                        if (!EditorApplication.isPlayingOrWillChangePlaymode)
+                        {
+                            Game.Instance.ResourceManager = ResourceManager;
+                        }
                     }
                     catch (Exception ex)
                     {

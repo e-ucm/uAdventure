@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using UnityEngine.WSA;
 
 
 namespace MapzenGo.Helpers
@@ -37,6 +38,17 @@ namespace MapzenGo.Helpers
         public static Vector2d LatLonToMeters(Vector2d v)
         {
             return LatLonToMeters(v.x, v.y);
+        }
+
+
+        public static double GetPixelsPerMeter(double lat, double zoom)
+        {
+            double pixelsPerTile = TileSize;
+            double numTiles = Math.Pow(2, zoom);
+            double radiusAtLat = Math.Cos(lat * Mathf.Deg2Rad) * GM.EarthRadius;
+            double perimeterAtLat = 2d * Math.PI * radiusAtLat;
+            double metersPerTile = perimeterAtLat / numTiles;
+            return pixelsPerTile / metersPerTile;
         }
 
         //Converts given lat/lon in WGS84 Datum to XY in Spherical Mercator EPSG:900913

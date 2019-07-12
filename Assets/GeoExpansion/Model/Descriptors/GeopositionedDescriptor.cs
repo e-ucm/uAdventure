@@ -14,7 +14,8 @@ namespace uAdventure.Geo
                 { "Position", new ParameterDescription(typeof(Vector2d), Vector2d.zero) },
                 { "Rotation", new ParameterDescription(typeof(float), 0f) },
                 { "InteractionRange", new ParameterDescription(typeof(float), 25f) }, // 25 metros
-                { "RevealOnlyOnRange", new ParameterDescription(typeof(bool), true) }
+                { "RevealOnlyOnRange", new ParameterDescription(typeof(bool), true) },
+                { "RevealParticleTexture", new ParameterDescription(typeof(string), "leaf_particle.png") }
             };
         }
 

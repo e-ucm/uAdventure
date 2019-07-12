@@ -11,8 +11,6 @@ namespace uAdventure.Geo
         private static readonly string ContentTypeAttr = "content-type";
         private static readonly string ContentTypeValue = "image/png";
 
-        private static readonly string LocalTilePath = "Assets/Resources/uAdventure/Geo/Tiles/{0}_{1}_{2}_{3}.png";
-        private static readonly string FullTilePath = Application.dataPath + "/Resources/uAdventure/Geo/Tiles/{0}_{1}_{2}_{3}.png";
 
         public bool CanStoreTile(Vector3d tile, ITileMeta meta)
         {
@@ -24,8 +22,8 @@ namespace uAdventure.Geo
         {
             if (tilePromise.Loaded && tilePromise.Data != null)
             {
-                SimpleCachedOnlineTextureTileLoader.SavePNG(tilePromise.Data as Texture2D, GetFullTilePath(tile, meta));
-                AssetDatabase.ImportAsset(GetTilePath(tile, meta));
+                SimpleCachedOnlineTextureTileLoader.SavePNG(tilePromise.Data as Texture2D, OfflineTextureTileLoader.GetFullTilePath(tile, meta));
+                AssetDatabase.ImportAsset(OfflineTextureTileLoader.GetTilePath(tile, meta));
                 return true;
             }
 
@@ -34,17 +32,7 @@ namespace uAdventure.Geo
 
         public bool DeleteTile(Vector3d tile, ITileMeta meta)
         {
-            return AssetDatabase.DeleteAsset(GetTilePath(tile, meta));
-        }
-
-        private string GetTilePath(Vector3d tile, ITileMeta tileMeta)
-        {
-            return string.Format(LocalTilePath, tileMeta.Identifier, tile.z, tile.x, tile.y);
-        }
-
-        private string GetFullTilePath(Vector3d tile, ITileMeta tileMeta)
-        {
-            return string.Format(FullTilePath, tileMeta.Identifier, tile.z, tile.x, tile.y);
+            return AssetDatabase.DeleteAsset(OfflineTextureTileLoader.GetTilePath(tile, meta));
         }
     }
 }

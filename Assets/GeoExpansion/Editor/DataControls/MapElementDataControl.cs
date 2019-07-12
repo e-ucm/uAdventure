@@ -34,13 +34,20 @@ namespace uAdventure.Geo
         public Orientation Orientation
         {
             get { return mapElement.Orientation; }
-            set { controller.AddTool(ChangeEnumValueTool.Create(mapElement, value, "Orientation")); }
+            set
+            {
+                controller.AddTool(ChangeEnumValueTool.Create(mapElement, value, "Orientation"));
+                
+            }
         }
 
         public float Scale
         {
             get { return mapElement.Scale; }
-            set { controller.AddTool(new ChangeFloatValueTool(mapElement, value, "Scale")); }
+            set
+            {
+                controller.AddTool(new ChangeValueTool<MapElement, float>(mapElement, value, "Scale", Changed));
+            }
         }
 
         public abstract bool UsesOrientation { get; }

@@ -52,6 +52,8 @@ namespace uAdventure.Geo
         {
             Id = id;
             Elements = new List<MapElement>();
+            GameplayArea = new RectD(Vector2d.zero, Vector2d.zero);
+            TileMetaIdentifier = "OSMTile";
         }
 
         /// <summary>
