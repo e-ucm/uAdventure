@@ -500,9 +500,9 @@ namespace uAdventure.Runner
             representable.Element = element;
 
             var scenePositioner = ret.AddComponent<ScenePositioner>();
+            scenePositioner.Scene = this;
             scenePositioner.Context = context;
             scenePositioner.Representable = representable;
-            scenePositioner.Scene = this;
         }
 
         private void InstanceRectangle<T>(Rectangle context) where T : Rectangle

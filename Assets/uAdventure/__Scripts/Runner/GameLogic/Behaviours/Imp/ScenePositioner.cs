@@ -62,6 +62,11 @@ namespace uAdventure.Runner
         {
             if (!rend)
             {
+                rend = this.GetComponent<Renderer>() ?? this.GetComponentInChildren<Renderer>();
+            }
+
+            if (!rend)
+            {
                 Debug.Log("No renderer was found!", this);
                 return;
             }
