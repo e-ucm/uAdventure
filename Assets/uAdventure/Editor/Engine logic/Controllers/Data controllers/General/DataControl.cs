@@ -57,11 +57,18 @@ namespace uAdventure.Editor
         {
 
             int[] addableElements = getAddableElements();
+            if (addableElements == null)
+            {
+                return false;
+            }
+
             bool canAddElements = false;
 
             // If at least one type of element can be added, return true
             foreach (int type in addableElements)
+            {
                 canAddElements = canAddElements || canAddElement(type);
+            }
 
             return canAddElements;
         }

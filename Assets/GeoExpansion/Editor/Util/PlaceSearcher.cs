@@ -1,14 +1,14 @@
 ﻿using System;
 using MapzenGo.Helpers.Search;
-using MapzenGo.Models.Settings.Editor;
 using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
-using MapzenGo.Helpers;
+using System.Linq;
+using UnityEngine.Networking;
 
 namespace uAdventure.Geo
 {
-    public class PlaceSearcher
+    public class PlaceSearcher : ScriptableObject
     {
         const string PATH_SAVE_SCRIPTABLE_OBJECT = "Assets/GeoExpansion/MapzenGo/Resources/Settings/";
         public delegate void RequestRepaint();
@@ -18,77 +18,83 @@ namespace uAdventure.Geo
          * Public variables
          * -------------------------------- */
         
-        public string Value { get; set; }
-        public Vector2d LatLon { get; protected set; }
+        public string Value
+        {
+            get { return addressDropdown.Value; }
+            set { addressDropdown.Value = value; }
+        }
+        public string Label
+        {
+            get { return addressDropdown.Label; }
+            set { addressDropdown.Label = value; }
+        }
+        public Vector2d LatLon { get; set; }
+        public RectD BoundingBox { get; set; }
 
         /* ---------------------------------
          * Attributes
          * -------------------------------- */
 
         private DropDown addressDropdown;
-        private SearchPlace place;
+        const string seachUrl = "http://nominatim.openstreetmap.org/search/{0}?format=json";
+        public string namePlace = "";
+        public string namePlaceСache = "";
+        public StructSearchData DataStructure;
         private string lastSearch = "";
         private float timeSinceLastWrite;
+        private EditorApplication.CallbackFunction update;
+        private UnityWebRequestAsyncOperation request;
+        private SearchData[] addresses;
 
         /* --------------------------------
          * Constructor
          * ------------------------------*/
-        public PlaceSearcher(string label)
+        public void Awake()
         {
-            addressDropdown = new DropDown(label);
-
-            // Get existing open window or if none, make a new one:
-            place = UnityEngine.Object.FindObjectOfType<SearchPlace>();
-            if (place == null)
-            {
-                SearchPlace search = new GameObject("Searcher").AddComponent<SearchPlace>();
-                place = search;
-            }
-
-            place.DataStructure = HelperExtention.GetOrCreateSObjectReturn<StructSearchData>(ref place.DataStructure, PATH_SAVE_SCRIPTABLE_OBJECT);
-            place.namePlaceСache = "";
-            place.DataStructure.dataChache.Clear();
-
-            EditorApplication.update += this.Update;
+            addressDropdown = new DropDown("");
+            
+            update = new EditorApplication.CallbackFunction(Update);
+            // Register the update
+            EditorApplication.update = (EditorApplication.CallbackFunction)Delegate.Combine(EditorApplication.update, update);
         }
 
 
         /* --------------------------------
          * Destructor
          * ------------------------------*/
-        ~PlaceSearcher()
+        public void OnDestroy()
         {
-            EditorApplication.update -= this.Update;
+            EditorApplication.update = (EditorApplication.CallbackFunction)Delegate.Remove(EditorApplication.update, update);
         }
 
 
         /* --------------------------------
          * Draw methods
          * ------------------------------*/
-        public string LayoutBegin()
+        public bool DoLayout()
+        {
+            return DoLayout(null);
+        }
+
+
+        public bool DoLayout(GUIStyle style)
         {
             var prevAddress = Value;
-            Value = addressDropdown.LayoutBegin();
-            if (Value != prevAddress)
+            var selected = addressDropdown.DoLayout(style);
+            if (selected)
+            {
+                lastSearch = Value;
+                var searchData = addresses.First(sd => sd.label == Value);
+                this.LatLon = searchData.coordinates.ToVector2d();
+                this.BoundingBox = searchData.boundingBox;
+            }
+
+            if (!selected && Value != prevAddress)
             {
                 timeSinceLastWrite = 0;
             }
 
-            return Value;
-        }
-
-        public bool LayoutEnd()
-        {
-            bool r = addressDropdown.LayoutEnd();
-            if (r)
-            {
-                // If new Location is selected from the dropdown
-                lastSearch = Value = addressDropdown.Value;
-                LatLon = place.DataStructure.dataChache.Find(l => l.label == Value).coordinates.ToVector2d().Swap();
-                place.DataStructure.dataChache.Clear();
-            }
-
-            return r;
+            return selected;
         }
 
         /* ---------------------------------------
@@ -96,11 +102,17 @@ namespace uAdventure.Geo
          * --------------------------------------- */
         private void PerformSearch()
         {
-            if (Value != null && Value.Trim() != "" && lastSearch != Value)
+            if (lastSearch != Value)
             {
-                place.namePlace = Value;
-                place.SearchInOSM();
-                lastSearch = Value;
+                if (Value != null && Value.Trim() != "")
+                {
+                    lastSearch = Value;
+                    SearchInOSM(Value);
+                }
+                else
+                {
+                    addressDropdown.Elements = null;
+                }
             }
         }
 
@@ -109,22 +121,53 @@ namespace uAdventure.Geo
          * ------------------------------------------ */
         void Update()
         {
-            //Debug.Log(Time.fixedDeltaTime);
             timeSinceLastWrite += Time.fixedDeltaTime;
             if (timeSinceLastWrite > 3f)
             {
                 PerformSearch();
             }
 
-            if (place.DataStructure.dataChache.Count > 0)
+            if (request != null && request.isDone)
             {
-                var addresses = new List<string>();
-                foreach (var r in place.DataStructure.dataChache)
-                    addresses.Add(r.label);
-                addressDropdown.Elements = addresses;
-                // Request the repaint of the element
-                OnRequestRepaint();
+                addresses = DataProcessingOSM(request.webRequest.downloadHandler.text);
+                addressDropdown.Elements = addresses.Select(a => a.label).ToList();
+                request = null;
+                // Request the repaint of the element 
+                if (OnRequestRepaint != null)
+                {
+                    OnRequestRepaint();
+                }
             }
+        }
+
+
+        private void SearchInOSM(string namePlace)
+        {
+            UnityWebRequest www = UnityWebRequest.Get(String.Format(seachUrl, System.Uri.EscapeDataString(namePlace)));
+            request = www.SendWebRequest();
+        }
+
+        private SearchData[] DataProcessingOSM(string success)
+        {
+            JSONObject obj = new JSONObject(success);
+            var dataCache = new List<SearchData>();
+
+            foreach (JSONObject jsonObject in obj.list)
+            {
+                var minLat = double.Parse(jsonObject["boundingbox"][0].str);
+                var maxLat = double.Parse(jsonObject["boundingbox"][1].str);
+                var minLon = double.Parse(jsonObject["boundingbox"][2].str);
+                var maxLon = double.Parse(jsonObject["boundingbox"][3].str);
+
+                dataCache.Add(new SearchData()
+                {
+                    coordinates = new Vector2(float.Parse(jsonObject["lat"].str), float.Parse(jsonObject["lon"].str)),
+                    label = jsonObject["display_name"].str,
+                    boundingBox = new RectD(new Vector2d(minLon, minLat), new Vector2d(maxLon - minLon, maxLat - minLat))
+                });
+            }
+
+            return dataCache.ToArray();
         }
     }
 

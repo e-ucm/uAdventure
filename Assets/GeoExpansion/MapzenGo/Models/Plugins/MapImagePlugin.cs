@@ -3,15 +3,14 @@ using System.Collections;
 using MapzenGo.Models.Plugins;
 using UnityEngine;
 using MapzenGo.Models;
+using uAdventure.Geo;
 
 public class MapImagePlugin : Plugin
 {
-
-    public TileServices TileService = TileServices.Default;
+    private ITileMeta defaultTileMeta = new OsmMeta();
 
     protected override IEnumerator CreateRoutine(Tile tile, Action<bool> finished)
     {
-
         var go = GameObject.CreatePrimitive(PrimitiveType.Quad).transform;
         go.name = "map";
         go.SetParent(tile.transform, true);
@@ -21,9 +20,9 @@ public class MapImagePlugin : Plugin
         go.localPosition -= new Vector3(0, 1, 0);
         var rend = go.GetComponent<Renderer>();
         rend.material = tile.Material;
-        TileProvider.TileService = TileService;
-        TileProvider.GetTile(new Vector3d(tile.TileTms.x, tile.TileTms.y, tile.Zoom), (texture) =>
+        TileProvider.Instance.GetTile(new Vector3d(tile.TileTms.x, tile.TileTms.y, tile.Zoom), defaultTileMeta, (tilePromise) =>
         {
+            var texture = tilePromise.Data as Texture2D;
             if (texture)
             {
                 if (rend)

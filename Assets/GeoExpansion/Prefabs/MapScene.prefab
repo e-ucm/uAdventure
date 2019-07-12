@@ -3340,8 +3340,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Order: 1
-  extElementPrefab: {fileID: 1000014039353336, guid: 7c81a13f02088c84b87932b4d72641f7,
-    type: 2}
+  Character_Prefab: {fileID: 169016, guid: 35b79a2bdd0eaa24f8efea8d587363c4, type: 2}
+  Atrezzo_Prefab: {fileID: 189346, guid: 1210ef09da727c14a96dd7d2b7b3cd11, type: 2}
+  Object_Prefab: {fileID: 196906, guid: c5cc4b0c1c01a164a8de62b28c635cb7, type: 2}
 --- !u!114 &114000011349155414
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -3414,7 +3415,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4220ca020e16a244195f43693a02bfa6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TileService: 0
 --- !u!114 &114000012607232796
 MonoBehaviour:
   m_ObjectHideFlags: 1

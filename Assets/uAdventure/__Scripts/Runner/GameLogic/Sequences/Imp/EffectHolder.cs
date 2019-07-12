@@ -89,7 +89,9 @@ namespace uAdventure.Runner
                                     {
                                         playerContext.setPosition(tse.getX(), tse.getY());
                                         if (tse.DestinyScale > 0)
-                                            playerContext.setScale(tse.DestinyScale);
+                                        {
+                                            playerContext.Scale = tse.DestinyScale;
+                                        }
                                     }
                                     else
                                     {
@@ -100,12 +102,12 @@ namespace uAdventure.Runner
                                             {
                                                 var initial = targetScene.getTrajectory().getInitial();
                                                 playerContext.setPosition(initial.getX(), initial.getY());
-                                                playerContext.setScale(initial.getScale());
+                                                playerContext.Scale = initial.getScale();
                                             }
                                             else
                                             {
                                                 playerContext.setPosition(targetScene.getPositionX(), targetScene.getPositionY());
-                                                playerContext.setScale(targetScene.getPlayerScale());
+                                                playerContext.Scale = targetScene.getPlayerScale();
                                             }
                                         }
                                     }

@@ -45,5 +45,7 @@ namespace MapzenGo.Helpers.Search
         public string url = "http://b.tile.openstreetmap.org/";
         public Vector2 coordinates;
         public string label;
+        public RectD boundingBox;
+        public Vector2[] points;
     }
 }

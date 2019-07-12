@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using UnityEngine;
 
 namespace uAdventure.Core
@@ -51,6 +52,24 @@ namespace uAdventure.Core
                 return def;
         }
 
+        public static RectD ParseDefault(string toParse, RectD def)
+        {
+            RectD toReturn;
+            if (!string.IsNullOrEmpty(toParse) && RectD.TryParse(toParse, out toReturn))
+                return toReturn;
+            else
+                return def;
+        }
+
+        public static Vector2d ParseDefault(string toParse, Vector2d def)
+        {
+            Vector2d toReturn;
+            if (!string.IsNullOrEmpty(toParse) && Vector2d.TryParse(toParse, out toReturn))
+                return toReturn;
+            else
+                return def;
+        }
+
         public static Color ParseDefault(string toParse, Color def)
         {
             try
@@ -68,10 +87,46 @@ namespace uAdventure.Core
         {
             return (T)System.Enum.Parse(typeof(T), value, true);
         }
+
+        public static T ParseDefaultEnum<T>(string value, T def)
+        {
+            try
+            {
+                return (T)System.Enum.Parse(typeof(T), value, true);
+            }
+            catch
+            {
+                return def;
+            }
+        }
+        public static object Parse(string value, Type type)
+        {
+            try
+            {
+                var parse = type.GetMethod("Parse", BindingFlags.Static);
+                if (parse != null)
+                {
+                    value = (string)parse.Invoke(null, new object[] { value });
+                }
+
+                return value;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         public static T ParseDefault<T>(string value, T def)
         {
             try
             {
+                var parse = typeof(T).GetMethod("Parse", BindingFlags.Static);
+                if (parse != null)
+                {
+                    value = (string) parse.Invoke(null, new object[] { value });
+                }
+
                 return (T)System.Enum.Parse(typeof(T), value, true);
             }
             catch

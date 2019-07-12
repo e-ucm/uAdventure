@@ -6,7 +6,7 @@ namespace uAdventure.Geo
 
     public class GeoReference : MapElement
     {
-        public GeoReference(string targetId) : base(targetId)
+        public GeoReference(string idTarget) : base(idTarget)
         {
         }
 

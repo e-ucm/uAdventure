@@ -3,11 +3,9 @@
 using uAdventure.Runner;
 using System;
 using System.Collections.Generic;
-using System.Collections;
 using MapzenGo.Models;
 using UnityStandardAssets.Characters.ThirdPerson;
 using MapzenGo.Helpers;
-using RAGE.Analytics;
 using UnityEngine.EventSystems;
 
 namespace uAdventure.Geo
@@ -89,13 +87,20 @@ namespace uAdventure.Geo
 
             // Start the gps just in case is not
             if (GPSController.Instance.IsStarted())
+            {
                 GPSController.Instance.Start();
+            }
 
             // If the location is valid
             if(GPSController.Instance.IsLocationValid())
+            {
                 geoCharacter.LatLon = new Vector2d(Input.location.lastData.latitude, Input.location.lastData.longitude);
-            else // if not, just put the character in the center of the map
+            }
+            else
+            {
+                // if not, just put the character in the center of the map
                 geoCharacter.LatLon = new Vector2d(tileManager.Latitude, tileManager.Longitude);
+            }
         }
 
 

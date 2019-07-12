@@ -90,7 +90,7 @@ namespace uAdventure.Runner
         {
             switch (type)
             {
-                case ResourceManager.LoadingType.RESOURCES_LOAD:
+                case ResourceManager.LoadingType.ResourcesLoad:
                     if (Application.platform == RuntimePlatform.WebGLPlayer)
                     {
                         videoPlayer.source = VideoSource.Url;
@@ -114,7 +114,7 @@ namespace uAdventure.Runner
                     }
 
                     break;
-                case ResourceManager.LoadingType.SYSTEM_IO:
+                case ResourceManager.LoadingType.SystemIO:
                     if (!Path.HasExtension(path))
                     {
                         foreach (var extension in extensions)

@@ -28,6 +28,7 @@ namespace uAdventure.Runner
 
         private Mover mover;
         private Representable representable;
+        private ScenePositioner scenePositioner; 
 
         static public PlayerMB Instance
         {
@@ -43,6 +44,7 @@ namespace uAdventure.Runner
         {
             mover = GetComponent<Mover>();
             representable = GetComponent<Representable>();
+            scenePositioner = GetComponent<ScenePositioner>();
         }
 
         public void Do(Action action, Rectangle area, Game.ExecutionEvent onExecutionStarted = null, Game.ExecutionEvent onExecutionFinishes = null)
@@ -67,11 +69,11 @@ namespace uAdventure.Runner
                     case Action.USE:
                     case Action.USE_WITH:
                     case Action.GRAB:
-                        representable.Orientation = (representable.getPosition() - toDo.area.ToRect().center).ToOrientation(true);
+                        representable.Orientation = (scenePositioner.Position - toDo.area.ToRect().center).ToOrientation(true);
                         representable.Play("use", "stand");
                         break;
                     case Action.CUSTOM:
-                        representable.Orientation = (representable.getPosition() - toDo.area.ToRect().center).ToOrientation(true);
+                        representable.Orientation = (scenePositioner.Position - toDo.area.ToRect().center).ToOrientation(true);
                         representable.Play("actionAnimation", "stand");
                         break;
                 }

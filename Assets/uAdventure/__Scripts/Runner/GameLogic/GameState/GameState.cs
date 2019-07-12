@@ -148,8 +148,10 @@ namespace uAdventure.Runner
                     scale = pos.getScale();
                 }
 
-                playerContext = new ElementReference("Player", (int)playerPosition.x, (int)playerPosition.y, scene.getPlayerLayer());
-                playerContext.setScale(scale);
+                playerContext = new ElementReference("Player", (int)playerPosition.x, (int)playerPosition.y, scene.getPlayerLayer())
+                {
+                    Scale = scale
+                };
             }
         }
 
@@ -277,8 +279,8 @@ namespace uAdventure.Runner
                 }
             }else
             {
-                Representable r = go.GetComponent<Representable>();
-                r.setPosition(position);
+                ScenePositioner r = go.GetComponent<ScenePositioner>();
+                r.Position = position;
             }
         }
 

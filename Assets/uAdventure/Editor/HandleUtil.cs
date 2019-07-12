@@ -1,24 +1,36 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
 public static class HandleUtil {
+    
 
-    public static Rect HandleRect(int handleId, Rect rect, float maxPointDistance, Action<Vector2[]> drawPolygon, Action<Vector2> drawPoint)
+    public static Rect HandleRect(int handleId, Rect rect, float maxPointDistance, Action<Vector2[], bool, bool> drawPolygon, Action<Vector2, bool, bool> drawPoint)
     {
         var points = rect.ToPoints();
         int pointChanged = -1;
         Vector2 oldPointValue = Vector2.zero;
-
-        if (Event.current.type == EventType.Repaint)
-            drawPolygon(points);
+        
+        int overActivePoint = -1;
+        bool over = rect.Contains(Event.current.mousePosition);
+        bool active = GUIUtility.hotControl == handleId;
 
         for (int i = 0; i < points.Length; i++)
         {
             EditorGUI.BeginChangeCheck();
             var aux = points[i];
-            points[i] = HandleUtil.HandlePointMovement(handleId + i + 1, points[i], 10f, p => drawPoint(p));
+            var pointId = GUIUtility.GetControlID(handleId + i + 1, FocusType.Passive);
+            points[i] = HandleUtil.HandlePointMovement(pointId, points[i], 10f, (p, o, a) => {
+                if (o || a)
+                {
+                    overActivePoint = i;
+                    over = o;
+                    active = a;
+                }
+            }, i%2 == 0 ? MouseCursor.ResizeUpLeft : MouseCursor.ResizeUpRight);
+
             if (EditorGUI.EndChangeCheck())
             {
                 oldPointValue = aux;
@@ -26,6 +38,16 @@ public static class HandleUtil {
                 pointChanged = i;
             }
         }
+
+        if (Event.current.type == EventType.Repaint)
+        {
+            drawPolygon(points, overActivePoint == -1 && over, overActivePoint == -1 && active);
+            for (int i = 0; i < points.Length; i++)
+            {
+                drawPoint(points[i], overActivePoint == i && over, overActivePoint == i && active);
+            }
+        }
+
 
         if (pointChanged != -1)
         {
@@ -49,7 +71,7 @@ public static class HandleUtil {
         return rect;
     }
 
-    public static Rect HandleFixedRatioRect(int handleId, Rect rect, float ratio, float maxPointDistance, Action<Vector2[]> drawPolygon, Action<Vector2> drawPoint)
+    public static Rect HandleFixedRatioRect(int handleId, Rect rect, float ratio, float maxPointDistance, Action<Vector2[], bool, bool> drawPolygon, Action<Vector2, bool, bool> drawPoint)
     {
         EditorGUI.BeginChangeCheck();
         // Use the handle for normal rects
@@ -73,20 +95,42 @@ public static class HandleUtil {
         return newRect;
     }
 
-    public static Vector2 HandlePointMovement(int controlId, Vector2 point, object maxDistance, Action<Vector2> draw)
+    private static Rect GetInscriptRect(Vector2 center, float radius, float angle)
     {
+        var width2 = radius * Mathf.Cos(angle);
+        var height2 = radius * Mathf.Sin(angle);
+
+        return new Rect(center - new Vector2(width2, height2), new Vector2(width2 * 2, height2 * 2));
+    }
+
+    public static Vector2 HandlePointMovement(int controlId, Vector2 point, float maxDistance, Action<Vector2, bool, bool> draw, MouseCursor mouseCursor = MouseCursor.Arrow)
+    {
+        /*if(mouseCursor != MouseCursor.Arrow)
+        {
+            for (int i = 1; i < 5; i++)
+            {
+                EditorGUIUtility.AddCursorRect(GetInscriptRect(point, maxDistance, 90*i/5f), mouseCursor, controlId);
+            }
+        }*/
+
+        var cursorRect = new Rect(0, 0, maxDistance * 1.5f, maxDistance * 1.5f) { center = point };
+        EditorGUIUtility.AddCursorRect(cursorRect, mouseCursor, controlId);
+
+        var isOver = (point - Event.current.mousePosition).magnitude < maxDistance;
+        var isActive = GUIUtility.hotControl == controlId;
+
         switch (Event.current.type)
         {
-            case EventType.Repaint:  draw(point); break;
+            case EventType.Repaint:  draw(point, isOver, isActive); break;
             case EventType.MouseDown:
-                if ((point - Event.current.mousePosition).magnitude < 10)
+                if (isOver)
                 {
                     GUIUtility.hotControl = controlId;
                     Event.current.Use();
                 }
                 break;
             case EventType.MouseDrag:
-                if (GUIUtility.hotControl == controlId)
+                if (isActive)
                 {
                     point.x += Event.current.delta.x;
                     point.y += Event.current.delta.y;
@@ -95,7 +139,7 @@ public static class HandleUtil {
                 }
                 break;
             case EventType.MouseUp:
-                if (GUIUtility.hotControl == controlId)
+                if (isActive)
                 {
                     GUIUtility.hotControl = 0;
                     Event.current.Use();
@@ -112,8 +156,10 @@ public static class HandleUtil {
     /// <param name="controlId"></param>
     /// <param name="rect"></param>
     /// <returns></returns>
-    public static Rect HandleRectMovement(int controlId, Rect rect)
+    public static Rect HandleRectMovement(int controlId, Rect rect, MouseCursor cursor = MouseCursor.MoveArrow)
     {
+        EditorGUIUtility.AddCursorRect(rect, cursor, controlId);
+
         switch (Event.current.type)
         {
             case EventType.MouseDown:
@@ -166,8 +212,21 @@ public static class HandleUtil {
     /// <param name="outerColor"></param>
     public static void DrawPoint(Vector2 position, float size, Color innerColor, Color outerColor)
     {
+        DrawPoint(position, size, innerColor, 1f, outerColor);
+    }
+
+    /// <summary>
+    /// Draws a circle point of the desired size with measured outline
+    /// </summary>
+    /// <param name="position"></param>
+    /// <param name="size"></param>
+    /// <param name="innerColor"></param>
+    /// <param name="outerSize"></param>
+    /// <param name="outerColor"></param>
+    public static void DrawPoint(Vector2 position, float size, Color innerColor, float outerSize, Color outerColor)
+    {
         Handles.color = outerColor;
-        Handles.DrawSolidDisc(position, Vector3.forward, size + 1f);
+        Handles.DrawSolidDisc(position, Vector3.forward, size + outerSize);
         Handles.color = innerColor;
         Handles.DrawSolidDisc(position, Vector3.forward, size);
     }
@@ -181,10 +240,17 @@ public static class HandleUtil {
     /// <param name="width"></param>
     public static void DrawPolyLine(Vector2[] points, bool closed, Color color, float width = 2f)
     {
+        if (points.Length == 0)
+        {
+            return;
+        }
+
         Handles.color = color;
         Handles.DrawAAPolyLine(width, V2ToV3(points));
         if (closed)
-            Handles.DrawAAPolyLine(width, V2ToV3(new Vector2[] { points[0], points[points.Length - 1] }));
+        {
+            Handles.DrawAAPolyLine(width, V2ToV3(new Vector2[] {points[0], points[points.Length - 1]}));
+        }
     }
 
     /// <summary>
@@ -194,6 +260,12 @@ public static class HandleUtil {
     /// <param name="color"></param>
     public static void DrawPolygon(Vector2[] points, Color color)
     {
+        if (points.Length <= 2)
+        {
+            DrawPolyLine(points, false, color);
+            return;
+        }
+
         Triangulator2 tr = new Triangulator2(points);
         Handles.color = color;
         int[] indices = tr.Triangulate();
@@ -215,7 +287,13 @@ public static class HandleUtil {
     /// <returns></returns>
     private static Vector3[] V2ToV3(Vector2[] points)
     {
-        return points.Select(p => new Vector3(p.x, p.y, 0f)).ToArray();
+        var r = new Vector3[points.Length];
+        for (int i = 0; i < points.Length; i++)
+        {
+            r[i] = new Vector3(points[i].x, points[i].y, 0f);
+        }
+
+        return r;
     }
 
 }

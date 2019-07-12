@@ -6,6 +6,7 @@ using System;
 using uAdventure.Core;
 using System.Collections.Generic;
 using System.Linq;
+using MapzenGo.Helpers;
 
 namespace uAdventure.Editor
 {
@@ -248,7 +249,7 @@ namespace uAdventure.Editor
             GUILayout.EndHorizontal();
         }
 
-        public override void OnRender(Rect viewport)
+        public override void OnRender()
         {
             if (Target is NodeDataControl)
             {
@@ -256,27 +257,30 @@ namespace uAdventure.Editor
             }
             
             var npc = Target as NPCDataControl;
-            var orientation = uAdventure.Runner.Orientation.S;
+            var orientation = Orientation.S;
             if (SceneEditor.ElementReference != null)
             {
-                orientation = SceneEditor.ElementReference.GetOrientation();
+                var elementReference = SceneEditor.ElementReference as ElementReferenceDataControl;
+                orientation = elementReference.Orientation;
             }
             if (npc != null)
             {
                 var resourceOrientation = "";
                 switch (orientation)
                 {
-                    case Runner.Orientation.S: resourceOrientation = NPC.RESOURCE_TYPE_STAND_DOWN;  break;
-                    case Runner.Orientation.N: resourceOrientation = NPC.RESOURCE_TYPE_STAND_UP;    break;
-                    case Runner.Orientation.O: resourceOrientation = NPC.RESOURCE_TYPE_STAND_LEFT;  break;
-                    case Runner.Orientation.E: resourceOrientation = NPC.RESOURCE_TYPE_STAND_RIGHT; break;
+                    case Orientation.S: resourceOrientation = NPC.RESOURCE_TYPE_STAND_DOWN;  break;
+                    case Orientation.N: resourceOrientation = NPC.RESOURCE_TYPE_STAND_UP;    break;
+                    case Orientation.O: resourceOrientation = NPC.RESOURCE_TYPE_STAND_LEFT;  break;
+                    case Orientation.E: resourceOrientation = NPC.RESOURCE_TYPE_STAND_RIGHT; break;
                 }
 
                 var preview = LoadCharacterTexturePreview(npc, resourceOrientation);
                 if (preview)
                 {
-                    var rect = GetViewportRect(new Rect(new Vector2(-0.5f * preview.width, -preview.height), new Vector2(preview.width, preview.height)), viewport);
-                    GUI.DrawTexture(rect, preview, ScaleMode.ScaleToFit);
+                    var rect = new RectD(new Vector2d(-0.5f * preview.width, -preview.height),
+                        new Vector2d(preview.width, preview.height));
+                    var adaptedRect = ComponentBasedEditor.Generic.ToRelative(rect.ToPoints()).ToRectD().ToRect();
+                    GUI.DrawTexture(adaptedRect, preview, ScaleMode.ScaleToFit);
                 }
             }
         }

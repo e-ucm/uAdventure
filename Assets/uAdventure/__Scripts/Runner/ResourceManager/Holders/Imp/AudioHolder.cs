@@ -22,10 +22,10 @@ namespace uAdventure.Runner
             loaded = true;
             switch (type)
             {
-                case ResourceManager.LoadingType.RESOURCES_LOAD:
+                case ResourceManager.LoadingType.ResourcesLoad:
                     audioClip = LoadAudio(path, type);
                     break;
-                case ResourceManager.LoadingType.SYSTEM_IO:
+                case ResourceManager.LoadingType.SystemIO:
                     Debug.LogError("Not yet implemented");
                     break;
             }
@@ -46,7 +46,7 @@ namespace uAdventure.Runner
             AudioClip loadedClip = null;
             switch (type)
             {
-                case ResourceManager.LoadingType.RESOURCES_LOAD:
+                case ResourceManager.LoadingType.ResourcesLoad:
                     loadedClip = Resources.Load<AudioClip>(path);
                     if (loadedClip == null)
                     {
@@ -54,7 +54,7 @@ namespace uAdventure.Runner
                     }
 
                     break;
-                case ResourceManager.LoadingType.SYSTEM_IO:
+                case ResourceManager.LoadingType.SystemIO:
                     Debug.LogError("Not yet implemented");
                     break;
             }

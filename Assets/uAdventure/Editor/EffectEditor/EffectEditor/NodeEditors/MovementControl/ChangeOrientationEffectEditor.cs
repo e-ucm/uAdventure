@@ -32,11 +32,11 @@ namespace uAdventure.Editor
         public ChangeOrientationEffectEditor()
         {
             var ids = Controller.Instance.IdentifierSummary.getIds<NPC>();
-            this.effect = new ChangeOrientationEffect(ids.FirstOrDefault(), Runner.Orientation.S);
+            this.effect = new ChangeOrientationEffect(ids.FirstOrDefault(), Orientation.S);
 
-            var orientations = Enum.GetValues(typeof(Runner.Orientation));
+            var orientations = Enum.GetValues(typeof(Orientation));
             orientationValues = orientations.Cast<int>().ToArray();
-            orientationTexts = orientations.Cast<Runner.Orientation>().Select(s => "Orientation." + s.ToString()).ToArray();
+            orientationTexts = orientations.Cast<Orientation>().Select(s => "Orientation." + s.ToString()).ToArray();
         }
 
         public void draw()
@@ -47,7 +47,7 @@ namespace uAdventure.Editor
             EditorGUI.BeginChangeCheck();
             var orientationLabel = TC.get("ElementReference.Orientation");
             var translatedTexts = orientationTexts.Select(TC.get).ToArray();
-            var newOrientation = (Runner.Orientation)EditorGUILayout.IntPopup(orientationLabel, (int)effect.GetOrientation(), translatedTexts, orientationValues);
+            var newOrientation = (Orientation)EditorGUILayout.IntPopup(orientationLabel, (int)effect.GetOrientation(), translatedTexts, orientationValues);
             if (EditorGUI.EndChangeCheck())
             {
                 effect.SetOrientation(newOrientation);

@@ -177,20 +177,17 @@ namespace uAdventure.Geo
                     UpdateArrow(reached);
 
                     // Go next
-                    if (reached && !currentStep.LockNavigation)
+                    if (reached && !currentStep.LockNavigation && CompleteStep(currentStep))
                     {
                         // If the step is completed successfully we set the current step to null
-                        if (CompleteStep(currentStep))
-                        {
-                            currentStep = null;
+                        currentStep = null;
 
-                            if (stepCompleted.All(kv => kv.Value == true))
-                            {
-                                // Navigation finished
-                                navigating = false;
-                                SaveNavigation();
-                                DestroyImmediate(this.gameObject);
-                            }
+                        if (stepCompleted.All(kv => kv.Value))
+                        {
+                            // Navigation finished
+                            navigating = false;
+                            SaveNavigation();
+                            DestroyImmediate(this.gameObject);
                         }
                     }
                 }
@@ -219,11 +216,11 @@ namespace uAdventure.Geo
             var mb = GetReference(currentStep.Reference);
             if (mb == null)
                 return false; // If the element is not there, just try to skip it
-            else if (mb is GeoWrapper)
+            else if (mb is GeoPositioner)
             {
-                var wrap = mb as GeoWrapper;
-                var position = (Vector2d)wrap.Reference.TransformManagerParameters["Position"];
-                var interactionRange = (float) wrap.Reference.TransformManagerParameters["InteractionRange"];
+                var wrap = mb as GeoPositioner;
+                var position = (Vector2d)wrap.Context.TransformManagerParameters["Position"];
+                var interactionRange = (float) wrap.Context.TransformManagerParameters["InteractionRange"];
                 
                 var distance = GM.SeparationInMeters(position, character.LatLon);
                 var realDistance = GM.SeparationInMeters(position, Input.location.lastData.LatLonD());
@@ -243,8 +240,8 @@ namespace uAdventure.Geo
                 // Otherwise, if there is no character or gps, only one of the checks is valid
 
                 // TODO check if the line element is reached
-                return (!character || geomb.Element.Geometry.InsideInfluence(character.LatLon)) 
-                    && (!GPSController.Instance.IsStarted() || geomb.Element.Geometry.InsideInfluence(Input.location.lastData.LatLonD()))
+                return (!character || geomb.Geometry.InsideInfluence(character.LatLon)) 
+                    && (!GPSController.Instance.IsStarted() || geomb.Geometry.InsideInfluence(Input.location.lastData.LatLonD()))
                     && (GPSController.Instance.IsStarted() || character);
             }
             else return false;
@@ -289,10 +286,10 @@ namespace uAdventure.Geo
         private int GetElementsFor(NavigationStep currentStep)
         {
             var mb = GetReference(currentStep.Reference);
-            if(mb is GeoElementMB && (mb as GeoElementMB).Element.Geometry.Type == GMLGeometry.GeometryType.LineString)
+            if(mb is GeoElementMB && (mb as GeoElementMB).Geometry.Type == GMLGeometry.GeometryType.LineString)
             {
                 // If it is a path, all the points are elements
-                return (mb as GeoElementMB).Element.Geometry.Points.Count;
+                return (mb as GeoElementMB).Geometry.Points.Length;
             }
             else
             {
@@ -333,11 +330,15 @@ namespace uAdventure.Geo
                 character = FindObjectOfType<GeoPositionedCharacter>();
             }
 
-            var latLon = character // If there is a character
-                ? character.LatLon // use the position of the character to calculate distance
-                : GPSController.Instance.IsLocationValid() // If not, but we have a location source
-                    ? Input.location.lastData.LatLonD() // Use the location
-                    : new Vector2d(double.NegativeInfinity, double.NegativeInfinity); // Otherwise, minus infinite, as the elements will be positioned at inifine
+            var latLon = new Vector2d(double.NegativeInfinity, double.NegativeInfinity); // Minus infinite, as the elements will be positioned at inifine
+            if (character) // If there is a character
+            {
+                latLon = character.LatLon; // use the position of the character to calculate distance
+            }
+            else if (GPSController.Instance.IsLocationValid()) // If We have a location source we use it
+            {
+                latLon = Input.location.lastData.LatLonD();
+            }
 
             var notCompleted = steps
                 .FindAll(e => !stepCompleted[e] && !double.IsNaN(GetElementPosition(e.Reference).x)); // Filter the completed
@@ -360,10 +361,10 @@ namespace uAdventure.Geo
             {
                 return GetGeoElementPosition((mb as GeoElementMB));
             }
-            else if(mb is GeoWrapper)
+            else if(mb is GeoPositioner)
             {
                 // Only works with geopositioned elements TODO make it compatible with the rest of types
-                return (Vector2d) (mb as GeoWrapper).Reference.TransformManagerParameters["Position"];
+                return (Vector2d) (mb as GeoPositioner).Context.TransformManagerParameters["Position"];
             }
 
             return new Vector2d(double.PositiveInfinity, double.PositiveInfinity);
@@ -380,7 +381,7 @@ namespace uAdventure.Geo
             {
                 referenceCache.Clear();
                 FindObjectsOfType<GeoElementMB>().ToList().ForEach(geoElem => referenceCache.Add(geoElem.Reference.getTargetId(), geoElem));
-                FindObjectsOfType<GeoWrapper>().ToList().ForEach(geoWrap => referenceCache.Add(geoWrap.Reference.getTargetId(), geoWrap));
+                FindObjectsOfType<GeoPositioner>().ToList().ForEach(geoWrap => referenceCache.Add(geoWrap.Context.getTargetId(), geoWrap));
             }
 
             var mb = referenceCache.ContainsKey(reference) ? referenceCache[reference] : null;
@@ -398,14 +399,20 @@ namespace uAdventure.Geo
         /// <returns>The position in latitude and longitude Vector2d format</returns>
         private Vector2d GetGeoElementPosition(GeoElementMB geoElementMB)
         {
-            switch (geoElementMB.Element.Geometry.Type)
+            var geometry = geoElementMB.Geometry;
+            if (geometry == null)
+            {
+                return Vector2d.zero;
+            }
+
+            switch (geometry.Type)
             {
                 case GMLGeometry.GeometryType.LineString:
-                    return geoElementMB.Element.Geometry.Points[0];
+                    return geometry.Points[0];
                 default:
                 case GMLGeometry.GeometryType.Polygon:
                 case GMLGeometry.GeometryType.Point:
-                    return geoElementMB.Element.Geometry.Center;
+                    return geometry.Center;
             }
         }
     }

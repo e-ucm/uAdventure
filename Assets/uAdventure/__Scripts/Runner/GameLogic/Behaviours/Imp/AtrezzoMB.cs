@@ -11,7 +11,7 @@ namespace uAdventure.Runner
         {
             base.Start();
             base.SetTexture(Atrezzo.RESOURCE_TYPE_IMAGE);
-            base.Positionate();
+            base.Adaptate();
 
             // Disable any kind of colliders
 

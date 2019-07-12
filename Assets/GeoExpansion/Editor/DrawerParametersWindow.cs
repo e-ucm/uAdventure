@@ -5,13 +5,15 @@ using UnityEditor;
 using uAdventure.Geo;
 using MapzenGo.Helpers;
 using System;
+using uAdventure.Core;
 
 namespace uAdventure.Editor
 {
 
     public class DrawerParametersMenu : EditorWindow {
 
-        public ExtElemReference ExtElemReference;
+        public ExtElementRefDataControl extElementRefDataControl;
+        private FileChooser textureField;
         
         internal static bool ShowAtPosition(Rect buttonRect)
         {
@@ -43,46 +45,58 @@ namespace uAdventure.Editor
             base.ShowAsDropDown(buttonRect, windowSize);
         }
 
+        protected void OnEnable()
+        {
+            textureField = new FileChooser { FileType = FileType.SET_ITEM_IMAGE };
+        }
+
         protected void OnDisable()
         {
             DrawerParametersMenu.s_LastClosedTime = DateTime.Now.Ticks / 10000L;
             DrawerParametersMenu.s_DrawerParametersMenu = null;
         }
 
-        protected void OnGUI()
+        public void OnGUI()
         {
-            if(ExtElemReference != null && ExtElemReference.TransformManagerDescriptor != null)
+            if(extElementRefDataControl != null && extElementRefDataControl.TransformManager != null)
             {
                 // And then show the required parameters
 
-                foreach (var param in ExtElemReference.TransformManagerDescriptor.ParameterDescription)
+                foreach (var param in extElementRefDataControl.TransformManager.ParameterDescription)
                 {
-                    if (!ExtElemReference.TransformManagerParameters.ContainsKey(param.Key))
-                        ExtElemReference.TransformManagerParameters.Add(param.Key, param.Value.DefaultValue);
-
                     if (param.Value.Type == typeof(float))
                     {
-                        ExtElemReference.TransformManagerParameters[param.Key] = EditorGUILayout.FloatField(param.Key, (float)ExtElemReference.TransformManagerParameters[param.Key]);
+                        extElementRefDataControl.TransformManager[param.Key] = EditorGUILayout.FloatField(param.Key.Traslate(), (float)extElementRefDataControl.TransformManager[param.Key]);
                     }
 
                     if (param.Value.Type == typeof(Vector2) )
                     {
-                        ExtElemReference.TransformManagerParameters[param.Key] = EditorGUILayout.Vector2Field(param.Key,(Vector2)ExtElemReference.TransformManagerParameters[param.Key]);
+                        extElementRefDataControl.TransformManager[param.Key] = EditorGUILayout.Vector2Field(param.Key.Traslate(), (Vector2)extElementRefDataControl.TransformManager[param.Key]);
                     }
 
                     if (param.Value.Type == typeof(Vector3))
                     {
-                        ExtElemReference.TransformManagerParameters[param.Key] = EditorGUILayout.Vector3Field(param.Key, (Vector3)ExtElemReference.TransformManagerParameters[param.Key]);
+                        extElementRefDataControl.TransformManager[param.Key] = EditorGUILayout.Vector3Field(param.Key.Traslate(), (Vector3)extElementRefDataControl.TransformManager[param.Key]);
                     }
 
                     if (param.Value.Type == typeof(Vector2d))
                     {
-                        ExtElemReference.TransformManagerParameters[param.Key] = EditorGUILayout.Vector2Field(param.Key, ((Vector2d)ExtElemReference.TransformManagerParameters[param.Key]).ToVector2()).ToVector2d();
+                        extElementRefDataControl.TransformManager[param.Key] = EditorGUILayout.Vector2Field(param.Key.Traslate(), ((Vector2d)extElementRefDataControl.TransformManager[param.Key]).ToVector2()).ToVector2d();
                     }
 
                     if (param.Value.Type == typeof(bool))
                     {
-                        ExtElemReference.TransformManagerParameters[param.Key] = EditorGUILayout.Toggle(param.Key, (bool)ExtElemReference.TransformManagerParameters[param.Key]);
+                        extElementRefDataControl.TransformManager[param.Key] = EditorGUILayout.Toggle(param.Key.Traslate(), (bool)extElementRefDataControl.TransformManager[param.Key]);
+                    }
+
+                    if (param.Value.Type == typeof(string))
+                    {
+                        textureField.Empty = extElementRefDataControl.TransformManager.ParameterDescription[param.Key]
+                            .DefaultValue as string;
+                        textureField.Label = param.Key.Traslate();
+                        textureField.Path = extElementRefDataControl.TransformManager[param.Key] as string;
+                        textureField.DoLayout();
+                        extElementRefDataControl.TransformManager[param.Key] = textureField.Path;
                     }
                 }
             }

@@ -19,22 +19,13 @@ namespace uAdventure.Runner
     }
 
     [RequireComponent(typeof(TransitionManager))]
-    public class Game : MonoBehaviour, IPointerClickHandler
+    public class Game : Singleton<Game>, IPointerClickHandler
     {
 
         //#################################################################
         //########################### SINGLETON ###########################
         //#################################################################
-        #region Singleton
-        static Game instance;
-
-        public static Game Instance
-        {
-            get { return instance; }
-        }
-        
         public static string GameToLoad { get; set; }
-        #endregion Singleton
         //#####################################################################
         //########################### MONOBEHAVIOUR ###########################
         //#####################################################################
@@ -80,7 +71,7 @@ namespace uAdventure.Runner
             get { return runnerTarget; }
         }
 
-        public ResourceManager ResourceManager { get; private set; }
+        public ResourceManager ResourceManager { get; set; }
 
         public string GameName
         {
@@ -99,7 +90,6 @@ namespace uAdventure.Runner
 
         protected void Awake()
         {
-            Game.instance = this;
             executeStack = new Stack<KeyValuePair<Interactuable, ExecutionEvent>>();
 
             skin = Resources.Load("basic") as GUISkin;
@@ -112,11 +102,11 @@ namespace uAdventure.Runner
             {
                 if (!string.IsNullOrEmpty(gameName))
                 {
-                    ResourceManager = ResourceManagerFactory.CreateLocal(gameName, useSystemIO ? ResourceManager.LoadingType.SYSTEM_IO : ResourceManager.LoadingType.RESOURCES_LOAD);
+                    ResourceManager = ResourceManagerFactory.CreateLocal(gameName, useSystemIO ? ResourceManager.LoadingType.SystemIO : ResourceManager.LoadingType.ResourcesLoad);
                 }
                 else
                 {
-                    ResourceManager = ResourceManagerFactory.CreateLocal("CurrentGame/", useSystemIO ? ResourceManager.LoadingType.SYSTEM_IO : ResourceManager.LoadingType.RESOURCES_LOAD);
+                    ResourceManager = ResourceManagerFactory.CreateLocal("CurrentGame/", useSystemIO ? ResourceManager.LoadingType.SystemIO : ResourceManager.LoadingType.ResourcesLoad);
                 }
             }
 

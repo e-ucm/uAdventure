@@ -31,7 +31,7 @@ namespace uAdventure.Editor
 
             this.elementReference = elementReference;
             this.scale = scale;
-            this.oldScale = this.elementReference.getScale();
+            this.oldScale = this.elementReference.Scale;
             changePosition = false;
             changeScale = true;
         }
@@ -45,7 +45,7 @@ namespace uAdventure.Editor
             this.scale = scale;
             this.oldX = elementReference.getX();
             this.oldY = elementReference.getY();
-            this.oldScale = this.elementReference.getScale();
+            this.oldScale = this.elementReference.Scale;
             changePosition = true;
             changeScale = true;
         }
@@ -98,7 +98,7 @@ namespace uAdventure.Editor
 
             if (changeScale)
             {
-                elementReference.setScale(scale);
+                elementReference.Scale = scale;
             }
             if (changePosition)
             {
@@ -121,7 +121,7 @@ namespace uAdventure.Editor
 
             if (changeScale)
             {
-                elementReference.setScale(scale);
+                elementReference.Scale = scale;
             }
             if (changePosition)
             {
@@ -137,7 +137,7 @@ namespace uAdventure.Editor
 
             if (changeScale)
             {
-                elementReference.setScale(oldScale);
+                elementReference.Scale = oldScale;
             }
             if (changePosition)
             {

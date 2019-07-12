@@ -4,6 +4,7 @@ using System.Collections;
 using uAdventure.Core;
 using uAdventure.Runner;
 using System;
+using System.Linq;
 using MapzenGo.Helpers;
 
 namespace uAdventure.Geo
@@ -20,7 +21,7 @@ namespace uAdventure.Geo
             var geoElement = Game.Instance.GameState.FindElement<GeoElement>(effect.ZoneId);
             var go = new GameObject();
             var zc = go.AddComponent<ZoneControl>();
-            zc.zone = geoElement.Geometry;
+            zc.zone = geoElement.Geometries.Checked().FirstOrDefault();
             zc.loadOnExit = Game.Instance.GameState.CurrentTarget;
             zc.transitionTime = effect.getTransitionTime();
             zc.zoneid = geoElement.Id;
@@ -45,17 +46,23 @@ namespace uAdventure.Geo
         {
             debugLatLong = zone.Center.ToVector2();
             if (!GPSController.Instance.IsStarted())
+            {
                 GPSController.Instance.Start();
+            }
 
             if (GPSController.Instance.IsLocationValid())
+            {
                 debugLatLong = new Vector2(Input.location.lastData.latitude, Input.location.lastData.longitude);
+            }
         }
         
 
         void Update()
         {
             if (Game.Instance.isSomethingRunning())
+            {
                 return; // We have to respect if something is running, like a conversation or an effect
+            }
 
             if(GPSController.Instance.IsLocationValid())
             {
@@ -67,15 +74,12 @@ namespace uAdventure.Geo
                     DestroyImmediate(this.gameObject);
                 }
             }
-            else if (!GPSController.Instance.IsStarted())
+            else if (!GPSController.Instance.IsStarted() && !zone.InsideInfluence(debugLatLong.ToVector2d(), 5))
             {
-                if (!zone.InsideInfluence(debugLatLong.ToVector2d(),5))
-                {
-                    Debug.Log("No está en la influencia");
-                    Game.Instance.RunTarget(loadOnExit, 0, 0);
-                    RemoveKeys();
-                    DestroyImmediate(this.gameObject);
-                }
+                Debug.Log("No está en la influencia");
+                Game.Instance.RunTarget(loadOnExit, 0, 0);
+                RemoveKeys();
+                DestroyImmediate(this.gameObject);
             }
         }
 
@@ -103,7 +107,7 @@ namespace uAdventure.Geo
         {
             // TODO use PlayerPrefs in settings
             loadOnExit = PlayerPrefs.GetString("zone_control_loadonexit");
-            zone = Game.Instance.GameState.FindElement<GeoElement>(PlayerPrefs.GetString("zone_control_id")).Geometry;
+            zone = Game.Instance.GameState.FindElement<GeoElement>(PlayerPrefs.GetString("zone_control_id")).Geometries.Checked().FirstOrDefault();
             transitionTime = PlayerPrefs.GetFloat("zone_control_transitiontime");
         }
     }

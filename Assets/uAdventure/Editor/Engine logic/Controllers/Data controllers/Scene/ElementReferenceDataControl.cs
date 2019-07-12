@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 using uAdventure.Core;
+using System;
 
 namespace uAdventure.Editor
 {
@@ -10,7 +11,7 @@ namespace uAdventure.Editor
      * This class can contain either an ElementReferenceDataControl or its
      * equivalent for the player
      */
-    public class ElementReferenceDataControl : DataControl
+    public class ElementReferenceDataControl : DataControl, IElementReference
     {
 
         /**
@@ -38,6 +39,16 @@ namespace uAdventure.Editor
 
         private bool visible;
 
+        public DataControl ReferencedDataControl
+        {
+            get { return getReferencedElementDataControl(); }
+        }
+
+        public string ReferencedId
+        {
+            get { return elementReference.getTargetId(); }
+        }
+
         /**
          * Contructor.
          * 
@@ -62,7 +73,7 @@ namespace uAdventure.Editor
             ConditionsController.ConditionOwner owner = new ConditionsController.ConditionOwner(type, elementReference.getTargetId(), parent);
             context1.Add(ConditionsController.CONDITION_OWNER, owner);
 
-            conditionsController = new ConditionsController(elementReference.getConditions(), context1);
+            conditionsController = new ConditionsController(elementReference.Conditions, context1);
         }
 
         /**
@@ -202,7 +213,7 @@ namespace uAdventure.Editor
         public float getElementScale()
         {
 
-            return elementReference.getScale();
+            return elementReference.Scale;
         }
 
         /**
@@ -314,7 +325,7 @@ namespace uAdventure.Editor
         {
 
             // Update the flag summary with the conditions
-            ConditionsController.updateVarFlagSummary(varFlagSummary, elementReference.getConditions());
+            ConditionsController.updateVarFlagSummary(varFlagSummary, elementReference.Conditions);
         }
 
 
@@ -451,12 +462,6 @@ namespace uAdventure.Editor
 
         }
 
-        public bool UsesOrientation()
-        {
-            return type == Controller.NPC_REFERENCE || type == Controller.PLAYER;
-        }
-
-
         public override void recursiveSearch()
         {
             check(this.conditionsController, TC.get("Search.Conditions"));
@@ -476,16 +481,25 @@ namespace uAdventure.Editor
             this.visible = visible;
         }
 
-        public Runner.Orientation GetOrientation()
+        public bool UsesOrientation
         {
-            return elementReference.GetOrientation();
+            get
+            {
+                return type == Controller.NPC_REFERENCE || type == Controller.PLAYER;
+            }
         }
 
-        public void SetOrientation(Runner.Orientation value)
+        public Orientation Orientation
         {
-            Controller.Instance.AddTool(new ChangeValueTool<ElementReference, Runner.Orientation>(elementReference, value, "GetOrientation", "SetOrientation"));
+            get { return elementReference.Orientation; }
+            set { controller.AddTool(ChangeEnumValueTool.Create(elementReference, value, "Orientation")); }
         }
 
+        public float Scale
+        {
+            get { return elementReference.Scale; }
+            set { controller.AddTool(new ChangeFloatValueTool(elementReference, value, "Scale")); }
+        }
 
         public override List<Searchable> getPathToDataControl(Searchable dataControl)
         {

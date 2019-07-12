@@ -80,7 +80,7 @@ namespace uAdventure.Geo
             return geoPoints.ConvertAll(gp => GM.MetersToPixels(GM.LatLonToMeters(gp), 19)).ConvertAll(p => new IntPoint(p.x, p.y));
         }
 
-        private bool Intersects(Tile tile, GeoReference elem)
+        /*private bool Intersects(Tile tile, GeoReference elem)
         {
             var element = FindGeoElement(elem);
 
@@ -101,7 +101,7 @@ namespace uAdventure.Geo
             clipper.AddPath(geoPoints, PolyType.ptSubject, true);
 
             return clipper.Execute(ClipType.ctIntersection, solution) && solution.Count > 0;
-        }
+        }*/
     }
 
 }

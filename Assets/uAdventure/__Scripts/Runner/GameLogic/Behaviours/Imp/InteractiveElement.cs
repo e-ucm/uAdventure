@@ -276,7 +276,9 @@ namespace uAdventure.Runner
             {
                 var representable = GetComponent<Representable>();
                 if (representable)
-                    representable.Positionate();
+                {
+                    representable.Adaptate();
+                }
                 this.GetComponent<Collider>().enabled = true;
             }
 

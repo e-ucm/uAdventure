@@ -246,7 +246,7 @@ namespace uAdventure.Editor
                     itemReferenceElement.SetAttribute("idTarget", itemReference.getTargetId());
                     itemReferenceElement.SetAttribute("x", itemReference.getX().ToString());
                     itemReferenceElement.SetAttribute("y", itemReference.getY().ToString());
-                    itemReferenceElement.SetAttribute("scale", itemReference.getScale().ToString());
+                    itemReferenceElement.SetAttribute("scale", itemReference.Scale.ToString());
                     if (itemReference.getLayer() != -1)
                         itemReferenceElement.SetAttribute("layer", itemReference.getLayer().ToString());
                     if (itemReference.getInfluenceArea().isExists())
@@ -272,9 +272,9 @@ namespace uAdventure.Editor
                     }
 
                     // Append the conditions (if avalaible)
-                    if (!itemReference.getConditions().IsEmpty())
+                    if (!itemReference.Conditions.IsEmpty())
                     {
-                        DOMWriterUtility.DOMWrite(itemReferenceElement, itemReference.getConditions());
+                        DOMWriterUtility.DOMWrite(itemReferenceElement, itemReference.Conditions);
                     }
 
                     // Append the exit
@@ -297,8 +297,8 @@ namespace uAdventure.Editor
                     npcReferenceElement.SetAttribute("idTarget", characterReference.getTargetId());
                     npcReferenceElement.SetAttribute("x", characterReference.getX().ToString());
                     npcReferenceElement.SetAttribute("y", characterReference.getY().ToString());
-                    npcReferenceElement.SetAttribute("scale", characterReference.getScale().ToString());
-                    npcReferenceElement.SetAttribute("orientation", ((int)characterReference.GetOrientation()).ToString());
+                    npcReferenceElement.SetAttribute("scale", characterReference.Scale.ToString());
+                    npcReferenceElement.SetAttribute("orientation", ((int)characterReference.Orientation).ToString());
                     if (characterReference.getLayer() != -1)
                         npcReferenceElement.SetAttribute("layer", characterReference.getLayer().ToString());
                     if (characterReference.getInfluenceArea().isExists())
@@ -324,9 +324,9 @@ namespace uAdventure.Editor
                     }
 
                     // Append the conditions (if avalaible)
-                    if (!characterReference.getConditions().IsEmpty())
+                    if (!characterReference.Conditions.IsEmpty())
                     {
-                        DOMWriterUtility.DOMWrite(npcReferenceElement, characterReference.getConditions());
+                        DOMWriterUtility.DOMWrite(npcReferenceElement, characterReference.Conditions);
                     }
 
                     // Append the exit
@@ -505,7 +505,7 @@ namespace uAdventure.Editor
                     atrezzoReferenceElement.SetAttribute("idTarget", atrezzoReference.getTargetId());
                     atrezzoReferenceElement.SetAttribute("x", atrezzoReference.getX().ToString());
                     atrezzoReferenceElement.SetAttribute("y", atrezzoReference.getY().ToString());
-                    atrezzoReferenceElement.SetAttribute("scale", atrezzoReference.getScale().ToString());
+                    atrezzoReferenceElement.SetAttribute("scale", atrezzoReference.Scale.ToString());
                     if (atrezzoReference.getLayer() != -1)
                         atrezzoReferenceElement.SetAttribute("layer", atrezzoReference.getLayer().ToString());
 
@@ -518,9 +518,9 @@ namespace uAdventure.Editor
                     }
 
                     // Append the conditions (if avalaible)
-                    if (!atrezzoReference.getConditions().IsEmpty())
+                    if (!atrezzoReference.Conditions.IsEmpty())
                     {
-                        DOMWriterUtility.DOMWrite(atrezzoReferenceElement, atrezzoReference.getConditions());
+                        DOMWriterUtility.DOMWrite(atrezzoReferenceElement, atrezzoReference.Conditions);
                     }
 
                     // Append the atrezzo reference

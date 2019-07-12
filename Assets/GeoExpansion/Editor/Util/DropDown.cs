@@ -2,6 +2,7 @@
 using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
+using uAdventure.Core;
 
 public class DropDown {
 
@@ -10,86 +11,132 @@ public class DropDown {
     public string Value;
     public string Label;
     public List<string> Elements;
-
-    private bool showDropdown = false;
-    private bool eventUsed = false;
-    private EventType lastEvent;
-    private Vector2 scrollPos;
-    private Rect scrollRect;
-   
-
-    private GUISkin dropdownskin;
+    
+    private Drop drop;
+    private bool selected;
+    private string nextValue;
 
     public DropDown(string label)
     {
         Label = label;
-        dropdownskin = Resources.Load<GUISkin>("DropdownSkin");
+        drop = ScriptableObject.CreateInstance<Drop>();
+        drop.OnOptionSelected = (index, option) =>
+        {
+            var os = drop.OnOptionSelected;
+            drop = ScriptableObject.CreateInstance<Drop>();
+            drop.OnOptionSelected = os;
+            nextValue = option;
+            selected = true;
+        };
     }
 
-	public string LayoutBegin()
-    {
 
+    public bool DoLayout()
+    {
+        return DoLayout(null);
+    }
+
+
+    public bool DoLayout(GUIStyle style)
+    {
         // Creating Layout element
         GUI.SetNextControlName(Label);
-        Value = EditorGUILayout.TextField(Label, Value);
+        if (style == null)
+        {
+            Value = EditorGUILayout.TextField(Label, Value);
+        }
+        else
+        {
+            Value = EditorGUILayout.TextField(Label, Value, style);
+        }
 
         // Calculating dropdown scroll rect
         var addressRect = GUILayoutUtility.GetLastRect();
-        addressRect = new Rect(addressRect.x + labelSize, addressRect.y, addressRect.width - labelSize, addressRect.height);
-        scrollRect = new Rect(addressRect.x, addressRect.y + addressRect.height, addressRect.width, 100);
 
-        // If focused show
-        showDropdown = false;
-        if (GUI.GetNameOfFocusedControl() == Label)
+
+        var r = selected;
+        if (selected)
         {
-            if (Elements != null && Elements.Count > 0)
-            {
-                showDropdown = true;
-            }
+            this.Elements.Clear();
+            selected = false;
+            this.Value = nextValue;
         }
-
-        // Event management
-        lastEvent = Event.current.type;
-        if (showDropdown && scrollRect.Contains(Event.current.mousePosition) 
-            && Event.current.type != EventType.Repaint 
-            && Event.current.type != EventType.Layout)
+        else
         {
-            eventUsed = true;
-            Event.current.Use();
-        }
-
-        return Value;
-    }
-
-    public bool LayoutEnd()
-    {
-        var r = false;
-        if (showDropdown)
-        {
-            if (eventUsed) Event.current.type = lastEvent;
-
-            GUI.skin = dropdownskin;
-            // Show Scrollview
-            scrollPos = GUI.BeginScrollView(scrollRect, scrollPos, new Rect(0, 0, scrollRect.width - 15, 15 * Elements.Count), false, false);
-            for (int i = 0; i < Elements.Count; i++)
+            // If focused show
+            if (Event.current.type == EventType.Repaint && GUI.GetNameOfFocusedControl() == Label &&
+                Elements != null && Elements.Count > 0)
             {
-                var buttonRect = new Rect(0, 15 * i, scrollRect.width, 15);
-                if(GUI.Button(buttonRect, Elements[i]))
+                drop.Elements = Elements;
+                if (!drop.Showing)
                 {
-                    Value = Elements[i];
-                    this.Elements = null;
-                    r = true;
-                    GUI.FocusControl(null);
-                    break;
+                    drop.ShowAt(addressRect);
                 }
+                drop.Repaint();
             }
-            GUI.EndScrollView();
 
-            GUI.skin = null;
-
-            //Repaint();
+            if (GUI.GetNameOfFocusedControl() != Label && drop.Showing)
+            {
+                drop.Showing = false;
+            }
         }
 
         return r;
+    }
+    
+}
+public class Drop : EditorWindow
+{
+    private Vector2 scrollPos;
+    private GUISkin dropdownskin;
+
+    public delegate void OnOptionSelectedDelegate(int index, string option);
+
+    public OnOptionSelectedDelegate OnOptionSelected;
+
+    public List<string> Elements { get; set; }
+
+    public bool Showing { get; set; }
+
+    public void ShowAt(Rect rect)
+    {
+        this.position = new Rect(GUIUtility.GUIToScreenPoint(rect.position + new Vector2(0, rect.height)), new Vector2(rect.width, 200));
+        this.ShowPopup();
+        Showing = true;
+    }
+
+    public void Awake()
+    {
+        dropdownskin = Resources.Load<GUISkin>("DropdownSkin");
+    }
+
+    public void OnGUI()
+    {
+        if (!Showing)
+        {
+            this.Close();
+            return;
+        }
+
+        // Show Scrollview
+        using (new GUIUtil.SkinScope(dropdownskin))
+        using (var scroll = new GUILayout.ScrollViewScope(scrollPos, false, false, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true)))
+        {
+            scrollPos = scroll.scrollPosition;
+            for (int i = 0; i < Elements.Count; i++)
+            {
+                if (GUILayout.Button(Elements[i]))
+                {
+                    if (OnOptionSelected != null)
+                    {
+                        OnOptionSelected(i, Elements[i]);
+                    }
+                    GUI.FocusControl(null);
+                    Showing = false;
+                    this.Close();
+                    break;
+                }
+            }
+        }
     }
 }

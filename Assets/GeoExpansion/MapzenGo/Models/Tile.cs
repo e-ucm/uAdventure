@@ -1,5 +1,4 @@
 ﻿using System;
-using MapzenGo.Helpers.VectorD;
 using UnityEngine;
 
 namespace MapzenGo.Models

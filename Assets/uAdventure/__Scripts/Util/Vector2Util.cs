@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using uAdventure.Runner;
 
@@ -7,6 +8,11 @@ namespace uAdventure.Core
 {
     public static class Vector2Util
     {
+        public static Vector3[] ToVector3s(this Vector2[] vector2s)
+        {
+            return vector2s.Select(p => new Vector3(p.x, p.y, 0f)).ToArray();
+        }
+
         public static Orientation ToOrientation(this Vector2 source, Vector2 target)
         {
             Orientation o = Orientation.S;
@@ -91,6 +97,34 @@ namespace uAdventure.Core
                 angle = 360 - angle;
 
             return angle;
+        }
+
+        public static Vector2d Center(this IEnumerable<Vector2d> source)
+        {
+            if (source == null)
+            {
+                throw new System.ArgumentNullException("source");
+            }
+
+            double sumX = 0;
+            double sumY = 0;
+            double count = 0;
+            checked
+            {
+                foreach (var v in source)
+                {
+                    sumX += v.x;
+                    sumY += v.y;
+                    count++;
+                }
+            }
+
+            if (count > 0)
+            {
+                return new Vector2d(sumX / count, sumY / count);
+            }
+
+            throw new ArgumentException("Average is empty");
         }
 
         public static Vector2 Center(this IEnumerable<Vector2> source)

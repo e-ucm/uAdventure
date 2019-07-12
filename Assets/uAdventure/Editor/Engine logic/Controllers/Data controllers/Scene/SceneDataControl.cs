@@ -186,7 +186,7 @@ namespace uAdventure.Editor
                         var data = reference.getElementReference();
                         data.setPosition((int)(reference.getElementX() * background.width / previousBackgroundSize.x),
                             (int)(reference.getElementY() * background.height / previousBackgroundSize.y));
-                        data.setScale(reference.getElementScale() * background.height / previousBackgroundSize.y);
+                        data.Scale = reference.getElementScale() * background.height / previousBackgroundSize.y;
                     }
 
                     // Areas

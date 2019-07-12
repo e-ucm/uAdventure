@@ -3,6 +3,7 @@ using System.Collections;
 using RAGE.Analytics;
 using MapzenGo.Helpers;
 using AssetPackage;
+using uAdventure.Runner;
 
 namespace uAdventure.Geo
 {
@@ -27,7 +28,7 @@ namespace uAdventure.Geo
                 return instance;
             }
         }
-
+        
         public Texture2D connectedSimbol;
         public Texture2D connectingSimbol;
         public Texture2D disconnectedSimbol;
@@ -115,22 +116,33 @@ namespace uAdventure.Geo
             timeSinceLastPositionUpdate += Time.deltaTime;
 
             if (time > blinkingTime)
+            {
                 time = time - Mathf.Floor(time / blinkingTime) * blinkingTime;
+            }
 
             if (timeSinceLastPositionUpdate > timeToFlush)
             {
                 if (!geochar)
+                {
                     geochar = FindObjectOfType<GeoPositionedCharacter>();
+                }
 
                 if (IsStarted() || geochar)
                 {
-                    var latlon = IsStarted() ? Input.location.lastData.LatLon() : geochar.LatLon.ToVector2();
-                    
-                    TrackerExtension.Movement.Geoposition("player", latlon);
+                    var latlon = IsStarted() ? Input.location.lastData.LatLon().ToVector2d() : geochar.LatLon;
+
+                    var mapScene = Game.Instance.CurrentTargetRunner.Data as MapScene;
+                    if (mapScene != null)
+                    {
+                        TrackerExtension.Movement.Moved(mapScene.Id, latlon);
+                    }
+                    else
+                    {
+                        TrackerExtension.Movement.Moved("World", latlon);
+                    }
+
                     TrackerAsset.Instance.Flush();
                     timeSinceLastPositionUpdate = 0;
-
-                    Debug.Log(latlon);
                 }
             }
 

@@ -4,22 +4,17 @@ using uAdventure.Core;
 
 namespace uAdventure.Runner
 {
-    public enum Orientation
-    {
-        N, E, S, O
-    }
 
     [RequireComponent(typeof(TransitionManager))]
-    public class Representable : MonoBehaviour, Movable
+    public class Representable : MonoBehaviour
     {
-        public static readonly Vector2 RepresentablePivot = new Vector2(0.5f, 0f);
-
 #region Attributes
 
         public enum ResourceType { ANIMATION, TEXTURE };
 
         private TransitionManager transitionManager;
         private Element element;
+        private Context context;
         private Renderer rend;
         private ResourcesUni resource;
         protected float deformation;
@@ -35,11 +30,13 @@ namespace uAdventure.Runner
         private int currentFrame;
         private float currentFrameDuration = 0.5f;
         private float timeElapsedInCurrentFrame = 0;
-        private float z = 0;
         private bool isTransitioning;
 
-        private ElementReference context;
         private Orientation orientation;
+
+        public delegate void RepresentableChangedDelegate();
+
+        public RepresentableChangedDelegate RepresentableChanged;
 
         #endregion Attributes
 
@@ -68,16 +65,15 @@ namespace uAdventure.Runner
                 }
             }
         }
-        public SceneMB Scene { get; set; }
 
 
-        public ElementReference Context
+        public Context Context
         {
             get { return context; }
             set
             {
                 context = value;
-                Orientation = context.GetOrientation();
+                Orientation = context.Orientation;
             }
         }
 
@@ -97,7 +93,7 @@ namespace uAdventure.Runner
 
                 if (context != null)
                 {
-                    context.SetOrientation(orientation);
+                    context.Orientation  = orientation;
                 }
             }
         }
@@ -125,21 +121,8 @@ namespace uAdventure.Runner
                 {
                     size = new Vector2(texture.width, texture.height);
                 }
-                return size * Context.getScale();
+                return size * Context.Scale;
 
-            }
-        }
-
-        public float Z
-        {
-            get { return z; }
-            set
-            {
-                if (value != z)
-                {
-                    z = value;
-                    this.Positionate();
-                }
             }
         }
 
@@ -173,8 +156,6 @@ namespace uAdventure.Runner
             }
         }
 
-
-
         #endregion Properties
 
         protected virtual void Start()
@@ -207,24 +188,11 @@ namespace uAdventure.Runner
             worldSize.Scale(new Vector3((mirror ? -1 : 1), 1, 1));
             // Set
             transform.localScale = worldSize;
-        }
 
-        public void Positionate()
-        {
-            if (!rend)
+            if (RepresentableChanged != null)
             {
-                rend = this.GetComponent<Renderer>();
+                RepresentableChanged();
             }
-
-            Vector3 tmp = Scene.ToWorldPosition(getPosition(), Size, RepresentablePivot, z);
-
-            transform.localPosition = tmp;
-        }
-
-        public void setPosition(Vector2 position)
-        {
-            Context.setPosition((int) position.x, (int) position.y);
-            Positionate();
         }
 
         //##############################################
@@ -241,7 +209,6 @@ namespace uAdventure.Runner
             ResourceMode = ResourceType.TEXTURE;
             texture = LoadTexture(uri);
             Adaptate();
-            Positionate();
         }
 
         private static string OrientationToText(Orientation orientation)
@@ -276,7 +243,6 @@ namespace uAdventure.Runner
             {
                 timeElapsedInCurrentFrame = 0;
                 SetFrame(0);
-                Positionate(); 
             }
         }
 
@@ -444,11 +410,6 @@ namespace uAdventure.Runner
                     this.NextFrame();
                 }
             }
-        }
-
-        public Vector2 getPosition()
-        {
-            return new Vector2(Context.getX(), Context.getY());
         }
     }
 }

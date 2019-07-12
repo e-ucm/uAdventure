@@ -53,14 +53,21 @@ namespace uAdventure.Core
             scene.setPlayerScale(playerScale);
 
             if (initialScene)
+            {
                 chapter.setTargetId(sceneId);
+            }
 
 			var name = element.SelectSingleNode ("name");
-			if (name != null) scene.setName(name.InnerText);
+			if (name != null)
+            {
+                scene.setName(name.InnerText);
+            }
 
 			var documentation = element.SelectSingleNode ("documentation");
-				if (documentation != null)
-				scene.setDocumentation(documentation.InnerText);
+			if (documentation != null)
+            {
+                scene.setDocumentation(documentation.InnerText);
+            }
 
 			//XAPI ELEMENTS
 			scene.setXApiClass(element.GetAttribute("class"));
@@ -134,7 +141,9 @@ namespace uAdventure.Core
                 }
 
                 if (el.SelectSingleNode("documentation") != null)
+                {
                     currentExit.setDocumentation(el.SelectSingleNode("documentation").InnerText);
+                }
 
 				foreach (XmlElement ell in el.SelectNodes("point"))
 				{
@@ -160,17 +169,23 @@ namespace uAdventure.Core
                         exit.setEffects(nextScene.getEffects());
                         exit.setPostEffects(nextScene.getPostEffects());
                         if (exit.getDefaultExitLook() == null)
+                        {
                             exit.setDefaultExitLook(nextScene.getExitLook());
+                        }
                         else
                         {
                             if (nextScene.getExitLook() != null)
                             {
                                 if (nextScene.getExitLook().getExitText() != null &&
                                     !nextScene.getExitLook().getExitText().Equals(""))
+                                {
                                     exit.getDefaultExitLook().setExitText(nextScene.getExitLook().getExitText());
+                                }
                                 if (nextScene.getExitLook().getCursorPath() != null &&
                                     !nextScene.getExitLook().getCursorPath().Equals(""))
+                                {
                                     exit.getDefaultExitLook().setCursorPath(nextScene.getExitLook().getCursorPath());
+                                }
                             }
                         }
                         exit.setHasNotEffects(false);
@@ -224,16 +239,25 @@ namespace uAdventure.Core
             }
 
 			foreach(var activeArea in DOMParserUtility.DOMParse<ActiveArea>(element.SelectNodes("active-areas/active-area"), parameters).ToList())
-				scene.addActiveArea (activeArea);
+            {
+                scene.addActiveArea(activeArea);
+            }
 				
 			foreach(var barrier in DOMParserUtility.DOMParse<Barrier>(element.SelectNodes("barriers/barrier"), parameters).ToList())
-				scene.addBarrier (barrier);
+            {
+                scene.addBarrier(barrier);
+            }
 
 			foreach(var trajectory in DOMParserUtility.DOMParse<Trajectory>(element.SelectNodes("trajectory"), parameters).ToList())
-				scene.setTrajectory (trajectory);
+            {
+                scene.setTrajectory(trajectory);
+            }
 
 
-            if (scene != null) TrajectoryFixer.fixTrajectory(scene);
+            if (scene != null)
+            {
+                TrajectoryFixer.fixTrajectory(scene);
+            }
 
 			return scene;
         }
@@ -244,7 +268,7 @@ namespace uAdventure.Core
 			int x = ExParsers.ParseDefault (element.GetAttribute ("x"), 0), 
 				y = ExParsers.ParseDefault (element.GetAttribute ("y"), 0);
 
-            Runner.Orientation orientation = (Runner.Orientation) ExParsers.ParseDefault(element.GetAttribute("orientation"), 2);
+            Orientation orientation = (Orientation) ExParsers.ParseDefault(element.GetAttribute("orientation"), 2);
 
             float scale = ExParsers.ParseDefault (element.GetAttribute("scale"), NumberFormatInfo.CurrentInfo, 0f);
 			int layer = ExParsers.ParseDefault (element.GetAttribute("layer"), -1);
@@ -257,19 +281,23 @@ namespace uAdventure.Core
 			bool hasInfluence = ExString.EqualsDefault(element.GetAttribute("hasInfluenceArea"), "yes", false);
 
 			var currentElementReference = new ElementReference(idTarget, x, y, layer);
-            currentElementReference.SetOrientation(orientation);
+            currentElementReference.Orientation = orientation;
 			if (hasInfluence)
 			{
 				InfluenceArea influenceArea = new InfluenceArea(influenceX, influenceY, influenceWidth, influenceHeight);
 				currentElementReference.setInfluenceArea(influenceArea);
 			}
 			if (scale > 0.001 || scale < -0.001)
-				currentElementReference.setScale(scale);
+            {
+                currentElementReference.Scale = scale;
+            }
 
 			if (element.SelectSingleNode("documentation") != null)
-				currentElementReference.setDocumentation(element.SelectSingleNode("documentation").InnerText);
+            {
+                currentElementReference.setDocumentation(element.SelectSingleNode("documentation").InnerText);
+            }
 
-			currentElementReference.setConditions(DOMParserUtility.DOMParse (element.SelectSingleNode("condition"), parameters) as Conditions ?? new Conditions());
+			currentElementReference.Conditions = DOMParserUtility.DOMParse (element.SelectSingleNode("condition"), parameters) as Conditions ?? new Conditions();
 
 			return currentElementReference;
 		}

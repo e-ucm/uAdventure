@@ -55,11 +55,11 @@ namespace uAdventure.Runner
             this.type = type;
             switch (type)
             {
-                case ResourceManager.LoadingType.RESOURCES_LOAD:
+                case ResourceManager.LoadingType.ResourcesLoad:
                     this.path = path;
                     tex = LoadTexture();
                     break;
-                case ResourceManager.LoadingType.SYSTEM_IO:
+                case ResourceManager.LoadingType.SystemIO:
                     this.path = path;
                     this.fileData = LoadBytes(this.path);
 
@@ -91,7 +91,7 @@ namespace uAdventure.Runner
             Texture2D tex = new Texture2D(1, 1);
             switch (type)
             {
-                case ResourceManager.LoadingType.RESOURCES_LOAD:
+                case ResourceManager.LoadingType.ResourcesLoad:
                     tex = Resources.Load(path) as Texture2D;
                     if (tex == null)
                     {
@@ -102,7 +102,7 @@ namespace uAdventure.Runner
                         loaded = true;
 
                     break;
-                case ResourceManager.LoadingType.SYSTEM_IO:
+                case ResourceManager.LoadingType.SystemIO:
                     if (!Path.HasExtension(path))
                     {
                         foreach(var extension in extensions)

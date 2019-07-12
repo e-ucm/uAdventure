@@ -15,7 +15,7 @@ namespace uAdventure.Runner
 
         public static IEnumerable<ElementReference> Checked(this IEnumerable<ElementReference> elements)
         {
-            return elements.Where(e => ConditionChecker.check(e.getConditions()));
+            return elements.Where(e => ConditionChecker.check(e.Conditions));
         }
 
         public static bool IsRemoved(this HasTargetId element)

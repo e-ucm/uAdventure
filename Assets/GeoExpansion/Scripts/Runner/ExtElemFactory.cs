@@ -8,15 +8,19 @@ namespace uAdventure.Geo
 {
     public class ExtElemFactory : MapElementFactory
     {
+        public GameObject Character_Prefab;
+        public GameObject Atrezzo_Prefab;
+        public GameObject Object_Prefab;
 
         private Dictionary<ExtElemReference, Element> cache;
-        public GameObject extElementPrefab;
+
+        private Dictionary<Tile, List<GeoPositioner>> _createdCache;
 
         public override void Awake()
         {
             base.Awake();
             cache = new Dictionary<ExtElemReference, Element>();
-            _createdCache = new Dictionary<Tile, List<GeoWrapper>>();
+            _createdCache = new Dictionary<Tile, List<GeoPositioner>>();
             Query = (elem, tile) => elem is ExtElemReference;
         }
 
@@ -31,26 +35,50 @@ namespace uAdventure.Geo
             return cache.ContainsKey(reference) ? cache[reference] : null;
         }
 
-        private Dictionary<Tile, List<GeoWrapper>> _createdCache;
-
         protected override IEnumerable<MonoBehaviour> Create(Tile tile, MapElement mapElement)
         {
+
             var extRef = mapElement as ExtElemReference;
             var element = FindElement(extRef);
 
-            // The geometry is inside of the ti
-            var geoWrapper = Instantiate(extElementPrefab).GetComponent<GeoWrapper>();
 
-            geoWrapper.Reference = extRef;
-            geoWrapper.Element = element;
+            GameObject base_prefab = null;
+            if (element is Atrezzo)
+            {
+                base_prefab = Atrezzo_Prefab;
+            }
+            else if (element is NPC)
+            {
+                base_prefab = Character_Prefab;
+            }
+            else if(element is Item)
+            {
+                base_prefab = Object_Prefab;
+            }
+            else
+            {
+                yield return null;
+            }
+
+            GameObject ret = Instantiate(base_prefab);
+            var representable = ret.GetComponent<Representable>();
+            representable.Context = extRef;
+            representable.Element = element;
+
+            // The geometry is inside of the ti
+            var geoWrapper = ret.AddComponent<GeoPositioner>();
             geoWrapper.Tile = tile;
+            geoWrapper.Context = extRef;
+            geoWrapper.Element = element;
+            geoWrapper.Representable = representable;
 
             if (!_createdCache.ContainsKey(tile))
             {
-                _createdCache.Add(tile, new List<GeoWrapper>());
+                _createdCache.Add(tile, new List<GeoPositioner>());
             }
 
             _createdCache[tile].Add(geoWrapper);
+            representable.Adaptate();
 
             yield return geoWrapper;
 

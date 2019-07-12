@@ -16,33 +16,35 @@ namespace uAdventure.Geo
         {
             var mapScene = new MapScene(element.Attributes["id"].Value);
             var chapter = parameters[0] as Chapter;
-            mapScene.CameraType = element.Attributes["cameraType"].Value.ToEnum<CameraType>();
-            
-            var tmpArgVal = element.GetAttribute("start");
-            if (!string.IsNullOrEmpty(tmpArgVal))
+
+            mapScene.CameraType = ExParsers.ParseEnum<CameraType>(ExString.Default(element.GetAttribute("cameraType"), CameraType.Aerial2D.ToString()));
+            mapScene.RenderStyle = ExParsers.ParseEnum<RenderStyle>(ExString.Default(element.GetAttribute("renderStyle"), RenderStyle.Tile.ToString()));
+            mapScene.TileMetaIdentifier = ExString.Default(element.GetAttribute("tileMetaIdentifier"), "OSMTile");
+            mapScene.UsesGameplayArea = ExString.EqualsDefault(element.GetAttribute("usesGameplayArea"), "yes", false);
+            mapScene.GameplayArea = ExParsers.ParseDefault(element.GetAttribute("gameplayArea"), new RectD(Vector2d.zero, Vector2d.zero));
+            mapScene.LatLon = ExParsers.ParseDefault(element.GetAttribute("center"), Vector2d.zero);
+            mapScene.Zoom = ExParsers.ParseDefault(element.GetAttribute("zoom"), 19);
+
+            bool initialScene = ExString.EqualsDefault(element.GetAttribute("start"), "yes", false);
+            if (initialScene)
             {
-                if (tmpArgVal.Equals("yes"))
-                {
-                    chapter.setTargetId(mapScene.getId());
-                }
+                chapter.setTargetId(mapScene.getId());
             }
 
-            tmpArgVal = element.GetAttribute("center");
-            if (!string.IsNullOrEmpty(tmpArgVal))
-            {
-                mapScene.LatLon = (Vector2d) parseParam(typeof(Vector2d), tmpArgVal);
-            }
-
+            int layer = 0;
             foreach (var e in element.SelectNodes("map-element"))
             {
                 var mapElementNode = e as XmlElement;
                 MapElement mapElement = null;
                 XmlElement extElemNode;
-                if((extElemNode = (XmlElement)mapElementNode.SelectSingleNode("ext-elem-ref")) != null)
+                var targetId = mapElementNode.GetAttribute("targetId");
+                if ((extElemNode = (XmlElement)mapElementNode.SelectSingleNode("ext-elem-ref")) != null)
                 {
-                    var extElem = new ExtElemReference(mapElementNode.Attributes["targetId"].Value);
+                    var extElem = new ExtElemReference(targetId);
                     mapElement = extElem;
-                    extElem.TransformManagerDescriptor = GetDescriptor(extElemNode.Attributes["transformManager"].Value);
+                    extElem.TransformManagerDescriptor = GetDescriptor(ExString.Default(extElemNode.GetAttribute("transformManager"),
+                        typeof(GeopositionedDescriptor).FullName));
+
                     foreach(var param in extElem.TransformManagerDescriptor.ParameterDescription)
                     {
                         var paramNode = extElemNode.SelectSingleNode("param[@name=\"" + param.Key + "\"]");
@@ -54,11 +56,14 @@ namespace uAdventure.Geo
                 }
                 else
                 {
-                    mapElement = new GeoReference(mapElementNode.Attributes["targetId"].Value);
+                    mapElement = new GeoReference(targetId);
                 }
 
-                mapElement.Conditions = (Conditions) DOMParserUtility.DOMParse(mapElementNode.SelectSingleNode("condition") as XmlElement, parameters);
-                mapElement.Layer = int.Parse(mapElementNode.Attributes["layer"].Value);
+                mapElement.Conditions = DOMParserUtility.DOMParse<Conditions>(mapElementNode.SelectSingleNode("condition") as XmlElement, parameters);
+                mapElement.Layer = ExParsers.ParseDefault(mapElementNode.GetAttribute("layer"), layer);
+                mapElement.Scale = ExParsers.ParseDefault(mapElementNode.GetAttribute("scale"), 1f);
+                mapElement.Orientation = (Orientation) ExParsers.ParseDefault(mapElementNode.GetAttribute("orientation"), 2);
+                layer = Mathf.Max(mapElement.Layer, layer) + 1;
                 mapScene.Elements.Add(mapElement);
             }
 
@@ -121,9 +126,9 @@ namespace uAdventure.Geo
             return null;
         }
 
-        private ExtElemReferenceTransformManagerDescriptor GetDescriptor(string type)
+        private ITransformManagerDescriptor GetDescriptor(string type)
         {
-            ExtElemReferenceTransformManagerDescriptor r = null;
+            ITransformManagerDescriptor r = null;
 
             Type t = Type.GetType(type);
             var manager = TransformManagerDescriptorFactory.Instance.AvaliableTransformManagers.Keys.ToList().Find(k => k == t);

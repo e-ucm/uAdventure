@@ -4,8 +4,19 @@ using uAdventure.Core;
 
 namespace uAdventure.Runner
 {
+
+    public interface ICheckable
+    {
+        Conditions Conditions { get; }
+    }
+
     public static class ActionsUtil
     {
+        public static IEnumerable<T> Checked<T>(this IEnumerable<T> checkables) where T : ICheckable
+        {
+            return checkables.Where(c => ConditionChecker.check(c.Conditions));
+        }
+
         public static IEnumerable<Action> Checked(this IEnumerable<Action> actions)
         {
             return actions.Where(a => ConditionChecker.check(a.getConditions()));

@@ -10,10 +10,10 @@ namespace uAdventure.Runner
 {
     public sealed class ResourceManagerFactory
     {
-        public static ResourceManager CreateLocal(string resourcesFolder = "CurrentGame/", ResourceManager.LoadingType loadingType = ResourceManager.LoadingType.RESOURCES_LOAD)
+        public static ResourceManager CreateLocal(string resourcesFolder = "CurrentGame/", ResourceManager.LoadingType loadingType = ResourceManager.LoadingType.ResourcesLoad)
         {
             var resourceManager = new ResourceManager(loadingType);
-            if(loadingType == ResourceManager.LoadingType.SYSTEM_IO)
+            if(loadingType == ResourceManager.LoadingType.SystemIO)
             {
                 resourceManager.Path = resourceManager.getCurrentDirectory() + resourcesFolder;
             }
@@ -26,9 +26,7 @@ namespace uAdventure.Runner
 
         public static ResourceManager CreateExternal(string path)
         {
-            var resourceManager = new ResourceManager(ResourceManager.LoadingType.SYSTEM_IO);
-            resourceManager.Path = path;
-            return resourceManager;
+            return new ResourceManager(ResourceManager.LoadingType.SystemIO) { Path = path };
         }
 
     }
@@ -39,8 +37,8 @@ namespace uAdventure.Runner
         
         public enum LoadingType
         {
-            SYSTEM_IO,
-            RESOURCES_LOAD
+            SystemIO,
+            ResourcesLoad
         }
 
         //##################################################
@@ -48,7 +46,7 @@ namespace uAdventure.Runner
         //##################################################
 
         private string path = "";
-        LoadingType type = LoadingType.RESOURCES_LOAD;
+        private readonly LoadingType type = LoadingType.ResourcesLoad;
         private readonly Dictionary<string, Texture2DHolder> images;
         private readonly Dictionary<string, AudioHolder> audios;
         private readonly Dictionary<string, eAnim> animations;
@@ -62,10 +60,10 @@ namespace uAdventure.Runner
 
                 switch (type)
                 {
-                    case LoadingType.SYSTEM_IO:
+                    case LoadingType.SystemIO:
                         ret = path;
                         break;
-                    case LoadingType.RESOURCES_LOAD:
+                    case LoadingType.ResourcesLoad:
                         ret = "CurrentGame/";
                         break;
                 }
@@ -101,13 +99,17 @@ namespace uAdventure.Runner
         public Sprite getSprite(string uri)
         {
             if (uri == null)
+            {
                 return null;
+            }
 
             if (images.ContainsKey(uri))
+            {
                 return images[uri].Sprite;
+            }
             else
             {
-                Texture2DHolder holder = new Texture2DHolder(fixPath(uri), type);
+                var holder = new Texture2DHolder(fixPath(uri), type);
                 if (holder.Loaded())
                 {
                     images.Add(uri, holder);
@@ -134,6 +136,11 @@ namespace uAdventure.Runner
 
         public Texture2D getImage(string uri)
         {
+            return getImage(uri, false);
+        }
+
+        public Texture2D getImage(string uri, bool loadFromDefaults)
+        {
             if (string.IsNullOrEmpty(uri))
             {
                 return null;
@@ -145,13 +152,13 @@ namespace uAdventure.Runner
             }
             else
             {
-                Texture2DHolder holder = new Texture2DHolder(fixPath(uri), type);
+                var holder = new Texture2DHolder(fixPath(uri), type);
                 if (holder.Loaded())
                 {
                     images.Add(uri, holder);
                     return holder.Texture;
                 }
-                else
+                else if(loadFromDefaults)
                 {
                     // Load from defaults
                     holder = new Texture2DHolder(defaultPath(uri), type);
@@ -166,6 +173,10 @@ namespace uAdventure.Runner
                         Debug.LogWarning("Unable to load " + uri);
                         return null;
                     }
+                }
+                else
+                {
+                    return null;
                 }
             }
         }
@@ -183,7 +194,7 @@ namespace uAdventure.Runner
             }
             else
             {
-                AudioHolder holder = new AudioHolder(fixPath(uri), type);
+                var holder = new AudioHolder(fixPath(uri), type);
                 if (holder.Loaded())
                 {
                     audios.Add(uri, holder);
@@ -211,14 +222,14 @@ namespace uAdventure.Runner
         public eAnim getAnimation(string uri)
         {
             if (string.IsNullOrEmpty(uri))
+            {
                 return null;
-            /*if (uri.EndsWith(".eaa"))
-                uri += ".xml";
-            else if (!uri.EndsWith(".eaa.xml"))
-                uri += ".eaa.xml";*/
-            
+            }
+
             if (animations.ContainsKey(uri))
+            {
                 return animations[uri];
+            }
             else
             {
                 eAnim animation = new eAnim(uri, type);
@@ -228,7 +239,9 @@ namespace uAdventure.Runner
                     return animation;
                 }
                 else
+                {
                     return null;
+                }
             }
         }
 
@@ -245,20 +258,25 @@ namespace uAdventure.Runner
 
             switch (getLoadingType())
             {
-                case LoadingType.RESOURCES_LOAD:
+                case LoadingType.ResourcesLoad:
                     
-                    TextAsset ta = Resources.Load<TextAsset>(uri); 
+                    var ta = Resources.Load<TextAsset>(uri); 
                     if (ta == null)
                     {
                         Debug.Log("Can't load Descriptor file: " + uri);
                         return "";
                     }
                     else
+                    {
                         xml = ta.text;
+                    }
                     break;
-                case LoadingType.SYSTEM_IO:
+                case LoadingType.SystemIO:
                     if(System.IO.File.Exists(uri))
+                    {
                         xml = System.IO.File.ReadAllText(uri);
+                    }
+
                     break;
             }
 
@@ -267,20 +285,30 @@ namespace uAdventure.Runner
 
         private string fixPath(string uri)
         {
-            Regex pattern = new Regex("[óñ]");
+            var pattern = new Regex("[óñ]");
             uri = pattern.Replace(uri, "+¦");
 
             if (!uri.StartsWith(Path))
+            {
                 uri = Path + uri;
+            }
 
-            if(type == LoadingType.RESOURCES_LOAD)
+            if(type == LoadingType.ResourcesLoad)
             {
                 if (uri.StartsWith("Assets/uAdventure/Resources/"))
+                {
                     uri = uri.Remove(0, "Assets/uAdventure/Resources/".Length);
+                }
+
                 if (uri.StartsWith("Assets/Resources/"))
+                {
                     uri = uri.Remove(0, "Assets/Resources/".Length);
+                }
+
                 if (uri.StartsWith("Resources/"))
+                {
                     uri = uri.Remove(0, "Resources/".Length);
+                }
 
                 if (System.IO.Path.HasExtension(uri))
                 {
@@ -293,23 +321,31 @@ namespace uAdventure.Runner
 
         private string defaultPath(string uri)
         {
-            Regex pattern = new Regex("[óñ]");
+            var pattern = new Regex("[óñ]");
             uri = pattern.Replace(uri, "+¦");
 
-            if(type == LoadingType.SYSTEM_IO)
+            if(type == LoadingType.SystemIO)
             {
-                // Default asset location for SYSTEM_IO
+                // Default asset location for SystemIO
                 uri = getCurrentDirectory() + "Assets/uAdventure/Resources/EAdventureData/" + uri;
             }
 
-            if (type == LoadingType.RESOURCES_LOAD)
+            if (type == LoadingType.ResourcesLoad)
             {
                 if (uri.StartsWith("Assets/uAdventure/Resources/"))
+                {
                     uri = uri.Remove(0, "Assets/uAdventure/Resources/".Length);
+                }
+
                 if (uri.StartsWith("Assets/Resources/"))
+                {
                     uri = uri.Remove(0, "Assets/Resources/".Length);
+                }
+
                 if (uri.StartsWith("Resources/"))
+                {
                     uri = uri.Remove(0, "Resources/".Length);
+                }
 
                 if (System.IO.Path.HasExtension(uri))
                 {
@@ -341,7 +377,9 @@ namespace uAdventure.Runner
             foreach (string f in System.IO.Directory.GetFiles(exportLocation))
             {
                 if (!f.Contains(".xml"))
+                {
                     System.IO.File.Delete(f);
+                }
             }
 
             string[] tmp;
@@ -349,7 +387,9 @@ namespace uAdventure.Runner
             {
                 tmp = f.Split(System.IO.Path.DirectorySeparatorChar);
                 if (tmp[tmp.Length - 1] != "assets" && tmp[tmp.Length - 1] != "gui")
+                {
                     System.IO.Directory.Delete(f, true);
+                }
             }
 
             VideoConverter converter = new VideoConverter();
@@ -366,7 +406,7 @@ namespace uAdventure.Runner
             switch (Application.platform)
             {
                 case RuntimePlatform.Android:
-                    ret = "/mnt/sdcard/uAdventure";//Application.persistentDataPath;
+                    ret = "/mnt/sdcard/uAdventure"; //Application.persistentDataPath;
                     break;
                 case RuntimePlatform.IPhonePlayer:
                     ret = "";

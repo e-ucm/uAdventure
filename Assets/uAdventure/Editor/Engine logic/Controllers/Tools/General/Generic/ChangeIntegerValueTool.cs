@@ -4,43 +4,68 @@ using System.Reflection;
 
 using uAdventure.Core;
 using System;
+using Action = uAdventure.Core.Action;
 
 namespace uAdventure.Editor
 {
     public class ChangeValueTool<O, T> : Tool
     {
+        public delegate void VoidCall();
+
         protected O data;
         protected Func<T> get;
         protected Action<T> set;
+        protected VoidCall changed;
         protected T oldValue;
         protected T newValue;
         protected bool updateTree;
         protected bool updatePanel;
 
         public ChangeValueTool(O data, T newValue, string propertyName) :
-            this(data, newValue, propertyName, false, true)
+            this(data, newValue, propertyName, false, true, null)
         {
         }
 
+        public ChangeValueTool(O data, T newValue, string propertyName, VoidCall changed) :
+            this(data, newValue, propertyName, false, true, changed)
+        {
+        }
         public ChangeValueTool(O data, T newValue, string propertyName, bool updateTree,
-            bool updatePanel)
+            bool updatePanel) : this(data, newValue, propertyName, updateTree, updatePanel, null)
+        {
+
+        }
+
+        public ChangeValueTool(O data, T newValue, string propertyName, bool updateTree,
+            bool updatePanel, VoidCall changed)
+
         {
             var type = data != null ? data.GetType() : typeof(O);
             var property = type.GetProperty(propertyName);
 
             if (property != null && typeof(T).IsAssignableFrom(property.PropertyType))
             {
-                Init(data, newValue, property.GetGetMethod(), property.GetSetMethod(), updateTree, updatePanel);
+                Init(data, newValue, property.GetGetMethod(), property.GetSetMethod(), updateTree, updatePanel, changed);
             }
         }
 
         public ChangeValueTool(O data, T newValue, string getMethodName, string setMethodName) :
-            this(data, newValue, getMethodName, setMethodName, false, true)
+            this(data, newValue, getMethodName, setMethodName, false, true, null)
+        {
+        }
+        public ChangeValueTool(O data, T newValue, string getMethodName, string setMethodName, VoidCall changed) :
+            this(data, newValue, getMethodName, setMethodName, false, true, changed)
         {
         }
 
         public ChangeValueTool(O data, T newValue, string getMethodName, string setMethodName, bool updateTree,
-            bool updatePanel)
+            bool updatePanel) :
+            this(data, newValue, getMethodName, setMethodName, updateTree, updatePanel, null)
+        {
+        }
+
+        public ChangeValueTool(O data, T newValue, string getMethodName, string setMethodName, bool updateTree,
+            bool updatePanel, VoidCall changed)
         {
             var type = data != null ? data.GetType() : typeof(O);
 
@@ -49,11 +74,11 @@ namespace uAdventure.Editor
 
             if (typeof(T).IsAssignableFrom(getter.ReturnType) && setter.GetParameters().Length == 1 && typeof(T).IsAssignableFrom(setter.GetParameters()[0].ParameterType))
             {
-                Init(data, newValue, getter, setter, updateTree, updatePanel);
+                Init(data, newValue, getter, setter, updateTree, updatePanel, changed);
             }
         }
 
-        protected void Init(O data, T newValue, MethodInfo getter, MethodInfo setter, bool updateTree, bool updatePanel)
+        protected void Init(O data, T newValue, MethodInfo getter, MethodInfo setter, bool updateTree, bool updatePanel, VoidCall changed)
         {
             this.data = data;
             this.newValue = newValue;
@@ -62,6 +87,7 @@ namespace uAdventure.Editor
 
             this.get = (Func<T>)Delegate.CreateDelegate(typeof(Func<T>), data, getter);
             this.set = (Action<T>)Delegate.CreateDelegate(typeof(Action<T>), data, setter);
+            this.changed = changed;
 
         }
 
@@ -90,7 +116,7 @@ namespace uAdventure.Editor
                 if (isNull && newValue != null || !isNull && !oldValue.Equals(newValue))
                 {
                     set(newValue);
-                    Update(updateTree, updatePanel);
+                    Update(updateTree, updatePanel, changed);
                     done = true;
                 }
 
@@ -105,7 +131,7 @@ namespace uAdventure.Editor
             if (get != null && set != null)
             {
                 set(newValue);
-                Update(updateTree, updatePanel);
+                Update(updateTree, updatePanel, changed);
                 done = true;
             }
             return done;
@@ -118,14 +144,18 @@ namespace uAdventure.Editor
             if (get != null && set != null)
             {
                 set(oldValue);
-                Update(updateTree, updatePanel);
+                Update(updateTree, updatePanel, changed);
                 done = true;
             }
             return done;
         }
 
-        private static void Update(bool updateTree, bool updatePanel)
+        private static void Update(bool updateTree, bool updatePanel, VoidCall changed)
         {
+            if (changed != null)
+            {
+                changed();
+            }
             if (updateTree)
             {
                 Controller.Instance.updateStructure();

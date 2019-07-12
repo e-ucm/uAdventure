@@ -22,8 +22,14 @@ namespace uAdventure.Runner
         {
             var size = representable.Size;
             var context = representable.Context;
+            var elemRef = context as ElementReference;
 
-            var topLeft = new Vector2(context.getX() - size.x / 2f, context.getY() - size.y);
+            if (elemRef == null)
+            {
+                return null;
+            }
+
+            var topLeft = new Vector2(elemRef.getX() - size.x / 2f, elemRef.getY() - size.y);
             Rectangle area = new InfluenceArea((int)topLeft.x - 20, (int)topLeft.y - 20, (int) size.x + 40, (int) size.y + 40);
             var scene = sceneMB.SceneData as Scene;
             if (scene != null && scene.getTrajectory() == null)
@@ -31,9 +37,9 @@ namespace uAdventure.Runner
                 // If no trajectory I have to move the area to the trajectory for it to be connected
                 area = area.MoveAreaToTrajectory(sceneMB.Trajectory);
             }
-            else if (context.getInfluenceArea() != null && context.getInfluenceArea().isExists())
+            else if (elemRef.getInfluenceArea() != null && elemRef.getInfluenceArea().isExists())
             {
-                area = context.getInfluenceArea().MoveArea(topLeft);
+                area = elemRef.getInfluenceArea().MoveArea(topLeft);
             }
             return area;
         }

@@ -48,6 +48,15 @@ public static class ExtensionRect
                 rect.position + new Vector2(0, rect.height)};
     }
 
+    public static Vector3[] ToPoints3(this Rect rect)
+    {
+        return new Vector3[] {
+            rect.position,
+            rect.position + new Vector2(rect.width, 0),
+            rect.position + rect.size,
+            rect.position + new Vector2(0, rect.height)};
+    }
+
     public static Rect ToRect(this Vector2[] points)
     {
         var minX = points.Min(p => p.x);
@@ -81,12 +90,29 @@ public static class ExtensionRect
     }
 
 
+    public static bool InsideMargin(this Vector2d[] points, Vector2d point, float margin)
+    {
+        return points.Inside(point) || points.Any(p => p.InsideRadius(point, margin)) || points.InsideEdgeRange(point, margin, true);
+    }
     public static bool InsideMargin(this Vector2[] points, Vector2 point, float margin)
     {
         return points.Inside(point) || points.Any(p => p.InsideRadius(point, margin)) || points.InsideEdgeRange(point, margin, true);
     }
-
     public static bool Inside(this Vector2[] points, Vector2 point)
+    {
+        bool inside = false;
+        var originPoints = points.Select(p => p - point).ToList();
+        for (int i = 0; i < originPoints.Count; i++)
+        {
+            if (((originPoints[i].y > 0) != (originPoints[(i + 1) % originPoints.Count].y > 0))
+                && ((originPoints[i].y > 0) == (originPoints[i].y * originPoints[(i + 1) % originPoints.Count].x > originPoints[(i + 1) % originPoints.Count].y * originPoints[i].x)))
+                inside = !inside;
+        }
+
+        return inside;
+    }
+
+    public static bool Inside(this Vector2d[] points, Vector2d point)
     {
         bool inside = false;
         var originPoints = points.Select(p => p - point).ToList();
@@ -105,12 +131,20 @@ public static class ExtensionRect
         return (point - p).sqrMagnitude <= radius * radius;
     }
 
+    public static bool InsideRadius(this Vector2d p, Vector2d point, double radius)
+    {
+        return (point - p).sqrMagnitude <= radius * radius;
+    }
+
     public static bool InsideEdgeRange(this Vector2[] points, Vector2 point, float radius, bool closed)
     {
-        if (points.Length <= 1) // If there are not edges, no sense to do it...
+        if (points.Length <= 1)
+        {
+            // If there are not edges, no sense to do it...
             return false;
+        }
 
-        Vector2 closestPoin = Vector2.zero;
+        Vector2 closestPoin;
         int l = closed ? points.Length - 1 : 0;
         float sqrRadius = radius * radius;
         for (int i = closed ? 0 : 1, end = points.Length; i < end; ++i)
@@ -118,7 +152,32 @@ public static class ExtensionRect
             closestPoin = uAdventure.Runner.LineHandler.GetClosestPointOnLineSegment(points[l], points[i], point);
             l = i;
             if ((closestPoin - point).sqrMagnitude <= sqrRadius)
+            {
                 return true;
+            }
+        }
+        return false;
+    }
+
+    public static bool InsideEdgeRange(this Vector2d[] points, Vector2d point, double radius, bool closed)
+    {
+        if (points.Length <= 1)
+        {
+            // If there are not edges, no sense to do it...
+            return false;
+        }
+
+        Vector2d closestPoin;
+        int l = closed ? points.Length - 1 : 0;
+        double sqrRadius = radius * radius;
+        for (int i = closed ? 0 : 1, end = points.Length; i < end; ++i)
+        {
+            closestPoin = uAdventure.Runner.LineHandler.GetClosestPointOnLineSegment(points[l], points[i], point);
+            l = i;
+            if ((closestPoin - point).sqrMagnitude <= sqrRadius)
+            {
+                return true;
+            }
         }
         return false;
     }
@@ -159,6 +218,11 @@ public static class ExtensionRect
                 (rect.width / viewport.width) * screenWidth,
                 (rect.height / viewport.height) * screenHeight
             );
+    }
+
+    public static Vector2 Base(this Rect rect)
+    {
+        return rect.position + new Vector2(rect.width * 0.5f, rect.height);
     }
 
     /// <summary>
@@ -306,5 +370,73 @@ public static class ExtensionRect
     public static bool IsSameRect(this RectInt rect, RectInt other)
     {
         return rect.position == other.position && rect.size == other.size;
+    }
+
+
+    public static RectD ToRectD(this Rect rect)
+    {
+        return new RectD(rect.position.ToVector2d(), rect.size.ToVector2d());
+    }
+
+    public static RectD ToRectD(this Vector2d[] points)
+    {
+        var minX = points.Min(p => p.x);
+        var minY = points.Min(p => p.y);
+        var maxX = points.Max(p => p.x);
+        var maxY = points.Max(p => p.y);
+
+        return new RectD(new Vector2d(minX, minY), new Vector2d(maxX - minX, maxY - minY));
+    }
+    public static Vector2d[] ToPoints(this RectD rect)
+    {
+        return new[]
+        {
+            rect.Min,
+            rect.Min + new Vector2d(rect.Size.x, 0),
+            rect.Min + rect.Size,
+            rect.Min + new Vector2d(0, rect.Size.y)
+        };
+    }
+
+
+    public static Rect[] Divide(this Rect r, int slices)
+    {
+        Rect[] rects = new Rect[slices];
+        var sliceWidth = r.width / slices;
+        rects[0] = new Rect(r.x, r.y, sliceWidth, r.height);
+        for (int i = 1; i < slices; ++i)
+        {
+            rects[i] = rects[i - 1];
+            rects[i].x += sliceWidth;
+        }
+        return rects;
+    }
+
+    public static Rect[,] Divide(this Rect r, int slices, int verticalSlices)
+    {
+        Rect[,] rects = new Rect[verticalSlices, slices];
+        var verticals = DivideRectVertically(r, verticalSlices);
+        for (int i = 0; i < verticals.Length; i++)
+        {
+            var horizontals = Divide(verticals[i], slices);
+            for (int j = 0; j < slices; j++)
+            {
+                rects[i, j] = horizontals[j];
+            }
+        }
+        return rects;
+    }
+
+    public static Rect[] DivideRectVertically(Rect r, int slices)
+    {
+        Rect[] rects = new Rect[slices];
+        var sliceHeight = r.height / slices;
+        rects[0] = new Rect(r.x, r.y, r.width, sliceHeight);
+        for (int i = 1; i < slices; ++i)
+        {
+            rects[i] = rects[i - 1];
+            rects[i].y += sliceHeight;
+        }
+        return rects;
     }
 }

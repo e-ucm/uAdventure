@@ -59,14 +59,19 @@ namespace uAdventure.Editor
             }
         }
 
-        public override void OnRender(Rect viewport)
+        public override void OnRender()
         {
             var imageTex = GetAtrezzoImage();
-            if (imageTex)
+            if (!imageTex)
             {
-                var rect = GetViewportRect(new Rect(new Vector2(-0.5f * imageTex.width, -imageTex.height), new Vector2(imageTex.width, imageTex.height)), viewport);
-                GUI.DrawTexture(rect, imageTex, ScaleMode.ScaleToFit);
+                return;
             }
+
+            var rect = new Rect(new Vector2(-0.5f * imageTex.width, -imageTex.height),
+                new Vector2(imageTex.width, imageTex.height));
+            var adaptedRect = ComponentBasedEditor.Generic.ToRelative(rect.ToRectD().ToPoints()).ToRectD().ToRect();
+            GUI.DrawTexture(adaptedRect, imageTex, ScaleMode.ScaleToFit);
+
         }
 
         private AtrezzoDataControl GetAtrezzo()

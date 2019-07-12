@@ -104,7 +104,7 @@ namespace uAdventure.Editor
                         case 3:
                             using (new EditorGUI.DisabledScope(erdc == null))
                             {
-                                if (GUI.Button(columnRect, erdc == null ? noConditionsTex : erdc.getConditions().getBlocksCount() > 0 ? conditionsTex : noConditionsTex))
+                                if (GUI.Button(columnRect, (erdc == null || erdc.getConditions().getBlocksCount() == 0) ? noConditionsTex : conditionsTex ))
                                 {
                                     this.reorderableList.index = row;
                                     ConditionEditorWindow window = ScriptableObject.CreateInstance<ConditionEditorWindow>();
@@ -197,9 +197,9 @@ namespace uAdventure.Editor
 
             public ReferenceComponent(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
             {
-                var orientations = Enum.GetValues(typeof(Runner.Orientation));
+                var orientations = Enum.GetValues(typeof(Orientation));
                 orientationValues = orientations.Cast<int>().ToArray();
-                orientationTexts = orientations.Cast<Runner.Orientation>().Select(s => "Orientation." + s.ToString()).ToArray();
+                orientationTexts = orientations.Cast<Orientation>().Select(s => "Orientation." + s.ToString()).ToArray();
             }
 
             public override void OnPreRender()
@@ -223,15 +223,15 @@ namespace uAdventure.Editor
                 var newScale = EditorGUILayout.FloatField("Scale", reference.getElementScale());
                 if (EditorGUI.EndChangeCheck()) { reference.setElementScale(newScale); }
 
-                if(reference.UsesOrientation())
+                if(reference.UsesOrientation)
                 {
                     EditorGUI.BeginChangeCheck();
                     var orientationLabel = TC.get("ElementReference.Orientation");
                     var translatedTexts = orientationTexts.Select(TC.get).ToArray();
-                    var newOrientation = (Runner.Orientation)EditorGUILayout.IntPopup(orientationLabel, (int)reference.GetOrientation(), translatedTexts, orientationValues);
+                    var newOrientation = (Orientation)EditorGUILayout.IntPopup(orientationLabel, (int)reference.Orientation, translatedTexts, orientationValues);
                     if (EditorGUI.EndChangeCheck())
                     {
-                        reference.SetOrientation(newOrientation);
+                        reference.Orientation = newOrientation;
                     }
                 }
             }
@@ -247,9 +247,9 @@ namespace uAdventure.Editor
                 {
                     sprite = Controller.ResourceManager.getSprite((elem as NodeDataControl).getPlayerImagePath());
                 }
-                else if (elem is ElementReferenceDataControl)
+                else if (elem is IElementReference)
                 {
-                    var referencedElement = (elem as ElementReferenceDataControl).getReferencedElementDataControl();
+                    var referencedElement = (elem as IElementReference).ReferencedDataControl;
                     if (referencedElement is ItemDataControl)
                     {
                         sprite = Controller.ResourceManager.getSprite((referencedElement as ItemDataControl).getPreviewImage());
@@ -283,9 +283,18 @@ namespace uAdventure.Editor
 
                 var myPos = SceneEditor.Current.Matrix.MultiplyPoint(new Vector2(-0.5f * unscaled.width, -unscaled.height));
                 var mySize = SceneEditor.Current.Matrix.MultiplyVector(new Vector3(unscaled.width, unscaled.height));
-                var rect = new Rect(myPos, mySize).AdjustToViewport(SceneEditor.Current.Size.x, SceneEditor.Current.Size.y, SceneEditor.Current.Viewport);
+                var rect = new Rect(myPos, mySize);//.AdjustToViewport(SceneEditor.Current.Size.x, SceneEditor.Current.Size.y, SceneEditor.Current.Viewport);
 
                 return rect;
+            }
+
+            private bool MouseOverTexture(ElementReferenceDataControl elemRef, Rect textureRect)
+            {
+                var sprite = GetSprite(elemRef);
+                float x = (Event.current.mousePosition.x - textureRect.x) / textureRect.width;
+                float y = (Event.current.mousePosition.y - textureRect.y) / textureRect.height;
+                return sprite != null && sprite.texture != null
+                                                 && sprite.texture.GetPixel((int)(x * sprite.texture.width), sprite.texture.height - (int)(y * sprite.texture.height)).a > 0;
             }
 
             public override bool Update()
@@ -300,15 +309,7 @@ namespace uAdventure.Editor
                         if (GUIUtility.hotControl == 0)
                         {
                             var rectContains = rect.Contains(Event.current.mousePosition);
-                            var textureContains = rectContains;
-                            if (rectContains)
-                            {
-                                var sprite = GetSprite(elemRef);
-                                float x = (Event.current.mousePosition.x - rect.x) / rect.width;
-                                float y = (Event.current.mousePosition.y - rect.y) / rect.height;
-                                textureContains = sprite != null && sprite.texture != null 
-                                    && sprite.texture.GetPixel((int) (x * sprite.texture.width), sprite.texture.height - (int) (y * sprite.texture.height)).a > 0;
-                            }
+                            var textureContains = rectContains && MouseOverTexture(elemRef, rect);
                             var anyHandleContains = rect.ToPoints().ToList().FindIndex(p => (p - Event.current.mousePosition).magnitude <= 10f) != -1;
 
                             selected = textureContains || anyHandleContains;
@@ -324,9 +325,11 @@ namespace uAdventure.Editor
                 var elemRef = Target as ElementReferenceDataControl;
                 var rect = GetElementRect(elemRef);
 
-                var newRect = HandleUtil.HandleFixedRatioRect(elemRef.GetHashCode() + 1, rect, rect.width / rect.height, 10f,
-                    polygon => HandleUtil.DrawPolyLine(polygon, true, Color.red),
-                    point => HandleUtil.DrawPoint(point, 4.5f, Color.blue, Color.black));
+                var id = GUIUtility.GetControlID(GetHashCode(), FocusType.Passive);
+                
+                var newRect = HandleUtil.HandleFixedRatioRect(id, rect, rect.width / rect.height, 10f,
+                    (polygon, over, active) => HandleUtil.DrawPolyLine(polygon, true, Color.red, over && MouseOverTexture(elemRef, rect) || active ? 4f : 2f),
+                    (point, over, active) => HandleUtil.DrawPoint(point, 4.5f, Color.blue, over || active ? 2f : 1f, SceneEditor.GetColor(over || active ? Color.red : Color.black)));
 
                 if (newRect != rect)
                 {
@@ -340,8 +343,9 @@ namespace uAdventure.Editor
                     elemRef.setElementPositionAndScale(Mathf.RoundToInt(position.x), Mathf.RoundToInt(position.y), scale);
                 }
 
+                var movementId = GUIUtility.GetControlID(GetHashCode() + 1, FocusType.Passive);
                 EditorGUI.BeginChangeCheck();
-                rect = HandleUtil.HandleRectMovement(elemRef.GetHashCode(), rect);
+                rect = HandleUtil.HandleRectMovement(movementId, rect);
                 if (EditorGUI.EndChangeCheck())
                 {
                     var original = rect.ViewportToScreen(SceneEditor.Current.Size.x, SceneEditor.Current.Size.y, SceneEditor.Current.Viewport);

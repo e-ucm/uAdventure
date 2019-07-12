@@ -8,14 +8,8 @@ namespace uAdventure.Core
      * This class holds the data for a element reference in eAdventure
      */
     [System.Serializable]
-    public class ElementReference : Documented, HasTargetId, ICloneable
+    public class ElementReference : Context
     {
-
-        /**
-         * Id of the element referenced
-         */
-        [SerializeField]
-        private string idTarget;
 
         /**
          * X position of the referenced element
@@ -30,37 +24,16 @@ namespace uAdventure.Core
         private int y;
 
         /**
-         * Scale of the referenced element
-         */
-        [SerializeField]
-        private float scale;
-
-        /**
          * The order in which will be drown this element
          */
         [SerializeField]
         private int layer;
 
         /**
-         * Documentation of the element reference.
-         */
-        [SerializeField]
-        private string documentation;
-
-        /**
-         * Conditions for the element to be placed
-         */
-        [SerializeField]
-        private Conditions conditions;
-
-        /**
          * The influenceArea of the object, used with trajectories
          */
         [SerializeField]
         private InfluenceArea influenceArea;
-
-        [SerializeField]
-        private Runner.Orientation orientation;
 
         /**
          * Creates a new ElementReference
@@ -73,18 +46,8 @@ namespace uAdventure.Core
          *            the vertical position of the element
          */
 
-        public ElementReference(string idTarget, int x, int y)
+        public ElementReference(string idTarget, int x, int y) : this(idTarget, x, y, -1)
         {
-
-            this.idTarget = idTarget;
-            this.x = x;
-            this.y = y;
-            this.scale = 1;
-            this.layer = -1;
-            documentation = null;
-            conditions = new Conditions();
-            influenceArea = new InfluenceArea();
-            orientation = Runner.Orientation.S;
         }
 
         /**
@@ -100,29 +63,12 @@ namespace uAdventure.Core
          *            the position where this element reference will be paint
          */
 
-        public ElementReference(string idTarget, int x, int y, int layer)
+        public ElementReference(string idTarget, int x, int y, int layer) : base(idTarget)
         {
-
-            this.idTarget = idTarget;
             this.x = x;
             this.y = y;
-            this.scale = 1;
             this.layer = layer;
-            documentation = null;
-            conditions = new Conditions();
             influenceArea = new InfluenceArea();
-        }
-
-        /**
-         * Returns the id of the element that is referenced
-         * 
-         * @return the id of the element that is referenced
-         */
-
-        public string getTargetId()
-        {
-
-            return idTarget;
         }
 
         /**
@@ -148,68 +94,7 @@ namespace uAdventure.Core
 
             return y;
         }
-
-        /**
-         * Returns the documentation of the element.
-         * 
-         * @return the documentation of the element
-         */
-
-        public string getDocumentation()
-        {
-
-            return documentation;
-        }
-
-        /**
-         * Returns the conditions for this element
-         * 
-         * @return the conditions for this element
-         */
-
-        public Conditions getConditions()
-        {
-
-            return this.conditions;
-        }
-
-        /**
-         * Returns the scale for this element
-         * 
-         * @return the scale for this element
-         */
-
-        public float getScale()
-        {
-
-            return this.scale;
-        }
-
-        /**
-         * Set the scale of the element
-         * 
-         * @param scale
-         *            the scale of the element
-         */
-
-        public void setScale(float scale)
-        {
-
-            this.scale = scale;
-        }
-
-        /**
-         * Sets the new id of the referenced element.
-         * 
-         * @param idTarget
-         *            Id of the new referenced element
-         */
-
-        public void setTargetId(string idTarget)
-        {
-
-            this.idTarget = idTarget;
-        }
+        
 
         /**
          * Sets the new position for the element reference.
@@ -225,32 +110,6 @@ namespace uAdventure.Core
 
             this.x = x;
             this.y = y;
-        }
-
-        /**
-         * Changes the documentation of this element reference.
-         * 
-         * @param documentation
-         *            The new documentation
-         */
-
-        public void setDocumentation(string documentation)
-        {
-
-            this.documentation = documentation;
-        }
-
-        /**
-         * Changes the conditions for this element
-         * 
-         * @param conditions
-         *            the new conditions
-         */
-
-        public void setConditions(Conditions conditions)
-        {
-
-            this.conditions = conditions;
         }
 
         /**
@@ -299,45 +158,14 @@ namespace uAdventure.Core
             this.influenceArea = influenceArea;
         }
 
-        public Runner.Orientation GetOrientation()
+        public override object Clone()
         {
-            return orientation;
-        }
-
-        public void SetOrientation(Runner.Orientation value)
-        {
-            orientation = value;
-        }
-
-        public object Clone()
-        {
-            ElementReference er = (ElementReference)this.MemberwiseClone();
-            er.conditions = (conditions != null ? (Conditions)conditions.Clone() : null);
-            er.documentation = (documentation != null ? documentation : null);
-            er.idTarget = (idTarget != null ? idTarget : null);
+            ElementReference er = base.Clone() as ElementReference;
             er.influenceArea = (influenceArea != null ? (InfluenceArea)influenceArea.Clone() : null);
             er.layer = layer;
-            er.scale = scale;
             er.x = x;
             er.y = y;
             return er;
         }
-
-        /*
-    @Override
-    public Object clone() throws CloneNotSupportedException
-    {
-
-       ElementReference er = (ElementReference) super.clone( );
-       er.conditions = ( conditions != null ? (Conditions) conditions.clone( ) : null );
-       er.documentation = ( documentation != null ? new string(documentation ) : null );
-       er.idTarget = ( idTarget != null ? new string(idTarget ) : null );
-       er.influenceArea = ( influenceArea != null ? (InfluenceArea) influenceArea.clone( ) : null );
-       er.layer = layer;
-       er.scale = scale;
-       er.x = x;
-       er.y = y;
-       return er;
-    }*/
     }
 }

@@ -60,7 +60,7 @@ namespace uAdventure.Editor
             if (EditorGUI.EndChangeCheck())
             {
                 workingScene.setPreviewBackground(background.Path);
-                sceneEditor.RefreshSceneResources(workingScene);
+                componentBasedEditor.RefreshSceneResources(workingScene);
             }
 
             EditorGUI.BeginChangeCheck();
@@ -69,7 +69,7 @@ namespace uAdventure.Editor
             if (EditorGUI.EndChangeCheck())
             {
                 workingScene.setPreviewForeground(foreground.Path);
-                sceneEditor.RefreshSceneResources(workingScene);
+                componentBasedEditor.RefreshSceneResources(workingScene);
             }
 
             EditorGUI.BeginChangeCheck();
