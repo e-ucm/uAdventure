@@ -1,11 +1,9 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 
 using uAdventure.Core;
 using UnityEngine.EventSystems;
 using System.Linq;
-using AssetPackage;
 
 namespace uAdventure.Runner
 {
@@ -189,7 +187,6 @@ namespace uAdventure.Runner
                 default:
                     if (Game.Instance.GameState.IsFirstPerson || !action.isNeedsGoTo())
                     {
-                        Game.Instance.GameState.BeginChangeAmbit();
                         OnActionStarted(action);
                         Game.Instance.Execute(new EffectHolder(action.Effects), OnActionFinished);
                     }
@@ -204,8 +201,7 @@ namespace uAdventure.Runner
         }
         private void OnActionStarted(object interactuable)
         {
-            Action action = interactuable as Action;
-            CompletablesController.Instance.ElementInteracted(this, action.getType().ToString(), action.getTargetId());
+            Game.Instance.ElementInteracted(false, interactuable as Action);
         }
 
         private void OnActionFinished(object interactuable)
@@ -224,48 +220,7 @@ namespace uAdventure.Runner
             if (action == null)
                 return;
 
-            string actionType = string.Empty;
-            switch (action.getType())
-            {
-                case Action.CUSTOM:          actionType = (action as CustomAction).getName();   break;
-                case Action.CUSTOM_INTERACT: actionType = (action as CustomAction).getName();   break;
-                case Action.DRAG_TO:         actionType = "drag_to";                            break;
-                case Action.EXAMINE:         actionType = "examine";                            break;
-                case Action.GIVE_TO:         actionType = "give_to";                            break;
-                case Action.GRAB:            actionType = "grab";                               break;
-                case Action.TALK_TO:         actionType = "talk_to";                            break;
-                case Action.USE:             actionType = "use";                                break;
-                case Action.USE_WITH:        actionType = "use_with";                           break;
-            }
-
-            if (!string.IsNullOrEmpty(action.getTargetId()))
-            {
-                TrackerAsset.Instance.setVar("action_target", action.getTargetId());
-            }
-
-            if (!string.IsNullOrEmpty(actionType))
-            {
-                TrackerAsset.Instance.setVar("action_type", actionType);
-            }
-
-            Game.Instance.GameState.EndChangeAmbitAsExtensions();
-
-            if(Element is NPC)
-            {
-                TrackerAsset.Instance.GameObject.Interacted(Element.getId(), GameObjectTracker.TrackedGameObject.Npc);
-            }
-            else if(Element is Item)
-            {
-                TrackerAsset.Instance.GameObject.Interacted(Element.getId(), GameObjectTracker.TrackedGameObject.Item);
-            }
-            else if(Element is ActiveArea)
-            {
-                TrackerAsset.Instance.GameObject.Interacted(Element.getId(), GameObjectTracker.TrackedGameObject.Item);
-            }
-            else
-            {
-                TrackerAsset.Instance.GameObject.Interacted(Element.getId(), GameObjectTracker.TrackedGameObject.GameObject);
-            }
+            Game.Instance.ElementInteracted(false, action);
         }
 
         public void OnTargetSelected(PointerEventData data)

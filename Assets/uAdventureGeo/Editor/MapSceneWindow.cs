@@ -27,10 +27,11 @@ namespace uAdventure.Geo
 
         public MapSceneWindow(Rect aStartPos, GUIStyle aStyle, params GUILayoutOption[] aOptions) : base(aStartPos, new GUIContent("Map Scenes"), aStyle, aOptions)
         {
+            var _ = GeoController.Instance;
             ButtonContent = new GUIContent()
             {
                 image = Resources.Load<Texture2D>("EAdventureData/img/icons/map"),
-                text = "Map Scenes"
+                text = "Geo.MapScene.Title".Traslate()
             };
 
             mapEditor = new MapEditor()

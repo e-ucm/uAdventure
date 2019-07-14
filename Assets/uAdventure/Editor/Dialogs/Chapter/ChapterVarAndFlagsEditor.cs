@@ -139,14 +139,21 @@ namespace uAdventure.Editor
             var windowWidth = position.width;
             var windowHeight = position.height;
 
+            if (!Controller.Instance.Loaded)
+            {
+                return;
+            }
             // Initialization
-            if ((!inited || varFlagSummary != Controller.Instance.VarFlagSummary) && Controller.Instance.Loaded)
+            /*if ((!inited || varFlagSummary != Controller.Instance.VarFlagSummary) && Controller.Instance.Loaded)
             {
                 RefreshList();
                 inited = true;
                 varFlagSummary = Controller.Instance.VarFlagSummary;
-            }
-            
+            }*/
+
+            varFlagSummary = Controller.Instance.VarFlagSummary;
+            RefreshList();
+
             /*
             * Upper buttons
             */
@@ -202,7 +209,7 @@ namespace uAdventure.Editor
             if (reorderableList.index >= 0)
             {
                 var selected = (int)reorderableList.list[reorderableList.index];
-                var summary = Controller.Instance.VarFlagSummary;
+                var summary = varFlagSummary;
                 switch (openedWindow)
                 {
                     case WindowType.FLAGS:
@@ -232,7 +239,7 @@ namespace uAdventure.Editor
 
         private void RefreshList()
         {
-            var summary = Controller.Instance.VarFlagSummary;
+            var summary = varFlagSummary;
             Func<int, bool> filterFunc = (_) => true;
             IEnumerable<int> indexes = new List<int>();
             switch (openedWindow)

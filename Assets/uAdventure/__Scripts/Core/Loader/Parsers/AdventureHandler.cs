@@ -30,11 +30,31 @@ namespace uAdventure.Core
             content.setDescription(description.InnerText ?? "");
 
             // Sub nodes
-            XmlElement configuration = (XmlElement)descriptor.SelectSingleNode("configuration"),
-                       contents      = (XmlElement)descriptor.SelectSingleNode("contents");
+            XmlElement configuration    = (XmlElement)descriptor.SelectSingleNode("configuration"),
+                       contents         = (XmlElement)descriptor.SelectSingleNode("contents"),
+                       extensionObjects = (XmlElement)descriptor.SelectSingleNode("extension-objects");
 
             ParseConfiguration(content, configuration, incidences);
             ParseContents(content, contents, resourceManager, incidences);
+
+            if (extensionObjects != null)
+            {
+                foreach (var el in extensionObjects.ChildNodes)
+                {
+                    object parsed = DOMParserUtility.DOMParse(el as XmlElement);
+                    if (parsed != null)
+                    {
+                        var t = parsed.GetType();
+                        // Group elements that are ITypeGroupable
+                        if (parsed is ITypeGroupable)
+                        {
+                            t = (parsed as ITypeGroupable).GetGroupType();
+                        }
+
+                        content.getObjects(t).Add(parsed);
+                    }
+                }
+            }
 
             return base.content;
         }
@@ -108,15 +128,13 @@ namespace uAdventure.Core
             adventureData.setSaveOnSuspend(isSaveOnSuspend);
 
             // Sub nodes
-            XmlElement gui = (XmlElement)configuration.SelectSingleNode("gui"),
-                mode       = (XmlElement)configuration.SelectSingleNode("mode"),
-                graphics   = (XmlElement)configuration.SelectSingleNode("graphics"),
-                tracker    = (XmlElement)configuration.SelectSingleNode("tracker");
+            XmlElement gui          = (XmlElement)configuration.SelectSingleNode("gui"),
+                mode                = (XmlElement)configuration.SelectSingleNode("mode"),
+                graphics            = (XmlElement)configuration.SelectSingleNode("graphics");
 
             ParseGui(adventureData, gui, incidences);
             ParseMode(adventureData, mode);
             ParseGraphics(adventureData, graphics, incidences);
-            ParseTrackerConfig(adventureData, tracker, incidences);
         }
 
         private static void ParseGraphics(AdventureData adventureData, XmlElement graphics, List<Incidence> incidences)
@@ -133,33 +151,6 @@ namespace uAdventure.Core
                 case "fullscreen": adventureData.setGraphicConfig(DescriptorData.GRAPHICS_FULLSCREEN); break;
                 case "blackbkg": adventureData.setGraphicConfig(DescriptorData.GRAPHICS_BLACKBKG); break;
                 default: incidences.Add(Incidence.createDescriptorIncidence("Unknown graphicsMode type: " + graphicsMode, null)); break;
-            }
-        }
-
-        private static void ParseTrackerConfig(AdventureData adventureData, XmlElement trackerConfig, List<Incidence> incidences)
-        {
-            string tmpString = "";
-            if (trackerConfig == null)
-            {
-                return;
-            }
-
-            adventureData.getTrackerConfig().setRawCopy(trackerConfig.GetAttribute("rawCopy") == "yes");
-
-            adventureData.getTrackerConfig().setHost(trackerConfig.GetAttribute("host"));
-            adventureData.getTrackerConfig().setTrackingCode(trackerConfig.GetAttribute("trackingCode"));
-            adventureData.getTrackerConfig().setDebug(trackerConfig.GetAttribute("debug") == "yes");
-
-            tmpString = trackerConfig.GetAttribute("storageType");
-            if (!string.IsNullOrEmpty(tmpString))
-            {
-                adventureData.getTrackerConfig().setStorageType(ParseEnum<TrackerConfig.StorageType>(tmpString));
-            }
-
-            tmpString = trackerConfig.GetAttribute("traceFormat");
-            if (!string.IsNullOrEmpty(tmpString))
-            {
-                adventureData.getTrackerConfig().setTraceFormat(ParseEnum<TrackerConfig.TraceFormat>(tmpString));
             }
         }
 

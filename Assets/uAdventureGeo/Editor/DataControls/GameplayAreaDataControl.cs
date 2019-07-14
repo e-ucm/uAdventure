@@ -87,7 +87,7 @@ namespace uAdventure.Geo
             {
                 return;
             }
-            //EditorWindowBase.LockWindow(); 
+            EditorWindowBase.LockWindow(); 
             TileStorage.Instance.StoreTiles(mapSceneDataControl, true, result =>
             {
                 if (result)
@@ -105,7 +105,7 @@ namespace uAdventure.Geo
                         "Geo.TileManager.Progress.Failed".Traslate(), "GeneralText.OK".Traslate());
                 }
 
-                //EditorWindowBase.UnlockWindow();
+                EditorWindowBase.UnlockWindow();
             });
         }
 

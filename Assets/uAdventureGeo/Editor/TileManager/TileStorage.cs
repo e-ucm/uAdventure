@@ -202,6 +202,10 @@ namespace uAdventure.Geo
                         });
                 }
             }
+            else
+            {
+                update(2, true);
+            }
         }
 
         private bool RemoveTile(ITileStorer tileStorer, Vector3d tile, ITileMeta tileMeta)

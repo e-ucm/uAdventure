@@ -5,7 +5,9 @@ using System.Collections.Generic;
 using uAdventure.Core;
 using System;
 using System.Linq;
+using uAdventure.Geo;
 using UnityEditor.SceneManagement;
+using UnityEditorInternal;
 
 namespace uAdventure.Editor
 {
@@ -56,6 +58,7 @@ namespace uAdventure.Editor
 
         private LayoutWindow m_Window = null;
         private ChapterWindow chapterWindow;
+        private GameObject debugGUIHolder = null;
 
         private Vector2 scrollPosition;
 
@@ -70,13 +73,32 @@ namespace uAdventure.Editor
         private static Rect zeroRect;
         private Rect windowArea;
 
+        private class DebugGUI : MonoBehaviour
+        {
+            void OnGUI()
+            {
+                EditorWindowBase.thisWindowReference.OnSceneGUI(null);
+            }
+        }
+
         private static bool locked;
 
         private void Return(PlayModeStateChange playModeStateChange)
         {
             if(playModeStateChange == PlayModeStateChange.EnteredEditMode)
             {
+
+                if (debugGUIHolder)
+                {
+                    DestroyImmediate(debugGUIHolder);
+                }
+
                 FocusWindowIfItsOpen(GetType());
+            }
+            else if (playModeStateChange == PlayModeStateChange.EnteredPlayMode)
+            {
+                debugGUIHolder = new GameObject { hideFlags =  HideFlags.HideAndDontSave };
+                debugGUIHolder.AddComponent<DebugGUI>();
             }
         }
 
@@ -158,6 +180,11 @@ namespace uAdventure.Editor
             if(thisWindowReference == this)
             {
                 EditorApplication.playModeStateChanged -= Return;
+            }
+
+            if (debugGUIHolder)
+            {
+                DestroyImmediate(debugGUIHolder);
             }
         }
 
@@ -401,6 +428,48 @@ namespace uAdventure.Editor
                     }
                 }
             }
+        }
+
+        private GUIMap guiMap;
+        private Rect debugWindowRect = new Rect(0, 0, 200, 200);
+        private GMLGeometryDataControl playerPosition;
+
+        protected void OnSceneGUI(SceneView scene)
+        {
+            if (guiMap == null)
+            {
+                guiMap = new GUIMap();
+            }
+
+
+            debugWindowRect = GUI.Window(12341234, debugWindowRect, (id) =>
+                {
+                    var mapRect = new Rect(2, 18, 196, 180);
+                    guiMap.DrawMap(mapRect);
+
+                    // Calculate the player pixel relative to the map
+                    var playerMeters = MapzenGo.Helpers.GM.LatLonToMeters(GPSController.Instance.geochar.LatLon);
+                    var playerPixel = MapzenGo.Helpers.GM.MetersToPixels(playerMeters, guiMap.Zoom);
+                    var playerPixelRelative = playerPixel + guiMap.PATR;
+
+                    // Do the point handling
+                    var pointControl = GUIUtility.GetControlID("PlayerPosition".GetHashCode(), FocusType.Passive);
+                    EditorGUI.BeginChangeCheck();
+                    var newPlayerPixel = HandleUtil.HandlePointMovement(pointControl, playerPixelRelative.ToVector2(), 10,
+                        (point, isOver, isActive) => HandleUtil.DrawPoint(point, 4, MapEditor.GetColor(Color.cyan),
+                            MapEditor.GetColor(Color.black)), MouseCursor.MoveArrow);
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        // If changed, restore the point to the geochar
+                        playerPixel = newPlayerPixel.ToVector2d() - guiMap.PATR;
+                        playerMeters = MapzenGo.Helpers.GM.PixelsToMeters(playerPixel, guiMap.Zoom);
+                        GPSController.Instance.Location = MapzenGo.Helpers.GM.MetersToPixels(playerMeters, guiMap.Zoom);
+                    }
+
+                    guiMap.ProcessEvents(mapRect);
+                    GUI.DragWindow();
+                },
+                "DebugWindow");
         }
 
         void OnWindowTypeChanged(EditorWindowType type_)

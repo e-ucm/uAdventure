@@ -3,7 +3,6 @@ using UnityEditorInternal;
 using System.Linq;
 using uAdventure.Editor;
 using System.Collections.Generic;
-using MapzenGo.Helpers;
 using uAdventure.Core;
 
 namespace uAdventure.Geo
@@ -24,12 +23,12 @@ namespace uAdventure.Geo
 
         private readonly GeoElementWindowGeometry geometryComponent; 
 
-        public GeoElementWindow(Rect aStartPos, GUIStyle aStyle, params GUILayoutOption[] aOptions) : base(aStartPos, new GUIContent("Geo Elements"), aStyle, aOptions)
+        public GeoElementWindow(Rect aStartPos, GUIStyle aStyle, params GUILayoutOption[] aOptions) : base(aStartPos, new GUIContent("Geo.GeoElement.Title".Traslate()), aStyle, aOptions)
         {
             ButtonContent = new GUIContent
             {
                 image = Resources.Load<Texture2D>("EAdventureData/img/icons/poi"),
-                text = "GeoElements"
+                text = "Geo.GeoElement.Title".Traslate()
             };
 
             mapEditor = new MapEditor()

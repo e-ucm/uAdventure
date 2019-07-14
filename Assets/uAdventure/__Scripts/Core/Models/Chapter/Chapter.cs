@@ -708,54 +708,6 @@ namespace uAdventure.Core
 			this.extensionObjects [typeof(Macro)] = macros;
         }
 
-        /**
-         * set the completables
-         */
-
-        public void setCompletables(List<Completable> completables)
-		{
-			this.extensionObjects [typeof(Completable)] = completables;
-        }
-
-        /**
-         * get all the completables
-         * @return the completables
-         */
-
-        public List<Completable> getCompletables()
-        {
-			return getObjects<Completable> ();
-        }
-
-        /**
-         * get all the completables
-         * @param id
-         * the id of the completable to find
-         * @return a completable that matches the id
-         */
-
-        public Completable getCompletable(string id)
-        {
-            Completable selectedCompletable = null;
-
-			foreach (Completable completable in getCompletables ())
-                if (completable.getId().Equals(id))
-                    selectedCompletable = completable;
-
-            return selectedCompletable;
-        }
-
-        /**
-         * adds a completable
-         * @param completable
-         * the completable to add into the list of completables
-         */
-
-        public void addCompletable(Completable completable)
-        {
-			getCompletables().Add(completable);
-        }
-
 		public object findObject(string id){
 			/*return from o in getObjects ()
 			       where (o is HasId) && ((o as HasId).getId () == id)

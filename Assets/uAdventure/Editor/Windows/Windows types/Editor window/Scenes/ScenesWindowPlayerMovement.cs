@@ -470,10 +470,11 @@ namespace uAdventure.Editor
             public override void OnDrawingGizmosSelected()
             {
                 var rect = ScenesWindowElementReference.ReferenceComponent.GetElementRect(Target);
-                
+
                 // Rect resizing
+                var id = GUIUtility.GetControlID(GetHashCode(), FocusType.Passive);
                 EditorGUI.BeginChangeCheck();
-                var newRect = HandleUtil.HandleFixedRatioRect(Target.GetHashCode() + 1, rect, rect.width / rect.height, 10f, 
+                var newRect = HandleUtil.HandleFixedRatioRect(id, rect, rect.width / rect.height, 10f, 
                     (polygon, over, active) => HandleUtil.DrawPolyLine(polygon, true, SceneEditor.GetColor(Color.red)),
                     (point, over, active) =>   HandleUtil.DrawPoint(point, 4.5f, SceneEditor.GetColor(Color.blue), SceneEditor.GetColor(Color.black)));
                 if (EditorGUI.EndChangeCheck())
@@ -500,15 +501,15 @@ namespace uAdventure.Editor
                 }
 
                 // Rect movement
+                var movementId = GUIUtility.GetControlID(GetHashCode() + 1, FocusType.Passive);
                 EditorGUI.BeginChangeCheck();
-                rect = HandleUtil.HandleRectMovement(Target.GetHashCode(), rect);
+                rect = HandleUtil.HandleRectMovement(movementId, rect);
                 if (EditorGUI.EndChangeCheck())
                 {
                     var original = rect.ViewportToScreen(SceneEditor.Current.Size.x, SceneEditor.Current.Size.y, SceneEditor.Current.Viewport);
-                    var rectBase = rect.Base();
+                    var rectBase = original.Base();
                     if (Target is PlayerDataControl)
                     {
-                        rectBase = original.Base();
                         var workingScene = Controller.Instance.SelectedChapterDataControl.getScenesList().getScenes()[GameRources.GetInstance().selectedSceneIndex];
                         workingScene.setDefaultInitialPosition(Mathf.RoundToInt(rectBase.x), Mathf.RoundToInt(rectBase.y));
                     }

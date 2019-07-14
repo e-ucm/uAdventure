@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using MapzenGo.Helpers;
+using System.Linq; 
 using uAdventure.Core;
 using uAdventure.Editor;
 using UnityEditor;
@@ -100,7 +99,7 @@ namespace uAdventure.Geo
             {
                 var gameplayArea = Target as GameplayAreaDataControl;
 
-                EditorGUILayout.HelpBox("Geo.MapScene.GameplayArea.Info", MessageType.Info);
+                EditorGUILayout.HelpBox("Geo.MapScene.GameplayArea.Info".Traslate(), MessageType.Info);
                 
                 EditorGUI.BeginChangeCheck();
                 var usesGameplayArea = EditorGUILayout.Toggle("Geo.MapScene.GameplayArea.UsesGameplayArea".Traslate(),
@@ -120,7 +119,7 @@ namespace uAdventure.Geo
 
                 using (new EditorGUI.DisabledScope(!gameplayArea.IsModified))
                 {
-                    if (GUILayout.Button("Geo.MapScene.GameplayArea.Apply"))
+                    if (GUILayout.Button("Geo.MapScene.GameplayArea.Apply".Traslate()))
                     {
                         gameplayArea.DownloadAndApplyChanges();
                     }

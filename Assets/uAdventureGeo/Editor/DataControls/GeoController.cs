@@ -78,6 +78,7 @@ namespace uAdventure.Geo
                                 }
                             })
                     });
+                Controller.Instance.SelectedChapterDataControl.RegisterExtraDataControl(mapScenes);
                 SelectedMapScene = -1;
 
                 // Geo Elements list manages only geo elements
@@ -120,9 +121,11 @@ namespace uAdventure.Geo
                             })
                     });
 
+                Controller.Instance.SelectedChapterDataControl.RegisterExtraDataControl(geoElements);
                 SelectedGeoElement = -1;
 
                 lastSelectedChapterDataControl = Controller.Instance.SelectedChapterDataControl;
+                Controller.Instance.updateVarFlagSummary();
             }
         }
 
@@ -137,7 +140,7 @@ namespace uAdventure.Geo
             {
                 this.callback = callback;
                 placeSearcher = ScriptableObject.CreateInstance<PlaceSearcher>();
-                placeSearcher.Label = "Geo.PlaceInput.PlaceSearcher.Label";
+                placeSearcher.Label = "Geo.PlaceInput.PlaceSearcher.Label".Traslate();
                 placeSearcher.OnRequestRepaint = Repaint;
 
                 if (searchData != null)
@@ -153,8 +156,9 @@ namespace uAdventure.Geo
             {
                 EditorWindow.FocusWindowIfItsOpen<InputDialog>();
 
-                // Message
-                EditorGUILayout.LabelField("Geo.PlaceInput.Message", EditorStyles.boldLabel);
+                // Message 
+                GUI.SetNextControlName("InputField");
+                EditorGUILayout.LabelField("Geo.PlaceInput.Message".Traslate(), EditorStyles.boldLabel);
                 GUILayout.Space(20);
 
                 // Input field
@@ -172,7 +176,7 @@ namespace uAdventure.Geo
                     this.Close();
                 }
 
-                if (GUI.GetNameOfFocusedControl() == "Geo.PlaceInput.Message" && isEnterPressed)
+                if (GUI.GetNameOfFocusedControl() == "InputField" && isEnterPressed)
                 {
                     searchData = new SearchData()
                     {

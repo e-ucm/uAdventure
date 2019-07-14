@@ -60,6 +60,13 @@ namespace uAdventure.Editor
          */
         private ConversationsListDataControl conversationsListDataControl;
 
+        private List<DataControl> extraDataControls = new List<DataControl>();
+
+        public void RegisterExtraDataControl(DataControl dataControl)
+        {
+            extraDataControls.Add(dataControl);
+        }
+
         /**
          * Assessment file data controller
          */
@@ -74,11 +81,6 @@ namespace uAdventure.Editor
          * Advanced features data controller (timers, global states and macros)
          */
         private AdvancedFeaturesDataControl advancedFeaturesDataControl;
-
-        /**
-        * Completables data control
-        */
-        private CompletableListDataControl completableListDataControl;
 
         /**
          * Constructor.
@@ -119,7 +121,6 @@ namespace uAdventure.Editor
             advancedFeaturesDataControl.setTimerListDataControl(timersListDataControl);
             advancedFeaturesDataControl.setGlobalStatesListDataContorl(globalStatesListDataControl);
             advancedFeaturesDataControl.setMacrosListDataControl(macrosListDataControl);
-            completableListDataControl = new CompletableListDataControl(chapter.getObjects<Completable>()); 
             // assessmentProfilesDataControl = new AssessmentProfilesDataControl(chapter.getAssessmentProfiles());
             //adaptationProfilesDataControl = new AdaptationProfilesDataControl(chapter.getAdaptationProfiles());
         }
@@ -445,9 +446,7 @@ namespace uAdventure.Editor
             playerDataControl.updateVarFlagSummary(varFlagSummary);
             conversationsListDataControl.updateVarFlagSummary(varFlagSummary);
             advancedFeaturesDataControl.updateVarFlagSummary(varFlagSummary);
-            completableListDataControl.updateVarFlagSummary(varFlagSummary);
-            //adaptationProfilesDataControl.updateVarFlagSummary(varFlagSummary);
-            // assessmentProfilesDataControl.updateVarFlagSummary(varFlagSummary);
+            extraDataControls.ForEach(d => d.updateVarFlagSummary(varFlagSummary));
         }
 
 
@@ -470,9 +469,7 @@ namespace uAdventure.Editor
             valid &= npcsListDataControl.isValid(currentPath, incidences);
             valid &= conversationsListDataControl.isValid(currentPath, incidences);
             valid &= advancedFeaturesDataControl.isValid(currentPath, incidences);
-            valid &= completableListDataControl.isValid(currentPath, incidences);
-            //valid &= adaptationProfilesDataControl.isValid(currentPath, incidences);
-            ////valid &= assessmentProfilesDataControl.isValid(currentPath, incidences);
+            valid &= extraDataControls.All(d => d.isValid(currentPath, incidences));
 
             return valid;
         }
@@ -482,13 +479,6 @@ namespace uAdventure.Editor
         {
 
             int count = 0;
-
-            // Add the references from the assessment and adaptation files
-            // if( getAssessmentName( ).Equals( assetPath ) )
-            //   count++;
-            //if( getAdaptationName( ).Equals( assetPath ) )
-            //  count++;
-
             // Add the references from the elements
             count += scenesListDataControl.countAssetReferences(assetPath);
             count += cutscenesListDataControl.countAssetReferences(assetPath);
@@ -499,7 +489,7 @@ namespace uAdventure.Editor
             count += npcsListDataControl.countAssetReferences(assetPath);
             count += conversationsListDataControl.countAssetReferences(assetPath);
             count += advancedFeaturesDataControl.countAssetReferences(assetPath);
-            count += completableListDataControl.countAssetReferences(assetPath);
+            count += extraDataControls.Sum(d => d.countAssetReferences(assetPath));
 
             return count;
         }
@@ -517,18 +507,12 @@ namespace uAdventure.Editor
             npcsListDataControl.getAssetReferences(assetPaths, assetTypes);
             conversationsListDataControl.getAssetReferences(assetPaths, assetTypes);
             advancedFeaturesDataControl.getAssetReferences(assetPaths, assetTypes);
-            completableListDataControl.getAssetReferences(assetPaths, assetTypes);
+            extraDataControls.ForEach(d => d.getAssetReferences(assetPaths, assetTypes));
         }
 
 
         public override void deleteAssetReferences(string assetPath)
         {
-
-            // Delete the references for the assessment and adaptation files
-            //        if( getAssessmentName( ).Equals( assetPath ) )
-            //            chapter.setAssessmentName( "" );
-            //        if( getAdaptationName( ).Equals( assetPath ) )
-            //            chapter.setAdaptationName( "" );
 
             // Delete the asset references in the chapter
             scenesListDataControl.deleteAssetReferences(assetPath);
@@ -540,9 +524,7 @@ namespace uAdventure.Editor
             npcsListDataControl.deleteAssetReferences(assetPath);
             conversationsListDataControl.deleteAssetReferences(assetPath);
             advancedFeaturesDataControl.deleteAssetReferences(assetPath);
-            completableListDataControl.deleteAssetReferences(assetPath);
-            //assessmentProfilesDataControl.deleteAssetReferences( assetPath );
-            //adaptationProfilesDataControl.deleteAssetReferences( assetPath );
+            extraDataControls.ForEach(d => d.deleteAssetReferences(assetPath));
         }
 
 
@@ -563,9 +545,7 @@ namespace uAdventure.Editor
             count += npcsListDataControl.countIdentifierReferences(id);
             count += conversationsListDataControl.countIdentifierReferences(id);
             count += advancedFeaturesDataControl.countIdentifierReferences(id);
-            count += completableListDataControl.countIdentifierReferences(id);
-            //count += adaptationProfilesDataControl.countIdentifierReferences(id);
-            //count += assessmentProfilesDataControl.countIdentifierReferences(id);
+            count += extraDataControls.Sum(d => d.countIdentifierReferences(id));
 
             return count;
         }
@@ -586,9 +566,7 @@ namespace uAdventure.Editor
             npcsListDataControl.replaceIdentifierReferences(oldId, newId);
             conversationsListDataControl.replaceIdentifierReferences(oldId, newId);
             advancedFeaturesDataControl.replaceIdentifierReferences(oldId, newId);
-            completableListDataControl.replaceIdentifierReferences(oldId, newId);
-            //        assessmentProfilesDataControl.replaceIdentifierReferences( oldId, newId );
-            //adaptationProfilesDataControl.replaceIdentifierReferences(oldId, newId);
+            extraDataControls.ForEach(d => d.replaceIdentifierReferences(oldId, newId));
         }
 
 
@@ -609,9 +587,7 @@ namespace uAdventure.Editor
             npcsListDataControl.deleteIdentifierReferences(id);
             conversationsListDataControl.deleteIdentifierReferences(id);
             advancedFeaturesDataControl.deleteIdentifierReferences(id);
-            completableListDataControl.deleteIdentifierReferences(id);
-            //        assessmentProfilesDataControl.deleteIdentifierReferences( id );
-            //adaptationProfilesDataControl.deleteIdentifierReferences(id);
+            extraDataControls.ForEach(d => d.deleteIdentifierReferences(id));
         }
 
 
@@ -639,15 +615,6 @@ namespace uAdventure.Editor
             return advancedFeaturesDataControl.getMacrosListDataControl();
         }
 
-        /**
-         * @return the Completables
-         */
-        public CompletableListDataControl getCompletables()
-        {
-
-            return this.completableListDataControl;
-        }
-
         public List<object> getObjects()
         {
             return chapter.getObjects();
@@ -656,26 +623,6 @@ namespace uAdventure.Editor
         public List<T> getObjects<T>()
         {
             return chapter.getObjects<T>();
-        }
-
-        public List<DataControl> getDataControls()
-        {
-            var dataControlList = new List<DataControl>();
-            dataControlList.AddRange(getAtrezzoList().getAtrezzoList().Cast<DataControl>());
-            dataControlList.AddRange(getBooksList().getBooks().Cast<DataControl>());
-            dataControlList.AddRange(getConversationsList().getConversations().Cast<DataControl>());
-            dataControlList.AddRange(getCutscenesList().getCutscenes().Cast<DataControl>());
-            dataControlList.AddRange(getItemsList().getItems().Cast<DataControl>());
-            dataControlList.AddRange(getNPCsList().getNPCs().Cast<DataControl>());
-            dataControlList.AddRange(getItemsList().getItems().Cast<DataControl>());
-            dataControlList.AddRange(getScenesList().getScenes().Cast<DataControl>());
-            dataControlList.AddRange(getCompletables().getCompletables().Cast<DataControl>());
-            return dataControlList;
-        }
-
-        public List<DataControl> getDataControls<T>()
-        {
-            return getDataControls().FindAll(d => d is T);
         }
 
         public override void recursiveSearch()
@@ -694,10 +641,7 @@ namespace uAdventure.Editor
             this.getNPCsList().recursiveSearch();
             this.getPlayer().recursiveSearch();
             this.getScenesList().recursiveSearch();
-            this.getCompletables().recursiveSearch();
-            // this.getAdvancedFeaturesController().recursiveSearch();
-            // this.getAdaptationProfilesDataControl().recursiveSearch();
-            // this.getAssessmentProfilesDataControl().recursiveSearch();
+            extraDataControls.ForEach(d => d.recursiveSearch());
         }
 
         /**
@@ -794,6 +738,13 @@ namespace uAdventure.Editor
             path = getPathFromChild(dataControl, advancedFeaturesDataControl);
             if (path != null)
                 return path;
+
+            foreach (var extraDataControl in extraDataControls)
+            {
+                path = getPathFromChild(dataControl, extraDataControl);
+                if (path != null)
+                    return path;
+            }
             //path = getPathFromChild(dataControl, assessmentProfilesDataControl);
             //if (path != null)
             //    return path;

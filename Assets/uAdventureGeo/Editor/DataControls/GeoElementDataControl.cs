@@ -187,24 +187,40 @@ namespace uAdventure.Geo
 
         public override int countAssetReferences(string assetPath)
         {
-            return geoActionDataControls.countAssetReferences(assetPath);
+            var count = 0;
+            count += descriptionController.countAssetReferences(assetPath);
+            count += geoActionDataControls.countAssetReferences(assetPath);
+            count += geometryDataControls.countAssetReferences(assetPath);
+            count += resourcesDataControlList.Sum(r => r.countAssetReferences(assetPath));
+            return count;
         }
 
         public override int countIdentifierReferences(string id)
         {
-            return geoActionDataControls.countIdentifierReferences(id);
+            var count = 0;
+            count += descriptionController.countIdentifierReferences(id);
+            count += geoActionDataControls.countIdentifierReferences(id);
+            count += geometryDataControls.countIdentifierReferences(id);
+            count += resourcesDataControlList.Sum(r => r.countIdentifierReferences(id));
+            return count;
         }
 
         public override void deleteAssetReferences(string assetPath)
         {
+            descriptionController.deleteAssetReferences(assetPath);
             geoActionDataControls.deleteAssetReferences(assetPath);
+            geometryDataControls.deleteAssetReferences(assetPath);
+            resourcesDataControlList.ForEach(r => r.deleteAssetReferences(assetPath));
         }
 
         public override bool deleteElement(DataControl dataControl, bool askConfirmation) { return false; }
 
         public override void deleteIdentifierReferences(string id)
         {
+            descriptionController.deleteIdentifierReferences(id);
             geoActionDataControls.deleteIdentifierReferences(id);
+            geometryDataControls.deleteIdentifierReferences(id);
+            resourcesDataControlList.ForEach(r => r.deleteIdentifierReferences(id));
         }
 
         public override int[] getAddableElements()
@@ -214,7 +230,10 @@ namespace uAdventure.Geo
 
         public override void getAssetReferences(List<string> assetPaths, List<int> assetTypes)
         {
+            descriptionController.getAssetReferences(assetPaths, assetTypes);
             geoActionDataControls.getAssetReferences(assetPaths, assetTypes);
+            geometryDataControls.getAssetReferences(assetPaths, assetTypes);
+            resourcesDataControlList.ForEach(r => r.getAssetReferences(assetPaths, assetTypes));
         }
 
         public override object getContent()
@@ -224,15 +243,32 @@ namespace uAdventure.Geo
 
         public override List<Searchable> getPathToDataControl(Searchable dataControl)
         {
-            return getPathFromChild(dataControl, geoActionDataControls.DataControls.Cast<object>().ToList());
+            List<Searchable> path;
+            path = getPathFromChild(dataControl, descriptionController);
+            if (path != null)
+                return path;
+            path = getPathFromChild(dataControl, geoActionDataControls);
+            if (path != null)
+                return path;
+            path = getPathFromChild(dataControl, geometryDataControls);
+            if (path != null)
+                return path;
+            foreach (var r in resourcesDataControlList)
+            {
+                path = getPathFromChild(dataControl, r);
+                if (path != null)
+                    return path;
+            }
+            return null;
         }
 
         public override bool isValid(string currentPath, List<string> incidences)
         {
-            var valid = descriptionController.isValid(currentPath, incidences);
-            resourcesDataControlList.ForEach(r => valid &= r.isValid(currentPath, incidences));
+            var valid = true;
+            valid &= descriptionController.isValid(currentPath, incidences);
             valid &= geoActionDataControls.isValid(currentPath, incidences);
-            valid &= geoElement.Geometries.Count > 0 && geoElement.Geometries.All(g => g.Points.Length > 0);
+            valid &= geometryDataControls.isValid(currentPath, incidences);
+            valid &= resourcesDataControlList.All(r => r.isValid(currentPath, incidences));
             return valid;
         }
 
@@ -243,8 +279,9 @@ namespace uAdventure.Geo
         public override void recursiveSearch()
         {
             descriptionController.recursiveSearch();
-            resourcesDataControlList.ForEach(r => r.recursiveSearch());
             geoActionDataControls.recursiveSearch();
+            geometryDataControls.recursiveSearch();
+            resourcesDataControlList.ForEach(r => r.recursiveSearch());
             check(geoElement.getDocumentation(), TC.get("Search.Documentation"));
             check(geoElement.getName(), TC.get("Search.Name"));
             check(geoElement.getId(), "ID");
@@ -262,12 +299,18 @@ namespace uAdventure.Geo
 
         public override void replaceIdentifierReferences(string oldId, string newId)
         {
+            descriptionController.replaceIdentifierReferences(oldId, newId);
             geoActionDataControls.replaceIdentifierReferences(oldId, newId);
+            geometryDataControls.replaceIdentifierReferences(oldId, newId);
+            resourcesDataControlList.ForEach(r => r.replaceIdentifierReferences(oldId, newId));
         }
 
         public override void updateVarFlagSummary(VarFlagSummary varFlagSummary)
         {
+            descriptionController.updateVarFlagSummary(varFlagSummary);
             geoActionDataControls.updateVarFlagSummary(varFlagSummary);
+            geometryDataControls.updateVarFlagSummary(varFlagSummary);
+            resourcesDataControlList.ForEach(r => r.updateVarFlagSummary(varFlagSummary));
         }
     }
 }

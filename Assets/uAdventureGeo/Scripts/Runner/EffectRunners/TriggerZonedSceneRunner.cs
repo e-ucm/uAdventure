@@ -40,19 +40,11 @@ namespace uAdventure.Geo
         public string loadOnExit;
         public float transitionTime;
 
-        public Vector2 debugLatLong;
-
         void Start()
         {
-            debugLatLong = zone.Center.ToVector2();
             if (!GPSController.Instance.IsStarted())
             {
                 GPSController.Instance.Start();
-            }
-
-            if (GPSController.Instance.IsLocationValid())
-            {
-                debugLatLong = new Vector2(Input.location.lastData.latitude, Input.location.lastData.longitude);
             }
         }
         
@@ -66,7 +58,7 @@ namespace uAdventure.Geo
 
             if(GPSController.Instance.IsLocationValid())
             {
-                if (!zone.InsideInfluence(new Vector2d(Input.location.lastData.latitude, Input.location.lastData.longitude),5))
+                if (!zone.InsideInfluence(GPSController.Instance.Location, 5))
                 {
                     Debug.Log("No está en la influencia, pero la ubicación es válida");
                     Game.Instance.RunTarget(loadOnExit, 0, 0);
@@ -74,7 +66,7 @@ namespace uAdventure.Geo
                     DestroyImmediate(this.gameObject);
                 }
             }
-            else if (!GPSController.Instance.IsStarted() && !zone.InsideInfluence(debugLatLong.ToVector2d(), 5))
+            else if (!GPSController.Instance.IsStarted() && !zone.InsideInfluence(GPSController.Instance.Location, 5))
             {
                 Debug.Log("No está en la influencia");
                 Game.Instance.RunTarget(loadOnExit, 0, 0);

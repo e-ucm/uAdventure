@@ -1,28 +1,40 @@
 ﻿using UnityEngine;
-using System.Collections;
-
-using uAdventure.Core;
 using uAdventure.Editor;
 using UnityEditor;
-using System.Collections.Generic;
+using System;
+using uAdventure.Core;
 
 namespace uAdventure.Geo
 {
     public class TriggerZonedSceneEffectEditor : TriggerSceneEffectEditor
     {
-        private List<string> zones;
+        protected TriggerZonedSceneEffect triggerZonedSceneEffect;
 
         public TriggerZonedSceneEffectEditor() : base()
         {
-            this.zones = Controller.Instance.SelectedChapterDataControl.getObjects<GeoElement>().ConvertAll(g => g.getId());
-            this.effect = subeffect = new TriggerZonedSceneEffect(effect.getTargetId(), "", effect.getX(), effect.getY());
+            this.effect = triggerZonedSceneEffect = new TriggerZonedSceneEffect(effect.getTargetId(), "", effect.getX(), effect.getY());
         }
-        protected TriggerZonedSceneEffect subeffect;
+
         public override void draw()
         {
             base.draw();
+            var geoElementsIds = Controller.Instance.IdentifierSummary.getIds<GeoElement>();
+            var selectedZoneIndex = Mathf.Max(0, Array.IndexOf(geoElementsIds, triggerZonedSceneEffect.ZoneId));
 
-            subeffect.ZoneId = zones[EditorGUILayout.Popup(this.zones.IndexOf(subeffect.ZoneId), zones.ToArray())];
+            if(Usable)
+            {
+                EditorGUI.BeginChangeCheck();
+                var newZoneId = geoElementsIds[EditorGUILayout.Popup(selectedZoneIndex, geoElementsIds)];
+                if (EditorGUI.EndChangeCheck())
+                {
+                    Controller.Instance.AddTool(new ChangeValueTool<TriggerZonedSceneEffect, string>(triggerZonedSceneEffect, 
+                        newZoneId, "ZoneId"));
+                }
+            }
+            else
+            {
+                EditorGUILayout.HelpBox("Geo.TriggetZonedSceneEffectEditor.NoZones".Traslate(), MessageType.Error);
+            }
         }
 
         public override string EffectName
@@ -42,7 +54,8 @@ namespace uAdventure.Geo
         {
             get
             {
-                return zones.Count > 0;
+                var geoElementsIds = Controller.Instance.IdentifierSummary.getIds<GeoElement>();
+                return geoElementsIds != null && geoElementsIds.Length > 0;
             }
         }
 

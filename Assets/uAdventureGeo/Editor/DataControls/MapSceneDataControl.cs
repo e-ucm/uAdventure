@@ -181,50 +181,75 @@ namespace uAdventure.Geo
         public override void updateVarFlagSummary(VarFlagSummary varFlagSummary)
         {
             mapElementListDataControl.updateVarFlagSummary(varFlagSummary);
+            gameplaAreaDataControl.updateVarFlagSummary(varFlagSummary);
         }
 
         public override bool isValid(string currentPath, List<string> incidences)
         {
-            return true;
+            var valid = true;
+            valid &= mapElementListDataControl.isValid(currentPath, incidences);
+            valid &= gameplaAreaDataControl.isValid(currentPath, incidences);
+            return valid;
         }
 
         public override int countAssetReferences(string assetPath)
         {
-            return 0;
+            var count = 0;
+            count &= mapElementListDataControl.countAssetReferences(assetPath);
+            count &= gameplaAreaDataControl.countAssetReferences(assetPath);
+            return count;
         }
 
         public override void getAssetReferences(List<string> assetPaths, List<int> assetTypes)
         {
+            mapElementListDataControl.getAssetReferences(assetPaths, assetTypes);
+            gameplaAreaDataControl.getAssetReferences(assetPaths, assetTypes);
         }
 
         public override void deleteAssetReferences(string assetPath)
         {
+            mapElementListDataControl.deleteAssetReferences(assetPath);
+            gameplaAreaDataControl.deleteAssetReferences(assetPath);
         }
 
         public override int countIdentifierReferences(string id)
         {
-            return mapElementListDataControl.countIdentifierReferences(id);
+            var count = 0;
+            count &= mapElementListDataControl.countIdentifierReferences(id);
+            count &= gameplaAreaDataControl.countIdentifierReferences(id);
+            return count;
         }
 
         public override void replaceIdentifierReferences(string oldId, string newId)
         {
             mapElementListDataControl.replaceIdentifierReferences(oldId, newId);
+            gameplaAreaDataControl.replaceIdentifierReferences(oldId, newId);
         }
 
         public override void deleteIdentifierReferences(string id)
         {
-            mapElementListDataControl.deleteAssetReferences(id);
+            mapElementListDataControl.deleteIdentifierReferences(id);
+            gameplaAreaDataControl.deleteIdentifierReferences(id);
         }
 
         public override List<Searchable> getPathToDataControl(Searchable dataControl)
         {
-            return getPathFromChild(dataControl, mapElementListDataControl.DataControls.Cast<System.Object>().ToList());
+            List<Searchable> path;
+            path = getPathFromChild(dataControl, mapElementListDataControl);
+            if (path != null)
+                return path;
+            path = getPathFromChild(dataControl, gameplaAreaDataControl);
+            if (path != null)
+                return path;
+
+            return null;
         }
 
 
         public override void recursiveSearch()
         {
-            this.Elements.recursiveSearch();
+            this.mapElementListDataControl.recursiveSearch();
+            this.gameplaAreaDataControl.recursiveSearch();
             check(this.Documentation, TC.get("Search.Documentation"));
             check(this.Id, "ID");
         }

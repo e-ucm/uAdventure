@@ -378,19 +378,6 @@ namespace uAdventure.Editor
 
 
 
-        /**
-         * Id for Completables
-         */
-
-        public const int COMPLETABLE = 67;
-
-        public const int MILESTONE = 68;
-
-        public const int PROGRESS = 69;
-
-        public const int SCORE = 70;
-
-
         //TYPES OF EAD FILES
         public const int FILE_ADVENTURE_1STPERSON_PLAYER = 0;
 

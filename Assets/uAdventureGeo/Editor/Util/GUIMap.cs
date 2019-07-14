@@ -75,7 +75,7 @@ namespace uAdventure.Geo
 
         public void DrawMap(Rect area)
         {
-            id = GUIUtility.GetControlID(GetHashCode(), FocusType.Passive, area);
+            id = GUIUtility.GetControlID("GUIMap".GetHashCode() + GetHashCode(), FocusType.Passive, area);
 
             GUI.BeginGroup(area);
             area = new Rect(Vector2.zero, area.size);
@@ -141,7 +141,7 @@ namespace uAdventure.Geo
 
         public void ProcessEvents(Rect area)
         {
-            switch (Event.current.type)
+            switch (Event.current.GetTypeForControl(id))
             {
                 case EventType.ScrollWheel:
                     {
@@ -167,7 +167,7 @@ namespace uAdventure.Geo
                     {
                         if (area.Contains(Event.current.mousePosition))
                         {
-                            GUI.FocusControl(null);
+                            //GUI.FocusControl(null);
                             GUIUtility.hotControl = id;
                             Event.current.Use();
                         }

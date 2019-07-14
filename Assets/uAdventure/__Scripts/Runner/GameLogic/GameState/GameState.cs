@@ -7,11 +7,12 @@ using RAGE.Analytics;
 using System;
 using AssetPackage;
 using System.Linq;
+using UniRx;
 
 namespace uAdventure.Runner
 {
     [Serializable]
-    public class GameState
+    public class GameState 
     {
         //###########################################################################
         //########################### GAME STATE HANDLING ###########################
@@ -39,6 +40,13 @@ namespace uAdventure.Runner
         private List<string> removedElements;
         [SerializeField]
         private List<string> inventoryItems;
+
+        public delegate void ConditionChangedDelegate(string condition, int value);
+
+        public ConditionChangedDelegate OnConditionChanged;
+
+        private List<string> runningSystems;
+        private Dictionary<string, Memory> memories;
         private Dictionary<string, List<ElementReference>> elementContexts;
         private Dictionary<string, int> varFlags;
         private Stack<List<KeyValuePair<string, int>>> varFlagChangeAmbits;
@@ -52,7 +60,11 @@ namespace uAdventure.Runner
         private List<string> elementContextsKeys;
         [SerializeField]
         private List<ContextList> elementContextsValues;
-#endregion
+        [SerializeField]
+        private List<string> memoryKeys;
+        [SerializeField]
+        private List<Memory> memoryValues;
+        #endregion
 
         public AdventureData Data
         {
@@ -181,7 +193,10 @@ namespace uAdventure.Runner
                 TrackerAsset.Instance.setVar(name, intVal);
             }
             TimerController.Instance.CheckTimers();
-            CompletablesController.Instance.ConditionChanged();
+            if (OnConditionChanged != null)
+            {
+                OnConditionChanged(name, state);
+            }
             Game.Instance.reRenderScene();
         }
 
@@ -209,10 +224,30 @@ namespace uAdventure.Runner
                 TrackerAsset.Instance.setVar(name, value);
             }
 
-            CompletablesController.Instance.ConditionChanged();
+            if (OnConditionChanged != null)
+            {
+                OnConditionChanged(name, value);
+            }
 
             Game.Instance.reRenderScene();
         }
+
+        public Memory GetMemory(string id)
+        {
+            Memory ret = null;
+
+            if (memories.ContainsKey(id))
+            {
+                ret = memories[id];
+            }
+            return ret;
+        }
+
+        public void SetMemory(string id, Memory memory)
+        {
+            memories[id] = memory;
+        }
+
 
         public List<ElementReference> GetElementReferences(string sceneId)
         {
@@ -350,11 +385,6 @@ namespace uAdventure.Runner
                 .FirstOrDefault(scene => ((Slidescene)scene).getNext() == Cutscene.ENDCHAPTER);
         }
 
-        public List<Completable> GetCompletables()
-        {
-            return data.getChapters()[currentChapter].getCompletables();
-        }
-
         public IChapterTarget GetChapterTarget(string runnerTargetId)
         {
             return data.getChapters()[currentChapter].getObjects<IChapterTarget>()
@@ -451,6 +481,8 @@ namespace uAdventure.Runner
             elementContextsKeys = elementContexts.Keys.ToList();
             elementContextsValues = elementContexts.Values.ToList()
                 .ConvertAll(l => new ContextList() { ElementReferences = l });
+            memoryKeys = memories.Keys.ToList();
+            memoryValues = memories.Values.ToList();
 
             var json = JsonUtility.ToJson(this);
             Debug.Log(json);
@@ -469,6 +501,11 @@ namespace uAdventure.Runner
             for (int i = 0, totalVars = elementContextsKeys.Count; i < totalVars; i++)
             {
                 elementContexts[elementContextsKeys[i]] = elementContextsValues[i].ElementReferences;
+            }
+            memories.Clear();
+            for (int i = 0, totalMemories = memoryKeys.Count; i < totalMemories; i++)
+            {
+                memories[memoryKeys[i]] = memoryValues[i];
             }
 
             InventoryManager.Instance.Restore();

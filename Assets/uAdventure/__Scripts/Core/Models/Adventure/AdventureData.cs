@@ -2,6 +2,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace uAdventure.Core
 {
@@ -18,10 +19,11 @@ namespace uAdventure.Core
          */
         protected List<Chapter> chapters;
 
-        /**
-         * Tracker config
-         */
-        protected TrackerConfig trackerConfig;
+        // ------------------------------
+        // EXTENSIONS
+        // ------------------------------
+
+        Dictionary<Type, IList> extensionObjects;
 
         /**
          * Default constructor
@@ -29,7 +31,7 @@ namespace uAdventure.Core
         public AdventureData() : base()
         {
             this.chapters = new List<Chapter>();
-            this.trackerConfig = new TrackerConfig();
+            extensionObjects = new Dictionary<Type, IList>();
             contents = null;
         }
 
@@ -83,16 +85,6 @@ namespace uAdventure.Core
             }
         }
 
-        public TrackerConfig getTrackerConfig()
-        {
-            return this.trackerConfig;
-        }
-
-        public void setTrackerConfig(TrackerConfig trackerConfig)
-        {
-            this.trackerConfig = trackerConfig;
-        }
-
         /**
          * Returns if the chapter.xml has adaptation and/or assessment data
          * 
@@ -130,6 +122,53 @@ namespace uAdventure.Core
             return summary;
         }
 
+        /// <summary>
+        /// Obtain extension objects by type
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public List<T> getObjects<T>()
+        {
+            if (!extensionObjects.ContainsKey(typeof(T)))
+            {
+                var exists = new List<T>(getObjects().FindAll(o => o is T).Cast<T>());
+                if (exists.Count == 0)
+                    extensionObjects.Add(typeof(T), new List<T>());
+                else
+                    return exists;
+            }
+
+            return extensionObjects[typeof(T)] as List<T>;
+        }
+
+        public List<object> getObjects()
+        {
+
+            // Let's return all the objects
+            List<object> allObjects = new List<object>();
+            foreach (var kp in extensionObjects)
+            {
+                allObjects.AddRange(kp.Value.Cast<object>());
+            }
+
+            return allObjects;
+        }
+
+        public IList getObjects(Type t)
+        {
+            var listType = typeof(List<>).MakeGenericType(t);
+
+            if (!extensionObjects.ContainsKey(t))
+                extensionObjects.Add(t, Activator.CreateInstance(listType) as IList);
+
+            return extensionObjects[t] as IList;
+        }
+
+        public List<Type> getObjectTypes()
+        {
+            return new List<Type>(extensionObjects.Keys);
+        }
+
         public override object Clone()
         {
             AdventureData ad = (AdventureData)base.Clone();
@@ -138,9 +177,9 @@ namespace uAdventure.Core
                 ad.buttons.Add((CustomButton)cb.Clone());
             foreach (CustomArrow ca in arrows)
                 ad.arrows.Add((CustomArrow)ca.Clone());
-            //ad.chapters = new List<Chapter>();
-            //for (Chapter c : chapters)
-            //	ad.chapters.Add((Chapter) c.Clone());
+            ad.chapters = new List<Chapter>();
+            foreach (Chapter c in chapters)
+            	ad.chapters.Add((Chapter) c.Clone());
             ad.commentaries = commentaries;
             ad.contents = new List<ChapterSummary>();
             foreach (ChapterSummary cs in contents)
@@ -156,35 +195,6 @@ namespace uAdventure.Core
             ad.title = title;
             return ad;
         }
-        /*
-        @Override
-        public Object clone() throws CloneNotSupportedException
-        {
-
-            AdventureData ad = (AdventureData) super.clone( );
-            ad.buttons = new List<CustomButton>( );
-            for( CustomButton cb : buttons )
-                ad.buttons.add( (CustomButton) cb.clone( ) );
-            for( CustomArrow ca : arrows )
-                ad.arrows.add( (CustomArrow) ca.clone( ) );
-            //ad.chapters = new List<Chapter>();
-            //for (Chapter c : chapters)
-            //	ad.chapters.add((Chapter) c.clone());
-            ad.commentaries = commentaries;
-            ad.contents = new List<ChapterSummary>( );
-            for( ChapterSummary cs : contents )
-                ad.contents.add( (ChapterSummary) cs.clone( ) );
-            ad.cursors = new List<CustomCursor>( );
-            for( CustomCursor cc : cursors )
-                ad.cursors.add( (CustomCursor) cc.clone( ) );
-            ad.description = new String(description );
-        ad.guiCustomized = guiCustomized;
-            ad.guiType = guiType;
-            ad.playerMode = playerMode;
-            ad.playerName = ( playerName != null ? new String(playerName ) : null );
-            ad.title = ( title != null ? new String(title ) : null );
-            return ad;
-        }*/
 
     }
 }

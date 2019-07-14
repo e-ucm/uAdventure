@@ -606,7 +606,7 @@ namespace uAdventure.Editor
                 return;
 
             var rect = GetNodeRect(Content, myNode);
-            var resizeRect = new Rect(new Vector2(rect.width - 10, 0), new Vector2(10, rect.width));
+            var resizeRect = new Rect(new Vector2(rect.width - 10, 0), new Vector2(10, rect.height));
             EditorGUIUtility.AddCursorRect(resizeRect, MouseCursor.ResizeHorizontal, myNode.GetHashCode());
             if (EditorGUIUtility.hotControl == 0
                 && Event.current.type == EventType.MouseDown

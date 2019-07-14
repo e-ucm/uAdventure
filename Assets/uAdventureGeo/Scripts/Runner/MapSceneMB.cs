@@ -94,12 +94,12 @@ namespace uAdventure.Geo
             // If the location is valid
             if(GPSController.Instance.IsLocationValid())
             {
-                geoCharacter.LatLon = new Vector2d(Input.location.lastData.latitude, Input.location.lastData.longitude);
+                geoCharacter.InstantMoveTo(GPSController.Instance.Location);
             }
             else
             {
                 // if not, just put the character in the center of the map
-                geoCharacter.LatLon = new Vector2d(tileManager.Latitude, tileManager.Longitude);
+                geoCharacter.InstantMoveTo(new Vector2d(tileManager.Latitude, tileManager.Longitude));
             }
         }
 
@@ -110,13 +110,13 @@ namespace uAdventure.Geo
         {
             if(Input.location.status == LocationServiceStatus.Running && Input.location.lastData.timestamp != 0 && Input.location.lastData.latitude != 0)
             {
-                var inputLatLon = new Vector2d(Input.location.lastData.latitude, Input.location.lastData.longitude);
+                var inputLatLon = GPSController.Instance.Location;
                 if (GPSController.Instance.IsLocationValid() 
                     && (GM.LatLonToMeters(lastUpdatedPosition) - GM.LatLonToMeters(inputLatLon)).sqrMagnitude >= 1f)
                 {
                     ready = true;
                     lastUpdatedPosition = inputLatLon;
-                    if (GM.SeparationInMeters(geoCharacter.LatLon, inputLatLon) > 150) geoCharacter.LatLon = inputLatLon;
+                    if (GM.SeparationInMeters(geoCharacter.LatLon, inputLatLon) > 150) geoCharacter.InstantMoveTo(inputLatLon);
                     else geoCharacter.MoveTo(inputLatLon);
                 }
                 

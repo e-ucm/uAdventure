@@ -418,7 +418,7 @@ namespace uAdventure.Editor
             for (var i = dataControls.Count - 1; i >= 0; i--)
             {
                 var targetsId = dataControls[i].getContent() as HasTargetId;
-                if (targetsId != null)
+                if (targetsId != null && targetsId.getTargetId() == id)
                 {
                     elements.RemoveAt(i);
                     dataControls.RemoveAt(i);
