@@ -200,7 +200,7 @@ namespace uAdventure.QR
         public string Content
         {
             get { return qr.Content; }
-            set { controller.AddTool(new ChangeValueTool<QR,string>(qr, value, "Content")); }
+            set { controller.AddTool(new ChangeValueTool<QR, string>(qr, value, "Content")); }
         }
     }
 }

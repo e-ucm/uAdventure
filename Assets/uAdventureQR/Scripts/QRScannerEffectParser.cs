@@ -6,16 +6,16 @@ using System.Xml;
 
 namespace uAdventure.QR
 {
-    [DOMParser(typeof(QRPromptEffect))]
-    [DOMParser("qr-prompt")]
-    public class QRPromptEffectParser : IDOMParser
+    [DOMParser(typeof(QRScannerEffect))]
+    [DOMParser("qr-scanner")]
+    public class QRScannerEffectParser : IDOMParser
     {
         public object DOMParse(XmlElement element, params object[] parameters)
         {
-            var qrPrompt = new QRPromptEffect();
+            var qrPrompt = new QRScannerEffect();
 
-            qrPrompt.SelectionType = element.Attributes["selection-type"].Value.ToEnum<QRPromptEffect.ListType>();
-            qrPrompt.PromptMessage = element.SelectSingleNode("message").InnerText;
+            qrPrompt.SelectionType = element.Attributes["selection-type"].Value.ToEnum<QRScannerEffect.ListType>();
+            qrPrompt.ScannerMessage = element.SelectSingleNode("message").InnerText;
 
             foreach (var listElem in element.SelectNodes("qr-id"))
                 qrPrompt.ValidIds.Add((listElem as XmlElement).InnerText);

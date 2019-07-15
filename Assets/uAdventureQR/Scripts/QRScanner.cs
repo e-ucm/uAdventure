@@ -1,28 +1,26 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
 using uAdventure.Runner;
-using System;
 using uAdventure.Core;
 using dZine4D.Misc.QR;
 
 namespace uAdventure.QR
 {
-    public class QRPrompt : MonoBehaviour, CustomEffectRunner
+    public class QRScanner : MonoBehaviour, CustomEffectRunner
     {
         public QRReader reader;
         public IEffect Effect {
-            get { return QRPromptEffect; }
-            set { QRPromptEffect = value as QRPromptEffect; }
+            get { return QrScannerEffect; }
+            set { QrScannerEffect = value as QRScannerEffect; }
         }
-        public QRPromptEffect QRPromptEffect { get; set; }
+        public QRScannerEffect QrScannerEffect { get; set; }
 
         public Text text;
         private bool force_wait = true;
 
         void Start()
         {
-            text.text = QRPromptEffect.PromptMessage;
+            text.text = QrScannerEffect.ScannerMessage;
             reader.OnQrCodeDetected.AddListener(OnQRCode);
         }
 
@@ -42,8 +40,8 @@ namespace uAdventure.QR
             if (qr != null)
                 return;
 
-            bool blackList = QRPromptEffect.SelectionType == QRPromptEffect.ListType.BlackList;
-            bool contained = QRPromptEffect.ValidIds.Contains(content);
+            bool blackList = QrScannerEffect.SelectionType == QRScannerEffect.ListType.BlackList;
+            bool contained = QrScannerEffect.ValidIds.Contains(content);
 
             if ((blackList && !contained) || (!blackList && contained))
             {
@@ -57,10 +55,14 @@ namespace uAdventure.QR
                     {
                         effects.Add(new SpeakPlayerEffect(qr.Content));
                     }
-                    foreach(var effect in qr.Effects.getEffects()) effects.Add(effect);
+                    foreach(var effect in qr.Effects.getEffects())
+                    {
+                        effects.Add(effect);
+                    }
 
                     effectHolder = new EffectHolder(effects);
                     this.transform.GetChild(0).gameObject.SetActive(false);
+                    Game.Instance.PulseOnTime(effectHolder.effects[0], 0);
                 }
             }
         }
@@ -71,6 +73,7 @@ namespace uAdventure.QR
             {
                 force_wait = false;
                 finished = true;
+                Game.Instance.PulseOnTime(null, 0);
             }
         }
 
@@ -80,8 +83,9 @@ namespace uAdventure.QR
             {
                 force_wait = effectHolder.execute();
                 if (!force_wait)
+                {
                     finished = true;
-                //DestroyImmediate(this.gameObject);
+                }
             }
 
             return force_wait;
