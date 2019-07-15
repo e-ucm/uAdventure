@@ -10,11 +10,16 @@ namespace uAdventure.Geo
     [ChapterTargetFactory(typeof(MapScene))]
     public class MapSceneMBFactory : MonoBehaviour, IChapterTargetFactory
     {
-        public GameObject geoScenePrefab;
+        public GameObject mapScenePrefab;
+
+        public void Awake()
+        {
+            mapScenePrefab = Resources.Load<GameObject>("MapScene");
+        }
 
         public IRunnerChapterTarget Instantiate(IChapterTarget modelObject)
         {
-            var ms =  GameObject.Instantiate(geoScenePrefab).GetComponent<MapSceneMB>();
+            var ms =  GameObject.Instantiate(mapScenePrefab).GetComponent<MapSceneMB>();
             return ms;
         }
     }

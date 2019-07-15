@@ -6,7 +6,7 @@ using uAdventure.Core;
 
 namespace uAdventure.Editor
 {
-    public class TriggerCutsceneEffectEditor : EffectEditor
+    public class TriggerCutsceneEffectEditor : IEffectEditor
     {
         private bool collapsed = false;
         public bool Collapsed { get { return collapsed; } set { collapsed = value; } }
@@ -52,7 +52,7 @@ namespace uAdventure.Editor
             }
         }
 
-        public EffectEditor clone() { return new TriggerCutsceneEffectEditor(); }
+        public IEffectEditor clone() { return new TriggerCutsceneEffectEditor(); }
 
         public bool manages(IEffect c)
         {

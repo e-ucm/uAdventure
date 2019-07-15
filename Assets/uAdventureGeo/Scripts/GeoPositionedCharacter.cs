@@ -76,10 +76,14 @@ public class GeoPositionedCharacter : MonoBehaviour
             }
         }
 
-        if (Application.isEditor && !moving && !GPSController.Instance.IsStarted()) // Debug GPS location
+        if (Application.isEditor && !moving && !GeoExtension.Instance.IsStarted()) // Debug GPS location
         {
-            thirdPersonCharacter.Move(new Vector3(Input.GetAxis("Horizontal") * 10, 0, Input.GetAxis("Vertical") * 10), false, false);
-            GPSController.Instance.Location = GM.MetersToLatLon(transform.localPosition.ToVector2xz().ToVector2d() + tileManagerRelative);
+            var movement = new Vector3(Input.GetAxis("Horizontal") * 10, 0, Input.GetAxis("Vertical") * 10);
+            thirdPersonCharacter.Move(movement, false, false);
+            if (movement.sqrMagnitude > 0)
+            {
+                GeoExtension.Instance.Location = GM.MetersToLatLon(transform.localPosition.ToVector2xz().ToVector2d() + tileManagerRelative);
+            }
         }
 
         // Update transform values

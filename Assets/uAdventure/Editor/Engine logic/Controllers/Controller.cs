@@ -1582,12 +1582,19 @@ namespace uAdventure.Editor
                 ProjectConfigData.storeToXML();
                 
                 // Check the consistency of the chapters
-                bool valid = chaptersController.isValid(null, null);
+                var incidences = new List<string>();
+                bool valid = chaptersController.isValid(null, incidences);
 
                 // If the data is not valid, show an error message
                 if (!valid)
+                {
                     Debug.LogError(TC.get("Operation.AdventureConsistencyTitle") + "\n" +
                                    TC.get("Operation.AdventurInconsistentWarning"));
+                    foreach (var incidence in incidences)
+                    {
+                        Debug.LogError(incidence);
+                    }
+                }
 
                 // Control the version number
                 string newValue = increaseVersionNumber(adventureDataControl.getAdventureData().getVersionNumber());

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-
+using System.Linq;
 using uAdventure.Core;
 
 namespace uAdventure.Editor
@@ -1309,9 +1309,17 @@ namespace uAdventure.Editor
                     EffectsController.countIdentifierReferences(id, e);
                 }
                 else if (effect is HasTargetId && ((HasTargetId)effect).getTargetId().Equals(id))
+                {
                     count++;
+                }
 
-                if(effect is AbstractEffect)
+                var hasExtraIds = effect as HasExtraIds;
+                if (hasExtraIds != null)
+                {
+                    count+= hasExtraIds.getIds().Count(id.Equals);
+                }
+
+                if (effect is AbstractEffect)
                 {
                     ConditionsController conditionsController =
                         new ConditionsController(((AbstractEffect)effect).getConditions());
@@ -1338,14 +1346,12 @@ namespace uAdventure.Editor
         {
             foreach (var effect in effects.getEffects())
             {
-                if (effect
-                is HasTargetId)
+                if (effect is HasTargetId)
                 {
                     if (((HasTargetId)effect).getTargetId().Equals(oldId))
                         ((HasTargetId)effect).setTargetId(newId);
                 }
-                else
-                if (effect.getType() == EffectType.RANDOM_EFFECT)
+                else if (effect.getType() == EffectType.RANDOM_EFFECT)
                 {
                     RandomEffect randomEffect = (RandomEffect)effect;
                     Effects e = new Effects();
@@ -1354,6 +1360,20 @@ namespace uAdventure.Editor
                     if (randomEffect.getNegativeEffect() != null)
                         e.Add(randomEffect.getNegativeEffect());
                     EffectsController.replaceIdentifierReferences(oldId, newId, e);
+                }
+
+                var hasExtraIds = effect as HasExtraIds;
+                if (hasExtraIds != null)
+                {
+                    var ids = hasExtraIds.getIds();
+                    for (int i = 0, l = ids.Length; i < l; i++)
+                    {
+                        if (ids[i].Equals(oldId))
+                        {
+                            ids[i] = newId;
+                        }
+                    }
+                    hasExtraIds.setIds(ids);
                 }
 
                 if (effect is AbstractEffect)
@@ -1425,6 +1445,22 @@ namespace uAdventure.Editor
                     deleteEffect = deleteSingleEffect(id, effect);
                 }
 
+
+
+                var hasExtraIds = effect as HasExtraIds;
+                if (hasExtraIds != null)
+                {
+                    var ids = hasExtraIds.getIds().ToList();
+                    for (int j = ids.Count - 1; j >= 0; j--)
+                    {
+                        if (ids[j].Equals(id))
+                        {
+                            ids.RemoveAt(j);
+                        }
+                    }
+                    hasExtraIds.setIds(ids.ToArray());
+                }
+
                 // Delete the effect, or increase the counter
                 if (deleteEffect)
                     effects.getEffects().RemoveAt(i);
@@ -1442,6 +1478,7 @@ namespace uAdventure.Editor
             {
                 deleteEffect = ((HasTargetId)effect).getTargetId().Equals(id);
             }
+
 
             return deleteEffect;
         }

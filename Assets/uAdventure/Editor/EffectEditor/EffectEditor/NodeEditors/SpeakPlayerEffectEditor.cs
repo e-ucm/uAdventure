@@ -6,7 +6,7 @@ using uAdventure.Core;
 
 namespace uAdventure.Editor
 {
-    public class SpeakPlayerEffectEditor : EffectEditor
+    public class SpeakPlayerEffectEditor : IEffectEditor
     {
         private FileChooser audioField;
         private bool collapsed = false;
@@ -54,7 +54,7 @@ namespace uAdventure.Editor
 
         public IEffect Effect { get { return effect; } set { effect = value as SpeakPlayerEffect; } }
         public string EffectName { get { return TC.get("SpeakPlayerEffect.Title"); } }
-        public EffectEditor clone() { return new SpeakPlayerEffectEditor(); }
+        public IEffectEditor clone() { return new SpeakPlayerEffectEditor(); }
 
         public bool manages(IEffect c)
         {

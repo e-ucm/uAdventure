@@ -1,8 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
-
 using uAdventure.Core;
-using System;
 
 namespace uAdventure.Runner
 {

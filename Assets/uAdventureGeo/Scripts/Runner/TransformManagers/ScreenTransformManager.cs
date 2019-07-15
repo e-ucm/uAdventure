@@ -17,7 +17,7 @@ namespace uAdventure.Geo
             {
                 transform = value;
                 positioner = transform.gameObject.GetComponent<GeoPositioner>();
-                representable = transform.gameObject.GetComponentInChildren<Representable>();
+                representable = transform.GetComponent<Representable>() ?? transform.gameObject.GetComponentInChildren<Representable>();
                 if (representable != null)
                 {
                     representable.RepresentableChanged += Adapted;

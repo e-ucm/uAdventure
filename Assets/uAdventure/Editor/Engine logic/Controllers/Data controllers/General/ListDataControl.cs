@@ -561,6 +561,7 @@ namespace uAdventure.Editor
                 var hasId = content as HasId;
                 if (hasId != null)
                 {
+                    Controller.Instance.deleteIdentifierReferences(hasId.getId());
                     Controller.Instance.IdentifierSummary.deleteId(hasId.GetType(), hasId.getId());
                 }
 

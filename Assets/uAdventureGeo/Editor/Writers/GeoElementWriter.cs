@@ -19,9 +19,7 @@ namespace uAdventure.Editor
             (node as XmlElement).SetAttribute("id", geoelement.Id);
 
             // Descriptions
-            var descriptions = doc.CreateElement("descriptions");
-            node.AppendChild(descriptions);
-            DOMWriterUtility.DOMWrite(descriptions, geoelement.Descriptions);
+            DOMWriterUtility.DOMWrite(node, geoelement.Descriptions);
 
             // Geometries
             var geometries = doc.CreateElement("geometries");

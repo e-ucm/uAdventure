@@ -93,6 +93,12 @@ namespace uAdventure.Analytics
             CheckTrackerFlush();
         }
 
+        public override void OnReset() { }
+
+        public override void OnBeforeGameSave() { }
+
+        public override void OnAfterGameLoad() { }
+
         private void PrepareTracker(TrackerConfig config)
         {
             trackerConfig = config;
@@ -158,9 +164,9 @@ namespace uAdventure.Analytics
                 Secure = secure,
                 StorageType = storage,
                 TraceFormat = format,
-                BackupStorage = config.getRawCopy()
+                BackupStorage = config.getRawCopy(),
             };
-
+            TrackerAsset.Instance.StrictMode = false;
             TrackerAsset.Instance.Bridge = new UnityBridge();
             TrackerAsset.Instance.Settings = tracker_settings;
 
@@ -225,14 +231,17 @@ namespace uAdventure.Analytics
             UpdateCompletables(completableController => completableController.UpdateMilestones(target));
         }
 
-        public void ElementInteracted(bool finished, Action action)
+        public void ElementInteracted(bool finished, Interactuable interactuable, Action action)
         {
-            var gameObject = GameObject.Find(action.getTargetId());
-            var interactiveElement = gameObject.GetComponentInChildren<Interactuable>(true);
+            var interactiveElement = interactuable as InteractiveElement;
+            if (interactiveElement == null)
+            {
+                return;
+            }
 
             if (!finished)
             {
-                UpdateElementsInteracted(interactiveElement, action.getType().ToString(), action.getTargetId());
+                UpdateElementsInteracted(interactiveElement, action.getType().ToString(), interactiveElement.Element.getId());
 
                 Game.Instance.GameState.BeginChangeAmbit();
             }
@@ -263,7 +272,7 @@ namespace uAdventure.Analytics
                 }
 
                 Game.Instance.GameState.EndChangeAmbitAsExtensions();
-                var element = Game.Instance.GameState.FindElement<Element>(action.getTargetId());
+                var element = interactiveElement.Element;
 
                 if (element is NPC)
                 {

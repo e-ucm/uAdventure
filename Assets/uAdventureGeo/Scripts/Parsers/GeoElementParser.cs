@@ -13,23 +13,22 @@ namespace uAdventure.Geo
         {
             GeoElement parsed = new GeoElement(element.Attributes["id"].Value);
 
-            foreach(var child in element.ChildNodes)
+            var oldDescriptionSystem = new Description();
+            parsed.Descriptions = new List<Description> ();
+            foreach (var child in element.ChildNodes)
             {
                 var node = child as XmlNode;
-                var description = new Description();
-                parsed.Descriptions = new List<Description>{description};
                 switch (node.Name)
                 {
-                    case "descriptions":
-                        parsed.Descriptions =
-                            DOMParserUtility.DOMParse<Description>(node.ChildNodes, parameters).DefaultIfEmpty(new Description()).ToList();
+                    case "description":
+                        parsed.Descriptions.Add(DOMParserUtility.DOMParse<Description>(node, parameters)); 
                         break;
                     case "name":
-                        description.setName(node.InnerText); break;
+                        oldDescriptionSystem.setName(node.InnerText); break;
                     case "brief-description":
-                        description.setDescription(node.InnerText); break;
+                        oldDescriptionSystem.setDescription(node.InnerText); break;
                     case "detailed-description":
-                        description.setDetailedDescription(node.InnerText); break;
+                        oldDescriptionSystem.setDetailedDescription(node.InnerText); break;
                     case "geometries":
                         parsed.Geometries = DOMParserUtility.DOMParse<GMLGeometry>(node.ChildNodes, parameters).DefaultIfEmpty(new GMLGeometry()).ToList(); break;
                     case "geometry":
@@ -44,6 +43,11 @@ namespace uAdventure.Geo
                         break;
 
                 }
+            }
+
+            if (parsed.Descriptions.Count == 0)
+            {
+                parsed.Descriptions.Add(oldDescriptionSystem);
             }
             return parsed;
         }

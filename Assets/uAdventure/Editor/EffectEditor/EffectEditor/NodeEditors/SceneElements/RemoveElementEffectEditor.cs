@@ -7,7 +7,7 @@ using uAdventure.Core;
 
 namespace uAdventure.Editor
 {
-    public class RemoveElementEffectEditor : EffectEditor
+    public class RemoveElementEffectEditor : IEffectEditor
     {
         private bool collapsed = false;
         public bool Collapsed { get { return collapsed; } set { collapsed = value; } }
@@ -55,7 +55,7 @@ namespace uAdventure.Editor
             }
         }
 
-        public EffectEditor clone() { return new RemoveElementEffectEditor(); }
+        public IEffectEditor clone() { return new RemoveElementEffectEditor(); }
 
         public bool manages(IEffect c)
         {

@@ -7,7 +7,7 @@ using System;
 
 namespace uAdventure.Editor
 {
-    public class CancelActionEffectEditor : EffectEditor
+    public class CancelActionEffectEditor : IEffectEditor
     {
         private bool collapsed = false;
         public bool Collapsed { get { return collapsed; } set { collapsed = value; } }
@@ -43,7 +43,7 @@ namespace uAdventure.Editor
 
         public bool Usable { get { return true; } }
 
-        public EffectEditor clone() { return new CancelActionEffectEditor(); }
+        public IEffectEditor clone() { return new CancelActionEffectEditor(); }
 
         public bool manages(IEffect c)
         {

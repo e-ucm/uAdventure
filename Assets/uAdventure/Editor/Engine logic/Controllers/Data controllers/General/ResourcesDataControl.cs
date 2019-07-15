@@ -361,6 +361,11 @@ namespace uAdventure.Editor
 
             bool valid = true;
 
+            if (assetsInformation == null)
+            {
+                return valid;
+            }
+
             // Check the assets that are necessary
             foreach (AssetInformation assetInformation in assetsInformation)
             {
@@ -370,8 +375,12 @@ namespace uAdventure.Editor
                     valid = false;
 
                     // Store the incidence
-                    //if (incidences != null)
-                    //    incidences.Add(currentPath + " >> " + Language.GetText("Operation.AdventureConsistencyErrorResources", assetInformation.name));
+                    if (incidences != null)
+                    {
+                        incidences.Add(currentPath + " >> " +
+                                       TC.get("Operation.AdventureConsistencyErrorResources",
+                                           assetInformation.name));
+                    }
                 }
             }
 

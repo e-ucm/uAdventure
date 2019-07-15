@@ -6,7 +6,7 @@ using uAdventure.Core;
 
 namespace uAdventure.Editor
 {
-    public class TriggerBookEffectEditor : EffectEditor
+    public class TriggerBookEffectEditor : IEffectEditor
     {
         private bool collapsed = false;
         public bool Collapsed { get { return collapsed; } set { collapsed = value; } }
@@ -51,7 +51,7 @@ namespace uAdventure.Editor
             }
         }
 
-        public EffectEditor clone() { return new TriggerBookEffectEditor(); }
+        public IEffectEditor clone() { return new TriggerBookEffectEditor(); }
 
         public bool manages(IEffect c)
         {

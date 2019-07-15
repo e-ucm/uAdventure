@@ -122,6 +122,7 @@ namespace uAdventure.Runner
             varFlags = new Dictionary<string, int>();
             elementContexts = new Dictionary<string, List<ElementReference>>();
             varFlagChangeAmbits = new Stack<List<KeyValuePair<string, int>>>();
+            memories = new Dictionary<string, Memory>();
         }
         
         public void OnGameSuspend()
@@ -470,6 +471,7 @@ namespace uAdventure.Runner
             elementContexts.Clear();
             varFlags.Clear();
             varFlagChangeAmbits.Clear();
+            memories.Clear();
             
             InventoryManager.Instance.Restore();
         }

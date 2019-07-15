@@ -8,7 +8,7 @@ using uAdventure.Core;
 
 namespace uAdventure.Editor
 {
-    public class MovePlayerEffectEditor : EffectEditor
+    public class MovePlayerEffectEditor : IEffectEditor
     {
         private bool collapsed = false;
 
@@ -60,7 +60,7 @@ namespace uAdventure.Editor
             get { return TC.get("MovePlayerEffect.Title"); }
         }
 
-        public EffectEditor clone()
+        public IEffectEditor clone()
         {
             return new MovePlayerEffectEditor();
         }

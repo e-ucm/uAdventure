@@ -7,7 +7,7 @@ using uAdventure.Core;
 
 namespace uAdventure.Editor
 {
-    public class MacroReferenceEffectEditor : EffectEditor
+    public class MacroReferenceEffectEditor : IEffectEditor
     {
         private bool collapsed = false;
         public bool Collapsed { get { return collapsed; } set { collapsed = value; } }
@@ -54,7 +54,7 @@ namespace uAdventure.Editor
             }
         }
 
-        public EffectEditor clone() { return new MacroReferenceEffectEditor(); }
+        public IEffectEditor clone() { return new MacroReferenceEffectEditor(); }
 
         public bool manages(IEffect c)
         {

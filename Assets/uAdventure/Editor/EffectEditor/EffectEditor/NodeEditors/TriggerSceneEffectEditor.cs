@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace uAdventure.Editor
 {
-    public class TriggerSceneEffectEditor : EffectEditor
+    public class TriggerSceneEffectEditor : IEffectEditor
     {
         public bool Collapsed { get; set; }
         private Rect window = new Rect(0, 0, 300, 0);
@@ -153,7 +153,7 @@ namespace uAdventure.Editor
 
         public IEffect Effect { get { return effect; } set { effect = value as TriggerSceneEffect; } }
         public virtual string EffectName { get { return TC.get("TriggerSceneEffect.Title"); } }
-        public virtual EffectEditor clone() { return new TriggerSceneEffectEditor(); }
+        public virtual IEffectEditor clone() { return new TriggerSceneEffectEditor(); }
 
         public bool manages(IEffect c)
         {

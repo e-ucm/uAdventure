@@ -7,7 +7,7 @@ using uAdventure.Core;
 
 namespace uAdventure.Editor
 {
-    public class ActivateEffectEditor : EffectEditor
+    public class ActivateEffectEditor : IEffectEditor
     {
         public bool Collapsed { get; set; }
         private Rect window = new Rect(0, 0, 300, 0);
@@ -51,7 +51,7 @@ namespace uAdventure.Editor
             }
         }
 
-        public EffectEditor clone() { return new ActivateEffectEditor(); }
+        public IEffectEditor clone() { return new ActivateEffectEditor(); }
 
         public bool manages(IEffect c)
         {

@@ -55,7 +55,7 @@ namespace uAdventure.Editor
 
         public override IEffect Effect { get { return effect; } set { effect = value as MoveObjectEffect; } }
         public override string EffectName { get { return TC.get("Effect.MoveObject"); } }
-        public override EffectEditor clone() { return new MoveObjectEffectEditor(); }
+        public override IEffectEditor clone() { return new MoveObjectEffectEditor(); }
 
         public override bool manages(IEffect c)
         {

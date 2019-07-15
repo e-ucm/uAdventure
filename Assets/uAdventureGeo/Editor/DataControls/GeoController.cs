@@ -21,6 +21,57 @@ namespace uAdventure.Geo
         private ChapterDataControl lastSelectedChapterDataControl;
         private ListDataControl<ChapterDataControl, GeoElementDataControl> geoElements;
         private ListDataControl<ChapterDataControl, MapSceneDataControl> mapScenes;
+        private GameObject debugGUIHolder;
+
+        private class DebugLocationHelper : MonoBehaviour
+        {
+
+            private GUIMap guiMap;
+            private Rect debugWindowRect = new Rect(0, 0, 200, 200);
+            private GMLGeometryDataControl playerPosition;
+
+            void OnGUI()
+            {
+                if (guiMap == null)
+                {
+                    guiMap = new GUIMap();
+                }
+
+
+                debugWindowRect = GUI.Window(12341234, debugWindowRect, (id) =>
+                    {
+                        var mapRect = new Rect(2, 18, 196, 180);
+                        using (new GUILayout.AreaScope(mapRect))
+                        {
+                            guiMap.Center = GeoExtension.Instance.Location;
+                            guiMap.Zoom = 17;
+                            guiMap.DrawMap(new Rect(0, 0, 196, 180));
+                            // Calculate the player pixel relative to the map
+                            var playerMeters = MapzenGo.Helpers.GM.LatLonToMeters(GeoExtension.Instance.Location);
+                            var playerPixel = MapzenGo.Helpers.GM.MetersToPixels(playerMeters, guiMap.Zoom);
+                            var playerPixelRelative = playerPixel + guiMap.PATR;
+
+                            // Do the point handling
+                            var pointControl = GUIUtility.GetControlID("PlayerPosition".GetHashCode(), FocusType.Passive);
+                            EditorGUI.BeginChangeCheck();
+                            var newPlayerPixel = HandleUtil.HandlePointMovement(pointControl, playerPixelRelative.ToVector2(), 10,
+                                (point, isOver, isActive) => HandleUtil.DrawPoint(point, 4, Color.cyan,
+                                    Color.black), MouseCursor.MoveArrow);
+                            if (EditorGUI.EndChangeCheck())
+                            {
+                                // If changed, restore the point to the geochar
+                                playerPixel = newPlayerPixel.ToVector2d() - guiMap.PATR;
+                                playerMeters = MapzenGo.Helpers.GM.PixelsToMeters(playerPixel, guiMap.Zoom);
+                                GeoExtension.Instance.Location = MapzenGo.Helpers.GM.MetersToLatLon(playerMeters);
+                            }
+
+                            guiMap.ProcessEvents(mapRect);
+                        }
+                        GUI.DragWindow();
+                    },
+                    "DebugWindow");
+            }
+        }
 
 
         public ListDataControl<ChapterDataControl, GeoElementDataControl> GeoElements
@@ -43,10 +94,29 @@ namespace uAdventure.Geo
 
         public int SelectedGeoElement { get; set; }
         public int SelectedMapScene { get; set; }
+        
 
         private GeoController()
         {
             UpdateChapter();
+            EditorApplication.playModeStateChanged += OnPlayModeChange;
+        }
+
+        ~GeoController()
+        {
+            EditorApplication.playModeStateChanged -= OnPlayModeChange;
+        }
+
+        private void OnPlayModeChange(PlayModeStateChange change)
+        {
+            if (change == PlayModeStateChange.EnteredPlayMode)
+            {
+                debugGUIHolder = new GameObject
+                {
+                    hideFlags = HideFlags.HideAndDontSave
+                };
+                debugGUIHolder.AddComponent<DebugLocationHelper>();
+            }
         }
 
         private void UpdateChapter()

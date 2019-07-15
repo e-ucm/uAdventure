@@ -26,7 +26,7 @@ namespace uAdventure.Editor
 
         public override IEffect Effect { get { return effect; } set { effect = value as ConsumeObjectEffect; } }
         public override string EffectName { get { return TC.get("Effect.ConsumeObject"); } }
-        public override EffectEditor clone() { return new ConsumeObjectEffectEditor(); }
+        public override IEffectEditor clone() { return new ConsumeObjectEffectEditor(); }
 
         public override bool manages(IEffect c)
         {

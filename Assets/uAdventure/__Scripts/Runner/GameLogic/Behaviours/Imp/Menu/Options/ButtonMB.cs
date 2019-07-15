@@ -74,7 +74,14 @@ namespace uAdventure.Runner
                 tmp = Game.Instance.ResourceManager.getSprite(resource.getAssetPath(DescriptorData.NORMAL_BUTTON));
 
             spriteRenderer.sprite = tmp;
-            this.gameObject.AddComponent<PolygonCollider2D>();
+            if (InventoryManager.Instance.Opened)
+            {
+                this.gameObject.AddComponent<BoxCollider2D>();
+            }
+            else
+            {
+                this.gameObject.AddComponent<BoxCollider>();
+            }
             //this.transform.localScale = new Vector3(tmp.width / 75f, tmp.height / 75f, 1);
         }
 

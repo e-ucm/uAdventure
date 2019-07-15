@@ -86,15 +86,15 @@ namespace uAdventure.Geo
             bkCameraTransform = Camera.main.transform.Backup();
 
             // Start the gps just in case is not
-            if (GPSController.Instance.IsStarted())
+            if (GeoExtension.Instance.IsStarted())
             {
-                GPSController.Instance.Start();
+                GeoExtension.Instance.Start();
             }
 
             // If the location is valid
-            if(GPSController.Instance.IsLocationValid())
+            if(GeoExtension.Instance.IsLocationValid())
             {
-                geoCharacter.InstantMoveTo(GPSController.Instance.Location);
+                geoCharacter.InstantMoveTo(GeoExtension.Instance.Location);
             }
             else
             {
@@ -108,13 +108,13 @@ namespace uAdventure.Geo
 
         protected void Update()
         {
-            if(Input.location.status == LocationServiceStatus.Running && Input.location.lastData.timestamp != 0 && Input.location.lastData.latitude != 0)
+            ready = true;
+            if (GeoExtension.Instance.IsLocationValid())
             {
-                var inputLatLon = GPSController.Instance.Location;
-                if (GPSController.Instance.IsLocationValid() 
+                var inputLatLon = GeoExtension.Instance.Location;
+                if (GeoExtension.Instance.IsLocationValid() 
                     && (GM.LatLonToMeters(lastUpdatedPosition) - GM.LatLonToMeters(inputLatLon)).sqrMagnitude >= 1f)
                 {
-                    ready = true;
                     lastUpdatedPosition = inputLatLon;
                     if (GM.SeparationInMeters(geoCharacter.LatLon, inputLatLon) > 150) geoCharacter.InstantMoveTo(inputLatLon);
                     else geoCharacter.MoveTo(inputLatLon);
@@ -122,20 +122,28 @@ namespace uAdventure.Geo
                 
             }
 
-            switch (mapScene.CameraType)
+            if (InventoryManager.Instance.Opened)
             {
-                case CameraType.Aerial2D:
-                    Camera.main.transform.position = character.transform.position + Vector3.up * 50;
-                    Camera.main.transform.rotation = Quaternion.Euler(90, 0, 0);
-                    break;
-                case CameraType.Ortographic3D:
-                    throw new System.NotImplementedException();
-                case CameraType.Perspective3D:
-                    throw new System.NotImplementedException();
-                default:
-                    break;
-
+                Camera.main.transform.rotation = Quaternion.Euler(0, 0, 0);
             }
+            else
+            {
+                switch (mapScene.CameraType)
+                {
+                    case CameraType.Aerial2D:
+                        Camera.main.transform.position = character.transform.position + Vector3.up * 50;
+                        Camera.main.transform.rotation = Quaternion.Euler(90, 0, 0);
+                        break;
+                    case CameraType.Ortographic3D:
+                        throw new System.NotImplementedException();
+                    case CameraType.Perspective3D:
+                        throw new System.NotImplementedException();
+                    default:
+                        break;
+
+                }
+            }
+
             //            Debug.Log("LatLon: " + geoCharacter.LatLon + " LT->Meters->LT: " + GM.MetersToLatLon(GM.LatLonToMeters(geoCharacter.LatLon)));
 
             //geoCharacter.MoveTo(geoCharacter.LatLon + GM.MetersToLatLon(new Vector2d(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"))));

@@ -6,7 +6,7 @@ using uAdventure.Core;
 
 namespace uAdventure.Editor
 {
-    public class TriggerLastSceneEffectEditor : EffectEditor
+    public class TriggerLastSceneEffectEditor : IEffectEditor
     {
         private bool collapsed = false;
         public bool Collapsed { get { return collapsed; } set { collapsed = value; } }
@@ -39,7 +39,7 @@ namespace uAdventure.Editor
 
         public IEffect Effect { get { return effect; } set { effect = value as TriggerLastSceneEffect; } }
         public string EffectName { get { return TC.get("Effect.TriggerLastSceneInfo"); } }
-        public EffectEditor clone() { return new TriggerLastSceneEffectEditor(); }
+        public IEffectEditor clone() { return new TriggerLastSceneEffectEditor(); }
 
         public bool manages(IEffect c)
         {

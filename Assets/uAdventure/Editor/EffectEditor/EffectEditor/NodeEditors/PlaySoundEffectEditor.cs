@@ -7,7 +7,7 @@ using uAdventure.Core;
 
 namespace uAdventure.Editor
 {
-    public class PlaySoundEffectEditor : EffectEditor
+    public class PlaySoundEffectEditor : IEffectEditor
     {
         private FileChooser musicField;
 
@@ -70,7 +70,7 @@ namespace uAdventure.Editor
             get { return TC.get("PlaySoundEffect.Title"); }
         }
 
-        public EffectEditor clone()
+        public IEffectEditor clone()
         {
             return new PlaySoundEffectEditor();
         }

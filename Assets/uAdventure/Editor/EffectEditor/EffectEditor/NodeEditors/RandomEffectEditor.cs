@@ -5,7 +5,7 @@ using uAdventure.Core;
 
 namespace uAdventure.Editor
 {
-    public class RandomEffectEditor : EffectEditor
+    public class RandomEffectEditor : IEffectEditor
     {
         private readonly Texture2D addTexture, removeTexture;
 
@@ -93,7 +93,7 @@ namespace uAdventure.Editor
 
         public bool Usable { get { return true; } }
 
-        public EffectEditor clone() { return new RandomEffectEditor(); }
+        public IEffectEditor clone() { return new RandomEffectEditor(); }
 
         public bool manages(IEffect c)
         {

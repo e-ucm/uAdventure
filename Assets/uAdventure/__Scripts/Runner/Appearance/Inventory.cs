@@ -37,6 +37,9 @@ namespace uAdventure.Runner
             }
 
             element.transform.SetParent(elementHolder.transform);
+            var rectTransform = element.transform as RectTransform;
+            rectTransform.anchoredPosition3D = new Vector3(rectTransform.anchoredPosition3D.x, rectTransform.anchoredPosition3D.y, 0);
+            rectTransform.localRotation = Quaternion.identity;
             element.transform.localScale = Vector3.one;
         }
 

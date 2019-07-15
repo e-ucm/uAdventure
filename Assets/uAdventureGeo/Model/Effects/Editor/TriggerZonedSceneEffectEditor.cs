@@ -12,7 +12,12 @@ namespace uAdventure.Geo
 
         public TriggerZonedSceneEffectEditor() : base()
         {
+            var geoElementsIds = Controller.Instance.IdentifierSummary.getIds<GeoElement>();
             this.effect = triggerZonedSceneEffect = new TriggerZonedSceneEffect(effect.getTargetId(), "", effect.getX(), effect.getY());
+            if (geoElementsIds.Length > 0)
+            {
+                triggerZonedSceneEffect.ZoneId = geoElementsIds[0];
+            }
         }
 
         public override void draw()
@@ -45,7 +50,7 @@ namespace uAdventure.Geo
             }
         }
 
-        public override EffectEditor clone()
+        public override IEffectEditor clone()
         {
             return new TriggerZonedSceneEffectEditor();
         }

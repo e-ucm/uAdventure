@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace uAdventure.Editor
 {
-    public abstract class AbstractItemEffectEditor : EffectEditor
+    public abstract class AbstractItemEffectEditor : IEffectEditor
     {
         private bool collapsed = false;
         public bool Collapsed { get { return collapsed; } set { collapsed = value; } }
@@ -36,7 +36,7 @@ namespace uAdventure.Editor
         public abstract IEffect Effect { get; set; }
         public abstract string EffectName { get; }
         public abstract void draw();
-        public abstract EffectEditor clone();
+        public abstract IEffectEditor clone();
         public abstract bool manages(IEffect c);
     }
 }

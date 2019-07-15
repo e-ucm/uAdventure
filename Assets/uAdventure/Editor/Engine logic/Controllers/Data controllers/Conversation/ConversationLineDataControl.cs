@@ -117,7 +117,7 @@ namespace uAdventure.Editor
         {
             bool valid = true;
 
-            if (controller.IdentifierSummary.existsId(conversationLine.getName()))
+            if (!conversationLine.isPlayerLine() && !controller.IdentifierSummary.existsId(conversationLine.getName()))
             {
                 incidences.Add("Character identifier not found: \"" + conversationLine.getName() + "\"");
                 valid = false;

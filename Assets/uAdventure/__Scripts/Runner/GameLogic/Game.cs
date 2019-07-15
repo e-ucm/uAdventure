@@ -49,12 +49,13 @@ namespace uAdventure.Runner
         private bool doTimeOut;
         private Book openedBook;
         private BookDrawer bookDrawer;
+        private List<GameExtension> gameExtensions;
 
         public delegate void TargetChangedDelegate(IChapterTarget newTarget);
 
         public TargetChangedDelegate OnTargetChanged;
 
-        public delegate void ElementInteractedDelegate(bool finished, Action action);
+        public delegate void ElementInteractedDelegate(bool finished, Interactuable element, Action action);
 
         public ElementInteractedDelegate OnElementInteracted;
 
@@ -129,9 +130,10 @@ namespace uAdventure.Runner
             game_state = new GameState(data);
             bookDrawer = new BookDrawer(ResourceManager);
 
+            gameExtensions = new List<GameExtension>();
             foreach (var gameExtension in GetAllSubclassOf(typeof(GameExtension)))
             {
-                gameObject.AddComponent(gameExtension);
+                gameExtensions.Add(gameObject.AddComponent(gameExtension) as GameExtension);
             }
 
 
@@ -229,11 +231,13 @@ namespace uAdventure.Runner
         {
             GameState.RestoreFrom("save");
             RunTarget(GameState.CurrentTarget);
+            gameExtensions.ForEach(g => g.OnAfterGameLoad());
             uAdventureInputModule.LookingForTarget = null;
         }
 
         public void SaveGame()
         {
+            gameExtensions.ForEach(g => g.OnBeforeGameSave());
             GameState.SerializeTo("save");
         }
 
@@ -311,6 +315,7 @@ namespace uAdventure.Runner
         public void Reset()
         {
             GameState.Reset();
+            gameExtensions.ForEach(g => g.OnReset());
             RunTarget(GameState.CurrentTarget);
             uAdventureInputModule.LookingForTarget = null;
         }
@@ -338,11 +343,11 @@ namespace uAdventure.Runner
             return false;
         }
 
-        public void ElementInteracted(bool finished, Action action)
+        public void ElementInteracted(bool finished, Interactuable element, Action action)
         {
             if (OnElementInteracted != null)
             {
-                OnElementInteracted(finished, action);
+                OnElementInteracted(finished, element, action);
             }
         }
 
@@ -626,7 +631,10 @@ namespace uAdventure.Runner
         private IEnumerator PulseOnTimeCorrutine(EffectHolderNode effect, int time)
         {
             yield return new WaitForSeconds(time);
-            effect.doPulse();
+            if (effect != null)
+            {
+                effect.doPulse();
+            }
             Interacted();
         }
 

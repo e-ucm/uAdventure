@@ -5,36 +5,38 @@ using uAdventure.Runner;
 
 namespace uAdventure.Geo
 {
-    public class GPSController : MonoBehaviour {
+    public class GeoExtension : GameExtension {
 
-        private static GPSController instance;
-        public static GPSController Instance {
+        private static GeoExtension instance;
+        public static GeoExtension Instance {
             get
             {
-                if (instance == null)
-                {
-                    // Try looking for any existing not inicialized
-                    instance = FindObjectOfType<GPSController>();
-                    if (instance == null)
-                    {
-                        var go = new GameObject("GPSController");
-                        instance = go.AddComponent<GPSController>();
-                    }
-                    instance.SendMessage("Awake");
-                    instance.SendMessage("Start");
-                }
                 return instance;
             }
         }
 
-        public bool UsingDebugLocation { get; set; }
+        public bool UsingDebugLocation
+        {
+            get { return memory.Get<bool>("using_debug_location"); }
+            set
+            {
+                if (Application.isEditor && Application.isPlaying)
+                {
+                    memory.Set("using_debug_location", value);
+                }
+            }
+        }
 
+
+        public GeoPositionedCharacter geochar;
+        public float timeToFlush = 5;
         public Texture2D connectedSimbol;
         public Texture2D connectingSimbol;
         public Texture2D disconnectedSimbol;
         public float blinkingTime;
         public float iconWidth, iconHeight;
-        private Vector2d debugLocation;
+        private Memory memory;
+        private float timeSinceLastPositionUpdate = 0;
 
         private float time;
 
@@ -44,7 +46,7 @@ namespace uAdventure.Geo
         void Awake()
         {
             instance = this;
-            DontDestroyOnLoad(this);
+            OnReset();
         }
 
         public void Start()
@@ -53,18 +55,54 @@ namespace uAdventure.Geo
             {
                 StartCoroutine(StartLocation());
             }
+        }
 
-            // In case is necesary
-            // TODO use PlayerPrefs in settings
-            if (PlayerPrefs.HasKey("navigating") && PlayerPrefs.GetInt("navigating") == 1)
+        public override void OnReset()
+        {
+            memory = new Memory();
+            memory.Set("using_debug_location", false);
+            memory.Set("debug_location", Vector2d.zero);
+            memory.Set("navigating", 0);
+            memory.Set("zone_control", false);
+            Game.Instance.GameState.SetMemory("geo_extension", memory);
+            CreateNavigationAndZoneControl();
+        }
+
+        public override void OnAfterGameLoad()
+        {
+            this.memory = Game.Instance.GameState.GetMemory("geo_extension") ?? memory;
+            CreateNavigationAndZoneControl();
+        }
+
+        public override void OnBeforeGameSave()
+        {
+        }
+
+        private void CreateNavigationAndZoneControl()
+        {
+            var oldNavigation = FindObjectOfType<NavigationController>();
+            if (oldNavigation)
             {
-                GameObject.Instantiate(Resources.Load<GameObject>("navigation"));
+                DestroyImmediate(oldNavigation.gameObject);
             }
 
-            if (PlayerPrefs.HasKey("zone_control") && !FindObjectOfType<ZoneControl>())
+            // In case is necesary
+            if (memory.Get<bool>("navigating"))
             {
-                var go = new GameObject();
-                go.AddComponent<ZoneControl>().Restore();
+                var newNavigation = Instantiate(Resources.Load<GameObject>("navigation"));
+                newNavigation.GetComponent<NavigationController>().RestoreNavigation(memory);
+            }
+
+            var oldZoneControl = FindObjectOfType<ZoneControl>();
+            if (oldZoneControl)
+            {
+                DestroyImmediate(oldZoneControl.gameObject);
+            }
+
+            if (memory.Get<bool>("zone_control") && !FindObjectOfType<ZoneControl>())
+            {
+                var newZoneControl = new GameObject("zone_control");
+                newZoneControl.AddComponent<ZoneControl>().Restore(memory);
             }
         }
 
@@ -110,10 +148,6 @@ namespace uAdventure.Geo
             return Input.location.status == LocationServiceStatus.Initializing || Input.location.status == LocationServiceStatus.Running;
         }
 
-        public GeoPositionedCharacter geochar;
-        public float timeToFlush;
-        private float timeSinceLastPositionUpdate = 0;
-
         void Update()
         {
             time += Time.deltaTime;
@@ -124,16 +158,19 @@ namespace uAdventure.Geo
                 time = time - Mathf.Floor(time / blinkingTime) * blinkingTime;
             }
 
+            if (Game.Instance.CurrentTargetRunner.Data is MapScene && !geochar)
+            {
+                geochar = FindObjectOfType<GeoPositionedCharacter>();
+            }
+
             if (timeSinceLastPositionUpdate > timeToFlush)
             {
-                if (!geochar)
-                {
-                    geochar = FindObjectOfType<GeoPositionedCharacter>();
-                }
+                timeSinceLastPositionUpdate = 0;
 
                 if (IsStarted() || UsingDebugLocation || geochar)
                 {
                     var mapScene = Game.Instance.CurrentTargetRunner.Data as MapScene;
+                    Debug.Log(Location);
                     if (mapScene != null)
                     {
                         TrackerExtension.Movement.Moved(mapScene.Id, Location);
@@ -144,7 +181,6 @@ namespace uAdventure.Geo
                     }
 
                     TrackerAsset.Instance.Flush();
-                    timeSinceLastPositionUpdate = 0;
                 }
             }
 
@@ -175,10 +211,10 @@ namespace uAdventure.Geo
 
         public bool IsLocationValid()
         {
-            return Input.location.status == LocationServiceStatus.Running
+            return UsingDebugLocation || (Input.location.status == LocationServiceStatus.Running
                 && Input.location.lastData.timestamp > 0 
                 && Input.location.lastData.LatLon() != Vector2.zero
-                && Mathf.Max(Input.location.lastData.horizontalAccuracy, Input.location.lastData.verticalAccuracy) < 50; // Max 50 metros
+                && Mathf.Max(Input.location.lastData.horizontalAccuracy, Input.location.lastData.verticalAccuracy) < 50); // Max 50 metros
         }
 
         public Vector2d Location
@@ -187,7 +223,7 @@ namespace uAdventure.Geo
             {
                 if (UsingDebugLocation)
                 {
-                    return debugLocation;
+                    return memory.Get<Vector2d>("debug_location");
                 }
 
                 if (IsLocationValid())
@@ -204,8 +240,11 @@ namespace uAdventure.Geo
             }
             set
             {
-                UsingDebugLocation = true;
-                debugLocation = value;
+                if (Application.isEditor && Application.isPlaying)
+                {
+                    UsingDebugLocation = true;
+                    memory.Set("debug_location", value);
+                }
             }
         }
     }

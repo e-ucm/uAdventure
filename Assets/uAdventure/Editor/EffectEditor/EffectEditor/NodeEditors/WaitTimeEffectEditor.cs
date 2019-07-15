@@ -6,7 +6,7 @@ using uAdventure.Core;
 
 namespace uAdventure.Editor
 {
-    public class WaitTimeEffectEditor : EffectEditor
+    public class WaitTimeEffectEditor : IEffectEditor
     {
         private bool collapsed = false;
 
@@ -56,7 +56,7 @@ namespace uAdventure.Editor
             get { return TC.get("Effect.WaitTime"); }
         }
 
-        public EffectEditor clone()
+        public IEffectEditor clone()
         {
             return new WaitTimeEffectEditor();
         }

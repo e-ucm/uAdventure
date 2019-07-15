@@ -5,12 +5,12 @@ using uAdventure.Core;
 
 namespace uAdventure.Editor
 {
-    public interface EffectEditor
+    public interface IEffectEditor
     {
         void draw();
         IEffect Effect { get; set; }
         string EffectName { get; }
-        EffectEditor clone();
+        IEffectEditor clone();
         bool manages(IEffect c);
         bool Collapsed { get; set; }
         Rect Window { get; set; }

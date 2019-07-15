@@ -63,49 +63,7 @@ namespace uAdventure.Editor
                 itemElement.AppendChild(resourcesNode);
             }
 
-            foreach (Description description in item.getDescriptions())
-            {
-
-                // Create the description
-                XmlNode descriptionNode = doc.CreateElement("description");
-
-                // Append the conditions (if available)
-                if (description.getConditions() != null && !description.getConditions().IsEmpty())
-                {
-                    DOMWriterUtility.DOMWrite(descriptionNode, description.getConditions());
-                }
-
-                // Create and append the name, brief description and detailed description and its soundPaths
-                XmlElement nameNode = doc.CreateElement("name");
-
-                if (description.getNameSoundPath() != null && !description.getNameSoundPath().Equals(""))
-                {
-                    nameNode.SetAttribute("soundPath", description.getNameSoundPath());
-                }
-                nameNode.AppendChild(doc.CreateTextNode(description.getName()));
-                descriptionNode.AppendChild(nameNode);
-
-                XmlElement briefNode = doc.CreateElement("brief");
-                if (description.getDescriptionSoundPath() != null && !description.getDescriptionSoundPath().Equals(""))
-                {
-                    briefNode.SetAttribute("soundPath", description.getDescriptionSoundPath());
-                }
-                briefNode.AppendChild(doc.CreateTextNode(description.getDescription()));
-                descriptionNode.AppendChild(briefNode);
-
-                XmlElement detailedNode = doc.CreateElement("detailed");
-                if (description.getDetailedDescriptionSoundPath() != null &&
-                    !description.getDetailedDescriptionSoundPath().Equals(""))
-                {
-                    detailedNode.SetAttribute("soundPath", description.getDetailedDescriptionSoundPath());
-                }
-                detailedNode.AppendChild(doc.CreateTextNode(description.getDetailedDescription()));
-                descriptionNode.AppendChild(detailedNode);
-
-                // Append the description
-                itemElement.AppendChild(descriptionNode);
-
-            }
+            DOMWriterUtility.DOMWrite(itemElement, item.getDescriptions());
 
             // Append the actions (if there is at least one)
             if (item.getActions().Count > 0)

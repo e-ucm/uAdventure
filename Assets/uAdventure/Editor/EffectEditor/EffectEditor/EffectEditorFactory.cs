@@ -21,8 +21,8 @@ namespace uAdventure.Editor
         }
 
         public abstract string[] CurrentEffectEditors { get; }
-        public abstract EffectEditor createEffectEditorFor(string effectName);
-        public abstract EffectEditor createEffectEditorFor(IEffect effect);
+        public abstract IEffectEditor createEffectEditorFor(string effectName);
+        public abstract IEffectEditor createEffectEditorFor(IEffect effect);
         public abstract int EffectEditorIndex(IEffect effect);
         public void ResetInstance()
         {
@@ -33,20 +33,20 @@ namespace uAdventure.Editor
     public class EffectEditorFactoryImp : EffectEditorFactory
     {
         private readonly List<System.Type> types;
-        private readonly List<EffectEditor> effectEditors;
+        private readonly List<IEffectEditor> effectEditors;
 
-        private readonly IEnumerable<EffectEditor> usableEffects;
+        private readonly IEnumerable<IEffectEditor> usableEffects;
         private readonly IEnumerable<string> usableEffectNames;
 
         public EffectEditorFactoryImp()
         {
-            var effectEditorType = typeof(EffectEditor);
+            var effectEditorType = typeof(IEffectEditor);
             types = System.AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(s => s.GetTypes())
                 .Where(p => !p.IsInterface && effectEditorType.IsAssignableFrom(p) && !p.IsAbstract)
                 .ToList();
 
-            effectEditors = types.ConvertAll(t => (EffectEditor)System.Activator.CreateInstance(t));
+            effectEditors = types.ConvertAll(t => (IEffectEditor)System.Activator.CreateInstance(t));
             usableEffects = effectEditors.Where(e => e.Usable);
             usableEffectNames = usableEffects.Select(e => e.EffectName);
         }
@@ -60,7 +60,7 @@ namespace uAdventure.Editor
         }
 
 
-        public override EffectEditor createEffectEditorFor(string effectName)
+        public override IEffectEditor createEffectEditorFor(string effectName)
         {
             var effectEditor = effectEditors.Find(e => e.EffectName.Equals(effectName, System.StringComparison.InvariantCultureIgnoreCase));
             if (effectEditor != null)
@@ -70,7 +70,7 @@ namespace uAdventure.Editor
             return null;
         }
 
-        public override EffectEditor createEffectEditorFor(IEffect effect)
+        public override IEffectEditor createEffectEditorFor(IEffect effect)
         {
             var effectEditor = effectEditors.Find(e => e.manages(effect));
             if (effectEditor != null)

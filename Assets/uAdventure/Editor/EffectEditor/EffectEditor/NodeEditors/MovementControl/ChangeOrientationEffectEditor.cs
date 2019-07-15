@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace uAdventure.Editor
 {
-    public class ChangeOrientationEffectEditor : EffectEditor
+    public class ChangeOrientationEffectEditor : IEffectEditor
     {
         private readonly int[] orientationValues;
         private readonly string[] orientationTexts;
@@ -65,7 +65,7 @@ namespace uAdventure.Editor
             }
         }
 
-        public EffectEditor clone() { return new ChangeOrientationEffectEditor(); }
+        public IEffectEditor clone() { return new ChangeOrientationEffectEditor(); }
 
         public bool manages(IEffect c)
         {

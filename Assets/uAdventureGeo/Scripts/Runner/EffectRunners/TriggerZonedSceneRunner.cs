@@ -25,7 +25,6 @@ namespace uAdventure.Geo
             zc.loadOnExit = Game.Instance.GameState.CurrentTarget;
             zc.transitionTime = effect.getTransitionTime();
             zc.zoneid = geoElement.Id;
-            zc.Save();
 
             Game.Instance.RunTarget(effect.getTargetId(), effect.getTransitionTime(), effect.getTransitionType());
 
@@ -42,9 +41,10 @@ namespace uAdventure.Geo
 
         void Start()
         {
-            if (!GPSController.Instance.IsStarted())
+            if (!GeoExtension.Instance.IsStarted())
             {
-                GPSController.Instance.Start();
+                GeoExtension.Instance.Start();
+                Save(Game.Instance.GameState.GetMemory("geo_extension"));
             }
         }
         
@@ -56,51 +56,38 @@ namespace uAdventure.Geo
                 return; // We have to respect if something is running, like a conversation or an effect
             }
 
-            if(GPSController.Instance.IsLocationValid())
+            if(GeoExtension.Instance.IsLocationValid())
             {
-                if (!zone.InsideInfluence(GPSController.Instance.Location, 5))
+                if (!zone.InsideInfluence(GeoExtension.Instance.Location, 5))
                 {
                     Debug.Log("No está en la influencia, pero la ubicación es válida");
                     Game.Instance.RunTarget(loadOnExit, 0, 0);
-                    RemoveKeys();
+                    Game.Instance.GameState.GetMemory("geo_extension").Set("zone_control", false);
                     DestroyImmediate(this.gameObject);
                 }
             }
-            else if (!GPSController.Instance.IsStarted() && !zone.InsideInfluence(GPSController.Instance.Location, 5))
+            else if (!GeoExtension.Instance.IsStarted() && !zone.InsideInfluence(GeoExtension.Instance.Location, 5))
             {
                 Debug.Log("No está en la influencia");
                 Game.Instance.RunTarget(loadOnExit, 0, 0);
-                RemoveKeys();
+                Game.Instance.GameState.GetMemory("geo_extension").Set("zone_control", false);
                 DestroyImmediate(this.gameObject);
             }
         }
 
-        void RemoveKeys()
+        private void Save(Memory memory)
         {
-            // TODO use PlayerPrefs in settings
-            PlayerPrefs.DeleteKey("zone_control");
-            PlayerPrefs.DeleteKey("zone_control_loadonexit");
-            PlayerPrefs.DeleteKey("zone_control_id");
-            PlayerPrefs.DeleteKey("zone_control_transitiontime");
-            PlayerPrefs.Save();
+            memory.Set("zone_control", true);
+            memory.Set("zone_control_loadonexit", loadOnExit);
+            memory.Set("zone_control_id", zoneid);
+            memory.Set("zone_control_transitiontime", transitionTime);
         }
 
-        public void Save()
+        public void Restore(Memory memory)
         {
-            // TODO use PlayerPrefs in settings
-            PlayerPrefs.SetInt("zone_control", 1);
-            PlayerPrefs.SetString("zone_control_loadonexit", loadOnExit);
-            PlayerPrefs.SetString("zone_control_id", zoneid);
-            PlayerPrefs.SetFloat("zone_control_transitiontime", transitionTime);
-            PlayerPrefs.Save();
-        }
-
-        public void Restore()
-        {
-            // TODO use PlayerPrefs in settings
-            loadOnExit = PlayerPrefs.GetString("zone_control_loadonexit");
-            zone = Game.Instance.GameState.FindElement<GeoElement>(PlayerPrefs.GetString("zone_control_id")).Geometries.Checked().FirstOrDefault();
-            transitionTime = PlayerPrefs.GetFloat("zone_control_transitiontime");
+            loadOnExit = memory.Get<string>("zone_control_loadonexit");
+            zone = Game.Instance.GameState.FindElement<GeoElement>(memory.Get<string>("zone_control_id")).Geometries.Checked().FirstOrDefault();
+            transitionTime = memory.Get<float>("zone_control_transitiontime");
         }
     }
 }

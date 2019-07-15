@@ -201,7 +201,7 @@ namespace uAdventure.Runner
         }
         private void OnActionStarted(object interactuable)
         {
-            Game.Instance.ElementInteracted(false, interactuable as Action);
+            Game.Instance.ElementInteracted(false, this, interactuable as Action);
         }
 
         private void OnActionFinished(object interactuable)
@@ -220,7 +220,7 @@ namespace uAdventure.Runner
             if (action == null)
                 return;
 
-            Game.Instance.ElementInteracted(false, action);
+            Game.Instance.ElementInteracted(false, this, action);
         }
 
         public void OnTargetSelected(PointerEventData data)

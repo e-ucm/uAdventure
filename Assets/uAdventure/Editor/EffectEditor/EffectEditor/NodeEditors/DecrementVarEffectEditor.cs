@@ -8,7 +8,7 @@ using uAdventure.Core;
 
 namespace uAdventure.Editor
 {
-    public class DecrementVarEffectEditor : EffectEditor
+    public class DecrementVarEffectEditor : IEffectEditor
     {
         private bool collapsed = false;
         public bool Collapsed { get { return collapsed; } set { collapsed = value; } }
@@ -54,7 +54,7 @@ namespace uAdventure.Editor
             }
         }
 
-        public EffectEditor clone() { return new DecrementVarEffectEditor(); }
+        public IEffectEditor clone() { return new DecrementVarEffectEditor(); }
 
         public bool manages(IEffect c)
         {

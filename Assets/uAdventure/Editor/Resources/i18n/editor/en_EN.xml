@@ -2422,4 +2422,9 @@
   <entry key="QR.QRCodeEditorWindow.Save">Save</entry>
   <entry key="QR.QRCodeEditorWindow.Save.Title">Save the QR code</entry>
   <entry key="QR.QRCodeEditorWindow.Print">Print</entry>
+  <entry key="QR.QRScannerEffect.Title">Open QR Scanner</entry>
+  <entry key="QR.QRScannerEffect.ListType.BlackList">Black list</entry>
+  <entry key="QR.QRScannerEffect.ListType.WhiteList">White list</entry>
+  <entry key="QR.QRScannerEffectEditor.Message">Message</entry>
+  <entry key="QR.QRScannerEffectEditor.ListType">List type</entry>
 </properties>

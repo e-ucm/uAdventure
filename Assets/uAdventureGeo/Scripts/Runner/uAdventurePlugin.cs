@@ -7,6 +7,7 @@ using System.Collections.Generic;
 
 using uAdventure.Runner;
 using System.Runtime.CompilerServices;
+using System.Linq;
 
 namespace uAdventure.Geo
 {
@@ -33,7 +34,8 @@ namespace uAdventure.Geo
         protected override IEnumerator CreateRoutine(Tile tile, Action<bool> finished)
         {
             
-            var allElements = MapSceneMB.MapElements.FindAll(elem => elem.Conditions == null || ConditionChecker.check(elem.Conditions));
+            var allElements = MapSceneMB.MapElements.FindAll(elem => elem.Conditions == null || ConditionChecker.check(elem.Conditions))
+                .Where(tc => !tc.IsRemoved());
             foreach(var elem in allElements)
             {
                 if (!AdoptedElements.Contains(elem) && !OrphanElements.Contains(elem))
@@ -50,7 +52,7 @@ namespace uAdventure.Geo
         protected override IEnumerator UnLoadRoutine(Tile tile, Action<bool> finished)
         {
 
-            var notExisting = MapSceneMB.MapElements.FindAll(elem => elem.Conditions != null && !ConditionChecker.check(elem.Conditions));
+            var notExisting = MapSceneMB.MapElements.FindAll(elem => (elem.Conditions != null && !ConditionChecker.check(elem.Conditions)) || elem.IsRemoved());
             foreach (var elem in notExisting)
             {
                 if (OrphanElements.Contains(elem))
@@ -83,7 +85,7 @@ namespace uAdventure.Geo
             if (AdoptedElements.Contains(mapElement))
             {
                 AdoptedElements.Remove(mapElement);
-                if(mapElement.Conditions == null || ConditionChecker.check(mapElement.Conditions))
+                if((mapElement.Conditions == null || ConditionChecker.check(mapElement.Conditions)) && !mapElement.IsRemoved())
                     OrphanElements.Add(mapElement);
             }
         }

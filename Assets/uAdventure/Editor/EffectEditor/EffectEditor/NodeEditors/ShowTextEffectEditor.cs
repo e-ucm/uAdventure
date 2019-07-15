@@ -5,7 +5,7 @@ using uAdventure.Core;
 
 namespace uAdventure.Editor
 {
-    public class ShowTextEffectEditor : EffectEditor
+    public class ShowTextEffectEditor : IEffectEditor
     {
         public bool Collapsed { get; set; }
         private Rect window = new Rect(0, 0, 300, 0);
@@ -75,7 +75,7 @@ namespace uAdventure.Editor
 
         public IEffect Effect { get { return effect; } set { effect = value as ShowTextEffect; } }
         public string EffectName { get { return TC.get("Effect.ShowText"); } }
-        public EffectEditor clone() { return new ShowTextEffectEditor(); }
+        public IEffectEditor clone() { return new ShowTextEffectEditor(); }
 
         public bool manages(IEffect c)
         {

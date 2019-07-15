@@ -7,7 +7,7 @@ using uAdventure.Core;
 
 namespace uAdventure.Editor
 {
-    public class PlayAnimationEffectEditor : EffectEditor, DialogReceiverInterface
+    public class PlayAnimationEffectEditor : IEffectEditor, DialogReceiverInterface
     {
         
         private string slidesPath = "assets/special/EmptyAnimation";
@@ -57,7 +57,7 @@ namespace uAdventure.Editor
             get { return TC.get("PlayAnimationEffect.Title"); }
         }
 
-        public EffectEditor clone()
+        public IEffectEditor clone()
         {
             return new PlayAnimationEffectEditor();
         }

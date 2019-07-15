@@ -32,7 +32,7 @@ namespace uAdventure.Editor
 
         public override IEffect Effect { get { return effect; } set { effect = value as HighlightItemEffect; } }
         public override string EffectName { get { return TC.get("HighlightItemEffect.Title"); } }
-        public override EffectEditor clone() { return new HighlightItemEffectEditor(); }
+        public override IEffectEditor clone() { return new HighlightItemEffectEditor(); }
 
         public override bool manages(IEffect c)
         {

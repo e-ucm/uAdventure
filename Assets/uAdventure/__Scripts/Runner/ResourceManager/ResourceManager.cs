@@ -136,7 +136,7 @@ namespace uAdventure.Runner
 
         public Texture2D getImage(string uri)
         {
-            return getImage(uri, false);
+            return getImage(uri, true);
         }
 
         public Texture2D getImage(string uri, bool loadFromDefaults)

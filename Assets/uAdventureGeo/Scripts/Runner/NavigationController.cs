@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 using MapzenGo.Helpers;
+using uAdventure.Runner;
 
 namespace uAdventure.Geo
 {
@@ -41,6 +42,7 @@ namespace uAdventure.Geo
         private Dictionary<NavigationStep, bool> stepCompleted;
         private Dictionary<NavigationStep, int> completedElementsForStep;
         private GeoPositionedCharacter character;
+
 
         // ----------------------
         // Init
@@ -88,30 +90,29 @@ namespace uAdventure.Geo
 
             navigating = true;
             if (Steps.Count > 0)
+            {
                 currentStep = Steps[0];
+            }
 
-            SaveNavigation();
+            SaveNavigation(Game.Instance.GameState.GetMemory("geo_extension"));
         }
 
-        private void SaveNavigation()
+        private void SaveNavigation(Memory memory)
         {
-            // TODO use PlayerPrefs in settings
-            PlayerPrefs.SetInt("navigating", navigating ? 1 : 0);
+            memory.Set("navigating", navigating);
             if (navigating)
             {
-                PlayerPrefs.SetString("navigation_strategy", NavigationStrategy.ToString());
-                PlayerPrefs.SetString("navigation_steps", String.Join(",", Steps.ConvertAll(s => s.Reference).ToArray()));
-                PlayerPrefs.SetString("navigation_locks", String.Join(",", Steps.ConvertAll(s => s.LockNavigation.ToString()).ToArray()));
-                PlayerPrefs.SetString("navigation_completed", String.Join(",", Steps.ConvertAll(s => stepCompleted.ContainsKey(s) ? stepCompleted[s] : false).ConvertAll(b => b.ToString()).ToArray()));
-                PlayerPrefs.SetString("navigation_elems_completed", String.Join(",", Steps.ConvertAll(s => completedElementsForStep.ContainsKey(s) ? completedElementsForStep[s] : 0).ConvertAll(i => i.ToString()).ToArray()));
+                memory.Set("navigation_strategy", NavigationStrategy.ToString());
+                memory.Set("navigation_steps", String.Join(",", Steps.ConvertAll(s => s.Reference).ToArray()));
+                memory.Set("navigation_locks", String.Join(",", Steps.ConvertAll(s => s.LockNavigation.ToString()).ToArray()));
+                memory.Set("navigation_completed", String.Join(",", Steps.ConvertAll(s => stepCompleted.ContainsKey(s) && stepCompleted[s]).ConvertAll(b => b.ToString()).ToArray()));
+                memory.Set("navigation_elems_completed", String.Join(",", Steps.ConvertAll(s => completedElementsForStep.ContainsKey(s) ? completedElementsForStep[s] : 0).ConvertAll(i => i.ToString()).ToArray()));
             }
-            PlayerPrefs.Save();
         }
 
-        private void RestoreNavigation()
+        public void RestoreNavigation(Memory memory)
         {
-            // TODO use PlayerPrefs in settings
-            if (PlayerPrefs.HasKey("navigating") && PlayerPrefs.GetInt("navigating") == 1)
+            if (memory.Get<bool>("navigating"))
             {
                 stepCompleted.Clear();
                 completedElementsForStep.Clear();
@@ -119,13 +120,12 @@ namespace uAdventure.Geo
                 try
                 {
                     navigating = true;
-                    // TODO use PlayerPrefs in settings
-                    NavigationStrategy = PlayerPrefs.GetString("navigation_strategy").ToEnum<NavigationType>();
-                    var locks = PlayerPrefs.GetString("navigation_locks").Split(',').ToList().ConvertAll(l => bool.Parse(l));
-                    var completed = PlayerPrefs.GetString("navigation_completed").Split(',').ToList().ConvertAll(l => bool.Parse(l));
-                    var elems = PlayerPrefs.GetString("navigation_elems_completed").Split(',').ToList().ConvertAll(l => int.Parse(l));
+                    NavigationStrategy = memory.Get<string>("navigation_strategy").ToEnum<NavigationType>();
+                    var locks = memory.Get<string>("navigation_locks").Split(',').ToList().ConvertAll(l => bool.Parse(l));
+                    var completed = memory.Get<string>("navigation_completed").Split(',').ToList().ConvertAll(l => bool.Parse(l));
+                    var elems = memory.Get<string>("navigation_elems_completed").Split(',').ToList().ConvertAll(l => int.Parse(l));
 
-                    Steps = PlayerPrefs.GetString("navigation_steps").Split(',').ToList().ConvertAll(r => new NavigationStep(r));
+                    Steps = memory.Get<string>("navigation_steps").Split(',').ToList().ConvertAll(r => new NavigationStep(r));
                     for (int i = 0; i < steps.Count; i++)
                     {
                         Steps[i].LockNavigation = locks[i];
@@ -154,7 +154,6 @@ namespace uAdventure.Geo
         {
             Instance = this;
             Init();
-            RestoreNavigation();
         }
 
         public void Update()
@@ -186,7 +185,7 @@ namespace uAdventure.Geo
                         {
                             // Navigation finished
                             navigating = false;
-                            SaveNavigation();
+                            SaveNavigation(Game.Instance.GameState.GetMemory("geo_extension"));
                             DestroyImmediate(this.gameObject);
                         }
                     }
@@ -229,8 +228,8 @@ namespace uAdventure.Geo
                 // Otherwise, if there is no character or gps, only one of the checks is valid
 
                 return (!character || distance < interactionRange) 
-                    && (!GPSController.Instance.IsStarted() || realDistance < interactionRange)
-                    && (GPSController.Instance.IsStarted() || character);
+                    && (!GeoExtension.Instance.IsStarted() || realDistance < interactionRange)
+                    && (GeoExtension.Instance.IsStarted() || character);
             }
             else if (mb is GeoElementMB)
             {
@@ -241,8 +240,8 @@ namespace uAdventure.Geo
 
                 // TODO check if the line element is reached
                 return (!character || geomb.Geometry.InsideInfluence(character.LatLon)) 
-                    && (!GPSController.Instance.IsStarted() || geomb.Geometry.InsideInfluence(Input.location.lastData.LatLonD()))
-                    && (GPSController.Instance.IsStarted() || character);
+                    && (!GeoExtension.Instance.IsStarted() || geomb.Geometry.InsideInfluence(Input.location.lastData.LatLonD()))
+                    && (GeoExtension.Instance.IsStarted() || character);
             }
             else return false;
         }
@@ -279,7 +278,7 @@ namespace uAdventure.Geo
 
             stepCompleted[currentStep] = completed;
 
-            SaveNavigation();
+            SaveNavigation(Game.Instance.GameState.GetMemory("geo_extension"));
             return completed;
         }
 
@@ -335,7 +334,7 @@ namespace uAdventure.Geo
             {
                 latLon = character.LatLon; // use the position of the character to calculate distance
             }
-            else if (GPSController.Instance.IsLocationValid()) // If We have a location source we use it
+            else if (GeoExtension.Instance.IsLocationValid()) // If We have a location source we use it
             {
                 latLon = Input.location.lastData.LatLonD();
             }

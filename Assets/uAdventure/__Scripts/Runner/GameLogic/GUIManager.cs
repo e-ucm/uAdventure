@@ -228,15 +228,15 @@ namespace uAdventure.Runner
 
             if (talker != null)
             {
-                Vector2 position = talker.transform.position;
+                Vector3 position = talker.transform.position;
 
                 newBubble.Origin = position;
-                newBubble.Destiny = position + new Vector2(0, talker.transform.lossyScale.y * 0.6f);
+                newBubble.Destiny = position + Camera.main.transform.up * talker.transform.lossyScale.y * 0.6f;
             }
             else
             {
                 newBubble.Origin = Camera.main.transform.position;
-                newBubble.Destiny = Camera.main.transform.position + new Vector3(0, 15, 0);
+                newBubble.Destiny = Camera.main.transform.position + Camera.main.transform.up * 15;
             }
 
             return newBubble;
@@ -255,7 +255,7 @@ namespace uAdventure.Runner
             SetCursor(toPut);
         }
 
-        private Vector2 SceneVector2GuiVector(Vector2 v)
+        private Vector2 SceneVector2GuiVector(Vector3 v)
         {
             // Convert it to ViewPort
             v = Camera.main.WorldToViewportPoint(v);

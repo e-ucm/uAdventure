@@ -11,7 +11,7 @@ using System.Collections.Generic;
 namespace uAdventure.Geo
 {
 
-    public class NavigateEffectEditor : EffectEditor
+    public class NavigateEffectEditor : IEffectEditor
     {
         // --------------------
         // Attributes
@@ -83,7 +83,7 @@ namespace uAdventure.Geo
         // Methods
         //--------------------------
 
-        public EffectEditor clone()
+        public IEffectEditor clone()
         {
             return new NavigateEffectEditor();
         }

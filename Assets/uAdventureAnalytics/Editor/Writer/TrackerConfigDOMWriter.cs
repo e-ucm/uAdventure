@@ -38,6 +38,7 @@ namespace uAdventure.Analytics
 
             trackerConfigElement.SetAttribute("host", trackerConfig.getHost());
             trackerConfigElement.SetAttribute("trackingCode", trackerConfig.getTrackingCode());
+            trackerConfigElement.SetAttribute("flushInterval", trackerConfig.getFlushInterval().ToString());
 
             trackerConfigElement.SetAttribute("debug", trackerConfig.getDebug() ? "yes" : "no");
         }

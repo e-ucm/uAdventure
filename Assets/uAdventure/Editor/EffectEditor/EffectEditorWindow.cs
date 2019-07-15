@@ -10,7 +10,7 @@ namespace uAdventure.Editor
     {
         private static readonly Vector2 initialSize = new Vector2(200, 50);
         private static GUIContent buttonContent = new GUIContent();
-        private readonly Dictionary<IEffect, EffectEditor> editors = new Dictionary<IEffect, EffectEditor>();
+        private readonly Dictionary<IEffect, IEffectEditor> editors = new Dictionary<IEffect, IEffectEditor>();
         private GUIStyle conditionStyle, eitherConditionStyle;
         private readonly Dictionary<string, Texture2D> icons = new Dictionary<string, Texture2D>();
 
@@ -264,7 +264,7 @@ namespace uAdventure.Editor
 
         protected override void DrawNodeControls(Effects content, IEffect node)
         {
-            EffectEditor editor = null;
+            IEffectEditor editor = null;
             editors.TryGetValue(node, out editor);
 
             string[] editorNames = EffectEditorFactory.Intance.CurrentEffectEditors;

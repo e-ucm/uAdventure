@@ -42,15 +42,15 @@ namespace uAdventure.Runner
             set { this.textOutlineColor = value; }
         }
 
-        public Vector2 origin;
-        public Vector2 Origin
+        public Vector3 origin;
+        public Vector3 Origin
         {
             get { return origin; }
             set { this.origin = value; }
         }
 
-        public Vector2 destiny;
-        public Vector2 Destiny
+        public Vector3 destiny;
+        public Vector3 Destiny
         {
             get { return destiny; }
             set { this.destiny = value; }
@@ -63,18 +63,18 @@ namespace uAdventure.Runner
             set { talker = value; }
         }
 
-        public BubbleData(string line, Vector2 origin, Vector2 destiny, GameObject talker = null)
+        public BubbleData(string line, Vector3 origin, Vector3 destiny, GameObject talker = null)
         {
             initialize(line, origin, destiny, Color.white, Color.black, Color.white, Color.black, talker);
         }
 
-        public BubbleData(string line, Vector2 origin, Vector2 destiny, Color baseColor, Color outlineColor, Color textColor, Color textOutlineColor, GameObject talker = null)
+        public BubbleData(string line, Vector3 origin, Vector3 destiny, Color baseColor, Color outlineColor, Color textColor, Color textOutlineColor, GameObject talker = null)
         {
             initialize(line, origin, destiny, baseColor, outlineColor, textColor, textOutlineColor, talker);
         }
 
 
-        private void initialize(string line, Vector2 origin, Vector2 destiny, Color baseColor, Color outlineColor, Color textColor, Color textOutlineColor, GameObject talker = null)
+        private void initialize(string line, Vector3 origin, Vector3 destiny, Color baseColor, Color outlineColor, Color textColor, Color textOutlineColor, GameObject talker = null)
         {
             this.line = line;
 

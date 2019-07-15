@@ -267,7 +267,7 @@ namespace uAdventure.Geo
             {
                 get
                 {
-                    return GPSController.Instance.IsStarted() && GPSController.Instance.IsLocationValid()
+                    return GeoExtension.Instance.IsStarted() && GeoExtension.Instance.IsLocationValid()
                         ? Input.location.lastData.LatLonD()
                         : Holder.player.LatLon;
                 }

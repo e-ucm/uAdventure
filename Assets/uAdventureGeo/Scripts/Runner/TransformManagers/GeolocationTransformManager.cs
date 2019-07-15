@@ -33,7 +33,7 @@ namespace uAdventure.Geo
                 material = particles.GetComponent<ParticleSystemRenderer>().material;
 
                 character = GameObject.FindObjectOfType<GeoPositionedCharacter>();
-                interactuable = transform.GetComponentInChildren<Interactuable>();
+                interactuable = transform.GetComponent<Interactuable>() ?? transform.GetComponentInChildren<Interactuable>();
 
                 representable = transform.gameObject.GetComponent<Representable>();
                 if (representable != null)

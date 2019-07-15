@@ -15,6 +15,7 @@ namespace uAdventure.Analytics
             trackerConfig.setHost(element.GetAttribute("host"));
             trackerConfig.setTrackingCode(element.GetAttribute("trackingCode"));
             trackerConfig.setDebug(element.GetAttribute("debug") == "yes");
+            trackerConfig.setFlushInterval(ExParsers.ParseDefault(element.GetAttribute("flushInterval"), 3));
 
             if (element.HasAttribute("storageType"))
             {
