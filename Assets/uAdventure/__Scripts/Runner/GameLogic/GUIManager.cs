@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 using uAdventure.Core;
+using UnityEngine.SceneManagement;
+using System.Collections.Generic;
+using AssetPackage;
 
 namespace uAdventure.Runner
 {
@@ -303,7 +306,52 @@ namespace uAdventure.Runner
 
         public void ExitApplication()
         {
-            Application.Quit();
+            if (PlayerPrefs.HasKey("LimesurveyToken") && PlayerPrefs.GetString("LimesurveyToken") != "ADMIN" && PlayerPrefs.HasKey("LimesurveyPost"))
+            {
+                string path = Application.persistentDataPath;
+
+                if (!path.EndsWith("/"))
+                {
+                    path += "/";
+                }
+
+                Dictionary<string, string> headers = new Dictionary<string, string>();
+
+                Net net = new Net(this);
+
+                WWWForm data = new WWWForm();
+
+                TrackerAssetSettings trackersettings = (TrackerAssetSettings) TrackerAsset.Instance.Settings;
+                string backupfile = Application.persistentDataPath + System.IO.Path.DirectorySeparatorChar + trackersettings.BackupFile;
+
+                data.AddField("token", PlayerPrefs.GetString("LimesurveyToken"));
+                data.AddBinaryData("traces", System.Text.Encoding.UTF8.GetBytes(System.IO.File.ReadAllText(backupfile)));
+
+                //d//ata.headers.Remove ("Content-Type");// = "multipart/form-data";
+
+                net.POST(PlayerPrefs.GetString("LimesurveyHost") + "classes/collector", data, new SavedTracesListener());
+
+                System.IO.File.AppendAllText(path + PlayerPrefs.GetString("LimesurveyToken") + ".csv", System.IO.File.ReadAllText(backupfile));
+                PlayerPrefs.SetString("CurrentSurvey", "post");
+                SceneManager.LoadScene("_Survey");
+            }
+            else
+                Application.Quit();
+        }
+
+        class SavedTracesListener : Net.IRequestListener
+        {
+            public void Result(string data)
+            {
+                Debug.Log("------------------------");
+                Debug.Log(data);
+            }
+
+            public void Error(string error)
+            {
+                Debug.Log("------------------------");
+                Debug.Log(error);
+            }
         }
     }
 }

@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -203,6 +203,7 @@ RectTransform:
   - {fileID: 1615906990}
   - {fileID: 585846352}
   - {fileID: 1228137614}
+  - {fileID: 1716430557}
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -278,7 +279,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Introduce tu nombre
+  m_Text: "Introduce un c\xF3digo"
 --- !u!222 &151349835
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -296,7 +297,7 @@ GameObject:
   - component: {fileID: 221819141}
   - component: {fileID: 221819140}
   m_Layer: 5
-  m_Name: Text
+  m_Name: TokenText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -441,7 +442,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: First Aid Game Login
+  m_Text: "El Se\xF1or de los Arbustos"
 --- !u!222 &303916504
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -525,7 +526,6 @@ GameObject:
   - component: {fileID: 458239702}
   - component: {fileID: 458239703}
   - component: {fileID: 458239704}
-  - component: {fileID: 458239705}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -622,7 +622,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 458239696}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b8965b24815e1e24091d92d301653f35, type: 3}
+  m_Script: {fileID: 11500000, guid: 4d50476fcba95b340b85b2fc12842c68, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   t: {fileID: 221819140}
@@ -634,28 +634,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 458239696}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1ef26519a418a446f834e3f77d246219, type: 3}
+  m_Script: {fileID: 11500000, guid: 0a7d630856f7503479d8f0fcc8b0e727, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rawCopy: 0
-  flushInterval: -1
-  checkInterval: 3
-  storageType: local
-  traceFormat: csv
-  host: 
-  trackingCode: 
-  debug: 0
---- !u!114 &458239705
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 458239696}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 241cb6d918e08e9489cba7de8fad2328, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  token: {fileID: 221819140}
+  response: {fileID: 1716430558}
 --- !u!1 &585846351
 GameObject:
   m_ObjectHideFlags: 0
@@ -942,15 +925,15 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 458239702}
-        m_MethodName: ChangeScene
-        m_Mode: 5
+      - m_Target: {fileID: 458239704}
+        m_MethodName: validate
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: _Scene1
+          m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
@@ -1018,10 +1001,10 @@ RectTransform:
   m_Father: {fileID: 36549294}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 14, y: -28}
-  m_SizeDelta: {x: -372, y: -445}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 14, y: -27.2}
+  m_SizeDelta: {x: 428, y: 158.4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1377728934
 MonoBehaviour:
@@ -1197,10 +1180,84 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Nombre
+  m_Text: "C\xF3digo"
 --- !u!222 &1615906992
 CanvasRenderer:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1615906989}
+--- !u!1 &1716430556
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 1716430557}
+  - component: {fileID: 1716430559}
+  - component: {fileID: 1716430558}
+  m_Layer: 5
+  m_Name: ResponseText
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1716430557
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1716430556}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 36549294}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 13.999939, y: -154.00005}
+  m_SizeDelta: {x: 428, y: 62}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1716430558
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1716430556}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 708705254, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 0, b: 0, a: 1}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_FontData:
+    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_FontSize: 20
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 2
+    m_MaxSize: 40
+    m_Alignment: 1
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: 
+--- !u!222 &1716430559
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1716430556}
