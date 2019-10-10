@@ -176,7 +176,46 @@ namespace uAdventure.Geo
 
         public override bool moveElementDown(DataControl dataControl) { return false; }
 
-        public override string renameElement(string newName) { return null; }
+
+        public override string renameElement(string newName)
+        {
+            string oldMapSceneId = mapScene.getId();
+            string references = controller.countIdentifierReferences(oldMapSceneId).ToString();
+
+            // Ask for confirmation 
+            if (newName != null || controller.ShowStrictConfirmDialog(TC.get("Operation.RenameSceneTitle"), TC.get("Operation.RenameElementWarning", new string[] { oldMapSceneId, references })))
+            {
+                // Show a dialog asking for the new atrezzo item id
+                if (newName == null)
+                {
+                    controller.ShowInputDialog(TC.get("Operation.RenameSceneTitle"), TC.get("Operation.RenameSceneMessage"), oldMapSceneId, (o, s) => performRenameElement(s));
+                }
+                else
+                {
+                    return performRenameElement(newName);
+                }
+            }
+
+            return null;
+        }
+
+        private string performRenameElement(string newMapSceneId)
+        {
+            string oldMapSceneId = mapScene.getId();
+
+            // If some value was typed and the identifiers are different
+            if (!controller.isElementIdValid(newMapSceneId))
+            {
+                newMapSceneId = controller.makeElementValid(newMapSceneId);
+            }
+
+            mapScene.setId(newMapSceneId);
+            controller.replaceIdentifierReferences(oldMapSceneId, newMapSceneId);
+            controller.IdentifierSummary.deleteId<MapScene>(oldMapSceneId);
+            controller.IdentifierSummary.addId<MapScene>(newMapSceneId);
+
+            return newMapSceneId;
+        }
 
         public override void updateVarFlagSummary(VarFlagSummary varFlagSummary)
         {

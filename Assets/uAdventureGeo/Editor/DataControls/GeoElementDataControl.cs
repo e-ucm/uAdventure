@@ -287,14 +287,45 @@ namespace uAdventure.Geo
             check(geoElement.getId(), "ID");
         }
 
+
         public override string renameElement(string newName)
         {
-            if (!controller.isElementIdValid(newName))
+            string oldGeoElementId = geoElement.getId();
+            string references = controller.countIdentifierReferences(oldGeoElementId).ToString();
+
+            // Ask for confirmation 
+            if (newName != null || controller.ShowStrictConfirmDialog(TC.get("Operation.RenameElementTitle"), TC.get("Operation.RenameElementWarning", new string[] { oldGeoElementId, references })))
             {
-                newName = controller.makeElementValid(newName);
+                // Show a dialog asking for the new atrezzo item id
+                if (newName == null)
+                {
+                    controller.ShowInputDialog(TC.get("Operation.RenameElementTitle"), TC.get("Operation.RenameElementMessage"), oldGeoElementId, (o, s) => performRenameElement(s));
+                }
+                else
+                {
+                    return performRenameElement(newName);
+                }
             }
 
-            return controller.AddTool(new ChangeIdTool(geoElement, newName)) ? newName : geoElement.getId();
+            return null;
+        }
+
+        private string performRenameElement(string newGeoElementId)
+        {
+            string oldGeoElementId = geoElement.getId();
+
+            // If some value was typed and the identifiers are different
+            if (!controller.isElementIdValid(newGeoElementId))
+            {
+                newGeoElementId = controller.makeElementValid(newGeoElementId);
+            }
+
+            geoElement.setId(newGeoElementId);
+            controller.replaceIdentifierReferences(oldGeoElementId, newGeoElementId);
+            controller.IdentifierSummary.deleteId<GeoElement>(oldGeoElementId);
+            controller.IdentifierSummary.addId<GeoElement>(newGeoElementId);
+
+            return newGeoElementId;
         }
 
         public override void replaceIdentifierReferences(string oldId, string newId)
