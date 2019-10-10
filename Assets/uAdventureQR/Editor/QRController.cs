@@ -40,6 +40,7 @@ namespace uAdventure.QR
                     new ListDataControl<ChapterDataControl, QRCodeDataControl>.ElementFactoryView
                     {
                         Titles = { { 3428323, "QR.Create.Title.QRCode" } },
+                        DefaultIds = { { 3428323, "QRCode" } },
                         Errors = { { 3428323, "QR.Create.Error.QRCode" } },
                         Messages = { { 3428323, "QR.Create.Message.QRCode" } },
                         ElementFactory = new DefaultElementFactory<QRCodeDataControl>(

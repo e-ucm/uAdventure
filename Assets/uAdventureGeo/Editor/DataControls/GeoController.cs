@@ -62,6 +62,7 @@ namespace uAdventure.Geo
                     new ListDataControl<ChapterDataControl, MapSceneDataControl>.ElementFactoryView
                     {
                         Titles = { { 8923478, "Geo.Create.Title.MapScene" } },
+                        DefaultIds = { { 8923478, "MapScene" } },
                         Errors = { { 8923478, "Geo.Create.Error.MapScene" } },
                         Messages = { { 8923478, "Geo.Create.Message.MapScene" } },
                         ElementFactory = new DefaultElementFactory<MapSceneDataControl>(
@@ -90,6 +91,7 @@ namespace uAdventure.Geo
                     new ListDataControl<ChapterDataControl, GeoElementDataControl>.ElementFactoryView
                     {
                         Titles = { { 6493512, "Geo.Create.Title.GeoElement" } },
+                        DefaultIds = { { 6493512, "GeoElement" } },
                         Errors = { { 6493512, "Geo.Create.Error.GeoElement" } },
                         Messages = { { 6493512, "Geo.Create.Message.GeoElement" } },
                         ElementFactory = new DefaultElementFactory<GeoElementDataControl>(
