@@ -107,6 +107,10 @@ namespace uAdventure.Editor
         public override void OnSceneSelected(SceneDataControl scene)
         {
             base.OnSceneSelected(scene);
+            if (scene == null)
+            {
+                return;
+            }
 
             exitsList.SetData(scene.getExitsList(),
                 (dc) => (dc as ExitsListDataControl).getExits().Cast<DataControl>().ToList());

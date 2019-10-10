@@ -82,6 +82,10 @@ namespace uAdventure.Editor
         public override void OnSceneSelected(SceneDataControl scene)
         {
             base.OnSceneSelected(scene);
+            if (scene == null)
+            {
+                return;
+            }
             barriersList.SetData(scene.getBarriersList(),
                 (dc) => (dc as BarriersListDataControl).getBarriers().Cast<DataControl>().ToList());
 
