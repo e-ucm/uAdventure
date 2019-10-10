@@ -217,32 +217,36 @@ namespace uAdventure.Editor
 
         public override int countAssetReferences(string assetPath)
         {
-            return conversationLines.Sum(l => l.countAssetReferences(assetPath));
+            return conversationLines.Sum(l => l.countAssetReferences(assetPath)) + EffectsController.countAssetReferences(assetPath, effectsController.getEffectsDirectly());
         }
 
         public override void getAssetReferences(List<string> assetPaths, List<int> assetTypes)
         {
             conversationLines.ForEach(l => l.getAssetReferences(assetPaths, assetTypes));
+            EffectsController.getAssetReferences(assetPaths, assetTypes, effectsController.getEffectsDirectly());
         }
 
         public override int countIdentifierReferences(string id)
         {
-            return conversationLines.Sum(l => l.countIdentifierReferences(id));
+            return conversationLines.Sum(l => l.countIdentifierReferences(id)) + EffectsController.countIdentifierReferences(id, effectsController.getEffectsDirectly());
         }
 
         public override void deleteAssetReferences(string assetPath)
         {
             conversationLines.ForEach(l => l.deleteAssetReferences(assetPath));
+            EffectsController.deleteAssetReferences(assetPath, effectsController.getEffectsDirectly());
         }
 
         public override void replaceIdentifierReferences(string oldId, string newId)
         {
             conversationLines.ForEach(l => l.replaceIdentifierReferences(oldId, newId));
+            EffectsController.replaceIdentifierReferences(oldId, newId, effectsController.getEffectsDirectly());
         }
 
         public override void deleteIdentifierReferences(string id)
         {
             conversationLines.ForEach(l => l.deleteIdentifierReferences(id));
+            EffectsController.deleteIdentifierReferences(id, effectsController.getEffectsDirectly());
         }
 
         /**
