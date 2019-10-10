@@ -36,6 +36,7 @@ namespace uAdventure.Geo
         private readonly List<ITileMeta> publicMeta;
         private ITileMeta[] publicMetaArray;
         private static Dictionary<ITileMeta, Dictionary<Vector3d, ITilePromise>> tileCache;
+        private bool previousPlayingState = false;
 
         // ##################################
         #endregion
@@ -109,6 +110,12 @@ namespace uAdventure.Geo
 
         public ITilePromise GetTile(Vector3d tile, ITileMeta tileMeta, Action<ITilePromise> callback)
         {
+            if(previousPlayingState != Application.isPlaying)
+            {
+                tileCache.Clear();
+                previousPlayingState = Application.isPlaying;
+            }
+
             if (!tileCache.ContainsKey(tileMeta))
             {
                 tileCache[tileMeta] = new Dictionary<Vector3d, ITilePromise>();
