@@ -59,7 +59,6 @@ namespace uAdventure.Editor
 
         private LayoutWindow m_Window = null;
         private ChapterWindow chapterWindow;
-        private GameObject debugGUIHolder = null;
 
         private Vector2 scrollPosition;
 
@@ -80,12 +79,6 @@ namespace uAdventure.Editor
         {
             if(playModeStateChange == PlayModeStateChange.EnteredEditMode)
             {
-
-                if (debugGUIHolder)
-                {
-                    DestroyImmediate(debugGUIHolder);
-                }
-
                 FocusWindowIfItsOpen(GetType());
             }
         }
@@ -171,11 +164,6 @@ namespace uAdventure.Editor
             if(thisWindowReference == this)
             {
                 EditorApplication.playModeStateChanged -= Return;
-            }
-
-            if (debugGUIHolder)
-            {
-                DestroyImmediate(debugGUIHolder);
             }
         }
 

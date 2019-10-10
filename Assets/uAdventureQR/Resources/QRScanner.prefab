@@ -22,7 +22,7 @@ GameObject:
   - component: {fileID: 114000013501029410}
   - component: {fileID: 114000013885383630}
   m_Layer: 0
-  m_Name: QRPrompt
+  m_Name: QRScanner
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
