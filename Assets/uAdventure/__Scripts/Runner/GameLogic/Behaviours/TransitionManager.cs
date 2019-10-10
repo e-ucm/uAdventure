@@ -41,6 +41,12 @@ namespace uAdventure.Runner
 
         public void DoTransition(Action<Transition, Texture> onFinish)
         {
+            if (transition == null)
+            {
+                onFinish(null, null);
+                return;
+            }
+
             StartCoroutine(TransitionRoutine(transition, onFinish));
         }
 
@@ -96,6 +102,7 @@ namespace uAdventure.Runner
         private void FinalizeTransition(Transition transition, Texture transitionTexture, Action<Transition, Texture> onFinish)
         {
             transitioning = false;
+            this.transition = null;
             ResetMaterial();
             transitionMaterial.SetTexture("_MainTex", transitionTexture);
             transitionMaterial.SetTexture("_TransitionTex", null);

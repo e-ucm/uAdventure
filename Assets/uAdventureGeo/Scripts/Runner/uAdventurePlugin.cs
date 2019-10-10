@@ -34,8 +34,7 @@ namespace uAdventure.Geo
         protected override IEnumerator CreateRoutine(Tile tile, Action<bool> finished)
         {
             
-            var allElements = MapSceneMB.MapElements.FindAll(elem => elem.Conditions == null || ConditionChecker.check(elem.Conditions))
-                .Where(tc => !tc.IsRemoved());
+            var allElements = MapSceneMB.MapElements;
             foreach(var elem in allElements)
             {
                 if (!AdoptedElements.Contains(elem) && !OrphanElements.Contains(elem))

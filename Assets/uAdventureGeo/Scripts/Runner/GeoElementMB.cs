@@ -36,9 +36,19 @@ namespace uAdventure.Geo
         protected GeoPositionedCharacter player;
         private List<IGeoActionManager> geoActionManagers;
 
+
+
+        public void UpdateConditions()
+        {
+            var display = !Element.IsRemoved() &&
+                          (Reference.Conditions == null || ConditionChecker.check(Reference.Conditions));
+            this.gameObject.SetActive(display);
+        }
+
         // Use this for initialization
         void Start()
         {
+            UpdateConditions();
 
             player = FindObjectOfType<GeoPositionedCharacter>();
 

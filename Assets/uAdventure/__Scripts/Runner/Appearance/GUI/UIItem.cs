@@ -9,7 +9,7 @@ namespace uAdventure.Runner
 {
     public class UIItem : UIRepresentable, Interactuable, IActionReceiver, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler, ITargetSelectedHandler
     {
-        private static readonly int[] restrictedActions = { Action.CUSTOM_INTERACT, Action.GIVE_TO, Action.USE_WITH, Action.EXAMINE };
+        private static readonly int[] restrictedActions = { Action.CUSTOM_INTERACT, Action.GIVE_TO, Action.USE_WITH, Action.EXAMINE, Action.USE, Action.CUSTOM };
 
         private bool isInteractive;
         private int targetActionType;
@@ -99,6 +99,8 @@ namespace uAdventure.Runner
 
         public void ActionSelected(Action action)
         {
+            InventoryManager.Instance.Opened = false;
+
             switch (action.getType())
             {
                 case Action.GIVE_TO:

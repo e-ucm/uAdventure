@@ -423,6 +423,7 @@ namespace uAdventure.Runner
         {
             if (runnerTarget != null)
             {
+                waitingRunTarget = true;
                 runnerTarget.RenderScene();
             }
         }

@@ -43,6 +43,20 @@ namespace uAdventure.Geo
                         {
                             createdElem.transform.SetParent(tile.transform, false);
                             uAdventurePlugin.AdoptElement(elem);
+
+                            var geoPositioner = createdElem.gameObject.GetComponent<GeoPositioner>();
+                            if (geoPositioner)
+                            {
+                                uAdventurePlugin.MapSceneMB.geoPositioners.Add(geoPositioner);
+                            }
+                            else
+                            {
+                                var geoElement = createdElem.gameObject.GetComponent<GeoElementMB>();
+                                if (geoElement)
+                                {
+                                    uAdventurePlugin.MapSceneMB.geoElements.Add(geoElement);
+                                }
+                            }
                         }
                     }
                 }

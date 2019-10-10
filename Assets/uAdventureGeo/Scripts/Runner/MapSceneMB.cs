@@ -16,6 +16,8 @@ namespace uAdventure.Geo
         public uAdventurePlugin uAdventurePlugin;
         public GeoPositionedCharacter geoCharacter;
         public ThirdPersonCharacter character;
+        public List<GeoPositioner> geoPositioners = new List<GeoPositioner>();
+        public List<GeoElementMB> geoElements = new List<GeoElementMB>();
 
         private bool ready = false;
         private MapScene mapScene;
@@ -62,8 +64,19 @@ namespace uAdventure.Geo
 
         public void RenderScene()
         {
+            ready = false;
+            /*
             tileManager.ReloadPlugins<uAdventurePlugin>();
-            tileManager.ReloadPlugins<MapElementFactory>();
+            tileManager.ReloadPlugins<MapElementFactory>();*/
+            foreach (var geopos in geoPositioners)
+            {
+                geopos.UpdateConditions();
+            }
+            foreach (var geoelement in geoElements)
+            {
+                geoelement.UpdateConditions();
+            }
+
         }
 
         public void setInteractuable(bool state)

@@ -20,6 +20,7 @@ namespace uAdventure.Geo
             transformManager.Context = Context;
             transformManager.ExtElemReferenceTransform = this.transform;
             transformManager.Update();
+            UpdateConditions();
         }
 
         // Update is called once per frame
@@ -40,6 +41,14 @@ namespace uAdventure.Geo
             {
                 ua.ReleaseElement(Context);
             }
+        }
+
+        public void UpdateConditions()
+        {
+            var display = !Context.IsRemoved() &&
+                       (Context.Conditions == null || ConditionChecker.check(Context.Conditions));
+            this.gameObject.SetActive(display);
+            this.Representable.checkResources();
         }
     }
 
