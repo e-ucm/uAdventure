@@ -44,13 +44,7 @@ namespace uAdventure.Core
                     object parsed = DOMParserUtility.DOMParse(el as XmlElement);
                     if (parsed != null)
                     {
-                        var t = parsed.GetType();
-                        // Group elements that are ITypeGroupable
-                        if (parsed is ITypeGroupable)
-                        {
-                            t = (parsed as ITypeGroupable).GetGroupType();
-                        }
-
+                        var t = GroupableTypeAttribute.GetGroupType(parsed.GetType());
                         content.getObjects(t).Add(parsed);
                     }
                 }

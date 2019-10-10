@@ -8,8 +8,8 @@ namespace uAdventure.Core
     /**
      * Implements Tree and Graph conversations
      */
-
-    public class Conversation : HasId, ICloneable, ITypeGroupable
+    [GroupableType]
+    public class Conversation : HasId, ICloneable
     {
 
         /**
@@ -197,11 +197,6 @@ namespace uAdventure.Core
                 }
             }
             return c;
-        }
-
-        public Type GetGroupType()
-        {
-            return typeof(Conversation);
         }
     }
 }

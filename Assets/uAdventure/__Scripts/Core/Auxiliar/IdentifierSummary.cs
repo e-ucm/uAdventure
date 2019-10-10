@@ -15,7 +15,6 @@ namespace uAdventure.Core
 
 		private Dictionary<string, System.Type> globalIdentifiers;
 		private Dictionary<System.Type, List<string>> typeGroups;
-        private Dictionary<System.Type, List<string>> pureTypeGroups;
 
         /**
          * List of all assessment profile identifiers in the script and its associated assessment rules. 
@@ -38,7 +37,6 @@ namespace uAdventure.Core
             // Create the lists
 			globalIdentifiers = new Dictionary<string, System.Type>();
 			typeGroups = new Dictionary<System.Type, List<string>>();
-            pureTypeGroups = new Dictionary<System.Type, List<string>>();
 
             assessmentIdentifiers = new Dictionary<string, List<string>> ();
 			adaptationIdentifiers = new Dictionary<string, List<string>> ();
@@ -113,12 +111,12 @@ namespace uAdventure.Core
          */
         public bool existsId(string id)
         {
-			return globalIdentifiers.ContainsKey(id);
+			return globalIdentifiers.ContainsKey(id); 
         }
 
 		public bool isType<T>(string id){
 
-			return globalIdentifiers.ContainsKey (id) && globalIdentifiers [id] == typeof(T);
+			return globalIdentifiers.ContainsKey (id) && typeof(T).IsAssignableFrom(globalIdentifiers[id]);
         }
 
         public Type getType(string id)
@@ -132,31 +130,8 @@ namespace uAdventure.Core
             {
                 globalIdentifiers.Add(id, t);
             }
-            
-            foreach (var i in t.GetInterfaces())
-            {
-                if (!typeGroups.ContainsKey(i))
-                {
-                    typeGroups.Add(i, new List<string>());
-                }
 
-                if (!typeGroups[i].Contains(id))
-                {
-                    typeGroups[i].Add(id);
-                }
-            }
-
-            if (!pureTypeGroups.ContainsKey(t))
-            {
-                pureTypeGroups.Add(t, new List<string>());
-            }
-
-            if (!pureTypeGroups[t].Contains(id))
-            {
-                pureTypeGroups[t].Add(id);
-            }
-
-            t = getGroupType(t);
+            t = GroupableTypeAttribute.GetGroupType(t);
 
             if (!typeGroups.ContainsKey (t))
             {
@@ -187,24 +162,12 @@ namespace uAdventure.Core
 
         public string[] getIds<T>()
         {
-			return getIds(typeof(T));
-		}
-
-        public string[] getPureIds(Type t)
-        {
-            if (pureTypeGroups.ContainsKey(t))
+            if (typeof(T).IsInterface)
             {
-                return pureTypeGroups[t].ToArray();
+                return groupIds(typeof(T));
             }
-            else
-            {
-                return new string[0];
-            }
-        }
 
-        public string[] getPureIds<T>()
-        {
-            return getPureIds(typeof(T));
+            return getIds(typeof(T)); 
         }
 
         public void deleteId<T>(string id)
@@ -217,51 +180,14 @@ namespace uAdventure.Core
             {
                 globalIdentifiers.Remove(id);
 
-                if (t.IsInterface)
-                {
-                    foreach (var kv in typeGroups)
-                    {
-                        if (t.IsAssignableFrom(kv.Key) && kv.Value.Contains(id))
-                        {
-                            kv.Value.Remove(id);
-                        }
-                    }
-                }
+                t = GroupableTypeAttribute.GetGroupType(t);
 
-                t = getGroupType(t);
-                
-                if (pureTypeGroups.ContainsKey(t) && pureTypeGroups[t].Contains(id))
-                {
-                    pureTypeGroups[t].Remove(id);
-                }
-                
                 if (typeGroups.ContainsKey(t) && typeGroups[t].Contains(id))
                 {
                     typeGroups[t].Remove(id);
                 }
             }
 		}
-
-        private Type getGroupType(Type t)
-        {
-            if (typeof(ITypeGroupable).IsAssignableFrom(t))
-            {
-                try
-                {
-                    var typeGroupable = Activator.CreateInstance(t, true) as ITypeGroupable;
-                    if (typeGroupable != null)
-                    {
-                        t = typeGroupable.GetGroupType();
-                    }
-                }
-                catch
-                {
-                    Debug.LogError("Cannot get groupable type for \"" + t.ToString() + "\": ITypeGroupables must have a default constructor.");
-                }
-            }
-
-            return t;
-        }
 
         /**
          * Returns an array of global state identifiers.

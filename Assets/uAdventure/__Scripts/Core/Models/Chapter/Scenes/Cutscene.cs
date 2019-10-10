@@ -2,7 +2,8 @@
 
 namespace uAdventure.Core
 {
-    public abstract class Cutscene : GeneralScene, HasTargetId, Positioned, ITypeGroupable
+    [GroupableType]
+    public abstract class Cutscene : GeneralScene, HasTargetId, Positioned
     {
         /**
             * The tag for the video
@@ -254,11 +255,6 @@ namespace uAdventure.Core
             c.effects = (effects != null ? (Effects)effects.Clone() : null);
             c.idTarget = idTarget;
             return c;
-        }
-
-        public Type GetGroupType()
-        {
-            return typeof(Cutscene);
         }
     }
 }
