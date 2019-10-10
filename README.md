@@ -24,7 +24,7 @@ one is enough to set up uAdventure.
 
 ### Installation
 
-1. **(Prev)** Install or have Unity installed (recommended version is 2017.3).
+1. **(Prev)** Install or have Unity installed (recommended version is [2017.4](https://download.unity3d.com/download_unity/a8557a619e24/UnityDownloadAssistant-2017.4.33f1.exe).
 2. Create a new and blank Unity Project.
 3. [Download the unitypackage](https://github.com/e-ucm/uAdventure/releases/download/1.0/uAdventure_Complete_v1.0.unitypackage) or locate uAdventure in the Unity Asset Store. 
 4. Import uAdventure by opening the unitypackage or by importing the extension from the Asset Store.
