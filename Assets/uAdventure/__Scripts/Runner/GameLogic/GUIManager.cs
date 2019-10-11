@@ -301,7 +301,7 @@ namespace uAdventure.Runner
 
         public void ResetAndExit()
         {
-            Game.Instance.Reset();
+            Game.Instance.Restart();
         }
 
         public void ExitApplication()

@@ -312,7 +312,7 @@ namespace uAdventure.Runner
             return false;
         }
 
-        public void Reset()
+        public void Restart()
         {
             GameState.Reset();
             gameExtensions.ForEach(g => g.OnReset());
