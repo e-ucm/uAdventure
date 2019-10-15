@@ -41,6 +41,7 @@ namespace uAdventure.Core
             this.scale = 1;
             this.idTarget = idTarget;
             this.conditions = new Conditions();
+            this.orientation = Orientation.S;
         }
 
         public string TargetId

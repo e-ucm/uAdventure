@@ -249,14 +249,29 @@ namespace uAdventure.Editor
                 }
                 else if (elem is IElementReference)
                 {
-                    var referencedElement = (elem as IElementReference).ReferencedDataControl;
+                    var elementReference = (elem as IElementReference);
+                    var referencedElement = elementReference.ReferencedDataControl;
                     if (referencedElement is ItemDataControl)
                     {
                         sprite = Controller.ResourceManager.getSprite((referencedElement as ItemDataControl).getPreviewImage());
                     }
                     else if (referencedElement is NPCDataControl)
                     {
-                        sprite = Controller.ResourceManager.getSprite((referencedElement as NPCDataControl).getPreviewImage());
+                        var npcDataControl = referencedElement as NPCDataControl; 
+                        var resourceOrientation = "";
+                        switch (elementReference.Orientation)
+                        {
+                            case Orientation.S: resourceOrientation = NPC.RESOURCE_TYPE_STAND_DOWN; break;
+                            case Orientation.N: resourceOrientation = NPC.RESOURCE_TYPE_STAND_UP; break;
+                            case Orientation.O: resourceOrientation = NPC.RESOURCE_TYPE_STAND_LEFT; break;
+                            case Orientation.E: resourceOrientation = NPC.RESOURCE_TYPE_STAND_RIGHT; break;
+                        }
+
+                        var path = npcDataControl.getAnimationPathPreview(resourceOrientation);
+                        if (!string.IsNullOrEmpty(path))
+                        {
+                            sprite = Controller.ResourceManager.getSprite(path);
+                        }
                     }
                     else if (referencedElement is AtrezzoDataControl)
                     {

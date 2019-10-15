@@ -100,7 +100,8 @@ namespace uAdventure.Editor
         private static CharacterAnimationType[] types;
 
         private readonly Dictionary<CharacterAnimationType, AnimationField> fields = new Dictionary<CharacterAnimationType, AnimationField>();
-        private readonly Dictionary<CharacterAnimationType, Texture2D> textures = new Dictionary<CharacterAnimationType, Texture2D>();
+        private readonly Dictionary<string, string> texturePaths = new Dictionary<string, string>();
+        private readonly Dictionary<string, Texture2D> textures = new Dictionary<string, Texture2D>();
         
         private CharacterAnimationsGroup selectedAnimationGroup;
 
@@ -151,23 +152,20 @@ namespace uAdventure.Editor
             }
         }
 
-        private Texture2D LoadCharacterTexturePreview(NPCDataControl data, string animation)
+        private Texture2D GetCharacterTexturePreview(NPCDataControl data, string animation)
         {
             var auxPath = data.getAnimationPathPreview(animation);
-            return string.IsNullOrEmpty(auxPath) ? null : Controller.ResourceManager.getImage(auxPath);
+            if (!texturePaths.ContainsKey(animation) || texturePaths[animation] != auxPath)
+            {
+                textures[animation] = string.IsNullOrEmpty(auxPath) ? null : Controller.ResourceManager.getImage(auxPath);
+            }
+            return textures[animation];
         }
 
         private void RefreshPathInformation(DataControlWithResources data)
         {
-            var npc = data as NPCDataControl;
-            foreach(var group in groups) // For each group
-            {
-                foreach (var animationType in resourceTypeGroups[group])
-                {
-                    // Reload the texture
-                    textures[animationType.Key] = LoadCharacterTexturePreview(npc, resourceTypeGroups[group][animationType.Key]);
-                }
-            }
+            texturePaths.Clear();
+            textures.Clear();
         }
 
         protected override void DrawInspector()
@@ -233,15 +231,21 @@ namespace uAdventure.Editor
             if (Target != null && !IsPlayer)
             {
                 var npc = Target as NPCDataControl;
-                var preview = LoadCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_STAND_DOWN);
+                var preview = GetCharacterTexturePreview(npc, NPC.RESOURCE_TYPE_STAND_DOWN);
                 DrawSinglePreview(preview);
             }
             else
             {
+                if (Target is NodeDataControl || IsPlayer)
+                {
+                    Target = Controller.Instance.SelectedChapterDataControl.getPlayer();
+                }
+
+                var npc = Target as NPCDataControl ?? workingCharacter;
                 // Draw the animation selector for each animation in the selected resource group
                 foreach (var resourceTypeGroup in resourceTypeGroups[selectedAnimationGroup])
                 {
-                    DrawSinglePreview(textures[resourceTypeGroup.Key], TC.get(fieldNames[resourceTypeGroup.Key]));
+                    DrawSinglePreview(GetCharacterTexturePreview(npc, resourceTypeGroup.Value), TC.get(fieldNames[resourceTypeGroup.Key]));
                 }
             }
             GUILayout.EndHorizontal();
@@ -272,7 +276,7 @@ namespace uAdventure.Editor
                     case Orientation.E: resourceOrientation = NPC.RESOURCE_TYPE_STAND_RIGHT; break;
                 }
 
-                var preview = LoadCharacterTexturePreview(npc, resourceOrientation);
+                var preview = GetCharacterTexturePreview(npc, resourceOrientation);
                 if (preview)
                 {
                     var rect = new RectD(new Vector2d(-0.5f * preview.width, -preview.height),
