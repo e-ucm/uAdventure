@@ -27,7 +27,20 @@ namespace uAdventure.Runner
             set
             {
                 lookingForTarget = value;
-                targetSelectedHandler = value == null ? null : ExecuteEvents.GetEventHandler<ITargetSelectedHandler>(value);
+                GetEventHandler(value);
+            }
+        }
+
+        private static void GetEventHandler(GameObject value)
+        {
+            targetSelectedHandler = value == null ? null : ExecuteEvents.GetEventHandler<ITargetSelectedHandler>(value);
+            if (!targetSelectedHandler)
+            {
+                var component = value.GetComponent<ITargetSelectedHandler>() ?? value.GetComponentInChildren<ITargetSelectedHandler>();
+                if (component != null)
+                {
+                    targetSelectedHandler = value;
+                }
             }
         }
 

@@ -225,8 +225,8 @@ namespace uAdventure.Geo
                     break;
             }
 
-            if (Event.current.type == EventType.Repaint)
-                GUI.DrawTexture(new Rect(Screen.width - iconWidth - 5, 5, iconWidth, iconHeight), paintSimbol);
+            /*if (Event.current.type == EventType.Repaint)
+                GUI.DrawTexture(new Rect(Screen.width - iconWidth - 5, 5, iconWidth, iconHeight), paintSimbol);*/
 
             if (guiMap == null)
             {
