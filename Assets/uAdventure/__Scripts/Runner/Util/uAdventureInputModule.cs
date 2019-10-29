@@ -34,7 +34,7 @@ namespace uAdventure.Runner
         private static void GetEventHandler(GameObject value)
         {
             targetSelectedHandler = value == null ? null : ExecuteEvents.GetEventHandler<ITargetSelectedHandler>(value);
-            if (!targetSelectedHandler)
+            if (!targetSelectedHandler && value)
             {
                 var component = value.GetComponent<ITargetSelectedHandler>() ?? value.GetComponentInChildren<ITargetSelectedHandler>();
                 if (component != null)
