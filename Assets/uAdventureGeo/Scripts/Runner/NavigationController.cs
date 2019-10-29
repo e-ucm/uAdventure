@@ -21,7 +21,7 @@ namespace uAdventure.Geo
         {
             get
             {
-                return (instance == null) ? instance = FindObjectOfType<NavigationController>() : instance;
+                return instance ?? (instance = FindObjectOfType<NavigationController>());
             }
             private set
             {
@@ -222,7 +222,7 @@ namespace uAdventure.Geo
                 var interactionRange = (float) wrap.Context.TransformManagerParameters["InteractionRange"];
                 
                 var distance = GM.SeparationInMeters(position, character.LatLon);
-                var realDistance = GM.SeparationInMeters(position, Input.location.lastData.LatLonD());
+                var realDistance = GM.SeparationInMeters(position, GeoExtension.Instance.Location);
 
                 // Is inside if the character is in range but also the real coords are saying so
                 // Otherwise, if there is no character or gps, only one of the checks is valid
@@ -236,12 +236,22 @@ namespace uAdventure.Geo
                 var geomb = mb as GeoElementMB;
 
                 // Is inside if the character is inside the influence but also the real coords are saying so
-                // Otherwise, if there is no character or gps, only one of the checks is valid
+                // Otherwise, if there is no character or gps, only one of the checks is valid                
 
-                // TODO check if the line element is reached
-                return (!character || geomb.Geometry.InsideInfluence(character.LatLon)) 
-                    && (!GeoExtension.Instance.IsStarted() || geomb.Geometry.InsideInfluence(Input.location.lastData.LatLonD()))
-                    && (GeoExtension.Instance.IsStarted() || character);
+                var location = character ? character.LatLon : GeoExtension.Instance.Location;
+                if (geomb.Geometry.InsideInfluence(location))
+                {
+                    if (geomb.Geometry.Type == GMLGeometry.GeometryType.LineString)
+                    {
+                        var step = 0; 
+                        completedElementsForStep.TryGetValue(currentStep, out step);
+                        var position = geomb.Geometry.Points[step];
+                        var distance = GM.SeparationInMeters(position, location);
+                        return distance < geomb.Geometry.Influence;
+                    }
+                    else return true;
+                }
+                else return false;
             }
             else return false;
         }
@@ -265,12 +275,17 @@ namespace uAdventure.Geo
             {
                 // If this is the first time we deal with this step, lets say we are in the 0
                 if (!completedElementsForStep.ContainsKey(currentStep))
+                {
                     completedElementsForStep.Add(currentStep, 0);
+                }
 
                 // Add one
                 completedElementsForStep[currentStep]++;
                 // Is completed if it matches in number
-                completed = completedElementsForStep[currentStep] == elems;
+                if(completedElementsForStep[currentStep] == elems)
+                {
+                    completed = true;
+                }
             }
 
             // Only complete
@@ -285,10 +300,11 @@ namespace uAdventure.Geo
         private int GetElementsFor(NavigationStep currentStep)
         {
             var mb = GetReference(currentStep.Reference);
-            if(mb is GeoElementMB && (mb as GeoElementMB).Geometry.Type == GMLGeometry.GeometryType.LineString)
+            var geoElementMb = mb as GeoElementMB;
+            if(geoElementMb != null && geoElementMb.Geometry.Type == GMLGeometry.GeometryType.LineString)
             {
                 // If it is a path, all the points are elements
-                return (mb as GeoElementMB).Geometry.Points.Length;
+                return geoElementMb.Geometry.Points.Length;
             }
             else
             {
@@ -407,7 +423,9 @@ namespace uAdventure.Geo
             switch (geometry.Type)
             {
                 case GMLGeometry.GeometryType.LineString:
-                    return geometry.Points[0];
+                    int step;
+                    completedElementsForStep.TryGetValue(currentStep, out step);
+                    return geometry.Points[step];
                 default:
                 case GMLGeometry.GeometryType.Polygon:
                 case GMLGeometry.GeometryType.Point:
