@@ -8,12 +8,12 @@ namespace uAdventure.Geo
 {
     public class TriggerZonedSceneEffectEditor : TriggerSceneEffectEditor
     {
-        protected TriggerZonedSceneEffect triggerZonedSceneEffect;
 
         public TriggerZonedSceneEffectEditor() : base()
         {
             var geoElementsIds = Controller.Instance.IdentifierSummary.getIds<GeoElement>();
-            this.effect = triggerZonedSceneEffect = new TriggerZonedSceneEffect(effect.getTargetId(), "", effect.getX(), effect.getY());
+            var triggerZonedSceneEffect = new TriggerZonedSceneEffect(effect.getTargetId(), "", effect.getX(), effect.getY());
+            this.effect = triggerZonedSceneEffect;
             if (geoElementsIds.Length > 0)
             {
                 triggerZonedSceneEffect.ZoneId = geoElementsIds[0];
@@ -22,6 +22,7 @@ namespace uAdventure.Geo
 
         public override void draw()
         {
+            var triggerZonedSceneEffect = effect as TriggerZonedSceneEffect;
             base.draw();
             var geoElementsIds = Controller.Instance.IdentifierSummary.getIds<GeoElement>();
             var selectedZoneIndex = Mathf.Max(0, Array.IndexOf(geoElementsIds, triggerZonedSceneEffect.ZoneId));
