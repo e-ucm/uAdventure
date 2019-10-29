@@ -119,7 +119,9 @@ namespace uAdventure.Geo
                 this.shown = shown;
                 if (shown)
                 {
+#if UNITY_ANDROID || UNITY_IOS
                     Handheld.Vibrate();
+#endif
                     // TODO change this after: https://github.com/e-ucm/unity-tracker/issues/29
                     TrackerAsset.Instance.setVar("geo_element_" + positioner.Element.getId(), 1);
                 }

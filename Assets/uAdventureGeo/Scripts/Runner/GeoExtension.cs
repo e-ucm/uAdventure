@@ -52,7 +52,7 @@ namespace uAdventure.Geo
         void Awake()
         {
             instance = this;
-            OnReset();
+            Restart();
         }
 
         public void Start()
@@ -77,7 +77,7 @@ namespace uAdventure.Geo
             pointer = Resources.Load<Texture2D>("pointer");
         }
 
-        public override void OnReset()
+        public override void Restart()
         {
             memory = new Memory();
             memory.Set("using_debug_location", false);
