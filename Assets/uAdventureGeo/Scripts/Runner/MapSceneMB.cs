@@ -21,6 +21,11 @@ namespace uAdventure.Geo
 
         private bool ready = false;
         private MapScene mapScene;
+        private bool isPinching = false;
+        private float startDist;
+        private float startOrtho;
+        private static float OriginalOrthoSize, LastOrthoSize;
+        private const float MinOrthoSize = 10, MaxOrthoSize = 40;
 
         public List<MapElement> MapElements {
             get
@@ -68,11 +73,11 @@ namespace uAdventure.Geo
             /*
             tileManager.ReloadPlugins<uAdventurePlugin>();
             tileManager.ReloadPlugins<MapElementFactory>();*/
-            foreach (var geopos in geoPositioners)
+            foreach (var geopos in geoPositioners.FindAll(gp => gp != null))
             {
                 geopos.UpdateConditions();
             }
-            foreach (var geoelement in geoElements)
+            foreach (var geoelement in geoElements.FindAll(gp => gp != null))
             {
                 geoelement.UpdateConditions();
             }
@@ -113,6 +118,21 @@ namespace uAdventure.Geo
             {
                 // if not, just put the character in the center of the map
                 geoCharacter.InstantMoveTo(new Vector2d(tileManager.Latitude, tileManager.Longitude));
+            }
+
+            if(OriginalOrthoSize == 0)
+            {
+                LastOrthoSize = OriginalOrthoSize = Camera.main.orthographicSize;
+            }
+
+            Camera.main.orthographicSize = LastOrthoSize;
+        }
+
+        protected void OnDestroy()
+        {
+            if (Camera.main)
+            {
+                Camera.main.orthographicSize = OriginalOrthoSize;
             }
         }
 
@@ -163,9 +183,33 @@ namespace uAdventure.Geo
             //geoCharacter.MoveTo(GM.MetersToLatLon(GM.LatLonToMeters(mapScene.LatLon.y, mapScene.LatLon.x) + new Vector2d(100, 100)));
             //geoCharacter.MoveTo(new Vector2d(-3.707398, 40.415363));
             //character.Move(new Vector3(Input.GetAxis("Horizontal"),0, Input.GetAxis("Vertical")), false, false);
+            if ((uAdventureRaycaster.Instance.Override == null || uAdventureRaycaster.Instance.Override == gameObject) && Input.touchCount >= 2)
+            {
+                var touch0 = Input.GetTouch(0);
+                var touch1 = Input.GetTouch(1);
+                if (!isPinching)
+                {
+                    isPinching = true;
+                    uAdventureRaycaster.Instance.Override = this.gameObject;
+                    startDist = (touch1.position - touch0.position).sqrMagnitude;
+                    startOrtho = Camera.main.orthographicSize;
+                }
+                
+                if((touch0.phase == TouchPhase.Moved || touch0.phase == TouchPhase.Stationary) &&
+                    (touch1.phase == TouchPhase.Moved || touch1.phase == TouchPhase.Stationary))
+                {
+                    var currentDist = (touch1.position - touch0.position).sqrMagnitude;
+                    var distGrowth = startDist / currentDist;
+                    var ortho = startOrtho * distGrowth;
+                    Camera.main.orthographicSize = LastOrthoSize = Mathf.Clamp(ortho, MinOrthoSize, MaxOrthoSize);
+                }
+            } 
+            else if (isPinching)
+            {
+                uAdventureRaycaster.Instance.Override = null;
+                isPinching = false;
+            }
         }
-
-
     }
 
 
@@ -182,11 +226,12 @@ namespace uAdventure.Geo
     {
         public static TransformData Backup(this Transform t)
         {
-            var td = new TransformData();
-            td.position = t.position;
-            td.scale = t.localScale;
-            td.rotation = t.rotation;
-            return td;
+            return new TransformData
+            {
+                position = t.position,
+                scale = t.localScale,
+                rotation = t.rotation
+            };
         }
 
         public static void Restore(this Transform t, TransformData backup)

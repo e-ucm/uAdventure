@@ -123,6 +123,10 @@ namespace uAdventure.Runner
             elementContexts = new Dictionary<string, List<ElementReference>>();
             varFlagChangeAmbits = new Stack<List<KeyValuePair<string, int>>>();
             memories = new Dictionary<string, Memory>();
+            currentChapter = 0;
+            playerContext = null;
+            currentTarget = data.getChapters()[currentChapter].getInitialChapterTarget().getId();
+            lastTarget = null;
         }
         
         public void OnGameSuspend()
@@ -460,7 +464,7 @@ namespace uAdventure.Runner
             }
         }
 
-        public void Reset()
+        public void Restart()
         {
             currentChapter = 0;
             playerContext = null;
@@ -493,6 +497,12 @@ namespace uAdventure.Runner
 
         public void RestoreFrom(string field)
         {
+            if (string.IsNullOrEmpty(PlayerPrefs.GetString(field)))
+            {
+                Debug.LogWarning("Could restore state: " + field);
+                return;
+            }
+
             JsonUtility.FromJsonOverwrite(PlayerPrefs.GetString(field), this);
             varFlags.Clear();
             for(int i = 0, totalVars = varFlagKeys.Count; i < totalVars; i++)

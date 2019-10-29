@@ -100,7 +100,6 @@ namespace uAdventure.Runner
         public void ActionSelected(Action action)
         {
             InventoryManager.Instance.Opened = false;
-
             switch (action.getType())
             {
                 case Action.GIVE_TO:

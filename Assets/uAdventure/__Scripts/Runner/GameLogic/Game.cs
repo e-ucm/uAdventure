@@ -50,6 +50,7 @@ namespace uAdventure.Runner
         private Book openedBook;
         private BookDrawer bookDrawer;
         private List<GameExtension> gameExtensions;
+        private bool started;
 
         public delegate void TargetChangedDelegate(IChapterTarget newTarget);
 
@@ -155,7 +156,8 @@ namespace uAdventure.Runner
 
         protected void Start()
         {
-
+            started = true;
+            GameState.OnGameResume();
             uAdventureRaycaster = FindObjectOfType<uAdventureRaycaster>();
             if (!uAdventureRaycaster)
             {
@@ -173,7 +175,9 @@ namespace uAdventure.Runner
                 Debug.LogError("No TransitionManager was found in the scene!");
             }
 
-            RunTarget(forceScene ? scene_name : GameState.InitialChapterTarget.getId());
+            RunTarget(forceScene ? scene_name : GameState.CurrentTarget);
+            gameExtensions.ForEach(g => g.OnAfterGameLoad());
+            uAdventureInputModule.LookingForTarget = null;
 
             TimerController.Instance.Timers = GameState.GetTimers();
             TimerController.Instance.Run();
@@ -241,6 +245,24 @@ namespace uAdventure.Runner
             GameState.SerializeTo("save");
         }
 
+        public void OnApplicationPause(bool paused)
+        {
+            if (paused)
+            {
+                GameState.OnGameSuspend();
+            }
+            else
+            {
+                GameState.OnGameResume();
+                if (started)
+                {
+                    RunTarget(GameState.CurrentTarget);
+                    gameExtensions.ForEach(g => g.OnAfterGameLoad());
+                    uAdventureInputModule.LookingForTarget = null;
+                }
+            }
+        }
+
         public bool Execute(Interactuable interactuable, ExecutionEvent callback = null)
         {
             // In case any menu is shown, we hide it
@@ -263,7 +285,7 @@ namespace uAdventure.Runner
                 }
                 catch (System.Exception ex)
                 {
-                    Debug.Log("Interacted execution exception: " + ex.Message);
+                    Debug.LogError("Interacted execution exception: " + ex.Message + ex.StackTrace);
                 }
 
                 if (requiresMore)
@@ -312,10 +334,18 @@ namespace uAdventure.Runner
             return false;
         }
 
+        public void ClearAndRestart()
+        {
+            PlayerPrefs.DeleteAll();
+            PlayerPrefs.Save();
+            DestroyImmediate(this.gameObject);
+            UnityEngine.SceneManagement.SceneManager.LoadScene(0);
+        }
+
         public void Restart()
         {
-            GameState.Reset();
-            gameExtensions.ForEach(g => g.OnReset());
+            GameState.Restart();
+            gameExtensions.ForEach(g => g.Restart());
             RunTarget(GameState.CurrentTarget);
             uAdventureInputModule.LookingForTarget = null;
         }
@@ -353,7 +383,7 @@ namespace uAdventure.Runner
 
         public bool isSomethingRunning()
         {
-            return executeStack.Count > 0;
+            return executeStack.Count > 0 || waitingRunTarget || waitingTransition;
         }
 
         public Interactuable getNextInteraction()

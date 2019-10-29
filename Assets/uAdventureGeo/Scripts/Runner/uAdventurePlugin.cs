@@ -50,9 +50,8 @@ namespace uAdventure.Geo
 
         protected override IEnumerator UnLoadRoutine(Tile tile, Action<bool> finished)
         {
-
-            var notExisting = MapSceneMB.MapElements.FindAll(elem => (elem.Conditions != null && !ConditionChecker.check(elem.Conditions)) || elem.IsRemoved());
-            foreach (var elem in notExisting)
+            var allElements = MapSceneMB.MapElements;
+            foreach (var elem in allElements)
             {
                 if (OrphanElements.Contains(elem))
                 {
@@ -84,8 +83,7 @@ namespace uAdventure.Geo
             if (AdoptedElements.Contains(mapElement))
             {
                 AdoptedElements.Remove(mapElement);
-                if((mapElement.Conditions == null || ConditionChecker.check(mapElement.Conditions)) && !mapElement.IsRemoved())
-                    OrphanElements.Add(mapElement);
+                OrphanElements.Add(mapElement);
             }
         }
     }

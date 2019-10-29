@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 using uAdventure.Core;
 using UnityEngine.SceneManagement;
-using System.Collections.Generic;
 using AssetPackage;
+using System.Collections.Generic;
 
 namespace uAdventure.Runner
 {
@@ -41,6 +41,10 @@ namespace uAdventure.Runner
         protected void Start()
         {
             guiprovider = new GUIProvider(Game.Instance.GameState.Data);
+            if (Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer)
+            {
+                this.GetComponent<UnityEngine.UI.CanvasScaler>().referenceResolution = new Vector2(600, 400);
+            }
         }
 
         protected void Update()
@@ -303,6 +307,10 @@ namespace uAdventure.Runner
         {
             Game.Instance.Restart();
         }
+        public void ClearData()
+        {
+            Game.Instance.ClearAndRestart();
+        }
 
         public void ExitApplication()
         {
@@ -321,7 +329,7 @@ namespace uAdventure.Runner
 
                 WWWForm data = new WWWForm();
 
-                TrackerAssetSettings trackersettings = (TrackerAssetSettings) TrackerAsset.Instance.Settings;
+                TrackerAssetSettings trackersettings = (TrackerAssetSettings)TrackerAsset.Instance.Settings;
                 string backupfile = Application.persistentDataPath + System.IO.Path.DirectorySeparatorChar + trackersettings.BackupFile;
 
                 data.AddField("token", PlayerPrefs.GetString("LimesurveyToken"));
@@ -336,7 +344,9 @@ namespace uAdventure.Runner
                 SceneManager.LoadScene("_Survey");
             }
             else
+            {
                 Application.Quit();
+            }
         }
 
         class SavedTracesListener : Net.IRequestListener

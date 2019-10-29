@@ -93,7 +93,7 @@ namespace uAdventure.Analytics
             CheckTrackerFlush();
         }
 
-        public override void OnReset() { }
+        public override void Restart() { }
 
         public override void OnBeforeGameSave() { }
 

@@ -10,7 +10,7 @@ namespace uAdventure.Geo
     public class GeoElement : Documented, Named, HasId, ICloneable
     {
 
-        private string id, image;
+        private string image;
         private string documentation;
         private GeoElementDrawer drawer;
         private List<Description> descriptions;
@@ -27,7 +27,7 @@ namespace uAdventure.Geo
             geoActions = new List<GeoAction>();
         }
 
-        public string Id { get { return id; } set { id = value; } }
+        public string Id { get; set; }
         public List<Description> Descriptions { get { return descriptions; } set { descriptions = value; } }
         public List<GMLGeometry> Geometries { get { return geometries; } set { geometries = value; } }
         public GeoElementDrawer Drawer { get { return drawer; } set { drawer = value; } }

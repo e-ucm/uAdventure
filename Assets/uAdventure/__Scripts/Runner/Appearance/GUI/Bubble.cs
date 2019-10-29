@@ -35,7 +35,10 @@ namespace uAdventure.Runner
 
             this.rectTransform.anchoredPosition = data.origin;
             this.moveTo(data.destiny);
-            this.state = BubbleState.SHOWING;
+            if(this.state != BubbleState.DESTROYING)
+            {
+                this.state = BubbleState.SHOWING;
+            }
         }
 
         //######################################################################

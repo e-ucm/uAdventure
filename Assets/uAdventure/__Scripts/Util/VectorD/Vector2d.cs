@@ -8,10 +8,13 @@ using System.Runtime.CompilerServices;
 
 namespace UnityEngine
 {
+    [Serializable]
     public struct Vector2d
     {
         public const double kEpsilon = 1E-05d;
+        [SerializeField]
         public double x;
+        [SerializeField]
         public double y;
 
         public double this[int index]

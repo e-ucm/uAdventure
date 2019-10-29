@@ -116,7 +116,7 @@ namespace uAdventure.Runner
                                         var targetScene = Game.Instance.GameState.GetChapterTarget(tse.getTargetId()) as Scene;
                                         if (targetScene != null)
                                         {
-                                            if (targetScene.getTrajectory() != null)
+                                            if(targetScene.getTrajectory() != null)
                                             {
                                                 var initial = targetScene.getTrajectory().getInitial();
                                                 playerContext.setPosition(initial.getX(), initial.getY());
@@ -161,7 +161,7 @@ namespace uAdventure.Runner
                                     }
                                 }
                             }
-                            else if (timesRun == 1)
+                            else if(timesRun == 1)
                             {
                                 forceWait = true;
                             }
@@ -201,7 +201,7 @@ namespace uAdventure.Runner
                             if (timesRun == 0)
                             {
                                 int pro = re.getProbability(), now = Random.Range(0, 100);
-
+                                    
                                 if (pro <= now)
                                 {
                                     if (re.getPositiveEffect() != null)
@@ -337,7 +337,7 @@ namespace uAdventure.Runner
                         case EffectType.WAIT_TIME:
                             WaitTimeEffect wte = (WaitTimeEffect)effect;
                             runsOnce = false;
-                            if (timesRun == 0)
+                            if(timesRun == 0)
                             {
                                 Game.Instance.PulseOnTime(this, wte.getTime());
                             }
@@ -348,7 +348,7 @@ namespace uAdventure.Runner
                             break;
                         case EffectType.CUSTOM_EFFECT:
                             runsOnce = false;
-                            if (timesRun == 0)
+                            if(timesRun == 0)
                             {
                                 this.additionalInfo["custom_effect_runner"] = CustomEffectRunnerFactory.Instance.CreateRunnerFor(effect);
                             }
@@ -413,7 +413,7 @@ namespace uAdventure.Runner
 
             if (effects != null && effects.getEffects().Count > 0)
             {
-
+                
                 //List<Condition> conditions = new List<Condition>();
                 foreach (IEffect effect in effects.getEffects())
                 {

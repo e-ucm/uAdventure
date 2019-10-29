@@ -86,7 +86,8 @@ namespace uAdventure.Geo
         public void Restore(Memory memory)
         {
             loadOnExit = memory.Get<string>("zone_control_loadonexit");
-            zone = Game.Instance.GameState.FindElement<GeoElement>(memory.Get<string>("zone_control_id")).Geometries.Checked().FirstOrDefault();
+            zoneid = memory.Get<string>("zone_control_id");
+            zone = Game.Instance.GameState.FindElement<GeoElement>(zoneid).Geometries.Checked().FirstOrDefault();
             transitionTime = memory.Get<float>("zone_control_transitiontime");
         }
     }
