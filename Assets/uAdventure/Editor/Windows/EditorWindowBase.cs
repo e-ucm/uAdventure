@@ -176,6 +176,7 @@ namespace uAdventure.Editor
             if (debugGUIHolder)
             {
                 DestroyImmediate(debugGUIHolder);
+            }
         }
 
         public static void RefreshLanguage(){
