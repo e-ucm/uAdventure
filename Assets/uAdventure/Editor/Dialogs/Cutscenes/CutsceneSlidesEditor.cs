@@ -32,6 +32,7 @@ namespace uAdventure.Editor
 
         private Vector2 scrollPosition;
 
+        [SerializeField]
         private string cutscenePath;
 
         protected void OnEnable()
@@ -41,8 +42,13 @@ namespace uAdventure.Editor
                 fontStyle = FontStyle.Bold,
                 margin = new RectOffset(0, 0, 5, 5)
             };
+            if (!string.IsNullOrEmpty(cutscenePath))
+            { 
+                Init(null, cutscenePath);
+            }
         }
 
+        [SerializeField]
         private DialogReceiverInterface parent;
 
         public void Init(DialogReceiverInterface e, string cutsceneFilePath)
@@ -84,6 +90,11 @@ namespace uAdventure.Editor
             Debug.Log(cutsceneFilePath);
 
             var incidences = new List<Incidence>();
+            if(Controller.Instance == null || !Controller.Instance.Initialized)
+            {  
+                Controller.Instance.Init();  
+            }
+
             workingAnimation = Loader.LoadAnimation(cutsceneFilePath, Controller.ResourceManager, incidences) ?? new Animation(cutsceneFilePath, 40);
 
             imageChooser = new FileChooser
@@ -107,6 +118,12 @@ namespace uAdventure.Editor
 
         protected void OnGUI()
         {
+            if (workingAnimation == null)
+            {
+                this.Close();
+                return;
+            }
+
             switch (Event.current.type)
             {                
                 case EventType.DragUpdated:
@@ -175,6 +192,7 @@ namespace uAdventure.Editor
                     if (GUILayout.Button(frameContent, GUILayout.Height(100), GUILayout.Width(80)))
                     {
                         selectedFrame = (i == selectedFrame) ? -1 : i;
+                        GUI.FocusControl(null);
                     }
                     if (useTransitions && i != workingAnimation.getFrames().Count - 1)
                     {
@@ -183,6 +201,7 @@ namespace uAdventure.Editor
                         if (GUILayout.Button(transitionContent, GUILayout.Height(100), GUILayout.Width(80)))
                         {
                             selectedFrame = (i == selectedFrame) ? -1 : i;
+                            GUI.FocusControl(null);
                         }
                     }
                     GUI.skin = noBackgroundSkin;
@@ -277,7 +296,7 @@ namespace uAdventure.Editor
                     frame.setSoundUri(soundChooser.Path);
                 }
 
-                var editTransition = useTransitions && selectedFrame.InRange(0, workingAnimation.getFrames().Count - 2);
+                var editTransition = useTransitions && selectedFrame.InRange(-1, workingAnimation.getFrames().Count - 1);   
                 var transition = editTransition ? workingAnimation.getTranstionForFrame(selectedFrame) : emptyTransition;
 
                 using (new EditorGUI.DisabledScope(!editTransition))
@@ -299,6 +318,8 @@ namespace uAdventure.Editor
                 }
             }
 
+            var lastEditorRect = GUILayoutUtility.GetLastRect();
+
 
             // Ending buttons
             GUILayout.FlexibleSpace();
@@ -314,14 +335,27 @@ namespace uAdventure.Editor
 
                     AnimationWriter.WriteAnimation(cutscenePath, workingAnimation);
                     AssetDatabase.Refresh(ImportAssetOptions.Default);
-                    reference.OnDialogOk(cutscenePath, this);
+                    if (reference != null)
+                    {
+                        reference.OnDialogOk(cutscenePath, this);
+                    }
                     this.Close();
                 }
                 if (GUILayout.Button(TC.get("GeneralText.Cancel")))
                 {
-                    reference.OnDialogCanceled();
+                    if(reference != null)
+                    {
+                        reference.OnDialogCanceled();
+                    }
                     this.Close();
                 }
+            }
+
+            if (Event.current.type == EventType.Repaint)
+            {
+                var lastButtonRect = GUILayoutUtility.GetLastRect();
+                var minheight = lastEditorRect.y + lastEditorRect.height + lastEditorRect.height + 10;
+                minSize = new Vector2(400, minheight);
             }
         }
     }
