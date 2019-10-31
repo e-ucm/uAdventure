@@ -12,22 +12,13 @@ public class DropDown {
     public string Label;
     public List<string> Elements;
     
-    private Drop drop;
     private bool selected;
     private string nextValue;
+    private bool showing = false;
 
     public DropDown(string label)
     {
         Label = label;
-        drop = ScriptableObject.CreateInstance<Drop>();
-        drop.OnOptionSelected = (index, option) =>
-        {
-            var os = drop.OnOptionSelected;
-            drop = ScriptableObject.CreateInstance<Drop>();
-            drop.OnOptionSelected = os;
-            nextValue = option;
-            selected = true;
-        };
     }
 
 
@@ -67,17 +58,21 @@ public class DropDown {
             if (Event.current.type == EventType.Repaint && GUI.GetNameOfFocusedControl() == Label &&
                 Elements != null && Elements.Count > 0)
             {
-                drop.Elements = Elements;
-                if (!drop.Showing)
+                if (!Drop.Showing)
                 {
-                    drop.ShowAt(addressRect);
+                    Drop.ShowAtPosition(addressRect, (index, option) =>
+                    {
+                        nextValue = option;
+                        selected = true;
+                    });
                 }
-                drop.Repaint();
+                Drop.Elements = Elements;
+                Drop.Refresh();
             }
 
-            if (GUI.GetNameOfFocusedControl() != Label && drop.Showing)
+            if (GUI.GetNameOfFocusedControl() != Label && Drop.Showing)
             {
-                drop.Showing = false;
+                Drop.Showing = false;
             }
         }
 
@@ -90,17 +85,47 @@ public class Drop : EditorWindow
     private Vector2 scrollPos;
     private GUISkin dropdownskin;
 
+    public static Drop s_Drop;
+    private static long s_LastClosedTime;
+
     public delegate void OnOptionSelectedDelegate(int index, string option);
 
     public OnOptionSelectedDelegate OnOptionSelected;
 
-    public List<string> Elements { get; set; }
+    public static List<string> Elements { get; set; }
+    public static bool Showing { get; set; }
+    public static void Refresh()
+    {
+        if (s_Drop)
+        {
+            s_Drop.Repaint();
+        }
+    }
 
-    public bool Showing { get; set; }
+    internal static bool ShowAtPosition(Rect buttonRect, OnOptionSelectedDelegate OnOptionSelected)
+    {
+        long num = System.DateTime.Now.Ticks / 10000L;
+        if (num >= Drop.s_LastClosedTime + 50L)
+        {
+            if (Event.current != null && Event.current.type != EventType.Repaint)
+            {
+                Event.current.Use();
+            }
+            if (Drop.s_Drop == null)
+            {
+                Drop.s_Drop = ScriptableObject.CreateInstance<Drop>();
+            }
+            Drop.s_Drop.Init(buttonRect, OnOptionSelected);
+            return true;
+        }
+        return false;
+    }
 
-    public void ShowAt(Rect rect)
+
+    public void Init(Rect rect, OnOptionSelectedDelegate OnOptionSelected)
     {
         this.position = new Rect(GUIUtility.GUIToScreenPoint(rect.position + new Vector2(0, rect.height)), new Vector2(rect.width, 200));
+        this.OnOptionSelected = OnOptionSelected;
         this.ShowPopup();
         Showing = true;
     }

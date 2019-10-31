@@ -163,7 +163,6 @@ namespace uAdventure.Geo
         [EditorComponent(typeof(ExtElementRefDataControl), Name = "Geo.MapElement.Component.Title", Order = 0)]
         private class MapReferenceComponent : AbstractEditorComponent
         {
-            private readonly DrawerParametersMenu transformManagerParametersEditor;
             private readonly Texture2D centerTex;
 
             private readonly int[] orientationValues;
@@ -171,7 +170,6 @@ namespace uAdventure.Geo
             
             public MapReferenceComponent(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
             {
-                transformManagerParametersEditor = ScriptableObject.CreateInstance<DrawerParametersMenu>();
                 centerTex = Resources.Load<Texture2D>("EAdventureData/img/icons/center-24x24");
                 var orientations = Enum.GetValues(typeof(Orientation));
                 orientationValues = orientations.Cast<int>().ToArray();
@@ -203,8 +201,7 @@ namespace uAdventure.Geo
                     using (new EditorGUI.IndentLevelScope(1))
                     {
                         EditorGUILayout.LabelField("Geo.MapElement.Component.Parameters".Traslate());
-                        transformManagerParametersEditor.extElementRefDataControl = extElementReference;
-                        transformManagerParametersEditor.OnGUI();
+                        DrawerParametersMenu.DrawParametersFor(extElementReference);
                         EditorGUI.BeginChangeCheck();
                         var newScale = EditorGUILayout.FloatField(
                             "Geo.MapElement.Positioner.Attribute.Scale".Traslate(), extElementReference.Scale);

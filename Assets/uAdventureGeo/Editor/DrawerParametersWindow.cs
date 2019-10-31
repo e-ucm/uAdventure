@@ -10,54 +10,17 @@ using uAdventure.Core;
 namespace uAdventure.Editor
 {
 
-    public class DrawerParametersMenu : EditorWindow {
-
-        public ExtElementRefDataControl extElementRefDataControl;
-        private FileChooser textureField;
+    public class DrawerParametersMenu {
         
-        internal static bool ShowAtPosition(Rect buttonRect)
+        private static FileChooser textureField;
+
+        public static void DrawParametersFor(ExtElementRefDataControl extElementRefDataControl)
         {
-            long num = DateTime.Now.Ticks / 10000L;
-            if (num >= DrawerParametersMenu.s_LastClosedTime + 50L)
+            if(textureField == null)
             {
-                if (Event.current != null)
-                {
-                    Event.current.Use();
-                }
-                if (DrawerParametersMenu.s_DrawerParametersMenu == null)
-                {
-                    DrawerParametersMenu.s_DrawerParametersMenu = ScriptableObject.CreateInstance<DrawerParametersMenu>();
-                }
-                DrawerParametersMenu.s_DrawerParametersMenu.Init(buttonRect);
-                return true;
+                textureField = new FileChooser { FileType = FileType.SET_ITEM_IMAGE };
             }
-            return false;
-        }
 
-        public static DrawerParametersMenu s_DrawerParametersMenu;
-        private static long s_LastClosedTime;
-
-        private void Init(Rect buttonRect)
-        {
-            buttonRect.position = GUIUtility.GUIToScreenPoint(buttonRect.position);
-            float y = 145f;
-            Vector2 windowSize = new Vector2(300f, y);
-            base.ShowAsDropDown(buttonRect, windowSize);
-        }
-
-        protected void OnEnable()
-        {
-            textureField = new FileChooser { FileType = FileType.SET_ITEM_IMAGE };
-        }
-
-        protected void OnDisable()
-        {
-            DrawerParametersMenu.s_LastClosedTime = DateTime.Now.Ticks / 10000L;
-            DrawerParametersMenu.s_DrawerParametersMenu = null;
-        }
-
-        public void OnGUI()
-        {
             if(extElementRefDataControl != null && extElementRefDataControl.TransformManager != null)
             {
                 // And then show the required parameters
