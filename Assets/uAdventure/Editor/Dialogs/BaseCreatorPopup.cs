@@ -5,7 +5,8 @@ namespace uAdventure.Editor
 {
     public class BaseCreatorPopup : EditorWindow
     {
-
+        [SerializeField]
+        protected bool shown = false;
         protected DialogReceiverInterface reference;
         protected float windowWidth = 500, windowHeight = 600;
 
@@ -13,8 +14,12 @@ namespace uAdventure.Editor
         {
             BaseCreatorPopup window = this;
             reference = e;
-            window.position = new Rect(Screen.width / 2 - windowWidth / 2, Screen.height / 2 - windowHeight / 2, windowWidth, windowHeight);
-            window.Show();
+            if (window && !shown)
+            { 
+                window.position = new Rect(Screen.width / 2 - windowWidth / 2, Screen.height / 2 - windowHeight / 2, windowWidth, windowHeight);
+                window.Show();
+                shown = true;
+            }
         }
     }
 }

@@ -44,10 +44,22 @@ namespace uAdventure.Runner
                    } into sameTypeAction
                    select sameTypeAction.First();
         }
+        public static IEnumerable<Action> DistinctTarget(this IEnumerable<Action> actions)
+        {
+            // This probably too
+            return from action in actions
+                   group action by new
+                   {
+                       Type = action.getType(),
+                       Name = (action is CustomAction) ? ((CustomAction)action).getName() : "",
+                       TargetId = action.getTargetId()
+                   } into sameTypeAction
+                   select sameTypeAction.First();
+        }
 
         public static IEnumerable<Action> Valid(this IEnumerable<Action> actions, IEnumerable<int> restricted = null)
         {
-            var unrestricted = actions.Checked().Distinct();
+            var unrestricted = actions.Checked();
 
             if (restricted != null)
                 return unrestricted.Restrict(restricted);
