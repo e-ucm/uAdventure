@@ -273,7 +273,7 @@ namespace uAdventure.Core
 
             Orientation orientation = (Orientation) ExParsers.ParseDefault(element.GetAttribute("orientation"), 2);
 
-            float scale = ExParsers.ParseDefault (element.GetAttribute("scale"), NumberFormatInfo.CurrentInfo, 0f);
+            float scale = ExParsers.ParseDefault (element.GetAttribute("scale"), NumberFormatInfo.InvariantInfo, 0f);
 			int layer = ExParsers.ParseDefault (element.GetAttribute("layer"), -1);
 
 			int influenceX 		= ExParsers.ParseDefault (element.GetAttribute("influenceX"), 0), 
