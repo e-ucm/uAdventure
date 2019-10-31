@@ -104,7 +104,26 @@ namespace uAdventure.Editor
                     switch (column)
                     {
                         case 0:
-                            EditorGUI.LabelField(rect, elem);
+                            if (Application.isPlaying || !isActive)
+                            {
+                                EditorGUI.LabelField(rect, elem);
+                            }
+                            else
+                            {
+                                EditorGUI.BeginChangeCheck();
+                                var newName = EditorGUI.DelayedTextField(rect, elem);
+                                if (EditorGUI.EndChangeCheck())
+                                {
+                                    if(varFlagSummary.getVarsAndFlags().Any(s => s.Equals(newName, StringComparison.InvariantCultureIgnoreCase)))
+                                    {
+                                        Controller.Instance.ShowErrorDialog("VarFlag.Error.NameIsUsed.Title".Traslate(), "VarFlag.Error.NameIsUsed.Message".Traslate());
+                                    }
+                                    else
+                                    {
+                                        EditorUtility.DisplayDialog("WIP", "Rename is WIP", "Ok");
+                                    }
+                                }
+                            }
                             break;
                         case 1:
                             object value = 0;
