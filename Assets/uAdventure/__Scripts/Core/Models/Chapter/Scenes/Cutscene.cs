@@ -60,6 +60,7 @@ namespace uAdventure.Core
             transitionType = TransitionType.NoTransition;
             transitionTime = 0;
             next = GOBACK;
+            HideInventory = true;
         }
 
         /**

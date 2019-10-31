@@ -888,5 +888,17 @@ namespace uAdventure.Editor
 
             controller.AddTool(new ChangeStringValueTool(scene, @class, "getXApiClass", "setXApiClass"));
         }
+
+        public bool HideInventory 
+        { 
+            get { return scene.HideInventory; } 
+            set
+            {
+                if(value != scene.HideInventory)
+                {
+                    controller.AddTool(new ChangeBooleanValueTool(scene, value, "HideInventory"));
+                }
+            } 
+        }
     }
 }

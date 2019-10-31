@@ -126,6 +126,7 @@ namespace uAdventure.Geo
             }
 
             Camera.main.orthographicSize = LastOrthoSize;
+            InventoryManager.Instance.Show = true;
         }
 
         protected void OnDestroy()

@@ -42,7 +42,8 @@ namespace uAdventure.Editor
             XmlDocument doc = Writer.GetDoc();
             // Create the root node
             sceneElement.SetAttribute("id", scene.getId());
-            
+            sceneElement.SetAttribute("hideInventory", scene.HideInventory ? "yes" : "no");
+
             if (options.Any(o => o is CIP && (o as CIP).TargetId.Equals(scene.getId())))
                 sceneElement.SetAttribute("start", "yes");
             else

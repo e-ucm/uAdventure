@@ -44,11 +44,14 @@ namespace uAdventure.Core
 
 			string sceneId = element.GetAttribute("id");
 			bool initialScene = ExString.EqualsDefault(element.GetAttribute("start"), "yes", false);
-			int playerLayer = ExParsers.ParseDefault (element.GetAttribute("playerLayer"), -1);
+            bool hideInventory = ExString.EqualsDefault(element.GetAttribute("hideInventory"), "yes", false);
+            int playerLayer = ExParsers.ParseDefault (element.GetAttribute("playerLayer"), -1);
 			float playerScale = ExParsers.ParseDefault (element.GetAttribute("playerScale"), CultureInfo.InvariantCulture, 1.0f);
 
-            scene = new Scene(sceneId);
-            
+            scene = new Scene(sceneId)
+            {
+                HideInventory = hideInventory
+            };
             scene.setPlayerLayer(playerLayer);
             scene.setPlayerScale(playerScale);
 

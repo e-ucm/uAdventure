@@ -77,6 +77,15 @@ namespace uAdventure.Editor
             music.DoLayout();
             if (EditorGUI.EndChangeCheck())
                 workingScene.setPreviewMusic(music.Path);
+
+            GUILayout.Space(10);
+
+            EditorGUI.BeginChangeCheck();
+            var newHideInventory = EditorGUILayout.Toggle("Scene.HideInventory".Traslate(), workingScene.HideInventory);
+            if (EditorGUI.EndChangeCheck())
+            {
+                workingScene.HideInventory = newHideInventory;
+            }
         }
     }
 }

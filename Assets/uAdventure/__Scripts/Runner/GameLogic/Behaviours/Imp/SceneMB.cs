@@ -309,8 +309,8 @@ namespace uAdventure.Runner
                     SetBackground(movie.Movie);
                     break;
                 case GeneralScene.GeneralSceneSceneType.SCENE:
-                    InventoryManager.Instance.Show = true;
                     Scene scene = (Scene)SceneData;
+                    InventoryManager.Instance.Show = !SceneData.HideInventory;
                     Texture2D backgroundTexture = null;
                     foreach (ResourcesUni sr in scene.getResources())
                     {

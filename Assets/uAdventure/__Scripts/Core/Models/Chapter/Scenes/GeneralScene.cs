@@ -63,6 +63,24 @@ namespace uAdventure.Core
         private bool initialScene;
 
         /**
+         * Stores if the scene should be loaded at the begining
+         */
+        private bool hideInventory;
+
+        public bool HideInventory
+        {
+            get
+            {
+                return hideInventory;
+            }
+
+            set
+            {
+                hideInventory = value;
+            }
+        }
+
+        /**
          * Creates a new GeneralScene.
          * 
          * @param type

@@ -2275,6 +2275,8 @@
   <entry key="EditorWindow.Reload">Reload</entry>
   <entry key="EditorWindow.CreateNew.Title">Warning!</entry>
   <entry key="EditorWindow.CreateNew.Body">Creating a new adventure deletes all previous existing files. Do you want to continue?</entry>
+  <entry key="Scene.HideInventory">Hide Inventory</entry>
+  <entry key="Scene.InventoryPosition">Inventory Position</entry>
 
   <!-- Analytics -->
   <entry key="Analytics.Title">Analytics</entry>
