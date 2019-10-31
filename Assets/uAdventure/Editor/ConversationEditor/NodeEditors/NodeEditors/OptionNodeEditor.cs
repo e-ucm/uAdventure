@@ -102,6 +102,12 @@ namespace uAdventure.Editor
                 },
                 drawCell = (rect, index, column, isActive, isFocused) =>
                 {
+                    // Mark the line as selected as soon as any click is performed in the line
+                    if (Event.current.isMouse && Event.current.type == EventType.MouseDown && rect.Contains(Event.current.mousePosition))
+                    {
+                        linesList.index = index;
+                    }
+
                     var line = this.linesList.list[index] as ConversationLineDataControl;
                     switch (column)
                     {

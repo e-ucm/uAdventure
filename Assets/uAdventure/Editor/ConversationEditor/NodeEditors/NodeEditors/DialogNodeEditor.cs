@@ -126,6 +126,13 @@ namespace uAdventure.Editor
                     var line = this.linesList.list[index] as ConversationLineDataControl;
                     BubbleType bubbleType = GetBubbleType(line);
                     var text = line.getText();
+
+                    // Mark the line as selected as soon as any click is performed in the line
+                    if(Event.current.isMouse && Event.current.type == EventType.MouseDown && rect.Contains(Event.current.mousePosition))
+                    {
+                        linesList.index = index;
+                    }
+
                     // Extract the bubble type
                     if (bubbleType.Identifier != "-")
                     {
