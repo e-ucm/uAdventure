@@ -110,7 +110,7 @@ namespace uAdventure.Editor
 
         public override List<Searchable> getPathToDataControl(Searchable dataControl)
         {
-            throw new NotImplementedException();
+            return null;
         }
 
         public override bool isValid(string currentPath, List<string> incidences)
