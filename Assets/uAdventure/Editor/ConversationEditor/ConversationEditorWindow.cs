@@ -172,6 +172,29 @@ namespace uAdventure.Editor
         {
             Content.moveNodes(nodes.First(), nodes.ToList(), new Vector2Int(Mathf.RoundToInt(delta.x), Mathf.RoundToInt(delta.y)));
         }
+
+        protected override void OnDrawLine(ConversationDataControl content, ConversationNodeDataControl originNode, ConversationNodeDataControl destinationNode, Rect originRect, Rect destinationRect, bool isHovered, bool isRemoving)
+        {
+            var addButton = new Rect(0, 0, 20, 20);
+            addButton.center = (originRect.center + destinationRect.center) / 2f;
+
+            Debug.Log(Event.current.type);
+            if(GUI.Button(addButton, "+"))
+            {
+                var options = new List<GUIContent>();
+                foreach (var addable in originNode.getAddableNodes())
+                {
+                    options.Add(new GUIContent("Create " + TC.get("Element.Name" + addable)));
+                }
+
+                EditorUtility.DisplayCustomMenu(new Rect(Event.current.mousePosition, Vector2.one), options.ToArray(), -1, (param, ops, selected) =>
+                {
+                    int index = originNode.getChilds().IndexOf(destinationNode);
+                    var option = originNode.getAddableNodes()[selected];
+                    Content.insertNode(originNode, option, index);
+                }, Event.current.mousePosition);
+            }
+        }
     }
 
     public class ConversationEditorWindow : EditorWindow

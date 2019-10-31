@@ -456,6 +456,116 @@ namespace uAdventure.Editor
             return false;
         }
 
+        public virtual bool insertNode(ConversationNodeDataControl parent, int nodeType, int index)
+        {
+            if (parent != null && parent.getAddableNodes().Contains(nodeType))
+            {
+                return controller.AddTool(new InsertNodeTool(this, parent, nodeType, index));
+            }
+            return false;
+        }
+
+        private class InsertNodeTool : Tool
+        {
+            protected const int DIALOG_NODE = Controller.CONVERSATION_DIALOGUE_LINE;
+            protected const int OPTION_NODE = Controller.CONVERSATION_OPTION_LINE;
+
+            private readonly List<Tool> subTools;
+            private readonly ConversationNodeDataControl parent, newNode;
+            private readonly ConversationDataControl content;
+            private readonly int index;
+
+            public InsertNodeTool(ConversationDataControl content, ConversationNodeDataControl parent, int nodeType, int index)
+            {
+                this.content = content;
+                this.parent = parent;
+                ConversationNode node = null;
+                switch (nodeType)
+                {
+                    case DIALOG_NODE: node = new DialogueConversationNode(); break;
+                    case OPTION_NODE: node = new OptionConversationNode(); break;
+                }
+
+
+                this.index = index;
+                var parentRect = parent.getEditorRect();
+                var childRect = parent.getChilds()[index].getEditorRect();
+
+                var center = (parentRect.center + childRect.center) / 2f;
+
+                node.setEditorX((int)(center.x - node.getEditorWidth() / 2f));
+                node.setEditorY((int)(center.y - node.getEditorHeight() / 2f));
+
+                this.newNode = ConversationNodeDataControlFactory.Instance.CreateDataControlFor(content, node);
+                this.subTools = CreateTools();
+            }
+
+            private List<Tool> CreateTools()
+            {
+                var tools = new List<Tool>()
+                {
+                    new ConversationNodeDataControl.LinkConversationNodeTool(content, parent, newNode, index)
+                };
+
+                var toolsList = tools.ToList();
+
+                if (parent.getChildCount() > 0)
+                {
+                    toolsList.Add(new ConversationNodeDataControl.AddRemoveConversationNodeTool(newNode, parent.getChilds()[index], 0));
+                }
+
+                return toolsList;
+            }
+
+            public override bool canRedo()
+            {
+                return true;
+            }
+
+            public override bool canUndo()
+            {
+                return true;
+            }
+
+            public override bool combine(Tool other)
+            {
+                return false;
+            }
+
+            public override bool doTool()
+            {
+                if (subTools == null)
+                {
+                    return false;
+                }
+
+                return subTools.All(t => t.doTool());
+            }
+
+            public override bool redoTool()
+            {
+                if (subTools == null)
+                {
+                    return false;
+                }
+
+                return subTools.All(t => t.redoTool());
+            }
+
+            public override bool undoTool()
+            {
+                if (subTools == null)
+                {
+                    return false;
+                }
+
+                subTools.Reverse();
+                var result = subTools.All(t => t.undoTool());
+                subTools.Reverse();
+
+                return result;
+            }
+        }
 
 
         private class ReplaceNodeTool : Tool

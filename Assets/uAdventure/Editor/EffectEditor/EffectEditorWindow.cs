@@ -378,6 +378,11 @@ namespace uAdventure.Editor
                 editors[node].Window = rect;
             }
         }
+
+        protected override void OnDrawLine(Effects content, IEffect originNode, IEffect destinationNode, Rect originRect, Rect destinationRect, bool isHovered, bool isRemoving)
+        {
+            return;
+        }
     }
 
     public class EffectEditorWindow : EditorWindow

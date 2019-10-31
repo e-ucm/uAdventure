@@ -32,6 +32,7 @@ namespace uAdventure.Editor
         protected abstract Rect GetNodeRect(T Content, N node);
         protected abstract string GetTitle(T Content, N node);
         protected abstract void DrawNodeContent(T content, N node);
+        protected abstract void OnDrawLine(T content, N originNode, N destinationNode, Rect originRect, Rect destinationRect, bool isHovered, bool isRemoving);
         protected abstract bool IsResizable(T content, N node);
         protected abstract void SetNodeChild(T content, N node, int slot, N child);
         public List<N> Selection { get { return selection; } }
@@ -199,10 +200,7 @@ namespace uAdventure.Editor
                         GUI.Box(nodeRect, "", selectedStyle);
                     }
 
-                if (Event.current.type == EventType.Repaint)
-                {
-                    DrawLines();
-                }
+                DrawLines();
             }
             EndWindows();
 
@@ -338,6 +336,11 @@ namespace uAdventure.Editor
         void CurveFromTo(Rect wr, Rect wr2, Color color)
         {
 
+            if (Event.current.type != EventType.Repaint)
+            {
+                return;
+            }
+
             Vector2 start = new Vector2(wr.x + wr.width, wr.y + 3 + wr.height / 2),
                 startTangent = new Vector2(wr.x + wr.width + Mathf.Abs(wr2.x - (wr.x + wr.width)) / 2, wr.y + 3 + wr.height / 2),
                 end = new Vector2(wr2.x, wr2.y + 3 + wr2.height / 2),
@@ -464,11 +467,15 @@ namespace uAdventure.Editor
                         {
                             if (hovering != -1)
                             {
-                                CurveFromTo(fromRect, GetNodeRect(Content, this.nodes[hovering]), blue);
+                                var toRect = GetNodeRect(Content, this.nodes[hovering]);
+                                CurveFromTo(fromRect, toRect, blue);
+                                OnDrawLine(Content, n, nodes[hovering], fromRect, toRect, true, false);
                             }
                             else
                             {
-                                CurveFromTo(fromRect, new Rect(Event.current.mousePosition, new Vector2(150, 0)), blue);
+                                var toRect = new Rect(Event.current.mousePosition, new Vector2(150, 0));
+                                CurveFromTo(fromRect, toRect, blue);
+                                OnDrawLine(Content, n, default(N), fromRect, toRect, true, false);
                             }
                         }
                         if (i < childs.Length && childs[i] != null)
@@ -477,10 +484,12 @@ namespace uAdventure.Editor
                             if (isCurrentChild)
                             {
                                 CurveFromTo(fromRect, to, red);
+                                OnDrawLine(Content, n, childs[i], fromRect, to, false, true);
                             }
                             else
                             {
                                 CurveFromTo(fromRect, to, green);
+                                OnDrawLine(Content, n, childs[i], fromRect, to, false, false);
                             }
                         }
                     }
