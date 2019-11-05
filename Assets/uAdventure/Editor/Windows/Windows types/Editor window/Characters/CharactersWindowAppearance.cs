@@ -107,7 +107,7 @@ namespace uAdventure.Editor
 
         private NPCDataControl workingCharacter;
 
-        private readonly AppearanceEditor appearanceEditor;
+        private readonly ResourcesList appearanceEditor;
 
         public CharactersWindowAppearance(Rect aStartPos, GUIContent aContent, GUIStyle aStyle,
             params GUILayoutOption[] aOptions)
@@ -117,9 +117,9 @@ namespace uAdventure.Editor
 
             PreviewTitle = "Character.Preview".Traslate();
 
-            appearanceEditor = ScriptableObject.CreateInstance<AppearanceEditor>();
-            appearanceEditor.height = 160;
-            appearanceEditor.onAppearanceSelected = RefreshPathInformation;
+            appearanceEditor = ScriptableObject.CreateInstance<ResourcesList>();
+            appearanceEditor.Height = 160;
+            appearanceEditor.onResourceSelected = RefreshPathInformation;
 
             if(groups == null)
             {

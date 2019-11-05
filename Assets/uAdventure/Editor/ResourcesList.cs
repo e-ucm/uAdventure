@@ -6,15 +6,15 @@ using uAdventure.Editor;
 using UnityEditor;
 using UnityEngine;
 
-public class AppearanceEditor : Editor {
+public class ResourcesList : Editor {
 
-    public delegate void AppearanceSelected(DataControlWithResources dataControl);
-    public AppearanceSelected onAppearanceSelected;
+    public delegate void ResourceSelected(DataControlWithResources dataControl);
+    public ResourceSelected onResourceSelected;
 
     private Texture2D conditionsTex = null;
     private Texture2D noConditionsTex = null;
-
     private DataControlWithResources dataControl;
+    private DataControlList resourcesList;
 
     public DataControlWithResources Data
     {
@@ -27,26 +27,24 @@ public class AppearanceEditor : Editor {
             if (dataControl != value)
             {
                 dataControl = value;
-                appearanceList.SetData(dataControl, (data) => (data as DataControlWithResources).getResources().Cast<DataControl>().ToList());
-                appearanceList.index = dataControl.getSelectedResources();
-                if (onAppearanceSelected != null)
+                resourcesList.SetData(dataControl, (data) => (data as DataControlWithResources).getResources().Cast<DataControl>().ToList());
+                resourcesList.index = dataControl.getSelectedResources();
+                if (onResourceSelected != null)
                 {
-                    onAppearanceSelected(dataControl);
+                    onResourceSelected(dataControl);
                 }
             }
         }
     }
 
-    public int height { get; internal set; }
-
-    private DataControlList appearanceList;
+    public int Height { get; internal set; }
 
     protected void Awake()
     {
         conditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/conditions-24x24", typeof(Texture2D));
         noConditionsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/no-conditions-24x24", typeof(Texture2D));
 
-        appearanceList = new DataControlList()
+        resourcesList = new DataControlList()
         {
             RequestRepaint = Repaint,
             headerHeight = 20,
@@ -74,7 +72,7 @@ public class AppearanceEditor : Editor {
                 switch (col) 
                 {
                     case 0:
-                        if (index == appearanceList.index)
+                        if (index == resourcesList.index)
                         {
                             EditorGUI.BeginChangeCheck();
                             var newname = EditorGUI.TextField(rect, "Resources " + (index + 1), resources.getName());
@@ -91,7 +89,7 @@ public class AppearanceEditor : Editor {
                     case 1:
                         if (GUI.Button(rect, resources.getConditions().getBlocksCount() > 0 ? conditionsTex : noConditionsTex))
                         {
-                            appearanceList.index = index;
+                            resourcesList.index = index;
                             ConditionEditorWindow window = CreateInstance<ConditionEditorWindow>();
                             window.Init(resources.getConditions());
                         }
@@ -102,14 +100,16 @@ public class AppearanceEditor : Editor {
             {
                 if (list.index == -1) list.index = 0;
                 dataControl.setSelectedResources(list.index);
-                if (onAppearanceSelected != null)
-                    onAppearanceSelected(dataControl);
+                if (onResourceSelected != null)
+                {
+                    onResourceSelected(dataControl);
+                }
             }
         };
     }
 
     public override void OnInspectorGUI()
     {
-        appearanceList.DoList(height);
+        resourcesList.DoList(Height);
     }
 }

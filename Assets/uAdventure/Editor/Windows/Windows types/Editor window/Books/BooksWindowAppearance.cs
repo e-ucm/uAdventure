@@ -13,7 +13,7 @@ namespace uAdventure.Editor
         private Texture2D backgroundPreview;
         private Texture2D leftNormalArrow, rightNormalArrow, leftOverArrow, rightOverArrow;
 
-        private readonly AppearanceEditor appearanceEditor;
+        private readonly ResourcesList appearanceEditor;
         private readonly FileChooser background, left, left_over, right, right_over;
 
         private int SelectedArrow = -1;
@@ -22,9 +22,9 @@ namespace uAdventure.Editor
             : base(aStartPos, aContent, aStyle, aOptions)
         {
 
-            appearanceEditor = ScriptableObject.CreateInstance<AppearanceEditor>();
-            appearanceEditor.height = 160;
-            appearanceEditor.onAppearanceSelected = RefreshPathInformation;
+            appearanceEditor = ScriptableObject.CreateInstance<ResourcesList>();
+            appearanceEditor.Height = 160;
+            appearanceEditor.onResourceSelected = RefreshPathInformation;
 
             PreviewTitle = "BackgroundAssets.Preview".Traslate();
 

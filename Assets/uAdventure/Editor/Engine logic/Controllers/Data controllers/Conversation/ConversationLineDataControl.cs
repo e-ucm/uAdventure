@@ -7,7 +7,7 @@ using System;
 
 namespace uAdventure.Editor
 {
-    public class ConversationLineDataControl : DataControl
+    public class ConversationLineDataControl : DataControlWithResources
     {
         private readonly ConversationLine conversationLine;
         private readonly ConditionsController conversationLineConditionsController;
@@ -245,25 +245,6 @@ namespace uAdventure.Editor
         public void setText(string text)
         {
             controller.AddTool(new ChangeStringValueTool(conversationLine, text, "getText", "setText"));
-        }
-
-        /**
-         * @return the audioPath
-         */
-
-        public string getAudioPath()
-        {
-            return conversationLine.getAudioPath();
-        }
-
-        /**
-         * @param audioPath
-         *            the audioPath to set
-         */
-
-        public void setAudioPath(string audioPath)
-        {
-            controller.AddTool(new ChangeStringValueTool(conversationLine, audioPath, "getAudioPath", "setAudioPath"));
         }
 
         /**

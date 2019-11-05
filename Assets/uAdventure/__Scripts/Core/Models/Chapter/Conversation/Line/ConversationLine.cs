@@ -92,7 +92,7 @@ namespace uAdventure.Core
         private string name;
 
         /**
-         * Sentence said by the character.
+         * Sentence said by the character. This can be replaced or combined with the image.
          */
         private string text;
 
@@ -100,6 +100,11 @@ namespace uAdventure.Core
          * Path for the audio track where the line is recorded. Its use is optional.
          */
         private string audioPath;
+
+        /**
+         * Path of the image that will be shown along or instead of the text. 
+         */
+        private string imagePath;
 
         /**
          * Tell if the line has to be read by synthesizer
@@ -247,14 +252,47 @@ namespace uAdventure.Core
         }
 
         /**
+         * @return the audioPath
+         */
+
+        public string getImagePath()
+        {
+
+            return imagePath;
+        }
+
+        /**
+         * @param audioPath
+         *            the audioPath to set
+         */
+
+        public void setImagePath(string imagePath)
+        {
+
+            this.imagePath = imagePath;
+
+            //if audioPath is not null, store the conversation line 
+            if (imagePath != null)
+                AllElementsWithAssets.addAsset(this);
+
+        }
+
+        /**
          * Returns true if the audio path is valid. That is when it is not null and
          * different to ""
          */
-
         public bool isValidAudio()
         {
+            return !string.IsNullOrEmpty(audioPath);
+        }
 
-            return audioPath != null && !audioPath.Equals("");
+        /**
+         * Returns true if the image path is valid. That is when it is not null and
+         * different to ""
+         */
+        public bool isValidImage()
+        {
+            return !string.IsNullOrEmpty(imagePath);
         }
 
         /**

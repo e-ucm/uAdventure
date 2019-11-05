@@ -12,13 +12,13 @@ namespace uAdventure.Editor
     public class SetItemsWindowApperance : AbstractEditorComponentWithPreview
     {
         private readonly FileChooser image;
-        private readonly AppearanceEditor appearanceEditor;
+        private readonly ResourcesList appearanceEditor;
 
         public SetItemsWindowApperance(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
         {
-            appearanceEditor = ScriptableObject.CreateInstance<AppearanceEditor>();
-            appearanceEditor.height = 160;
+            appearanceEditor = ScriptableObject.CreateInstance<ResourcesList>();
+            appearanceEditor.Height = 160;
 
             PreviewTitle = "Atrezzo.Preview".Traslate();
 

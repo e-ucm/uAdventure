@@ -139,6 +139,13 @@ namespace uAdventure.Editor
                     if (!resources.existAsset("image"))
                         resources.addAsset("image", SpecialAssetPaths.ASSET_EMPTY_IMAGE);
                     break;
+                case Controller.CONVERSATION_DIALOGUE_LINE:
+                case Controller.CONVERSATION_OPTION_LINE:
+                    assetsInformation = new AssetInformation[] {
+                        new AssetInformation("Resources.DescriptionLineAudio", "audio", false, AssetsConstants.CATEGORY_AUDIO, AssetsController.FILTER_MP3),
+                        new AssetInformation("Resources.DescriptionLineImage", "image", false, AssetsConstants.CATEGORY_IMAGE, AssetsController.FILTER_NONE) 
+                    };
+                    break;
             }
 
             // Create subcontrollers

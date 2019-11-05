@@ -17,7 +17,7 @@ namespace uAdventure.Editor
             VIDEOSCENE
         };
 
-        private readonly AppearanceEditor appearanceEditor;
+        private readonly ResourcesList appearanceEditor;
 
         private readonly FileChooser video, music;
         private readonly AnimationField slides;
@@ -28,8 +28,8 @@ namespace uAdventure.Editor
             params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
         {
-            appearanceEditor = ScriptableObject.CreateInstance<AppearanceEditor>();
-            appearanceEditor.height = 160;
+            appearanceEditor = ScriptableObject.CreateInstance<ResourcesList>();
+            appearanceEditor.Height = 160;
 
             video = new FileChooser()
             {

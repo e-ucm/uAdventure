@@ -17,15 +17,15 @@ namespace uAdventure.Editor
         private readonly FileChooser image, icon, image_over;
 
         private ItemDataControl workingItem;
-        private readonly AppearanceEditor appearanceEditor;
+        private readonly ResourcesList appearanceEditor;
 
         public ItemsWindowAppearance(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
         {
 
-            appearanceEditor = ScriptableObject.CreateInstance<AppearanceEditor>();
-            appearanceEditor.height = 160;
-            appearanceEditor.onAppearanceSelected = RefreshResources;
+            appearanceEditor = ScriptableObject.CreateInstance<ResourcesList>();
+            appearanceEditor.Height = 160;
+            appearanceEditor.onResourceSelected = RefreshResources;
 
             PreviewTitle = "Item.Preview".Traslate();
             // File selectors

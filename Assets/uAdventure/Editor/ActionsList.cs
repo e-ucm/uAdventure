@@ -12,17 +12,13 @@ public class ActionsList : ScriptableObject {
     private Texture2D noConditionsTex = null;
 
     private DataControlList actionsList;
-    private AppearanceEditor appearances;
     private CustomActionDataControl customAction;
+    private ResourcesEditor resourcesEditor;
     
-    private FileChooser file;
-    private AnimationField animation;
-    private int groupSelected = 0;
 
     public void Awake()
     {
-        appearances = ScriptableObject.CreateInstance<AppearanceEditor>();
-
+        resourcesEditor = new ResourcesEditor { ShowResourcesList = true };
         conditionsTex = Resources.Load<Texture2D>("EAdventureData/img/icons/conditions-24x24");
         noConditionsTex = Resources.Load<Texture2D>("EAdventureData/img/icons/no-conditions-24x24");
 
@@ -183,25 +179,13 @@ public class ActionsList : ScriptableObject {
             customAction = i != -1 && actions[i] is CustomActionDataControl ? actions[i] as CustomActionDataControl : null;
             if(customAction != null)
             {
-                appearances.Data = customAction;
+                resourcesEditor.Data = customAction;
             }
         };
 
         actionsList.onRemoveCallback += (list) => 
         {
             customAction = null;
-        };
-
-        appearances = CreateInstance<AppearanceEditor>();
-
-        file = new FileChooser()
-        {
-            FileType = FileType.BUTTON,
-        };
-
-        animation = new AnimationField()
-        {
-            FileType = FileType.CHARACTER_ANIM,
         };
     }
 
@@ -233,30 +217,7 @@ public class ActionsList : ScriptableObject {
 
         if (customAction != null)
         {
-            appearances.height = 80;
-            appearances.OnInspectorGUI();
-            var resources = customAction.getResources()[customAction.getSelectedResources()];
-            var titles = new string[resources.getAssetGroupCount()];
-            for (int i = 0, end = titles.Length; i < end; ++i)
-            {
-                titles[i] = resources.getGroupInfo(i);
-            }
-
-            groupSelected = EditorGUILayout.Popup(TC.get("Resources.ResourcesGroup"), groupSelected, titles);
-            int assetIndex;
-            for(int i = 0, end = resources.getGroupAssetCount(groupSelected); i < end; ++i)
-            {
-                assetIndex = resources.getAssetIndex(groupSelected, i);
-                var field = resources.getAssetCategory(assetIndex) == AssetsConstants.CATEGORY_ANIMATION ? animation : file;
-                field.Label = resources.getAssetDescription(i);
-                field.Path = resources.getAssetPath(assetIndex);
-                EditorGUI.BeginChangeCheck();
-                field.DoLayout();
-                if (EditorGUI.EndChangeCheck())
-                {
-                    resources.addAsset(resources.getAssetName(i), field.Path);
-                }
-            }
+            resourcesEditor.DoLayout();
         }
     }
 }
