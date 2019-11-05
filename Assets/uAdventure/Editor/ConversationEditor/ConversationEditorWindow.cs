@@ -16,42 +16,6 @@ namespace uAdventure.Editor
         {
             return parent.getChilds().ToArray();
         }
-        protected override void OnAfterDrawWindows()
-        {
-            switch (Event.current.type)
-            {
-                case EventType.MouseDown:
-                    elegibleForClick = true;
-                    break;
-                case EventType.MouseUp:
-                    if(elegibleForClick && lookingChildNode != null)
-                    {
-                        var options = new List<GUIContent> { new GUIContent("Cancel asignation") };
-                        foreach(var addable in lookingChildNode.getAddableNodes())
-                        {
-                            options.Add(new GUIContent("Create/" + TC.get("Element.Name" + addable)));
-                        }
-
-                        EditorUtility.DisplayCustomMenu(new Rect(Event.current.mousePosition, Vector2.one), options.ToArray(), -1, (param, ops, selected) =>
-                        {
-                            if(selected != 0)
-                            {
-                                var option = lookingChildNode.getAddableNodes()[selected - 1];
-                                Content.linkNode(lookingChildNode, option, lookingChildSlot);
-                            }
-                            lookingChildNode = null;
-                            lookingChildSlot = -1;
-                        }, Event.current.mousePosition);
-                        elegibleForClick = false;
-                    }
-                    break;
-                case EventType.MouseDrag:
-                    elegibleForClick = false;
-                    break;
-            }
-
-            base.OnAfterDrawWindows();
-        }
 
         protected override void DeleteNode(ConversationDataControl content, ConversationNodeDataControl node)
         {
@@ -175,24 +139,83 @@ namespace uAdventure.Editor
 
         protected override void OnDrawLine(ConversationDataControl content, ConversationNodeDataControl originNode, ConversationNodeDataControl destinationNode, Rect originRect, Rect destinationRect, bool isHovered, bool isRemoving)
         {
-            var addButton = new Rect(0, 0, 20, 20);
-            addButton.center = (originRect.center + destinationRect.center) / 2f;
+            var button = new Rect(0, 0, 20, 20);
 
-            Debug.Log(Event.current.type);
-            if(GUI.Button(addButton, "+"))
+            if(destinationNode == null)
             {
-                var options = new List<GUIContent>();
-                foreach (var addable in originNode.getAddableNodes())
+                button.center = Event.current.mousePosition;
+                if (GUI.Button(button, "+"))
                 {
-                    options.Add(new GUIContent("Create " + TC.get("Element.Name" + addable)));
+                    ShowOptionsForNode(originNode, true, lookingChildNode.getChildCount() > lookingChildSlot, selected =>
+                    {
+                        if(selected > 0)
+                        {
+                            Content.linkNode(lookingChildNode, selected, lookingChildSlot);
+                        }
+                        if(selected == REMOVE_OPTION)
+                        {
+                            Content.deleteNodeLink(lookingChildNode, lookingChildSlot);
+                        }
+                        lookingChildNode = null;
+                        lookingChildSlot = -1;
+                    });
                 }
+            }
 
-                EditorUtility.DisplayCustomMenu(new Rect(Event.current.mousePosition, Vector2.one), options.ToArray(), -1, (param, ops, selected) =>
+
+            if(lookingChildNode != null)
+            {
+                return;
+            }
+
+            button.center = (originRect.position + new Vector2(originRect.width, originRect.height / 2f) + destinationRect.position + new Vector2(0, destinationRect.height/2f)) / 2f;
+            if (GUI.Button(button, "+"))
+            {
+                ShowOptionsForNode(originNode, true, false, selected =>
                 {
-                    int index = originNode.getChilds().IndexOf(destinationNode);
-                    var option = originNode.getAddableNodes()[selected];
-                    Content.insertNode(originNode, option, index);
-                }, Event.current.mousePosition);
+                    if (selected != CANCEL_OPTION)
+                    {
+                        int index = originNode == null ? 0 : originNode.getChilds().IndexOf(destinationNode);
+                        Content.insertNode(originNode, selected, index);
+                    }
+                });
+            }
+        }
+
+        private const int CANCEL_OPTION = -1;
+        private const int REMOVE_OPTION = -2;
+
+        private static void ShowOptionsForNode(ConversationNodeDataControl node, bool showCancel, bool showRemove, Action<int> onOptionSelected)
+        {
+            var optionsDict = new Dictionary<int, string> { };
+            var addableNodes = node != null ? node.getAddableNodes() : new int[] { Controller.CONVERSATION_DIALOGUE_LINE, Controller.CONVERSATION_OPTION_LINE };
+            foreach (var addable in addableNodes)
+            {
+                optionsDict.Add(addable, "Create " + TC.get("Element.Name" + addable));
+            }
+
+            if (showRemove)
+            {
+                optionsDict.Add(REMOVE_OPTION, "Remove link");
+            }
+
+            if (showCancel)
+            {
+                optionsDict.Add(CANCEL_OPTION, "Cancel asignation");
+            }
+
+            if(optionsDict.Count == 1)
+            {
+                onOptionSelected(optionsDict.Keys.First());
+            }
+            else
+            {
+                EditorUtility.DisplayCustomMenu(new Rect(Event.current.mousePosition, Vector2.one), 
+                    optionsDict.Values.Select(v => new GUIContent(v)).ToArray(), -1, (param, ops, selected) =>
+                {
+                    var d = param as int[];
+                    onOptionSelected(d[selected]);
+                }, optionsDict.Keys.ToArray());
             }
         }
     }

@@ -345,10 +345,25 @@ namespace uAdventure.Editor
          *            Dialogue node to delete the link
          * @return True if the link was deleted, false otherwise
          */
-        public bool deleteNodeLink(ConversationNodeDataControl nodeView)
+        public bool deleteNodeLink(ConversationNodeDataControl node)
         {
 
-            return controller.AddTool(new ConversationNodeDataControl.DeleteNodeLinkTool(nodeView));
+            return controller.AddTool(new ConversationNodeDataControl.DeleteNodeLinkTool(node));
+        }
+
+        /**
+         * Deletes the link with the child node. This method should only be used
+         * with dialogue nodes (to delete the link with their only child). For
+         * option nodes, the method <i>deleteNodeOption</i> should be used instead.
+         * 
+         * @param nodeView
+         *            Dialogue node to delete the link
+         * @return True if the link was deleted, false otherwise
+         */
+        public bool deleteNodeLink(ConversationNodeDataControl node, int index)
+        {
+
+            return controller.AddTool(new ConversationNodeDataControl.DeleteNodeLinkTool(node,index));
         }
 
         public override int[] getAddableElements()
@@ -458,11 +473,7 @@ namespace uAdventure.Editor
 
         public virtual bool insertNode(ConversationNodeDataControl parent, int nodeType, int index)
         {
-            if (parent != null && parent.getAddableNodes().Contains(nodeType))
-            {
-                return controller.AddTool(new InsertNodeTool(this, parent, nodeType, index));
-            }
-            return false;
+            return controller.AddTool(new InsertNodeTool(this, parent, nodeType, index));
         }
 
         private class InsertNodeTool : Tool
@@ -474,11 +485,14 @@ namespace uAdventure.Editor
             private readonly ConversationNodeDataControl parent, newNode;
             private readonly ConversationDataControl content;
             private readonly int index;
+            private readonly bool isRootNode;
+            private readonly ConversationNodeDataControl oldRoot;
 
             public InsertNodeTool(ConversationDataControl content, ConversationNodeDataControl parent, int nodeType, int index)
             {
                 this.content = content;
-                this.parent = parent;
+                this.isRootNode = parent == null;
+                this.parent = isRootNode ? content.getRootNode() : parent;
                 ConversationNode node = null;
                 switch (nodeType)
                 {
@@ -488,8 +502,8 @@ namespace uAdventure.Editor
 
 
                 this.index = index;
-                var parentRect = parent.getEditorRect();
-                var childRect = parent.getChilds()[index].getEditorRect();
+                var parentRect = isRootNode ? new RectInt(0, 25, 0, 0) : parent.getEditorRect();
+                var childRect = isRootNode ? content.getRootNode().getEditorRect() : parent.getChilds()[index].getEditorRect();
 
                 var center = (parentRect.center + childRect.center) / 2f;
 
@@ -502,19 +516,19 @@ namespace uAdventure.Editor
 
             private List<Tool> CreateTools()
             {
-                var tools = new List<Tool>()
+                var tools = new List<Tool>();
+                
+                if (!isRootNode)
                 {
-                    new ConversationNodeDataControl.LinkConversationNodeTool(content, parent, newNode, index)
-                };
-
-                var toolsList = tools.ToList();
-
-                if (parent.getChildCount() > 0)
-                {
-                    toolsList.Add(new ConversationNodeDataControl.AddRemoveConversationNodeTool(newNode, parent.getChilds()[index], 0));
+                    tools.Add(new ConversationNodeDataControl.LinkConversationNodeTool(content, parent, newNode, index));
                 }
 
-                return toolsList;
+                if (isRootNode || parent.getChildCount() > 0)
+                {
+                    tools.Add(new ConversationNodeDataControl.AddRemoveConversationNodeTool(newNode, isRootNode ? parent : parent.getChilds()[index], 0));
+                }
+
+                return tools;
             }
 
             public override bool canRedo()
@@ -539,6 +553,12 @@ namespace uAdventure.Editor
                     return false;
                 }
 
+                if (isRootNode)
+                {
+                    var conversation = content.getContent() as Conversation;
+                    conversation.setRootNode(newNode.getContent() as ConversationNode);
+                }
+
                 return subTools.All(t => t.doTool());
             }
 
@@ -547,6 +567,12 @@ namespace uAdventure.Editor
                 if (subTools == null)
                 {
                     return false;
+                }
+
+                if (isRootNode)
+                {
+                    var conversation = content.getContent() as Conversation;
+                    conversation.setRootNode(newNode.getContent() as ConversationNode);
                 }
 
                 return subTools.All(t => t.redoTool());
@@ -562,6 +588,13 @@ namespace uAdventure.Editor
                 subTools.Reverse();
                 var result = subTools.All(t => t.undoTool());
                 subTools.Reverse();
+
+
+                if (isRootNode)
+                {
+                    var conversation = content.getContent() as Conversation;
+                    conversation.setRootNode(parent.getContent() as ConversationNode);
+                }
 
                 return result;
             }

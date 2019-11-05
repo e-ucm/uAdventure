@@ -441,6 +441,7 @@ namespace uAdventure.Editor
                 Rect from = new Rect(0, 0, 0, 50f);
                 Rect to = GetNodeRect(Content, contentNodes[0]);
                 CurveFromTo(from, to, new Color(0.8f, 0.5f, 0.1f));
+                OnDrawLine(Content, default(N), contentNodes[0], from, to, false, false);
             }
 
             // Draw the rest of the lines in red
