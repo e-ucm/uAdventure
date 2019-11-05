@@ -273,9 +273,16 @@ namespace uAdventure.Editor
                     {
                         var action = new Action(actionType, selectedTarget);
                         var parentItem = parent as ItemDataControl;
-                        if(parentItem != null && controller.ShowStrictConfirmDialog("Consume item?", "Do you want the item to be removed from the inventory in the action?"))
+                        if(parentItem != null && controller.ShowStrictConfirmDialog("Remove element?", "Do you want the item to be removed or consumed in the action?"))
                         {
-                            action.Effects.Add(new ConsumeObjectEffect(parentItem.getId()));
+                            if(actionType == Action.DRAG_TO)
+                            {
+                                action.Effects.Add(new RemoveElementEffect(parentItem.getId()));
+                            }
+                            else
+                            {
+                                action.Effects.Add(new ConsumeObjectEffect(parentItem.getId()));
+                            }
                         }
                         return action;
                     });
