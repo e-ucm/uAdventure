@@ -63,6 +63,10 @@ namespace uAdventure.Runner
             set { talker = value; }
         }
 
+        public Texture2D Image { get; set; }
+        public AudioClip Audio { get; set; }
+        public bool TTS { get; set; }
+
         public BubbleData(string line, Vector3 origin, Vector3 destiny, GameObject talker = null)
         {
             initialize(line, origin, destiny, Color.white, Color.black, Color.white, Color.black, talker);

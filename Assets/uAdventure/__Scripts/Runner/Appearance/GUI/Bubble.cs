@@ -19,11 +19,34 @@ namespace uAdventure.Runner
             set { data = value; }
         }
 
-        Transform text;
+        Transform text, image;
         RectTransform rectTransform;
         // Use this for initialization
         void Start()
         {
+            //Image
+            if (data.Image)
+            {
+                image = this.transform.Find("RawImage");
+                image.GetComponent<RawImage>().texture = data.Image;
+                var layoutElement = image.GetComponent<LayoutElement>();
+
+                var ratio = data.Image.width / (float) data.Image.height;
+
+                var height = Mathf.Min(240f, Mathf.Min(240f, data.Image.width) / ratio);
+                var width = height * ratio;
+
+                layoutElement.preferredHeight = height;
+                layoutElement.preferredWidth = width;
+            }
+            //Audio
+            if (data.Audio)
+            {
+                var audioSource = GetComponent<AudioSource>();
+                audioSource.clip = data.Audio;
+                audioSource.Play();
+
+            }
             //resize ();
             text = this.transform.Find("Text");
             text.GetComponent<Text>().text = data.Line;
@@ -158,6 +181,11 @@ namespace uAdventure.Runner
 
             text.GetComponent<Text>().color = new Color(data.TextColor.r, data.TextColor.g, data.TextColor.b, alpha);
             text.GetComponent<Outline>().effectColor = new Color(data.TextOutlineColor.r, data.TextOutlineColor.g, data.TextOutlineColor.b, alpha);
+
+            if (image)
+            {
+                image.GetComponent<RawImage>().color = new Color(1f, 1f, 1f, alpha);
+            }
 
         }
 

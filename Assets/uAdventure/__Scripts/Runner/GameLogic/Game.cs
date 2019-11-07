@@ -533,6 +533,11 @@ namespace uAdventure.Runner
             GUIManager.Instance.Talk(text, character);
         }
 
+        public void Talk(ConversationLine line, string character)
+        {
+            GUIManager.Instance.Talk(line, character);
+        }
+
         public void ShowBook(string bookId)
         {
             guistate = GUIState.BOOK;
@@ -547,6 +552,8 @@ namespace uAdventure.Runner
                 return bookDrawer.Book != null;
             }
         }
+
+        private List<GUILayoutOption> auxLimitList = new List<GUILayoutOption>();
 
         protected void OnGUI()
         {
@@ -566,6 +573,10 @@ namespace uAdventure.Runner
                         float guiscale = Screen.width / 800f;
                         skin.box.fontSize = Mathf.RoundToInt(guiscale * 20);
                         skin.button.fontSize = Mathf.RoundToInt(guiscale * 20);
+                        skin.button.alignment = TextAnchor.MiddleCenter;
+                        skin.button.imagePosition = ImagePosition.ImageAbove;
+                        skin.button.stretchHeight = false;
+                        skin.button.stretchWidth = true;
                         skin.label.fontSize = Mathf.RoundToInt(guiscale * 20);
                         skin.GetStyle("optionLabel").fontSize = Mathf.RoundToInt(guiscale * 36);
                         skin.GetStyle("talk_player").fontSize = Mathf.RoundToInt(guiscale * 20);
@@ -592,7 +603,25 @@ namespace uAdventure.Runner
                                 foreach (var i in order)
                                 {
                                     ConversationLine ono = options.getLine(i);
-                                    if (ConditionChecker.check(options.getLineConditions(i)) && GUILayout.Button(ono.getText()))
+                                    var content = new GUIContent(ono.getText());
+                                    var resources = ono.getResources().Checked().FirstOrDefault();
+                                    auxLimitList.Clear();
+
+                                    if (resources != null && resources.existAsset("image") && !string.IsNullOrEmpty(resources.getAssetPath("image")))
+                                    {
+                                        var imagePath = resources.getAssetPath("image");
+                                        var image = ResourceManager.getImage(imagePath);
+                                        if (image)
+                                        {
+                                            content.image = image;
+                                            if (image.height > 240)
+                                            {
+                                                auxLimitList.Add(GUILayout.Height(240));
+                                            }
+                                        }
+                                    }
+
+                                    if (ConditionChecker.check(options.getLineConditions(i)) && GUILayout.Button(content, auxLimitList.ToArray()))
                                     {
                                         OptionSelected(i);
                                     }

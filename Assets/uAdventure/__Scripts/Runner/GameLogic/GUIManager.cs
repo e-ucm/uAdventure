@@ -3,6 +3,7 @@ using uAdventure.Core;
 using UnityEngine.SceneManagement;
 using AssetPackage;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace uAdventure.Runner
 {
@@ -92,16 +93,36 @@ namespace uAdventure.Runner
             lastText = text;
             ShowBubble(GenerateBubble(text, x, y, textColor, textBorderColor, backgroundColor, borderColor));
         }
+        public void Talk(ConversationLine line, string talkerName = null)
+        {
+            var resources = line.getResources().Checked().FirstOrDefault();
+            if (resources != null)
+            {
+                var image = resources.existAsset("image") ? Game.Instance.ResourceManager.getImage(resources.getAssetPath("image")) : null;
+                var audio = resources.existAsset("audio") ? Game.Instance.ResourceManager.getAudio(resources.getAssetPath("audio")) : null;
+                var tts = resources.existAsset("tts") ? resources.getAssetPath("tts") == "yes" : false;
+                Talk(line.getText(), image, audio, tts, talkerName);
+            }
+            else
+            {
+                Talk(line.getText(), null, null, false, talkerName);
+            }
+        }
 
         public void Talk(string text, string talkerName = null)
         {
+            Talk(text, null, null, false, talkerName);
+        }
+
+        public void Talk(string text, Texture2D image, AudioClip audio, bool synthetizeVoice, string talkerName = null)
+        {
             lastText = text;
             GameObject talkerObject = null;
+            BubbleData bubbleData;
             if (talkerName == null || talkerName == Player.IDENTIFIER)
             {
                 text = text.Replace("[]", "[" + Player.IDENTIFIER + "]");
                 NPC player = Game.Instance.GameState.Player;
-                BubbleData bubbleData;
 
                 if (Game.Instance.GameState.IsFirstPerson || PlayerMB.Instance == null)
                 {
@@ -116,6 +137,9 @@ namespace uAdventure.Runner
                     }
                     bubbleData = GenerateBubble(player, text, talkerObject);
                 }
+                bubbleData.Image = image;
+                bubbleData.TTS = synthetizeVoice;
+                bubbleData.Audio = audio;
 
                 ShowBubble(bubbleData);
             }
@@ -128,7 +152,11 @@ namespace uAdventure.Runner
                 }
 
                 NPC cha = Game.Instance.GameState.GetCharacter(talkerName);
-                ShowBubble(GenerateBubble(cha, text, talkerObject));
+                bubbleData = GenerateBubble(cha, text, talkerObject);
+                bubbleData.Image = image;
+                bubbleData.TTS = synthetizeVoice;
+                bubbleData.Audio = audio;
+                ShowBubble(bubbleData);
             }
             if (talkerObject)
             {

@@ -12,7 +12,7 @@ namespace uAdventure.Runner
 
         protected override Rectangle GetInteractionArea(SceneMB sceneMB)
         {
-            var aad = element as ActiveArea;
+            var aad = Element as ActiveArea;
             var scene = sceneMB.SceneData as Scene;
             Rectangle area = null;
             if (scene != null && scene.getTrajectory() == null)
@@ -35,7 +35,7 @@ namespace uAdventure.Runner
 
         protected override Item.BehaviourType GetBehaviourType()
         {
-            return (element as ActiveArea).getBehaviour();
+            return (Element as ActiveArea).getBehaviour();
         }
     }
 }
