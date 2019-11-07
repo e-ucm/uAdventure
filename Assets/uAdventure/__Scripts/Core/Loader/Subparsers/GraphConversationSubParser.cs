@@ -40,11 +40,6 @@ namespace uAdventure.Core
         private string characterName;
 
         /**
-         * Path of the audio track for a conversation line
-         */
-        private string audioPath;
-
-        /**
          * Check if the options in option node may be random
          */
         private bool random;
@@ -83,12 +78,6 @@ namespace uAdventure.Core
          * Check if each conversation line will wait until user interacts
          */
         private bool keepShowingDialogue;
-
-        /**
-         * Check if a conversation line must be synthesize
-         */
-        private bool synthesizerVoice;
-
         /**
          * Store the current conversation line
          */
@@ -209,10 +198,6 @@ namespace uAdventure.Core
             foreach (XmlElement ell in lines.ChildNodes)
             {
 				addline = true;
-
-				audioPath = ell.GetAttribute("uri");
-				// If there is a "synthesize" attribute, store its value
-				synthesizerVoice = ExString.EqualsDefault(ell.GetAttribute("synthesize"), "yes", false);
 				// If there is a "keepShowing" attribute, store its value
 				keepShowingLine = ExString.EqualsDefault(ell.GetAttribute("keepShowing"), "yes", false);
 
@@ -220,15 +205,18 @@ namespace uAdventure.Core
                 {
                     // Store the read string into the current node, and then delete the string. The trim is performed so we
                     // don't have to worry with indentations or leading/trailing spaces
-                    conversationLine = new ConversationLine(ConversationLine.PLAYER, ell.InnerText);
 
-					conversationLine.setAudioPath(audioPath);
-                    conversationLine.setSynthesizerVoice(synthesizerVoice);
+
+                    conversationLine = new ConversationLine(ConversationLine.PLAYER, GetText(ell));
                     conversationLine.setKeepShowing(keepShowingLine);
-
                     //XAPI ELEMENTS
 					conversationLine.setXApiCorrect("true".Equals (ell.GetAttribute("correct")));
                     //END OF XAPI
+                    // RESOURCES
+                    foreach (var res in DOMParserUtility.DOMParse<ResourcesUni>(ell.SelectNodes("resources"), parameters))
+                    {
+                        conversationLine.addResources(res);
+                    }
 
                 }
                 else if (ell.Name == "speak-char")
@@ -241,10 +229,13 @@ namespace uAdventure.Core
 
                     // Store the read string into the current node, and then delete the string. The trim is performed so we
                     // don't have to worry with indentations or leading/trailing spaces
-                    conversationLine = new ConversationLine(characterName, ell.InnerText);
-					conversationLine.setAudioPath(audioPath);
-                    conversationLine.setSynthesizerVoice(synthesizerVoice);
+                    conversationLine = new ConversationLine(characterName, GetText(ell));
                     conversationLine.setKeepShowing(keepShowingLine);
+                    // RESOURCES
+                    foreach (var res in DOMParserUtility.DOMParse<ResourcesUni>(ell.SelectNodes("resources"), parameters))
+                    {
+                        conversationLine.addResources(res);
+                    }
                 }
                 else if (ell.Name == "condition")
                 {
@@ -273,7 +264,7 @@ namespace uAdventure.Core
                 }
                 else if(ell.Name == "timeout")
                 {
-                    ((OptionConversationNode)currentNode).Timeout = ExParsers.ParseDefault(ell.InnerText, 10f);
+                    ((OptionConversationNode)currentNode).Timeout = ExParsers.ParseDefault(GetText(ell), 10f);
                     timeoutConditions = true;
                     addline = false;
                 }
@@ -287,6 +278,18 @@ namespace uAdventure.Core
                     node.addLine(conversationLine);
                 }
             }
+        }
+
+        private static string GetText(XmlElement el)
+        {
+            var textNode = el.SelectSingleNode("text");
+            var text = "";
+            if (textNode != null)
+            {
+                text = textNode.InnerText;
+            }
+
+            return text;
         }
     }
 }

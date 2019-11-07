@@ -93,6 +93,20 @@ namespace uAdventure.Core
             return resources;
         }
 
+
+
+        /**
+         * Adds some resources to the list of resources
+         * 
+         * @param resources
+         *            the resources to add
+         */
+        public void addResources(ResourcesUni resources)
+        {
+
+            this.resources.Add(resources);
+        }
+
         /**
          * Sets the a new identifier for the element.
          * 
@@ -115,20 +129,6 @@ namespace uAdventure.Core
         {
 
             this.documentation = documentation;
-        }
-
-
-
-        /**
-         * Adds some resources to the list of resources
-         * 
-         * @param resources
-         *            the resources to add
-         */
-        public void addResources(ResourcesUni resources)
-        {
-
-            this.resources.Add(resources);
         }
 
         /**

@@ -33,11 +33,6 @@ namespace uAdventure.Core
         private string characterName;
 
         /**
-         * Path of the audio track for a conversation line
-         */
-        private string audioPath;
-
-        /**
          * Check if the options in option node may be random
          */
         private bool random;
@@ -61,12 +56,6 @@ namespace uAdventure.Core
          * The position to be painted the option nodes
          */
         private int x, y;
-
-        /**
-         * Check if a conversation line must be synthesize
-         */
-
-        private bool synthesizerVoice;
 
 
         public TreeConversationSubParser(Chapter chapter) : base(chapter)
@@ -105,7 +94,6 @@ namespace uAdventure.Core
             {
                 // Set default name to "NPC"
                 characterName = "NPC";
-                audioPath = "";
 
                 // If there is a "idTarget" attribute, store it
                 tmpArgVal = el.GetAttribute("idTarget");
@@ -114,67 +102,32 @@ namespace uAdventure.Core
                     characterName = tmpArgVal;
                 }
 
-                // If there is a "uri" attribute, store it as audio path
-                tmpArgVal = el.GetAttribute("uri");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    audioPath = tmpArgVal;
-                }
-
-                // If there is a "uri" attribute, store it as audio path
-                tmpArgVal = el.GetAttribute("synthesize");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    string response = tmpArgVal;
-                    if (response.Equals("yes"))
-                        synthesizerVoice = true;
-                    else
-                        synthesizerVoice = false;
-                }
-
                 // Store the read string into the current node, and then delete the string. The trim is performed so we
                 // don't
                 // have to worry with indentations or leading/trailing spaces
-                ConversationLine line = new ConversationLine(characterName, el.InnerText);
-                if (audioPath != null && !this.audioPath.Equals(""))
-                {
-                    line.setAudioPath(audioPath);
-                }
+                ConversationLine line = new ConversationLine(characterName, GetText(el));
 
-                line.setSynthesizerVoice(synthesizerVoice);
+                // RESOURCES
+                foreach (var res in DOMParserUtility.DOMParse<ResourcesUni>(el.SelectNodes("resources")))
+                {
+                    line.addResources(res);
+                }
                 currentNode.addLine(line);
 
             }
 
             foreach (XmlElement el in speaksplayer)
             {
-                audioPath = "";
-
-                // If there is a "uri" attribute, store it as audio path
-                tmpArgVal = el.GetAttribute("uri");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    audioPath = tmpArgVal;
-                }
-                // If there is a "uri" attribute, store it as audio path
-                tmpArgVal = el.GetAttribute("synthesize");
-                if (!string.IsNullOrEmpty(tmpArgVal))
-                {
-                    string response = tmpArgVal;
-                    if (response.Equals("yes"))
-                        synthesizerVoice = true;
-                    else
-                        synthesizerVoice = false;
-                }
 
                 // Store the read string into the current node, and then delete the string. The trim is performed so we
                 // don't have to worry with indentations or leading/trailing spaces
-                ConversationLine line = new ConversationLine(ConversationLine.PLAYER, el.InnerText);
-                if (audioPath != null && !this.audioPath.Equals(""))
+                ConversationLine line = new ConversationLine(ConversationLine.PLAYER, GetText(el));
+
+                // RESOURCES
+                foreach (var res in DOMParserUtility.DOMParse<ResourcesUni>(el.SelectNodes("resources")))
                 {
-                    line.setAudioPath(audioPath);
+                    line.addResources(res);
                 }
-                line.setSynthesizerVoice(synthesizerVoice);
 
                 currentNode.addLine(line);
             }
@@ -279,6 +232,18 @@ namespace uAdventure.Core
             }
 
             chapter.addConversation(new GraphConversation((TreeConversation)conversation));
+        }
+
+        private static string GetText(XmlElement el)
+        {
+            var textNode = el.SelectSingleNode("text");
+            var text = "";
+            if (textNode != null)
+            {
+                text = textNode.InnerText;
+            }
+
+            return text;
         }
 
         //public override void startElement(string namespaceURI, string sName, string qName, Dictionary<string, string> attrs)

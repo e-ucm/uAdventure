@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace uAdventure.Core
 {
@@ -97,21 +98,6 @@ namespace uAdventure.Core
         private string text;
 
         /**
-         * Path for the audio track where the line is recorded. Its use is optional.
-         */
-        private string audioPath;
-
-        /**
-         * Path of the image that will be shown along or instead of the text. 
-         */
-        private string imagePath;
-
-        /**
-         * Tell if the line has to be read by synthesizer
-         */
-        private bool synthesizerVoice;
-
-        /**
          * Conditions associated to this line
          */
         private Conditions conditions;
@@ -120,6 +106,11 @@ namespace uAdventure.Core
          * Keep line showing until user interacts
          */
         private bool keepShowing;
+
+        /**
+         * The element's set of resources
+         */
+        private List<ResourcesUni> resources;
 
         /**
          * Constructor.
@@ -135,9 +126,35 @@ namespace uAdventure.Core
 
             this.name = name;
             this.text = text;
-            this.synthesizerVoice = false;
             this.keepShowing = false;
             conditions = new Conditions();
+            resources = new List<ResourcesUni> ();
+        }
+
+
+        /**
+         * Returns the element's list of resources
+         * 
+         * @return the element's list of resources
+         */
+        public List<ResourcesUni> getResources()
+        {
+
+            return resources;
+        }
+
+
+
+        /**
+         * Adds some resources to the list of resources
+         * 
+         * @param resources
+         *            the resources to add
+         */
+        public void addResources(ResourcesUni resources)
+        {
+
+            this.resources.Add(resources);
         }
 
         /**
@@ -226,101 +243,6 @@ namespace uAdventure.Core
         }
 
         /**
-         * @return the audioPath
-         */
-
-        public string getAudioPath()
-        {
-
-            return audioPath;
-        }
-
-        /**
-         * @param audioPath
-         *            the audioPath to set
-         */
-
-        public void setAudioPath(string audioPath)
-        {
-
-            this.audioPath = audioPath;
-
-            //if audioPath is not null, store the conversation line 
-            if (audioPath != null)
-                AllElementsWithAssets.addAsset(this);
-
-        }
-
-        /**
-         * @return the audioPath
-         */
-
-        public string getImagePath()
-        {
-
-            return imagePath;
-        }
-
-        /**
-         * @param audioPath
-         *            the audioPath to set
-         */
-
-        public void setImagePath(string imagePath)
-        {
-
-            this.imagePath = imagePath;
-
-            //if audioPath is not null, store the conversation line 
-            if (imagePath != null)
-                AllElementsWithAssets.addAsset(this);
-
-        }
-
-        /**
-         * Returns true if the audio path is valid. That is when it is not null and
-         * different to ""
-         */
-        public bool isValidAudio()
-        {
-            return !string.IsNullOrEmpty(audioPath);
-        }
-
-        /**
-         * Returns true if the image path is valid. That is when it is not null and
-         * different to ""
-         */
-        public bool isValidImage()
-        {
-            return !string.IsNullOrEmpty(imagePath);
-        }
-
-        /**
-         * Returns if the line has to be read by synthesizer
-         * 
-         * @return if this line has to be read by synthesizer
-         */
-
-        public bool getSynthesizerVoice()
-        {
-
-            return synthesizerVoice;
-        }
-
-        /**
-         * Set if the line to be read by synthesizer
-         * 
-         * @param synthesizerVoice
-         *            true for to be read by synthesizer
-         */
-
-        public void setSynthesizerVoice(bool synthesizerVoice)
-        {
-
-            this.synthesizerVoice = synthesizerVoice;
-        }
-
-        /**
          * @return the conditions
          */
 
@@ -356,12 +278,11 @@ namespace uAdventure.Core
         public object Clone()
         {
             ConversationLine cl = (ConversationLine)this.MemberwiseClone();
-            cl.audioPath = (audioPath != null ? audioPath : null);
             cl.name = (name != null ? name : null);
-            cl.synthesizerVoice = synthesizerVoice;
             cl.text = (text != null ? text : null);
             cl.conditions = (conditions != null ? (Conditions)conditions.Clone() : null);
             cl.keepShowing = keepShowing;
+            cl.resources = resources.ConvertAll(r => r.Clone() as ResourcesUni);
             return cl;
         }
     }

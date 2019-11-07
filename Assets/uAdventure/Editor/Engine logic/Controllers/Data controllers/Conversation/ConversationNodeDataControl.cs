@@ -440,7 +440,9 @@ namespace uAdventure.Editor
             {
                 this.isAdd = true;
                 this.node = node;
-                this.line = new ConversationLineDataControl(new ConversationLine(name, text));
+                var newLine = new ConversationLine(name, text);
+                newLine.addResources(new ResourcesUni());
+                this.line = new ConversationLineDataControl(newLine);
             }
             public AddRemoveLineTool(ConversationNodeDataControl node, ConversationLineDataControl toRemove)
             {

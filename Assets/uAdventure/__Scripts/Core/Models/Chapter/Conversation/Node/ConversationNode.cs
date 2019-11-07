@@ -120,18 +120,6 @@ namespace uAdventure.Core
             return getLine(index).getText();
         }
 
-        public string getAudioPath(int index)
-        {
-
-            return getLine(index).getAudioPath();
-        }
-
-        public bool hasAudioPath(int index)
-        {
-
-            return getLine(index).isValidAudio();
-        }
-
         /**
          * Adds a new line to the node, in the last position
          * 
@@ -159,25 +147,6 @@ namespace uAdventure.Core
          */
         public abstract ConversationLine removeLine(int index);
 
-
-        /**
-         * Set the voice for synthesize the specified line
-         * 
-         */
-        public void setSynthesizerVoice(bool synthesize, int line)
-        {
-
-            getLine(line).setSynthesizerVoice(synthesize);
-        }
-
-        /**
-         * Get the voice for the specified line
-         */
-        public bool getSynthesizerVoice(int line)
-        {
-
-            return getLine(line).getSynthesizerVoice();
-        }
 
         public bool getEditorCollapsed()
         {

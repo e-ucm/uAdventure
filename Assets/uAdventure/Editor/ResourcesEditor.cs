@@ -46,29 +46,94 @@ namespace uAdventure.Editor
                 resourcesList.Height = 80;
                 resourcesList.OnInspectorGUI();
             }
-
             var resources = Data.getResources()[Data.getSelectedResources()];
-            var titles = new string[resources.getAssetGroupCount()];
-            for (int i = 0, end = titles.Length; i < end; ++i)
+
+            if (resources.getAssetGroupCount() > 1)
             {
-                titles[i] = resources.getGroupInfo(i);
+                var titles = new string[resources.getAssetGroupCount()];
+                for (int i = 0, te = titles.Length; i < te; ++i)
+                {
+                    titles[i] = resources.getGroupInfo(i);
+                }
+
+                groupSelected = EditorGUILayout.Popup(TC.get("Resources.ResourcesGroup"), groupSelected, titles);
             }
 
-            groupSelected = EditorGUILayout.Popup(TC.get("Resources.ResourcesGroup"), groupSelected, titles);
             int assetIndex;
-            for (int i = 0, end = resources.getGroupAssetCount(groupSelected); i < end; ++i)
+            int end = resources.getAssetCount();
+            if(resources.getAssetGroupCount() > 1)
+            {
+                end = resources.getGroupAssetCount(groupSelected);
+            }
+
+            for (int i = 0; i < end; ++i)
             {
                 assetIndex = resources.getAssetIndex(groupSelected, i);
-                var field = resources.getAssetCategory(assetIndex) == AssetsConstants.CATEGORY_ANIMATION ? animation : file;
-                field.Label = resources.getAssetDescription(i);
-                field.Path = resources.getAssetPath(assetIndex);
+                var assetCategory = resources.getAssetCategory(assetIndex);
+                var label = resources.getAssetDescription(assetIndex);
+                var value = resources.getAssetPath(assetIndex);
                 EditorGUI.BeginChangeCheck();
-                field.DoLayout();
+                if (assetCategory == AssetsConstants.CATEGORY_BOOL)
+                {
+                    value = EditorGUILayout.Toggle(label, value == "yes") ? "yes" : "no";
+                }
+                else
+                {
+                    var field = resources.getAssetCategory(assetIndex) == AssetsConstants.CATEGORY_ANIMATION ? animation : file;
+                    field.Label = label;
+                    field.Path = value;
+                    field.FileType = GetFileType(resources.getAssetCategory(assetIndex));
+                    field.DoLayout();
+                    value = field.Path;
+                }
                 if (EditorGUI.EndChangeCheck())
                 {
-                    resources.addAsset(resources.getAssetName(i), field.Path);
+                    resources.addAsset(resources.getAssetName(assetIndex), value);
                 }
+
             }
+        }
+
+        private static FileType GetFileType(int assetCategory)
+        {
+            FileType r = default(FileType);
+            switch (assetCategory)
+            {
+                case AssetsConstants.CATEGORY_BACKGROUND:
+                    r = FileType.SCENE_BACKGROUND;
+                    break;
+                case AssetsConstants.CATEGORY_ANIMATION:
+                    r = FileType.CHARACTER_ANIM;
+                    break;
+                case AssetsConstants.CATEGORY_IMAGE:
+                    r = FileType.ITEM_IMAGE;
+                    break;
+                case AssetsConstants.CATEGORY_ICON:
+                    r = FileType.ITEM_ICON;
+                    break;
+                case AssetsConstants.CATEGORY_AUDIO:
+                case AssetsConstants.CATEGORY_ANIMATION_AUDIO:
+                    r = FileType.SCENE_MUSIC;
+                    break;
+                case AssetsConstants.CATEGORY_VIDEO:
+                    r = FileType.CUTSCENE_VIDEO;
+                    break;
+                case AssetsConstants.CATEGORY_CURSOR:
+                    r = FileType.ITEM_IMAGE;
+                    break;
+                case AssetsConstants.CATEGORY_STYLED_TEXT:
+                    throw new System.NotImplementedException();
+                case AssetsConstants.CATEGORY_ANIMATION_IMAGE:
+                    r = FileType.FRAME_IMAGE;
+                    break;
+                case AssetsConstants.CATEGORY_BUTTON:
+                    r = FileType.BUTTON;
+                    break;
+                case AssetsConstants.CATEGORY_ARROW_BOOK:
+                    r = FileType.BOOK_ARROW_RIGHT_NORMAL;
+                    break;
+            }
+            return r;
         }
     }
 }

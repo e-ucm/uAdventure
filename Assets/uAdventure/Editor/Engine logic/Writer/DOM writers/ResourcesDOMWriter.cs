@@ -26,6 +26,8 @@ namespace uAdventure.Editor
 
         public const int RESOURCES_BOOK = 7;
 
+        public const int RESOURCES_CONVERSATION_LINE = 8;
+
         /**
          * Private constructor.
          */

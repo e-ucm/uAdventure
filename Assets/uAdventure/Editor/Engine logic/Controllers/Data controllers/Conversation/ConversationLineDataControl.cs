@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 using uAdventure.Core;
 using System;
+using System.Linq;
 
 namespace uAdventure.Editor
 {
@@ -12,10 +13,12 @@ namespace uAdventure.Editor
         private readonly ConversationLine conversationLine;
         private readonly ConditionsController conversationLineConditionsController;
 
-        public ConversationLineDataControl(ConversationLine conversationLine)
+        public ConversationLineDataControl(ConversationLine conversationLine) : base()
         {
             this.conversationLine = conversationLine;
             this.conversationLineConditionsController = new ConditionsController(conversationLine.getConditions());
+            this.resourcesList = conversationLine.getResources();
+            this.resourcesDataControlList = conversationLine.getResources().ConvertAll(r => new ResourcesDataControl(r, Controller.CONVERSATION_DIALOGUE_LINE));
         }
 
         public override bool addElement(int type, string id)
@@ -50,14 +53,7 @@ namespace uAdventure.Editor
 
         public override int countAssetReferences(string assetPath)
         {
-            int count = 0;
-
-            if(conversationLine.getAudioPath() == assetPath)
-            {
-                count++;
-            }
-
-            return count;
+            return resourcesDataControlList.Sum(r => r.countAssetReferences(assetPath));
         }
 
         public override int countIdentifierReferences(string id)
@@ -68,10 +64,7 @@ namespace uAdventure.Editor
 
         public override void deleteAssetReferences(string assetPath)
         {
-            if(conversationLine.getAudioPath() == assetPath)
-            {
-                conversationLine.setAudioPath("");
-            }
+            resourcesDataControlList.ForEach(r => r.deleteAssetReferences(assetPath));
         }
 
         public override bool deleteElement(DataControl dataControl, bool askConfirmation)
@@ -96,11 +89,7 @@ namespace uAdventure.Editor
 
         public override void getAssetReferences(List<string> assetPaths, List<int> assetTypes)
         {
-            if (!string.IsNullOrEmpty(conversationLine.getAudioPath()))
-            {
-                assetPaths.Add(conversationLine.getAudioPath());
-                assetTypes.Add(AssetsConstants.CATEGORY_AUDIO);
-            }
+            resourcesDataControlList.ForEach(r => r.getAssetReferences(assetPaths, assetTypes));
         }
 
         public override object getContent()
@@ -122,6 +111,8 @@ namespace uAdventure.Editor
                 incidences.Add("Character identifier not found: \"" + conversationLine.getName() + "\"");
                 valid = false;
             }
+
+            valid &= resourcesDataControlList.All(r => r.isValid(currentPath, incidences));
 
             return valid;
         }
@@ -235,6 +226,11 @@ namespace uAdventure.Editor
             controller.AddTool(new ChangeStringValueTool(conversationLine, name, "getName", "setName"));
         }
 
+        public bool isValidImage()
+        {
+            return resourcesDataControlList.Any(r => !string.IsNullOrEmpty(r.getAssetPath("image")));
+        }
+
         /**
          * Sets the new text of the line.
          * 
@@ -254,18 +250,7 @@ namespace uAdventure.Editor
 
         public bool isValidAudio()
         {
-            return conversationLine.isValidAudio();
-        }
-
-        /**
-         * Returns if the line has to be read by synthesizer
-         * 
-         * @return if this line has to be read by synthesizer
-         */
-
-        public bool getSynthesizerVoice()
-        {
-            return conversationLine.getSynthesizerVoice();
+            return resourcesDataControlList.Any(r => !string.IsNullOrEmpty(r.getAssetPath("audio")));
         }
 
         /**

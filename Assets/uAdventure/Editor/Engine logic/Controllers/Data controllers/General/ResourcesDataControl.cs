@@ -142,8 +142,9 @@ namespace uAdventure.Editor
                 case Controller.CONVERSATION_DIALOGUE_LINE:
                 case Controller.CONVERSATION_OPTION_LINE:
                     assetsInformation = new AssetInformation[] {
+                        new AssetInformation("Resources.DescriptionLineImage", "image", false, AssetsConstants.CATEGORY_IMAGE, AssetsController.FILTER_NONE),
                         new AssetInformation("Resources.DescriptionLineAudio", "audio", false, AssetsConstants.CATEGORY_AUDIO, AssetsController.FILTER_MP3),
-                        new AssetInformation("Resources.DescriptionLineImage", "image", false, AssetsConstants.CATEGORY_IMAGE, AssetsController.FILTER_NONE) 
+                        new AssetInformation("Resources.DescriptionLineTTS", "tts", false, AssetsConstants.CATEGORY_BOOL, AssetsController.FILTER_NONE)
                     };
                     break;
             }
@@ -413,12 +414,12 @@ namespace uAdventure.Editor
         {
 
             // Search in the assetsInformation
-            for (int index = 0; index < assetsInformation.Length; index++)
+            foreach (var assetInfo in assetsInformation)
             {
-                if (resources.getAssetPath(assetsInformation[index].name) != null && !resources.getAssetPath(assetsInformation[index].name).Equals(""))
+                if (!string.IsNullOrEmpty(resources.getAssetPath(assetInfo.name)) && assetInfo.category != AssetsConstants.CATEGORY_BOOL)
                 {
-                    string assetPath = resources.getAssetPath(assetsInformation[index].name);
-                    int assetType = assetsInformation[index].category;
+                    string assetPath = resources.getAssetPath(assetInfo.name);
+                    int assetType = assetInfo.category;
 
                     // Search that the assetPath has not been previously added
                     bool add = true;
@@ -530,7 +531,7 @@ namespace uAdventure.Editor
         public int getAssetIndex(int group, int asset)
         {
 
-            if (assetsGroups == null)
+            if (assetsGroups == null || assetsGroups.Length == 0)
                 return asset;
             return assetsGroups[group][asset];
         }

@@ -104,17 +104,16 @@ namespace uAdventure.Editor
                     }
 
                     // Add the line text into the element
-                    phrase.InnerText = (line.getText());
+                    var text = document.CreateElement("text");
+                    text.InnerText = line.getText();
+                    phrase.AppendChild(text);
 
-                    //If there is audio track, store it as attribute
-                    if (line.isValidAudio())
+                    // Append the resources
+                    foreach (ResourcesUni resources in line.getResources())
                     {
-                        phrase.SetAttribute("uri", line.getAudioPath());
-                    }
-                    //If there is a synthesizer valid voice, store it as attribute
-                    if (line.getSynthesizerVoice())
-                    {
-                        phrase.SetAttribute("synthesize", "yes");
+                        XmlNode resourcesNode = ResourcesDOMWriter.buildDOM(resources, ResourcesDOMWriter.RESOURCES_CONVERSATION_LINE);
+                        document.ImportNode(resourcesNode, true);
+                        phrase.AppendChild(resourcesNode);
                     }
 
                     // Add the element to the DOM root
@@ -175,17 +174,17 @@ namespace uAdventure.Editor
                     ConversationLine line = currentNode.getLine(i);
                     // Create the actual option (a "speak-player" element) and add its respective text
                     XmlElement lineElement = document.CreateElement("speak-player");
-                    lineElement.InnerText = currentNode.getLine(i).getText();
 
-                    //If there is audio track, store it as attribute
-                    if (line.isValidAudio())
+                    var text = document.CreateElement("text");
+                    text.InnerText = currentNode.getLine(i).getText();
+                    lineElement.AppendChild(text);
+
+                    // Append the resources
+                    foreach (ResourcesUni resources in line.getResources())
                     {
-                        lineElement.SetAttribute("uri", line.getAudioPath());
-                    }
-                    //If there is a synthesizer valid voice, store it as attribute
-                    if (line.getSynthesizerVoice())
-                    {
-                        lineElement.SetAttribute("synthesize", "yes");
+                        XmlNode resourcesNode = ResourcesDOMWriter.buildDOM(resources, ResourcesDOMWriter.RESOURCES_CONVERSATION_LINE);
+                        document.ImportNode(resourcesNode, true);
+                        lineElement.AppendChild(resourcesNode);
                     }
 
                     // Insert the text line in the option node
@@ -279,19 +278,19 @@ namespace uAdventure.Editor
                             }
                         }
 
-                        //If there is audio track, store it as attribute
-                        if (line.isValidAudio())
+                        // Append the resources
+                        foreach (ResourcesUni resources in line.getResources())
                         {
-                            phrase.SetAttribute("uri", line.getAudioPath());
-                        }
-                        //If there is a synthesizer valid voice, store it as attribute
-                        if (line.getSynthesizerVoice())
-                        {
-                            phrase.SetAttribute("synthesize", "yes");
+                            XmlNode resourcesNode = ResourcesDOMWriter.buildDOM(resources, ResourcesDOMWriter.RESOURCES_CONVERSATION_LINE);
+                            doc.ImportNode(resourcesNode, true);
+                            phrase.AppendChild(resourcesNode);
                         }
 
                         // Add the line text into the element
-                        phrase.InnerText = (line.getText());
+
+                        var text = doc.CreateElement("text");
+                        text.InnerText = line.getText();
+                        phrase.AppendChild(text);
 
                         // Add the element to the node
                         nodeElement.AppendChild(phrase);
@@ -394,17 +393,17 @@ namespace uAdventure.Editor
 
                         // Create the actual option (a "speak-player" element) and add its respective text
                         XmlElement lineElement = doc.CreateElement("speak-player");
-                        lineElement.InnerText = (node.getLine(j).getText());
 
-                        //If there is audio track, store it as attribute
-                        if (line.isValidAudio())
+                        var text = doc.CreateElement("text");
+                        text.InnerText = node.getLine(j).getText();
+                        lineElement.AppendChild(text);
+
+                        // Append the resources
+                        foreach (ResourcesUni resources in line.getResources())
                         {
-                            lineElement.SetAttribute("uri", line.getAudioPath());
-                        }
-                        //If there is a synthesizer valid voice, store it as attribute
-                        if (line.getSynthesizerVoice())
-                        {
-                            lineElement.SetAttribute("synthesize", "yes");
+                            XmlNode resourcesNode = ResourcesDOMWriter.buildDOM(resources, ResourcesDOMWriter.RESOURCES_CONVERSATION_LINE);
+                            doc.ImportNode(resourcesNode, true);
+                            lineElement.AppendChild(resourcesNode);
                         }
 
                         if (line.getXApiCorrect())

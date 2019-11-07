@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+
+    <xsl:output method="xml"/>
+
+<!--  SPEAK-PLAYER OR SPEAK-CHAR: Now the text is inside of the <text> node and has resources -->
+    <xsl:template match="speak-player|speak-char">
+      <xsl:copy>
+        <resources name="No name">
+        </resources>
+        <text><xsl:apply-templates select="node()|@*"/></text>
+      </xsl:copy>
+    </xsl:template>
+<!-- END SPEAK-PLAYER OR SPEAK-CHAR -->
+  
+    <xsl:template match="node()|@*">
+        <xsl:copy>
+            <xsl:apply-templates select="node()|@*"/>
+        </xsl:copy>
+    </xsl:template>
+
+</xsl:stylesheet>

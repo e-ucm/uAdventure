@@ -70,9 +70,14 @@
         public const int CATEGORY_ARROW_BOOK = 11;
 
         /**
+         * Arrows for books
+         */
+        public const int CATEGORY_BOOL = 12;
+
+        /**
          * Number of categories.
          */
-        public const int CATEGORIES_COUNT = 12;
+        public const int CATEGORIES_COUNT = 13;
 
 
     }

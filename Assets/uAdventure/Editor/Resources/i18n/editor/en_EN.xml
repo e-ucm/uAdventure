@@ -2278,6 +2278,10 @@
   <entry key="Scene.HideInventory">Hide Inventory</entry>
   <entry key="Scene.InventoryPosition">Inventory Position</entry>
 
+  <entry key="Resources.DescriptionLineAudio">Audio</entry>
+  <entry key="Resources.DescriptionLineImage">Image</entry>
+  <entry key="Resources.DescriptionLineTTS">Synthetize</entry>
+
   <!-- Analytics -->
   <entry key="Analytics.Title">Analytics</entry>
   <entry key="Analytics.GameStart">Game starts in </entry>

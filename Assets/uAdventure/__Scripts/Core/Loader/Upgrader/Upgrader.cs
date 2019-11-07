@@ -11,6 +11,7 @@ namespace uAdventure.Core.XmlUpgrader
         private static readonly ITransformer[] transformers = 
         {
             new Chapter0To1Transformer(),
+            new Chapter1To2Transformer(),
             new AnimationNonExistentTo0Transformer()
         };
         private readonly Dictionary<string, Dictionary<int, ITransformer>> orderedTransformers;

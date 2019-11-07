@@ -91,6 +91,11 @@ namespace uAdventure.Editor
                     },
                     new ColumnList.Column
                     {
+                        Text = "Res.",
+                        SizeOptions = new GUILayoutOption[]{ GUILayout.MaxWidth(25) }
+                    },
+                    new ColumnList.Column
+                    {
                         Text = "Cond.",
                         SizeOptions = new GUILayoutOption[]{ GUILayout.MaxWidth(25) }
                     },
@@ -123,10 +128,13 @@ namespace uAdventure.Editor
                         case 2: // Correct
                             DoCorrectEditor(rect, line);
                             break;
-                        case 3: // Conditions
+                        case 3: // Resources
+                            DoResourcesEditor(rect, line);
+                            break;
+                        case 4: // Conditions
                             DoConditionsEditor(rect, line.getConditions());
                             break;
-                        case 4: // Child
+                        case 5: // Child
                             DoChildEditor(rect, index);
                             break;
                     }
@@ -148,12 +156,18 @@ namespace uAdventure.Editor
             }
         }
 
+        private void DoResourcesEditor(Rect rect, ConversationLineDataControl data)
+        {
+            var hasResources = data.isValidAudio() || data.isValidImage();
+            ResourcesPopup.DoResourcesButton(rect, data, false, hasResources, noBackgroundSkin.button);
+        }
+
         private void DoConditionsEditor(Rect rect, ConditionsController conditions)
         {
             var hasConditions = conditions.getBlocksCount() > 0;
             if (GUI.Button(rect, hasConditions ? conditionsTex : noConditionsTex, noBackgroundSkin.button))
             {
-                ConditionEditorWindow.ShowAtPosition(conditions, new Rect(rect.x + rect.width, rect.y, 0,0));
+                ConditionEditorWindow.ShowAtPosition(conditions, new Rect(rect.x + rect.width, rect.y, 0, 0));
             }
         }
 
