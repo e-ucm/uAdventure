@@ -95,7 +95,7 @@ namespace uAdventure.Editor
 
         public TT CreateElement(int type, string id, params object[] extraParams)
         {
-            if (!Controller.Instance.isElementIdValid(id))
+            if (!string.IsNullOrEmpty(id) && !Controller.Instance.isElementIdValid(id))
             {
                 id = Controller.Instance.makeElementValid(id);
             }

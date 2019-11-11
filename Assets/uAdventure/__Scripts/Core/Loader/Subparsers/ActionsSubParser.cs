@@ -23,7 +23,7 @@ namespace uAdventure.Core
 			Effects effects 	  = DOMParserUtility.DOMParse<Effects> ((XmlElement)element.SelectSingleNode("effect"), parameters) 		?? new Effects();
 			Effects clickeffects  = DOMParserUtility.DOMParse<Effects> ((XmlElement)element.SelectSingleNode("click-effect"), parameters) 	?? new Effects();
 			Effects noteffects 	  = DOMParserUtility.DOMParse<Effects> ((XmlElement)element.SelectSingleNode("not-effect"), parameters) 	?? new Effects();
-
+            
             // Then we instantiate the correct action by name.
             // We also parse the elements that are unique of that action.
 			switch (element.Name)
@@ -46,8 +46,15 @@ namespace uAdventure.Core
                     break;
             }
 
+            // Documentation
+            var documentationNode = element.SelectSingleNode("documentation");
+            if (documentationNode != null)
+            {
+                currentAction.setDocumentation(documentationNode.InnerText);
+            }
+
             // Lastly we set al the attributes to the action
-			currentAction.setConditions(conditions);
+            currentAction.setConditions(conditions);
 			currentAction.setEffects(effects);
 			currentAction.setNotEffects(noteffects);
             currentAction.setKeepDistance(currentKeepDistance);
