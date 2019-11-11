@@ -4,13 +4,21 @@
     <xsl:output method="xml"/>
 
 <!--  SPEAK-PLAYER OR SPEAK-CHAR: Now the text is inside of the <text> node and has resources -->
-    <xsl:template match="speak-player|speak-char">
+    <xsl:template match="speak-player">
       <xsl:copy>
         <resources name="No name">
         </resources>
         <text><xsl:apply-templates select="node()|@*"/></text>
       </xsl:copy>
     </xsl:template>
+
+  <xsl:template match="speak-char">
+    <speak-char idTarget="{@idTarget}">
+      <resources name="No name">
+      </resources>
+      <text><xsl:apply-templates select="node()|@*"/></text>
+    </speak-char>
+  </xsl:template>
 <!-- END SPEAK-PLAYER OR SPEAK-CHAR -->
   
     <xsl:template match="node()|@*">
