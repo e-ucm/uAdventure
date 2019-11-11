@@ -64,7 +64,7 @@ namespace uAdventure.Geo
             var mesh = GetComponent<MeshFilter>().mesh;
 
             var selectedGeometry = Geometry;
-            if (selectedGeometry != null)
+            if (selectedGeometry != null && selectedGeometry.Points != null && selectedGeometry.Points.Length > 0)
             {
                 switch (selectedGeometry.Type)
                 {

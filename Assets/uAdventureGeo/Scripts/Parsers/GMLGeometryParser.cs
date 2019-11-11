@@ -38,9 +38,14 @@ namespace uAdventure.Geo
 
         private Vector2d[] UnzipPoints(string pointList)
         {
+            string[] zippedPoints = string.IsNullOrEmpty(pointList) ? null : pointList.Split(' ');
+            if (zippedPoints == null || zippedPoints.Length < 2)
+            {
+                return new Vector2d[0];
+            }
+
             var points = new List<Vector2d>();
-            var zippedPoints = pointList.Split(' ');
-            for (int i = 0; i < zippedPoints.Length; i += 2)
+            for (int i = 0; i < zippedPoints.Length; i += 2) 
             {
                 points.Add(new Vector2d(double.Parse(zippedPoints[i]), double.Parse(zippedPoints[i + 1])));
             }
