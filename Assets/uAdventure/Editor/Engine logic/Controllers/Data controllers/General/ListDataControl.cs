@@ -95,6 +95,11 @@ namespace uAdventure.Editor
 
         public TT CreateElement(int type, string id, params object[] extraParams)
         {
+            if (!Controller.Instance.isElementIdValid(id))
+            {
+                id = Controller.Instance.makeElementValid(id);
+            }
+
             var dataControl = elementCreators.First(ec => ec.TypeDescriptors.Select(td => td.Type).Contains(type)).CreateElement(type, id, extraParams);
 
             if (dataControl != null)
