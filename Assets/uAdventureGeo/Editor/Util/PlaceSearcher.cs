@@ -5,6 +5,7 @@ using UnityEditor;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.Networking;
+using uAdventure.Editor;
 
 namespace uAdventure.Geo
 {
@@ -42,6 +43,7 @@ namespace uAdventure.Geo
         public StructSearchData DataStructure;
         private string lastSearch = "";
         private float timeSinceLastWrite;
+        private bool searched;
         private EditorApplication.CallbackFunction update;
         private UnityWebRequestAsyncOperation request;
         private SearchData[] addresses;
@@ -92,6 +94,7 @@ namespace uAdventure.Geo
             if (!selected && Value != prevAddress)
             {
                 timeSinceLastWrite = 0;
+                searched = false;
             }
 
             return selected;
@@ -102,11 +105,12 @@ namespace uAdventure.Geo
          * --------------------------------------- */
         private void PerformSearch()
         {
-            if (lastSearch != Value)
+            if (lastSearch != Value && !searched)
             {
                 if (Value != null && Value.Trim() != "")
                 {
                     lastSearch = Value;
+                    searched = true;
                     SearchInOSM(Value);
                 }
                 else
@@ -130,13 +134,21 @@ namespace uAdventure.Geo
             if (request != null && request.isDone)
             {
                 addresses = DataProcessingOSM(request.webRequest.downloadHandler.text);
-                addressDropdown.Elements = addresses.Select(a => a.label).ToList();
-                request = null;
-                // Request the repaint of the element 
-                if (OnRequestRepaint != null)
+                if(addresses == null || request.webRequest.isHttpError || request.webRequest.isNetworkError)
                 {
-                    OnRequestRepaint();
+                    Controller.Instance.ShowErrorDialog("Geo.PlaceSearcher.ErrorNoResults.Title", "Geo.PlaceSearcher.ErrorNoResults.Message");
+                    Debug.LogError("Cannot connect with address search server (err: " + request.webRequest.responseCode + "): " + request.webRequest.error);
+                } 
+                else
+                {
+                    addressDropdown.Elements = addresses.Select(a => a.label).ToList();
+                    // Request the repaint of the element 
+                    if (OnRequestRepaint != null)
+                    {
+                        OnRequestRepaint();
+                    }
                 }
+                request = null;
             }
         }
 
@@ -151,6 +163,11 @@ namespace uAdventure.Geo
         {
             JSONObject obj = new JSONObject(success);
             var dataCache = new List<SearchData>();
+
+            if(obj == null || obj.list == null)
+            {
+                return null;
+            }
 
             foreach (JSONObject jsonObject in obj.list)
             {

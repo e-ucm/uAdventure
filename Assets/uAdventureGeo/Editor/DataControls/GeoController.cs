@@ -205,19 +205,6 @@ namespace uAdventure.Geo
                 GUILayout.FlexibleSpace();
                 using (new GUILayout.HorizontalScope())
                 {
-                    if (GUILayout.Button(TC.get("Geo.PlaceInput.WithLocation")))
-                    {
-                        searchData = new SearchData()
-                        {
-                            label = placeSearcher.Value,
-                            coordinates = placeSearcher.LatLon.ToVector2(),
-                            boundingBox = placeSearcher.BoundingBox
-                        };
-                        DestroyImmediate(placeSearcher);
-                        callback(searchData);
-                        this.Close();
-                    }
-
                     if (GUILayout.Button(TC.get("Geo.PlaceInput.WithoutLocation")))
                     {
                         searchData = null;
