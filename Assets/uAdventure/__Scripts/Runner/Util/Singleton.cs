@@ -59,9 +59,9 @@ namespace uAdventure.Runner
         }
     
     
-        private void OnDestroy()
+        /*private void OnDestroy()
         {
             m_ShuttingDown = true;
-        }
+        }*/
     }
 }

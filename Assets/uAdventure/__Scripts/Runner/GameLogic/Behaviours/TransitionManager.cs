@@ -6,7 +6,6 @@ using Action = System.Action;
 
 namespace uAdventure.Runner
 {
-    [RequireComponent(typeof(MeshRenderer))]
     public class TransitionManager : MonoBehaviour
     {
         [SerializeField] private Material transitionMaterial;
@@ -17,6 +16,7 @@ namespace uAdventure.Runner
         private Coroutine transitionRoutine;
         private float endTime;
         private Action<Transition, Texture> onFinish;
+        private bool _shuttingDown = false;
 
         void Awake()
         {
@@ -95,8 +95,18 @@ namespace uAdventure.Runner
             this.transitionRoutine = StartCoroutine(TransitionRoutine(transition));
         }
 
+        private void OnDestroy()
+        {
+            _shuttingDown = true;
+        }
+
         private void ResetMaterial()
         {
+            if (_shuttingDown)
+            {
+                return;
+            }
+
             transitionMaterial.SetFloat("_DirectionX", 0);
             transitionMaterial.SetFloat("_DirectionY", 0);
             transitionMaterial.SetFloat("_Progress", 0);

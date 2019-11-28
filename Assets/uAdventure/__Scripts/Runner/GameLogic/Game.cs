@@ -14,7 +14,6 @@ namespace uAdventure.Runner
         BOOK
     }
 
-    [RequireComponent(typeof(TransitionManager))]
     public class Game : Singleton<Game>, IPointerClickHandler
     {
 
@@ -36,7 +35,13 @@ namespace uAdventure.Runner
         private IRunnerChapterTarget runnerTarget;
         private GameState game_state;
         private uAdventureRaycaster uAdventureRaycaster;
-        private TransitionManager transitionManager;
+        private TransitionManager TransitionManager 
+        { 
+            get 
+            {
+                return FindObjectOfType<TransitionManager>();
+            } 
+        }
 
         // GUI
         public GameObject Blur_Prefab;
@@ -96,6 +101,13 @@ namespace uAdventure.Runner
 
         protected void Awake()
         {
+            if (FindObjectsOfType(typeof(Game)).Length > 1)
+            {
+                Destroy(this.gameObject);
+                return;
+            }
+
+            DontDestroyOnLoad(this.gameObject);
             executeStack = new Stack<KeyValuePair<Interactuable, ExecutionEvent>>();
 
             skin = Resources.Load("basic") as GUISkin;
@@ -168,9 +180,7 @@ namespace uAdventure.Runner
                 // When clicks are out, i capture them
                 uAdventureRaycaster.Base = this.gameObject;
             }
-
-            transitionManager = GetComponent<TransitionManager>();
-            if (!transitionManager)
+            if (!TransitionManager)
             {
                 Debug.LogError("No TransitionManager was found in the scene!");
             }
@@ -186,7 +196,10 @@ namespace uAdventure.Runner
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            MenuMB.Instance.hide();
+            if (MenuMB.Instance)
+            {
+                MenuMB.Instance.hide();
+            }
             if (!waitingRunTarget && !waitingTransition && executeStack.Count > 0 && guistate != GUIState.ANSWERS_MENU)
             {
                 Interacted();
@@ -199,12 +212,20 @@ namespace uAdventure.Runner
             {
                 waitingRunTarget = false;
                 waitingTransition = true;
-                transitionManager.DoTransition((_, __) =>
+                System.Action<Transition, Texture> afterTransition = (transition, texture) =>
                 {
                     waitingTransition = false;
                     uAdventureRaycaster.Instance.Override = null;
                     Interacted();
-                });
+                };
+
+                if(TransitionManager != null)
+                {
+                    TransitionManager.DoTransition(afterTransition);
+                } else
+                {
+                    afterTransition(null, null);
+                }
             }
 
             if (doTimeOut)
@@ -266,7 +287,10 @@ namespace uAdventure.Runner
         public bool Execute(Interactuable interactuable, ExecutionEvent callback = null)
         {
             // In case any menu is shown, we hide it
-            MenuMB.Instance.hide(true);
+            if (MenuMB.Instance)
+            {
+                MenuMB.Instance.hide(true);
+            }
             // Then we execute anything
             if (executeStack.Count == 0 || executeStack.Peek().Key != interactuable)
             {
@@ -406,15 +430,24 @@ namespace uAdventure.Runner
         public IRunnerChapterTarget RunTarget(string scene_id, int transition_time = 0, TransitionType transition_type = 0, Interactuable notifyObject = null, bool trace = true)
         {
             Debug.Log("Run target: " + scene_id);
-            GUIManager.Instance.ShowHand(false);
-            MenuMB.Instance.hide(true);
+            if (GUIManager.Instance)
+            {
+                GUIManager.Instance.ShowHand(false);
+            }
+            if (MenuMB.Instance)
+            {
+                MenuMB.Instance.hide(true);
+            }
 
             IChapterTarget target = GameState.GetChapterTarget(scene_id);
 
-            var transition = new Transition();
-            transition.setTime(transition_time);
-            transition.setType(transition_type);
-            transitionManager.PrepareTransition(transition);
+            if (TransitionManager != null)
+            {
+                var transition = new Transition();
+                transition.setTime(transition_time);
+                transition.setType(transition_type);
+                TransitionManager.PrepareTransition(transition);
+            }
 
             if (runnerTarget != null && runnerTarget.Data == target && scene_id == GameState.CurrentTarget)
             {
@@ -473,6 +506,11 @@ namespace uAdventure.Runner
         #region Misc
         public void showActions(List<Action> actions, Vector2 position, IActionReceiver actionReceiver = null)
         {
+            if (!MenuMB.Instance)
+            {
+                return;
+            }
+
             Vector3 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             var mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
             MenuMB.Instance.transform.position = new Vector3(pos.x, pos.y, pos.z) + mouseRay.direction.normalized * 10;

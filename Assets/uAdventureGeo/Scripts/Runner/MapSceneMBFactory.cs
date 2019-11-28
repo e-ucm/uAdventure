@@ -1,8 +1,6 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 using uAdventure.Runner;
-using System;
 using uAdventure.Core;
 
 namespace uAdventure.Geo

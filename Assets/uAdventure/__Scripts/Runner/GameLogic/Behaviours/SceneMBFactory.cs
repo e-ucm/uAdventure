@@ -7,10 +7,9 @@ namespace uAdventure.Runner
     public class SceneMBFactory : MonoBehaviour, IChapterTargetFactory {
 
         public GameObject prefab;
-        void Start()
+        public void Awake()
         {
-            if (prefab == null)
-                prefab = Resources.Load<GameObject>("Prefabs/Scene");
+            prefab = Resources.Load<GameObject>("Scene");
         }
 
         public IRunnerChapterTarget Instantiate(IChapterTarget modelObject)

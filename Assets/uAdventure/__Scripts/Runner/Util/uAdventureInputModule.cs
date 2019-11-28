@@ -60,6 +60,12 @@ namespace uAdventure.Runner
             return false;
         }
 
+        protected override void Start()
+        {
+            base.Start();
+            DontDestroyOnLoad(this.gameObject);
+        }
+
         public override void Process()
         {
             if (!eventSystem.isFocused && ShouldIgnoreEventsOnNoFocus())

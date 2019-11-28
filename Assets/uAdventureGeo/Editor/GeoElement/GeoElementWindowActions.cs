@@ -143,7 +143,7 @@ namespace uAdventure.Geo
                 action["Center"] = newCenter;
             }
 
-            if (newCenter)
+            if (!newCenter)
             {
                 EditorGUI.BeginChangeCheck();
                 var newDirection = RadialSlider.Do(horiz[1], 

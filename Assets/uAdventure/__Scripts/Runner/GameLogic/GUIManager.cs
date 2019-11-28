@@ -18,6 +18,8 @@ namespace uAdventure.Runner
         private GUIProvider guiprovider;
         private bool locked = false;
         private string current_cursor = "";
+        private bool started = false;
+
 
         public static GUIManager Instance
         {
@@ -36,11 +38,19 @@ namespace uAdventure.Runner
 
         protected void Awake()
         {
+            if(instance != null)
+            {
+                DestroyImmediate(this.gameObject);
+                return;
+            }
+
+            DontDestroyOnLoad(this.gameObject);
             instance = this;
         }
 
         protected void Start()
         {
+            started = true;
             guiprovider = new GUIProvider(Game.Instance.GameState.Data);
             if (Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer)
             {
@@ -59,6 +69,11 @@ namespace uAdventure.Runner
 
         public void SetCursor(string cursor)
         {
+            if (!started)
+            {
+                Start();
+            }
+
             if (cursor != current_cursor)
             {
                 if (!locked)
