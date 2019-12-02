@@ -11,6 +11,7 @@ namespace uAdventure.Editor
     {
         private ResourcesEditor resourcesEditor;
         private DataControlWithResources data;
+        private Drop drop;
         private bool showResourcesList;
 
         private static Texture2D resourceInactive, resourceActive;

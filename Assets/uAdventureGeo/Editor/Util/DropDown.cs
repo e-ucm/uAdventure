@@ -15,16 +15,13 @@ public class DropDown {
     private Drop drop;
     private bool selected;
     private string nextValue;
+    private EditorWindow myWindow;
 
     public DropDown(string label)
     {
         Label = label;
-        drop = ScriptableObject.CreateInstance<Drop>();
-        drop.OnOptionSelected = (index, option) =>
+        Drop.OnOptionSelected = (index, option) =>
         {
-            var os = drop.OnOptionSelected;
-            drop = ScriptableObject.CreateInstance<Drop>();
-            drop.OnOptionSelected = os;
             nextValue = option;
             selected = true;
         };
@@ -50,6 +47,12 @@ public class DropDown {
             Value = EditorGUILayout.TextField(Label, Value, style);
         }
 
+        if(drop != null && drop.editorWindow == EditorWindow.focusedWindow)
+        {
+            myWindow.Focus();
+            GUI.FocusControl(Label);
+        }
+
         // Calculating dropdown scroll rect
         var addressRect = GUILayoutUtility.GetLastRect();
 
@@ -67,17 +70,19 @@ public class DropDown {
             if (Event.current.type == EventType.Repaint && GUI.GetNameOfFocusedControl() == Label &&
                 Elements != null && Elements.Count > 0)
             {
-                drop.Elements = Elements;
-                if (!drop.Showing)
+                Drop.Elements = Elements;
+                
+                if (drop == null)
                 {
-                    drop.ShowAt(addressRect);
+                    myWindow = EditorWindow.focusedWindow;
+                    drop = Drop.ShowAt(addressRect);
                 }
                 drop.Repaint();
             }
 
-            if (GUI.GetNameOfFocusedControl() != Label && drop.Showing)
+            if (GUI.GetNameOfFocusedControl() != Label && drop != null)
             {
-                drop.Showing = false;
+                drop.editorWindow.Close(); 
             }
         }
 
@@ -85,39 +90,31 @@ public class DropDown {
     }
     
 }
-public class Drop : EditorWindow
+public class Drop : PopupWindowContent
 {
     private Vector2 scrollPos;
     private GUISkin dropdownskin;
 
     public delegate void OnOptionSelectedDelegate(int index, string option);
 
-    public OnOptionSelectedDelegate OnOptionSelected;
+    public static OnOptionSelectedDelegate OnOptionSelected;
 
-    public List<string> Elements { get; set; }
+    public static List<string> Elements { get; set; }
 
-    public bool Showing { get; set; }
-
-    public void ShowAt(Rect rect)
+    public static Drop ShowAt(Rect rect)
     {
-        this.position = new Rect(GUIUtility.GUIToScreenPoint(rect.position + new Vector2(0, rect.height)), new Vector2(rect.width, 200));
-        this.ShowPopup();
-        Showing = true;
+        var drop = new Drop();
+        PopupWindow.Show(rect, drop);
+        return drop;
     }
 
-    public void Awake()
+    public override void OnOpen()
     {
         dropdownskin = Resources.Load<GUISkin>("DropdownSkin");
     }
 
-    public void OnGUI()
+    public override void OnGUI(Rect rect)
     {
-        if (!Showing)
-        {
-            this.Close();
-            return;
-        }
-
         // Show Scrollview
         using (new GUIUtil.SkinScope(dropdownskin))
         using (var scroll = new GUILayout.ScrollViewScope(scrollPos, false, false, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true)))
@@ -132,11 +129,14 @@ public class Drop : EditorWindow
                         OnOptionSelected(i, Elements[i]);
                     }
                     GUI.FocusControl(null);
-                    Showing = false;
-                    this.Close();
                     break;
                 }
             }
         }
+    }
+
+    public void Repaint()
+    {
+        this.editorWindow.Repaint();
     }
 }
