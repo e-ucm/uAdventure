@@ -9,11 +9,10 @@ namespace uAdventure.Runner
     public class MenuMB : MonoBehaviour
     {
 #region Singleton
-        static MenuMB instance;
 
         public static MenuMB Instance
         {
-            get { return instance; }
+            get; private set;
         }
 #endregion
 
@@ -30,7 +29,16 @@ namespace uAdventure.Runner
 
         void Awake()
         {
-            MenuMB.instance = this;
+            if(!MenuMB.Instance)
+            {
+                MenuMB.Instance = this;
+                DontDestroyOnLoad(this.gameObject);
+            }
+            else
+            {
+                DestroyImmediate(this.gameObject);
+            }
+
             alpha = 0f;
         }
 
@@ -38,7 +46,6 @@ namespace uAdventure.Runner
         void Start()
         {
             this.actions = new List<Action>();
-
             regenerate();
         }
 

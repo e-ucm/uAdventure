@@ -8,7 +8,7 @@ namespace uAdventure.Runner
         object Data { get; set; }
         void RenderScene();
         bool IsReady { get; }
-        void Destroy(float time = 0);
+        void Destroy(float time, System.Action onDestroy);
         GameObject gameObject { get; }
     }
 

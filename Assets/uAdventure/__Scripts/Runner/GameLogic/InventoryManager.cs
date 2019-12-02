@@ -49,7 +49,10 @@ namespace uAdventure.Runner
             }
             set
             {
-                MenuMB.Instance.hide(true);
+                if (MenuMB.Instance)
+                {
+                    MenuMB.Instance.hide(true);
+                }
                 if (inventory)
                 {
                     inventory.Opened = value;

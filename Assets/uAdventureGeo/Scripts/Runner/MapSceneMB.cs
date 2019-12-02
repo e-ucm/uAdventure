@@ -56,10 +56,11 @@ namespace uAdventure.Geo
             return false;
         }
 
-        public void Destroy(float time = 0)
+        public void Destroy(float time, System.Action onDestroy)
         {
             Camera.main.transform.Restore(bkCameraTransform);
             DestroyImmediate(this.gameObject);
+            onDestroy();
         }
 
         public InteractuableResult Interacted(PointerEventData pointerData = null)

@@ -14,13 +14,19 @@ namespace uAdventure.Runner
         public bool Disabled { get; set; }
         public GameObject Override { get; set; }
         public GameObject Base { get; set; }
-        public static uAdventureRaycaster Instance { get; private set; }
+
+        public static uAdventureRaycaster Instance 
+        { 
+            get
+            {
+                return FindObjectOfType<uAdventureRaycaster>();
+            }
+        }
 
         protected override void Awake()
         {
             base.Awake();
             Disabled = false;
-            Instance = this;
         }
 
         public override void Raycast(PointerEventData eventData, List<RaycastResult> resultAppendList)

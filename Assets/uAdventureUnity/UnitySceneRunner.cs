@@ -20,7 +20,16 @@ namespace uAdventure.Unity
 
     public class UnitySceneRunner : MonoBehaviour, IRunnerChapterTarget
     {
+        // uAdventure Unity Scene Data Transfer
         private UnityScene unityScene;
+        // OnDestroy holer for after the scenes are loaded
+        private System.Action onDestroy;
+        // previousCamera stores the camera used prior to any load
+        private GameObject previousCamera;
+        // previousTrasitionManager stores the transitionManager used prior to any load
+        private TransitionManager previousTransitionManager;
+        // previousRaycasterOverride stores the uAdventureRaycaster override value prior to any load
+        private GameObject previousRaycasterOverride;
 
         public object Data
         {
@@ -50,47 +59,98 @@ namespace uAdventure.Unity
             return false;
         }
 
-        public void Destroy(float time = 0)
-        {
-            UnityEngine.SceneManagement.SceneManager.UnloadSceneAsync(unityScene.Scene);
-            UnityEngine.SceneManagement.SceneManager.LoadScene("_Scene1");
-        }
-
         public InteractuableResult Interacted(PointerEventData pointerData = null)
         {
             return InteractuableResult.IGNORES;
         }
 
-        private Camera previousCamera;
         public void RenderScene()
         {
-            previousCamera = FindObjectOfType<Camera>();
-            UnityEngine.SceneManagement.SceneManager.sceneLoaded += SceneManager_sceneLoaded; 
+            // Back up the camera to differenciate it in case there is another one after loading
+            previousCamera = Camera.main.gameObject;
+            // Save the transition manager to restore its rendertexture and transition in the new TransitionManager if there's a new Camera
+            previousTransitionManager = previousCamera.GetComponent<TransitionManager>();
+            // Save also the override
+            previousRaycasterOverride = previousCamera.GetComponent<uAdventureRaycaster>().Override;
+            // Add the AfterLoadingScene to get the callback right after the scene is loaded
+            UnityEngine.SceneManagement.SceneManager.sceneLoaded += AfterLoadingScene; 
+            // Load the scene
             UnityEngine.SceneManagement.SceneManager.LoadScene(unityScene.Scene);
         }
 
-        private void SceneManager_sceneLoaded(UnityEngine.SceneManagement.Scene arg0, UnityEngine.SceneManagement.LoadSceneMode arg1)
+        private void AfterLoadingScene(UnityEngine.SceneManagement.Scene arg0, UnityEngine.SceneManagement.LoadSceneMode arg1)
         {
-            var newCamera = FindObjectsOfType<Camera>().Where(c => c != previousCamera).FirstOrDefault();
+            // Remove the callback of the scene loaded
+            UnityEngine.SceneManagement.SceneManager.sceneLoaded -= AfterLoadingScene;
 
-            // If there's no camera in the new scene loaded we clone the old camera
-            if (!newCamera)
+            // Look for a new camera different than the previous
+            var newCamera = FindObjectsOfType<Camera>().Where(c => c.gameObject != previousCamera.gameObject).FirstOrDefault();
+
+            // If we find it, we have to check some of its configurations, otherwise we keep it
+            if (newCamera)
             {
-                newCamera = Instantiate(previousCamera);
-            }
-            // Otherwise, we check if it has a Raycaster and if not, we add the uA raycaster
-            else if (!newCamera.GetComponent<BaseRaycaster>())
-            {
-                newCamera.gameObject.AddComponent<uAdventureRaycaster>();
+                // We configure the new transition manager
+                var newTransitionManager = newCamera.GetComponent<TransitionManager>();
+                if (!newTransitionManager)
+                {
+                    newTransitionManager = newCamera.gameObject.AddComponent<TransitionManager>();
+                }
+                // This step restores the previous transition and RenderTexture
+                newTransitionManager.CopyFrom(previousTransitionManager);
+                // And then we forget about the previous transition manager
+                previousTransitionManager = newTransitionManager;
+
+                // If there's camera in the new scene loaded we destroy the old camera
+                DestroyImmediate(previousCamera.gameObject);
+                // We check if it has a Raycaster and if not, we add the uA raycaster
+                if (!newCamera.GetComponent<BaseRaycaster>())
+                {
+                    var newRaycaster = newCamera.gameObject.AddComponent<uAdventureRaycaster>();
+                    // Also we restore the override
+                    newRaycaster.Override = previousRaycasterOverride;
+                }
             }
 
-            UnityEngine.SceneManagement.SceneManager.sceneLoaded -= SceneManager_sceneLoaded;
+            // Our render is ready
             IsReady = true;
+        }
+
+        public void Destroy(float time, System.Action onDestroy)
+        {
+            // We save the onDestroy for calling it in AfterGoingBack
+            this.onDestroy = onDestroy;
+            // Save the current camera in case its marked as DontDestroyOnLoad
+            this.previousCamera = Camera.main.gameObject;
+            // Save the uAdventureRaycaster Override
+            var newRaycaster = previousCamera.GetComponent<uAdventureRaycaster>();
+            previousRaycasterOverride = newRaycaster ? newRaycaster.Override : null;
+            // Set the AfterGoingBack Callback to get the callback after loading _Scene1
+            UnityEngine.SceneManagement.SceneManager.sceneLoaded += AfterGoingBack;
+            UnityEngine.SceneManagement.SceneManager.LoadScene("_Scene1");
+        }
+
+        private void AfterGoingBack(UnityEngine.SceneManagement.Scene arg0, UnityEngine.SceneManagement.LoadSceneMode arg1)
+        {
+            // We remove the callback
+            UnityEngine.SceneManagement.SceneManager.sceneLoaded -= AfterGoingBack;
+
+            // We look for the new camera and restore the transition manager and the raycaster override
+            var newCamera = FindObjectsOfType<Camera>().Where(c => c.gameObject != previousCamera.gameObject).FirstOrDefault();
+            newCamera.GetComponent<TransitionManager>().CopyFrom(previousTransitionManager);
+            newCamera.GetComponent<uAdventureRaycaster>().Override = previousRaycasterOverride;
+            DontDestroyOnLoad(newCamera);
+
+            // If we still have a previous camera (in case its marked as dont destroy on load, we destroy it
+            if (previousCamera)
+            {
+                DestroyImmediate(previousCamera);
+            }
+
+            onDestroy();
         }
 
         public void setInteractuable(bool state)
         {
-            throw new System.NotImplementedException();
         }
     }
 }

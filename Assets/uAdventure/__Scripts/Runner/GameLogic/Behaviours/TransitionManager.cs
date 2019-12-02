@@ -95,6 +95,21 @@ namespace uAdventure.Runner
             this.transitionRoutine = StartCoroutine(TransitionRoutine(transition));
         }
 
+        public void CopyFrom(TransitionManager otherTransitionManager)
+        {
+            if (transitionRoutine != null || otherTransitionManager.transitionRoutine != null)
+            {
+                Debug.LogError("The other transition manager is already doing a transition!");
+                return;
+            }
+
+            this.transitionMaterial = otherTransitionManager.transitionMaterial;
+            this.transitionTexture  = otherTransitionManager.transitionTexture;
+            this.renderTexture      = otherTransitionManager.renderTexture;
+            this.transitioning      = otherTransitionManager.transitioning;
+            this.transition         = otherTransitionManager.transition;
+        }
+
         private void OnDestroy()
         {
             _shuttingDown = true;

@@ -30,7 +30,7 @@ namespace uAdventure.Runner
         public string gamePath = "", gameName = "", scene_name = "";
 
         // Execution
-        private bool waitingRunTarget = false, waitingTransition = false;
+        private bool waitingRunTarget = false, waitingTransition = false, waitingTargetDestroy = false;
         private Stack<KeyValuePair<Interactuable, ExecutionEvent>> executeStack;
         private IRunnerChapterTarget runnerTarget;
         private GameState game_state;
@@ -39,7 +39,8 @@ namespace uAdventure.Runner
         { 
             get 
             {
-                return FindObjectOfType<TransitionManager>();
+                var camera = FindObjectOfType<Camera>();
+                return camera ? camera.GetComponent<TransitionManager>() : null;
             } 
         }
 
@@ -108,6 +109,8 @@ namespace uAdventure.Runner
             }
 
             DontDestroyOnLoad(this.gameObject);
+            DontDestroyOnLoad(Camera.main);
+
             executeStack = new Stack<KeyValuePair<Interactuable, ExecutionEvent>>();
 
             skin = Resources.Load("basic") as GUISkin;
@@ -200,7 +203,7 @@ namespace uAdventure.Runner
             {
                 MenuMB.Instance.hide();
             }
-            if (!waitingRunTarget && !waitingTransition && executeStack.Count > 0 && guistate != GUIState.ANSWERS_MENU)
+            if (!waitingRunTarget && !waitingTargetDestroy && !waitingTransition && executeStack.Count > 0 && guistate != GUIState.ANSWERS_MENU)
             {
                 Interacted();
             }
@@ -215,14 +218,18 @@ namespace uAdventure.Runner
                 System.Action<Transition, Texture> afterTransition = (transition, texture) =>
                 {
                     waitingTransition = false;
-                    uAdventureRaycaster.Instance.Override = null;
+                    if (uAdventureRaycaster.Instance)
+                    {
+                        uAdventureRaycaster.Instance.Override = null;
+                    }
                     Interacted();
                 };
 
-                if(TransitionManager != null)
+                if (TransitionManager)
                 {
                     TransitionManager.DoTransition(afterTransition);
-                } else
+                } 
+                else
                 {
                     afterTransition(null, null);
                 }
@@ -272,7 +279,7 @@ namespace uAdventure.Runner
             {
                 GameState.OnGameSuspend();
             }
-            else
+            else if(Application.isMobilePlatform)
             {
                 GameState.OnGameResume();
                 if (started)
@@ -354,7 +361,10 @@ namespace uAdventure.Runner
                     }
                 }
             }
-            uAdventureRaycaster.Instance.Override = null;
+            if (uAdventureRaycaster.Instance)
+            {
+                uAdventureRaycaster.Instance.Override = null;
+            }
             return false;
         }
 
@@ -407,7 +417,7 @@ namespace uAdventure.Runner
 
         public bool isSomethingRunning()
         {
-            return executeStack.Count > 0 || waitingRunTarget || waitingTransition;
+            return executeStack.Count > 0 || waitingRunTarget || waitingTransition || waitingTargetDestroy;
         }
 
         public Interactuable getNextInteraction()
@@ -455,29 +465,41 @@ namespace uAdventure.Runner
             }
             else
             {
+                waitingTargetDestroy = true;
+                System.Action runTarget = () =>
+                {
+
+                    // Here we connect with the IChapterTargetFactory and create an IRunnerChapterTarget
+
+                    runnerTarget = RunnerChapterTargetFactory.Instance.Instantiate(target);
+                    runnerTarget.Data = target;
+                    waitingTargetDestroy = false;
+                    waitingRunTarget = true;
+                    GameState.CurrentTarget = target.getId();
+
+                    if (trace && OnTargetChanged != null)
+                    {
+                        OnTargetChanged(target);
+                    }
+                };
+
                 if (runnerTarget != null)
                 {
-                    runnerTarget.Destroy();
+                    runnerTarget.Destroy(0f, runTarget);
                 }
-
-                // Here we connect with the IChapterTargetFactory and create an IRunnerChapterTarget
-
-                runnerTarget = RunnerChapterTargetFactory.Instance.Instantiate(target);
-                runnerTarget.Data = target;
-                GameState.CurrentTarget = target.getId();
+                else
+                {
+                    runTarget();
+                }
             }
-
-            if (trace && OnTargetChanged != null)
-            {
-                OnTargetChanged(target);
-            }
-
-            waitingRunTarget = true;
             if(notifyObject != null)
             {
                 executeStack.Push(new KeyValuePair<Interactuable, ExecutionEvent>(notifyObject, null));
             }
-            uAdventureRaycaster.Instance.Override = this.gameObject;
+            if (uAdventureRaycaster.Instance)
+            {
+                uAdventureRaycaster.Instance.Override = this.gameObject;
+            }
             
             return runnerTarget;
         }

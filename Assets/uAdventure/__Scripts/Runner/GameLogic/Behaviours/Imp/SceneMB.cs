@@ -217,14 +217,10 @@ namespace uAdventure.Runner
             }
         }
 
-        public void Destroy()
-        {
-            Destroy(0f);
-        }
-
-        public void Destroy(float time)
+        public void Destroy(float time, System.Action onDestroy)
         {
             GameObject.DestroyImmediate(this.gameObject);
+            onDestroy();
         }
 
         private void LoadParents()
@@ -413,8 +409,12 @@ namespace uAdventure.Runner
                     {
                         ready = true;
                     }
-                    
-                    Camera.main.GetComponent<PlayerFollower>().SettleInstant();
+
+                    var playerFollower = FindObjectOfType<PlayerFollower>();
+                    if (playerFollower)
+                    {
+                        playerFollower.SettleInstant();
+                    }
 
                     break;
                 case GeneralScene.GeneralSceneSceneType.SLIDESCENE:
@@ -564,7 +564,7 @@ namespace uAdventure.Runner
                 background.localScale = ToWorldSize(size);
                 background.localPosition = ToWorldPosition(Vector2.zero, size, ScenePivot, 20);
                 transform.localScale = (Vector3) (Vector2.one * (PixelsSceneHeight / size.y)) + new Vector3(0, 0, 1);
-                var playerFollower = Camera.main.GetComponent<PlayerFollower>();
+                var playerFollower = FindObjectOfType<PlayerFollower>();
                 if (playerFollower)
                 {
                     playerFollower.Background = background.gameObject;

@@ -63,7 +63,15 @@ namespace uAdventure.Runner
         protected override void Start()
         {
             base.Start();
-            DontDestroyOnLoad(this.gameObject);
+
+            if(FindObjectsOfType<uAdventureInputModule>().Length > 1)
+            {
+                DestroyImmediate(this.gameObject);
+            }
+            else
+            {
+                DontDestroyOnLoad(this.gameObject);
+            }
         }
 
         public override void Process()
