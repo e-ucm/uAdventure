@@ -110,7 +110,10 @@ namespace uAdventure.Runner
         {
             get
             {
-                return data.getPlayerMode() == DescriptorData.MODE_PLAYER_1STPERSON;
+                var currentScene = GetChapterTarget(CurrentTarget) as Scene;
+                var hasHiddenPlayer = currentScene != null && currentScene.getPlayerLayer() == -2;
+
+                return data.getPlayerMode() == DescriptorData.MODE_PLAYER_1STPERSON || hasHiddenPlayer;
             }
         }
 

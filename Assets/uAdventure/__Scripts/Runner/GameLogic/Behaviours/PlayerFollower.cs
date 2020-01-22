@@ -26,7 +26,6 @@ namespace uAdventure.Runner
         // Use this for initialization
         protected void Start()
         {
-            follow = !Game.Instance.GameState.IsFirstPerson;
         }
 
         public void Init()
@@ -54,6 +53,7 @@ namespace uAdventure.Runner
         // Update is called once per frame
         protected void Update()
         {
+            follow = !Game.Instance.GameState.IsFirstPerson;
 
             if (!Background)
             {
