@@ -22,6 +22,11 @@ namespace uAdventure.Editor
             PreviewTitle = "ImageAssets.Preview".Traslate();
             Margin = 30;
             LeaveWindowSpace = true;
+            if (previewResizer == null)
+            {
+                previewResizer = new PreviewResizer();
+                previewResizer.Init("Preview");
+            }
         }
 
         /** Callback for window destroy */
@@ -44,6 +49,10 @@ namespace uAdventure.Editor
         private Rect areaRect;
         private Vector2 scroll;
         private bool useScroll = false;
+
+        private static PreviewResizer previewResizer;
+        private static float previewHeight;
+        private Vector2 topScroll;
 
         // ######################## PROPERTIES ###########################
 
@@ -123,14 +132,18 @@ namespace uAdventure.Editor
         /** Called to draw the main Extension window content */
         public override void Draw(int aID)
         {
+            topScroll = EditorGUILayout.BeginScrollView(topScroll, GUILayout.Height(m_Rect.height - previewHeight - 25));
             DrawInspector();
+            EditorGUILayout.EndScrollView();
 
             DrawPreviewHeader();
-            var auxRect = EditorGUILayout.BeginVertical("preBackground", GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+
+            GUILayout.Box("", "preBackground", GUILayout.ExpandWidth(true), GUILayout.Height(previewHeight - 35));
             {
-                
+                var auxRect = GUILayoutUtility.GetLastRect();
                 if (Event.current.type == EventType.Repaint)
                 {
+                    //auxRect.height = previewHeight;
                     areaRect = auxRect;
 
                     auxRect.position = Vector2.zero;
@@ -163,7 +176,7 @@ namespace uAdventure.Editor
                             case Corner.BottomLeft:
                             case Corner.TopLeft:
                                 {
-                                    var reduction = (windowRect.width + 10) * Mathf.Clamp01(1f - (Vector2.Distance(windowRect.position, corner.Value) / (previewRect.width / 3f)));
+                                    var reduction = (windowRect.width + 10) * Mathf.Clamp01(1f - (Vector2.Distance(windowRect.position, corner.Value) / (previewRect.width / 4f)));
 
                                     viewport.x += reduction;
                                     viewport.width -= reduction;
@@ -173,7 +186,7 @@ namespace uAdventure.Editor
                             case Corner.BottomRight:
                             case Corner.TopRight:
                                 {
-                                    var reduction = (windowRect.width + 10) * Mathf.Clamp01(1f - (Vector2.Distance(windowRect.position, corner.Value) / (previewRect.width / 3f)));
+                                    var reduction = (windowRect.width + 10) * Mathf.Clamp01(1f - (Vector2.Distance(windowRect.position, corner.Value) / (previewRect.width / 4f)));
                                     viewport.width -= reduction;
                                 }
                                 break;
@@ -244,7 +257,6 @@ namespace uAdventure.Editor
                 GUILayout.EndArea();
             }
             
-            EditorGUILayout.EndVertical();
             
         }
         
@@ -254,8 +266,16 @@ namespace uAdventure.Editor
         /** Called to draw the preview header */
         protected virtual void DrawPreviewHeader()
         {
-            GUILayout.Space(10);
             GUILayout.Label(PreviewTitle, "preToolbar", GUILayout.ExpandWidth(true));
+            var lastRect = GUILayoutUtility.GetLastRect();
+            var window = m_Rect;
+            window.height += 35;
+
+            previewHeight = previewResizer.ResizeHandle(window, 50, 50, 20, lastRect);
+            if (!previewResizer.GetExpanded())
+            {
+                previewResizer.ToggleExpanded();
+            }
         }
 
         /** Called to draw the preview content */

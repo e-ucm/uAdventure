@@ -18,7 +18,7 @@ namespace uAdventure.Editor
          * WINDOW CONSTS
          * ----------------------*/
 
-        public const float LEFT_MENU_WIDTH = 250;
+        public const float LEFT_MENU_WIDTH = 200;
         public const float TOP_MENU_HEIGHT = 15;
 
         /* -----------------------
