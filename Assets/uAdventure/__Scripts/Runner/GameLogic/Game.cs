@@ -462,6 +462,7 @@ namespace uAdventure.Runner
             if (runnerTarget != null && runnerTarget.Data == target && scene_id == GameState.CurrentTarget)
             {
                 runnerTarget.RenderScene();
+                waitingRunTarget = true;
             }
             else
             {
