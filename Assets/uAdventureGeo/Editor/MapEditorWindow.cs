@@ -23,7 +23,8 @@ namespace uAdventure.Geo
             GUILayout.Space(10);
             using (new EditorGUILayout.HorizontalScope("preToolbar"))
             {
-                GUILayout.Label(PreviewTitle, "preToolbar", GUILayout.Width(250));
+                GUILayout.Label(PreviewTitle, "preToolbar", GUILayout.Width(180));
+                componentBasedEditor.PlaceSearcher.Source = GUILayout.Toggle(componentBasedEditor.PlaceSearcher.Source == 1, "WorldWide", "toolbarbutton", GUILayout.Width(70)) ? 1 : 0;
                 if (componentBasedEditor.PlaceSearcher.DoLayout("ToolbarSeachTextField"))
                 {
                     componentBasedEditor.Center = componentBasedEditor.PlaceSearcher.LatLon;
@@ -48,6 +49,16 @@ namespace uAdventure.Geo
                 {
                     componentBasedEditor.Center = new Vector2d(locationX, locationY);
                 }
+            }
+
+            var lastRect = GUILayoutUtility.GetLastRect();
+            var window = m_Rect;
+            window.height += 35;
+
+            previewHeight = previewResizer.ResizeHandle(window, 50, 50, 20, lastRect);
+            if (!previewResizer.GetExpanded())
+            {
+                previewResizer.ToggleExpanded();
             }
         }
     }

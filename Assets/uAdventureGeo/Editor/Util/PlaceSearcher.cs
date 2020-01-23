@@ -18,7 +18,7 @@ namespace uAdventure.Geo
         /* ---------------------------------
          * Public variables
          * -------------------------------- */
-        
+
         public string Value
         {
             get { return addressDropdown.Value; }
@@ -37,6 +37,7 @@ namespace uAdventure.Geo
          * -------------------------------- */
 
         private DropDown addressDropdown;
+        const string spainSearchUrl = "http://rage.e-ucm.es/search/{0}?format=json";
         const string seachUrl = "http://nominatim.openstreetmap.org/search/{0}?format=json";
         public string namePlace = "";
         public string namePlaceСache = "";
@@ -48,11 +49,21 @@ namespace uAdventure.Geo
         private UnityWebRequestAsyncOperation request;
         private SearchData[] addresses;
 
+        public int Source { get; set; }
+
+        public string[] Sources {
+            get
+            {
+                return new string[] { "Spain", "Worldwide (Has Limit)" };
+            }
+        }
+
         /* --------------------------------
          * Constructor
          * ------------------------------*/
         public void Awake()
         {
+            Source = 0;
             addressDropdown = new DropDown("");
             
             update = new EditorApplication.CallbackFunction(Update);
@@ -111,7 +122,7 @@ namespace uAdventure.Geo
                 {
                     lastSearch = Value;
                     searched = true;
-                    SearchInOSM(Value);
+                    SearchInOSM(Value, Source == 0);
                 }
                 else
                 {
@@ -153,9 +164,10 @@ namespace uAdventure.Geo
         }
 
 
-        private void SearchInOSM(string namePlace)
+        private void SearchInOSM(string namePlace, bool spainOnly)
         {
-            UnityWebRequest www = UnityWebRequest.Get(String.Format(seachUrl, System.Uri.EscapeDataString(namePlace)));
+            var searchURL = spainOnly ? spainSearchUrl : seachUrl;
+            UnityWebRequest www = UnityWebRequest.Get(String.Format(searchURL, System.Uri.EscapeDataString(namePlace)));
             request = www.SendWebRequest();
         }
 

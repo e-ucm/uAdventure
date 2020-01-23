@@ -162,6 +162,7 @@ namespace uAdventure.Geo
 
                 // Message 
                 GUI.SetNextControlName("InputField");
+                placeSearcher.Source = GUILayout.Toolbar(placeSearcher.Source, placeSearcher.Sources);
                 EditorGUILayout.LabelField("Geo.PlaceInput.Message".Traslate(), EditorStyles.boldLabel);
                 GUILayout.Space(20);
 
