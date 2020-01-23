@@ -14,19 +14,13 @@ namespace uAdventure.Runner
         public bool Disabled { get; set; }
         public GameObject Override { get; set; }
         public GameObject Base { get; set; }
-
-        public static uAdventureRaycaster Instance 
-        { 
-            get
-            {
-                return FindObjectOfType<uAdventureRaycaster>();
-            }
-        }
+        public static uAdventureRaycaster Instance { get; private set; }
 
         protected override void Awake()
         {
             base.Awake();
             Disabled = false;
+            Instance = this;
         }
 
         public override void Raycast(PointerEventData eventData, List<RaycastResult> resultAppendList)
@@ -53,9 +47,18 @@ namespace uAdventure.Runner
             if (eventCamera == null)
                 return;
 
-            Ray ray;
-            float distanceToClipPlane;
+            Ray ray = new Ray();
+            float distanceToClipPlane = 0f;
+
+#if UNITY_2019_3_OR_NEWER || (!UNITY_2017_4_1 && !UNITY_2017_4_2 && !UNITY_2017_4_3 && !UNITY_2017_4_4 &&!UNITY_2017_4_5 &&!UNITY_2017_4_6 &&!UNITY_2017_4_7 &&!UNITY_2017_4_8 &&!UNITY_2017_4_9 &&!UNITY_2017_4_10 &&!UNITY_2017_4_11 &&!UNITY_2017_4_12 &&!UNITY_2017_4_13 &&!UNITY_2017_4_14 &&!UNITY_2017_4_15 &&!UNITY_2017_4_16 &&!UNITY_2017_4_17 &&!UNITY_2017_4_18 &&!UNITY_2017_4_19 &&!UNITY_2017_4_20 &&!UNITY_2017_4_21 && !UNITY_2017_4_22 && !UNITY_2017_4_23 && !UNITY_2017_4_24 && !UNITY_2017_4_25 && !UNITY_2017_4_26 && !UNITY_2017_4_27 && !UNITY_2017_4_28 && !UNITY_2017_4_29 && !UNITY_2017_4_30 && !UNITY_2017_4_31 && !UNITY_2017_4_32 && !UNITY_2017_4_33 && !UNITY_2017_4_34)
+            int eventDisplayIndex = 0;
+            ComputeRayAndDistance(eventData, ref ray, ref eventDisplayIndex, ref distanceToClipPlane);
+#else
             ComputeRayAndDistance(eventData, out ray, out distanceToClipPlane);
+#endif
+
+
+
 
             int hitCount = 0, hitCount2D = 0;
 
@@ -115,14 +118,13 @@ namespace uAdventure.Runner
                 for (int b = 0, bmax = hitCount2D; b < bmax; ++b)
                 {
                     var sr = m_Hits2D[b].collider.gameObject.GetComponent<SpriteRenderer>();
-                    var hitPosition = new Vector3(m_Hits2D[b].point.x, m_Hits2D[b].point.y, m_Hits2D[b].collider.gameObject.transform.position.z);
 
                     var result = new RaycastResult
                     {
                         gameObject = m_Hits2D[b].collider.gameObject,
                         module = this,
-                        distance = Vector3.Distance(eventCamera.transform.position, hitPosition),
-                        worldPosition = hitPosition,
+                        distance = Vector3.Distance(eventCamera.transform.position, m_Hits2D[b].point),
+                        worldPosition = m_Hits2D[b].point,
                         worldNormal = m_Hits2D[b].normal,
                         screenPosition = eventData.position,
                         index = resultAppendList.Count,
