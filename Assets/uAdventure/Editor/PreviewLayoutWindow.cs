@@ -50,8 +50,8 @@ namespace uAdventure.Editor
         private Vector2 scroll;
         private bool useScroll = false;
 
-        private static PreviewResizer previewResizer;
-        private static float previewHeight;
+        protected static PreviewResizer previewResizer;
+        protected static float previewHeight;
         private Vector2 topScroll;
 
         // ######################## PROPERTIES ###########################
@@ -132,12 +132,16 @@ namespace uAdventure.Editor
         /** Called to draw the main Extension window content */
         public override void Draw(int aID)
         {
+            if (previewHeight == 0)
+            {
+                previewHeight = m_Rect.height * 3f / 4f;
+            }
+
             topScroll = EditorGUILayout.BeginScrollView(topScroll, GUILayout.Height(m_Rect.height - previewHeight - 25));
             DrawInspector();
             EditorGUILayout.EndScrollView();
 
             DrawPreviewHeader();
-
             GUILayout.Box("", "preBackground", GUILayout.ExpandWidth(true), GUILayout.Height(previewHeight - 35));
             {
                 var auxRect = GUILayoutUtility.GetLastRect();

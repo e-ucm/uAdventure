@@ -9,7 +9,7 @@ using UnityEditor;
 namespace uAdventure.Editor
 {
     [System.Serializable]
-    internal class PreviewResizer
+    public class PreviewResizer
     {
         // The raw preview size while dragging (not snapped to allowed values) (shared)
         static float s_DraggedPreviewSize = 0;
