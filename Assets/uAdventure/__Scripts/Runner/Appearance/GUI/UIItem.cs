@@ -36,10 +36,10 @@ namespace uAdventure.Runner
                 {
                     case Item.BehaviourType.FIRST_ACTION:
                         {
-                            var actions = Element.getActions().Checked();
+                            var actions = Element.getActions().Valid(restrictedActions).Distinct().Checked();
                             if (actions.Any())
                             {
-                                Game.Instance.Execute(new EffectHolder(actions.First().getEffects()));
+                                ActionSelected(actions.First());
                                 result = InteractuableResult.DOES_SOMETHING;
                             }
                         }
@@ -127,9 +127,29 @@ namespace uAdventure.Runner
                     targetActionType = action.getType();
                     break;
                 default:
-                    Game.Instance.Execute(new EffectHolder(action.getEffects()));
+                    OnActionStarted(action);
+                    Game.Instance.Execute(new EffectHolder(action.Effects), OnActionFinished);
                     break;
             }
+        }
+        private void OnActionStarted(object interactuable)
+        {
+            Game.Instance.ElementInteracted(false, Element, interactuable as Action);
+        }
+
+        private void OnActionFinished(object interactuable)
+        {
+            Action action = interactuable as Action;
+            if (interactuable is EffectHolder)
+            {
+                var effectHolder = interactuable as EffectHolder;
+                action = Element.getActions().Where(a => a.Effects == effectHolder.originalEffects).FirstOrDefault();
+            }
+
+            if (action == null)
+                return;
+
+            Game.Instance.ElementInteracted(true, Element, action);
         }
 
         public void OnTargetSelected(PointerEventData data)
@@ -160,7 +180,8 @@ namespace uAdventure.Runner
 
             if (targetAction != null)
             {
-                Game.Instance.Execute(new EffectHolder(targetAction.Effects));
+                OnActionStarted(targetAction);
+                Game.Instance.Execute(new EffectHolder(targetAction.Effects), OnActionFinished);
             }
         }
     }
