@@ -15,6 +15,7 @@ namespace uAdventure.Geo
                 { "Rotation", new ParameterDescription(typeof(float), 0f) },
                 { "InteractionRange", new ParameterDescription(typeof(float), 25f) }, // 25 metros
                 { "RevealOnlyOnRange", new ParameterDescription(typeof(bool), true) },
+                { "Hint", new ParameterDescription(typeof(bool), false) },
                 { "RevealParticleTexture", new ParameterDescription(typeof(string), "leaf_particle.png") }
             };
         }
