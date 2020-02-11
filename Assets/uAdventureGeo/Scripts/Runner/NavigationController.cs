@@ -395,8 +395,8 @@ namespace uAdventure.Geo
             if (!referenceCache.ContainsKey(reference) || referenceCache[reference] == null)
             {
                 referenceCache.Clear();
-                FindObjectsOfType<GeoElementMB>().ToList().ForEach(geoElem => referenceCache.Add(geoElem.Reference.getTargetId(), geoElem));
-                FindObjectsOfType<GeoPositioner>().ToList().ForEach(geoWrap => referenceCache.Add(geoWrap.Context.getTargetId(), geoWrap));
+                FindObjectsOfType<GeoElementMB>().ToList().ForEach(geoElem => referenceCache[geoElem.Reference.getTargetId()] = geoElem);
+                FindObjectsOfType<GeoPositioner>().ToList().ForEach(geoWrap => referenceCache[geoWrap.Context.getTargetId()] = geoWrap);
             }
 
             var mb = referenceCache.ContainsKey(reference) ? referenceCache[reference] : null;

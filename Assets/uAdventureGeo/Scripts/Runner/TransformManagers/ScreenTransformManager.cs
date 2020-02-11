@@ -56,7 +56,7 @@ namespace uAdventure.Geo
         {
             var lcs = transform.localScale;
             var lss = transform.lossyScale;
-            var counterScale = new Vector3(lcs.x / lss.x, lcs.y / lss.y, lcs.z / lss.z);
+            var counterScale = new Vector3(lcs.x / lss.x, lcs.y / lss.y, lcs.z / lss.z) * (Camera.main.orthographicSize/30f);
             transform.localScale = new Vector3(lcs.x * counterScale.x, lcs.y * counterScale.y, lcs.z * counterScale.z);
         }
 

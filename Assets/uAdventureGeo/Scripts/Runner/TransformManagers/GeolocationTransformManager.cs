@@ -61,6 +61,7 @@ namespace uAdventure.Geo
         private ParticleSystem particles;
         private Representable representable;
         private bool shown = true;
+        private bool hint;
 
         public void Configure(Dictionary<string, object> parameters)
         {
@@ -68,6 +69,7 @@ namespace uAdventure.Geo
             rotation = (float)parameters["Rotation"];
             interactionRange = (float)parameters["InteractionRange"];
             revealOnRange = (bool)parameters["RevealOnlyOnRange"];
+            hint = (bool)parameters["Hint"];
             particleTexture = Game.Instance.ResourceManager.getImage(parameters["RevealParticleTexture"] as string);
         }
 
@@ -107,9 +109,10 @@ namespace uAdventure.Geo
         {
             // Position
             var metersSizeAt0 = representable.Size / (float) GM.GetPixelsPerMeter(0, 19);
-            var pixelScaleAt = (float) GM.GetPixelsPerMeter(latLon.x, 19) / (float)GM.GetPixelsPerMeter(0, 19);
-            transform.localScale = new Vector3(metersSizeAt0.x * pixelScaleAt, metersSizeAt0.y * pixelScaleAt, 1);
-
+            var pixelScaleAt = (float)GM.GetPixelsPerMeter(latLon.x, 19) / (float)GM.GetPixelsPerMeter(0, 19);
+            var ns = new Vector3(metersSizeAt0.x * pixelScaleAt, metersSizeAt0.y * pixelScaleAt, 1);
+            transform.localScale = ns;
+            positioner.Hint.transform.localScale = new Vector3(1f/ns.x, 1f/ns.y, 1f/ns.z) * 7f;
         }
 
         private void SetShown(bool shown)
@@ -124,6 +127,10 @@ namespace uAdventure.Geo
 #endif
                     // TODO change this after: https://github.com/e-ucm/unity-tracker/issues/29
                     TrackerAsset.Instance.setVar("geo_element_" + positioner.Element.getId(), 1);
+                }
+                if (hint)
+                {
+                    positioner.Hint.SetActive(!shown);
                 }
                 if (revealOnRange)
                 {
