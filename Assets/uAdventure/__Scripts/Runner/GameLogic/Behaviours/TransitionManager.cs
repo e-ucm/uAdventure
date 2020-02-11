@@ -27,7 +27,7 @@ namespace uAdventure.Runner
 
         void Update()
         {
-            if(!transitioning || (renderTexture == null || renderTexture.width != Screen.width || renderTexture.height != Screen.height))
+            if(!transitioning && (renderTexture == null || renderTexture.width != Screen.width || renderTexture.height != Screen.height))
             {
                 if (renderTexture)
                 {
