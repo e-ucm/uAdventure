@@ -17,9 +17,16 @@ namespace uAdventure.Core
 			// DOCUMENTATION
 			var doc = element.SelectSingleNode("documentation");
 			if (doc != null) npc.setDocumentation(doc.InnerText);
-			
-			// DESCRIPTIONS
-			npc.setDescriptions(DOMParserUtility.DOMParse <Description> (element.SelectNodes("description"), parameters).ToList ());
+
+            switch (element.GetAttribute("behaviour"))
+            {
+                case "atrezzo": npc.setBehaviour(Item.BehaviourType.ATREZZO); break;
+                case "first-action": npc.setBehaviour(Item.BehaviourType.FIRST_ACTION); break;
+                default: npc.setBehaviour(Item.BehaviourType.NORMAL); break;
+            }
+
+            // DESCRIPTIONS
+            npc.setDescriptions(DOMParserUtility.DOMParse <Description> (element.SelectNodes("description"), parameters).ToList ());
 
 			// RESOURCES
 			foreach(var res in DOMParserUtility.DOMParse <ResourcesUni> (element.SelectNodes("resources"), parameters))

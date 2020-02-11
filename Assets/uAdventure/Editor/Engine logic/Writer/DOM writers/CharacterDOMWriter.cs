@@ -67,6 +67,15 @@ namespace uAdventure.Editor
 
             // Append the textcolor
             characterElement.AppendChild(textColorNode);
+            
+            //v1.4
+            if (character.getBehaviour() == Item.BehaviourType.NORMAL)
+                characterElement.SetAttribute("behaviour", "normal");
+            if (character.getBehaviour() == Item.BehaviourType.ATREZZO)
+                characterElement.SetAttribute("behaviour", "atrezzo");
+            if (character.getBehaviour() == Item.BehaviourType.FIRST_ACTION)
+                characterElement.SetAttribute("behaviour", "first-action");
+            //v1.4
 
 
             foreach (Description description in character.getDescriptions())

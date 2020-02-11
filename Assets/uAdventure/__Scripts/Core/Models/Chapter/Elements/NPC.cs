@@ -85,6 +85,12 @@ namespace uAdventure.Core
 
         protected bool showsSpeechBubbles;
 
+
+        /**
+         * Item's Behaviour (see {@link BehaviourTYpe}
+         */
+        private Item.BehaviourType behaviour;
+
         /**
          * The voice which the synthesizer uses to read text of the character
          */
@@ -109,6 +115,7 @@ namespace uAdventure.Core
             showsSpeechBubbles = false;
             bubbleBkgColor = Color.white;
             bubbleBorderColor = Color.black;
+            behaviour = Item.BehaviourType.NORMAL;
         }
 
         /**
@@ -255,6 +262,45 @@ namespace uAdventure.Core
         {
 
             this.alwaysSynthesizer = alwaysSynthesizer;
+        }
+
+
+        /**
+         * Returns this item's behaviour. 
+         * @return Behaviour
+         * see {@link BehaviourType for more info}
+         */
+        public Item.BehaviourType getBehaviour()
+        {
+            return behaviour;
+        }
+        //For tools
+        public int getBehaviourInteger()
+        {
+            return (int)behaviour;
+        }
+
+        public void setBehaviour(Item.BehaviourType behaviour)
+        {
+
+            this.behaviour = behaviour;
+        }
+
+        // For tools
+        public void setBehaviourInteger(int behaviour)
+        {
+            if (behaviour == (int)Item.BehaviourType.ATREZZO)
+            {
+                this.behaviour = Item.BehaviourType.ATREZZO;
+            }
+            else if (behaviour == (int)Item.BehaviourType.NORMAL)
+            {
+                this.behaviour = Item.BehaviourType.NORMAL;
+            }
+            else if (behaviour == (int)Item.BehaviourType.FIRST_ACTION)
+            {
+                this.behaviour = Item.BehaviourType.FIRST_ACTION;
+            }
         }
 
         public override object Clone()
