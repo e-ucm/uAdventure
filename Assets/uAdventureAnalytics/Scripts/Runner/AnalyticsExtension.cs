@@ -307,17 +307,16 @@ namespace uAdventure.Analytics
             UpdateCompletables(completableController => completableController.UpdateMilestones(target));
         }
 
-        public void ElementInteracted(bool finished, Interactuable interactuable, Action action)
+        public void ElementInteracted(bool finished, Element element, Action action)
         {
-            var interactiveElement = interactuable as InteractiveElement;
-            if (interactiveElement == null)
+            if (element == null)
             {
                 return;
             }
 
             if (!finished)
             {
-                UpdateElementsInteracted(interactiveElement, action.getType().ToString(), interactiveElement.Element.getId());
+                UpdateElementsInteracted(element, action.getType().ToString(), element.getId());
 
                 Game.Instance.GameState.BeginChangeAmbit();
             }
@@ -348,7 +347,6 @@ namespace uAdventure.Analytics
                 }
 
                 Game.Instance.GameState.EndChangeAmbitAsExtensions();
-                var element = interactiveElement.Element;
 
                 if (element is NPC)
                 {
@@ -369,9 +367,9 @@ namespace uAdventure.Analytics
             }
         }
 
-        public void UpdateElementsInteracted(Interactuable interactuable, string interaction, string targetId)
+        public void UpdateElementsInteracted(Element element, string interaction, string targetId)
         {
-            UpdateCompletables(completableController => completableController.UpdateMilestones(interactuable, interaction, targetId));
+            UpdateCompletables(completableController => completableController.UpdateMilestones(element, interaction, targetId));
         }
 
         public void CompletableCompleted()

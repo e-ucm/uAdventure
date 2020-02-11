@@ -70,7 +70,7 @@ namespace uAdventure.Analytics
             return hasBeenUpdated;
         }
 
-        public bool Update(Interactuable interactuable, string interaction = null, string targetId = null)
+        public bool Update(Element element, string interaction = null, string targetId = null)
         {
             bool hasBeenUpdated = false;
 
@@ -78,19 +78,18 @@ namespace uAdventure.Analytics
             {
                 bool isTargetType = false;
 
-                if (interactuable is CharacterMB)
+                if (element is NPC)
                 {
-                    isTargetType = Milestone.getType() == Completable.Milestone.MilestoneType.CHARACTER;
+                    isTargetType = GetMilestone().getType() == Completable.Milestone.MilestoneType.CHARACTER;
                 }
-                else if (interactuable is ObjectMB)
+                else if (element is Item)
                 {
-                    isTargetType = Milestone.getType() == Completable.Milestone.MilestoneType.ITEM;
+                    isTargetType = GetMilestone().getType() == Completable.Milestone.MilestoneType.ITEM;
                 }
 
-                var interactiveElement = (interactuable as MonoBehaviour).GetComponent<InteractiveElement>();
-                if (interactiveElement != null)
+                if (element != null)
                 {
-                    var isTargetedElement = Milestone.getId() == interactiveElement.Element.getId();
+                    var isTargetedElement = GetMilestone().getId() == element.getId();
 
                     if (isTargetType && isTargetedElement)
                     {
@@ -295,9 +294,9 @@ namespace uAdventure.Analytics
             return completed;
         }
 
-        public bool UpdateMilestones(Interactuable interactuable, string interaction = null, string targetId = null)
+        public bool UpdateMilestones(Element element, string interaction = null, string targetId = null)
         {
-            return UpdateMilestones(milestone => milestone.Update(interactuable, interaction, targetId));
+            return UpdateMilestones(milestone => milestone.Update(element, interaction, targetId));
         }
 
         private float CalculateScore(Completable.Score completableScore)

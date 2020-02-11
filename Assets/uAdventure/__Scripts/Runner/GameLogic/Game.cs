@@ -63,7 +63,7 @@ namespace uAdventure.Runner
 
         public TargetChangedDelegate OnTargetChanged;
 
-        public delegate void ElementInteractedDelegate(bool finished, Interactuable element, Action action);
+        public delegate void ElementInteractedDelegate(bool finished, Element element, Action action);
 
         public ElementInteractedDelegate OnElementInteracted;
 
@@ -434,7 +434,7 @@ namespace uAdventure.Runner
             return false;
         }
 
-        public void ElementInteracted(bool finished, Interactuable element, Action action)
+        public void ElementInteracted(bool finished, Element element, Action action)
         {
             if (OnElementInteracted != null)
             {

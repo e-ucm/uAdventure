@@ -404,11 +404,13 @@ namespace uAdventure.Runner
     public class EffectHolder : Secuence, Interactuable
     {
         public List<EffectHolderNode> effects;
+        internal readonly Effects originalEffects;
 
         private string documentation;
 
         public EffectHolder(Effects effects)
         {
+            this.originalEffects = effects;
             this.effects = new List<EffectHolderNode>();
 
             if (effects != null && effects.getEffects().Count > 0)

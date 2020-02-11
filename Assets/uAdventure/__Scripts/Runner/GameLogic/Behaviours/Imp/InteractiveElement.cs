@@ -217,7 +217,7 @@ namespace uAdventure.Runner
 
         private void OnActionStarted(object interactuable)
         {
-            Game.Instance.ElementInteracted(false, this, interactuable as Action);
+            Game.Instance.ElementInteracted(false, Element, interactuable as Action);
         }
 
         private void OnActionFinished(object interactuable)
@@ -226,17 +226,13 @@ namespace uAdventure.Runner
             if(interactuable is EffectHolder)
             {
                 var effectHolder = interactuable as EffectHolder;
-                if (executingAction.ContainsKey(effectHolder))
-                {
-                    action = executingAction[effectHolder];
-                    executingAction.Remove(effectHolder);
-                }
+                action = Element.getActions().Where(a => a.Effects == effectHolder.originalEffects).FirstOrDefault();
             }
 
             if (action == null)
                 return;
 
-            Game.Instance.ElementInteracted(false, this, action);
+            Game.Instance.ElementInteracted(true, Element, action);
         }
 
         public void OnTargetSelected(PointerEventData data)
