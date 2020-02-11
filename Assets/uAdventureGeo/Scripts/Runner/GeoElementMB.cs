@@ -304,17 +304,27 @@ namespace uAdventure.Geo
                 EnterAction ea = Action as EnterAction;
                 var r = false;
 
-                if (first)
+                if (Holder.Geometry.InsideInfluence(LatLon))
                 {
-                    r = wasInside && !ea.OnlyFromOutside;
-                    first = true;
+                    if (!wasInside)
+                    {
+                        r = wasInside = true;
+                    }
+                }
+                else
+                {
+                    wasInside = false;
                 }
 
-                if (Holder.Geometry.InsideInfluence(LatLon) && !wasInside)
+                if (first)
                 {
-                    wasInside = true;
-                    r = wasInside;
+                    first = false;
+                    if (ea.OnlyFromOutside && wasInside)
+                    {
+                        r = false;
+                    }
                 }
+
                 return r;
             }
 
@@ -336,14 +346,14 @@ namespace uAdventure.Geo
         private class ExitGeoActionManager : AbstractGeoActionManager
         {
             private bool first = true;
-            private bool wasInside = false;
+            private bool wasOutside = false;
             private Vector2d latLonOnExecute;
 
             public override Type ActionType { get { return typeof(ExitAction); } }
 
             public override void Start()
             {
-                wasInside = Holder.Geometry.InsideInfluence(LatLon);
+                wasOutside = Holder.Geometry.InsideInfluence(LatLon);
             }
 
             protected override bool CustomChecks()
@@ -351,17 +361,27 @@ namespace uAdventure.Geo
                 ExitAction ea = Action as ExitAction;
                 var r = false;
 
-                if (first)
+                if (!Holder.Geometry.InsideInfluence(LatLon))
                 {
-                    r = !wasInside && !ea.OnlyFromInside;
-                    first = false;
+                    if (!wasOutside)
+                    {
+                        r = wasOutside = true;
+                    }
+                }
+                else
+                {
+                    wasOutside = false;
                 }
 
-                if (!Holder.Geometry.InsideInfluence(LatLon) && wasInside)
+                if (first)
                 {
-                    wasInside = false;
-                    r = wasInside;
+                    first = false;
+                    if (ea.OnlyFromInside && wasOutside)
+                    {
+                        r = false;
+                    }
                 }
+
                 return r;
             }
 
