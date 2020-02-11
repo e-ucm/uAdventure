@@ -8,15 +8,30 @@ using uAdventure.Runner;
 
 namespace uAdventure.Analytics
 {
+    [Serializable]
     public class MilestoneController
     {
-        public Completable.Milestone Milestone { get; private set; }
+        [NonSerialized]
+        private Completable.Milestone milestone;
 
-        public bool Reached { get; private set; }
+        public Completable.Milestone GetMilestone()
+        {
+            return milestone;
+        }
+
+        internal void SetMilestone(Completable.Milestone value)
+        {
+            milestone = value;
+        }
+
+        [SerializeField]
+        private bool reached;
+
+        public bool Reached { get { return reached; } private set { reached = value; } }
 
         public MilestoneController(Completable.Milestone milestone)
         {
-            Milestone = milestone;
+            SetMilestone(milestone);
         }
 
         public bool Update(IChapterTarget target)
@@ -25,10 +40,10 @@ namespace uAdventure.Analytics
 
             if (!Reached)
             {
-                switch (Milestone.getType())
+                switch (GetMilestone().getType())
                 {
                     case Completable.Milestone.MilestoneType.SCENE:
-                        var isTargetedScene = Milestone.getId() == target.getId();
+                        var isTargetedScene = GetMilestone().getId() == target.getId();
 
                         if (isTargetedScene)
                         {
@@ -94,14 +109,14 @@ namespace uAdventure.Analytics
 
             if (!Reached)
             {
-                switch (Milestone.getType())
+                switch (GetMilestone().getType())
                 {
                     case Completable.Milestone.MilestoneType.COMPLETABLE:
-                        var targetCompletable = AnalyticsExtension.Instance.GetCompletable(Milestone.getId());
+                        var targetCompletable = AnalyticsExtension.Instance.GetCompletable(GetMilestone().getId());
                         Reached = targetCompletable.End.Reached;
                         break;
                     case Completable.Milestone.MilestoneType.CONDITION:
-                        Reached = ConditionChecker.check(Milestone.getConditions());
+                        Reached = ConditionChecker.check(GetMilestone().getConditions());
                         break;
                 }
 
@@ -120,18 +135,36 @@ namespace uAdventure.Analytics
         }
     }
 
+    [Serializable]
     public class CompletableController
     {
-        private readonly MilestoneController startController, endController;
-        private readonly List<MilestoneController> progressControllers;
-
+        [SerializeField]
+        private MilestoneController startController, endController;
+        [SerializeField]
+        private List<MilestoneController> progressControllers;
+        [SerializeField]
         private DateTime startTime;
-        private bool completeOnExit = false;
-        private bool completed = false;
+        [SerializeField]
+        private bool completeOnExit;
+        [SerializeField]
+        private bool completed;
 
-        public Completable Completable { get; private set; }
+        [NonSerialized]
+        private Completable completable;
+
+        public Completable GetCompletable()
+        {
+            return completable;
+        }
+
+        internal void SetCompletable(Completable value)
+        {
+            completable = value;
+        }
+
         public MilestoneController Start { get { return startController; } }
         public MilestoneController End { get { return endController; } }
+        internal List<MilestoneController> ProgressControllers { get { return progressControllers; } }
 
         public bool Started { get { return startController.Reached; } }
         public bool Completed { get { return completed; } }
@@ -146,7 +179,7 @@ namespace uAdventure.Analytics
                     progress = 1f;
                 }else
                 {
-                    var progressType = Completable.getProgress().getType();
+                    var progressType = GetCompletable().getProgress().getType();
                     switch (progressType)
                     {
                         case Completable.Progress.ProgressType.SUM:
@@ -155,7 +188,7 @@ namespace uAdventure.Analytics
                         case Completable.Progress.ProgressType.SPECIFIC:
                             progress = progressControllers
                                 .Where(milestone => milestone.Reached)
-                                .Max(milestone => milestone.Milestone.getProgress());
+                                .Max(milestone => milestone.GetMilestone().getProgress());
                             break;
                     }
                 }
@@ -168,14 +201,14 @@ namespace uAdventure.Analytics
         {
             get
             {
-                var score = CalculateScore(Completable.getScore());
+                var score = CalculateScore(GetCompletable().getScore());
                 return score; //TODO: enable this? Mathf.Clamp01(score / 10f);
             }
         }
 
         public CompletableController(Completable completable)
         {
-            this.Completable = completable;
+            this.SetCompletable(completable);
 
             this.startController = new MilestoneController(completable.getStart());
             this.endController = new MilestoneController(completable.getEnd());
@@ -244,7 +277,7 @@ namespace uAdventure.Analytics
                 return false;
             }
 
-            if (completeOnExit && target.getId() != Start.Milestone.getId())
+            if (completeOnExit && target.getId() != Start.GetMilestone().getId())
             {
                 completed = true;
                 AnalyticsExtension.Instance.TrackCompleted(this, DateTime.Now - startTime);
@@ -253,7 +286,7 @@ namespace uAdventure.Analytics
             {
                 var wasStarted = Started;
                 completed = UpdateMilestones(milestone => milestone.Update(target));
-                if (wasStarted != Started && Completable.getEnd() == null)
+                if (wasStarted != Started && GetCompletable().getEnd() == null)
                 {
                     completeOnExit = true;
                 }
@@ -305,7 +338,7 @@ namespace uAdventure.Analytics
 
         public void Reset()
         {
-            if (Completable.getRepeatable()) {
+            if (GetCompletable().getRepeatable()) {
                 if (Start != null)
                 {
                     Start.Reset();
