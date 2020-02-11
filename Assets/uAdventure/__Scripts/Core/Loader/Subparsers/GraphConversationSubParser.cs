@@ -131,12 +131,18 @@ namespace uAdventure.Core
                 }
                 else if (el.Name == "option-node")
                 {
+
 					random = ExString.EqualsDefault(el.GetAttribute("random"), "yes", false);
 					showUserOption = ExString.EqualsDefault(el.GetAttribute("showUserOption"), "yes", false);
                     keepShowing = ExString.EqualsDefault(el.GetAttribute("keepShowing"), "yes", false);
                     preListening = ExString.EqualsDefault(el.GetAttribute("preListening"), "yes", false) || editorX >= 0 || editorY >= 0;
 
-                    var optionConversationNode = new OptionConversationNode(random, keepShowing, showUserOption, preListening);
+                    var optionConversationNode = new OptionConversationNode(random, keepShowing, showUserOption, preListening)
+                    {
+                        Horizontal = ExString.EqualsDefault(el.GetAttribute("horizontal"), "yes", false),
+                        MaxElemsPerRow = ExParsers.ParseDefault(el.GetAttribute("max-elements-per-row"), -1),
+                        Alignment = el.HasAttribute("alignment") ? ExParsers.ParseEnum<TextAnchor>(el.GetAttribute("alignment")) : TextAnchor.UpperCenter
+                    };
                     currentNode = optionConversationNode;
 
                     //XAPI ELEMENTS

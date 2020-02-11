@@ -368,6 +368,18 @@ namespace uAdventure.Editor
                     {
                         nodeElement.SetAttribute("preListening", "yes");
                     }
+                    if (optionConversationNode.MaxElemsPerRow != -1)
+                    {
+                        nodeElement.SetAttribute("max-elements-per-row", optionConversationNode.MaxElemsPerRow.ToString());
+                    }
+                    if (optionConversationNode.Alignment != TextAnchor.UpperCenter)
+                    {
+                        nodeElement.SetAttribute("alignment", optionConversationNode.Alignment.ToString());
+                    }
+                    if (optionConversationNode.Horizontal)
+                    {
+                        nodeElement.SetAttribute("horizontal", "yes");
+                    }
                     if (node.getEditorX() != -1)
                     {
                         nodeElement.SetAttribute("editor-x", node.getEditorX().ToString());

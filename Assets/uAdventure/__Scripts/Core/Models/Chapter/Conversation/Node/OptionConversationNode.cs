@@ -59,11 +59,17 @@ namespace uAdventure.Core
 
         private ConversationNode timerChild;
 
+        private bool horizontal = false;
+
+        private int maxElemsPerRow = -1;
+
+        private TextAnchor alignment = TextAnchor.UpperCenter;
+
+
         /* Methods */
 
         public bool isRandom()
         {
-
             return random;
         }
 
@@ -249,6 +255,45 @@ namespace uAdventure.Core
 
         public float Timeout { get { return timeout; } set { timeout = value; } }
         public Conditions TimeoutConditions { get { return timeoutConditions; } set { timeoutConditions = value; } }
+
+        public bool Horizontal
+        {
+            get
+            {
+                return horizontal;
+            }
+
+            set
+            {
+                horizontal = value;
+            }
+        }
+
+        public int MaxElemsPerRow
+        {
+            get
+            {
+                return maxElemsPerRow;
+            }
+
+            set
+            {
+                maxElemsPerRow = value;
+            }
+        }
+
+        public TextAnchor Alignment
+        {
+            get
+            {
+                return alignment;
+            }
+
+            set
+            {
+                alignment = value;
+            }
+        }
 
         internal override object Clone()
         {

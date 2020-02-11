@@ -14,7 +14,8 @@ namespace uAdventure.Runner
         private static GUIManager instance;
         private GameObject bubble;
         private bool get_talker = false;
-        private string talkerToFind, lastText;
+        private string talkerToFind;
+        private ConversationLine line;
         private GUIProvider guiprovider;
         private bool locked = false;
         private string current_cursor = "";
@@ -26,9 +27,9 @@ namespace uAdventure.Runner
             get { return instance; }
         }
 
-        public string Last
+        public ConversationLine Line
         {
-            get { return lastText; }
+            get { return line; }
         }
 
         public GUIProvider Provider
@@ -63,7 +64,7 @@ namespace uAdventure.Runner
             if (get_talker && GameObject.Find(talkerToFind) != null)
             {
                 get_talker = false;
-                Talk(lastText, talkerToFind);
+                Talk(line.getText(), talkerToFind);
             }
         }
 
@@ -111,13 +112,13 @@ namespace uAdventure.Runner
 
         public void Talk(string text, int x, int y, Color textColor, Color textBorderColor)
         {
-            lastText = text;
+            line = new ConversationLine("", text);
             ShowBubble(GenerateBubble(text, x, y, textColor, textBorderColor));
         }
 
         public void Talk(string text, int x, int y, Color textColor, Color textBorderColor, Color backgroundColor, Color borderColor)
         {
-            lastText = text;
+            line = new ConversationLine("", text);
             ShowBubble(GenerateBubble(text, x, y, textColor, textBorderColor, backgroundColor, borderColor));
         }
         public void Talk(ConversationLine line, string talkerName = null)
@@ -134,6 +135,7 @@ namespace uAdventure.Runner
             {
                 Talk(line.getText(), null, null, false, talkerName);
             }
+            this.line = line;
         }
 
         public void Talk(string text, string talkerName = null)
@@ -143,7 +145,7 @@ namespace uAdventure.Runner
 
         public void Talk(string text, Texture2D image, AudioClip audio, bool synthetizeVoice, string talkerName = null)
         {
-            lastText = text;
+            line = new ConversationLine("", text);
             GameObject talkerObject = null;
             BubbleData bubbleData;
             if (talkerName == null || talkerName == Player.IDENTIFIER)
@@ -202,7 +204,7 @@ namespace uAdventure.Runner
 
             if (bubble != null)
             {
-                bubble.GetComponent<Bubble>().destroy();
+                bubble.GetComponent<Bubble>().Destroy();
             }
             if (data.Line.Length > 0 && data.Line[0] == '#')
             {
@@ -241,7 +243,7 @@ namespace uAdventure.Runner
                         talker.Play("stand");
                     }
                 } 
-                this.bubble.GetComponent<Bubble>().destroy();
+                this.bubble.GetComponent<Bubble>().Destroy();
             }
         }
 

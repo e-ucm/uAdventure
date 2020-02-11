@@ -635,6 +635,7 @@ namespace uAdventure.Runner
                     using(new GUIUtil.SkinScope(skin))
                     {
                         float guiscale = Screen.width / 800f;
+                        var buttonImageWidth = (200f / 600f) * Screen.height;
                         skin.box.fontSize = Mathf.RoundToInt(guiscale * 20);
                         skin.button.fontSize = Mathf.RoundToInt(guiscale * 20);
                         skin.button.alignment = TextAnchor.MiddleCenter;
@@ -645,16 +646,18 @@ namespace uAdventure.Runner
                         skin.GetStyle("optionLabel").fontSize = Mathf.RoundToInt(guiscale * 36);
                         skin.GetStyle("talk_player").fontSize = Mathf.RoundToInt(guiscale * 20);
                         skin.GetStyle("emptyProgressBar").fontSize = Mathf.RoundToInt(guiscale * 20);
-
-                        using (new GUILayout.AreaScope(new Rect(Screen.width * 0.1f, Screen.height * 0.1f, Screen.width * 0.8f, Screen.height * 0.8f)))
+                        OptionConversationNode options = (OptionConversationNode)guioptions.getNode();
+                        var areawidth = Screen.width * 0.8f;
+                        using (new GUILayout.AreaScope(new Rect(Screen.width * 0.1f, Screen.height * 0.1f, areawidth, Screen.height * 0.8f)))
                         {
-                            using (new GUILayout.VerticalScope())
+                            using (new GUILayout.VerticalScope(GUILayout.ExpandWidth(true)))
                             {
-                                OptionConversationNode options = (OptionConversationNode)guioptions.getNode();
+                                var restWidth = 1f;
+                                var initedHorizontal = false;
 
-                                if (options.isKeepShowing())
+                                if (options.isKeepShowing() && GUIManager.Instance.Line != null)
                                 {
-                                    var text = GUIManager.Instance.Last;
+                                    var text = GUIManager.Instance.Line.getText();
                                     if (text[0] == '#')
                                         text = text.Remove(0, Mathf.Max(0, text.IndexOf(' ') + 1));
 
@@ -663,45 +666,115 @@ namespace uAdventure.Runner
 
                                     GUIUtil.DrawTextBorder(textRect, textContent, Color.black, "optionLabel");
                                     GUIUtil.DrawText(textRect, textContent, ((GUIStyle)"optionLabel").normal.textColor, "optionLabel");
-                                }
-                                foreach (var i in order)
-                                {
-                                    ConversationLine ono = options.getLine(i);
-                                    var content = new GUIContent(ono.getText());
-                                    var resources = ono.getResources().Checked().FirstOrDefault();
-                                    auxLimitList.Clear();
 
-                                    if (resources != null && resources.existAsset("image") && !string.IsNullOrEmpty(resources.getAssetPath("image")))
+                                    var resources = GUIManager.Instance.Line.getResources().Checked().FirstOrDefault();
+                                    if (resources != null)
                                     {
-                                        var imagePath = resources.getAssetPath("image");
-                                        var image = ResourceManager.getImage(imagePath);
+                                        var image = resources.existAsset("image") ? Game.Instance.ResourceManager.getImage(resources.getAssetPath("image")) : null;
                                         if (image)
                                         {
-                                            content.image = image;
-                                            if (image.height > 240)
+                                            GUILayout.BeginHorizontal();
+                                            initedHorizontal = true;
+                                            restWidth = 0.7f;
+                                            var imageRatio = image.width / (float) image.height;
+                                            var imageWidth = areawidth * 0.28f;
+                                            var imageHeight = Mathf.Min(imageWidth / imageRatio, Screen.height * 0.45f);
+                                            using (new GUILayout.VerticalScope(GUILayout.Width(areawidth * 0.3f)))
                                             {
-                                                auxLimitList.Add(GUILayout.Height(240));
+                                                GUILayout.FlexibleSpace();
+                                                GUILayout.Box(image, GUILayout.Width(imageWidth), GUILayout.Height(imageHeight));
+                                                GUILayout.FlexibleSpace();
                                             }
                                         }
                                     }
-
-                                    if (ConditionChecker.check(options.getLineConditions(i)) && GUILayout.Button(content, auxLimitList.ToArray()))
-                                    {
-                                        OptionSelected(i);
-                                    }
                                 }
 
-                                if (doTimeOut)
+                                using (new GUILayout.VerticalScope(GUILayout.Width(areawidth * restWidth)))
                                 {
-                                    if (Event.current.type == EventType.Repaint && elapsedTime > options.Timeout)
+                                    if (options.Horizontal)
                                     {
-                                        OptionSelected(options.getChildCount() - 1);
+                                        GUILayout.FlexibleSpace();
+                                    }
+                                    var elementsLeft = options.getLineCount();
+                                    while (elementsLeft > 0)
+                                    {
+                                        if (options.Horizontal)
+                                        {
+                                            GUILayout.BeginHorizontal();
+                                            GUILayout.FlexibleSpace();
+                                        }
+                                        else
+                                        {
+                                            GUILayout.BeginVertical();
+                                        }
+                                        var start = options.getLineCount() - elementsLeft;
+                                        var amount = options.MaxElemsPerRow > 0 ? options.MaxElemsPerRow : options.getLineCount();
+                                        var end = Mathf.Clamp(start + amount, 0, options.getLineCount());
+                                        var eachWidth = (areawidth * restWidth / (end - start)) - 20;
+                                        for (int i = start; i < end; i++)
+                                        {
+                                            ConversationLine ono = options.getLine(order[i]);
+                                            var content = new GUIContent(ono.getText());
+                                            var resources = ono.getResources().Checked().FirstOrDefault();
+                                            auxLimitList.Clear();
+                                            if(end - start > 1 && options.Horizontal)
+                                            {
+                                                auxLimitList.Add(GUILayout.Width(eachWidth));
+                                            }
+
+                                            if (resources != null && resources.existAsset("image") && !string.IsNullOrEmpty(resources.getAssetPath("image")))
+                                            {
+                                                var imagePath = resources.getAssetPath("image");
+                                                var image = ResourceManager.getImage(imagePath);
+                                                if (image)
+                                                {
+                                                    content.image = image;
+                                                    if (image.height > buttonImageWidth)
+                                                    {
+                                                        auxLimitList.Add(GUILayout.Height(buttonImageWidth - 20));
+                                                    }
+                                                }
+                                            }
+
+                                            if (ConditionChecker.check(options.getLineConditions(order[i])) && GUILayout.Button(content, auxLimitList.ToArray()))
+                                            {
+                                                OptionSelected(order[i]);
+                                            }
+                                        }
+                                        elementsLeft = options.getLineCount() - end;
+                                        if (options.Horizontal)
+                                        {
+                                            GUILayout.FlexibleSpace();
+                                            GUILayout.EndHorizontal();
+                                        }
+                                        else
+                                        {
+                                            GUILayout.EndVertical();
+                                        }
+
+                                        if (doTimeOut)
+                                        {
+                                            if (Event.current.type == EventType.Repaint && elapsedTime > options.Timeout)
+                                            {
+                                                OptionSelected(options.getChildCount() - 1);
+                                            }
+
+                                            var timeLeft = Mathf.Max(0, options.Timeout - elapsedTime);
+                                            var timeLeftText = Mathf.Round(timeLeft * 10) / 10 + " s";
+                                            GUILayout.FlexibleSpace();
+                                            DrawProgressBar(GUILayoutUtility.GetRect(0, 0, "emptyProgressBar", GUILayout.ExpandWidth(true), GUILayout.Height(50)), timeLeftText, 1 - (elapsedTime / options.Timeout));
+                                        }
                                     }
 
-                                    var timeLeft = Mathf.Max(0, options.Timeout - elapsedTime);
-                                    var timeLeftText = Mathf.Round(timeLeft * 10) / 10 + " s";
-                                    GUILayout.FlexibleSpace();
-                                    DrawProgressBar(GUILayoutUtility.GetRect(0, 0, "emptyProgressBar", GUILayout.ExpandWidth(true), GUILayout.Height(50)), timeLeftText, 1 - (elapsedTime / options.Timeout));
+                                    if (initedHorizontal)
+                                    {
+                                        GUILayout.EndHorizontal();
+                                    }
+
+                                    if (options.Horizontal)
+                                    {
+                                        GUILayout.FlexibleSpace();
+                                    }
                                 }
                             }
                         }
