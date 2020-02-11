@@ -347,7 +347,9 @@ namespace uAdventure.Runner
 
         public void ShowConfigMenu()
         {
-            this.Config_Menu_Ref.SetActive(!Config_Menu_Ref.activeSelf);
+            var nextState = !Config_Menu_Ref.activeSelf;
+            Time.timeScale = nextState ? 0 : 1;
+            this.Config_Menu_Ref.SetActive(nextState);
         }
 
         public void OnClickLoad()

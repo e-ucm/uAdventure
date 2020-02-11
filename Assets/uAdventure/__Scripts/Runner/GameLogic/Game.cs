@@ -246,14 +246,8 @@ namespace uAdventure.Runner
             }
             else if (Input.GetKeyDown(KeyCode.Escape))
             {
-                if (Time.timeScale == 0)
+                if (!isSomethingRunning())
                 {
-                    Time.timeScale = 1;
-                    GUIManager.Instance.ShowConfigMenu();
-                }
-                else if (!isSomethingRunning())
-                {
-                    Time.timeScale = 0;
                     GUIManager.Instance.ShowConfigMenu();
                 }
             }
