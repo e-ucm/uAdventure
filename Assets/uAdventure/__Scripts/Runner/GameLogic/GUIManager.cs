@@ -97,6 +97,18 @@ namespace uAdventure.Runner
             SetCursor(show ? "over" : "default");
         }
 
+        public InteractuableResult InteractWithDialogue()
+        {
+            if(bubble != null)
+            {
+                return bubble.GetComponent<Bubble>().Interacted();
+            }
+            else
+            {
+                return InteractuableResult.IGNORES;
+            }
+        }
+
         public void Talk(string text, int x, int y, Color textColor, Color textBorderColor)
         {
             lastText = text;

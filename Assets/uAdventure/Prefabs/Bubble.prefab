@@ -163,8 +163,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   easing: 0.2
-  _____________________________: 0
   camZ: 0
+  image: {fileID: 114506588140490336}
+  audioSource: {fileID: 82639004654792884}
+  text: {fileID: 11418734}
+  charactersPerSecond: 10
 --- !u!114 &11472306
 MonoBehaviour:
   m_ObjectHideFlags: 1

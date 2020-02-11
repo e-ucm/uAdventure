@@ -398,7 +398,10 @@ namespace uAdventure.Runner
             if(guistate != GUIState.BOOK)
             {
                 guistate = GUIState.NOTHING;
-                GUIManager.Instance.DestroyBubbles();
+                if (GUIManager.Instance.InteractWithDialogue() == InteractuableResult.REQUIRES_MORE_INTERACTION)
+                {
+                    return true;
+                }
             }
             if (executeStack.Count > 0)
             {

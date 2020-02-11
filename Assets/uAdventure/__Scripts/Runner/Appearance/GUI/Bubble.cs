@@ -4,159 +4,248 @@ using System.Collections;
 
 namespace uAdventure.Runner
 {
+    [RequireComponent(typeof(RectTransform), typeof(Image), typeof(Outline))]
     public class Bubble : MonoBehaviour
     {
-        public static readonly Vector2 Margin = new Vector2(20,20);
+        private enum BubbleState { FADING, SHOWING, DESTROYING, NOTHING };
 
-        private enum BubbleState { SHOWING, DESTROYING, NOTHING };
+        public static readonly Vector2 Margin = new Vector2(20, 20);
 
-        BubbleState state = BubbleState.NOTHING;
+        // Speed of the transition
+        public float easing = 0.1f; 
+        // Desired Z pos of the camera
+        public float camZ;
+        // Image component for the line image
+        public RawImage image;
+        // Audio source for the line sound
+        public AudioSource audioSource;
+        // Text component to put the line into
+        public Text text;
+        // Text displaying speed (characters per second)
+        private int charactersPerSecond = 20;
 
-        BubbleData data;
-        public BubbleData Data
-        {
-            get { return data; }
-            set { data = value; }
-        }
+        private Outline textBorder;
+        private Image background;
+        private Outline border;
+        private RectTransform rectTransform, canvasRectTransform;
+        private float completed;
+        private float textCompleted;
 
-        Transform text, image;
-        RectTransform rectTransform;
-        // Use this for initialization
-        void Start()
-        {
-            //Image
-            if (data.Image)
-            {
-                image = this.transform.Find("RawImage");
-                image.GetComponent<RawImage>().texture = data.Image;
-                var layoutElement = image.GetComponent<LayoutElement>();
+        // Scale constants for the bubble size transition
+        private const float MinScale = 0.7f, MaxScale = 1f;
+        // Alpha costants for the bubble alpha transition
+        private const float MinAlpha = 0f, MaxAlpha = 1f;
+        // Max height for the image in the bubble
+        private const float Height = 240f;
 
-                var ratio = data.Image.width / (float) data.Image.height;
-
-                var height = Mathf.Min(240f, Mathf.Min(240f, data.Image.width) / ratio);
-                var width = height * ratio;
-
-                layoutElement.preferredHeight = height;
-                layoutElement.preferredWidth = width;
-            }
-            //Audio
-            if (data.Audio)
-            {
-                var audioSource = GetComponent<AudioSource>();
-                audioSource.clip = data.Audio;
-                audioSource.Play();
-
-            }
-            //resize ();
-            text = this.transform.Find("Text");
-            text.GetComponent<Text>().text = data.Line;
-            rectTransform = this.GetComponent<RectTransform>();
-
-            /*float guiscale = Screen.height/600f;
-
-            text.GetComponent<Text>().fontSize = Mathf.RoundToInt(guiscale * 20);*/
-
-            this.rectTransform.anchoredPosition = data.origin;
-            this.moveTo(data.destiny);
-            if(this.state != BubbleState.DESTROYING)
-            {
-                this.state = BubbleState.SHOWING;
-            }
-        }
-
-        //######################################################################
-        //############################## MOVEMENT ##############################
-        //######################################################################
-        private Vector2 finalPosition;
+        private BubbleState state = BubbleState.FADING;
+        private Vector3 finalPosition;
         private float distance;
-        public float easing = 0.1f;
-        public bool _____________________________;
-        // fields set dynamically
-        public float camZ; // The desired Z pos of the camera
-        void Awake()
+        private float currenttime = 0f;
+
+        public BubbleData Data { get; set; }
+
+        public InteractuableResult Interacted()
         {
+            if(this.state == BubbleState.FADING)
+            { 
+                this.rectTransform.anchoredPosition = finalPosition;
+                completed = 1;
+                Update();
+            }
+            if(this.state == BubbleState.SHOWING)
+            {
+                textCompleted = Data.Line.Length;
+                Update();
+                return InteractuableResult.REQUIRES_MORE_INTERACTION;
+            }
+            if(this.state == BubbleState.NOTHING || this.state == BubbleState.DESTROYING)
+            {
+                Destroy();
+                return InteractuableResult.IGNORES;
+            }
+            return InteractuableResult.REQUIRES_MORE_INTERACTION;
+        }
+
+        public void Destroy()
+        {
+            this.state = BubbleState.DESTROYING;
+        }
+
+        /// <summary>
+        /// Constructor method.
+        /// Gather all the components and set up the initial Z.
+        /// </summary>
+        protected void Awake()
+        {
+            // Gather all the components
+            rectTransform = GetComponent<RectTransform>();
+            background = GetComponent<Image>();
+            border = GetComponent<Outline>();
+            textBorder = text.GetComponent<Outline>();
+
             camZ = this.transform.position.z;
         }
 
-
-        // TODO why destroy time is unused?
-        //private float destroytime = 0.2f;
-        private float currenttime = 0f;
-        void FixedUpdate()
+        /// <summary>
+        /// Initialization method.
+        /// Set up the image, text and audio of the bubble.
+        /// </summary>
+        protected void Start()
         {
-            float completed = 0f;
+            canvasRectTransform = transform.parent.GetComponent<RectTransform>();
+            // Image set up
+            if (Data.Image)
+            {
+                image.texture = Data.Image;
+                    
+                // In case of a LayoutElement is present in the image, we set up its sizes
+                var layoutElement = image.GetComponent<LayoutElement>();
+                if (layoutElement)
+                {
+                    // The height and width of the element will be fixed to the height, but the image has to adjust 
+                    // its width based on the image ratio
+                    var ratio = Data.Image.width / (float)Data.Image.height;
+                    var height = Mathf.Min(Height, Mathf.Min(Height, Data.Image.width) / ratio);
+                    var width = height * ratio;
+                    layoutElement.preferredHeight = height;
+                    layoutElement.preferredWidth = width;
+                }
+            }
+
+            // Audio set up
+            if (Data.Audio)
+            {
+                audioSource.clip = Data.Audio;
+                audioSource.Play();
+            }
+
+            // Text set up
+            if (!string.IsNullOrEmpty(Data.Line))
+            {
+                SetTextProgress(0);
+            }
+
+            // We set up the screen position (anchored position) using the origin screen position to make the bubble 
+            // pop up from the character of specified location
+            this.rectTransform.anchoredPosition = Data.origin;
+            this.MoveTo(Data.destiny);
+
+            // Make sure the state is showing when started unless it's being destroyed (due to fast clicking for example)
+            if (this.state != BubbleState.DESTROYING)
+            {
+                this.state = BubbleState.FADING;
+                completed = 0;
+            }
+        }
+
+        /// <summary>
+        /// Update method used to animate and manage the current state flow.
+        /// </summary>
+        protected void Update()
+        {
             switch (state)
             {
                 case BubbleState.NOTHING:
-                    break;
-                case BubbleState.DESTROYING:
-                    currenttime += Time.deltaTime;
-                    completed = 1f - currenttime / 0.2f;
-
-                    setAlpha(completed);
-                    setScale(completed);
-
-                    if (completed <= 0)
                     {
-                        GameObject.Destroy(this.gameObject);
+                        // In the nothing state the bubble is just idle.
+                    }
+                    break;
+
+                case BubbleState.DESTROYING:
+                    {
+                        // In the destroying state the bubble is fading out and finally destroyed.
+                        currenttime += Time.deltaTime;
+                        completed = 1f - currenttime / 0.2f;
+
+                        SetAlpha(completed);
+                        SetScale(completed);
+
+                        if (completed <= 0)
+                        {
+                            GameObject.Destroy(this.gameObject);
+                        }
+                    }
+                    break;
+                case BubbleState.FADING:
+                    {
+                        // In the showing state the bubble is fading in and finally moves to nothing (idle) state.
+                        Vector3 destination = finalPosition;
+
+                        destination = Vector3.Lerp(this.rectTransform.anchoredPosition, destination, easing);
+                        destination.z = camZ;
+
+                        var ratioLeft = Vector2.Distance(destination, finalPosition) / distance;
+                        if(ratioLeft < 0.001)
+                        {
+                            ratioLeft = 0;
+                        }
+                        completed = Mathf.Clamp01(1f - ratioLeft);
+                        textCompleted += Time.deltaTime * charactersPerSecond;
+
+                        SetTextProgress(textCompleted / Data.Line.Length);
+                        SetAlpha(completed);
+                        SetScale(completed);
+
+                        this.rectTransform.anchoredPosition = destination;
+
+                        if (Mathf.Approximately(completed,1f))
+                        {
+                            completed = 0;
+                            this.state = BubbleState.SHOWING;
+                        }
                     }
                     break;
                 case BubbleState.SHOWING:
-                    Vector3 destination = finalPosition;
-
-                    destination = Vector3.Lerp(this.rectTransform.anchoredPosition, destination, easing);
-                    destination.z = camZ;
-
-
-                    completed = 1f - (Vector2.Distance(destination, finalPosition) / distance);
-
-                    if (float.IsNaN(completed))
-                        completed = 1f;
-
-                    setAlpha(completed);
-                    setScale(completed);
-
-                    this.rectTransform.anchoredPosition = destination;
-
-                    if (completed >= 1f)
                     {
-                        this.state = BubbleState.NOTHING;
+                        // In the showing state the bubble is fading in and finally moves to nothing (idle) state.
+
+                        textCompleted += Time.deltaTime * charactersPerSecond;
+                        SetTextProgress(textCompleted / Data.Line.Length);
+
+                        if (textCompleted >= Data.Line.Length)
+                        {
+                            this.state = BubbleState.NOTHING;
+                            completed = 0;
+                            textCompleted = 0;
+                        }
                     }
                     break;
             }
         }
 
-        private Vector2 getMaxSize()
+        private Vector2 GetMaxSize()
         {
-            setScale(1);
+            SetScale(1);
             LayoutRebuilder.ForceRebuildLayoutImmediate(rectTransform);
             var size = rectTransform.sizeDelta;
-            setScale(0);
+            SetScale(0);
             return size;
         }
 
-        private Vector2 encapsulateInParent(Vector2 position)
+        protected Vector2 EncapsulateInParent(Vector2 position)
         {
-            var canvasRectTransform = transform.parent.GetComponent<RectTransform>();
             // Calculate the destination rect
-            var myRect = new Rect();
-            // Calculate my size in the end
-            myRect.size = getMaxSize();
-            // Set the destination position
-            myRect.center = position;
+            var myRect = new Rect
+            {
+                // Calculate my size in the end
+                size = GetMaxSize(),
+                // Set the destination position
+                center = position
+            };
             // And trap the rect inside of the canvas rect
             return myRect.TrapInside(new Rect(Margin, canvasRectTransform.sizeDelta - 2 * Margin)).center;
         }
 
-        public void moveTo(Vector2 position)
+        protected void MoveTo(Vector2 position)
         {
-            this.finalPosition = encapsulateInParent(position);
+            this.finalPosition = EncapsulateInParent(position);
             // If the position on the Y axis has changed we try to move it below
             if (finalPosition.y != position.y)
             {
-                var maxSize = getMaxSize();
+                var maxSize = GetMaxSize();
                 var inversePosition = 2 * rectTransform.anchoredPosition - position - new Vector2(0, maxSize.y * 0.5f);
-                var encapsulatedInverse = encapsulateInParent(inversePosition);
+                var encapsulatedInverse = EncapsulateInParent(inversePosition);
                 // If the inverse position is moved less than the original position then we go with the inverse
                 if (encapsulatedInverse.y - inversePosition.y < position.y - finalPosition.y)
                 {
@@ -167,41 +256,30 @@ namespace uAdventure.Runner
             this.distance = Vector2.Distance(rectTransform.anchoredPosition, position);
         }
 
-        public void destroy()
+        protected void SetAlpha(float percent)
         {
-            this.state = BubbleState.DESTROYING;
-        }
+            float alpha = (MaxAlpha - MinAlpha) * percent + MinAlpha;
+            background.color = new Color(Data.BaseColor.r, Data.BaseColor.g, Data.BaseColor.b, alpha);
+            border.effectColor = new Color(Data.OutlineColor.r, Data.OutlineColor.g, Data.OutlineColor.b, alpha);
 
-        float min_alpha = 0f, max_alpha = 1f;
-        public void setAlpha(float percent)
-        {
-            float alpha = (max_alpha - min_alpha) * percent + min_alpha;
-            this.GetComponent<Image>().color = new Color(data.BaseColor.r, data.BaseColor.g, data.BaseColor.b, alpha);
-            this.GetComponent<Outline>().effectColor = new Color(data.OutlineColor.r, data.OutlineColor.g, data.OutlineColor.b, alpha);
-
-            text.GetComponent<Text>().color = new Color(data.TextColor.r, data.TextColor.g, data.TextColor.b, alpha);
-            text.GetComponent<Outline>().effectColor = new Color(data.TextOutlineColor.r, data.TextOutlineColor.g, data.TextOutlineColor.b, alpha);
+            text.color = new Color(Data.TextColor.r, Data.TextColor.g, Data.TextColor.b, alpha);
+            textBorder.effectColor = new Color(Data.TextOutlineColor.r, Data.TextOutlineColor.g, Data.TextOutlineColor.b, alpha);
 
             if (image)
             {
-                image.GetComponent<RawImage>().color = new Color(1f, 1f, 1f, alpha);
+                image.color = new Color(1f, 1f, 1f, alpha);
             }
-
         }
-
-        float min_scale = 0.7f, max_scale = 1f;
-        public void setScale(float percent)
+        protected void SetScale(float percent)
         {
-            float scale = (max_scale - min_scale) * percent + min_scale;
+            float scale = (MaxScale - MinScale) * percent + MinScale;
             this.transform.localScale = new Vector3(scale, scale, 1);
         }
 
-        private float width = 200f;
-        public void resize()
+        protected void SetTextProgress(float percent)
         {
-            float newwidth = (Screen.width / 600f) * width;
-
-            this.rectTransform.sizeDelta = new Vector2(newwidth, 0);
+            var charactersShown = (int) (Data.Line.Length * Mathf.Clamp01(percent));
+            text.text = Data.Line.Substring(0, charactersShown) + "<color=#00000000>" + Data.Line.Substring(charactersShown) + "</color>";
         }
     }
 }
