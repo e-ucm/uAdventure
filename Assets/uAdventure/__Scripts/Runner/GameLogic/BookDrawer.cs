@@ -197,19 +197,22 @@ namespace uAdventure.Runner
             // Lastly we draw the buttons
             if (Application.isPlaying && DoBookButton(rect.position, closeButton, closeButton, rect, false))
             {
-                this.Book = null;
+                Game.Instance.CloseBook();
             }
 
-            if (currentPage > 0 && leftImage 
-                && DoBookButton(Book.getPreviousPageVector2(), leftImage, leftImageOver, rect, false))
+            if(this.book != null)
             {
-                currentPage--;
-            }
-            
-            if (hasNextPage && (rightImage || leftImage) 
-                && DoBookButton(Book.getNextPageVector2(), rightImage ?? leftImage, rightImageOver ?? leftImageOver, rect, !rightImage || rightIsDefault))
-            {
-                currentPage++;
+                if (currentPage > 0 && leftImage
+                    && DoBookButton(Book.getPreviousPageVector2(), leftImage, leftImageOver, rect, false))
+                {
+                    currentPage--;
+                }
+
+                if (hasNextPage && (rightImage || leftImage)
+                    && DoBookButton(Book.getNextPageVector2(), rightImage ?? leftImage, rightImageOver ?? leftImageOver, rect, !rightImage || rightIsDefault))
+                {
+                    currentPage++;
+                }
             }
             GUI.matrix = Matrix4x4.identity;
 

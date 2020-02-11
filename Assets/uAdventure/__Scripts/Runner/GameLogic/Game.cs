@@ -603,6 +603,12 @@ namespace uAdventure.Runner
             bookDrawer.RefreshResources();
         }
 
+        public void CloseBook()
+        {
+            guistate = GUIState.NOTHING;
+            bookDrawer.Book = null;
+        }
+
         public bool ShowingBook
         {
             get
