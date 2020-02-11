@@ -194,7 +194,6 @@ namespace uAdventure.Geo
                 if (IsStarted() || UsingDebugLocation || geochar)
                 {
                     var mapScene = Game.Instance.CurrentTargetRunner.Data as MapScene;
-                    Debug.Log(Location);
                     if (mapScene != null)
                     {
                         TrackerExtension.Movement.Moved(mapScene.Id, Location);
