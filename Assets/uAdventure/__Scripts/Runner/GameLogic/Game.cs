@@ -57,6 +57,7 @@ namespace uAdventure.Runner
         private BookDrawer bookDrawer;
         private List<GameExtension> gameExtensions;
         private bool started;
+        private int pulsing = 0;
 
         public delegate void TargetChangedDelegate(IChapterTarget newTarget);
 
@@ -389,6 +390,11 @@ namespace uAdventure.Runner
 
         private bool Interacted()
         {
+            if (pulsing > 0)
+            {
+                return false;
+            }
+
             if(guistate != GUIState.BOOK)
             {
                 guistate = GUIState.NOTHING;
@@ -827,11 +833,13 @@ namespace uAdventure.Runner
 
         private IEnumerator PulseOnTimeCorrutine(EffectHolderNode effect, int time)
         {
+            pulsing++;
             yield return new WaitForSeconds(time);
             if (effect != null)
             {
                 effect.doPulse();
             }
+            pulsing--;
             Interacted();
         }
 
