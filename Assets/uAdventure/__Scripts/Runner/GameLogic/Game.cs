@@ -132,7 +132,7 @@ namespace uAdventure.Runner
                 }
             }
 
-            if (Game.GameToLoad != "")
+            if (!string.IsNullOrEmpty(Game.GameToLoad))
             {
                 gameName = Game.GameToLoad;
                 gamePath = ResourceManager.getCurrentDirectory() + System.IO.Path.DirectorySeparatorChar + "Games" + System.IO.Path.DirectorySeparatorChar;
@@ -174,6 +174,7 @@ namespace uAdventure.Runner
         {
             started = true;
             GameState.OnGameResume();
+            gameExtensions.ForEach(g => g.OnAfterGameLoad());
             uAdventureRaycaster = FindObjectOfType<uAdventureRaycaster>();
             if (!uAdventureRaycaster)
             {
@@ -190,7 +191,7 @@ namespace uAdventure.Runner
             }
 
             RunTarget(forceScene ? scene_name : GameState.CurrentTarget);
-            gameExtensions.ForEach(g => g.OnAfterGameLoad());
+            gameExtensions.ForEach(g => g.OnGameReady());
             uAdventureInputModule.LookingForTarget = null;
 
             TimerController.Instance.Timers = GameState.GetTimers();
@@ -257,8 +258,9 @@ namespace uAdventure.Runner
         public void LoadGame()
         {
             GameState.RestoreFrom("save");
-            RunTarget(GameState.CurrentTarget);
             gameExtensions.ForEach(g => g.OnAfterGameLoad());
+            RunTarget(GameState.CurrentTarget);
+            gameExtensions.ForEach(g => g.OnGameReady());
             uAdventureInputModule.LookingForTarget = null;
         }
 
@@ -268,22 +270,32 @@ namespace uAdventure.Runner
             GameState.SerializeTo("save");
         }
 
+        public void AutoSave()
+        {
+            gameExtensions.ForEach(g => g.OnBeforeGameSave());
+            GameState.SerializeTo("save");
+        }
+
         public void OnApplicationPause(bool paused)
         {
-            if (paused)
+            if (!isSomethingRunning())
             {
-                GameState.OnGameSuspend();
-            }
-            else if(Application.isMobilePlatform)
-            {
-                GameState.OnGameResume();
-                if (started)
+                if (paused)
                 {
-                    RunTarget(GameState.CurrentTarget);
-                    gameExtensions.ForEach(g => g.OnAfterGameLoad());
-                    uAdventureInputModule.LookingForTarget = null;
+                    GameState.OnGameSuspend();
+                }
+                else if (Application.isMobilePlatform)
+                {
+                    GameState.OnGameResume();
+                    if (started)
+                    {
+                        RunTarget(GameState.CurrentTarget);
+                        gameExtensions.ForEach(g => g.OnGameReady());
+                        uAdventureInputModule.LookingForTarget = null;
+                    }
                 }
             }
+
         }
 
         public bool Execute(Interactuable interactuable, ExecutionEvent callback = null)
@@ -293,6 +305,12 @@ namespace uAdventure.Runner
             {
                 MenuMB.Instance.hide(true);
             }
+
+            if(executeStack.Count == 0)
+            {
+                AutoSave();
+            }
+
             // Then we execute anything
             if (executeStack.Count == 0 || executeStack.Peek().Key != interactuable)
             {
@@ -360,6 +378,12 @@ namespace uAdventure.Runner
             {
                 uAdventureRaycaster.Instance.Override = null;
             }
+            if (executeStack.Count == 0)
+            {
+                AutoSave();
+            }
+            // In case any bubble is bugged
+            GUIManager.Instance.DestroyBubbles();
             return false;
         }
 

@@ -136,7 +136,7 @@ namespace uAdventure.Runner
         {
             if (data.isSaveOnSuspend())
             {
-                SerializeTo("suspend_state");
+                SerializeTo("save");
             }
         }
 
@@ -144,7 +144,7 @@ namespace uAdventure.Runner
         {
             if (data.isSaveOnSuspend())
             {
-                RestoreFrom("suspend_state");
+                RestoreFrom("save");
             }
         }
 
@@ -496,6 +496,7 @@ namespace uAdventure.Runner
             var json = JsonUtility.ToJson(this);
             Debug.Log(json);
             PlayerPrefs.SetString(field, JsonUtility.ToJson(this));
+            PlayerPrefs.Save();
         }
 
         public void RestoreFrom(string field)

@@ -88,15 +88,14 @@ namespace uAdventure.Geo
             CreateNavigationAndZoneControl();
         }
 
-        public override void OnAfterGameLoad()
+        public override void OnGameReady()
         {
             this.memory = Game.Instance.GameState.GetMemory("geo_extension") ?? memory;
             CreateNavigationAndZoneControl();
         }
 
-        public override void OnBeforeGameSave()
-        {
-        }
+        public override void OnBeforeGameSave() { }
+        public override void OnAfterGameLoad() { }
 
         private void CreateNavigationAndZoneControl()
         {

@@ -93,11 +93,17 @@ namespace uAdventure.Analytics
             CheckTrackerFlush();
         }
 
-        public override void Restart() { }
+        public override void Restart() { awake = false; Awake(); }
 
-        public override void OnBeforeGameSave() { }
+        public override void OnBeforeGameSave() 
+        {
+        public override void OnGameReady() { }
 
-        public override void OnAfterGameLoad() { }
+        public override void OnAfterGameLoad()
+        {
+        }
+
+
 
         private void PrepareTracker(TrackerConfig config)
         {
