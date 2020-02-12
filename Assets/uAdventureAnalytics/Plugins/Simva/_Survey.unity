@@ -449,7 +449,6 @@ GameObject:
   - component: {fileID: 458239702}
   - component: {fileID: 458239703}
   - component: {fileID: 458239704}
-  - component: {fileID: 458239705}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -558,22 +557,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 458239696}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0a7d630856f7503479d8f0fcc8b0e727, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  token: {fileID: 0}
-  response: {fileID: 1716430558}
-  loading: {fileID: 1624506803}
-  form: {fileID: 1377728932}
---- !u!114 &458239705
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 458239696}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bea612f78158bb149aa913cf365092cf, type: 3}
+  m_Script: {fileID: 11500000, guid: f709546ead4831846b39aa51e457463a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &637850348
@@ -717,7 +701,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 458239705}
+      - m_Target: {fileID: 458239704}
         m_MethodName: OpenSurvey
         m_Mode: 1
         m_Arguments:
@@ -840,7 +824,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 458239704}
-        m_MethodName: completed
+        m_MethodName: CheckSurvey
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -901,7 +885,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1377728933
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1121,7 +1105,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1624506802
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1189,6 +1173,7 @@ GameObject:
   - component: {fileID: 1716430557}
   - component: {fileID: 1716430559}
   - component: {fileID: 1716430558}
+  - component: {fileID: 1716430560}
   m_Layer: 5
   m_Name: ResponseText
   m_TagString: Untagged
@@ -1253,3 +1238,15 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1716430556}
+--- !u!114 &1716430560
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1716430556}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b6e2ed41903db7a4ba5d149c28ef9028, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  response: {fileID: 1716430558}
