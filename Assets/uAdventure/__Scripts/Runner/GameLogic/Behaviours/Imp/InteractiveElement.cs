@@ -146,9 +146,9 @@ namespace uAdventure.Runner
                 return;
             }
 
-            var dragActions = GetDistinctInteractiveActionsOfType(Action.DRAG_TO);
+            targetActions = GetDistinctInteractiveActionsOfType(Action.DRAG_TO);
 
-            if (dragActions.Any())
+            if (targetActions.Any())
             {
                 data.Use();
             }
