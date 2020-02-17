@@ -48,10 +48,25 @@ namespace uAdventure.Analytics
 
             awake = true;
             instance = this;
-            //Create Main game completable
-            var trackerConfigs = Game.Instance.GameState.Data.getObjects<TrackerConfig>();
-            PrepareTracker(trackerConfigs.Count == 0 ? new TrackerConfig() : trackerConfigs[0]);
+            
+            //If using SIMVA, it will override the configuration to use the one based on the server
+            var trackerConfig = new TrackerConfig();
+            if (SimvaController.Instance && SimvaController.Instance.isActive())
+            {
+                trackerConfig.setRawCopy(true);
+                trackerConfig.setStorageType(TrackerConfig.StorageType.LOCAL);
+                trackerConfig.setTraceFormat(TrackerConfig.TraceFormat.CSV);
+                trackerConfig.setDebug(true);
+            }
+            else
+            {
+                var trackerConfigs = Game.Instance.GameState.Data.getObjects<TrackerConfig>();
+                trackerConfig = trackerConfigs.Count == 0 ? new TrackerConfig() : trackerConfigs[0];
+            }
+            
+            PrepareTracker(trackerConfig);
 
+            //Create Main game completabl
             Completable mainGame = new Completable();
 
             Completable.Milestone gameStart = new Completable.Milestone();
@@ -245,11 +260,10 @@ namespace uAdventure.Analytics
             TrackerAsset.Instance.Settings = tracker_settings;
             TrackerAsset.Instance.StrictMode = false;
 
-            if (PlayerPrefs.HasKey("LimesurveyToken") && PlayerPrefs.GetString("LimesurveyToken") != "ADMIN")
+            if (storage == TrackerAsset.StorageTypes.net && SimvaController.Instance && SimvaController.Instance.isActive())
             {
-                TrackerAsset.Instance.Login(PlayerPrefs.GetString("LimesurveyToken"), PlayerPrefs.GetString("LimesurveyToken"));
+                TrackerAsset.Instance.Login(SimvaController.Instance.Token, SimvaController.Instance.Token);
             }
-                
 
             TrackerAsset.Instance.Start();
             this.nextFlush = config.getFlushInterval();

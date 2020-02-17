@@ -1,9 +1,11 @@
 ﻿using UnityEngine;
 using uAdventure.Core;
+using System.Collections;
 using UnityEngine.SceneManagement;
 using AssetPackage;
-using System.Collections.Generic;
 using System.Linq;
+using UniRx;
+using SimpleJSON;
 
 namespace uAdventure.Runner
 {
@@ -373,7 +375,7 @@ namespace uAdventure.Runner
 
         public void ExitApplication()
         {
-            if (PlayerPrefs.HasKey("LimesurveyToken") && PlayerPrefs.GetString("LimesurveyToken") != "ADMIN" && PlayerPrefs.HasKey("LimesurveyPost"))
+            if (SimvaController.Instance && SimvaController.Instance.isActive())
             {
                 string path = Application.persistentDataPath;
 
@@ -382,25 +384,12 @@ namespace uAdventure.Runner
                     path += "/";
                 }
 
-                Dictionary<string, string> headers = new Dictionary<string, string>();
-
-                Net net = new Net(this);
-
-                WWWForm data = new WWWForm();
-
                 TrackerAssetSettings trackersettings = (TrackerAssetSettings)TrackerAsset.Instance.Settings;
-                string backupfile = Application.persistentDataPath + System.IO.Path.DirectorySeparatorChar + trackersettings.BackupFile;
+                string backupfile = path + trackersettings.BackupFile;
+                string traces = System.IO.File.ReadAllText(backupfile);
+                System.IO.File.AppendAllText(path + SimvaController.Instance.Token + ".csv", traces);
 
-                data.AddField("token", PlayerPrefs.GetString("LimesurveyToken"));
-                data.AddBinaryData("traces", System.Text.Encoding.UTF8.GetBytes(System.IO.File.ReadAllText(backupfile)));
-
-                //d//ata.headers.Remove ("Content-Type");// = "multipart/form-data";
-
-                net.POST(PlayerPrefs.GetString("LimesurveyHost") + "classes/collector", data, new SavedTracesListener());
-
-                System.IO.File.AppendAllText(path + PlayerPrefs.GetString("LimesurveyToken") + ".csv", System.IO.File.ReadAllText(backupfile));
-                PlayerPrefs.SetString("CurrentSurvey", "post");
-                SceneManager.LoadScene("_Survey");
+                StartCoroutine(SaveActivityAndContinue(SimvaController.Instance.getCurrentActivityId(), traces, true));
             }
             else
             {
@@ -408,18 +397,37 @@ namespace uAdventure.Runner
             }
         }
 
-        class SavedTracesListener : Net.IRequestListener
+        IEnumerator SaveActivityAndContinue(string activityId, string traces, bool completed)
         {
-            public void Result(string data)
-            {
-                Debug.Log("------------------------");
-                Debug.Log(data);
-            }
+            SimvaController.CoroutineWithData cd
+                = new SimvaController.CoroutineWithData(this, SimvaController.Instance.setResults(activityId, traces));
+            yield return cd.coroutine;
 
-            public void Error(string error)
+            Tuple<string, string> result = (Tuple<string, string>)cd.result;
+
+            if (result.Item1 != null)
             {
-                Debug.Log("------------------------");
-                Debug.Log(error);
+                JSONNode body = JSON.Parse(result.Item1);
+                SimvaController.Instance.NotifyManagers(body["message"].Value);
+            }
+            else
+            {
+                cd = new SimvaController.CoroutineWithData(this, SimvaController.Instance.setCompletion(activityId, completed));
+                yield return cd.coroutine;
+
+                result = (Tuple<string, string>)cd.result;
+                if (result.Item1 != null)
+                {
+                    JSONNode body = JSON.Parse(result.Item1);
+                    SimvaController.Instance.NotifyManagers(body["message"].Value);
+                }
+                else
+                {
+                    cd = new SimvaController.CoroutineWithData(this, SimvaController.Instance.getSchedule());
+                    yield return cd.coroutine;
+
+                    SimvaController.Instance.LaunchActivity(SimvaController.Instance.Schedule["next"].Value);
+                }
             }
         }
     }

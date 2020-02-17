@@ -16,7 +16,6 @@ public class SimvaController : MonoBehaviour {
         get { return SimvaController.instance; }
     }
 
-
     List<SimvaResponseManager> responseManagers = new List<SimvaResponseManager>();
     string host = "localhost",  port = "443", protocol = "https";
     string study = "", master_token_online = "online", master_token_offline = "offline";
@@ -78,6 +77,11 @@ public class SimvaController : MonoBehaviour {
                 return "";
             }
         }
+    }
+
+    public bool isActive()
+    {
+        return (this.jwt != null && this.user != null && Schedule != null);
     }
 
     private void Awake()
@@ -150,19 +154,26 @@ public class SimvaController : MonoBehaviour {
 
     public void LaunchActivity(string activityId)
     {
-        JSONNode activity = getActivity(activityId);
-
-        if(activity != null)
+        if(activityId == null)
         {
-            switch (activity["type"].Value)
+            SceneManager.LoadScene("_End");
+        }
+        else
+        {
+            JSONNode activity = getActivity(activityId);
+
+            if (activity != null)
             {
-                case "limesurvey":
-                    SceneManager.LoadScene("_Survey");
-                    break;
-                case "activity":
-                default:
-                    SceneManager.LoadScene("_Scene1");
-                    break;
+                switch (activity["type"].Value)
+                {
+                    case "limesurvey":
+                        SceneManager.LoadScene("_Survey");
+                        break;
+                    case "activity":
+                    default:
+                        SceneManager.LoadScene("_Scene1");
+                        break;
+                }
             }
         }
     }
@@ -297,6 +308,72 @@ public class SimvaController : MonoBehaviour {
         UnityWebRequest www = UnityWebRequest.Get(this.URL + "/activities/" + activityId + "/completion");
         www.SetRequestHeader("Content-Type", "application/json");
         www.SetRequestHeader("Authorization", "Bearer " + this.jwt);
+        yield return www.SendWebRequest();
+
+        if (www.isNetworkError)
+        {
+            yield return new Tuple<string, string>("{\"message\": \"Unable to connect\"}", null);
+        }
+        else
+        {
+            if (www.responseCode != 200)
+            {
+                yield return new Tuple<string, string>(www.downloadHandler.text, null);
+            }
+            else
+            {
+                yield return new Tuple<string, string>(null, www.downloadHandler.text);
+            }
+        }
+    }
+
+    public IEnumerator setResults(string activityId, string results)
+    {
+        JSONNode body = new JSONClass();
+        body.Add("result", results);
+        string bodystring = body.ToString();
+
+        UnityWebRequest www = new UnityWebRequest(this.URL + "/activities/" + activityId + "/result", "POST");
+        byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(bodystring);
+        www.uploadHandler = (UploadHandler)new UploadHandlerRaw(bodyRaw);
+        www.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
+
+        www.SetRequestHeader("Content-Type", "application/json");
+        www.SetRequestHeader("Authorization", "Bearer " + this.jwt);
+
+        yield return www.SendWebRequest();
+
+        if (www.isNetworkError)
+        {
+            yield return new Tuple<string, string>("{\"message\": \"Unable to connect\"}", null);
+        }
+        else
+        {
+            if (www.responseCode != 200)
+            {
+                yield return new Tuple<string, string>(www.downloadHandler.text, null);
+            }
+            else
+            {
+                yield return new Tuple<string, string>(null, www.downloadHandler.text);
+            }
+        }
+    }
+
+    public IEnumerator setCompletion(string activityId, bool completion)
+    {
+        JSONNode body = new JSONClass();
+        body.Add("status", new JSONData(completion));
+        string bodystring = body.ToString();
+
+        UnityWebRequest www = new UnityWebRequest(this.URL + "/activities/" + activityId + "/completion", "POST");
+        byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(bodystring);
+        www.uploadHandler = (UploadHandler)new UploadHandlerRaw(bodyRaw);
+        www.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
+
+        www.SetRequestHeader("Content-Type", "application/json");
+        www.SetRequestHeader("Authorization", "Bearer " + this.jwt);
+
         yield return www.SendWebRequest();
 
         if (www.isNetworkError)
