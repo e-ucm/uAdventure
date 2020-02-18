@@ -356,7 +356,6 @@ namespace uAdventure.Geo
                     if (GUIUtility.hotControl == geometryControlId)
                     {
                         GUIUtility.hotControl = -1;
-                        Event.current.Use();
                     }
 
                     break;
