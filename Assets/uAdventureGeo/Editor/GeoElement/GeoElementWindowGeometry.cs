@@ -182,7 +182,14 @@ namespace uAdventure.Geo
             if (Event.current.button == 0 && Event.current.type == EventType.MouseDown)
             {
                 var geoElement = Target as GeoElementDataControl;
-                if (MapEditor.Current.SelectedElement == geoElement && ActionSelected == 1)
+                var selectedElement = MapEditor.Current.SelectedElement as GeoElementDataControl;
+                var geoElementRef = MapEditor.Current.SelectedElement as GeoElementRefDataControl;
+                if (geoElementRef != null)
+                {
+                    selectedElement = geoElementRef.ReferencedDataControl as GeoElementDataControl;
+                }
+
+                if (selectedElement == geoElement && ActionSelected == 1)
                 {
                     return true;
                 }
