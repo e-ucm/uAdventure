@@ -295,14 +295,17 @@ namespace uAdventure.Geo
                         }
                         break;
                     case 2: // Remove
+                        var mouseUpAsButton = false;
                         HandleUtil.HandlePointMovement(pointControl, points[i], 5,
-                            (point, isOver, isActive) => HandleUtil.DrawPoint(point, 4, MapEditor.GetColor(Color.red), isOver ? 2f : 1f,
-                                isOver ? MapEditor.GetColor(Color.yellow) : MapEditor.GetColor(Color.black)), MouseCursor.ArrowMinus);
-                        if (GUIUtility.hotControl == pointControl)
+                            (point, isOver, isActive) =>
+                            {
+                                var size = isOver ? 2f : 1f;
+                                var borderColor = isOver ? MapEditor.GetColor(Color.yellow) : MapEditor.GetColor(Color.black);
+                                HandleUtil.DrawPoint(point, 4, MapEditor.GetColor(Color.red), size, borderColor); 
+                            }, out mouseUpAsButton, MouseCursor.ArrowMinus);
+                        if (mouseUpAsButton)
                         {
                             geometry.RemovePoint(i);
-                            GUIUtility.hotControl = -1;
-                            Event.current.Use();
                             r = i;
                         }
                         break;
