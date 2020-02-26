@@ -25,6 +25,9 @@ namespace dZine4D.Misc.QR
         [Tooltip("An optional RawImage component to display the camera feed.")]
         private RawImage OutputImage = null;
         [SerializeField]
+        [Tooltip("The Scaler for the RawImage")]
+        private CanvasScaler OutputImageScaler = null;
+        [SerializeField]
         [Tooltip("An optional text component to display the last qr decoding result.")]
         private Text OutputText = null;
         [SerializeField]
@@ -42,6 +45,7 @@ namespace dZine4D.Misc.QR
         private bool isReaderEnabled;
 
         private string prevResult;
+        private int previousWebCamRotation = -1;
 
         // .. EVENTS
 
@@ -114,6 +118,22 @@ namespace dZine4D.Misc.QR
             if (cameraFeedGrab == null)
             {
                 cameraFeedGrab = camTexture.GetPixels32();
+            }
+
+            if(previousWebCamRotation != camTexture.videoRotationAngle)
+            {
+                if(camTexture.videoRotationAngle == 90 || camTexture.videoRotationAngle == 270)
+                {
+                    OutputImageScaler.referenceResolution = new Vector2(camTexture.height, camTexture.width);
+                }
+                else
+                {
+                    OutputImageScaler.referenceResolution = new Vector2(camTexture.width, camTexture.height);
+                }
+
+                OutputImage.rectTransform.sizeDelta = new Vector2((float) camTexture.width, (float) camTexture.height);
+                OutputImage.rectTransform.rotation = Quaternion.Euler(0, 0, 360 - camTexture.videoRotationAngle);
+                previousWebCamRotation = camTexture.videoRotationAngle;
             }
 
             if (!string.IsNullOrEmpty(LastResult) && LastResult != prevResult)
