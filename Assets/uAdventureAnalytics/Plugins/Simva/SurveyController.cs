@@ -23,6 +23,8 @@ public class SurveyController : MonoBehaviour {
 
     IEnumerator LoadTargetAndOpen(string activityId) {
 
+        SimvaController.Instance.NotifyManagers("Loading Link");
+
         SimvaController.CoroutineWithData cd = new SimvaController.CoroutineWithData(this, SimvaController.Instance.getTarget(activityId));
         yield return cd.coroutine;
 
@@ -35,6 +37,7 @@ public class SurveyController : MonoBehaviour {
         }
         else
         {
+            SimvaController.Instance.NotifyManagers("");
             JSONNode body = JSON.Parse(result.Item2);
             Application.OpenURL(body[SimvaController.Instance.Token].Value);
         }
@@ -42,16 +45,27 @@ public class SurveyController : MonoBehaviour {
 
     IEnumerator CheckStatusAndContinue(string activityId)
     {
-
+        SimvaController.Instance.NotifyLoading(true);
         SimvaController.CoroutineWithData cd = new SimvaController.CoroutineWithData(this, SimvaController.Instance.getCompletion(activityId));
         yield return cd.coroutine;
 
         Tuple<string, string> result = (Tuple<string, string>)cd.result;
 
+        
+
         if (result.Item1 != null)
         {
+            SimvaController.Instance.NotifyLoading(false);
+            SimvaController.Instance.NotifyManagers("Error");
             JSONNode body = JSON.Parse(result.Item1);
-            SimvaController.Instance.NotifyManagers(body["message"].Value);
+            if (body == null)
+            {
+                SimvaController.Instance.NotifyManagers("Unable to connect");
+            }
+            else
+            {
+                SimvaController.Instance.NotifyManagers(body["message"].Value);
+            }
         }
         else
         {
@@ -64,6 +78,7 @@ public class SurveyController : MonoBehaviour {
                 SimvaController.Instance.LaunchActivity(SimvaController.Instance.Schedule["next"].Value);
             }else
             {
+                SimvaController.Instance.NotifyLoading(false);
                 SimvaController.Instance.NotifyManagers("Survey not completed");
             }
         }

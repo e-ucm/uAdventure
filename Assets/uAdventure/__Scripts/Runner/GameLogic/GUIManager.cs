@@ -377,19 +377,27 @@ namespace uAdventure.Runner
         {
             if (SimvaController.Instance && SimvaController.Instance.isActive())
             {
-                string path = Application.persistentDataPath;
-
-                if (!path.EndsWith("/"))
+                JSONNode activity = SimvaController.Instance.getActivity(SimvaController.Instance.getCurrentActivityId());
+                string activityType = activity["type"].Value;
+                if (activityType == "miniokafka" || activityType == "activity")
                 {
-                    path += "/";
+                    string path = Application.persistentDataPath;
+                    if (!path.EndsWith("/"))
+                    {
+                        path += "/";
+                    }
+
+                    TrackerAssetSettings trackersettings = (TrackerAssetSettings)TrackerAsset.Instance.Settings;
+                    string backupfile = path + trackersettings.BackupFile;
+                    string traces = System.IO.File.ReadAllText(backupfile);
+                    System.IO.File.AppendAllText(path + SimvaController.Instance.Token + ".csv", traces);
+
+                    StartCoroutine(SaveActivityAndContinue(SimvaController.Instance.getCurrentActivityId(), traces, true));
                 }
-
-                TrackerAssetSettings trackersettings = (TrackerAssetSettings)TrackerAsset.Instance.Settings;
-                string backupfile = path + trackersettings.BackupFile;
-                string traces = System.IO.File.ReadAllText(backupfile);
-                System.IO.File.AppendAllText(path + SimvaController.Instance.Token + ".csv", traces);
-
-                StartCoroutine(SaveActivityAndContinue(SimvaController.Instance.getCurrentActivityId(), traces, true));
+                else
+                {
+                    StartCoroutine(Continue(SimvaController.Instance.getCurrentActivityId(), true));
+                }
             }
             else
             {
@@ -400,7 +408,7 @@ namespace uAdventure.Runner
         IEnumerator SaveActivityAndContinue(string activityId, string traces, bool completed)
         {
             SimvaController.CoroutineWithData cd
-                = new SimvaController.CoroutineWithData(this, SimvaController.Instance.setResults(activityId, traces));
+                = new SimvaController.CoroutineWithData(this, SimvaController.Instance.setResults(activityId, traces, true));
             yield return cd.coroutine;
 
             Tuple<string, string> result = (Tuple<string, string>)cd.result;
@@ -412,22 +420,27 @@ namespace uAdventure.Runner
             }
             else
             {
-                cd = new SimvaController.CoroutineWithData(this, SimvaController.Instance.setCompletion(activityId, completed));
+                StartCoroutine(Continue(activityId, completed));
+            }
+        }
+
+        IEnumerator Continue(string activityId, bool completed)
+        {
+            SimvaController.CoroutineWithData cd = new SimvaController.CoroutineWithData(this, SimvaController.Instance.setCompletion(activityId, completed));
+            yield return cd.coroutine;
+
+            Tuple<string, string>  result = (Tuple<string, string>)cd.result;
+            if (result.Item1 != null)
+            {
+                JSONNode body = JSON.Parse(result.Item1);
+                SimvaController.Instance.NotifyManagers(body["message"].Value);
+            }
+            else
+            {
+                cd = new SimvaController.CoroutineWithData(this, SimvaController.Instance.getSchedule());
                 yield return cd.coroutine;
 
-                result = (Tuple<string, string>)cd.result;
-                if (result.Item1 != null)
-                {
-                    JSONNode body = JSON.Parse(result.Item1);
-                    SimvaController.Instance.NotifyManagers(body["message"].Value);
-                }
-                else
-                {
-                    cd = new SimvaController.CoroutineWithData(this, SimvaController.Instance.getSchedule());
-                    yield return cd.coroutine;
-
-                    SimvaController.Instance.LaunchActivity(SimvaController.Instance.Schedule["next"].Value);
-                }
+                SimvaController.Instance.LaunchActivity(SimvaController.Instance.Schedule["next"].Value);
             }
         }
     }
