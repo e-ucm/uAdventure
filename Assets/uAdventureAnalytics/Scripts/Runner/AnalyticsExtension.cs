@@ -1,4 +1,5 @@
 ﻿using AssetPackage;
+using SimpleJSON;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -53,17 +54,38 @@ namespace uAdventure.Analytics
             var trackerConfig = new TrackerConfig();
             if (SimvaController.Instance && SimvaController.Instance.isActive())
             {
-                trackerConfig.setRawCopy(true);
-                trackerConfig.setStorageType(TrackerConfig.StorageType.LOCAL);
-                trackerConfig.setTraceFormat(TrackerConfig.TraceFormat.CSV);
-                trackerConfig.setDebug(true);
+                JSONNode activity = SimvaController.Instance.getActivity(SimvaController.Instance.getCurrentActivityId());
+                switch (activity["type"])
+                {
+                    case "miniokafka":
+                    case "rageanalytics":
+                        trackerConfig.setRawCopy(true);
+                        trackerConfig.setStorageType(TrackerConfig.StorageType.NET);
+                        trackerConfig.setTraceFormat(TrackerConfig.TraceFormat.XAPI);
+                        trackerConfig.setHost(SimvaController.Instance.URL);
+                        trackerConfig.setBasePath("");
+                        trackerConfig.setLoginEndpoint("/users/login");
+                        trackerConfig.setStartEndpoint("/activities/{0}/result");
+                        trackerConfig.setTrackEndpoint("/activities/{0}/result");
+                        trackerConfig.setTrackingCode(SimvaController.Instance.getCurrentActivityId());
+                        trackerConfig.setUseBearerOnTrackEndpoint(true);
+                        trackerConfig.setDebug(true);
+                        break;
+                    default:
+                        trackerConfig.setRawCopy(true);
+                        trackerConfig.setStorageType(TrackerConfig.StorageType.LOCAL);
+                        trackerConfig.setTraceFormat(TrackerConfig.TraceFormat.CSV);
+                        trackerConfig.setDebug(true);
+                        break;
+                }
+                
             }
             else
             {
                 var trackerConfigs = Game.Instance.GameState.Data.getObjects<TrackerConfig>();
-                trackerConfig = trackerConfigs.Count == 0 ? new TrackerConfig() : trackerConfigs[0];
+                trackerConfig = trackerConfigs.Count == 0 ? new TrackerConfig() : trackerConfigs[0]; 
             }
-            
+
             PrepareTracker(trackerConfig);
 
             //Create Main game completabl
@@ -248,13 +270,17 @@ namespace uAdventure.Analytics
             {
                 Host = domain,
                 TrackingCode = config.getTrackingCode(),
-                BasePath = "/api",
+                BasePath = trackerConfig.getBasePath() != null ? trackerConfig.getBasePath() : "/api",
+                LoginEndpoint = trackerConfig.getLoginEndpoint() != null ? trackerConfig.getLoginEndpoint() : "login",
+                StartEndpoint = trackerConfig.getStartEndpoint() != null ? trackerConfig.getStartEndpoint() : "proxy/gleaner/collector/start/{0}",
+                TrackEndpoint = trackerConfig.getStartEndpoint() != null ? trackerConfig.getStartEndpoint() : "proxy/gleaner/collector/track",
                 Port = port,
                 Secure = secure,
                 StorageType = storage,
                 TraceFormat = format,
                 BackupStorage = config.getRawCopy(),
-            };
+                UseBearerOnTrackEndpoint = trackerConfig.getUseBearerOnTrackEndpoint()
+        };
             TrackerAsset.Instance.StrictMode = false;
             TrackerAsset.Instance.Bridge = new UnityBridge();
             TrackerAsset.Instance.Settings = tracker_settings;

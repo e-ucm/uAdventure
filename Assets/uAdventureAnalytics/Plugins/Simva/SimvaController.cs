@@ -17,12 +17,37 @@ public class SimvaController : MonoBehaviour {
     }
 
     List<SimvaResponseManager> responseManagers = new List<SimvaResponseManager>();
+    List<SimvaLoadingManager> loadingManagers = new List<SimvaLoadingManager>();
     string host = "localhost",  port = "443", protocol = "https";
     string study = "", master_token_online = "online", master_token_offline = "offline";
     string jwt = null;
     JSONNode schedule;
 
-    string URL
+    public string Host
+    {
+        get
+        {
+            return host;
+        }
+    }
+
+    public string Port
+    {
+        get
+        {
+            return port;
+        }
+    }
+
+    public string Protocol
+    {
+        get
+        {
+            return protocol;
+        }
+    }
+
+    public string URL
     {
         get {
             return protocol + "://" + host + ":" + port;
@@ -121,11 +146,29 @@ public class SimvaController : MonoBehaviour {
         responseManagers.Remove(manager);
     }
 
+    public void AddLoadingManager(SimvaLoadingManager manager)
+    {
+        loadingManagers.Add(manager);
+    }
+
+    public void RemoveLoadingManager(SimvaLoadingManager manager)
+    {
+        loadingManagers.Remove(manager);
+    }
+
     public void NotifyManagers(string message)
     {
         foreach(SimvaResponseManager responseManager in responseManagers)
         {
             responseManager.Notify(message);
+        }
+    }
+
+    public void NotifyLoading(bool state)
+    {
+        foreach (SimvaLoadingManager loadingManager in loadingManagers)
+        {
+            loadingManager.IsLoading(state);
         }
     }
 
@@ -180,6 +223,7 @@ public class SimvaController : MonoBehaviour {
 
     public IEnumerator LoginAndSchedule()
     {
+        NotifyLoading(true);
         CoroutineWithData cd = new CoroutineWithData(this, Login());
         yield return cd.coroutine;
 
@@ -187,13 +231,21 @@ public class SimvaController : MonoBehaviour {
 
         if (result.Item1 != null)
         {
-            Debug.Log("login failed");
+            NotifyLoading(false);
+            NotifyManagers("Error");
             JSONNode body = JSON.Parse(result.Item1);
-            NotifyManagers(body["message"].Value);
+            if (body == null)
+            {
+                NotifyManagers("Unable to connect");
+            }
+            else
+            {
+                NotifyManagers(body["message"].Value);
+            }
         }
         else
         {
-            NotifyManagers("login success");
+            NotifyManagers("Login success");
             JSONNode body = JSON.Parse(result.Item2);
             this.jwt = body["token"];
             this.user = Token;
@@ -205,6 +257,7 @@ public class SimvaController : MonoBehaviour {
 
             if (result.Item1 != null)
             {
+                NotifyLoading(false);
                 Debug.Log("Getting Schedule Failed");
                 body = JSON.Parse(result.Item1);
                 NotifyManagers(body["message"].Value);
@@ -327,11 +380,12 @@ public class SimvaController : MonoBehaviour {
         }
     }
 
-    public IEnumerator setResults(string activityId, string results)
+    public IEnumerator setResults(string activityId, string results, bool tofile)
     {
         JSONNode body = new JSONClass();
         body.Add("result", results);
-        string bodystring = body.ToString();
+        body.Add("tofile", new JSONData(tofile));
+        string bodystring = body.ToJSON(0);
 
         UnityWebRequest www = new UnityWebRequest(this.URL + "/activities/" + activityId + "/result", "POST");
         byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(bodystring);

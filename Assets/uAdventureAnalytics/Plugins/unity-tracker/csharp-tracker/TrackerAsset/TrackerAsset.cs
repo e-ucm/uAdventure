@@ -242,6 +242,10 @@ namespace AssetPackage
                 settings.Port = 443;
                 settings.BasePath = "/api/";
 
+                settings.LoginEndpoint = "login";
+                settings.StartEndpoint = "proxy/gleaner/collector/start/{0}";
+                settings.TrackEndpoint = "proxy/gleaner/collector/track";
+
                 settings.UserToken = "";
                 settings.TrackingCode = "";
                 settings.StorageType = StorageTypes.local;
@@ -692,7 +696,7 @@ namespace AssetPackage
             headers.Add("Content-Type", "application/json");
             headers.Add("Accept", "application/json");
 
-            RequestResponse response = IssueRequest("login", "POST", headers,
+            RequestResponse response = IssueRequest(settings.LoginEndpoint, "POST", headers,
                 String.Format("{{\r\n \"username\": \"{0}\",\r\n \"password\": \"{1}\"\r\n}}",
                 username, password));
 
@@ -814,7 +818,7 @@ namespace AssetPackage
                 body = "{\"anonymous\" : \"" + settings.PlayerId + "\"}";
             }
 
-            RequestResponse response = IssueRequest(String.Format("proxy/gleaner/collector/start/{0}", settings.TrackingCode), "POST", headers, body);
+            RequestResponse response = IssueRequest(String.Format(settings.StartEndpoint, settings.TrackingCode), "POST", headers, body);
 
             if (response.ResultAllowed)
             {
@@ -1274,11 +1278,16 @@ namespace AssetPackage
                     Dictionary<string, string> headers = new Dictionary<string, string>();
 
                     headers.Add("Content-Type", "application/json");
-                    headers.Add("Authorization", String.Format("{0}", settings.UserToken));
+                    string authformat = "{0}";
+                    if (settings.UseBearerOnTrackEndpoint)
+                    {
+                        authformat = "Bearer {0}";
+                    }
+                    headers.Add("Authorization", String.Format(authformat, settings.UserToken));
 
                     Log(Severity.Information, "\r\n" + data);
 
-                    RequestResponse response = IssueRequest("proxy/gleaner/collector/track", "POST", headers, data);
+                    RequestResponse response = IssueRequest(String.Format(settings.TrackEndpoint, settings.TrackingCode), "POST", headers, data);
 
                     if (response.ResultAllowed)
                     {
