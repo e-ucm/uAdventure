@@ -375,73 +375,7 @@ namespace uAdventure.Runner
 
         public void ExitApplication()
         {
-            if (SimvaController.Instance && SimvaController.Instance.isActive())
-            {
-                JSONNode activity = SimvaController.Instance.getActivity(SimvaController.Instance.getCurrentActivityId());
-                string activityType = activity["type"].Value;
-                if (activityType == "miniokafka" || activityType == "activity")
-                {
-                    string path = Application.persistentDataPath;
-                    if (!path.EndsWith("/"))
-                    {
-                        path += "/";
-                    }
-
-                    TrackerAssetSettings trackersettings = (TrackerAssetSettings)TrackerAsset.Instance.Settings;
-                    string backupfile = path + trackersettings.BackupFile;
-                    string traces = System.IO.File.ReadAllText(backupfile);
-                    System.IO.File.AppendAllText(path + SimvaController.Instance.Token + ".csv", traces);
-
-                    StartCoroutine(SaveActivityAndContinue(SimvaController.Instance.getCurrentActivityId(), traces, true));
-                }
-                else
-                {
-                    StartCoroutine(Continue(SimvaController.Instance.getCurrentActivityId(), true));
-                }
-            }
-            else
-            {
-                Application.Quit();
-            }
-        }
-
-        IEnumerator SaveActivityAndContinue(string activityId, string traces, bool completed)
-        {
-            SimvaController.CoroutineWithData cd
-                = new SimvaController.CoroutineWithData(this, SimvaController.Instance.setResults(activityId, traces, true));
-            yield return cd.coroutine;
-
-            Tuple<string, string> result = (Tuple<string, string>)cd.result;
-
-            if (result.Item1 != null)
-            {
-                JSONNode body = JSON.Parse(result.Item1);
-                SimvaController.Instance.NotifyManagers(body["message"].Value);
-            }
-            else
-            {
-                StartCoroutine(Continue(activityId, completed));
-            }
-        }
-
-        IEnumerator Continue(string activityId, bool completed)
-        {
-            SimvaController.CoroutineWithData cd = new SimvaController.CoroutineWithData(this, SimvaController.Instance.setCompletion(activityId, completed));
-            yield return cd.coroutine;
-
-            Tuple<string, string>  result = (Tuple<string, string>)cd.result;
-            if (result.Item1 != null)
-            {
-                JSONNode body = JSON.Parse(result.Item1);
-                SimvaController.Instance.NotifyManagers(body["message"].Value);
-            }
-            else
-            {
-                cd = new SimvaController.CoroutineWithData(this, SimvaController.Instance.getSchedule());
-                yield return cd.coroutine;
-
-                SimvaController.Instance.LaunchActivity(SimvaController.Instance.Schedule["next"].Value);
-            }
+            Game.Instance.Quit();
         }
     }
 }

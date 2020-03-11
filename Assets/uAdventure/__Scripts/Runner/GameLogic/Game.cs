@@ -387,6 +387,16 @@ namespace uAdventure.Runner
             return false;
         }
 
+        public void Quit()
+        {
+            var quit = true;
+            gameExtensions.ForEach(g => quit &= g.OnGameFinished());
+            if (quit)
+            {
+                Application.Quit();
+            }
+        }
+
         public void ClearAndRestart()
         {
             PlayerPrefs.DeleteAll();

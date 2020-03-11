@@ -96,6 +96,7 @@ namespace uAdventure.Geo
 
         public override void OnBeforeGameSave() { }
         public override void OnAfterGameLoad() { }
+        public override bool OnGameFinished() { return true; }
 
         private void CreateNavigationAndZoneControl()
         {

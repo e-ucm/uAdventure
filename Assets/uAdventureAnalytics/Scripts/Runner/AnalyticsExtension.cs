@@ -1,10 +1,12 @@
 ﻿using AssetPackage;
 using SimpleJSON;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using uAdventure.Core;
 using uAdventure.Runner;
+using UniRx;
 using UnityEngine;
 
 namespace uAdventure.Analytics
@@ -52,9 +54,9 @@ namespace uAdventure.Analytics
             
             //If using SIMVA, it will override the configuration to use the one based on the server
             var trackerConfig = new TrackerConfig();
-            if (SimvaController.Instance && SimvaController.Instance.isActive())
+            if (SimvaController.Instance && SimvaController.Instance.IsActive)
             {
-                JSONNode activity = SimvaController.Instance.getActivity(SimvaController.Instance.getCurrentActivityId());
+                JSONNode activity = SimvaController.Instance.GetActivity(SimvaController.Instance.CurrentActivityId);
                 switch (activity["type"])
                 {
                     case "miniokafka":
@@ -67,7 +69,7 @@ namespace uAdventure.Analytics
                         trackerConfig.setLoginEndpoint("/users/login");
                         trackerConfig.setStartEndpoint("/activities/{0}/result");
                         trackerConfig.setTrackEndpoint("/activities/{0}/result");
-                        trackerConfig.setTrackingCode(SimvaController.Instance.getCurrentActivityId());
+                        trackerConfig.setTrackingCode(SimvaController.Instance.CurrentActivityId);
                         trackerConfig.setUseBearerOnTrackEndpoint(true);
                         trackerConfig.setDebug(true);
                         break;
@@ -153,6 +155,42 @@ namespace uAdventure.Analytics
             analyticsMemory.Set("completables", SerializeToString(completableControllers));
         }
         public override void OnGameReady() { }
+
+        public override bool OnGameFinished()
+        {
+
+            if (SimvaController.Instance && SimvaController.Instance.IsActive)
+            {
+                JSONNode activity = SimvaController.Instance.GetActivity(SimvaController.Instance.CurrentActivityId);
+                string activityType = activity["type"].Value;
+                if (activityType == "miniokafka" || activityType == "activity")
+                {
+                    string path = Application.persistentDataPath;
+                    if (!path.EndsWith("/"))
+                    {
+                        path += "/";
+                    }
+
+                    TrackerAssetSettings trackersettings = (TrackerAssetSettings)TrackerAsset.Instance.Settings;
+                    string backupfile = path + trackersettings.BackupFile;
+                    string traces = File.ReadAllText(backupfile);
+                    File.AppendAllText(path + SimvaController.Instance.Token + ".csv", traces);
+
+                    StartCoroutine(SaveActivityAndContinue(SimvaController.Instance.CurrentActivityId, traces, true));
+                }
+                else
+                {
+                    StartCoroutine(Continue(SimvaController.Instance.CurrentActivityId, true));
+                }
+
+                return false;
+            }
+            else
+            {
+                // The application can be closed
+                return true;
+            }
+        }
 
         public override void OnAfterGameLoad()
         {
@@ -286,7 +324,7 @@ namespace uAdventure.Analytics
             TrackerAsset.Instance.Settings = tracker_settings;
             TrackerAsset.Instance.StrictMode = false;
 
-            if (storage == TrackerAsset.StorageTypes.net && SimvaController.Instance && SimvaController.Instance.isActive())
+            if (storage == TrackerAsset.StorageTypes.net && SimvaController.Instance && SimvaController.Instance.IsActive)
             {
                 TrackerAsset.Instance.Login(SimvaController.Instance.Token, SimvaController.Instance.Token);
             }
@@ -514,6 +552,44 @@ namespace uAdventure.Analytics
             {
                 flushRequested = false;
                 TrackerAsset.Instance.Flush();
+            }
+        }
+
+        IEnumerator SaveActivityAndContinue(string activityId, string traces, bool completed)
+        {
+            var cd = new SimvaController.CoroutineWithResult(this, SimvaController.Instance.SetResults(activityId, traces, true));
+            yield return cd.Coroutine;
+
+            var result = (Tuple<string, string>)cd.Result;
+
+            if (result.Item1 != null)
+            {
+                JSONNode body = JSON.Parse(result.Item1);
+                SimvaController.Instance.NotifyManagers(body["message"].Value);
+            }
+            else
+            {
+                StartCoroutine(Continue(activityId, completed));
+            }
+        }
+
+        IEnumerator Continue(string activityId, bool completed)
+        {
+            var cd = new SimvaController.CoroutineWithResult(this, SimvaController.Instance.SetCompletion(activityId, completed));
+            yield return cd.Coroutine;
+
+            var result = (Tuple<string, string>)cd.Result;
+            if (result.Item1 != null)
+            {
+                JSONNode body = JSON.Parse(result.Item1);
+                SimvaController.Instance.NotifyManagers(body["message"].Value);
+            }
+            else
+            {
+                cd = new SimvaController.CoroutineWithResult(this, SimvaController.Instance.GetSchedule());
+                yield return cd.Coroutine;
+
+                SimvaController.Instance.LaunchActivity(SimvaController.Instance.Schedule["next"].Value);
             }
         }
 
