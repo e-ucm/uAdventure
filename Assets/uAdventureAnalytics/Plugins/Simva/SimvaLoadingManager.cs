@@ -1,35 +1,34 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine;
 
-public class SimvaLoadingManager : MonoBehaviour
+namespace uAdventure.Analytics
 {
-
-    public GameObject Loading;
-    public GameObject Form;
-
-    void Start()
+    public class SimvaLoadingManager : MonoBehaviour
     {
-        SimvaController.Instance.AddLoadingManager(this);
-    }
+        public GameObject Loading;
+        public GameObject Form;
 
-    private void OnDestroy()
-    {
-        SimvaController.Instance.RemoveLoadingManager(this);
-    }
-
-    public void IsLoading(bool state)
-    {
-        if (state)
+        protected void Start()
         {
-            Loading.active = true;
-            Form.active = false;
+            SimvaController.Instance.AddLoadingManager(this);
         }
-        else
+
+        protected void OnDestroy()
         {
-            Loading.active = false;
-            Form.active = true;
+            SimvaController.Instance.RemoveLoadingManager(this);
+        }
+
+        public void IsLoading(bool state)
+        {
+            if (state)
+            {
+                Loading.SetActive(true);
+                Form.SetActive(false);
+            }
+            else
+            {
+                Loading.SetActive(false);
+                Form.SetActive(true);
+            }
         }
     }
 }

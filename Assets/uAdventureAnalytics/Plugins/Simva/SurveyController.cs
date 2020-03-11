@@ -3,84 +3,84 @@ using System.Collections;
 using UniRx;
 using SimpleJSON;
 
-public class SurveyController : MonoBehaviour {
-	void Start () {
-	}
-	void Update () {
-	}
-
-    public void OpenSurvey()
+namespace uAdventure.Analytics
+{
+    public class SurveyController : MonoBehaviour
     {
-        string survey = SimvaController.Instance.getCurrentActivityId();
-        StartCoroutine(LoadTargetAndOpen(survey));
-    }
-
-    public void CheckSurvey()
-    {
-        string survey = SimvaController.Instance.getCurrentActivityId();
-        StartCoroutine(CheckStatusAndContinue(survey));
-    }
-
-    IEnumerator LoadTargetAndOpen(string activityId) {
-
-        SimvaController.Instance.NotifyManagers("Loading Link");
-
-        SimvaController.CoroutineWithData cd = new SimvaController.CoroutineWithData(this, SimvaController.Instance.getTarget(activityId));
-        yield return cd.coroutine;
-
-        Tuple<string, string>  result = (Tuple<string, string>) cd.result;
-
-        if(result.Item1 != null)
+        public void OpenSurvey()
         {
-            JSONNode body = JSON.Parse(result.Item1);
-            SimvaController.Instance.NotifyManagers(body["message"].Value);
+            string survey = SimvaController.Instance.CurrentActivityId;
+            StartCoroutine(LoadTargetAndOpen(survey));
         }
-        else
+
+        public void CheckSurvey()
         {
-            SimvaController.Instance.NotifyManagers("");
-            JSONNode body = JSON.Parse(result.Item2);
-            Application.OpenURL(body[SimvaController.Instance.Token].Value);
+            string survey = SimvaController.Instance.CurrentActivityId;
+            StartCoroutine(CheckStatusAndContinue(survey));
         }
-    }
 
-    IEnumerator CheckStatusAndContinue(string activityId)
-    {
-        SimvaController.Instance.NotifyLoading(true);
-        SimvaController.CoroutineWithData cd = new SimvaController.CoroutineWithData(this, SimvaController.Instance.getCompletion(activityId));
-        yield return cd.coroutine;
-
-        Tuple<string, string> result = (Tuple<string, string>)cd.result;
-
-        
-
-        if (result.Item1 != null)
+        protected IEnumerator LoadTargetAndOpen(string activityId)
         {
-            SimvaController.Instance.NotifyLoading(false);
-            SimvaController.Instance.NotifyManagers("Error");
-            JSONNode body = JSON.Parse(result.Item1);
-            if (body == null)
+
+            SimvaController.Instance.NotifyManagers("Loading Link");
+
+            var cd = new SimvaController.CoroutineWithResult(this, SimvaController.Instance.GetTarget(activityId));
+            yield return cd.Coroutine;
+
+            var result = (Tuple<string, string>)cd.Result;
+
+            if (result.Item1 != null)
             {
-                SimvaController.Instance.NotifyManagers("Unable to connect");
+                var body = JSON.Parse(result.Item1);
+                SimvaController.Instance.NotifyManagers(body["message"].Value);
             }
             else
             {
-                SimvaController.Instance.NotifyManagers(body["message"].Value);
+                SimvaController.Instance.NotifyManagers("");
+                var body = JSON.Parse(result.Item2);
+                Application.OpenURL(body[SimvaController.Instance.Token].Value);
             }
         }
-        else
-        {
-            JSONNode body = JSON.Parse(result.Item2);
-            if (body[SimvaController.Instance.Token].AsBool)
-            {
-                cd = new SimvaController.CoroutineWithData(this, SimvaController.Instance.getSchedule());
-                yield return cd.coroutine;
 
-                SimvaController.Instance.LaunchActivity(SimvaController.Instance.Schedule["next"].Value);
-            }else
+        protected IEnumerator CheckStatusAndContinue(string activityId)
+        {
+            SimvaController.Instance.NotifyLoading(true);
+            var cd = new SimvaController.CoroutineWithResult(this, SimvaController.Instance.GetCompletion(activityId));
+            yield return cd.Coroutine;
+
+            var result = (Tuple<string, string>)cd.Result;
+
+            if (result.Item1 != null)
             {
                 SimvaController.Instance.NotifyLoading(false);
-                SimvaController.Instance.NotifyManagers("Survey not completed");
+                SimvaController.Instance.NotifyManagers("Error");
+                var body = JSON.Parse(result.Item1);
+                if (body == null)
+                {
+                    SimvaController.Instance.NotifyManagers("Unable to connect");
+                }
+                else
+                {
+                    SimvaController.Instance.NotifyManagers(body["message"].Value);
+                }
+            }
+            else
+            {
+                var body = JSON.Parse(result.Item2);
+                if (body[SimvaController.Instance.Token].AsBool)
+                {
+                    cd = new SimvaController.CoroutineWithResult(this, SimvaController.Instance.GetSchedule());
+                    yield return cd.Coroutine;
+
+                    SimvaController.Instance.LaunchActivity(SimvaController.Instance.Schedule["next"].Value);
+                }
+                else
+                {
+                    SimvaController.Instance.NotifyLoading(false);
+                    SimvaController.Instance.NotifyManagers("Survey not completed");
+                }
             }
         }
     }
 }
+

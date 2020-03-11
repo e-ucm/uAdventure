@@ -1,469 +1,433 @@
 ﻿using UnityEngine;
 using System.Collections;
-using System;
-using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.Networking;
 using UniRx;
 using System.Collections.Generic;
 using SimpleJSON;
+using uAdventure.Runner;
 
-public class SimvaController : MonoBehaviour {
-
-    static SimvaController instance;
-    public static SimvaController Instance
+namespace uAdventure.Analytics
+{
+    public class SimvaController : Singleton<SimvaController>
     {
-        get { return SimvaController.instance; }
-    }
+        public delegate void LoadingDelegate(bool loading);
+        public delegate void ResponseDelegate(string message);
 
-    List<SimvaResponseManager> responseManagers = new List<SimvaResponseManager>();
-    List<SimvaLoadingManager> loadingManagers = new List<SimvaLoadingManager>();
-    string host = "localhost",  port = "443", protocol = "https";
-    string study = "", master_token_online = "online", master_token_offline = "offline";
-    string jwt = null;
-    JSONNode schedule;
+        private LoadingDelegate loadingListeners;
+        private ResponseDelegate responseListeners;
 
-    public string Host
-    {
-        get
+        private string user;
+        private string host = "localhost", port = "443", protocol = "https";
+        private string study = "";
+        private string jwt = null;
+
+        JSONNode schedule;
+
+        public string Host
         {
-            return host;
-        }
-    }
-
-    public string Port
-    {
-        get
-        {
-            return port;
-        }
-    }
-
-    public string Protocol
-    {
-        get
-        {
-            return protocol;
-        }
-    }
-
-    public string URL
-    {
-        get {
-            return protocol + "://" + host + ":" + port;
-        }
-    }
-
-    public JSONNode Schedule
-    {
-        get
-        {
-            return schedule;
-        }
-    }
-
-    string user;
-    public string Token
-    {
-        get
-        {
-            if (user != null)
+            get
             {
-                return user;
-            }
-            else if (PlayerPrefs.HasKey("username"))
-            {
-                return PlayerPrefs.GetString("username");
-            }
-            else if(PlayerPrefs.HasKey("simvatoken"))
-            {
-                return PlayerPrefs.GetString("simvatoken");
-            }else
-            {
-                return "";
+                return host;
             }
         }
-    }
-    
-    string Study
-    {
-        get
+
+        public string Port
         {
-            if (this.study != null && this.study != "")
+            get
             {
-                return this.study;
-            }
-            else if (PlayerPrefs.HasKey("simvastudy"))
-            {
-                return PlayerPrefs.GetString("simvastudy");
-            }
-            else
-            {
-                return "";
+                return port;
             }
         }
-    }
 
-    public bool isActive()
-    {
-        return (this.jwt != null && this.user != null && Schedule != null);
-    }
-
-    private void Awake()
-    {
-        SimvaController.instance = this;
-        DontDestroyOnLoad(this.gameObject);
-    }
-
-    void Start () {
-
-        #if UNITY_WEBPLAYER || UNITY_WEBGL
-        #elif UNITY_ANDROID || UNITY_IPHONE
-        #else
-        SimpleJSON.JSONNode simvaconf = new SimpleJSON.JSONClass();
-
-        if (System.IO.File.Exists("simva.conf")) {
-            simvaconf = SimpleJSON.JSON.Parse(System.IO.File.ReadAllText("simva.conf"));
-            this.study = simvaconf["study"];
-            this.host = simvaconf["host"];
-            this.protocol = simvaconf["protocol"];
-            this.port = simvaconf["port"];
-        }
-        #endif
-
-        PlayerPrefs.SetString("simvahost", host);
-		PlayerPrefs.SetString("simvastudy", study);
-        PlayerPrefs.Save();
-    }
-
-    public void AddResponseManager(SimvaResponseManager manager)
-    {
-        responseManagers.Add(manager);
-    }
-
-    public void RemoveResponseManager(SimvaResponseManager manager)
-    {
-        responseManagers.Remove(manager);
-    }
-
-    public void AddLoadingManager(SimvaLoadingManager manager)
-    {
-        loadingManagers.Add(manager);
-    }
-
-    public void RemoveLoadingManager(SimvaLoadingManager manager)
-    {
-        loadingManagers.Remove(manager);
-    }
-
-    public void NotifyManagers(string message)
-    {
-        foreach(SimvaResponseManager responseManager in responseManagers)
+        public string Protocol
         {
-            responseManager.Notify(message);
-        }
-    }
-
-    public void NotifyLoading(bool state)
-    {
-        foreach (SimvaLoadingManager loadingManager in loadingManagers)
-        {
-            loadingManager.IsLoading(state);
-        }
-    }
-
-    public void InitUser()
-    {
-        this.StartCoroutine(LoginAndSchedule());
-    }
-
-    public string getCurrentActivityId()
-    {
-        if (schedule != null)
-        {
-            return schedule["next"].Value;
-        }
-        return null;
-    }
-
-    public JSONNode getActivity(string activityId)
-    {
-        if (schedule != null)
-        {
-            return schedule["activities"][activityId];
-        }
-        return null;
-    }
-
-    public void LaunchActivity(string activityId)
-    {
-        if(activityId == null)
-        {
-            SceneManager.LoadScene("_End");
-        }
-        else
-        {
-            JSONNode activity = getActivity(activityId);
-
-            if (activity != null)
+            get
             {
-                switch (activity["type"].Value)
+                return protocol;
+            }
+        }
+
+        public string URL
+        {
+            get
+            {
+                return protocol + "://" + host + ":" + port;
+            }
+        }
+
+        public JSONNode Schedule
+        {
+            get
+            {
+                return schedule;
+            }
+        }
+
+        public string Token
+        {
+            get
+            {
+                if (user != null)
                 {
-                    case "limesurvey":
-                        SceneManager.LoadScene("_Survey");
-                        break;
-                    case "activity":
-                    default:
-                        SceneManager.LoadScene("_Scene1");
-                        break;
+                    return user;
+                }
+                else if (PlayerPrefs.HasKey("username"))
+                {
+                    return PlayerPrefs.GetString("username");
+                }
+                else if (PlayerPrefs.HasKey("simvatoken"))
+                {
+                    return PlayerPrefs.GetString("simvatoken");
+                }
+                else
+                {
+                    return "";
                 }
             }
         }
-    }
 
-    public IEnumerator LoginAndSchedule()
-    {
-        NotifyLoading(true);
-        CoroutineWithData cd = new CoroutineWithData(this, Login());
-        yield return cd.coroutine;
-
-        Tuple<string, string> result = (Tuple<string, string>) cd.result;
-
-        if (result.Item1 != null)
+        string Study
         {
-            NotifyLoading(false);
-            NotifyManagers("Error");
-            JSONNode body = JSON.Parse(result.Item1);
-            if (body == null)
+            get
             {
-                NotifyManagers("Unable to connect");
+                if (this.study != null && this.study != "")
+                {
+                    return this.study;
+                }
+                else if (PlayerPrefs.HasKey("simvastudy"))
+                {
+                    return PlayerPrefs.GetString("simvastudy");
+                }
+                else
+                {
+                    return "";
+                }
+            }
+        }
+
+        public bool IsActive
+        {
+            get
+            {
+                return this.jwt != null && this.user != null && Schedule != null;
+            }
+        }
+
+        protected void Start()
+        {
+
+#if UNITY_WEBPLAYER || UNITY_WEBGL
+#elif UNITY_ANDROID || UNITY_IPHONE
+#else
+            SimpleJSON.JSONNode simvaconf = new SimpleJSON.JSONClass();
+
+            if (System.IO.File.Exists("simva.conf"))
+            {
+                simvaconf = SimpleJSON.JSON.Parse(System.IO.File.ReadAllText("simva.conf"));
+                this.study = simvaconf["study"];
+                this.host = simvaconf["host"];
+                this.protocol = simvaconf["protocol"];
+                this.port = simvaconf["port"];
+            }
+#endif
+
+            PlayerPrefs.SetString("simvahost", host);
+            PlayerPrefs.SetString("simvastudy", study);
+            PlayerPrefs.Save();
+        }
+
+        public void AddResponseManager(SimvaResponseManager manager)
+        {
+            if (manager)
+            {
+                // To make sure we only have one instance of a notify per manager
+                // We first remove (as it is ignored if not present)
+                responseListeners -= manager.Notify;
+                // Then we add it
+                responseListeners += manager.Notify;
+            }
+        }
+
+        public void RemoveResponseManager(SimvaResponseManager manager)
+        {
+            if (manager)
+            {
+                // If a delegate is not present the method gets ignored
+                responseListeners -= manager.Notify;
+            }
+        }
+
+        public void AddLoadingManager(SimvaLoadingManager manager)
+        {
+            if (manager)
+            {
+                // To make sure we only have one instance of a notify per manager
+                // We first remove (as it is ignored if not present)
+                loadingListeners -= manager.IsLoading;
+                // Then we add it
+                loadingListeners += manager.IsLoading;
+            }
+        }
+
+        public void RemoveLoadingManager(SimvaLoadingManager manager)
+        {
+            if (manager)
+            {
+                // If a delegate is not present the method gets ignored
+                loadingListeners += manager.IsLoading;
+            }
+        }
+
+        public void NotifyManagers(string message)
+        {
+            if(responseListeners != null)
+            {
+                responseListeners(message);
+            }
+        }
+
+        public void NotifyLoading(bool state)
+        {
+            if (loadingListeners != null)
+            {
+                loadingListeners(state);
+            }
+        }
+
+        public void InitUser()
+        {
+            this.StartCoroutine(LoginAndSchedule());
+        }
+
+        public string CurrentActivityId
+        {
+            get
+            {
+                if (schedule != null)
+                {
+                    return schedule["next"].Value;
+                }
+                return null;
+            }
+        }
+
+        public JSONNode GetActivity(string activityId)
+        {
+            if (schedule != null)
+            {
+                return schedule["activities"][activityId];
+            }
+            return null;
+        }
+
+        public void LaunchActivity(string activityId)
+        {
+            if (activityId == null)
+            {
+                SceneManager.LoadScene("_End");
             }
             else
             {
-                NotifyManagers(body["message"].Value);
+                JSONNode activity = GetActivity(activityId);
+
+                if (activity != null)
+                {
+                    switch (activity["type"].Value)
+                    {
+                        case "limesurvey":
+                            SceneManager.LoadScene("_Survey");
+                            break;
+                        case "activity":
+                        default:
+                            SceneManager.LoadScene("_Scene1");
+                            break;
+                    }
+                }
             }
         }
-        else
+
+        protected IEnumerator LoginAndSchedule()
         {
-            NotifyManagers("Login success");
-            JSONNode body = JSON.Parse(result.Item2);
-            this.jwt = body["token"];
-            this.user = Token;
+            NotifyLoading(true);
+            CoroutineWithResult cd = new CoroutineWithResult(this, Login());
+            yield return cd.Coroutine;
 
-            cd = new CoroutineWithData(this, getSchedule());
-            yield return cd.coroutine;
-
-            result = (Tuple<string, string>)cd.result;
+            Tuple<string, string> result = (Tuple<string, string>)cd.Result;
 
             if (result.Item1 != null)
             {
                 NotifyLoading(false);
-                Debug.Log("Getting Schedule Failed");
-                body = JSON.Parse(result.Item1);
-                NotifyManagers(body["message"].Value);
+                NotifyManagers("Error");
+                JSONNode body = JSON.Parse(result.Item1);
+                if (body == null)
+                {
+                    NotifyManagers("Unable to connect");
+                }
+                else
+                {
+                    NotifyManagers(body["message"].Value);
+                }
             }
             else
             {
-                body = JSON.Parse(result.Item2);
-                LaunchActivity(body["next"].Value);
+                NotifyManagers("Login success");
+                JSONNode body = JSON.Parse(result.Item2);
+                this.jwt = body["token"];
+                this.user = Token;
+
+                cd = new CoroutineWithResult(this, GetSchedule());
+                yield return cd.Coroutine;
+
+                result = (Tuple<string, string>)cd.Result;
+
+                if (result.Item1 != null)
+                {
+                    NotifyLoading(false);
+                    Debug.Log("Getting Schedule Failed");
+                    body = JSON.Parse(result.Item1);
+                    NotifyManagers(body["message"].Value);
+                }
+                else
+                {
+                    body = JSON.Parse(result.Item2);
+                    LaunchActivity(body["next"].Value);
+                }
             }
         }
-    }
 
-    public IEnumerator Login()
-    {
-        CoroutineWithData cd = new CoroutineWithData(this, Login(Token, Token));
-        yield return cd.coroutine;
-        yield return cd.result;
-    }
-
-    private IEnumerator Login(string username, string password)
-    {
-        JSONNode body = new JSONClass();
-
-        body.Add("username", username);
-        body.Add("password", password);
-
-        string bodystring = body.ToString();
-
-        UnityWebRequest www = new UnityWebRequest(this.URL + "/users/login", "POST");
-        byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(bodystring);
-        www.uploadHandler = (UploadHandler)new UploadHandlerRaw(bodyRaw);
-        www.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
-        www.SetRequestHeader("Content-Type", "application/json");
-        yield return www.SendWebRequest();
- 
-        if(www.isNetworkError) {
-            yield return new Tuple<string, string>("{\"message\": \"Unable to connect\"}", null);
+        public IEnumerator Login()
+        {
+            CoroutineWithResult cd = new CoroutineWithResult(this, Login(Token, Token));
+            yield return cd.Coroutine;
+            yield return cd.Result;
         }
-        else {
-            if(www.responseCode != 200)
+
+        public IEnumerator Login(string username, string password)
+        {
+            using (var request = PostJSON(this.URL + "/users/login", new JSONClass
+                {
+                    { "username", username },
+                    { "password", password }
+                }))
             {
-                yield return new Tuple<string, string>(www.downloadHandler.text, null);
-            }else
-            {
-                yield return new Tuple<string, string>(null, www.downloadHandler.text);
+                yield return ProcessWWW(request);
             }
         }
-    }
 
-    public IEnumerator getSchedule()
-    {
-        UnityWebRequest www = UnityWebRequest.Get(this.URL + "/studies/" + Study + "/schedule");
-        www.SetRequestHeader("Content-Type", "application/json");
-        www.SetRequestHeader("Authorization", "Bearer " + this.jwt);
-        yield return www.SendWebRequest();
-
-        if (www.isNetworkError)
+        public IEnumerator GetSchedule()
         {
-            yield return new Tuple<string, string>("{\"message\": \"Unable to connect\"}", null);
-        }
-        else
-        {
-            if (www.responseCode != 200)
+            using (var request = UnityWebRequest.Get(this.URL + "/studies/" + Study + "/schedule"))
             {
-                yield return new Tuple<string, string>(www.downloadHandler.text, null);
-            }
-            else
-            {
-                this.schedule = JSON.Parse(www.downloadHandler.text);
-                yield return new Tuple<string, string>(null, www.downloadHandler.text);
+                request.SetRequestHeader("Content-Type", "application/json");
+                request.SetRequestHeader("Authorization", "Bearer " + this.jwt);
+                yield return ProcessWWW(request);
             }
         }
-    }
 
-    public IEnumerator getTarget(string activityId)
-    {
-        UnityWebRequest www = UnityWebRequest.Get(this.URL + "/activities/" + activityId + "/target");
-        www.SetRequestHeader("Content-Type", "application/json");
-        www.SetRequestHeader("Authorization", "Bearer " + this.jwt);
-        yield return www.SendWebRequest();
-
-        if (www.isNetworkError)
+        public IEnumerator GetTarget(string activityId)
         {
-            yield return new Tuple<string, string>("{\"message\": \"Unable to connect\"}", null);
-        }
-        else
-        {
-            if (www.responseCode != 200)
+            using (var request = UnityWebRequest.Get(this.URL + "/activities/" + activityId + "/target"))
             {
-                yield return new Tuple<string, string>(www.downloadHandler.text, null);
-            }
-            else
-            {
-                yield return new Tuple<string, string>(null, www.downloadHandler.text);
+                request.SetRequestHeader("Content-Type", "application/json");
+                request.SetRequestHeader("Authorization", "Bearer " + this.jwt);
+                yield return ProcessWWW(request);
             }
         }
-    }
 
-    public IEnumerator getCompletion(string activityId)
-    {
-        UnityWebRequest www = UnityWebRequest.Get(this.URL + "/activities/" + activityId + "/completion");
-        www.SetRequestHeader("Content-Type", "application/json");
-        www.SetRequestHeader("Authorization", "Bearer " + this.jwt);
-        yield return www.SendWebRequest();
-
-        if (www.isNetworkError)
+        public IEnumerator GetCompletion(string activityId)
         {
-            yield return new Tuple<string, string>("{\"message\": \"Unable to connect\"}", null);
-        }
-        else
-        {
-            if (www.responseCode != 200)
+            using (var request = UnityWebRequest.Get(this.URL + "/activities/" + activityId + "/completion"))
             {
-                yield return new Tuple<string, string>(www.downloadHandler.text, null);
-            }
-            else
-            {
-                yield return new Tuple<string, string>(null, www.downloadHandler.text);
+                request.SetRequestHeader("Content-Type", "application/json");
+                request.SetRequestHeader("Authorization", "Bearer " + this.jwt);
+                yield return ProcessWWW(request);
             }
         }
-    }
 
-    public IEnumerator setResults(string activityId, string results, bool tofile)
-    {
-        JSONNode body = new JSONClass();
-        body.Add("result", results);
-        body.Add("tofile", new JSONData(tofile));
-        string bodystring = body.ToJSON(0);
-
-        UnityWebRequest www = new UnityWebRequest(this.URL + "/activities/" + activityId + "/result", "POST");
-        byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(bodystring);
-        www.uploadHandler = (UploadHandler)new UploadHandlerRaw(bodyRaw);
-        www.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
-
-        www.SetRequestHeader("Content-Type", "application/json");
-        www.SetRequestHeader("Authorization", "Bearer " + this.jwt);
-
-        yield return www.SendWebRequest();
-
-        if (www.isNetworkError)
+        public IEnumerator SetResults(string activityId, string results, bool tofile)
         {
-            yield return new Tuple<string, string>("{\"message\": \"Unable to connect\"}", null);
-        }
-        else
-        {
-            if (www.responseCode != 200)
+            using (var request = PostJSON(this.URL + "/activities/" + activityId + "/result", new JSONClass
+                {
+                    { "result", results },
+                    { "tofile", new JSONData(tofile) }
+                }))
             {
-                yield return new Tuple<string, string>(www.downloadHandler.text, null);
+                request.SetRequestHeader("Authorization", "Bearer " + this.jwt);
+                yield return ProcessWWW(request);
+            }
+        }
+
+        public IEnumerator SetCompletion(string activityId, bool completion)
+        {
+            using (var request = PostJSON(this.URL + "/activities/" + activityId + "/completion", new JSONClass
+                {
+                    { "status", new JSONData(completion) }
+                }))
+            {
+                request.SetRequestHeader("Authorization", "Bearer " + this.jwt);
+                yield return ProcessWWW(request);
+            }
+        }
+
+        private static UnityWebRequest PostJSON(string url, JSONClass json)
+        {
+
+            UnityWebRequest www = new UnityWebRequest(url, "POST")
+            {
+                uploadHandler = new UploadHandlerRaw(EncodeJSONBody(json)),
+                downloadHandler = new DownloadHandlerBuffer()
+            };
+
+            www.SetRequestHeader("Content-Type", "application/json");
+            return www;
+        }
+
+        private static byte[] EncodeJSONBody(JSONClass json)
+        {
+            return System.Text.Encoding.UTF8.GetBytes(json.ToString());
+        }
+
+
+        private IEnumerator ProcessWWW(UnityWebRequest www)
+        {
+            yield return www.SendWebRequest();
+
+            if (www.isNetworkError)
+            {
+                yield return new Tuple<string, string>("{\"message\": \"Unable to connect\"}", null);
             }
             else
             {
-                yield return new Tuple<string, string>(null, www.downloadHandler.text);
+                if (www.responseCode != 200)
+                {
+                    yield return new Tuple<string, string>(www.downloadHandler.text, null);
+                }
+                else
+                {
+                    yield return new Tuple<string, string>(null, www.downloadHandler.text);
+                }
             }
         }
-    }
 
-    public IEnumerator setCompletion(string activityId, bool completion)
-    {
-        JSONNode body = new JSONClass();
-        body.Add("status", new JSONData(completion));
-        string bodystring = body.ToString();
-
-        UnityWebRequest www = new UnityWebRequest(this.URL + "/activities/" + activityId + "/completion", "POST");
-        byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(bodystring);
-        www.uploadHandler = (UploadHandler)new UploadHandlerRaw(bodyRaw);
-        www.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
-
-        www.SetRequestHeader("Content-Type", "application/json");
-        www.SetRequestHeader("Authorization", "Bearer " + this.jwt);
-
-        yield return www.SendWebRequest();
-
-        if (www.isNetworkError)
+        internal class CoroutineWithResult
         {
-            yield return new Tuple<string, string>("{\"message\": \"Unable to connect\"}", null);
-        }
-        else
-        {
-            if (www.responseCode != 200)
+            public Coroutine Coroutine { get; private set; }
+            public object Result { get; private set; }
+            private readonly IEnumerator target;
+            public CoroutineWithResult(MonoBehaviour owner, IEnumerator target)
             {
-                yield return new Tuple<string, string>(www.downloadHandler.text, null);
+                this.target = target;
+                this.Coroutine = owner.StartCoroutine(Run());
             }
-            else
-            {
-                yield return new Tuple<string, string>(null, www.downloadHandler.text);
-            }
-        }
-    }
 
-    public class CoroutineWithData
-    {
-        public Coroutine coroutine { get; private set; }
-        public object result;
-        private IEnumerator target;
-        public CoroutineWithData(MonoBehaviour owner, IEnumerator target)
-        {
-            this.target = target;
-            this.coroutine = owner.StartCoroutine(Run());
-        }
-
-        private IEnumerator Run()
-        {
-            while (target.MoveNext())
+            private IEnumerator Run()
             {
-                result = target.Current;
-                yield return result;
+                while (target.MoveNext())
+                {
+                    Result = target.Current;
+                    yield return Result;
+                }
             }
         }
     }
