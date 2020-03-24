@@ -116,21 +116,41 @@ namespace uAdventure.Analytics
 
         protected void Start()
         {
+            var FileName = "simva.conf";
+            string contents = "";
 
+            // Platform dependent StreamingAssets Load https://docs.unity3d.com/Manual/StreamingAssets.html
 #if UNITY_WEBPLAYER || UNITY_WEBGL
-#elif UNITY_ANDROID || UNITY_IPHONE
+            WWW reader = new WWW(Application.streamingAssetsPath + "/" + FileName);
+#elif UNITY_ANDROID
+            WWW reader = new WWW("jar: file://" + Application.dataPath + "!/assets/" + FileName);
+#elif UNITY_IOS
+            var filePath = Path.Combine(Application.dataPath + "/Raw", FileName);
 #else
-            SimpleJSON.JSONNode simvaconf = new SimpleJSON.JSONClass();
+            var filePath = System.IO.Path.Combine(Application.streamingAssetsPath + "/", FileName);
+#endif
 
-            if (System.IO.File.Exists("simva.conf"))
+            // WebGL and Android have to use WWW to load from streaming assets
+#if UNITY_WEBPLAYER || UNITY_WEBGL || UNITY_ANDROID 
+            while (!reader.isDone) { }
+            if (string.IsNullOrEmpty(reader.error))
             {
-                simvaconf = SimpleJSON.JSON.Parse(System.IO.File.ReadAllText("simva.conf"));
+                contents = System.Text.Encoding.UTF8.GetString(reader.bytes);
+            }
+#else       // The others can read from System.IO            
+            if (System.IO.File.Exists(filePath))
+            {
+                contents = System.IO.File.ReadAllText(filePath);
+            }
+#endif
+            if (!string.IsNullOrEmpty(contents))
+            {
+                var simvaconf = SimpleJSON.JSON.Parse(contents);
                 this.study = simvaconf["study"];
                 this.host = simvaconf["host"];
                 this.protocol = simvaconf["protocol"];
                 this.port = simvaconf["port"];
             }
-#endif
 
             PlayerPrefs.SetString("simvahost", host);
             PlayerPrefs.SetString("simvastudy", study);
