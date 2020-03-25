@@ -342,6 +342,10 @@ namespace uAdventure.Analytics
                 request.SetRequestHeader("Content-Type", "application/json");
                 request.SetRequestHeader("Authorization", "Bearer " + this.jwt);
                 yield return ProcessWWW(request);
+                if(!request.isNetworkError && string.IsNullOrEmpty(request.error))
+                {
+                    schedule = JSON.Parse(request.downloadHandler.text);
+                }
             }
         }
 
