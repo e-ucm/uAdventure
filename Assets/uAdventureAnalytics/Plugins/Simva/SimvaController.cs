@@ -311,7 +311,6 @@ namespace uAdventure.Analytics
                 else
                 {
                     body = JSON.Parse(result.Item2);
-                    this.schedule = body;
                     LaunchActivity(body["next"].Value);
                 }
             }
