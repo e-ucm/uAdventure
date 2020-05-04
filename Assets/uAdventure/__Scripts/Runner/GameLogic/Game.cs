@@ -173,7 +173,10 @@ namespace uAdventure.Runner
         protected void Start()
         {
             started = true;
-            GameState.OnGameResume();
+            if (!Application.isEditor)
+            {
+                GameState.OnGameResume();
+            }
             gameExtensions.ForEach(g => g.OnAfterGameLoad());
             uAdventureRaycaster = FindObjectOfType<uAdventureRaycaster>();
             if (!uAdventureRaycaster)
@@ -401,6 +404,20 @@ namespace uAdventure.Runner
             gameExtensions.ForEach(g => g.Restart());
             RunTarget(GameState.CurrentTarget);
             uAdventureInputModule.LookingForTarget = null;
+        }
+
+        public void Exit()
+        {
+            var exit = true;
+            foreach(var gameExtension in gameExtensions)
+            {
+                exit &= gameExtension.OnGameFinished();
+            }
+
+            if (exit)
+            {
+                Application.Quit();
+            }
         }
 
         public bool ContinueEffectExecution()
