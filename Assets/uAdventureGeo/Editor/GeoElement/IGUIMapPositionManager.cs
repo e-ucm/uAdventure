@@ -1,6 +1,5 @@
 ﻿using System;
 using uAdventure.Editor;
-using UniRx;
 using UnityEngine;
 
 namespace uAdventure.Geo
@@ -8,7 +7,7 @@ namespace uAdventure.Geo
     /// <summary>
     /// GeoReferenceTransformManager interface for creating new positioning types
     /// </summary>
-    public interface IGuiMapPositionManager : IObserver<DataControl>
+    public interface IGuiMapPositionManager : UniRx.IObserver<DataControl>
     {
         Type ForType { get; }
 

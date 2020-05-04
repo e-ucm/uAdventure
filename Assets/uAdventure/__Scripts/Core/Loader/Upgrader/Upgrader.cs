@@ -95,10 +95,11 @@ namespace uAdventure.Core.XmlUpgrader
             var xmlText = resourceManager.getText(path);
             if (string.IsNullOrEmpty(xmlText))
             {
-                return -1;
+                return -1; 
             }
 
             var xmlDocument = new XmlDocument();
+            xmlDocument.XmlResolver = null;
             xmlDocument.LoadXml(xmlText);
 
             XmlElement root = xmlDocument.DocumentElement;

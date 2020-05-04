@@ -8,5 +8,6 @@ namespace uAdventure.Runner
         public abstract void OnGameReady();
         public abstract void OnAfterGameLoad();
         public abstract void OnBeforeGameSave();
+        public abstract bool OnGameFinished();
     }
 }

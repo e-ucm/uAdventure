@@ -20,7 +20,8 @@ namespace uAdventure.Editor
 
     public class AssetsController
     {
-        protected const string DIR_PREFIX = "Assets/uAdventure/Resources/CurrentGame";
+        protected const string UA_RESOURCES = "Assets/uAdventure/Resources/";
+        protected const string UA_EDITOR_RESOURCES = "Assets/uAdventure/Editor/Resources/";
         /**
          * Assessment files category.
          */
@@ -109,6 +110,8 @@ namespace uAdventure.Editor
         
         private static List<string> pathsToReimport;
 
+        public static string EditorResourcesPath { get { return UA_EDITOR_RESOURCES; } }
+
         /**
          * Static class. Private constructor.
          */
@@ -141,67 +144,33 @@ namespace uAdventure.Editor
         {
             DirectoryInfo projectDir = new DirectoryInfo(Controller.Instance.ProjectFolder);
             Debug.Log("CREATE: " + projectDir.FullName);
-            string[] folders = CategoryFolders();
-            for (int i = 0; i < folders.Length; i++)
+            var folders = new List<string>();
+            folders.AddRange(CategoryFolders());
+            folders.Add("assets/special/");
+            foreach(var folder in folders)
             {
-                projectDir.CreateSubdirectory(folders[i]);
-            }
-            projectDir.CreateSubdirectory("assets/special/");
-
-            // Copy eadventure.dtd, descriptor.dtd, assessment.dtd, adaptation.dtd
-            FileInfo descriptorDTD = new FileInfo(Path.Combine("Assets/uAdventure/Editor/Resources/" + EADVETURE_CONTENT_FOLDER, "descriptor.dtd"));
-            if (descriptorDTD.Exists)
-            {
-                descriptorDTD.CopyTo(Path.Combine(projectDir.FullName, "descriptor.dtd"), true);
-            }
-            else
-            {
-                Controller.Instance.ShowErrorDialog("Error.DTD.NotFound.Title", "Error.DTD.NotFound.Message" + " descriptor.dtd");
+                var subDirPath = Path.Combine(projectDir.FullName, folder);
+                if (!Directory.Exists(subDirPath))
+                {
+                    projectDir.CreateSubdirectory(folder);
+                }
             }
 
-            // eadventure.dtd
-            FileInfo eadventureDTD = new FileInfo(Path.Combine("Assets/uAdventure/Editor/Resources/" + EADVETURE_CONTENT_FOLDER, "eadventure.dtd"));
-            if (eadventureDTD.Exists)
-            {
-                eadventureDTD.CopyTo(Path.Combine(projectDir.FullName, "eadventure.dtd"), true);
-            }
-            else
-            {
-                Controller.Instance.ShowErrorDialog("Error.DTD.NotFound.Title", "Error.DTD.NotFound.Message" + " eadventure.dtd");
-            }
+            var dtds = new string[] { "descriptor.dtd", "eadventure.dtd", "assessment.dtd", "adaptation.dtd", "animation.dtd" };
+            var uAdventureContentFolder = UA_EDITOR_RESOURCES + EADVETURE_CONTENT_FOLDER;
 
-            // assessment.dtd
-            FileInfo assessmentDTD = new FileInfo("Assets/uAdventure/Editor/Resources/" + Path.Combine(EADVETURE_CONTENT_FOLDER, "assessment.dtd"));
-            if (assessmentDTD.Exists)
+            foreach(var dtd in dtds)
             {
-                assessmentDTD.CopyTo(Path.Combine(projectDir.FullName, "assessment.dtd"), true);
-            }
-            else
-            {
-                Controller.Instance.ShowErrorDialog("Error.DTD.NotFound.Title", "Error.DTD.NotFound.Message" + " assessment.dtd");
-            }
-
-
-            // adaptation.dtd
-            FileInfo adaptationDTD = new FileInfo(Path.Combine("Assets/uAdventure/Editor/Resources/" + EADVETURE_CONTENT_FOLDER, "adaptation.dtd"));
-            if (adaptationDTD.Exists)
-            {
-                adaptationDTD.CopyTo(Path.Combine(projectDir.FullName, "adaptation.dtd"), true);
-            }
-            else
-            {
-                Controller.Instance.ShowErrorDialog("Error.DTD.NotFound.Title", "Error.DTD.NotFound.Message" + " adaptation.dtd");
-            }
-
-            // animation.dtd
-            FileInfo animationDTD = new FileInfo(Path.Combine("Assets/uAdventure/Editor/Resources/" + EADVETURE_CONTENT_FOLDER, "animation.dtd"));
-            if (animationDTD.Exists)
-            {
-                animationDTD.CopyTo(Path.Combine(projectDir.FullName, "animation.dtd"), true);
-            }
-            else
-            {
-                Controller.Instance.ShowErrorDialog("Error.DTD.NotFound.Title", "Error.DTD.NotFound.Message" + " animation.dtd");
+                // Copy eadventure.dtd, descriptor.dtd, assessment.dtd, adaptation.dtd
+                FileInfo descriptorDTD = new FileInfo(Path.Combine(uAdventureContentFolder, dtd));
+                if (descriptorDTD.Exists)
+                {
+                    descriptorDTD.CopyTo(Path.Combine(projectDir.FullName, dtd), true);
+                }
+                else
+                {
+                    Controller.Instance.ShowErrorDialog("Error.DTD.NotFound.Title", "Error.DTD.NotFound.Message" + " " + dtd);
+                }
             }
         }
 
@@ -348,7 +317,7 @@ namespace uAdventure.Editor
         {
             string assetTypeDir = getCategoryFolder(assetsCategory);
 
-            var localPath = DIR_PREFIX + "/" + assetTypeDir;
+            var localPath = UA_RESOURCES + BASE_DIR + assetTypeDir;
             DirectoryInfo path = new DirectoryInfo(localPath);
             if (!Directory.Exists(path.FullName))
             {
@@ -360,7 +329,7 @@ namespace uAdventure.Editor
             string destinationPath = Path.Combine(path.FullName, nameOnly);
 
             var isSameAsDestiny = assetPath.Equals(destinationPath, StringComparison.InvariantCultureIgnoreCase);
-            var isLocalFile = assetPath.StartsWith(DIR_PREFIX);
+            var isLocalFile = assetPath.StartsWith(UA_RESOURCES + BASE_DIR);
 
             if (!isSameAsDestiny && !isLocalFile) // Avoid to copy the same origin to same destination files
             {
@@ -495,7 +464,7 @@ namespace uAdventure.Editor
                 // If it is not an animation, just delete the file
                 else
                 {
-                    var path = "Assets/uAdventure/CurrentGame/" + assetPath;
+                    var path = UA_RESOURCES + BASE_DIR + assetPath;
                     assetDeleted = AssetDatabase.DeleteAsset(path);
                 }
             }
@@ -582,7 +551,7 @@ namespace uAdventure.Editor
         {
             // Add the defaultBook
             var finalDest = Path.Combine(Controller.Instance.ProjectFolder, destination);
-            if (AssetDatabase.CopyAsset("Assets/uAdventure/Editor/Resources/" + uri, finalDest))
+            if (AssetDatabase.CopyAsset(UA_EDITOR_RESOURCES + uri, finalDest))
             {
                 pathsToReimport.Add(finalDest);
                 return true;

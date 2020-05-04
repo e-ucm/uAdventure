@@ -3,6 +3,8 @@ using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
 using uAdventure.Core;
+using System;
+using System.Linq;
 
 public class DropDown {
 
@@ -12,22 +14,18 @@ public class DropDown {
     public string Label;
     public List<string> Elements;
     
-    private Drop drop;
     private bool selected;
     private string nextValue;
 
     public DropDown(string label)
     {
         Label = label;
-        drop = ScriptableObject.CreateInstance<Drop>();
-        drop.OnOptionSelected = (index, option) =>
-        {
-            var os = drop.OnOptionSelected;
-            drop = ScriptableObject.CreateInstance<Drop>();
-            drop.OnOptionSelected = os;
-            nextValue = option;
-            selected = true;
-        };
+    }
+
+    private void OnOptionSelected(int index, string option)
+    {
+        nextValue = option;
+        selected = true;
     }
 
 
@@ -40,7 +38,8 @@ public class DropDown {
     public bool DoLayout(GUIStyle style)
     {
         // Creating Layout element
-        GUI.SetNextControlName(Label);
+        var id = GUIUtility.GetControlID(Label.GetHashCode(), FocusType.Keyboard);
+        GUI.SetNextControlName(id.ToString());
         if (style == null)
         {
             Value = EditorGUILayout.TextField(Label, Value);
@@ -64,20 +63,20 @@ public class DropDown {
         else
         {
             // If focused show
-            if (Event.current.type == EventType.Repaint && GUI.GetNameOfFocusedControl() == Label &&
+            if (Event.current.type == EventType.Repaint && GUI.GetNameOfFocusedControl() == id.ToString() &&
                 Elements != null && Elements.Count > 0)
             {
-                drop.Elements = Elements;
-                if (!drop.Showing)
+                if (!Drop.IsShowing(id))
                 {
-                    drop.ShowAt(addressRect);
+                    Drop.ShowAt(id, addressRect, Elements, OnOptionSelected);
                 }
-                drop.Repaint();
+                Drop.Update(id, Elements);
             }
 
-            if (GUI.GetNameOfFocusedControl() != Label && drop.Showing)
+            if (GUI.GetNameOfFocusedControl() != id.ToString() && Drop.IsShowing(id))
             {
-                drop.Showing = false;
+                Drop.Hide(id);
+                Drop.Update(id, Elements);
             }
         }
 
@@ -93,16 +92,74 @@ public class Drop : EditorWindow
     public delegate void OnOptionSelectedDelegate(int index, string option);
 
     public OnOptionSelectedDelegate OnOptionSelected;
+    private static Dictionary<int, Drop> s_Drop = new Dictionary<int, Drop>();
+    private static Dictionary<int, long> s_LastClosedTime = new Dictionary<int, long>();
+    private static Dictionary<int, bool> s_showing = new Dictionary<int, bool>();
 
     public List<string> Elements { get; set; }
 
-    public bool Showing { get; set; }
 
-    public void ShowAt(Rect rect)
+    public static bool ShowAt(int id, Rect rect, List<string> elements, OnOptionSelectedDelegate callback)
     {
-        this.position = new Rect(GUIUtility.GUIToScreenPoint(rect.position + new Vector2(0, rect.height)), new Vector2(rect.width, 200));
-        this.ShowPopup();
-        Showing = true;
+        if (!s_LastClosedTime.ContainsKey(id))
+        {
+            s_LastClosedTime[id] = 0;
+        }
+
+        long num = DateTime.Now.Ticks / 10000L;
+        if (num >= s_LastClosedTime[id] + 50L)
+        {
+            if (Event.current != null)
+            {
+                Event.current.Use();
+            }
+            if (!s_Drop.ContainsKey(id) || s_Drop[id] == null)
+            {
+                s_Drop[id] = ScriptableObject.CreateInstance<Drop>();
+            }
+
+            s_Drop[id].position = new Rect(GUIUtility.GUIToScreenPoint(rect.position + new Vector2(0, rect.height)), new Vector2(rect.width, 200));
+            s_Drop[id].OnOptionSelected += callback;
+            s_Drop[id].Elements = elements;
+            s_Drop[id].ShowPopup();
+            s_showing[id] = true;
+
+            return true;
+        }
+        return false;
+    }
+
+    public static void Update(int id, List<string> elements)
+    {
+        if(s_Drop[id] != null)
+        {
+            s_Drop[id].Elements = elements;
+            s_Drop[id].Repaint();
+        }
+    }
+
+    public static bool IsShowing(int id)
+    {
+        if (s_showing.ContainsKey(id))
+        {
+            return s_showing[id];
+        }
+        return false;
+    }
+
+    public static void Hide(int id)
+    {
+        if (s_showing.ContainsKey(id))
+        {
+            s_showing[id] = false;
+        }
+    }
+
+    protected void OnDisable()
+    {
+        var id = s_Drop.Where(kv => kv.Value == this).First().Key;
+        s_LastClosedTime[id] = DateTime.Now.Ticks / 10000L;
+        s_Drop[id] = null;
     }
 
     public void Awake()
@@ -112,7 +169,8 @@ public class Drop : EditorWindow
 
     public void OnGUI()
     {
-        if (!Showing)
+        var id = s_Drop.Where(kv => kv.Value == this).First().Key;
+        if (!IsShowing(id))
         {
             this.Close();
             return;
@@ -132,7 +190,7 @@ public class Drop : EditorWindow
                         OnOptionSelected(i, Elements[i]);
                     }
                     GUI.FocusControl(null);
-                    Showing = false;
+                    s_showing[id] = false;
                     this.Close();
                     break;
                 }
