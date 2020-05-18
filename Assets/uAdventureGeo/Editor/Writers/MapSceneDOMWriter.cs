@@ -5,6 +5,7 @@ using System.Linq;
 
 using uAdventure.Editor;
 using System.Xml;
+using System.Globalization;
 
 namespace uAdventure.Geo
 {
@@ -48,7 +49,7 @@ namespace uAdventure.Geo
             var mapElementNode = Writer.GetDoc().CreateElement("map-element");
             mapElementNode.SetAttribute("targetId", mapElement.getTargetId());
             mapElementNode.SetAttribute("layer", mapElement.Layer.ToString());
-            mapElementNode.SetAttribute("scale", mapElement.Scale.ToString());
+            mapElementNode.SetAttribute("scale", mapElement.Scale.ToString(CultureInfo.InvariantCulture));
             mapElementNode.SetAttribute("orientation", ((int)mapElement.Orientation).ToString());
             node.AppendChild(mapElementNode);
 
@@ -64,8 +65,15 @@ namespace uAdventure.Geo
                 foreach(var param in elemRef.TransformManagerDescriptor.ParameterDescription)
                 {
                     var paramElem = Writer.GetDoc().CreateElement("param");
-                    paramElem.SetAttribute("name", param.Key);
-                    paramElem.InnerText = elemRef.TransformManagerParameters[param.Key].ToString();
+                    paramElem.SetAttribute("name", param.Key); 
+                    if (elemRef.TransformManagerParameters[param.Key] is float)
+                    {
+                        paramElem.InnerText = ((float)elemRef.TransformManagerParameters[param.Key]).ToString(CultureInfo.InvariantCulture);
+                    }
+                    else
+                    {
+                        paramElem.InnerText = elemRef.TransformManagerParameters[param.Key].ToString();
+                    }
                     elemRefNode.AppendChild(paramElem);
                 }
             }

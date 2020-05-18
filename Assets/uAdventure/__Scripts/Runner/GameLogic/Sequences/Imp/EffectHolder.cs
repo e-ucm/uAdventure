@@ -58,28 +58,10 @@ namespace uAdventure.Runner
                     switch (effect.getType())
                     {
                         case EffectType.ACTIVATE:
-                            if (!waitForLoadPulse)
-                            {
-                                Game.Instance.GameState.SetFlag(((ActivateEffect)effect).getTargetId(), FlagCondition.FLAG_ACTIVE);
-                                waitForLoadPulse = true;
-                                forceWait = true;
-                            }
-                            else
-                            {
-                                waitForLoadPulse = false;
-                            }
+                            Game.Instance.GameState.SetFlag(((ActivateEffect)effect).getTargetId(), FlagCondition.FLAG_ACTIVE);
                             break;
                         case EffectType.DEACTIVATE:
-                            if (!waitForLoadPulse)
-                            {
-                                Game.Instance.GameState.SetFlag(((DeactivateEffect)effect).getTargetId(), FlagCondition.FLAG_INACTIVE);
-                                waitForLoadPulse = true;
-                                forceWait = true;
-                            }
-                            else
-                            {
-                                waitForLoadPulse = false;
-                            }
+                            Game.Instance.GameState.SetFlag(((DeactivateEffect)effect).getTargetId(), FlagCondition.FLAG_INACTIVE);
                             break;
                         case EffectType.SHOW_TEXT:
                             var showTextEffect = (ShowTextEffect)effect;
@@ -227,42 +209,15 @@ namespace uAdventure.Runner
                             break;
                         case EffectType.SET_VALUE:
                             SetValueEffect sve = (SetValueEffect)effect;
-                            if (!waitForLoadPulse)
-                            {
-                                Game.Instance.GameState.SetVariable(sve.getTargetId(), sve.getValue());
-                                waitForLoadPulse = true;
-                                forceWait = true;
-                            }
-                            else
-                            {
-                                waitForLoadPulse = false;
-                            }
+                            Game.Instance.GameState.SetVariable(sve.getTargetId(), sve.getValue());
                             break;
                         case EffectType.INCREMENT_VAR:
                             IncrementVarEffect ive = (IncrementVarEffect)effect;
-                            if (!waitForLoadPulse)
-                            {
-                                Game.Instance.GameState.SetVariable(ive.getTargetId(), Game.Instance.GameState.GetVariable(ive.getTargetId()) + ive.getIncrement());
-                                waitForLoadPulse = true;
-                                forceWait = true;
-                            }
-                            else
-                            {
-                                waitForLoadPulse = false;
-                            }
+                            Game.Instance.GameState.SetVariable(ive.getTargetId(), Game.Instance.GameState.GetVariable(ive.getTargetId()) + ive.getIncrement());
                             break;
                         case EffectType.DECREMENT_VAR:
                             DecrementVarEffect dve = (DecrementVarEffect)effect;
-                            if (!waitForLoadPulse)
-                            {
-                                Game.Instance.GameState.SetVariable(dve.getTargetId(), Game.Instance.GameState.GetVariable(dve.getTargetId()) - dve.getDecrement());
-                                waitForLoadPulse = true;
-                                forceWait = true;
-                            }
-                            else
-                            {
-                                waitForLoadPulse = false;
-                            }
+                            Game.Instance.GameState.SetVariable(dve.getTargetId(), Game.Instance.GameState.GetVariable(dve.getTargetId()) - dve.getDecrement());
                             break;
                         case EffectType.MACRO_REF:
                             runsOnce = false;

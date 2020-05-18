@@ -52,9 +52,26 @@ namespace uAdventure.Runner
                 return tmp;
             }
         }
+        protected virtual void Awake()
+        {
+            Game.Instance.GameState.OnConditionChanged += OnConditionChanged;
+        }
+
+        protected void OnDestroy()
+        {
+            if (Game.Instance)
+            {
+                Game.Instance.GameState.OnConditionChanged -= OnConditionChanged;
+            }
+        }
+
+        protected virtual void OnConditionChanged(string condition, int value)
+        {
+        }
 
         protected virtual void Start()
         {
+            OnConditionChanged(null, 0);
         }
 
         protected virtual void Update()

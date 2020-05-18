@@ -6,7 +6,7 @@ using System.Xml;
 using System.Linq;
 
 using uAdventure.Core;
-
+using System.Globalization;
 
 namespace uAdventure.Editor
 {
@@ -50,7 +50,7 @@ namespace uAdventure.Editor
                 sceneElement.SetAttribute("start", "no");
 
             sceneElement.SetAttribute("playerLayer", scene.getPlayerLayer().ToString());
-            sceneElement.SetAttribute("playerScale", scene.getPlayerScale().ToString());
+            sceneElement.SetAttribute("playerScale", scene.getPlayerScale().ToString(CultureInfo.InvariantCulture));
 
             sceneElement.SetAttribute("class", scene.getXApiClass());
             sceneElement.SetAttribute("type", scene.getXApiType());
@@ -106,7 +106,7 @@ namespace uAdventure.Editor
                     exitElement.SetAttribute("destinyX", exit.getDestinyX().ToString());
                     if (exit.getDestinyScale() >= 0)
                     {
-                        exitElement.SetAttribute("destinyScale", exit.getDestinyScale().ToString());
+                        exitElement.SetAttribute("destinyScale", exit.getDestinyScale().ToString(CultureInfo.InvariantCulture));
                     }
                     exitElement.SetAttribute("transitionType", exit.getTransitionType().ToString());
                     exitElement.SetAttribute("transitionTime", exit.getTransitionTime().ToString());
@@ -247,7 +247,7 @@ namespace uAdventure.Editor
                     itemReferenceElement.SetAttribute("idTarget", itemReference.getTargetId());
                     itemReferenceElement.SetAttribute("x", itemReference.getX().ToString());
                     itemReferenceElement.SetAttribute("y", itemReference.getY().ToString());
-                    itemReferenceElement.SetAttribute("scale", itemReference.Scale.ToString());
+                    itemReferenceElement.SetAttribute("scale", itemReference.Scale.ToString(CultureInfo.InvariantCulture));
                     if (itemReference.getLayer() != -1)
                         itemReferenceElement.SetAttribute("layer", itemReference.getLayer().ToString());
                     if (itemReference.getInfluenceArea().isExists())
@@ -298,7 +298,7 @@ namespace uAdventure.Editor
                     npcReferenceElement.SetAttribute("idTarget", characterReference.getTargetId());
                     npcReferenceElement.SetAttribute("x", characterReference.getX().ToString());
                     npcReferenceElement.SetAttribute("y", characterReference.getY().ToString());
-                    npcReferenceElement.SetAttribute("scale", characterReference.Scale.ToString());
+                    npcReferenceElement.SetAttribute("scale", characterReference.Scale.ToString(CultureInfo.InvariantCulture));
                     npcReferenceElement.SetAttribute("orientation", ((int)characterReference.Orientation).ToString());
                     if (characterReference.getLayer() != -1)
                         npcReferenceElement.SetAttribute("layer", characterReference.getLayer().ToString());
@@ -506,7 +506,7 @@ namespace uAdventure.Editor
                     atrezzoReferenceElement.SetAttribute("idTarget", atrezzoReference.getTargetId());
                     atrezzoReferenceElement.SetAttribute("x", atrezzoReference.getX().ToString());
                     atrezzoReferenceElement.SetAttribute("y", atrezzoReference.getY().ToString());
-                    atrezzoReferenceElement.SetAttribute("scale", atrezzoReference.Scale.ToString());
+                    atrezzoReferenceElement.SetAttribute("scale", atrezzoReference.Scale.ToString(CultureInfo.InvariantCulture));
                     if (atrezzoReference.getLayer() != -1)
                         atrezzoReferenceElement.SetAttribute("layer", atrezzoReference.getLayer().ToString());
 

@@ -83,9 +83,9 @@ namespace uAdventure.Editor
             /** ******* START WRITING THE DESCRIPTOR ********* */
             // Pick the main node for the descriptor
             XmlDeclaration declaration = doc.CreateXmlDeclaration("1.0", "UTF-8", "no");
-            XmlDocumentType typeDescriptor = doc.CreateDocumentType("game-descriptor", "SYSTEM", "descriptor.dtd", null);
+            //XmlDocumentType typeDescriptor = doc.CreateDocumentType("game-descriptor", "SYSTEM", "descriptor.dtd", null);
             doc.AppendChild(declaration);
-            doc.AppendChild(typeDescriptor);
+            //doc.AppendChild(typeDescriptor);
 
             if (!valid)
                 DOMWriterUtility.DOMWrite(doc, adventureData, new DescriptorDOMWriter.InvalidAdventureDataControlParam());
@@ -97,7 +97,7 @@ namespace uAdventure.Editor
 
             /** ******* START WRITING THE CHAPTERS ********* */
             // Write every chapter
-            XmlDocumentType typeChapter;
+            //XmlDocumentType typeChapter;
 
             int chapterIndex = 1;
             foreach (Chapter chapter in adventureData.getChapters())
@@ -105,9 +105,9 @@ namespace uAdventure.Editor
 
                 doc = new XmlDocument();
                 declaration = doc.CreateXmlDeclaration("1.0", "UTF-8", "no");
-                typeChapter = doc.CreateDocumentType("eAdventure", "SYSTEM", "eadventure.dtd", null);
+                //typeChapter = doc.CreateDocumentType("eAdventure", "SYSTEM", "eadventure.dtd", null);
                 doc.AppendChild(declaration);
-                doc.AppendChild(typeChapter);
+                //doc.AppendChild(typeChapter);
 
                 DOMWriterUtility.DOMWrite(doc, chapter);
 

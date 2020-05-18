@@ -1057,11 +1057,10 @@ namespace uAdventure.Editor
             {
                 // Folder can be created/used
                 // Does the folder exist?
-                DeleteDirectory(currentGamePath);
-                /*if (Directory.Exists(currentGamePath))
+                if (Directory.Exists(currentGamePath))
                 {
-                    // Clean the CurrentGame directory
-                }*/
+                    DeleteDirectory(currentGamePath);
+                }
                 Directory.CreateDirectory(currentGamePath);
                 create = true; 
             }

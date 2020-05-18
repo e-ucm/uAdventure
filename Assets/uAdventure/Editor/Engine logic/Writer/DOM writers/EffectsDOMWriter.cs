@@ -4,6 +4,7 @@ using System.Xml;
 
 using uAdventure.Core;
 using System;
+using System.Globalization;
 
 namespace uAdventure.Editor
 {
@@ -231,7 +232,7 @@ namespace uAdventure.Editor
                     effectElement.SetAttribute("transitionType", ((int)triggerSceneEffect.getTransitionType()).ToString());
                     if (triggerSceneEffect.DestinyScale >= 0)
                     {
-                        effectElement.SetAttribute("scale", triggerSceneEffect.DestinyScale.ToString());
+                        effectElement.SetAttribute("scale", triggerSceneEffect.DestinyScale.ToString(CultureInfo.InvariantCulture));
                     }
                     break;
                 case EffectType.WAIT_TIME:
@@ -255,7 +256,7 @@ namespace uAdventure.Editor
                     effectElement.SetAttribute("idTarget", moveObjectEffect.getTargetId());
                     effectElement.SetAttribute("x", moveObjectEffect.getX().ToString());
                     effectElement.SetAttribute("y", moveObjectEffect.getY().ToString());
-                    effectElement.SetAttribute("scale", moveObjectEffect.getScale().ToString());
+                    effectElement.SetAttribute("scale", moveObjectEffect.getScale().ToString(CultureInfo.InvariantCulture));
                     effectElement.SetAttribute("animated", (moveObjectEffect.isAnimated() ? "yes" : "no"));
                     effectElement.SetAttribute("translateSpeed", moveObjectEffect.getTranslateSpeed().ToString());
                     effectElement.SetAttribute("scaleSpeed", moveObjectEffect.getScaleSpeed().ToString());

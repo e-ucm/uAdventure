@@ -205,7 +205,6 @@ namespace uAdventure.Runner
             {
                 OnConditionChanged(name, state);
             }
-            Game.Instance.reRenderScene();
         }
 
         public int GetVariable(string var)
@@ -236,8 +235,6 @@ namespace uAdventure.Runner
             {
                 OnConditionChanged(name, value);
             }
-
-            Game.Instance.reRenderScene();
         }
 
         public Memory GetMemory(string id)
@@ -407,11 +404,20 @@ namespace uAdventure.Runner
         public void AddRemovedElement(string elementId)
         {
             removedElements.Add(elementId);
+            if (OnConditionChanged != null)
+            {
+                OnConditionChanged(null, 0);
+            }
         }
 
         public bool RemoveRemovedElement(string elementId)
         {
-            return removedElements.Remove(elementId);
+            var removed = removedElements.Remove(elementId);
+            if (OnConditionChanged != null)
+            {
+                OnConditionChanged(null, 0);
+            }
+            return removed;
         }
 
         // Inventory objects

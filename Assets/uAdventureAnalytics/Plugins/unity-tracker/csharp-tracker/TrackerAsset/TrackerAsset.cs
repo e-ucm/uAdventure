@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
-//#define ASYNC
-#undef ASYNC
+#define ASYNC
+//#undef ASYNC
 
 namespace AssetPackage
 {
@@ -1255,8 +1255,9 @@ namespace AssetPackage
 
                     if (append_storage != null)
                     {
-                        append_storage.Append(settings.BackupFile, data);
-                    }else if (storage != null)
+                        append_storage.Append(settings.LogFile, data);
+                    }
+                    else if (storage != null)
                     {
                         String previous = storage.Exists(settings.LogFile) ? storage.Load(settings.LogFile) : String.Empty;
 

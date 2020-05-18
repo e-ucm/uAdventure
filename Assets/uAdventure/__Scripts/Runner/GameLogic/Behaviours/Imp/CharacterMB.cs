@@ -16,6 +16,7 @@ namespace uAdventure.Runner
 
         protected override void Start()
         {
+            base.Start();
             representable = GetComponent<Representable>();
             representable.Play("stand");
         }

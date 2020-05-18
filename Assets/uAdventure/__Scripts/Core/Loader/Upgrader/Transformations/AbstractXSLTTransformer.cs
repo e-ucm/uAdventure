@@ -25,15 +25,21 @@ namespace uAdventure.Core.XmlUpgrader
         {
             StringWriter sw = new StringWriter();
             var xslAsset = Resources.Load<TextAsset>(XsltFile);
-            if(!xslAsset)
+            if(!xslAsset) 
             {
                 Debug.LogError("Coudn't load upgrader xsl file: " + XsltFile);
                 return null;
             }
+
             XmlReaderSettings settings = new XmlReaderSettings()
             {
+#if NET_4_6
+                DtdProcessing = DtdProcessing.Ignore
+#else
+                ValidationType = ValidationType.None,
                 ProhibitDtd = false
-            };
+#endif
+            }; 
             using (XmlReader xri = XmlReader.Create(new StringReader(input), settings))
             using (XmlReader xrt = XmlReader.Create(new StringReader(xslAsset.text), settings))
             using (XmlWriter xwo = XmlWriter.Create(sw))

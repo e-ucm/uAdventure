@@ -158,6 +158,8 @@ namespace uAdventure.Geo
 
             protected void OnGUI()
             {
+                this.wantsMouseMove = true;
+                this.wantsMouseEnterLeaveWindow = true;
                 EditorWindow.FocusWindowIfItsOpen<InputDialog>();
 
                 // Message 

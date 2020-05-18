@@ -58,6 +58,7 @@ namespace uAdventure.Runner
         private List<GameExtension> gameExtensions;
         private bool started;
         private int pulsing = 0;
+        private bool wasShowingInventory = false;
 
         public delegate void TargetChangedDelegate(IChapterTarget newTarget);
 
@@ -549,15 +550,6 @@ namespace uAdventure.Runner
             return runnerTarget;
         }
 
-        public void reRenderScene()
-        {
-            if (runnerTarget != null)
-            {
-                waitingRunTarget = true;
-                runnerTarget.RenderScene();
-            }
-        }
-
         public void SwitchToLastTarget()
         {
             GeneralScene scene = GameState.GetLastScene();
@@ -595,6 +587,7 @@ namespace uAdventure.Runner
             {
                 // Disable the UI interactivity
                 uAdventureRaycaster.Instance.enabled = false;
+                wasShowingInventory = InventoryManager.Instance.Show;
                 InventoryManager.Instance.Show = false;
 
                 // Enable blurred background
@@ -833,11 +826,11 @@ namespace uAdventure.Runner
 
         private void OptionSelected(int i)
         {
+            uAdventureRaycaster.Instance.enabled = true;
+            InventoryManager.Instance.Show = wasShowingInventory;
             doTimeOut = false;
             GameObject.Destroy(blur);
             guioptions.clicked(i);
-            uAdventureRaycaster.Instance.enabled = true;
-            InventoryManager.Instance.Show = true;
             Interacted();
         }
 

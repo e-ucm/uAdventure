@@ -38,6 +38,10 @@ namespace uAdventure.Runner
         public static readonly float PixelsSceneHeight = 600f;
         public static readonly float WorldSceneHeight = PixelsSceneHeight * PixelsToWorld;
 
+        // Music synchronization
+        private static AudioClip lastClip;
+        private static float lastSecond;
+
         // Properties
         [SerializeField]
         protected GameObject exitPrefab, activeAreaPrefab, characterPrefab, objectPrefab, atrezzoPrefab, playerPrefab;
@@ -47,8 +51,10 @@ namespace uAdventure.Runner
         private bool firstRender = true;
         private bool dragging;
         private Vector2 endDragSpeed;
+        private Texture2D backgroundTexture;
         private Dictionary<ScenePositioner, float> heights;
         private SortedList<ScenePositioner, float> finalOrder;
+        private bool wasDisabled;
 
         // Movements
         private float minZ;
@@ -112,6 +118,7 @@ namespace uAdventure.Runner
         {
             this.gameObject.name = SceneData.getId();
             this.transitionManager = GetComponent<TransitionManager>();
+            Game.Instance.GameState.OnConditionChanged += OnConditionChanged;
 
             RenderScene();
         }
@@ -179,15 +186,17 @@ namespace uAdventure.Runner
             // And then we apply the Z coordinate
             if (finalOrder.Any())
             {
-                var zStep = (maxZ - minZ) / finalOrder.Count;
+                var zStep = SectionSpace / finalOrder.Count;
                 var count = 0;
                 foreach (var kv in finalOrder)
                 {
-                    kv.Key.Z = minZ + zStep * count;
+                    kv.Key.Z = zStep * count;
                     count++;
                 }
             }
         }
+
+        protected float SectionSpace { get { return (maxZ - minZ) / (float)transform.childCount; } }
 
         protected void FixedUpdate()
         {
@@ -219,28 +228,79 @@ namespace uAdventure.Runner
 
         public void Destroy(float time, System.Action onDestroy)
         {
+            var audioSource = GetComponent<AudioSource>();
+            lastClip = null;
+            lastSecond = 0;
+            if (audioSource && audioSource.clip)
+            {
+                lastClip = audioSource.clip;
+                lastSecond = audioSource.time;
+            }
+
+            Game.Instance.GameState.OnConditionChanged -= OnConditionChanged;
             GameObject.DestroyImmediate(this.gameObject);
+
             onDestroy();
+        }
+
+        private void OnConditionChanged(string condition, int value)
+        {
+            switch (SceneData.getType())
+            {
+                default:
+                    // Nothing to do in the other scenes
+                    break;
+                case GeneralScene.GeneralSceneSceneType.SCENE:
+                    Scene scene = (Scene)SceneData;
+                    RefreshBackground(scene);
+                    if (!Game.Instance.GameState.IsFirstPerson && scene.isAllowPlayerLayer())
+                    {
+                        RefreshPlayerAndTrajectory(scene);
+                    }
+                    break;
+            }
         }
 
         private void LoadParents()
         {
-            this.background = this.transform.Find("Background");
-            if (background)
+            var childs = Enumerable.Range(0, this.transform.childCount).Select(n => transform.GetChild(n));
+            LoadZBoundaries();
+            var step = (maxZ - minZ) / ((int)childs.Count());
+
+            for(int i = 0; i < transform.childCount; i++)
             {
-                this.transitionManager.UseMaterial(background.GetComponent<MeshRenderer>().material);
+                var child = transform.GetChild(i);
+                child.transform.localPosition = new Vector3(child.transform.localPosition.x, child.transform.localPosition.y, minZ + step * i);
+                switch (child.name)
+                {
+                    case "Background":
+                        this.background = child;
+                        if (background)
+                        {
+                            this.transitionManager.UseMaterial(background.GetComponent<MeshRenderer>().material);
+                        }
+                        break;
+                    case "Foreground":
+                        this.foreground = child;
+                        break;
+                    case "Exits":
+                        this.exitsHolder = child;
+                        break;
+                    case "ActiveAreas":
+                        this.activeAreasHolder = child;
+                        break;
+                    case "References":
+                        this.referencesHolder = child;
+                        break;
+                }
             }
-            this.foreground = this.transform.Find("Foreground");
-            this.exitsHolder = this.transform.Find("Exits");
-            this.activeAreasHolder = this.transform.Find("ActiveAreas");
-            this.referencesHolder = this.transform.Find("References");
         }
 
         private void LoadZBoundaries()
         {
             // Space for references goes from background to the references holder
-            minZ = 1; 
-            maxZ = -1; 
+            minZ = 10; 
+            maxZ = 0; 
         }
         
         public static Vector3 ToWorldSize(Vector2 size)
@@ -307,33 +367,7 @@ namespace uAdventure.Runner
                 case GeneralScene.GeneralSceneSceneType.SCENE:
                     Scene scene = (Scene)SceneData;
                     InventoryManager.Instance.Show = !SceneData.HideInventory;
-                    Texture2D backgroundTexture = null;
-                    foreach (ResourcesUni sr in scene.getResources())
-                    {
-                        if (ConditionChecker.check(sr.getConditions()))
-                        {
-                            backgroundTexture = Game.Instance.ResourceManager.getImage(sr.getAssetPath(Scene.RESOURCE_TYPE_BACKGROUND));
-                            SetBackground(backgroundTexture);
-
-                            var foregroundPath = sr.getAssetPath(Scene.RESOURCE_TYPE_FOREGROUND);
-                            if (!string.IsNullOrEmpty(foregroundPath))
-                            {
-                                Texture2D foregroundTexture = Game.Instance.ResourceManager.getImage(foregroundPath);
-
-                                foreground.GetComponent<Renderer>().material.SetTexture("_MainTex", backgroundTexture);
-                                foreground.GetComponent<Renderer>().material.SetTexture("_AlphaTex", foregroundTexture);
-
-                                foreground.localScale = background.localScale;
-                                var foreGroundPos = background.localPosition;
-                                foreGroundPos.z = 1;
-                                foreground.localPosition = foreGroundPos;
-                            }
-
-                            LoadBackgroundMusic(sr);
-
-                            break;
-                        }
-                    }
+                    RefreshBackground(scene);
 
                     LoadZBoundaries();
                     //###################### REFERENCES ######################
@@ -341,68 +375,37 @@ namespace uAdventure.Runner
                     // Characters
 
                     foreach (var context in Game.Instance.GameState
-                        .GetElementReferences(scene.getId())
-                        .Where(tc => !tc.IsRemoved())
-                        .Checked())
+                        .GetElementReferences(scene.getId()))
                     {
                         InstanceElement(context);
                     }
+                    // The references are ordered in lateupdate
 
                     //###################### ACTIVEAREAS ######################
                     DeleteChilds(activeAreasHolder);
 
-                    foreach (var activeArea in scene.getActiveAreas().NotRemoved()
-                        .Where(a => ConditionChecker.check(a.getConditions())))
+                    foreach (var activeArea in scene.getActiveAreas())
                     {
                         InstanceRectangle<ActiveArea>(activeArea);
                     }
 
+                    OrderElementsZ(activeAreasHolder, SectionSpace);
+
                     //###################### EXITS ######################
                     DeleteChilds(exitsHolder);
 
-                    foreach (var exit in scene.getExits()
-                        .Where(e => e.isHasNotEffects() || ConditionChecker.check(e.getConditions())))
+                    foreach (var exit in scene.getExits())
                     {
                         InstanceRectangle<Exit>(exit);
                     }
 
+                    OrderElementsZ(exitsHolder, SectionSpace);
 
+
+                    //###################### THIRD PERSON ######################
                     if (!Game.Instance.GameState.IsFirstPerson && scene.isAllowPlayerLayer())
                     {
-                        var playerContext = Game.Instance.GameState.PlayerContext;
-
-                        //###################### BARRIERS ######################
-                        var barriers = scene.getBarriers().FindAll(b => ConditionChecker.check(b.getConditions())).ToArray();
-
-                        var trajectory = scene.getTrajectory();
-                        if (trajectory == null)
-                        {
-                            barriers = barriers.ToList().ConvertAll(b => {
-                                Barrier r = b.Clone() as Barrier;
-                                r.setValues(r.getX(), 0, r.getWidth(), backgroundTexture.height);
-                                return r;
-                            }).ToArray();
-
-                            trajectory = new Trajectory();
-                            var width = backgroundTexture ? backgroundTexture.width : Screen.width;
-                            trajectory.addNode("leftSide", 0, playerContext.getY(), playerContext.Scale);
-                            trajectory.addNode("rightSide", width, playerContext.getY(), playerContext.Scale);
-                            trajectory.addSide("leftSide", "rightSide", width);
-                        }
-
-                        trajectoryHandler = new TrajectoryHandler(TrajectoryHandler.CreateBlockedTrajectory(trajectory, barriers));
-
-                        Representable player = GameObject.Instantiate(playerPrefab, referencesHolder).GetComponent<Representable>();
-                        player.Element = Game.Instance.GameState.Player;
-                        player.Context = playerContext;
-
-                        var scenePositioner = player.gameObject.AddComponent<ScenePositioner>();
-                        scenePositioner.Scene = this;
-                        scenePositioner.Representable = player;
-                        scenePositioner.Context = playerContext;
-                        // Force the start
-                        player.SendMessage("Start");
-                        
+                        RefreshPlayerAndTrajectory(scene);
                         ready = true;
                     }
                     else
@@ -439,6 +442,86 @@ namespace uAdventure.Runner
             firstRender = false;
         }
 
+        private void RefreshPlayerAndTrajectory(Scene scene)
+        {
+            var playerContext = Game.Instance.GameState.PlayerContext;
+
+            //###################### BARRIERS ######################
+            var barriers = scene.getBarriers().FindAll(b => ConditionChecker.check(b.getConditions())).ToArray();
+
+            var trajectory = scene.getTrajectory();
+            if (trajectory == null)
+            {
+                barriers = barriers.ToList().ConvertAll(b =>
+                {
+                    Barrier r = b.Clone() as Barrier;
+                    r.setValues(r.getX(), 0, r.getWidth(), backgroundTexture.height);
+                    return r;
+                }).ToArray();
+
+                trajectory = new Trajectory();
+                var width = backgroundTexture ? backgroundTexture.width : Screen.width;
+                trajectory.addNode("leftSide", 0, playerContext.getY(), playerContext.Scale);
+                trajectory.addNode("rightSide", width, playerContext.getY(), playerContext.Scale);
+                trajectory.addSide("leftSide", "rightSide", width);
+            }
+
+            trajectoryHandler = new TrajectoryHandler(TrajectoryHandler.CreateBlockedTrajectory(trajectory, barriers));
+
+            Representable player = GameObject.Instantiate(playerPrefab, referencesHolder).GetComponent<Representable>();
+            player.Element = Game.Instance.GameState.Player;
+            player.Context = playerContext;
+
+            var scenePositioner = player.gameObject.AddComponent<ScenePositioner>();
+            scenePositioner.Scene = this;
+            scenePositioner.Representable = player;
+            scenePositioner.Context = playerContext;
+            // Force the start
+            player.SendMessage("Start");
+        }
+
+        private void RefreshBackground(Scene scene)
+        {
+            backgroundTexture = null;
+            foreach (ResourcesUni sr in scene.getResources())
+            {
+                if (ConditionChecker.check(sr.getConditions()))
+                {
+                    backgroundTexture = Game.Instance.ResourceManager.getImage(sr.getAssetPath(Scene.RESOURCE_TYPE_BACKGROUND));
+                    SetBackground(backgroundTexture);
+
+                    var foregroundPath = sr.getAssetPath(Scene.RESOURCE_TYPE_FOREGROUND);
+                    if (!string.IsNullOrEmpty(foregroundPath))
+                    {
+                        Texture2D foregroundTexture = Game.Instance.ResourceManager.getImage(foregroundPath);
+
+                        foreground.GetComponent<Renderer>().material.SetTexture("_MainTex", backgroundTexture);
+                        foreground.GetComponent<Renderer>().material.SetTexture("_AlphaTex", foregroundTexture);
+
+                        foreground.localScale = background.localScale;
+                        var foreGroundPos = background.localPosition;
+                        foreGroundPos.z = 1;
+                        foreground.localPosition = foreGroundPos;
+                    }
+
+                    LoadBackgroundMusic(sr);
+
+                    break;
+                }
+            }
+        }
+
+        private void OrderElementsZ(Transform holder, float sectionSpace)
+        {
+            var space = sectionSpace / holder.childCount;
+            for (int i = 0; i < holder.childCount; i++)
+            {
+                var t = holder.GetChild(i).transform;
+                var p = t.localPosition;
+                t.localPosition = new Vector3(p.x, p.y, space * i);
+            }
+        }
+
         private void LoadBackgroundMusic(ResourcesUni sr)
         {
             var musicPath = sr.getAssetPath(Scene.RESOURCE_TYPE_MUSIC);
@@ -446,9 +529,16 @@ namespace uAdventure.Runner
             {
                 AudioClip audioClip = Game.Instance.ResourceManager.getAudio(musicPath);
                 var audioSource = GetComponent<AudioSource>();
-                audioSource.clip = audioClip;
-                audioSource.loop = true;
-                audioSource.Play();
+                if(audioSource.clip != audioClip)
+                {
+                    audioSource.clip = audioClip;
+                    audioSource.loop = true;
+                    if(lastClip == audioClip)
+                    {
+                        audioSource.time = lastSecond;
+                    }
+                    audioSource.Play();
+                }
             }
         }
 
@@ -463,13 +553,13 @@ namespace uAdventure.Runner
             }
         }
 
-        private void InstanceElement(ElementReference context)
+        private GameObject InstanceElement(ElementReference context)
         {
             Element element = Game.Instance.GameState.FindElement<Element>(context.getTargetId());
             if(element == null)
             {
                 Debug.LogError("Unable to find target element: " + context.getTargetId());
-                return;
+                return null;
             }
 
             GameObject basePrefab;
@@ -491,7 +581,7 @@ namespace uAdventure.Runner
             }
             else
             {
-                return;
+                return null;
             }
 
             GameObject ret = Instantiate(basePrefab, parent);
@@ -503,13 +593,15 @@ namespace uAdventure.Runner
             scenePositioner.Scene = this;
             scenePositioner.Context = context;
             scenePositioner.Representable = representable;
+
+            return ret;
         }
 
-        private void InstanceRectangle<T>(Rectangle context) where T : Rectangle
+        private GameObject InstanceRectangle<T>(Rectangle context) where T : Rectangle
         {
             if (context == null)
             {
-                return;
+                return null;
             }
 
             GameObject basePrefab;
@@ -520,13 +612,14 @@ namespace uAdventure.Runner
                 basePrefab = activeAreaPrefab;
                 parent = activeAreasHolder;
             }
-            else if(typeof(T) == typeof(Exit))
+            else if (typeof(T) == typeof(Exit))
             {
                 basePrefab = exitPrefab;
                 parent = exitsHolder;
-            }else
+            }
+            else
             {
-                return;
+                return null;
             }
 
             GameObject ret = GameObject.Instantiate(basePrefab, parent);
@@ -540,6 +633,8 @@ namespace uAdventure.Runner
             // ActiveArea pivot starts from top-left corner (Y = 1, X = 0)
             trans.localPosition = ToWorldPosition(tmpPos, tmpSize, new Vector2(0, 1f), 0);
             trans.localScale = ToWorldSize(tmpSize);
+
+            return ret;
         }
 
         public bool canBeInteracted()
@@ -580,7 +675,7 @@ namespace uAdventure.Runner
 
         }
 
-        private bool wasDisabled;
+
         private void SetSlide(int i)
         {
             if (slides != null && i < slides.frames.Count)

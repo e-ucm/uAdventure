@@ -30,7 +30,7 @@ namespace AssetPackage
 
     public class UnityBridge : IBridge, IDataStorage, IAppend, IWebServiceRequest, ILog
     {
-		readonly String StorageDir = Application.persistentDataPath;
+		readonly String StorageDir = Application.temporaryCachePath;
         /// <summary>
         /// Initializes a new instance of the asset_proof_of_concept_demo_CSharp.Bridge class.
         /// </summary>

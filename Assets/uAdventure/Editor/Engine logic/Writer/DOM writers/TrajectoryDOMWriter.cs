@@ -5,6 +5,7 @@ using System.Collections;
 using System.Xml;
 
 using uAdventure.Core;
+using System.Globalization;
 
 namespace uAdventure.Editor
 {
@@ -33,7 +34,7 @@ namespace uAdventure.Editor
                 nodeElement.SetAttribute("id", node.getID());
                 nodeElement.SetAttribute("x", node.getX().ToString());
                 nodeElement.SetAttribute("y", node.getY().ToString());
-                nodeElement.SetAttribute("scale", node.getScale().ToString());
+                nodeElement.SetAttribute("scale", node.getScale().ToString(CultureInfo.InvariantCulture));
                 xmlNode.AppendChild(nodeElement);
             }
 

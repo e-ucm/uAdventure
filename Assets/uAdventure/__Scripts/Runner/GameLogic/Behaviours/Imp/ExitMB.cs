@@ -12,10 +12,33 @@ namespace uAdventure.Runner
     {
         System.StringComparison IgnoreCase = System.StringComparison.InvariantCultureIgnoreCase;
         private Area area;
+        private Exit exit;
+
+        protected void Awake()
+        {
+            Game.Instance.GameState.OnConditionChanged += OnConditionChanged;
+        }
 
         protected void Start()
         {
             area = GetComponent<Area>();
+            exit = area.Element as Exit;
+            OnConditionChanged(null, 0);
+        }
+
+        private void OnConditionChanged(string name, int value)
+        {
+            area = GetComponent<Area>();
+            exit = area.Element as Exit;
+            gameObject.SetActive(exit.isHasNotEffects() || ConditionChecker.check(exit.getConditions()));
+        }
+
+        protected void OnDestroy()
+        {
+            if (Game.Instance)
+            {
+                Game.Instance.GameState.OnConditionChanged -= OnConditionChanged;
+            }
         }
 
         private EffectHolder GetExitEffects(out bool exited)

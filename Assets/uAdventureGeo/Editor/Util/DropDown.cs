@@ -39,6 +39,19 @@ public class DropDown {
     {
         // Creating Layout element
         var id = GUIUtility.GetControlID(Label.GetHashCode(), FocusType.Keyboard);
+        if(Event.current.type == EventType.Used)
+        {
+            if(Drop.IsShowing(id))
+            {
+                Drop.Hide(id);
+                Drop.Update(id, Elements);
+            }
+            if(GUI.GetNameOfFocusedControl() == id.ToString())
+            {
+                GUI.FocusControl(null);
+            }
+        }
+        
         GUI.SetNextControlName(id.ToString());
         if (style == null)
         {
@@ -63,7 +76,7 @@ public class DropDown {
         else
         {
             // If focused show
-            if (Event.current.type == EventType.Repaint && GUI.GetNameOfFocusedControl() == id.ToString() &&
+            if ((Event.current.type == EventType.Repaint || Event.current.type == EventType.MouseMove) && GUI.GetNameOfFocusedControl() == id.ToString() &&
                 Elements != null && Elements.Count > 0)
             {
                 if (!Drop.IsShowing(id))
@@ -73,10 +86,11 @@ public class DropDown {
                 Drop.Update(id, Elements);
             }
 
-            if (GUI.GetNameOfFocusedControl() != id.ToString() && Drop.IsShowing(id))
+            if (GUI.GetNameOfFocusedControl() != id.ToString() && Drop.IsShowing(id) || (Event.current.type == EventType.MouseDown && !addressRect.Contains(Event.current.mousePosition)))
             {
                 Drop.Hide(id);
                 Drop.Update(id, Elements);
+                GUI.FocusControl(null);
             }
         }
 
@@ -95,6 +109,7 @@ public class Drop : EditorWindow
     private static Dictionary<int, Drop> s_Drop = new Dictionary<int, Drop>();
     private static Dictionary<int, long> s_LastClosedTime = new Dictionary<int, long>();
     private static Dictionary<int, bool> s_showing = new Dictionary<int, bool>();
+    private int id;
 
     public List<string> Elements { get; set; }
 
@@ -109,7 +124,7 @@ public class Drop : EditorWindow
         long num = DateTime.Now.Ticks / 10000L;
         if (num >= s_LastClosedTime[id] + 50L)
         {
-            if (Event.current != null)
+            if (Event.current != null && Event.current.type != EventType.Repaint && Event.current.type != EventType.Layout)
             {
                 Event.current.Use();
             }
@@ -117,7 +132,7 @@ public class Drop : EditorWindow
             {
                 s_Drop[id] = ScriptableObject.CreateInstance<Drop>();
             }
-
+            s_Drop[id].id = id;
             s_Drop[id].position = new Rect(GUIUtility.GUIToScreenPoint(rect.position + new Vector2(0, rect.height)), new Vector2(rect.width, 200));
             s_Drop[id].OnOptionSelected += callback;
             s_Drop[id].Elements = elements;
@@ -131,7 +146,7 @@ public class Drop : EditorWindow
 
     public static void Update(int id, List<string> elements)
     {
-        if(s_Drop[id] != null)
+        if(s_Drop.ContainsKey(id) && s_Drop[id] != null)
         {
             s_Drop[id].Elements = elements;
             s_Drop[id].Repaint();
@@ -157,7 +172,6 @@ public class Drop : EditorWindow
 
     protected void OnDisable()
     {
-        var id = s_Drop.Where(kv => kv.Value == this).First().Key;
         s_LastClosedTime[id] = DateTime.Now.Ticks / 10000L;
         s_Drop[id] = null;
     }
@@ -169,7 +183,7 @@ public class Drop : EditorWindow
 
     public void OnGUI()
     {
-        var id = s_Drop.Where(kv => kv.Value == this).First().Key;
+        this.wantsMouseMove = true;
         if (!IsShowing(id))
         {
             this.Close();
@@ -180,7 +194,7 @@ public class Drop : EditorWindow
         using (new GUIUtil.SkinScope(dropdownskin))
         using (var scroll = new GUILayout.ScrollViewScope(scrollPos, false, false, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true)))
         {
-            scrollPos = scroll.scrollPosition;
+            scrollPos = scroll.scrollPosition; 
             for (int i = 0; i < Elements.Count; i++)
             {
                 if (GUILayout.Button(Elements[i]))
@@ -196,5 +210,6 @@ public class Drop : EditorWindow
                 }
             }
         }
+        this.Repaint();
     }
 }
