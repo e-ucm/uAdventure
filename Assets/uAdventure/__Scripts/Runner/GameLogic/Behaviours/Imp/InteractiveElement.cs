@@ -52,9 +52,26 @@ namespace uAdventure.Runner
                 return tmp;
             }
         }
+        protected virtual void Awake()
+        {
+            Game.Instance.GameState.OnConditionChanged += OnConditionChanged;
+        }
+
+        protected void OnDestroy()
+        {
+            if (Game.Instance)
+            {
+                Game.Instance.GameState.OnConditionChanged -= OnConditionChanged;
+            }
+        }
+
+        protected virtual void OnConditionChanged(string condition, int value)
+        {
+        }
 
         protected virtual void Start()
         {
+            OnConditionChanged(null, 0);
         }
 
         protected virtual void Update()
@@ -146,9 +163,9 @@ namespace uAdventure.Runner
                 return;
             }
 
-            var dragActions = GetDistinctInteractiveActionsOfType(Action.DRAG_TO);
+            targetActions = GetDistinctInteractiveActionsOfType(Action.DRAG_TO);
 
-            if (dragActions.Any())
+            if (targetActions.Any())
             {
                 data.Use();
             }

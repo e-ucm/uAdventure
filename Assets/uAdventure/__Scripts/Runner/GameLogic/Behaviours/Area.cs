@@ -83,7 +83,7 @@ namespace uAdventure.Runner
 
                 foreach (Vector2 v in this.element.getPoints())
                 {
-                    contour[i].Position = new LibTessDotNet.Vec3 { X = v.x / 10f - minx, Y = 60 - v.y / 10f - miny, Z = this.transform.position.z };
+                    contour[i].Position = new LibTessDotNet.Vec3 { X = v.x / 10f - minx, Y = 60 - v.y / 10f - miny, Z = 0 };
                     i++;
                 }
 

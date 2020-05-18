@@ -14,12 +14,14 @@ namespace uAdventure.Editor
         public static ConditionEditorWindow s_ConditionEditor;
         private static long s_LastClosedTime;
 
-        private ColumnList variablesAndFlagsList;
-        private VarFlagSummary varFlagSummary;
-        private string filter;
         private Vector2 scroll;
 
         private static Conditions lastDestroyConditions;
+
+        public Conditions Conditions { get; set; }
+
+        private static bool stylesInited = false;
+        private static GUIStyle closeStyle, collapseStyle, conditionStyle, eitherConditionStyle;
 
         internal static bool ShowAtPosition(ConditionsController con, Rect buttonRect)
         {
@@ -77,11 +79,6 @@ namespace uAdventure.Editor
             Vector2 windowSize = new Vector2(300f, y);
             base.ShowAsDropDown(buttonRect, windowSize);
         }
-
-        public Conditions Conditions { get; set; }
-
-		private static bool stylesInited = false;
-		private static GUIStyle closeStyle, collapseStyle, conditionStyle, eitherConditionStyle;
 
 		static void InitStyles(){
 			if (!stylesInited) {

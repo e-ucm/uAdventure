@@ -12,8 +12,10 @@ namespace uAdventure.Runner
 
         private Representable representable;
 
+
         protected override void Start()
         {
+            base.Start();
             representable = GetComponent<Representable>();
             representable.SetTexture(Item.RESOURCE_TYPE_IMAGE);
         }

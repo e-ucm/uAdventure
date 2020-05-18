@@ -25,6 +25,7 @@ namespace uAdventure.Editor
      * operations and data to control the editor.
      */
 
+    [InitializeOnLoad]
     public class Controller
     {
         /**
@@ -450,11 +451,25 @@ namespace uAdventure.Editor
          */
         private string languageFile;
 
-        private ChapterListDataControl chaptersController = new ChapterListDataControl();
+        private static ChapterListDataControl chaptersController = new ChapterListDataControl();
 
-        private Controller()
+        static Controller()
         {
             chaptersController = new ChapterListDataControl();
+            if (!File.Exists(ReleaseFolders.configFileEditorRelativePath()))
+            {
+                var protoConfig = Path.Combine(AssetsController.EditorResourcesPath + AssetsController.EADVETURE_CONTENT_FOLDER, ReleaseFolders.CONFIG_FILE_PATH_EDITOR);
+                File.Copy(protoConfig, ReleaseFolders.configFileEditorRelativePath());
+                UnityEditor.AssetDatabase.ImportAsset(ReleaseFolders.configFileEditorRelativePath());
+            }
+
+            ConfigData.LoadFromXML(ReleaseFolders.configFileEditorRelativePath());
+            if (string.IsNullOrEmpty(ConfigData.GetExtraProperties().GetProperty("shownWelcome")))
+            {
+                OpenWelcomeWindow();
+                ConfigData.GetExtraProperties().SetProperty("shownWelcome", "yes");
+                ConfigData.StoreToXML();
+            }
         }
 
         // ABSOLUTE?
@@ -482,6 +497,14 @@ namespace uAdventure.Editor
                 return controllerInstance;
             }
         }
+
+        public class Startup
+        {
+            static Startup()
+            {
+            }
+        }
+
 
         public static void ResetInstance()
         {
@@ -1034,11 +1057,10 @@ namespace uAdventure.Editor
             {
                 // Folder can be created/used
                 // Does the folder exist?
-                DeleteDirectory(currentGamePath);
-                /*if (Directory.Exists(currentGamePath))
+                if (Directory.Exists(currentGamePath))
                 {
-                    // Clean the CurrentGame directory
-                }*/
+                    DeleteDirectory(currentGamePath);
+                }
                 Directory.CreateDirectory(currentGamePath);
                 create = true; 
             }
@@ -1116,6 +1138,13 @@ namespace uAdventure.Editor
         [UnityEditor.MenuItem("uAdventure/Configure Layout", priority = 4)]
         public static void ConfigureWindowLayout()
         {
+            ConfigData.LoadFromXML(ReleaseFolders.configFileEditorRelativePath());
+            if (string.IsNullOrEmpty(ConfigData.GetExtraProperties().GetProperty("layoutSet")))
+            {
+                ConfigData.GetExtraProperties().SetProperty("layoutSet", "yes");
+                ConfigData.StoreToXML();
+            }
+
             string path = Path.Combine(Directory.GetCurrentDirectory(), "Assets/uAdventure/Editor/Layouts/uAdventure.wlt");
             EditorUtility.LoadWindowLayout(path); 
         }
@@ -1382,6 +1411,9 @@ namespace uAdventure.Editor
                 currentZipFile = path;
                 currentZipName = directory.Name;
 
+                // Check the project folder structure and dtds
+                AssetsController.CreateFolderStructure();
+
                 System.IO.File.WriteAllText("Assets/uAdventure/Resources/CurrentGame.eap", path);
                 loadedAdventureData.setProjectName(currentZipName);
 
@@ -1458,8 +1490,6 @@ namespace uAdventure.Editor
                 }*/
             }
 
-            //TODO: implement
-            //if the file was loaded, update the RecentFiles list:
             if (fileLoaded)
             {
                 AssetsController.ResetCache();
@@ -1479,26 +1509,11 @@ namespace uAdventure.Editor
                 //    mainWindow.showInformationDialog(TC.get("Operation.FileLoadedWithErrorTitle"), TC.get("Operation.FileLoadedWithErrorMessage"));
 
             }
-            //else {
-            //    // Feedback
-            //    //loadingScreen.close( );
-            //    mainWindow.showInformationDialog(TC.get("Operation.FileNotLoadedTitle"), TC.get("Operation.FileNotLoadedMessage"));
-            //}
-
-            //if (loadingImage)
-            //    //ls.close( );
-            //    loadingScreen.setVisible(false);
-            /*}
-            catch (Exception e)
+            else 
             {
-                Debug.LogError(e.Message + "\n\n" + e.StackTrace);
-                fileLoaded = false;
-                //if (loadingImage)
-                //    loadingScreen.setVisible(false);
-                //mainWindow.showInformationDialog(TC.get("Operation.FileNotLoadedTitle"), TC.get("Operation.FileNotLoadedMessage"));
-            }*/
-
-            //Controller.gc();
+                // Feedback
+                ShowErrorDialog(TC.get("Operation.FileNotLoadedTitle"), TC.get("Operation.FileNotLoadedMessage"));
+            }
 
             return fileLoaded;
         }
@@ -3394,7 +3409,7 @@ namespace uAdventure.Editor
         public AdvancedFeaturesDataControl getAdvancedFeaturesController()
         {
 
-            return this.chaptersController.getSelectedChapterDataControl().getAdvancedFeaturesController();
+            return chaptersController.getSelectedChapterDataControl().getAdvancedFeaturesController();
         }
 
         public void RefreshView()
@@ -3454,6 +3469,19 @@ namespace uAdventure.Editor
             if (!Language.Initialized)
             {
                 Language.Initialize();
+            }
+
+
+            ConfigData.LoadFromXML(ReleaseFolders.configFileEditorRelativePath());
+            if (string.IsNullOrEmpty(ConfigData.GetExtraProperties().GetProperty("layoutSet")))
+            {
+                ConfigData.GetExtraProperties().SetProperty("layoutSet", "yes");
+                ConfigData.StoreToXML();
+                if (Controller.Instance.ShowStrictConfirmDialog("Set up the layout?", "Do you want to set up the Unity " +
+                    "layout to uAdventure's layout (Recommended for new users)?"))
+                {
+                    Controller.ConfigureWindowLayout();
+                }
             }
 
             var window = EditorWindow.GetWindow(typeof(EditorWindowBase));

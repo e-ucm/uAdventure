@@ -4,6 +4,7 @@ using System.Collections;
 using System.IO;
 
 using uAdventure.Core;
+using System.Security;
 
 namespace uAdventure.Editor
 {
@@ -13,6 +14,7 @@ namespace uAdventure.Editor
         private bool showStartDialog_F;
 
         private static ConfigData instance;
+        private static Properties extraProperties;
 
         private string configFile;
 
@@ -135,6 +137,10 @@ namespace uAdventure.Editor
          */
         private int debugWindowH = int.MaxValue;
 
+        public static Properties GetExtraProperties()
+        {
+            return extraProperties;
+        }
 
         public static bool showNPCReferences()
         {
@@ -398,6 +404,11 @@ namespace uAdventure.Editor
             if (instance.projectsPath != null)
                 configuration.SetProperty("EffectSelectorTab", instance.effectSelectorTab.ToString());
 
+            if (extraProperties != null)
+            {
+                configuration.SetProperty("ExtraProperties", SecurityElement.Escape(extraProperties.ToString()));
+            }
+
             // Store the configuration into a file
             try
             {
@@ -460,6 +471,11 @@ namespace uAdventure.Editor
                     ReleaseFolders.setProjectsPath(projectsPath);
 
                 effectSelectorTab = ExParsers.ParseDefault(configuration.GetProperty("EffectSelectorTab"), 0);
+                extraProperties = new Properties();
+                if (!string.IsNullOrEmpty(configuration.GetProperty("ExtraProperties")))
+                {
+                    extraProperties.ReloadFromString(configuration.GetProperty("ExtraProperties"));
+                }
             }
             catch (FileNotFoundException)
             {

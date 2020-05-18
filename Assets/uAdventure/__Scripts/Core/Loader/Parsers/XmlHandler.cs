@@ -49,6 +49,7 @@ namespace uAdventure.Core
             try
             {
                 XmlDocument xmld = new XmlDocument();
+                xmld.XmlResolver = null; 
                 xmld.LoadXml(content);
                 return ParseXml(xmld);
             }

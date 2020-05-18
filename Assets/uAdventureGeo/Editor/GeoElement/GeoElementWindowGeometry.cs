@@ -182,7 +182,14 @@ namespace uAdventure.Geo
             if (Event.current.button == 0 && Event.current.type == EventType.MouseDown)
             {
                 var geoElement = Target as GeoElementDataControl;
-                if (MapEditor.Current.SelectedElement == geoElement && ActionSelected == 1)
+                var selectedElement = MapEditor.Current.SelectedElement as GeoElementDataControl;
+                var geoElementRef = MapEditor.Current.SelectedElement as GeoElementRefDataControl;
+                if (geoElementRef != null)
+                {
+                    selectedElement = geoElementRef.ReferencedDataControl as GeoElementDataControl;
+                }
+
+                if (selectedElement == geoElement && ActionSelected == 1)
                 {
                     return true;
                 }
@@ -288,14 +295,17 @@ namespace uAdventure.Geo
                         }
                         break;
                     case 2: // Remove
+                        var mouseUpAsButton = false;
                         HandleUtil.HandlePointMovement(pointControl, points[i], 5,
-                            (point, isOver, isActive) => HandleUtil.DrawPoint(point, 4, MapEditor.GetColor(Color.red), isOver ? 2f : 1f,
-                                isOver ? MapEditor.GetColor(Color.yellow) : MapEditor.GetColor(Color.black)), MouseCursor.ArrowMinus);
-                        if (GUIUtility.hotControl == pointControl)
+                            (point, isOver, isActive) =>
+                            {
+                                var size = isOver ? 2f : 1f;
+                                var borderColor = isOver ? MapEditor.GetColor(Color.yellow) : MapEditor.GetColor(Color.black);
+                                HandleUtil.DrawPoint(point, 4, MapEditor.GetColor(Color.red), size, borderColor); 
+                            }, out mouseUpAsButton, MouseCursor.ArrowMinus);
+                        if (mouseUpAsButton)
                         {
                             geometry.RemovePoint(i);
-                            GUIUtility.hotControl = -1;
-                            Event.current.Use();
                             r = i;
                         }
                         break;
@@ -349,7 +359,6 @@ namespace uAdventure.Geo
                     if (GUIUtility.hotControl == geometryControlId)
                     {
                         GUIUtility.hotControl = -1;
-                        Event.current.Use();
                     }
 
                     break;

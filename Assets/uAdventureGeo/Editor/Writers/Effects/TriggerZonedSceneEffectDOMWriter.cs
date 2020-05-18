@@ -5,6 +5,7 @@ using uAdventure.Core;
 using uAdventure.Editor;
 using System;
 using System.Xml;
+using System.Globalization;
 
 namespace uAdventure.Geo
 {
@@ -25,7 +26,7 @@ namespace uAdventure.Geo
             element.SetAttribute("transitionType", ((int)triggerZonedSceneEffect.getTransitionType()).ToString());
             if (triggerZonedSceneEffect.DestinyScale >= 0)
             {
-                element.SetAttribute("scale", triggerZonedSceneEffect.DestinyScale.ToString());
+                element.SetAttribute("scale", triggerZonedSceneEffect.DestinyScale.ToString(CultureInfo.InvariantCulture));
             }
         }
 

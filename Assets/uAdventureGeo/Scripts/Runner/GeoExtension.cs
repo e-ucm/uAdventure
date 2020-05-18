@@ -159,7 +159,8 @@ namespace uAdventure.Geo
             }
 
             // Access granted and location value could be retrieved
-            print("Location: " + Input.location.lastData.latitude + " " + Input.location.lastData.longitude + " " + Input.location.lastData.altitude + " " + Input.location.lastData.horizontalAccuracy + " " + Input.location.lastData.timestamp);
+            print("Location: " + Input.location.lastData.latitude + " " + Input.location.lastData.longitude + " " + 
+                Input.location.lastData.altitude + " " + Input.location.lastData.horizontalAccuracy + " " + Input.location.lastData.timestamp);
 
         }
 
@@ -369,6 +370,11 @@ namespace uAdventure.Geo
             }
 
             return point;
+        }
+
+        public override bool OnGameFinished()
+        {
+            return true;
         }
     }
 }

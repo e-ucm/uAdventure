@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Xml;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace uAdventure.Core
 {
@@ -270,7 +271,7 @@ namespace uAdventure.Core
                 }
                 else if(ell.Name == "timeout")
                 {
-                    ((OptionConversationNode)currentNode).Timeout = ExParsers.ParseDefault(GetText(ell), 10f);
+                    ((OptionConversationNode)currentNode).Timeout = ExParsers.ParseDefault(GetText(ell), CultureInfo.InvariantCulture, 10f);
                     timeoutConditions = true;
                     addline = false;
                 }

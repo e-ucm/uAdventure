@@ -7,6 +7,7 @@ namespace uAdventure.Editor
 {
     public class WelcomeWindow : EditorWindow
     {
+        public static WelcomeWindow Instance { get { return (WelcomeWindow)thisWindowReference; } }
 
         public enum WelcomeWindowType { New, Open, Recent };
 

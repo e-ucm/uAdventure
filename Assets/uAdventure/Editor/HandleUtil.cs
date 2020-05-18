@@ -103,7 +103,14 @@ public static class HandleUtil {
         return new Rect(center - new Vector2(width2, height2), new Vector2(width2 * 2, height2 * 2));
     }
 
+
     public static Vector2 HandlePointMovement(int controlId, Vector2 point, float maxDistance, Action<Vector2, bool, bool> draw, MouseCursor mouseCursor = MouseCursor.Arrow)
+    {
+        bool _;
+        return HandlePointMovement(controlId, point, maxDistance, draw, out _, mouseCursor);
+    }
+
+    public static Vector2 HandlePointMovement(int controlId, Vector2 point, float maxDistance, Action<Vector2, bool, bool> draw, out bool mouseUpAsButton, MouseCursor mouseCursor = MouseCursor.Arrow)
     {
         /*if(mouseCursor != MouseCursor.Arrow)
         {
@@ -114,10 +121,14 @@ public static class HandleUtil {
         }*/
 
         var cursorRect = new Rect(0, 0, maxDistance * 1.5f, maxDistance * 1.5f) { center = point };
-        EditorGUIUtility.AddCursorRect(cursorRect, mouseCursor, controlId);
 
         var isOver = (point - Event.current.mousePosition).magnitude < maxDistance;
+        if (isOver)
+        {
+            EditorGUIUtility.AddCursorRect(cursorRect, mouseCursor, controlId);
+        }
         var isActive = GUIUtility.hotControl == controlId;
+        mouseUpAsButton = false;
 
         switch (Event.current.type)
         {
@@ -142,7 +153,10 @@ public static class HandleUtil {
                 if (isActive)
                 {
                     GUIUtility.hotControl = 0;
-                    Event.current.Use();
+                    if (isOver)
+                    {
+                        mouseUpAsButton = true;
+                    }
                 }
                 break;
         }

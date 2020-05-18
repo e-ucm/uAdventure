@@ -64,7 +64,7 @@ namespace uAdventure.Runner
 
                 resource = GUIManager.Instance.Provider.getButton(this.action);
 
-                actionName = ConstantNames.L["ES"].Actions[action.getType()];
+                actionName = ConstantNames.L["EN"].Actions[action.getType()];
             }
 
             Sprite tmp;

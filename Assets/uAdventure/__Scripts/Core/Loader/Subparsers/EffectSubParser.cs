@@ -94,7 +94,7 @@ namespace uAdventure.Core
                         string scene = effect.GetAttribute("idTarget");
                         var triggerSceneEffect = new TriggerSceneEffect(scene, x, y)
                         {
-                            DestinyScale = ExParsers.ParseDefault(effect.GetAttribute("scale"), float.MinValue)
+                            DestinyScale = ExParsers.ParseDefault(effect.GetAttribute("scale"), CultureInfo.InvariantCulture, float.MinValue)
                         };
 
                         triggerSceneEffect.setTransitionTime(ExParsers.ParseDefault(effect.GetAttribute("transitionTime"), 0));

@@ -4,6 +4,7 @@ using System.Collections;
 using uAdventure.Core;
 using System;
 using System.Xml;
+using System.Globalization;
 
 namespace uAdventure.Geo
 {
@@ -19,7 +20,7 @@ namespace uAdventure.Geo
                 int.Parse(element.GetAttribute("x")),
                 int.Parse(element.GetAttribute("y")))
             {
-                DestinyScale = ExParsers.ParseDefault(element.GetAttribute("scale"), float.MinValue)
+                DestinyScale = ExParsers.ParseDefault(element.GetAttribute("scale"), CultureInfo.InvariantCulture, float.MinValue)
             };
 
             triggerSceneEffect.setTransitionTime(ExParsers.ParseDefault(element.GetAttribute("transitionTime"), 0));

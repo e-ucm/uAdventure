@@ -25,8 +25,8 @@ namespace uAdventure.Editor
             doc.AppendChild(declaration);
 
             // DTD
-            XmlDocumentType typeDescriptor = doc.CreateDocumentType("animation", "SYSTEM", "animation.dtd", null);
-            doc.AppendChild(typeDescriptor);
+            //XmlDocumentType typeDescriptor = doc.CreateDocumentType("animation", "SYSTEM", "animation.dtd", null);
+            //doc.AppendChild(typeDescriptor);
 
             // Main animation node
             XmlElement mainNode = doc.CreateElement("animation");

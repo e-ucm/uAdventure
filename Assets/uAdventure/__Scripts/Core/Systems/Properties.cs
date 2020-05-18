@@ -11,6 +11,11 @@ namespace uAdventure.Core
         private Dictionary<string, string> list;
         private string filename;
 
+        public Properties()
+        {
+            list = new Dictionary<string, string>();
+        }
+
         public Properties(string file)
         {
             Reload(file);
@@ -61,13 +66,19 @@ namespace uAdventure.Core
 
             System.IO.StreamWriter file = new System.IO.StreamWriter(filename);
             file.WriteLine("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><!DOCTYPE properties SYSTEM \"http://java.sun.com/dtd/properties.dtd\">");
-            file.WriteLine("<properties>");
-            file.WriteLine("<comment> Project Configuration </comment>");
+            file.WriteLine(ToString());
+            file.Close();
+        }
+
+        public override string ToString()
+        {
+            string s = "<properties>\n";
+            s += "<comment> Project Configuration </comment>\n";
             foreach (string prop in list.Keys.ToArray())
                 if (!string.IsNullOrEmpty(list[prop]))
-                    file.WriteLine("<entry key=\"" + prop + "\">" + list[prop] + "</entry>");
-            file.Write("</properties>");
-            file.Close();
+                    s += "<entry key=\"" + prop + "\">" + list[prop] + "</entry>\n";
+            s += "</properties>\n";
+            return s;
         }
 
         public void Reload()
@@ -85,10 +96,24 @@ namespace uAdventure.Core
                 System.IO.File.Create(filename).Close();
         }
 
+        public void ReloadFromString(string data)
+        {
+            LoadFromString(data);
+        }
+
+        private void LoadFromString(string data)
+        {
+            Load(new XmlTextReader(new StringReader(data)));
+        }
+
         private void LoadFromFile(string file)
         {
+            Load(new XmlTextReader(file));
+        }
+
+        private void Load(XmlTextReader reader)
+        {
             string key = "", value = "";
-            XmlTextReader reader = new XmlTextReader(file);
             while (reader.Read())
             {
                 switch (reader.NodeType)
@@ -116,6 +141,7 @@ namespace uAdventure.Core
             }
             reader.Close();
         }
+
         public Dictionary<string, string>.KeyCollection KeySet
         {
             get { return list.Keys; }

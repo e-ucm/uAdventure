@@ -10,6 +10,7 @@ using Microsoft.Msagl.Core.Layout;
 using Microsoft.Msagl.Core.Geometry.Curves;
 using Microsoft.Msagl.Miscellaneous;
 using Microsoft.Msagl.Core.Geometry;
+using UniRx;
 
 namespace uAdventure.Editor
 {
@@ -362,7 +363,7 @@ namespace uAdventure.Editor
                     return;
 
                 var polygon = AdaptToViewport(GetExitArea(scene, exit), space);
-                var c = sceneColors[scene.getId()];
+                var c = sceneColors[scene.getPreviewBackground()];
                 c = new Color(c.r, c.g, c.b, 0.8f);
                 HandleUtil.DrawPolygon(polygon, c);
 
@@ -381,7 +382,7 @@ namespace uAdventure.Editor
                     destination = Center(sceneRect.ToPoints().ToArray());
                 }
 
-                HandleUtil.DrawPolyLine(new Vector2[] { origin, destination }, false, sceneColors[scene.getId()], 4);
+                HandleUtil.DrawPolyLine(new Vector2[] { origin, destination }, false, sceneColors[scene.getPreviewBackground()], 4);
 
                 DrawArrowCap(destination, (destination - origin), 15f);
             }
@@ -492,7 +493,7 @@ namespace uAdventure.Editor
                         color = UnityEngine.Random.ColorHSV(0f, 1f, 0.8f, 1f, 0.5f, 1f, 1f, 1f);
                     }
 
-                    sceneColors[scene.getId()] = color;
+                    sceneColors[background] = color;
                 }
 
                 return new Rect(positions[scene.getId()], sizes[background] * SceneScaling);
@@ -550,7 +551,7 @@ namespace uAdventure.Editor
                     graph.UpdateBoundingBox();
 
                     Dictionary<SceneDataControl, Node> sceneToNode = new Dictionary<SceneDataControl, Node>();
-                    Dictionary<Tuple<Node, Node>, bool> present = new Dictionary<Tuple<Node, Node>, bool>();
+                    Dictionary<UniRx.Tuple<Node, Node>, bool> present = new Dictionary<UniRx.Tuple<Node, Node>, bool>();
 
                     foreach (var scene in scenes.getScenes())
                     {
@@ -576,7 +577,7 @@ namespace uAdventure.Editor
 
                             var nextScene = scenes.getScenes()[index];
 
-                            var t = new Tuple<Node, Node>(node, sceneToNode[nextScene]);
+                            var t = new UniRx.Tuple<Node, Node>(node, sceneToNode[nextScene]);
                             if (!present.ContainsKey(t))
                             {
                                 present.Add(t, true);

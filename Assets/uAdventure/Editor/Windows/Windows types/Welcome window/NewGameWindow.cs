@@ -103,6 +103,7 @@ namespace uAdventure.Editor
             {
                 Controller.Instance.NewAdventure(type);
                 Controller.OpenEditorWindow();
+                WelcomeWindow.Instance.Close();
                 EditorWindowBase.RefreshWindows();
             }
         }

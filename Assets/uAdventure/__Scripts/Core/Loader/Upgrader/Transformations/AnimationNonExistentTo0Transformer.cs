@@ -47,11 +47,13 @@ namespace uAdventure.Core.XmlUpgrader
             } while (img);
 
             var animationXml = CreateAnimationXml(id, frames, frameTypes);
-
-            StringWriter sw = new StringWriter();
-            animationXml.WriteTo(XmlWriter.Create(sw));
-
-            return sw.ToString();
+            using (var stringWriter = new StringWriter())
+            using (var xmlTextWriter = XmlWriter.Create(stringWriter))
+            {
+                animationXml.WriteTo(xmlTextWriter);
+                xmlTextWriter.Flush();
+                return stringWriter.GetStringBuilder().ToString();
+            }
         }
 
 
@@ -61,7 +63,7 @@ namespace uAdventure.Core.XmlUpgrader
 
             // Declaration, encoding, version, and dtd
             doc.AppendChild(doc.CreateXmlDeclaration("1.0", "UTF-8", "no"));
-            doc.AppendChild(doc.CreateDocumentType("animation", "SYSTEM", "animation.dtd", null));
+            //doc.AppendChild(doc.CreateDocumentType("animation", "SYSTEM", "animation.dtd", null));
 
             // Main animation node
             XmlElement mainNode = doc.CreateElement("animation");

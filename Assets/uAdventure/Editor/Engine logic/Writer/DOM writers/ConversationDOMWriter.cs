@@ -5,6 +5,7 @@ using System.Xml;
 
 using uAdventure.Core;
 using System;
+using System.Globalization;
 
 namespace uAdventure.Editor
 {
@@ -440,7 +441,7 @@ namespace uAdventure.Editor
                     {
                         // Timeout
                         XmlElement timeoutElement = doc.CreateElement("timeout");
-                        timeoutElement.InnerText = optionConversationNode.Timeout.ToString();
+                        timeoutElement.InnerText = optionConversationNode.Timeout.ToString(CultureInfo.InvariantCulture);
                         nodeElement.AppendChild(timeoutElement);
                         // Timeout conditions
                         DOMWriterUtility.DOMWrite(nodeElement, optionConversationNode.TimeoutConditions);

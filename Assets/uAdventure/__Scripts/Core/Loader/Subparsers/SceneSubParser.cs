@@ -108,7 +108,7 @@ namespace uAdventure.Core
 				int destinyX 		= ExParsers.ParseDefault (el.GetAttribute ("destinyX"), int.MinValue), 
 					destinyY 		= ExParsers.ParseDefault (el.GetAttribute ("destinyY"), int.MinValue);
 
-                float destinyScale  = ExParsers.ParseDefault (el.GetAttribute ("destinyScale"), float.MinValue);
+                float destinyScale  = ExParsers.ParseDefault (el.GetAttribute ("destinyScale"), CultureInfo.InvariantCulture, float.MinValue);
 
 				int transitionType 	= ExParsers.ParseDefault(el.GetAttribute("transitionType"), 0),
 					transitionTime 	= ExParsers.ParseDefault(el.GetAttribute("transitionTime"), 0);
@@ -273,7 +273,7 @@ namespace uAdventure.Core
 
             Orientation orientation = (Orientation) ExParsers.ParseDefault(element.GetAttribute("orientation"), 2);
 
-            float scale = ExParsers.ParseDefault (element.GetAttribute("scale"), NumberFormatInfo.InvariantInfo, 0f);
+            float scale = ExParsers.ParseDefault (element.GetAttribute("scale"), CultureInfo.InvariantCulture, 0f);
 			int layer = ExParsers.ParseDefault (element.GetAttribute("layer"), -1);
 
 			int influenceX 		= ExParsers.ParseDefault (element.GetAttribute("influenceX"), 0), 

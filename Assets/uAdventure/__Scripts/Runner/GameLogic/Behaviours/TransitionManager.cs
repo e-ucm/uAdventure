@@ -2,7 +2,6 @@
 using System.Collections;
 using uAdventure.Core;
 using UnityEngine;
-using Action = System.Action;
 
 namespace uAdventure.Runner
 {
@@ -15,7 +14,7 @@ namespace uAdventure.Runner
         private Transition transition;
         private Coroutine transitionRoutine;
         private float endTime;
-        private Action<Transition, Texture> onFinish;
+        private System.Action<Transition, Texture> onFinish;
         private bool _shuttingDown = false;
 
         void Awake()
@@ -75,7 +74,7 @@ namespace uAdventure.Runner
             this.transition = transition;
         }
 
-        public void DoTransition(Action<Transition, Texture> onFinish)
+        public void DoTransition(System.Action<Transition, Texture> onFinish)
         {
             if (transitionRoutine != null)
             {
@@ -163,7 +162,7 @@ namespace uAdventure.Runner
             }
         }
 
-        private void FinalizeTransition(Transition transition, Texture transitionTexture, Action<Transition, Texture> onFinish)
+        private void FinalizeTransition(Transition transition, Texture transitionTexture, System.Action<Transition, Texture> onFinish)
         {
             transitioning = false;
             this.transition = null;

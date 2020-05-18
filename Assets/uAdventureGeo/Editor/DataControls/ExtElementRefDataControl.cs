@@ -2,14 +2,13 @@ using System.Collections.Generic;
 using uAdventure.Core;
 
 using uAdventure.Editor;
-using System;
 using System.Linq;
 using MoreLinq;
-using UniRx;
+using System;
 
 namespace uAdventure.Geo
 {
-    public class TransformManagerDataControl : DataControl, IObserver<DataControl>
+    public class TransformManagerDataControl : DataControl, UniRx.IObserver<DataControl>
     {
         private readonly ExtElementRefDataControl extElemReferencedataControl;
         private readonly ExtElemReference extElemReference;

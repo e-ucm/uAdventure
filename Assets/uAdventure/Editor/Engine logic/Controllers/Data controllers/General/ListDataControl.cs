@@ -95,14 +95,24 @@ namespace uAdventure.Editor
 
         public TT CreateElement(int type, string id, params object[] extraParams)
         {
-            if (!string.IsNullOrEmpty(id) && !Controller.Instance.isElementIdValid(id))
+            var ET = elementCreators
+                .SelectMany(ec => ec.TypeDescriptors.Select(td => new { ElementCreator = ec, TypeDescriptor = td }))
+                .Where(a => a.TypeDescriptor.Type == type)
+                .FirstOrDefault();
+
+            if(ET == null)
+            {
+                throw new Exception(string.Format("No element creator found for type {0}!", type));
+            }
+
+            if (ET.TypeDescriptor.RequiresId && !string.IsNullOrEmpty(id) && !Controller.Instance.isElementIdValid(id))
             {
                 id = Controller.Instance.makeElementValid(id);
             }
 
-            var dataControl = elementCreators.First(ec => ec.TypeDescriptors.Select(td => td.Type).Contains(type)).CreateElement(type, id, extraParams);
+            var dataControl = ET.ElementCreator.CreateElement(type, id, extraParams);
 
-            if (dataControl != null)
+            if (ET.TypeDescriptor.RequiresId && dataControl != null)
             {
                 var hasId = dataControl.getContent() as HasId;
                 if (hasId != null)
