@@ -371,10 +371,5 @@ namespace uAdventure.Geo
 
             return point;
         }
-
-        public override bool OnGameFinished()
-        {
-            return true;
-        }
     }
 }

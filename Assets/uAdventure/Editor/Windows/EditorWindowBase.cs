@@ -5,10 +5,11 @@ using System.Collections.Generic;
 using uAdventure.Core;
 using System;
 using System.Linq;
-using uAdventure.Analytics;
-using uAdventure.Geo;
 using UnityEditor.SceneManagement;
 using UnityEditorInternal;
+
+using uAdventure.Analytics;
+//using uAdventure.Geo;
 
 namespace uAdventure.Editor
 {
@@ -162,7 +163,7 @@ namespace uAdventure.Editor
 			configurationMenu = new ConfigurationMenu();
 			aboutMenu = new AboutMenu();
 
-            var g = GeoController.Instance;
+            //var g = GeoController.Instance;
             var a = AnalyticsController.Instance;
         }
 

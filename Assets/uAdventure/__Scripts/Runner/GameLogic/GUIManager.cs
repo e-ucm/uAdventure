@@ -2,10 +2,8 @@
 using uAdventure.Core;
 using System.Collections;
 using UnityEngine.SceneManagement;
-using AssetPackage;
 using System.Linq;
 using UniRx;
-using SimpleJSON;
 
 namespace uAdventure.Runner
 {

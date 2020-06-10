@@ -437,14 +437,18 @@ namespace uAdventure.Runner
             return inventoryItems.Remove(elementId);
         }
 
+        internal int ChangeAmbitCount { get { return varFlagChangeAmbits.Count; } }
+
         // Var flag change ambits
         public void BeginChangeAmbit()
         {
             this.varFlagChangeAmbits.Push(new List<KeyValuePair<string, int>>());
+            Debug.Log("Opened change ambit " + varFlagChangeAmbits.Count);
         }
 
         public List<KeyValuePair<string, int>> EndChangeAmbit(bool appendToParent = false)
         {
+            Debug.Log("Closed change ambit " + varFlagChangeAmbits.Count);
             var currentAmbit = this.varFlagChangeAmbits.Pop();
 
             if (appendToParent)
@@ -509,28 +513,46 @@ namespace uAdventure.Runner
         {
             if (string.IsNullOrEmpty(PlayerPrefs.GetString(field)))
             {
-                Debug.LogWarning("Could restore state: " + field);
+                Debug.LogWarning("Couldn't restore state: " + field);
                 return;
             }
 
-            JsonUtility.FromJsonOverwrite(PlayerPrefs.GetString(field), this);
-            varFlags.Clear();
-            for(int i = 0, totalVars = varFlagKeys.Count; i < totalVars; i++)
+            try
             {
-                varFlags[varFlagKeys[i]] = varFlagValues[i];
-            }
-            elementContexts.Clear();
-            for (int i = 0, totalVars = elementContextsKeys.Count; i < totalVars; i++)
-            {
-                elementContexts[elementContextsKeys[i]] = elementContextsValues[i].ElementReferences;
-            }
-            memories.Clear();
-            for (int i = 0, totalMemories = memoryKeys.Count; i < totalMemories; i++)
-            {
-                memories[memoryKeys[i]] = memoryValues[i];
-            }
+                Debug.Log("Restoring savestate: " + PlayerPrefs.GetString(field));
+                JsonUtility.FromJsonOverwrite(PlayerPrefs.GetString(field), this);
+                varFlags.Clear();
+                for (int i = 0, totalVars = varFlagKeys.Count; i < totalVars; i++)
+                {
+                    varFlags[varFlagKeys[i]] = varFlagValues[i];
+                }
+                elementContexts.Clear();
+                for (int i = 0, totalVars = elementContextsKeys.Count; i < totalVars; i++)
+                {
+                    elementContexts[elementContextsKeys[i]] = elementContextsValues[i].ElementReferences;
+                }
+                memories.Clear();
+                if (memoryKeys == null || memoryValues == null)
+                {
+                    Debug.LogError("Memory restoration failed! (memorykeys " + ((object)memoryKeys ?? "null").ToString() + ", memoryvalues " + ((object)memoryValues ?? "null").ToString());
+                }
+                else if (memoryKeys.Count != memoryValues.Count)
+                {
+                    Debug.LogError("Memory restoration failed! (Different keys and values: " + memoryKeys.Count + " != " + memoryValues.Count);
+                }
+                for (int i = 0, totalMemories = memoryKeys.Count; i < totalMemories; i++)
+                {
+                    memories[memoryKeys[i]] = memoryValues[i];
+                }
 
-            InventoryManager.Instance.Restore();
+                InventoryManager.Instance.Restore();
+            }
+            catch(Exception ex)
+            {
+                Debug.Log("Unable to restore save state! Maybe you're trying to restore a save from an older version? (" + ex.Message + ", " + ex.StackTrace + ")");
+                this.Restart();
+            }
+            
         }
     }
 }

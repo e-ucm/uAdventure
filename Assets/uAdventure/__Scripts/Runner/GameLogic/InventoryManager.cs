@@ -77,7 +77,7 @@ namespace uAdventure.Runner
 
         private void Start()
         {
-            if (InventoryManager.Instance)
+            if (Instance && Instance != this)
             {
                 Debug.LogWarning("Multiple inventory managers have been found!");
             }

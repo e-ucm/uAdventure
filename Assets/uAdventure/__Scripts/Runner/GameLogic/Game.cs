@@ -174,9 +174,10 @@ namespace uAdventure.Runner
         protected void Start()
         {
             started = true;
-            if (!Application.isEditor)
+            //if (!Application.isEditor)
             {
-                GameState.OnGameResume();
+                Debug.Log("Game Resume is disabled");
+                //GameState.OnGameResume();
             }
             gameExtensions.ForEach(g => g.OnAfterGameLoad());
             uAdventureRaycaster = FindObjectOfType<uAdventureRaycaster>();
@@ -276,12 +277,17 @@ namespace uAdventure.Runner
 
         public void AutoSave()
         {
+            Debug.Log("Auto save is Disabled");
+            return;
             gameExtensions.ForEach(g => g.OnBeforeGameSave());
             GameState.SerializeTo("save");
         }
 
         public void OnApplicationPause(bool paused)
         {
+            Debug.Log("Save on pause is disabled");
+            return;
+
             if (!isSomethingRunning())
             {
                 if (paused)
@@ -384,6 +390,10 @@ namespace uAdventure.Runner
             }
             if (executeStack.Count == 0)
             {
+                if (GameState.ChangeAmbitCount > 0)
+                {
+                    Debug.LogWarning("There are still some opened change ambits! " + GameState.ChangeAmbitCount);
+                }
                 AutoSave();
             }
             // In case any bubble is bugged
@@ -532,6 +542,7 @@ namespace uAdventure.Runner
                     waitingTargetDestroy = false;
                     waitingRunTarget = true;
                     GameState.CurrentTarget = target.getId();
+                    runnerTarget.RenderScene();
 
                     if (trace && OnTargetChanged != null)
                     {

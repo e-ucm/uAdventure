@@ -3,6 +3,7 @@ using SimpleJSON;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using uAdventure.Core;
 using uAdventure.Runner;
@@ -38,7 +39,7 @@ namespace uAdventure.Analytics
         private float nextFlush = 0;
         private bool flushRequested = true;
         private List<Completable> completables;
-        private List<CompletableController> completableControllers = new List<CompletableController>();
+        private CompletableControllers completableControllers = new CompletableControllers();
         private TrackerConfig trackerConfig;
         private bool inited = false;
         private bool autostart = true;
@@ -65,19 +66,12 @@ namespace uAdventure.Analytics
 
         public void Init()
         {
-
             if (inited)
             {
                 return;
             }
 
             inited = true;
-
-            // Get the tracker config from the game settings
-            var trackerConfigs = Game.Instance.GameState.Data.getObjects<TrackerConfig>();
-            trackerConfig = trackerConfigs.Count == 0 ? new TrackerConfig() : trackerConfigs[0];
-
-            StartTracker(trackerConfig);
 
             InitCompletables();
 
@@ -103,7 +97,7 @@ namespace uAdventure.Analytics
                 analyticsMemory = new Memory();
                 Game.Instance.GameState.SetMemory("analytics", analyticsMemory);
             }
-            analyticsMemory.Set("completables", SerializeToString(completableControllers));
+            analyticsMemory.Set("completables", JsonUtility.ToJson(completableControllers));
         }
         public override void OnGameReady() { }
 
@@ -129,9 +123,18 @@ namespace uAdventure.Analytics
             {
                 RestoreCompletables(analyticsMemory);
             }
+
+            if (AutoStart)
+            {
+                // Get the tracker config from the game settings
+                var trackerConfigs = Game.Instance.GameState.Data.getObjects<TrackerConfig>();
+                trackerConfig = trackerConfigs.Count == 0 ? new TrackerConfig() : trackerConfigs[0];
+
+                StartTracker(trackerConfig);
+            }
         }
 
-        public void RestartFinished()
+        public void ResetFinishedCompletables()
         {
             foreach (var completableController in completableControllers)
             {
@@ -144,7 +147,7 @@ namespace uAdventure.Analytics
 
         #endregion GameExtension
                 
-        private void StartTracker(TrackerConfig config)
+        public void StartTracker(TrackerConfig config)
         {
             trackerConfig = config;
             string domain = "";
@@ -204,26 +207,22 @@ namespace uAdventure.Analytics
             {
                 Host = domain,
                 TrackingCode = config.getTrackingCode(),
-                BasePath = trackerConfig.getBasePath() != null ? trackerConfig.getBasePath() : "/api",
-                LoginEndpoint = trackerConfig.getLoginEndpoint() != null ? trackerConfig.getLoginEndpoint() : "login",
-                StartEndpoint = trackerConfig.getStartEndpoint() != null ? trackerConfig.getStartEndpoint() : "proxy/gleaner/collector/start/{0}",
-                TrackEndpoint = trackerConfig.getStartEndpoint() != null ? trackerConfig.getStartEndpoint() : "proxy/gleaner/collector/track",
+                BasePath = trackerConfig.getBasePath() ?? "/api",
+                LoginEndpoint = trackerConfig.getLoginEndpoint() ?? "login",
+                StartEndpoint = trackerConfig.getStartEndpoint() ?? "proxy/gleaner/collector/start/{0}",
+                TrackEndpoint = trackerConfig.getStartEndpoint() ?? "proxy/gleaner/collector/track",
                 Port = port,
                 Secure = secure,
                 StorageType = storage,
                 TraceFormat = format,
                 BackupStorage = config.getRawCopy(),
                 UseBearerOnTrackEndpoint = trackerConfig.getUseBearerOnTrackEndpoint()
-        };
+            };
             TrackerAsset.Instance.StrictMode = false;
             TrackerAsset.Instance.Bridge = new UnityBridge();
             TrackerAsset.Instance.Settings = tracker_settings;
             TrackerAsset.Instance.StrictMode = false;
 
-            if (storage == TrackerAsset.StorageTypes.net && SimvaController.Instance && SimvaController.Instance.IsActive)
-            {
-                TrackerAsset.Instance.Login(SimvaController.Instance.Token, SimvaController.Instance.Token);
-            }
             if (storage == TrackerAsset.StorageTypes.net && !string.IsNullOrEmpty(User) && !string.IsNullOrEmpty(Password))
             {
                 TrackerAsset.Instance.Login(User, Password);
@@ -350,26 +349,57 @@ namespace uAdventure.Analytics
 
         private void RestoreCompletables(Memory analyticsMemory)
         {
-            var serializedCompletables = analyticsMemory.Get<string>("completables");
-            if (!string.IsNullOrEmpty(serializedCompletables))
+            try
             {
-                completableControllers = DeserializeFromString<List<CompletableController>>(serializedCompletables);
-                for (int i = 0; i < completableControllers.Count; i++)
+                var serializedCompletables = analyticsMemory.Get<string>("completables");
+                if (!string.IsNullOrEmpty(serializedCompletables))
                 {
-                    completableControllers[i].SetCompletable(this.completables[i]);
-                    completableControllers[i].Start.SetMilestone(this.completables[i].getStart());
-                    completableControllers[i].End.SetMilestone(this.completables[i].getEnd());
-                    for (int j = 0; j < this.completables[i].getProgress().getMilestones().Count; j++)
+                    CompletableControllers restoredCompletables;
+                    if (serializedCompletables[0] == '{')
                     {
-                        completableControllers[i].ProgressControllers[j].SetMilestone(this.completables[i].getProgress().getMilestones()[j]);
+                        restoredCompletables = (CompletableControllers)JsonUtility.FromJson(serializedCompletables, typeof(CompletableControllers));
+                    }
+                    else
+                    {
+                        restoredCompletables = new CompletableControllers();
+                        restoredCompletables.AddRange(DeserializeFromString<List<CompletableController>>(serializedCompletables));
+                    }
+
+                    if (!VerifyControllers(restoredCompletables))
+                    {
+                        throw new System.Exception("The saved completable controllers didn't match the current completables. The save is ignored.");
+                    }
+
+                    completableControllers = restoredCompletables;
+                    for (int i = 0; i < completableControllers.Count; i++)
+                    {
+                        completableControllers[i].SetCompletable(this.completables[i]);
+                        completableControllers[i].Start.SetMilestone(this.completables[i].getStart());
+                        completableControllers[i].End.SetMilestone(this.completables[i].getEnd());
+                        for (int j = 0; j < this.completables[i].getProgress().getMilestones().Count; j++)
+                        {
+                            completableControllers[i].ProgressControllers[j].SetMilestone(this.completables[i].getProgress().getMilestones()[j]);
+                        }
                     }
                 }
             }
+            catch (System.Exception ex)
+            {
+                Debug.LogError("Error parsing the completables: " + ex.Message + " " + ex.StackTrace);
+            }
+        }
+
+        private bool VerifyControllers(CompletableControllers restoredCompletables)
+        {
+            return  restoredCompletables.Count == completables.Count && 
+                    restoredCompletables
+                        .Select((c, i) => new { c, i })
+                        .All(r => r.c.ProgressControllers.Count == completables[r.i].getProgress().getMilestones().Count);
         }
 
         public CompletableController GetCompletable(string id)
         {
-            return completableControllers.Find(c => c.GetCompletable().getId().Equals(id));
+            return completableControllers.FirstOrDefault(c => c.GetCompletable().getId().Equals(id));
         }
 
         public void SetCompletables(List<Completable> value)
@@ -397,10 +427,8 @@ namespace uAdventure.Analytics
                 }
             }
             while (somethingCompleted);
-
-
-
-            RestartFinished();
+            
+            ResetFinishedCompletables();
         }
 
         public void ConditionChanged()

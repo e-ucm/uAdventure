@@ -6,14 +6,5 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/uAdventureAnalytics/Plugins/Simva/_Login.unity
-    guid: b5afec73f54a29640882e304b8bc2cbb
-  - enabled: 1
-    path: Assets/uAdventureAnalytics/Plugins/Simva/_Survey.unity
-    guid: c3f0ac1bc4f9e114581e460bf1c68a95
-  - enabled: 1
     path: Assets/uAdventure/Scenes/_Scene1.unity
     guid: b352354f2b25ab44dbc72d700538ae19
-  - enabled: 1
-    path: Assets/uAdventureAnalytics/Plugins/Simva/_End.unity
-    guid: 2f3e2781dd955354fa23147e257e994c

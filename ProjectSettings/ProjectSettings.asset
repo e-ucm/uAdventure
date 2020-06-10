@@ -52,7 +52,7 @@ PlayerSettings:
   iosShowActivityIndicatorOnLoading: -1
   androidShowActivityIndicatorOnLoading: -1
   tizenShowActivityIndicatorOnLoading: -1
-  displayResolutionDialog: 0
+  displayResolutionDialog: 1
   iosAppInBackgroundBehavior: 0
   iosAllowHTTPDownload: 1
   allowedAutorotateToPortrait: 1
@@ -159,10 +159,11 @@ PlayerSettings:
   androidSupportedAspectRatio: 1
   androidMaxAspectRatio: 2.1
   applicationIdentifier:
-    Android: com.eucm.test
+    Android: com.Company.ProductName
     Standalone: es.eucm.firstaid
     Tizen: com.eucm.gps
-    iOS: com.eucm.test
+    WebGL: es.eucm.firstaid
+    iOS: com.Company.ProductName
     tvOS: com.eucm.gps
   buildNumber:
     iOS: 1
