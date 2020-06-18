@@ -146,8 +146,9 @@ namespace uAdventure.Geo
             EditorGUI.BeginChangeCheck();
             GUILayout.Label("Geo.GeoElement.Geometry.Type.Title".Traslate());
             var newType = (GMLGeometry.GeometryType)GUILayout.Toolbar((int) geometry.Type, typeNames);
-            if (EditorGUI.EndChangeCheck()) 
+            if (EditorGUI.EndChangeCheck())
             {
+                geometry.CurrentEditor = MapEditor.Current ?? componentBasedEditor;
                 geometry.Type = newType;
             }
 

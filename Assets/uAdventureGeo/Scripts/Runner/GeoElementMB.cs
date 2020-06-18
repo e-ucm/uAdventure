@@ -64,9 +64,22 @@ namespace uAdventure.Geo
             var mesh = GetComponent<MeshFilter>().mesh;
 
             var selectedGeometry = Geometry;
+            var type = selectedGeometry.Type;
+
+            // We make sure if only one point we render it as a POI
+            if(selectedGeometry.Points.Length == 1)
+            {
+                type = GMLGeometry.GeometryType.Point;
+            }
+            // We make sure if only two points and is a region we render it as a path
+            else if(selectedGeometry.Points.Length == 2 && type == GMLGeometry.GeometryType.Polygon)
+            {
+                type = GMLGeometry.GeometryType.LineString;
+            }
+
             if (selectedGeometry != null && selectedGeometry.Points != null && selectedGeometry.Points.Length > 0)
             {
-                switch (selectedGeometry.Type)
+                switch (type)
                 {
                     case GMLGeometry.GeometryType.Point:
                         {

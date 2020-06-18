@@ -7,7 +7,7 @@ namespace uAdventure.Geo
     /// <summary>
     /// GeoReferenceTransformManager interface for creating new positioning types
     /// </summary>
-    public interface IGuiMapPositionManager : UniRx.IObserver<DataControl>
+    public interface IGuiMapPositionManager : IObserver<DataControl>
     {
         Type ForType { get; }
 
