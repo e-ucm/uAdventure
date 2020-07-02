@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
-#define ASYNC
-//#undef ASYNC
+//#define ASYNC
+#undef ASYNC
 
 namespace AssetPackage
 {
@@ -621,6 +621,10 @@ namespace AssetPackage
         /// </summary>
         public void Flush()
         {
+            if (!Started)
+            {
+                return;
+            }
 #if ASYNC
             // If its waiting for flush, lets wake it up
             if (flushThread.IsAlive)
@@ -770,34 +774,43 @@ namespace AssetPackage
         /// </summary>
         public void Start()
         {
-            this.Started = true;
-
-            switch (settings.StorageType)
+            try
             {
-                case StorageTypes.net:
-                    Connect();
-                    break;
+                switch (settings.StorageType)
+                {
+                    case StorageTypes.net:
+                        Connect();
+                        break;
 
-                case StorageTypes.local:
-                    {
-                        // Allow LocalStorage if a Bridge is implementing IDataStorage.
-                        // 
-                        IDataStorage tmp = getInterface<IDataStorage>();
+                    case StorageTypes.local:
+                        {
+                            // Allow LocalStorage if a Bridge is implementing IDataStorage.
+                            // 
+                            IDataStorage tmp = getInterface<IDataStorage>();
 
-                        Connected = tmp != null;
-                        Active = tmp != null;
-                    }
-                    break;
-            }
+                            Connected = tmp != null;
+                            Active = tmp != null;
+                        }
+                        break;
+                }
 #if ASYNC
-            if (flushThread == null || !flushThread.IsAlive)
-            {
-                exit = false;
-                flushThread = new Thread(new ThreadStart(DoFlush));
-                flushThread.Name = System.DateTime.Now.ToString();
-                flushThread.Start();
-            }
+                if (flushThread == null || !flushThread.IsAlive)
+                {
+                    exit = false;
+                    flushThread = new Thread(new ThreadStart(DoFlush));
+                    flushThread.Name = System.DateTime.Now.ToString();
+                    flushThread.Start();
+                }
 #endif
+                Started = true;
+            }
+            catch(Exception ex)
+            {
+                Log(Severity.Error, "Unable to connect: " + ex.Message + " - " + ex.StackTrace);
+            }
+            
+
+
         }
 
         private void Connect()
@@ -817,7 +830,6 @@ namespace AssetPackage
 
                 body = "{\"anonymous\" : \"" + settings.PlayerId + "\"}";
             }
-
             RequestResponse response = IssueRequest(String.Format(settings.StartEndpoint, settings.TrackingCode), "POST", headers, body);
 
             if (response.ResultAllowed)
@@ -1279,12 +1291,15 @@ namespace AssetPackage
                     Dictionary<string, string> headers = new Dictionary<string, string>();
 
                     headers.Add("Content-Type", "application/json");
-                    string authformat = "{0}";
-                    if (settings.UseBearerOnTrackEndpoint)
+                    if (!string.IsNullOrEmpty(settings.UserToken))
                     {
-                        authformat = "Bearer {0}";
+                        string authformat = "{0}";
+                        if (settings.UseBearerOnTrackEndpoint)
+                        {
+                            authformat = "Bearer {0}";
+                        }
+                        headers.Add("Authorization", String.Format(authformat, settings.UserToken));
                     }
-                    headers.Add("Authorization", String.Format(authformat, settings.UserToken));
 
                     Log(Severity.Information, "\r\n" + data);
 

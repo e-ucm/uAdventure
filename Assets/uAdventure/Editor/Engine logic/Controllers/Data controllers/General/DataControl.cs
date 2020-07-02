@@ -1,9 +1,8 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿
 using System.Collections.Generic;
 
 using uAdventure.Core;
-using UniRx;
+using System;
 
 namespace uAdventure.Editor
 {

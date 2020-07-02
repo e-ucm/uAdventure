@@ -551,7 +551,7 @@ namespace uAdventure.Editor
                     graph.UpdateBoundingBox();
 
                     Dictionary<SceneDataControl, Node> sceneToNode = new Dictionary<SceneDataControl, Node>();
-                    Dictionary<UniRx.Tuple<Node, Node>, bool> present = new Dictionary<UniRx.Tuple<Node, Node>, bool>();
+                    Dictionary<Tuple<Node, Node>, bool> present = new Dictionary<Tuple<Node, Node>, bool>();
 
                     foreach (var scene in scenes.getScenes())
                     {
@@ -577,7 +577,7 @@ namespace uAdventure.Editor
 
                             var nextScene = scenes.getScenes()[index];
 
-                            var t = new UniRx.Tuple<Node, Node>(node, sceneToNode[nextScene]);
+                            var t = new Tuple<Node, Node>(node, sceneToNode[nextScene]);
                             if (!present.ContainsKey(t))
                             {
                                 present.Add(t, true);

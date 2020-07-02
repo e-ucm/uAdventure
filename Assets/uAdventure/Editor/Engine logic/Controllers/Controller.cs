@@ -12,11 +12,7 @@ using System.Text.RegularExpressions;
 using System.Globalization;
 using uAdventure.Runner;
 using UnityEditor.Callbacks;
-using System.Collections;
 using System.Linq;
-using System.Reflection;
-using UnityEditor.IMGUI.Controls;
-using UnityEngine.Experimental.UIElements;
 
 namespace uAdventure.Editor
 {
