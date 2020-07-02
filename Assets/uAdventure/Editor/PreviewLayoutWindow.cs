@@ -201,7 +201,7 @@ namespace uAdventure.Editor
 
                     if (HasToDrawPreviewInspector())
                     {
-                        var maxHeight = viewport.height- 25f;
+                        var maxHeight = viewport.height - 26f;
 
                         windowRect.height = Mathf.Clamp(windowRect.height, 0, maxHeight);
                         // Create the preview inspector window
@@ -214,7 +214,7 @@ namespace uAdventure.Editor
 
                             if (useScroll)
                             {
-                                scroll = EditorGUILayout.BeginScrollView(scroll, GUILayout.Height(maxHeight));
+                                scroll = EditorGUILayout.BeginScrollView(scroll, GUILayout.Height(maxHeight), GUILayout.Width(windowRect.width - 8));
                             }
                             DrawPreviewInspector();
                             if (useScroll)
@@ -232,7 +232,6 @@ namespace uAdventure.Editor
 
                         }, "Properties")
                         .TrapInside(previewRect);
-
 
                         // And then, we update the position
                         windowRect = newWindowRect;
