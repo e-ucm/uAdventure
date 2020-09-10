@@ -266,9 +266,38 @@ namespace uAdventure.Editor
 
         protected void DrawSplitLine(float y)
         {
-            Rect position = new Rect(-5f, y, 1000f, 1f);
-            Rect texCoords = new Rect(0f, 1f, 1f, 1f - 1f / (float)GUI.skin.FindStyle("IN title").normal.background.height);
-            GUI.DrawTextureWithTexCoords(position, GUI.skin.FindStyle("IN title").normal.background, texCoords);
+            if(Event.current.type != EventType.Repaint)
+            {
+                return;
+            }
+            Rect position = new Rect(-5f, y, 1000f, 25f);
+            GetStyle("IN Title").Draw(position, position.Contains(Event.current.mousePosition), false, false, false);
+        }
+
+        GUIStyle GetStyle(string styleName)
+        {
+            GUIStyle s = GUI.skin.FindStyle(styleName) ?? EditorGUIUtility.GetBuiltinSkin(EditorSkin.Inspector).FindStyle(styleName);
+            if (s == null)
+            {
+                Debug.LogError("Missing built-in guistyle " + styleName);
+                s = error;
+            }
+            return s;
+        }
+
+        private GameObject gameObject;
+        private static GUIStyle ms_Error;
+        internal static GUIStyle error
+        {
+            get
+            {
+                if (ms_Error == null)
+                {
+                    ms_Error = new GUIStyle();
+                    ms_Error.name = "StyleNotFoundError";
+                }
+                return ms_Error;
+            }
         }
 
     }
