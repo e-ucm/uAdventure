@@ -113,7 +113,7 @@ namespace uAdventure.Runner
                 return;
             }
 
-            if (!string.IsNullOrEmpty(onode.getXApiQuestion()))
+            if (TrackerAsset.Instance.Started && !string.IsNullOrEmpty(onode.getXApiQuestion()))
             {
                 isTracePending = true;
                 Game.Instance.GameState.BeginChangeAmbit();
@@ -125,6 +125,11 @@ namespace uAdventure.Runner
 
         public void EndTrace()
         {
+            if (!TrackerAsset.Instance.Started)
+            {
+                return;
+            }
+
             Game.Instance.GameState.EndChangeAmbitAsExtensions();
             TrackerAsset.Instance.setSuccess(xAPISuccess);
             TrackerAsset.Instance.Alternative.Selected(xAPIQuestion, xAPIResponse, AlternativeTracker.Alternative.Question);
