@@ -13,6 +13,14 @@ using JWT;
 using JWT.Serializers;
 using JWT.Algorithms;
 using JWT.Exceptions;
+using System.IO;
+using AssetPackage;
+using uAdventure.Simva;
+using Chromely.Core;
+using Chromely.Core.Configuration;
+using Chromely;
+using uAdventure.Runner;
+using System.Linq;
 
 namespace Simva
 {
@@ -112,10 +120,30 @@ namespace Simva
 
         public static void OpenBrowser(string url)
         {
-            windowProcess = new System.Diagnostics.Process();
+            bool windowOpened = false;
 
-            if (Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.WindowsPlayer)
+            /*if (Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.LinuxPlayer || Application.platform == RuntimePlatform.OSXPlayer )
             {
+                // create a configuration with OS-specific defaults
+                var config = DefaultConfiguration.CreateForRuntimePlatform();
+
+                // your configuration
+                config.StartUrl = url;
+                config.WindowOptions.Title = "Simva Login";
+                //..
+                windowOpened = true;
+
+                // application builder
+                AppBuilder
+                    .Create()
+                    .UseApp<ChromelyBasicApp>()
+                    .UseConfiguration<IChromelyConfiguration>(config)
+                    .Build()
+                    .Run(new string[0]);
+            }
+            else */if (Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.WindowsPlayer)
+            {
+                windowProcess = new System.Diagnostics.Process();
                 if (tokenLogin)
                 {
                     url += "&token";
@@ -123,70 +151,111 @@ namespace Simva
 
                 System.Diagnostics.ProcessStartInfo proc = new System.Diagnostics.ProcessStartInfo("chrome.exe", "--app=\"" + url + "\"" + (tokenLogin ? " -incognito" : ""));
                 windowProcess.StartInfo = proc;
+
+                try
+                {
+                    windowOpened = windowProcess.Start();
+                }
+                catch(Exception ex)
+                {
+                    windowOpened = false;
+                }
+
+                if (!windowOpened)
+                {
+                    windowProcess = null;
+                }
             }
 
-            if (windowProcess == null || !windowProcess.Start())
+            if (!windowOpened)
             {
                 Application.OpenURL(url);
             }
         }
 
-        public static void ListenForCode(int port, Action<bool, string, string> onLogin)
+        public static string ListenForCode(int port, Action<bool, string, string> onLogin)
         {
-            var responseTransfer = new ResponseTransfer();
-
-            httpListener = new Thread(() =>
+            if (Application.isEditor)
             {
-                HttpListener listener = new HttpListener();
-                listener.Prefixes.Add("http://127.0.0.1:" + port + "/");
-                listener.Prefixes.Add("http://localhost:" + port + "/");
-                listener.Start();
+                var responseTransfer = new ResponseTransfer();
 
-                // Note: The GetContext method blocks while waiting for a request. 
-                HttpListenerContext context = listener.GetContext();
-                HttpListenerRequest request = context.Request;
-
-                // Get the code
-                var code = context.Request.QueryString.Get("code");
-                var state = context.Request.QueryString.Get("session-state");
-
-                // Obtain a response object.
-                HttpListenerResponse response = context.Response;
-                // Construct a response.
-                string responseString = "<HTML><BODY onload=\"javascript: setTimeout('self.close()', 10); \">Please close this window and go back to uAdventure</BODY></HTML>";
-                byte[] buffer = System.Text.Encoding.UTF8.GetBytes(responseString);
-                // Get a response stream and write the response to it.
-                response.ContentLength64 = buffer.Length;
-                System.IO.Stream output = response.OutputStream;
-                output.Write(buffer, 0, buffer.Length);
-                // You must close the output stream.
-                output.Close();
-                if (windowProcess != null)
+                httpListener = new Thread(() =>
                 {
-                    if (!windowProcess.HasExited)
+                    HttpListener listener = new HttpListener();
+                    listener.Prefixes.Add("http://127.0.0.1:" + port + "/");
+                    listener.Prefixes.Add("http://localhost:" + port + "/");
+                    listener.Start();
+
+                    // Note: The GetContext method blocks while waiting for a request. 
+                    HttpListenerContext context = listener.GetContext();
+                    HttpListenerRequest request = context.Request;
+
+                    // Get the code
+                    var code = context.Request.QueryString.Get("code");
+                    var state = context.Request.QueryString.Get("session-state");
+
+                    // Obtain a response object.
+                    HttpListenerResponse response = context.Response;
+                    // Construct a response.
+                    string responseString = "<HTML><BODY onload=\"javascript: setTimeout('self.close()', 10); \">Please close this window and go back to uAdventure</BODY></HTML>";
+                    byte[] buffer = System.Text.Encoding.UTF8.GetBytes(responseString);
+                    // Get a response stream and write the response to it.
+                    response.ContentLength64 = buffer.Length;
+                    System.IO.Stream output = response.OutputStream;
+                    output.Write(buffer, 0, buffer.Length);
+                    // You must close the output stream.
+                    output.Close();
+                    if (windowProcess != null)
                     {
-                        windowProcess.Kill();
+                        if (!windowProcess.HasExited)
+                        {
+                            windowProcess.Kill();
+                        }
+                        windowProcess = null;
                     }
-                    windowProcess = null;
-                }
 
-                responseTransfer.result = true;
-                responseTransfer.status = state;
-                responseTransfer.code = code;
-                responseTransfer.done = true;
+                    responseTransfer.result = true;
+                    responseTransfer.status = state;
+                    responseTransfer.code = code;
+                    responseTransfer.done = true;
 
-                listener.Close();
-            });
+                    listener.Close();
+                });
 
-            httpListener.Start();
+                httpListener.Start();
 
-            responseTransfer.ObserveEveryValueChanged(r => r.done).Subscribe(done =>
-            {
-                if (done)
+                responseTransfer.ObserveEveryValueChanged(r => r.done).Subscribe(done =>
                 {
-                    onLogin(responseTransfer.result, responseTransfer.code, responseTransfer.status);
-                }
-            });
+                    if (done)
+                    {
+                        onLogin(responseTransfer.result, responseTransfer.code, responseTransfer.status);
+                    }
+                });
+
+                return "http://127.0.0.1:" + port + "/redirect";
+            }
+            else if(Application.platform == RuntimePlatform.WindowsPlayer)
+            {
+                int ipcport = SimvaUriHandler.Start(uri =>
+                {
+                    Debug.Log("uri received!");
+                    var query = uri.Split('?')[1].Split('&');
+                    var d = new Dictionary<string, string>();
+                    foreach (var q in query.Select(q => q.Split('=')))
+                    {
+                        d.Add(q[0], q[1]);
+                    }
+
+                    SimvaUriHandler.Stop();
+                    onLogin(true, d["code"], d["session_state"]);
+                });
+
+                return Game.Instance.GameState.Data.getApplicationIdentifier() + "://" + ipcport + "/";
+            }
+            else
+            {
+                throw new NotImplementedException("Platform: " + Application.platform + " is not yet implemented!");
+            }
         }
 
         public static IAsyncOperation<AuthorizationInfo> LoginWithAccessCode(string authUrl, string tokenUrl, string clientId,
@@ -198,8 +267,7 @@ namespace Simva
 
             var url = authUrl + "?" +
                 "response_type=code" +
-                "&client_id=" + clientId +
-                "&redirect_uri=http://127.0.0.1:" + port + "/redirect";
+                "&client_id=" + clientId;
 
             string codeVerifier = null, codeChallenge = null;
             if (usePKCE)
@@ -219,11 +287,17 @@ namespace Simva
                 url += "&audience=" + audience;
             }
 
-            ListenForCode(port, (logged, code, state) =>
+            var redirectUri = ListenForCode(port, (logged, code, state) =>
             {
                 var token = GetToken(tokenUrl, clientId, code, port, codeVerifier);
                 result.SetResult(token);
             });
+
+
+            url += "&redirect_uri=" + redirectUri;
+            Debug.Log(redirectUri);
+            Debug.Log(url);
+
             OpenBrowser(url);
             return result;
         }
@@ -288,6 +362,24 @@ namespace Simva
 
         public static AuthorizationInfo RefreshToken(string tokenUrl, string clientId, string refresh_token)
         {
+            
+            /*var response = WebServiceRequest(new RequestSetttings
+            {
+                uri = new Uri(tokenUrl),
+                method = "POST",
+                requestHeaders = new Dictionary<string, string>
+                {
+                    { "Content-Type", "application/json" },
+                    { "Accept", "application/json" }
+                },
+                body = JsonConvert.SerializeObject(new Dictionary<string, string>()
+                {
+                    { "grant_type", "refresh_token" },
+                    { "refresh_token", refresh_token },
+                    { "client_id", clientId }
+                })
+            });*/
+
             UnityWebRequest uwr = UnityWebRequest.Post(tokenUrl,
                 new Dictionary<string, string>()
                 {
@@ -299,9 +391,17 @@ namespace Simva
             uwr.SendWebRequest();
 
             while (!uwr.isDone) { }
+            AuthorizationInfo authInfo = null;
+            try
+            {
+                authInfo = JsonConvert.DeserializeObject<AuthorizationInfo>(uwr.downloadHandler.text);
+            } 
+            catch (Exception e)
+            { 
+                Debug.LogWarning("Could not login to Simva: " + e.Message);
+            }
 
-            var authInfo = JsonConvert.DeserializeObject<AuthorizationInfo>(uwr.downloadHandler.text);
-            if (authInfo.AccessToken == null)
+            if (authInfo == null || authInfo.AccessToken == null)
             {
                 authInfo = null;
             }
@@ -310,6 +410,99 @@ namespace Simva
                 authInfo.ClientId = clientId;
             }
             return authInfo;
+        }
+
+        /// <summary>
+        /// Web service request.
+        /// </summary>
+        ///
+        /// <param name="requestSettings">Options for controlling the operation. </param>
+        ///
+        /// <returns>
+        /// A RequestResponse.
+        /// </returns>
+        private static RequestResponse WebServiceRequest(RequestSetttings requestSettings)
+        {
+            RequestResponse result = new RequestResponse(requestSettings);
+
+            try
+            {
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(requestSettings.uri);
+
+                request.Method = requestSettings.method;
+
+                // Both Accept and Content-Type are not allowed as Headers in a HttpWebRequest.
+                // They need to be assigned to a matching property.
+
+                if (requestSettings.requestHeaders.ContainsKey("Accept"))
+                {
+                    request.Accept = requestSettings.requestHeaders["Accept"];
+                }
+
+                if (!String.IsNullOrEmpty(requestSettings.body))
+                {
+                    byte[] data = Encoding.UTF8.GetBytes(requestSettings.body);
+
+                    if (requestSettings.requestHeaders.ContainsKey("Content-Type"))
+                    {
+                        request.ContentType = requestSettings.requestHeaders["Content-Type"];
+                    }
+
+                    foreach (KeyValuePair<string, string> kvp in requestSettings.requestHeaders)
+                    {
+                        if (kvp.Key.Equals("Accept") || kvp.Key.Equals("Content-Type"))
+                        {
+                            continue;
+                        }
+                        request.Headers.Add(kvp.Key, kvp.Value);
+                    }
+
+                    request.ContentLength = data.Length;
+
+                    // See https://msdn.microsoft.com/en-us/library/system.net.servicepoint.expect100continue(v=vs.110).aspx
+                    // A2 currently does not support this 100-Continue response for POST requets.
+                    request.ServicePoint.Expect100Continue = false;
+
+                    Stream stream = request.GetRequestStream();
+                    stream.Write(data, 0, data.Length);
+                    stream.Close();
+                }
+                else
+                {
+                    foreach (KeyValuePair<string, string> kvp in requestSettings.requestHeaders)
+                    {
+                        if (kvp.Key.Equals("Accept") || kvp.Key.Equals("Content-Type"))
+                        {
+                            continue;
+                        }
+                        request.Headers.Add(kvp.Key, kvp.Value);
+                    }
+                }
+
+                WebResponse response = request.GetResponse();
+                if (response.Headers.HasKeys())
+                {
+                    foreach (string key in response.Headers.AllKeys)
+                    {
+                        result.responseHeaders.Add(key, response.Headers.Get(key));
+                    }
+                }
+
+                result.responseCode = (int)(response as HttpWebResponse).StatusCode;
+
+                using (StreamReader reader = new StreamReader(response.GetResponseStream()))
+                {
+                    result.body = reader.ReadToEnd();
+                }
+            }
+            catch (Exception e)
+            {
+                result.responsMessage = e.Message;
+
+                Debug.Log(String.Format("{0} - {1}", e.GetType().Name, e.Message));
+            }
+
+            return result;
         }
     }
 
