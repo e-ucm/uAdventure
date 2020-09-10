@@ -134,8 +134,8 @@ namespace uAdventure.Editor
             {
                 // Show a dialog asking for the item id
                 if (string.IsNullOrEmpty(id))
-                    controller.ShowInputDialog(TC.get("Operation.AddItemTitle"), TC.get("Operation.AddItemMessage"),
-                        TC.get("Operation.AddItemDefaultValue"), performAddElement);
+                    controller.ShowInputDialog(TC.get("Operation.AddActiveAreaTitle"), TC.get("Operation.AddActiveAreaMessage"),
+                        TC.get("Operation.AddActiveAreaDefaultValue"), performAddElement);
                 else
                 {
                     performAddElement(null, id);
