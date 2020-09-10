@@ -87,14 +87,14 @@ namespace Simva.Api
         /// <param name="id">The test ID</param>
         /// <param name="user">the user to get its completion status (if logged in student , user is not needed) </param>
         /// <returns></returns>
-        IAsyncOperation SetCompletion (string id, string user);
+        IAsyncOperation SetCompletion (string id, string user, bool status);
         /// <summary>
         /// sets the result for the activity Set the completion status of the activity for a student 
         /// </summary>
         /// <param name="id">The test ID</param>
         /// <param name="user">the user to set its result (if logged in student , user is not needed) </param>
         /// <returns></returns>
-        IAsyncOperation SetCompletion_2 (string id, string user);
+        IAsyncOperation SetResult (string id, string user, object body);
     }
   
     /// <summary>
@@ -592,29 +592,31 @@ namespace Simva.Api
     
             return result;
         }
-    
+
         /// <summary>
         /// sets the completion status of the activity Set the completion status of the activity for a student 
         /// </summary>
         /// <param name="id">The test ID</param> 
         /// <param name="user">the user to get its completion status (if logged in student , user is not needed) </param> 
         /// <returns></returns>            
-        public IAsyncOperation SetCompletion (string id, string user)
+        public IAsyncOperation SetCompletion(string id, string user, bool status)
         {
-            
+
             // verify the required parameter 'id' is set
             if (id == null) throw new ApiException(400, "Missing required parameter 'id' when calling SetCompletion");
-            
-    
+
+
             var path = "/activities/{id}/completion";
             path = path.Replace("{format}", "json");
             path = path.Replace("{" + "id" + "}", ApiClient.ParameterToString(id));
-    
+
             var queryParams = new Dictionary<String, String>();
             var headerParams = new Dictionary<String, String>();
             var formParams = new Dictionary<String, String>();
             var fileParams = new Dictionary<String, String>();
-            String postBody = null;
+            String postBody = ApiClient.Serialize(new Dictionary<string, bool>{
+                { "status", status}
+            });
     
              if (user != null) queryParams.Add("user", ApiClient.ParameterToString(user)); // query parameter
                                         
@@ -643,11 +645,11 @@ namespace Simva.Api
         /// <param name="id">The test ID</param> 
         /// <param name="user">the user to set its result (if logged in student , user is not needed) </param> 
         /// <returns></returns>            
-        public IAsyncOperation SetCompletion_2 (string id, string user)
+        public IAsyncOperation SetResult(string id, string user, object body)
         {
             
             // verify the required parameter 'id' is set
-            if (id == null) throw new ApiException(400, "Missing required parameter 'id' when calling SetCompletion_2");
+            if (id == null) throw new ApiException(400, "Missing required parameter 'id' when calling SetResult");
             
     
             var path = "/activities/{id}/result";
@@ -658,7 +660,7 @@ namespace Simva.Api
             var headerParams = new Dictionary<String, String>();
             var formParams = new Dictionary<String, String>();
             var fileParams = new Dictionary<String, String>();
-            String postBody = null;
+            String postBody = ApiClient.Serialize(body);
     
              if (user != null) queryParams.Add("user", ApiClient.ParameterToString(user)); // query parameter
                                         
@@ -675,7 +677,7 @@ namespace Simva.Api
                 })
                 .Catch(error => {
                     var apiEx = (ApiException)error;
-                    result.SetException(new ApiException(apiEx.ErrorCode, "Error calling SetCompletion_2: " + apiEx.Message, apiEx.ErrorContent));
+                    result.SetException(new ApiException(apiEx.ErrorCode, "Error calling SetResult: " + apiEx.Message, apiEx.ErrorContent));
                 });
     
             return result;
