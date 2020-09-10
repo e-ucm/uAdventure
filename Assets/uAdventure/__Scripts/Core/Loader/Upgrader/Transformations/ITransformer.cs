@@ -8,5 +8,6 @@ namespace uAdventure.Core.XmlUpgrader
         int TargetVersion { get; }
         int DestinationVersion { get; }
         string Upgrade(string input, string path, ResourceManager resourceManager);
+        //IAsyncOperation<string> UpgradeAsync(string input, string path, ResourceManager resourceManager);
     }
 }

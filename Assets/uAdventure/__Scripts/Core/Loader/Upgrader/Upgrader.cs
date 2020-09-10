@@ -3,6 +3,8 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml;
 using uAdventure.Runner;
+using UnityFx.Async;
+using UnityFx.Async.Promises;
 
 namespace uAdventure.Core.XmlUpgrader
 {
@@ -38,7 +40,25 @@ namespace uAdventure.Core.XmlUpgrader
         public bool NeedsUpgrade(string path)
         {
             var fileVersion = GetFileVersion(path, resourceManager);
+            return CheckUpgraders(fileVersion, path);
+        }
 
+        public IAsyncOperation<bool> NeedsUpgradeAsync(string path)
+        {
+            UnityEngine.Debug.Log("Checking Upgrade Async");
+            var result = new AsyncCompletionSource<bool>();
+            GetFileVersionAsync(path, resourceManager)
+                .Then(version =>
+                {
+                    UnityEngine.Debug.Log("Done Checking Upgrade Async");
+                    result.SetResult(CheckUpgraders(version, path));
+                });
+
+            return result;
+        }
+
+        private bool CheckUpgraders(int fileVersion, string path)
+        {
             foreach (var upgradableFile in orderedTransformers.Keys)
             {
                 if (Regex.IsMatch(path, upgradableFile))
@@ -48,7 +68,6 @@ namespace uAdventure.Core.XmlUpgrader
                     return fileVersion < maxVersion;
                 }
             }
-
             return false;
         }
 
@@ -90,17 +109,88 @@ namespace uAdventure.Core.XmlUpgrader
             return null;
         }
 
+        public IAsyncOperation<string> UpgradeAsync(string path)
+        {
+            var result = new AsyncCompletionSource<string>();
+
+            GetFileVersionAsync(path, resourceManager)
+                .Then(version =>
+                {
+                    Dictionary<int, ITransformer> transformers = null;
+                    foreach (var upgradableFile in orderedTransformers.Keys)
+                    {
+                        if (Regex.IsMatch(path, upgradableFile))
+                        {
+                            transformers = orderedTransformers[upgradableFile];
+                            break;
+                        }
+                    }
+
+                    if (transformers == null)
+                    {
+                        result.SetResult(null);
+                    }
+                    else
+                    {
+                        var maxVersion = transformers.Values.Max(t => t.DestinationVersion);
+                        resourceManager.getTextAsync(path)
+                            .Then(input =>
+                            {
+                                while (version < maxVersion)
+                                {
+                                    if (!transformers.ContainsKey(version))
+                                    {
+                                        incidences.Add(new Incidence(Incidence.XML_INCIDENCE, Incidence.XML_INCIDENCE, path,
+                                            Incidence.IMPORTANCE_CRITICAL, "Upgrader not found to upgrade from version "
+                                            + version + " towards " + maxVersion, false, new UpgraderVersionNotFoundException()
+                                            {
+                                                TargetFile = path,
+                                                TargetVersion = version,
+                                                MaxVersion = maxVersion
+                                            }));
+                                        result.SetResult(null);
+                                    }
+
+                                    input = transformers[version].Upgrade(input, path, resourceManager);
+                                    version = transformers[version].DestinationVersion;
+                                }
+                                result.SetResult(input);
+                            });
+                    }
+                });
+
+            return result;
+        }
+
         private static int GetFileVersion(string path, ResourceManager resourceManager)
         {
             var xmlText = resourceManager.getText(path);
-            if (string.IsNullOrEmpty(xmlText))
+            return ExtractFileVersion(xmlText);
+        }
+        private static IAsyncOperation<int> GetFileVersionAsync(string path, ResourceManager resourceManager)
+        {
+            UnityEngine.Debug.Log("Getting File Version Async");
+            var result = new AsyncCompletionSource<int>();
+            resourceManager.getTextAsync(path)
+                .Then(text =>
+                {
+                    UnityEngine.Debug.Log("Done Getting File Version Async");
+                    result.SetResult(ExtractFileVersion(text));
+                });
+
+            return result;
+        }
+
+        private static int ExtractFileVersion(string text)
+        {
+            if (string.IsNullOrEmpty(text))
             {
-                return -1; 
+                return -1;
             }
 
             var xmlDocument = new XmlDocument();
             xmlDocument.XmlResolver = null;
-            xmlDocument.LoadXml(xmlText);
+            xmlDocument.LoadXml(text);
 
             XmlElement root = xmlDocument.DocumentElement;
 

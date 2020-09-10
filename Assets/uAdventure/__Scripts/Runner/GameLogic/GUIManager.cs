@@ -51,16 +51,24 @@ namespace uAdventure.Runner
 
         protected void Start()
         {
-            started = true;
-            guiprovider = new GUIProvider(Game.Instance.GameState.Data);
-            if (Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer)
+            if(Game.Instance.GameState != null)
             {
-                this.GetComponent<UnityEngine.UI.CanvasScaler>().referenceResolution = new Vector2(600, 400);
+                started = true;
+                guiprovider = new GUIProvider(Game.Instance.GameState.Data);
+                if (Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer)
+                {
+                    this.GetComponent<UnityEngine.UI.CanvasScaler>().referenceResolution = new Vector2(600, 400);
+                }
             }
         }
 
         protected void Update()
         {
+            if (!started)
+            {
+                Start();
+            }
+
             if (get_talker && GameObject.Find(talkerToFind) != null)
             {
                 get_talker = false;

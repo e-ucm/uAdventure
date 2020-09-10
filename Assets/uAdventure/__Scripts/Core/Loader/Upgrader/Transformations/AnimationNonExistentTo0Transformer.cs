@@ -5,6 +5,7 @@ using System.Linq;
 using System.Xml;
 using uAdventure.Runner;
 using UnityEngine;
+using UnityFx.Async;
 
 namespace uAdventure.Core.XmlUpgrader
 {
@@ -55,6 +56,40 @@ namespace uAdventure.Core.XmlUpgrader
                 return stringWriter.GetStringBuilder().ToString();
             }
         }
+
+        /*public IAsyncOperation<string> UpgradeAsync(string input, string path, ResourceManager resourceManager)
+        {
+            var id = path.Split('/').Last();
+
+            var frames = new List<string>();
+            var frameTypes = new List<int>();
+
+            int num = 1;
+            string ruta;
+            Texture2D img;
+
+            do
+            {
+                ruta = path + "_" + IntToStr(num);
+                img = resourceManager.getImage(ruta);
+                if (img)
+                {
+                    frames.Add(ruta);
+                    frameTypes.Add(Frame.TYPE_IMAGE);
+                    num++;
+                }
+
+            } while (img);
+
+            var animationXml = CreateAnimationXml(id, frames, frameTypes);
+            using (var stringWriter = new StringWriter())
+            using (var xmlTextWriter = XmlWriter.Create(stringWriter))
+            {
+                animationXml.WriteTo(xmlTextWriter);
+                xmlTextWriter.Flush();
+                return stringWriter.GetStringBuilder().ToString();
+            }
+        }*/
 
 
         public static XmlDocument CreateAnimationXml(string id, List<string> frames, List<int> frameTypes)
