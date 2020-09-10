@@ -87,6 +87,15 @@ namespace uAdventure.Editor
             adventureData.setPlayerMode(DescriptorData.MODE_PLAYER_3RDPERSON);
         }
 
+        public string getApplicationIdentifier()
+        {
+            return adventureData.getApplicationIdentifier();
+        }
+        public void setApplicationIdentifier(string applicationIdentifier)
+        {
+            Controller.Instance.AddTool(new ChangeStringValueTool(adventureData, applicationIdentifier, "getApplicationIdentifier", "setApplicationIdentifier"));
+        }
+
         public bool isCursorTypeAllowed(string type)
         {
             return isCursorTypeAllowed(DescriptorData.getCursorTypeIndex(type));
@@ -401,6 +410,42 @@ namespace uAdventure.Editor
         {
 
             Controller.Instance.AddTool(new ChangeValueTool<AdventureData, int>(adventureData, inventoryPosition, "getInventoryPosition", "setInventoryPosition"));
+        }
+
+        public Vector2 getInventoryCoords()
+        {
+
+            return adventureData.getInventoryCoords();
+        }
+
+        public float getInventoryScale()
+        {
+
+            return adventureData.getInventoryScale();
+        }
+
+        public void setInventoryScale(float inventoryScale)
+        {
+
+            Controller.Instance.AddTool(new ChangeValueTool<AdventureData, float>(adventureData, inventoryScale, "getInventoryScale", "setInventoryScale"));
+        }
+
+        public void setInventoryImage(string inventoryImage)
+        {
+
+            Controller.Instance.AddTool(new ChangeValueTool<AdventureData, string>(adventureData, inventoryImage, "getInventoryImage", "setInventoryImage"));
+        }
+
+        public string getInventoryImage()
+        {
+
+            return adventureData.getInventoryImage();
+        }
+
+        public void setInventoryCoords(Vector2 inventoryCoords)
+        {
+
+            Controller.Instance.AddTool(new ChangeValueTool<AdventureData, Vector2>(adventureData, inventoryCoords, "getInventoryCoords", "setInventoryCoords"));
         }
 
         public int countAssetReferences(string assetPath)

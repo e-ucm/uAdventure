@@ -7,13 +7,17 @@ using uAdventure.Core;
 
 namespace uAdventure.Editor
 {
-    public class ChapterWindow : LayoutWindow
+    public class ChapterWindow : DefaultButtonMenuEditorWindowExtension
     {
         public ChapterWindow(Rect aStartPos, GUIContent aContent, GUIStyle aStyle, params GUILayoutOption[] aOptions)
             : base(aStartPos, aContent, aStyle, aOptions)
         {
+            ButtonContent = new GUIContent("Chapter");
         }
 
+        protected override void OnButton()
+        {
+        }
 
         public override void Draw(int aID)
         {

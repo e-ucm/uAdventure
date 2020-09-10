@@ -23,7 +23,7 @@ namespace uAdventure.Editor
             {
                 foreach (var t in attr.Types)
                 {
-                    EditorWindowBase.RegisterComponent(t, component);
+                    uAdventureWindowMain.Instance.RegisterComponent(t, component);
                 }
             }
         }

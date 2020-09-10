@@ -4,18 +4,18 @@ using uAdventure.Core;
 
 namespace uAdventure.Editor
 {
-    public class AdventureWindow : EditorWindow
+    public class AdventureWindow : DefaultButtonMenuEditorWindowExtension
     {
-        public static void OpenAdventureWindow()
-        {
-            if (!Language.Initialized)
-                Language.Initialize();
+        private Vector2 scroll;
 
-            var window = ScriptableObject.CreateInstance<AdventureWindow>();
-            window.ShowUtility();
+        public AdventureWindow(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options)
+            : base(rect, content, style)
+        {
+            Options = options;
+            ButtonContent = new GUIContent("Settings");
         }
 
-        protected void OnGUI()
+        public override void Draw(int id)
         {
             if (!Controller.Instance.Loaded)
             {
@@ -23,54 +23,34 @@ namespace uAdventure.Editor
                 return;
             }
 
-            var adventureData = Controller.Instance.AdventureData;
-            EditData(adventureData);
-            EditMode(adventureData);
-            EditComentaries(adventureData);
-            EditKeepShowing(adventureData);
-            EditDefaultClickAction(adventureData);
-            EditPerspective(adventureData);
-            EditDragBehaviour(adventureData);
-            EditKeyboardNavigation(adventureData);
-            EditSaveMode(adventureData);
-            ShowVersionNumber(adventureData);
-
-            if (GUILayout.Button(TC.get("GeneralText.Close")))
+            using (var scope = new GUILayout.ScrollViewScope(scroll))
             {
-                this.Close();
-                return;
-            }
+                scroll = scope.scrollPosition;
+                EditorGUIUtility.labelWidth = Rect.width - 30;
 
-            if (Event.current.type == EventType.Repaint)
-            {
-                var lastRect = GUILayoutUtility.GetLastRect();
-                var size = new Vector2(400, lastRect.y + lastRect.height + 2);
-                minSize = maxSize = size;
+                var adventureData = Controller.Instance.AdventureData;
+                EditData(adventureData);
+                EditMode(adventureData);
+                EditComentaries(adventureData);
+                EditKeepShowing(adventureData);
+                EditDefaultClickAction(adventureData);
+                EditPerspective(adventureData);
+                EditDragBehaviour(adventureData);
+                EditKeyboardNavigation(adventureData);
+                ShowVersionNumber(adventureData);
+
+                if (Event.current.type == EventType.Repaint)
+                {
+                    var lastRect = GUILayoutUtility.GetLastRect();
+                    var size = new Vector2(400, lastRect.y + lastRect.height + 2);
+                }
             }
         }
 
         private static void ShowVersionNumber(AdventureDataControl adventureData)
         {
             EditorGUILayout.LabelField(TC.get("VersionNumber"), EditorStyles.boldLabel);
-            GUILayout.Box(adventureData.getVersionNumber(), GUILayout.Width(392));
-        }
-
-        private static void EditSaveMode(AdventureDataControl adventureData)
-        {
-            EditorGUILayout.LabelField(TC.get("MenuAdventure.SaveMode"), EditorStyles.boldLabel);
-            EditorGUI.BeginChangeCheck();
-            var newAutoSave = EditorGUILayout.Toggle(TC.get("MenuAdventure.AutoSave.Checkbox"), adventureData.isAutoSave());
-            if (EditorGUI.EndChangeCheck())
-            {
-                adventureData.setAutoSave(newAutoSave);
-            }
-
-            EditorGUI.BeginChangeCheck();
-            var newSaveOnSuspend = EditorGUILayout.Toggle(TC.get("MenuAdventure.SaveOnSuspend.Checkbox"), adventureData.isSaveOnSuspend());
-            if (EditorGUI.EndChangeCheck())
-            {
-                adventureData.setSaveOnSuspend(newSaveOnSuspend);
-            }
+            GUILayout.Box(adventureData.getVersionNumber(), GUILayout.ExpandWidth(true));
         }
 
         private static void EditKeyboardNavigation(AdventureDataControl adventureData)
@@ -79,7 +59,7 @@ namespace uAdventure.Editor
             using (new EditorGUI.DisabledScope(true)) // TODO add navigation control by keyboard
             {
                 EditorGUI.BeginChangeCheck();
-                var newKeyboardNavigation = EditorGUILayout.Toggle(TC.get("MenuAdventure.KeyboardNavigationEnabled.Checkbox"), adventureData.isKeyboardNavigationEnabled());
+                var newKeyboardNavigation = EditorGUILayout.Toggle(TC.get("MenuAdventure.KeyboardNavigationEnabled.Checkbox"), adventureData.isKeyboardNavigationEnabled(), GUILayout.ExpandWidth(true));
                 if (EditorGUI.EndChangeCheck())
                 {
                     adventureData.setKeyboardNavigation(newKeyboardNavigation);
@@ -142,7 +122,7 @@ namespace uAdventure.Editor
             // Keep showing texts or change after time
             EditorGUILayout.LabelField(TC.get("MenuAdventure.KeepShowing"), EditorStyles.boldLabel);
             EditorGUI.BeginChangeCheck();
-            var newKeep = EditorGUILayout.Toggle(TC.get("MenuAdventure.KeepText"), adventureData.isKeepShowing());
+            var newKeep = EditorGUILayout.Toggle(TC.get("MenuAdventure.KeepText"), adventureData.isKeepShowing(), GUILayout.ExpandWidth(true));
             if (EditorGUI.EndChangeCheck())
             {
                 adventureData.setKeepShowing(newKeep);
@@ -154,7 +134,7 @@ namespace uAdventure.Editor
             // Adventure commentaries
             EditorGUILayout.LabelField(TC.get("MenuAdventure.Commentaries"), EditorStyles.boldLabel);
             EditorGUI.BeginChangeCheck();
-            var newCommentaries = EditorGUILayout.Toggle(TC.get("MenuAdventure.CommentariesLabel"), adventureData.isCommentaries());
+            var newCommentaries = EditorGUILayout.Toggle(TC.get("MenuAdventure.CommentariesLabel"), adventureData.isCommentaries(), GUILayout.ExpandWidth(true));
             if (EditorGUI.EndChangeCheck())
             {
                 adventureData.setCommentaries(newCommentaries);
@@ -180,13 +160,12 @@ namespace uAdventure.Editor
                     modeDescription = TC.get("Adventure.ModePlayerVisible.Description");
                     break;
             }
-            GUILayout.Box(modeName, GUILayout.Width(392));
+            GUILayout.Box(modeName, GUILayout.ExpandWidth(true));
             GUILayout.Box(modeDescription);
         }
 
         private static void EditData(AdventureDataControl adventureData)
         {
-            EditorGUIUtility.labelWidth = 379;
             EditorGUILayout.LabelField(TC.get("Adventure.Title"), EditorStyles.boldLabel);
 
             EditorGUILayout.LabelField(TC.get("Adventure.AdventureTitle"));
@@ -204,6 +183,10 @@ namespace uAdventure.Editor
             {
                 adventureData.setDescription(newDescription);
             }
+        }
+
+        protected override void OnButton()
+        {
         }
     }
 }

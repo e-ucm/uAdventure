@@ -36,7 +36,7 @@ namespace uAdventure.Editor
 					selectedGameProjectPath = file.FullName;
                     GameRources.LoadGameProject(selectedGameProjectPath);
                     Controller.OpenEditorWindow();
-                    EditorWindowBase.RefreshWindows();
+                    uAdventureWindowMain.Instance.RefreshWindows();
                 }
             }
         }

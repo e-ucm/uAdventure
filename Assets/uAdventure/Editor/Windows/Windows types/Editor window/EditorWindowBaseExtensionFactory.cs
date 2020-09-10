@@ -29,7 +29,9 @@ namespace uAdventure.Editor
             LoadExtensions();
             var r = new List<EditorWindowExtension>();
             foreach (var t in knownExtensions.Values.Distinct().OrderBy(t => priorities[t]))
+            {
                 r.Add((EditorWindowExtension)Activator.CreateInstance(t, windowRect, style, options));
+            }
 
             return r;
         }

@@ -53,7 +53,7 @@ namespace uAdventure.Editor
                 {
                     Controller.Instance.ChapterList.setSelectedChapterInternal((int)obj);
                     SetMenuItems();
-                    EditorWindowBase.RefreshChapter();
+                    uAdventureWindowMain.Instance.RefreshChapter();
                 }
             }
         }

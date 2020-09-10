@@ -12,11 +12,7 @@ using System.Text.RegularExpressions;
 using System.Globalization;
 using uAdventure.Runner;
 using UnityEditor.Callbacks;
-using System.Collections;
 using System.Linq;
-using System.Reflection;
-using UnityEditor.IMGUI.Controls;
-using UnityEngine.Experimental.UIElements;
 
 namespace uAdventure.Editor
 {
@@ -3355,7 +3351,8 @@ namespace uAdventure.Editor
         public void SelectElement(Searchable element)
         {
             var path = SelectedChapterDataControl.getPathToDataControl(element);
-            EditorWindowBase.SelectElement(path);
+
+            uAdventureWindowMain.Instance.SelectElement(path);
         }
 
         //public void search()
@@ -3414,7 +3411,7 @@ namespace uAdventure.Editor
 
         public void RefreshView()
         {
-            EditorWindowBase.RefreshChapter();
+            uAdventureWindowMain.Instance.RefreshChapter();
         }
 
         public class InputReceiver : DialogReceiverInterface
@@ -3484,7 +3481,7 @@ namespace uAdventure.Editor
                 }
             }
 
-            var window = EditorWindow.GetWindow(typeof(EditorWindowBase));
+            var window = EditorWindow.GetWindow(typeof(uAdventureWindowMain));
             window.Show();
         }  
 
