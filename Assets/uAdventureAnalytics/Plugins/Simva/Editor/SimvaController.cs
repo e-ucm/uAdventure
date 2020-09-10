@@ -1,18 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using uAdventure.Editor;
-using UnityEditor;
-using UnityEngine;
-using uAdventure.Core;
-using uAdventure.Runner;
+﻿using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Callbacks;
+using UnityEditor.Build.Reporting;
+using WixSharp;
+using System.Windows.Forms;
+using WixSharp.CommonTasks;
+using System.IO;
+using System.Linq;
+using UnityEngine;
+using UnityEngine.WSA;
 
 namespace uAdventure.Simva
 {
-    public class SimvaController : IPreprocessBuild
+    public class SimvaController : IPreprocessBuildWithReport
     {
         private static SimvaController instance;
         public static SimvaController Instance
@@ -26,9 +26,9 @@ namespace uAdventure.Simva
         {
         }
 
-        public void OnPreprocessBuild(BuildTarget target, string path)
+        public void OnPreprocessBuild(BuildReport report)
         {
-            switch (target)
+            switch (report.summary.platform)
             {
 
                 // Windows
@@ -42,8 +42,6 @@ namespace uAdventure.Simva
                     break;
 
                 // Linux
-                case BuildTarget.StandaloneLinux:
-                    break;
                 case BuildTarget.StandaloneLinux64:
                     break;
 
@@ -61,7 +59,26 @@ namespace uAdventure.Simva
             }
         }
 
-        [PostProcessBuild(0)] 
+        private static Dir GetDirContents(string prepend, string localPath, string folder, bool prependIsBase = true)
+        {
+            var localFolder = prependIsBase ? localPath + folder : localPath + prepend + folder;
+
+            var dir = new Dir(prependIsBase ? prepend + folder : folder);
+
+            foreach (var file in Directory.GetFiles(localFolder))
+            {
+                dir.AddFile(new WixSharp.File(file));
+            }
+
+            foreach(var directory in Directory.GetDirectories(localFolder).Select(d => new DirectoryInfo(d)))
+            {
+                dir.AddDir(GetDirContents(prependIsBase ? folder : prepend + "\\" + folder + "\\", localPath, directory.Name, false));
+            }
+
+            return dir;
+        }
+
+        [PostProcessBuild(0)]
         public static void OnPostprocessBuild(BuildTarget target, string pathToBuiltProject)
         {
             switch (target)
@@ -71,6 +88,31 @@ namespace uAdventure.Simva
                 case BuildTarget.StandaloneWindows:
                     break;
                 case BuildTarget.StandaloneWindows64:
+                    Compiler.WixLocation = "C:\\Users\\Victor\\Documents\\uAdventure\\wixsharp\\Wix_bin\\bin";
+
+                    var path = new FileInfo(pathToBuiltProject).Directory.FullName;
+
+                    var fullSetup = new Feature(PlayerSettings.productName + " Binaries");
+
+                    var project = new Project(PlayerSettings.productName,
+                        GetDirContents(@"%ProgramFiles%\" + PlayerSettings.companyName + @"\" + PlayerSettings.productName, path, "\\"))
+                    {
+                        GUID = new System.Guid(PlayerSettings.productGUID.ToString())
+                    };
+
+                    project.AddRegKey(new RegKey(fullSetup, RegistryHive.CurrentUser, @"Software\Classes\" + PlayerSettings.applicationIdentifier,
+                        new RegValue("", "URL " + PlayerSettings.productName + " Link"),
+                        new RegValue("URL Protocol", PlayerSettings.productName + " Protocol")));
+                    project.AddRegKey(new RegKey(fullSetup, RegistryHive.CurrentUser, @"Software\Classes\" + PlayerSettings.applicationIdentifier + @"\shell"));
+                    project.AddRegKey(new RegKey(fullSetup, RegistryHive.CurrentUser, @"Software\Classes\" + PlayerSettings.applicationIdentifier + @"\shell\open"));
+                    project.AddRegValue(new RegValue(fullSetup, RegistryHive.CurrentUser, @"Software\Classes\" + PlayerSettings.applicationIdentifier 
+                        + @"\shell\open\command", "", "\"[INSTALLDIR]" + PlayerSettings.productName +".exe\" \"%1\""));
+
+                    project.OutDir = "Installers/";
+                    project.OutFileName = PlayerSettings.productName + ".msi";
+                    project.BuildMsiCmd();
+                    //Compiler.BuildMsi(project);
+
                     break;
 
                 // Mac OS X
@@ -120,8 +162,6 @@ namespace uAdventure.Simva
                 case BuildTarget.WebGL:
                     break;
             }
-
-
-            }
         }
+    }
 }

@@ -18,20 +18,20 @@ namespace SimvaPlugin
         private string jwt = null;
         private static SimvaConf simvaConf;
 
-        private ApiClient apiClient;
         public T Api { get; private set; }
+        public ApiClient ApiClient { get; private set; }
 
         public AuthorizationInfo AuthorizationInfo
         {
             get
             {
-                if (apiClient == null)
+                if (ApiClient == null)
                 {
                     return null;
                 }
                 else
                 {
-                    return apiClient.AuthorizationInfo;
+                    return ApiClient.AuthorizationInfo;
                 }
             }
         }
@@ -62,22 +62,22 @@ namespace SimvaPlugin
             if (Inherits<T, IAdminsApi>())
             {
                 var admins = api as AdminsApi;
-                apiClient = admins.ApiClient;
+                ApiClient = admins.ApiClient;
             }
             else if (Inherits<T, ITeachersApi>())
             {
                 var teachers = api as TeachersApi;
-                apiClient = teachers.ApiClient;
+                ApiClient = teachers.ApiClient;
             }
             else if (Inherits<T, IStudentsApi>())
             {
                 var students = api as StudentsApi;
-                apiClient = students.ApiClient;
+                ApiClient = students.ApiClient;
             }
             else if (Inherits<T, IDefaultApi>())
             {
                 var defaults = api as DefaultApi;
-                apiClient = defaults.ApiClient;
+                ApiClient = defaults.ApiClient;
             }
             this.Api = api;
         }
@@ -202,7 +202,7 @@ namespace SimvaPlugin
         public IAsyncOperation<bool> Register(string username, string email, string password, bool teacher)
         {
             var result = new AsyncCompletionSource<bool>();
-            apiClient.CallApi("/users", UnityWebRequest.kHttpVerbPOST, new Dictionary<string, string>(), new JSONClass {
+            ApiClient.CallApi("/users", UnityWebRequest.kHttpVerbPOST, new Dictionary<string, string>(), new JSONClass {
                 { "username", username },
                 { "password", password },
                 { "email", email },

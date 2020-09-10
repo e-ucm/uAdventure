@@ -111,6 +111,8 @@ namespace uAdventure.Simva
             }
         }
 
+        public SimvaBridge SimvaBridge { get; private set; }
+
         public override void OnAfterGameLoad()
         {
             if (!IsEnabled)
@@ -147,19 +149,10 @@ namespace uAdventure.Simva
             {
                 Activity activity = GetActivity(CurrentActivityId);
                 string activityType = activity.Type;
-                if (activityType == "gameplay")
+                if (activityType.Equals("gameplay", StringComparison.InvariantCultureIgnoreCase) 
+                    && activity.Details != null && activity.Details.ContainsKey("backup") && (bool)activity.Details["backup"])
                 {
-                    string path = Application.persistentDataPath;
-                    if (!path.EndsWith("/"))
-                    {
-                        path += "/";
-                    }
-
-                    TrackerAssetSettings trackersettings = (TrackerAssetSettings)TrackerAsset.Instance.Settings;
-                    string backupfile = path + trackersettings.BackupFile;
-                    string traces = File.ReadAllText(backupfile);
-                    File.AppendAllText(path + Token + ".csv", traces);
-
+                    string traces = SimvaBridge.Load(((TrackerAssetSettings)TrackerAsset.Instance.Settings).BackupFile);
                     SaveActivityAndContinue(CurrentActivityId, traces, true);
                 }
                 else
@@ -228,11 +221,17 @@ namespace uAdventure.Simva
 
         public IAsyncOperation SaveActivityAndContinue(string activityId, string traces, bool completed)
         {
-            throw new NotImplementedException();
+            NotifyLoading(true);
 
-            /*NotifyLoading(true);
-            return API.SetResults(activityId, traces, true)
-                .Then(result =>
+            var body = new Dictionary<string, object>();
+            if (!string.IsNullOrEmpty(traces))
+            {
+                body.Add("tofile", true);
+                body.Add("result", traces);
+            }
+
+            return API.Api.SetResult(activityId, API.AuthorizationInfo.Username, body)
+                .Then(() =>
                 {
                     NotifyLoading(false);
                     return Continue(activityId, completed);
@@ -241,28 +240,27 @@ namespace uAdventure.Simva
                 {
                     NotifyLoading(false);
                     NotifyManagers(error.Message);
-                });*/
+                });
         }
 
         public IAsyncOperation Continue(string activityId, bool completed)
         {
-            throw new NotImplementedException();
-            /*NotifyLoading(true);
-            return API.SetCompletion(activityId, completed)
-                .Then(result =>
+            NotifyLoading(true);
+            return API.Api.SetCompletion(activityId, API.AuthorizationInfo.Username, completed)
+                .Then(() =>
                 {
                     return UpdateSchedule();
                 })
                 .Then(schedule =>
                 {
                     NotifyLoading(false);
-                    LaunchActivity(schedule["next"].Value);
+                    LaunchActivity(schedule.Next);
                 })
                 .Catch(error =>
                 {
                     NotifyLoading(false);
                     NotifyManagers(error.Message);
-                });*/
+                });
         }
 
         public Activity GetActivity(string activityId)
@@ -309,17 +307,19 @@ namespace uAdventure.Simva
                                 trackerConfig.setLoginEndpoint("/users/login");
                                 trackerConfig.setStartEndpoint("/activities/{0}/result");
                                 trackerConfig.setTrackEndpoint("/activities/{0}/result");
-                                trackerConfig.setTrackingCode(activity.Id);
+                                trackerConfig.setTrackingCode(activityId);
                                 trackerConfig.setUseBearerOnTrackEndpoint(true);
                             }
+                            Debug.Log("TrackingCode: " + activity.Id + " settings " + trackerConfig.getTrackingCode());
 
                             if (ActivityHasDetails(activity, "backup"))
                             {
                                 // Local
                                 trackerConfig.setRawCopy(true);
                             }
+                            SimvaBridge = new SimvaBridge(API.ApiClient);
+                            AnalyticsExtension.Instance.StartTracker(trackerConfig, SimvaBridge);
 
-                            AnalyticsExtension.Instance.StartTracker(trackerConfig);
 
                             Game.Instance.RunTarget(Game.Instance.GameState.InitialChapterTarget.getId());
                             break;
