@@ -22,12 +22,14 @@ namespace uAdventure.Core
             XmlElement element = doc.DocumentElement,
                 descriptor     = (XmlElement)element.SelectSingleNode("/game-descriptor"),
                 title          = (XmlElement)descriptor.SelectSingleNode("title"),
-                description    = (XmlElement)descriptor.SelectSingleNode("description");
+                description    = (XmlElement)descriptor.SelectSingleNode("description"),
+                application_identifier = (XmlElement)descriptor.SelectSingleNode("application-identifier");
 
             // Basic attributes
             content.setVersionNumber(ExString.Default(descriptor.GetAttribute("versionNumber"), "0"));
             content.setTitle(title.InnerText ?? "");
             content.setDescription(description.InnerText ?? "");
+            content.setApplicationIdentifier(application_identifier?.InnerText);
 
             // Sub nodes
             XmlElement configuration    = (XmlElement)descriptor.SelectSingleNode("configuration"),

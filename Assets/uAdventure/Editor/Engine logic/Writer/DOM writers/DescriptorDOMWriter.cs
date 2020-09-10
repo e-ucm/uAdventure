@@ -62,6 +62,11 @@ namespace uAdventure.Editor
             adventureDescriptionNode.AppendChild(doc.CreateTextNode(adventureData.getDescription()));
             node.AppendChild(adventureDescriptionNode);
 
+            // Create and append the description
+            XmlNode applicationIdentifierNode = doc.CreateElement("application-identifier");
+            applicationIdentifierNode.AppendChild(doc.CreateTextNode(adventureData.getApplicationIdentifier()));
+            node.AppendChild(applicationIdentifierNode);
+
             // Create and append the "invalid" tag (if necessary)
             var invalid = options.Any(option => option is InvalidAdventureDataControlParam);
             if (invalid)
