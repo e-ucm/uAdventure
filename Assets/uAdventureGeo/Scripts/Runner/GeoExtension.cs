@@ -48,6 +48,7 @@ namespace uAdventure.Geo
         private GUIMap guiMap;
         private Rect debugWindowRect = new Rect(0, 0, 200, 200);
         private Texture2D pointer;
+        private bool gameIsReady;
 
         void Awake()
         {
@@ -90,6 +91,7 @@ namespace uAdventure.Geo
 
         public override void OnGameReady()
         {
+            gameIsReady = true;
             this.memory = Game.Instance.GameState.GetMemory("geo_extension") ?? memory;
             CreateNavigationAndZoneControl();
         }
@@ -171,6 +173,11 @@ namespace uAdventure.Geo
 
         void Update()
         {
+            if (!gameIsReady)
+            {
+                return;
+            }
+
             if (!Application.isEditor && !IsStarted())
             {
                 StartCoroutine(StartLocation());

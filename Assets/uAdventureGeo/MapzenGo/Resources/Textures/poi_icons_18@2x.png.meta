@@ -1,168 +1,471 @@
 fileFormatVersion: 2
 guid: 69d4d6e2d4257d84781137050fd12175
-timeCreated: 1475004021
-licenseType: Free
 TextureImporter:
-  fileIDToRecycleName:
-    21300000: poi_icons_18@2x_0
-    21300002: poi_icons_18@2x_1
-    21300004: poi_icons_18@2x_2
-    21300006: poi_icons_18@2x_3
-    21300008: poi_icons_18@2x_4
-    21300010: poi_icons_18@2x_5
-    21300012: poi_icons_18@2x_6
-    21300014: poi_icons_18@2x_7
-    21300016: poi_icons_18@2x_8
-    21300018: poi_icons_18@2x_9
-    21300020: poi_icons_18@2x_10
-    21300022: poi_icons_18@2x_11
-    21300024: poi_icons_18@2x_12
-    21300026: poi_icons_18@2x_13
-    21300028: poi_icons_18@2x_14
-    21300030: poi_icons_18@2x_15
-    21300032: poi_icons_18@2x_16
-    21300034: poi_icons_18@2x_17
-    21300036: poi_icons_18@2x_18
-    21300038: poi_icons_18@2x_19
-    21300040: poi_icons_18@2x_20
-    21300042: poi_icons_18@2x_21
-    21300044: poi_icons_18@2x_22
-    21300046: poi_icons_18@2x_23
-    21300048: poi_icons_18@2x_24
-    21300050: poi_icons_18@2x_25
-    21300052: poi_icons_18@2x_26
-    21300054: poi_icons_18@2x_27
-    21300056: poi_icons_18@2x_28
-    21300058: poi_icons_18@2x_29
-    21300060: poi_icons_18@2x_30
-    21300062: poi_icons_18@2x_31
-    21300064: poi_icons_18@2x_32
-    21300066: poi_icons_18@2x_33
-    21300068: poi_icons_18@2x_34
-    21300070: poi_icons_18@2x_35
-    21300072: poi_icons_18@2x_36
-    21300074: poi_icons_18@2x_37
-    21300076: poi_icons_18@2x_38
-    21300078: poi_icons_18@2x_39
-    21300080: poi_icons_18@2x_40
-    21300082: poi_icons_18@2x_41
-    21300084: poi_icons_18@2x_42
-    21300086: poi_icons_18@2x_43
-    21300088: poi_icons_18@2x_44
-    21300090: poi_icons_18@2x_45
-    21300092: poi_icons_18@2x_46
-    21300094: poi_icons_18@2x_47
-    21300096: poi_icons_18@2x_48
-    21300098: poi_icons_18@2x_49
-    21300100: poi_icons_18@2x_50
-    21300102: poi_icons_18@2x_51
-    21300104: poi_icons_18@2x_52
-    21300106: poi_icons_18@2x_53
-    21300108: poi_icons_18@2x_54
-    21300110: poi_icons_18@2x_55
-    21300112: poi_icons_18@2x_56
-    21300114: poi_icons_18@2x_57
-    21300116: poi_icons_18@2x_58
-    21300118: poi_icons_18@2x_59
-    21300120: poi_icons_18@2x_60
-    21300122: poi_icons_18@2x_61
-    21300124: poi_icons_18@2x_62
-    21300126: poi_icons_18@2x_63
-    21300128: poi_icons_18@2x_64
-    21300130: poi_icons_18@2x_65
-    21300132: poi_icons_18@2x_66
-    21300134: poi_icons_18@2x_67
-    21300136: poi_icons_18@2x_68
-    21300138: poi_icons_18@2x_69
-    21300140: poi_icons_18@2x_70
-    21300142: poi_icons_18@2x_71
-    21300144: poi_icons_18@2x_72
-    21300146: poi_icons_18@2x_73
-    21300148: poi_icons_18@2x_74
-    21300150: poi_icons_18@2x_75
-    21300152: poi_icons_18@2x_76
-    21300154: poi_icons_18@2x_77
-    21300156: poi_icons_18@2x_78
-    21300158: poi_icons_18@2x_79
-    21300160: poi_icons_18@2x_80
-    21300162: poi_icons_18@2x_81
-    21300164: poi_icons_18@2x_82
-    21300166: poi_icons_18@2x_83
-    21300168: poi_icons_18@2x_84
-    21300170: poi_icons_18@2x_85
-    21300172: poi_icons_18@2x_86
-    21300174: poi_icons_18@2x_87
-    21300176: poi_icons_18@2x_88
-    21300178: poi_icons_18@2x_89
-    21300180: poi_icons_18@2x_90
-    21300182: poi_icons_18@2x_91
-    21300184: poi_icons_18@2x_92
-    21300186: poi_icons_18@2x_93
-    21300188: poi_icons_18@2x_94
-    21300190: poi_icons_18@2x_95
-    21300192: poi_icons_18@2x_96
-    21300194: poi_icons_18@2x_97
-    21300196: poi_icons_18@2x_98
-    21300198: poi_icons_18@2x_99
-    21300200: poi_icons_18@2x_100
-    21300202: poi_icons_18@2x_101
-    21300204: poi_icons_18@2x_102
-    21300206: poi_icons_18@2x_103
-    21300208: poi_icons_18@2x_104
-    21300210: poi_icons_18@2x_105
-    21300212: poi_icons_18@2x_106
-    21300214: poi_icons_18@2x_107
-    21300216: poi_icons_18@2x_108
-    21300218: poi_icons_18@2x_109
-    21300220: poi_icons_18@2x_110
-    21300222: poi_icons_18@2x_111
-    21300224: poi_icons_18@2x_112
-    21300226: poi_icons_18@2x_113
-    21300228: poi_icons_18@2x_114
-    21300230: poi_icons_18@2x_115
-    21300232: poi_icons_18@2x_116
-    21300234: poi_icons_18@2x_117
-    21300236: poi_icons_18@2x_118
-    21300238: poi_icons_18@2x_119
-    21300240: poi_icons_18@2x_120
-    21300242: poi_icons_18@2x_121
-    21300244: poi_icons_18@2x_122
-    21300246: poi_icons_18@2x_123
-    21300248: poi_icons_18@2x_124
-    21300250: poi_icons_18@2x_125
-    21300252: poi_icons_18@2x_126
-    21300254: poi_icons_18@2x_127
-    21300256: poi_icons_18@2x_128
-    21300258: poi_icons_18@2x_129
-    21300260: poi_icons_18@2x_130
-    21300262: poi_icons_18@2x_131
-    21300264: poi_icons_18@2x_132
-    21300266: poi_icons_18@2x_133
-    21300268: poi_icons_18@2x_134
-    21300270: poi_icons_18@2x_135
-    21300272: poi_icons_18@2x_136
-    21300274: poi_icons_18@2x_137
-    21300276: poi_icons_18@2x_138
-    21300278: poi_icons_18@2x_139
-    21300280: poi_icons_18@2x_140
-    21300282: poi_icons_18@2x_141
-    21300284: poi_icons_18@2x_142
-    21300286: poi_icons_18@2x_143
-    21300288: poi_icons_18@2x_144
-    21300290: poi_icons_18@2x_145
-    21300292: poi_icons_18@2x_146
-    21300294: poi_icons_18@2x_147
-    21300296: poi_icons_18@2x_148
-    21300298: poi_icons_18@2x_149
-    21300300: poi_icons_18@2x_150
-  serializedVersion: 2
+  internalIDToNameTable:
+  - first:
+      213: 21300000
+    second: poi_icons_18@2x_0
+  - first:
+      213: 21300002
+    second: poi_icons_18@2x_1
+  - first:
+      213: 21300004
+    second: poi_icons_18@2x_2
+  - first:
+      213: 21300006
+    second: poi_icons_18@2x_3
+  - first:
+      213: 21300008
+    second: poi_icons_18@2x_4
+  - first:
+      213: 21300010
+    second: poi_icons_18@2x_5
+  - first:
+      213: 21300012
+    second: poi_icons_18@2x_6
+  - first:
+      213: 21300014
+    second: poi_icons_18@2x_7
+  - first:
+      213: 21300016
+    second: poi_icons_18@2x_8
+  - first:
+      213: 21300018
+    second: poi_icons_18@2x_9
+  - first:
+      213: 21300020
+    second: poi_icons_18@2x_10
+  - first:
+      213: 21300022
+    second: poi_icons_18@2x_11
+  - first:
+      213: 21300024
+    second: poi_icons_18@2x_12
+  - first:
+      213: 21300026
+    second: poi_icons_18@2x_13
+  - first:
+      213: 21300028
+    second: poi_icons_18@2x_14
+  - first:
+      213: 21300030
+    second: poi_icons_18@2x_15
+  - first:
+      213: 21300032
+    second: poi_icons_18@2x_16
+  - first:
+      213: 21300034
+    second: poi_icons_18@2x_17
+  - first:
+      213: 21300036
+    second: poi_icons_18@2x_18
+  - first:
+      213: 21300038
+    second: poi_icons_18@2x_19
+  - first:
+      213: 21300040
+    second: poi_icons_18@2x_20
+  - first:
+      213: 21300042
+    second: poi_icons_18@2x_21
+  - first:
+      213: 21300044
+    second: poi_icons_18@2x_22
+  - first:
+      213: 21300046
+    second: poi_icons_18@2x_23
+  - first:
+      213: 21300048
+    second: poi_icons_18@2x_24
+  - first:
+      213: 21300050
+    second: poi_icons_18@2x_25
+  - first:
+      213: 21300052
+    second: poi_icons_18@2x_26
+  - first:
+      213: 21300054
+    second: poi_icons_18@2x_27
+  - first:
+      213: 21300056
+    second: poi_icons_18@2x_28
+  - first:
+      213: 21300058
+    second: poi_icons_18@2x_29
+  - first:
+      213: 21300060
+    second: poi_icons_18@2x_30
+  - first:
+      213: 21300062
+    second: poi_icons_18@2x_31
+  - first:
+      213: 21300064
+    second: poi_icons_18@2x_32
+  - first:
+      213: 21300066
+    second: poi_icons_18@2x_33
+  - first:
+      213: 21300068
+    second: poi_icons_18@2x_34
+  - first:
+      213: 21300070
+    second: poi_icons_18@2x_35
+  - first:
+      213: 21300072
+    second: poi_icons_18@2x_36
+  - first:
+      213: 21300074
+    second: poi_icons_18@2x_37
+  - first:
+      213: 21300076
+    second: poi_icons_18@2x_38
+  - first:
+      213: 21300078
+    second: poi_icons_18@2x_39
+  - first:
+      213: 21300080
+    second: poi_icons_18@2x_40
+  - first:
+      213: 21300082
+    second: poi_icons_18@2x_41
+  - first:
+      213: 21300084
+    second: poi_icons_18@2x_42
+  - first:
+      213: 21300086
+    second: poi_icons_18@2x_43
+  - first:
+      213: 21300088
+    second: poi_icons_18@2x_44
+  - first:
+      213: 21300090
+    second: poi_icons_18@2x_45
+  - first:
+      213: 21300092
+    second: poi_icons_18@2x_46
+  - first:
+      213: 21300094
+    second: poi_icons_18@2x_47
+  - first:
+      213: 21300096
+    second: poi_icons_18@2x_48
+  - first:
+      213: 21300098
+    second: poi_icons_18@2x_49
+  - first:
+      213: 21300100
+    second: poi_icons_18@2x_50
+  - first:
+      213: 21300102
+    second: poi_icons_18@2x_51
+  - first:
+      213: 21300104
+    second: poi_icons_18@2x_52
+  - first:
+      213: 21300106
+    second: poi_icons_18@2x_53
+  - first:
+      213: 21300108
+    second: poi_icons_18@2x_54
+  - first:
+      213: 21300110
+    second: poi_icons_18@2x_55
+  - first:
+      213: 21300112
+    second: poi_icons_18@2x_56
+  - first:
+      213: 21300114
+    second: poi_icons_18@2x_57
+  - first:
+      213: 21300116
+    second: poi_icons_18@2x_58
+  - first:
+      213: 21300118
+    second: poi_icons_18@2x_59
+  - first:
+      213: 21300120
+    second: poi_icons_18@2x_60
+  - first:
+      213: 21300122
+    second: poi_icons_18@2x_61
+  - first:
+      213: 21300124
+    second: poi_icons_18@2x_62
+  - first:
+      213: 21300126
+    second: poi_icons_18@2x_63
+  - first:
+      213: 21300128
+    second: poi_icons_18@2x_64
+  - first:
+      213: 21300130
+    second: poi_icons_18@2x_65
+  - first:
+      213: 21300132
+    second: poi_icons_18@2x_66
+  - first:
+      213: 21300134
+    second: poi_icons_18@2x_67
+  - first:
+      213: 21300136
+    second: poi_icons_18@2x_68
+  - first:
+      213: 21300138
+    second: poi_icons_18@2x_69
+  - first:
+      213: 21300140
+    second: poi_icons_18@2x_70
+  - first:
+      213: 21300142
+    second: poi_icons_18@2x_71
+  - first:
+      213: 21300144
+    second: poi_icons_18@2x_72
+  - first:
+      213: 21300146
+    second: poi_icons_18@2x_73
+  - first:
+      213: 21300148
+    second: poi_icons_18@2x_74
+  - first:
+      213: 21300150
+    second: poi_icons_18@2x_75
+  - first:
+      213: 21300152
+    second: poi_icons_18@2x_76
+  - first:
+      213: 21300154
+    second: poi_icons_18@2x_77
+  - first:
+      213: 21300156
+    second: poi_icons_18@2x_78
+  - first:
+      213: 21300158
+    second: poi_icons_18@2x_79
+  - first:
+      213: 21300160
+    second: poi_icons_18@2x_80
+  - first:
+      213: 21300162
+    second: poi_icons_18@2x_81
+  - first:
+      213: 21300164
+    second: poi_icons_18@2x_82
+  - first:
+      213: 21300166
+    second: poi_icons_18@2x_83
+  - first:
+      213: 21300168
+    second: poi_icons_18@2x_84
+  - first:
+      213: 21300170
+    second: poi_icons_18@2x_85
+  - first:
+      213: 21300172
+    second: poi_icons_18@2x_86
+  - first:
+      213: 21300174
+    second: poi_icons_18@2x_87
+  - first:
+      213: 21300176
+    second: poi_icons_18@2x_88
+  - first:
+      213: 21300178
+    second: poi_icons_18@2x_89
+  - first:
+      213: 21300180
+    second: poi_icons_18@2x_90
+  - first:
+      213: 21300182
+    second: poi_icons_18@2x_91
+  - first:
+      213: 21300184
+    second: poi_icons_18@2x_92
+  - first:
+      213: 21300186
+    second: poi_icons_18@2x_93
+  - first:
+      213: 21300188
+    second: poi_icons_18@2x_94
+  - first:
+      213: 21300190
+    second: poi_icons_18@2x_95
+  - first:
+      213: 21300192
+    second: poi_icons_18@2x_96
+  - first:
+      213: 21300194
+    second: poi_icons_18@2x_97
+  - first:
+      213: 21300196
+    second: poi_icons_18@2x_98
+  - first:
+      213: 21300198
+    second: poi_icons_18@2x_99
+  - first:
+      213: 21300200
+    second: poi_icons_18@2x_100
+  - first:
+      213: 21300202
+    second: poi_icons_18@2x_101
+  - first:
+      213: 21300204
+    second: poi_icons_18@2x_102
+  - first:
+      213: 21300206
+    second: poi_icons_18@2x_103
+  - first:
+      213: 21300208
+    second: poi_icons_18@2x_104
+  - first:
+      213: 21300210
+    second: poi_icons_18@2x_105
+  - first:
+      213: 21300212
+    second: poi_icons_18@2x_106
+  - first:
+      213: 21300214
+    second: poi_icons_18@2x_107
+  - first:
+      213: 21300216
+    second: poi_icons_18@2x_108
+  - first:
+      213: 21300218
+    second: poi_icons_18@2x_109
+  - first:
+      213: 21300220
+    second: poi_icons_18@2x_110
+  - first:
+      213: 21300222
+    second: poi_icons_18@2x_111
+  - first:
+      213: 21300224
+    second: poi_icons_18@2x_112
+  - first:
+      213: 21300226
+    second: poi_icons_18@2x_113
+  - first:
+      213: 21300228
+    second: poi_icons_18@2x_114
+  - first:
+      213: 21300230
+    second: poi_icons_18@2x_115
+  - first:
+      213: 21300232
+    second: poi_icons_18@2x_116
+  - first:
+      213: 21300234
+    second: poi_icons_18@2x_117
+  - first:
+      213: 21300236
+    second: poi_icons_18@2x_118
+  - first:
+      213: 21300238
+    second: poi_icons_18@2x_119
+  - first:
+      213: 21300240
+    second: poi_icons_18@2x_120
+  - first:
+      213: 21300242
+    second: poi_icons_18@2x_121
+  - first:
+      213: 21300244
+    second: poi_icons_18@2x_122
+  - first:
+      213: 21300246
+    second: poi_icons_18@2x_123
+  - first:
+      213: 21300248
+    second: poi_icons_18@2x_124
+  - first:
+      213: 21300250
+    second: poi_icons_18@2x_125
+  - first:
+      213: 21300252
+    second: poi_icons_18@2x_126
+  - first:
+      213: 21300254
+    second: poi_icons_18@2x_127
+  - first:
+      213: 21300256
+    second: poi_icons_18@2x_128
+  - first:
+      213: 21300258
+    second: poi_icons_18@2x_129
+  - first:
+      213: 21300260
+    second: poi_icons_18@2x_130
+  - first:
+      213: 21300262
+    second: poi_icons_18@2x_131
+  - first:
+      213: 21300264
+    second: poi_icons_18@2x_132
+  - first:
+      213: 21300266
+    second: poi_icons_18@2x_133
+  - first:
+      213: 21300268
+    second: poi_icons_18@2x_134
+  - first:
+      213: 21300270
+    second: poi_icons_18@2x_135
+  - first:
+      213: 21300272
+    second: poi_icons_18@2x_136
+  - first:
+      213: 21300274
+    second: poi_icons_18@2x_137
+  - first:
+      213: 21300276
+    second: poi_icons_18@2x_138
+  - first:
+      213: 21300278
+    second: poi_icons_18@2x_139
+  - first:
+      213: 21300280
+    second: poi_icons_18@2x_140
+  - first:
+      213: 21300282
+    second: poi_icons_18@2x_141
+  - first:
+      213: 21300284
+    second: poi_icons_18@2x_142
+  - first:
+      213: 21300286
+    second: poi_icons_18@2x_143
+  - first:
+      213: 21300288
+    second: poi_icons_18@2x_144
+  - first:
+      213: 21300290
+    second: poi_icons_18@2x_145
+  - first:
+      213: 21300292
+    second: poi_icons_18@2x_146
+  - first:
+      213: 21300294
+    second: poi_icons_18@2x_147
+  - first:
+      213: 21300296
+    second: poi_icons_18@2x_148
+  - first:
+      213: 21300298
+    second: poi_icons_18@2x_149
+  - first:
+      213: 21300300
+    second: poi_icons_18@2x_150
+  externalObjects: {}
+  serializedVersion: 11
   mipmaps:
     mipMapMode: 0
     enableMipMap: 1
+    sRGBTexture: 1
     linearTexture: 0
-    correctGamma: 0
     fadeOut: 0
     borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
     mipMapFadeDistanceStart: 1
     mipMapFadeDistanceEnd: 3
   bumpmap:
@@ -171,37 +474,61 @@ TextureImporter:
     heightScale: 0.25
     normalMapFilter: 0
   isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
   grayScaleToAlpha: 0
-  generateCubemap: 0
+  generateCubemap: 6
   cubemapConvolution: 0
-  cubemapConvolutionSteps: 7
-  cubemapConvolutionExponent: 1.5
   seamlessCubemap: 0
   textureFormat: -1
   maxTextureSize: 2048
   textureSettings:
+    serializedVersion: 2
     filterMode: -1
     aniso: 16
-    mipBias: -1
-    wrapMode: 1
+    mipBias: -100
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
   nPOTScale: 0
   lightmap: 0
-  rGBM: 0
   compressionQuality: 50
-  allowsAlphaSplitting: 0
   spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
   alphaIsTransparency: 1
+  spriteTessellationDetail: -1
   textureType: 8
-  buildTargetSettings: []
+  textureShape: 1
+  singleChannelComponent: 0
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  applyGammaDecoding: 1
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
+    serializedVersion: 2
     sprites:
-    - name: poi_icons_18@2x_0
+    - serializedVersion: 2
+      name: poi_icons_18@2x_0
       rect:
         serializedVersion: 2
         x: 0
@@ -211,16 +538,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_1
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 02305410000000000800000000000000
+      internalID: 21300000
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_1
       rect:
         serializedVersion: 2
         x: 46
@@ -230,16 +559,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_2
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 22305410000000000800000000000000
+      internalID: 21300002
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_2
       rect:
         serializedVersion: 2
         x: 92
@@ -249,16 +580,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_3
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 42305410000000000800000000000000
+      internalID: 21300004
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_3
       rect:
         serializedVersion: 2
         x: 138
@@ -268,16 +601,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_4
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 62305410000000000800000000000000
+      internalID: 21300006
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_4
       rect:
         serializedVersion: 2
         x: 184
@@ -287,12 +622,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 17}
-        - {x: -17, y: -17}
-        - {x: 17, y: -17}
-        - {x: 17, y: 17}
-    - name: poi_icons_18@2x_5
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 82305410000000000800000000000000
+      internalID: 21300008
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_5
       rect:
         serializedVersion: 2
         x: 226
@@ -302,16 +643,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_6
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a2305410000000000800000000000000
+      internalID: 21300010
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_6
       rect:
         serializedVersion: 2
         x: 272
@@ -321,16 +664,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_7
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c2305410000000000800000000000000
+      internalID: 21300012
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_7
       rect:
         serializedVersion: 2
         x: 318
@@ -340,16 +685,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_8
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e2305410000000000800000000000000
+      internalID: 21300014
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_8
       rect:
         serializedVersion: 2
         x: 364
@@ -359,16 +706,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_9
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 03305410000000000800000000000000
+      internalID: 21300016
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_9
       rect:
         serializedVersion: 2
         x: 410
@@ -378,16 +727,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_10
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 23305410000000000800000000000000
+      internalID: 21300018
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_10
       rect:
         serializedVersion: 2
         x: 456
@@ -397,16 +748,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_11
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 43305410000000000800000000000000
+      internalID: 21300020
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_11
       rect:
         serializedVersion: 2
         x: 502
@@ -416,16 +769,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_12
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 63305410000000000800000000000000
+      internalID: 21300022
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_12
       rect:
         serializedVersion: 2
         x: 548
@@ -435,16 +790,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_13
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 83305410000000000800000000000000
+      internalID: 21300024
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_13
       rect:
         serializedVersion: 2
         x: 594
@@ -454,13 +811,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -19, y: 19}
-        - {x: -19, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -18}
-        - {x: 19, y: 19}
-    - name: poi_icons_18@2x_14
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a3305410000000000800000000000000
+      internalID: 21300026
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_14
       rect:
         serializedVersion: 2
         x: 640
@@ -470,16 +832,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_15
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c3305410000000000800000000000000
+      internalID: 21300028
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_15
       rect:
         serializedVersion: 2
         x: 686
@@ -489,16 +853,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_16
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e3305410000000000800000000000000
+      internalID: 21300030
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_16
       rect:
         serializedVersion: 2
         x: 732
@@ -508,16 +874,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_17
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 04305410000000000800000000000000
+      internalID: 21300032
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_17
       rect:
         serializedVersion: 2
         x: 778
@@ -527,16 +895,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_18
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 24305410000000000800000000000000
+      internalID: 21300034
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_18
       rect:
         serializedVersion: 2
         x: 824
@@ -546,16 +916,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_19
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 44305410000000000800000000000000
+      internalID: 21300036
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_19
       rect:
         serializedVersion: 2
         x: 870
@@ -565,16 +937,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_20
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 64305410000000000800000000000000
+      internalID: 21300038
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_20
       rect:
         serializedVersion: 2
         x: 916
@@ -584,16 +958,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_21
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 84305410000000000800000000000000
+      internalID: 21300040
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_21
       rect:
         serializedVersion: 2
         x: 962
@@ -603,16 +979,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_22
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a4305410000000000800000000000000
+      internalID: 21300042
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_22
       rect:
         serializedVersion: 2
         x: 0
@@ -622,16 +1000,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_23
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c4305410000000000800000000000000
+      internalID: 21300044
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_23
       rect:
         serializedVersion: 2
         x: 46
@@ -641,16 +1021,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_24
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e4305410000000000800000000000000
+      internalID: 21300046
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_24
       rect:
         serializedVersion: 2
         x: 92
@@ -660,16 +1042,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_25
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 05305410000000000800000000000000
+      internalID: 21300048
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_25
       rect:
         serializedVersion: 2
         x: 138
@@ -679,16 +1063,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_26
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 25305410000000000800000000000000
+      internalID: 21300050
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_26
       rect:
         serializedVersion: 2
         x: 184
@@ -698,16 +1084,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_27
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 45305410000000000800000000000000
+      internalID: 21300052
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_27
       rect:
         serializedVersion: 2
         x: 230
@@ -717,16 +1105,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_28
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 65305410000000000800000000000000
+      internalID: 21300054
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_28
       rect:
         serializedVersion: 2
         x: 276
@@ -736,16 +1126,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_29
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 85305410000000000800000000000000
+      internalID: 21300056
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_29
       rect:
         serializedVersion: 2
         x: 322
@@ -755,16 +1147,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_30
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a5305410000000000800000000000000
+      internalID: 21300058
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_30
       rect:
         serializedVersion: 2
         x: 368
@@ -774,16 +1168,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_31
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c5305410000000000800000000000000
+      internalID: 21300060
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_31
       rect:
         serializedVersion: 2
         x: 414
@@ -793,16 +1189,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_32
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e5305410000000000800000000000000
+      internalID: 21300062
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_32
       rect:
         serializedVersion: 2
         x: 460
@@ -812,16 +1210,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_33
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 06305410000000000800000000000000
+      internalID: 21300064
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_33
       rect:
         serializedVersion: 2
         x: 506
@@ -831,16 +1231,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_34
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 26305410000000000800000000000000
+      internalID: 21300066
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_34
       rect:
         serializedVersion: 2
         x: 552
@@ -850,16 +1252,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_35
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 46305410000000000800000000000000
+      internalID: 21300068
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_35
       rect:
         serializedVersion: 2
         x: 598
@@ -869,16 +1273,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_36
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 66305410000000000800000000000000
+      internalID: 21300070
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_36
       rect:
         serializedVersion: 2
         x: 644
@@ -888,16 +1294,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_37
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 86305410000000000800000000000000
+      internalID: 21300072
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_37
       rect:
         serializedVersion: 2
         x: 690
@@ -907,16 +1315,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_38
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a6305410000000000800000000000000
+      internalID: 21300074
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_38
       rect:
         serializedVersion: 2
         x: 736
@@ -926,16 +1336,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_39
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c6305410000000000800000000000000
+      internalID: 21300076
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_39
       rect:
         serializedVersion: 2
         x: 782
@@ -945,16 +1357,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_40
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e6305410000000000800000000000000
+      internalID: 21300078
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_40
       rect:
         serializedVersion: 2
         x: 828
@@ -964,16 +1378,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_41
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 07305410000000000800000000000000
+      internalID: 21300080
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_41
       rect:
         serializedVersion: 2
         x: 874
@@ -983,16 +1399,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_42
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 27305410000000000800000000000000
+      internalID: 21300082
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_42
       rect:
         serializedVersion: 2
         x: 920
@@ -1002,16 +1420,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_43
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 47305410000000000800000000000000
+      internalID: 21300084
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_43
       rect:
         serializedVersion: 2
         x: 966
@@ -1021,16 +1441,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_44
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 67305410000000000800000000000000
+      internalID: 21300086
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_44
       rect:
         serializedVersion: 2
         x: 0
@@ -1040,16 +1462,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_45
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 87305410000000000800000000000000
+      internalID: 21300088
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_45
       rect:
         serializedVersion: 2
         x: 46
@@ -1059,16 +1483,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_46
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a7305410000000000800000000000000
+      internalID: 21300090
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_46
       rect:
         serializedVersion: 2
         x: 92
@@ -1078,16 +1504,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_47
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c7305410000000000800000000000000
+      internalID: 21300092
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_47
       rect:
         serializedVersion: 2
         x: 138
@@ -1097,16 +1525,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_48
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e7305410000000000800000000000000
+      internalID: 21300094
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_48
       rect:
         serializedVersion: 2
         x: 184
@@ -1116,16 +1546,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_49
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 08305410000000000800000000000000
+      internalID: 21300096
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_49
       rect:
         serializedVersion: 2
         x: 230
@@ -1135,16 +1567,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_50
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 28305410000000000800000000000000
+      internalID: 21300098
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_50
       rect:
         serializedVersion: 2
         x: 276
@@ -1154,16 +1588,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_51
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 48305410000000000800000000000000
+      internalID: 21300100
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_51
       rect:
         serializedVersion: 2
         x: 322
@@ -1173,16 +1609,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_52
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 68305410000000000800000000000000
+      internalID: 21300102
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_52
       rect:
         serializedVersion: 2
         x: 368
@@ -1192,16 +1630,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_53
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 88305410000000000800000000000000
+      internalID: 21300104
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_53
       rect:
         serializedVersion: 2
         x: 414
@@ -1211,16 +1651,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_54
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a8305410000000000800000000000000
+      internalID: 21300106
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_54
       rect:
         serializedVersion: 2
         x: 460
@@ -1230,16 +1672,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_55
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c8305410000000000800000000000000
+      internalID: 21300108
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_55
       rect:
         serializedVersion: 2
         x: 506
@@ -1249,16 +1693,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_56
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e8305410000000000800000000000000
+      internalID: 21300110
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_56
       rect:
         serializedVersion: 2
         x: 552
@@ -1268,16 +1714,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_57
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 09305410000000000800000000000000
+      internalID: 21300112
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_57
       rect:
         serializedVersion: 2
         x: 598
@@ -1287,16 +1735,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_58
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 29305410000000000800000000000000
+      internalID: 21300114
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_58
       rect:
         serializedVersion: 2
         x: 644
@@ -1306,16 +1756,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_59
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 49305410000000000800000000000000
+      internalID: 21300116
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_59
       rect:
         serializedVersion: 2
         x: 690
@@ -1325,16 +1777,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_60
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 69305410000000000800000000000000
+      internalID: 21300118
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_60
       rect:
         serializedVersion: 2
         x: 736
@@ -1344,16 +1798,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_61
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 89305410000000000800000000000000
+      internalID: 21300120
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_61
       rect:
         serializedVersion: 2
         x: 782
@@ -1363,16 +1819,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_62
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a9305410000000000800000000000000
+      internalID: 21300122
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_62
       rect:
         serializedVersion: 2
         x: 828
@@ -1382,16 +1840,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_63
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c9305410000000000800000000000000
+      internalID: 21300124
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_63
       rect:
         serializedVersion: 2
         x: 874
@@ -1401,16 +1861,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_64
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e9305410000000000800000000000000
+      internalID: 21300126
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_64
       rect:
         serializedVersion: 2
         x: 920
@@ -1420,16 +1882,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_65
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0a305410000000000800000000000000
+      internalID: 21300128
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_65
       rect:
         serializedVersion: 2
         x: 966
@@ -1439,16 +1903,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_66
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2a305410000000000800000000000000
+      internalID: 21300130
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_66
       rect:
         serializedVersion: 2
         x: 0
@@ -1458,16 +1924,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_67
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4a305410000000000800000000000000
+      internalID: 21300132
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_67
       rect:
         serializedVersion: 2
         x: 46
@@ -1477,16 +1945,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_68
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6a305410000000000800000000000000
+      internalID: 21300134
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_68
       rect:
         serializedVersion: 2
         x: 92
@@ -1496,16 +1966,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_69
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8a305410000000000800000000000000
+      internalID: 21300136
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_69
       rect:
         serializedVersion: 2
         x: 138
@@ -1515,16 +1987,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_70
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: aa305410000000000800000000000000
+      internalID: 21300138
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_70
       rect:
         serializedVersion: 2
         x: 184
@@ -1534,16 +2008,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_71
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ca305410000000000800000000000000
+      internalID: 21300140
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_71
       rect:
         serializedVersion: 2
         x: 230
@@ -1553,16 +2029,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_72
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ea305410000000000800000000000000
+      internalID: 21300142
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_72
       rect:
         serializedVersion: 2
         x: 276
@@ -1572,16 +2050,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_73
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0b305410000000000800000000000000
+      internalID: 21300144
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_73
       rect:
         serializedVersion: 2
         x: 322
@@ -1591,16 +2071,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_74
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2b305410000000000800000000000000
+      internalID: 21300146
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_74
       rect:
         serializedVersion: 2
         x: 368
@@ -1610,16 +2092,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_75
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4b305410000000000800000000000000
+      internalID: 21300148
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_75
       rect:
         serializedVersion: 2
         x: 414
@@ -1629,16 +2113,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_76
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6b305410000000000800000000000000
+      internalID: 21300150
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_76
       rect:
         serializedVersion: 2
         x: 460
@@ -1648,16 +2134,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_77
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8b305410000000000800000000000000
+      internalID: 21300152
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_77
       rect:
         serializedVersion: 2
         x: 506
@@ -1667,16 +2155,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_78
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ab305410000000000800000000000000
+      internalID: 21300154
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_78
       rect:
         serializedVersion: 2
         x: 552
@@ -1686,16 +2176,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_79
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cb305410000000000800000000000000
+      internalID: 21300156
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_79
       rect:
         serializedVersion: 2
         x: 598
@@ -1705,16 +2197,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_80
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eb305410000000000800000000000000
+      internalID: 21300158
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_80
       rect:
         serializedVersion: 2
         x: 644
@@ -1724,13 +2218,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -19, y: 19}
-        - {x: -19, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -18}
-        - {x: 19, y: 19}
-    - name: poi_icons_18@2x_81
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0c305410000000000800000000000000
+      internalID: 21300160
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_81
       rect:
         serializedVersion: 2
         x: 694
@@ -1741,7 +2240,17 @@ TextureImporter:
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-    - name: poi_icons_18@2x_82
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2c305410000000000800000000000000
+      internalID: 21300162
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_82
       rect:
         serializedVersion: 2
         x: 734
@@ -1751,16 +2260,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_83
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4c305410000000000800000000000000
+      internalID: 21300164
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_83
       rect:
         serializedVersion: 2
         x: 780
@@ -1770,13 +2281,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -19, y: 19}
-        - {x: -19, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -18}
-        - {x: 19, y: 19}
-    - name: poi_icons_18@2x_84
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6c305410000000000800000000000000
+      internalID: 21300166
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_84
       rect:
         serializedVersion: 2
         x: 826
@@ -1786,16 +2302,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_85
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8c305410000000000800000000000000
+      internalID: 21300168
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_85
       rect:
         serializedVersion: 2
         x: 872
@@ -1805,16 +2323,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_86
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ac305410000000000800000000000000
+      internalID: 21300170
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_86
       rect:
         serializedVersion: 2
         x: 918
@@ -1824,16 +2344,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_87
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cc305410000000000800000000000000
+      internalID: 21300172
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_87
       rect:
         serializedVersion: 2
         x: 969
@@ -1844,7 +2366,17 @@ TextureImporter:
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-    - name: poi_icons_18@2x_88
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ec305410000000000800000000000000
+      internalID: 21300174
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_88
       rect:
         serializedVersion: 2
         x: 0
@@ -1854,13 +2386,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -19, y: 19}
-        - {x: -19, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -18}
-        - {x: 19, y: 19}
-    - name: poi_icons_18@2x_89
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0d305410000000000800000000000000
+      internalID: 21300176
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_89
       rect:
         serializedVersion: 2
         x: 46
@@ -1870,16 +2407,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_90
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2d305410000000000800000000000000
+      internalID: 21300178
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_90
       rect:
         serializedVersion: 2
         x: 92
@@ -1889,16 +2428,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_91
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4d305410000000000800000000000000
+      internalID: 21300180
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_91
       rect:
         serializedVersion: 2
         x: 138
@@ -1908,16 +2449,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_92
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6d305410000000000800000000000000
+      internalID: 21300182
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_92
       rect:
         serializedVersion: 2
         x: 184
@@ -1927,16 +2470,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_93
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8d305410000000000800000000000000
+      internalID: 21300184
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_93
       rect:
         serializedVersion: 2
         x: 230
@@ -1946,16 +2491,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_94
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ad305410000000000800000000000000
+      internalID: 21300186
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_94
       rect:
         serializedVersion: 2
         x: 276
@@ -1965,16 +2512,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_95
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cd305410000000000800000000000000
+      internalID: 21300188
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_95
       rect:
         serializedVersion: 2
         x: 322
@@ -1984,16 +2533,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_96
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ed305410000000000800000000000000
+      internalID: 21300190
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_96
       rect:
         serializedVersion: 2
         x: 368
@@ -2003,16 +2554,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_97
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0e305410000000000800000000000000
+      internalID: 21300192
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_97
       rect:
         serializedVersion: 2
         x: 414
@@ -2022,12 +2575,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 17}
-        - {x: -17, y: -17}
-        - {x: 17, y: -17}
-        - {x: 17, y: 17}
-    - name: poi_icons_18@2x_98
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2e305410000000000800000000000000
+      internalID: 21300194
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_98
       rect:
         serializedVersion: 2
         x: 456
@@ -2037,16 +2596,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_99
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4e305410000000000800000000000000
+      internalID: 21300196
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_99
       rect:
         serializedVersion: 2
         x: 502
@@ -2056,16 +2617,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_100
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6e305410000000000800000000000000
+      internalID: 21300198
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_100
       rect:
         serializedVersion: 2
         x: 548
@@ -2075,16 +2638,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_101
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8e305410000000000800000000000000
+      internalID: 21300200
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_101
       rect:
         serializedVersion: 2
         x: 594
@@ -2094,16 +2659,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_102
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ae305410000000000800000000000000
+      internalID: 21300202
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_102
       rect:
         serializedVersion: 2
         x: 640
@@ -2113,16 +2680,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_103
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ce305410000000000800000000000000
+      internalID: 21300204
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_103
       rect:
         serializedVersion: 2
         x: 686
@@ -2132,16 +2701,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_104
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ee305410000000000800000000000000
+      internalID: 21300206
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_104
       rect:
         serializedVersion: 2
         x: 732
@@ -2151,16 +2722,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_105
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0f305410000000000800000000000000
+      internalID: 21300208
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_105
       rect:
         serializedVersion: 2
         x: 778
@@ -2170,16 +2743,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_106
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2f305410000000000800000000000000
+      internalID: 21300210
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_106
       rect:
         serializedVersion: 2
         x: 824
@@ -2189,16 +2764,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_107
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4f305410000000000800000000000000
+      internalID: 21300212
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_107
       rect:
         serializedVersion: 2
         x: 870
@@ -2208,16 +2785,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_108
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6f305410000000000800000000000000
+      internalID: 21300214
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_108
       rect:
         serializedVersion: 2
         x: 916
@@ -2228,7 +2807,17 @@ TextureImporter:
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-    - name: poi_icons_18@2x_109
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8f305410000000000800000000000000
+      internalID: 21300216
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_109
       rect:
         serializedVersion: 2
         x: 960
@@ -2238,16 +2827,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_110
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: af305410000000000800000000000000
+      internalID: 21300218
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_110
       rect:
         serializedVersion: 2
         x: 0
@@ -2257,16 +2848,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_111
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cf305410000000000800000000000000
+      internalID: 21300220
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_111
       rect:
         serializedVersion: 2
         x: 46
@@ -2276,16 +2869,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_112
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ef305410000000000800000000000000
+      internalID: 21300222
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_112
       rect:
         serializedVersion: 2
         x: 92
@@ -2295,16 +2890,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_113
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 00405410000000000800000000000000
+      internalID: 21300224
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_113
       rect:
         serializedVersion: 2
         x: 138
@@ -2314,16 +2911,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_114
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 20405410000000000800000000000000
+      internalID: 21300226
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_114
       rect:
         serializedVersion: 2
         x: 184
@@ -2333,16 +2932,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_115
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 40405410000000000800000000000000
+      internalID: 21300228
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_115
       rect:
         serializedVersion: 2
         x: 230
@@ -2352,16 +2953,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_116
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 60405410000000000800000000000000
+      internalID: 21300230
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_116
       rect:
         serializedVersion: 2
         x: 276
@@ -2371,16 +2974,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_117
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 80405410000000000800000000000000
+      internalID: 21300232
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_117
       rect:
         serializedVersion: 2
         x: 322
@@ -2390,16 +2995,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -17, y: 19}
-        - {x: -19, y: 17}
-        - {x: -19, y: -17}
-        - {x: -17, y: -19}
-        - {x: 17, y: -19}
-        - {x: 19, y: -17}
-        - {x: 19, y: 17}
-        - {x: 17, y: 19}
-    - name: poi_icons_18@2x_118
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a0405410000000000800000000000000
+      internalID: 21300234
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_118
       rect:
         serializedVersion: 2
         x: 374
@@ -2410,7 +3017,17 @@ TextureImporter:
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-    - name: poi_icons_18@2x_119
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c0405410000000000800000000000000
+      internalID: 21300236
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_119
       rect:
         serializedVersion: 2
         x: 459
@@ -2421,7 +3038,17 @@ TextureImporter:
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-    - name: poi_icons_18@2x_120
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e0405410000000000800000000000000
+      internalID: 21300238
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_120
       rect:
         serializedVersion: 2
         x: 475
@@ -2432,7 +3059,17 @@ TextureImporter:
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-    - name: poi_icons_18@2x_121
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 01405410000000000800000000000000
+      internalID: 21300240
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_121
       rect:
         serializedVersion: 2
         x: 494
@@ -2443,7 +3080,17 @@ TextureImporter:
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-    - name: poi_icons_18@2x_122
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 21405410000000000800000000000000
+      internalID: 21300242
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_122
       rect:
         serializedVersion: 2
         x: 513
@@ -2454,7 +3101,17 @@ TextureImporter:
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-    - name: poi_icons_18@2x_123
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 41405410000000000800000000000000
+      internalID: 21300244
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_123
       rect:
         serializedVersion: 2
         x: 537
@@ -2465,7 +3122,17 @@ TextureImporter:
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-    - name: poi_icons_18@2x_124
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 61405410000000000800000000000000
+      internalID: 21300246
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_124
       rect:
         serializedVersion: 2
         x: 566
@@ -2476,7 +3143,17 @@ TextureImporter:
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-    - name: poi_icons_18@2x_125
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 81405410000000000800000000000000
+      internalID: 21300248
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_125
       rect:
         serializedVersion: 2
         x: 580
@@ -2487,7 +3164,17 @@ TextureImporter:
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-    - name: poi_icons_18@2x_126
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a1405410000000000800000000000000
+      internalID: 21300250
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_126
       rect:
         serializedVersion: 2
         x: 597
@@ -2498,7 +3185,17 @@ TextureImporter:
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-    - name: poi_icons_18@2x_127
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c1405410000000000800000000000000
+      internalID: 21300252
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_127
       rect:
         serializedVersion: 2
         x: 617
@@ -2509,7 +3206,17 @@ TextureImporter:
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-    - name: poi_icons_18@2x_128
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e1405410000000000800000000000000
+      internalID: 21300254
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_128
       rect:
         serializedVersion: 2
         x: 641
@@ -2520,7 +3227,17 @@ TextureImporter:
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-    - name: poi_icons_18@2x_129
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 02405410000000000800000000000000
+      internalID: 21300256
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_129
       rect:
         serializedVersion: 2
         x: 670
@@ -2531,7 +3248,17 @@ TextureImporter:
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-    - name: poi_icons_18@2x_130
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 22405410000000000800000000000000
+      internalID: 21300258
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_130
       rect:
         serializedVersion: 2
         x: 686
@@ -2542,7 +3269,17 @@ TextureImporter:
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-    - name: poi_icons_18@2x_131
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 42405410000000000800000000000000
+      internalID: 21300260
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_131
       rect:
         serializedVersion: 2
         x: 704
@@ -2553,7 +3290,17 @@ TextureImporter:
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-    - name: poi_icons_18@2x_132
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 62405410000000000800000000000000
+      internalID: 21300262
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_132
       rect:
         serializedVersion: 2
         x: 724
@@ -2564,7 +3311,17 @@ TextureImporter:
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-    - name: poi_icons_18@2x_133
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 82405410000000000800000000000000
+      internalID: 21300264
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_133
       rect:
         serializedVersion: 2
         x: 748
@@ -2575,7 +3332,17 @@ TextureImporter:
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-    - name: poi_icons_18@2x_134
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a2405410000000000800000000000000
+      internalID: 21300266
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_134
       rect:
         serializedVersion: 2
         x: 924
@@ -2585,16 +3352,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -16.5, y: 44}
-        - {x: -24.5, y: 38}
-        - {x: -24.5, y: -4}
-        - {x: -4.5, y: -44}
-        - {x: 3.5, y: -44}
-        - {x: 24.5, y: -3}
-        - {x: 24.5, y: 42}
-        - {x: 15.5, y: 44}
-    - name: poi_icons_18@2x_135
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c2405410000000000800000000000000
+      internalID: 21300268
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_135
       rect:
         serializedVersion: 2
         x: 426
@@ -2605,7 +3374,17 @@ TextureImporter:
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-    - name: poi_icons_18@2x_136
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e2405410000000000800000000000000
+      internalID: 21300270
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_136
       rect:
         serializedVersion: 2
         x: 783
@@ -2615,16 +3394,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -47, y: 57.5}
-        - {x: -57, y: 37.5}
-        - {x: -57, y: -40.5}
-        - {x: -34, y: -57.5}
-        - {x: 27, y: -57.5}
-        - {x: 57, y: -34.5}
-        - {x: 57, y: 32.5}
-        - {x: 31, y: 57.5}
-    - name: poi_icons_18@2x_137
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 03405410000000000800000000000000
+      internalID: 21300272
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_137
       rect:
         serializedVersion: 2
         x: 12
@@ -2634,15 +3415,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -24.5, y: 44}
-        - {x: -24.5, y: -19}
-        - {x: -19.5, y: -44}
-        - {x: 8.5, y: -44}
-        - {x: 24.5, y: 0}
-        - {x: 24.5, y: 40}
-        - {x: 19.5, y: 44}
-    - name: poi_icons_18@2x_138
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 23405410000000000800000000000000
+      internalID: 21300274
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_138
       rect:
         serializedVersion: 2
         x: 83
@@ -2652,17 +3436,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -30, y: 40.5}
-        - {x: -40, y: 26.5}
-        - {x: -40, y: -26.5}
-        - {x: -39, y: -30.5}
-        - {x: -23, y: -40.5}
-        - {x: 34, y: -40.5}
-        - {x: 40, y: -22.5}
-        - {x: 40, y: 31.5}
-        - {x: 32, y: 40.5}
-    - name: poi_icons_18@2x_139
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 43405410000000000800000000000000
+      internalID: 21300276
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_139
       rect:
         serializedVersion: 2
         x: 183
@@ -2672,18 +3457,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: 18, y: 50}
-        - {x: -20, y: 50}
-        - {x: -28, y: 40}
-        - {x: -28, y: -2}
-        - {x: -26, y: -12}
-        - {x: -3, y: -50}
-        - {x: 3, y: -50}
-        - {x: 13, y: -38}
-        - {x: 28, y: 5}
-        - {x: 28, y: 41}
-    - name: poi_icons_18@2x_140
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 63405410000000000800000000000000
+      internalID: 21300278
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_140
       rect:
         serializedVersion: 2
         x: 262
@@ -2693,15 +3478,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -28, y: 50}
-        - {x: -28, y: -19}
-        - {x: -3, y: -50}
-        - {x: 3, y: -50}
-        - {x: 28, y: -17}
-        - {x: 28, y: 43}
-        - {x: 25, y: 50}
-    - name: poi_icons_18@2x_141
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 83405410000000000800000000000000
+      internalID: 21300280
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_141
       rect:
         serializedVersion: 2
         x: 368
@@ -2712,7 +3500,17 @@ TextureImporter:
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-    - name: poi_icons_18@2x_142
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a3405410000000000800000000000000
+      internalID: 21300282
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_142
       rect:
         serializedVersion: 2
         x: 448
@@ -2723,7 +3521,17 @@ TextureImporter:
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-    - name: poi_icons_18@2x_143
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c3405410000000000800000000000000
+      internalID: 21300284
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_143
       rect:
         serializedVersion: 2
         x: 338
@@ -2734,7 +3542,17 @@ TextureImporter:
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-    - name: poi_icons_18@2x_144
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e3405410000000000800000000000000
+      internalID: 21300286
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_144
       rect:
         serializedVersion: 2
         x: 352
@@ -2744,26 +3562,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -12, y: 18}
-        - {x: -18, y: 15}
-        - {x: -18, y: -18}
-        - {x: 17, y: -18}
-        - {x: 18, y: -17}
-        - {x: 18, y: 15}
-        - {x: 17, y: 18}
-      - - {x: -6, y: -7}
-        - {x: -5, y: 7}
-        - {x: 3, y: 9}
-        - {x: 9, y: -2}
-      - - {x: -2, y: 8}
-        - {x: -7, y: 4}
-        - {x: -7, y: -7}
-        - {x: -4, y: -8}
-        - {x: 8, y: -8}
-        - {x: 8, y: 3}
-        - {x: 7, y: 8}
-    - name: poi_icons_18@2x_145
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 04405410000000000800000000000000
+      internalID: 21300288
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_145
       rect:
         serializedVersion: 2
         x: 391
@@ -2774,7 +3584,17 @@ TextureImporter:
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-    - name: poi_icons_18@2x_146
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 24405410000000000800000000000000
+      internalID: 21300290
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_146
       rect:
         serializedVersion: 2
         x: 418
@@ -2785,7 +3605,17 @@ TextureImporter:
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-    - name: poi_icons_18@2x_147
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 44405410000000000800000000000000
+      internalID: 21300292
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_147
       rect:
         serializedVersion: 2
         x: 432
@@ -2795,28 +3625,18 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -11, y: 18}
-        - {x: -18, y: 11}
-        - {x: -18, y: -13}
-        - {x: -15, y: -18}
-        - {x: 18, y: -18}
-        - {x: 18, y: 12}
-        - {x: 12, y: 18}
-      - - {x: -4, y: -9}
-        - {x: -8, y: 3}
-        - {x: 9, y: 4}
-        - {x: 5, y: -8}
-      - - {x: -5, y: 8}
-        - {x: -7, y: 6}
-        - {x: -8, y: 1}
-        - {x: -8, y: -4}
-        - {x: -5, y: -8}
-        - {x: 3, y: -8}
-        - {x: 8, y: -7}
-        - {x: 8, y: 6}
-        - {x: 4, y: 8}
-    - name: poi_icons_18@2x_148
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 64405410000000000800000000000000
+      internalID: 21300294
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_148
       rect:
         serializedVersion: 2
         x: 470
@@ -2827,7 +3647,17 @@ TextureImporter:
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-    - name: poi_icons_18@2x_149
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 84405410000000000800000000000000
+      internalID: 21300296
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_149
       rect:
         serializedVersion: 2
         x: 368
@@ -2838,7 +3668,17 @@ TextureImporter:
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-    - name: poi_icons_18@2x_150
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a4405410000000000800000000000000
+      internalID: 21300298
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: poi_icons_18@2x_150
       rect:
         serializedVersion: 2
         x: 448
@@ -2849,8 +3689,28 @@ TextureImporter:
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c4405410000000000800000000000000
+      internalID: 21300300
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
   spritePackingTag: 
+  pSDRemoveMatte: 0
+  pSDShowRemoveMatteOption: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 

@@ -33,7 +33,7 @@ namespace uAdventure.Geo
 
             mapEditor = new MapEditor()
             {
-                Components = EditorWindowBase.Components,
+                Components = uAdventureWindowMain.Components,
                 Elements = new List<DataControl> { null },
                 Repaint = () => Repaint(),
                 PlaceSearcher = { OnRequestRepaint = () => OnRequestRepaint() }
