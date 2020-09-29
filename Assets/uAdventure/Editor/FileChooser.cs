@@ -142,6 +142,7 @@ namespace uAdventure.Editor
                 case FileType.BOOK_ARROW_LEFT_OVER:
                 case FileType.BOOK_ARROW_RIGHT_NORMAL:
                 case FileType.BOOK_ARROW_RIGHT_OVER:
+                case FileType.CURSOR:
                 case FileType.BUTTON:
                 case FileType.BUTTON_OVER:
                     fileDialog = ScriptableObject.CreateInstance<ImageFileOpenDialog>();

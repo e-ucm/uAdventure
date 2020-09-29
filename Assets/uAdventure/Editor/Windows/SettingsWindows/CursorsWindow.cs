@@ -15,31 +15,32 @@ namespace uAdventure.Editor
             private string loadedNormal;
             private Texture2D normal;
 
-            public FileChooser normalButton;
+            public FileChooser chooser;
             private string identifier;
             private string camelCaseIdentifier;
             public string Label { get { return ("Buttons." + camelCaseIdentifier + ".Title").Traslate(); } }
+            public string Identifier { get { return identifier; } }
 
             public CursorInfo(string identifier)
             {
                 this.identifier = identifier;
                 camelCaseIdentifier = identifier.Split('-').Select(w => w.Substring(0, 1).ToUpper() + w.Substring(1)).Aggregate((w1, w2) => w1 + w2);
-                normalButton = new FileChooser
+                chooser = new FileChooser
                 {
                     Label = "Normal",
-                    FileType = FileType.BUTTON, // TODO Filetype cursor
-                    Path = Controller.Instance.AdventureData.getCursorPath(identifier)
+                    FileType = FileType.CURSOR,
+                    Path = Controller.Instance.AdventureData.getCursorPath(identifier),
+                    Empty = Controller.Instance.AdventureData.getAdventureData().getDefaultCursorPath(identifier)
                 };
             }
 
             public Texture2D GetTexture()
             {
-                var texturePath = normalButton.Path;
+                var texturePath = chooser.Path;
                 var loadedPath = loadedNormal;
                 if (texturePath == null)
                 {
-                    texturePath = Controller.Instance.AdventureData.getAdventureData()
-                        .getDefaultCursorPath(identifier);
+                    texturePath = chooser.Empty;
                 }
 
                 if (texturePath != null && texturePath != loadedPath)
@@ -74,19 +75,26 @@ namespace uAdventure.Editor
                 GUILayout.Label("GeneralText.Information".Traslate(), EditorStyles.boldLabel);
                 GUILayout.Label("Cursors.Information".Traslate());
                 GUILayout.Space(10);
-                foreach (var buttonInfo in cursors)
+                foreach (var cursorInfo in cursors)
                 {
-                    GUILayout.Label(buttonInfo.Label, EditorStyles.boldLabel);
+                    GUILayout.Label(cursorInfo.Label, EditorStyles.boldLabel);
                     using (new GUILayout.HorizontalScope())
                     {
                         using (new GUILayout.VerticalScope())
                         {
-                            buttonInfo.normalButton.DoLayout();
+                            EditorGUI.BeginChangeCheck();
+                            var path = Controller.Instance.AdventureData.getCursorPath(cursorInfo.Identifier);
+                            cursorInfo.chooser.Path = path;
+                            cursorInfo.chooser.DoLayout();
+                            if (EditorGUI.EndChangeCheck())
+                            {
+                                Controller.Instance.AdventureData.editCursorPath(cursorInfo.Identifier, cursorInfo.chooser.Path);
+                            }
                         }
                         GUILayout.Box("", GUILayout.Width(100), GUILayout.ExpandHeight(true));
                         var lastRect = GUILayoutUtility.GetLastRect();
 
-                        var texture = buttonInfo.GetTexture();
+                        var texture = cursorInfo.GetTexture();
                         lastRect.position += new Vector2(5, 5);
                         lastRect.size -= new Vector2(10, 10);
                         GUI.DrawTexture(lastRect, texture, ScaleMode.ScaleToFit);

@@ -279,9 +279,16 @@ namespace uAdventure.Editor
             }
         }
 
-        public void editCursorPath(int t)
+        public void editCursorPath(string t, string newPath)
         {
-            Controller.Instance.AddTool(new SelectCursorPathTool(adventureData, t));
+            var cursor = getCursors().Find(c => c.getType() == t);
+            if(cursor == null)
+            {
+                cursor = new CustomCursor(t, getCursorPath(t));
+                getCursors().Add(cursor);
+            }
+
+            Controller.Instance.AddTool(new ChangeValueTool<CustomCursor, string>(cursor, newPath, "getPath", "setPath"));
         }
 
         public string getArrowPath(string type)
