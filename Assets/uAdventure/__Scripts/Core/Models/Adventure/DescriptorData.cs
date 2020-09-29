@@ -326,9 +326,9 @@ namespace uAdventure.Core
 
         protected int inventoryPosition = INVENTORY_TOP_BOTTOM;
 
-        protected Vector2 inventoryCoords = new Vector2(750, 550);
+        protected Vector2 inventoryCoords = new Vector2(675, 550);
 
-        protected float inventoryScale = 1f;
+        protected float inventoryScale = 0.2f;
 
         protected string inventoryImage;
 

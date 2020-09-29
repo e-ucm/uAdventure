@@ -71,6 +71,18 @@ namespace uAdventure.Runner
             get { return data; }
         }
 
+        public int CurrentChapter
+        {
+            get
+            {
+                return currentChapter;
+            }
+            set
+            {
+                currentChapter = value;
+            }
+        }
+
         public string CurrentTarget
         {
             get

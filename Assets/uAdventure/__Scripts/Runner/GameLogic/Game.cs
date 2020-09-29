@@ -192,6 +192,7 @@ namespace uAdventure.Runner
 
         protected void StartGame()
         {
+            GameState.Restart();
             started = true;
             //if (!Application.isEditor)
             {
@@ -589,6 +590,10 @@ namespace uAdventure.Runner
                         {
                             loadedChapter = GameState.CurrentChapter;
                             afterChapterLoad();
+                        })
+                        .Catch(ex =>
+                        {
+                            Debug.LogError(ex);
                         });
                 }
                 else

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 using uAdventure.Runner;
+using System.Globalization;
 
 namespace uAdventure.Core
 {
@@ -188,6 +189,15 @@ namespace uAdventure.Core
                 case "bottom": adventureData.setInventoryPosition(DescriptorData.INVENTORY_BOTTOM); break;
                 case "fixed_top": adventureData.setInventoryPosition(DescriptorData.INVENTORY_FIXED_TOP); break;
                 case "fixed_bottom": adventureData.setInventoryPosition(DescriptorData.INVENTORY_FIXED_BOTTOM); break;
+                case "icon":
+                    adventureData.setInventoryPosition(DescriptorData.INVENTORY_ICON_FREEPOS);
+                    var scale = gui.GetAttribute("inventoryScale");
+                    adventureData.setInventoryScale(ExParsers.ParseDefault(gui.GetAttribute("inventoryScale"), CultureInfo.InvariantCulture, 0.2f));
+                    var xCoord = ExParsers.ParseDefault(gui.GetAttribute("inventoryX"), CultureInfo.InvariantCulture, 675f);
+                    var yCoord = ExParsers.ParseDefault(gui.GetAttribute("inventoryY"), CultureInfo.InvariantCulture, 550f);
+                    adventureData.setInventoryCoords(new UnityEngine.Vector2(xCoord, yCoord));
+                    adventureData.setInventoryImage(ExString.Default(gui.GetAttribute("inventoryImage"), SpecialAssetPaths.ASSET_DEFAULT_INVENTORY));
+                    break;
                 default: incidences.Add(Incidence.createDescriptorIncidence("Unknown inventoryPosition type: " + inventoryPosition, null)); break;
             }
 

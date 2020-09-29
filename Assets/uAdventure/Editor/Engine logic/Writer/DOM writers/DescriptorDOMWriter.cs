@@ -5,6 +5,7 @@ using System.Xml;
 using uAdventure.Core;
 using System;
 using System.Linq;
+using System.Globalization;
 
 namespace uAdventure.Editor
 {
@@ -156,6 +157,13 @@ namespace uAdventure.Editor
                     break;
                 case DescriptorData.INVENTORY_FIXED_BOTTOM:
                     guiElement.SetAttribute("inventoryPosition", "fixed_bottom");
+                    break;
+                case DescriptorData.INVENTORY_ICON_FREEPOS:
+                    guiElement.SetAttribute("inventoryPosition", "icon");
+                    guiElement.SetAttribute("inventoryImage", adventureData.getInventoryImage());
+                    guiElement.SetAttribute("inventoryX", adventureData.getInventoryCoords().x.ToString(CultureInfo.InvariantCulture));
+                    guiElement.SetAttribute("inventoryY", adventureData.getInventoryCoords().y.ToString(CultureInfo.InvariantCulture));
+                    guiElement.SetAttribute("inventoryScale", adventureData.getInventoryScale().ToString(CultureInfo.InvariantCulture));
                     break;
 
             }
