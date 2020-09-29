@@ -144,6 +144,35 @@ namespace uAdventure.Runner
             buttons = new Dictionary<int, ResourcesUni>();
             cursores = new Dictionary<string, Texture2D>();
 
+            //For each button that isn on descriptor file we try to find the default assets;
+            Texture2D auxTexture;
+            foreach (KeyValuePair<int, string> button in ActionNameWrapper.Names)
+            {
+                if (DefaultActionAssetWrapper.Assets.ContainsKey(button.Key))
+                {
+                    string selected = "";
+                    foreach (string name in DefaultActionAssetWrapper.Assets[button.Key])
+                    {
+                        auxTexture = Game.Instance.ResourceManager.getImage(GUIProvider.DEFAULT_ASSET_DIRECTORY + name + ".png");
+
+                        if (auxTexture != null)
+                        {
+                            selected = name;
+                            break;
+                        }
+                    }
+
+                    if (selected != "")
+                    {
+                        auxResource = new ResourcesUni();
+                        auxResource.addAsset(DescriptorData.NORMAL_BUTTON, GUIProvider.DEFAULT_ASSET_DIRECTORY + selected + ".png");
+                        auxResource.addAsset(DescriptorData.HIGHLIGHTED_BUTTON, GUIProvider.DEFAULT_ASSET_DIRECTORY + selected + "Highlighted.png");
+                        auxResource.addAsset(DescriptorData.PRESSED_BUTTON, GUIProvider.DEFAULT_ASSET_DIRECTORY + selected + "Pressed.png");
+                        buttons.Add(button.Key, auxResource);
+                    }
+                }
+            }
+
             //We add a resource for each button parsed in descriptor file
             foreach (CustomButton cb in data.getButtons())
             {
@@ -159,37 +188,6 @@ namespace uAdventure.Runner
                 }
             }
 
-            //For each button that isn on descriptor file we try to find the default assets;
-            Texture2D auxTexture;
-            foreach (KeyValuePair<int, string> button in ActionNameWrapper.Names)
-            {
-                if (!buttons.ContainsKey(button.Key))
-                {
-                    if (DefaultActionAssetWrapper.Assets.ContainsKey(button.Key))
-                    {
-                        string selected = "";
-                        foreach (string name in DefaultActionAssetWrapper.Assets[button.Key])
-                        {
-                            auxTexture = Game.Instance.ResourceManager.getImage(GUIProvider.DEFAULT_ASSET_DIRECTORY + name + ".png");
-
-                            if (auxTexture != null)
-                            {
-                                selected = name;
-                                break;
-                            }
-                        }
-
-                        if (selected != "")
-                        {
-                            auxResource = new ResourcesUni();
-                            auxResource.addAsset(DescriptorData.NORMAL_BUTTON, GUIProvider.DEFAULT_ASSET_DIRECTORY + selected + ".png");
-                            auxResource.addAsset(DescriptorData.HIGHLIGHTED_BUTTON, GUIProvider.DEFAULT_ASSET_DIRECTORY + selected + "Highlighted.png");
-                            auxResource.addAsset(DescriptorData.PRESSED_BUTTON, GUIProvider.DEFAULT_ASSET_DIRECTORY + selected + "Pressed.png");
-                            buttons.Add(button.Key, auxResource);
-                        }
-                    }
-                }
-            }
 
             if (data.getCursors().Count == 0)
                 loadDefaultCursors();

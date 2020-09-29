@@ -390,9 +390,16 @@ namespace uAdventure.Editor
             Controller.Instance.AddTool(new DeleteButtonTool(adventureData, action, type));
         }
 
-        public void editButtonPath(string action, string type)
+        public void editButtonPath(string action, string type, string newPath)
         {
-            Controller.Instance.AddTool(new SelectButtonTool(adventureData, action, type));
+            var button = getButtons().Find(c => c.getAction() == action && c.getType() == type);
+            if (button == null)
+            {
+                button = new CustomButton(action, type, adventureData.getDefaultButtonPath(action, type));
+                getButtons().Add(button);
+            }
+
+            Controller.Instance.AddTool(new ChangeValueTool<CustomButton, string>(button, newPath, "getPath", "setPath"));
         }
 
         public void editArrowPath(string type)

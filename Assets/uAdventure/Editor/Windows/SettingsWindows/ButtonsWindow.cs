@@ -21,6 +21,8 @@ namespace uAdventure.Editor
             private string identifier;
             private string camelCaseIdentifier;
             public string Label { get { return ("Buttons." + camelCaseIdentifier + ".Title").Traslate(); } }
+            public string Identifier { get { return identifier; } }
+        
 
             public ButtonInfo(string identifier)
             {
@@ -30,13 +32,15 @@ namespace uAdventure.Editor
                 {
                     Label = "Normal",
                     FileType = FileType.BUTTON,
-                    Path = Controller.Instance.AdventureData.getButtonPath(identifier, DescriptorData.NORMAL_BUTTON)
+                    Path = Controller.Instance.AdventureData.getButtonPath(identifier, DescriptorData.NORMAL_BUTTON),
+                    Empty = Controller.Instance.AdventureData.getAdventureData().getDefaultButtonPath(identifier, DescriptorData.NORMAL_BUTTON)
                 };
                 highlightedButton = new FileChooser
                 {
                     Label = "Highlighted",
                     FileType = FileType.BUTTON,
-                    Path = Controller.Instance.AdventureData.getButtonPath(identifier, DescriptorData.HIGHLIGHTED_BUTTON)
+                    Path = Controller.Instance.AdventureData.getButtonPath(identifier, DescriptorData.HIGHLIGHTED_BUTTON),
+                    Empty = Controller.Instance.AdventureData.getAdventureData().getDefaultButtonPath(identifier, DescriptorData.HIGHLIGHTED_BUTTON)
                 };
             }
 
@@ -46,8 +50,7 @@ namespace uAdventure.Editor
                 var loadedPath = over ? loadedHightlighted : loadedNormal;
                 if (texturePath == null)
                 {
-                    texturePath = Controller.Instance.AdventureData.getAdventureData()
-                        .getDefaultButtonPath(identifier, over ? DescriptorData.HIGHLIGHTED_BUTTON : DescriptorData.NORMAL_BUTTON);
+                    texturePath = over ? highlightedButton.Empty : normalButton.Empty;
                 }
                 var texture = over ? highlighted : normal;
 
@@ -99,8 +102,33 @@ namespace uAdventure.Editor
                     {
                         using (new GUILayout.VerticalScope())
                         {
+                            var adc = Controller.Instance.AdventureData;
+                            var ad = Controller.Instance.AdventureData.getAdventureData();
+                            EditorGUI.BeginChangeCheck();
+                            var normalPath = ad.getButtonPathFromEngine(buttonInfo.Identifier, DescriptorData.NORMAL_BUTTON);
+                            if (string.IsNullOrEmpty(normalPath))
+                            {
+                                normalPath = buttonInfo.normalButton.Empty;
+                            }
+                            buttonInfo.normalButton.Path = normalPath;
                             buttonInfo.normalButton.DoLayout();
+                            if (EditorGUI.EndChangeCheck())
+                            {
+                                adc.editButtonPath(buttonInfo.Identifier, DescriptorData.NORMAL_BUTTON, buttonInfo.normalButton.Path);
+                            }
+
+                            EditorGUI.BeginChangeCheck();
+                            var highlightedPath = ad.getButtonPathFromEngine(buttonInfo.Identifier, DescriptorData.HIGHLIGHTED_BUTTON);
+                            if (string.IsNullOrEmpty(highlightedPath))
+                            {
+                                highlightedPath = buttonInfo.highlightedButton.Empty;
+                            }
+                            buttonInfo.highlightedButton.Path = highlightedPath;
                             buttonInfo.highlightedButton.DoLayout();
+                            if (EditorGUI.EndChangeCheck())
+                            {
+                                adc.editButtonPath(buttonInfo.Identifier, DescriptorData.HIGHLIGHTED_BUTTON, buttonInfo.highlightedButton.Path);
+                            }
                         }
                         GUILayout.Box("", GUILayout.Width(100), GUILayout.ExpandHeight(true));
                         var lastRect = GUILayoutUtility.GetLastRect();
