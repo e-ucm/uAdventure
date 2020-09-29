@@ -239,6 +239,7 @@ namespace uAdventure.Analytics
                 {
                     TrackerAsset.Instance.GameObject.Interacted(element.getId(), GameObjectTracker.TrackedGameObject.GameObject);
                 }
+                TrackerAsset.Instance.Flush();
             }
         }
 

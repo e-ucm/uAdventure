@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
-#define ASYNC
-//#undef ASYNC
+//#define ASYNC
+#undef ASYNC
 
 namespace AssetPackage
 {
@@ -29,9 +29,6 @@ namespace AssetPackage
     using System.ComponentModel;
     using System.Text.RegularExpressions;
     using SimpleJSON;
-#if ASYNC
-    using System.Threading;
-#endif
 
     [Obsolete("Use TrackerAsset instead")]
     public class Tracker
@@ -60,14 +57,20 @@ namespace AssetPackage
 
         public static DateTime START_DATE = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
-#if ASYNC
-        readonly object flushLockObject = new object();
-        private Thread flushThread;
-#endif
         /// <summary>
-        /// True when the thread must exit.
+        /// Flag to control when the tracker is flushing.
         /// </summary>
-        private bool exit = false;
+        private bool flushing = false;
+
+        /// <summary>
+        /// True when flush is called while flushing.
+        /// </summary>
+        private bool extraFlushRequested = false;
+
+        /// <summary>
+        /// Callbacks to call when the extra flush is performed.
+        /// </summary>
+        private List<Action> callbacksForExtraFlush = new List<Action>();
 
         /// <summary>
         /// The RegEx to extract a JSON Object. Used to extract 'actor'.
@@ -583,24 +586,33 @@ namespace AssetPackage
             get { return GameObject; }
         }
 
-        #endregion SubTracker Properties
+		#endregion SubTracker Properties
 
-        #endregion Properties
+		#endregion Properties
 
-        #region Methods
+		#region Methods
 
-        /// <summary>
-        /// Checks the health of the UCM Tracker.
-        /// </summary>
-        ///
-        /// <returns>
-        /// true if it succeeds, false if it fails.
-        /// </returns>
-        public Boolean CheckHealth()
-        {
-            RequestResponse response = IssueRequest("health", "GET");
+		/// <summary>
+		/// Checks the health of the UCM Tracker.
+		/// </summary>
+		///
+		/// <returns>
+		/// true if it succeeds, false if it fails.
+		/// </returns>
+#if ASYNC
+		public void CheckHealth(Action<Boolean> callback)
+#else
+			public Boolean CheckHealth()
+#endif
 
-            if (response.ResultAllowed)
+		{
+#if ASYNC
+			IssueRequestAsync("health", "GET", response => {
+#else
+			RequestResponse response = IssueRequest("health", "GET");
+#endif
+
+			if (response.ResultAllowed)
             {
                 if (jsonHealth.IsMatch(response.body))
                 {
@@ -612,8 +624,13 @@ namespace AssetPackage
             else
             {
                 Log(Severity.Error, "Request Error: {0}-{1}", response.responseCode, response.responsMessage);
-            }
-            return response.ResultAllowed;
+			}
+#if ASYNC
+			callback(response.ResultAllowed);
+		});
+#else
+			return response.ResultAllowed;
+#endif
         }
 
         /// <summary>
@@ -621,62 +638,73 @@ namespace AssetPackage
         /// </summary>
         public void Flush()
         {
+            Flush(null);
+        }
+
+        /// <summary>
+        /// Flushes the queue.
+        /// </summary>
+        public void Flush(Action callback = null)
+        {
             if (!Started)
             {
                 return;
             }
-#if ASYNC
-            // If its waiting for flush, lets wake it up
-            if (flushThread.IsAlive)
-            {
-                if (!flushing)
-                    lock (flushLockObject)
-                    {
-                        Monitor.Pulse(flushLockObject);
-                    }
-                else
-                    this.redo_flush = true;
-            }
-#else
-            ProcessQueue();
-#endif
-        }
 
 #if ASYNC
-        bool redo_flush = false;
-        bool flushing = false;
-        /// <summary>
-        /// Real flushes (to be called from the thread)
-        /// </summary>
-        private void DoFlush()
-        {
-            lock (flushLockObject)
+            if (flushing)
             {
-                while (!exit)
+                extraFlushRequested = true;
+                if (callback != null)
                 {
-                    Monitor.Wait(flushLockObject);
-                    {
-                        flushing = true;
-                        ProcessQueue();
-                        if (redo_flush)
-                        {
-                            redo_flush = false;
-                            ProcessQueue();
-                        }
-                        flushing = false;
-                    }
+                    callbacksForExtraFlush.Add(callback);
                 }
             }
-        }
+            else
+            {
+                flushing = true;
+                if (callback == null)
+                {
+                    callback = () => { Log(Severity.Information, "Flushed!"); };
+                }
+                ProcessQueue(() =>
+                {
+                    flushing = false;
+                    callback();
+                    if (extraFlushRequested)
+                    {
+                        Flush(() =>
+                        {
+                            extraFlushRequested = false;
+                            var auxCallbacks = callbacksForExtraFlush.ToArray();
+                            callbacksForExtraFlush.Clear();
+                            foreach (var c in auxCallbacks)
+                            {
+                                c();
+                            }
+                        });
+                    }
+                });
+            }
+
+
+#else
+            ProcessQueue();
+            if(callback != null)
+            {
+                callback();
+            }
 #endif
+        }
+		
 
         /// <summary>
         /// Flushes the queue.
         /// </summary>
         [Obsolete("Use Flush instead.")]
-        public void RequestFlush()
+        public void RequestFlush(Action done)
         {
-            Flush();
+            Flush(done);
         }
 
 
@@ -692,18 +720,17 @@ namespace AssetPackage
         /// <returns>
         /// true if it succeeds, false if it fails.
         /// </returns>
-        public Boolean Login(string username, string password)
+        public bool Login(string username, string password) 
         {
             bool logged = false;
             Dictionary<string, string> headers = new Dictionary<string, string>();
 
             headers.Add("Content-Type", "application/json");
             headers.Add("Accept", "application/json");
-
             RequestResponse response = IssueRequest(settings.LoginEndpoint, "POST", headers,
-                String.Format("{{\r\n \"username\": \"{0}\",\r\n \"password\": \"{1}\"\r\n}}",
-                username, password));
-
+            String.Format("{{\r\n \"username\": \"{0}\",\r\n \"password\": \"{1}\"\r\n}}",
+            username, password)); 
+            
             if (response.ResultAllowed)
             {
                 if (jsonToken.IsMatch(response.body))
@@ -743,6 +770,52 @@ namespace AssetPackage
         }
 
         /// <summary>
+        /// Login with a Username and Password.
+        ///
+        /// After this call, the Success method will extract the token from the returned and call the callback.
+        /// with true if it succeeds or false if it fails.
+        /// </summary>
+        ///
+        /// <param name="username"> The username. </param>
+        /// <param name="password"> The password. </param>
+        public void LoginAsync(string username, string password, Action<Boolean> callback)
+		{
+			bool logged = false;
+			Dictionary<string, string> headers = new Dictionary<string, string>();
+
+            headers.Add("Content-Type", "application/json");
+            headers.Add("Accept", "application/json");
+
+			IssueRequestAsync(settings.LoginEndpoint, "POST", headers,
+			String.Format("{{\r\n \"username\": \"{0}\",\r\n \"password\": \"{1}\"\r\n}}",
+			username, password), response =>
+			{
+
+			if (response.ResultAllowed)
+			{
+				if (jsonToken.IsMatch(response.body))
+				{
+					settings.UserToken = jsonToken.Match(response.body).Groups[1].Value;
+					if (settings.UserToken.StartsWith("Bearer "))
+					{
+						settings.UserToken.Remove(0, "Bearer ".Length);
+					}
+					Log(Severity.Information, "Token= {0}", settings.UserToken);
+
+					logged = true;
+				}
+			}
+			else
+			{
+				logged = false;
+				Log(Severity.Error, "Request Error: {0}-{1}", response.responseCode, response.responsMessage);
+			}
+
+				callback(logged);
+			});
+        }
+
+        /// <summary>
         /// Starts with a userToken and trackingCode.
         /// </summary>
         ///
@@ -752,34 +825,78 @@ namespace AssetPackage
         {
             settings.UserToken = userToken;
             settings.TrackingCode = trackingCode;
-
             Start();
         }
 
         /// <summary>
-        /// Starts with a trackingCode (and with the already extracted UserToken).
+        /// Asynchronously Starts with a userToken and trackingCode.
+        /// </summary>
+        ///
+        /// <param name="userToken">    The user token. </param>
+        /// <param name="trackingCode"> The tracking code. </param>
+        /// <param name="done">Async callback.</param>
+        public void StartAsync(String userToken, String trackingCode, Action done)
+        {
+            settings.UserToken = userToken;
+            settings.TrackingCode = trackingCode;
+            StartAsync(done);
+		}
+
+		/// <summary>
+		/// Starts with a trackingCode (and with the already extracted UserToken).
+		/// </summary>
+		///
+		/// <param name="trackingCode"> The tracking code. </param>
+		public void Start(String trackingCode)
+        {
+            settings.TrackingCode = trackingCode;
+			Start();
+        }
+
+        /// <summary>
+        /// Asynchronously Starts with a trackingCode (and with the already extracted UserToken).
         /// </summary>
         ///
         /// <param name="trackingCode"> The tracking code. </param>
-        public void Start(String trackingCode)
+        /// <param name="done">Async callback.</param>
+        public void StartAsync(String trackingCode, Action done)
         {
-            settings.TrackingCode = trackingCode;
-
-            Start();
-        }
+			settings.TrackingCode = trackingCode;
+            StartAsync(done);
+		}
 
         /// <summary>
         /// Starts Tracking with: 1) An already extracted UserToken (from Login) and
         /// 2) TrackingCode (Shown at Game on a2 server).
         /// </summary>
-        public void Start()
+		public void Start()
+        {
+            StartAux(false, null);
+        }
+
+        /// <summary>
+        /// Asynchronously Starts Tracking with: 1) An already extracted UserToken (from Login) and
+        /// 2) TrackingCode (Shown at Game on a2 server).
+        /// </summary>
+        /// <param name="done">Callback when its done.</param>
+        public void StartAsync(Action done)
+        {
+            StartAux(true, done);
+        }
+
+        /// <summary>
+        /// Starts the tracker.
+        /// </summary>
+        /// <param name="async">True to make the start async.</param>
+        /// <param name="done">Callback for async start (leave null otherwise).</param>
+        private void StartAux(bool async, Action done)
         {
             try
             {
                 switch (settings.StorageType)
                 {
                     case StorageTypes.net:
-                        Connect();
+                        Connect(async, done);
                         break;
 
                     case StorageTypes.local:
@@ -793,27 +910,20 @@ namespace AssetPackage
                         }
                         break;
                 }
-#if ASYNC
-                if (flushThread == null || !flushThread.IsAlive)
-                {
-                    exit = false;
-                    flushThread = new Thread(new ThreadStart(DoFlush));
-                    flushThread.Name = System.DateTime.Now.ToString();
-                    flushThread.Start();
-                }
-#endif
                 Started = true;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Log(Severity.Error, "Unable to connect: " + ex.Message + " - " + ex.StackTrace);
             }
-            
-
-
         }
 
-        private void Connect()
+        /// <summary>
+        /// Connects the tracker to the LMS.
+        /// </summary>
+        /// <param name="async">True to make the connection async.</param>
+        /// <param name="done">Callback for async connection (leave null otherwise).</param>
+        private void Connect(bool async, Action done)
         {
             Dictionary<string, string> headers = new Dictionary<string, string>();
 
@@ -830,69 +940,87 @@ namespace AssetPackage
 
                 body = "{\"anonymous\" : \"" + settings.PlayerId + "\"}";
             }
-            RequestResponse response = IssueRequest(String.Format(settings.StartEndpoint, settings.TrackingCode), "POST", headers, body);
 
-            if (response.ResultAllowed)
+            Action<RequestResponse> connectResponse = response =>
             {
-                Log(Severity.Information, "");
-
-                // Extract AuthToken.
-                //
-                if (jsonAuthToken.IsMatch(response.body))
+                if (response.ResultAllowed)
                 {
-                    settings.UserToken = jsonAuthToken.Match(response.body).Groups[1].Value;
-                    Log(Severity.Information, "AuthToken= {0}", settings.UserToken);
+                    Log(Severity.Information, "");
 
-                    Connected = true;
-                }
-
-                // Extract PlayerId.
-                //
-                if (jsonPlayerId.IsMatch(response.body))
-                {
-                    settings.PlayerId = jsonPlayerId.Match(response.body).Groups[1].Value;
-                    Log(Severity.Information, "PlayerId= {0}", settings.PlayerId);
-                }
-
-                // Extract Session number.
-                //
-                if (jsonSession.IsMatch(response.body))
-                {
-                    Log(Severity.Information, "Session= {0}", jsonSession.Match(response.body).Groups[1].Value);
-                }
-
-                // Extract ObjectID.
-                //
-                if (jsonObjectId.IsMatch(response.body))
-                {
-                    ObjectId = jsonObjectId.Match(response.body).Groups[1].Value;
-
-                    if (!ObjectId.EndsWith("/"))
+                    // Extract AuthToken.
+                    //
+                    if (jsonAuthToken.IsMatch(response.body))
                     {
-                        ObjectId += "/";
+                        settings.UserToken = jsonAuthToken.Match(response.body).Groups[1].Value;
+                        Log(Severity.Information, "AuthToken= {0}", settings.UserToken);
+
+                        Connected = true;
                     }
 
-                    Log(Severity.Information, "ObjectId= {0}", ObjectId);
-                }
+                    // Extract PlayerId.
+                    //
+                    if (jsonPlayerId.IsMatch(response.body))
+                    {
+                        settings.PlayerId = jsonPlayerId.Match(response.body).Groups[1].Value;
+                        Log(Severity.Information, "PlayerId= {0}", settings.PlayerId);
+                    }
 
-                // Extract Actor Json Object.
-                //
-                if (jsonActor.IsMatch(response.body))
+                    // Extract Session number.
+                    //
+                    if (jsonSession.IsMatch(response.body))
+                    {
+                        Log(Severity.Information, "Session= {0}", jsonSession.Match(response.body).Groups[1].Value);
+                    }
+
+                    // Extract ObjectID.
+                    //
+                    if (jsonObjectId.IsMatch(response.body))
+                    {
+                        ObjectId = jsonObjectId.Match(response.body).Groups[1].Value;
+
+                        if (!ObjectId.EndsWith("/"))
+                        {
+                            ObjectId += "/";
+                        }
+
+                        Log(Severity.Information, "ObjectId= {0}", ObjectId);
+                    }
+
+                    // Extract Actor Json Object.
+                    //
+                    if (jsonActor.IsMatch(response.body))
+                    {
+                        ActorObject = JSONNode.Parse(jsonActor.Match(response.body).Groups[1].Value);
+
+                        Log(Severity.Information, "Actor= {0}", ActorObject);
+
+                        Active = true;
+                    }
+                }
+                else
                 {
-                    ActorObject = JSONNode.Parse(jsonActor.Match(response.body).Groups[1].Value);
+                    Log(Severity.Error, "Request Error: {0}-{1}", response.responseCode, response.responsMessage);
 
-                    Log(Severity.Information, "Actor= {0}", ActorObject);
-
-                    Active = true;
+                    Active = false;
+                    Connected = false;
                 }
+
+                if (async)
+                {
+                    done();
+                }
+            };
+
+            if (async)
+            {
+                IssueRequestAsync(String.Format(settings.StartEndpoint, settings.TrackingCode), "POST", headers, body, connectResponse);
             }
             else
             {
-                Log(Severity.Error, "Request Error: {0}-{1}", response.responseCode, response.responsMessage);
-
-                Active = false;
-                Connected = false;
+                var response = IssueRequest(String.Format(settings.StartEndpoint, settings.TrackingCode), "POST", headers, body);
+                connectResponse(response);
             }
+
         }
 
         /// <summary>
@@ -906,13 +1034,6 @@ namespace AssetPackage
             this.Connected = false;
             this.Started = false;
             this.ActorObject = null;
-#if ASYNC
-            if (flushThread != null || flushThread.IsAlive)
-            {
-                exit = true;
-                flushThread.Abort();
-            }
-#endif
             this.queue = new ConcurrentQueue<TrackerEvent>();
             this.tracesPending = new List<string>();
         }
@@ -920,14 +1041,9 @@ namespace AssetPackage
         /// <summary>
         /// Exit the tracker before closing to guarantee the thread closing.
         /// </summary>
-        public void Exit()
+        public void Exit(Action done)
         {
-            exit = true;
-            Flush();
-#if ASYNC
-            flushThread.Join();
-            flushThread = null;
-#endif
+            Flush(done);
         }
 
         /// <summary>
@@ -1018,7 +1134,7 @@ namespace AssetPackage
                     Target = new TrackerEvent.TraceObject(target_type, target_id)
                 });
             }
-        }
+		}
 
         /// <summary>
         /// Issue a HTTP Webrequest.
@@ -1036,6 +1152,18 @@ namespace AssetPackage
         }
 
         /// <summary>
+        /// Issue a HTTP Webrequest and returns the RequestResponse in the callback.
+        /// </summary>
+        ///
+        /// <param name="path">   Full pathname of the file. </param>
+        /// <param name="method"> The method. </param>
+        /// <param name="callback"> Method to be called when the request finishes. </param>
+        private void IssueRequestAsync(string path, string method, Action<RequestResponse> callback)
+		{
+			IssueRequestAsync(path, method, new Dictionary<string, string>(), String.Empty, callback);
+		}
+
+        /// <summary>
         /// Issue a HTTP Webrequest.
         /// </summary>
         ///
@@ -1047,10 +1175,25 @@ namespace AssetPackage
         /// <returns>
         /// true if it succeeds, false if it fails.
         /// </returns>
+
         private RequestResponse IssueRequest(string path, string method, Dictionary<string, string> headers, string body = "")
         {
             return IssueRequest(path, method, headers, body, settings.Port);
         }
+
+        /// <summary>
+        /// Issue a HTTP Webrequest and returns the RequestResponse in the callback.
+        /// </summary>
+        ///
+        /// <param name="path">    Full pathname of the file. </param>
+        /// <param name="method">  The method. </param>
+        /// <param name="headers"> The headers. </param>
+        /// <param name="body">    The body. </param>
+        /// <param name="callback"> Method to be called when the request finishes. </param>
+        private void IssueRequestAsync(string path, string method, Dictionary<string, string> headers, string body, Action<RequestResponse> callback)
+		{
+			IssueRequestAsync(path, method, headers, body, settings.Port, callback);
+		}
 
         /// <summary>
         /// Query if this object issue request 2.
@@ -1065,7 +1208,7 @@ namespace AssetPackage
         /// <returns>
         /// true if it succeeds, false if it fails.
         /// </returns>
-        private RequestResponse IssueRequest(string path, string method, Dictionary<string, string> headers, string body, Int32 port)
+		private RequestResponse IssueRequest(string path, string method, Dictionary<string, string> headers, string body, Int32 port)
         {
             IWebServiceRequest ds = getInterface<IWebServiceRequest>();
 
@@ -1074,24 +1217,148 @@ namespace AssetPackage
             if (ds != null)
             {
                 ds.WebServiceRequest(
-                   new RequestSetttings
-                   {
-                       method = method,
-                       uri = new Uri(string.Format("http{0}://{1}{2}{3}/{4}",
-                                   settings.Secure ? "s" : String.Empty,
-                                   settings.Host,
-                                   port == 80 ? String.Empty : String.Format(":{0}", port),
-                                   String.IsNullOrEmpty(settings.BasePath.TrimEnd('/')) ? "" : settings.BasePath.TrimEnd('/'),
-                                   path.TrimStart('/')
-                                   )),
-                       requestHeaders = headers,
-                       //! allowedResponsCodes,     // TODO default is ok
-                       body = body, // or method.Equals("GET")?string.Empty:body
-                   }, out response);
+                    new RequestSetttings
+                    {
+                        method = method,
+                        uri = new Uri(string.Format("http{0}://{1}{2}{3}/{4}",
+                                    settings.Secure ? "s" : String.Empty,
+                                    settings.Host,
+                                    port == 80 ? String.Empty : String.Format(":{0}", port),
+                                    String.IsNullOrEmpty(settings.BasePath.TrimEnd('/')) ? "" : settings.BasePath.TrimEnd('/'),
+                                    path.TrimStart('/')
+                                    )),
+                        requestHeaders = headers,
+                        //! allowedResponsCodes,     // TODO default is ok
+                        body = body, // or method.Equals("GET")?string.Empty:body
+				   }, out response);
+			}
+
+			return response;
+        }
+
+        /// <summary>
+        /// Query if this object issue request 2.
+        /// </summary>
+        ///
+        /// <param name="path">    Full pathname of the file. </param>
+        /// <param name="method">  The method. </param>
+        /// <param name="headers"> The headers. </param>
+        /// <param name="body">    The body. </param>
+        /// <param name="port">    The port. </param>
+        /// <param name="callback"> Method to be called when the request finishes. </param>
+        private void IssueRequestAsync(string path, string method, Dictionary<string, string> headers, string body, Int32 port, Action<RequestResponse> callback)
+        {
+            IWebServiceRequest ds = getInterface<IWebServiceRequest>();
+
+            RequestResponse response = new RequestResponse();
+
+			if (ds != null)
+			{
+				ds.WebServiceRequestAsync(
+					new RequestSetttings
+					{
+						method = method,
+						uri = new Uri(string.Format("http{0}://{1}{2}{3}/{4}",
+									settings.Secure ? "s" : String.Empty,
+									settings.Host,
+									port == 80 ? String.Empty : String.Format(":{0}", port),
+									String.IsNullOrEmpty(settings.BasePath.TrimEnd('/')) ? "" : settings.BasePath.TrimEnd('/'),
+									path.TrimStart('/')
+									)),
+						requestHeaders = headers,
+						//! allowedResponsCodes,     // TODO default is ok
+						body = body, // or method.Equals("GET")?string.Empty:body
+					}, callback);
+			}
+		}
+
+#if ASYNC
+        /// <summary>
+        /// Process the queue.
+        /// </summary>
+        private void ProcessQueue(Action done)
+        {
+            if (!Started)
+            {
+                Log(Severity.Warning, "Refusing to send traces without starting tracker (Active is False, should be True)");
+                done();
+                return;
+            }
+            else if (!Active)
+            {
+                Connect(false, null);
             }
 
-            return response;
+            Action<TrackerEvent[]> saveAndDequeue = traces =>
+            {
+                // if backup requested, save a copy
+                if (settings.BackupStorage)
+                {
+                    SaveTracesInBackup(traces);
+                }
+
+                queue.Dequeue(traces.Length);
+                done();
+            };
+
+            if (queue.Count > 0 || tracesPending.Count > 0 || tracesUnlogged.Count > 0)
+            {
+                //Extract the traces from the queue and remove from the queue
+                TrackerEvent[] traces = CollectTraces();
+
+                //Check if it's connected now
+                if (Active)
+                {
+                    SendUnloggedTraces(sentUnlogged =>
+                    {
+                        string data = ProcessTraces(traces, settings.TraceFormat);
+                        if (sentUnlogged)
+                        {
+                            SendPendingTraces(sentPending =>
+                            {
+                                if (queue.Count > 0)
+                                {
+                                    if (!sentPending)
+                                    {
+                                        tracesPending.Add(data);
+                                        saveAndDequeue(traces);
+                                    }
+                                    else SendTraces(data, sent =>
+                                    {
+                                        if (!sent)
+                                        {
+                                            tracesPending.Add(data);
+                                        }
+                                        saveAndDequeue(traces);
+                                    });
+                                }
+                                else
+                                {
+                                    saveAndDequeue(traces);
+                                }
+                            });
+                        }
+                        else
+                        {
+                            tracesPending.Add(data);
+                            saveAndDequeue(traces);
+                        }
+                    });
+                }
+                else
+                {
+                    tracesUnlogged.AddRange(traces);
+                    saveAndDequeue(traces);
+                }
+            }
+            else
+            {
+                Log(Severity.Information, "Nothing to flush");
+                done();
+            }
         }
+
+#else
 
         /// <summary>
         /// Process the queue.
@@ -1105,7 +1372,7 @@ namespace AssetPackage
             }
             else if (!Active)
             {
-                Connect();
+                Connect(false, null);
             }
 
             if (queue.Count > 0 || tracesPending.Count > 0 || tracesUnlogged.Count > 0)
@@ -1121,7 +1388,7 @@ namespace AssetPackage
                         string data = ProcessTraces(traces, settings.TraceFormat);
 
                         if ((!SendPendingTraces() || !(queue.Count > 0 && SendTraces(data))) && queue.Count > 0)
-                                tracesPending.Add(data);
+                            tracesPending.Add(data);
                     }
                 }
                 else
@@ -1135,7 +1402,7 @@ namespace AssetPackage
                     IDataStorage storage = getInterface<IDataStorage>();
                     IAppend append_storage = getInterface<IAppend>();
 
-                    if(queue.Count > 0)
+                    if (queue.Count > 0)
                     {
                         string rawData = ProcessTraces(traces, TraceFormats.csv);
 
@@ -1143,10 +1410,10 @@ namespace AssetPackage
                         {
                             append_storage.Append(settings.BackupFile, rawData);
                         }
-                        else if(storage != null)
+                        else if (storage != null)
                         {
                             String previous = storage.Exists(settings.BackupFile) ? storage.Load(settings.BackupFile) : String.Empty;
-                            
+
                             if (storage.Exists(settings.BackupFile))
                                 storage.Save(settings.BackupFile, previous + rawData);
                             else
@@ -1162,7 +1429,38 @@ namespace AssetPackage
                 Log(Severity.Information, "Nothing to flush");
             }
         }
+#endif
+        /// <summary>
+        /// Save traces in the backup file.
+        /// </summary>
+        private void SaveTracesInBackup(TrackerEvent[] traces)
+        {
+            IDataStorage storage = getInterface<IDataStorage>();
+            IAppend append_storage = getInterface<IAppend>();
 
+            if (queue.Count > 0)
+            {
+                string rawData = ProcessTraces(traces, TraceFormats.csv);
+
+                if (append_storage != null)
+                {
+                    append_storage.Append(settings.BackupFile, rawData);
+                }
+                else if (storage != null)
+                {
+                    String previous = storage.Exists(settings.BackupFile) ? storage.Load(settings.BackupFile) : String.Empty;
+
+                    if (storage.Exists(settings.BackupFile))
+                        storage.Save(settings.BackupFile, previous + rawData);
+                    else
+                        storage.Save(settings.BackupFile, rawData);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Takes a configurable amount of traces from the queue.
+        /// </summary>
         TrackerEvent[] CollectTraces()
         {
             UInt32 cnt = settings.BatchSize == 0 ? UInt32.MaxValue : settings.BatchSize;
@@ -1172,6 +1470,9 @@ namespace AssetPackage
             return traces;
         }
 
+        /// <summary>
+        /// Converts TrackerEvents into an specific TraceFormat.
+        /// </summary>
         string ProcessTraces(TrackerEvent[] traces, TraceFormats format)
         {
             String data = String.Empty;
@@ -1223,7 +1524,43 @@ namespace AssetPackage
             return data;
         }
 
-        bool SendPendingTraces()
+#if ASYNC
+        /// <summary>
+        /// Sends the traces from the pending queue, which are the ones failed being sent before.
+        /// </summary>
+		void SendPendingTraces(Action<bool> done)
+		{
+			// Try to send old traces
+			if (tracesPending.Count > 0)
+			{
+				Log(Severity.Information, "Enqueued trace-blocks detected: {0}. Processing...", tracesPending.Count);
+				String data = tracesPending[0];
+				SendTraces(data, sent =>
+				{
+					if (!sent)
+					{
+						Log(Severity.Information, "Error sending enqueued traces");
+						// does not keep sending old traces, but continues processing new traces so that get added to tracesPending
+						done(false);
+					}
+					else
+					{
+						tracesPending.RemoveAt(0);
+						Log(Severity.Information, "Sent enqueued traces OK");
+						SendPendingTraces(done);
+					}
+				});
+			}
+			else
+			{
+				done(true);
+			}
+		}
+#else
+        /// <summary>
+        /// Sends the traces from the pending queue, which are the ones failed being sent before.
+        /// </summary>
+		bool SendPendingTraces()
         {
             // Try to send old traces
             while (tracesPending.Count > 0)
@@ -1245,10 +1582,39 @@ namespace AssetPackage
 
             return tracesPending.Count == 0;
         }
+#endif
 
-        bool SendUnloggedTraces()
-        {
-            if(tracesUnlogged.Count > 0 && this.ActorObject != null)
+#if ASYNC
+        /// <summary>
+        /// Sends the traces from the unlogged queue, which are traces enqueued prior to login.
+        /// </summary>
+        void SendUnloggedTraces(Action<bool> callback)
+		{
+			if (tracesUnlogged.Count > 0 && this.ActorObject != null)
+			{
+				string data = ProcessTraces(tracesUnlogged.ToArray(), settings.TraceFormat);
+				SendTraces(data, sent =>
+				{
+					tracesUnlogged.Clear();
+
+					if (!sent)
+						tracesPending.Add(data);
+
+					callback(sent);
+				});
+            }
+            else
+            {
+                callback(tracesUnlogged.Count == 0);
+            }
+		}
+#else
+        /// <summary>
+        /// Sends the traces from the unlogged queue, which are traces enqueued prior to login.
+        /// </summary>
+		bool SendUnloggedTraces()
+		{
+			if (tracesUnlogged.Count > 0 && this.ActorObject != null)
             {
                 string data = ProcessTraces(tracesUnlogged.ToArray(), settings.TraceFormat);
                 bool sent = SendTraces(data);
@@ -1260,8 +1626,16 @@ namespace AssetPackage
 
             return tracesUnlogged.Count == 0;
         }
+#endif
 
-        bool SendTraces(String data)
+#if ASYNC
+        /// <summary>
+        /// Sends the trace.
+        /// </summary>
+        void SendTraces(String data, Action<bool> callback)
+#else
+		bool SendTraces(String data)
+#endif
         {
             switch (settings.StorageType)
             {
@@ -1284,9 +1658,11 @@ namespace AssetPackage
                         }
 
                         storage.Save(settings.LogFile, previous + data);
-                    }
-
-                    break;
+					}
+#if ASYNC
+					callback(true);
+#endif
+					break;
                 case StorageTypes.net:                    
                     Dictionary<string, string> headers = new Dictionary<string, string>();
 
@@ -1302,36 +1678,49 @@ namespace AssetPackage
                     }
 
                     Log(Severity.Information, "\r\n" + data);
+#if ASYNC
+					IssueRequestAsync(String.Format(settings.TrackEndpoint, settings.TrackingCode), "POST", headers, data, response =>
+					{
+#else
+					RequestResponse response = IssueRequest(String.Format(settings.TrackEndpoint, settings.TrackingCode), "POST", headers, data);
+#endif
+						if (response.ResultAllowed)
+						{
+							Log(Severity.Information, "Track= {0}", response.body);
+							Connected = true;
+						}
+						else
+						{
+							Log(Severity.Error, "Request Error: {0}-{1}", response.responseCode, response.responsMessage);
 
-                    RequestResponse response = IssueRequest(String.Format(settings.TrackEndpoint, settings.TrackingCode), "POST", headers, data);
+							Log(Severity.Warning, "Error flushing, connection disabled temporaly");
 
-                    if (response.ResultAllowed)
-                    {
-                        Log(Severity.Information, "Track= {0}", response.body);
-                        Connected = true;
-                    }
-                    else
-                    {
-                        Log(Severity.Error, "Request Error: {0}-{1}", response.responseCode, response.responsMessage);
-
-                        Log(Severity.Warning, "Error flushing, connection disabled temporaly");
-
-                        Connected = false;
+							Connected = false;
+#if ASYNC
+							callback(false);
+                            return;
+                        }
+                        callback(true);
+                    });
+#else
                         return false;
-                    }
+						}
+#endif
 
-                    break;
+						break;
             }
-            return true;
-        }
+#if !ASYNC
+		return true;
+#endif
+	}
 
-        #region Extension Methods
+#region Extension Methods
 
-        /// <summary>
-        /// Sets if the following trace has been a success, including this value to the extensions.
-        /// </summary>
-        /// <param name="success">If set to <c>true</c> means it has been a success.</param>
-        public void setSuccess(bool success)
+					/// <summary>
+					/// Sets if the following trace has been a success, including this value to the extensions.
+					/// </summary>
+					/// <param name="success">If set to <c>true</c> means it has been a success.</param>
+					public void setSuccess(bool success)
         {
             setVar(Extension.Success.ToString().ToLower(), success);
         }

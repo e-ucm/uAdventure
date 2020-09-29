@@ -153,16 +153,17 @@ namespace AssetPackage
     /// </remarks>
     public interface IWebServiceRequest
     {
-        /// <summary>
-        /// Web service request.
-        /// </summary>
-        ///
-        /// <returns>
-        /// A RequestResponse.
-        /// </returns>
-        ///
-        /// <param name="requestSettings">  Options for controlling the operation. </param>
-        /// <param name="requestResponse"> The request response. </param>
-        void WebServiceRequest(RequestSetttings requestSettings, out RequestResponse requestResponse);
-    }
+		/// <summary>
+		/// Web service request.
+		/// </summary>
+		///
+		/// <returns>
+		/// A RequestResponse.
+		/// </returns>
+		///
+		/// <param name="requestSettings">  Options for controlling the operation. </param>
+		/// <param name="requestResponse"> The request response. </param>
+		void WebServiceRequestAsync(RequestSetttings requestSettings, Action<RequestResponse> callback);
+		void WebServiceRequest(RequestSetttings requestSettings, out RequestResponse requestResponse);
+	}
 }

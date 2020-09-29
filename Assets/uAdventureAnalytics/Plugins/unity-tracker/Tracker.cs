@@ -47,6 +47,8 @@ namespace RAGE.Analytics
 		public string host = "https://analytics.e-ucm.es/";
 		public string trackingCode;
 		public Boolean debug = false;
+		private bool allowQuitting = false;
+		private bool flushing = false;
 
 		public string username;
 		public string password;
@@ -58,6 +60,11 @@ namespace RAGE.Analytics
 
         void Awake()
         {
+			if (TrackerAsset.Instance.Started)
+			{
+				return;
+			}
+
             string domain = "";
             int port = 80;
             bool secure = false;
@@ -114,24 +121,48 @@ namespace RAGE.Analytics
 		/// </summary>
 		public void Start ()
 		{
-			if (!String.IsNullOrEmpty (username))
-				TrackerAsset.Instance.Login (username, password);
+			if (TrackerAsset.Instance.Started)
+			{
+				return;
+			}
 
-			TrackerAsset.Instance.Start ();
 			this.nextFlush = flushInterval;
-			UnityEngine.Object.DontDestroyOnLoad (this);
+			UnityEngine.Object.DontDestroyOnLoad(this);
+
+			Action afterStart = () =>
+			{
+				UnityEngine.Debug.Log("started");
+				allowQuitting = false;
+				Application.wantsToQuit += Application_wantsToQuit;
+			};
+
+			if (!String.IsNullOrEmpty(username))
+			{
+				TrackerAsset.Instance.Login(username, password);
+			}
+			TrackerAsset.Instance.Start();
 		}
 
-		void OnApplicationQuit(){
-			// We start the thread for a final
-			ProcessThreadCollection currentThreads = Process.GetCurrentProcess().Threads;
-
-			foreach (ProcessThread thread in currentThreads)    
+        private bool Application_wantsToQuit()
+        {
+            if (!allowQuitting)
 			{
-				UnityEngine.Debug.Log ("Thread: " + thread.Id + " - " + thread.StartTime);
+				// We start the thread for a final
+				ProcessThreadCollection currentThreads = Process.GetCurrentProcess().Threads;
+
+				foreach (ProcessThread thread in currentThreads)
+				{
+					UnityEngine.Debug.Log("Thread: " + thread.Id + " - " + thread.StartTime);
+				}
+				TrackerAsset.Instance.Exit(() =>
+				{
+					UnityEngine.Debug.Log("Fin");
+					allowQuitting = true;
+					Application.Quit();
+				});
 			}
-			TrackerAsset.Instance.Exit ();
-			UnityEngine.Debug.Log ("Fin");
+
+			return allowQuitting;
 		}
 
 		// <summary>
@@ -139,6 +170,11 @@ namespace RAGE.Analytics
 		/// </summary>
 		public void Update ()
 		{
+            if (flushing)
+            {
+				return;
+            }
+
 			float delta = Time.deltaTime;
 			if (flushInterval >= 0) {
 					nextFlush -= delta;
@@ -151,7 +187,11 @@ namespace RAGE.Analytics
 			}
 			if (flushRequested) {
 				flushRequested = false;
-				TrackerAsset.Instance.Flush ();
+				flushing = true;
+				TrackerAsset.Instance.Flush (() =>
+				{
+					flushing = false;
+				});
 			}
 		}
 	}

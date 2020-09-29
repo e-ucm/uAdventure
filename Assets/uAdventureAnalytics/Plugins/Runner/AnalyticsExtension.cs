@@ -108,6 +108,7 @@ namespace uAdventure.Analytics
                 trackerConfig = trackerConfigs.Count == 0 ? new TrackerConfig() : trackerConfigs[0];
 
                 StartTracker(trackerConfig);
+                // TODO wait till start tracker is ready
             }
         }
 
