@@ -403,6 +403,9 @@ MonoBehaviour:
   Think_Prefab: {fileID: 173476, guid: 99377200feb4acf469b35b76b2835905, type: 3}
   Yell_Prefab: {fileID: 150400, guid: 872d08044cdef604c8ba4190b69ce3b5, type: 3}
   Config_Menu_Ref: {fileID: 370788399}
+  SaveButton: {fileID: 1292745875}
+  LoadButton: {fileID: 1773614975}
+  ResetButton: {fileID: 908416224}
 --- !u!1 &703138873
 GameObject:
   m_ObjectHideFlags: 0
@@ -625,6 +628,12 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &908416224 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 188494, guid: b9005d6734bce75468383e56d0747f81,
+    type: 3}
+  m_PrefabInstance: {fileID: 916667157}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &916667157
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -632,6 +641,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 688127768}
     m_Modifications:
+    - target: {fileID: 100272, guid: b9005d6734bce75468383e56d0747f81, type: 3}
+      propertyPath: m_Name
+      value: SaveButton
+      objectReference: {fileID: 0}
+    - target: {fileID: 150446, guid: b9005d6734bce75468383e56d0747f81, type: 3}
+      propertyPath: m_Name
+      value: LoadButton
+      objectReference: {fileID: 0}
     - target: {fileID: 182138, guid: b9005d6734bce75468383e56d0747f81, type: 3}
       propertyPath: m_Name
       value: ConfigMenu
@@ -639,6 +656,34 @@ PrefabInstance:
     - target: {fileID: 182138, guid: b9005d6734bce75468383e56d0747f81, type: 3}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 188494, guid: b9005d6734bce75468383e56d0747f81, type: 3}
+      propertyPath: m_Name
+      value: ResetButton
+      objectReference: {fileID: 0}
+    - target: {fileID: 11403334, guid: b9005d6734bce75468383e56d0747f81, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 688127769}
+    - target: {fileID: 11403334, guid: b9005d6734bce75468383e56d0747f81, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: ResetAndExit
+      objectReference: {fileID: 0}
+    - target: {fileID: 11423330, guid: b9005d6734bce75468383e56d0747f81, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 688127769}
+    - target: {fileID: 11423330, guid: b9005d6734bce75468383e56d0747f81, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnClickLoad
+      objectReference: {fileID: 0}
+    - target: {fileID: 11429942, guid: b9005d6734bce75468383e56d0747f81, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 688127769}
+    - target: {fileID: 11429942, guid: b9005d6734bce75468383e56d0747f81, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnClickSave
       objectReference: {fileID: 0}
     - target: {fileID: 22401748, guid: b9005d6734bce75468383e56d0747f81, type: 3}
       propertyPath: m_AnchorMin.y
@@ -849,6 +894,18 @@ PrefabInstance:
 --- !u!224 &916667158 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 22423866, guid: b9005d6734bce75468383e56d0747f81,
+    type: 3}
+  m_PrefabInstance: {fileID: 916667157}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1292745875 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 150446, guid: b9005d6734bce75468383e56d0747f81,
+    type: 3}
+  m_PrefabInstance: {fileID: 916667157}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1773614975 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100272, guid: b9005d6734bce75468383e56d0747f81,
     type: 3}
   m_PrefabInstance: {fileID: 916667157}
   m_PrefabAsset: {fileID: 0}
