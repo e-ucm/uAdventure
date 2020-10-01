@@ -1,12 +1,8 @@
 ﻿using AssetPackage;
-using Simva;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using UnityFx.Async.Promises;
 
-namespace uAdventure.Simva
+namespace Simva
 {
     public class SimvaBridge : IBridge, IDataStorage, IAppend, IWebServiceRequest, ILog
     {
@@ -54,11 +50,29 @@ namespace uAdventure.Simva
             unityBridge.Save(fileId, fileData);
         }
 
-        public void WebServiceRequest(RequestSetttings requestSettings, out RequestResponse requestResponse)
+		public void WebServiceRequestAsync(RequestSetttings requestSettings, Action<RequestResponse> callback)
+		{
+            // Force Update auth params
+            apiClient.UpdateParamsForAuth(null, requestSettings.requestHeaders, new string[] { "OAuth2" }, true)
+                .Then(() =>
+                {
+                    unityBridge.WebServiceRequestAsync(requestSettings, callback);
+                })
+                .Catch(ex =>
+                {
+                    RequestResponse response = new RequestResponse
+                    {
+                        body = ex.Message,
+                        responseCode = ex is ApiException apiEx ? apiEx.ErrorCode : 401
+                    };
+                });
+		}
+
+		public void WebServiceRequest(RequestSetttings requestSettings, out RequestResponse requestResponse)
         {
             // Force Update auth params
-            apiClient.UpdateParamsForAuth(null, requestSettings.requestHeaders, new string[] { "OAuth2" });
+            apiClient.UpdateParamsForAuth(null, requestSettings.requestHeaders, new string[] { "OAuth2" }, false);
             unityBridge.WebServiceRequest(requestSettings, out requestResponse);
         }
-    }
+	}
 }

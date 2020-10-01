@@ -106,7 +106,42 @@ namespace Simva
 
             return done;
         }
-        public IAsyncOperation InitOAuth(AuthorizationInfo authorizationInfo)
+
+		public IAsyncOperation InitOAuth(string username, string password, string clientId, string clientSecret = null,
+		string realm = null, string appName = null, string scopeSeparator = ":", bool usePKCE = false,
+		Dictionary<string, string> aditionalQueryStringParams = null, bool scope_offline = false)
+		{
+			String[] scopes = null;
+			if (scope_offline)
+			{
+				scopes = new string[] { "read", "write", "scope_offline" };
+			}
+			else
+			{
+				scopes = new string[] { "read", "write" };
+			}
+
+
+			var tokenUrl = TokenPath ?? "https://sso.simva.e-ucm.es/auth/realms/simva/protocol/openid-connect/token";
+			var authUrl = AuthPath ?? "https://sso.simva.e-ucm.es/auth/realms/simva/protocol/openid-connect/auth";
+
+			var done = new AsyncCompletionSource();
+
+			OpenIdUtility.LoginWithROPC(username, password, authUrl, tokenUrl, clientId, null, string.Join(scopeSeparator, scopes))
+				.Then(authInfo =>
+				{
+					AuthorizationInfo = authInfo;
+					done.SetCompleted();
+				})
+				.Catch(error =>
+				{
+					done.SetException(new ApiException(500, error.Message));
+				});
+
+			return done;
+		}
+
+		public IAsyncOperation InitOAuth(AuthorizationInfo authorizationInfo)
         {
             var scopes = new string[] { "read", "write" };
 
@@ -115,14 +150,18 @@ namespace Simva
 
             var done = new AsyncCompletionSource();
 
-            AuthorizationInfo = OpenIdUtility.RefreshToken(tokenUrl, authorizationInfo.ClientId, authorizationInfo.RefreshToken);
-            if(AuthorizationInfo != null)
+			try
+			{
+                OpenIdUtility.RefreshTokenAsync(tokenUrl, authorizationInfo.ClientId, authorizationInfo.RefreshToken)
+                    .Then(authInfo =>
+                    {
+                        AuthorizationInfo = authInfo;
+                        done.SetCompleted();
+                    });
+			}
+            catch(ApiException ex)
             {
-                done.SetCompleted();
-            }
-            else
-            {
-                done.SetException(new ApiException(500, "Failed to renew AuthorizationInfo"));
+                done.SetException(new ApiException(ex.ErrorCode, "Failed to renew AuthorizationInfo: " + ex.Message));
             }
 
             return done;
@@ -170,52 +209,60 @@ namespace Simva
                 default:
                     throw new ApiException(500, "Method not available: " + method);
             }
-   
-            UpdateParamsForAuth(queryParams, headerParams, authSettings);
 
-            // add default header, if any
-            foreach(var defaultHeader in _defaultHeaderMap)
-                request.SetRequestHeader(defaultHeader.Key, defaultHeader.Value);
+            return UpdateParamsForAuth(queryParams, headerParams, authSettings, true)
+                .Then(() =>
+                {
+                    var result = new AsyncCompletionSource<UnityWebRequest>();
+                    // add default header, if any
+                    foreach (var defaultHeader in _defaultHeaderMap)
+                        request.SetRequestHeader(defaultHeader.Key, defaultHeader.Value);
 
-            // add header parameter, if any
-            foreach(var param in headerParams)
-                request.SetRequestHeader(param.Key, param.Value);
+                    // add header parameter, if any
+                    foreach (var param in headerParams)
+                        request.SetRequestHeader(param.Key, param.Value);
 
-            if(queryParams.Count > 0 || formParams.Count > 0 && method != UnityWebRequest.kHttpVerbPOST){
-                request.url += "?";
-            }
+                    if (queryParams.Count > 0 || formParams.Count > 0 && method != UnityWebRequest.kHttpVerbPOST)
+                    {
+                        request.url += "?";
+                    }
 
-            // add query parameter, if any
-            if(queryParams.Count > 0){
-                request.url += String.Join("&", queryParams.Select(kv => kv.Key + "=" + kv.Value).ToArray());
-            }
-            
-            foreach(var param in fileParams){
-                throw new ApiException(500, "Uploading files is not implemented.");
-            }
-            
-            // add form parameter, if any
-            if(formParams.Count > 0 && method != UnityWebRequest.kHttpVerbPOST){
-                request.url += String.Join("&", formParams.Select(kv => kv.Key + "=" + kv.Value).ToArray());
-            }
+                    // add query parameter, if any
+                    if (queryParams.Count > 0)
+                    {
+                        request.url += String.Join("&", queryParams.Select(kv => kv.Key + "=" + kv.Value).ToArray());
+                    }
 
-            // add file parameter, if any
-            foreach(var param in fileParams){
-                throw new ApiException(500, "Uploading files is not implemented.");
-            }
+                    foreach (var param in fileParams)
+                    {
+                        throw new ApiException(500, "Uploading files is not implemented.");
+                    }
 
-            if (postBody != null)
-            { 
-                // http body (model) parameter
-                var bodyBytes = System.Text.Encoding.UTF8.GetBytes(postBody);
-                request.SetRequestHeader("Content-Type", "application/json");
-                request.uploadHandler = new UploadHandlerRaw(bodyBytes);
-                request.downloadHandler = new DownloadHandlerBuffer();
-            }
-            
-            var result = new AsyncCompletionSource<UnityWebRequest>();
-            Observable.FromCoroutine(() => DoRequest(result, request)).Subscribe();
-            return result;
+                    // add form parameter, if any
+                    if (formParams.Count > 0 && method != UnityWebRequest.kHttpVerbPOST)
+                    {
+                        request.url += String.Join("&", formParams.Select(kv => kv.Key + "=" + kv.Value).ToArray());
+                    }
+
+                    // add file parameter, if any
+                    foreach (var param in fileParams)
+                    {
+                        throw new ApiException(500, "Uploading files is not implemented.");
+                    }
+
+                    if (postBody != null)
+                    {
+                        // http body (model) parameter
+                        var bodyBytes = System.Text.Encoding.UTF8.GetBytes(postBody);
+                        request.SetRequestHeader("Content-Type", "application/json");
+                        request.uploadHandler = new UploadHandlerRaw(bodyBytes);
+                        request.downloadHandler = new DownloadHandlerBuffer();
+                    }
+
+                    Observable.FromCoroutine(() => DoRequest(result, request)).Subscribe();
+                    return result;
+                });
+
 
         }
 
@@ -374,10 +421,15 @@ namespace Simva
         /// <param name="queryParams">Query parameters.</param>
         /// <param name="headerParams">Header parameters.</param>
         /// <param name="authSettings">Authentication settings.</param>
-        public void UpdateParamsForAuth(Dictionary<String, String> queryParams, Dictionary<String, String> headerParams, string[] authSettings)
+        public IAsyncOperation UpdateParamsForAuth(Dictionary<String, String> queryParams, Dictionary<String, String> headerParams, string[] authSettings, bool async)
         {
+            var result = new AsyncCompletionSource();
+
             if (authSettings == null || authSettings.Length == 0)
-                return;
+            {
+                result.SetCompleted();
+                return result;
+            }
 
             foreach (string auth in authSettings)
             {
@@ -388,27 +440,47 @@ namespace Simva
                         
                         if(AuthorizationInfo == null)
                         {
-                            throw new ApiException(500, "OAuth not inited, please init the authorization in ApiClient with InitOauth or set up the AuthorizationInfo!");
+                            result.SetException(new ApiException(500, "OAuth not inited, please init the authorization in ApiClient with InitOauth or set up the AuthorizationInfo!"));
+                            return result;
                         }
                         var tokenUrl = TokenPath ?? "https://sso.simva.e-ucm.es/auth/realms/simva/protocol/openid-connect/token";
+                        Action addAuthAndComplete = () => 
+                        {
+                            var tokenType = AuthorizationInfo.TokenType.First().ToString().ToUpper() + AuthorizationInfo.TokenType.Substring(1);
+                            headerParams.Add("Authorization", tokenType + " " + AuthorizationInfo.AccessToken);
+                            result.SetCompleted();
+                        };
                         if (AuthorizationInfo.Expired)
                         {
-                            // TODO async refresh
-                            AuthorizationInfo = OpenIdUtility.RefreshToken(tokenUrl, AuthorizationInfo.ClientId, AuthorizationInfo.RefreshToken);
-                            if(AuthorizationInfo == null)
+                            if (async)
                             {
-                                throw new Exception("Couldnt renew auth token!");
+                                OpenIdUtility.RefreshTokenAsync(tokenUrl, AuthorizationInfo.ClientId, AuthorizationInfo.RefreshToken)
+                                    .Then(authInfo =>
+                                    {
+                                        AuthorizationInfo = authInfo;
+                                        addAuthAndComplete();
+                                    });
+                            }
+                            else
+                            {
+                                AuthorizationInfo = OpenIdUtility.RefreshToken(tokenUrl, AuthorizationInfo.ClientId, AuthorizationInfo.RefreshToken);
+                                addAuthAndComplete();
                             }
                         }
-                        var tokenType = AuthorizationInfo.TokenType.First().ToString().ToUpper() + AuthorizationInfo.TokenType.Substring(1);
-                        headerParams.Add("Authorization", tokenType + " " + AuthorizationInfo.AccessToken);
+                        else
+                        {
+                            addAuthAndComplete();
+                        }
                                                 
                         break;
                     default:
                         //TODO show warning about security definition not found
+                        result.SetCompleted();
                         break;
                 }
             }
+
+            return result;
         }
  
         /// <summary>

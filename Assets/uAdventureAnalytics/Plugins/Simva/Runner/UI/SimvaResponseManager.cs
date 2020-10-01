@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace uAdventure.Analytics
+namespace Simva
 {
     public class SimvaResponseManager : MonoBehaviour
     {

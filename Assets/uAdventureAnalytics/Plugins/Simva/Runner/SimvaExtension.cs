@@ -208,6 +208,27 @@ namespace uAdventure.Simva
                 });
         }
 
+        public void LoginAndSchedule(string token)
+        {
+            NotifyLoading(true);
+            SimvaApi<IStudentsApi>.LoginWithToken(token)
+                .Then(simvaController =>
+                {
+                    this.auth = simvaController.AuthorizationInfo;
+                    this.simvaController = simvaController;
+                    return UpdateSchedule();
+                })
+                .Then(schedule =>
+                {
+                    LaunchActivity(schedule.Next);
+                })
+                .Catch(error =>
+                {
+                    NotifyLoading(false);
+                    NotifyManagers(error.Message);
+                });
+        }
+
         public IAsyncOperation<Schedule> UpdateSchedule()
         {
             var webRequest = simvaController.Api.GetSchedule(simvaController.SimvaConf.Study);

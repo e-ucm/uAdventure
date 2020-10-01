@@ -28,6 +28,8 @@ namespace Simva
 
         public string SSO { get; private set; }
 
+        public string ClientId { get; set; }
+
         public string Study { get; set; }
 
         public string URL
@@ -73,6 +75,7 @@ namespace Simva
                 Protocol = simvaconf["protocol"];
                 Port = simvaconf["port"];
                 SSO = simvaconf["sso"];
+                ClientId = simvaconf["client_id"];
                 TraceStorage = simvaconf["trace_storage"].AsBool;
                 Backup = simvaconf["backup"].AsBool;
                 Realtime = simvaconf["realtime"].AsBool;
@@ -115,6 +118,7 @@ namespace Simva
                 simvaconf["protocol"] = Protocol;
                 simvaconf["port"] = Port;
                 simvaconf["sso"] = SSO;
+                simvaconf["client_id"] = ClientId;
                 simvaconf["url"] = URL;
                 simvaconf["trace_storage"] = TraceStorage.ToString();
                 simvaconf["backup"] = Backup.ToString();

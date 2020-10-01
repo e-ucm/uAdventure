@@ -5,8 +5,8 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using UnityEngine;
-using UnityEngine.Networking;
 using UniRx;
+using UnityEngine.Networking;
 using UnityFx.Async;
 using Newtonsoft.Json;
 using JWT;
@@ -15,12 +15,11 @@ using JWT.Algorithms;
 using JWT.Exceptions;
 using System.IO;
 using AssetPackage;
-using uAdventure.Simva;
-using Chromely.Core;
-using Chromely.Core.Configuration;
-using Chromely;
-using uAdventure.Runner;
 using System.Linq;
+using uAdventure.Simva;
+using uAdventure.Runner;
+using System.Collections;
+using UnityFx.Async.Promises;
 
 namespace Simva
 {
@@ -88,7 +87,18 @@ namespace Simva
         public string Username { get { return (string)decodedJWT["preferred_username"]; } }
     }
 
-    public static class OpenIdUtility
+	public class AuthorizationError
+	{
+		public AuthorizationError()	{}
+
+		[JsonProperty("error")]
+		public string Error { get; set; }
+
+		[JsonProperty("error_description")]
+		public string ErrorDescription { get; set; }
+	}
+
+	public static class OpenIdUtility
     {
         private static System.Diagnostics.Process windowProcess;
         private static Thread httpListener;
@@ -289,9 +299,13 @@ namespace Simva
 
             var redirectUri = ListenForCode(port, (logged, code, state) =>
             {
-                var token = GetToken(tokenUrl, clientId, code, port, codeVerifier);
-                result.SetResult(token);
-            });
+                GetToken(tokenUrl, clientId, code, port, codeVerifier)
+                .Then(token =>
+                {
+                    result.SetResult(token);
+                })
+                .Catch(ex => result.SetException(ex));
+			});
 
 
             url += "&redirect_uri=" + redirectUri;
@@ -309,33 +323,28 @@ namespace Simva
 
             var port = UnityEngine.Random.Range(25525, 65535);
 
-            var url = authUrl + "?" +
-                "grant_type=password" +
+			var url = authUrl;
+			var formUrlEncoded = "grant_type=password" +
                 "&username=" + username +
                 "&password=" + password +
                 "&client_id=" + clientId;
 
             if (!string.IsNullOrEmpty(scope))
             {
-                url += "&scope=" + scope;
+				formUrlEncoded += "&scope=" + scope;
             }
 
             if (!string.IsNullOrEmpty(audience))
             {
-                url += "&audience=" + audience;
+				formUrlEncoded += "&audience=" + audience;
             }
 
-            ListenForCode(port, (logged, code, state) =>
-            {
-                var token = GetToken(tokenUrl, clientId, code, port, null);
-                result.SetResult(token);
-            });
-            OpenBrowser(url);
-            return result;
+			return GetToken(tokenUrl, formUrlEncoded, clientId);
         }
 
-        public static AuthorizationInfo GetToken(string tokenUrl, string clientId, string authCode, int port, string codeVerifier)
+        public static IAsyncOperation<AuthorizationInfo> GetToken(string tokenUrl, string clientId, string authCode, int port, string codeVerifier)
         {
+            var result = new AsyncCompletionSource<AuthorizationInfo>();
             var form = new Dictionary<string, string>()
                 {
                     { "grant_type", "authorization_code" },
@@ -351,34 +360,67 @@ namespace Simva
 
             UnityWebRequest uwr = UnityWebRequest.Post(tokenUrl, form);
 
+            Observable.FromCoroutine(() => DoRequest(result, uwr)).Subscribe();
+
+            var wrapper = new AsyncCompletionSource<AuthorizationInfo>();
+
+            result.Then(authInfo =>
+            {
+                authInfo.ClientId = clientId;
+                wrapper.SetResult(authInfo);
+            }).Catch(ex => wrapper.SetException(ex));
+
+            return wrapper;
+        }
+
+		public static IAsyncOperation<AuthorizationInfo> GetToken(string tokenUrl, string formUrlEncoded, string clientId)
+        {
+            var result = new AsyncCompletionSource<AuthorizationInfo>();
+            UnityWebRequest uwr = UnityWebRequest.Post(tokenUrl, "");
+			byte[] bytes = Encoding.UTF8.GetBytes(formUrlEncoded);
+			UploadHandlerRaw uH = new UploadHandlerRaw(bytes);
+			uH.contentType = "application/x-www-form-urlencoded";
+			uwr.uploadHandler = uH;
+
+			uwr.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+            Observable.FromCoroutine(() => DoRequest(result, uwr)).Subscribe();
+
+            var wrapper = new AsyncCompletionSource<AuthorizationInfo>();
+
+            result.Then(authInfo =>
+            {
+                authInfo.ClientId = clientId;
+                wrapper.SetResult(authInfo);
+            }).Catch(ex => wrapper.SetException(ex));
+
+            return wrapper;
+        }
+
+		public static AuthorizationInfo RefreshToken(string tokenUrl, string clientId, string refresh_token)
+		{
+			UnityWebRequest uwr = UnityWebRequest.Post(tokenUrl,
+				new Dictionary<string, string>()
+				{
+					{ "grant_type", "refresh_token" },
+					{ "refresh_token", refresh_token },
+					{ "client_id", clientId }
+				});
+
             uwr.SendWebRequest();
 
-            while (!uwr.isDone) { }
+            while(!uwr.isDone) { }
+
+            ThrowErrors(uwr);
 
             var authInfo = JsonConvert.DeserializeObject<AuthorizationInfo>(uwr.downloadHandler.text);
             authInfo.ClientId = clientId;
             return authInfo;
         }
 
-        public static AuthorizationInfo RefreshToken(string tokenUrl, string clientId, string refresh_token)
+        public static IAsyncOperation<AuthorizationInfo> RefreshTokenAsync(string tokenUrl, string clientId, string refresh_token)
         {
-            
-            /*var response = WebServiceRequest(new RequestSetttings
-            {
-                uri = new Uri(tokenUrl),
-                method = "POST",
-                requestHeaders = new Dictionary<string, string>
-                {
-                    { "Content-Type", "application/json" },
-                    { "Accept", "application/json" }
-                },
-                body = JsonConvert.SerializeObject(new Dictionary<string, string>()
-                {
-                    { "grant_type", "refresh_token" },
-                    { "refresh_token", refresh_token },
-                    { "client_id", clientId }
-                })
-            });*/
+            var result = new AsyncCompletionSource<AuthorizationInfo>();
 
             UnityWebRequest uwr = UnityWebRequest.Post(tokenUrl,
                 new Dictionary<string, string>()
@@ -388,40 +430,42 @@ namespace Simva
                     { "client_id", clientId }
                 });
 
-            uwr.SendWebRequest();
+            Observable.FromCoroutine(() => DoRequest(result, uwr)).Subscribe();
 
-            while (!uwr.isDone) { }
-            AuthorizationInfo authInfo = null;
-            try
+            return result.Then(authInfo =>
             {
-                authInfo = JsonConvert.DeserializeObject<AuthorizationInfo>(uwr.downloadHandler.text);
-            } 
-            catch (Exception e)
-            { 
-                Debug.LogWarning("Could not login to Simva: " + e.Message);
-            }
-
-            if (authInfo == null || authInfo.AccessToken == null)
-            {
-                authInfo = null;
-            }
-            else
-            {
+                var wrapper = new AsyncCompletionSource<AuthorizationInfo>();
                 authInfo.ClientId = clientId;
-            }
-            return authInfo;
+                wrapper.SetResult(authInfo);
+                return wrapper;
+            });
         }
 
-        /// <summary>
-        /// Web service request.
-        /// </summary>
-        ///
-        /// <param name="requestSettings">Options for controlling the operation. </param>
-        ///
-        /// <returns>
-        /// A RequestResponse.
-        /// </returns>
-        private static RequestResponse WebServiceRequest(RequestSetttings requestSettings)
+        private static void ThrowErrors(UnityWebRequest uwr)
+		{
+			if (uwr.isHttpError)
+			{
+				var error = uwr.downloadHandler.text;
+				try
+				{
+					var authError = JsonConvert.DeserializeObject<AuthorizationError>(uwr.downloadHandler.text);
+					error = authError.ErrorDescription;
+				}
+				catch { }
+				throw new ApiException((int)uwr.responseCode, error);
+			}
+		}
+
+		/// <summary>
+		/// Web service request.
+		/// </summary>
+		///
+		/// <param name="requestSettings">Options for controlling the operation. </param>
+		///
+		/// <returns>
+		/// A RequestResponse.
+		/// </returns>
+		private static RequestResponse WebServiceRequest(RequestSetttings requestSettings)
         {
             RequestResponse result = new RequestResponse(requestSettings);
 
@@ -503,6 +547,34 @@ namespace Simva
             }
 
             return result;
+        }
+
+        private static IEnumerator DoRequest<T>(IAsyncCompletionSource<T> op, UnityWebRequest webRequest)
+        {
+            yield return webRequest.SendWebRequest();
+
+            // Sometimes the webrequest is finished but the download is not
+            while (!webRequest.isNetworkError && !webRequest.isHttpError && webRequest.downloadProgress != 1)
+            {
+                yield return new WaitForFixedUpdate();
+            }
+
+            if (webRequest.isNetworkError)
+            {
+                op.SetException(new ApiException((int)webRequest.responseCode, webRequest.error, webRequest.downloadHandler.text));
+            }
+            else if (webRequest.isHttpError)
+            {
+                Debug.Log(webRequest.downloadHandler.text);
+                op.SetException(new ApiException((int)webRequest.responseCode, webRequest.error, webRequest.downloadHandler.text));
+            }
+            else
+            {
+                var deserialized = JsonConvert.DeserializeObject<T>(webRequest.downloadHandler.text);
+                op.SetResult(deserialized);
+            }
+
+            webRequest.Dispose();
         }
     }
 

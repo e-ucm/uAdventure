@@ -1,7 +1,7 @@
 ﻿using uAdventure.Simva;
 using UnityEngine;
 
-namespace uAdventure.Analytics
+namespace Simva
 {
     public class SimvaLoadingManager : MonoBehaviour
     {

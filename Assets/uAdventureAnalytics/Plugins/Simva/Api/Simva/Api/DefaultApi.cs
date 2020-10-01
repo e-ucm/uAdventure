@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 
-using UniRx;
 using UnityFx.Async;
 using UnityFx.Async.Promises;
 using UnityEngine.Networking;

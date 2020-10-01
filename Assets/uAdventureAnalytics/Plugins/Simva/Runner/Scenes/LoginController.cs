@@ -13,6 +13,8 @@ namespace uAdventure.Simva
     {
         private bool ready;
 
+        public InputField token;
+
         public object Data { get { return null; } set { } }
 
         public bool IsReady { get { return ready; } }
@@ -23,7 +25,13 @@ namespace uAdventure.Simva
 
         public void Login()
         {
+            if(token == null || string.IsNullOrEmpty(token.text))
+            {
+                SimvaExtension.Instance.NotifyManagers("Please insert a token");
+                return;
+            }
 
+            SimvaExtension.Instance.LoginAndSchedule(token.text);
         }
 
         public void LoginWithKeykloak()

@@ -108,6 +108,11 @@ namespace uAdventure.Simva
                     project.AddRegValue(new RegValue(fullSetup, RegistryHive.CurrentUser, @"Software\Classes\" + PlayerSettings.applicationIdentifier 
                         + @"\shell\open\command", "", "\"[INSTALLDIR]" + PlayerSettings.productName +".exe\" \"%1\""));
 
+                    if (!Directory.Exists("Installers"))
+                    {
+                        Directory.CreateDirectory("Installers");
+                    }
+
                     project.OutDir = "Installers/";
                     project.OutFileName = PlayerSettings.productName + ".msi";
                     project.BuildMsiCmd();

@@ -105,7 +105,7 @@ namespace SimvaPlugin
             };
 
             var result = new AsyncCompletionSource<SimvaApi<T>>();
-            apiClient.InitOAuth("uadventure", null, "simva", null, ":", true, null, true)
+            apiClient.InitOAuth(SimvaConf.Local.ClientId, null, "simva", null, ":", true, null, true)
                 .Then(() =>
                 {
                     if (Inherits<T, IAdminsApi>())
@@ -186,18 +186,46 @@ namespace SimvaPlugin
 
         public static IAsyncOperation<SimvaApi<T>> LoginWithCredentials(string username, string password)
         {
-            var result = new AsyncCompletionSource<SimvaApi<T>>();
-            /*OpenIdUtility.LoginWithROPC(username, password, SimvaConf.Local.SSO, "uadventure", "simva:api")
-                .Then(auth =>
-                {
-                    result.SetResult(new SimvaApi(auth["access_token"], auth["expires_in"].AsInt, auth["refresh_token"]));
-                })
-                .Catch(error =>
-                {
-                    result.SetException(error);
-                });*/
-            return result;
-        }
+			var apiClient = new ApiClient
+			{
+				BasePath = SimvaConf.Local.URL,
+				AuthPath = SimvaConf.Local.SSO + "/auth",
+				TokenPath = SimvaConf.Local.SSO + "/token"
+			};
+
+			var result = new AsyncCompletionSource<SimvaApi<T>>();
+			apiClient.InitOAuth(username, password, SimvaConf.Local.ClientId, null, "simva", null, ":", true, null)
+				.Then(() =>
+				{
+					if (Inherits<T, IAdminsApi>())
+					{
+						result.SetResult(new SimvaApi<T>((T)(IAdminsApi)new AdminsApi(apiClient)));
+					}
+					else if (Inherits<T, ITeachersApi>())
+					{
+						result.SetResult(new SimvaApi<T>((T)(ITeachersApi)new TeachersApi(apiClient)));
+					}
+					else if (Inherits<T, IStudentsApi>())
+					{
+						result.SetResult(new SimvaApi<T>((T)(IStudentsApi)new StudentsApi(apiClient)));
+					}
+					else if (Inherits<T, IDefaultApi>())
+					{
+						result.SetResult(new SimvaApi<T>((T)(IDefaultApi)new DefaultApi(apiClient)));
+					}
+					else
+					{
+						throw new Exception("Unsupported api type: " + typeof(T));
+					}
+
+				})
+				.Catch(error =>
+				{
+					result.SetException(error);
+				});
+
+			return result;
+		}
 
         public IAsyncOperation<bool> Register(string username, string email, string password, bool teacher)
         {
