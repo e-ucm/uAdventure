@@ -2,12 +2,11 @@
 using UnityEngine;
 
 using uAdventure.Editor;
-using UnityEditorInternal;
 using UnityEditor;
 using QRCoder;
 using System.IO;
 using System.Windows.Forms;
-using System.Drawing.Printing;
+//using System.Drawing.Printing;
 using uAdventure.Core;
 
 namespace uAdventure.QR
@@ -96,7 +95,7 @@ namespace uAdventure.QR
 
         private static void PrintQR(QRCodeDataControl qr)
         {
-            var printDialog = new PrintDialog();
+            /*var printDialog = new PrintDialog();
             var printDocument = new PrintDocument();
             printDialog.Document = printDocument;
 
@@ -130,7 +129,7 @@ namespace uAdventure.QR
             if (result == DialogResult.OK)
             {
                 printDocument.Print();
-            }
+            }*/
         }
 
         private static Texture2D GetQRTexture(QRCodeDataControl qr)
