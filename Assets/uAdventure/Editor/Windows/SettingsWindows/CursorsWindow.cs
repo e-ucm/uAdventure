@@ -18,7 +18,7 @@ namespace uAdventure.Editor
             public FileChooser chooser;
             private string identifier;
             private string camelCaseIdentifier;
-            public string Label { get { return ("Buttons." + camelCaseIdentifier + ".Title").Traslate(); } }
+            public string Label { get { return ("Cursors." + camelCaseIdentifier + ".Title").Traslate(); } }
             public string Identifier { get { return identifier; } }
 
             public CursorInfo(string identifier)

@@ -2315,6 +2315,12 @@
   <entry key="Buttons.Grab.Title">Grab button</entry>
   <entry key="Buttons.UseWith.Title">Use with button</entry>
   <entry key="Buttons.GiveTo.Title">Give to button</entry>
+  
+  <!-- Cursors -->
+  <entry key="Cursors.Default.Title">Default cursor</entry>
+  <entry key="Cursors.Over.Title">Element cursor</entry>
+  <entry key="Cursors.Action.Title">Action cursor</entry>
+  <entry key="Cursors.Exit.Title">Exit cursor</entry>
 
   <!-- Analytics -->
   <entry key="Analytics.Title">Analytics</entry>
