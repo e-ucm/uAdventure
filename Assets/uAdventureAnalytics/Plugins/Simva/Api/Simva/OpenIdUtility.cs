@@ -262,6 +262,28 @@ namespace Simva
 
                 return Game.Instance.GameState.Data.getApplicationIdentifier() + "://" + ipcport + "/";
             }
+            else if (Application.platform == RuntimePlatform.Android)
+            {
+                var objectName = "OpenIdListener";
+                var methodName = "OnAuthReply";
+                var openIdListener = new GameObject(objectName, typeof(OpenIdListener)).GetComponent<OpenIdListener>();
+
+                openIdListener.onAuthReceived += uri =>
+                {
+                    Debug.Log("uri received!");
+                    var query = uri.Split('?')[1].Split('&');
+                    var d = new Dictionary<string, string>();
+                    foreach (var q in query.Select(q => q.Split('=')))
+                    {
+                        d.Add(q[0], q[1]);
+                    }
+
+                    GameObject.DestroyImmediate(openIdListener.gameObject);
+                    onLogin(true, d["code"], d["session_state"]);
+                };
+
+                return Game.Instance.GameState.Data.getApplicationIdentifier() + "://" + objectName + "/" + methodName + "/";
+            }
             else
             {
                 throw new NotImplementedException("Platform: " + Application.platform + " is not yet implemented!");

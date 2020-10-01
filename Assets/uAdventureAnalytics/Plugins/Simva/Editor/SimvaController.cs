@@ -9,6 +9,8 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.WSA;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace uAdventure.Simva
 {
@@ -51,6 +53,51 @@ namespace uAdventure.Simva
 
                 // Android
                 case BuildTarget.Android:
+                    var docPath = @"Assets\uAdventureAnalytics\Plugins\Simva\Plugins\Android\AndroidManifest.xml";
+                    var finalPath = @"Assets/Plugins/Android/AndroidManifest.xml";
+                    XDocument doc = XDocument.Load(docPath);
+                    Debug.Log("Loaded!");
+
+                    XElement manifest = doc.FirstNode as XElement;
+                    XElement application = manifest.Element(XName.Get("application"));
+                    var activity = application.Elements(XName.Get("activity")).Where(a => a.Attributes().Any(at => at.Value == "org.identitymodel.unityclient.AuthRedirectActivity")).FirstOrDefault();
+
+                    XElement intentFilter = activity.Element(XName.Get("intent-filter"));
+                    var data = intentFilter.Element(XName.Get("data"));
+                    foreach (var attr in data.Attributes())
+                    {
+                        if (attr.Name.ToString() == @"{http://schemas.android.com/apk/res/android}scheme")
+                        {
+                            attr.Value = PlayerSettings.applicationIdentifier;
+                        }
+                    }
+
+                    if (!Directory.Exists("Assets/Plugins"))
+                    {
+                        Directory.CreateDirectory("Assets/Plugins");
+                    }
+
+                    if (!Directory.Exists("Assets/Plugins/Android"))
+                    {
+                        Directory.CreateDirectory("Assets/Plugins/Android");
+                    }
+
+                    if (System.IO.File.Exists(finalPath))
+                    {
+                        EditorUtility.DisplayDialog("Manifest found!", "The project already contains a AndroidManifest.xml file. For Simva to work" +
+                            "you must use the AndroidManifest.xml in the Assets/uAdventureAnalytics/Simva/Plugins/Android folder.", "Ok");
+                        throw new System.Exception("Multiple manifests found!");
+                    }
+                    else
+                    {
+                        using (var writer = XmlWriter.Create(finalPath))
+                        {
+                            doc.WriteTo(writer);
+                            Debug.Log("Written!");
+                        }
+                    }
+
+
                     break;
 
                 // WebGL
@@ -161,6 +208,9 @@ namespace uAdventure.Simva
 
                 // Android
                 case BuildTarget.Android:
+
+                    var finalPath = @"Assets/Plugins/Android/AndroidManifest.xml";
+                    System.IO.File.Delete(finalPath);
                     break;
 
                 // WebGL
