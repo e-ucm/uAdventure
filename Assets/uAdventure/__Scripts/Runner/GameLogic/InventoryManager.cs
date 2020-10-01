@@ -24,6 +24,7 @@ namespace uAdventure.Runner
         public int InventoryType;
 
         private bool started = false;
+        private bool show = true;
 
         // Properties
         public GameObject InventoryHolder
@@ -69,7 +70,7 @@ namespace uAdventure.Runner
         {
             get
             {
-                return inventory.InventoryType != DescriptorData.INVENTORY_NONE;
+                return show;
             }
             set
             {
@@ -78,6 +79,7 @@ namespace uAdventure.Runner
                     Start();
                 }
 
+                show = value;
                 if (!value)
                 {
                     inventory.InventoryType = DescriptorData.INVENTORY_NONE;
