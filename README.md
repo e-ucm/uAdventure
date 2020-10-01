@@ -24,7 +24,7 @@ one is enough to set up uAdventure.
 
 ### Installation
 
-1. **(Prev)** Install or have Unity installed (recommended version is [2017.4](https://download.unity3d.com/download_unity/a8557a619e24/UnityDownloadAssistant-2017.4.33f1.exe).
+1. **(Prev)** Install or have Unity installed (recommended version is [2019.4](https://download.unity3d.com/download_unity/2d9804dddde7/UnityDownloadAssistant-2019.4.11f1.exe).
 2. Create a new and blank Unity Project.
 3. [Download the unitypackage](https://github.com/e-ucm/uAdventure/releases/download/1.0/uAdventure_Complete_v1.0.unitypackage) or locate uAdventure in the Unity Asset Store. 
 4. Import uAdventure by opening the unitypackage or by importing the extension from the Asset Store.
@@ -41,6 +41,6 @@ This will configure Unity Editor to work with uAdventure the best way.
 
 ## Downloads
 
-* [**uAdventure 1.0 UnityPackage**](https://github.com/e-ucm/uAdventure/releases/download/1.0/uAdventure_Complete_v1.0.unitypackage)
-* [uAdventure very detailed **Manual for users**](https://github.com/e-ucm/uAdventure/releases/download/1.0/ManualUadventure-v1.1.docx)
+* [**uAdventure 1.1 UnityPackage**](https://github.com/e-ucm/uAdventure/releases/download/1.1/uAdventure_Complete_v1.1.unitypackage)
+* [uAdventure very detailed **Manual for users**](https://github.com/e-ucm/uAdventure/releases/download/1.1/ManualUadventure-v1.6.docx)
 * [More detailed **Installation and Setup guide**](https://github.com/e-ucm/uAdventure/releases/download/1.0/Installation_Manual_v1.0.pdf)
