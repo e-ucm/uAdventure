@@ -2265,8 +2265,17 @@
   <entry key="SceneEditor.PlayerTrajectory.Delete">Delete tool</entry>
 
   <entry key="MenuAdventure.SaveMode">Save configuration</entry>
-  <entry key="MenuAdventure.AutoSave.Checkbox">Save the game automatically?</entry>
-  <entry key="MenuAdventure.SaveOnSuspend.Checkbox">Save on suspend? (Useful for mobile devices)</entry>
+  <entry key="MenuAdventure.SaveMode.Info">Please notice that auto-save, save-on-suspend and restore-after-open features will be ignored in editor playback to simplify debugging. If you want the game to be saved, just use the Exit menu in game.</entry>
+  <entry key="MenuAdventure.ShowSaveLoad.Info">Toggles the display of the save/load buttons in the Exit in-game menu.</entry>
+  <entry key="MenuAdventure.ShowSaveLoad.Checkbox">Allow save/load</entry>
+  <entry key="MenuAdventure.ShowReset.Info">Toggles the display of the reset button in the Exit in-game menu.</entry>
+  <entry key="MenuAdventure.ShowReset.Checkbox">Allow reset</entry>
+  <entry key="MenuAdventure.AutoSave.Info">Auto-save makes the game to be saved after an effects block is executed. </entry>
+  <entry key="MenuAdventure.AutoSave.Checkbox">Auto-save</entry>
+  <entry key="MenuAdventure.SaveOnSuspend.Info">Save on suspend saves the game when the player loses focus on the game window. This is mainly useful in handheld devices where the game can be accidentally closed and you want to maintain the game state. </entry>
+  <entry key="MenuAdventure.SaveOnSuspend.Checkbox">Save on suspend</entry>
+  <entry key="MenuAdventure.RestoreAfterOpen.Info">Restore after open loads the last save game right after the game is opened. When used in combination with save on suspend it creates the experience that the game runs continuously, despite of being closed. </entry>
+  <entry key="MenuAdventure.RestoreAfterOpen.Checkbox">Restore after open</entry>
 
   <entry key="EditorWindow.MainSceneNotFound.Title">Main scene not found!</entry>
   <entry key="EditorWindow.MainSceneNotFound.Body">Main Scene was not found! Please open \"_Scene1\" in scenes folder before playing the game.</entry>

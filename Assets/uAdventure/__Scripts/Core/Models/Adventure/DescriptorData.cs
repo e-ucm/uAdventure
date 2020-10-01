@@ -353,9 +353,15 @@ namespace uAdventure.Core
 
         protected bool keyboardNavigationEnabled;
 
+        protected bool showSaveLoad = true;
+
+        protected bool showReset = true;
+
         protected bool autoSave;
 
         protected bool saveOnSuspend;
+
+        protected bool restoreAfterOpen;
 
         /**
          * Constant for identify when a game is executed from engine
@@ -1044,7 +1050,27 @@ namespace uAdventure.Core
 
             this.keyboardNavigationEnabled = keyboardNavigation;
         }
-        
+
+        public bool isShowSaveLoad()
+        {
+            return showSaveLoad;
+        }
+
+        public void setShowSaveLoad(bool showSaveLoad)
+        {
+            this.showSaveLoad = showSaveLoad;
+        }
+
+        public bool isShowReset()
+        {
+            return showReset;
+        }
+
+        public void setShowReset(bool showReset)
+        {
+            this.showReset = showReset;
+        }
+
         public bool isAutoSave()
         {
             return autoSave;
@@ -1063,6 +1089,16 @@ namespace uAdventure.Core
         public void setSaveOnSuspend(bool saveOnSuspend)
         {
             this.saveOnSuspend = saveOnSuspend;
+        }
+
+        public bool isRestoreAfterOpen()
+        {
+            return restoreAfterOpen;
+        }
+
+        public void setRestoreAfterOpen(bool restoreAfterOpen)
+        {
+            this.restoreAfterOpen = restoreAfterOpen;
         }
 
 

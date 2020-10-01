@@ -10,6 +10,7 @@ namespace uAdventure.Runner
     public class GUIManager : MonoBehaviour
     {
         public GameObject Bubble_Prefab, Think_Prefab, Yell_Prefab, Config_Menu_Ref;
+        public GameObject SaveButton, LoadButton, ResetButton;
 
         private static GUIManager instance;
         private GameObject bubble;
@@ -51,10 +52,16 @@ namespace uAdventure.Runner
 
         protected void Start()
         {
-            if(Game.Instance.GameState != null)
+            var gs = Game.Instance.GameState;
+            if (gs != null)
             {
                 started = true;
-                guiprovider = new GUIProvider(Game.Instance.GameState.Data);
+                guiprovider = new GUIProvider(gs.Data);
+
+                SaveButton.SetActive(gs.Data.isShowSaveLoad());
+                LoadButton.SetActive(gs.Data.isShowSaveLoad());
+                ResetButton.SetActive(gs.Data.isShowReset());
+
                 if (Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer)
                 {
                     this.GetComponent<UnityEngine.UI.CanvasScaler>().referenceResolution = new Vector2(600, 400);

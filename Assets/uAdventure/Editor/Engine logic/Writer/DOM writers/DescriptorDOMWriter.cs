@@ -233,14 +233,25 @@ namespace uAdventure.Editor
 
             configurationNode.AppendChild(graphicConfigElement);
 
+            // Show Save Load
+            var showSaveLoad = adventureData.isShowSaveLoad() ? "yes" : "no";
+            configurationNode.SetAttribute("show-save-load", showSaveLoad);
 
-            // Keep Showing
+            // Show Reset
+            var showReset = adventureData.isShowReset() ? "yes" : "no";
+            configurationNode.SetAttribute("show-reset", showReset);
+
+            // Autosave
             var autoSave = adventureData.isAutoSave() ? "yes" : "no";
             configurationNode.SetAttribute("autosave", autoSave);
 
-            // Keep Showing
+            // Save on suspend
             var saveOnSuspend = adventureData.isSaveOnSuspend() ? "yes" : "no";
             configurationNode.SetAttribute("save-on-suspend", saveOnSuspend);
+
+            // Restore after open
+            var restoreAfterOpen = adventureData.isRestoreAfterOpen() ? "yes" : "no";
+            configurationNode.SetAttribute("restore-after-open", restoreAfterOpen);
 
             //Append configurationNode
             node.AppendChild(configurationNode);

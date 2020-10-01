@@ -29,31 +29,48 @@ namespace uAdventure.Editor
 
         private static void EditSaveMode(AdventureDataControl adventureData, Rect rect)
         {
+            bool newValue;
             using (new GUILayout.VerticalScope(GUILayout.ExpandWidth(true)))
             {
                 EditorGUIUtility.labelWidth = rect.width - 30;
+
                 EditorGUILayout.LabelField(TC.get("MenuAdventure.SaveMode"), EditorStyles.boldLabel);
-                EditorGUI.BeginChangeCheck();
-                var newAutoSave = EditorGUILayout.Toggle(TC.get("MenuAdventure.AutoSave.Checkbox"), adventureData.isAutoSave(), GUILayout.ExpandWidth(true));
-                if (EditorGUI.EndChangeCheck())
+
+                EditorGUILayout.HelpBox(TC.get("MenuAdventure.SaveMode.Info"), MessageType.Warning);
+
+                if (CheckedField("MenuAdventure.ShowSaveLoad", adventureData.isShowSaveLoad(), out newValue))
                 {
-                    adventureData.setAutoSave(newAutoSave);
+                    adventureData.setShowSaveLoad(newValue);
                 }
 
-                EditorGUI.BeginChangeCheck();
-                var newSaveOnSuspend = EditorGUILayout.Toggle(TC.get("MenuAdventure.SaveOnSuspend.Checkbox"), adventureData.isSaveOnSuspend(), GUILayout.ExpandWidth(true));
-                if (EditorGUI.EndChangeCheck())
+                if (CheckedField("MenuAdventure.ShowReset", adventureData.isShowReset(), out newValue))
                 {
-                    adventureData.setSaveOnSuspend(newSaveOnSuspend);
+                    adventureData.setShowReset(newValue);
+                }
+                if (CheckedField("MenuAdventure.AutoSave", adventureData.isAutoSave(), out newValue))
+                {
+                    adventureData.setAutoSave(newValue);
                 }
 
-                EditorGUI.BeginChangeCheck();
-                var newRestoreAfterOpen = EditorGUILayout.Toggle(TC.get("MenuAdventure.RestoreAfterOpen.Checkbox"), adventureData.isSaveOnSuspend(), GUILayout.ExpandWidth(true));
-                if (EditorGUI.EndChangeCheck())
+                if (CheckedField("MenuAdventure.SaveOnSuspend", adventureData.isSaveOnSuspend(), out newValue))
                 {
-                    adventureData.setSaveOnSuspend(newRestoreAfterOpen);
+                    adventureData.setSaveOnSuspend(newValue);
+                }
+
+                if (CheckedField("MenuAdventure.RestoreAfterOpen", adventureData.isRestoreAfterOpen(), out newValue))
+                {
+                    adventureData.setRestoreAfterOpen(newValue);
                 }
             }
+        }
+
+        private static bool CheckedField(string name, bool value, out bool newValue)
+        {
+            EditorGUILayout.Space(20);
+            EditorGUI.BeginChangeCheck();
+            newValue = EditorGUILayout.Toggle(TC.get(name + ".Checkbox"), value, GUILayout.ExpandWidth(true));
+            EditorGUILayout.HelpBox(TC.get(name + ".Info"), MessageType.Info);
+            return EditorGUI.EndChangeCheck();
         }
     }
 }

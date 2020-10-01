@@ -194,10 +194,9 @@ namespace uAdventure.Runner
         {
             GameState.Restart();
             started = true;
-            //if (!Application.isEditor)
+            if (!Application.isEditor && GameState.Data.isRestoreAfterOpen())
             {
-                Debug.Log("Game Resume is disabled");
-                //GameState.OnGameResume();
+                GameState.OnGameResume();
             }
             gameExtensions.ForEach(g => g.OnAfterGameLoad());
             uAdventureRaycaster = FindObjectOfType<uAdventureRaycaster>();
@@ -297,24 +296,30 @@ namespace uAdventure.Runner
 
         public void AutoSave()
         {
-            Debug.Log("Auto save is Disabled");
-            return;
+            if(Application.isEditor || !GameState.Data.isAutoSave())
+            {
+                return;
+            }
+
             gameExtensions.ForEach(g => g.OnBeforeGameSave());
             GameState.SerializeTo("save");
         }
 
         public void OnApplicationPause(bool paused)
         {
-            Debug.Log("Save on pause is disabled");
-            return;
+            if (Application.isEditor)
+            {
+                return;
+            }
 
             if (!isSomethingRunning())
             {
-                if (paused)
+                if (paused && GameState.Data.isSaveOnSuspend())
                 {
                     GameState.OnGameSuspend();
                 }
-                else if (Application.isMobilePlatform)
+                
+                if (!paused && GameState.Data.isRestoreAfterOpen())
                 {
                     GameState.OnGameResume();
                     if (started)

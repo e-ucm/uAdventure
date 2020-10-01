@@ -106,6 +106,26 @@ namespace uAdventure.Editor
             return DescriptorData.typeAllowed[adventureData.getGUIType()][type];
         }
 
+        public bool isShowSaveLoad()
+        {
+            return adventureData.isShowSaveLoad();
+        }
+
+        public void setShowSaveLoad(bool showSaveLoad)
+        {
+            Controller.Instance.AddTool(new ChangeBooleanValueTool(adventureData, showSaveLoad, "isShowSaveLoad", "setShowSaveLoad"));
+        }
+
+        public bool isShowReset()
+        {
+            return adventureData.isShowReset();
+        }
+
+        public void setShowReset(bool showReset)
+        {
+            Controller.Instance.AddTool(new ChangeBooleanValueTool(adventureData, showReset, "isShowReset", "setShowReset"));
+        }
+
         public bool isAutoSave()
         {
             return adventureData.isAutoSave();
@@ -124,6 +144,16 @@ namespace uAdventure.Editor
         public void setSaveOnSuspend(bool autoSave)
         {
             Controller.Instance.AddTool(new ChangeBooleanValueTool(adventureData, autoSave, "isSaveOnSuspend", "setSaveOnSuspend"));
+        }
+
+        public bool isRestoreAfterOpen()
+        {
+            return adventureData.isRestoreAfterOpen();
+        }
+
+        public void setRestoreAfterOpen(bool autoSave)
+        {
+            Controller.Instance.AddTool(new ChangeBooleanValueTool(adventureData, autoSave, "isRestoreAfterOpen", "setRestoreAfterOpen"));
         }
 
         /**

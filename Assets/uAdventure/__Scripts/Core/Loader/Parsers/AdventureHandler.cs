@@ -116,13 +116,25 @@ namespace uAdventure.Core
                 default: incidences.Add(Incidence.createDescriptorIncidence("Unknown dragBehaviour type: " + dragBehaviour, null)); break;
             }
 
+            // Show save/load
+            var showSaveLoad = ExString.EqualsDefault(configuration.GetAttribute("show-save-load"), "yes", true);
+            adventureData.setShowSaveLoad(showSaveLoad);
+
+            // Show reset
+            var showReset = ExString.EqualsDefault(configuration.GetAttribute("show-reset"), "yes", true);
+            adventureData.setShowReset(showReset);
+
             // Auto Save
-            var isAutoSave = ExString.EqualsDefault(configuration.GetAttribute("autosave"), "yes", true);
+            var isAutoSave = ExString.EqualsDefault(configuration.GetAttribute("autosave"), "yes", false);
             adventureData.setAutoSave(isAutoSave);
 
             // Save on suspend
-            var isSaveOnSuspend = ExString.EqualsDefault(configuration.GetAttribute("save-on-suspend"), "yes", true);
+            var isSaveOnSuspend = ExString.EqualsDefault(configuration.GetAttribute("save-on-suspend"), "yes", false);
             adventureData.setSaveOnSuspend(isSaveOnSuspend);
+
+            // Restore after open
+            var restoreAfterOpen = ExString.EqualsDefault(configuration.GetAttribute("restore-after-open"), "yes", false);
+            adventureData.setRestoreAfterOpen(restoreAfterOpen);
 
             // Sub nodes
             XmlElement gui          = (XmlElement)configuration.SelectSingleNode("gui"),

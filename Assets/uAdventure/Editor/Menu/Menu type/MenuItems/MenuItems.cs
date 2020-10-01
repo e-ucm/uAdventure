@@ -57,7 +57,7 @@ namespace uAdventure.Editor
         public void OnCliked()
         {
             Controller.Instance.Save();
-            Debug.Log("saved2");
+            Debug.Log("Saved!");
         }
     }
 
@@ -75,7 +75,7 @@ namespace uAdventure.Editor
 
         public void OnCliked()
         {
-            Debug.Log("saved");
+            Debug.Log("Saved!");
         }
     }
 
