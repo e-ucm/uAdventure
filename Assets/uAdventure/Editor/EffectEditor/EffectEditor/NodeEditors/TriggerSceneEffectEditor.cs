@@ -118,7 +118,7 @@ namespace uAdventure.Editor
                     EditorGUILayout.HelpBox("TriggerSceneEffectEditor.SizeMaintained".Traslate(), MessageType.Info);
                 }
 
-                localSceneEditor.Components = EditorWindowBase.Components;
+                localSceneEditor.Components = uAdventureWindowMain.Components;
                 localSceneEditor.Scene = scenesList.getScenes()[sceneIndex];
                 playerDestination.setValues(effect.getX(), effect.getY(), useDestinyScale ? effect.DestinyScale : 1f);
 

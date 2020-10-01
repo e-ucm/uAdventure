@@ -62,7 +62,7 @@ namespace uAdventure.Geo
 
             set
             {
-                controller.AddTool(new ChangeGeometryTypeTool(gmlGeometry, value));
+                controller.AddTool(new ChangeGeometryTypeTool(gmlGeometry, value, CurrentEditor));
             }
         }
 
@@ -228,13 +228,19 @@ namespace uAdventure.Geo
             private readonly Vector2d[] previousPoints;
             private readonly GMLGeometry.GeometryType previousGeometryType;
             private GMLGeometry.GeometryType newGeometryType;
+            private MapEditor mapEditor;
+            private int zoom;
+            private Vector2d center;
 
-            public ChangeGeometryTypeTool(GMLGeometry gmlGeometry, GMLGeometry.GeometryType geometryType)
+            public ChangeGeometryTypeTool(GMLGeometry gmlGeometry, GMLGeometry.GeometryType geometryType, MapEditor mapEditor)
             {
                 this.gmlGeometry = gmlGeometry;
                 this.previousPoints = gmlGeometry.Points.ToArray();
                 this.previousGeometryType = gmlGeometry.Type;
                 this.newGeometryType = geometryType;
+                this.mapEditor = mapEditor;
+                zoom = mapEditor.Zoom;
+                center = mapEditor.Center;
             }
 
             public override bool canRedo()
@@ -261,10 +267,52 @@ namespace uAdventure.Geo
 
             public override bool doTool()
             {
+                if (gmlGeometry.Points.Length == 0)
+                {
+                    gmlGeometry.Points = new[] { center };
+                }
+
                 if (newGeometryType == GMLGeometry.GeometryType.Point)
                 {
                     gmlGeometry.Points = new [] { gmlGeometry.Center };
                 }
+
+                var prevZoom = mapEditor.Zoom;
+                var prevCenter = mapEditor.Center;
+
+                mapEditor.Zoom = zoom;
+                mapEditor.Center = center;
+
+
+                if (newGeometryType == GMLGeometry.GeometryType.LineString && gmlGeometry.Points.Length == 1)
+                {
+                    var width = 50; // pixels
+                    var pixels = mapEditor.LatLonToPixels(gmlGeometry.Points);
+                    gmlGeometry.Points = mapEditor.PixelsToLatLon(
+                        new Vector2d[]
+                        {
+                            new Vector2d(pixels[0].x - width / 2f, pixels[0].y),
+                            new Vector2d(pixels[0].x + width / 2f , pixels[0].y)
+                        });
+                }
+
+                if (newGeometryType == GMLGeometry.GeometryType.Polygon && gmlGeometry.Points.Length <= 2)
+                {
+                    var width = 50; // pixels
+                    gmlGeometry.Points = new[] { gmlGeometry.Center };
+                    var pixels = mapEditor.LatLonToPixels(gmlGeometry.Points);
+                    gmlGeometry.Points = mapEditor.PixelsToLatLon(
+                        new Vector2d[]
+                        {
+                            new Vector2d(pixels[0].x + width/2f, pixels[0].y - width / 2f),
+                            new Vector2d(pixels[0].x + width/2f, pixels[0].y + width / 2f),
+                            new Vector2d(pixels[0].x - width/2f, pixels[0].y + width / 2f),
+                            new Vector2d(pixels[0].x - width/2f, pixels[0].y - width / 2f)
+                        });
+                }
+
+                mapEditor.Zoom = prevZoom;
+                mapEditor.Center = prevCenter;
 
                 gmlGeometry.Type = newGeometryType;
                 return true;
@@ -293,9 +341,7 @@ namespace uAdventure.Geo
 
             private readonly Vector2d point;
 
-            private bool replaced = false;
-
-            private Vector2d pointReplaced;
+            private GMLGeometry.GeometryType previousType;
 
             public AddRemovePointTool(GMLGeometry gmlGeometry, Vector2d point)
             {
@@ -303,6 +349,7 @@ namespace uAdventure.Geo
                 this.add = true;
                 this.index = GetIndex(point);
                 this.point = point;
+                this.previousType = gmlGeometry.Type;
             }
 
             public AddRemovePointTool(GMLGeometry gmlGeometry, int index)
@@ -311,6 +358,7 @@ namespace uAdventure.Geo
                 this.add = false;
                 this.index = index;
                 this.point = gmlGeometry.Points[index];
+                this.previousType = gmlGeometry.Type;
             }
 
             public AddRemovePointTool(GMLGeometry gmlGeometry, int index, Vector2d point)
@@ -319,6 +367,7 @@ namespace uAdventure.Geo
                 this.add = true;
                 this.index = index;
                 this.point = point;
+                this.previousType = gmlGeometry.Type;
             }
 
             public override bool canRedo()
@@ -353,35 +402,42 @@ namespace uAdventure.Geo
 
             private bool Add()
             {
-                if (gmlGeometry.Type == GMLGeometry.GeometryType.Point && gmlGeometry.Points.Length == 1)
-                {
-                    pointReplaced = gmlGeometry.Points[0];
-                    replaced = true;
-                    gmlGeometry.Points[0] = point;
-                }
-                else
-                {
-                    var ps = gmlGeometry.Points.ToList();
-                    ps.Insert(index, point);
-                    gmlGeometry.Points = ps.ToArray();
-                }
+                var ps = gmlGeometry.Points.ToList();
+                ps.Insert(index, point);
+                gmlGeometry.Points = ps.ToArray();
+
+                ReasignType(gmlGeometry);
 
                 return true;
             }
+
             private bool Remove()
             {
-                if (replaced)
-                {
-                    gmlGeometry.Points[0] = pointReplaced;
-                }
-                else
+                if(gmlGeometry.Points.Length > 1)
                 {
                     var ps = gmlGeometry.Points.ToList();
                     ps.RemoveAt(index);
                     gmlGeometry.Points = ps.ToArray();
+                    ReasignType(gmlGeometry);
                 }
 
                 return true;
+            }
+
+            private void ReasignType(GMLGeometry gmlGeometry)
+            {
+                if (gmlGeometry.Points.Length <= 1)
+                {
+                    gmlGeometry.Type = GMLGeometry.GeometryType.Point;
+                }
+                else if (gmlGeometry.Points.Length == 2)
+                {
+                    gmlGeometry.Type = GMLGeometry.GeometryType.LineString;
+                }
+                else if (previousType != GMLGeometry.GeometryType.Point)
+                {
+                    gmlGeometry.Type = previousType;
+                }
             }
 
             private int FindInsertPos(Vector2[] points, Vector2 point)
@@ -554,6 +610,8 @@ namespace uAdventure.Geo
             get { return gmlGeometry.Name; }
             set { renameElement(value); }
         }
+
+        public MapEditor CurrentEditor { get; internal set; }
 
         public override string renameElement(string newName)
         {

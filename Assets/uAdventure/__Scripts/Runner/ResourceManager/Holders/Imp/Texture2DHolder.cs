@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 using System.IO;
+using System.Linq;
+using UnityFx.Async;
+using UnityFx.Async.Promises;
 
 namespace uAdventure.Runner
 {
@@ -51,30 +54,28 @@ namespace uAdventure.Runner
 
         public Texture2DHolder(string path, ResourceManager.LoadingType type)
         {
-            loaded = true;
             this.type = type;
-            switch (type)
-            {
-                case ResourceManager.LoadingType.ResourcesLoad:
-                    this.path = path;
-                    tex = LoadTexture();
-                    break;
-                case ResourceManager.LoadingType.SystemIO:
-                    this.path = path;
-                    this.fileData = LoadBytes(this.path);
+            this.path = path;
+        }
 
-                    if (this.fileData == null)
-                    {
-                        this.fileData = LoadBytes(this.path);
+        public bool Load()
+        {
+            tex = LoadTexture();
+            loaded = tex != null;
+            return loaded;
+        }
 
-                        if (this.fileData == null)
-                        {
-                            loaded = false;
-                            Debug.Log("No se pudo cargar: " + this.path);
-                        }
-                    }
-                    break;
-            }
+        public IAsyncOperation<bool> LoadAsync()
+        {
+            var result = new AsyncCompletionSource<bool>();
+            LoadTextureAsync()
+                .Then(texture =>
+                {
+                    tex = texture;
+                    loaded = tex != null;
+                    result.SetResult(tex);
+                });
+            return result;
         }
 
         public bool Loaded()
@@ -88,37 +89,77 @@ namespace uAdventure.Runner
 
         private Texture2D LoadTexture()
         {
-            Texture2D tex = new Texture2D(1, 1);
+            Texture2D tex = null;
             switch (type)
             {
                 case ResourceManager.LoadingType.ResourcesLoad:
                     tex = Resources.Load(path) as Texture2D;
                     if (tex == null)
                     {
-                        loaded = false;
                         Debug.Log("No se pudo cargar: " + this.path);
                     }
-                    else
-                        loaded = true;
 
                     break;
+
                 case ResourceManager.LoadingType.SystemIO:
-                    if (!Path.HasExtension(path))
-                    {
-                        foreach(var extension in extensions)
-                        {
-                            if(File.Exists(path + "." + extension))
-                            {
-                                path = path + "." + extension;
-                                break;
-                            }
-                        }
-                    }
+                    tex = ReadFromFile(path);
 
-                    tex = new Texture2D(2, 2, TextureFormat.BGRA32, false);
-                    tex.LoadImage(fileData);
-                    this.fileData = null;
                     break;
+            }
+
+            return tex;
+        }
+
+        private IAsyncOperation<Texture2D> LoadTextureAsync()
+        {
+            var result = new AsyncCompletionSource<Texture2D>();
+            Texture2D tex = null;
+            switch (type)
+            {
+                case ResourceManager.LoadingType.ResourcesLoad:
+                    var resourceRequest = Resources.LoadAsync<Texture2D>(path);
+                    resourceRequest.completed += done =>
+                    {
+                        tex = resourceRequest.asset as Texture2D;
+                        if (tex == null)
+                        {
+                            Debug.Log("No se pudo cargar: " + this.path);
+                        }
+                        result.SetResult(tex);
+                    };
+
+                    break;
+
+                case ResourceManager.LoadingType.SystemIO:
+                    tex = ReadFromFile(path);
+                    result.SetResult(tex);
+
+                    break;
+            }
+
+            return result;
+        }
+
+        private Texture2D ReadFromFile(string path)
+        {
+            if (!Path.HasExtension(path))
+            {
+                path = extensions
+                    .Select(ex => path + "." + ex)
+                    .Where(File.Exists)
+                    .FirstOrDefault();
+            }
+
+            this.fileData = LoadBytes(this.path);
+            if (this.fileData == null)
+            {
+                Debug.Log("No se pudo cargar: " + this.path);
+            }
+            else
+            {
+                tex = new Texture2D(2, 2, TextureFormat.BGRA32, false);
+                tex.LoadImage(fileData);
+                this.fileData = null;
             }
 
             return tex;

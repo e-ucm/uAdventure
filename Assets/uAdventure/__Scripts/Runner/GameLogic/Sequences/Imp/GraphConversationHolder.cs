@@ -113,7 +113,7 @@ namespace uAdventure.Runner
                 return;
             }
 
-            if (!string.IsNullOrEmpty(onode.getXApiQuestion()))
+            if (TrackerAsset.Instance.Started && !string.IsNullOrEmpty(onode.getXApiQuestion()))
             {
                 isTracePending = true;
                 Game.Instance.GameState.BeginChangeAmbit();
@@ -125,6 +125,11 @@ namespace uAdventure.Runner
 
         public void EndTrace()
         {
+            if (!TrackerAsset.Instance.Started)
+            {
+                return;
+            }
+
             Game.Instance.GameState.EndChangeAmbitAsExtensions();
             TrackerAsset.Instance.setSuccess(xAPISuccess);
             TrackerAsset.Instance.Alternative.Selected(xAPIQuestion, xAPIResponse, AlternativeTracker.Alternative.Question);
@@ -177,15 +182,20 @@ namespace uAdventure.Runner
                     ConversationNodeHolder child = current.getChild();
                     if (current.TracePending)
                     {
+                        // If the current node has a pending trace
+                        // We end the previous trace pending
                         if (tracePendingNode != null)
                             tracePendingNode.EndTrace();
 
+                        // And we put this into pending
                         tracePendingNode = current;
                     }
 
                     current = child;
                     if (current == null)
                     {
+                        // When the conversation is over if there's a
+                        // pending node, we end it
                         if(tracePendingNode != null)
                             tracePendingNode.EndTrace();
                         break;

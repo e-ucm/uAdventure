@@ -47,11 +47,6 @@ namespace uAdventure.Unity
             get; set;
         }
 
-        public void Start()
-        {
-            RenderScene();
-        }
-
 
 
         public bool canBeInteracted()

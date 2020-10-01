@@ -1,6 +1,7 @@
 ﻿
 using System.Collections.Generic;
 using uAdventure.Runner;
+using UnityFx.Async;
 
 namespace uAdventure.Core
 {
@@ -27,5 +28,6 @@ namespace uAdventure.Core
         protected abstract T CreateObject();
 
         public abstract T Parse(string path);
+        public abstract IAsyncOperation<T> ParseAsync(string path);
     }
 }

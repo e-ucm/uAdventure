@@ -16,6 +16,7 @@ namespace uAdventure.Runner
 
         private bool interactable = false;
         private SpriteRenderer spriteRenderer;
+        private UnityEngine.UI.Image image;
 
         bool showText = false;
 
@@ -33,7 +34,9 @@ namespace uAdventure.Runner
         // Use this for initialization
         protected void Start()
         {
+            transform.parent.GetComponent<Canvas>().worldCamera = FindObjectOfType<Camera>();
             spriteRenderer = GetComponent<SpriteRenderer>();
+            image = GetComponent<UnityEngine.UI.Image>();
 
             if (this.action.getType() == Action.CUSTOM)
             {
@@ -73,6 +76,7 @@ namespace uAdventure.Runner
             else
                 tmp = Game.Instance.ResourceManager.getSprite(resource.getAssetPath(DescriptorData.NORMAL_BUTTON));
 
+            image.sprite = tmp;
             spriteRenderer.sprite = tmp;
             if (InventoryManager.Instance.Opened)
             {
@@ -145,14 +149,18 @@ namespace uAdventure.Runner
 
         private void ChangeButtonSprite(string normal, string custom)
         {
+            Sprite sprite = null;
             if (this.action.getType() == Action.CUSTOM)
             {
-                spriteRenderer.sprite = Game.Instance.ResourceManager.getSprite(resource.getAssetPath(custom));
+                sprite = Game.Instance.ResourceManager.getSprite(resource.getAssetPath(custom));
             }
             else
             {
-                spriteRenderer.sprite = Game.Instance.ResourceManager.getSprite(resource.getAssetPath(normal));
+                sprite = Game.Instance.ResourceManager.getSprite(resource.getAssetPath(normal));
             }
+
+            image.sprite = sprite;
+            spriteRenderer.sprite = sprite;
         }
     }
 }

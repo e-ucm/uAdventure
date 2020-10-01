@@ -8,7 +8,7 @@ using System;
 
 namespace uAdventure.Geo
 {
-    public class TransformManagerDataControl : DataControl, UniRx.IObserver<DataControl>
+    public class TransformManagerDataControl : DataControl, IObserver<DataControl>
     {
         private readonly ExtElementRefDataControl extElemReferencedataControl;
         private readonly ExtElemReference extElemReference;

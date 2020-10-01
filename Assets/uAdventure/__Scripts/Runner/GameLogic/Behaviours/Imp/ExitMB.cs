@@ -74,7 +74,7 @@ namespace uAdventure.Runner
             return effectHolder;
         }
 
-        private void TrackExit(bool exited, IChapterTarget targetOnExit)
+        private void TraceExit(bool exited, IChapterTarget targetOnExit)
         {
             var ed = area.Element as Exit;
 
@@ -122,18 +122,6 @@ namespace uAdventure.Runner
 
         }
 
-        public void Exit()
-        {
-            var currentTarget = Game.Instance.GameState.GetChapterTarget(Game.Instance.GameState.CurrentTarget);
-            Game.Instance.GameState.BeginChangeAmbit();
-            bool exited;
-            Game.Instance.Execute(GetExitEffects(out exited), (effects) =>
-            {
-                Game.Instance.GameState.EndChangeAmbitAsExtensions();
-                TrackExit(exited, currentTarget);
-            });
-        }
-
         bool interactable = false;
         public bool canBeInteracted()
         {
@@ -150,7 +138,7 @@ namespace uAdventure.Runner
             var ed = area.Element as Exit;
             if (Game.Instance.GameState.IsFirstPerson)
             {
-                Exit();
+                Game.Instance.Execute(new EffectHolder(new Effects { new ExecuteExitEffect(this) }));
             }
             else
             {
@@ -208,25 +196,34 @@ namespace uAdventure.Runner
         {
             private ExecuteExitEffect toRun;
             private EffectHolder exitEffects;
-            private bool exit;
+            private bool exits;
             private IChapterTarget targetOnExit;
 
-            public IEffect Effect { get { return toRun; } set { toRun = value as ExecuteExitEffect; } }
+            public IEffect Effect { get { return toRun; } set { toRun = value as ExecuteExitEffect; Init(); } }
+
+            private void Init()
+            {
+                // First run
+                targetOnExit = Game.Instance.GameState.GetChapterTarget(Game.Instance.GameState.CurrentTarget);
+                Game.Instance.GameState.BeginChangeAmbit();
+                exitEffects = toRun.ExitMb.GetExitEffects(out exits);
+            }
 
             public bool execute()
             {
-                if(exitEffects == null)
-                {
-                    Game.Instance.GameState.BeginChangeAmbit();
-                    targetOnExit = Game.Instance.GameState.GetChapterTarget(Game.Instance.GameState.CurrentTarget);
-                    exitEffects = toRun.ExitMb.GetExitEffects(out exit);
-                }
-
                 var forceWait = exitEffects.execute();
                 if (!forceWait)
                 {
-                    Game.Instance.GameState.EndChangeAmbit();
-                    toRun.ExitMb.TrackExit(exit, targetOnExit);
+                    // Last run
+                    Game.Instance.GameState.EndChangeAmbitAsExtensions();
+                    try
+                    {
+                        toRun.ExitMb.TraceExit(exits, targetOnExit);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.Log("Error while tracing the exit! (" + ex.Message + ", " + ex.StackTrace + ")");
+                    }
                 }
                 return forceWait;
             }

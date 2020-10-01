@@ -27,8 +27,9 @@ namespace uAdventure.Geo
                 componentBasedEditor.PlaceSearcher.Source = GUILayout.Toggle(componentBasedEditor.PlaceSearcher.Source == 1, "WorldWide", "toolbarbutton", GUILayout.Width(70)) ? 1 : 0;
                 if (componentBasedEditor.PlaceSearcher.DoLayout("ToolbarSeachTextField"))
                 {
-                    componentBasedEditor.Center = componentBasedEditor.PlaceSearcher.LatLon;
-                    componentBasedEditor.ZoomToBoundingBox(componentBasedEditor.PlaceSearcher.BoundingBox);
+                    var place = componentBasedEditor.PlaceSearcher.Place;
+                    componentBasedEditor.Center = place.LatLon;
+                    componentBasedEditor.ZoomToBoundingBox(place.RectBoundingBox);
                 }
 
                 if (GUILayout.Button("", string.IsNullOrEmpty(componentBasedEditor.PlaceSearcher.Value) ? "ToolbarSeachCancelButtonEmpty" : "ToolbarSeachCancelButton"))

@@ -140,6 +140,11 @@ namespace TrackerAssetUnitTests
             set { this.connected = value; }
         }
 
+        public void WebServiceRequestAsync(RequestSetttings requestSettings, Action<RequestResponse> callback)
+        {
+            var response = this.WebServiceRequest(requestSettings);
+            callback(response);
+        }
         public void WebServiceRequest(RequestSetttings requestSettings, out RequestResponse requestResponse)
         {
             requestResponse = this.WebServiceRequest(requestSettings);
@@ -175,6 +180,6 @@ namespace TrackerAssetUnitTests
             return result;
         }
 
-        #endregion IWebServiceRequest Members
+#endregion IWebServiceRequest Members
     }
 }

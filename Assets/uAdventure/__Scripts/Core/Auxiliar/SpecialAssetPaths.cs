@@ -21,6 +21,11 @@ namespace uAdventure.Core
         public const string ASSET_EMPTY_BACKGROUND = "assets/special/EmptyBackground.png";
 
         /**
+         * Asset path for the empty icon. For use only in assets.
+         */
+        public const string ASSET_DEFAULT_INVENTORY = "assets/special/DefaultInventory.png";
+
+        /**
          * Asset path for the empty animation. For use only in assets.
          */
         public const string ASSET_EMPTY_ANIMATION = "assets/special/EmptyAnimation";

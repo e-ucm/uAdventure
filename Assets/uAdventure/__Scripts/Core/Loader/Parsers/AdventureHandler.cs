@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 using uAdventure.Runner;
+using System.Globalization;
 
 namespace uAdventure.Core
 {
@@ -22,12 +23,14 @@ namespace uAdventure.Core
             XmlElement element = doc.DocumentElement,
                 descriptor     = (XmlElement)element.SelectSingleNode("/game-descriptor"),
                 title          = (XmlElement)descriptor.SelectSingleNode("title"),
-                description    = (XmlElement)descriptor.SelectSingleNode("description");
+                description    = (XmlElement)descriptor.SelectSingleNode("description"),
+                application_identifier = (XmlElement)descriptor.SelectSingleNode("application-identifier");
 
             // Basic attributes
             content.setVersionNumber(ExString.Default(descriptor.GetAttribute("versionNumber"), "0"));
             content.setTitle(title.InnerText ?? "");
             content.setDescription(description.InnerText ?? "");
+            content.setApplicationIdentifier(application_identifier?.InnerText);
 
             // Sub nodes
             XmlElement configuration    = (XmlElement)descriptor.SelectSingleNode("configuration"),
@@ -113,13 +116,25 @@ namespace uAdventure.Core
                 default: incidences.Add(Incidence.createDescriptorIncidence("Unknown dragBehaviour type: " + dragBehaviour, null)); break;
             }
 
+            // Show save/load
+            var showSaveLoad = ExString.EqualsDefault(configuration.GetAttribute("show-save-load"), "yes", true);
+            adventureData.setShowSaveLoad(showSaveLoad);
+
+            // Show reset
+            var showReset = ExString.EqualsDefault(configuration.GetAttribute("show-reset"), "yes", true);
+            adventureData.setShowReset(showReset);
+
             // Auto Save
-            var isAutoSave = ExString.EqualsDefault(configuration.GetAttribute("autosave"), "yes", true);
+            var isAutoSave = ExString.EqualsDefault(configuration.GetAttribute("autosave"), "yes", false);
             adventureData.setAutoSave(isAutoSave);
 
             // Save on suspend
-            var isSaveOnSuspend = ExString.EqualsDefault(configuration.GetAttribute("save-on-suspend"), "yes", true);
+            var isSaveOnSuspend = ExString.EqualsDefault(configuration.GetAttribute("save-on-suspend"), "yes", false);
             adventureData.setSaveOnSuspend(isSaveOnSuspend);
+
+            // Restore after open
+            var restoreAfterOpen = ExString.EqualsDefault(configuration.GetAttribute("restore-after-open"), "yes", false);
+            adventureData.setRestoreAfterOpen(restoreAfterOpen);
 
             // Sub nodes
             XmlElement gui          = (XmlElement)configuration.SelectSingleNode("gui"),
@@ -186,6 +201,15 @@ namespace uAdventure.Core
                 case "bottom": adventureData.setInventoryPosition(DescriptorData.INVENTORY_BOTTOM); break;
                 case "fixed_top": adventureData.setInventoryPosition(DescriptorData.INVENTORY_FIXED_TOP); break;
                 case "fixed_bottom": adventureData.setInventoryPosition(DescriptorData.INVENTORY_FIXED_BOTTOM); break;
+                case "icon":
+                    adventureData.setInventoryPosition(DescriptorData.INVENTORY_ICON_FREEPOS);
+                    var scale = gui.GetAttribute("inventoryScale");
+                    adventureData.setInventoryScale(ExParsers.ParseDefault(gui.GetAttribute("inventoryScale"), CultureInfo.InvariantCulture, 0.2f));
+                    var xCoord = ExParsers.ParseDefault(gui.GetAttribute("inventoryX"), CultureInfo.InvariantCulture, 675f);
+                    var yCoord = ExParsers.ParseDefault(gui.GetAttribute("inventoryY"), CultureInfo.InvariantCulture, 550f);
+                    adventureData.setInventoryCoords(new UnityEngine.Vector2(xCoord, yCoord));
+                    adventureData.setInventoryImage(ExString.Default(gui.GetAttribute("inventoryImage"), SpecialAssetPaths.ASSET_DEFAULT_INVENTORY));
+                    break;
                 default: incidences.Add(Incidence.createDescriptorIncidence("Unknown inventoryPosition type: " + inventoryPosition, null)); break;
             }
 

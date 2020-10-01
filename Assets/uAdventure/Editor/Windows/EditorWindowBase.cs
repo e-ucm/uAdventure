@@ -4,15 +4,10 @@ using UnityEngine;
 using System.Collections.Generic;
 using uAdventure.Core;
 using System;
-using System.Linq;
-using uAdventure.Analytics;
-using uAdventure.Geo;
-using UnityEditor.SceneManagement;
-using UnityEditorInternal;
 
 namespace uAdventure.Editor
 {
-    public class EditorWindowBase : EditorWindow
+    public abstract class EditorWindowBase : EditorWindow
     {
         /* -----------------------
          * WINDOW CONSTS
@@ -25,26 +20,6 @@ namespace uAdventure.Editor
          * END WINDOW CONSTS
          * ----------------------*/
 
-        public enum EditorMenuItem
-        {
-            File,
-            Edit,
-            Adventure,
-            Chapters,
-            Run,
-            Configuration,
-            About
-        };
-
-        public enum EditorWindowType
-        {
-            Chapter,
-            AdaptationProfiles,
-            Extension
-        };
-
-        // The position of the window
-        private static EditorWindowBase thisWindowReference;
         public static bool WantsMouseMove = false;
 
 
@@ -55,232 +30,90 @@ namespace uAdventure.Editor
             configurationMenu,
             aboutMenu;
 
-        private EditorWindowType openedWindow = EditorWindowType.Chapter;
+        protected Enum openedWindow;
 
         private LayoutWindow m_Window = null;
-        private ChapterWindow chapterWindow;
-        private GameObject debugGUIHolder = null;
 
         private Vector2 scrollPosition;
-
-        private static Texture2D redoTexture = null;
-        private static Texture2D undoTexture = null;
-        
-        private static Texture2D adaptationTexture = null;
-
-        private List<EditorWindowExtension> extensions;
         private EditorWindowExtension extensionSelected;
 
         private static Rect zeroRect;
         private Rect windowArea;
+        [NonSerialized]
+        private bool inited = false;
 
-        private static bool locked;
+        public static bool Locked { get; private set; }
 
-        private void Return(PlayModeStateChange playModeStateChange)
+        protected List<EditorWindowExtension> Extensions { get; private set; }
+
+        protected void AddExtension(EditorWindowExtension extension)
         {
-            if(playModeStateChange == PlayModeStateChange.EnteredEditMode)
+            if(Extensions == null)
             {
+                Extensions = new List<EditorWindowExtension>();
+            }
 
-                if (debugGUIHolder)
+            if (!Extensions.Contains(extension))
+            {
+                if(extensionSelected == null)
                 {
-                    DestroyImmediate(debugGUIHolder);
+                    extensionSelected = extension;
                 }
-
-                FocusWindowIfItsOpen(GetType());
+                Extensions.Add(extension);
             }
         }
 
-        public static bool Locked
+        protected Dictionary<GenericMenu, string> Menus { get; private set; }
+
+        protected void AddMenu(GenericMenu menu, string title)
         {
-            get { return locked; }
+            if (Menus == null)
+            {
+                Menus = new Dictionary<GenericMenu, string>();
+            }
+
+            if (!Menus.ContainsKey(menu))
+            {
+                Menus.Add(menu, title);
+            }
         }
 
         public static void LockWindow()
         {
-            locked = true;
+            Locked = true;
         }
 
         public static void UnlockWindow()
         {
-            locked = false;
+            Locked = false;
         }
 
-        public void OnEnable()
+        public void RefreshWindows()
         {
-            if (!thisWindowReference)
-            {
-                thisWindowReference = this;
-                EditorApplication.playModeStateChanged += Return;
-            }
-            else
-            {
-                DestroyImmediate(thisWindowReference);
-                return;
-            }
+            InitWindows();
 
-            if (!Language.Initialized)
-                Language.Initialize();
-
-            if (!Controller.Instance.Initialized)
-			{
-				Controller.ResetInstance();
-				Controller.Instance.Init();
-			}
-
-            var initialScene = AssetDatabase.LoadAssetAtPath<SceneAsset>("Assets/uAdventure/Scenes/_Scene1.unity");
-
-            if (initialScene)
+            var ops = new GUILayoutOption[]
             {
-                EditorSceneManager.playModeStartScene = initialScene;
-            }
-            else
+                    GUILayout.ExpandWidth(true),
+                    GUILayout.ExpandHeight(true)
+            };
+            foreach (var e in Extensions)
             {
-                var title = "EditorWindow.MainSceneNotFound.Title".Traslate();
-                var body = "EditorWindow.MainSceneNotFound.Body".Traslate();
-                var ok = "GeneralText.OK".Traslate();
-                EditorUtility.DisplayDialog(title, body, ok);
+                e.Options = ops;
+                e.OnRequestMainView += RequestMainView;
+                e.OnRequestRepaint += Repaint;
+                e.EndWindows = EndWindows;
+                e.BeginWindows = BeginWindows;
             }
 
-
-            if (!redoTexture)
-            {
-                redoTexture = Resources.Load<Texture2D>("EAdventureData/img/icons/redo");
-            }
-            if (!undoTexture)
-            {
-                undoTexture = Resources.Load<Texture2D>("EAdventureData/img/icons/undo");
-            }
-            if (!adaptationTexture)
-            {
-                adaptationTexture = Resources.Load<Texture2D>("EAdventureData/img/icons/adaptationProfiles");
-            }
-			
-			fileMenu = new FileMenu();
-			editMenu = new EditMenu();
-			adventureMenu = new AdventureMenu();
-			chaptersMenu = new ChaptersMenu();
-			configurationMenu = new ConfigurationMenu();
-			aboutMenu = new AboutMenu();
-
-            var g = GeoController.Instance;
-            var a = AnalyticsController.Instance;
+            inited = true;
         }
 
-        protected void OnDestroy()
-        {
-            if(thisWindowReference == this)
-            {
-                EditorApplication.playModeStateChanged -= Return;
-            }
-
-            if (debugGUIHolder)
-            {
-                DestroyImmediate(debugGUIHolder);
-            }
-        }
-
-        public static void RefreshLanguage(){
-			thisWindowReference.OnEnable ();
-		}
-
-        private static Dictionary<Type, List<EditorComponent>> knownComponents;
-        public static Dictionary<Type, List<EditorComponent>> Components
-        {
-            get { return knownComponents; }
-        }
-
-        public static void RegisterComponent<T>(EditorComponent component) { RegisterComponent(typeof(T), component); }
-
-        public static void RegisterComponent(Type t, EditorComponent component)
-        {
-            if (knownComponents == null)
-            {
-                knownComponents = new Dictionary<Type, List<EditorComponent>>();
-            }
-
-            if (!knownComponents.ContainsKey(t))
-            {
-                knownComponents.Add(t, new List<EditorComponent>());
-            }
-
-            if(component is BaseWindow)
-            {
-                (component as BaseWindow).OnRequestRepaint = () => thisWindowReference.Repaint();
-            }
-
-            // if there's a component of the same tipe already registered we ignore it
-            if (knownComponents[t].Any(c => c.GetType() == component.GetType()))
-            {
-                return;
-            }
-
-            knownComponents[t].Add(component);
-            knownComponents[t].Sort((c1, c2) => CompareComponents(c1, c2));
-        }
-
-        private static int CompareComponents(EditorComponent c1, EditorComponent c2)
-        {
-            var c1Attr = c1.GetType().GetCustomAttributes(typeof(EditorComponentAttribute), true)[0] as EditorComponentAttribute;
-            var c2Attr = c2.GetType().GetCustomAttributes(typeof(EditorComponentAttribute), true)[0] as EditorComponentAttribute;
-
-            return c1Attr.Order.CompareTo(c2Attr.Order);
-        } 
-
-        public static void RefreshChapter()
-        {
-            thisWindowReference.chapterWindow = new ChapterWindow(zeroRect, new GUIContent(TC.get("Element.Name0")), "Window");
-            thisWindowReference.openedWindow = EditorWindowType.Chapter;
-        }
-
-        public static void RefreshWindows()
-        {
-            thisWindowReference.chapterWindow = null;
-            thisWindowReference.InitWindows();
-        }
-
-        public static void SelectElement(List<Searchable> path)
-        {
-            var extension = EditorWindowBaseExtensionFactory.Instance.GetExistingExtensionFor(path.First().GetType(), 
-                thisWindowReference.extensions);
-
-            
-            if (extension != null)
-            {
-                thisWindowReference.RequestMainView(extension);
-                extension.SelectElement(path);
-            }
-        }
-
-        void InitWindows()
-        {
-			if (chapterWindow == null)
-            {
-				zeroRect = new Rect(0, 0, 0, 0);    
-				chapterWindow = new ChapterWindow(zeroRect, new GUIContent(TC.get("Element.Name0")), "Window");
-                thisWindowReference.openedWindow = EditorWindowType.Chapter;
-
-                // Extensions of the editor
-                extensions = EditorWindowBaseExtensionFactory.Instance.CreateAllExistingExtensions(zeroRect, "Window");
-
-				var ops = new GUILayoutOption[] 
-                {
-					GUILayout.ExpandWidth(true),
-					GUILayout.ExpandHeight(true)
-				};
-				foreach (var e in extensions)
-				{
-					e.Options = ops;
-					e.OnRequestMainView += thisWindowReference.RequestMainView;
-					e.OnRequestRepaint += Repaint;
-                    e.EndWindows = EndWindows;
-                    e.BeginWindows = BeginWindows;
-                }   
-			}
-		}
+        protected abstract void InitWindows();
 
         protected void OnGUI()
         {
-            if (locked)
+            if (Locked)
             {
                 GUI.depth = Int32.MaxValue;
                 if (Event.current.type != EventType.Layout && Event.current.type != EventType.Repaint)
@@ -295,36 +128,26 @@ namespace uAdventure.Editor
 
             this.wantsMouseMove = WantsMouseMove;
 
-            InitWindows ();
+            if (!inited)
+            {
+                Debug.Log("InitWindows " + inited);
+                RefreshWindows();
+            }
             /**
             UPPER MENU
             */
-            EditorGUILayout.BeginHorizontal("Toolbar", GUILayout.Height(TOP_MENU_HEIGHT));
-            if (GUILayout.Button(TC.get("MenuFile.Title"),"toolbarButton"))
+            if(Menus != null && Menus.Count > 0)
             {
-                fileMenu.menu.ShowAsContext();
+                EditorGUILayout.BeginHorizontal("Toolbar", GUILayout.Height(TOP_MENU_HEIGHT));
+                foreach (var kv in Menus)
+                {
+                    if (GUILayout.Button(kv.Value, "toolbarButton"))
+                    {
+                        kv.Key.ShowAsContext();
+                    }
+                } 
+                EditorGUILayout.EndHorizontal();
             }
-            if (GUILayout.Button(TC.get("MenuEdit.Title"), "toolbarButton"))
-            {
-                editMenu.menu.ShowAsContext();
-            }
-            if (GUILayout.Button(TC.get("MenuAdventure.Title"), "toolbarButton"))
-            {
-                adventureMenu.menu.ShowAsContext();
-            }
-            if (GUILayout.Button(TC.get("MenuChapters.Title"), "toolbarButton"))
-            {
-                chaptersMenu.menu.ShowAsContext();
-            }
-            if (GUILayout.Button(TC.get("MenuConfiguration.Title"), "toolbarButton"))
-            {
-                configurationMenu.menu.ShowAsContext();
-            }
-            if (GUILayout.Button(TC.get("About"), "toolbarButton"))
-            {
-                aboutMenu.menu.ShowAsContext();
-            }
-            EditorGUILayout.EndHorizontal();
 
             /**
             LEFT MENU
@@ -336,14 +159,11 @@ namespace uAdventure.Editor
 
                 scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
 
-                // Button event chapter
-                if (GUILayout.Button(TC.get("Element.Name0")))
-                {
-                    OnWindowTypeChanged(EditorWindowType.Chapter);
-                }
-
                 // Button event scene
-                extensions.ForEach(e => e.LayoutDrawLeftPanelContent(null, null));
+                if (Extensions != null)
+                {
+                    Extensions.ForEach(e => e.LayoutDrawLeftPanelContent(null, null));
+                }
 
                 EditorGUILayout.EndScrollView();
                 EditorGUILayout.EndVertical();
@@ -353,17 +173,10 @@ namespace uAdventure.Editor
                 */
 
                 windowArea = EditorGUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
-                switch (openedWindow)
+
+                if (extensionSelected != null)
                 {
-                    case EditorWindowType.Chapter:
-                        m_Window = chapterWindow;
-                        break;
-                    default:
-                        if (extensionSelected != null)
-                        {
-                            m_Window = extensionSelected;
-                        }
-                        break;
+                    m_Window = extensionSelected;
                 }
 
                 if (m_Window != null)
@@ -371,7 +184,7 @@ namespace uAdventure.Editor
                     if (Event.current.type == EventType.Repaint && m_Window.Rect != windowArea)
                     {
                         m_Window.Rect = windowArea;
-                        extensions.ForEach(e => e.Rect = windowArea);
+                        Extensions.ForEach(e => e.Rect = windowArea);
                     }
                     m_Window.OnGUI();
                 }
@@ -402,7 +215,7 @@ namespace uAdventure.Editor
                 {
                     Controller.ResetInstance();
                     Controller.Instance.Init();
-                    EditorWindowBase.RefreshWindows();
+                    RefreshWindows();
                 }
                 if (GUILayout.Button("GeneralText.New".Traslate()))
                 {
@@ -415,30 +228,21 @@ namespace uAdventure.Editor
                     {
                         Controller.Instance.NewAdventure(Controller.FILE_ADVENTURE_1STPERSON_PLAYER);
                         Controller.OpenEditorWindow();
-                        EditorWindowBase.RefreshWindows();
+                        RefreshWindows();
                     }
                 }
             }
         }
 
-        void OnWindowTypeChanged(EditorWindowType type_)
-        {
-            openedWindow = type_;
-        }
-
-        void RequestMainView(EditorWindowExtension who)
+        public void RequestMainView(EditorWindowExtension who)
         {
             extensionSelected = who;
-            OnWindowTypeChanged(EditorWindowType.Extension);
-            extensions.ForEach(e => e.Selected = e == who);
+            Extensions.ForEach(e => e.Selected = e == who);
         }
 
         internal static void LanguageChanged()
         {
-            if (thisWindowReference)
-            {
-                thisWindowReference.OnEnable();
-            }
+            //OnEnable();
         }
     }
 }

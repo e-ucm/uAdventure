@@ -101,11 +101,11 @@ namespace uAdventure.Geo
                                 CreateElement = (type, id, extra) =>
                                 {
                                     var geoElement = new GeoElement(id);
-                                    var place = extra[0] as SearchData;
+                                    var place = extra[0] as Place;
                                     if (place != null)
                                     {
                                         geoElement.Geometries[0].Type = GMLGeometry.GeometryType.Polygon;
-                                        geoElement.Geometries[0].Points = place.boundingBox.ToPoints().Select(p => new Vector2d(p.y, p.x)).ToArray();
+                                        geoElement.Geometries[0].Points = place.RectBoundingBox.ToPoints();
                                     }
                                     return new GeoElementDataControl(geoElement);
                                 },
@@ -137,10 +137,10 @@ namespace uAdventure.Geo
         {
             private bool hasToFocus = true;
             private PlaceSearcher placeSearcher;
-            private static SearchData searchData;
-            private Action<SearchData> callback;
+            private static Place searchData;
+            private Action<Place> callback;
 
-            public virtual void Init(Action<SearchData> callback)
+            public virtual void Init(Action<Place> callback)
             {
                 this.callback = callback;
                 placeSearcher = ScriptableObject.CreateInstance<PlaceSearcher>();
@@ -149,8 +149,7 @@ namespace uAdventure.Geo
 
                 if (searchData != null)
                 {
-                    placeSearcher.Value = searchData.label;
-                    placeSearcher.LatLon = searchData.coordinates.ToVector2d();
+                    placeSearcher.Place = searchData;
                 }
                 position = new Rect(Screen.width / 2 - 250, Screen.height / 2 - 150, 500, 300);
                 ShowUtility();
@@ -172,12 +171,7 @@ namespace uAdventure.Geo
                 var isEnterPressed = IsEnterPressed();
                 if (placeSearcher.DoLayout())
                 {
-                    searchData = new SearchData()
-                    {
-                        label = placeSearcher.Value,
-                        coordinates = placeSearcher.LatLon.ToVector2(),
-                        boundingBox = placeSearcher.BoundingBox
-                    };
+                    searchData = placeSearcher.Place;
                     DestroyImmediate(placeSearcher);
                     callback(searchData);
                     this.Close();
@@ -185,12 +179,7 @@ namespace uAdventure.Geo
 
                 if (GUI.GetNameOfFocusedControl() == "InputField" && isEnterPressed)
                 {
-                    searchData = new SearchData()
-                    {
-                        label = placeSearcher.Value,
-                        coordinates = placeSearcher.LatLon.ToVector2(),
-                        boundingBox = placeSearcher.BoundingBox
-                    };
+                    searchData = placeSearcher.Place;
                     callback(searchData);
                     this.Close();
                 }

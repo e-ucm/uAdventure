@@ -20,6 +20,12 @@ namespace uAdventure.Runner
         private Inventory inventory;
         private Dictionary<Element, GameObject> elementObjects = new Dictionary<Element, GameObject>();
 
+        [Range(0, DescriptorData.INVENTORY_ICON_FREEPOS)]
+        public int InventoryType;
+
+        private bool started = false;
+        private bool show = true;
+
         // Properties
         public GameObject InventoryHolder
         {
@@ -64,20 +70,36 @@ namespace uAdventure.Runner
         {
             get
             {
-                return inventory && inventory.gameObject.activeSelf;
+                return show;
             }
             set
             {
-                if (inventory)
+                if (!started)
                 {
-                    inventory.gameObject.SetActive(value);
+                    Start();
+                }
+
+                show = value;
+                if (!value)
+                {
+                    inventory.InventoryType = DescriptorData.INVENTORY_NONE;
+                }
+                else
+                {
+                    inventory.InventoryType = InventoryType;
                 }
             }
         }
 
         private void Start()
         {
-            if (InventoryManager.Instance)
+            if (started)
+            {
+                return;
+            }
+            started = true;
+
+            if (Instance && Instance != this)
             {
                 Debug.LogWarning("Multiple inventory managers have been found!");
             }
@@ -110,12 +132,29 @@ namespace uAdventure.Runner
 
         public void Restore()
         {
-            Clear();
-            foreach (var item in Game.Instance.GameState.GetInventoryItems())
+            if (!started)
             {
-                var element = Game.Instance.GameState.GetObject(item);
+                Start();
+            }
+
+            Clear();
+            var gs = Game.Instance.GameState;
+            foreach (var item in gs.GetInventoryItems())
+            {
+                var element = gs.GetObject(item);
                 AddElementToInventory(element, false);
             }
+            InventoryType = gs.Data.getInventoryPosition();
+            var inventoryImage = gs.Data.getInventoryImage();
+            if (string.IsNullOrEmpty(inventoryImage))
+            {
+                inventoryImage = SpecialAssetPaths.ASSET_DEFAULT_INVENTORY;
+            }
+
+            var inventoryIcon = Game.Instance.ResourceManager.getSprite(inventoryImage);
+
+            inventory.openButton.image.sprite = inventoryIcon;
+
         }
 
         private void Clear()
@@ -177,6 +216,30 @@ namespace uAdventure.Runner
             // Removing from the refferences
             elementObjects.Remove(element);
             return true;
+        }
+
+        private void Update()
+        {
+            if(inventory.InventoryType != InventoryType && Show)
+            {
+                inventory.InventoryType = InventoryType;
+            }
+
+            var rectTransform = (RectTransform)inventory.openButton.transform;
+            var parentRectTransform = rectTransform.parent.GetComponent<RectTransform>();
+            var inventoryIcon = inventory.openButton.image.sprite;
+            if (!inventoryIcon)
+            {
+                return;
+            }
+            var gs = Game.Instance.GameState;
+            var position = gs.Data.getInventoryCoords();
+            var ratio = new Vector2(position.x / 800, 1- (position.y / 600));
+            parentRectTransform.anchorMax = parentRectTransform.anchorMin = ratio;
+            parentRectTransform.anchoredPosition = new Vector2(0,0);
+            var scale = gs.Data.getInventoryScale();
+            parentRectTransform.localScale = new Vector3(scale, scale, 1);
+            rectTransform.sizeDelta = new Vector2(inventoryIcon.texture.width, inventoryIcon.texture.height);
         }
     }
 }

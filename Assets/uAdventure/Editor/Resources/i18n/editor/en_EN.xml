@@ -2265,8 +2265,17 @@
   <entry key="SceneEditor.PlayerTrajectory.Delete">Delete tool</entry>
 
   <entry key="MenuAdventure.SaveMode">Save configuration</entry>
-  <entry key="MenuAdventure.AutoSave.Checkbox">Save the game automatically?</entry>
-  <entry key="MenuAdventure.SaveOnSuspend.Checkbox">Save on suspend? (Useful for mobile devices)</entry>
+  <entry key="MenuAdventure.SaveMode.Info">Please notice that auto-save, save-on-suspend and restore-after-open features will be ignored in editor playback to simplify debugging. If you want the game to be saved, just use the Exit menu in game.</entry>
+  <entry key="MenuAdventure.ShowSaveLoad.Info">Toggles the display of the save/load buttons in the Exit in-game menu.</entry>
+  <entry key="MenuAdventure.ShowSaveLoad.Checkbox">Allow save/load</entry>
+  <entry key="MenuAdventure.ShowReset.Info">Toggles the display of the reset button in the Exit in-game menu.</entry>
+  <entry key="MenuAdventure.ShowReset.Checkbox">Allow reset</entry>
+  <entry key="MenuAdventure.AutoSave.Info">Auto-save makes the game to be saved after an effects block is executed. </entry>
+  <entry key="MenuAdventure.AutoSave.Checkbox">Auto-save</entry>
+  <entry key="MenuAdventure.SaveOnSuspend.Info">Save on suspend saves the game when the player loses focus on the game window. This is mainly useful in handheld devices where the game can be accidentally closed and you want to maintain the game state. </entry>
+  <entry key="MenuAdventure.SaveOnSuspend.Checkbox">Save on suspend</entry>
+  <entry key="MenuAdventure.RestoreAfterOpen.Info">Restore after open loads the last save game right after the game is opened. When used in combination with save on suspend it creates the experience that the game runs continuously, despite of being closed. </entry>
+  <entry key="MenuAdventure.RestoreAfterOpen.Checkbox">Restore after open</entry>
 
   <entry key="EditorWindow.MainSceneNotFound.Title">Main scene not found!</entry>
   <entry key="EditorWindow.MainSceneNotFound.Body">Main Scene was not found! Please open \"_Scene1\" in scenes folder before playing the game.</entry>
@@ -2281,6 +2290,37 @@
   <entry key="Resources.DescriptionLineAudio">Audio</entry>
   <entry key="Resources.DescriptionLineImage">Image</entry>
   <entry key="Resources.DescriptionLineTTS">Synthetize</entry>
+
+  <entry key="Operation.AddActiveAreaTitle">Add active area</entry>
+  <entry key="Operation.AddActiveAreaMessage">Type an identifier for the new active area</entry>
+  <entry key="Operation.AddActiveAreaDefaultValue">ActiveAreaId</entry>
+
+  <entry key="Inventory.Image">Image</entry>
+  <entry key="Inventory.Type0">No iventory</entry>
+  <entry key="Inventory.Type1">Top and bottom</entry>
+  <entry key="Inventory.Type2">Only on top</entry>
+  <entry key="Inventory.Type3">Only on bottom</entry>
+  <entry key="Inventory.Type4">Fixed on top</entry>
+  <entry key="Inventory.Type5">Fixed on bottom</entry>
+  <entry key="Inventory.Type6">Icon freely positioned</entry>
+  
+  <!-- Buttons -->
+  <entry key="Buttons.Hint">Hover the icon to see the highlighted version</entry>
+  <entry key="Buttons.Normal">Normal</entry>
+  <entry key="Buttons.Highlighted">Highlighted</entry>
+  <entry key="Buttons.Talk.Title">Talk button</entry>
+  <entry key="Buttons.Use.Title">Use button</entry>
+  <entry key="Buttons.Examine.Title">Examine button</entry>
+  <entry key="Buttons.DragTo.Title">Drag to button</entry>
+  <entry key="Buttons.Grab.Title">Grab button</entry>
+  <entry key="Buttons.UseWith.Title">Use with button</entry>
+  <entry key="Buttons.GiveTo.Title">Give to button</entry>
+  
+  <!-- Cursors -->
+  <entry key="Cursors.Default.Title">Default cursor</entry>
+  <entry key="Cursors.Over.Title">Element cursor</entry>
+  <entry key="Cursors.Action.Title">Action cursor</entry>
+  <entry key="Cursors.Exit.Title">Exit cursor</entry>
 
   <!-- Analytics -->
   <entry key="Analytics.Title">Analytics</entry>

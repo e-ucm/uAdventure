@@ -5,6 +5,10 @@ using System.Collections.Generic;
 using uAdventure.Core;
 using System.Linq;
 using UnityEngine.EventSystems;
+using System;
+using UnityFx.Async.Promises;
+using UnityFx.Async;
+using UnityEngine.UI;
 
 namespace uAdventure.Runner
 {
@@ -59,12 +63,13 @@ namespace uAdventure.Runner
         private bool started;
         private int pulsing = 0;
         private bool wasShowingInventory = false;
+        private int loadedChapter = -1;
 
         public delegate void TargetChangedDelegate(IChapterTarget newTarget);
 
         public TargetChangedDelegate OnTargetChanged;
 
-        public delegate void ElementInteractedDelegate(bool finished, Element element, Action action);
+        public delegate void ElementInteractedDelegate(bool finished, Element element, Core.Action action);
 
         public ElementInteractedDelegate OnElementInteracted;
 
@@ -140,21 +145,35 @@ namespace uAdventure.Runner
                 useSystemIO = true;
             }
 
-            AdventureData data = new AdventureData();
             var incidences = new List<Incidence>();
-            AdventureHandler adventure = new AdventureHandler(data, ResourceManager, incidences);
-            adventure.Parse("descriptor.xml");
-
-            game_state = new GameState(data);
-            bookDrawer = new BookDrawer(ResourceManager);
-
-            gameExtensions = new List<GameExtension>();
-            foreach (var gameExtension in GetAllSubclassOf(typeof(GameExtension)))
+            var loadScreen = ShowLoading();
+            loadScreen.Text = "Loading main assets...";
+            var descriptorPromise = LoadDescriptor();
+            descriptorPromise.AddProgressCallback((p) =>
             {
-                gameExtensions.Add(gameObject.AddComponent(gameExtension) as GameExtension);
-            }
-
-
+                Debug.Log("Updating progress: " + p);
+                loadScreen.Progress = p*100f;
+            });
+            descriptorPromise.Then(adventureData =>
+                {
+                    game_state = new GameState(adventureData);
+                    bookDrawer = new BookDrawer(ResourceManager);
+                    gameExtensions = new List<GameExtension>();
+                    foreach (var gameExtension in GetAllSubclassOf(typeof(GameExtension)))
+                    {
+                        gameExtensions.Add(gameObject.AddComponent(gameExtension) as GameExtension);
+                    }
+                    loadScreen.Text = "Loading chapter...";
+                    var chapterPromise = LoadChapter(1);
+                    chapterPromise.ProgressChanged += (s, e) => loadScreen.Progress = chapterPromise.Progress;
+                    return chapterPromise;
+                })
+                .Then(() =>
+                {
+                    loadScreen.Text = "Starting game...";
+                    StartGame();
+                    loadScreen.Close();
+                });
         }
 
         public static IEnumerable<System.Type> GetAllSubclassOf(System.Type parent)
@@ -171,10 +190,11 @@ namespace uAdventure.Runner
             }
         }
 
-        protected void Start()
+        protected void StartGame()
         {
+            GameState.Restart();
             started = true;
-            if (!Application.isEditor)
+            if (!Application.isEditor && GameState.Data.isRestoreAfterOpen())
             {
                 GameState.OnGameResume();
             }
@@ -276,19 +296,30 @@ namespace uAdventure.Runner
 
         public void AutoSave()
         {
+            if(Application.isEditor || !GameState.Data.isAutoSave())
+            {
+                return;
+            }
+
             gameExtensions.ForEach(g => g.OnBeforeGameSave());
             GameState.SerializeTo("save");
         }
 
         public void OnApplicationPause(bool paused)
         {
+            if (Application.isEditor)
+            {
+                return;
+            }
+
             if (!isSomethingRunning())
             {
-                if (paused)
+                if (paused && GameState.Data.isSaveOnSuspend())
                 {
                     GameState.OnGameSuspend();
                 }
-                else if (Application.isMobilePlatform)
+                
+                if (!paused && GameState.Data.isRestoreAfterOpen())
                 {
                     GameState.OnGameResume();
                     if (started)
@@ -384,11 +415,25 @@ namespace uAdventure.Runner
             }
             if (executeStack.Count == 0)
             {
+                if (GameState.ChangeAmbitCount > 0)
+                {
+                    Debug.LogWarning("There are still some opened change ambits! " + GameState.ChangeAmbitCount);
+                }
                 AutoSave();
             }
             // In case any bubble is bugged
             GUIManager.Instance.DestroyBubbles();
             return false;
+        }
+
+        public void Quit()
+        {
+            var quit = true;
+            gameExtensions.ForEach(g => quit &= g.OnGameFinished());
+            if (quit)
+            {
+                Application.Quit();
+            }
         }
 
         public void ClearAndRestart()
@@ -452,7 +497,7 @@ namespace uAdventure.Runner
             return false;
         }
 
-        public void ElementInteracted(bool finished, Element element, Action action)
+        public void ElementInteracted(bool finished, Element element, Core.Action action)
         {
             if (OnElementInteracted != null)
             {
@@ -514,14 +559,10 @@ namespace uAdventure.Runner
                 waitingTargetDestroy = true;
                 System.Action runTarget = () =>
                 {
-
-                    // Here we connect with the IChapterTargetFactory and create an IRunnerChapterTarget
-
-                    runnerTarget = RunnerChapterTargetFactory.Instance.Instantiate(target);
-                    runnerTarget.Data = target;
                     waitingTargetDestroy = false;
                     waitingRunTarget = true;
                     GameState.CurrentTarget = target.getId();
+                    runnerTarget.RenderScene();
 
                     if (trace && OnTargetChanged != null)
                     {
@@ -529,25 +570,167 @@ namespace uAdventure.Runner
                     }
                 };
 
-                if (runnerTarget != null)
+                var oldTarget = runnerTarget;
+
+                // Here we connect with the IChapterTargetFactory and create an IRunnerChapterTarget
+                runnerTarget = RunnerChapterTargetFactory.Instance.Instantiate(target);
+                runnerTarget.Data = target;
+
+                System.Action afterChapterLoad = () =>
                 {
-                    runnerTarget.Destroy(0f, runTarget);
+                    if (oldTarget != null)
+                    {
+                        oldTarget.Destroy(0f, runTarget);
+                    }
+                    else
+                    {
+                        runTarget();
+                    }
+                };
+
+                if (loadedChapter != GameState.CurrentChapter)
+                {
+                    LoadChapter(GameState.CurrentChapter)
+                        .Then(() =>
+                        {
+                            loadedChapter = GameState.CurrentChapter;
+                            afterChapterLoad();
+                        })
+                        .Catch(ex =>
+                        {
+                            Debug.LogError(ex);
+                        });
                 }
                 else
                 {
-                    runTarget();
+                    afterChapterLoad();
                 }
             }
+
             if(notifyObject != null)
             {
                 executeStack.Push(new KeyValuePair<Interactuable, ExecutionEvent>(notifyObject, null));
             }
+
             if (uAdventureRaycaster.Instance)
             {
                 uAdventureRaycaster.Instance.Override = this.gameObject;
             }
-            
+
             return runnerTarget;
+        }
+
+        private IAsyncOperation<AdventureData> LoadDescriptor()
+        {
+            var done = new AsyncCompletionSource<AdventureData>();
+
+            done.SetProgress(0);
+            Loader.LoadAdventureDataAsync(ResourceManager, new List<Incidence>())
+                .Then(adventureData =>
+                {
+                    var descriptorAssets = new List<string>();
+                    done.SetProgress(0.1f);
+                    Debug.Log("Setting progress 10");
+                    /*foreach (var cursor in adventureData.getCursors())
+                    {
+                        descriptorAssets.Add(cursor.getPath());
+                    }
+                    foreach (var button in adventureData.getButtons())
+                    {
+                        descriptorAssets.Add(button.getPath());
+                    }*/
+                    var cachePromise = ResourceManager.CacheAssets(descriptorAssets);
+                    cachePromise.AddProgressCallback(p => done.SetProgress(p));
+                    cachePromise.Then(() =>
+                    {
+                        Debug.Log("Done Caching 100");
+                        done.SetProgress(1f);
+                        done.SetResult(adventureData);
+                    });
+                });
+
+            return done;
+        }
+
+        private IAsyncOperation LoadChapter(int currentChapter)
+        {
+            var assets = new string[0] as IEnumerable<string>;
+
+            /*foreach(var scene in GameState.GetObjects<Scene>())
+            {
+                assets = assets.Union(scene.getResources().SelectMany(r => r.getAssetValues()));
+                foreach(var exit in scene.getExits())
+                {
+                    // TODO load exit sounds
+                    assets = assets.Union(getEffectsAssets(exit.getEffects()));
+                    assets = assets.Union(getEffectsAssets(exit.getNotEffects()));
+                    assets = assets.Union(getEffectsAssets(exit.getPostEffects()));
+                }
+
+                foreach(var activeArea in scene.getActiveAreas())
+                {
+                    assets = assets.Union(activeArea.getResources().SelectMany(r => r.getAssetValues()));
+                    assets = assets.Union(getActionsAssets(activeArea.getActions()));
+                }
+            }
+            foreach (var item in GameState.GetObjects<Item>())
+            {
+                assets = assets.Union(item.getResources().SelectMany(r => r.getAssetValues()));
+                assets = assets.Union(getActionsAssets(item.getActions()));
+            }
+            foreach (var npc in GameState.GetObjects<NPC>())
+            {
+                assets = assets.Union(npc.getResources().SelectMany(r => r.getAssetValues()));
+                assets = assets.Union(getActionsAssets(npc.getActions()));
+            }
+            foreach (var atrezzo in GameState.GetObjects<Atrezzo>())
+            {
+                assets = assets.Union(atrezzo.getResources().SelectMany(r => r.getAssetValues()));
+            }
+            foreach (var player in GameState.GetObjects<Player>())
+            {
+                assets = assets.Union(player.getResources().SelectMany(r => r.getAssetValues()));
+            }
+            foreach (var conversation in GameState.GetObjects<Conversation>())
+            {
+                assets = assets.Union(
+                    conversation.getAllNodes()
+                    .SelectMany(n => Enumerable.Range(0, n.getLineCount()).Select(i => n.getLine(i)))
+                    .SelectMany(l => l.getResources())
+                    .SelectMany(r => r.getAssetValues()));
+
+                assets = assets.Union(
+                    conversation.getAllNodes()
+                    .SelectMany(n => getEffectsAssets(n.getEffects())));
+            }
+            foreach (var book in GameState.GetObjects<Book>())
+            {
+                assets = assets.Union(book.getResources().SelectMany(r => r.getAssetValues()));
+                // TODO read book paragraph types
+            }
+            foreach (var timer in GameState.GetObjects<Timer>())
+            {
+                assets = assets.Union(getEffectsAssets(timer.getEffects()));
+                assets = assets.Union(getEffectsAssets(timer.getPostEffects()));
+            }*/
+
+            return ResourceManager.CacheAssets(assets);
+        }
+
+        private IEnumerable<string> getActionsAssets(List<Core.Action> lists)
+        {
+            var assets = lists.SelectMany(a => getEffectsAssets(a.getEffects()));
+            assets = assets.Union(lists.SelectMany(a => getEffectsAssets(a.getClickEffects())));
+            assets = assets.Union(lists.SelectMany(a => getEffectsAssets(a.getNotEffects())));
+            // TODO read action sounds and custom actions
+
+            return assets;
+        }
+
+        private IEnumerable<string> getEffectsAssets(Effects effects)
+        {
+            // TODO
+            return new string[0];
         }
 
         public void SwitchToLastTarget()
@@ -563,7 +746,7 @@ namespace uAdventure.Runner
         //#################################################################
         //#################################################################
         #region Misc
-        public void showActions(List<Action> actions, Vector2 position, IActionReceiver actionReceiver = null)
+        public void showActions(List<Core.Action> actions, Vector2 position, IActionReceiver actionReceiver = null)
         {
             if (!MenuMB.Instance)
             {
@@ -657,10 +840,73 @@ namespace uAdventure.Runner
             }
         }
 
+        private class LoadingScreen : IDisposable
+        {
+            private bool showing;
+            private Texture2D backgroundColor;
+            private GUIStyle backgroundStyle;
+
+            public string Text { get; set; }
+            public float Progress { get; set; }
+
+            public LoadingScreen()
+            {
+                backgroundColor = new Texture2D(1, 1);
+                backgroundColor.SetPixel(0, 0, new Color(0.6f, 0.3f, 0.1f));
+                backgroundStyle = new GUIStyle();
+                backgroundStyle.alignment = TextAnchor.MiddleCenter;
+                backgroundStyle.normal.background = backgroundColor;
+                showing = true;
+            }
+
+            public void OnGUI()
+            {
+                if (!showing)
+                {
+                    return;
+                }
+                using (new GUILayout.AreaScope(new Rect(0, 0, Screen.width, Screen.height)))
+                using (new GUILayout.VerticalScope(backgroundStyle, GUILayout.ExpandWidth(true)))
+                {
+                    GUILayout.FlexibleSpace();
+
+                    GUILayout.Label(Text);
+
+                    GUILayout.Space(30);
+
+                    GUILayout.HorizontalSlider(Progress, 0, 100, GUILayout.Width(400));
+
+                    GUILayout.FlexibleSpace();
+                }
+            }
+
+            public void Close()
+            {
+                Dispose();
+            }
+
+            public void Dispose()
+            {
+                showing = false;
+            }
+        }
+
+        private LoadingScreen loadingScreen;
+
+        private LoadingScreen ShowLoading()
+        {
+            return loadingScreen = new LoadingScreen();
+        }
+
         private List<GUILayoutOption> auxLimitList = new List<GUILayoutOption>();
 
         protected void OnGUI()
         {
+            if(loadingScreen != null)
+            {
+                loadingScreen.OnGUI();
+            }
+
 
             switch (guistate)
             {

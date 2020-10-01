@@ -1,15 +1,16 @@
 ﻿using UnityEngine;
 using uAdventure.Core;
+using System.Collections;
 using UnityEngine.SceneManagement;
-using AssetPackage;
-using System.Collections.Generic;
 using System.Linq;
+using UniRx;
 
 namespace uAdventure.Runner
 {
     public class GUIManager : MonoBehaviour
     {
         public GameObject Bubble_Prefab, Think_Prefab, Yell_Prefab, Config_Menu_Ref;
+        public GameObject SaveButton, LoadButton, ResetButton;
 
         private static GUIManager instance;
         private GameObject bubble;
@@ -51,16 +52,30 @@ namespace uAdventure.Runner
 
         protected void Start()
         {
-            started = true;
-            guiprovider = new GUIProvider(Game.Instance.GameState.Data);
-            if (Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer)
+            var gs = Game.Instance.GameState;
+            if (gs != null)
             {
-                this.GetComponent<UnityEngine.UI.CanvasScaler>().referenceResolution = new Vector2(600, 400);
+                started = true;
+                guiprovider = new GUIProvider(gs.Data);
+
+                SaveButton.SetActive(gs.Data.isShowSaveLoad());
+                LoadButton.SetActive(gs.Data.isShowSaveLoad());
+                ResetButton.SetActive(gs.Data.isShowReset());
+
+                if (Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer)
+                {
+                    this.GetComponent<UnityEngine.UI.CanvasScaler>().referenceResolution = new Vector2(600, 400);
+                }
             }
         }
 
         protected void Update()
         {
+            if (!started)
+            {
+                Start();
+            }
+
             if (get_talker && GameObject.Find(talkerToFind) != null)
             {
                 get_talker = false;
@@ -373,22 +388,7 @@ namespace uAdventure.Runner
 
         public void ExitApplication()
         {
-            Game.Instance.Exit();
-        }
-
-        class SavedTracesListener : Net.IRequestListener
-        {
-            public void Result(string data)
-            {
-                Debug.Log("------------------------");
-                Debug.Log(data);
-            }
-
-            public void Error(string error)
-            {
-                Debug.Log("------------------------");
-                Debug.Log(error);
-            }
+            Game.Instance.Quit();
         }
     }
 }

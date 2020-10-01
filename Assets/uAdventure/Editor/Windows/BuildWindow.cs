@@ -5,6 +5,7 @@ using uAdventure.Editor;
 using System;
 using BuildConfigs = uAdventure.Editor.Controller.BuildConfigs;
 using System.IO;
+using uAdventure.Core;
 
 public class BuildWindow : EditorWindow {
 
@@ -67,6 +68,12 @@ public class BuildWindow : EditorWindow {
                 PlayerSettings.companyName = EditorGUILayout.TextField("Author", PlayerSettings.companyName);
                 PlayerSettings.Android.bundleVersionCode = EditorGUILayout.IntField("Version number", PlayerSettings.Android.bundleVersionCode);
                 PlayerSettings.applicationIdentifier = EditorGUILayout.TextField("Package name", PlayerSettings.applicationIdentifier);
+
+                PlayerSettings.SetApplicationIdentifier(BuildTargetGroup.Standalone, PlayerSettings.applicationIdentifier);
+                PlayerSettings.SetApplicationIdentifier(BuildTargetGroup.Android, PlayerSettings.applicationIdentifier);
+                PlayerSettings.SetApplicationIdentifier(BuildTargetGroup.iOS, PlayerSettings.applicationIdentifier);
+                PlayerSettings.SetApplicationIdentifier(BuildTargetGroup.WebGL, PlayerSettings.applicationIdentifier);
+                Controller.Instance.AdventureData.setApplicationIdentifier(PlayerSettings.applicationIdentifier);
             }
             GUILayout.EndVertical();
         }

@@ -12,11 +12,7 @@ using System.Text.RegularExpressions;
 using System.Globalization;
 using uAdventure.Runner;
 using UnityEditor.Callbacks;
-using System.Collections;
 using System.Linq;
-using System.Reflection;
-using UnityEditor.IMGUI.Controls;
-using UnityEngine.Experimental.UIElements;
 
 namespace uAdventure.Editor
 {
@@ -1956,7 +1952,7 @@ namespace uAdventure.Editor
 
             bool buildGame = true;
             bool exported = false;
-            buildGame = saveFile(false);
+            //buildGame = saveFile(false);
 
             if (buildGame)
             {
@@ -2113,8 +2109,8 @@ namespace uAdventure.Editor
 
             if (config.BuildWindows)
             {
-                var b = createBasic(scenes, config.path + "/Windows/" + name + ".exe", BuildTarget.StandaloneWindows, BuildOptions.None);
-                builds.Add(b);
+                /*var b = createBasic(scenes, config.path + "/Windows/" + name + ".exe", BuildTarget.StandaloneWindows, BuildOptions.None);
+                builds.Add(b);*/
 
                 var b64 = createBasic(scenes, config.path + "/Windows64/" + name + ".exe", BuildTarget.StandaloneWindows64, BuildOptions.None);
                 builds.Add(b64);
@@ -2122,7 +2118,7 @@ namespace uAdventure.Editor
 
             if (config.BuildLinux)
             {
-                var b = createBasic(scenes, config.path + "/Linux/" + name, BuildTarget.StandaloneLinuxUniversal, BuildOptions.None);
+                var b = createBasic(scenes, config.path + "/Linux/" + name, BuildTarget.StandaloneLinux64, BuildOptions.None);
                 builds.Add(b);
             }
 
@@ -3355,7 +3351,8 @@ namespace uAdventure.Editor
         public void SelectElement(Searchable element)
         {
             var path = SelectedChapterDataControl.getPathToDataControl(element);
-            EditorWindowBase.SelectElement(path);
+
+            uAdventureWindowMain.Instance.SelectElement(path);
         }
 
         //public void search()
@@ -3414,7 +3411,7 @@ namespace uAdventure.Editor
 
         public void RefreshView()
         {
-            EditorWindowBase.RefreshChapter();
+            uAdventureWindowMain.Instance.RefreshChapter();
         }
 
         public class InputReceiver : DialogReceiverInterface
@@ -3484,7 +3481,7 @@ namespace uAdventure.Editor
                 }
             }
 
-            var window = EditorWindow.GetWindow(typeof(EditorWindowBase));
+            var window = EditorWindow.GetWindow(typeof(uAdventureWindowMain));
             window.Show();
         }  
 

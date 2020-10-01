@@ -196,14 +196,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 64c0146adef1b6745bd3592d954dfe90, type: 3}
+  m_Script: {fileID: 11500000, guid: 930cea03e97b7224b9e0a4386bc2a3df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_AutoRepaintOnSceneChange: 0
   m_MinSize: {x: 100, y: 100}
   m_MaxSize: {x: 4000, y: 4000}
   m_TitleContent:
-    m_Text: uAdventure.Editor.EditorWindowBase
+    m_Text: uAdventure.Editor.uAdventureWindowMain
     m_Image: {fileID: 0}
     m_Tooltip: 
   m_DepthBufferBits: 0

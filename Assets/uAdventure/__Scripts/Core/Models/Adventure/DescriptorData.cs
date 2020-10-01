@@ -2,6 +2,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace uAdventure.Core
 {
@@ -79,6 +80,8 @@ namespace uAdventure.Core
         public const int INVENTORY_FIXED_TOP = 4;
 
         public const int INVENTORY_FIXED_BOTTOM = 5;
+
+        public const int INVENTORY_ICON_FREEPOS = 6;
 
 
         public enum DefaultClickAction
@@ -213,12 +216,20 @@ namespace uAdventure.Core
             return arrowTypes;
         }
 
+        private static readonly int[] inventoryTypes = { INVENTORY_NONE, INVENTORY_TOP_BOTTOM, INVENTORY_TOP, INVENTORY_BOTTOM, INVENTORY_FIXED_TOP, INVENTORY_FIXED_BOTTOM, INVENTORY_ICON_FREEPOS};
+
+        public static int[] getInventoryTypes()
+        {
+
+            return inventoryTypes;
+        }
+
         public static readonly bool[][]
-        typeAllowed = new bool[][]{
-    //TRADITIONAL GUI
-    new bool[]{ true, false, false, true, true, true, true, true, true, true },
-    //CONTEXTUAL GUI
-    new bool[]{ true, true, true, true, false, false, false, false, false, false } };
+            typeAllowed = new bool[][]{
+        //TRADITIONAL GUI
+        new bool[]{ true, false, false, true, true, true, true, true, true, true },
+        //CONTEXTUAL GUI
+        new bool[]{ true, true, true, true, false, false, false, false, false, false } };
 
         /**
          * Constant for traditional GUI.
@@ -255,6 +266,11 @@ namespace uAdventure.Core
          * Description of the adventure.
          */
         protected string description;
+
+        /**
+         * Description of the adventure.
+         */
+        protected string applicationIdentifier;
 
         /**
          * Type of the GUI (Traditional or contextual)
@@ -310,6 +326,12 @@ namespace uAdventure.Core
 
         protected int inventoryPosition = INVENTORY_TOP_BOTTOM;
 
+        protected Vector2 inventoryCoords = new Vector2(675, 550);
+
+        protected float inventoryScale = 0.2f;
+
+        protected string inventoryImage;
+
         /**
          * The version number of the current game/proyect
          */
@@ -331,9 +353,15 @@ namespace uAdventure.Core
 
         protected bool keyboardNavigationEnabled;
 
+        protected bool showSaveLoad = true;
+
+        protected bool showReset = true;
+
         protected bool autoSave;
 
         protected bool saveOnSuspend;
+
+        protected bool restoreAfterOpen;
 
         /**
          * Constant for identify when a game is executed from engine
@@ -551,6 +579,31 @@ namespace uAdventure.Core
             addButton(cb);
         }
 
+        public string getDefaultButtonPath(string action, string type)
+        {
+            if (getActionTypes().Contains(action) && getButtonTypes().Contains(type))
+            {
+
+                var camelCaseAction = action.Split('-').Select(w => w.Substring(0, 1).ToUpper() + w.Substring(1)).Aggregate((w1, w2) => w1 + w2);
+                var talktoFix = camelCaseAction == "Talk" ? "TalkTo" : camelCaseAction;
+                if (type == HIGHLIGHTED_BUTTON)
+                {
+                    talktoFix += "Highlighted";
+                }
+
+                return "gui/hud/contextual/btn" + talktoFix + ".png";
+            }
+            return null;
+        }
+        public string getDefaultCursorPath(string cursor)
+        {
+            if (getCursorTypes().Contains(cursor))
+            {
+                return "gui/cursors/" + cursor + ".png";
+            }
+            return null;
+        }
+
         public string getButtonPathFromEditor(string action, string type)
         {
             return getButtonPath(action, type, false);
@@ -578,6 +631,7 @@ namespace uAdventure.Core
             {
                 return getButtonPath(USE_GRAB_BUTTON, type, false);
             }
+
             return null;
         }
 
@@ -665,6 +719,42 @@ namespace uAdventure.Core
         {
 
             this.inventoryPosition = inventoryPosition;
+        }
+
+        public Vector2 getInventoryCoords()
+        {
+
+            return inventoryCoords;
+        }
+
+        public void setInventoryCoords(Vector2 inventoryCoords)
+        {
+
+            this.inventoryCoords = inventoryCoords;
+        }
+
+        public float getInventoryScale()
+        {
+
+            return inventoryScale;
+        }
+
+        public void setInventoryScale(float inventoryScale)
+        {
+
+            this.inventoryScale = inventoryScale;
+        }
+
+        public string getInventoryImage()
+        {
+
+            return inventoryImage;
+        }
+
+        public void setInventoryImage(string inventoryImage)
+        {
+
+            this.inventoryImage = inventoryImage;
         }
 
         public int countAssetReferences(string path)
@@ -960,7 +1050,27 @@ namespace uAdventure.Core
 
             this.keyboardNavigationEnabled = keyboardNavigation;
         }
-        
+
+        public bool isShowSaveLoad()
+        {
+            return showSaveLoad;
+        }
+
+        public void setShowSaveLoad(bool showSaveLoad)
+        {
+            this.showSaveLoad = showSaveLoad;
+        }
+
+        public bool isShowReset()
+        {
+            return showReset;
+        }
+
+        public void setShowReset(bool showReset)
+        {
+            this.showReset = showReset;
+        }
+
         public bool isAutoSave()
         {
             return autoSave;
@@ -979,6 +1089,27 @@ namespace uAdventure.Core
         public void setSaveOnSuspend(bool saveOnSuspend)
         {
             this.saveOnSuspend = saveOnSuspend;
+        }
+
+        public bool isRestoreAfterOpen()
+        {
+            return restoreAfterOpen;
+        }
+
+        public void setRestoreAfterOpen(bool restoreAfterOpen)
+        {
+            this.restoreAfterOpen = restoreAfterOpen;
+        }
+
+
+        public string getApplicationIdentifier()
+        {
+            return applicationIdentifier;
+        }
+
+        public void setApplicationIdentifier(string applicationIdentifier)
+        {
+            this.applicationIdentifier = applicationIdentifier;
         }
 
         public virtual object Clone()

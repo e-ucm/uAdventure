@@ -38,7 +38,9 @@ namespace uAdventure.Core
             {
                 if (el.Name == "adaptation" || el.Name == "assessment")
                     return null;
-                throw new Exception("Parser not found for the desired name: " + el.Name);
+
+                Debug.LogWarning("Parser not found for the desired name: " + el.Name);
+                return null;
             }
         }
 

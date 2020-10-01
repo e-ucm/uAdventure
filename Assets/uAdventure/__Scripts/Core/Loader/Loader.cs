@@ -1,8 +1,8 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
-using System;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 using uAdventure.Runner;
-using uAdventure.Core.XmlUpgrader;
+using UnityFx.Async;
+using UnityFx.Async.Promises;
 
 namespace uAdventure.Core
 {
@@ -23,6 +23,23 @@ namespace uAdventure.Core
             return adventureData;
         }
 
+        public static IAsyncOperation<AdventureData> LoadAdventureDataAsync(ResourceManager resourceManager, List<Incidence> incidences)
+        {
+            UnityEngine.Debug.Log("LoadingAdventureData");
+            var result = new AsyncCompletionSource<AdventureData>();
+
+            var adventureParser = new AdventureHandler(new AdventureData(), resourceManager, incidences);
+
+            adventureParser.ParseAsync("descriptor.xml")
+                .Then(adventureData =>
+                {
+                    UnityEngine.Debug.Log("Done LoadingAdventureData");
+                    result.SetResult(adventureData);
+                });
+
+            return result;
+        }
+
         public static Chapter LoadChapter(string filename, ResourceManager resourceManager, List<Incidence> incidences)
         {
             var currentChapter = new Chapter();
@@ -30,6 +47,21 @@ namespace uAdventure.Core
             var chapterParser = new ChapterHandler(currentChapter, resourceManager, incidences);
 
             return chapterParser.Parse(filename);
+        }
+
+        public static IAsyncOperation<Chapter> LoadChapterAsync(string filename, ResourceManager resourceManager, List<Incidence> incidences)
+        {
+            var result = new AsyncCompletionSource<Chapter>();
+
+            var chapterHandler = new ChapterHandler(new Chapter(), resourceManager, incidences);
+
+            chapterHandler.ParseAsync(filename)
+                .Then(chapter =>
+                {
+                    result.SetResult(chapter);
+                });
+
+            return result;
         }
 
         public static Animation LoadAnimation(string filename, ResourceManager resourceManager, List<Incidence> incidences)
@@ -48,6 +80,30 @@ namespace uAdventure.Core
             }
 
             return anim;
+        }
+
+        public static IAsyncOperation<Animation> LoadAnimationAsync(string filename, ResourceManager resourceManager, List<Incidence> incidences)
+        {
+            var result = new AsyncCompletionSource<Animation>();
+
+            if (resourceManager.getAnimationsCache().ContainsKey(filename))
+            {
+                result.SetResult(resourceManager.getAnimationsCache()[filename]); 
+            }
+
+            var animationHandler = new AnimationHandler(resourceManager, incidences);
+
+            animationHandler.ParseAsync(filename)
+                .Then(anim =>
+                {
+                    result.SetResult(anim); 
+                    if (anim != null)
+                    {
+                        resourceManager.getAnimationsCache()[filename] = anim;
+                    }
+                });
+
+            return result;
         }
     }
 }

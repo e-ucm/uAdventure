@@ -5,6 +5,7 @@ using System.Xml;
 using uAdventure.Core;
 using System;
 using System.Linq;
+using System.Globalization;
 
 namespace uAdventure.Editor
 {
@@ -61,6 +62,11 @@ namespace uAdventure.Editor
             XmlNode adventureDescriptionNode = doc.CreateElement("description");
             adventureDescriptionNode.AppendChild(doc.CreateTextNode(adventureData.getDescription()));
             node.AppendChild(adventureDescriptionNode);
+
+            // Create and append the description
+            XmlNode applicationIdentifierNode = doc.CreateElement("application-identifier");
+            applicationIdentifierNode.AppendChild(doc.CreateTextNode(adventureData.getApplicationIdentifier()));
+            node.AppendChild(applicationIdentifierNode);
 
             // Create and append the "invalid" tag (if necessary)
             var invalid = options.Any(option => option is InvalidAdventureDataControlParam);
@@ -152,6 +158,13 @@ namespace uAdventure.Editor
                 case DescriptorData.INVENTORY_FIXED_BOTTOM:
                     guiElement.SetAttribute("inventoryPosition", "fixed_bottom");
                     break;
+                case DescriptorData.INVENTORY_ICON_FREEPOS:
+                    guiElement.SetAttribute("inventoryPosition", "icon");
+                    guiElement.SetAttribute("inventoryImage", adventureData.getInventoryImage());
+                    guiElement.SetAttribute("inventoryX", adventureData.getInventoryCoords().x.ToString(CultureInfo.InvariantCulture));
+                    guiElement.SetAttribute("inventoryY", adventureData.getInventoryCoords().y.ToString(CultureInfo.InvariantCulture));
+                    guiElement.SetAttribute("inventoryScale", adventureData.getInventoryScale().ToString(CultureInfo.InvariantCulture));
+                    break;
 
             }
 
@@ -220,14 +233,25 @@ namespace uAdventure.Editor
 
             configurationNode.AppendChild(graphicConfigElement);
 
+            // Show Save Load
+            var showSaveLoad = adventureData.isShowSaveLoad() ? "yes" : "no";
+            configurationNode.SetAttribute("show-save-load", showSaveLoad);
 
-            // Keep Showing
+            // Show Reset
+            var showReset = adventureData.isShowReset() ? "yes" : "no";
+            configurationNode.SetAttribute("show-reset", showReset);
+
+            // Autosave
             var autoSave = adventureData.isAutoSave() ? "yes" : "no";
             configurationNode.SetAttribute("autosave", autoSave);
 
-            // Keep Showing
+            // Save on suspend
             var saveOnSuspend = adventureData.isSaveOnSuspend() ? "yes" : "no";
             configurationNode.SetAttribute("save-on-suspend", saveOnSuspend);
+
+            // Restore after open
+            var restoreAfterOpen = adventureData.isRestoreAfterOpen() ? "yes" : "no";
+            configurationNode.SetAttribute("restore-after-open", restoreAfterOpen);
 
             //Append configurationNode
             node.AppendChild(configurationNode);

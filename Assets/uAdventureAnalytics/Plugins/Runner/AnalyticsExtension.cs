@@ -1,8 +1,4 @@
 ﻿using AssetPackage;
-using System.Collections.Generic;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
-using uAdventure.Core;
 using uAdventure.Runner;
 using UnityEngine;
 
@@ -34,35 +30,22 @@ namespace uAdventure.Analytics
 
         private float nextFlush = 0;
         private bool flushRequested = true;
-        private List<Completable> completables;
-        private List<CompletableController> completableControllers = new List<CompletableController>();
+        public CompletablesController CompletablesController { get; private set; }
         private TrackerConfig trackerConfig;
         private bool inited = false;
-        private bool autostart = true;
 
-        public bool AutoStart
-        {
-            get
-            {
-                return autostart;
-            }
-            set
-            {
-                autostart = value;
-            }
-        }
-
+        public bool AutoStart { get; set; }
         public string User { get; set; }
         public string Password { get; set; }
 
         protected void Awake()
         {
+            AutoStart = true;
             instance = this;
         }
 
         public void Init()
         {
-
             if (inited)
             {
                 return;
@@ -70,17 +53,7 @@ namespace uAdventure.Analytics
 
             inited = true;
 
-            // Get the tracker config from the game settings
-            var trackerConfigs = Game.Instance.GameState.Data.getObjects<TrackerConfig>();
-            trackerConfig = trackerConfigs.Count == 0 ? new TrackerConfig() : trackerConfigs[0];
-
-            StartTracker(trackerConfig);
-
-            InitCompletables();
-
-            Game.Instance.GameState.OnConditionChanged += (_, __) => ConditionChanged();
-            Game.Instance.OnTargetChanged += TargetChanged;
-            Game.Instance.OnElementInteracted += ElementInteracted;
+            CompletablesController = new CompletablesController();
         }
 
         void Update()
@@ -100,8 +73,9 @@ namespace uAdventure.Analytics
                 analyticsMemory = new Memory();
                 Game.Instance.GameState.SetMemory("analytics", analyticsMemory);
             }
-            analyticsMemory.Set("completables", SerializeToString(completableControllers));
+            analyticsMemory.Set("completables", JsonUtility.ToJson(CompletablesController));
         }
+
         public override void OnGameReady() { }
 
         public override bool OnGameFinished()
@@ -124,24 +98,23 @@ namespace uAdventure.Analytics
             }
             else
             {
-                RestoreCompletables(analyticsMemory);
+                CompletablesController.RestoreCompletables(analyticsMemory);
             }
-        }
 
-        public void RestartFinished()
-        {
-            foreach (var completableController in completableControllers)
+            if (AutoStart)
             {
-                if (completableController.Completed)
-                {
-                    completableController.Reset();
-                }
+                // Get the tracker config from the game settings
+                var trackerConfigs = Game.Instance.GameState.Data.getObjects<TrackerConfig>();
+                trackerConfig = trackerConfigs.Count == 0 ? new TrackerConfig() : trackerConfigs[0];
+
+                StartTracker(trackerConfig);
+                // TODO wait till start tracker is ready
             }
         }
 
         #endregion GameExtension
                 
-        private void StartTracker(TrackerConfig config)
+        public void StartTracker(TrackerConfig config, IBridge bridge = null)
         {
             trackerConfig = config;
             string domain = "";
@@ -201,27 +174,22 @@ namespace uAdventure.Analytics
             {
                 Host = domain,
                 TrackingCode = config.getTrackingCode(),
-                /*BasePath = trackerConfig.getBasePath() ?? "/api",
+                BasePath = trackerConfig.getBasePath() ?? "/api",
                 LoginEndpoint = trackerConfig.getLoginEndpoint() ?? "login",
                 StartEndpoint = trackerConfig.getStartEndpoint() ?? "proxy/gleaner/collector/start/{0}",
-                TrackEndpoint = trackerConfig.getStartEndpoint() ?? "proxy/gleaner/collector/track",*/
+                TrackEndpoint = trackerConfig.getStartEndpoint() ?? "proxy/gleaner/collector/track",
                 Port = port,
                 Secure = secure,
                 StorageType = storage,
                 TraceFormat = format,
-                BackupStorage = config.getRawCopy()
-                //UseBearerOnTrackEndpoint = trackerConfig.getUseBearerOnTrackEndpoint()
+                BackupStorage = config.getRawCopy(),
+                UseBearerOnTrackEndpoint = trackerConfig.getUseBearerOnTrackEndpoint()
             };
-
             TrackerAsset.Instance.StrictMode = false;
-            TrackerAsset.Instance.Bridge = new UnityBridge();
+            TrackerAsset.Instance.Bridge = bridge ?? new UnityBridge();
             TrackerAsset.Instance.Settings = tracker_settings;
             TrackerAsset.Instance.StrictMode = false;
 
-            if (PlayerPrefs.HasKey("LimesurveyToken") && PlayerPrefs.GetString("LimesurveyToken") != "ADMIN")
-            {
-                TrackerAsset.Instance.Login(PlayerPrefs.GetString("LimesurveyToken"), PlayerPrefs.GetString("LimesurveyToken"));
-            }
             if (storage == TrackerAsset.StorageTypes.net && !string.IsNullOrEmpty(User) && !string.IsNullOrEmpty(Password))
             {
                 TrackerAsset.Instance.Login(User, Password);
@@ -231,7 +199,8 @@ namespace uAdventure.Analytics
             TrackerAsset.Instance.Start();
             this.nextFlush = config.getFlushInterval();
         }
-
+        
+        [System.Obsolete]
         private void LoadTrackerSettings()
         {
             //Load tracker data
@@ -271,6 +240,11 @@ namespace uAdventure.Analytics
 
         private void CheckTrackerFlush()
         {
+            if (!TrackerAsset.Instance.Started)
+            {
+                return;
+            }
+
             float delta = Time.deltaTime;
             if (trackerConfig.getFlushInterval() >= 0)
             {
@@ -292,259 +266,5 @@ namespace uAdventure.Analytics
         }
         
         #endregion Controller
-        
-        #region Completables
-
-        // #########################################
-        // ############### COMPLETABLES ############
-        // #########################################
-
-
-
-        private void InitCompletables()
-        {
-            //Create Main game completabl
-            Completable mainGame = new Completable();
-
-            Completable.Milestone gameStart = new Completable.Milestone();
-            gameStart.setType(Completable.Milestone.MilestoneType.SCENE);
-            gameStart.setId(Game.Instance.GameState.InitialChapterTarget.getId());
-            mainGame.setStart(gameStart);
-            mainGame.setId(Game.Instance.GameState.Data.getTitle());
-            mainGame.setType(Completable.TYPE_GAME);
-
-            Completable.Milestone gameEnd = new Completable.Milestone();
-            gameEnd.setType(Completable.Milestone.MilestoneType.ENDING);
-            mainGame.setEnd(gameEnd);
-
-            Completable.Progress gameProgress = new Completable.Progress();
-            gameProgress.setType(Completable.Progress.ProgressType.SUM);
-
-            Completable.Score mainScore = new Completable.Score();
-            mainScore.setMethod(Completable.Score.ScoreMethod.AVERAGE);
-
-            completables = new List<Completable>(Game.Instance.GameState.GetObjects<Completable>());
-
-            foreach (Completable part in completables)
-            {
-                Completable.Milestone tmpMilestone = new Completable.Milestone();
-                tmpMilestone.setType(Completable.Milestone.MilestoneType.COMPLETABLE);
-                tmpMilestone.setId(part.getId());
-                gameProgress.addMilestone(tmpMilestone);
-
-                Completable.Score tmpScore = new Completable.Score();
-                tmpScore.setMethod(Completable.Score.ScoreMethod.SINGLE);
-                tmpScore.setType(Completable.Score.ScoreType.COMPLETABLE);
-                tmpScore.setId(part.getId());
-                mainScore.addSubScore(tmpScore);
-            }
-            mainGame.setProgress(gameProgress);
-            mainGame.setScore(mainScore);
-
-            completables.Insert(0, mainGame);
-
-            SetCompletables(completables);
-        }
-
-        private void RestoreCompletables(Memory analyticsMemory)
-        {
-            var serializedCompletables = analyticsMemory.Get<string>("completables");
-            if (!string.IsNullOrEmpty(serializedCompletables))
-            {
-                completableControllers = DeserializeFromString<List<CompletableController>>(serializedCompletables);
-                for (int i = 0; i < completableControllers.Count; i++)
-                {
-                    completableControllers[i].SetCompletable(this.completables[i]);
-                    completableControllers[i].Start.SetMilestone(this.completables[i].getStart());
-                    completableControllers[i].End.SetMilestone(this.completables[i].getEnd());
-                    for (int j = 0; j < this.completables[i].getProgress().getMilestones().Count; j++)
-                    {
-                        completableControllers[i].ProgressControllers[j].SetMilestone(this.completables[i].getProgress().getMilestones()[j]);
-                    }
-                }
-            }
-        }
-
-        public CompletableController GetCompletable(string id)
-        {
-            return completableControllers.Find(c => c.GetCompletable().getId().Equals(id));
-        }
-
-        public void SetCompletables(List<Completable> value)
-        {
-            this.completableControllers.Clear();
-            this.completableControllers.AddRange(value.ConvertAll(c => new CompletableController(c)));
-        }
-
-        private void UpdateCompletables(System.Func<CompletableController, bool> updatefunction)
-        {
-
-            bool somethingCompleted;
-            do
-            {
-                somethingCompleted = false;
-                foreach (var completableController in completableControllers)
-                {
-                    somethingCompleted |= updatefunction(completableController);
-
-                }
-
-                if (somethingCompleted)
-                {
-                    CompletableCompleted();
-                }
-            }
-            while (somethingCompleted);
-
-
-
-            RestartFinished();
-        }
-
-        public void ConditionChanged()
-        {
-            UpdateCompletables(completableController => completableController.UpdateMilestones());
-        }
-
-        public void TargetChanged(IChapterTarget target)
-        {
-            if (!string.IsNullOrEmpty(target.getXApiClass()) && target.getXApiClass() == "accesible")
-            {
-                TrackerAsset.Instance.Accessible.Accessed(target.getId(), ExParsers.ParseEnum<AccessibleTracker.Accessible>(target.getXApiType()));
-                TrackerAsset.Instance.Flush();
-            }
-
-            UpdateCompletables(completableController => completableController.UpdateMilestones(target));
-        }
-
-        public void ElementInteracted(bool finished, Element element, Action action)
-        {
-            if (element == null)
-            {
-                return;
-            }
-
-            if (!finished)
-            {
-                UpdateElementsInteracted(element, action.getType().ToString(), element.getId());
-
-                Game.Instance.GameState.BeginChangeAmbit();
-            }
-            else
-            {
-                string actionType = string.Empty;
-                switch (action.getType())
-                {
-                    case Action.CUSTOM: actionType = (action as CustomAction).getName(); break;
-                    case Action.CUSTOM_INTERACT: actionType = (action as CustomAction).getName(); break;
-                    case Action.DRAG_TO: actionType = "drag_to"; break;
-                    case Action.EXAMINE: actionType = "examine"; break;
-                    case Action.GIVE_TO: actionType = "give_to"; break;
-                    case Action.GRAB: actionType = "grab"; break;
-                    case Action.TALK_TO: actionType = "talk_to"; break;
-                    case Action.USE: actionType = "use"; break;
-                    case Action.USE_WITH: actionType = "use_with"; break;
-                }
-
-                if (!string.IsNullOrEmpty(action.getTargetId()))
-                {
-                    TrackerAsset.Instance.setVar("action_target", action.getTargetId());
-                }
-
-                if (!string.IsNullOrEmpty(actionType))
-                {
-                    TrackerAsset.Instance.setVar("action_type", actionType);
-                }
-
-                Game.Instance.GameState.EndChangeAmbitAsExtensions();
-
-                if (element is NPC)
-                {
-                    TrackerAsset.Instance.GameObject.Interacted(element.getId(), GameObjectTracker.TrackedGameObject.Npc);
-                }
-                else if (element is Item)
-                {
-                    TrackerAsset.Instance.GameObject.Interacted(element.getId(), GameObjectTracker.TrackedGameObject.Item);
-                }
-                else if (element is ActiveArea)
-                {
-                    TrackerAsset.Instance.GameObject.Interacted(element.getId(), GameObjectTracker.TrackedGameObject.Item);
-                }
-                else
-                {
-                    TrackerAsset.Instance.GameObject.Interacted(element.getId(), GameObjectTracker.TrackedGameObject.GameObject);
-                }
-            }
-        }
-
-        public void UpdateElementsInteracted(Element element, string interaction, string targetId)
-        {
-            UpdateCompletables(completableController => completableController.UpdateMilestones(element, interaction, targetId));
-        }
-
-        public void CompletableCompleted()
-        {
-            UpdateCompletables(completableController => completableController.UpdateMilestones());
-        }
-
-        public void TrackStarted(CompletableController completableController)
-        {
-            var completableId = completableController.GetCompletable().getId();
-            var completableType = (CompletableTracker.Completable)completableController.GetCompletable().getType() - 1;
-
-
-            TrackerAsset.Instance.Completable.Initialized(completableId, completableType);
-            TrackerAsset.Instance.Completable.Progressed(completableId, completableType, 0);
-        }
-
-        public void TrackProgressed(CompletableController completableController)
-        {
-            var completableId = completableController.GetCompletable().getId();
-            var completableType = (CompletableTracker.Completable)completableController.GetCompletable().getType() - 1;
-            var completableProgress = completableController.Progress;
-
-            TrackerAsset.Instance.Completable.Progressed(completableId, completableType, completableProgress);
-        }
-
-
-        public void TrackCompleted(CompletableController completableController, System.TimeSpan timeElapsed)
-        {
-            var completableId = completableController.GetCompletable().getId();
-            var completableType = (CompletableTracker.Completable)completableController.GetCompletable().getType() - 1;
-            var completableScore = completableController.Score;
-
-            TrackerAsset.Instance.setVar("time", timeElapsed.TotalSeconds);
-            TrackerAsset.Instance.Completable.Completed(completableId, completableType, true, completableScore);
-        }
-
-        #endregion Controller
-        // ################################
-            
-        #region Serialization
-            
-        private static TData DeserializeFromString<TData>(string settings)
-        {
-            byte[] b = System.Convert.FromBase64String(settings);
-            using (var stream = new MemoryStream(b))
-            {
-                var formatter = new BinaryFormatter();
-                stream.Seek(0, SeekOrigin.Begin);
-                return (TData)formatter.Deserialize(stream);
-            }
-        }
-
-        private static string SerializeToString<TData>(TData settings)
-        {
-            using (var stream = new MemoryStream())
-            {
-                var formatter = new BinaryFormatter();
-                formatter.Serialize(stream, settings);
-                stream.Flush();
-                stream.Position = 0;
-                return System.Convert.ToBase64String(stream.ToArray());
-            }
-        }
-
-        #endregion
     }
 }

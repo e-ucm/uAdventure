@@ -1,12 +1,9 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 
 using uAdventure.Core;
-using RAGE.Analytics;
 using UnityEngine.EventSystems;
 using System.Linq;
-using System;
 using AssetPackage;
 
 namespace uAdventure.Runner
@@ -63,7 +60,7 @@ namespace uAdventure.Runner
 
         // Transitions
         private TransitionManager transitionManager;
-        private readonly float resistance = 5000f;
+        private readonly float resistance = 500f;
 
 
         // Slides Properties
@@ -111,16 +108,14 @@ namespace uAdventure.Runner
             heights = new Dictionary<ScenePositioner, float>();
             finalOrder = new SortedList<ScenePositioner, float>(comparer);
             comparer.Heights = heights;
+            this.transitionManager = GetComponent<TransitionManager>();
+            Game.Instance.GameState.OnConditionChanged += OnConditionChanged;
         }
 
         // Use this for initialization
         protected void Start()
         {
             this.gameObject.name = SceneData.getId();
-            this.transitionManager = GetComponent<TransitionManager>();
-            Game.Instance.GameState.OnConditionChanged += OnConditionChanged;
-
-            RenderScene();
         }
 
         protected void Update()
@@ -864,7 +859,7 @@ namespace uAdventure.Runner
             {
                 dragging = false;
                 eventData.Use();
-                endDragSpeed = eventData.delta / Time.deltaTime;
+                endDragSpeed = -MoveCamera(-eventData.delta) / Time.deltaTime;
             }
         }
 
@@ -877,7 +872,7 @@ namespace uAdventure.Runner
             }
         }
 
-        private static void MoveCamera(Vector2 delta)
+        private Vector2 MoveCamera(Vector2 delta)
         {
             var cameraPos = Camera.main.transform.position;
             var screenCameraPosition = Camera.main.WorldToScreenPoint(cameraPos);
@@ -885,6 +880,8 @@ namespace uAdventure.Runner
             screenCameraPosition.y += delta.y;
             var newPos = Camera.main.ScreenToWorldPoint(screenCameraPosition);
             Camera.main.transform.position = new Vector3(newPos.x, newPos.y, cameraPos.z);
+            PlayerFollower.FixInside(Camera.main.transform, background.gameObject, cameraPos.z);
+            return Camera.main.transform.position - cameraPos;
         }
 
         public void OnConfirmWantsDrag(PointerEventData data)

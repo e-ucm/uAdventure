@@ -53,6 +53,11 @@ namespace uAdventure.Runner
         // Update is called once per frame
         protected void Update()
         {
+            if (!Game.Instance || Game.Instance.GameState == null)
+            {
+                return;
+            }
+
             follow = !Game.Instance.GameState.IsFirstPerson;
 
             if (!Background)
@@ -84,7 +89,7 @@ namespace uAdventure.Runner
             FixInside(transform, Background, z);
         }
 
-        private static void FixInside(Transform transform, GameObject gameObject, float z)
+        public static void FixInside(Transform transform, GameObject gameObject, float z)
         {
             var screenRatio = Screen.width / (float)Screen.height;
             var cameraSize = new Vector2(Camera.main.orthographicSize * 2 * screenRatio, Camera.main.orthographicSize * 2);

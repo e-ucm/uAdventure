@@ -18,14 +18,19 @@ namespace uAdventure.Editor
         /** Constructor */
         protected PreviewLayoutWindow(Rect rect, GUIContent content, GUIStyle style, params GUILayoutOption[] options) : base(rect, content, style, options)
         {
+            Resizable = true;
             DoUpdate = false; 
             PreviewTitle = "ImageAssets.Preview".Traslate();
             Margin = 30;
             LeaveWindowSpace = true;
-            if (previewResizer == null)
+
+            previewResizer = new PreviewResizer();
+            previewResizer.Init("Preview");
+
+            if (globalPreviewResizer == null)
             {
-                previewResizer = new PreviewResizer();
-                previewResizer.Init("Preview");
+                globalPreviewResizer = new PreviewResizer();
+                globalPreviewResizer.Init("Preview");
             }
         }
 
@@ -50,8 +55,12 @@ namespace uAdventure.Editor
         private Vector2 scroll;
         private bool useScroll = false;
 
-        protected static PreviewResizer previewResizer;
-        protected static float previewHeight;
+        protected static PreviewResizer globalPreviewResizer;
+        protected static float globalPreviewHeight;
+
+        protected PreviewResizer previewResizer;
+        protected float previewHeight;
+        protected bool SharedHeight = true;
         private Vector2 topScroll;
 
         // ######################## PROPERTIES ###########################
@@ -93,7 +102,8 @@ namespace uAdventure.Editor
                 }
             }
         }
-        
+        public bool Resizable { get; set; }
+
         private bool Dragging { get; set; }
 
         protected string PreviewTitle { get; set; }
@@ -132,15 +142,20 @@ namespace uAdventure.Editor
         /** Called to draw the main Extension window content */
         public override void Draw(int aID)
         {
-            if (previewHeight == 0)
+            if (Resizable)
             {
-                previewHeight = m_Rect.height * 3f / 4f;
+                if (previewHeight == 0)
+                {
+                    previewHeight = m_Rect.height * 3f / 4f;
+                }
+                topScroll = EditorGUILayout.BeginScrollView(topScroll, GUILayout.Height(m_Rect.height - previewHeight - 25));
             }
 
-            topScroll = EditorGUILayout.BeginScrollView(topScroll, GUILayout.Height(m_Rect.height - previewHeight - 25));
             DrawInspector();
-            EditorGUILayout.EndScrollView();
-
+            if (Resizable)
+            {
+                EditorGUILayout.EndScrollView();
+            }
             DrawPreviewHeader();
             GUILayout.Box("", "preBackground", GUILayout.ExpandWidth(true), GUILayout.Height(previewHeight - 35));
             {
@@ -272,14 +287,26 @@ namespace uAdventure.Editor
         {
             GUILayout.Label(PreviewTitle, "preToolbar", GUILayout.ExpandWidth(true));
             var lastRect = GUILayoutUtility.GetLastRect();
-            var window = m_Rect;
-            window.height += 35;
 
-            previewHeight = previewResizer.ResizeHandle(window, 50, 50, 20, lastRect);
-            if (!previewResizer.GetExpanded())
+            var resizer = SharedHeight ? globalPreviewResizer : previewResizer;
+            if (Resizable)
             {
-                previewResizer.ToggleExpanded();
+                var window = m_Rect;
+                window.height += 35;
+                previewHeight = resizer.ResizeHandle(window, 50, 50, 20, lastRect);
+                if (!resizer.GetExpanded())
+                {
+                    resizer.ToggleExpanded();
+                }
             }
+            else
+            {
+                if (Event.current.type == EventType.Repaint)
+                {
+                    previewHeight = m_Rect.height - (lastRect.y + lastRect.height) + 35;
+                }
+            }
+
         }
 
         /** Called to draw the preview content */

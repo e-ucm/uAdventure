@@ -30,6 +30,7 @@ namespace uAdventure.Runner
         private RectTransform rectTransform, canvasRectTransform;
         private float completed;
         private float textCompleted;
+        private Vector3 currentVelocity;
 
         // Scale constants for the bubble size transition
         private const float MinScale = 0.7f, MaxScale = 1f;
@@ -50,6 +51,7 @@ namespace uAdventure.Runner
             if(this.state == BubbleState.FADING)
             { 
                 this.rectTransform.anchoredPosition = finalPosition;
+                currentVelocity = Vector3.zero;
                 completed = 1;
                 Update();
             }
@@ -93,6 +95,7 @@ namespace uAdventure.Runner
         /// </summary>
         protected void Start()
         {
+            currentVelocity = Vector3.zero;
             canvasRectTransform = transform.parent.GetComponent<RectTransform>();
             // Image set up
             if (Data.Image)
@@ -169,13 +172,12 @@ namespace uAdventure.Runner
                     break;
                 case BubbleState.FADING:
                     {
+                        finalPosition.z = camZ;
                         // In the showing state the bubble is fading in and finally moves to nothing (idle) state.
-                        Vector3 destination = finalPosition;
 
-                        destination = Vector3.Lerp(this.rectTransform.anchoredPosition, destination, easing);
-                        destination.z = camZ;
+                        rectTransform.anchoredPosition = Vector3.SmoothDamp(rectTransform.anchoredPosition, finalPosition, ref currentVelocity, easing);
 
-                        var ratioLeft = Vector2.Distance(destination, finalPosition) / distance;
+                        var ratioLeft = Vector2.Distance(finalPosition, rectTransform.anchoredPosition) / distance;
                         if(ratioLeft < 0.001)
                         {
                             ratioLeft = 0;
@@ -187,7 +189,6 @@ namespace uAdventure.Runner
                         SetAlpha(completed);
                         SetScale(completed);
 
-                        this.rectTransform.anchoredPosition = destination;
 
                         if (Mathf.Approximately(completed,1f))
                         {

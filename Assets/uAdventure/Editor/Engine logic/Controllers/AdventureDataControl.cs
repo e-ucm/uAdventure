@@ -87,6 +87,15 @@ namespace uAdventure.Editor
             adventureData.setPlayerMode(DescriptorData.MODE_PLAYER_3RDPERSON);
         }
 
+        public string getApplicationIdentifier()
+        {
+            return adventureData.getApplicationIdentifier();
+        }
+        public void setApplicationIdentifier(string applicationIdentifier)
+        {
+            Controller.Instance.AddTool(new ChangeStringValueTool(adventureData, applicationIdentifier, "getApplicationIdentifier", "setApplicationIdentifier"));
+        }
+
         public bool isCursorTypeAllowed(string type)
         {
             return isCursorTypeAllowed(DescriptorData.getCursorTypeIndex(type));
@@ -95,6 +104,26 @@ namespace uAdventure.Editor
         public bool isCursorTypeAllowed(int type)
         {
             return DescriptorData.typeAllowed[adventureData.getGUIType()][type];
+        }
+
+        public bool isShowSaveLoad()
+        {
+            return adventureData.isShowSaveLoad();
+        }
+
+        public void setShowSaveLoad(bool showSaveLoad)
+        {
+            Controller.Instance.AddTool(new ChangeBooleanValueTool(adventureData, showSaveLoad, "isShowSaveLoad", "setShowSaveLoad"));
+        }
+
+        public bool isShowReset()
+        {
+            return adventureData.isShowReset();
+        }
+
+        public void setShowReset(bool showReset)
+        {
+            Controller.Instance.AddTool(new ChangeBooleanValueTool(adventureData, showReset, "isShowReset", "setShowReset"));
         }
 
         public bool isAutoSave()
@@ -115,6 +144,16 @@ namespace uAdventure.Editor
         public void setSaveOnSuspend(bool autoSave)
         {
             Controller.Instance.AddTool(new ChangeBooleanValueTool(adventureData, autoSave, "isSaveOnSuspend", "setSaveOnSuspend"));
+        }
+
+        public bool isRestoreAfterOpen()
+        {
+            return adventureData.isRestoreAfterOpen();
+        }
+
+        public void setRestoreAfterOpen(bool autoSave)
+        {
+            Controller.Instance.AddTool(new ChangeBooleanValueTool(adventureData, autoSave, "isRestoreAfterOpen", "setRestoreAfterOpen"));
         }
 
         /**
@@ -270,9 +309,16 @@ namespace uAdventure.Editor
             }
         }
 
-        public void editCursorPath(int t)
+        public void editCursorPath(string t, string newPath)
         {
-            Controller.Instance.AddTool(new SelectCursorPathTool(adventureData, t));
+            var cursor = getCursors().Find(c => c.getType() == t);
+            if(cursor == null)
+            {
+                cursor = new CustomCursor(t, getCursorPath(t));
+                getCursors().Add(cursor);
+            }
+
+            Controller.Instance.AddTool(new ChangeValueTool<CustomCursor, string>(cursor, newPath, "getPath", "setPath"));
         }
 
         public string getArrowPath(string type)
@@ -381,9 +427,16 @@ namespace uAdventure.Editor
             Controller.Instance.AddTool(new DeleteButtonTool(adventureData, action, type));
         }
 
-        public void editButtonPath(string action, string type)
+        public void editButtonPath(string action, string type, string newPath)
         {
-            Controller.Instance.AddTool(new SelectButtonTool(adventureData, action, type));
+            var button = getButtons().Find(c => c.getAction() == action && c.getType() == type);
+            if (button == null)
+            {
+                button = new CustomButton(action, type, adventureData.getDefaultButtonPath(action, type));
+                getButtons().Add(button);
+            }
+
+            Controller.Instance.AddTool(new ChangeValueTool<CustomButton, string>(button, newPath, "getPath", "setPath"));
         }
 
         public void editArrowPath(string type)
@@ -401,6 +454,42 @@ namespace uAdventure.Editor
         {
 
             Controller.Instance.AddTool(new ChangeValueTool<AdventureData, int>(adventureData, inventoryPosition, "getInventoryPosition", "setInventoryPosition"));
+        }
+
+        public Vector2 getInventoryCoords()
+        {
+
+            return adventureData.getInventoryCoords();
+        }
+
+        public float getInventoryScale()
+        {
+
+            return adventureData.getInventoryScale();
+        }
+
+        public void setInventoryScale(float inventoryScale)
+        {
+
+            Controller.Instance.AddTool(new ChangeValueTool<AdventureData, float>(adventureData, inventoryScale, "getInventoryScale", "setInventoryScale"));
+        }
+
+        public void setInventoryImage(string inventoryImage)
+        {
+
+            Controller.Instance.AddTool(new ChangeValueTool<AdventureData, string>(adventureData, inventoryImage, "getInventoryImage", "setInventoryImage"));
+        }
+
+        public string getInventoryImage()
+        {
+
+            return adventureData.getInventoryImage();
+        }
+
+        public void setInventoryCoords(Vector2 inventoryCoords)
+        {
+
+            Controller.Instance.AddTool(new ChangeValueTool<AdventureData, Vector2>(adventureData, inventoryCoords, "getInventoryCoords", "setInventoryCoords"));
         }
 
         public int countAssetReferences(string assetPath)
