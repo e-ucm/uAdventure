@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product Id="dcbfa5c2-776f-41e5-9a24-0659243c48d8" Name="FeatureCondition" Language="1033" Codepage="Windows-1252" Version="1.0.0.0" UpgradeCode="dcbfa5c2-776f-41e5-9a24-0659143c48d7" Manufacturer="oleg.shilo">
+    <Package InstallerVersion="200" Compressed="yes" SummaryCodepage="Windows-1252" Languages="1033" />
+    <Media Id="1" Cabinet="FeatureCondition.cab" EmbedCab="yes" />
+
+    <Condition Message="PROP1 is required">PROP1 or Installed</Condition>
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder" Name="ProgramFilesFolder">
+        <Directory Id="ProgramFilesFolder.My_Company" Name="My Company">
+          <Directory Id="INSTALLDIR" Name="Features">
+
+            <Component Id="Component.default.txt_1135202871" Guid="dcbfa5c2-776f-41e5-9a24-0659dab73c15">
+              <File Id="default.txt_1135202871" Source="Files\default.txt" />
+            </Component>
+
+            <Component Id="Component.a.txt_1857897549" Guid="dcbfa5c2-776f-41e5-9a24-0659aa89ae42">
+              <File Id="a.txt_1857897549" Source="Files\a.txt" />
+            </Component>
+
+            <Component Id="Component.b.txt_1872643149" Guid="dcbfa5c2-776f-41e5-9a24-0659ae19a655">
+              <File Id="b.txt_1872643149" Source="Files\b.txt" />
+            </Component>
+
+            <Component Id="Component.c.txt_1871135821" Guid="dcbfa5c2-776f-41e5-9a24-0659290a0643">
+              <File Id="c.txt_1871135821" Source="Files\c.txt" />
+            </Component>
+
+            <Component Id="Component.d.txt_1869104205" Guid="dcbfa5c2-776f-41e5-9a24-0659dd147f12">
+              <File Id="d.txt_1869104205" Source="Files\d.txt" />
+            </Component>
+
+          </Directory>
+        </Directory>
+      </Directory>
+    </Directory>
+
+    <UIRef Id="WixUI_FeatureTree" />
+    <UIRef Id="WixUI_ErrorProgressText" />
+
+    <Feature Id="Feature_A" Title="Feature A" Absent="allow" Level="1">
+      <ComponentRef Id="Component.a.txt_1857897549" />
+    </Feature>
+
+    <Feature Id="Feature_B" Title="Feature B" Absent="allow" Level="2">
+      <Condition Level="1"><![CDATA[PROP1 = 1]]></Condition>
+
+      <ComponentRef Id="Component.b.txt_1872643149" />
+    </Feature>
+
+    <Feature Id="Complete" Title="Complete" Absent="allow" Level="1">
+      <ComponentRef Id="Component.default.txt_1135202871" />
+
+      <Feature Id="Feature_C" Title="Feature C" Absent="allow" Level="1">
+        <ComponentRef Id="Component.c.txt_1871135821" />
+      </Feature>
+
+      <Feature Id="Feature_D" Title="Feature D" Absent="allow" Level="1">
+        <Condition Level="2"><![CDATA[PROP1 = 1]]></Condition>
+
+        <ComponentRef Id="Component.d.txt_1869104205" />
+      </Feature>
+    </Feature>
+
+  </Product>
+</Wix>
+
