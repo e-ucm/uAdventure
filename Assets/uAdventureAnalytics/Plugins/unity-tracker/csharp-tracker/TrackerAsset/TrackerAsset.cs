@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
-//#define ASYNC
-#undef ASYNC
+#define ASYNC
+//#undef ASYNC
 
 namespace AssetPackage
 {
@@ -174,6 +174,11 @@ namespace AssetPackage
         private Regex jsonHealth = new Regex(String.Format(TokenRegEx, "status"), RegexOptions.Singleline);
 
         /// <summary>
+        /// The queue of TrackerEvents to put in the backup.
+        /// </summary>
+        private ConcurrentQueue<TrackerEvent> backupQueue = new ConcurrentQueue<TrackerEvent>();
+
+        /// <summary>
         /// The queue of TrackerEvents to Send.
         /// </summary>
         private ConcurrentQueue<TrackerEvent> queue = new ConcurrentQueue<TrackerEvent>();
@@ -253,7 +258,7 @@ namespace AssetPackage
                 settings.TrackingCode = "";
                 settings.StorageType = StorageTypes.local;
                 settings.TraceFormat = TraceFormats.csv;
-                settings.BatchSize = 10;
+                settings.BatchSize = 512;
 
                 SaveSettings(SettingsFileName);
             }
@@ -684,7 +689,7 @@ namespace AssetPackage
                             }
                         });
                     }
-                });
+                }, false);
             }
 
 
@@ -696,7 +701,23 @@ namespace AssetPackage
             }
 #endif
         }
-		
+
+#if ASYNC
+        /// <summary>
+        /// Flushes the queue.
+        /// </summary>
+        public void FlushAll(
+                Action callback
+            )
+        {
+            if (!Started)
+            {
+                return;
+            }
+            ProcessQueue(callback, true);
+        }
+#endif
+
 
         /// <summary>
         /// Flushes the queue.
@@ -1043,7 +1064,7 @@ namespace AssetPackage
         /// </summary>
         public void Exit(Action done)
         {
-            Flush(done);
+            FlushAll(done);
         }
 
         /// <summary>
@@ -1113,6 +1134,12 @@ namespace AssetPackage
                 extensions.Clear();
             }
             queue.Enqueue(trace);
+
+            // if backup requested, enqueue in the backup queue
+            if (settings.BackupStorage)
+            {
+                backupQueue.Enqueue(trace);
+            }
         }
 
         /// <summary>
@@ -1276,7 +1303,7 @@ namespace AssetPackage
         /// <summary>
         /// Process the queue.
         /// </summary>
-        private void ProcessQueue(Action done)
+        private void ProcessQueue(Action done, bool complete)
         {
             if (!Started)
             {
@@ -1289,16 +1316,24 @@ namespace AssetPackage
                 Connect(false, null);
             }
 
+            if (settings.BackupStorage)
+            {
+                TrackerEvent[] traces = backupQueue.Peek((uint)backupQueue.Count);
+                SaveTracesInBackup(traces);
+                backupQueue.Clear();
+            }
+
             Action<TrackerEvent[]> saveAndDequeue = traces =>
             {
-                // if backup requested, save a copy
-                if (settings.BackupStorage)
-                {
-                    SaveTracesInBackup(traces);
-                }
-
                 queue.Dequeue(traces.Length);
-                done();
+                if (complete && queue.Count > 0)
+                {
+                    ProcessQueue(done, complete);
+                }
+                else
+                {
+                    done();
+                }
             };
 
             if (queue.Count > 0 || tracesPending.Count > 0 || tracesUnlogged.Count > 0)
@@ -1375,6 +1410,13 @@ namespace AssetPackage
                 Connect(false, null);
             }
 
+            if (settings.BackupStorage)
+            {
+                TrackerEvent[] traces = backupQueue.Peek((uint)backupQueue.Count);
+                SaveTracesInBackup(traces);
+                backupQueue.Clear();
+            }
+
             if (queue.Count > 0 || tracesPending.Count > 0 || tracesUnlogged.Count > 0)
             {
                 //Extract the traces from the queue and remove from the queue
@@ -1438,7 +1480,7 @@ namespace AssetPackage
             IDataStorage storage = getInterface<IDataStorage>();
             IAppend append_storage = getInterface<IAppend>();
 
-            if (queue.Count > 0)
+            if (backupQueue.Count > 0)
             {
                 string rawData = ProcessTraces(traces, TraceFormats.csv);
 

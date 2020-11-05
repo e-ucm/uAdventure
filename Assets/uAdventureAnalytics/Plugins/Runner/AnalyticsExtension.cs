@@ -1,4 +1,6 @@
 ﻿using AssetPackage;
+using Newtonsoft.Json;
+using System.Collections;
 using uAdventure.Runner;
 using UnityEngine;
 
@@ -63,9 +65,14 @@ namespace uAdventure.Analytics
 
         #region GameExtension
 
-        public override void Restart() { inited = false; Init(); }
+        public override IEnumerator Restart() 
+        { 
+            inited = false;
+            Init();
+            yield return true;
+        }
 
-        public override void OnBeforeGameSave() 
+        public override IEnumerator OnBeforeGameSave() 
         {
             var analyticsMemory = Game.Instance.GameState.GetMemory("analytics"); 
             if (analyticsMemory == null)
@@ -74,16 +81,20 @@ namespace uAdventure.Analytics
                 Game.Instance.GameState.SetMemory("analytics", analyticsMemory);
             }
             analyticsMemory.Set("completables", JsonUtility.ToJson(CompletablesController));
+            yield return true;
         }
 
-        public override void OnGameReady() { }
-
-        public override bool OnGameFinished()
+        public override IEnumerator OnGameReady()
         {
-            return true;
+            yield return true;
         }
 
-        public override void OnAfterGameLoad()
+        public override IEnumerator OnGameFinished()
+        {
+            yield return true;
+        }
+
+        public override IEnumerator OnAfterGameLoad()
         {
             if (!inited)
             {
@@ -107,20 +118,21 @@ namespace uAdventure.Analytics
                 var trackerConfigs = Game.Instance.GameState.Data.getObjects<TrackerConfig>();
                 trackerConfig = trackerConfigs.Count == 0 ? new TrackerConfig() : trackerConfigs[0];
 
-                StartTracker(trackerConfig);
+                yield return StartCoroutine(StartTracker(trackerConfig));
                 // TODO wait till start tracker is ready
             }
         }
 
         #endregion GameExtension
                 
-        public void StartTracker(TrackerConfig config, IBridge bridge = null)
+        public IEnumerator StartTracker(TrackerConfig config, IBridge bridge = null)
         {
             trackerConfig = config;
             string domain = "";
             int port = 80;
             bool secure = false;
 
+            Debug.Log("[ANALYTICS] Setting up tracker...");
             try
             {
                 if (config.getHost() != "")
@@ -142,6 +154,7 @@ namespace uAdventure.Analytics
                 {
                     config.setHost("localhost");
                 }
+                Debug.Log("[ANALYTICS] Config: " + JsonConvert.SerializeObject(config));
             }
             catch (System.Exception e)
             {
@@ -158,6 +171,7 @@ namespace uAdventure.Analytics
                     format = TrackerAsset.TraceFormats.csv;
                     break;
             }
+            Debug.Log("[ANALYTICS] Format: " + format);
 
             TrackerAsset.StorageTypes storage;
             switch (config.getStorageType())
@@ -169,6 +183,7 @@ namespace uAdventure.Analytics
                     storage = TrackerAsset.StorageTypes.local;
                     break;
             }
+            Debug.Log("[ANALYTICS] Storage: " + storage);
 
             TrackerAssetSettings tracker_settings = new TrackerAssetSettings()
             {
@@ -185,19 +200,43 @@ namespace uAdventure.Analytics
                 BackupStorage = config.getRawCopy(),
                 UseBearerOnTrackEndpoint = trackerConfig.getUseBearerOnTrackEndpoint()
             };
+            Debug.Log("[ANALYTICS] Settings: " + JsonConvert.SerializeObject(tracker_settings));
             TrackerAsset.Instance.StrictMode = false;
             TrackerAsset.Instance.Bridge = bridge ?? new UnityBridge();
             TrackerAsset.Instance.Settings = tracker_settings;
             TrackerAsset.Instance.StrictMode = false;
 
-            if (storage == TrackerAsset.StorageTypes.net && !string.IsNullOrEmpty(User) && !string.IsNullOrEmpty(Password))
-            {
-                TrackerAsset.Instance.Login(User, Password);
-            }
-                
+            var done = false;
 
-            TrackerAsset.Instance.Start();
+            if (storage == TrackerAsset.StorageTypes.net && !string.IsNullOrEmpty(User) && !string.IsNullOrEmpty(Password))
+            { 
+                Debug.Log("[ANALYTICS] Loging in...");
+                TrackerAsset.Instance.LoginAsync(User, Password, logged =>
+                {
+                    Debug.Log("[ANALYTICS] Logged");
+                    if (logged)
+                    {
+                        Debug.Log("[ANALYTICS] Starting tracker...");
+                        TrackerAsset.Instance.StartAsync(() => done = true);
+                    }
+                    else
+                    {
+                        done = true;
+                    }
+                });
+            }
+            else
+            {
+                Debug.Log("[ANALYTICS] Starting tracker without login...");
+                TrackerAsset.Instance.StartAsync(() => done = true);
+            }
+
+
             this.nextFlush = config.getFlushInterval();
+
+            Debug.Log("[ANALYTICS] Waiting until start");
+            yield return new WaitUntil(() => done);
+            Debug.Log("[ANALYTICS] Start done, result: " + TrackerAsset.Instance.Started);
         }
         
         [System.Obsolete]

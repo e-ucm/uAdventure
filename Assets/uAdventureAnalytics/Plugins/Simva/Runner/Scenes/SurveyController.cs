@@ -73,10 +73,16 @@ namespace uAdventure.Simva
                 })
                 .Then(schedule =>
                 {
-                    if(schedule != null)
+                    var result = new AsyncCompletionSource();
+                    if (schedule != null)
                     {
-                        SimvaExtension.Instance.LaunchActivity(schedule.Next);
+                        StartCoroutine(SimvaExtension.Instance.AsyncCoroutine(SimvaExtension.Instance.LaunchActivity(schedule.Next), result));
                     }
+                    else
+                    {
+                        result.SetException(new Exception("No schedule!"));
+                    }
+                    return result;
                 })
                 .Catch(error =>
                 {
@@ -85,10 +91,10 @@ namespace uAdventure.Simva
                 });
         }
 
-        public void RenderScene()
+        public void RenderScene() 
         {
             InventoryManager.Instance.Show = false;
-            var background = GameObject.Find("background").GetComponent<Image>();
+            //var background = GameObject.Find("background").GetComponent<Image>();
             /*var backgroundPath = 
             var backgroundSprite = Game.Instance.ResourceManager.getSprite();
             background.sprite = Game.Instance.ResourceManager.getSprite()*/

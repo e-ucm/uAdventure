@@ -403,7 +403,8 @@ path = path.Replace("{" + "testid" + "}", ApiClient.ParameterToString(testid));
             String postBody = null;
     
                                                 postBody = ApiClient.Serialize(body); // http body (model) parameter
-    
+            UnityEngine.Debug.Log(path);
+            UnityEngine.Debug.Log(postBody);
             // authentication setting, if any
             String[] authSettings = new String[] { "OAuth2" };
     

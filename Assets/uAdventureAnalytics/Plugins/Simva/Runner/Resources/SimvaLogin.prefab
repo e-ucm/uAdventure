@@ -464,7 +464,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 224904990406369308}
-  - component: {fileID: 4014082677845703891}
+  - component: {fileID: 8379672774020437286}
   m_Layer: 5
   m_Name: LoadingManager
   m_TagString: Untagged
@@ -493,7 +493,7 @@ RectTransform:
   m_AnchoredPosition: {x: 14.000005, y: -27.199995}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &4014082677845703891
+--- !u!114 &8379672774020437286
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

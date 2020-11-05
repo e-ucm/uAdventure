@@ -4,6 +4,7 @@ using Simva.Api;
 using Simva.Model;
 using SimvaPlugin;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,6 +14,7 @@ using System.Security.Cryptography;
 using System.Text;
 using uAdventure.Core;
 using uAdventure.Editor;
+using UniRx;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -81,23 +83,28 @@ namespace uAdventure.Simva
 
         private void Login()
         {
-            isLogin = true;
+            SimvaConf.Local = new SimvaConf();
+            var carga = new AsyncCompletionSource();
+            Observable.FromCoroutine(() => LoadSimvaConf(SimvaConf.Local.LoadAsync(), carga)).Subscribe();
 
-            IAsyncOperation<SimvaApi<ITeachersApi>> loginCall = null;
-            if (ProjectConfigData.existsKey("Simva.RefreshToken"))
+            isLogin = true;
+            carga.Then(() =>
             {
-                loginCall = SimvaApi<ITeachersApi>.Login(new AuthorizationInfo
+                IAsyncOperation<SimvaApi<ITeachersApi>> loginCall = null;
+                if (ProjectConfigData.existsKey("Simva.RefreshToken"))
                 {
-                    ClientId = "uadventure",
-                    RefreshToken = ProjectConfigData.getProperty("Simva.RefreshToken")
-                });
-            }
-            else
-            {
-                loginCall = SimvaApi<ITeachersApi>.Login(true);
-            }
-            
-            loginCall.Then(simvaController =>
+                    loginCall = SimvaApi<ITeachersApi>.Login(new AuthorizationInfo
+                    {
+                        ClientId = "uadventure",
+                        RefreshToken = ProjectConfigData.getProperty("Simva.RefreshToken") 
+                    });
+                }
+                else
+                {
+                    loginCall = SimvaApi<ITeachersApi>.Login(true);
+                }
+
+                loginCall.Then(simvaController =>
                 {
                     this.simvaController = simvaController;
                     this.simvaConf = simvaController.SimvaConf;
@@ -109,13 +116,20 @@ namespace uAdventure.Simva
                     ProjectConfigData.setProperty("Simva.RefreshToken", apiClient.AuthorizationInfo.RefreshToken);
                     ProjectConfigData.storeToXML();
                 })
-                .Catch(error =>
-                {
-                    ProjectConfigData.setProperty("Simva.RefreshToken", null);
-                    ProjectConfigData.storeToXML();
-                    Controller.Instance.ShowErrorDialog("Simva.Login.Error.Title", "Simva.Login.Error.Message");
-                })
-                .Finally(() => isLogin = false);
+                    .Catch(error =>
+                    {
+                        ProjectConfigData.setProperty("Simva.RefreshToken", null);
+                        ProjectConfigData.storeToXML();
+                        Controller.Instance.ShowErrorDialog("Simva.Login.Error.Title", "Simva.Login.Error.Message");
+                    })
+                    .Finally(() => isLogin = false);
+            });
+        }
+
+        private IEnumerator LoadSimvaConf(IEnumerator coroutine, IAsyncCompletionSource op)
+        {
+            yield return coroutine;
+            op.SetCompleted();           
         }
 
         public override void Draw(int aID)

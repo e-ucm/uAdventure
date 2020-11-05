@@ -104,8 +104,11 @@ namespace SimvaPlugin
                 TokenPath = SimvaConf.Local.SSO + "/token"
             };
 
+            Debug.Log("Platform: " + Application.platform.ToString());
+            Debug.Log("Use PKCE: " + (Application.platform != RuntimePlatform.WebGLPlayer));
+
             var result = new AsyncCompletionSource<SimvaApi<T>>();
-            apiClient.InitOAuth(SimvaConf.Local.ClientId, null, "simva", null, ":", true, null, true)
+            apiClient.InitOAuth(SimvaConf.Local.ClientId, null, "simva", null, ":", Application.platform != RuntimePlatform.WebGLPlayer, null, offline_access)
                 .Then(() =>
                 {
                     if (Inherits<T, IAdminsApi>())
@@ -225,7 +228,50 @@ namespace SimvaPlugin
 				});
 
 			return result;
-		}
+        }
+
+        public static IAsyncOperation<SimvaApi<T>> ContinueLogin()
+        {
+            var apiClient = new ApiClient
+            {
+                BasePath = SimvaConf.Local.URL,
+                AuthPath = SimvaConf.Local.SSO + "/auth",
+                TokenPath = SimvaConf.Local.SSO + "/token"
+            };
+
+            var result = new AsyncCompletionSource<SimvaApi<T>>();
+            apiClient.ContinueOAuth(SimvaConf.Local.ClientId)
+                .Then(() =>
+                {
+                    if (Inherits<T, IAdminsApi>())
+                    {
+                        result.SetResult(new SimvaApi<T>((T)(IAdminsApi)new AdminsApi(apiClient)));
+                    }
+                    else if (Inherits<T, ITeachersApi>())
+                    {
+                        result.SetResult(new SimvaApi<T>((T)(ITeachersApi)new TeachersApi(apiClient)));
+                    }
+                    else if (Inherits<T, IStudentsApi>())
+                    {
+                        result.SetResult(new SimvaApi<T>((T)(IStudentsApi)new StudentsApi(apiClient)));
+                    }
+                    else if (Inherits<T, IDefaultApi>())
+                    {
+                        result.SetResult(new SimvaApi<T>((T)(IDefaultApi)new DefaultApi(apiClient)));
+                    }
+                    else
+                    {
+                        throw new Exception("Unsupported api type: " + typeof(T));
+                    }
+
+                })
+                .Catch(error =>
+                {
+                    result.SetException(error);
+                });
+
+            return result;
+        }
 
         public IAsyncOperation<bool> Register(string username, string email, string password, bool teacher)
         {

@@ -379,7 +379,7 @@ namespace uAdventure.Runner
 
         public void ResetAndExit()
         {
-            Game.Instance.Restart();
+            StartCoroutine(Game.Instance.Restart());
         }
         public void ClearData()
         {

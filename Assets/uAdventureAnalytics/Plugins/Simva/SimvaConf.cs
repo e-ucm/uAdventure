@@ -1,5 +1,7 @@
 ﻿using SimpleJSON;
+using System.Collections;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace Simva
 {
@@ -11,12 +13,11 @@ namespace Simva
         {
             get
             {
-                if (local == null)
-                {
-                    local = new SimvaConf();
-                }
-
                 return local;
+            }
+            set
+            {
+                local = value;
             }
         }
 
@@ -46,19 +47,25 @@ namespace Simva
 
         public SimvaConf()
         {
+            Debug.Log("[SIMVA CONF] Loading...");
             Host = "localhost";
             Port = "443";
             Protocol = "https";
+        }
 
+        public IEnumerator LoadAsync()
+        {
             string contents = "";
 
             // WebGL and Android have to use WWW to load from streaming assets
 #if UNITY_WEBPLAYER || UNITY_WEBGL || UNITY_ANDROID 
-            WWW reader = GetReader();
-            while (!reader.isDone) { }
+            Debug.Log("[SIMVA CONF] Doing WebGL / Android read...");
+            UnityWebRequest reader = GetReader();
+            yield return reader.SendWebRequest();
             if (string.IsNullOrEmpty(reader.error))
             {
-                contents = System.Text.Encoding.UTF8.GetString(reader.bytes);
+                Debug.Log("[SIMVA CONF] Request failed: (" + reader.responseCode + " ) " + reader.error + " - " + reader.downloadHandler.data);
+                contents = System.Text.Encoding.UTF8.GetString(reader.downloadHandler.data);
             }
 #else       // The others can read from System.IO       
             string filePath = GetFilePath();     
@@ -67,8 +74,14 @@ namespace Simva
                 contents = System.IO.File.ReadAllText(filePath);
             }
 #endif
+            ParseContents(contents);
+        }
+
+        private void ParseContents(string contents)
+        {
             if (!string.IsNullOrEmpty(contents))
             {
+                Debug.Log("[SIMVA CONF] Simva.conf content: " + contents);
                 var simvaconf = SimpleJSON.JSON.Parse(contents);
                 Study = simvaconf["study"];
                 Host = simvaconf["host"];
@@ -81,16 +94,18 @@ namespace Simva
                 Realtime = simvaconf["realtime"].AsBool;
             }
         }
-        private static WWW GetReader()
+
+        private static UnityWebRequest GetReader()
         {
             var FileName = "simva.conf";
-            WWW reader = null;
+            UnityWebRequest reader = null;
             // Platform dependent StreamingAssets Load https://docs.unity3d.com/Manual/StreamingAssets.html
 #if UNITY_WEBPLAYER || UNITY_WEBGL
-            reader = new WWW(Application.streamingAssetsPath + "/" + FileName);
+            reader = UnityWebRequest.Get(Application.streamingAssetsPath + "/" + FileName);
 #elif UNITY_ANDROID
-            reader = new WWW("jar: file://" + Application.dataPath + "!/assets/" + FileName);
+            reader = new UnityWebRequest.Get("jar: file://" + Application.dataPath + "!/assets/" + FileName);
 #endif
+            Debug.Log("[SIMVA CONF] Requesting simva.conf from: " + reader.uri);
             return reader;
         }
 

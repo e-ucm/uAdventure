@@ -253,7 +253,7 @@ namespace AssetPackage
 					request.SetRequestHeader(header.Key, header.Value);
 				}
 
-                if (async)
+                if (async || Application.platform == RuntimePlatform.WebGLPlayer)
 				{
 					Observable.FromCoroutine(() => DoRequest(request, operation =>
 					{

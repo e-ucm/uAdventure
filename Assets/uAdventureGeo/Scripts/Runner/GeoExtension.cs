@@ -53,7 +53,7 @@ namespace uAdventure.Geo
         void Awake()
         {
             instance = this;
-            Restart();
+            StartCoroutine(Restart());
         }
 
         public void Start()
@@ -78,7 +78,7 @@ namespace uAdventure.Geo
             pointer = Resources.Load<Texture2D>("pointer");
         }
 
-        public override void Restart()
+        public override IEnumerator Restart()
         {
             memory = new Memory();
             memory.Set("using_debug_location", false);
@@ -87,18 +87,20 @@ namespace uAdventure.Geo
             memory.Set("zone_control", false);
             Game.Instance.GameState.SetMemory("geo_extension", memory);
             CreateNavigationAndZoneControl();
+            yield return true;
         }
 
-        public override void OnGameReady()
+        public override IEnumerator OnGameReady()
         {
             gameIsReady = true;
             this.memory = Game.Instance.GameState.GetMemory("geo_extension") ?? memory;
             CreateNavigationAndZoneControl();
+            yield return null;
         }
 
-        public override void OnBeforeGameSave() { }
-        public override void OnAfterGameLoad() { }
-        public override bool OnGameFinished() { return true; }
+        public override IEnumerator OnBeforeGameSave() { yield return null; }
+        public override IEnumerator OnAfterGameLoad() { yield return null; }
+        public override IEnumerator OnGameFinished() { yield return true; }
 
         private void CreateNavigationAndZoneControl()
         {

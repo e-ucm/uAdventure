@@ -14,6 +14,8 @@ using Simva.Model;
 using Simva;
 using System.Collections.Generic;
 using System.Linq;
+using System.Collections;
+using Newtonsoft.Json;
 
 namespace uAdventure.Simva
 {
@@ -113,68 +115,87 @@ namespace uAdventure.Simva
 
         public SimvaBridge SimvaBridge { get; private set; }
 
-        public override void OnAfterGameLoad()
+        public override IEnumerator OnAfterGameLoad()
         {
-            if (!IsEnabled)
-            {
-                Debug.Log("No study was set for Simva");
-                return;
-            }
-
-            if (IsActive)
-            {
-                // No need to restart
-                return;
-            }
-
+            Debug.Log("[SIMVA] Disabling tracker autostart...");
             AnalyticsExtension.Instance.AutoStart = false;
 
-            //if(PlayerPrefs.GetString())
-            Game.Instance.GameState.Data.getChapters()[0].getObjects<SimvaScene>().AddRange(new SimvaScene[]
+            Debug.Log("[SIMVA] Starting...");
+            if(SimvaConf.Local == null)
             {
+                SimvaConf.Local = new SimvaConf();
+                yield return StartCoroutine(SimvaConf.Local.LoadAsync());
+                Debug.Log("[SIMVA] Conf Loaded...");
+            }
+
+            if (!IsEnabled)
+            {
+                Debug.Log("[SIMVA] Study is not set! Stopping...");
+                yield return null;
+            }
+            else if (IsActive)
+            {
+                Debug.Log("[SIMVA] Simva is already started...");
+                // No need to restart
+                yield return null;
+            }
+            else
+            {
+
+                //if(PlayerPrefs.GetString())
+                Debug.Log("[SIMVA] Adding scenes...");
+                Game.Instance.GameState.Data.getChapters()[0].getObjects<SimvaScene>().AddRange(new SimvaScene[]
+                {
                 new LoginScene(),
                 new SurveyScene(),
                 new EndScene()
-            });
-            Game.Instance.GameState.CurrentTarget = "Simva.Login";
+                });
+                Debug.Log("[SIMVA] Setting current target to Simva.Login...");
+                Game.Instance.GameState.CurrentTarget = "Simva.Login";
+            }
         }
 
-        public override void OnBeforeGameSave()
+        public override IEnumerator OnBeforeGameSave()
         {
+            yield return null;
         }
 
-        public override bool OnGameFinished()
+        public override IEnumerator OnGameFinished()
         {
             if (IsActive)
             {
                 Activity activity = GetActivity(CurrentActivityId);
                 string activityType = activity.Type;
+                var readyToClose = false;
                 if (activityType.Equals("gameplay", StringComparison.InvariantCultureIgnoreCase) 
                     && activity.Details != null && activity.Details.ContainsKey("backup") && (bool)activity.Details["backup"])
                 {
                     string traces = SimvaBridge.Load(((TrackerAssetSettings)TrackerAsset.Instance.Settings).BackupFile);
-                    SaveActivityAndContinue(CurrentActivityId, traces, true);
+                    SaveActivityAndContinue(CurrentActivityId, traces, true)
+                        .Then(() => readyToClose = true);
                 }
                 else
                 {
-                    Continue(CurrentActivityId, true);
+                    Continue(CurrentActivityId, true)
+                        .Then(() => readyToClose = true);
                 }
 
-                return false;
+                yield return new WaitUntil(() => readyToClose);
             }
-            else
+        }
+
+        public override IEnumerator OnGameReady()
+        {
+            if (HasLoginInfo())
             {
-                // The application can be closed
-                return true;
+                ContinueLoginAndSchedule();
             }
+            yield return null;
         }
 
-        public override void OnGameReady()
+        public override IEnumerator Restart()
         {
-        }
-
-        public override void Restart()
-        {
+            yield return null;
         }
 
         public void InitUser()
@@ -195,7 +216,9 @@ namespace uAdventure.Simva
                 })
                 .Then(schedule =>
                 {
-                    LaunchActivity(schedule.Next);
+                    var result = new AsyncCompletionSource();
+                    StartCoroutine(AsyncCoroutine(LaunchActivity(schedule.Next), result));
+                    return result;
                 })
                 .Catch(error =>
                 {
@@ -220,7 +243,9 @@ namespace uAdventure.Simva
                 })
                 .Then(schedule =>
                 {
-                    LaunchActivity(schedule.Next);
+                    var result = new AsyncCompletionSource();
+                    StartCoroutine(AsyncCoroutine(LaunchActivity(schedule.Next), result));
+                    return result;
                 })
                 .Catch(error =>
                 {
@@ -229,14 +254,50 @@ namespace uAdventure.Simva
                 });
         }
 
+        public void ContinueLoginAndSchedule()
+        {
+            NotifyLoading(true);
+            SimvaApi<IStudentsApi>.ContinueLogin()
+                .Then(simvaController =>
+                {
+                    this.auth = simvaController.AuthorizationInfo;
+                    this.simvaController = simvaController;
+                    return UpdateSchedule();
+                })
+                .Then(schedule =>
+                {
+                    var result = new AsyncCompletionSource();
+                    StartCoroutine(AsyncCoroutine(LaunchActivity(schedule.Next), result));
+                    return result;
+                })
+                .Catch(error =>
+                {
+                    NotifyLoading(false);
+                    NotifyManagers(error.Message);
+                })
+                .Finally(() =>
+                {
+                    OpenIdUtility.tokenLogin = false;
+                });
+        }
+
         public IAsyncOperation<Schedule> UpdateSchedule()
         {
-            var webRequest = simvaController.Api.GetSchedule(simvaController.SimvaConf.Study);
-            webRequest.Then(result =>
-            {
-                this.schedule = result;
-            });
-            return webRequest;
+            var result = new AsyncCompletionSource<Schedule>(); 
+                
+            simvaController.Api.GetSchedule(simvaController.SimvaConf.Study)
+                .Then(schedule =>
+                {
+                    this.schedule = schedule;
+                    foreach(var a in schedule.Activities)
+                    {
+                        schedule.Activities[a.Key].Id = a.Key;
+                    }
+                    Debug.Log("[SIMVA] Schedule: " + JsonConvert.SerializeObject(schedule));
+                    result.SetResult(schedule);
+                })
+                .Catch(result.SetException);
+            return result;
         }
 
 
@@ -275,7 +336,9 @@ namespace uAdventure.Simva
                 .Then(schedule =>
                 {
                     NotifyLoading(false);
-                    LaunchActivity(schedule.Next);
+                    var result = new AsyncCompletionSource();
+                    StartCoroutine(AsyncCoroutine(LaunchActivity(schedule.Next), result));
+                    return result;
                 })
                 .Catch(error =>
                 {
@@ -293,7 +356,7 @@ namespace uAdventure.Simva
             return null;
         }
 
-        public void LaunchActivity(string activityId)
+        public IEnumerator LaunchActivity(string activityId)
         {
             if (activityId == null)
             {
@@ -305,9 +368,11 @@ namespace uAdventure.Simva
 
                 if (activity != null)
                 {
+                    Debug.Log("[SIMVA] Schedule: " + activity.Type + ". Name: " + activity.Name + " activityId " + activityId);
                     switch (activity.Type)
                     {
                         case "limesurvey":
+                            Debug.Log("[SIMVA] Starting Survey...");
                             Game.Instance.RunTarget("Simva.Survey", null, false);
                             break;
                         case "gameplay":
@@ -330,19 +395,24 @@ namespace uAdventure.Simva
                                 trackerConfig.setTrackEndpoint("/activities/{0}/result");
                                 trackerConfig.setTrackingCode(activityId);
                                 trackerConfig.setUseBearerOnTrackEndpoint(true);
+                                Debug.Log("TrackingCode: " + activity.Id + " settings " + trackerConfig.getTrackingCode());
                             }
-                            Debug.Log("TrackingCode: " + activity.Id + " settings " + trackerConfig.getTrackingCode());
 
                             if (ActivityHasDetails(activity, "backup"))
                             {
                                 // Local
                                 trackerConfig.setRawCopy(true);
                             }
-                            SimvaBridge = new SimvaBridge(API.ApiClient);
-                            AnalyticsExtension.Instance.StartTracker(trackerConfig, SimvaBridge);
 
+                            if(ActivityHasDetails(activity, "realtime", "trace_storage", "backup"))
+                            {
+                                SimvaBridge = new SimvaBridge(API.ApiClient);
+                                Debug.Log("[SIMVA] Starting tracker...");
+                                yield return StartCoroutine(AnalyticsExtension.Instance.StartTracker(trackerConfig, SimvaBridge));
+                            }
 
-                            Game.Instance.RunTarget(Game.Instance.GameState.InitialChapterTarget.getId());
+                            Debug.Log("[SIMVA] Starting Gameplay...");
+                            Game.Instance.RunTarget(Game.Instance.GameState.InitialChapterTarget.getId(), this);
                             break;
                     }
                 }
@@ -448,6 +518,11 @@ namespace uAdventure.Simva
             return InteractuableResult.IGNORES;
         }
 
+        private static bool HasLoginInfo()
+        {
+            return OpenIdUtility.HasLoginInfo();
+        }
+
         public bool canBeInteracted()
         {
             return false;
@@ -455,6 +530,12 @@ namespace uAdventure.Simva
 
         public void setInteractuable(bool state)
         {
+        }
+
+        internal IEnumerator AsyncCoroutine(IEnumerator coroutine, IAsyncCompletionSource op)
+        {
+            yield return coroutine;
+            op.SetCompleted();
         }
     }
 }

@@ -114,66 +114,82 @@ namespace uAdventure.Runner
                 Destroy(this.gameObject);
                 return;
             }
-
-            DontDestroyOnLoad(this.gameObject);
-            DontDestroyOnLoad(Camera.main);
-
-            executeStack = new Stack<KeyValuePair<Interactuable, ExecutionEvent>>();
-
-            skin = Resources.Load("basic") as GUISkin;
-
-            if (!string.IsNullOrEmpty(gamePath))
-            {
-                ResourceManager = ResourceManagerFactory.CreateExternal(gamePath + gameName);
-            }
             else
             {
-                if (!string.IsNullOrEmpty(gameName))
+                Debug.Log("[START ENGINE] Starting...");
+                DontDestroyOnLoad(this.gameObject);
+                DontDestroyOnLoad(Camera.main);
+
+                executeStack = new Stack<KeyValuePair<Interactuable, ExecutionEvent>>();
+
+                skin = Resources.Load("basic") as GUISkin;
+
+                if (!string.IsNullOrEmpty(gamePath))
                 {
-                    ResourceManager = ResourceManagerFactory.CreateLocal(gameName, useSystemIO ? ResourceManager.LoadingType.SystemIO : ResourceManager.LoadingType.ResourcesLoad);
+                    Debug.Log("[START ENGINE] Creating external resource manager: " + gamePath + gameName);
+                    ResourceManager = ResourceManagerFactory.CreateExternal(gamePath + gameName);
                 }
                 else
                 {
-                    ResourceManager = ResourceManagerFactory.CreateLocal("CurrentGame/", useSystemIO ? ResourceManager.LoadingType.SystemIO : ResourceManager.LoadingType.ResourcesLoad);
+                    Debug.Log("[START ENGINE] Creating resource manager: " + gameName);
+                    if (!string.IsNullOrEmpty(gameName))
+                    {
+                        ResourceManager = ResourceManagerFactory.CreateLocal(gameName, useSystemIO ? ResourceManager.LoadingType.SystemIO : ResourceManager.LoadingType.ResourcesLoad);
+                    }
+                    else
+                    {
+                        ResourceManager = ResourceManagerFactory.CreateLocal("CurrentGame/", useSystemIO ? ResourceManager.LoadingType.SystemIO : ResourceManager.LoadingType.ResourcesLoad);
+                    }
                 }
-            }
 
-            if (!string.IsNullOrEmpty(Game.GameToLoad))
-            {
-                gameName = Game.GameToLoad;
-                gamePath = ResourceManager.getCurrentDirectory() + System.IO.Path.DirectorySeparatorChar + "Games" + System.IO.Path.DirectorySeparatorChar;
-                useSystemIO = true;
-            }
-
-            var incidences = new List<Incidence>();
-            var loadScreen = ShowLoading();
-            loadScreen.Text = "Loading main assets...";
-            var descriptorPromise = LoadDescriptor();
-            descriptorPromise.AddProgressCallback((p) =>
-            {
-                Debug.Log("Updating progress: " + p);
-                loadScreen.Progress = p*100f;
-            });
-            descriptorPromise.Then(adventureData =>
+                if (!string.IsNullOrEmpty(Game.GameToLoad))
                 {
+                    gameName = Game.GameToLoad;
+                    gamePath = ResourceManager.getCurrentDirectory() + System.IO.Path.DirectorySeparatorChar + "Games" + System.IO.Path.DirectorySeparatorChar;
+                    Debug.Log("[START ENGINE] Loading game from GameToLoad: " + gamePath);
+                    useSystemIO = true;
+                }
+
+                var incidences = new List<Incidence>();
+                var loadScreen = ShowLoading();
+                Debug.Log("[START ENGINE] Loading main assets...");
+                loadScreen.Text = "Loading main assets...";
+                var descriptorPromise = LoadDescriptor();
+                descriptorPromise.AddProgressCallback((p) =>
+                {
+                    Debug.Log("[START ENGINE] Main assets loading progress: " + p);
+                    loadScreen.Progress = p * 100f;
+                });
+                descriptorPromise.Then(adventureData =>
+                {
+                    Debug.Log("[START ENGINE] Main assets loading done!");
                     game_state = new GameState(adventureData);
                     bookDrawer = new BookDrawer(ResourceManager);
                     gameExtensions = new List<GameExtension>();
+                    Debug.Log("[START ENGINE] Creating game extensions...");
                     foreach (var gameExtension in GetAllSubclassOf(typeof(GameExtension)))
                     {
+                        Debug.Log("[START ENGINE] Creating " + gameExtension.ToString());
                         gameExtensions.Add(gameObject.AddComponent(gameExtension) as GameExtension);
                     }
+                    Debug.Log("[START GAME] Loading Chapter...");
                     loadScreen.Text = "Loading chapter...";
                     var chapterPromise = LoadChapter(1);
-                    chapterPromise.ProgressChanged += (s, e) => loadScreen.Progress = chapterPromise.Progress;
+                    chapterPromise.ProgressChanged += (s, e) =>
+                    {
+                        Debug.Log("[START GAME] Chapter loading progress: " + chapterPromise.Progress);
+                        loadScreen.Progress = chapterPromise.Progress;
+
+                    };
                     return chapterPromise;
                 })
                 .Then(() =>
                 {
+                    Debug.Log("[START GAME] Chapter loading done!");
                     loadScreen.Text = "Starting game...";
-                    StartGame();
-                    loadScreen.Close();
+                    StartCoroutine(StartGame(loadScreen));
                 });
+            }
         }
 
         public static IEnumerable<System.Type> GetAllSubclassOf(System.Type parent)
@@ -190,15 +206,21 @@ namespace uAdventure.Runner
             }
         }
 
-        protected void StartGame()
+        private IEnumerator StartGame(LoadingScreen loadScreen)
         {
+            Debug.Log("[START GAME] GameState Restart...");
             GameState.Restart();
             started = true;
+            Debug.Log("[START GAME] Game Resuming...");
             if (!Application.isEditor && GameState.Data.isRestoreAfterOpen())
             {
                 GameState.OnGameResume();
             }
-            gameExtensions.ForEach(g => g.OnAfterGameLoad());
+            Debug.Log("[START GAME] After Game Load...");
+            foreach(var g in gameExtensions)
+            {
+                yield return StartCoroutine(g.OnAfterGameLoad());
+            }
             uAdventureRaycaster = FindObjectOfType<uAdventureRaycaster>();
             if (!uAdventureRaycaster)
             {
@@ -214,12 +236,20 @@ namespace uAdventure.Runner
                 Debug.LogError("No TransitionManager was found in the scene!");
             }
 
+            Debug.Log("[START GAME] Running Target...");
             RunTarget(forceScene ? scene_name : GameState.CurrentTarget);
-            gameExtensions.ForEach(g => g.OnGameReady());
+            yield return new WaitUntil(() => !waitingRunTarget);
+            Debug.Log("[START GAME] Game Ready...");
+            foreach (var g in gameExtensions)
+            {
+                yield return StartCoroutine(g.OnGameReady());
+            }
             uAdventureInputModule.LookingForTarget = null;
 
             TimerController.Instance.Timers = GameState.GetTimers();
             TimerController.Instance.Run();
+            Debug.Log("[START GAME] Done! (Waiting for target to be ready)");
+            loadScreen.Close();
         }
 
 
@@ -239,20 +269,24 @@ namespace uAdventure.Runner
         {
             if (waitingRunTarget && runnerTarget.IsReady)
             {
+                Debug.Log("[UPDATE] Target Ready!");
                 waitingRunTarget = false;
                 waitingTransition = true;
                 System.Action<Transition, Texture> afterTransition = (transition, texture) =>
                 {
+                    Debug.Log("[UPDATE] Transition done.");
                     waitingTransition = false;
                     if (uAdventureRaycaster.Instance)
                     {
                         uAdventureRaycaster.Instance.Override = null;
                     }
+                    Debug.Log("[UPDATE] Continue execution...");
                     Interacted();
                 };
 
                 if (TransitionManager)
                 {
+                    Debug.Log("[UPDATE] Doing transition...");
                     TransitionManager.DoTransition(afterTransition);
                 } 
                 else
@@ -277,32 +311,53 @@ namespace uAdventure.Runner
                     GUIManager.Instance.ShowConfigMenu();
                 }
             }
-        }
+        } 
 
-        public void LoadGame()
+        public IEnumerator LoadGame()
         {
+            Debug.Log("[LOAD GAME] Restoring save...");
             GameState.RestoreFrom("save");
-            gameExtensions.ForEach(g => g.OnAfterGameLoad());
+            Debug.Log("[LOAD GAME] After Game Load...");
+            foreach(var g in gameExtensions)
+            {
+                yield return StartCoroutine(g.OnAfterGameLoad());
+            }
+            Debug.Log("[LOAD GAME] Running target...");
+            waitingRunTarget = true;
             RunTarget(GameState.CurrentTarget);
-            gameExtensions.ForEach(g => g.OnGameReady());
+            Debug.Log("[LOAD GAME] Waiting for target to be ready...!");
+            yield return new WaitUntil(() => !waitingRunTarget);
+            Debug.Log("[LOAD GAME] Game Ready...");
+            foreach (var g in gameExtensions)
+            {
+                yield return StartCoroutine(g.OnGameReady());
+            }
             uAdventureInputModule.LookingForTarget = null;
+            Debug.Log("[LOAD GAME] Done!");
         }
 
-        public void SaveGame()
+        public IEnumerator SaveGame()
         {
-            gameExtensions.ForEach(g => g.OnBeforeGameSave());
+            Debug.Log("[SAVE GAME] Before saving game...");
+            foreach (var g in gameExtensions)
+            {
+                yield return StartCoroutine(g.OnBeforeGameSave());
+            }
+            Debug.Log("[SAVE GAME] Saving...");
             GameState.SerializeTo("save");
+            Debug.Log("[SAVE GAME] Done!");
         }
 
         public void AutoSave()
         {
             if(Application.isEditor || !GameState.Data.isAutoSave())
             {
+                Debug.Log("[AUTO SAVE] Auto save is disabled. Skipping...");
                 return;
             }
 
-            gameExtensions.ForEach(g => g.OnBeforeGameSave());
-            GameState.SerializeTo("save");
+            Debug.Log("[AUTO SAVE] Performing auto-save...");
+            StartCoroutine(SaveGame());
         }
 
         public void OnApplicationPause(bool paused)
@@ -321,6 +376,7 @@ namespace uAdventure.Runner
                 
                 if (!paused && GameState.Data.isRestoreAfterOpen())
                 {
+                    // TODO REPARE RESTORE AFTER OPEN
                     GameState.OnGameResume();
                     if (started)
                     {
@@ -428,8 +484,16 @@ namespace uAdventure.Runner
 
         public void Quit()
         {
+            StartCoroutine(QuitCoroutine());
+        }
+
+        private IEnumerator QuitCoroutine()
+        {
             var quit = true;
-            gameExtensions.ForEach(g => quit &= g.OnGameFinished());
+            foreach (var g in gameExtensions)
+            {
+                yield return StartCoroutine(g.OnGameFinished());
+            }
             if (quit)
             {
                 Application.Quit();
@@ -444,26 +508,15 @@ namespace uAdventure.Runner
             UnityEngine.SceneManagement.SceneManager.LoadScene(0);
         }
 
-        public void Restart()
+        public IEnumerator Restart()
         {
             GameState.Restart();
-            gameExtensions.ForEach(g => g.Restart());
+            foreach(var g in gameExtensions)
+            {
+                yield return StartCoroutine(g.Restart());
+            }
             RunTarget(GameState.CurrentTarget);
             uAdventureInputModule.LookingForTarget = null;
-        }
-
-        public void Exit()
-        {
-            var exit = true;
-            foreach(var gameExtension in gameExtensions)
-            {
-                exit &= gameExtension.OnGameFinished();
-            }
-
-            if (exit)
-            {
-                Application.Quit();
-            }
         }
 
         public bool ContinueEffectExecution()
