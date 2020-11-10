@@ -42,12 +42,6 @@ namespace uAdventure.Unity
             get; private set;
         }
 
-        public GameObject gameObject
-        {
-            get; set;
-        }
-
-
 
         public bool canBeInteracted()
         {
@@ -122,6 +116,7 @@ namespace uAdventure.Unity
             // Set the AfterGoingBack Callback to get the callback after loading _Scene1
             UnityEngine.SceneManagement.SceneManager.sceneLoaded += AfterGoingBack;
             UnityEngine.SceneManagement.SceneManager.LoadScene("_Scene1");
+            DestroyImmediate(this.gameObject);
         }
 
         private void AfterGoingBack(UnityEngine.SceneManagement.Scene arg0, UnityEngine.SceneManagement.LoadSceneMode arg1)

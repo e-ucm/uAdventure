@@ -628,6 +628,9 @@ namespace uAdventure.Runner
                 // Here we connect with the IChapterTargetFactory and create an IRunnerChapterTarget
                 runnerTarget = RunnerChapterTargetFactory.Instance.Instantiate(target);
                 runnerTarget.Data = target;
+                Debug.Log("Target gameobject: " + runnerTarget.gameObject);
+                DontDestroyOnLoad(runnerTarget.gameObject);
+                Debug.Log("Target creado: " + runnerTarget);
 
                 System.Action afterChapterLoad = () =>
                 {

@@ -100,7 +100,6 @@ namespace Simva
 
 	public static class OpenIdUtility
     {
-#if UNITY_WEBGL
         [DllImport("__Internal")]
         private static extern void OpenUrl(string url);
 
@@ -112,7 +111,6 @@ namespace Simva
 
         [DllImport("__Internal")]
         private static extern string GetUrl();
-#endif
 
         private static System.Diagnostics.Process windowProcess;
         private static Thread httpListener;

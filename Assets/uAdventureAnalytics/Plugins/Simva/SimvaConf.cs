@@ -73,6 +73,7 @@ namespace Simva
             {
                 contents = System.IO.File.ReadAllText(filePath);
             }
+            yield return null;
 #endif
             ParseContents(contents);
         }
