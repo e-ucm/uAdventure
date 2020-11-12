@@ -45,6 +45,6 @@ This will configure Unity Editor to work with uAdventure the best way.
 
 ## Downloads
 
-* [**uAdventure 1.1.1c UnityPackage**](https://github.com/e-ucm/uAdventure/releases/download/1.1.1/uAdventure_v1.1.1c.unitypackage)
+* [**uAdventure 1.1.1c UnityPackage**](https://github.com/e-ucm/uAdventure/releases/download/v1.1.1/uAdventure_v1.1.1c.unitypackage)
 * [uAdventure very detailed **Manual for users**](https://github.com/e-ucm/uAdventure/releases/download/v1.1.1/ManualUadventure-v1.6.pdf)
 * [More detailed **Installation and Setup guide**](https://github.com/e-ucm/uAdventure/releases/download/1.0/Installation_Manual_v1.0.pdf)
