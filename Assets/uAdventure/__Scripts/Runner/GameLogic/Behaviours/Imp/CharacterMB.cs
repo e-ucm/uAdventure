@@ -9,7 +9,7 @@ namespace uAdventure.Runner
     [RequireComponent(typeof(Mover))]
     public class CharacterMB : InteractiveElement
     {
-        private static readonly int[] availableActions = { Action.CUSTOM, Action.TALK_TO, Action.EXAMINE };
+        private static readonly int[] availableActions = { Action.DRAG_TO, Action.USE, Action.CUSTOM, Action.TALK_TO, Action.EXAMINE };
         protected override int[] AvailableActions { get { return availableActions; } }
 
         private Representable representable;

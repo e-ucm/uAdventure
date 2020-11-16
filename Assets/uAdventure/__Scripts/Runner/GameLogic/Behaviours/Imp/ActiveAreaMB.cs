@@ -6,7 +6,7 @@ namespace uAdventure.Runner
     [RequireComponent(typeof(Area))]
     public class ActiveAreaMB : InteractiveElement
     {
-        private static readonly int[] restrictedActions = { Action.CUSTOM, Action.EXAMINE, Action.USE };
+        private static readonly int[] restrictedActions = { Action.CUSTOM, Action.GRAB, Action.EXAMINE, Action.USE };
         
         protected override int[] AvailableActions { get { return restrictedActions; } }
 
