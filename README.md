@@ -9,6 +9,10 @@
 ## Introduction
 
 uAdventure is a platform for the development of classic adventure computer games with educational purposes. This platform was developed by the <e-UCM> research group (http://www.e-ucm.es) at the Complutense University in Madrid (Spain). It is the successor of the eAdventure platform (http://e-adventure.e-ucm.es). In contrast to its predecessor, that was built on Java framework, uAdventure runs on top of Unity game engine. Despite of this, no previous knowledge of Unity is required. Previous eAdventure projects can be upgraded to be used in uAdventure. However, uAdventure is not completely backwards compatible, as some features have been deprecated or are still work in progress
+
+
+
+[![SlideShare](https://user-images.githubusercontent.com/3171485/98928125-b77f2b80-24d9-11eb-8105-0c14725a861a.png)](https://es2.slideshare.net/VctorManuelPrezColad/uadventure-autora-de-juegos-serios-de-aventura-gps-ejemplos)
   
 ## Minimum Requirements
   
@@ -41,6 +45,6 @@ This will configure Unity Editor to work with uAdventure the best way.
 
 ## Downloads
 
-* [**uAdventure 1.1 UnityPackage**](https://github.com/e-ucm/uAdventure/releases/download/1.1/uAdventure_Complete_v1.1.unitypackage)
-* [uAdventure very detailed **Manual for users**](https://github.com/e-ucm/uAdventure/releases/download/1.1/ManualUadventure-v1.6.docx)
+* [**uAdventure 1.1.1c UnityPackage**](https://github.com/e-ucm/uAdventure/releases/download/v1.1.1/uAdventure_v1.1.1c.unitypackage)
+* [uAdventure very detailed **Manual for users**](https://github.com/e-ucm/uAdventure/releases/download/v1.1.1/ManualUadventure-v1.6.pdf)
 * [More detailed **Installation and Setup guide**](https://github.com/e-ucm/uAdventure/releases/download/1.0/Installation_Manual_v1.0.pdf)
