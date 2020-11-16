@@ -133,8 +133,8 @@ namespace uAdventure.Editor
                 // Show a dialog asking for the conversation id
                 if (string.IsNullOrEmpty(conversationID))
                 {
-                    controller.ShowInputDialog(TC.get("Operation.AddConversationTitle"), TC.get("Operation.AddConversationMessage"),
-                        TC.get("Operation.AddConversationDefaultValue"), (sender, id) =>
+                    controller.ShowInputIdDialog(TC.get("Operation.AddConversationTitle"), TC.get("Operation.AddConversationMessage"),
+                        Controller.Instance.makeElementValid(TC.get("Operation.AddConversationDefaultValue")), (sender, id) =>
                         {
                             performAddElement(sender, id);
                             if (createTalkToAction)

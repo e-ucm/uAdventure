@@ -153,7 +153,8 @@ namespace uAdventure.Editor
             {
                 // Show a dialog asking for the macro id
                 if (macroId == null)
-                    controller.ShowInputDialog(TC.get("Operation.AddMacroTitle"), TC.get("Operation.AddMacroMessage"), TC.get("Operation.AddMacroDefaultValue"), performAddElement);
+                    controller.ShowInputIdDialog(TC.get("Operation.AddMacroTitle"), TC.get("Operation.AddMacroMessage"),
+                        Controller.Instance.makeElementValid(TC.get("Operation.AddMacroDefaultValue")), performAddElement);
                 else
                 {
                     performAddElement(null, macroId);

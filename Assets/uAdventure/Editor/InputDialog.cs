@@ -12,6 +12,10 @@ namespace uAdventure.Editor
         private string value;
         private string message;
         private bool hasToFocus = true;
+        private bool isInvalid;
+        private string invalidReason;
+        private delegate string OnValidateDelegate(string value);
+        private OnValidateDelegate onValidate;
 
         public void Init(DialogReceiverInterface e, object token, string title, string message, string defaultValue = null)
         {
@@ -21,6 +25,12 @@ namespace uAdventure.Editor
             this.token = token;
             this.Init(e);
         }
+
+        public void Validation(Func<string, string> onValidate)
+        {
+            this.onValidate += new OnValidateDelegate(onValidate);
+        }
+
 
         protected void OnGUI()
         {
@@ -33,11 +43,22 @@ namespace uAdventure.Editor
             // Input field
             GUI.SetNextControlName("InputField");
             var isEnterPressed = IsEnterPressed();
+            EditorGUI.BeginChangeCheck();
             value = EditorGUILayout.TextField(value);
+            if (EditorGUI.EndChangeCheck())
+            {
+                Validate();
+            }
+
             if (GUI.GetNameOfFocusedControl() == "InputField" && isEnterPressed)
             {
                 reference.OnDialogOk(value, token ?? this);
                 this.Close();
+            }
+
+            if (isInvalid)
+            {
+                EditorGUILayout.HelpBox(invalidReason.Traslate(), MessageType.Error);
             }
 
             if (hasToFocus)
@@ -51,25 +72,37 @@ namespace uAdventure.Editor
 
             // Bottom buttons
             GUILayout.FlexibleSpace();
-            GUILayout.BeginHorizontal();
+            using(new GUILayout.HorizontalScope())
             {
-                if (string.IsNullOrEmpty(value))
-                    GUI.enabled = false;
-
-                if (GUILayout.Button(TC.get("GeneralText.OK")))
+                using (new EditorGUI.DisabledGroupScope(isInvalid))
                 {
-                    reference.OnDialogOk(value, token ?? this);
-                    this.Close();
+                    if (GUILayout.Button(TC.get("GeneralText.OK")))
+                    {
+                        reference.OnDialogOk(value, token ?? this);
+                        this.Close();
+                    }
                 }
 
-                GUI.enabled = true;
                 if (GUILayout.Button(TC.get("GeneralText.Cancel")))
                 {
                     reference.OnDialogCanceled();
                     this.Close();
                 }
             }
-            GUILayout.EndHorizontal();
+        }
+
+        private void Validate()
+        {
+            if (onValidate != null)
+            {
+                invalidReason = onValidate(value);
+                isInvalid = !string.IsNullOrEmpty(invalidReason);
+            }
+            else
+            {
+                isInvalid = false;
+                invalidReason = null;
+            }
         }
 
         private static bool IsEnterPressed()

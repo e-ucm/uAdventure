@@ -3176,6 +3176,43 @@ namespace uAdventure.Editor
             inputDialog.Init(receiver, token, title, message, values);
         }
 
+        public void ShowInputIdDialog(string title, string message, string defaultValue, InputReceiver.HandleInputCallback onInput, InputReceiver.CancelInputCallback onCancel = null)
+        {
+            var receiver = new InputReceiver(this, onInput, onCancel);
+            var inputDialog = ScriptableObject.CreateInstance<InputDialog>();
+            inputDialog.Init(receiver, null, title, message, defaultValue);
+            inputDialog.Validation(value =>
+            {
+                if (string.IsNullOrEmpty(value))
+                {
+                    return "Validation.Id.IsEmpty";
+                }
+                if (value.Contains(" "))
+                {
+                    return "Validation.Id.ContainsSpaces";
+                }
+                Regex alphanumeric = new Regex("^[a-zA-Z0-9\\.\\:_-]*$");
+                if (!alphanumeric.IsMatch(value))
+                {
+                    return "Validation.Id.NotValidCharacter";
+                }
+                if (!char.IsLetter(value[0]))
+                {
+                    return "Validation.Id.NotStartsWithLetter";
+                }
+                if (value.ToLower().Equals(Player.IDENTIFIER.ToLower()) || value.ToLower().Equals(TC.get("ConversationLine.PlayerName").ToLower()))
+                {
+                    return "Validation.Id.IsReservedPlayerValue";
+                }
+                if (IdentifierSummary.existsId(value))
+                {
+                    return "Validation.Id.IsAlreadyUsed";
+                }
+                
+                return null;
+            });
+        }
+
         ///**
         // * Uses the GUI to show an error dialog.
         // * 

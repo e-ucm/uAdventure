@@ -2304,6 +2304,15 @@
   <entry key="Inventory.Type5">Fixed on bottom</entry>
   <entry key="Inventory.Type6">Icon freely positioned</entry>
   
+  <!-- Id Validation -->
+  <entry key="Validation.Id.IsEmpty">Id must not be empty</entry>
+  <entry key="Validation.Id.ContainsSpaces">Id must not contain spaces</entry>
+  <entry key="Validation.Id.NotValidCharacter">Id contains a not valid character. Valid characters are alphanumeric and "_", "-", ".", ":".</entry>
+  <entry key="Validation.Id.NotStartsWithLetter">Id must start with a letter</entry>
+  <entry key="Validation.Id.IsReservedPlayerValue">Id must not be the reserved Player tag</entry>
+  <entry key="Validation.Id.IsAlreadyUsedy">Id is already in use</entry>
+  
+  
   <!-- Buttons -->
   <entry key="Buttons.Hint">Hover the icon to see the highlighted version</entry>
   <entry key="Buttons.Normal">Normal</entry>

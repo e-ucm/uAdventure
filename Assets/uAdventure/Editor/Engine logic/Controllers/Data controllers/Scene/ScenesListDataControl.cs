@@ -167,7 +167,8 @@ namespace uAdventure.Editor
 
                 // Show a dialog asking for the scene id
                 if (string.IsNullOrEmpty(sceneId))
-                    controller.ShowInputDialog(TC.get("Operation.AddSceneTitle"), TC.get("Operation.AddSceneMessage"), TC.get("Operation.AddSceneDefaultValue"), performAddElement);
+                    controller.ShowInputIdDialog(TC.get("Operation.AddSceneTitle"), TC.get("Operation.AddSceneMessage"), 
+                        Controller.Instance.makeElementValid(TC.get("Operation.AddSceneDefaultValue")), performAddElement);
                 else
                 {
                     performAddElement(null, sceneId);

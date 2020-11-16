@@ -164,8 +164,8 @@ namespace uAdventure.Editor
             bool elementAdded = false;
 
             if (string.IsNullOrEmpty(cutsceneId))
-                controller.ShowInputDialog(TC.get("Operation.AddCutsceneTitle"),
-                        TC.get("Operation.AddCutsceneMessage"), TC.get("Operation.AddCutsceneDefaultValue"), (o,s) => performCreateCutscene(type, s));
+                controller.ShowInputIdDialog(TC.get("Operation.AddCutsceneTitle"),
+                        Controller.Instance.makeElementValid(TC.get("Operation.AddCutsceneMessage")), TC.get("Operation.AddCutsceneDefaultValue"), (o,s) => performCreateCutscene(type, s));
             else
             {
                 performCreateCutscene(type, cutsceneId);

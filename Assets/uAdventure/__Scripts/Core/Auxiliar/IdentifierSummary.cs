@@ -35,7 +35,7 @@ namespace uAdventure.Core
         public IdentifierSummary(Chapter chapter)
         {
             // Create the lists
-			globalIdentifiers = new Dictionary<string, System.Type>();
+			globalIdentifiers = new Dictionary<string, System.Type>(StringComparer.InvariantCultureIgnoreCase);
 			typeGroups = new Dictionary<System.Type, List<string>>();
 
             assessmentIdentifiers = new Dictionary<string, List<string>> ();

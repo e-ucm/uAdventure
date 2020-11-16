@@ -160,7 +160,8 @@ namespace uAdventure.Editor
 
                 // Show a dialog asking for the character id
                 if (string.IsNullOrEmpty(npcId))
-                    controller.ShowInputDialog(TC.get("Operation.AddNPCTitle"), TC.get("Operation.AddNPCMessage"), TC.get("Operation.AddNPCDefaultValue"), performAddElement);
+                    controller.ShowInputIdDialog(TC.get("Operation.AddNPCTitle"), TC.get("Operation.AddNPCMessage"),
+                        Controller.Instance.makeElementValid(TC.get("Operation.AddNPCDefaultValue")), performAddElement);
                 else
                 {
                     controller.DataModified();

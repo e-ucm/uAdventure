@@ -320,11 +320,11 @@ namespace uAdventure.Editor
                 {
                     if (elementFactoryView.DefaultIds.ContainsKey(type))
                     {
-                        controller.ShowInputDialog(title, message, elementFactoryView.DefaultIds[type], (o, s) => continueAddingElement(type, s));
+                        controller.ShowInputIdDialog(title, message, Controller.Instance.makeElementValid(elementFactoryView.DefaultIds[type]), (o, s) => continueAddingElement(type, s));
                     }
                     else
                     {
-                        controller.ShowInputDialog(title, message, (o, s) => continueAddingElement(type, s));
+                        controller.ShowInputIdDialog(title, message, "", (o, s) => continueAddingElement(type, s));
                     }
                 }
                 else if (elementFactory.ReferencesId(type))

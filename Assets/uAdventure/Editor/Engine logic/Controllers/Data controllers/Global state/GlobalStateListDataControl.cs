@@ -157,7 +157,8 @@ namespace uAdventure.Editor
 
                 // Show a dialog asking for the globalState id
                 if (string.IsNullOrEmpty(globalStateId))
-                    controller.ShowInputDialog(TC.get("Operation.AddGlobalStateTitle"), TC.get("Operation.AddGlobalStateMessage"), TC.get("Operation.AddGlobalStateDefaultValue"), performAddElement);
+                    controller.ShowInputIdDialog(TC.get("Operation.AddGlobalStateTitle"), TC.get("Operation.AddGlobalStateMessage"),
+                        Controller.Instance.makeElementValid(TC.get("Operation.AddGlobalStateDefaultValue")), performAddElement);
                 // If some value was typed and the identifier is valid
                 else
                 {
