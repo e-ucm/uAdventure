@@ -2482,4 +2482,13 @@
   <entry key="QR.QRScannerEffect.ListType.WhiteList">White list</entry>
   <entry key="QR.QRScannerEffectEditor.Message">Message</entry>
   <entry key="QR.QRScannerEffectEditor.ListType">List type</entry>
+  
+  <!-- Unity Plugin -->
+
+  <entry key="UnityPlugin.SceneWindow.InBuildSettings">Scene is in Build Settings, everything will work fine.</entry>
+  <entry key="UnityPlugin.SceneWindow.MainSceneInBuildSettings">Main uAdventure Scene is in Build Settings, everything will work fine.</entry>
+  <entry key="UnityPlugin.SceneWindow.SceneNotInBuildSettings">The scene is not in Build Settings, the engine won't be able to load it!</entry>
+  <entry key="UnityPlugin.SceneWindow.MainSceneNotInBuildSettings">uAdventure main scene is not in Build Settings, the engine won't be able to return to it!</entry>
+  <entry key="UnityPlugin.SceneWindow.AddSceneToBuildSettings">Add scene to Build Settings</entry>
+  
 </properties>

@@ -6,6 +6,7 @@ using uAdventure.Editor;
 using UnityEditorInternal;
 using System.Linq;
 using UnityEditor;
+using uAdventure.Core;
 
 namespace uAdventure.Unity
 {
@@ -60,15 +61,15 @@ namespace uAdventure.Unity
                 var isInBuildSettings = IsInBuildSettings(newScene);
                 if (isInBuildSettings)
                 {
-                    EditorGUILayout.HelpBox("UnityPlugin.SceneWindow.InBuildSettings", MessageType.Info);
+                    EditorGUILayout.HelpBox("UnityPlugin.SceneWindow.InBuildSettings".Traslate(), MessageType.Info);
                 }
                 else
                 {
-                    EditorGUILayout.HelpBox("UnityPlugin.SceneWindow.SceneNotInBuildSettings", MessageType.Error);
+                    EditorGUILayout.HelpBox("UnityPlugin.SceneWindow.SceneNotInBuildSettings".Traslate(), MessageType.Error);
                 }
                 using (new EditorGUI.DisabledScope(!newScene || isInBuildSettings))
                 {
-                    if (GUILayout.Button("UnityPlugin.SceneWindow.AddSceneToBuildSettings"))
+                    if (GUILayout.Button("UnityPlugin.SceneWindow.AddSceneToBuildSettings".Traslate()))
                     {
                         var buildSettingsScene = new EditorBuildSettingsScene(unitySceneDataControl.Scene, true);
                         EditorBuildSettings.scenes = new List<EditorBuildSettingsScene>(EditorBuildSettings.scenes) { buildSettingsScene }.ToArray();
@@ -77,7 +78,27 @@ namespace uAdventure.Unity
             }
             else
             {
+
                 GUILayout.Label("Select an scene in the left");
+                var scene1GUID = AssetDatabase.GUIDToAssetPath(AssetDatabase.FindAssets("_Scene1")[0]);
+                var scene1 = AssetDatabase.LoadAssetAtPath(scene1GUID, typeof(SceneAsset));
+                var isInBuildSettings = IsInBuildSettings(scene1);
+                if (isInBuildSettings)
+                {
+                    EditorGUILayout.HelpBox("UnityPlugin.SceneWindow.MainSceneInBuildSettings".Traslate(), MessageType.Info);
+                }
+                else
+                {
+                    EditorGUILayout.HelpBox("UnityPlugin.SceneWindow.MainSceneNotInBuildSettings".Traslate(), MessageType.Error);
+                }
+                using (new EditorGUI.DisabledScope(!scene1 || isInBuildSettings))
+                {
+                    if (GUILayout.Button("UnityPlugin.SceneWindow.AddSceneToBuildSettings".Traslate()))
+                    {
+                        var buildSettingsScene = new EditorBuildSettingsScene(scene1GUID, true);
+                        EditorBuildSettings.scenes = new List<EditorBuildSettingsScene>(EditorBuildSettings.scenes) { buildSettingsScene }.ToArray();
+                    }
+                }
             }
         }
 
