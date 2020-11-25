@@ -98,8 +98,22 @@ namespace uAdventure.Analytics
         public static void ScoreEditor(Rect rect, ScoreDataControl score)
         {
             var rects = rect.Divide(3);
+            var previousMethod = score.getMethod();
+            var newMethod = (Completable.Score.ScoreMethod)EditorGUI.EnumPopup(rects[0], previousMethod);
+            score.setMethod(newMethod);
 
-            score.setMethod((Completable.Score.ScoreMethod)EditorGUI.EnumPopup(rects[0], score.getMethod()));
+            if (newMethod != previousMethod)
+            {
+                if (newMethod == Completable.Score.ScoreMethod.SINGLE)
+                {
+                    Controller.Instance.VarFlagSummary.addVarReference(score.getId());
+                }
+                else
+                {
+                    Controller.Instance.VarFlagSummary.deleteVarReference(score.getId());
+                }
+            }
+
             switch (score.getMethod())
             {
                 case Completable.Score.ScoreMethod.AVERAGE:

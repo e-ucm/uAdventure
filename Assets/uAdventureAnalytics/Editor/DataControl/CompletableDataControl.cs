@@ -196,6 +196,8 @@ namespace uAdventure.Analytics
                 var milestones = progress.getMilestones();
                 milestones.Remove(milestone.getContent() as Completable.Milestone);
                 progress.setMilestones(milestones);
+                controller.updateVarFlagSummary();
+                controller.DataModified();
                 return true;
             }
 
@@ -260,6 +262,7 @@ namespace uAdventure.Analytics
             milestones.RemoveAt(index);
             milestones.Insert(index + 1, milestone.getContent() as Completable.Milestone);
             progress.setMilestones(milestones);
+            controller.DataModified();
             return true;
         }
 
@@ -292,6 +295,7 @@ namespace uAdventure.Analytics
             milestones.RemoveAt(index);
             milestones.Insert(index - 1, milestone.getContent() as Completable.Milestone);
             progress.setMilestones(milestones);
+            controller.DataModified();
             return true;
         }
 

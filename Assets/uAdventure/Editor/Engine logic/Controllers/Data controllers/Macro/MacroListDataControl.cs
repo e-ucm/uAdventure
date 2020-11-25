@@ -197,6 +197,8 @@ namespace uAdventure.Editor
             macrosList.Add(newElement);
             macrosDataControlList.Add(new MacroDataControl(newElement));
             controller.IdentifierSummary.addId<Macro>(id);
+            controller.updateVarFlagSummary();
+            controller.DataModified();
             return true;
 
         }
@@ -224,6 +226,7 @@ namespace uAdventure.Editor
                     macrosDataControlList.Remove((MacroDataControl)dataControl);
                     controller.deleteIdentifierReferences(macroId);
                     controller.IdentifierSummary.deleteId<Macro>(macroId);
+                    controller.updateVarFlagSummary();
                     controller.DataModified();
                     elementDeleted = true;
                 }

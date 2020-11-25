@@ -55,10 +55,7 @@ namespace uAdventure.Editor
                 {
                     if (effect.getPositiveEffect() == null)
                     {
-                        EffectEditorWindow.CreateEffect(newEffect =>
-                        {
-                            effect.setPositiveEffect(newEffect);
-                        });
+                        EffectEditorWindow.CreateEffect(effect.setPositiveEffect);
                     }
                     else
                     {

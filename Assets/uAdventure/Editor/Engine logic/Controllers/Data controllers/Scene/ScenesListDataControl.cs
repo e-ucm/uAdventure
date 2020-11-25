@@ -252,6 +252,7 @@ namespace uAdventure.Editor
                         scenesList.Remove((Scene)dataControl.getContent());
                         controller.deleteIdentifierReferences(sceneId);
                         controller.IdentifierSummary.deleteId<Scene>(sceneId);
+                        controller.updateVarFlagSummary();
                         controller.DataModified();
                         elementDeleted = true;
                     }

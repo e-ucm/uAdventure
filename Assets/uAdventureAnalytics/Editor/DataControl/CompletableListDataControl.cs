@@ -64,7 +64,7 @@ namespace uAdventure.Analytics
 
         public override bool canAddElement(int type) { return type == AnalyticsController.COMPLETABLE; }
         public override bool canBeDeleted() { return true; }
-        public override bool canBeDuplicated() { return true; }
+        public override bool canBeDuplicated() { return false; }
         public override bool canBeMoved() { return true; }
         public override bool canBeRenamed() { return false; }
         public override int countAssetReferences(string assetPath) { return 0; }
@@ -89,6 +89,8 @@ namespace uAdventure.Analytics
             completableDataControls.Remove(completable);
             completables.Remove(completable.getContent() as Completable);
             controller.IdentifierSummary.deleteId<Completable>(completable.getId());
+            controller.updateVarFlagSummary();
+            controller.DataModified();
 
             return true;
         }
@@ -131,6 +133,7 @@ namespace uAdventure.Analytics
             completableDataControls.Insert(index + 1, completable);
             completables.RemoveAt(index);
             completables.Insert(index + 1, completable.getContent() as Completable);
+            controller.DataModified();
             return true;
         }
 
@@ -149,6 +152,7 @@ namespace uAdventure.Analytics
             completableDataControls.Insert(index - 1, completable);
             completables.RemoveAt(index);
             completables.Insert(index - 1, completable.getContent() as Completable);
+            controller.DataModified();
             return true;
         }
 
@@ -205,6 +209,7 @@ namespace uAdventure.Analytics
                 if (vars != null && vars.Length > 0)
                 {
                     target = vars[0];
+                    controller.VarFlagSummary.addVarReference(vars[0]);
                     newSubScore.setType(Completable.Score.ScoreType.VARIABLE);
                 }
                 else
@@ -254,6 +259,8 @@ namespace uAdventure.Analytics
 
             scoreDataControls.Remove(scoreDataControl);
             this.score.getSubScores().Remove(scoreDataControl.getContent() as Completable.Score);
+            controller.updateVarFlagSummary();
+            controller.DataModified();
             return true;
 
         }
@@ -334,6 +341,7 @@ namespace uAdventure.Analytics
             scoreDataControls.Insert(index + 1, scoreDataControl);
             this.score.getSubScores().RemoveAt(index);
             this.score.getSubScores().Insert(index + 1, scoreDataControl.getContent() as Completable.Score);
+            controller.DataModified();
             return true;
         }
 
@@ -363,6 +371,7 @@ namespace uAdventure.Analytics
             scoreDataControls.Insert(index - 1, scoreDataControl);
             this.score.getSubScores().RemoveAt(index);
             this.score.getSubScores().Insert(index - 1, scoreDataControl.getContent() as Completable.Score);
+            controller.DataModified();
             return true;
         }
 

@@ -186,6 +186,8 @@ namespace uAdventure.Editor
             activeAreasList.Add(newElement);
             activeAreasDataControlList.Add(new ActiveAreaDataControl(sceneDataControl, newElement));
             controller.IdentifierSummary.addId<ActiveArea>(id);
+            Controller.Instance.updateVarFlagSummary();
+            Controller.Instance.DataModified();
             return true;
 
         }
@@ -207,6 +209,8 @@ namespace uAdventure.Editor
                     activeAreasDataControlList.Remove((ActiveAreaDataControl)dataControl);
                     controller.deleteIdentifierReferences(id);
                     controller.IdentifierSummary.deleteId<ActiveArea>(((ActiveArea)dataControl.getContent()).getId());
+                    Controller.Instance.updateVarFlagSummary();
+                    Controller.Instance.DataModified();
                     elementDeleted = true;
                 }
             }

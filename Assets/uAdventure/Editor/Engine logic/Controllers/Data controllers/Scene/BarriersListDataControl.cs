@@ -165,6 +165,8 @@ namespace uAdventure.Editor
             id++;
             barriersList.Add(newElement);
             barriersDataControlList.Add(new BarrierDataControl(sceneDataControl, newElement));
+            controller.updateVarFlagSummary();
+            controller.DataModified();
             return true;
         }
 
@@ -177,6 +179,7 @@ namespace uAdventure.Editor
             if (barriersList.Remove((Barrier)dataControl.getContent()))
             {
                 barriersDataControlList.Remove((BarrierDataControl)dataControl);
+                controller.updateVarFlagSummary();
                 controller.DataModified();
                 elementDeleted = true;
             }

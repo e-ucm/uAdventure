@@ -55,7 +55,7 @@ namespace uAdventure.Editor
          * 
          * @return True if an effect was added, false otherwise
          */
-        public override bool addEffect()
+        public override bool addEffect(IEffect effect)
         {
 
             effects.Clear();
@@ -131,7 +131,7 @@ namespace uAdventure.Editor
             if (getEffectCount() > 0)
                 return editEffect(0);
             else
-                return addEffect();
+                return addEffect(null); // TODO null was put there just to silence the compiler after IEffect was added as a parameter in the effectsController add effect
         }
 
         public IEffect getEffect()

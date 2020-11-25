@@ -390,6 +390,7 @@ namespace uAdventure.Editor
             if (actionsList.Remove((Action)dataControl.getContent()))
             {
                 actionsDataControlList.Remove((ActionDataControl)dataControl);
+                controller.updateVarFlagSummary();
                 controller.DataModified();
                 elementDeleted = true;
             }
@@ -419,6 +420,8 @@ namespace uAdventure.Editor
             }
             actionsList.Add(newElement);
             actionsDataControlList.Add(adc);
+            controller.updateVarFlagSummary();
+            controller.DataModified();
             return true;
         }
 

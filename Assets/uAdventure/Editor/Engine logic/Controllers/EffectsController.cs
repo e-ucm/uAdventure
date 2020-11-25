@@ -498,10 +498,10 @@ namespace uAdventure.Editor
              * @return True if an effect was added, false otherwise
              */
 
-        public virtual bool addEffect()
+        public virtual bool addEffect(IEffect newEffect)
         {
 
-            bool effectAdded = false;
+            /*bool effectAdded = false;
             // TODO: visual version of effect checker
             //Dictionary<int, System.Object> effectProperties = SelectEffectsDialog.getNewEffectProperties(this);
             Dictionary<int, System.Object> effectProperties = new Dictionary<int, System.Object>();
@@ -539,8 +539,28 @@ namespace uAdventure.Editor
                     newEffect = randomEffect;
                 }
                 effectAdded = controller.AddTool(new AddEffectTool(effects, newEffect, conditionsList));
+            }*/
+
+            switch (newEffect.getType())
+            {
+                case EffectType.ACTIVATE:
+                    controller.VarFlagSummary.addFlagReference(((ActivateEffect)newEffect).getTargetId());
+                    break;
+                case EffectType.DEACTIVATE:
+                    controller.VarFlagSummary.addFlagReference(((DeactivateEffect)newEffect).getTargetId());
+                    break;
+                case EffectType.SET_VALUE:
+                    controller.VarFlagSummary.addVarReference(((SetValueEffect)newEffect).getTargetId());
+                    break;
+                case EffectType.INCREMENT_VAR:
+                    controller.VarFlagSummary.addVarReference(((IncrementVarEffect)newEffect).getTargetId());
+                    break;
+                case EffectType.DECREMENT_VAR:
+                    controller.VarFlagSummary.addVarReference(((DecrementVarEffect)newEffect).getTargetId());
+                    break;
             }
-            return effectAdded;
+
+            return controller.AddTool(new AddEffectTool(effects, newEffect, conditionsList));
         }
 
         /**

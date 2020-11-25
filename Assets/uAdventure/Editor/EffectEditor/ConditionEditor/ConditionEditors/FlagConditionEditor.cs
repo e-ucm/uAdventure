@@ -38,6 +38,7 @@ namespace uAdventure.Editor
             condition = c as FlagCondition;
             using (new EditorGUILayout.HorizontalScope())
             {
+                var target = c.getId();
                 if (Available)
                 {
                     var flags = Controller.Instance.VarFlagSummary.getFlags();
@@ -60,6 +61,17 @@ namespace uAdventure.Editor
                 if (Available)
                 {
                     c.setState(EditorGUILayout.Popup(c.getState(), types));
+                }
+
+                var newTarget = c.getId();
+                if (target != newTarget)
+                {
+                    if (!string.IsNullOrEmpty(target))
+                    {
+                        Controller.Instance.VarFlagSummary.deleteFlagReference(target);
+                    }
+                    Controller.Instance.VarFlagSummary.addFlagReference(newTarget);
+                    Controller.Instance.DataModified();
                 }
             }
         }
@@ -93,8 +105,15 @@ namespace uAdventure.Editor
             }
             else
             {
+                if (!string.IsNullOrEmpty(condition.getId()))
+                {
+                    Controller.Instance.VarFlagSummary.deleteFlagReference(condition.getId());
+                }
                 condition.setId(message);
             }
+
+            Controller.Instance.VarFlagSummary.addFlagReference(message);
+            Controller.Instance.DataModified();
         }
 
         public void OnDialogCanceled(object workingObject = null) {}

@@ -70,6 +70,7 @@ namespace uAdventure.Editor
             resourcesList.Add(newElement);
             resourcesDataControlList.Add(newDataControl);
             parent.setSelectedResources(resourcesList.Count - 1);
+            Controller.Instance.updateVarFlagSummary();
             return true;
 
         }
@@ -81,6 +82,7 @@ namespace uAdventure.Editor
             resourcesList.Add(newElement);
             resourcesDataControlList.Add(newDataControl);
             parent.setSelectedResources(resourcesList.Count - 1);
+            Controller.Instance.updateVarFlagSummary();
             Controller.Instance.reloadPanel();
             return true;
         }
@@ -93,6 +95,7 @@ namespace uAdventure.Editor
             if (undone)
             {
                 parent.setSelectedResources(resourcesList.Count - 1);
+                Controller.Instance.updateVarFlagSummary();
                 Controller.Instance.reloadPanel();
             }
             return undone;

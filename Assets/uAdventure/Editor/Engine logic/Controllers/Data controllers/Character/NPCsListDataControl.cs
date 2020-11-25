@@ -231,6 +231,7 @@ namespace uAdventure.Editor
                     npcsDataControlList.Remove((NPCDataControl)dataControl);
                     controller.deleteIdentifierReferences(npcId);
                     controller.IdentifierSummary.deleteId<NPC>(npcId);
+                    controller.updateVarFlagSummary();
                     controller.DataModified();
                     elementDeleted = true;
                 }

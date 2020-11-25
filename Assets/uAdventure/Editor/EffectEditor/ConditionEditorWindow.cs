@@ -184,6 +184,8 @@ namespace uAdventure.Editor
                     if (previousEditorSelected != editorSelected)
                     {
                         condition = conditionEditorFactory.Editors[editorSelected].InstanceManagedCondition();
+                        RemoveReference(conditionBlock[i]);
+
                         conditionBlock[i] = condition;
                     }
 
@@ -196,6 +198,7 @@ namespace uAdventure.Editor
 
                     if (GUILayout.Button("X", closeStyle, GUILayout.Width(15), GUILayout.Height(15)))
                     {
+                        RemoveReference(conditionBlock[i]);
                         conditionBlock.RemoveAt(i);
                         i--;
                     }
@@ -206,6 +209,20 @@ namespace uAdventure.Editor
             {
                 GUILayout.EndVertical();
             }
+        }
+
+        private static void RemoveReference(Condition condition)
+        {
+            var type = condition.getType();
+            if (type == Condition.FLAG_CONDITION)
+            {
+                Controller.Instance.VarFlagSummary.deleteFlagReference(condition.getId());
+            }
+            else if (type == Condition.VAR_CONDITION)
+            {
+                Controller.Instance.VarFlagSummary.deleteVarReference(condition.getId());
+            }
+            Controller.Instance.DataModified();
         }
     }
 

@@ -229,12 +229,24 @@ namespace uAdventure.Editor
             {
                 var selected = (int)reorderableList.list[reorderableList.index];
                 var summary = varFlagSummary;
+                Controller.Instance.updateVarFlagSummary();
+
                 switch (openedWindow)
                 {
                     case WindowType.FLAGS:
+                        if (summary.getFlagReferences(selected) > 0) 
+                        { 
+                            Controller.Instance.ShowErrorDialog("Flags.DeleteFlag".Traslate(), "Flags.ErrorFlagWithReferences".Traslate());
+                            return;
+                        }
                         summary.deleteFlag(varFlagSummary.getFlag(selected));
                         break;
                     case WindowType.VARS:
+                        if (summary.getVarReferences(selected) > 0)
+                        {
+                            Controller.Instance.ShowErrorDialog("Vars.DeleteVar".Traslate(), "Vars.ErrorVarWithReferences".Traslate());
+                            return;
+                        }
                         summary.deleteVar(varFlagSummary.getVar(selected));
                         break;
                 }

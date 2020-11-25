@@ -226,6 +226,7 @@ namespace uAdventure.Editor
                     itemsDataControlList.Remove((ItemDataControl)dataControl);
                     controller.deleteIdentifierReferences(itemId);
                     controller.IdentifierSummary.deleteId<Item>(itemId);
+                    controller.updateVarFlagSummary();
                     controller.DataModified();
                     elementDeleted = true;
                 }

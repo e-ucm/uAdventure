@@ -199,6 +199,7 @@ namespace uAdventure.Editor
                     booksDataControlList.Remove((BookDataControl)dataControl);
                     controller.deleteIdentifierReferences(bookId);
                     controller.IdentifierSummary.deleteId<Book>(bookId);
+                    controller.updateVarFlagSummary();
                     controller.DataModified();
                     elementDeleted = true;
                 }

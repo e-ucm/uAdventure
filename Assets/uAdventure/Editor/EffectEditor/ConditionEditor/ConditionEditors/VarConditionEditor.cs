@@ -67,6 +67,7 @@ namespace uAdventure.Editor
 
             EditorGUILayout.BeginHorizontal();
 
+            var target = c.getId();
             if (Available)
             {
                 var vars = Controller.Instance.VarFlagSummary.getVars();
@@ -90,6 +91,17 @@ namespace uAdventure.Editor
             {
                 condition.setState(indexToState[EditorGUILayout.Popup(stateToIndex[condition.getState()], valueStrings)]);
                 condition.setValue(int.Parse(EditorGUILayout.TextField(condition.getValue().ToString())));
+            }
+
+            var newTarget = c.getId();
+            if (target != newTarget)
+            {
+                if (!string.IsNullOrEmpty(target))
+                {
+                    Controller.Instance.VarFlagSummary.deleteVarReference(target);
+                }
+                Controller.Instance.VarFlagSummary.addVarReference(newTarget);
+                Controller.Instance.DataModified();
             }
 
             EditorGUILayout.EndHorizontal();
@@ -124,8 +136,15 @@ namespace uAdventure.Editor
             }
             else
             {
+                if (!string.IsNullOrEmpty(condition.getId()))
+                {
+                    Controller.Instance.VarFlagSummary.deleteVarReference(condition.getId());
+                }
                 condition.setId(message);
             }
+
+            Controller.Instance.VarFlagSummary.addVarReference(message);
+            Controller.Instance.DataModified();
         }
 
         public void OnDialogCanceled(object workingObject = null) { }

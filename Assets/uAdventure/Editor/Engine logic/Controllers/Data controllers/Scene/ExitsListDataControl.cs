@@ -162,6 +162,7 @@ namespace uAdventure.Editor
 
             exitsList.Add(newExit);
             exitsDataControlList.Add(newExitDataControl);
+            Controller.Instance.DataModified();
         }
 
 
@@ -175,6 +176,8 @@ namespace uAdventure.Editor
             Exit newElement = (Exit)(((Exit)(dataControl.getContent())).Clone());
             exitsList.Add(newElement);
             exitsDataControlList.Add(new ExitDataControl(sceneDataControl, newElement));
+            Controller.Instance.updateVarFlagSummary();
+            Controller.Instance.DataModified();
             return true;
         }
 
@@ -187,7 +190,8 @@ namespace uAdventure.Editor
             if (exitsList.Remove((Exit)dataControl.getContent()))
             {
                 exitsDataControlList.Remove((ExitDataControl)dataControl);
-                controller.DataModified();
+                Controller.Instance.updateVarFlagSummary();
+                Controller.Instance.DataModified();
                 elementDeleted = true;
             }
 

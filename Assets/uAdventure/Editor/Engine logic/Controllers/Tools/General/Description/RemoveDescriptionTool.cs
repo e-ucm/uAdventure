@@ -75,10 +75,12 @@ namespace uAdventure.Editor
 
         public override bool redoTool()
         {
-
             bool redone = doTool();
             if (redone)
+            {
+                Controller.Instance.updateVarFlagSummary();
                 Controller.Instance.updatePanel();
+            }
             return redone;
         }
 
@@ -89,6 +91,7 @@ namespace uAdventure.Editor
             descriptionsController.addDescriptionController(deletedDescriptionController, lastSelectedDescription);
             descriptionsController.addDescription(deletedDescriptionController.getDescriptionData(), lastSelectedDescription);
             descriptionsController.setSelectedDescription(lastSelectedDescription);
+            Controller.Instance.updateVarFlagSummary();
             Controller.Instance.updatePanel();
             return true;
         }

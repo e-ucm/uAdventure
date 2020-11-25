@@ -202,6 +202,8 @@ namespace uAdventure.Editor
             globalStatesList.Add(newElement);
             globalStatesDataControlList.Add(new GlobalStateDataControl(newElement));
             controller.IdentifierSummary.addId<GlobalState>(id);
+            controller.updateVarFlagSummary();
+            controller.DataModified();
             return true;
         }
 
@@ -228,6 +230,7 @@ namespace uAdventure.Editor
                     globalStatesDataControlList.Remove((GlobalStateDataControl)dataControl);
                     controller.deleteIdentifierReferences(globalStateId);
                     controller.IdentifierSummary.deleteId<GlobalState>(globalStateId);
+                    controller.updateVarFlagSummary();
                     controller.DataModified();
                     elementDeleted = true;
                 }

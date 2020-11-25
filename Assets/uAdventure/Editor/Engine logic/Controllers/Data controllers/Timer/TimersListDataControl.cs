@@ -205,6 +205,8 @@ namespace uAdventure.Editor
             Timer newElement = (Timer)(((Timer)(dataControl.getContent())).Clone());
             timersList.Add(newElement);
             timersDataControlList.Add(new TimerDataControl(newElement));
+            controller.updateVarFlagSummary();
+            controller.DataModified();
             return true;
 
         }
@@ -242,6 +244,7 @@ namespace uAdventure.Editor
                 if (timersList.Remove((Timer)dataControl.getContent()))
                 {
                     timersDataControlList.Remove((TimerDataControl)dataControl);
+                    controller.updateVarFlagSummary();
                     controller.DataModified();
                     elementDeleted = true;
                 }

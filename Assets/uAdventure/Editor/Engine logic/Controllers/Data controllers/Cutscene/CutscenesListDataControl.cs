@@ -231,6 +231,7 @@ namespace uAdventure.Editor
                         cutscenesDataControlList.Remove((CutsceneDataControl)dataControl);
                         controller.deleteIdentifierReferences(cutsceneId);
                         controller.IdentifierSummary.deleteId<Cutscene>(cutsceneId);
+                        controller.updateVarFlagSummary();
                         controller.DataModified();
                         elementDeleted = true;
                     }

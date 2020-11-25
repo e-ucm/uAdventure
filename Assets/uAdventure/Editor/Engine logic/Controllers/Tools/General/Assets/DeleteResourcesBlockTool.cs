@@ -80,6 +80,7 @@ namespace uAdventure.Editor
                         parentDataControl.setSelectedResources(selectedResources - 1);
                     }
 
+                    Controller.Instance.updateVarFlagSummary();
                     Controller.Instance.DataModified();
                     elementDeleted = true;
                 }
@@ -98,7 +99,9 @@ namespace uAdventure.Editor
 
             bool redone = doTool();
             if (redone)
+            {
                 Controller.Instance.updatePanel();
+            }
             return redone;
         }
 
@@ -111,6 +114,7 @@ namespace uAdventure.Editor
             resourcesDataControlList.Insert(resourcesIndex, (ResourcesDataControl)dataControl);
             parentDataControl.setSelectedResources(lastSelectedResources);
             Controller.Instance.reloadPanel();
+            Controller.Instance.updateVarFlagSummary();
             return true;
         }
     }

@@ -377,6 +377,7 @@ namespace uAdventure.Editor
                 ElementContainer ec = new ElementContainer(erdc, -1, null);
                 lastElementContainer = ec;
                 reassignLayerAllReferencesDataControl(insertInOrder(ec, false));
+                Controller.Instance.DataModified();
             }
         }
 
@@ -429,6 +430,8 @@ namespace uAdventure.Editor
                 {
                     getReferencesList(type).Remove(elementRef);
                     delete(dataControl);
+                    Controller.Instance.updateVarFlagSummary();
+                    Controller.Instance.DataModified();
                     elementDeleted = true;
                 }
                 
@@ -489,6 +492,7 @@ namespace uAdventure.Editor
                 {
                     setPlayerPosition(index);
                 }
+                Controller.Instance.DataModified();
                 moved = true;
             }
 

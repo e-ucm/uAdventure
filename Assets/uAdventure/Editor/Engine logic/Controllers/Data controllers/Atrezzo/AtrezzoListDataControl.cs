@@ -254,6 +254,7 @@ namespace uAdventure.Editor
                     atrezzoDataControlList.Remove((AtrezzoDataControl)dataControl);
                     controller.deleteIdentifierReferences(atrezzoId);
                     controller.IdentifierSummary.deleteId<Atrezzo>(atrezzoId);
+                    controller.updateVarFlagSummary();
                     controller.DataModified();
                     elementDeleted = true;
                 }

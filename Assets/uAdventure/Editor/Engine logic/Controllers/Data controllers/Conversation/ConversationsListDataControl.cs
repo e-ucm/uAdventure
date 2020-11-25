@@ -280,6 +280,7 @@ namespace uAdventure.Editor
                     conversationsDataControlList.Remove((ConversationDataControl)dataControl);
                     controller.deleteIdentifierReferences(conversationId);
                     controller.IdentifierSummary.deleteId<Conversation>(conversationId);
+                    controller.updateVarFlagSummary();
                     controller.DataModified();
                     elementDeleted = true;
                 }
