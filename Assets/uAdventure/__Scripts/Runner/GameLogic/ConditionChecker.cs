@@ -83,6 +83,9 @@ namespace uAdventure.Runner
                         case VarCondition.VAR_LESS_EQUALS_THAN:
                             ret = val <= c.getValue();
                             break;
+                        case VarCondition.VAR_NOT_EQUALS:
+                            ret = val != c.getValue();
+                            break;
                     }
                     break;
             }
