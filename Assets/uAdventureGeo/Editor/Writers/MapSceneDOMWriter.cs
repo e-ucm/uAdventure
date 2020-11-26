@@ -25,7 +25,7 @@ namespace uAdventure.Geo
             element.SetAttribute("tileMetaIdentifier", mapScene.TileMetaIdentifier);
             element.SetAttribute("usesGameplayArea", mapScene.UsesGameplayArea ? "yes" : "no");
             element.SetAttribute("gameplayArea", mapScene.GameplayArea.ToString());
-            element.SetAttribute("center", mapScene.LatLon.ToString());
+            element.SetAttribute("center", ToStringWithCulture(mapScene.LatLon, CultureInfo.InvariantCulture));
             element.SetAttribute("zoom", mapScene.Zoom.ToString());
 
             if (options.Any(o => o is CIP && (o as CIP).TargetId.Equals(mapScene.getId())))
@@ -49,7 +49,7 @@ namespace uAdventure.Geo
             var mapElementNode = Writer.GetDoc().CreateElement("map-element");
             mapElementNode.SetAttribute("targetId", mapElement.getTargetId());
             mapElementNode.SetAttribute("layer", mapElement.Layer.ToString());
-            mapElementNode.SetAttribute("scale", mapElement.Scale.ToString(CultureInfo.InvariantCulture));
+            mapElementNode.SetAttribute("scale", ToStringWithCulture(mapElement.Scale, CultureInfo.InvariantCulture));
             mapElementNode.SetAttribute("orientation", ((int)mapElement.Orientation).ToString());
             node.AppendChild(mapElementNode);
 
@@ -65,17 +65,50 @@ namespace uAdventure.Geo
                 foreach(var param in elemRef.TransformManagerDescriptor.ParameterDescription)
                 {
                     var paramElem = Writer.GetDoc().CreateElement("param");
-                    paramElem.SetAttribute("name", param.Key); 
-                    if (elemRef.TransformManagerParameters[param.Key] is float)
-                    {
-                        paramElem.InnerText = ((float)elemRef.TransformManagerParameters[param.Key]).ToString(CultureInfo.InvariantCulture);
-                    }
-                    else
-                    {
-                        paramElem.InnerText = elemRef.TransformManagerParameters[param.Key].ToString();
-                    }
+                    paramElem.SetAttribute("name", param.Key);
+                    paramElem.InnerText = ToStringWithCulture(elemRef.TransformManagerParameters[param.Key], CultureInfo.InvariantCulture);
                     elemRefNode.AppendChild(paramElem);
                 }
+
+                var actions = Writer.GetDoc().CreateElement("actions");
+                elemRefNode.AppendChild(actions);
+                DOMWriterUtility.DOMWrite(actions, elemRef.Actions);
+            }
+        }
+
+        private static string ToStringWithCulture(object elem, CultureInfo culture)
+        {
+            if (elem is float)
+            {
+                return ((float)elem).ToString(culture);
+            }
+            else if (elem is double)
+            {
+                return ((double)elem).ToString(culture);
+            }
+            else if (elem is Vector2)
+            {
+                var vector = (Vector2)elem;
+                return "(" + vector[0].ToString(culture) + ", " + vector[1].ToString(culture) + ")";
+            }
+            else if (elem is Vector2d)
+            {
+                var vector = (Vector2d)elem;
+                return "(" + vector[0].ToString(culture) + ", " + vector[1].ToString(culture) + ")";
+            }
+            else if (elem is Vector3)
+            {
+                var vector = (Vector3)elem;
+                return "(" + vector[0].ToString(culture) + ", " + vector[1].ToString(culture) + ", " + vector[2].ToString(culture) + ")";
+            }
+            else if (elem is Vector3d)
+            {
+                var vector = (Vector3d)elem;
+                return "(" + vector[0].ToString(culture) + ", " + vector[1].ToString(culture) + ", " + vector[2].ToString(culture) + ")";
+            }
+            else
+            {
+                return elem.ToString();
             }
         }
 

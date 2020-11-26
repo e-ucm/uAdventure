@@ -23,7 +23,7 @@ namespace uAdventure.Geo
             mapScene.TileMetaIdentifier = ExString.Default(element.GetAttribute("tileMetaIdentifier"), "OSMTile");
             mapScene.UsesGameplayArea = ExString.EqualsDefault(element.GetAttribute("usesGameplayArea"), "yes", false);
             mapScene.GameplayArea = ExParsers.ParseDefault(element.GetAttribute("gameplayArea"), new RectD(Vector2d.zero, Vector2d.zero));
-            mapScene.LatLon = ExParsers.ParseDefault(element.GetAttribute("center"), Vector2d.zero);
+            mapScene.LatLon = (Vector2d) parseParam(typeof(Vector2d), element.GetAttribute("center"));
             mapScene.Zoom = ExParsers.ParseDefault(element.GetAttribute("zoom"), 19);
 
             bool initialScene = ExString.EqualsDefault(element.GetAttribute("start"), "yes", false);
@@ -54,6 +54,11 @@ namespace uAdventure.Geo
                             extElem.TransformManagerParameters.Add(param.Key, parseParam(param.Value.Type, paramNode.InnerText));
                         }
                     }
+                    var actions = extElemNode.SelectSingleNode("actions");
+                    if(actions != null)
+                    {
+                        extElem.Actions = DOMParserUtility.DOMParse<GeoAction>(actions.ChildNodes, parameters) as List<GeoAction>;
+                    }
                 }
                 else
                 {
@@ -76,7 +81,7 @@ namespace uAdventure.Geo
             // Basic types
             if(paramType == typeof(float))
             {
-                return float.Parse(innerText);
+                return float.Parse(innerText, CultureInfo.InvariantCulture);
             }
             if (paramType == typeof(int))
             {
@@ -92,37 +97,47 @@ namespace uAdventure.Geo
             }
             if (paramType == typeof(double))
             {
-                return double.Parse(innerText);
+                return double.Parse(innerText, CultureInfo.InvariantCulture);
             }
             if (paramType == typeof(char))
             {
                 return innerText[0];
             }
-            // Unity types
-            if (paramType == typeof(Vector2))
+
+            if (paramType == typeof(Vector2) || paramType == typeof(Vector2d) || paramType == typeof(Vector3) || paramType == typeof(Vector3d))
             {
+                // Unity types
+
                 // Remove '(' and ')', then split and then convert to numbers
-                var numbers = innerText.Substring(1, innerText.Length - 2).Split(',').ToList().ConvertAll(s => float.Parse(s.Trim()));
-                return new Vector2(numbers[0], numbers[1]);
+                var noParenthesis = innerText.Substring(1, innerText.Length - 2);
+
+                // Split by coma and space as a separator
+                var cyphers = noParenthesis.Split(new string[] { ", " }, StringSplitOptions.None);
+
+                if (paramType == typeof(Vector2))
+                {
+                    var numbers = cyphers.Select(s => float.Parse(s, CultureInfo.InvariantCulture)).ToArray();
+                    return new Vector2(numbers[0], numbers[1]);
+                }
+                if (paramType == typeof(Vector2d))
+                {
+                    var numbers = cyphers.Select(s => double.Parse(s, CultureInfo.InvariantCulture)).ToArray();
+                    return new Vector2d(numbers[0], numbers[1]);
+                }
+                if (paramType == typeof(Vector3))
+                {
+                    // Remove '(' and ')', then split and then convert to numbers
+                    var numbers = cyphers.Select(s => float.Parse(s, CultureInfo.InvariantCulture)).ToArray();
+                    return new Vector3(numbers[0], numbers[1], numbers[2]);
+                }
+                if (paramType == typeof(Vector3d))
+                {
+                    // Remove '(' and ')', then split and then convert to numbers
+                    var numbers = cyphers.Select(s => double.Parse(s, CultureInfo.InvariantCulture)).ToArray();
+                    return new Vector3d(numbers[0], numbers[1], numbers[2]);
+                }
             }
-            if (paramType == typeof(Vector2d))
-            {
-                // Remove '(' and ')', then split and then convert to numbers
-                var numbers = innerText.Substring(1, innerText.Length - 2).Split(',').ToList().ConvertAll(s => double.Parse(s.Trim()));
-                return new Vector2d(numbers[0], numbers[1]);
-            }
-            if (paramType == typeof(Vector3))
-            {
-                // Remove '(' and ')', then split and then convert to numbers
-                var numbers = innerText.Substring(1, innerText.Length - 2).Split(',').ToList().ConvertAll(s => float.Parse(s.Trim()));
-                return new Vector3(numbers[0], numbers[1], numbers[2]);
-            }
-            if (paramType == typeof(Vector3d))
-            {
-                // Remove '(' and ')', then split and then convert to numbers
-                var numbers = innerText.Substring(1, innerText.Length - 2).Split(',').ToList().ConvertAll(s => double.Parse(s.Trim()));
-                return new Vector3d(numbers[0], numbers[1], numbers[2]);
-            }
+            
 
             return null;
         }
