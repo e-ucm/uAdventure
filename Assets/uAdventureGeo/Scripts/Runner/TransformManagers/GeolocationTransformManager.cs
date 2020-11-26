@@ -123,6 +123,7 @@ namespace uAdventure.Geo
                         Type = GMLGeometry.GeometryType.Point
                     };
                     newManager.Player = character;
+                    newManager.Holder = positioner.gameObject;
                     geoActionManagers.Add(newManager);
                 }
             }

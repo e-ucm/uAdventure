@@ -193,6 +193,35 @@ namespace uAdventure.Geo
             }
         }
 
+        public void SomethingReached(GameObject gb)
+        {
+            if (navigating && currentStep != null && currentStep.Reference == gb.name)
+            {
+                var mb = GetReference(gb.name);
+                if(mb != null)
+                {
+                    // Check if reached
+                    bool reached = IsReached(mb);
+                    UpdateArrow(reached);
+
+                    // Go next
+                    if (reached && !currentStep.LockNavigation && CompleteStep(currentStep))
+                    {
+                        // If the step is completed successfully we set the current step to null
+                        currentStep = null;
+
+                        if (stepCompleted.All(kv => kv.Value))
+                        {
+                            // Navigation finished
+                            navigating = false;
+                            SaveNavigation(Game.Instance.GameState.GetMemory("geo_extension"));
+                            DestroyImmediate(this.gameObject);
+                        }
+                    }
+                }
+            }
+        }
+
 
 
         // -------------------- 
@@ -204,7 +233,6 @@ namespace uAdventure.Geo
             return steps.Find(s => !stepCompleted[s]); // The first not completed
         }
 
-
         private bool IsReached(NavigationStep currentStep)
         {
             if (!character)
@@ -215,21 +243,26 @@ namespace uAdventure.Geo
             var mb = GetReference(currentStep.Reference);
             if (mb == null)
                 return false; // If the element is not there, just try to skip it
+
+            return IsReached(mb);
+        }
+
+        private bool IsReached(MonoBehaviour mb)
+        {
+            if (mb == null)
+                return false; // If the element is not there, just try to skip it
             else if (mb is GeoPositioner)
             {
                 var wrap = mb as GeoPositioner;
                 var position = (Vector2d)wrap.Context.TransformManagerParameters["Position"];
-                var interactionRange = (float) wrap.Context.TransformManagerParameters["InteractionRange"];
-                
-                var distance = GM.SeparationInMeters(position, character.LatLon);
+                var interactionRange = (float)wrap.Context.TransformManagerParameters["InteractionRange"];
+
                 var realDistance = GM.SeparationInMeters(position, GeoExtension.Instance.Location);
 
                 // Is inside if the character is in range but also the real coords are saying so
                 // Otherwise, if there is no character or gps, only one of the checks is valid
 
-                return (!character || distance < interactionRange) 
-                    && (!GeoExtension.Instance.IsStarted() || realDistance < interactionRange)
-                    && (GeoExtension.Instance.IsStarted() || character);
+                return realDistance < interactionRange;
             }
             else if (mb is GeoElementMB)
             {
@@ -238,12 +271,12 @@ namespace uAdventure.Geo
                 // Is inside if the character is inside the influence but also the real coords are saying so
                 // Otherwise, if there is no character or gps, only one of the checks is valid                
 
-                var location = character ? character.LatLon : GeoExtension.Instance.Location;
+                var location = GeoExtension.Instance.Location;
                 if (geomb.Geometry.InsideInfluence(location))
                 {
                     if (geomb.Geometry.Type == GMLGeometry.GeometryType.LineString)
                     {
-                        var step = 0; 
+                        var step = 0;
                         completedElementsForStep.TryGetValue(currentStep, out step);
                         var position = geomb.Geometry.Points[step];
                         var distance = GM.SeparationInMeters(position, location);
@@ -255,6 +288,8 @@ namespace uAdventure.Geo
             }
             else return false;
         }
+
+
 
         /// <summary>
         /// To complete the step, all the elements inside the step must be completed.

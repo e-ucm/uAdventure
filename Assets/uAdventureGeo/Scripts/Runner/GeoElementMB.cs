@@ -347,6 +347,11 @@ namespace uAdventure.Geo
 
             protected override void Execute()
             {
+                if (NavigationController.Instance)
+                {
+                    NavigationController.Instance.SomethingReached(Holder);
+                }
+
                 Game.Instance.GameState.BeginChangeAmbit();
                 latLonOnExecute = LatLon;
                 base.Execute();
