@@ -20,7 +20,7 @@ namespace uAdventure.Geo
             get { return memory.Get<bool>("using_debug_location"); }
             set
             {
-                if (Application.isEditor && Application.isPlaying)
+                if ((!Application.isMobilePlatform || PreviewManager.Instance.InPreviewMode) && Application.isPlaying)
                 {
                     memory.Set("using_debug_location", value);
                 }
@@ -247,7 +247,7 @@ namespace uAdventure.Geo
                 GUI.DrawTexture(new Rect(Screen.width - iconWidth - 5, 5, iconWidth, iconHeight), paintSimbol);
             }
 
-            if (Application.isEditor)
+            if (Application.isEditor || PreviewManager.Instance.InPreviewMode)
             {
                 if (guiMap == null)
                 {
@@ -336,7 +336,7 @@ namespace uAdventure.Geo
             }
             set
             {
-                if (Application.isEditor && Application.isPlaying)
+                if ((!Application.isMobilePlatform || PreviewManager.Instance.InPreviewMode) && Application.isPlaying)
                 {
                     UsingDebugLocation = true;
                     memory.Set("debug_location", value);

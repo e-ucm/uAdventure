@@ -10,7 +10,7 @@ using UnityEngine.EventSystems;
 
 namespace uAdventure.Geo
 {
-    public class MapSceneMB : MonoBehaviour, IRunnerChapterTarget
+    public class MapSceneMB : MonoBehaviour, IRunnerChapterTarget, IPointerClickHandler
     {
         public TileManager tileManager;
         public uAdventurePlugin uAdventurePlugin;
@@ -197,7 +197,7 @@ namespace uAdventure.Geo
                     startOrtho = Camera.main.orthographicSize;
                 }
                 
-                if((touch0.phase == TouchPhase.Moved || touch0.phase == TouchPhase.Stationary) &&
+                if ((touch0.phase == TouchPhase.Moved || touch0.phase == TouchPhase.Stationary) &&
                     (touch1.phase == TouchPhase.Moved || touch1.phase == TouchPhase.Stationary))
                 {
                     var currentDist = (touch1.position - touch0.position).sqrMagnitude;
@@ -210,6 +210,20 @@ namespace uAdventure.Geo
             {
                 uAdventureRaycaster.Instance.Override = null;
                 isPinching = false;
+            }
+        }
+
+        public void OnPointerClick(PointerEventData eventData)
+        {
+            if (!Application.isMobilePlatform)
+            {
+                GeoExtension.Instance.UsingDebugLocation = true;
+                eventData.Use();
+                var tileManagerRelative = GM.LatLonToMeters(tileManager.Latitude, tileManager.Longitude);
+                var localPosition = tileManager.transform.worldToLocalMatrix.MultiplyPoint(eventData.pointerCurrentRaycast.worldPosition);
+                var meters = localPosition.ToVector2xz().ToVector2d();
+                var latLon = GM.MetersToLatLon(tileManagerRelative + meters);
+                GeoExtension.Instance.Location = latLon;
             }
         }
     }
