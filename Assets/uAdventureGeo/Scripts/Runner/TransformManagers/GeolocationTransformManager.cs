@@ -3,6 +3,7 @@ using MapzenGo.Helpers;
 using System.Collections.Generic;
 using uAdventure.Runner;
 using UnityEngine;
+using static uAdventure.Geo.GeoElementMB;
 
 namespace uAdventure.Geo
 {
@@ -62,6 +63,7 @@ namespace uAdventure.Geo
         private Representable representable;
         private bool shown = true;
         private bool hint;
+        private List<IGeoActionManager> geoActionManagers;
 
         public void Configure(Dictionary<string, object> parameters)
         {
@@ -71,6 +73,8 @@ namespace uAdventure.Geo
             revealOnRange = (bool)parameters["RevealOnlyOnRange"];
             hint = (bool)parameters["Hint"];
             particleTexture = Game.Instance.ResourceManager.getImage(parameters["RevealParticleTexture"] as string);
+
+
         }
 
 
@@ -87,7 +91,7 @@ namespace uAdventure.Geo
             transform.localPosition = basePosition + centerVector;
             transform.localRotation = Quaternion.Euler(90, rotation, 0);
 
-            if (interactionRange <= 0 || GM.SeparationInMeters(character.LatLon, latLon) <= interactionRange)
+            if (interactionRange <= 0 || GM.SeparationInMeters(GeoExtension.Instance.Location, latLon) <= interactionRange)
             {
                 SetShown(true);
                 if (interactuable != null)
@@ -102,6 +106,30 @@ namespace uAdventure.Geo
                 {
                     interactuable.setInteractuable(true);
                 }
+            }
+
+            if (geoActionManagers == null && Context != null && Context.Actions != null)
+            {
+                geoActionManagers = new List<IGeoActionManager>();
+                foreach (var action in Context.Actions)
+                {
+                    GeoActionManagerFactory.Instance.CreateFor(action);
+                    var newManager = GeoActionManagerFactory.Instance.CreateFor(action);
+                    newManager.Element = Context.TargetId;
+                    newManager.Geometry = new GMLGeometry
+                    {
+                        Influence = interactionRange,
+                        Points = new Vector2d[] { latLon },
+                        Type = GMLGeometry.GeometryType.Point
+                    };
+                    newManager.Player = character;
+                    geoActionManagers.Add(newManager);
+                }
+            }
+
+            if(geoActionManagers != null)
+            {
+                geoActionManagers.ForEach(g => g.Update());
             }
         }
 

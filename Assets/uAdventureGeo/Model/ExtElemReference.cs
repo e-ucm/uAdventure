@@ -16,6 +16,9 @@ namespace uAdventure.Geo
         private List<string> values;
         [SerializeField]
         private List<string> types;
+        [SerializeField]
+        private List<GeoAction> geoActions;
+        public List<GeoAction> Actions { get { return geoActions; } set { geoActions = value; } }
 
         public ExtElemReference(string idTarget) : base(idTarget)
         {
@@ -27,6 +30,8 @@ namespace uAdventure.Geo
                 TransformManagerDescriptor = TransformManagerDescriptorFactory.Instance
                     .CreateDescriptor(keys.Current);
             }
+
+            geoActions = new List<GeoAction>();
         }
 
         public ITransformManagerDescriptor TransformManagerDescriptor { get; set; }

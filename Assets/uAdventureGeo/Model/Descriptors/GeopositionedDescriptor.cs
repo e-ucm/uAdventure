@@ -6,6 +6,7 @@ namespace uAdventure.Geo
 {
     public class GeopositionedDescriptor : ITransformManagerDescriptor
     {
+        public const string GeopositionedName = "WorldPositioned";
 
         public GeopositionedDescriptor()
         {
@@ -20,7 +21,7 @@ namespace uAdventure.Geo
             };
         }
 
-        public string Name { get { return "WorldPositioned"; } }
+        public string Name { get { return GeopositionedName; } }
         public Dictionary<string, ParameterDescription> ParameterDescription { get; private set; }
         public Type Type { get { return typeof(GeolocationTransformManager); } }
     }

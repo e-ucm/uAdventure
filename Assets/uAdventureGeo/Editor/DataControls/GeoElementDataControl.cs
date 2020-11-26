@@ -19,12 +19,12 @@ namespace uAdventure.Geo
         private readonly ListDataControl<GeoElementDataControl, GMLGeometryDataControl> geometryDataControls;
         private int selectedGeometry;
 
-        private const int GEO_ELEMENT    = 62345459;
-        private const int ENTER_ACTION   = 87234678;
-        private const int EXIT_ACTION    = 78234568;
-        private const int LOOK_TO_ACTION = 23848923;
-        private const int INSPECT_ACTION = 67213469;
-        private const int GEOMETRY       = 24312342;
+        public const int GEO_ELEMENT    = 62345459;
+        public const int ENTER_ACTION   = 87234678;
+        public const int EXIT_ACTION    = 78234568;
+        public const int LOOK_TO_ACTION = 23848923;
+        public const int INSPECT_ACTION = 67213469;
+        public const int GEOMETRY       = 24312342;
 
         public DescriptionsController DescriptionController
         {

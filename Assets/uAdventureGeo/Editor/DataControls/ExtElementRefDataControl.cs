@@ -6,6 +6,8 @@ using System.Linq;
 using MoreLinq;
 using System;
 
+using TD = uAdventure.Editor.DefaultElementFactory<uAdventure.Geo.GeoActionDataControl>.ElementCreator.TypeDescriptor;
+
 namespace uAdventure.Geo
 {
     public class TransformManagerDataControl : DataControl, IObserver<DataControl>
@@ -281,6 +283,7 @@ namespace uAdventure.Geo
     {
         private readonly ExtElemReference extElemReference;
         private readonly TransformManagerDataControl transformManagerDataControl;
+        private readonly ListDataControl<ExtElementRefDataControl, GeoActionDataControl> geoActionDataControls;
 
         private int type;
 
@@ -288,12 +291,73 @@ namespace uAdventure.Geo
         {
             get { return getReferencedElementDataControl(); }
         }
+        public ListDataControl<ExtElementRefDataControl, GeoActionDataControl> GeoActions
+        {
+            get { return geoActionDataControls; }
+        }
 
         public ExtElementRefDataControl(ExtElemReference extElemReference) : base(extElemReference)
         {
             this.extElemReference = extElemReference;
             type = getReferenceType(extElemReference.getTargetId());
-            this.transformManagerDataControl = new TransformManagerDataControl(this);
+            this.transformManagerDataControl = new TransformManagerDataControl(this); 
+
+            geoActionDataControls = new ListDataControl<ExtElementRefDataControl, GeoActionDataControl>(this, extElemReference.Actions, new []
+            {
+                new ListDataControl<ExtElementRefDataControl, GeoActionDataControl>.ElementFactoryView
+                {
+                    Titles =
+                    {
+                        { GeoElementDataControl.ENTER_ACTION   , "Geo.Create.Title.EnterAction"},
+                        { GeoElementDataControl.EXIT_ACTION    , "Geo.Create.Title.ExitAction"},
+                        { GeoElementDataControl.LOOK_TO_ACTION , "Geo.Create.Title.LookToAction"}
+                    },
+                    Messages =
+                    {
+                        { GeoElementDataControl.ENTER_ACTION   , "Geo.Create.Message.EnterAction"},
+                        { GeoElementDataControl.EXIT_ACTION    , "Geo.Create.Message.ExitAction"},
+                        { GeoElementDataControl.LOOK_TO_ACTION , "Geo.Create.Message.LookToAction"}
+                    },
+                    Errors =
+                    {
+                        { GeoElementDataControl.ENTER_ACTION   , "Geo.Create.Error.EnterAction"},
+                        { GeoElementDataControl.EXIT_ACTION    , "Geo.Create.Error.ExitAction"},
+                        { GeoElementDataControl.LOOK_TO_ACTION , "Geo.Create.Error.LookToAction"}
+                    },
+                    ElementFactory = new DefaultElementFactory<GeoActionDataControl>(new DefaultElementFactory<GeoActionDataControl>.ElementCreator()
+                    {
+                        TypeDescriptors = new []
+                        {
+                            new TD
+                            {
+                                Type = GeoElementDataControl.ENTER_ACTION,
+                                ContentType = typeof(EnterAction)
+                            },
+                            new TD
+                            {
+                                Type = GeoElementDataControl.EXIT_ACTION,
+                                ContentType = typeof(ExitAction)
+                            },
+                            new TD
+                            {
+                                Type = GeoElementDataControl.LOOK_TO_ACTION,
+                                ContentType = typeof(InspectAction)
+                            }
+                        },
+                        CreateDataControl = action => new GeoActionDataControl(action as GeoAction),
+                        CreateElement = (type, id, _) =>
+                        {
+                            switch (type)
+                            {
+                                case GeoElementDataControl.ENTER_ACTION:   return new GeoActionDataControl(new EnterAction());
+                                case GeoElementDataControl.EXIT_ACTION:    return new GeoActionDataControl(new ExitAction());
+                                case GeoElementDataControl.LOOK_TO_ACTION: return new GeoActionDataControl(new LookToAction());
+                                default: return null;
+                            }
+                        }
+                    })
+                }
+            });
         }
 
         private static int getReferenceType(string id)
