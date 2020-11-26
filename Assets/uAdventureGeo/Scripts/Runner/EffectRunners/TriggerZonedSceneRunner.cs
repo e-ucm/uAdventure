@@ -26,6 +26,11 @@ namespace uAdventure.Geo
             zc.transitionTime = effect.getTransitionTime();
             zc.zoneid = geoElement.Id;
 
+            if (Application.isEditor && Application.isPlaying)
+            {
+                GeoExtension.Instance.Location = GeoExtension.Instance.Location; // This will activate debug location
+            }
+
             Game.Instance.RunTarget(effect.getTargetId(), effect.getTransitionTime(), effect.getTransitionType());
 
             return false;

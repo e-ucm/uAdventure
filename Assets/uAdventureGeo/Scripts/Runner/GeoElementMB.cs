@@ -56,8 +56,10 @@ namespace uAdventure.Geo
             foreach (var action in Element.Actions)
             {
                 var newManager = GeoActionManagerFactory.Instance.CreateFor(action);
-                newManager.Element = Element;
-                newManager.Holder = this;
+                newManager.Element = Element.Id;
+                newManager.Geometry = Geometry;
+                newManager.Player = player;
+                newManager.Holder = gameObject;
                 geoActionManagers.Add(newManager);
             }
 
@@ -218,7 +220,7 @@ namespace uAdventure.Geo
         // GEO Actions
         // --------------------------------------
 
-        private class GeoActionManagerFactory
+        public class GeoActionManagerFactory
         {
             private static GeoActionManagerFactory instance;
             public static GeoActionManagerFactory Instance { get { return instance ?? (instance = new GeoActionManagerFactory()); } }
@@ -245,11 +247,13 @@ namespace uAdventure.Geo
         }
 
         // Interface
-        private interface IGeoActionManager
+        public interface IGeoActionManager
         {
             GeoAction Action { get; set; }
-            GeoElementMB Holder { get; set; }
-            GeoElement Element { get; set; }
+            GMLGeometry Geometry { get; set; }
+            GeoPositionedCharacter Player { get; set; }
+            GameObject Holder { get; set; }
+            string Element { get; set; }
             Type ActionType { get; }
             void Update();
         }
@@ -257,8 +261,10 @@ namespace uAdventure.Geo
         // Abstract class
         private abstract class AbstractGeoActionManager : IGeoActionManager
         {
-            public GeoElementMB Holder { get; set; }
-            public GeoElement Element { get; set; }
+            public GMLGeometry Geometry { get; set; }
+            public GeoPositionedCharacter Player { get; set; }
+            public GameObject Holder { get; set; }
+            public string Element { get; set; }
             public GeoAction Action { get; set; }
             public abstract Type ActionType { get; }
 
@@ -290,9 +296,7 @@ namespace uAdventure.Geo
             {
                 get
                 {
-                    return GeoExtension.Instance.IsStarted() && GeoExtension.Instance.IsLocationValid()
-                        ? Input.location.lastData.LatLonD()
-                        : Holder.player.LatLon;
+                    return GeoExtension.Instance.Location;
                 }
             }
 
@@ -309,7 +313,7 @@ namespace uAdventure.Geo
 
             public override void Start()
             {
-                wasInside = Holder.Geometry.InsideInfluence(LatLon);
+                wasInside = Geometry.InsideInfluence(LatLon);
             }
 
             protected override bool CustomChecks()
@@ -317,7 +321,7 @@ namespace uAdventure.Geo
                 EnterAction ea = Action as EnterAction;
                 var r = false;
 
-                if (Holder.Geometry.InsideInfluence(LatLon))
+                if (Geometry.InsideInfluence(LatLon))
                 {
                     if (!wasInside)
                     {
@@ -351,7 +355,7 @@ namespace uAdventure.Geo
             protected override void ActionFinished(object interactuable)
             {
                 Game.Instance.GameState.EndChangeAmbitAsExtensions();
-                TrackerExtension.Movement.Entered(Element.Id, latLonOnExecute);
+                TrackerExtension.Movement.Entered(Element, latLonOnExecute);
                 TrackerAsset.Instance.Flush();
             }
         }
@@ -366,7 +370,7 @@ namespace uAdventure.Geo
 
             public override void Start()
             {
-                wasOutside = Holder.Geometry.InsideInfluence(LatLon);
+                wasOutside = Geometry.InsideInfluence(LatLon);
             }
 
             protected override bool CustomChecks()
@@ -374,7 +378,7 @@ namespace uAdventure.Geo
                 ExitAction ea = Action as ExitAction;
                 var r = false;
 
-                if (!Holder.Geometry.InsideInfluence(LatLon))
+                if (!Geometry.InsideInfluence(LatLon))
                 {
                     if (!wasOutside)
                     {
@@ -408,7 +412,7 @@ namespace uAdventure.Geo
             protected override void ActionFinished(object interactuable)
             {
                 Game.Instance.GameState.EndChangeAmbitAsExtensions();
-                TrackerExtension.Movement.Exited(Element.Id, latLonOnExecute);
+                TrackerExtension.Movement.Exited(Element, latLonOnExecute);
                 TrackerAsset.Instance.Flush();
             }
         }
@@ -425,15 +429,15 @@ namespace uAdventure.Geo
                 LookToAction ea = Action as LookToAction;
                 var r = false;
 
-                if (!ea.Inside || Holder.Geometry.InsideInfluence(LatLon))
+                if (!ea.Inside || Geometry.InsideInfluence(LatLon))
                 {
                     if (ea.Center)
                     {
-                        r = Holder.player.IsLookingTo(Holder.Geometry.Center);
+                        r = Player.IsLookingTo(Geometry.Center);
                     }
                     else
                     {
-                        r = Holder.player.IsLookingTowards(ea.Direction.ToVector2d());
+                        r = Player.IsLookingTowards(ea.Direction.ToVector2d());
                     }
                 }
 
@@ -444,14 +448,14 @@ namespace uAdventure.Geo
             {
                 Game.Instance.GameState.BeginChangeAmbit();
                 latLonOnExecute = LatLon;
-                orientationOnExecute = Holder.player.Orientation;
+                orientationOnExecute = Player.Orientation;
                 base.Execute();
             }
 
             protected override void ActionFinished(object interactuable)
             {
                 Game.Instance.GameState.EndChangeAmbitAsExtensions();
-                TrackerExtension.Movement.Looked(Element.Id, orientationOnExecute, latLonOnExecute);
+                TrackerExtension.Movement.Looked(Element, orientationOnExecute, latLonOnExecute);
                 TrackerAsset.Instance.Flush();
             }
         }
@@ -464,7 +468,7 @@ namespace uAdventure.Geo
             public override void Start()
             {
                 base.Start();
-                collider = Holder.gameObject.AddComponent<MeshCollider>();
+                collider = Holder.AddComponent<MeshCollider>();
             }
 
             protected override bool CustomChecks()
@@ -494,7 +498,7 @@ namespace uAdventure.Geo
             {
                 Game.Instance.GameState.EndChangeAmbitAsExtensions();
                 TrackerAsset.Instance.setVar("geocommand", "inspect");
-                TrackerAsset.Instance.GameObject.Interacted(Element.Id, GameObjectTracker.TrackedGameObject.GameObject);
+                TrackerAsset.Instance.GameObject.Interacted(Element, GameObjectTracker.TrackedGameObject.GameObject);
                 TrackerAsset.Instance.Flush();
             }
         }

@@ -143,7 +143,7 @@ namespace uAdventure.Geo
 
         protected void Update()
         {
-            ready = true;
+            ready = uAdventurePlugin.ready;
             if (GeoExtension.Instance.IsLocationValid())
             {
                 var inputLatLon = GeoExtension.Instance.Location;

@@ -13,6 +13,7 @@ namespace uAdventure.Geo
 {
     public class uAdventurePlugin : Plugin
     {
+        public bool ready = true;
         public MapSceneMB MapSceneMB { get; set; }
 
         public List<MapElement> OrphanElements
@@ -33,7 +34,8 @@ namespace uAdventure.Geo
 
         protected override IEnumerator CreateRoutine(Tile tile, Action<bool> finished)
         {
-            
+            ready = false;
+
             var allElements = MapSceneMB.MapElements;
             foreach(var elem in allElements)
             {
@@ -46,6 +48,8 @@ namespace uAdventure.Geo
             finished(true);
 
             yield return null;
+
+            ready = true;
         }
 
         protected override IEnumerator UnLoadRoutine(Tile tile, Action<bool> finished)

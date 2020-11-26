@@ -80,12 +80,6 @@ namespace uAdventure.Geo
 
         public override IEnumerator Restart()
         {
-            memory = new Memory();
-            memory.Set("using_debug_location", false);
-            memory.Set("debug_location", Vector2d.zero);
-            memory.Set("navigating", 0);
-            memory.Set("zone_control", false);
-            Game.Instance.GameState.SetMemory("geo_extension", memory);
             CreateNavigationAndZoneControl();
             yield return true;
         }
@@ -93,13 +87,22 @@ namespace uAdventure.Geo
         public override IEnumerator OnGameReady()
         {
             gameIsReady = true;
-            this.memory = Game.Instance.GameState.GetMemory("geo_extension") ?? memory;
             CreateNavigationAndZoneControl();
             yield return null;
         }
 
         public override IEnumerator OnBeforeGameSave() { yield return null; }
-        public override IEnumerator OnAfterGameLoad() { yield return null; }
+        public override IEnumerator OnAfterGameLoad()
+        {
+            memory = new Memory();
+            memory.Set("using_debug_location", false);
+            memory.Set("debug_location", Vector2d.zero);
+            memory.Set("navigating", 0);
+            memory.Set("zone_control", false);
+            this.memory = Game.Instance.GameState.GetMemory("geo_extension") ?? memory;
+            Game.Instance.GameState.SetMemory("geo_extension", memory);
+            yield return null; 
+        }
         public override IEnumerator OnGameFinished() { yield return true; }
 
         private void CreateNavigationAndZoneControl()
