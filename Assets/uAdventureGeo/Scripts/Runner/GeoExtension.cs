@@ -53,7 +53,7 @@ namespace uAdventure.Geo
         void Awake()
         {
             instance = this;
-            StartCoroutine(Restart());
+            //StartCoroutine(Restart());
         }
 
         public void Start()

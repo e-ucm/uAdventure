@@ -13,7 +13,7 @@ namespace uAdventure.Runner
         // -----------
         private CustomEffectRunnerFactory() { LoadRunners(); }
         private static CustomEffectRunnerFactory instance;
-        public static CustomEffectRunnerFactory Instance { get { return instance == null ? instance = new CustomEffectRunnerFactory() : instance; } }
+        public static CustomEffectRunnerFactory Instance { get { return instance == null ? instance = new GameObject().AddComponent<CustomEffectRunnerFactory>() : instance; } }
 
         // ------------------
         // Runner methods

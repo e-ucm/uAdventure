@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Linq;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.Events;
@@ -79,8 +80,8 @@ namespace dZine4D.Misc.QR
 
         public void EnableReader()
         {
-            StopCoroutine("EnableReaderRoutine");
-            StartCoroutine("EnableReaderRoutine");
+            StopCoroutine(EnableReaderRoutine());
+            StartCoroutine(EnableReaderRoutine());
         }
 
         public void DisableReader()
@@ -193,6 +194,22 @@ namespace dZine4D.Misc.QR
                 {
                 }
             }
+        }
+
+
+        private int tries = 0;
+        public void SwitchDevice()
+        {
+            camTexture.Stop();
+            var currentDeviceIndex = WebCamTexture.devices
+                .Select((t, index) => new { t, index })
+                .Where(a => a.t.name == camTexture.deviceName)
+                .Select(a => a.index)
+                .DefaultIfEmpty(-1)
+                .First();
+            
+            camTexture.deviceName = WebCamTexture.devices[(currentDeviceIndex +1) % WebCamTexture.devices.Length].name;
+            camTexture.Play();
         }
 
         // .. COROUTINES
