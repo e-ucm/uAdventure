@@ -5,6 +5,7 @@ using System;
 using uAdventure.Core;
 using System.Collections.Generic;
 using System.Linq;
+using uAdventure.Geo;
 
 namespace uAdventure.Editor
 {
@@ -263,6 +264,11 @@ namespace uAdventure.Editor
             if (SceneEditor.ElementReference != null)
             {
                 var elementReference = SceneEditor.ElementReference as ElementReferenceDataControl;
+                orientation = elementReference.Orientation;
+            }
+            if (MapEditor.ElementReference != null)
+            {
+                var elementReference = MapEditor.ElementReference as ExtElementRefDataControl;
                 orientation = elementReference.Orientation;
             }
             if (npc != null)
