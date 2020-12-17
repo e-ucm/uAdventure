@@ -78,7 +78,6 @@ namespace uAdventure.Runner
                         break;
                 }
                 
-                Game.Instance.GameState.BeginChangeAmbit();
                 if(onExecutionStarted != null)
                 {
                     onExecutionStarted(toDo.action);
