@@ -102,24 +102,6 @@ namespace uAdventure.Runner
                 }
                 TrackerAsset.Instance.Flush();
             }
-
-            // ACCESIBLE
-
-            // If no exited, accesible doesnt matter
-            if (!exited)
-                return;
-
-            // If no destination accesible doesnt matter
-            var destination = Game.Instance.GameState.GetChapterTarget(ed.getNextSceneId());
-            if (destination == null)
-                return;
-
-            if ("accesible".Equals(destination.getXApiClass(), IgnoreCase))
-            {
-                var type = ExParsers.ParseDefault(destination.getXApiType(), AccessibleTracker.Accessible.Accessible);
-                TrackerAsset.Instance.Accessible.Accessed(destination.getId(), type);
-            }
-
         }
 
         bool interactable = false;
