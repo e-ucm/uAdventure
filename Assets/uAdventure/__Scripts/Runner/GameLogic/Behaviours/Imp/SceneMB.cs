@@ -463,16 +463,19 @@ namespace uAdventure.Runner
 
             trajectoryHandler = new TrajectoryHandler(TrajectoryHandler.CreateBlockedTrajectory(trajectory, barriers));
 
-            Representable player = GameObject.Instantiate(playerPrefab, referencesHolder).GetComponent<Representable>();
-            player.Element = Game.Instance.GameState.Player;
-            player.Context = playerContext;
+            if (!ready)
+            {
+                Representable player = GameObject.Instantiate(playerPrefab, referencesHolder).GetComponent<Representable>();
+                player.Element = Game.Instance.GameState.Player;
+                player.Context = playerContext;
 
-            var scenePositioner = player.gameObject.AddComponent<ScenePositioner>();
-            scenePositioner.Scene = this;
-            scenePositioner.Representable = player;
-            scenePositioner.Context = playerContext;
-            // Force the start
-            player.SendMessage("Start");
+                var scenePositioner = player.gameObject.AddComponent<ScenePositioner>();
+                scenePositioner.Scene = this;
+                scenePositioner.Representable = player;
+                scenePositioner.Context = playerContext;
+                // Force the start
+                player.SendMessage("Start");
+            }
         }
 
         private void RefreshBackground(Scene scene)
