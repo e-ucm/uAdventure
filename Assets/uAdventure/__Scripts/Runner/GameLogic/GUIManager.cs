@@ -204,10 +204,10 @@ namespace uAdventure.Runner
             }
             if (talkerObject)
             {
-                var bubbleTalker = talkerObject.GetComponent<Representable>();
-                if (bubbleTalker)
+                var talkerRepresentable = talkerObject.GetComponent<Representable>();
+                if (talkerRepresentable)
                 {
-                    bubbleTalker.Play("speak");
+                    talkerRepresentable.Play("speak");
                 }
             }
         }
@@ -219,7 +219,7 @@ namespace uAdventure.Runner
 
             if (bubble != null)
             {
-                bubble.GetComponent<Bubble>().Destroy();
+                DestroyBubbles();
             }
             if (data.Line.Length > 0 && data.Line[0] == '#')
             {
@@ -311,11 +311,13 @@ namespace uAdventure.Runner
 
                 newBubble.Origin = position;
                 newBubble.Destiny = position + Camera.main.transform.up * talker.transform.lossyScale.y * 0.6f;
+                newBubble.Talker = talker;
             }
             else
             {
                 newBubble.Origin = Camera.main.transform.position;
                 newBubble.Destiny = Camera.main.transform.position + Camera.main.transform.up * 15;
+                newBubble.Talker = talker;
             }
 
             return newBubble;

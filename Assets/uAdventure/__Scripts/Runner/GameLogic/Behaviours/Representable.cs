@@ -49,7 +49,6 @@ namespace uAdventure.Runner
                 {
                     animationUri = value;
                     resourceType = ResourceType.ANIMATION;
-                    Debug.Log("Setted animation: " + value);
                     eAnim = GetAnimationInPriority(animationUri, Orientation, ref mirror);
                 }
             }
@@ -178,7 +177,10 @@ namespace uAdventure.Runner
         private void OnConditionChanged(string condition, int value)
         {
             checkResources();
-            gameObject.SetActive(!Context.IsRemoved() && ConditionChecker.check(Context.Conditions));
+            if (this && gameObject)
+            {
+                gameObject.SetActive(!Context.IsRemoved() && ConditionChecker.check(Context.Conditions)); 
+            }
         }
 
         public void checkResources()
