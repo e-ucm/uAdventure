@@ -67,6 +67,8 @@ namespace uAdventure.Runner
             return unrestricted;
         }
 
+        private static Dictionary<Description, Action> examineActions = new Dictionary<Description, Action>();
+
         public static void AddExamineIfNotExists(Element element, List<Action> actions)
         {
             if (!actions.Any(a => a.getType() == Action.EXAMINE))
@@ -74,7 +76,7 @@ namespace uAdventure.Runner
                 var description = element.getDescriptions()
                     .Find(d => ConditionChecker.check(d.getConditions()));
 
-                if (description != null)
+                if (description != null && !examineActions.ContainsKey(description))
                 {
                     var textToShow = description.getDetailedDescription();
                     if (string.IsNullOrEmpty(textToShow))
@@ -85,16 +87,20 @@ namespace uAdventure.Runner
                     // Only add the examine if there's text to show
                     if (!string.IsNullOrEmpty(textToShow))
                     {
-                        actions.Add(
-                            new Action(Action.EXAMINE)
+                        var action = new Action(Action.EXAMINE)
+                        {
+                            Effects = new Effects
                             {
-                                Effects = new Effects
-                                {
-                                    new SpeakPlayerEffect(textToShow)
-                                }
+                                new SpeakPlayerEffect(textToShow)
                             }
-                        );
+                        };
+                        examineActions.Add(description, action);
                     }
+                }
+
+                if (examineActions.ContainsKey(description))
+                {
+                    actions.Add(examineActions[description]);
                 }
             }
         }

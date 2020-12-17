@@ -243,7 +243,9 @@ namespace uAdventure.Runner
             if(interactuable is EffectHolder)
             {
                 var effectHolder = interactuable as EffectHolder;
-                action = Element.getActions().Where(a => a.Effects == effectHolder.originalEffects).FirstOrDefault();
+                var availableActions = Element.getActions().Valid(AvailableActions).Distinct().ToList();
+                ActionsUtil.AddExamineIfNotExists(Element, availableActions);
+                action = availableActions.Where(a => a.Effects == effectHolder.originalEffects).FirstOrDefault();
             }
 
             if (action == null)
