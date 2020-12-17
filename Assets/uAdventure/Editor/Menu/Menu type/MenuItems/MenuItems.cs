@@ -93,7 +93,7 @@ namespace uAdventure.Editor
 
         public void OnCliked()
         {
-
+            uAdventureWindowMetaData.OpenMetaDataWindow();
         }
     }
 

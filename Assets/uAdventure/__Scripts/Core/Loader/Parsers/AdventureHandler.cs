@@ -53,6 +53,8 @@ namespace uAdventure.Core
                 }
             }
 
+            ParseImsCPMetadata(content, resourceManager, incidences);
+
             return base.content;
         }
 
@@ -71,6 +73,16 @@ namespace uAdventure.Core
                 {
                     adventureData.addChapter(Loader.LoadChapter(chapterPath, resourceManager, incidences));
                 }
+            }
+        }
+
+        private static void ParseImsCPMetadata(AdventureData adventureData, ResourceManager resourceManager, List<Incidence> incidences)
+        {
+            var imsCPMetadataPath = "imscpmetadata.xml";
+
+            if (!string.IsNullOrEmpty(resourceManager.getText(imsCPMetadataPath))) 
+            {
+                adventureData.setImsCPMetadata(Loader.LoadImsCPMetadata(imsCPMetadataPath, resourceManager, incidences));
             }
         }
 
