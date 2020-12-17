@@ -73,8 +73,8 @@ namespace uAdventure.Core
             }
 
 			//XAPI ELEMENTS
-			scene.setXApiClass(element.GetAttribute("class"));
-			scene.setXApiType(element.GetAttribute("type"));
+			scene.setXApiClass(ExString.Default(element.GetAttribute("class"), "accesible"));
+            scene.setXApiType(ExString.Default(element.GetAttribute("type"), "area"));
             //END OF XAPI
 
 			foreach(var res in DOMParserUtility.DOMParse <ResourcesUni> (element.SelectNodes("resources"), parameters))

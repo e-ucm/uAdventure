@@ -2,6 +2,7 @@
 using System.Xml;
 using System.Collections.Generic;
 using System.Globalization;
+using System;
 
 namespace uAdventure.Core
 {
@@ -169,7 +170,14 @@ namespace uAdventure.Core
                 }
             }
 
-            setNodeLinks();
+            try
+            {
+                setNodeLinks();
+            }catch(Exception ex)
+            {
+                Debug.Log(conversationName);
+                throw ex;
+            }
             return new GraphConversation(conversationName, graphNodes[0]);
         }
 
@@ -180,6 +188,7 @@ namespace uAdventure.Core
 
         private void setNodeLinks()
         {
+
             // The size of graphNodes and nodeLinks should be the same
             for (int i = 0; i < graphNodes.Count; i++)
             {

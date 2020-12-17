@@ -359,6 +359,7 @@ namespace uAdventure.Runner
                 }
                 else
                 {
+                    animations.Add(uri, null);
                     return null;
                 }
             }

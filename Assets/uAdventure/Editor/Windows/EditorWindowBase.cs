@@ -111,7 +111,7 @@ namespace uAdventure.Editor
 
         protected abstract void InitWindows();
 
-        protected void OnGUI()
+        protected virtual void OnGUI()
         {
             if (Locked)
             {
@@ -158,12 +158,7 @@ namespace uAdventure.Editor
                 EditorGUILayout.BeginVertical(GUILayout.Width(LEFT_MENU_WIDTH), GUILayout.ExpandHeight(true));
 
                 scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
-
-                // Button event scene
-                if (Extensions != null)
-                {
-                    Extensions.ForEach(e => e.LayoutDrawLeftPanelContent(null, null));
-                }
+                DrawLeftMenu();
 
                 EditorGUILayout.EndScrollView();
                 EditorGUILayout.EndVertical();
@@ -188,7 +183,7 @@ namespace uAdventure.Editor
                     }
                     m_Window.OnGUI();
                 }
- 
+
                 EditorGUILayout.EndVertical();
                 EditorGUILayout.EndHorizontal();
 
@@ -231,6 +226,15 @@ namespace uAdventure.Editor
                         RefreshWindows();
                     }
                 }
+            }
+        }
+
+        protected virtual void DrawLeftMenu()
+        {
+            // Button event scene
+            if (Extensions != null)
+            {
+                Extensions.ForEach(e => e.LayoutDrawLeftPanelContent(null, null));
             }
         }
 
