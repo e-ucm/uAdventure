@@ -928,6 +928,7 @@ namespace AssetPackage
 
                             Connected = tmp != null;
                             Active = tmp != null;
+                            done();
                         }
                         break;
                 }

@@ -114,6 +114,7 @@ namespace uAdventure.Analytics
 
             if (AutoStart)
             {
+                Debug.Log("[TRACKER] AutoStart!");
                 // Get the tracker config from the game settings
                 var trackerConfigs = Game.Instance.GameState.Data.getObjects<TrackerConfig>();
                 trackerConfig = trackerConfigs.Count == 0 ? new TrackerConfig() : trackerConfigs[0];

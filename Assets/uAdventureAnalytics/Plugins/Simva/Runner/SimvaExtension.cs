@@ -117,8 +117,6 @@ namespace uAdventure.Simva
 
         public override IEnumerator OnAfterGameLoad()
         {
-            Debug.Log("[SIMVA] Disabling tracker autostart...");
-            AnalyticsExtension.Instance.AutoStart = false;
 
             Debug.Log("[SIMVA] Starting...");
             if(SimvaConf.Local == null)
@@ -141,6 +139,8 @@ namespace uAdventure.Simva
             }
             else
             {
+                Debug.Log("[SIMVA] Disabling tracker autostart...");
+                AnalyticsExtension.Instance.AutoStart = false;
 
                 //if(PlayerPrefs.GetString())
                 Debug.Log("[SIMVA] Adding scenes...");
