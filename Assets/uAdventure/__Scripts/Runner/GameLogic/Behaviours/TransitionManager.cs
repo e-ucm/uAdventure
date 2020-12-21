@@ -147,10 +147,10 @@ namespace uAdventure.Runner
                     transitionMaterial.SetFloat("_DirectionY", 1);
                     break;
                 case TransitionType.RightToLeft:
-                    transitionMaterial.SetFloat("_DirectionX", -1);
+                    transitionMaterial.SetFloat("_DirectionX", 1);
                     break;
                 case TransitionType.LeftToRight:
-                    transitionMaterial.SetFloat("_DirectionX", 1);
+                    transitionMaterial.SetFloat("_DirectionX", -1);
                     break;
             }
 

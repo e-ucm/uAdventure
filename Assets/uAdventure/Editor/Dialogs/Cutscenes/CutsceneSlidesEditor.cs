@@ -81,9 +81,9 @@ namespace uAdventure.Editor
             {
                 Resources.Load<Texture2D>("EAdventureData/img/icons/transitionNone"),
                 Resources.Load<Texture2D>("EAdventureData/img/icons/transitionVertical"),
-                Resources.Load<Texture2D>("EAdventureData/img/icons/transitionReverseVertical"),
+                Resources.Load<Texture2D>("EAdventureData/img/icons/transitionVerticalReversed"),
                 Resources.Load<Texture2D>("EAdventureData/img/icons/transitionHorizontal"),
-                Resources.Load<Texture2D>("EAdventureData/img/icons/transitionReverseHorizontal"),
+                Resources.Load<Texture2D>("EAdventureData/img/icons/transitionHorizontalReversed"),
                 Resources.Load<Texture2D>("EAdventureData/img/icons/transitionFadein"),
             };
 
