@@ -756,12 +756,12 @@ namespace uAdventure.Runner
                         || (movieplayer == MovieState.PLAYING && !movie.isPlaying())
                         || videoscene.isCanSkip())
                     {
-                        movie.Stop();
-                        movieplayer = MovieState.STOPPED;
                         if (movieplayer == MovieState.PLAYING)
                         {
                             TrackerAsset.Instance.Accessible.Skipped(SceneData.getId(), AccessibleTracker.Accessible.Cutscene);
                         }
+                        movie.Stop();
+                        movieplayer = MovieState.STOPPED;
                         res = FinishCutscene(videoscene);
                     }
                     break;
