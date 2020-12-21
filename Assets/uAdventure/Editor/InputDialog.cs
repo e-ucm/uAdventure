@@ -50,15 +50,15 @@ namespace uAdventure.Editor
                 Validate();
             }
 
-            if (GUI.GetNameOfFocusedControl() == "InputField" && isEnterPressed)
-            {
-                reference.OnDialogOk(value, token ?? this);
-                this.Close();
-            }
-
             if (isInvalid)
             {
                 EditorGUILayout.HelpBox(invalidReason.Traslate(), MessageType.Error);
+            }
+
+            if (GUI.GetNameOfFocusedControl() == "InputField" && isEnterPressed && !isInvalid)
+            {
+                reference.OnDialogOk(value, token ?? this);
+                this.Close();
             }
 
             if (hasToFocus)

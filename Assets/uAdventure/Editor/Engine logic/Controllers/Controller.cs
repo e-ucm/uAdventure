@@ -2709,9 +2709,11 @@ namespace uAdventure.Editor
         {
             if (elementId == null) elementId = "new";
             var clean = elementId.Replace(" ", "").Replace("'"," ");
-            while (clean != "" && !char.IsLetter(clean[0]))
-                clean.Remove(0, 1);
-            if (clean == "") clean = "new";
+            while (clean != "" && !char.IsLetter(clean[0]) && clean.Length > 0)
+            {
+                clean = clean.Remove(0, 1);
+            }
+            if (string.IsNullOrEmpty(clean)) clean = "new";
 
             if (clean.Equals(Player.IDENTIFIER) || clean.Equals(TC.get("ConversationLine.PlayerName")))
                 clean = "new";
@@ -2719,12 +2721,19 @@ namespace uAdventure.Editor
             while (IdentifierSummary.existsId(clean))
             {
                 int lastN = 0;
-                for (Match match = Regex.Match(clean, @"\d+$"); match.Success; match = match.NextMatch())
+                Match match = Regex.Match(clean, @"\d+$");
+
+                for (; match.Success; match = match.NextMatch())
+                {
                     lastN = int.Parse(match.Value, NumberFormatInfo.InvariantInfo); // do something with it
-                if (lastN == 0) clean += "0";
+                }
+                if (lastN == 0)
+                {
+                    clean += "0";
+                }
                 clean = clean.Substring(0, clean.Length - ("" + lastN).Length);
                 lastN++;
-                clean = clean + lastN;
+                clean += lastN;
             }
 
             return clean;
