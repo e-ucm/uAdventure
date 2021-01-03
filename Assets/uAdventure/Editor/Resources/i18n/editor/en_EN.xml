@@ -567,6 +567,8 @@
     Cannot delete the last scene of the chapter.
     All chapters must have at least one scene or cutscene
   </entry>
+  <entry key="Operation.CantDeleteLastElementTitle">Cannot delete</entry>
+  <entry key="Operation.CantDeleteLastElementMessage">Cannot delete the last element!</entry>
   <entry key="Effect.TriggerCutsceneInfo">Trigger cutscene {#0}</entry>
   <entry key="NPC.Name">Name of the character</entry>
   <entry key="Operation.DeleteResourcesErrorLastResources">The last look can not be deleted</entry>

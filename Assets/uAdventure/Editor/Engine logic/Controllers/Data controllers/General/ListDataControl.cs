@@ -261,6 +261,7 @@ namespace uAdventure.Editor
         private readonly IList elements;
         private readonly ElementFactoryView[] elementFactoryViews;
         private readonly List<TT> dataControls;
+        public bool CanDeleteLastElement { get; set; } = true;
 
         public ListDataControl(TD parent, IList elements, params ElementFactoryView[] elementFactoryViews)
         {
@@ -418,6 +419,12 @@ namespace uAdventure.Editor
 
         public override bool deleteElement(DataControl dataControl, bool askConfirmation)
         {
+            if(!CanDeleteLastElement && elements.Count == 1)
+            {
+                controller.ShowErrorDialog("Operation.CantDeleteLastElementTitle".Traslate(), "Operation.CantDeleteLastElementMessage".Traslate());
+                return false;
+            }
+
             var toRemove = dataControl as TT;
             if (toRemove == null)
             {

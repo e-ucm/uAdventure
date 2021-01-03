@@ -39,7 +39,7 @@ namespace uAdventure.Geo
         public GeoElementDataControl(GeoElement geoElement)
         {
             this.geoElement = geoElement;
-            
+
             this.resourcesList = geoElement.Resources;
 
             selectedResources = 0;
@@ -59,7 +59,7 @@ namespace uAdventure.Geo
 
             descriptionController = new DescriptionsController(geoElement.Descriptions);
 
-            geoActionDataControls = new ListDataControl<GeoElementDataControl, GeoActionDataControl>(this, geoElement.Actions, new []
+            geoActionDataControls = new ListDataControl<GeoElementDataControl, GeoActionDataControl>(this, geoElement.Actions, new[]
             {
                 new ListDataControl<GeoElementDataControl, GeoActionDataControl>.ElementFactoryView
                 {
@@ -125,7 +125,7 @@ namespace uAdventure.Geo
                 }
             });
 
-            geometryDataControls = new ListDataControl<GeoElementDataControl, GMLGeometryDataControl>(this, geoElement.Geometries, new []
+            geometryDataControls = new ListDataControl<GeoElementDataControl, GMLGeometryDataControl>(this, geoElement.Geometries, new[]
             {
                 new ListDataControl<GeoElementDataControl, GMLGeometryDataControl>.ElementFactoryView()
                 {
@@ -142,11 +142,14 @@ namespace uAdventure.Geo
                             {
                                 ContentType = typeof(GMLGeometry),
                                 Type = GEOMETRY
-                            } 
+                            }
                         }
                     })
-                } 
-            });
+                }
+            })
+            {
+                CanDeleteLastElement = false
+            };
         }
 
         public ListDataControl<GeoElementDataControl, GMLGeometryDataControl> GMLGeometries

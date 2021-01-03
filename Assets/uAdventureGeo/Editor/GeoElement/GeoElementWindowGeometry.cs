@@ -110,9 +110,11 @@ namespace uAdventure.Geo
                 },
                 onRemoveCallback = list =>
                 {
-                    if (list.index > -1)
+                    if (workingGeoElement.SelectedGeometry > -1)
                     {
-                        workingGeoElement.SelectedGeometry = 0;
+                        workingGeoElement.SelectedGeometry = Mathf.Max(0, workingGeoElement.SelectedGeometry - 1);
+                        Center(workingGeoElement.GMLGeometries[workingGeoElement.SelectedGeometry]);
+                        list.index = workingGeoElement.SelectedGeometry;
                     }
                 }
             };
