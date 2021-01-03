@@ -55,7 +55,7 @@ namespace uAdventure.Editor
             var chapter = target as Chapter;
             var doc = Writer.GetDoc();
             XmlElement chapterNode = node as XmlElement;
-            chapterNode.SetAttribute("version", "2");
+            chapterNode.SetAttribute("version", "3");
 
             // Add the adaptation and assessment active profiles
             if (!chapter.getAdaptationName().Equals(""))

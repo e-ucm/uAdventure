@@ -14,6 +14,7 @@ namespace uAdventure.Core.XmlUpgrader
         {
             new Chapter0To1Transformer(),
             new Chapter1To2Transformer(),
+            new Chapter2To3Transformer(),
             new AnimationNonExistentTo0Transformer()
         };
         private readonly Dictionary<string, Dictionary<int, ITransformer>> orderedTransformers;

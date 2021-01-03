@@ -48,6 +48,7 @@ namespace uAdventure.Core.XmlUpgrader
                 XslCompiledTransform xslt = new XslCompiledTransform();
                 xslt.Load(xrt);
                 xslt.Transform(xri, xwo);
+                xwo.Flush();
             }
             return sw.ToString();
         }

@@ -22,7 +22,7 @@ namespace uAdventure.Geo
             mapScene.RenderStyle = ExParsers.ParseEnum<RenderStyle>(ExString.Default(element.GetAttribute("renderStyle"), RenderStyle.Tile.ToString()));
             mapScene.TileMetaIdentifier = ExString.Default(element.GetAttribute("tileMetaIdentifier"), "OSMTile");
             mapScene.UsesGameplayArea = ExString.EqualsDefault(element.GetAttribute("usesGameplayArea"), "yes", false);
-            mapScene.GameplayArea = ExParsers.ParseDefault(element.GetAttribute("gameplayArea"), new RectD(Vector2d.zero, Vector2d.zero));
+            mapScene.GameplayArea = ExParsers.ParseDefault(element.GetAttribute("gameplayArea"), CultureInfo.InvariantCulture, new RectD(Vector2d.zero, Vector2d.zero));
             mapScene.LatLon = (Vector2d) parseParam(typeof(Vector2d), element.GetAttribute("center"));
             mapScene.Zoom = ExParsers.ParseDefault(element.GetAttribute("zoom"), 19);
 
@@ -43,6 +43,9 @@ namespace uAdventure.Geo
                 {
                     var extElem = new ExtElemReference(targetId);
                     mapElement = extElem;
+                    mapElement.Scale = ExParsers.ParseDefault(extElemNode.GetAttribute("scale"), CultureInfo.InvariantCulture, 1f);
+                    mapElement.Orientation = (Orientation)ExParsers.ParseDefault(extElemNode.GetAttribute("orientation"), 2);
+
                     extElem.TransformManagerDescriptor = GetDescriptor(ExString.Default(extElemNode.GetAttribute("transformManager"),
                         typeof(GeopositionedDescriptor).FullName));
 
@@ -67,8 +70,6 @@ namespace uAdventure.Geo
 
                 mapElement.Conditions = DOMParserUtility.DOMParse<Conditions>(mapElementNode.SelectSingleNode("condition") as XmlElement, parameters);
                 mapElement.Layer = ExParsers.ParseDefault(mapElementNode.GetAttribute("layer"), layer);
-                mapElement.Scale = ExParsers.ParseDefault(mapElementNode.GetAttribute("scale"), CultureInfo.InvariantCulture, 1f);
-                mapElement.Orientation = (Orientation) ExParsers.ParseDefault(mapElementNode.GetAttribute("orientation"), 2);
                 layer = Mathf.Max(mapElement.Layer, layer) + 1;
                 mapScene.Elements.Add(mapElement);
             }

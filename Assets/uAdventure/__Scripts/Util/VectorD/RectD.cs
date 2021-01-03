@@ -2,6 +2,7 @@
 // Assembly: UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
 // Assembly location: C:\Program Files (x86)\Unity\Editor\Data\Managed\UnityEngine.dll
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
@@ -94,6 +95,34 @@ namespace UnityEngine
 
             if (!double.TryParse(numbers[0], out x) || !double.TryParse(numbers[1], out y) ||
                 !double.TryParse(numbers[2], out w) || !double.TryParse(numbers[3], out h))
+            {
+                result = new RectD(Vector2d.zero, Vector2d.zero);
+                return false;
+            }
+
+            result = new RectD(new Vector2d(x, y), new Vector2d(w, h));
+            return true;
+        }
+
+        public static bool TryParse(string input, out RectD result, IFormatProvider format)
+        {
+            if (String.IsNullOrEmpty(input) || string.IsNullOrEmpty(input.Trim()) || input.Length < 7)
+            {
+                result = new RectD(Vector2d.zero, Vector2d.zero);
+                return false;
+            }
+
+            var numbers = input.Split(' ').Select(t => t.Trim()).ToArray();
+            if (numbers.Length < 4)
+            {
+                result = new RectD(Vector2d.zero, Vector2d.zero);
+                return false;
+            }
+
+            double x, y, w, h;
+
+            if (!double.TryParse(numbers[0], NumberStyles.Any, format, out x) || !double.TryParse(numbers[1], NumberStyles.Any, format, out y) ||
+                !double.TryParse(numbers[2], NumberStyles.Any, format, out w) || !double.TryParse(numbers[3], NumberStyles.Any, format, out h))
             {
                 result = new RectD(Vector2d.zero, Vector2d.zero);
                 return false;

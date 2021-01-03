@@ -52,10 +52,10 @@ namespace uAdventure.Core
                 return def;
         }
 
-        public static RectD ParseDefault(string toParse, RectD def)
+        public static RectD ParseDefault(string toParse, System.IFormatProvider format, RectD def)
         {
             RectD toReturn;
-            if (!string.IsNullOrEmpty(toParse) && RectD.TryParse(toParse, out toReturn))
+            if (!string.IsNullOrEmpty(toParse) && RectD.TryParse(toParse, out toReturn, format))
                 return toReturn;
             else
                 return def;

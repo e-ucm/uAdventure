@@ -1,10 +1,9 @@
 ﻿using UnityEngine;
-using System.Collections;
 using uAdventure.Geo;
 using System;
 using System.Xml;
-using System.Collections.Generic;
 using System.Linq;
+using System.Globalization;
 
 namespace uAdventure.Editor
 {
@@ -41,7 +40,7 @@ namespace uAdventure.Editor
             // base element
             var elem = doc.CreateElement(name);
             parent.AppendChild(elem);
-            elem.SetAttribute("influence", content.Influence.ToString());
+            elem.SetAttribute("influence", content.Influence.ToString(CultureInfo.InvariantCulture));
 
             // Dump geometry type
             XmlNode gmlElement;
@@ -75,12 +74,12 @@ namespace uAdventure.Editor
             var elem = doc.CreateElement(points.Length > 1 ? "gml:posList" : "gml:pos");
             parent.AppendChild(elem);
 
-            elem.InnerText = String.Join(" ", points.Select(p => p.x + " " + p.y).ToArray());
+            elem.InnerText = String.Join(" ", points.Select(p => p.x.ToString(CultureInfo.InvariantCulture) + " " + p.y.ToString(CultureInfo.InvariantCulture)).ToArray());
         }
 
         protected override string GetElementNameFor(object target)
         {
-            return "geoelement";
+            return "geo-element";
         }
     }
 }
