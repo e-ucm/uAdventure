@@ -138,9 +138,8 @@ namespace uAdventure.Simva
                 case BuildTarget.StandaloneWindows:
                     break;
                 case BuildTarget.StandaloneWindows64:
-                    Compiler.WixLocation = Directory.GetCurrentDirectory() + "\\wixsharp\\Wix_bin\\bin";
 
-                    if (!Directory.Exists(Compiler.WixLocation))
+                    if (!Directory.Exists(Directory.GetCurrentDirectory() + "\\wixsharp"))
                     {
                         Controller.DownloadDependencyZip("WixSharp", "/wixsharp", WIXSHARP_URL, downloaded =>
                         {
@@ -212,6 +211,8 @@ namespace uAdventure.Simva
 
         private static void CreateMsiInstaller(string pathToBuiltProject)
         {
+            EditorUtility.DisplayProgressBar("Creating Installers", "Preparing Wix project...", 0f);
+            Compiler.WixLocation = Directory.GetCurrentDirectory() + "\\wixsharp\\Wix_bin\\bin";
             var path = new FileInfo(pathToBuiltProject).Directory.FullName;
 
             var fullSetup = new Feature(PlayerSettings.productName + " Binaries");
@@ -237,7 +238,9 @@ namespace uAdventure.Simva
 
             project.OutDir = "Installers/";
             project.OutFileName = PlayerSettings.productName;
+            EditorUtility.DisplayProgressBar("Creating Installers", "Building Msi installer...", 0.1f);
             project.BuildMsi();
+            EditorUtility.DisplayProgressBar("Creating Installers", "Done!", 1f);
         }
     }
 }

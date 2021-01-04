@@ -2204,6 +2204,12 @@ namespace uAdventure.Editor
                 }
                 // Write the zip file
                 var downloadFileName = name.Replace(" ", "").Trim() + ".zip";
+
+                if (!Directory.Exists(downloadPath))
+                {
+                    Directory.CreateDirectory(downloadPath);
+                }
+
                 File.WriteAllBytes(downloadPath + "/" + downloadFileName, www.bytes);
                 // Unzip it
                 EditorUtility.DisplayProgressBar("Extracting...", "Extracting " + name + " to " + downloadPath, 0f);
