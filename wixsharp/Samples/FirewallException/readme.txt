@@ -1,1 +1,0 @@
-This sample demonstrates how to add Firewall Exception to the Windows Firewall.Execute corresponding .cmd file to build desired msi. Then execute the .msi to start the installation.

@@ -1,1 +1,0 @@
-This sample demonstrates how to to integrate a WiX extension with Wix#.

@@ -1,1 +1,0 @@
-This sample demonstrates how to define Managed Custom Actions.Execute corresponding .cmd file to build desired msi. Then execute the Install.cmd to start the installation.

@@ -11,11 +11,14 @@ using UnityEngine;
 using UnityEngine.WSA;
 using System.Xml;
 using System.Xml.Linq;
+using uAdventure.Editor;
 
 namespace uAdventure.Simva
 {
     public class SimvaController : IPreprocessBuildWithReport
     {
+        private static readonly string WIXSHARP_URL = "https://github.com/e-ucm/uAdventure-WIXSHARP/releases/download/v1.15.0.0/WixSharp.1.15.0.0.zip";
+
         private static SimvaController instance;
         public static SimvaController Instance
         {
@@ -135,35 +138,23 @@ namespace uAdventure.Simva
                 case BuildTarget.StandaloneWindows:
                     break;
                 case BuildTarget.StandaloneWindows64:
-                    Compiler.WixLocation = "C:\\Users\\Victor\\Documents\\uAdventure\\wixsharp\\Wix_bin\\bin";
+                    Compiler.WixLocation = Directory.GetCurrentDirectory() + "\\wixsharp\\Wix_bin\\bin";
 
-                    var path = new FileInfo(pathToBuiltProject).Directory.FullName;
-
-                    var fullSetup = new Feature(PlayerSettings.productName + " Binaries");
-
-                    var project = new Project(PlayerSettings.productName,
-                        GetDirContents(@"%ProgramFiles%\" + PlayerSettings.companyName + @"\" + PlayerSettings.productName, path, "\\"))
+                    if (!Directory.Exists(Compiler.WixLocation))
                     {
-                        GUID = new System.Guid(PlayerSettings.productGUID.ToString())
-                    };
-
-                    project.AddRegKey(new RegKey(fullSetup, RegistryHive.CurrentUser, @"Software\Classes\" + PlayerSettings.applicationIdentifier,
-                        new RegValue("", "URL " + PlayerSettings.productName + " Link"),
-                        new RegValue("URL Protocol", PlayerSettings.productName + " Protocol")));
-                    project.AddRegKey(new RegKey(fullSetup, RegistryHive.CurrentUser, @"Software\Classes\" + PlayerSettings.applicationIdentifier + @"\shell"));
-                    project.AddRegKey(new RegKey(fullSetup, RegistryHive.CurrentUser, @"Software\Classes\" + PlayerSettings.applicationIdentifier + @"\shell\open"));
-                    project.AddRegValue(new RegValue(fullSetup, RegistryHive.CurrentUser, @"Software\Classes\" + PlayerSettings.applicationIdentifier 
-                        + @"\shell\open\command", "", "\"[INSTALLDIR]" + PlayerSettings.productName +".exe\" \"%1\""));
-
-                    if (!Directory.Exists("Installers"))
+                        Controller.DownloadDependencyZip("WixSharp", "/wixsharp", WIXSHARP_URL, downloaded =>
+                        {
+                            if (downloaded)
+                            {
+                                CreateMsiInstaller(pathToBuiltProject);
+                            }
+                        });
+                    }
+                    else
                     {
-                        Directory.CreateDirectory("Installers");
+                        CreateMsiInstaller(pathToBuiltProject);
                     }
 
-                    project.OutDir = "Installers/";
-                    project.OutFileName = PlayerSettings.productName + ".msi";
-                    project.BuildMsiCmd();
-                    //Compiler.BuildMsi(project);
 
                     break;
 
@@ -217,6 +208,36 @@ namespace uAdventure.Simva
                 case BuildTarget.WebGL:
                     break;
             }
+        }
+
+        private static void CreateMsiInstaller(string pathToBuiltProject)
+        {
+            var path = new FileInfo(pathToBuiltProject).Directory.FullName;
+
+            var fullSetup = new Feature(PlayerSettings.productName + " Binaries");
+
+            var project = new Project(PlayerSettings.productName,
+                GetDirContents(@"%ProgramFiles%\" + PlayerSettings.companyName + @"\" + PlayerSettings.productName, path, "\\"))
+            {
+                GUID = new System.Guid(PlayerSettings.productGUID.ToString())
+            };
+
+            project.AddRegKey(new RegKey(fullSetup, RegistryHive.CurrentUser, @"Software\Classes\" + PlayerSettings.applicationIdentifier,
+                new RegValue("", "URL " + PlayerSettings.productName + " Link"),
+                new RegValue("URL Protocol", PlayerSettings.productName + " Protocol")));
+            project.AddRegKey(new RegKey(fullSetup, RegistryHive.CurrentUser, @"Software\Classes\" + PlayerSettings.applicationIdentifier + @"\shell"));
+            project.AddRegKey(new RegKey(fullSetup, RegistryHive.CurrentUser, @"Software\Classes\" + PlayerSettings.applicationIdentifier + @"\shell\open"));
+            project.AddRegValue(new RegValue(fullSetup, RegistryHive.CurrentUser, @"Software\Classes\" + PlayerSettings.applicationIdentifier
+                + @"\shell\open\command", "", "\"[INSTALLDIR]" + PlayerSettings.productName + ".exe\" \"%1\""));
+
+            if (!Directory.Exists("Installers"))
+            {
+                Directory.CreateDirectory("Installers");
+            }
+
+            project.OutDir = "Installers/";
+            project.OutFileName = PlayerSettings.productName;
+            project.BuildMsi();
         }
     }
 }

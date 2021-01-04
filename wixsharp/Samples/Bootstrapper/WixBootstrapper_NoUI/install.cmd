@@ -1,1 +1,0 @@
-start setup.exe

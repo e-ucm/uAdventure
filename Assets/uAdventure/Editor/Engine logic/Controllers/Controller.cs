@@ -2170,18 +2170,19 @@ namespace uAdventure.Editor
         private static readonly string WINDOWS32_FFMPEG_URL = "https://github.com/e-ucm/uAdventure-FFMPEG/releases/download/1/ffmpeg-3.4.2-win32.zip";
         private static readonly string MACOSX64_FFMPEG_URL  = "https://github.com/e-ucm/uAdventure-FFMPEG/releases/download/1/ffmpeg-3.4.2-mac64.zip";
 
-        private static void DownloadFFMPEG(string url, System.Action ready)
+        public static void DownloadDependencyZip(string name, string folderName, string url, System.Action<bool> ready)
         {
             var projectPath = Directory.GetCurrentDirectory().Replace("\\", "/");
-            var ffmpegPath = projectPath + "/FFMPEG";
+            var downloadPath = projectPath + folderName;
 
             using (WWW www = new WWW(url))
             {
                 while (!www.isDone)
                 {
-                    if (EditorUtility.DisplayCancelableProgressBar("Downloading", "Downloading ffmpeg...", www.progress))
+                    if (EditorUtility.DisplayCancelableProgressBar("Downloading", "Downloading "+ name + "...", www.progress))
                     {
                         EditorUtility.ClearProgressBar();
+                        ready(false);
                         return;
                     }
                     www.MoveNext();
@@ -2191,23 +2192,28 @@ namespace uAdventure.Editor
                 if (!string.IsNullOrEmpty(www.error))
                 {
                     EditorUtility.DisplayDialog("Error!", "Download failed! Check your connection and try again. " +
-                        "If the problem persist download it manually and put it in the FFMPEG at the root of the project. (" + www.error + ")", "Ok");
+                        "If the problem persist download it manually and put it in the " + folderName +" folder at the root of the project. (" + www.error + ")", "Ok");
+                    ready(false);
                     return;
                 }
 
                 if (www.progress != 1f)
+                {
+                    ready(false);
                     return;
+                }
                 // Write the zip file
-                File.WriteAllBytes(ffmpegPath + "/ffmpeg.zip", www.bytes);
+                var downloadFileName = name.Replace(" ", "").Trim() + ".zip";
+                File.WriteAllBytes(downloadPath + "/" + downloadFileName, www.bytes);
                 // Unzip it
-                EditorUtility.DisplayProgressBar("Extracting...", "Extracting MMPEG to " + ffmpegPath, 0f);
-                ZipUtil.Unzip(ffmpegPath + "/ffmpeg.zip", ffmpegPath);
-                EditorUtility.DisplayProgressBar("Extracting...", "Extracting MMPEG to " + ffmpegPath, 1f);
+                EditorUtility.DisplayProgressBar("Extracting...", "Extracting " + name + " to " + downloadPath, 0f);
+                ZipUtil.Unzip(downloadPath + "/" + downloadFileName, downloadPath);
+                EditorUtility.DisplayProgressBar("Extracting...", "Extracting " + name + " to " + downloadPath, 1f);
                 EditorUtility.ClearProgressBar();
                 // Delete the zip
-                File.Delete(ffmpegPath + "/ffmpeg.zip");
+                File.Delete(downloadPath + "/" + downloadFileName);
                 // Continue
-                ready();
+                ready(true);
             }
         }
         
@@ -2223,9 +2229,12 @@ namespace uAdventure.Editor
                 if (!Directory.Exists(ffmpegPath))
                     Directory.CreateDirectory(ffmpegPath);
 
-                System.Action convert = () =>
+                System.Action<bool> convert = (downloaded) =>
                 {
-                    ConvertVideos(pathToBuiltProject);
+                    if (downloaded)
+                    {
+                        ConvertVideos(pathToBuiltProject);
+                    }
                 };
 
                 switch (SystemInfo.operatingSystemFamily)
@@ -2233,27 +2242,27 @@ namespace uAdventure.Editor
                     case OperatingSystemFamily.Windows:
                         if (!File.Exists(ffmpegPath + "/ffmpeg.exe"))
                         {
-                            if(EditorUtility.DisplayDialog("Video conversion", "FFMPEG was not found, do you want to download it?", "Yes", "No"))
+                            if(EditorUtility.DisplayDialog("Video conversion", "FFMPEG was not found, do you want to download it? Videos for WebGL must be in Webm format, this software will be used to covert them automatically.", "Yes", "No"))
                             {
 
                                 if (SystemInfo.operatingSystem.Contains("64bit"))
-                                    DownloadFFMPEG(WINDOWS64_FFMPEG_URL, convert);
+                                    DownloadDependencyZip("FFMPEG", "/FFMPEG", WINDOWS64_FFMPEG_URL, convert);
                                 else
-                                    DownloadFFMPEG(WINDOWS32_FFMPEG_URL, convert);
+                                    DownloadDependencyZip("FFMPEG", "/FFMPEG", WINDOWS32_FFMPEG_URL, convert);
                             }
                         }                            
-                        else convert();
+                        else convert(true);
                         break;
 
                     case OperatingSystemFamily.MacOSX:
                         if (!File.Exists(ffmpegPath + "/ffmpeg"))
                         {
-                            if (EditorUtility.DisplayDialog("Video conversion", "FFMPEG was not found, do you want to download it?", "Yes", "No"))
+                            if (EditorUtility.DisplayDialog("Video conversion", "FFMPEG was not found, do you want to download it? Videos for WebGL must be in Webm format, this software will be used to covert them automatically.", "Yes", "No"))
                             {
-                                DownloadFFMPEG(MACOSX64_FFMPEG_URL, convert);
+                                DownloadDependencyZip("FFMPEG", "/FFMPEG", MACOSX64_FFMPEG_URL, convert);
                             }
                         }
-                        else convert();
+                        else convert(true);
                         break;
 
                     default:

@@ -1,1 +1,0 @@
-This sample demonstrates how to interact with a Sql Server instance during installation.Execute corresponding .cmd file to build desired msi. Then execute the .msi to start the installation.

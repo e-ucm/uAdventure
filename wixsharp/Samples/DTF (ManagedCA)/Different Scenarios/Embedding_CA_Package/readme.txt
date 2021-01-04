@@ -1,1 +1,0 @@
-This sample demonstrates how to embedd existing CA package into MSI Managed Custom Actions.The sample demonstrates two different techniques: using WiX XM Include and Wix# XML injection.Execute corresponding .cmd file to build desired msi. Then execute the Install.cmd to start the installation.

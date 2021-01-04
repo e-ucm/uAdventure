@@ -1,1 +1,0 @@
-This sample demonstrates how to install a certificate to a specified location/store.
