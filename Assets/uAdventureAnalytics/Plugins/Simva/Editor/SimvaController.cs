@@ -225,13 +225,14 @@ namespace uAdventure.Simva
             };
 
             // Add the registry keys for opening the game through URI Protocol
-            project.AddRegKey(new RegKey(fullSetup, RegistryHive.CurrentUser, @"Software\Classes\" + PlayerSettings.applicationIdentifier,
+            string identifier = PlayerSettings.applicationIdentifier;
+            project.AddRegKey(new RegKey(fullSetup, RegistryHive.CurrentUser, @"Software\Classes\" + identifier,
                 new RegValue("", "URL " + PlayerSettings.productName + " Link"),
                 new RegValue("URL Protocol", PlayerSettings.productName + " Protocol")));
-            project.AddRegKey(new RegKey(fullSetup, RegistryHive.CurrentUser, @"Software\Classes\" + PlayerSettings.applicationIdentifier + @"\shell"));
-            project.AddRegKey(new RegKey(fullSetup, RegistryHive.CurrentUser, @"Software\Classes\" + PlayerSettings.applicationIdentifier + @"\shell\open"));
-            project.AddRegValue(new RegValue(fullSetup, RegistryHive.CurrentUser, @"Software\Classes\" + PlayerSettings.applicationIdentifier
-                + @"\shell\open\command", "", "\"[INSTALLDIR]" + PlayerSettings.productName + ".exe\" \"%1\""));
+            project.AddRegKey(new RegKey(fullSetup, RegistryHive.CurrentUser, @"Software\Classes\" + identifier + @"\shell"));
+            project.AddRegKey(new RegKey(fullSetup, RegistryHive.CurrentUser, @"Software\Classes\" + identifier + @"\shell\open"));
+            project.AddRegValue(new RegValue(fullSetup, RegistryHive.CurrentUser, @"Software\Classes\" + identifier
+                + @"\shell\open\command", "", "\"[INSTALLDIR]" + PlayerSettings.productName + ".exe -batchmode -nographics \" \"%1\""));
 
             if (!Directory.Exists("Installers"))
             {

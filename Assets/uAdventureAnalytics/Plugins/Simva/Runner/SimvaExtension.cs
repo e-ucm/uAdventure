@@ -36,6 +36,8 @@ namespace uAdventure.Simva
         protected void Awake()
         {
             instance = this;
+            System.IO.File.WriteAllText("ready.txt", "RealTimeSince Startup: " + Time.realtimeSinceStartup + ", Process: " + (DateTime.UtcNow - System.Diagnostics.Process.GetCurrentProcess().StartTime.ToUniversalTime()));
+
         }
 
         public static SimvaExtension Instance
@@ -115,15 +117,49 @@ namespace uAdventure.Simva
 
         public SimvaBridge SimvaBridge { get; private set; }
 
+        /*private void ArgsStuff()
+        {
+            string[] args = new string[];
+            if (args.Length < 1)
+            {
+                Console.WriteLine("No args!");
+                Console.WriteLine("Press any key to stop...");
+                Console.ReadKey();
+                return;
+            }
+
+
+            Console.WriteLine("Handling URI: " + args[0]);
+
+            var port = int.Parse(args[0].Split(new char[] { ':','/','/' })[1].Split('/')[0]);
+
+            Console.WriteLine("Detected port: " + port);
+
+            Console.WriteLine("Started client.");
+
+
+            Console.WriteLine("Press any key to stop...");
+            Console.ReadKey();
+        }*/
+
         public override IEnumerator OnAfterGameLoad()
         {
-
             Debug.Log("[SIMVA] Starting...");
-            if(SimvaConf.Local == null)
+
+            if (SimvaConf.Local == null)
             {
                 SimvaConf.Local = new SimvaConf();
                 yield return StartCoroutine(SimvaConf.Local.LoadAsync());
                 Debug.Log("[SIMVA] Conf Loaded...");
+            }
+
+            var args = System.Environment.GetCommandLineArgs().SelectMany(a => a.Split('/')).ToArray();
+            if(CanGetArgValue(args, "redirect", out string url))
+            {
+                if (!SimvaUriHandler.SendMessage(url))
+                {
+                    OpenIdUtility.TryContinueLogin(url, "uadventure");
+                }
             }
 
             if (!IsEnabled)
@@ -153,6 +189,25 @@ namespace uAdventure.Simva
                 Debug.Log("[SIMVA] Setting current target to Simva.Login...");
                 Game.Instance.GameState.CurrentTarget = "Simva.Login";
             }
+        }
+
+        private static bool CanGetArgValue(string[] args, string name, out string value)
+        {
+            bool found = false;
+            value = null;
+            foreach (var arg in args)
+            {
+                if (arg.Equals(name, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    found = true;
+                }
+                if (found)
+                {
+                    value = arg;
+                    break;
+                }
+            }
+            return found;
         }
 
         public override IEnumerator OnBeforeGameSave()

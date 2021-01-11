@@ -17,6 +17,7 @@ using uAdventure.Runner;
 using System.Collections;
 using UnityFx.Async.Promises;
 using System.Runtime.InteropServices;
+using ZetaIpc.Runtime.Helper;
 
 namespace Simva
 {
@@ -111,6 +112,18 @@ namespace Simva
 
         [DllImport("__Internal")]
         private static extern string GetUrl();
+
+        [DllImport("user32.dll")]
+        static extern IntPtr GetActiveWindow();
+        [DllImport("user32.dll")]
+        static extern bool LockSetForegroundWindow(uint uLockCode);
+        [DllImport("user32.dll")]
+        static extern void SwitchToThisWindow(IntPtr hWnd, bool fAltTab);
+
+
+        private const uint LOCK = 1;
+        private const uint UNLOCK = 2;
+        private static IntPtr window;
 
         private static System.Diagnostics.Process windowProcess;
         private static Thread httpListener;
@@ -222,7 +235,7 @@ namespace Simva
         {
             var result = new AsyncCompletionSource<LoginResponse>(); 
 
-            if (Application.isEditor)
+            if (Application.isEditor || Application.platform == RuntimePlatform.WindowsPlayer)
             {
                 var responseTransfer = new ResponseTransfer();
 
@@ -278,8 +291,19 @@ namespace Simva
                     }
                     responseTransfer.done = true;
 
+                    IntPtr newWindow = GetActiveWindow();
+
+                    if (window != newWindow)
+                    {
+                        Debug.Log("Set to foreground");
+                        SwitchToThisWindow(window, true);
+                    }
+
                     listener.Close();
                 });
+
+                LockSetForegroundWindow(LOCK);
+                window = GetActiveWindow();
 
                 httpListener.Start();
 
@@ -308,9 +332,9 @@ namespace Simva
 
                 redirectUrl = "http://127.0.0.1:" + port + "/redirect";
             }
-            else if(Application.platform == RuntimePlatform.WindowsPlayer)
+            /*else if(Application.platform == RuntimePlatform.WindowsPlayer)
             {
-                int ipcport = SimvaUriHandler.Start(uri =>
+                bool listening = SimvaUriHandler.Listen(uri =>
                 {
                     Debug.Log("uri received!");
                     var query = uri.Split('?')[1].Split('&');
@@ -320,16 +344,20 @@ namespace Simva
                         d.Add(q[0], q[1]);
                     }
 
-                    SimvaUriHandler.Stop();
+                    SimvaUriHandler.Unregister();
                     result.SetResult(new LoginResponse
                     {
                         Code = d["code"],
                         SessionState = d["session_state"]
                     });
                 });
+                if (!listening)
+                {
+                    result.SetException("Couldnt start ICP listening!");
+                }
+                redirectUrl = Game.Instance.GameState.Data.getApplicationIdentifier() + "://redirect/";
 
-                redirectUrl =  Game.Instance.GameState.Data.getApplicationIdentifier() + "://" + ipcport + "/";
-            }
+            }*/
             else if (Application.platform == RuntimePlatform.Android)
             {
                 var objectName = "OpenIdListener";
@@ -434,7 +462,7 @@ namespace Simva
         {
             var result = new AsyncCompletionSource<AuthorizationInfo>();
 
-            var port = UnityEngine.Random.Range(25525, 65535);
+            var port = FreePortHelper.GetFreePort();
 
             var url = authUrl + "?" +
                 "response_type=code" +
@@ -485,6 +513,11 @@ namespace Simva
 
             OpenBrowser(url);
             return result;
+        }
+
+        private static object GetFreePort()
+        {
+            throw new NotImplementedException();
         }
 
         public static IAsyncOperation<AuthorizationInfo> LoginWithROPC(string username, string password, string authUrl, string tokenUrl, string clientId,

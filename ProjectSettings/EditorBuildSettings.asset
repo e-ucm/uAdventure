@@ -8,3 +8,4 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/uAdventure/Scenes/_Scene1.unity
     guid: b352354f2b25ab44dbc72d700538ae19
+  m_configObjects: {}
