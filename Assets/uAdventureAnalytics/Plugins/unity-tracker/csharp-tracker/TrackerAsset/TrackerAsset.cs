@@ -651,7 +651,7 @@ namespace AssetPackage
         /// </summary>
         public void Flush(Action callback = null)
         {
-            if (!Started)
+            if (!Started || !Active)
             {
                 return;
             }
@@ -967,7 +967,7 @@ namespace AssetPackage
             {
                 if (response.ResultAllowed)
                 {
-                    Log(Severity.Information, "");
+                    Log(Severity.Information, "Connect Response: " + response.body);
 
                     // Extract AuthToken.
                     //
@@ -1314,7 +1314,9 @@ namespace AssetPackage
             }
             else if (!Active)
             {
-                Connect(false, null);
+                Log(Severity.Warning, "The tracker is not active!");
+                done();
+                return;
             }
 
             if (settings.BackupStorage)
@@ -2522,6 +2524,8 @@ namespace AssetPackage
                 private int completion = -1;
                 private float score = float.NaN;
 
+                private TraceExtensions extensions;
+
                 public bool Success
                 {
                     get { return success == 1 ? true : false; }
@@ -2558,67 +2562,37 @@ namespace AssetPackage
                     }
                 }
 
-                Dictionary<string, System.Object> extdir;
-                public Dictionary<string,System.Object> Extensions
+                public Dictionary<string, System.Object> Extensions
                 {
-                    get { return extdir; }
+                    get { return extensions.Extensions; }
                     set
                     {
-                        extdir = new Dictionary<string, object>();
-                        foreach(KeyValuePair<string,object> extension in value)
+                        var extdir = new Dictionary<string, object>();
+                        foreach (KeyValuePair<string, object> extension in value)
                         {
                             switch (extension.Key.ToLower())
                             {
-                                case "success": Success = (bool) extension.Value; break;
-                                case "completion": Completion = (bool) extension.Value; break;
-                                case "response": Response = (string) extension.Value; break;
-                                case "score": Score = (float) extension.Value; break;
-                                default: extdir.Add(extension.Key, extension.Value);  break;
+                                case "success": Success = (bool)extension.Value; break;
+                                case "completion": Completion = (bool)extension.Value; break;
+                                case "response": Response = (string)extension.Value; break;
+                                case "score": Score = (float)extension.Value; break;
+                                default: extdir.Add(extension.Key, extension.Value); break;
                             }
                         }
+                        extensions = new TraceExtensions(extdir);
                     }
                 }
 
                 public string ToCsv()
                 {
                     string result =
-                        ((success>-1) ? ",success" + intToBoolString(success) : "")
+                        ((success > -1) ? ",success" + intToBoolString(success) : "")
                         + ((completion > -1) ? ",completion" + intToBoolString(completion) : "")
                         + ((!string.IsNullOrEmpty(Response)) ? ",response," + Response.Replace(",", "\\,") : "")
                         + ((!float.IsNaN(score)) ? ",score," + score.ToString("G", System.Globalization.CultureInfo.InvariantCulture) : "");
 
                     if (Extensions != null && Extensions.Count > 0)
-                        foreach (KeyValuePair<string, System.Object> extension in Extensions)
-                        {
-                            result += "," + extension.Key.Replace(",", "\\,") + ",";
-                            if(extension.Value != null)
-                            {
-                                if (extension.Value.GetType() == typeof(string))
-                                    result += extension.Value.ToString().Replace(",", "\\,");
-                                else if (extension.Value.GetType() == typeof(float))
-                                {
-                                    result += ((float)extension.Value).ToString("G", System.Globalization.CultureInfo.InvariantCulture);
-                                }
-                                else if (extension.Value.GetType() == typeof(double))
-                                {
-                                    result += ((double)extension.Value).ToString("G", System.Globalization.CultureInfo.InvariantCulture);
-                                }
-                                else if (extension.Value.GetType() == typeof(Dictionary<string,bool>))
-                                {
-                                    Dictionary<string, bool> map = (Dictionary<string, bool>)extension.Value;
-                                    string smap = "";
-                                    foreach(KeyValuePair<string,bool> t in map)
-                                    {
-                                        smap += t.Key + "=" + t.Value.ToString().ToLower() + "-";
-                                    }
-                                    result += smap.TrimEnd('-');
-                                }
-                                else
-                                {
-                                    result += extension.Value.ToString();
-                                }
-                            }
-                        }
+                        result += extensions.ToCsv();
 
 
                     return result;
@@ -2644,47 +2618,9 @@ namespace AssetPackage
                         result.Add("score", s);
                     }
 
-                    if (Extensions != null && Extensions.Count > 0) {
-
-                        JSONClass extensions = new JSONClass();
-                        foreach(KeyValuePair <string, System.Object > extension in Extensions)
-                        {
-                            if (extension.Value != null)
-                            {
-                                if (extension.Value.GetType() == typeof(int))
-                                {
-                                    extensions.Add(extension.Key, new JSONData((int)extension.Value));
-                                }
-                                else if (extension.Value.GetType() == typeof(bool))
-                                {
-                                    extensions.Add(extension.Key, new JSONData((bool)extension.Value));
-                                }
-                                else if (extension.Value.GetType() == typeof(float))
-                                {
-                                    extensions.Add(extension.Key, new JSONData((float) extension.Value));
-                                }
-                                else if (extension.Value.GetType() == typeof(double))
-                                {
-                                    extensions.Add(extension.Key, new JSONData((double) extension.Value));
-                                }
-                                else if (extension.Value.GetType() == typeof(Dictionary<string, bool>))
-                                {
-                                    Dictionary<string, bool> map = (Dictionary<string, bool>)extension.Value;
-                                    JSONClass emap = new JSONClass();
-                                    foreach (KeyValuePair<string, bool> t in map)
-                                    {
-                                        emap.Add(t.Key, new JSONData(t.Value));
-                                    }
-                                    extensions.Add(extension.Key, emap);
-                                }
-                                else
-                                {
-                                    extensions.Add(extension.Key, new JSONData(extension.Value.ToString()));
-                                }
-                            }
-                        }
-
-                        result.Add("extensions", extensions);
+                    if (Extensions != null && Extensions.Count > 0)
+                    {
+                        result.Add("extensions", extensions.ToJson());
                     }
 
                     return result;
@@ -2718,52 +2654,7 @@ namespace AssetPackage
 
                     if (Extensions != null && Extensions.Count > 0)
                     {
-
-                        JSONClass extensions = new JSONClass();
-                        foreach (KeyValuePair<string, System.Object> extension in Extensions)
-                        {
-                            if (extension.Value != null)
-                            {
-                                string key = extension.Key;
-
-                                string tmpkey = "";
-                                if (ExtensionIDs.TryGetValue(key, out tmpkey))
-                                    key = tmpkey;
-
-                                if (extension.Value.GetType() == typeof(int))
-                                {
-                                    extensions.Add(key, new JSONData((int)extension.Value));
-                                }
-                                else if (extension.Value.GetType() == typeof(bool))
-                                {
-                                    extensions.Add(key, new JSONData((bool)extension.Value));
-                                }
-                                else if (extension.Value.GetType() == typeof(float))
-                                {
-                                    extensions.Add(key, new JSONData((float)extension.Value));
-                                }
-                                else if (extension.Value.GetType() == typeof(double))
-                                {
-                                    extensions.Add(key, new JSONData((double)extension.Value));
-                                }
-                                else if (extension.Value.GetType() == typeof(Dictionary<string, bool>))
-                                {
-                                    Dictionary<string, bool> map = (Dictionary<string, bool>)extension.Value;
-                                    JSONClass emap = new JSONClass();
-                                    foreach (KeyValuePair<string, bool> t in map)
-                                    {
-                                        emap.Add(t.Key, new JSONData(t.Value));
-                                    }
-                                    extensions.Add(key, emap);
-                                }
-                                else
-                                {
-                                    extensions.Add(key, new JSONData(extension.Value.ToString()));
-                                }
-                            }
-                        }
-
-                        result.Add("extensions", extensions);
+                        result.Add("extensions", extensions.ToXapi());
                     }
 
                     return result;
@@ -2772,11 +2663,11 @@ namespace AssetPackage
                 private static string intToBoolString(int property)
                 {
                     string ret = "";
-                    if(property >= 1)
-                    { 
+                    if (property >= 1)
+                    {
                         ret = ",true";
                     }
-                    else if( property == 0)
+                    else if (property == 0)
                     {
                         ret = ",false";
                     }
@@ -2811,17 +2702,329 @@ namespace AssetPackage
 
                     if (Extensions != null && Extensions.Count > 0)
                     {
-                        foreach (KeyValuePair<string, System.Object> extension in Extensions)
-                        {
-                            valid &= TrackerAssetUtils.quickCheckExtension(extension.Key, extension.Value);
-                        }
+                        valid &= extensions.isValid();
                     }
+
 
                     return valid;
                 }
             }
 
-#endregion Nested Types
+
+            /// <summary>
+            /// Class for Result storage.
+            /// </summary>
+            public class TraceContext
+            {
+                public TrackerEvent Parent { get; internal set; }
+
+                private string registration = string.Empty;
+                private JSONObject instructor;
+                private JSONObject team;
+                private ContextActivities contextActivities;
+
+                private TraceExtensions extensions;
+
+                public string Registration
+                {
+                    get { return registration; }
+                    set 
+                    {
+                        if (Parent == null || Parent.Tracker.Utils.check<ValueExtensionException>(value, "xAPI extension: registration Empty or null. Ignoring", "xAPI extension: registration can't be empty or null"))
+                            registration = value;
+                    }
+                }
+
+                public Dictionary<string, System.Object> Extensions
+                {
+                    get { return extensions.Extensions; }
+                    set
+                    {
+                        var extdir = new Dictionary<string, object>();
+                        foreach (KeyValuePair<string, object> extension in value)
+                        {
+                            switch (extension.Key.ToLower())
+                            {
+                                case "registration": Registration = (string)extension.Value; break;
+                                default: extdir.Add(extension.Key, extension.Value); break;
+                            }
+                        }
+                        extensions = new TraceExtensions(extdir);
+                    }
+                }
+
+                public string ToCsv()
+                {
+                    string result =
+                        (!string.IsNullOrEmpty(registration) ? ",registration" + registration.Replace(",", "\\,") : "");
+
+                    if (Extensions != null && Extensions.Count > 0)
+                        result += extensions.ToCsv();
+
+                    return result;
+                }
+
+                public JSONClass ToJson()
+                {
+                    JSONClass result = new JSONClass();
+
+                    if (!string.IsNullOrEmpty(registration))
+                        result.Add("registration", new JSONData(registration));
+
+                    if (Extensions != null && Extensions.Count > 0)
+                    {
+                        result.Add("extensions", extensions.ToJson());
+                    }
+
+                    return result;
+                }
+
+                public string ToXml()
+                {
+                    // TODO;
+                    return "";
+                }
+
+                public JSONClass ToXapi()
+                {
+                    JSONClass result = new JSONClass();
+
+                    if (!string.IsNullOrEmpty(registration))
+                        result.Add("registration", new JSONData(registration));
+
+                    if (Extensions != null && Extensions.Count > 0)
+                    {
+                        result.Add("extensions", extensions.ToXapi());
+                    }
+
+                    return result;
+                }
+
+                public bool isValid()
+                {
+                    bool valid = true;
+
+                    if (!string.IsNullOrEmpty(registration))
+                        valid &= TrackerAssetUtils.quickCheck(registration);
+
+                    if (Extensions != null && Extensions.Count > 0)
+                    {
+                        valid &= extensions.isValid();
+                    }
+
+
+                    return valid;
+                }
+            }
+
+            public class ContextActivities
+            {
+                public ContextActivity[] Parent { get; set; }
+                public ContextActivity[] Grouping { get; set; }
+                public ContextActivity[] Category { get; set; }
+                public ContextActivity[] Other { get; set; }
+            }
+
+            public class ContextActivity
+            {
+                public string ObjectType { get; set; }
+                public string Id { get; set; }
+            }
+
+            public class TraceExtensions
+            {
+
+                Dictionary<string, System.Object> extdir;
+
+                public TraceExtensions()
+                {
+                    extdir = new Dictionary<string, object>();
+                }
+
+                public TraceExtensions(Dictionary<string, System.Object> extensions)
+                {
+                    this.extdir = extensions;
+                }
+
+                public Dictionary<string, System.Object> Extensions
+                {
+                    get { return extdir; }
+                    set
+                    {
+                        extdir = new Dictionary<string, object>();
+                        foreach (KeyValuePair<string, object> extension in value)
+                        {
+                            extdir.Add(extension.Key, extension.Value);
+                        }
+                    }
+                }
+
+                public string ToCsv()
+                {
+                    string result = "";
+
+                    foreach (KeyValuePair<string, System.Object> extension in Extensions)
+                    {
+                        result += "," + extension.Key.Replace(",", "\\,") + ",";
+                        if (extension.Value != null)
+                        {
+                            if (extension.Value.GetType() == typeof(string))
+                                result += extension.Value.ToString().Replace(",", "\\,");
+                            else if (extension.Value.GetType() == typeof(float))
+                            {
+                                result += ((float)extension.Value).ToString("G", System.Globalization.CultureInfo.InvariantCulture);
+                            }
+                            else if (extension.Value.GetType() == typeof(double))
+                            {
+                                result += ((double)extension.Value).ToString("G", System.Globalization.CultureInfo.InvariantCulture);
+                            }
+                            else if (extension.Value.GetType() == typeof(Dictionary<string, bool>))
+                            {
+                                Dictionary<string, bool> map = (Dictionary<string, bool>)extension.Value;
+                                string smap = "";
+                                foreach (KeyValuePair<string, bool> t in map)
+                                {
+                                    smap += t.Key + "=" + t.Value.ToString().ToLower() + "-";
+                                }
+                                result += smap.TrimEnd('-');
+                            }
+                            else
+                            {
+                                result += extension.Value.ToString();
+                            }
+                        }
+                    }
+
+                    return result;
+                }
+
+                public JSONClass ToJson()
+                {
+                    JSONClass result = new JSONClass();
+
+                    foreach (KeyValuePair<string, System.Object> extension in Extensions)
+                    {
+                        if (extension.Value != null)
+                        {
+                            if (extension.Value.GetType() == typeof(int))
+                            {
+                                result.Add(extension.Key, new JSONData((int)extension.Value));
+                            }
+                            else if (extension.Value.GetType() == typeof(bool))
+                            {
+                                result.Add(extension.Key, new JSONData((bool)extension.Value));
+                            }
+                            else if (extension.Value.GetType() == typeof(float))
+                            {
+                                result.Add(extension.Key, new JSONData((float)extension.Value));
+                            }
+                            else if (extension.Value.GetType() == typeof(double))
+                            {
+                                result.Add(extension.Key, new JSONData((double)extension.Value));
+                            }
+                            else if (extension.Value.GetType() == typeof(Dictionary<string, bool>))
+                            {
+                                Dictionary<string, bool> map = (Dictionary<string, bool>)extension.Value;
+                                JSONClass emap = new JSONClass();
+                                foreach (KeyValuePair<string, bool> t in map)
+                                {
+                                    emap.Add(t.Key, new JSONData(t.Value));
+                                }
+                                result.Add(extension.Key, emap);
+                            }
+                            else
+                            {
+                                result.Add(extension.Key, new JSONData(extension.Value.ToString()));
+                            }
+                        }
+                    }
+
+                    return result;
+                }
+
+                public string ToXml()
+                {
+                    // TODO;
+                    return "";
+                }
+
+                public JSONClass ToXapi()
+                {
+                    JSONClass result = new JSONClass();
+
+                    foreach (KeyValuePair<string, System.Object> extension in Extensions)
+                    {
+                        if (extension.Value != null)
+                        {
+                            string key = extension.Key;
+
+                            string tmpkey = "";
+                            if (ExtensionIDs.TryGetValue(key, out tmpkey))
+                                key = tmpkey;
+
+                            if (extension.Value.GetType() == typeof(int))
+                            {
+                                result.Add(key, new JSONData((int)extension.Value));
+                            }
+                            else if (extension.Value.GetType() == typeof(bool))
+                            {
+                                result.Add(key, new JSONData((bool)extension.Value));
+                            }
+                            else if (extension.Value.GetType() == typeof(float))
+                            {
+                                result.Add(key, new JSONData((float)extension.Value));
+                            }
+                            else if (extension.Value.GetType() == typeof(double))
+                            {
+                                result.Add(key, new JSONData((double)extension.Value));
+                            }
+                            else if (extension.Value.GetType() == typeof(Dictionary<string, bool>))
+                            {
+                                Dictionary<string, bool> map = (Dictionary<string, bool>)extension.Value;
+                                JSONClass emap = new JSONClass();
+                                foreach (KeyValuePair<string, bool> t in map)
+                                {
+                                    emap.Add(t.Key, new JSONData(t.Value));
+                                }
+                                result.Add(key, emap);
+                            }
+                            else
+                            {
+                                result.Add(key, new JSONData(extension.Value.ToString()));
+                            }
+                        }
+                    }
+
+                    return result;
+                }
+
+                private static string intToBoolString(int property)
+                {
+                    string ret = "";
+                    if (property >= 1)
+                    {
+                        ret = ",true";
+                    }
+                    else if (property == 0)
+                    {
+                        ret = ",false";
+                    }
+                    return ret;
+                }
+
+                public bool isValid()
+                {
+                    bool valid = true;
+
+                    foreach (KeyValuePair<string, System.Object> extension in Extensions)
+                    {
+                        valid &= TrackerAssetUtils.quickCheckExtension(extension.Key, extension.Value);
+                    }
+
+                    return valid;
+                }
+            }
+            #endregion Nested Types
         }
 
 #endregion Nested Types
