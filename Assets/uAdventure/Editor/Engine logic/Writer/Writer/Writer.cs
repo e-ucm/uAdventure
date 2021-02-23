@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 using uAdventure.Core;
 using System.Xml.Serialization;
+using uAdventure.Core.Metadata;
 
 namespace uAdventure.Editor
 {
@@ -122,9 +123,11 @@ namespace uAdventure.Editor
             var metadata = adventureData.getImsCPMetadata();
             if(metadata != null)
             {
+                var xmlMetadata = SerializeToXmlElement(new XmlDocument(), metadata);
                 doc = new XmlDocument();
-                doc.AppendChild(SerializeToXmlElement(doc, metadata));
-                doc.Save(folderName + "/imscpmetadata.xml");
+                xmlMetadata = MetadataUtility.CleanXMLGarbage(doc, xmlMetadata);
+                doc.AppendChild(xmlMetadata);
+                doc.Save(folderName + "/imscpmetadata.xml"); 
             }
             /** ******** END WRITING THE CHAPTERS ********** */
             dataSaved = true;

@@ -323,6 +323,24 @@ namespace uAdventure.Editor
         }
     }
 
+    public class ExportLearningObject : IMenuItem
+    {
+        public ExportLearningObject(string name_)
+        {
+            this.Label = name_;
+        }
+
+        public string Label
+        {
+            get; set;
+        }
+
+        public void OnCliked()
+        {
+            Controller.Instance.ExportLearningObject();
+        }
+    }
+
     public class UndoMenuItem : IMenuItem
     {
         public UndoMenuItem(string name_)

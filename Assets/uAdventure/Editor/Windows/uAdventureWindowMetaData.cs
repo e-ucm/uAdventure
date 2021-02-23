@@ -3,12 +3,14 @@ using IMS.MD.v1p2;
 using Malee.List;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Serialization;
 using uAdventure.Core;
+using uAdventure.Core.Metadata;
 using UnityEditor;
 using UnityEngine;
 
@@ -16,63 +18,61 @@ namespace uAdventure.Editor
 {
     public class uAdventureWindowMetaData : EditorWindowBase
     {
-        private SerializedObject serializedObject;
-        private SimpleMetaDataWindow simple;
-        private MultiMetaDataWindow multi;
+		private SerializedObject serializedObject;
+		private SimpleMetaDataWindow simple;
+		private MultiMetaDataWindow multi;
 		private lomType metadata;
 
-        public static void OpenMetaDataWindow()
-        {
-            if (!Language.Initialized)
-                Language.Initialize();
+		public static void OpenMetaDataWindow()
+		{
+			if (!Language.Initialized)
+				Language.Initialize();
 
-            var window = ScriptableObject.CreateInstance<uAdventureWindowMetaData>();
-            window.ShowUtility();
-        }
+			var window = ScriptableObject.CreateInstance<uAdventureWindowMetaData>();
+			window.ShowUtility();
+		}
 
 
-        protected override void InitWindows()
-        {
-            WantsMouseMove = true;
+		protected override void InitWindows()
+		{
+			WantsMouseMove = true;
 
-            if (serializedObject == null)
-            {
-                var wrapper = ScriptableObject.CreateInstance<LomWrapper>();
-                serializedObject = new SerializedObject(wrapper);
+			if (serializedObject == null)
+			{
+				var wrapper = ScriptableObject.CreateInstance<LomWrapper>();
+				serializedObject = new SerializedObject(wrapper);
 				var adventureMetadata = Controller.Instance.AdventureData.getImsCPMetadata();
-				if(adventureMetadata == null)
-                {
+				if (adventureMetadata == null)
+				{
 					adventureMetadata = new lomType();
 					Controller.Instance.AdventureData.setImsCPMetadata(adventureMetadata);
-                }
-
+				}
 				metadata = wrapper.lom = adventureMetadata;
 				serializedObject.Update();
-
-            }
+			}
 			var lom = serializedObject.FindProperty("lom");
 			var property = lom.FindPropertyRelative("general");
-            do
-            {
-                if (property.isArray)
-                {
-                    AddExtension(multi = new MultiMetaDataWindow(Rect.zero, new GUIContent(TC.get("Element.Name0")), "Window"));
-                    multi.ButtonContent = new GUIContent(property.displayName);
-                    multi.property = property.Copy();
+			do
+			{
+				if (property.isArray)
+				{
+					AddExtension(multi = new MultiMetaDataWindow(Rect.zero, new GUIContent(TC.get("Element.Name0")), "Window"));
+					multi.ButtonContent = new GUIContent(property.displayName);
+					multi.property = property.Copy();
 					multi.onDraw = DrawProperty;
 				}
-                else
-                {
-                    AddExtension(simple = new SimpleMetaDataWindow(Rect.zero, new GUIContent(TC.get("Element.Name0")), "Window"));
-                    simple.ButtonContent = new GUIContent(property.displayName);
-                    simple.property = property.Copy();
+				else
+				{
+					AddExtension(simple = new SimpleMetaDataWindow(Rect.zero, new GUIContent(TC.get("Element.Name0")), "Window"));
+					simple.ButtonContent = new GUIContent(property.displayName);
+					simple.property = property.Copy();
 					simple.onDraw = DrawProperty;
 				}
-            }
-            while (property.Next(false));
-        }
+			}
+			while (property.Next(false));
+		}
 
-        protected override void OnGUI()
+		protected override void OnGUI()
 		{
 			EditorGUI.BeginChangeCheck();
 			base.OnGUI();
@@ -96,7 +96,6 @@ namespace uAdventure.Editor
 #endif
 		private const float ELEMENT_HEIGHT_OFFSET = ELEMENT_EDGE_TOP + ELEMENT_EDGE_BOT;
 		private const float ELEMENT_WIDTH_OFFSET = ELEMENT_EDGE_LEFT + ELEMENT_EDGE_RIGHT;
-        private const string UADVENTURE_RESOURCE = "res_uAdventure";
 
         static class Style
 		{
@@ -546,97 +545,6 @@ namespace uAdventure.Editor
 			return drawerType != null;
 		}
 
-        protected override void DrawLeftMenu()
-        {
-            base.DrawLeftMenu();
-            if(GUILayout.Button("Serialize")){
-				using(var writer = new System.IO.StringWriter())
-                {
-                    var serializer = new System.Xml.Serialization.XmlSerializer(typeof(ManifestType));
-                    XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
-                    var manifest = new ManifestType
-                    {
-                        metadata = new ManifestMetadataType
-                        {
-                            schema = "IMS Content",
-                            schemaversion = "1.2",
-                            Any = new XmlElement[]
-                            {
-                                SerializeToXmlElement(new lomType
-                                {
-                                    general = new generalType
-                                    {
-                                        title = new langType
-                                        {
-                                            langstring = new langstringType[]
-                                            {
-                                                new langstringType
-                                                {
-                                                    lang = "es-ES",
-                                                    Value = Controller.Instance.AdventureData.getTitle()
-                                                }
-                                            }
-                                        }
-                                    }
-                                })
-                            }
-                        },
-                        organizations = new OrganizationsType
-                        {
-                            @default = "uAdventure",
-                            organization = new OrganizationType[]
-                            {
-                                new OrganizationType
-                                {
-                                    title = "uAdventure course",
-                                    item = new ItemType[]
-                                    {
-                                        new ItemType
-                                        {
-                                            identifier = "itm_uAdventure",
-                                            identifierref = UADVENTURE_RESOURCE,
-                                            isvisible = true,
-                                            title = Controller.Instance.AdventureData.getTitle()
-                                        }
-                                    }
-                                }
-                            }
-                        },
-                        resources = new ResourcesType
-                        {
-                            resource = new ResourceType[]
-                            {
-                                new ResourceType
-                                {
-                                    href = "index.html",
-                                    identifier = UADVENTURE_RESOURCE,
-                                    type = "webcontent",
-                                    metadata = new MetadataType
-                                    {
-                                        schema = "IMS Content",
-                                        schemaversion = "1.2",
-                                        Any = new XmlElement[] { SerializeToXmlElement(metadata) }
-                                    },
-                                    file = new IMS.CP.v1p2.FileType[]
-                                    {
-                                        new IMS.CP.v1p2.FileType
-                                        {
-                                            href = "index.html"
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    };
-                    serializer.Serialize(writer, manifest, ns);
-                    var finalText = writer.ToString();
-                    Debug.Log(finalText);
-
-                    finalText = CleanXMLGarbage(finalText);
-                    Debug.Log(finalText);
-                }
-            }
-        }
 
         private static string CleanXMLGarbage(string finalText)
         {
@@ -668,21 +576,5 @@ namespace uAdventure.Editor
             } while (beforeStart != finalText);
             return finalText;
         }
-
-        public static XmlElement SerializeToXmlElement(object o)
-		{
-			XmlDocument doc = new XmlDocument();
-
-			using (XmlWriter writer = doc.CreateNavigator().AppendChild())
-			{
-				var serializer = new XmlSerializer(o.GetType());
-				XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
-				ns.Add("imsmd", "http://www.imsglobal.org/xsd/imsmd_v1p2");
-				serializer.Serialize(writer, o, ns);
-			}
-
-			return doc.DocumentElement;
-		}
-
 	}
 }

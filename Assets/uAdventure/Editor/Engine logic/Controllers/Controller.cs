@@ -13,6 +13,11 @@ using System.Globalization;
 using uAdventure.Runner;
 using UnityEditor.Callbacks;
 using System.Linq;
+using System.Xml.Serialization;
+using IMS.CP.v1p2;
+using IMS.MD.v1p2;
+using System.Xml;
+using uAdventure.Core.Metadata;
 
 namespace uAdventure.Editor
 {
@@ -414,6 +419,8 @@ namespace uAdventure.Editor
         public const int EXPORT_MOBILE = 7;
 
         public const int EXPORT_ALL = 8;
+
+        private const string UADVENTURE_RESOURCE = "res_uAdventure";
 
         /**
          * Singleton instance.
@@ -2280,6 +2287,188 @@ namespace uAdventure.Editor
 
                 Debug.Log("Done!");
             }
+        }
+
+        public void ExportLearningObject()
+        {
+            if (!IsPlatformAvailable(BuildTarget.WebGL))
+            {
+                ShowErrorDialog("ExportLearningObject.WebGLUnavailable.Title", "ExportLearningObject.WebGLUnavailable.Message");
+                return;
+            }
+
+            var projectPath = "./Builds/WebGL/";
+            if (Directory.Exists(projectPath) && File.Exists(projectPath + "index.html"))
+            {
+                if(!ShowStrictConfirmDialog("ExportLearningObject.BuildDetected.Title", "ExportLearningObject.BuildDetected.Message"))
+                {
+                    projectPath = null;
+                }
+            }
+
+            var outputFile = EditorUtility.SaveFilePanel("ExportLearningObject.OuputFile.Title", projectPath, PlayerSettings.productName + ".zip", ".zip");
+            if(string.IsNullOrEmpty(outputFile))
+            {
+                return;
+            }
+
+            EditorUtility.DisplayProgressBar("ExportLearningObject.Progress.Title", "ExportLearningObject.Starting", 0f);
+
+            if (projectPath == null)
+            {
+                EditorUtility.DisplayProgressBar("ExportLearningObject.Progress.Title", "ExportLearningObject.BuildingWebGL", 0.05f);
+                DoBuild(new BuildConfig
+                {
+                    BuildWebGL = true,
+                    fileName = PlayerSettings.productName,
+                    author = PlayerSettings.companyName,
+                    version = PlayerSettings.Android.bundleVersionCode,
+                    packageName = PlayerSettings.applicationIdentifier
+                });
+            }
+
+
+            EditorUtility.DisplayProgressBar("ExportLearningObject.Progress.Title", "ExportLearningObject.CreatingManifest", 0.75f);
+            var serializer = new System.Xml.Serialization.XmlSerializer(typeof(ManifestType));
+            XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
+            ManifestType manifest = GetImsManifest();
+
+            XmlDocument doc = new XmlDocument();
+
+            using (XmlWriter writer = doc.CreateNavigator().AppendChild())
+            {
+                serializer.Serialize(writer, manifest, ns);
+            }
+
+            XmlDocument finalDoc = new XmlDocument();
+            var finalElement = MetadataUtility.CleanXMLGarbage(finalDoc, doc.DocumentElement);
+
+            finalDoc.CreateXmlDeclaration("1.0", "UTF-8", null);
+            finalDoc.AppendChild(finalElement);
+            finalDoc.DocumentElement.SetAttribute("xmlns:imsmd", "http://www.imsglobal.org/xsd/imsmd_v1p2");
+            finalDoc.DocumentElement.SetAttribute("xsi:schemaLocation", "http://www.imsglobal.org/xsd/imscp_v1p1 ../xsds/imscp_v1p2.xsd http://www.imsglobal.org/xsd/imsmd_v1p2 http://www.imsglobal.org/xsd/imsmd_v1p2p4.xsd ");
+
+            using (var fw = File.Open(projectPath+"imsmanifest.xml", FileMode.Create))
+            using (var xmlWr = XmlWriter.Create(fw, new XmlWriterSettings
+            {
+                Encoding = System.Text.Encoding.UTF8,
+                NamespaceHandling = NamespaceHandling.OmitDuplicates,
+                Indent = true
+            }))
+            {
+                finalDoc.WriteTo(xmlWr);
+                xmlWr.Flush();
+                fw.Flush();
+
+                Debug.Log(fw.ToString());
+            }
+
+            EditorUtility.DisplayProgressBar("ExportLearningObject.Progress.Title", "ExportLearningObject.GatheringFiles", 0.80f);
+            var files = Directory.GetFiles(projectPath, "*", SearchOption.AllDirectories);
+            var zipFile = new Ionic.Zip.ZipFile(PlayerSettings.productName + ".zip", System.Text.Encoding.UTF8);
+            var prefix = new DirectoryInfo(projectPath).FullName;
+            foreach (var file in files.Select(f => new FileInfo(f)))
+            {
+                zipFile.AddFile(file.FullName, file.FullName.Remove(0, prefix.Length).RemoveFromEnd(file.Name));
+            }
+            EditorUtility.DisplayProgressBar("ExportLearningObject.Progress.Title", "ExportLearningObject.Compressing", 0.9f);
+            zipFile.Save(outputFile);
+
+            EditorUtility.DisplayProgressBar("ExportLearningObject.Progress.Title", "ExportLearningObject.Done", 1f);
+            EditorUtility.ClearProgressBar();
+            EditorUtility.RevealInFinder(outputFile);
+        }
+
+        private static ManifestType GetImsManifest()
+        {
+            return new ManifestType
+            {
+                version = "IMS CP 1.2",
+                identifier = MetadataUtility.GenerateManifestIdentifier(),
+                metadata = new ManifestMetadataType
+                {
+                    schema = "IMS Content",
+                    schemaversion = "1.2",
+                    Any = new XmlElement[]
+                    {
+                            MetadataUtility.SerializeToXmlElement(new lomType
+                            {
+                                general = new generalType
+                                {
+                                    title = new langType
+                                    {
+                                        langstring = new langstringType[]
+                                        {
+                                            new langstringType
+                                            {
+                                                lang = "es-ES",
+                                                Value = Controller.Instance.AdventureData.getTitle()
+                                            }
+                                        }
+                                    }
+                                }
+                            })
+                    }
+                },
+                organizations = new OrganizationsType
+                {
+                    @default = "uAdventure",
+                    organization = new OrganizationType[]
+                    {
+                            new OrganizationType
+                            {
+                                title = "uAdventure course",
+                                item = new ItemType[]
+                                {
+                                    new ItemType
+                                    {
+                                        identifier = "itm_uAdventure",
+                                        identifierref = UADVENTURE_RESOURCE,
+                                        isvisible = true,
+                                        title = Controller.Instance.AdventureData.getTitle()
+                                    }
+                                }
+                            }
+                    }
+                },
+                resources = new ResourcesType
+                {
+                    resource = new ResourceType[]
+                    {
+                            new ResourceType
+                            {
+                                href = "index.html",
+                                identifier = UADVENTURE_RESOURCE,
+                                type = "webcontent",
+                                metadata = new MetadataType
+                                {
+                                    schema = "IMS Content",
+                                    schemaversion = "1.2",
+                                    Any = new XmlElement[] 
+                                    { 
+                                        MetadataUtility.SerializeToXmlElement(controllerInstance.AdventureData.getImsCPMetadata()) 
+                                    }
+                                },
+                                file = new IMS.CP.v1p2.FileType[]
+                                {
+                                    new IMS.CP.v1p2.FileType
+                                    {
+                                        href = "index.html"
+                                    }
+                                }
+                            }
+                    }
+                }
+            };
+        }
+
+        private static bool IsPlatformAvailable(BuildTarget target)
+        {
+            var moduleManager = System.Type.GetType("UnityEditor.Modules.ModuleManager,UnityEditor.dll");
+            var isPlatformSupportLoaded = moduleManager.GetMethod("IsPlatformSupportLoaded", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
+            var getTargetStringFromBuildTarget = moduleManager.GetMethod("GetTargetStringFromBuildTarget", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
+
+            return (bool)isPlatformSupportLoaded.Invoke(null, new object[] { (string)getTargetStringFromBuildTarget.Invoke(null, new object[] { target }) });
         }
 
         public static int GetFrameCount(FileInfo file)
