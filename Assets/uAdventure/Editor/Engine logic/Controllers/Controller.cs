@@ -2325,6 +2325,7 @@ namespace uAdventure.Editor
                     version = PlayerSettings.Android.bundleVersionCode,
                     packageName = PlayerSettings.applicationIdentifier
                 });
+                projectPath = "./Builds/WebGL/"; // Default build path
             }
 
 
