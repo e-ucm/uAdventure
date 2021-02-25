@@ -93,7 +93,7 @@ namespace uAdventure.Editor
 
         public void OnCliked()
         {
-
+            uAdventureWindowMetaData.OpenMetaDataWindow();
         }
     }
 
@@ -320,6 +320,24 @@ namespace uAdventure.Editor
         public void OnCliked()
         {
             Controller.Instance.BuildGame(Controller.EXPORT_ALL);
+        }
+    }
+
+    public class ExportLearningObject : IMenuItem
+    {
+        public ExportLearningObject(string name_)
+        {
+            this.Label = name_;
+        }
+
+        public string Label
+        {
+            get; set;
+        }
+
+        public void OnCliked()
+        {
+            Controller.Instance.ExportLearningObject();
         }
     }
 

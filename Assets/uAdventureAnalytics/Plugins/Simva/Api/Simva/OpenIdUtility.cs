@@ -208,6 +208,7 @@ namespace Simva
             {
 #if UNITY_WEBGL
                 OpenUrl(url);
+                windowOpened = true;
 #endif
             }
 
@@ -231,12 +232,13 @@ namespace Simva
             public string SessionState { get; set; }
         }
 
-        public static IAsyncOperation<LoginResponse> ListenForCode(int port, out string redirectUrl)
+        public static IAsyncOperation<LoginResponse> ListenForCode(out string redirectUrl)
         {
             var result = new AsyncCompletionSource<LoginResponse>(); 
 
             if (Application.isEditor || Application.platform == RuntimePlatform.WindowsPlayer)
             {
+                var port = FreePortHelper.GetFreePort();
                 var responseTransfer = new ResponseTransfer();
 
                 httpListener = new Thread(() =>
@@ -406,7 +408,7 @@ namespace Simva
             var result = new AsyncCompletionSource<AuthorizationInfo>();
 
 
-            var loginResponse = ExtractLoginresponseFromUrl();
+            var loginResponse = ExtractLoginResponseFromUrl();
             Debug.Log("Login response read: " + loginResponse.Code + " - " + loginResponse.SessionState);
 
             var redirectUrl = PlayerPrefs.GetString("OpenIdRedirectUrl");
@@ -436,7 +438,7 @@ namespace Simva
             return result;
         }
 
-        private static LoginResponse ExtractLoginresponseFromUrl()
+        private static LoginResponse ExtractLoginResponseFromUrl()
         {
             var error = GetParameter("error");
             if (!string.IsNullOrEmpty(error))
@@ -462,8 +464,6 @@ namespace Simva
         {
             var result = new AsyncCompletionSource<AuthorizationInfo>();
 
-            var port = FreePortHelper.GetFreePort();
-
             var url = authUrl + "?" +
                 "response_type=code" +
                 "&client_id=" + clientId;
@@ -488,7 +488,7 @@ namespace Simva
 
             var redirectUri = string.Empty; 
                 
-            ListenForCode(port, out redirectUri)
+            ListenForCode(out redirectUri)
             .Then(loginResponse => {
                 if (loginResponse.IsError)
                 {

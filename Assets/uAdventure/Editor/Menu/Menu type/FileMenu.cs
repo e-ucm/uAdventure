@@ -25,6 +25,7 @@ namespace uAdventure.Editor
         private BuildProjectWebGL buildProjectWebGL;
         private BuildProjectMobile buildProjectMobile;
         private BuildProjectAll buildProjectAll;
+        private ExportLearningObject exportLearningObject;
 
         public FileMenu()
         {
@@ -60,6 +61,7 @@ namespace uAdventure.Editor
             else if ((obj as BuildProjectWebGL) != null) buildProjectWebGL.OnCliked();
             else if ((obj as BuildProjectMobile) != null) buildProjectMobile.OnCliked();
             else if ((obj as BuildProjectAll) != null) buildProjectAll.OnCliked();
+            else if ((obj as ExportLearningObject) != null) exportLearningObject.OnCliked();
         }
 
         protected override void SetMenuItems()
@@ -79,7 +81,8 @@ namespace uAdventure.Editor
             buildProjectWebGL = new BuildProjectWebGL("MenuFile.BuildWebGL");
             buildProjectMobile = new BuildProjectMobile("MenuFile.BuildMobile");
             buildProjectAll = new BuildProjectAll("MenuFile.BuildAll");
-            
+            exportLearningObject = new ExportLearningObject("MenuFile.ExportLOM");
+
             menu.AddItem(new GUIContent(TC.get(saveProject.Label)), false, Callback, saveProject);
 
             menu.AddItem(new GUIContent(TC.get(buildProject.Label) + "/" + TC.get(buildProject.Label)), false, Callback, buildProject);
@@ -95,6 +98,8 @@ namespace uAdventure.Editor
             menu.AddItem(new GUIContent(TC.get(buildProject.Label) + "/" + TC.get(buildProjectMobile.Label)), false, Callback, buildProjectMobile);
             menu.AddSeparator(TC.get(buildProject.Label) + "/");
             menu.AddItem(new GUIContent(TC.get(buildProject.Label) + "/" + TC.get(buildProjectAll.Label)), false, Callback, buildProjectAll);
+
+            menu.AddItem(new GUIContent(TC.get(exportLearningObject.Label)), false, Callback, exportLearningObject);
         }
     }
 }

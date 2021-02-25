@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 
 using uAdventure.Core;
+using System.Xml.Serialization;
+using uAdventure.Core.Metadata;
 
 namespace uAdventure.Editor
 {
@@ -114,8 +116,35 @@ namespace uAdventure.Editor
                 doc.Save(folderName + "/chapter" + chapterIndex++ + ".xml");
             }
             /** ******** END WRITING THE CHAPTERS ********** */
+
+            /** ******* START WRITING THE METADATA ********* */
+
+            // Pick the main node for the descriptor
+            var metadata = adventureData.getImsCPMetadata();
+            if(metadata != null)
+            {
+                var xmlMetadata = SerializeToXmlElement(new XmlDocument(), metadata);
+                doc = new XmlDocument();
+                xmlMetadata = MetadataUtility.CleanXMLGarbage(doc, xmlMetadata);
+                doc.AppendChild(xmlMetadata);
+                doc.Save(folderName + "/imscpmetadata.xml"); 
+            }
+            /** ******** END WRITING THE CHAPTERS ********** */
             dataSaved = true;
             return dataSaved;
+        }
+
+        public static XmlElement SerializeToXmlElement(XmlDocument doc, object o)
+        {
+            using (XmlWriter writer = doc.CreateNavigator().AppendChild())
+            {
+                var serializer = new XmlSerializer(o.GetType());
+                XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
+                ns.Add("imsmd", "http://www.imsglobal.org/xsd/imsmd_v1p2");
+                serializer.Serialize(writer, o, ns);
+            }
+
+            return doc.DocumentElement;
         }
 
         public static XmlElement writeAssessmentData( /* string zipFilename,*/
