@@ -377,7 +377,7 @@
   <entry key="Conditions.Context.1.21"> The action {#ELEMENT_TYPE$} {#ELEMENT_ID$} &lt;b&gt;will become executable&lt;/b&gt; when the next condition is satisfied:</entry>
   <entry key="Flags.FlagReferences">References</entry>
   <entry key="ExitsList.DuplicateExit">Duplicate selected exit</entry>
-  <entry key="Operation.ExportProject.AsLO">Operation: Exporting project as Learning Object</entry>
+  <entry key="Operation.ExportProject.AsLO">Exporting project as Learning Object</entry>
   <entry key="Element.PostEffects">Post effects</entry>
   <entry key="ResourceBlock.deleteOnlyOneBlock.message"> Are you sure to delete the selected resource block? The conditions in the other block will be deleted </entry>
   <entry key="Effect.MoveCharacterInfo">Move character {#0} to x:{#1} y:{#2}</entry>
@@ -2305,6 +2305,20 @@
   <entry key="Inventory.Type4">Fixed on top</entry>
   <entry key="Inventory.Type5">Fixed on bottom</entry>
   <entry key="Inventory.Type6">Icon freely positioned</entry>
+  
+  <!-- Learning Object -->
+  
+  <entry key="ExportLearningObject.WebGLUnavailable">WebGL is not available in Unity, please install the WebGL build support using the Unity Hub.</entry>
+  <entry key="ExportLearningObject.BuildDetected">
+    A WebGL built has been detected in the default builds directory. Using it can drastically reduce 
+    the export time, but the Learning Object will not have the changes made after the WebGL Build. Do you want to use it?
+  </entry>
+  <entry key="ExportLearningObject.Starting">Starting...</entry>
+  <entry key="ExportLearningObject.BuildingWebGL">Building project for WebGL platform.</entry>
+  <entry key="ExportLearningObject.CreatingManifest">Creating ImsManifest file.</entry>
+  <entry key="ExportLearningObject.GatheringFiles">Gathering build files.</entry>
+  <entry key="ExportLearningObject.Compressing">Compressing Files</entry>
+  <entry key="ExportLearningObject.Done">Done!</entry>
   
   <!-- Id Validation -->
   <entry key="Validation.Id.IsEmpty">Id must not be empty</entry>

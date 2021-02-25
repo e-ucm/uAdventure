@@ -2293,30 +2293,30 @@ namespace uAdventure.Editor
         {
             if (!IsPlatformAvailable(BuildTarget.WebGL))
             {
-                ShowErrorDialog("ExportLearningObject.WebGLUnavailable.Title", "ExportLearningObject.WebGLUnavailable.Message");
+                ShowErrorDialog("Operation.ExportProject.AsLO".Traslate(), "ExportLearningObject.WebGLUnavailable".Traslate());
                 return;
             }
 
             var projectPath = "./Builds/WebGL/";
             if (Directory.Exists(projectPath) && File.Exists(projectPath + "index.html"))
             {
-                if(!ShowStrictConfirmDialog("ExportLearningObject.BuildDetected.Title", "ExportLearningObject.BuildDetected.Message"))
+                if(!ShowStrictConfirmDialog("Operation.ExportProject.AsLO".Traslate(), "ExportLearningObject.BuildDetected".Traslate()))
                 {
                     projectPath = null;
                 }
             }
 
-            var outputFile = EditorUtility.SaveFilePanel("ExportLearningObject.OuputFile.Title", projectPath, PlayerSettings.productName + ".zip", ".zip");
+            var outputFile = EditorUtility.SaveFilePanel("Operation.ExportProject.AsLO".Traslate(), projectPath, PlayerSettings.productName + ".zip", ".zip");
             if(string.IsNullOrEmpty(outputFile))
             {
                 return;
             }
 
-            EditorUtility.DisplayProgressBar("ExportLearningObject.Progress.Title", "ExportLearningObject.Starting", 0f);
+            EditorUtility.DisplayProgressBar("Operation.ExportProject.AsLO".Traslate(), "ExportLearningObject.Starting".Traslate(), 0f);
 
             if (projectPath == null)
             {
-                EditorUtility.DisplayProgressBar("ExportLearningObject.Progress.Title", "ExportLearningObject.BuildingWebGL", 0.05f);
+                EditorUtility.DisplayProgressBar("Operation.ExportProject.AsLO".Traslate(), "ExportLearningObject.BuildingWebGL".Traslate(), 0.05f);
                 DoBuild(new BuildConfig
                 {
                     BuildWebGL = true,
@@ -2328,7 +2328,7 @@ namespace uAdventure.Editor
             }
 
 
-            EditorUtility.DisplayProgressBar("ExportLearningObject.Progress.Title", "ExportLearningObject.CreatingManifest", 0.75f);
+            EditorUtility.DisplayProgressBar("Operation.ExportProject.AsLO".Traslate(), "ExportLearningObject.CreatingManifest".Traslate(), 0.75f);
             var serializer = new System.Xml.Serialization.XmlSerializer(typeof(ManifestType));
             XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
             ManifestType manifest = GetImsManifest();
@@ -2363,7 +2363,7 @@ namespace uAdventure.Editor
                 Debug.Log(fw.ToString());
             }
 
-            EditorUtility.DisplayProgressBar("ExportLearningObject.Progress.Title", "ExportLearningObject.GatheringFiles", 0.80f);
+            EditorUtility.DisplayProgressBar("Operation.ExportProject.AsLO".Traslate(), "ExportLearningObject.GatheringFiles".Traslate(), 0.80f);
             var files = Directory.GetFiles(projectPath, "*", SearchOption.AllDirectories);
             var zipFile = new Ionic.Zip.ZipFile(PlayerSettings.productName + ".zip", System.Text.Encoding.UTF8);
             var prefix = new DirectoryInfo(projectPath).FullName;
@@ -2371,10 +2371,10 @@ namespace uAdventure.Editor
             {
                 zipFile.AddFile(file.FullName, file.FullName.Remove(0, prefix.Length).RemoveFromEnd(file.Name));
             }
-            EditorUtility.DisplayProgressBar("ExportLearningObject.Progress.Title", "ExportLearningObject.Compressing", 0.9f);
+            EditorUtility.DisplayProgressBar("Operation.ExportProject.AsLO".Traslate(), "ExportLearningObject.Compressing".Traslate(), 0.9f);
             zipFile.Save(outputFile);
 
-            EditorUtility.DisplayProgressBar("ExportLearningObject.Progress.Title", "ExportLearningObject.Done", 1f);
+            EditorUtility.DisplayProgressBar("Operation.ExportProject.AsLO".Traslate(), "ExportLearningObject.Done".Traslate(), 1f);
             EditorUtility.ClearProgressBar();
             EditorUtility.RevealInFinder(outputFile);
         }

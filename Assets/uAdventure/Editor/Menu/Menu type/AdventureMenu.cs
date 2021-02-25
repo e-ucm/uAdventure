@@ -41,7 +41,7 @@ namespace uAdventure.Editor
 
             consistency = new CheckAdventureConsistencyMenuItem("MenuAdventure.CheckConsistency");
             editAdventureData = new EditAdventureDataMenuItem("MenuAdventure.AdventureData");
-            editMetaData = new LOMMetadataEditorMenuItem("MenuAdventure.MetaData");
+            editMetaData = new LOMMetadataEditorMenuItem("MenuFile.AllLOMProperties");
             visualisation = new VisualisationMenuItem("MenuAdventure.Visualization");
             convertTo = new ConvertToMenuItem("MenuAdventure.ChangeToModePlayerVisible");
             deleteUnused = new DeleteUnusedDataMenuItem("MenuAdventure.DeleteUnusedAssets");

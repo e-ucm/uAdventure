@@ -1,7 +1,7 @@
 mergeInto(LibraryManager.library, {
 
   OpenUrl: function (str) {
-    window.open(str, "_self");
+    window.open(Pointer_stringify(str), "_self");
   },
 
   ClearUrl: function () {

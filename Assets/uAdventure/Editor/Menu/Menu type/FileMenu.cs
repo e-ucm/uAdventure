@@ -81,7 +81,7 @@ namespace uAdventure.Editor
             buildProjectWebGL = new BuildProjectWebGL("MenuFile.BuildWebGL");
             buildProjectMobile = new BuildProjectMobile("MenuFile.BuildMobile");
             buildProjectAll = new BuildProjectAll("MenuFile.BuildAll");
-            exportLearningObject = new ExportLearningObject("MenuFile.ExportLearningObject");
+            exportLearningObject = new ExportLearningObject("MenuFile.ExportLOM");
 
             menu.AddItem(new GUIContent(TC.get(saveProject.Label)), false, Callback, saveProject);
 

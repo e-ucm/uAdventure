@@ -35,6 +35,7 @@ namespace uAdventure.Editor
 
 		protected override void InitWindows()
 		{
+			titleContent = new GUIContent(TC.Traslate("LOM.Title"));
 			WantsMouseMove = true;
 
 			if (serializedObject == null)
@@ -56,14 +57,14 @@ namespace uAdventure.Editor
 			{
 				if (property.isArray)
 				{
-					AddExtension(multi = new MultiMetaDataWindow(Rect.zero, new GUIContent(TC.get("Element.Name0")), "Window"));
+					AddExtension(multi = new MultiMetaDataWindow(Rect.zero, new GUIContent(TC.get("")), "Window"));
 					multi.ButtonContent = new GUIContent(property.displayName);
 					multi.property = property.Copy();
 					multi.onDraw = DrawProperty;
 				}
 				else
 				{
-					AddExtension(simple = new SimpleMetaDataWindow(Rect.zero, new GUIContent(TC.get("Element.Name0")), "Window"));
+					AddExtension(simple = new SimpleMetaDataWindow(Rect.zero, new GUIContent(TC.get("")), "Window"));
 					simple.ButtonContent = new GUIContent(property.displayName);
 					simple.property = property.Copy();
 					simple.onDraw = DrawProperty;
