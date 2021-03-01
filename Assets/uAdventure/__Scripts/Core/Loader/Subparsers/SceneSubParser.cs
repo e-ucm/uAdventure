@@ -47,6 +47,7 @@ namespace uAdventure.Core
             bool hideInventory = ExString.EqualsDefault(element.GetAttribute("hideInventory"), "yes", false);
             int playerLayer = ExParsers.ParseDefault (element.GetAttribute("playerLayer"), -1);
 			float playerScale = ExParsers.ParseDefault (element.GetAttribute("playerScale"), CultureInfo.InvariantCulture, 1.0f);
+            playerScale = Mathf.Max(0, playerScale);
 
             scene = new Scene(sceneId)
             {

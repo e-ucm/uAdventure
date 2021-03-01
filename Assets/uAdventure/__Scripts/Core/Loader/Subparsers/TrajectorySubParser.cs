@@ -19,8 +19,8 @@ namespace uAdventure.Core
 				int x = ExParsers.ParseDefault(el.GetAttribute("x"), 0),
 					y = ExParsers.ParseDefault(el.GetAttribute("y"), 0);
 				float scale = ExParsers.ParseDefault(el.GetAttribute("scale"), CultureInfo.InvariantCulture, 1.0f);
-
-                trajectory.addNode(id, x, y, scale);
+				scale = Mathf.Max(0, scale);
+				trajectory.addNode(id, x, y, scale);
             }
 
 			foreach (XmlElement el in element.SelectNodes("side"))

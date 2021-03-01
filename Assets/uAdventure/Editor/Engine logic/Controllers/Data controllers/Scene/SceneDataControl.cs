@@ -729,7 +729,7 @@ namespace uAdventure.Editor
 
         public void setPlayerScale(float scale)
         {
-
+            scale = Mathf.Max(0, scale);
             //scene.setPlayerScale(scale);
             Controller.Instance.AddTool(new ChangePlayerScaleTool(scene, scale));
         }
