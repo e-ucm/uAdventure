@@ -889,7 +889,7 @@ namespace uAdventure.Editor
 
         public void OnCliked()
         {
-
+            Application.OpenURL("https://www.e-ucm.es/uadventure/");
         }
     }
 
@@ -907,7 +907,7 @@ namespace uAdventure.Editor
 
         public void OnCliked()
         {
-
+            Application.OpenURL("https://github.com/e-ucm/uAdventure/issues/new");
         }
     }
 }

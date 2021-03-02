@@ -117,7 +117,7 @@ namespace uAdventure.Editor
                 AddMenu(new AdventureMenu().menu, TC.get("MenuAdventure.Title"));
                 AddMenu(new ChaptersMenu().menu, TC.get("MenuChapters.Title"));
                 AddMenu(new ConfigurationMenu().menu, TC.get("MenuConfiguration.Title"));
-                AddMenu(new AboutMenu().menu, TC.get("About.Title"));
+                AddMenu(new AboutMenu().menu, TC.get("Menu.About"));
 
 
                 openedWindow = EditorWindowType.Chapter;
