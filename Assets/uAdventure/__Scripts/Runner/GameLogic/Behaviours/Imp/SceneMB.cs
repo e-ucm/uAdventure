@@ -419,18 +419,15 @@ namespace uAdventure.Runner
                     InventoryManager.Instance.Show = false;
                     Slidescene ssd = (Slidescene)SceneData;
                     currentSlide = 0;
-                    foreach (ResourcesUni r in ssd.getResources())
+                    foreach (ResourcesUni r in ssd.getResources().Checked())
                     {
-                        if (ConditionChecker.check(r.getConditions()))
-                        {
-                            this.slides = Game.Instance.ResourceManager.getAnimation(r.getAssetPath(Slidescene.RESOURCE_TYPE_SLIDES));
-                            SetSlide(0);
+                        this.slides = Game.Instance.ResourceManager.getAnimation(r.getAssetPath(Slidescene.RESOURCE_TYPE_SLIDES));
+                        SetSlide(0);
 
-                            LoadBackgroundMusic(r);
+                        LoadBackgroundMusic(r);
 
-                            ready = true;
-                            break;
-                        }
+                        ready = true;
+                        break;
                     }
                     break;
             }
