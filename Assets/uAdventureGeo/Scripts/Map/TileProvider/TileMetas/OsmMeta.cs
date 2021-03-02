@@ -13,7 +13,7 @@ namespace uAdventure.Geo
             {
                 {"content-type", "image/png"},
                 {"resolution", new Vector2Int(512,512)},
-                {"url-template", "http://b.tile.openstreetmap.org/{0}/{1}/{2}.png" }
+                {"url-template", "{0}://b.tile.openstreetmap.org/{1}/{2}/{3}.png" }
             })
         { }
     }
