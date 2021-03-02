@@ -1005,6 +1005,11 @@ namespace uAdventure.Editor
                 }
                 else
                     fileCreated = false;
+
+                if (fileCreated)
+                {
+                    uAdventureWindowMain.Instance.RefreshWindows();
+                }
             }
 
             return fileCreated;
