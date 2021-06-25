@@ -36,12 +36,14 @@ namespace uAdventure.Runner
                     module = this,
                     screenPosition = eventData.position,
                     index = resultAppendList.Count,
-                    sortingLayer = 0,
-                    sortingOrder = 1,
-                    distance = int.MaxValue,
+                    sortingLayer = SortingLayer.NameToID("Overrides"),
+                    sortingOrder = int.MaxValue,
+                    distance = 0,
                     depth = int.MaxValue
                 };
                 resultAppendList.Add(result);
+                return;
+                
             }
 
             if (eventCamera == null)

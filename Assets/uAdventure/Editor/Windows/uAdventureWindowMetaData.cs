@@ -1,16 +1,11 @@
-﻿using IMS.CP.v1p2;
-using IMS.MD.v1p2;
+﻿using IMS.MD.v1p2;
 using Malee.List;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using System.Xml;
-using System.Xml.Serialization;
 using uAdventure.Core;
-using uAdventure.Core.Metadata;
 using UnityEditor;
 using UnityEngine;
 

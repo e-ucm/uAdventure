@@ -17,7 +17,6 @@ using uAdventure.Runner;
 using System.Collections;
 using UnityFx.Async.Promises;
 using System.Runtime.InteropServices;
-using ZetaIpc.Runtime.Helper;
 
 namespace Simva
 {
@@ -101,6 +100,7 @@ namespace Simva
 
 	public static class OpenIdUtility
     {
+#if UNITY_WEBGL
         [DllImport("__Internal")]
         private static extern void OpenUrl(string url);
 
@@ -112,18 +112,7 @@ namespace Simva
 
         [DllImport("__Internal")]
         private static extern string GetUrl();
-
-        [DllImport("user32.dll")]
-        static extern IntPtr GetActiveWindow();
-        [DllImport("user32.dll")]
-        static extern bool LockSetForegroundWindow(uint uLockCode);
-        [DllImport("user32.dll")]
-        static extern void SwitchToThisWindow(IntPtr hWnd, bool fAltTab);
-
-
-        private const uint LOCK = 1;
-        private const uint UNLOCK = 2;
-        private static IntPtr window;
+#endif
 
         private static System.Diagnostics.Process windowProcess;
         private static Thread httpListener;
@@ -208,7 +197,6 @@ namespace Simva
             {
 #if UNITY_WEBGL
                 OpenUrl(url);
-                windowOpened = true;
 #endif
             }
 
@@ -232,13 +220,12 @@ namespace Simva
             public string SessionState { get; set; }
         }
 
-        public static IAsyncOperation<LoginResponse> ListenForCode(out string redirectUrl)
+        public static IAsyncOperation<LoginResponse> ListenForCode(int port, out string redirectUrl)
         {
             var result = new AsyncCompletionSource<LoginResponse>(); 
 
-            if (Application.isEditor || Application.platform == RuntimePlatform.WindowsPlayer)
+            if (Application.isEditor)
             {
-                var port = FreePortHelper.GetFreePort();
                 var responseTransfer = new ResponseTransfer();
 
                 httpListener = new Thread(() =>
@@ -293,19 +280,8 @@ namespace Simva
                     }
                     responseTransfer.done = true;
 
-                    IntPtr newWindow = GetActiveWindow();
-
-                    if (window != newWindow)
-                    {
-                        Debug.Log("Set to foreground");
-                        SwitchToThisWindow(window, true);
-                    }
-
                     listener.Close();
                 });
-
-                LockSetForegroundWindow(LOCK);
-                window = GetActiveWindow();
 
                 httpListener.Start();
 
@@ -334,9 +310,9 @@ namespace Simva
 
                 redirectUrl = "http://127.0.0.1:" + port + "/redirect";
             }
-            /*else if(Application.platform == RuntimePlatform.WindowsPlayer)
+            else if(Application.platform == RuntimePlatform.WindowsPlayer)
             {
-                bool listening = SimvaUriHandler.Listen(uri =>
+                int ipcport = SimvaUriHandler.Start(uri =>
                 {
                     Debug.Log("uri received!");
                     var query = uri.Split('?')[1].Split('&');
@@ -346,20 +322,16 @@ namespace Simva
                         d.Add(q[0], q[1]);
                     }
 
-                    SimvaUriHandler.Unregister();
+                    SimvaUriHandler.Stop();
                     result.SetResult(new LoginResponse
                     {
                         Code = d["code"],
                         SessionState = d["session_state"]
                     });
                 });
-                if (!listening)
-                {
-                    result.SetException("Couldnt start ICP listening!");
-                }
-                redirectUrl = Game.Instance.GameState.Data.getApplicationIdentifier() + "://redirect/";
 
-            }*/
+                redirectUrl =  Game.Instance.GameState.Data.getApplicationIdentifier() + "://" + ipcport + "/";
+            }
             else if (Application.platform == RuntimePlatform.Android)
             {
                 var objectName = "OpenIdListener";
@@ -388,11 +360,15 @@ namespace Simva
             }
             else if(Application.platform == RuntimePlatform.WebGLPlayer)
             {
+#if UNITY_WEBGL
                 PlayerPrefs.SetInt("OpenIdTryContinueLogin", 1);
                 PlayerPrefs.SetString("OpenIdRedirectUrl", GetUrl());
                 PlayerPrefs.Save();
                 Debug.Log("RedirectURL: " + GetUrl());
                 redirectUrl = GetUrl();
+#else
+                redirectUrl = null;
+#endif
             }
             else
             {
@@ -408,13 +384,15 @@ namespace Simva
             var result = new AsyncCompletionSource<AuthorizationInfo>();
 
 
-            var loginResponse = ExtractLoginResponseFromUrl();
+            var loginResponse = ExtractLoginresponseFromUrl();
             Debug.Log("Login response read: " + loginResponse.Code + " - " + loginResponse.SessionState);
 
             var redirectUrl = PlayerPrefs.GetString("OpenIdRedirectUrl");
             if (string.IsNullOrEmpty(redirectUrl))
             {
+#if UNITY_WEBGL
                 redirectUrl = GetUrl();
+#endif
             }
 
             PlayerPrefs.DeleteKey("OpenIdTryContinueLogin");
@@ -438,8 +416,9 @@ namespace Simva
             return result;
         }
 
-        private static LoginResponse ExtractLoginResponseFromUrl()
+        private static LoginResponse ExtractLoginresponseFromUrl()
         {
+#if UNITY_WEBGL
             var error = GetParameter("error");
             if (!string.IsNullOrEmpty(error))
             {
@@ -457,12 +436,17 @@ namespace Simva
                     SessionState = GetParameter("session_state")
                 };
             }
+#else
+            return null;
+#endif
         }
 
         public static IAsyncOperation<AuthorizationInfo> LoginWithAccessCode(string authUrl, string tokenUrl, string clientId,
             string audience = null, string scope = null, bool usePKCE = false, string codeChallengeMethod = "S256")
         {
             var result = new AsyncCompletionSource<AuthorizationInfo>();
+
+            var port = UnityEngine.Random.Range(25525, 65535);
 
             var url = authUrl + "?" +
                 "response_type=code" +
@@ -488,7 +472,7 @@ namespace Simva
 
             var redirectUri = string.Empty; 
                 
-            ListenForCode(out redirectUri)
+            ListenForCode(port, out redirectUri)
             .Then(loginResponse => {
                 if (loginResponse.IsError)
                 {
@@ -515,20 +499,10 @@ namespace Simva
             return result;
         }
 
-        private static object GetFreePort()
-        {
-            throw new NotImplementedException();
-        }
-
         public static IAsyncOperation<AuthorizationInfo> LoginWithROPC(string username, string password, string authUrl, string tokenUrl, string clientId,
             string audience, string scope = null)
         {
-            var result = new AsyncCompletionSource<AuthorizationInfo>();
-
-            var port = UnityEngine.Random.Range(25525, 65535);
-
-			var url = authUrl;
-			var formUrlEncoded = "grant_type=password" +
+            var formUrlEncoded = "grant_type=password" +
                 "&username=" + username +
                 "&password=" + password +
                 "&client_id=" + clientId;
@@ -548,16 +522,13 @@ namespace Simva
 
         public static bool HasLoginInfo()
         {
-            if(Application.platform == RuntimePlatform.WebGLPlayer)
-            {
-                var state = GetParameter("session_state");
-                var code = GetParameter("code");
-                return !string.IsNullOrEmpty(state) && !string.IsNullOrEmpty(code);
-            }
-            else
-            {
-                return false;
-            }
+#if UNITY_WEBGL
+            var state = GetParameter("session_state");
+            var code = GetParameter("code");
+            return !string.IsNullOrEmpty(state) && !string.IsNullOrEmpty(code);
+#else
+            return false;
+#endif
 
         }
 
@@ -568,7 +539,6 @@ namespace Simva
 
         public static IAsyncOperation<AuthorizationInfo> GetToken(string tokenUrl, string clientId, string authCode, string redirect_uri, string codeVerifier = null)
         {
-            var result = new AsyncCompletionSource<AuthorizationInfo>();
             var form = new Dictionary<string, string>()
                 {
                     { "grant_type", "authorization_code" },
@@ -577,7 +547,6 @@ namespace Simva
                     { "client_id", clientId },
                 };
 
-            Debug.Log("A - Redirect uri: " + redirect_uri);
             //Debug.Log(JsonConvert.SerializeObject(form, Formatting.Indented));
 
             if (!string.IsNullOrEmpty(codeVerifier))
@@ -586,27 +555,12 @@ namespace Simva
                 Debug.Log("A2 - Code Verifier: " + codeVerifier);
             }
 
-            Debug.Log("B");
             UnityWebRequest uwr = UnityWebRequest.Post(tokenUrl, form);
-
-            Debug.Log("C");
-            Observable.FromCoroutine(() => DoRequest(result, uwr)).Subscribe();
-
-            var wrapper = new AsyncCompletionSource<AuthorizationInfo>();
-
-            result.Then(authInfo =>
-            {
-                Debug.Log("D");
-                authInfo.ClientId = clientId;
-                wrapper.SetResult(authInfo);
-            }).Catch(ex => wrapper.SetException(ex));
-
-            return wrapper;
+            return DoAuthorizationRequest(clientId, uwr);
         }
 
 		public static IAsyncOperation<AuthorizationInfo> GetToken(string tokenUrl, string formUrlEncoded, string clientId)
         {
-            var result = new AsyncCompletionSource<AuthorizationInfo>();
             UnityWebRequest uwr = UnityWebRequest.Post(tokenUrl, "");
 			byte[] bytes = Encoding.UTF8.GetBytes(formUrlEncoded);
 			UploadHandlerRaw uH = new UploadHandlerRaw(bytes);
@@ -615,17 +569,7 @@ namespace Simva
 
 			uwr.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
-            Observable.FromCoroutine(() => DoRequest(result, uwr)).Subscribe();
-
-            var wrapper = new AsyncCompletionSource<AuthorizationInfo>();
-
-            result.Then(authInfo =>
-            {
-                authInfo.ClientId = clientId;
-                wrapper.SetResult(authInfo);
-            }).Catch(ex => wrapper.SetException(ex));
-
-            return wrapper;
+            return DoAuthorizationRequest(clientId, uwr);
         }
 
 		public static AuthorizationInfo RefreshToken(string tokenUrl, string clientId, string refresh_token)
@@ -651,8 +595,6 @@ namespace Simva
 
         public static IAsyncOperation<AuthorizationInfo> RefreshTokenAsync(string tokenUrl, string clientId, string refresh_token)
         {
-            var result = new AsyncCompletionSource<AuthorizationInfo>();
-
             UnityWebRequest uwr = UnityWebRequest.Post(tokenUrl,
                 new Dictionary<string, string>()
                 {
@@ -661,15 +603,42 @@ namespace Simva
                     { "client_id", clientId }
                 });
 
-            Observable.FromCoroutine(() => DoRequest(result, uwr)).Subscribe();
+            return DoAuthorizationRequest(clientId, uwr);
+        }
 
-            return result.Then(authInfo =>
-            {
-                var wrapper = new AsyncCompletionSource<AuthorizationInfo>();
-                authInfo.ClientId = clientId;
-                wrapper.SetResult(authInfo);
-                return wrapper;
-            });
+        private static IAsyncOperation<AuthorizationInfo> DoAuthorizationRequest(string clientId, UnityWebRequest uwr)
+        {
+            var wrapper = new AsyncCompletionSource<AuthorizationInfo>();
+
+            RequestsUtil.DoRequest<AuthorizationInfo>(uwr)
+                .Then(authInfo =>
+                {
+                    authInfo.ClientId = clientId;
+                    wrapper.SetResult(authInfo);
+                    return wrapper;
+                })
+                .Catch(ex =>
+                {
+                    if (uwr.isHttpError)
+                    {
+                        var apiEx = (ApiException)ex;
+                        var msg = (string)apiEx.ErrorContent;
+                        try
+                        {
+                            var authError = JsonConvert.DeserializeObject<AuthorizationError>(msg);
+                            msg = authError.ErrorDescription;
+                        }
+                        catch { }
+                        wrapper.SetException(new ApiException((int)uwr.responseCode, msg));
+                    }
+                    else
+                    {
+                        wrapper.SetException(ex);
+                    }
+                })
+                .AddProgressCallback(wrapper.SetProgress);
+
+            return wrapper;
         }
 
         private static void ThrowErrors(UnityWebRequest uwr)
@@ -780,34 +749,14 @@ namespace Simva
             return result;
         }
 
-        private static IEnumerator DoRequest<T>(IAsyncCompletionSource<T> op, UnityWebRequest webRequest)
-        {
-            yield return webRequest.SendWebRequest();
+    }
 
-            // Sometimes the webrequest is finished but the download is not
-            while (!webRequest.isNetworkError && !webRequest.isHttpError && webRequest.downloadProgress != 1)
-            {
-                yield return new WaitForFixedUpdate();
-            }
-
-            if (webRequest.isNetworkError)
-            {
-                op.SetException(new ApiException((int)webRequest.responseCode, webRequest.error, webRequest.downloadHandler.text));
-            }
-            else if (webRequest.isHttpError)
-            {
-                Debug.Log(webRequest.downloadHandler.text);
-                op.SetException(new ApiException((int)webRequest.responseCode, webRequest.error, webRequest.downloadHandler.text));
-            }
-            else
-            {
-                Debug.Log("Deserializing...");
-                var deserialized = JsonConvert.DeserializeObject<T>(webRequest.downloadHandler.text);
-                op.SetResult(deserialized);
-            }
-
-            webRequest.Dispose();
-        }
+    internal class ErrorMessage
+    {
+        [JsonProperty("error")]
+        public string Error;
+        [JsonProperty("error_description")]
+        public string ErrorDescription;
     }
 
     /// <summary>

@@ -43,6 +43,7 @@ namespace uAdventure.Editor
             // Create the root node
             sceneElement.SetAttribute("id", scene.getId());
             sceneElement.SetAttribute("hideInventory", scene.HideInventory ? "yes" : "no");
+            sceneElement.SetAttribute("allowsSavingGame", scene.allowsSavingGame() ? "yes" : "no");
 
             if (options.Any(o => o is CIP && (o as CIP).TargetId.Equals(scene.getId())))
                 sceneElement.SetAttribute("start", "yes");

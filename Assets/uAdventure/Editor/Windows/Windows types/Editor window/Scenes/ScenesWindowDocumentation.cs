@@ -54,6 +54,14 @@ namespace uAdventure.Editor
 
             // Name
             EditorGUI.BeginChangeCheck();
+            var allowsSaving = EditorGUILayout.Toggle(TC.get("Scene.AllowsSaving"), workingScene.allowsSavingGame());
+            if (EditorGUI.EndChangeCheck())
+            {
+                workingScene.setAllowsSavingGame(allowsSaving);
+            }
+
+            // Name
+            EditorGUI.BeginChangeCheck();
             var newName = EditorGUILayout.TextField(TC.get("Scene.Name"), workingScene.getName());
             if (EditorGUI.EndChangeCheck())
             {

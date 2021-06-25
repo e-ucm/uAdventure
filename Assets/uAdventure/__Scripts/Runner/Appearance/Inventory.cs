@@ -103,6 +103,7 @@ namespace uAdventure.Runner
                         insideElement.SetActive(value);
                         break;
                 }
+                opened = value;
             }
         }
 

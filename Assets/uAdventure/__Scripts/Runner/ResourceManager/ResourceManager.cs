@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using Ionic.Zip;
 using uAdventure.Core;
 using System;
 using System.Text.RegularExpressions;
@@ -116,7 +115,7 @@ namespace uAdventure.Runner
                 holder.Load();
                 if (holder.Loaded())
                 {
-                    images.Add(uri, holder);
+                    //images.Add(uri, holder);
                     return holder.Sprite;
                 }
                 else
@@ -127,7 +126,7 @@ namespace uAdventure.Runner
                     if (holder.Loaded())
                     {
                         Debug.Log(uri + " loaded from defaults...");
-                        images.Add(uri, holder);
+                        //images.Add(uri, holder);
                         return holder.Sprite;
                     }
                     else
@@ -298,6 +297,18 @@ namespace uAdventure.Runner
                 }
             }
             return result;
+        }
+
+        public void ClearImage(string uri)
+        {
+            if (images.ContainsKey(uri))
+            {
+                Texture2D.Destroy(images[uri].Sprite);
+                Resources.UnloadAsset(images[uri].Texture);
+                images[uri].Texture = new Texture2D(1, 1);
+                images.Remove(uri);
+               
+            }
         }
 
         public AudioClip getAudio(string uri)
@@ -548,50 +559,6 @@ namespace uAdventure.Runner
             }
 
             return uri;
-        }
-
-        public bool extracted = false;
-        public void extractFile(string file)
-        {
-            extracted = false;
-            if (Application.platform == RuntimePlatform.WebGLPlayer)
-            {
-                Debug.LogWarning("Extraction is not allowed in browser!");
-                return;
-            }
-
-
-            string[] dir = file.Split(System.IO.Path.DirectorySeparatorChar);
-            string filename = dir[dir.Length - 1].Split('.')[0];
-
-            string exportLocation = getCurrentDirectory() + System.IO.Path.DirectorySeparatorChar + "Games" + System.IO.Path.DirectorySeparatorChar + filename;
-
-            ZipUtil.Unzip(file, exportLocation);
-
-            foreach (string f in System.IO.Directory.GetFiles(exportLocation))
-            {
-                if (!f.Contains(".xml"))
-                {
-                    System.IO.File.Delete(f);
-                }
-            }
-
-            string[] tmp;
-            foreach (string f in System.IO.Directory.GetDirectories(exportLocation))
-            {
-                tmp = f.Split(System.IO.Path.DirectorySeparatorChar);
-                if (tmp[tmp.Length - 1] != "assets" && tmp[tmp.Length - 1] != "gui")
-                {
-                    System.IO.Directory.Delete(f, true);
-                }
-            }
-
-            VideoConverter converter = new VideoConverter();
-            foreach (string video in System.IO.Directory.GetFiles(exportLocation + "/assets/video/"))
-            {
-                converter.Convert(video);
-            }
-            extracted = true;
         }
 
         public string getCurrentDirectory()

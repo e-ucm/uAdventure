@@ -1,5 +1,6 @@
 ﻿using AssetPackage;
 using System;
+using uAdventure.Simva;
 using UnityFx.Async.Promises;
 
 namespace Simva
@@ -42,6 +43,11 @@ namespace Simva
 
         public void Log(Severity severity, string msg)
         {
+            if(severity == Severity.Error || severity == Severity.Critical)
+            {
+                SimvaExtension.Instance.NotifyManagers("Tracker Error: " + msg);
+            }
+
             unityBridge.Log(severity, msg);
         }
 

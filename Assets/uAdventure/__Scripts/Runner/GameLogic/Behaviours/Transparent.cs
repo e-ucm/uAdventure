@@ -82,6 +82,7 @@ namespace uAdventure.Runner
 
         public static Texture2D CreateReadableTexture(Texture2D texture)
         {
+            Debug.Log("Generated Readable: " + texture.name);
             // Create a temporary RenderTexture of the same size as the texture
             RenderTexture tmp = RenderTexture.GetTemporary(
                                 texture.width,
@@ -104,6 +105,7 @@ namespace uAdventure.Runner
             // Reset the active RenderTexture
             RenderTexture.active = previous;
             // Release the temporary RenderTexture
+            tmp.Release();
             RenderTexture.ReleaseTemporary(tmp);
 
             return readableVersion;

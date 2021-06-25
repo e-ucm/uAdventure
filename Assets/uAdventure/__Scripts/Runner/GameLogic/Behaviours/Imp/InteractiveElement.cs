@@ -14,6 +14,7 @@ namespace uAdventure.Runner
         private bool dragging = false;
         private IEnumerable<Action> targetActions;
         private readonly Dictionary<EffectHolder, Action> executingAction = new Dictionary<EffectHolder, Action>();
+        private List<Action> lastActions;
 
         protected Element element;
         public Element Element
@@ -108,6 +109,7 @@ namespace uAdventure.Runner
                     case Item.BehaviourType.FIRST_ACTION:
                         {
                             var actions = Element.getActions().Valid(AvailableActions);
+                            lastActions = actions.ToList();
                             if (actions.Any())
                             {
                                 ActionSelected(actions.First());
@@ -118,6 +120,7 @@ namespace uAdventure.Runner
                     case Item.BehaviourType.NORMAL:
                         var availableActions = Element.getActions().Valid(AvailableActions).Distinct().ToList();
                         ActionsUtil.AddExamineIfNotExists(Element, availableActions);
+                        lastActions = availableActions;
 
                         //if there is an action, we show them
                         if (availableActions.Count > 0)
@@ -143,6 +146,7 @@ namespace uAdventure.Runner
             }
             else
             {
+                Debug.Log(eventData.ToString());
                 Interacted(eventData);
             }
         }
@@ -243,9 +247,7 @@ namespace uAdventure.Runner
             if(interactuable is EffectHolder)
             {
                 var effectHolder = interactuable as EffectHolder;
-                var availableActions = Element.getActions().Valid(AvailableActions).Distinct().ToList();
-                ActionsUtil.AddExamineIfNotExists(Element, availableActions);
-                action = availableActions.Where(a => a.Effects == effectHolder.originalEffects).FirstOrDefault();
+                action = lastActions.Where(a => a.Effects == effectHolder.originalEffects).FirstOrDefault();
             }
 
             if (action == null)

@@ -66,6 +66,30 @@ namespace uAdventure.Runner
                 {
                     this.GetComponent<UnityEngine.UI.CanvasScaler>().referenceResolution = new Vector2(600, 400);
                 }
+
+                /*Game.Instance.OnShowText += (finished, line, text, x, y, textColor, textOutlineColor, baseColor, outlineColor, id) =>
+                {
+                    if (!finished)
+                    {
+                        if (line != null)
+                        {
+                            Talk(line);
+                        }
+                        else if (textColor == Game.NoColor && textOutlineColor == Game.NoColor)
+                        {
+                            Talk(text, x, y, Color.white, Color.black);
+                        }
+                        else if(baseColor == Game.NoColor && outlineColor == Game.NoColor)
+                        {
+                            Talk(text, x, y, textColor, textOutlineColor);
+                        }
+                        else
+                        {
+                            Talk(text, x, y, textColor, textOutlineColor, baseColor, outlineColor);
+                        }
+                    }
+                };*/
+
             }
         }
 
@@ -136,7 +160,7 @@ namespace uAdventure.Runner
             line = new ConversationLine("", text);
             ShowBubble(GenerateBubble(text, x, y, textColor, textBorderColor, backgroundColor, borderColor));
         }
-        public void Talk(ConversationLine line, string talkerName = null)
+        public void Talk(ConversationLine line)
         {
             var resources = line.getResources().Checked().FirstOrDefault();
             if (resources != null)
@@ -144,11 +168,11 @@ namespace uAdventure.Runner
                 var image = resources.existAsset("image") ? Game.Instance.ResourceManager.getImage(resources.getAssetPath("image")) : null;
                 var audio = resources.existAsset("audio") ? Game.Instance.ResourceManager.getAudio(resources.getAssetPath("audio")) : null;
                 var tts = resources.existAsset("tts") ? resources.getAssetPath("tts") == "yes" : false;
-                Talk(line.getText(), image, audio, tts, talkerName);
+                Talk(line.getText(), image, audio, tts, line.getName());
             }
             else
             {
-                Talk(line.getText(), null, null, false, talkerName);
+                Talk(line.getText(), null, null, false, line.getName());
             }
             this.line = line;
         }
@@ -390,6 +414,7 @@ namespace uAdventure.Runner
 
         public void ExitApplication()
         {
+            ShowConfigMenu();
             Game.Instance.Quit();
         }
     }

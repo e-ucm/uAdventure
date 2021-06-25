@@ -8,6 +8,7 @@ namespace uAdventure.Core
         string getId();
         string getXApiClass();
         string getXApiType();
+        bool allowsSavingGame();
     }
 }
 

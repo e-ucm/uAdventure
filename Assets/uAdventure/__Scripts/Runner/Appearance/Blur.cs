@@ -9,9 +9,7 @@ namespace uAdventure.Runner
         {
             var camera = Camera.main;
 
-            var position = camera.transform.position;
-            position.z = transform.position.z;
-            transform.position = position;
+            transform.position = camera.transform.position + camera.transform.forward;
 
             float cameraHeight = camera.orthographicSize * 2;
             float cameraWidth = Screen.width * cameraHeight / Screen.height;

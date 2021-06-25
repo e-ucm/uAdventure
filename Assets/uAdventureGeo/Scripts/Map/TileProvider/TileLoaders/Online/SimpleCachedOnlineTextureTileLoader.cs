@@ -98,12 +98,45 @@ namespace uAdventure.Geo
 
         public static void SavePNG(Texture2D texture, string filePath)
         {
-            var bytes = texture.EncodeToPNG();
+            var readable = CreateReadableTexture(texture);
+            var bytes = readable.EncodeToPNG();
             Directory.CreateDirectory(Path.GetDirectoryName(filePath));
             var file = File.Open(filePath, FileMode.Create);
             var binary = new BinaryWriter(file);
             binary.Write(bytes);
             file.Close();
+            Texture2D.Destroy(readable);
+        }
+
+        public static Texture2D CreateReadableTexture(Texture2D texture)
+        {
+            Debug.Log("Generated Readable: " + texture.name);
+            // Create a temporary RenderTexture of the same size as the texture
+            RenderTexture tmp = RenderTexture.GetTemporary(
+                                texture.width,
+                                texture.height,
+                                0,
+                                RenderTextureFormat.Default,
+                                RenderTextureReadWrite.Linear);
+
+            // Blit the pixels on texture to the RenderTexture
+            Graphics.Blit(texture, tmp);
+            // Backup the currently set RenderTexture
+            RenderTexture previous = RenderTexture.active;
+            // Set the current RenderTexture to the temporary one we created
+            RenderTexture.active = tmp;
+            // Create a new readable Texture2D to copy the pixels to it
+            Texture2D readableVersion = new Texture2D(texture.width, texture.height);
+            // Copy the pixels from the RenderTexture to the new Texture
+            readableVersion.ReadPixels(new Rect(0, 0, tmp.width, tmp.height), 0, 0);
+            readableVersion.Apply();
+            // Reset the active RenderTexture
+            RenderTexture.active = previous;
+            // Release the temporary RenderTexture
+            tmp.Release();
+            RenderTexture.ReleaseTemporary(tmp);
+
+            return readableVersion;
         }
     }
 }

@@ -144,6 +144,7 @@ namespace uAdventure.Core
      */
     public interface IEffect : ICloneable
     {
+        string GUID { get; set; }
         /**
          * Returns the type of the effect.
          * 

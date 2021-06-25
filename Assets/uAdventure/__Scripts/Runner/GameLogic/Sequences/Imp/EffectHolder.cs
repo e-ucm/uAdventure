@@ -5,6 +5,7 @@ using System.Xml;
 
 using uAdventure.Core;
 using UnityEngine.EventSystems;
+using AssetPackage;
 
 namespace uAdventure.Runner
 {
@@ -64,18 +65,46 @@ namespace uAdventure.Runner
                             Game.Instance.GameState.SetFlag(((DeactivateEffect)effect).getTargetId(), FlagCondition.FLAG_INACTIVE);
                             break;
                         case EffectType.SHOW_TEXT:
-                            var showTextEffect = (ShowTextEffect)effect;
-                            Game.Instance.Talk(showTextEffect.getText(), showTextEffect.getX(), showTextEffect.getY(),
-                                showTextEffect.getRgbFrontColor(), showTextEffect.getRgbBorderColor());
-                            forceWait = true;
-                            break;
                         case EffectType.SPEAK_PLAYER:
-                            Game.Instance.Talk(((SpeakPlayerEffect)effect).getLine(), Player.IDENTIFIER);
-                            forceWait = true;
-                            break;
                         case EffectType.SPEAK_CHAR:
-                            Game.Instance.Talk(((SpeakCharEffect)effect).getLine(), ((SpeakCharEffect)effect).getTargetId());
-                            forceWait = true;
+                            runsOnce = false;
+                            if (timesRun == 0)
+                            {
+                                if(effect.getType() == EffectType.SHOW_TEXT)
+                                {
+                                    var showTextEffect = (ShowTextEffect)effect;
+                                    Game.Instance.Talk(showTextEffect.getText(), showTextEffect.getX(), showTextEffect.getY(),
+                                        showTextEffect.getRgbFrontColor(), showTextEffect.getRgbBorderColor());
+                                }
+                                else if (effect.getType() == EffectType.SPEAK_PLAYER)
+                                {
+                                    Game.Instance.Talk(((SpeakPlayerEffect)effect).getLine(), Player.IDENTIFIER);
+                                }
+                                else if(effect.getType() == EffectType.SPEAK_CHAR)
+                                {
+                                    Game.Instance.Talk(((SpeakCharEffect)effect).getLine(), ((SpeakCharEffect)effect).getTargetId());
+                                }
+                                if (TrackerAsset.Instance.Started)
+                                {
+                                    TrackerAsset.Instance.Completable.Initialized(effect.GUID, CompletableTracker.Completable.DialogFragment);
+                                }
+                                forceWait = true;
+                            }
+                            else 
+                            {
+                                if (GUIManager.Instance.InteractWithDialogue() == InteractuableResult.REQUIRES_MORE_INTERACTION)
+                                {
+                                    forceWait = true;
+                                    if (TrackerAsset.Instance.Started)
+                                    {
+                                        TrackerAsset.Instance.Completable.Progressed(effect.GUID, CompletableTracker.Completable.DialogFragment, 1f);
+                                    }
+                                }
+                                else if(TrackerAsset.Instance.Started)
+                                {
+                                    TrackerAsset.Instance.Completable.Completed(effect.GUID, CompletableTracker.Completable.DialogFragment);
+                                }
+                            }
                             break;
                         case EffectType.TRIGGER_SCENE:
                             if (!waitForLoadPulse)
@@ -98,7 +127,7 @@ namespace uAdventure.Runner
                                         var targetScene = Game.Instance.GameState.GetChapterTarget(tse.getTargetId()) as Scene;
                                         if (targetScene != null)
                                         {
-                                            if(targetScene.getTrajectory() != null)
+                                            if (targetScene.getTrajectory() != null)
                                             {
                                                 var initial = targetScene.getTrajectory().getInitial();
                                                 playerContext.setPosition(initial.getX(), initial.getY());
@@ -143,7 +172,7 @@ namespace uAdventure.Runner
                                     }
                                 }
                             }
-                            else if(timesRun == 1)
+                            else if (timesRun == 1)
                             {
                                 forceWait = true;
                             }
@@ -183,7 +212,7 @@ namespace uAdventure.Runner
                             if (timesRun == 0)
                             {
                                 int pro = re.getProbability(), now = Random.Range(0, 100);
-                                    
+
                                 if (pro <= now)
                                 {
                                     if (re.getPositiveEffect() != null)
@@ -292,7 +321,7 @@ namespace uAdventure.Runner
                         case EffectType.WAIT_TIME:
                             WaitTimeEffect wte = (WaitTimeEffect)effect;
                             runsOnce = false;
-                            if(timesRun == 0)
+                            if (timesRun == 0)
                             {
                                 Game.Instance.PulseOnTime(this, wte.getTime());
                             }
@@ -301,9 +330,13 @@ namespace uAdventure.Runner
                                 forceWait = true;
                             }
                             break;
+                        case EffectType.CANCEL_ACTION:
+                            Game.Instance.ActionCanceled();
+                            forceWait = true;
+                            break;
                         case EffectType.CUSTOM_EFFECT:
                             runsOnce = false;
-                            if(timesRun == 0)
+                            if (timesRun == 0)
                             {
                                 this.additionalInfo["custom_effect_runner"] = CustomEffectRunnerFactory.Instance.CreateRunnerFor(effect);
                             }
@@ -370,7 +403,7 @@ namespace uAdventure.Runner
 
             if (effects != null && effects.getEffects().Count > 0)
             {
-                
+
                 //List<Condition> conditions = new List<Condition>();
                 foreach (IEffect effect in effects.getEffects())
                 {

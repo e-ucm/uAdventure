@@ -25,7 +25,7 @@ namespace uAdventure.Runner
         // Text component to put the line into
         public Text text;
         // Text displaying speed (characters per second)
-        private int charactersPerSecond = 20;
+        private int charactersPerSecond = 50;
 
         private Outline textBorder;
         private Image background;

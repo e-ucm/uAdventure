@@ -18,7 +18,7 @@ namespace MapzenGo.Models
         [SerializeField]
         public float Longitude = 32.818442f;
         [SerializeField]
-        public int Range = 3;
+        public int Range = 4;
         [SerializeField]
         public int Zoom = 16;
         [SerializeField]

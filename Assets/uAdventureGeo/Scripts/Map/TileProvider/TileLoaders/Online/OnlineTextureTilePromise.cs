@@ -61,7 +61,11 @@ namespace uAdventure.Geo
             }
             else
             {
-                Data = DownloadHandlerTexture.GetContent(currRequest.webRequest);
+                var texture = DownloadHandlerTexture.GetContent(currRequest.webRequest);
+                var reducedSize = new Texture2D(128, 128, TextureFormat.RGBA32, false);
+                Graphics.ConvertTexture(texture, reducedSize);
+                Texture2D.DestroyImmediate(texture);
+                Data = reducedSize;
                 Loaded = true;
                 callback(this);
             }

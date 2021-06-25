@@ -72,7 +72,7 @@ namespace uAdventure.Analytics
             yield return true;
         }
 
-        public override IEnumerator OnBeforeGameSave() 
+        public override void OnBeforeGameSave() 
         {
             var analyticsMemory = Game.Instance.GameState.GetMemory("analytics"); 
             if (analyticsMemory == null)
@@ -81,7 +81,6 @@ namespace uAdventure.Analytics
                 Game.Instance.GameState.SetMemory("analytics", analyticsMemory);
             }
             analyticsMemory.Set("completables", JsonUtility.ToJson(CompletablesController));
-            yield return true;
         }
 
         public override IEnumerator OnGameReady()
@@ -89,11 +88,27 @@ namespace uAdventure.Analytics
             yield return true;
         }
 
-        public override IEnumerator OnGameFinished()
+        private bool afterFlush;
+        public void AfterFlush()
         {
-            yield return true;
+            afterFlush = true;
         }
 
+        [Priority(1)]
+        public override IEnumerator OnGameFinished()
+        {
+            if (TrackerAsset.Instance.Active)
+            {
+                var flushed = false;
+                TrackerAsset.Instance.ForceCompleteTraces();
+                TrackerAsset.Instance.FlushAll(() => flushed = true);
+                var time = Time.time;
+                yield return new WaitUntil(() => flushed);
+                TrackerAsset.Instance.Stop();
+            }
+        }
+
+        [Priority(1)]
         public override IEnumerator OnAfterGameLoad()
         {
             if (!inited)
@@ -119,14 +134,14 @@ namespace uAdventure.Analytics
                 var trackerConfigs = Game.Instance.GameState.Data.getObjects<TrackerConfig>();
                 trackerConfig = trackerConfigs.Count == 0 ? new TrackerConfig() : trackerConfigs[0];
 
-                yield return StartCoroutine(StartTracker(trackerConfig));
+                yield return StartCoroutine(StartTracker(trackerConfig, null));
                 // TODO wait till start tracker is ready
             }
         }
 
         #endregion GameExtension
                 
-        public IEnumerator StartTracker(TrackerConfig config, IBridge bridge = null)
+        public IEnumerator StartTracker(TrackerConfig config, string backupFilename, IBridge bridge = null)
         {
             trackerConfig = config;
             string domain = "";
@@ -201,6 +216,12 @@ namespace uAdventure.Analytics
                 BackupStorage = config.getRawCopy(),
                 UseBearerOnTrackEndpoint = trackerConfig.getUseBearerOnTrackEndpoint()
             };
+
+            if (!string.IsNullOrEmpty(backupFilename))
+            {
+                tracker_settings.BackupFile = backupFilename;
+            }
+
             Debug.Log("[ANALYTICS] Settings: " + JsonConvert.SerializeObject(tracker_settings));
             TrackerAsset.Instance.StrictMode = false;
             TrackerAsset.Instance.Bridge = bridge ?? new UnityBridge();

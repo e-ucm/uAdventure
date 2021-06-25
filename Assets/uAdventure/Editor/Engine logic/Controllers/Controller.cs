@@ -18,6 +18,9 @@ using IMS.CP.v1p2;
 using IMS.MD.v1p2;
 using System.Xml;
 using uAdventure.Core.Metadata;
+using SimvaPlugin;
+using Simva.Api;
+using UnityFx.Async.Promises;
 
 namespace uAdventure.Editor
 {
@@ -2225,7 +2228,7 @@ namespace uAdventure.Editor
                 File.WriteAllBytes(downloadPath + "/" + downloadFileName, www.bytes);
                 // Unzip it
                 EditorUtility.DisplayProgressBar("Extracting...", "Extracting " + name + " to " + downloadPath, 0f);
-                ZipUtil.Unzip(downloadPath + "/" + downloadFileName, downloadPath);
+                //ZipUtil.Unzip(downloadPath + "/" + downloadFileName, downloadPath);
                 EditorUtility.DisplayProgressBar("Extracting...", "Extracting " + name + " to " + downloadPath, 1f);
                 EditorUtility.ClearProgressBar();
                 // Delete the zip
@@ -2371,7 +2374,7 @@ namespace uAdventure.Editor
 
             EditorUtility.DisplayProgressBar("Operation.ExportProject.AsLO".Traslate(), "ExportLearningObject.GatheringFiles".Traslate(), 0.80f);
             var files = Directory.GetFiles(projectPath, "*", SearchOption.AllDirectories);
-            var zipFile = new Ionic.Zip.ZipFile(PlayerSettings.productName + ".zip", System.Text.Encoding.UTF8);
+            /*var zipFile = new Ionic.Zip.ZipFile(PlayerSettings.productName + ".zip", System.Text.Encoding.UTF8);
             var prefix = new DirectoryInfo(projectPath).FullName;
             foreach (var file in files.Select(f => new FileInfo(f)))
             {
@@ -2382,7 +2385,7 @@ namespace uAdventure.Editor
 
             EditorUtility.DisplayProgressBar("Operation.ExportProject.AsLO".Traslate(), "ExportLearningObject.Done".Traslate(), 1f);
             EditorUtility.ClearProgressBar();
-            EditorUtility.RevealInFinder(outputFile);
+            EditorUtility.RevealInFinder(outputFile);*/
         }
 
         private static ManifestType GetImsManifest()
@@ -3713,6 +3716,26 @@ namespace uAdventure.Editor
 
             var window = EditorWindow.GetWindow(typeof(WelcomeWindow));
             window.Show();
+        }
+
+        [UnityEditor.MenuItem("uAdventure/UnComplete", priority = 1)]
+        public static void UnComplete()
+        {
+            SimvaApi<StudentsApi>.LoginWithToken("myiq").Then(api =>
+            {
+                api.Api.GetSchedule("6046a0f7c34511006e84f53d")
+                .Then(schedule =>
+                {
+                    var act = schedule.Activities.First(a => a.Value.Name == "Gameplay");
+                    api.Api.SetCompletion(act.Key, "myiq", false);
+                });
+            });
+        }
+        [UnityEditor.MenuItem("uAdventure/Screenshot", priority = 1)]
+        public static void Screenshot()
+        {
+            ScreenCapture.CaptureScreenshot("Capture");
+
         }
 
 

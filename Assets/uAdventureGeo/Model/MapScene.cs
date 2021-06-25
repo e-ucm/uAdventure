@@ -104,6 +104,11 @@ namespace uAdventure.Geo
         {
             return Name;
         }
+
+        public bool allowsSavingGame()
+        {
+            return true;
+        }
     }
 
 }

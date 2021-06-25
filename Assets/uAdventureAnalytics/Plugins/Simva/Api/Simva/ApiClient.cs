@@ -157,6 +157,10 @@ namespace Simva
                     {
                         AuthorizationInfo = authInfo;
                         done.SetCompleted();
+                    })
+                    .Catch(ex =>
+                    {
+                        done.SetException(ex);
                     });
 			}
             catch(ApiException ex)
@@ -200,7 +204,7 @@ namespace Simva
         {
             get { return _defaultHeaderMap; }
         }
-    
+
         /// <summary>
         /// Makes the HTTP request (Sync).
         /// </summary>
@@ -214,12 +218,13 @@ namespace Simva
         /// <param name="authSettings">Authentication settings.</param>
         /// <returns>IAsyncOperation<UnityWebRequest></returns>
         public IAsyncOperation<UnityWebRequest> CallApi(String path, string method, Dictionary<String, String> queryParams, String postBody,
-            Dictionary<String, String> headerParams, Dictionary<String, String> formParams, 
-            Dictionary<String, String> fileParams, String[] authSettings)
+            Dictionary<String, String> headerParams, Dictionary<String, String> formParams,
+            Dictionary<String, String> fileParams, String[] authSettings, bool inBackground = false)
         {
             UnityWebRequest request = null;
-            
-            switch(method){
+            var result = new AsyncCompletionSource<UnityWebRequest>();
+
+            switch (method){
                 case UnityWebRequest.kHttpVerbGET:
                     request = UnityWebRequest.Get(BasePath + path);
                     break;
@@ -236,10 +241,9 @@ namespace Simva
                     throw new ApiException(500, "Method not available: " + method);
             }
 
-            return UpdateParamsForAuth(queryParams, headerParams, authSettings, true)
+            UpdateParamsForAuth(queryParams, headerParams, authSettings, true)
                 .Then(() =>
                 {
-                    var result = new AsyncCompletionSource<UnityWebRequest>();
                     // add default header, if any
                     foreach (var defaultHeader in _defaultHeaderMap)
                         request.SetRequestHeader(defaultHeader.Key, defaultHeader.Value);
@@ -285,39 +289,24 @@ namespace Simva
                         request.downloadHandler = new DownloadHandlerBuffer();
                     }
 
-                    Observable.FromCoroutine(() => DoRequest(result, request)).Subscribe();
-                    return result;
+                    if (inBackground)
+                    {
+                        RequestsUtil.DoRequestInBackground(request).Wrap(result);
+                    }
+                    else
+                    {
+                        RequestsUtil.DoRequest(request).Wrap(result);
+                    }
+                })
+                .Catch(error =>
+                {
+                    result.SetException(error);
                 });
 
+            return result;
 
         }
 
-        private static IEnumerator DoRequest(IAsyncCompletionSource<UnityWebRequest> op, UnityWebRequest webRequest)
-        {
-            yield return webRequest.SendWebRequest();
-
-            // Sometimes the webrequest is finished but the download is not
-            while(!webRequest.isNetworkError && !webRequest.isHttpError && webRequest.downloadProgress != 1)
-            {
-                yield return new WaitForFixedUpdate();
-            }
-            
-            if (webRequest.isNetworkError)
-            {
-                op.SetException(new ApiException((int)webRequest.responseCode, webRequest.error, webRequest.downloadHandler.text));
-            }
-            else if (webRequest.isHttpError)
-            {
-                Debug.Log(webRequest.downloadHandler.text);
-                op.SetException(new ApiException((int)webRequest.responseCode, webRequest.error, webRequest.downloadHandler.text));
-            }
-            else
-            {
-                op.SetResult(webRequest);
-            }
-
-            webRequest.Dispose();
-        }
     
         /// <summary>
         /// Add default header.
@@ -485,6 +474,10 @@ namespace Simva
                                     {
                                         AuthorizationInfo = authInfo;
                                         addAuthAndComplete();
+                                    })
+                                    .Catch(ex =>
+                                    {
+                                        result.SetException(ex);
                                     });
                             }
                             else

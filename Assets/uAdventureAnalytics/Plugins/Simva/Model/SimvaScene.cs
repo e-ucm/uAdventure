@@ -11,6 +11,11 @@ namespace uAdventure.Simva
             this.id = id;
         }
 
+        public bool allowsSavingGame()
+        {
+            return false;
+        }
+
         public string getId()
         {
             return id;

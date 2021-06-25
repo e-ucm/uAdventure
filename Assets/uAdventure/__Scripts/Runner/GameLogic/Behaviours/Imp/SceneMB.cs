@@ -232,8 +232,24 @@ namespace uAdventure.Runner
                 lastSecond = audioSource.time;
             }
 
+            var emptytexture = new Texture2D(1, 1);
+            foreground.GetComponent<Renderer>().material.SetTexture("_MainTex", emptytexture);
+            foreground.GetComponent<Renderer>().material.SetTexture("_AlphaTex", emptytexture);
+
             Game.Instance.GameState.OnConditionChanged -= OnConditionChanged;
             GameObject.DestroyImmediate(this.gameObject);
+
+            Scene scene = SceneData as Scene;
+            if(scene != null)
+            {
+                foreach (ResourcesUni sr in scene.getResources())
+                {
+                    if (ConditionChecker.check(sr.getConditions()))
+                    {
+                        Game.Instance.ResourceManager.ClearImage(sr.getAssetPath(Scene.RESOURCE_TYPE_BACKGROUND));
+                    }
+                }
+            }
 
             onDestroy();
         }
@@ -753,7 +769,7 @@ namespace uAdventure.Runner
                         || (movieplayer == MovieState.PLAYING && !movie.isPlaying())
                         || videoscene.isCanSkip())
                     {
-                        if (movieplayer == MovieState.PLAYING)
+                        if (movieplayer == MovieState.PLAYING && TrackerAsset.Instance.Started)
                         {
                             TrackerAsset.Instance.Accessible.Skipped(SceneData.getId(), AccessibleTracker.Accessible.Cutscene);
                         }
@@ -793,7 +809,7 @@ namespace uAdventure.Runner
                     break;
                 case Cutscene.ENDCHAPTER:
                     // TODO: When we add more chapters, we must trigger the next chapter instead of quiting que aplication
-                    GUIManager.Instance.ExitApplication();
+                    Game.Instance.Quit();
                     break;
             }
 

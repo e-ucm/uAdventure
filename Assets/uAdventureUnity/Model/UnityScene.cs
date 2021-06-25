@@ -8,6 +8,11 @@ namespace uAdventure.Unity
         public string Id { get; set; }
         public string Scene { get; set; }
 
+        public bool allowsSavingGame()
+        {
+            return true;
+        }
+
         public string getId()
         {
             return Id;

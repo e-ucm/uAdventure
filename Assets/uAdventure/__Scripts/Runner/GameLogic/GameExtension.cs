@@ -8,7 +8,7 @@ namespace uAdventure.Runner
         public abstract IEnumerator Restart();
         public abstract IEnumerator OnGameReady();
         public abstract IEnumerator OnAfterGameLoad();
-        public abstract IEnumerator OnBeforeGameSave();
+        public abstract void OnBeforeGameSave();
         public abstract IEnumerator OnGameFinished();
     }
 }
