@@ -5,7 +5,9 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityFx.Async;
 using UnityFx.Async.Promises;
+#if UNITY_ANDROID || UNITY_IOS 
 using Vuopaja;
+#endif
 
 namespace Simva
 {
