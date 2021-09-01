@@ -729,7 +729,7 @@ namespace uAdventure.Editor
 
         public void setPlayerScale(float scale)
         {
-
+            scale = Mathf.Max(0, scale);
             //scene.setPlayerScale(scale);
             Controller.Instance.AddTool(new ChangePlayerScaleTool(scene, scale));
         }
@@ -887,6 +887,19 @@ namespace uAdventure.Editor
             }
 
             controller.AddTool(new ChangeStringValueTool(scene, @class, "getXApiClass", "setXApiClass"));
+        }
+
+        public void setAllowsSavingGame(bool allowsSavingGame)
+        {
+            if (scene.allowsSavingGame() != allowsSavingGame)
+            {
+                controller.AddTool(new ChangeBooleanValueTool(scene, allowsSavingGame, "allowsSavingGame", "setAllowsSavingGame"));
+            }
+        }
+
+        public bool allowsSavingGame()
+        {
+            return scene.allowsSavingGame();
         }
 
         public bool HideInventory 

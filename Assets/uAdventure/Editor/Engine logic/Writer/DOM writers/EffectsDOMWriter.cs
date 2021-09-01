@@ -98,11 +98,13 @@ namespace uAdventure.Editor
                     effectElement = buildEffectNode(effect, doc);
                     effectsNode.AppendChild(effectElement);
                 }
+                
+                ((XmlElement)effectsNode.ChildNodes.Item(effectsNode.ChildNodes.Count-1)).SetAttribute("guid", effect.GUID);
 
                 // Add conditions associated to that effect               
                 // Create conditions for current effect
 
-                if(effect is AbstractEffect)
+                if (effect is AbstractEffect)
                 {
                     DOMWriterUtility.DOMWrite(effectsNode, (effect as AbstractEffect).getConditions());
                 }

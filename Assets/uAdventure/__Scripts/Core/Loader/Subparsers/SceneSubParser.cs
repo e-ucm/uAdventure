@@ -45,8 +45,10 @@ namespace uAdventure.Core
 			string sceneId = element.GetAttribute("id");
 			bool initialScene = ExString.EqualsDefault(element.GetAttribute("start"), "yes", false);
             bool hideInventory = ExString.EqualsDefault(element.GetAttribute("hideInventory"), "yes", false);
+            bool allowsSavingGame = ExString.EqualsDefault(element.GetAttribute("allowsSavingGame"), "yes", true);
             int playerLayer = ExParsers.ParseDefault (element.GetAttribute("playerLayer"), -1);
 			float playerScale = ExParsers.ParseDefault (element.GetAttribute("playerScale"), CultureInfo.InvariantCulture, 1.0f);
+            playerScale = Mathf.Max(0, playerScale);
 
             scene = new Scene(sceneId)
             {
@@ -54,6 +56,7 @@ namespace uAdventure.Core
             };
             scene.setPlayerLayer(playerLayer);
             scene.setPlayerScale(playerScale);
+            scene.setAllowsSavingGame(allowsSavingGame);
 
             if (initialScene)
             {

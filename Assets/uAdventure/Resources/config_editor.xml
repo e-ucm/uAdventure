@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
 <comment> Project Configuration </comment>
-<entry key="RecentFiles">0</entry>
+<entry key="RecentFiles">1</entry>
 <entry key="LoadingImage">img/loading/en_EN/Editor2D-Loading.png</entry>
 <entry key="AboutFile">i18n/editor/about-en_EN.html</entry>
 <entry key="DebugWindowY">2147483647</entry>
@@ -24,6 +24,10 @@
 <entry key="ShowAtrezzoReferences">False</entry>
 <entry key="DebugWindowHeight">2147483647</entry>
 <entry key="ShowItemReferences">False</entry>
+<entry key="RecentFile.0.FilePath">Assets/uAdventure/Resources/CurrentGame</entry>
+<entry key="RecentFile.0.DateOpened">uAdventure.Editor.RecentFile</entry>
+<entry key="RecentFile.1.FilePath">C:\Users\dijks\Desktop\Export\test1</entry>
+<entry key="RecentFile.1.DateOpened">RecentFile</entry>
 <entry key="ExtraProperties">&lt;properties&gt;
 &lt;comment&gt; Project Configuration &lt;/comment&gt;
 &lt;entry key=&quot;shownWelcome&quot;&gt;yes&lt;/entry&gt;

@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using System;
+using System.Text.RegularExpressions;
+using System.Collections.Generic;
 
 namespace uAdventure.Runner
 {
@@ -22,7 +25,7 @@ namespace uAdventure.Runner
         // Text component to put the line into
         public Text text;
         // Text displaying speed (characters per second)
-        private int charactersPerSecond = 20;
+        private int charactersPerSecond = 50;
 
         private Outline textBorder;
         private Image background;
@@ -279,8 +282,105 @@ namespace uAdventure.Runner
 
         protected void SetTextProgress(float percent)
         {
-            var charactersShown = (int) (Data.Line.Length * Mathf.Clamp01(percent));
-            text.text = Data.Line.Substring(0, charactersShown) + "<color=#00000000>" + Data.Line.Substring(charactersShown) + "</color>";
+            var charactersShown = (int)(Data.Line.Length * Mathf.Clamp01(percent));
+            string cutted = CutWithSymbols(Data.Line, charactersShown);
+            var openedSymbols = FindOpenedSimbols(cutted);
+            text.text = cutted + CloseOpenedSymbols(openedSymbols) + "<color=#00000000>" + RemoveSymbols(Data.Line.Substring(cutted.Length)) + "</color>";
+        }
+
+        private string CutWithSymbols(string line, int charactersShown)
+        {
+            var regex = @"<(\/?[A-z]+)(=#?[A-z0-9\.]+)*(\s[A-z]+=#?[A-z0-9\.]+)*>";
+
+            string cutted = null;
+            foreach (Match match in Regex.Matches(line, regex))
+            {
+                if(match.Index <= charactersShown && match.Index+match.Length > charactersShown)
+                {
+                    if (IsValidSymbol(match.Groups[1].Value))
+                    {
+                        charactersShown = match.Index;
+                    }
+                    break;
+                }
+            }
+
+            if (cutted == null)
+            {
+                cutted = Data.Line.Substring(0, charactersShown);
+            }
+
+            return cutted;
+        }
+
+        private List<string> FindOpenedSimbols(string v)
+        {
+            var openedSymbols = new List<string>();
+            var regex = @"<(\/?[A-z]+)(=#?[A-z0-9\.]+)*(\s[A-z]+=#?[A-z0-9\.]+)*>";
+
+            foreach(Match match in Regex.Matches(v, regex))
+            {
+                var openedSymbol = match.Groups[1].Value;
+                if (!IsValidSymbol(openedSymbol))
+                {
+                    continue;
+                }
+
+                var rest = v.Substring(match.Index);
+                rest.IndexOf("</" + openedSymbol + ">");
+
+                if (!openedSymbol.StartsWith("/"))
+                {
+                    openedSymbols.Add(match.Groups[1].Value);
+                }
+                else if (openedSymbols.Count > 0 && openedSymbol.Substring(1) == openedSymbols[openedSymbols.Count - 1])
+                {
+                    openedSymbols.RemoveAt(openedSymbols.Count - 1);
+                }
+                else
+                {
+                    throw new Exception("Malformed html!");
+                }
+            }
+
+            return openedSymbols;
+        }
+
+        private string RemoveSymbols(string v)
+        {
+            var regex = @"<(\/?[A-z]+)(=#?[A-z0-9\.]+)*(\s[A-z]+=#?[A-z0-9\.]+)*>";
+            return Regex.Replace(v, regex, t => IsValidSymbol(t.Groups[1].Value) ? "" : t.Value);
+        }
+
+        private string CloseOpenedSymbols(List<string> openedSymbols)
+        {
+            var r = "";
+            foreach (var symbol in openedSymbols)
+            {
+                r += "</" + symbol + ">";
+            }
+            return r;
+        }
+
+        private bool IsValidSymbol(string openedSymbol)
+        {
+            if (openedSymbol.StartsWith("/"))
+            {
+                openedSymbol = openedSymbol.Substring(1);
+            }
+
+            switch (openedSymbol)
+            {
+                case "b":
+                case "i":
+                case "size":
+                case "color":
+                case "material":
+                case "quad":
+                    return true;
+                default:
+                    return false;
+            }
         }
     }
 }

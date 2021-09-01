@@ -9,10 +9,23 @@ namespace uAdventure.Core
     {
 
         private Conditions conditions;
+        private string identifier;
+
+        public string GUID 
+        { 
+            get 
+            {
+                return identifier;
+            }
+            set
+            {
+                identifier = value;
+            }
+        }
 
         protected AbstractEffect()
         {
-
+            identifier = Guid.NewGuid().ToString();
             conditions = new Conditions();
         }
 

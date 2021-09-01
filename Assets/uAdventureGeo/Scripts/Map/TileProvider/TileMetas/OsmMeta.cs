@@ -12,8 +12,8 @@ namespace uAdventure.Geo
             new Dictionary<string, object>
             {
                 {"content-type", "image/png"},
-                {"resolution", new Vector2Int(512,512)},
-                {"url-template", "http://b.tile.openstreetmap.org/{0}/{1}/{2}.png" }
+                {"resolution", new Vector2Int(128,128)},
+                {"url-template", "{0}://b.tile.openstreetmap.org/{1}/{2}/{3}.png" }
             })
         { }
     }

@@ -8,6 +8,7 @@ using System.Collections;
 using AssetPackage;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using System;
 
 namespace uAdventure.Analytics
 {
@@ -18,6 +19,9 @@ namespace uAdventure.Analytics
         private List<CompletableController> controllers = new List<CompletableController>();
         [System.NonSerialized]
         private List<Completable> completables;
+        private TrackerAsset.TrackerEvent trace;
+        private Element element;
+        private Core.Action action;
 
         public CompletablesController()
         {
@@ -27,6 +31,14 @@ namespace uAdventure.Analytics
             Game.Instance.OnTargetChanged += TargetChanged;
             Game.Instance.OnElementInteracted += ElementInteracted;
         }
+
+        public void Dispose()
+        {
+            Game.Instance.GameState.OnConditionChanged -= (_, __) => ConditionChanged();
+            Game.Instance.OnTargetChanged -= TargetChanged;
+            Game.Instance.OnElementInteracted -= ElementInteracted;
+        }
+
 
         #region Completables
 
@@ -98,6 +110,9 @@ namespace uAdventure.Analytics
                         restoredCompletables = new CompletablesController();
                         restoredCompletables.AddRange(DeserializeFromString<List<CompletableController>>(serializedCompletables));
                     }
+
+                    // Disable the hooks
+                    restoredCompletables.Dispose();
 
                     if (!VerifyControllers(restoredCompletables))
                     {
@@ -183,7 +198,7 @@ namespace uAdventure.Analytics
             UpdateCompletables(completableController => completableController.UpdateMilestones(target));
         }
 
-        public void ElementInteracted(bool finished, Element element, Action action)
+        public void ElementInteracted(bool finished, Element element, Core.Action action)
         {
             if (element == null || !TrackerAsset.Instance.Started)
             {
@@ -192,24 +207,47 @@ namespace uAdventure.Analytics
 
             if (!finished)
             {
-                UpdateElementsInteracted(element, action.getType().ToString(), element.getId());
+                if(trace != null)
+                {
+                    Debug.LogError("An interaction has been made while another element is being interacted!!");
+                }
 
-                Game.Instance.GameState.BeginChangeAmbit();
+                if (element is NPC)
+                {
+                    trace = TrackerAsset.Instance.GameObject.Interacted(element.getId(), GameObjectTracker.TrackedGameObject.Npc);
+                }
+                else if (element is Item)
+                {
+                    trace = TrackerAsset.Instance.GameObject.Interacted(element.getId(), GameObjectTracker.TrackedGameObject.Item);
+                }
+                else if (element is ActiveArea)
+                {
+                    trace = TrackerAsset.Instance.GameObject.Interacted(element.getId(), GameObjectTracker.TrackedGameObject.Item);
+                }
+                else
+                {
+                    trace = TrackerAsset.Instance.GameObject.Interacted(element.getId(), GameObjectTracker.TrackedGameObject.GameObject);
+                }
+                trace.SetPartial();
+                Game.Instance.GameState.BeginChangeAmbit(trace);
+                //Game.Instance.OnActionCanceled += ActionCanceled;
+
+                UpdateElementsInteracted(element, action.getType().ToString(), element.getId());
             }
             else
             {
                 string actionType = string.Empty;
                 switch (action.getType())
                 {
-                    case Action.CUSTOM: actionType = (action as CustomAction).getName(); break;
-                    case Action.CUSTOM_INTERACT: actionType = (action as CustomAction).getName(); break;
-                    case Action.DRAG_TO: actionType = "drag_to"; break;
-                    case Action.EXAMINE: actionType = "examine"; break;
-                    case Action.GIVE_TO: actionType = "give_to"; break;
-                    case Action.GRAB: actionType = "grab"; break;
-                    case Action.TALK_TO: actionType = "talk_to"; break;
-                    case Action.USE: actionType = "use"; break;
-                    case Action.USE_WITH: actionType = "use_with"; break;
+                    case Core.Action.CUSTOM: actionType = (action as CustomAction).getName(); break;
+                    case Core.Action.CUSTOM_INTERACT: actionType = (action as CustomAction).getName(); break;
+                    case Core.Action.DRAG_TO: actionType = "drag_to"; break;
+                    case Core.Action.EXAMINE: actionType = "examine"; break;
+                    case Core.Action.GIVE_TO: actionType = "give_to"; break;
+                    case Core.Action.GRAB: actionType = "grab"; break;
+                    case Core.Action.TALK_TO: actionType = "talk_to"; break;
+                    case Core.Action.USE: actionType = "use"; break;
+                    case Core.Action.USE_WITH: actionType = "use_with"; break;
                 }
 
                 if (!string.IsNullOrEmpty(action.getTargetId()))
@@ -221,27 +259,35 @@ namespace uAdventure.Analytics
                     TrackerAsset.Instance.setVar("action_type", actionType);
                 }
 
-                Game.Instance.GameState.EndChangeAmbitAsExtensions();
-
-                if (element is NPC)
-                {
-                    TrackerAsset.Instance.GameObject.Interacted(element.getId(), GameObjectTracker.TrackedGameObject.Npc);
-                }
-                else if (element is Item)
-                {
-                    TrackerAsset.Instance.GameObject.Interacted(element.getId(), GameObjectTracker.TrackedGameObject.Item);
-                }
-                else if (element is ActiveArea)
-                {
-                    TrackerAsset.Instance.GameObject.Interacted(element.getId(), GameObjectTracker.TrackedGameObject.Item);
-                }
-                else
-                {
-                    TrackerAsset.Instance.GameObject.Interacted(element.getId(), GameObjectTracker.TrackedGameObject.GameObject);
-                }
-                TrackerAsset.Instance.Flush();
+                Game.Instance.GameState.EndChangeAmbitAsExtensions(trace);
+                trace.Completed();
+                trace = null;
             }
         }
+
+        /*private void ActionCanceled()
+        {
+            if (trace != null)
+            {
+                ElementInteracted(true, element, action);
+            }
+        }*/
+
+        /*private void TextShown(int state, ConversationLine line, string text, int x, int y, Color textColor, Color textOutlineColor, Color baseColor, Color outlineColor, string id)
+        {
+            if (state == -1)
+            {
+                TrackerAsset.Instance.Completable.Initialized(id, CompletableTracker.Completable.DialogNode);
+            }
+            else if(state == 0)
+            {
+                TrackerAsset.Instance.Completable.Progressed(id, CompletableTracker.Completable.DialogNode, 1f);
+            }
+            else
+            {
+                TrackerAsset.Instance.Completable.Completed(id, CompletableTracker.Completable.DialogNode);
+            }
+        }*/
 
         public void UpdateElementsInteracted(Element element, string interaction, string targetId)
         {

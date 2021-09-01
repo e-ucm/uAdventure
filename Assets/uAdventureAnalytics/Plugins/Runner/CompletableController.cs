@@ -52,9 +52,9 @@ namespace uAdventure.Analytics
                         }
                         break;
                     case Completable.Milestone.MilestoneType.ENDING:
-                        if(target is Cutscene)
+                        if(target is Cutscene || target.getId() == "EndScene")
                         {
-                            if (((Cutscene)target).isEndScene())
+                            if (target.getId() == "EndScene" || ((Cutscene)target).isEndScene())
                             {
                                 Reached = true;
                                 hasBeenUpdated = true;

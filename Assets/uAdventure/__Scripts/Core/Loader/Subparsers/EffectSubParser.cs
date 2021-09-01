@@ -27,6 +27,7 @@ namespace uAdventure.Core
             int y = 0;
             string path = "";
             string id = "";
+            string guid = "";
             bool animated = false, addeffect = true;
 
             IEffect currentEffect = null;
@@ -34,6 +35,7 @@ namespace uAdventure.Core
             foreach (XmlElement effect in element.ChildNodes)
             {
                 addeffect = true;
+                guid = effect.GetAttribute("guid");
 
                 switch (effect.Name)
                 {
@@ -213,7 +215,13 @@ namespace uAdventure.Core
                 }
 
                 if (addeffect)
-					effects.Add(currentEffect);
+                {
+                    if (!string.IsNullOrEmpty(guid))
+                    {
+                        currentEffect.GUID = guid;
+                    }
+                    effects.Add(currentEffect);
+                }
             }
 
 			return effects;

@@ -9,6 +9,7 @@ public class GeoPositionedCharacter : MonoBehaviour
 
     public TileManager tileManager;
     public ThirdPersonCharacter thirdPersonCharacter;
+    public SimpleSampleCharacterControl alternativeCharacter;
     public float minDistanceToWalk = 5; // 2 meters
 
     public void MoveTo(Vector2d latLon)
@@ -60,11 +61,21 @@ public class GeoPositionedCharacter : MonoBehaviour
         var destinationMeters = GM.LatLonToMeters(destination.x, destination.y) - tileManagerRelative;
         destinationMeters -= latLonMeters;
 
-        if (moving && destinationMeters.sqrMagnitude >= minDistanceToWalk * minDistanceToWalk) // It is moving and it shoudl move
+        if (moving && destinationMeters.sqrMagnitude >= minDistanceToWalk * minDistanceToWalk) // It is moving and it should move
         {
             thirdPersonCharacter.Move(
                 Vector3.ClampMagnitude(new Vector3((float)destinationMeters.x, 0, (float)destinationMeters.y),
                     minDistanceToWalk * 3) / (minDistanceToWalk * 3), false, false);
+        }
+        else if ((!Application.isMobilePlatform || PreviewManager.Instance.InPreviewMode) && !GeoExtension.Instance.IsStarted()
+            && (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0))// Debug GPS location
+        {
+            var movement = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
+            thirdPersonCharacter.Move(movement, false, false);
+            if (movement.sqrMagnitude > 0)
+            {
+                GeoExtension.Instance.Location = GM.MetersToLatLon(transform.localPosition.ToVector2xz().ToVector2d() + tileManagerRelative);
+            }
         }
         else if (lastPos == transform.position) // It is not moving at all
         {
@@ -74,19 +85,14 @@ public class GeoPositionedCharacter : MonoBehaviour
             {
                 transform.localRotation = Quaternion.Euler(0, Input.compass.trueHeading, 0);
             }
-        }
-
-        if ((!Application.isMobilePlatform || PreviewManager.Instance.InPreviewMode) && !GeoExtension.Instance.IsStarted()) // Debug GPS location
+        }   
+        
+        if(alternativeCharacter.transform.position != thirdPersonCharacter.transform.position 
+            || alternativeCharacter.transform.rotation != alternativeCharacter.transform.rotation)
         {
-            if (Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Horizontal") != 0)
-            {
-                var movement = new Vector3(Input.GetAxis("Horizontal") * 10, 0, Input.GetAxis("Vertical") * 10);
-                thirdPersonCharacter.Move(movement, false, false);
-                if (movement.sqrMagnitude > 0)
-                {
-                    GeoExtension.Instance.Location = GM.MetersToLatLon(transform.localPosition.ToVector2xz().ToVector2d() + tileManagerRelative);
-                }
-            }
+            alternativeCharacter.transform.position = thirdPersonCharacter.transform.position;
+            alternativeCharacter.transform.rotation = thirdPersonCharacter.transform.rotation;
+            alternativeCharacter.speed = thirdPersonCharacter.GetComponent<Animator>().GetFloat("Forward");
         }
 
         // Update transform values

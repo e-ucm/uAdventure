@@ -670,17 +670,27 @@ namespace Simva.Api
             var result = new AsyncCompletionSource();
 
             // make the HTTP request
-            ApiClient.CallApi(path, UnityWebRequest.kHttpVerbPOST, queryParams, postBody, headerParams, formParams, fileParams, authSettings)
-                .Then(webRequest => {
+            var callApi = ApiClient.CallApi(path, UnityWebRequest.kHttpVerbPOST, queryParams, postBody, headerParams, formParams, fileParams, authSettings, true);
+
+            callApi.AddProgressCallback(p =>
+                {
+                    if (!result.IsCompleted && !result.IsCanceled)
+                    {
+                        result.SetProgress(p);
+                    }
+                });
+            callApi.Then(webRequest =>
+                {
                     result.SetCompleted();
                 })
-                .Catch(error => {
+                .Catch(error =>
+                {
                     var apiEx = (ApiException)error;
                     result.SetException(new ApiException(apiEx.ErrorCode, "Error calling SetResult: " + apiEx.Message, apiEx.ErrorContent));
-                });
+                })
+                ;
     
             return result;
         }
-    
     }
 }

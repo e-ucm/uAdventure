@@ -110,27 +110,28 @@ namespace uAdventure.Editor
 
         protected override void InitWindows()
         {
-            if (Extensions == null)
+            knownComponents = new Dictionary<Type, List<EditorComponent>>();
+            Extensions = new List<EditorWindowExtension>();
+            Menus = new Dictionary<GenericMenu, string>();
+
+            AddMenu(new FileMenu().menu, TC.get("MenuFile.Title"));
+            AddMenu(new EditMenu().menu, TC.get("MenuEdit.Title"));
+            AddMenu(new AdventureMenu().menu, TC.get("MenuAdventure.Title"));
+            AddMenu(new ChaptersMenu().menu, TC.get("MenuChapters.Title"));
+            AddMenu(new ConfigurationMenu().menu, TC.get("MenuConfiguration.Title"));
+            AddMenu(new AboutMenu().menu, TC.get("Menu.About"));
+
+
+            openedWindow = EditorWindowType.Chapter;
+            var chapterWindow = new ChapterWindow(Rect.zero, new GUIContent(TC.get("Element.Name0")), "Window");
+            AddExtension(new ChapterWindow(Rect.zero, new GUIContent(TC.get("Element.Name0")), "Window"));
+
+            // Extensions of the editor
+            foreach (var extension in EditorWindowBaseExtensionFactory.Instance.CreateAllExistingExtensions(Rect.zero, "Window"))
             {
-                AddMenu(new FileMenu().menu, TC.get("MenuFile.Title"));
-                AddMenu(new EditMenu().menu, TC.get("MenuEdit.Title"));
-                AddMenu(new AdventureMenu().menu, TC.get("MenuAdventure.Title"));
-                AddMenu(new ChaptersMenu().menu, TC.get("MenuChapters.Title"));
-                AddMenu(new ConfigurationMenu().menu, TC.get("MenuConfiguration.Title"));
-                AddMenu(new AboutMenu().menu, TC.get("About.Title"));
-
-
-                openedWindow = EditorWindowType.Chapter;
-                var chapterWindow = new ChapterWindow(Rect.zero, new GUIContent(TC.get("Element.Name0")), "Window");
-                AddExtension(new ChapterWindow(Rect.zero, new GUIContent(TC.get("Element.Name0")), "Window"));
-
-                // Extensions of the editor
-                foreach (var extension in EditorWindowBaseExtensionFactory.Instance.CreateAllExistingExtensions(Rect.zero, "Window"))
-                {
-                    AddExtension(extension);
-                }
-                RequestMainView(chapterWindow);
+                AddExtension(extension);
             }
+            RequestMainView(chapterWindow);
         }
 
         public void RefreshChapter()

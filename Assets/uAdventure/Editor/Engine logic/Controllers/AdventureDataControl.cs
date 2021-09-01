@@ -492,6 +492,18 @@ namespace uAdventure.Editor
             Controller.Instance.AddTool(new ChangeValueTool<AdventureData, Vector2>(adventureData, inventoryCoords, "getInventoryCoords", "setInventoryCoords"));
         }
 
+        public IMS.MD.v1p2.lomType getImsCPMetadata()
+        {
+
+            return adventureData.getImsCPMetadata();
+        }
+
+        public void setImsCPMetadata(IMS.MD.v1p2.lomType metadata)
+        {
+
+            Controller.Instance.AddTool(new ChangeValueTool<AdventureData, IMS.MD.v1p2.lomType>(adventureData, metadata, "getImsCPMetadata", "setImsCPMetadata"));
+        }
+
         public int countAssetReferences(string assetPath)
         {
 

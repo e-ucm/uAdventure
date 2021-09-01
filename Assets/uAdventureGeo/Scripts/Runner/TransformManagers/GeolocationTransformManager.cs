@@ -154,8 +154,12 @@ namespace uAdventure.Geo
 #if UNITY_ANDROID || UNITY_IOS
                     Handheld.Vibrate();
 #endif
-                    // TODO change this after: https://github.com/e-ucm/unity-tracker/issues/29
-                    TrackerAsset.Instance.setVar("geo_element_" + positioner.Element.getId(), 1);
+                    if (TrackerAsset.Instance.Started)
+                    {
+                        // TODO change this after: https://github.com/e-ucm/unity-tracker/issues/29
+                        TrackerAsset.Instance.setVar("geo_element_" + positioner.Element.getId(), 1);
+                        TrackerExtension.Movement.Moved(Game.Instance.GameState.CurrentTarget, GeoExtension.Instance.Location);
+                    }
                 }
                 if (hint)
                 {

@@ -19,6 +19,8 @@ using System.Collections;
 using AssetPackage;
 using AssetPackage.Utils;
 using AssetPackage.Exceptions;
+using static AssetPackage.TrackerAsset;
+using System.Collections.Generic;
 
 public class AlternativeTracker : TrackerAsset.IGameObjectTracker
 {
@@ -48,7 +50,7 @@ public class AlternativeTracker : TrackerAsset.IGameObjectTracker
     /// </summary>
     /// <param name="alternativeId">Alternative identifier.</param>
     /// <param name="optionId">Option identifier.</param>
-    public void Selected(string alternativeId, string optionId)
+    public TrackerEvent Selected(string alternativeId, string optionId)
     {
         bool check = true;
 
@@ -57,16 +59,17 @@ public class AlternativeTracker : TrackerAsset.IGameObjectTracker
 
         if (check)
         {
-            tracker.Trace(new TrackerAsset.TrackerEvent(tracker)
+            return tracker.Trace(new TrackerEvent(tracker)
             {
-                Event = new TrackerAsset.TrackerEvent.TraceVerb(TrackerAsset.Verb.Selected),
-                Target = new TrackerAsset.TrackerEvent.TraceObject(Alternative.Alternative.ToString().ToLower(), alternativeId),
-                Result = new TrackerAsset.TrackerEvent.TraceResult()
+                Event = new TrackerEvent.TraceVerb(Verb.Selected),
+                Target = new TrackerEvent.TraceObject(Alternative.Alternative.ToString().ToLower(), alternativeId),
+                Result = new TrackerEvent.TraceResult()
                 {
                     Response = optionId
                 }
             });
         }
+        return null;
     }
 
     /// <summary>
@@ -75,7 +78,7 @@ public class AlternativeTracker : TrackerAsset.IGameObjectTracker
     /// <param name="alternativeId">Alternative identifier.</param>
     /// <param name="optionId">Option identifier.</param>
     /// <param name="type">Alternative type.</param>
-    public void Selected(string alternativeId, string optionId, Alternative type)
+    public TrackerEvent Selected(string alternativeId, string optionId, Alternative type)
     {
         bool check = true;
 
@@ -84,16 +87,17 @@ public class AlternativeTracker : TrackerAsset.IGameObjectTracker
 
         if (check)
         {
-            tracker.Trace(new TrackerAsset.TrackerEvent(tracker)
+            return tracker.Trace(new TrackerAsset.TrackerEvent(tracker)
             {
-                Event = new TrackerAsset.TrackerEvent.TraceVerb(TrackerAsset.Verb.Selected),
-                Target = new TrackerAsset.TrackerEvent.TraceObject(type.ToString().ToLower(), alternativeId),
-                Result = new TrackerAsset.TrackerEvent.TraceResult()
+                Event = new TrackerEvent.TraceVerb(Verb.Selected),
+                Target = new TrackerEvent.TraceObject(type.ToString().ToLower(), alternativeId),
+                Result = new TrackerEvent.TraceResult()
                 {
                     Response = optionId
                 }
             });
         }
+        return null;
     }
 
     /// <summary>
@@ -102,7 +106,7 @@ public class AlternativeTracker : TrackerAsset.IGameObjectTracker
     /// </summary>
     /// <param name="alternativeId">Alternative identifier.</param>
     /// <param name="optionId">Option identifier.</param>
-    public void Unlocked(string alternativeId, string optionId)
+    public TrackerEvent Unlocked(string alternativeId, string optionId)
     {
         bool check = true;
 
@@ -111,16 +115,17 @@ public class AlternativeTracker : TrackerAsset.IGameObjectTracker
 
         if (check)
         {
-            tracker.Trace(new TrackerAsset.TrackerEvent(tracker)
+            return tracker.Trace(new TrackerEvent(tracker)
             {
-                Event = new TrackerAsset.TrackerEvent.TraceVerb(TrackerAsset.Verb.Unlocked),
-                Target = new TrackerAsset.TrackerEvent.TraceObject(Alternative.Alternative.ToString().ToLower(), alternativeId),
-                Result = new TrackerAsset.TrackerEvent.TraceResult()
+                Event = new TrackerEvent.TraceVerb(Verb.Unlocked),
+                Target = new TrackerEvent.TraceObject(Alternative.Alternative.ToString().ToLower(), alternativeId),
+                Result = new TrackerEvent.TraceResult()
                 {
                     Response = optionId
                 }
             });
         }
+        return null;
     }
 
     /// <summary>
@@ -129,7 +134,7 @@ public class AlternativeTracker : TrackerAsset.IGameObjectTracker
     /// <param name="alternativeId">Alternative identifier.</param>
     /// <param name="optionId">Option identifier.</param>
     /// <param name="type">Alternative type.</param>
-    public void Unlocked(string alternativeId, string optionId, Alternative type)
+    public TrackerEvent Unlocked(string alternativeId, string optionId, Alternative type)
     {
         bool check = true;
 
@@ -138,16 +143,17 @@ public class AlternativeTracker : TrackerAsset.IGameObjectTracker
 
         if (check)
         {
-            tracker.Trace(new TrackerAsset.TrackerEvent(tracker)
+            return tracker.Trace(new TrackerEvent(tracker)
             {
-                Event = new TrackerAsset.TrackerEvent.TraceVerb(TrackerAsset.Verb.Unlocked),
-                Target = new TrackerAsset.TrackerEvent.TraceObject(type.ToString().ToLower(), alternativeId),
-                Result = new TrackerAsset.TrackerEvent.TraceResult()
+                Event = new TrackerEvent.TraceVerb(Verb.Unlocked),
+                Target = new TrackerEvent.TraceObject(type.ToString().ToLower(), alternativeId),
+                Result = new TrackerEvent.TraceResult()
                 {
                     Response = optionId
                 }
             });
         }
+        return null;
     }
 
 }

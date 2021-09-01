@@ -7,6 +7,7 @@ using MapzenGo.Models;
 using UnityStandardAssets.Characters.ThirdPerson;
 using MapzenGo.Helpers;
 using UnityEngine.EventSystems;
+using UnityEngine.Android;
 
 namespace uAdventure.Geo
 {
@@ -25,7 +26,7 @@ namespace uAdventure.Geo
         private float startDist;
         private float startOrtho;
         private static float OriginalOrthoSize, LastOrthoSize;
-        private const float MinOrthoSize = 10, MaxOrthoSize = 40;
+        private const float MinOrthoSize = 15, MaxOrthoSize = 40;
 
         public List<MapElement> MapElements {
             get
@@ -104,8 +105,19 @@ namespace uAdventure.Geo
         {
             bkCameraTransform = Camera.main.transform.Backup();
 
+#if PLATFORM_ANDROID
+            if (!Permission.HasUserAuthorizedPermission(Permission.FineLocation))
+            {
+                if (!Permission.HasUserAuthorizedPermission(Permission.CoarseLocation))
+                {
+                    Permission.RequestUserPermission(Permission.CoarseLocation);
+                }
+                Permission.RequestUserPermission(Permission.FineLocation);
+            }
+#endif
+
             // Start the gps just in case is not
-            if (GeoExtension.Instance.IsStarted())
+            if (!GeoExtension.Instance.IsStarted())
             {
                 GeoExtension.Instance.Start();
             }
@@ -134,6 +146,7 @@ namespace uAdventure.Geo
         {
             if (Camera.main)
             {
+                Camera.main.orthographic = true;
                 Camera.main.orthographicSize = OriginalOrthoSize;
             }
         }
@@ -157,22 +170,68 @@ namespace uAdventure.Geo
                 
             }
 
+            if ((uAdventureRaycaster.Instance.Override == null || uAdventureRaycaster.Instance.Override == gameObject) && Input.touchCount >= 2)
+            {
+                var touch0 = Input.GetTouch(0);
+                var touch1 = Input.GetTouch(1);
+                if (!isPinching)
+                {
+                    isPinching = true;
+                    uAdventureRaycaster.Instance.Override = this.gameObject;
+                    startDist = (touch1.position - touch0.position).sqrMagnitude;
+                    startOrtho = LastOrthoSize;
+                }
+
+                if ((touch0.phase == TouchPhase.Moved || touch0.phase == TouchPhase.Stationary) &&
+                    (touch1.phase == TouchPhase.Moved || touch1.phase == TouchPhase.Stationary))
+                {
+                    var currentDist = (touch1.position - touch0.position).sqrMagnitude;
+                    var distGrowth = startDist / currentDist;
+                    var ortho = startOrtho * distGrowth;
+                    LastOrthoSize = Mathf.Clamp(ortho, MinOrthoSize, MaxOrthoSize);
+                }
+            }
+            else if (isPinching)
+            {
+                uAdventureRaycaster.Instance.Override = null;
+                isPinching = false;
+            }
+
+
+            if ((uAdventureRaycaster.Instance.Override == null || uAdventureRaycaster.Instance.Override == gameObject) && Input.mouseScrollDelta.y != 0)
+            {
+                LastOrthoSize = Mathf.Clamp(LastOrthoSize - Input.mouseScrollDelta.y, MinOrthoSize, MaxOrthoSize);
+            }
+
             if (InventoryManager.Instance.Opened)
             {
                 Camera.main.transform.rotation = Quaternion.Euler(0, 0, 0);
             }
             else
             {
+                mapScene.CameraType = CameraType.Ortographic3D;
+                var distancePercentage = (LastOrthoSize - MinOrthoSize) / (MaxOrthoSize - MinOrthoSize);
+                var distancePercentageWithMinimum = distancePercentage * 0.65f + 0.35f; // Adjusted to a minimum distance of 30%
+
                 switch (mapScene.CameraType)
                 {
                     case CameraType.Aerial2D:
+                        Camera.main.orthographic = true;
+                        Camera.main.orthographicSize = LastOrthoSize;
                         Camera.main.transform.position = character.transform.position + Vector3.up * 50;
-                        Camera.main.transform.rotation = Quaternion.Euler(90, 0, 0);
+                        Camera.main.transform.LookAt(character.transform.position);
                         break;
                     case CameraType.Ortographic3D:
-                        throw new System.NotImplementedException();
+                        Camera.main.orthographic = true;
+                        Camera.main.orthographicSize = LastOrthoSize;
+                        Camera.main.transform.position = character.transform.position + Vector3.up * 50 + Vector3.back * 50 * (1 - distancePercentage);
+                        Camera.main.transform.LookAt(character.transform.position);
+                        break;
                     case CameraType.Perspective3D:
-                        throw new System.NotImplementedException();
+                        Camera.main.orthographic = false;
+                        Camera.main.transform.position = character.transform.position + Vector3.up * 70 * distancePercentageWithMinimum + Vector3.back * 35 * (1 - distancePercentageWithMinimum);
+                        Camera.main.transform.LookAt(character.transform.position);
+                        break;
                     default:
                         break;
 
@@ -185,37 +244,12 @@ namespace uAdventure.Geo
             //geoCharacter.MoveTo(GM.MetersToLatLon(GM.LatLonToMeters(mapScene.LatLon.y, mapScene.LatLon.x) + new Vector2d(100, 100)));
             //geoCharacter.MoveTo(new Vector2d(-3.707398, 40.415363));
             //character.Move(new Vector3(Input.GetAxis("Horizontal"),0, Input.GetAxis("Vertical")), false, false);
-            if ((uAdventureRaycaster.Instance.Override == null || uAdventureRaycaster.Instance.Override == gameObject) && Input.touchCount >= 2)
-            {
-                var touch0 = Input.GetTouch(0);
-                var touch1 = Input.GetTouch(1);
-                if (!isPinching)
-                {
-                    isPinching = true;
-                    uAdventureRaycaster.Instance.Override = this.gameObject;
-                    startDist = (touch1.position - touch0.position).sqrMagnitude;
-                    startOrtho = Camera.main.orthographicSize;
-                }
-                
-                if ((touch0.phase == TouchPhase.Moved || touch0.phase == TouchPhase.Stationary) &&
-                    (touch1.phase == TouchPhase.Moved || touch1.phase == TouchPhase.Stationary))
-                {
-                    var currentDist = (touch1.position - touch0.position).sqrMagnitude;
-                    var distGrowth = startDist / currentDist;
-                    var ortho = startOrtho * distGrowth;
-                    Camera.main.orthographicSize = LastOrthoSize = Mathf.Clamp(ortho, MinOrthoSize, MaxOrthoSize);
-                }
-            } 
-            else if (isPinching)
-            {
-                uAdventureRaycaster.Instance.Override = null;
-                isPinching = false;
-            }
+            
         }
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            if (!Application.isMobilePlatform)
+            if (!Application.isMobilePlatform || PreviewManager.Instance.InPreviewMode || GeoExtension.Instance.UsingDebugLocation)
             {
                 GeoExtension.Instance.UsingDebugLocation = true;
                 eventData.Use();

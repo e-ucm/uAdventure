@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using IMS.MD.v1p2;
 
 namespace uAdventure.Core
 {
@@ -362,6 +363,8 @@ namespace uAdventure.Core
         protected bool saveOnSuspend;
 
         protected bool restoreAfterOpen;
+
+        private IMS.MD.v1p2.lomType imsCPMetadata;
 
         /**
          * Constant for identify when a game is executed from engine
@@ -1110,6 +1113,16 @@ namespace uAdventure.Core
         public void setApplicationIdentifier(string applicationIdentifier)
         {
             this.applicationIdentifier = applicationIdentifier;
+        }
+
+        public lomType getImsCPMetadata()
+        {
+            return imsCPMetadata;
+        }
+
+        public void setImsCPMetadata(lomType value)
+        {
+            imsCPMetadata = value;
         }
 
         public virtual object Clone()

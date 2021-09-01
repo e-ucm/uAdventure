@@ -13,7 +13,7 @@ namespace uAdventure.Geo
             {
                 {"content-type", "image/png"},
                 {"resolution", new Vector2Int(512,512)},
-                {"url-template", "http://a.tile.stamen.com/toner/{0}/{1}/{2}.png" }
+                {"url-template", "{0}://a.tile.stamen.com/toner/{1}/{2}/{3}.png" }
             })
         { }
     }

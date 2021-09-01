@@ -33,6 +33,7 @@ namespace uAdventure.Runner
             videoPlayer.aspectRatio = VideoAspectRatio.FitInside;
             videoPlayer.audioOutputMode = VideoAudioOutputMode.Direct;
             videoPlayer.errorReceived += VideoPlayer_errorReceived;
+            Debug.Log("MovieHolder Path: " + path);
 
             this.path = path;
             LoadVideo();
@@ -97,10 +98,22 @@ namespace uAdventure.Runner
                         videoPlayer.url = Application.streamingAssetsPath + "/" + path + ".webm";
                         videoPlayer.targetTexture = new RenderTexture(Screen.width, Screen.height, 16, RenderTextureFormat.RGB565);
                     }
+                    /*else if (Application.platform == RuntimePlatform.LinuxPlayer)
+                    {
+                        videoPlayer.source = VideoSource.Url;
+                        Debug.Log("LoadVideo Linux: " + path);
+                        var loadPath = "file://" + Application.streamingAssetsPath + "/" + path + ".webm";
+                        Debug.Log("LoadPath: " + loadPath);
+                        videoPlayer.url = loadPath;
+                        Debug.Log("LoadedURL Linux: " + videoPlayer.url);
+                        videoPlayer.targetTexture = new RenderTexture(Screen.width, Screen.height, 16, RenderTextureFormat.RGB565);
+                    }*/
                     else
                     {
                         videoPlayer.source = VideoSource.VideoClip;
+                        Debug.Log("LoadVideo: " + path);
                         videoPlayer.clip = Resources.Load<VideoClip>(path);
+                        Debug.Log("LoadedClip: " + videoPlayer.clip.originalPath);
                         if (videoPlayer.clip)
                             videoPlayer.targetTexture = new RenderTexture((int)videoPlayer.clip.width, (int)videoPlayer.clip.height, 16, RenderTextureFormat.RGB565);
                         else

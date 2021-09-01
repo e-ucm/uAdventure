@@ -29,6 +29,7 @@ namespace AssetPackage
     using System.ComponentModel;
     using System.Text.RegularExpressions;
     using SimpleJSON;
+    using Iso8601Duration;
 
     [Obsolete("Use TrackerAsset instead")]
     public class Tracker
@@ -61,6 +62,11 @@ namespace AssetPackage
         /// Flag to control when the tracker is flushing.
         /// </summary>
         private bool flushing = false;
+
+        /// <summary>
+        /// True when flush is called while flushing.
+        /// </summary>
+        private bool flushAllRequested = false;
 
         /// <summary>
         /// True when flush is called while flushing.
@@ -184,6 +190,11 @@ namespace AssetPackage
         private ConcurrentQueue<TrackerEvent> queue = new ConcurrentQueue<TrackerEvent>();
 
         /// <summary>
+        /// The queue of TrackerEvents to Send.
+        /// </summary>
+        private ConcurrentQueue<TrackerEvent> partialQueue = new ConcurrentQueue<TrackerEvent>();
+
+        /// <summary>
         /// The list of traces flushed while the connection was offline
         /// </summary>
         private List<String> tracesPending = new List<String>();
@@ -202,6 +213,11 @@ namespace AssetPackage
         /// List of Extensions that have to ve added to the next trace
         /// </summary>
         private Dictionary<string, System.Object> extensions = new Dictionary<string, System.Object>();
+
+        /// <summary>
+        /// Duration builder and parser
+        /// </summary>
+        private static PeriodBuilder periodBuilder = new PeriodBuilder();
 
         #region SubTracker Fields
 
@@ -649,7 +665,7 @@ namespace AssetPackage
         /// <summary>
         /// Flushes the queue.
         /// </summary>
-        public void Flush(Action callback = null)
+        public void Flush(Action callback = null, bool complete = false)
         {
             if (!Started || !Active)
             {
@@ -660,6 +676,10 @@ namespace AssetPackage
             if (flushing)
             {
                 extraFlushRequested = true;
+                if (complete)
+                {
+                    flushAllRequested = true;
+                }
                 if (callback != null)
                 {
                     callbacksForExtraFlush.Add(callback);
@@ -681,6 +701,7 @@ namespace AssetPackage
                         Flush(() =>
                         {
                             extraFlushRequested = false;
+                            flushAllRequested = false;
                             var auxCallbacks = callbacksForExtraFlush.ToArray();
                             callbacksForExtraFlush.Clear();
                             foreach (var c in auxCallbacks)
@@ -689,7 +710,7 @@ namespace AssetPackage
                             }
                         });
                     }
-                }, false);
+                }, complete);
             }
 
 
@@ -714,7 +735,7 @@ namespace AssetPackage
             {
                 return;
             }
-            ProcessQueue(callback, true);
+            Flush(callback, true);
         }
 #endif
 
@@ -1124,7 +1145,7 @@ namespace AssetPackage
         /// </summary>
         ///
         /// <param name="value"> New value for the variable. </param>
-        public void Trace(TrackerEvent trace)
+        public TrackerEvent Trace(TrackerEvent trace)
         {
             if (!this.Started)
                 throw new TrackerException("Tracker Has not been started");
@@ -1134,20 +1155,41 @@ namespace AssetPackage
                 trace.Result.Extensions = new Dictionary<string, object>(extensions);
                 extensions.Clear();
             }
-            queue.Enqueue(trace);
 
-            // if backup requested, enqueue in the backup queue
-            if (settings.BackupStorage)
+            partialQueue.Enqueue(trace);
+
+            return trace;
+        }
+
+        /// <summary>
+        /// Adds the given value to the Queue.
+        /// </summary>
+        ///
+        /// <param name="value"> New value for the variable. </param>
+        public void AddExtensionsToTrace(TrackerEvent trace)
+        {
+            if (!this.Started)
+                throw new TrackerException("Tracker Has not been started");
+
+            if(trace.Result.Extensions == null)
             {
-                backupQueue.Enqueue(trace);
+                trace.Result.Extensions = new Dictionary<string, object>(extensions);
             }
+            else
+            {
+                foreach (var extension in extensions)
+                {
+                    trace.Result.Extensions.Add(extension.Key, extension.Value);
+                }
+            }
+            extensions.Clear();
         }
 
         /// <summary>
 		/// Adds a trace with verb, target and targeit
 		/// </summary>
 		/// <param name="values">Values of the trace.</param>
-		public void ActionTrace(string verb, string target_type, string target_id)
+		public TrackerEvent ActionTrace(string verb, string target_type, string target_id, bool complete = true)
         {
             bool trace = true;
 
@@ -1157,11 +1199,14 @@ namespace AssetPackage
 
             if (trace)
             {
-                Trace(new TrackerEvent(this){
+                var traceCreated = new TrackerEvent(this, complete)
+                {
                     Event = new TrackerEvent.TraceVerb(verb),
                     Target = new TrackerEvent.TraceObject(target_type, target_id)
-                });
+                };
+                return Trace(traceCreated);
             }
+            return null;
 		}
 
         /// <summary>
@@ -1319,6 +1364,8 @@ namespace AssetPackage
                 return;
             }
 
+            EnqueueCompletedTraces();
+
             if (settings.BackupStorage)
             {
                 TrackerEvent[] traces = backupQueue.Peek((uint)backupQueue.Count);
@@ -1413,6 +1460,8 @@ namespace AssetPackage
                 Connect(false, null);
             }
 
+            EnqueueCompletedTraces();
+
             if (settings.BackupStorage)
             {
                 TrackerEvent[] traces = backupQueue.Peek((uint)backupQueue.Count);
@@ -1474,7 +1523,40 @@ namespace AssetPackage
                 Log(Severity.Information, "Nothing to flush");
             }
         }
-#endif
+#endif 
+        public void ForceCompleteTraces()
+        {
+            // Move all possible partial traces to the main queue
+            while (partialQueue.Count > 0)
+            {
+                TrackerEvent pendingTrace = partialQueue.Dequeue();
+                pendingTrace.Completed();
+                queue.Enqueue(pendingTrace);
+
+                // if backup requested, enqueue in the backup queue
+                if (settings.BackupStorage)
+                {
+                    backupQueue.Enqueue(pendingTrace);
+                }
+            }
+        }
+
+        private void EnqueueCompletedTraces()
+        {
+
+            // Move all possible partial traces to the main queue
+            while (partialQueue.Count > 0 && !partialQueue.Peek()[0].IsPartial())
+            {
+                TrackerEvent pendingTrace = partialQueue.Dequeue();
+                queue.Enqueue(pendingTrace);
+
+                // if backup requested, enqueue in the backup queue
+                if (settings.BackupStorage)
+                {
+                    backupQueue.Enqueue(pendingTrace);
+                }
+            }
+        }
         /// <summary>
         /// Save traces in the backup file.
         /// </summary>
@@ -1953,7 +2035,7 @@ namespace AssetPackage
 
 #endregion Methods
 
-#region Nested Types
+        #region Nested Types
 
         /// <summary>
         /// Interface that subtrackers must implement.
@@ -1990,20 +2072,26 @@ namespace AssetPackage
                 private TraceObject target;
 
                 private TraceResult result;
+
+            private bool complete;
 #endregion Fields
 
 #region Constructors
 
-            public TrackerEvent(TrackerAsset tracker)
+            public TrackerEvent(TrackerAsset tracker) : this(tracker, true)
+            {
+            }
+            public TrackerEvent(TrackerAsset tracker, bool complete)
             {
                 this.Tracker = tracker;
                 this.TimeStamp = Math.Round(System.DateTime.Now.ToUniversalTime().Subtract(START_DATE).TotalMilliseconds);
                 this.Result = new TraceResult();
+                this.complete = complete;
             }
 
-#endregion Constructors
+            #endregion Constructors
 
-#region Properties
+            #region Properties
 
             private static Dictionary<string, string> VerbIDs
             {
@@ -2044,6 +2132,8 @@ namespace AssetPackage
                             { CompletableTracker.Completable.Stage.ToString().ToLower(), "https://w3id.org/xapi/seriousgames/activity-types/stage"},
                             { CompletableTracker.Completable.Combat.ToString().ToLower(), "https://w3id.org/xapi/seriousgames/activity-types/combat"},
                             { CompletableTracker.Completable.StoryNode.ToString().ToLower(), "https://w3id.org/xapi/seriousgames/activity-types/story-node"},
+                            { CompletableTracker.Completable.DialogNode.ToString().ToLower(), "https://w3id.org/xapi/seriousgames/activity-types/dialog-node"},
+                            { CompletableTracker.Completable.DialogFragment.ToString().ToLower(), "https://w3id.org/xapi/seriousgames/activity-types/dialog-fragment"},
                             { CompletableTracker.Completable.Race.ToString().ToLower(), "https://w3id.org/xapi/seriousgames/activity-types/race"},
                             { CompletableTracker.Completable.Completable.ToString().ToLower(), "https://w3id.org/xapi/seriousgames/activity-types/completable"},
 
@@ -2223,6 +2313,42 @@ namespace AssetPackage
                        (this.Result == null || String.IsNullOrEmpty(this.Result.ToXml()) ?
                        " />" :
                        "><![CDATA[" + this.Result.ToXml() + "]]></TrackEvent>");
+            }
+
+            /// <summary>
+            /// Converts this object to an xapi.
+            /// </summary>
+            ///
+            /// <returns>
+            /// This object as a string.
+            /// </returns>
+            public void SetPartial(bool partial = true)
+            {
+                complete = !partial;
+            }
+
+            /// <summary>
+            /// Converts this object to an xapi.
+            /// </summary>
+            ///
+            /// <returns>
+            /// This object as a string.
+            /// </returns>
+            public bool IsPartial()
+            {
+                return !complete;
+            }
+
+            /// <summary>
+            /// Converts this object to an xapi.
+            /// </summary>
+            ///
+            /// <returns>
+            /// This object as a string.
+            /// </returns>
+            public void Completed()
+            {
+                this.complete = true;
             }
 
             /// <summary>
@@ -2523,6 +2649,7 @@ namespace AssetPackage
                 private int success = -1;
                 private int completion = -1;
                 private float score = float.NaN;
+                private float duration = float.NaN;
 
                 private TraceExtensions extensions;
 
@@ -2562,7 +2689,21 @@ namespace AssetPackage
                     }
                 }
 
-                public Dictionary<string, System.Object> Extensions
+                public float Duration
+                {
+                    get
+                    {
+                        return duration;
+                    }
+                    set
+                    {
+                        if (Parent == null || Parent.Tracker.Utils.check<ValueExtensionException>(value, "xAPI extension: duration null or NaN. Ignoring", "xAPI extension: duration can't be null or NaN."))
+                            duration = value;
+                    }
+                }
+
+                Dictionary<string, System.Object> extdir;
+                public Dictionary<string,System.Object> Extensions
                 {
                     get { return extensions.Extensions; }
                     set
@@ -2572,11 +2713,12 @@ namespace AssetPackage
                         {
                             switch (extension.Key.ToLower())
                             {
-                                case "success": Success = (bool)extension.Value; break;
-                                case "completion": Completion = (bool)extension.Value; break;
-                                case "response": Response = (string)extension.Value; break;
-                                case "score": Score = (float)extension.Value; break;
-                                default: extdir.Add(extension.Key, extension.Value); break;
+                                case "success": Success = (bool) extension.Value; break;
+                                case "completion": Completion = (bool) extension.Value; break;
+                                case "response": Response = (string) extension.Value; break;
+                                case "score": Score = (float) extension.Value; break;
+                                case "duration": Duration = (float) extension.Value; break;
+                                default: extdir.Add(extension.Key, extension.Value);  break;
                             }
                         }
                         extensions = new TraceExtensions(extdir);
@@ -2589,7 +2731,8 @@ namespace AssetPackage
                         ((success > -1) ? ",success" + intToBoolString(success) : "")
                         + ((completion > -1) ? ",completion" + intToBoolString(completion) : "")
                         + ((!string.IsNullOrEmpty(Response)) ? ",response," + Response.Replace(",", "\\,") : "")
-                        + ((!float.IsNaN(score)) ? ",score," + score.ToString("G", System.Globalization.CultureInfo.InvariantCulture) : "");
+                        + ((!float.IsNaN(score)) ? ",score," + score.ToString("G", System.Globalization.CultureInfo.InvariantCulture) : "")
+                        + ((!float.IsNaN(duration)) ? ",duration," + periodBuilder.ToString(TimeSpan.FromSeconds(duration)) : "");
 
                     if (Extensions != null && Extensions.Count > 0)
                         result += extensions.ToCsv();
@@ -2618,9 +2761,52 @@ namespace AssetPackage
                         result.Add("score", s);
                     }
 
-                    if (Extensions != null && Extensions.Count > 0)
+                    if (!float.IsNaN(duration))
                     {
-                        result.Add("extensions", extensions.ToJson());
+                        result.Add("duration", new JSONData(periodBuilder.ToString(TimeSpan.FromSeconds(duration))));
+                    }
+
+                    if (Extensions != null && Extensions.Count > 0) {
+
+                        JSONClass extensions = new JSONClass();
+                        foreach(KeyValuePair <string, System.Object > extension in Extensions)
+                        {
+                            if (extension.Value != null)
+                            {
+                                if (extension.Value.GetType() == typeof(int))
+                                {
+                                    extensions.Add(extension.Key, new JSONData((int)extension.Value));
+                                }
+                                else if (extension.Value.GetType() == typeof(bool))
+                                {
+                                    extensions.Add(extension.Key, new JSONData((bool)extension.Value));
+                                }
+                                else if (extension.Value.GetType() == typeof(float))
+                                {
+                                    extensions.Add(extension.Key, new JSONData((float) extension.Value));
+                                }
+                                else if (extension.Value.GetType() == typeof(double))
+                                {
+                                    extensions.Add(extension.Key, new JSONData((double) extension.Value));
+                                }
+                                else if (extension.Value.GetType() == typeof(Dictionary<string, bool>))
+                                {
+                                    Dictionary<string, bool> map = (Dictionary<string, bool>)extension.Value;
+                                    JSONClass emap = new JSONClass();
+                                    foreach (KeyValuePair<string, bool> t in map)
+                                    {
+                                        emap.Add(t.Key, new JSONData(t.Value));
+                                    }
+                                    extensions.Add(extension.Key, emap);
+                                }
+                                else
+                                {
+                                    extensions.Add(extension.Key, new JSONData(extension.Value.ToString()));
+                                }
+                            }
+                        }
+
+                        result.Add("extensions", extensions);
                     }
 
                     return result;

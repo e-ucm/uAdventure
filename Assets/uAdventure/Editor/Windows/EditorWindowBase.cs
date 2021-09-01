@@ -42,9 +42,9 @@ namespace uAdventure.Editor
         [NonSerialized]
         private bool inited = false;
 
-        public static bool Locked { get; private set; }
+        public static bool Locked { get; set; }
 
-        protected List<EditorWindowExtension> Extensions { get; private set; }
+        protected List<EditorWindowExtension> Extensions { get; set; }
 
         protected void AddExtension(EditorWindowExtension extension)
         {
@@ -63,7 +63,7 @@ namespace uAdventure.Editor
             }
         }
 
-        protected Dictionary<GenericMenu, string> Menus { get; private set; }
+        protected Dictionary<GenericMenu, string> Menus { get; set; }
 
         protected void AddMenu(GenericMenu menu, string title)
         {

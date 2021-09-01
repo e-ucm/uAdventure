@@ -1,5 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using IMS.MD.v1p2;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Text;
+using System.Xml.Serialization;
 using uAdventure.Runner;
 using UnityFx.Async;
 using UnityFx.Async.Promises;
@@ -104,6 +109,18 @@ namespace uAdventure.Core
                 });
 
             return result;
+        }
+
+        public static lomType LoadImsCPMetadata(string imsCPMetadataPath, ResourceManager resourceManager, List<Incidence> incidences)
+        {
+            var metadata = resourceManager.getText(imsCPMetadataPath);
+
+            var serializer = new XmlSerializer(typeof(lomType));     
+            
+            // convert string to stream
+            byte[] byteArray = Encoding.ASCII.GetBytes(metadata);
+            MemoryStream stream = new MemoryStream(byteArray);
+            return (lomType)serializer.Deserialize(stream);
         }
     }
 }

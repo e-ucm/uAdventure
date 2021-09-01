@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static AssetPackage.TrackerAsset;
 
 namespace uAdventure.Geo
 {
@@ -96,9 +97,9 @@ namespace uAdventure.Geo
             /// </summary>
             /// <param name="id">Reachable identifier.</param>
             /// <param name="latLon">Actor latitude and longitude.</param>
-            public void Moved(string id, Vector2d latLon)
+            public TrackerEvent Moved(string id, Vector2d latLon)
             {
-                Moved(id, Type.Place, latLon);
+                return Moved(id, Type.Place, latLon);
             }
 
             /// <summary>
@@ -107,10 +108,10 @@ namespace uAdventure.Geo
             /// <param name="id">Place identifier.</param>
             /// <param name="type">Place type.</param>
             /// <param name="latLon">Actor latitude and longitude.</param>
-            public void Moved(string id, Type type, Vector2d latLon)
+            public TrackerEvent Moved(string id, Type type, Vector2d latLon)
             {
                 tracker.setPosition(latLon.x, latLon.y);
-                tracker.ActionTrace(Verb.Moved.ToString().ToLower(), type.ToString().ToLower(), id);
+                return tracker.ActionTrace(Verb.Moved.ToString().ToLower(), type.ToString().ToLower(), id);
             }
             #endregion
 
@@ -121,9 +122,9 @@ namespace uAdventure.Geo
             /// Type = Place 
             /// </summary>
             /// <param name="id">Reachable identifier.</param> 
-            public void Entered(string id)
+            public TrackerEvent Entered(string id)
             {
-                Entered(id, Type.Place);
+                return Entered(id, Type.Place);
             }
 
             /// <summary>
@@ -131,9 +132,9 @@ namespace uAdventure.Geo
             /// </summary>
             /// <param name="id">Reachable identifier.</param> 
             /// <param name="type">Reachable type.</param>
-            public void Entered(string id, Type type)
+            public TrackerEvent Entered(string id, Type type)
             {
-                tracker.ActionTrace(Verb.Entered.ToString().ToLower(), type.ToString().ToLower(), id);
+                return tracker.ActionTrace(Verb.Entered.ToString().ToLower(), type.ToString().ToLower(), id);
             }
 
             /// <summary>
@@ -142,9 +143,9 @@ namespace uAdventure.Geo
             /// </summary>
             /// <param name="id">Reachable identifier.</param> 
             /// <param name="latLon">Actor latitude and longitude.</param>
-            public void Entered(string id, Vector2d latLon)
+            public TrackerEvent Entered(string id, Vector2d latLon)
             {
-                Entered(id, Type.Place, latLon);
+                return Entered(id, Type.Place, latLon);
             }
 
             /// <summary>
@@ -153,10 +154,10 @@ namespace uAdventure.Geo
             /// <param name="id">Reachable identifier.</param> 
             /// <param name="type">Reachable type.</param>
             /// <param name="latLon">Actor latitude and longitude.</param>
-            public void Entered(string id, Type type, Vector2d latLon)
+            public TrackerEvent Entered(string id, Type type, Vector2d latLon)
             {
                 tracker.setPosition(latLon.x, latLon.y);
-                Entered(id, type);
+                return Entered(id, type);
             }
 
             /// <summary>
@@ -166,9 +167,9 @@ namespace uAdventure.Geo
             /// <param name="id">Reachable identifier.</param> 
             /// <param name="latLon">Actor latitude and longitude.</param>
             /// <param name="orientation">Actor orientation.</param>
-            public void Entered(string id, Vector2d latLon, Vector3d orientation)
+            public TrackerEvent Entered(string id, Vector2d latLon, Vector3d orientation)
             {
-                Entered(id, Type.Place, latLon, orientation);
+                return Entered(id, Type.Place, latLon, orientation);
             }
 
             /// <summary>
@@ -178,11 +179,11 @@ namespace uAdventure.Geo
             /// <param name="type">Reachable type.</param>
             /// <param name="latLon">Actor latitude and longitude.</param>
             /// <param name="orientation">Actor orientation.</param>
-            public void Entered(string id, Type type, Vector2d latLon, Vector3d orientation)
+            public TrackerEvent Entered(string id, Type type, Vector2d latLon, Vector3d orientation)
             {
                 tracker.setPosition(latLon.x, latLon.y);
                 tracker.setOrientation(orientation.x, orientation.y, orientation.z);
-                Entered(id, type);
+                return Entered(id, type);
             }
 
             #endregion
@@ -194,9 +195,9 @@ namespace uAdventure.Geo
             /// Type = Place 
             /// </summary>
             /// <param name="id">Reachable identifier.</param> 
-            public void Exited(string id)
+            public TrackerEvent Exited(string id)
             {
-                Exited(id, Type.Place);
+                return Exited(id, Type.Place);
             }
 
             /// <summary>
@@ -204,9 +205,9 @@ namespace uAdventure.Geo
             /// </summary>
             /// <param name="id">Reachable identifier.</param> 
             /// <param name="type">Reachable type.</param>
-            public void Exited(string id, Type type)
+            public TrackerEvent Exited(string id, Type type)
             {
-                tracker.ActionTrace(Verb.Exited.ToString().ToLower(), type.ToString().ToLower(), id);
+                return tracker.ActionTrace(Verb.Exited.ToString().ToLower(), type.ToString().ToLower(), id);
             }
 
             /// <summary>
@@ -215,9 +216,9 @@ namespace uAdventure.Geo
             /// </summary>
             /// <param name="id">Reachable identifier.</param> 
             /// <param name="latLon">Actor latitude and longitude.</param>
-            public void Exited(string id, Vector2d latLon)
+            public TrackerEvent Exited(string id, Vector2d latLon)
             {
-                Exited(id, Type.Place, latLon);
+                return Exited(id, Type.Place, latLon);
             }
 
             /// <summary>
@@ -226,10 +227,10 @@ namespace uAdventure.Geo
             /// <param name="id">Reachable identifier.</param> 
             /// <param name="type">Reachable type.</param>
             /// <param name="latLon">Actor latitude and longitude.</param>
-            public void Exited(string id, Type type, Vector2d latLon)
+            public TrackerEvent Exited(string id, Type type, Vector2d latLon)
             {
                 tracker.setPosition(latLon.x, latLon.y);
-                Exited(id, type);
+                return Exited(id, type);
             }
 
             /// <summary>
@@ -239,9 +240,9 @@ namespace uAdventure.Geo
             /// <param name="id">Reachable identifier.</param> 
             /// <param name="latLon">Actor latitude and longitude.</param>
             /// <param name="orientation">Actor orientation.</param>
-            public void Exited(string id, Vector2d latLon, Vector3d orientation)
+            public TrackerEvent Exited(string id, Vector2d latLon, Vector3d orientation)
             {
-                Exited(id, Type.Place, latLon, orientation);
+                return Exited(id, Type.Place, latLon, orientation);
             }
 
             /// <summary>
@@ -251,11 +252,11 @@ namespace uAdventure.Geo
             /// <param name="type">Reachable type.</param>
             /// <param name="latLon">Actor latitude and longitude.</param>
             /// <param name="orientation">Actor orientation.</param>
-            public void Exited(string id, Type type, Vector2d latLon, Vector3d orientation)
+            public TrackerEvent Exited(string id, Type type, Vector2d latLon, Vector3d orientation)
             {
                 tracker.setPosition(latLon.x, latLon.y);
                 tracker.setOrientation(orientation.x, orientation.y, orientation.z);
-                Exited(id, type);
+                return Exited(id, type);
             }
 
             #endregion
@@ -268,9 +269,9 @@ namespace uAdventure.Geo
             /// </summary>
             /// <param name="id">Reachable identifier.</param> 
             /// <param name="latLon">Actor latitude and longitude.</param>
-            public void Looked(string id, Vector3d orientation)
+            public TrackerEvent Looked(string id, Vector3d orientation)
             {
-                Looked(id, Type.Place, orientation);
+                return Looked(id, Type.Place, orientation);
             }
 
             /// <summary>
@@ -279,10 +280,10 @@ namespace uAdventure.Geo
             /// <param name="id">Reachable identifier.</param> 
             /// <param name="type">Reachable type.</param>
             /// <param name="latLon">Actor latitude and longitude.</param>
-            public void Looked(string id, Type type, Vector3d orientation)
+            public TrackerEvent Looked(string id, Type type, Vector3d orientation)
             {
                 tracker.setOrientation(orientation.x, orientation.y, orientation.z);
-                tracker.ActionTrace(Verb.Looked.ToString().ToLower(), type.ToString().ToLower(), id);
+                return tracker.ActionTrace(Verb.Looked.ToString().ToLower(), type.ToString().ToLower(), id);
             }
 
             /// <summary>
@@ -292,9 +293,9 @@ namespace uAdventure.Geo
             /// <param name="id">Reachable identifier.</param> 
             /// <param name="latLon">Actor latitude and longitude.</param>
             /// <param name="orientation">Actor orientation.</param>
-            public void Looked(string id, Vector3d orientation, Vector2d latLon)
+            public TrackerEvent Looked(string id, Vector3d orientation, Vector2d latLon)
             {
-                Looked(id, Type.Place, orientation, latLon);
+                return Looked(id, Type.Place, orientation, latLon);
             }
 
             /// <summary>
@@ -304,11 +305,11 @@ namespace uAdventure.Geo
             /// <param name="type">Reachable type.</param>
             /// <param name="latLon">Actor latitude and longitude.</param>
             /// <param name="orientation">Actor orientation.</param>
-            public void Looked(string id, Type type, Vector3d orientation, Vector2d latLon)
+            public TrackerEvent Looked(string id, Type type, Vector3d orientation, Vector2d latLon)
             {
                 tracker.setOrientation(orientation.x, orientation.y, orientation.z);
                 tracker.setPosition(latLon.x, latLon.y);
-                tracker.ActionTrace(Verb.Looked.ToString().ToLower(), type.ToString().ToLower(), id);
+                return tracker.ActionTrace(Verb.Looked.ToString().ToLower(), type.ToString().ToLower(), id);
             }
 
             #endregion
@@ -320,9 +321,9 @@ namespace uAdventure.Geo
             /// Type = Place 
             /// </summary>
             /// <param name="id">Element identifier.</param> 
-            public void Followed(string id)
+            public TrackerEvent Followed(string id)
             {
-                tracker.ActionTrace(Verb.Followed.ToString().ToLower(), Type.Direction.ToString().ToLower(), id);
+                return tracker.ActionTrace(Verb.Followed.ToString().ToLower(), Type.Direction.ToString().ToLower(), id);
             }
 
             /// <summary>
@@ -331,10 +332,10 @@ namespace uAdventure.Geo
             /// </summary>
             /// <param name="id">Element identifier.</param> 
             /// <param name="guide">Array of indications the user is following.</param> 
-            public void Followed(string id, string[] guide)
+            public TrackerEvent Followed(string id, string[] guide)
             {
                 tracker.setGuide(guide);
-                tracker.ActionTrace(Verb.Followed.ToString().ToLower(), Type.Direction.ToString().ToLower(), id);
+                return tracker.ActionTrace(Verb.Followed.ToString().ToLower(), Type.Direction.ToString().ToLower(), id);
             }
 
             #endregion

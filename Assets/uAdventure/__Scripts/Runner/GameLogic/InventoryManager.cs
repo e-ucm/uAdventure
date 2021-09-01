@@ -2,6 +2,7 @@
 using System.Linq;
 using UnityEngine;
 using uAdventure.Core;
+using AssetPackage;
 
 namespace uAdventure.Runner
 {
@@ -61,6 +62,18 @@ namespace uAdventure.Runner
                 }
                 if (inventory)
                 {
+                    if(inventory.Opened != value && TrackerAsset.Instance.Started)
+                    {
+                        if (value)
+                        {
+                            TrackerAsset.Instance.Accessible.Accessed("Inventory", AccessibleTracker.Accessible.Inventory);
+                        }
+                        else
+                        {
+                            TrackerAsset.Instance.Accessible.Skipped("Inventory", AccessibleTracker.Accessible.Inventory);
+                        }
+                    }
+
                     inventory.Opened = value;
                 }
             }

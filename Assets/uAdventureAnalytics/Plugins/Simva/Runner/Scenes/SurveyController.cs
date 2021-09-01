@@ -4,7 +4,6 @@ using UnityFx.Async.Promises;
 using uAdventure.Runner;
 using System;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 using UnityFx.Async;
 using Simva.Model;
 
@@ -14,12 +13,10 @@ namespace uAdventure.Simva
     public class SurveyController : MonoBehaviour, IRunnerChapterTarget
     {
         private bool surveyOpened;
-        private bool ready;
-        private GameObject surveyOpener;
 
         public object Data { get { return null; } set { } }
 
-        public bool IsReady { get { return ready; } }
+        public bool IsReady { get { return true; } }
 
         public void OpenSurvey()
         {
@@ -53,7 +50,6 @@ namespace uAdventure.Simva
         {
             SimvaExtension.Instance.NotifyLoading(true);
             string activityId = SimvaExtension.Instance.CurrentActivityId;
-            string token = SimvaExtension.Instance.Token;
             string username = SimvaExtension.Instance.API.AuthorizationInfo.Username;
             SimvaExtension.Instance.API.Api.GetCompletion(activityId, username)
                 .Then(result =>
@@ -98,7 +94,6 @@ namespace uAdventure.Simva
             /*var backgroundPath = 
             var backgroundSprite = Game.Instance.ResourceManager.getSprite();
             background.sprite = Game.Instance.ResourceManager.getSprite()*/
-            ready = true;
         }
 
         public void Destroy(float time, Action onDestroy)

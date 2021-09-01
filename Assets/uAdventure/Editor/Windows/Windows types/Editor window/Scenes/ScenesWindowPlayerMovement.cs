@@ -68,6 +68,7 @@ namespace uAdventure.Editor
                 case PlayerMode.NoPlayer: // No Player
                     break;
                 case PlayerMode.InitialPosition: // No trajectory
+                    componentBasedEditor.SelectedElement = Controller.Instance.SelectedChapterDataControl.getPlayer();
                     break;
                 case PlayerMode.Trajectory: // Trajectory
                     {
@@ -409,7 +410,7 @@ namespace uAdventure.Editor
                     if (EditorGUI.EndChangeCheck()) workingScene.setDefaultInitialPosition(Mathf.RoundToInt(newPos.x), Mathf.RoundToInt(newPos.y));
 
                     EditorGUI.BeginChangeCheck();
-                    var newScale = EditorGUILayout.FloatField("Scale", workingScene.getPlayerScale());
+                    var newScale = Mathf.Max(0, EditorGUILayout.FloatField("Scale", workingScene.getPlayerScale()));
                     if (EditorGUI.EndChangeCheck()) workingScene.setPlayerScale(newScale);
                 }
                 else if(Target is NodeDataControl)
@@ -421,7 +422,7 @@ namespace uAdventure.Editor
                     if (EditorGUI.EndChangeCheck()) target.setNode(Mathf.RoundToInt(newPos.x), Mathf.RoundToInt(newPos.y), target.getScale());
 
                     EditorGUI.BeginChangeCheck();
-                    var newScale = EditorGUILayout.FloatField("Scale", target.getScale());
+                    var newScale = Mathf.Max(0, EditorGUILayout.FloatField("Scale", target.getScale()));
                     if (EditorGUI.EndChangeCheck()) target.setNode(target.getX(), target.getY(), newScale);
                 }
 
@@ -703,7 +704,16 @@ namespace uAdventure.Editor
                                 var pos = (Event.current.mousePosition - SceneEditor.Current.Viewport.position);
                                 pos.x = (pos.x / SceneEditor.Current.Viewport.size.x) * SceneEditor.Current.Size.x;
                                 pos.y = (pos.y / SceneEditor.Current.Viewport.size.y) * SceneEditor.Current.Size.y;
-                                trajectory.addNode(Mathf.RoundToInt(pos.x), Mathf.RoundToInt(pos.y));
+                                var initialNode = trajectory.getInitialNode();
+                                if (trajectory.addNode(Mathf.RoundToInt(pos.x), Mathf.RoundToInt(pos.y)))
+                                {
+                                    var addedNode = trajectory.getLastNode();
+                                    var trajectoryNode = (Trajectory.Node)addedNode.getContent();
+                                    if(initialNode != null)
+                                    {
+                                        trajectoryNode.setScale(initialNode.getScale());
+                                    }
+                                }
                             }
                             break;
 

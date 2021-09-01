@@ -67,6 +67,11 @@ namespace uAdventure.Core
          */
         private bool hideInventory;
 
+        /**
+         * Stores if the user can save in the scene or not
+         */
+        private bool saveGameAllowed = true;
+
         public bool HideInventory
         {
             get
@@ -278,6 +283,16 @@ namespace uAdventure.Core
             }
             gs.type = type;
             return gs;
+        }
+
+        public void setAllowsSavingGame(bool allowsSavingGame)
+        {
+            saveGameAllowed = allowsSavingGame;
+        }
+
+        public bool allowsSavingGame()
+        {
+            return saveGameAllowed;
         }
 
         /*
