@@ -36,6 +36,7 @@ namespace uAdventure.Runner
 
         // Execution
         private bool waitingRunTarget = false, waitingTransition = false, waitingTargetDestroy = false;
+        private List<EffectHolderNode> background;
         private Stack<KeyValuePair<Interactuable, ExecutionEvent>> executeStack;
         private IRunnerChapterTarget runnerTarget;
         private GameState game_state;
@@ -131,6 +132,7 @@ namespace uAdventure.Runner
                 DontDestroyOnLoad(Camera.main);
 
                 executeStack = new Stack<KeyValuePair<Interactuable, ExecutionEvent>>();
+                background = new List<EffectHolderNode>();
 
                 skin = Resources.Load("basic") as GUISkin;
 
@@ -277,6 +279,22 @@ namespace uAdventure.Runner
 
         protected void Update()
         {
+            if (background.Count > 0)
+            {
+                foreach(var element in background.ToList())
+                {
+                    if (!element.execute())
+                    {
+                        background.Remove(element);
+                    }
+                }
+
+                if(background.Count == 0 && executeStack.Count == 0)
+                {
+                    FinalizeExecution();
+                }
+            }
+
             if (waitingRunTarget && runnerTarget.IsReady)
             {
                 Debug.Log("[UPDATE] Target Ready!");
@@ -390,7 +408,8 @@ namespace uAdventure.Runner
             {
                 if (paused && GameState.Data.isSaveOnSuspend())
                 {
-                    GameState.OnGameSuspend();
+                    var gameReadyOrderedExtensions = PriorityAttribute.OrderExtensionsByMethod("OnGameReady", gameExtensions);
+                    RunTarget(GameState.CurrentTarget);
                 }
 
                 /*if (!paused && GameState.Data.isRestoreAfterOpen())
@@ -407,6 +426,9 @@ namespace uAdventure.Runner
                 }*/
             }
 
+        public void RunInBackground(EffectHolderNode effect)
+        {
+            background.Add(effect);
         }
 
         public bool Execute(Interactuable interactuable, ExecutionEvent callback = null)
@@ -417,7 +439,7 @@ namespace uAdventure.Runner
                 MenuMB.Instance.hide(true);
             }
 
-            if(executeStack.Count == 0)
+            if (executeStack.Count == 0)
             {
                 AutoSave();
             }
@@ -428,7 +450,7 @@ namespace uAdventure.Runner
                 Debug.Log("Pushed " + interactuable.ToString());
                 executeStack.Push(new KeyValuePair<Interactuable, ExecutionEvent>(interactuable, callback));
             }
-            while(executeStack.Count > 0)
+            while (executeStack.Count > 0)
             {
                 var preInteractSize = executeStack.Count;
                 var toExecute = executeStack.Peek();
@@ -450,7 +472,7 @@ namespace uAdventure.Runner
                 }
                 else
                 {
-                    Debug.Log("Execution finished " + toExecute.ToString()); 
+                    Debug.Log("Execution finished " + toExecute.ToString());
                     if (!actionCanceled)
                     {
                         if (preInteractSize != executeStack.Count)
@@ -475,7 +497,7 @@ namespace uAdventure.Runner
                             executeStack.Pop();
                         }
                     }
-                    
+
                     try
                     {
                         if (actionCanceled)
@@ -504,6 +526,17 @@ namespace uAdventure.Runner
                     }
                 }
             }
+            if(background.Count > 0)
+            {
+                return true;
+            }
+
+            FinalizeExecution();
+            return false;
+        }
+
+        private void FinalizeExecution()
+        {
             if (uAdventureRaycaster.Instance)
             {
                 uAdventureRaycaster.Instance.Override = null;
@@ -520,7 +553,6 @@ namespace uAdventure.Runner
             // In case any bubble is bugged
             GUIManager.Instance.DestroyBubbles();
             actionCanceled = false;
-            return false;
         }
 
         public void Quit()
@@ -562,6 +594,11 @@ namespace uAdventure.Runner
             }
             RunTarget(GameState.CurrentTarget);
             uAdventureInputModule.LookingForTarget = null;
+        }
+
+        public bool IsRunningInBackground(EffectHolderNode node)
+        {
+            return background.Contains(node);
         }
 
         public bool ContinueEffectExecution()

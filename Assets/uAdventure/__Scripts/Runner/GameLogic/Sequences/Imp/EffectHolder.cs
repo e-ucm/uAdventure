@@ -15,7 +15,7 @@ namespace uAdventure.Runner
         private readonly Conditions conditions;
 
         private bool runsOnce = true;
-        private int timesRun = 0;
+        private ulong timesRun = 0;
         private bool waitForLoadPulse = false;
         private bool pulsed = false;
 
@@ -259,13 +259,12 @@ namespace uAdventure.Runner
                             break;
                         case EffectType.MOVE_OBJECT:
                             MoveObjectEffect moe = (MoveObjectEffect)effect;
-                            runsOnce = !moe.isAnimated();
-
                             if (timesRun == 0)
                             {
                                 if (moe.isAnimated())
                                 {
                                     Game.Instance.GameState.Move(moe.getTargetId(), new Vector2(moe.getX(), moe.getY()), moe.getTranslateSpeed(), this);
+                                    runsOnce = false;
                                 }
                                 else
                                 {
@@ -279,13 +278,15 @@ namespace uAdventure.Runner
                             break;
                         case EffectType.MOVE_NPC:
                             MoveNPCEffect mne = (MoveNPCEffect)effect;
-                            runsOnce = true;
-
                             if (timesRun == 0)
                             {
+                                runsOnce = false;
+                                timesRun++;
                                 Game.Instance.GameState.Move(mne.getTargetId(), new Vector2(mne.getX(), mne.getY()), 1, this);
+                                Game.Instance.RunInBackground(this);
+                                return false;
                             }
-                            if (!runsOnce && !pulsed)
+                            if (!pulsed)
                             {
                                 forceWait = true;
                             }
@@ -400,6 +401,7 @@ namespace uAdventure.Runner
         {
             this.originalEffects = effects;
             this.effects = new List<EffectHolderNode>();
+            EffectHolderNode previousEffect = null;
 
             if (effects != null && effects.getEffects().Count > 0)
             {
@@ -408,7 +410,15 @@ namespace uAdventure.Runner
                 foreach (IEffect effect in effects.getEffects())
                 {
                     if (effect != null) // TODO check if this (if) is correct
-                        this.effects.Add(new EffectHolderNode(effect));
+                    {
+                        var newHolder = new EffectHolderNode(effect);
+                        if(previousEffect != null)
+                        {
+                            previousEffect.AddAdditionalInfo("next_effect", newHolder);
+                        }
+                        this.effects.Add(newHolder);
+                        previousEffect = newHolder;
+                    }
                 }
             }
         }
