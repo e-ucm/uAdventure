@@ -78,6 +78,7 @@ namespace uAdventure.Runner
                         else if(TrackerAsset.Instance.Started)
                         {
                             TrackerAsset.Instance.Completable.Completed(initializedDialogNode, CompletableTracker.Completable.DialogFragment);
+                            initializedDialogNode = null;
                         }
                     }
 
@@ -147,12 +148,14 @@ namespace uAdventure.Runner
                 return;
             }
 
-            if (TrackerAsset.Instance.Started && !string.IsNullOrEmpty(onode.getXApiQuestion()))
+            if (TrackerAsset.Instance.Started)
             {
                 holder.EndTracePending();
                 isTracePending = true;
                 xAPISuccess = onode.getLine(option).getXApiCorrect();
-                xAPIQuestion = onode.getXApiQuestion();
+                xAPIQuestion = string.IsNullOrWhiteSpace(onode.getXApiQuestion()) 
+                    ? conversation.getId() + "." + conversation.getAllNodes().IndexOf(node) 
+                    : onode.getXApiQuestion();
                 xAPIResponse = onode.getLine(option).getText().Replace(",", " ");
                 trace = TrackerAsset.Instance.Alternative.Selected(xAPIQuestion, xAPIResponse, AlternativeTracker.Alternative.Question);
                 Game.Instance.GameState.BeginChangeAmbit(trace);
