@@ -902,7 +902,7 @@ namespace uAdventure.Runner
 
         public void OnConfirmWantsDrag(PointerEventData data)
         {
-            if (SceneData is Scene)
+            if (SceneData is Scene && data.button == PointerEventData.InputButton.Left)
             {
                 data.Use();
             }
