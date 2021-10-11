@@ -809,6 +809,7 @@ namespace uAdventure.Runner
                     break;
                 case Cutscene.ENDCHAPTER:
                     // TODO: When we add more chapters, we must trigger the next chapter instead of quiting que aplication
+                    Game.Instance.ActionCanceled();
                     Game.Instance.Quit();
                     break;
             }
