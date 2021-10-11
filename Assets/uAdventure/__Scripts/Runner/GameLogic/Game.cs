@@ -399,32 +399,39 @@ namespace uAdventure.Runner
 
         public void OnApplicationPause(bool paused)
         {
-            /*if (Application.isEditor)
-            {
-                return;
-            }*/
 
-            if (!isSomethingRunning())
+            if (isSomethingRunning())
             {
-                if (paused && GameState.Data.isSaveOnSuspend())
+                Debug.Log("[SAVE ON SUSPEND] Not saved on suspend because something was running.");
+                return;
+            }
+
+            if (!GameState.GetChapterTarget(GameState.CurrentTarget).allowsSavingGame())
+            {
+                Debug.Log("[SAVE ON SUSPEND] Current scene doesn't allow saving. Cancelling save...");
+                return;
+            }
+
+            if (paused && GameState.Data.isSaveOnSuspend())
+            {
+                Debug.Log("[SAVE ON SUSPEND] Saving game...");
+                GameState.OnGameSuspend();
+            }
+
+            /*if (!paused && GameState.Data.isRestoreAfterOpen())
+            {
+                // TODO REPARE RESTORE AFTER OPEN
+                GameState.OnGameResume();
+                if (started)
                 {
                     var gameReadyOrderedExtensions = PriorityAttribute.OrderExtensionsByMethod("OnGameReady", gameExtensions);
                     RunTarget(GameState.CurrentTarget);
+                    gameReadyOrderedExtensions.ForEach(g => g.OnGameReady());
+                    uAdventureInputModule.LookingForTarget = null;
                 }
+            }*/
 
-                /*if (!paused && GameState.Data.isRestoreAfterOpen())
-                {
-                    // TODO REPARE RESTORE AFTER OPEN
-                    GameState.OnGameResume();
-                    if (started)
-                    {
-                        var gameReadyOrderedExtensions = PriorityAttribute.OrderExtensionsByMethod("OnGameReady", gameExtensions);
-                        RunTarget(GameState.CurrentTarget);
-                        gameReadyOrderedExtensions.ForEach(g => g.OnGameReady());
-                        uAdventureInputModule.LookingForTarget = null;
-                    }
-                }*/
-            }
+        }
 
         public void RunInBackground(EffectHolderNode effect)
         {
