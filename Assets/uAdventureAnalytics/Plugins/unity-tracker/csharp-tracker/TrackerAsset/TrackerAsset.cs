@@ -73,6 +73,11 @@ namespace AssetPackage
         /// </summary>
         private bool extraFlushRequested = false;
 
+        private long lastRequestStart;
+        private long lastRequestEnd;
+
+        private bool lastRequestFinished;
+
         /// <summary>
         /// Callbacks to call when the extra flush is performed.
         /// </summary>
@@ -208,6 +213,11 @@ namespace AssetPackage
         /// Options for controlling the operation.
         /// </summary>
         private TrackerAssetSettings settings = null;
+
+        /// <summary>
+        /// Auxiliar dictionary to store the different tracker status information.
+        /// </summary>
+        private Dictionary<string, string> statusDictionary;
 
         /// <summary>
         /// List of Extensions that have to ve added to the next trace
@@ -667,7 +677,7 @@ namespace AssetPackage
         /// </summary>
         public void Flush(Action callback = null, bool complete = false)
         {
-            if (!Started || !Active)
+            if (!Started)
             {
                 return;
             }
@@ -708,7 +718,7 @@ namespace AssetPackage
                             {
                                 c();
                             }
-                        });
+                        }, flushAllRequested);
                     }
                 }, complete);
             }
@@ -911,9 +921,10 @@ namespace AssetPackage
         /// Starts Tracking with: 1) An already extracted UserToken (from Login) and
         /// 2) TrackingCode (Shown at Game on a2 server).
         /// </summary>
-		public void Start()
+		public void Start(Action done = null)
         {
-            StartAux(false, null);
+            StartAux(false, done);
+            Completable.Initialized("application");
         }
 
         /// <summary>
@@ -949,7 +960,7 @@ namespace AssetPackage
 
                             Connected = tmp != null;
                             Active = tmp != null;
-                            done();
+                            if(done != null) done();
                         }
                         break;
                 }
@@ -1086,6 +1097,7 @@ namespace AssetPackage
         /// </summary>
         public void Exit(Action done)
         {
+            Completable.Completed("application");
             FlushAll(done);
         }
 
@@ -1289,6 +1301,8 @@ namespace AssetPackage
 
             if (ds != null)
             {
+                lastRequestFinished = false;
+                lastRequestStart = System.DateTimeOffset.Now.ToUnixTimeMilliseconds();
                 ds.WebServiceRequest(
                     new RequestSetttings
                     {
@@ -1304,7 +1318,10 @@ namespace AssetPackage
                         //! allowedResponsCodes,     // TODO default is ok
                         body = body, // or method.Equals("GET")?string.Empty:body
 				   }, out response);
-			}
+
+                lastRequestFinished = true;
+                lastRequestEnd = System.DateTimeOffset.Now.ToUnixTimeMilliseconds();
+            }
 
 			return response;
         }
@@ -1326,8 +1343,15 @@ namespace AssetPackage
             RequestResponse response = new RequestResponse();
 
 			if (ds != null)
-			{
-				ds.WebServiceRequestAsync(
+            {
+                if (lastRequestFinished == false)
+                {
+                    Log(Severity.Warning, "The tracker made a request while having a pending request!");
+                }
+
+                lastRequestFinished = false;
+                lastRequestStart = System.DateTimeOffset.Now.ToUnixTimeMilliseconds();
+                ds.WebServiceRequestAsync(
 					new RequestSetttings
 					{
 						method = method,
@@ -1341,7 +1365,12 @@ namespace AssetPackage
 						requestHeaders = headers,
 						//! allowedResponsCodes,     // TODO default is ok
 						body = body, // or method.Equals("GET")?string.Empty:body
-					}, callback);
+					}, requestResponse =>
+                    {
+                        lastRequestFinished = true;
+                        lastRequestEnd = System.DateTimeOffset.Now.ToUnixTimeMilliseconds();
+                        callback(requestResponse);
+                    });
 			}
 		}
 
@@ -1359,9 +1388,7 @@ namespace AssetPackage
             }
             else if (!Active)
             {
-                Log(Severity.Warning, "The tracker is not active!");
-                done();
-                return;
+                Connect(false, null);
             }
 
             EnqueueCompletedTraces();
@@ -1376,7 +1403,7 @@ namespace AssetPackage
             Action<TrackerEvent[]> saveAndDequeue = traces =>
             {
                 queue.Dequeue(traces.Length);
-                if (complete && queue.Count > 0)
+                if (complete && ContainsTraces())
                 {
                     ProcessQueue(done, complete);
                 }
@@ -1386,7 +1413,7 @@ namespace AssetPackage
                 }
             };
 
-            if (queue.Count > 0 || tracesPending.Count > 0 || tracesUnlogged.Count > 0)
+            if (ContainsTraces())
             {
                 //Extract the traces from the queue and remove from the queue
                 TrackerEvent[] traces = CollectTraces();
@@ -1523,7 +1550,46 @@ namespace AssetPackage
                 Log(Severity.Information, "Nothing to flush");
             }
         }
-#endif 
+#endif
+
+        private bool ContainsTraces()
+        {
+            return queue.Count > 0 || tracesPending.Count > 0 || tracesUnlogged.Count > 0 || partialQueue.Count > 0 || backupQueue.Count > 0;
+        }
+
+
+        public Dictionary<string, string> GetTrackerStatus()
+        {
+            // Main Status
+            statusDictionary["active"] = Active.ToString();
+            statusDictionary["connected"] = Connected.ToString();
+            statusDictionary["batch_size"] = settings.BatchSize.ToString();
+            statusDictionary["trace_format"] = settings.TraceFormat.ToString();
+            // Queues
+            statusDictionary["partial_queue_count"] = partialQueue.Count.ToString();
+            statusDictionary["unlogged_queue_count"] = tracesUnlogged.Count.ToString();
+            statusDictionary["queue_count"] = queue.Count.ToString();
+            statusDictionary["pending_queue_count"] = tracesPending.Count.ToString();
+            // Backup
+            statusDictionary["backup_file"] = settings.BackupFile.ToString();
+            statusDictionary["backup_queue_count"] = backupQueue.Count.ToString();
+            // Flushing
+            statusDictionary["flushing"] = flushing.ToString();
+            statusDictionary["extra_flush"] = extraFlushRequested.ToString();
+            statusDictionary["extra_flush_count"] = callbacksForExtraFlush.Count.ToString();
+            statusDictionary["flushing_all"] = flushAllRequested.ToString();
+            // Connection
+            statusDictionary["requesting"] = (!lastRequestFinished).ToString();
+            statusDictionary["last_request_start"] = lastRequestStart.ToString();
+
+            var endingTime = lastRequestFinished ? lastRequestEnd : DateTimeOffset.Now.ToUnixTimeMilliseconds();
+            var lastRequestDuration = DateTimeOffset.FromUnixTimeMilliseconds(endingTime - lastRequestStart).ToUnixTimeSeconds();
+            statusDictionary["last_request_duration"] = lastRequestDuration.ToString();
+
+
+            return statusDictionary;
+        }
+
         public void ForceCompleteTraces()
         {
             // Move all possible partial traces to the main queue

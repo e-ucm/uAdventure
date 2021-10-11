@@ -30,8 +30,9 @@ using System.Threading;
 namespace RAGE.Analytics
 {
 	using AssetPackage;
+    using UnityEditor;
 
-	public class Tracker : MonoBehaviour
+    public class Tracker : MonoBehaviour
 	{
 		public static DateTime START_DATE = new DateTime (1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 		public bool rawCopy;
@@ -133,14 +134,21 @@ namespace RAGE.Analytics
 			{
 				UnityEngine.Debug.Log("started");
 				allowQuitting = false;
+#if UNITY_EDITOR
+				EditorApplication.playModeStateChanged += (PlayModeStateChange state) => { 
+					if (state == PlayModeStateChange.ExitingPlayMode) 
+						Application_wantsToQuit(); 
+				};
+#else
 				Application.wantsToQuit += Application_wantsToQuit;
+#endif
 			};
 
 			if (!String.IsNullOrEmpty(username))
 			{
 				TrackerAsset.Instance.Login(username, password);
 			}
-			TrackerAsset.Instance.Start();
+			TrackerAsset.Instance.Start(afterStart);
 		}
 
         private bool Application_wantsToQuit()
@@ -158,6 +166,9 @@ namespace RAGE.Analytics
 				{
 					UnityEngine.Debug.Log("Fin");
 					allowQuitting = true;
+#if UNITY_EDITOR
+					EditorApplication.ExitPlaymode(); ;
+#endif
 					Application.Quit();
 				});
 			}
