@@ -13,6 +13,7 @@ namespace uAdventure.Runner
         public enum ResourceType { ANIMATION, TEXTURE };
 
         private TransitionManager transitionManager;
+        private AutoGlower autoGlower;
         private Element element;
         private Context context;
         private Renderer rend;
@@ -162,6 +163,7 @@ namespace uAdventure.Runner
             rend = this.GetComponent<Renderer>();
             transitionManager = this.GetComponent<TransitionManager>();
             transitionManager.UseMaterial(rend.material);
+            autoGlower = this.GetComponent<AutoGlower>();
             Game.Instance.GameState.OnConditionChanged += OnConditionChanged;
             OnConditionChanged(null, 0);
         }
@@ -173,7 +175,7 @@ namespace uAdventure.Runner
                 Game.Instance.GameState.OnConditionChanged -= OnConditionChanged;
             }
         }
-
+        
         private void OnConditionChanged(string condition, int value)
         {
             checkResources();
@@ -221,6 +223,8 @@ namespace uAdventure.Runner
             // Set
             transform.localScale = worldSize;
 
+            if(this.autoGlower)
+                this.autoGlower.enabled = context.Glow;
             if (RepresentableChanged != null)
             {
                 RepresentableChanged();

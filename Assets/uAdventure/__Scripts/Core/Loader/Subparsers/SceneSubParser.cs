@@ -278,6 +278,7 @@ namespace uAdventure.Core
 
             float scale = ExParsers.ParseDefault (element.GetAttribute("scale"), CultureInfo.InvariantCulture, 0f);
 			int layer = ExParsers.ParseDefault (element.GetAttribute("layer"), -1);
+            bool glow = ExString.Default(element.GetAttribute("glow"), "yes").Equals("yes", System.StringComparison.InvariantCultureIgnoreCase);
 
 			int influenceX 		= ExParsers.ParseDefault (element.GetAttribute("influenceX"), 0), 
 				influenceY 		= ExParsers.ParseDefault (element.GetAttribute("influenceY"), 0), 
@@ -288,7 +289,8 @@ namespace uAdventure.Core
 
 			var currentElementReference = new ElementReference(idTarget, x, y, layer);
             currentElementReference.Orientation = orientation;
-			if (hasInfluence)
+            currentElementReference.Glow = glow;
+            if (hasInfluence)
 			{
 				InfluenceArea influenceArea = new InfluenceArea(influenceX, influenceY, influenceWidth, influenceHeight);
 				currentElementReference.setInfluenceArea(influenceArea);

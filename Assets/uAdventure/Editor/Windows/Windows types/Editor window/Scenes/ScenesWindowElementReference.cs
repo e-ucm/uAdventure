@@ -234,6 +234,10 @@ namespace uAdventure.Editor
                         reference.Orientation = newOrientation;
                     }
                 }
+
+                EditorGUI.BeginChangeCheck();
+                var newGlow = EditorGUILayout.Toggle("Glow", reference.Glow);
+                if (EditorGUI.EndChangeCheck()) { reference.Glow = newGlow; }
             }
 
             public static Sprite GetSprite(DataControl elem)
