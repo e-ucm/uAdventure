@@ -409,10 +409,13 @@ namespace uAdventure.Simva
                 })
                 .Then(schedule =>
                 {
-                    NotifyLoading(false);
                     var result = new AsyncCompletionSource();
                     StartCoroutine(AsyncCoroutine(LaunchActivity(schedule.Next), result));
                     return result;
+                })
+                .Finally(() =>
+                {
+                    NotifyLoading(false);
                 })
                 .Catch(error =>
                 {
