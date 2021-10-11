@@ -105,7 +105,14 @@ namespace uAdventure.Geo
             var binary = new BinaryWriter(file);
             binary.Write(bytes);
             file.Close();
-            Texture2D.Destroy(readable);
+            if(Application.isEditor && !Application.isPlaying)
+            {
+                Texture2D.DestroyImmediate(readable);
+            }
+            else
+            {
+                Texture2D.Destroy(readable);
+            }
         }
 
         public static Texture2D CreateReadableTexture(Texture2D texture)
