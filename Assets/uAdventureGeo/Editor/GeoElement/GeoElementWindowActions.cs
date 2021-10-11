@@ -54,15 +54,19 @@ namespace uAdventure.Geo
 
         public override void Draw(int aID)
         {
-            var isInspector = Target != null;
-            if (isInspector)
+            var t = Target;
+            if (t != null) // Is in the inspector
             {
                 m_Rect.height = 300;
             }
-
-            if (Target is ExtElementRefDataControl)
+            else
             {
-                var extElemRefDataControl = Target as ExtElementRefDataControl;
+                t = GeoController.Instance.GeoElements.DataControls[GeoController.Instance.SelectedGeoElement];
+            }
+
+            if (t is ExtElementRefDataControl)
+            {
+                var extElemRefDataControl = t as ExtElementRefDataControl;
                 var geoActions = extElemRefDataControl.GeoActions;
 
                 if (extElemRefDataControl.TransformManager.PositionManagerName != GeopositionedDescriptor.GeopositionedName)
@@ -78,12 +82,12 @@ namespace uAdventure.Geo
                     geoActionsList.DoList(m_Rect.height - 60f);
                 }
             }
-            else if (Target is GeoElementDataControl)
+            else if (t is GeoElementDataControl)
             {
                 // -------------
                 // Actions
                 // -------------
-                var geoActions = (Target as GeoElementDataControl ?? GeoController.Instance.GeoElements.DataControls[GeoController.Instance.SelectedGeoElement]).GeoActions;
+                var geoActions = (t as GeoElementDataControl).GeoActions;
                 geoActionsList.SetData(geoActions, ge => (ge as ListDataControl<GeoElementDataControl, GeoActionDataControl>).DataControls.Cast<DataControl>().ToList());
                 geoActionsList.DoList(m_Rect.height - 60f);
             }
