@@ -895,10 +895,13 @@ namespace uAdventure.Runner
             if (isSomethingRunning())
             {
                 this.actionCanceled = true; 
-                Delegate[] delegateList = OnActionCanceled.GetInvocationList();
-                for (int counter = delegateList.Length - 1; counter >= 0; counter--)
+                if(OnActionCanceled != null)
                 {
-                    ((ActionCanceledDelegate)delegateList[counter])();
+                    Delegate[] delegateList = OnActionCanceled.GetInvocationList();
+                    for (int counter = delegateList.Length - 1; counter >= 0; counter--)
+                    {
+                        ((ActionCanceledDelegate)delegateList[counter])();
+                    }
                 }
             }
             OnActionCanceled = null;
