@@ -42,10 +42,11 @@ public class CompletableTracker : IGameObjectTracker
         Stage,
         Combat,
         StoryNode,
-        DialogNode,
-        DialogFragment,
         Race,
-        Completable
+        Completable,
+        // Dialog completables extension
+        DialogNode,
+        DialogFragment
     }
 
     /// <summary>
