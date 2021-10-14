@@ -108,7 +108,12 @@ namespace uAdventure.Simva
                 Debug.Log("[SIMVA] Conf Loaded...");
             }
 
-            if (!IsEnabled)
+            if (Cmi5Launcher.config != null)
+            {
+                Debug.Log("[SIMVA] CMI-5 config detected. Stopping...");
+                yield return null;
+            }
+            else if (!IsEnabled)
             {
                 Debug.Log("[SIMVA] Study is not set! Stopping...");
                 yield return null;

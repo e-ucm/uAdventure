@@ -78,78 +78,13 @@ public class Cmi5Helper
         public string AudioPreference { get; set; }
     }
 
-    public ICmi5LaunchConfig GetConfig()
+    public static ICmi5LaunchConfig GetConfig()
     {
-        return new Cmi5LaunchConfig
-        {
-            Endpoint = GetParam("endpoint"),
-            Fetch = GetParam("fetch"),
-            Actor = GetParam("actor"),
-            Registration = GetParam("registration"),
-            ActivityId = GetParam("activityId")
-        };
+        return uAdventure.Runner.Cmi5Launcher.config;
     }
 
-    public static IAsyncOperation<string> FetchAuthToken()
+    public static IAsyncOperation<Fetch> FetchAuthToken()
     {
-        return DoRequest(UnityWebRequest.Get(GetFetch()));
-    }
-
-
-    public static string GetEndpoint()
-    {
-        return GetParam("endpoint");
-    }
-
-    public static string GetFetch()
-    {
-        return GetParam("fetch");
-    }
-
-    public static string GetActor()
-    {
-        return GetParam("actor");
-    }
-
-    public static string GetRegistration()
-    {
-        return GetParam("registration");
-    }
-
-    public static string GetActivityId()
-    {
-        return GetParam("activityId");
-    }
-
-    private static string GetParam(string name)
-    {
-        return null;
-    }
-
-
-
-    private static IAsyncOperation<string> DoRequest(UnityWebRequest webRequest)
-    {
-        var result = new AsyncCompletionSource<string>();
-        var asyncOP = webRequest.SendWebRequest();
-        asyncOP.completed += a =>
-        {
-            if (webRequest.isNetworkError)
-            {
-                result.SetException(new ApiException((int)webRequest.responseCode, webRequest.error, webRequest.downloadHandler.text));
-            }
-            else if (webRequest.isHttpError)
-            {
-                result.SetException(new ApiException((int)webRequest.responseCode, webRequest.error, webRequest.downloadHandler.text));
-            }
-            else
-            {
-                result.SetResult(webRequest.downloadHandler.text);
-            }
-
-            webRequest.Dispose();
-        };
-
-        return result;
+        return Simva.RequestsUtil.DoRequest<Fetch>(UnityWebRequest.Post(GetConfig().Fetch, ""));
     }
 }
