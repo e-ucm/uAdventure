@@ -392,6 +392,13 @@ namespace uAdventure.Runner
                 Debug.Log("[AUTO SAVE] Auto save is disabled. Skipping...");
                 return;
             }
+            
+            if (!GameState.GetChapterTarget(GameState.CurrentTarget).allowsSavingGame())
+            {
+                Debug.Log("[AUTO SAVE] Current scene doesn't allow saving. Cancelling save...");
+                return;
+            }
+
 
             Debug.Log("[AUTO SAVE] Performing auto-save...");
             SaveGame();
@@ -399,6 +406,10 @@ namespace uAdventure.Runner
 
         public void OnApplicationPause(bool paused)
         {
+            if (!paused) // Ignore restores
+            {
+                return;
+            }
 
             if (isSomethingRunning())
             {
