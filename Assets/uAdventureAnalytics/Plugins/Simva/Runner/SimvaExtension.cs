@@ -435,20 +435,7 @@ namespace uAdventure.Simva
             return API.Api.SetCompletion(activityId, API.AuthorizationInfo.Username, completed)
                 .Then(() =>
                 {
-                    backupActivity = GetActivity(CurrentActivityId);
-                    string activityType = backupActivity.Type;
-                    if (activityType.Equals("gameplay", StringComparison.InvariantCultureIgnoreCase)
-                    && backupActivity.Details != null && backupActivity.Details.ContainsKey("backup") && (bool)backupActivity.Details["backup"])
-                    {
-                        string traces = SimvaBridge.Load(((TrackerAssetSettings)TrackerAsset.Instance.Settings).BackupFile);
-                        Instantiate(Resources.Load("SimvaBackupPopup"));
-                        backupOperation = SaveActivity(CurrentActivityId, traces, true);
-                        backupOperation.Then(() =>
-                        {
-                            afterBackup = true;
-                        });
-                    }
-
+                    StartBackupIfNeeded();
                     return UpdateSchedule();
                 })
                 .Then(schedule =>
@@ -466,6 +453,23 @@ namespace uAdventure.Simva
                     NotifyLoading(false);
                     NotifyManagers(error.Message);
                 });
+        }
+
+        private void StartBackupIfNeeded()
+        {
+            backupActivity = GetActivity(CurrentActivityId);
+            string activityType = backupActivity.Type;
+            if (activityType.Equals("gameplay", StringComparison.InvariantCultureIgnoreCase)
+            && backupActivity.Details != null && backupActivity.Details.ContainsKey("backup") && (bool)backupActivity.Details["backup"])
+            {
+                string traces = SimvaBridge.Load(((TrackerAssetSettings)TrackerAsset.Instance.Settings).BackupFile);
+                Instantiate(Resources.Load("SimvaBackupPopup"));
+                backupOperation = SaveActivity(CurrentActivityId, traces, true);
+                backupOperation.Then(() =>
+                {
+                    afterBackup = true;
+                });
+            }
         }
 
         public Activity GetActivity(string activityId)
