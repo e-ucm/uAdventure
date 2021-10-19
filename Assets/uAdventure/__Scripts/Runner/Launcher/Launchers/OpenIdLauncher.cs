@@ -13,12 +13,12 @@ namespace uAdventure.Runner
 
         public virtual bool WantsControl()
         {
-            return true;
+            return false;
         }
 
         public virtual bool Launch()
         {
-
+            return false;
         }
     }
 }
