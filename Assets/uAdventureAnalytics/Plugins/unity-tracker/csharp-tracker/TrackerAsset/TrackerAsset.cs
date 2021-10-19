@@ -217,7 +217,7 @@ namespace AssetPackage
         /// <summary>
         /// Auxiliar dictionary to store the different tracker status information.
         /// </summary>
-        private Dictionary<string, string> statusDictionary;
+        private Dictionary<string, string> statusDictionary = new Dictionary<string, string>();
 
         /// <summary>
         /// List of Extensions that have to ve added to the next trace
