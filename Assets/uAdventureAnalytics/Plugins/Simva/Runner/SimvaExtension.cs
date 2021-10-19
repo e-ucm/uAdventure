@@ -32,6 +32,7 @@ namespace uAdventure.Simva
         private string savedGameTarget;
         private bool wasAutoSave;
         private bool firstTimeDisabling = true;
+        private FlushAllScene flushAllScene;
 
         private AuthorizationInfo auth;
         private Schedule schedule;
@@ -135,7 +136,7 @@ namespace uAdventure.Simva
                 {
                     new LoginScene(),
                     new SurveyScene(),
-                    new FlushAllScene(),
+                    flushAllScene = new FlushAllScene(),
                     new BackupScene(),
                     new EndScene()
                 });
@@ -189,6 +190,7 @@ namespace uAdventure.Simva
         [Priority(10)]
         public override IEnumerator OnGameFinished()
         {
+            yield return new WaitWhile(() => Game.Instance.isSomethingRunning());
             if (IsActive)
             {
                 var readyToClose = false;
@@ -203,6 +205,43 @@ namespace uAdventure.Simva
             else
             {
                 yield return AnalyticsExtension.Instance.OnGameFinished();
+            }
+        }
+
+        public void OnGameCompleted()
+        {
+            StartCoroutine(OnGameCompletedRoutine());
+        }
+
+        private IEnumerator OnGameCompletedRoutine()
+        {
+            yield return new WaitWhile(() => Game.Instance.isSomethingRunning());
+
+            if (IsActive)
+            {
+                DisableAutoSave();
+                flushAllScene.onlyFlushAndBackup = true;
+                Game.Instance.RunTarget("Simva.FlushAll", null, false);
+                yield return new WaitUntil(() => afterFlush);
+                flushAllScene.onlyFlushAndBackup = false;
+                StartBackupIfNeeded();
+
+                UpdateSchedule()
+                    .Then(schedule =>
+                    {
+                        var result = new AsyncCompletionSource();
+                        StartCoroutine(AsyncCoroutine(LaunchActivity(schedule.Next), result));
+                        return result;
+                    })
+                    .Finally(() =>
+                    {
+                        NotifyLoading(false);
+                    })
+                    .Catch(error =>
+                    {
+                        NotifyLoading(false);
+                        NotifyManagers(error.Message);
+                    });
             }
         }
 
