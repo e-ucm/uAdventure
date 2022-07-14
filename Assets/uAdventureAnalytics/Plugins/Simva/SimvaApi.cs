@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using UnityEngine.Networking;
-using SimpleJSON;
 using UniRx;
 using UnityFx.Async;
 using UnityFx.Async.Promises;
@@ -10,6 +9,7 @@ using System.Linq;
 using System;
 using Simva;
 using Simva.Api;
+using Newtonsoft.Json.Linq;
 using Xasu.Auth.Protocols.OAuth2;
 
 namespace SimvaPlugin
@@ -43,8 +43,8 @@ namespace SimvaPlugin
             {
                 byte[] data = System.Convert.FromBase64String(jwt);
                 string decodedString = System.Text.Encoding.UTF8.GetString(data).Split('.')[1];
-                var json = JSON.Parse(decodedString);
-                return json["data"]["username"];
+                var json = JObject.Parse(decodedString);
+                return json["data"]["username"].Value<string>();
             }
         }
 
@@ -277,12 +277,12 @@ namespace SimvaPlugin
         public IAsyncOperation<bool> Register(string username, string email, string password, bool teacher)
         {
             var result = new AsyncCompletionSource<bool>();
-            ApiClient.CallApi("/users", UnityWebRequest.kHttpVerbPOST, new Dictionary<string, string>(), new JSONClass {
+            ApiClient.CallApi("/users", UnityWebRequest.kHttpVerbPOST, new Dictionary<string, string>(), new JObject {
                 { "username", username },
                 { "password", password },
                 { "email", email },
                 { "role", teacher ? "teacher" : "student" }
-            }.ToJSON(0), new Dictionary<string, string>(), new Dictionary<string, string>(), new Dictionary<string, string>(), new string[] { "OAuth2" })
+            }.ToString(Newtonsoft.Json.Formatting.None), new Dictionary<string, string>(), new Dictionary<string, string>(), new Dictionary<string, string>(), new string[] { "OAuth2" })
                 .Then(_ =>
                 {
                     result.SetResult(true);
@@ -296,9 +296,9 @@ namespace SimvaPlugin
         }
 
         
-        public IAsyncOperation<JSONNode> CreateStudyWithTestAndUsers(string studyName, string testName, string groupName, int numberOfUsers)
+        public IAsyncOperation<JObject> CreateStudyWithTestAndUsers(string studyName, string testName, string groupName, int numberOfUsers)
         {
-            var result = new AsyncCompletionSource<JSONNode>();
+            var result = new AsyncCompletionSource<JObject>();
             Simva.Model.Group createdGroup = null;
             string groupId = null;
             string testId = null;
@@ -345,11 +345,11 @@ namespace SimvaPlugin
                 {
                     result.SetProgress((numberOfUsers + 4) / totalOperations);
                     testId = test.Id;
-                    result.SetResult(new JSONClass
+                    result.SetResult(new JObject
                     {
-                        {"groupId", groupId },
-                        {"studyId", studyId },
-                        {"testId", testId }
+                        ["groupId"] = groupId,
+                        ["studyId"] = studyId,
+                        ["testId"]  = testId
                     });
                 })
                 .Catch(error =>

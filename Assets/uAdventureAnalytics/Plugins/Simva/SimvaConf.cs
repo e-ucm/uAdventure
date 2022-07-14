@@ -1,4 +1,4 @@
-﻿using SimpleJSON;
+﻿using Newtonsoft.Json.Linq;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -83,16 +83,16 @@ namespace Simva
             if (!string.IsNullOrEmpty(contents))
             {
                 Debug.Log("[SIMVA CONF] Simva.conf content: " + contents);
-                var simvaconf = SimpleJSON.JSON.Parse(contents);
-                Study = simvaconf["study"];
-                Host = simvaconf["host"];
-                Protocol = simvaconf["protocol"];
-                Port = simvaconf["port"];
-                SSO = simvaconf["sso"];
-                ClientId = simvaconf["client_id"];
-                TraceStorage = simvaconf["trace_storage"].AsBool;
-                Backup = simvaconf["backup"].AsBool;
-                Realtime = simvaconf["realtime"].AsBool;
+                var simvaconf = JObject.Parse(contents);
+                Study = simvaconf["study"].Value<string>();
+                Host = simvaconf["host"].Value<string>();
+                Protocol = simvaconf["protocol"].Value<string>();
+                Port = simvaconf["port"].Value<string>();
+                SSO = simvaconf["sso"].Value<string>();
+                ClientId = simvaconf["client_id"].Value<string>();
+                TraceStorage = simvaconf["trace_storage"].Value<bool>();
+                Backup = simvaconf["backup"].Value<bool>();
+                Realtime = simvaconf["realtime"].Value<bool>();
             }
         }
 
@@ -128,18 +128,20 @@ namespace Simva
             var path = GetFilePath();
             if (Application.isEditor && !Application.isPlaying)
             {
-                var simvaconf = new SimpleJSON.JSONClass();
-                simvaconf["study"] = Study;
-                simvaconf["host"] = Host;
-                simvaconf["protocol"] = Protocol;
-                simvaconf["port"] = Port;
-                simvaconf["sso"] = SSO;
-                simvaconf["client_id"] = ClientId;
-                simvaconf["url"] = URL;
-                simvaconf["trace_storage"] = TraceStorage.ToString();
-                simvaconf["backup"] = Backup.ToString();
-                simvaconf["realtime"] = Realtime.ToString();
-                System.IO.File.WriteAllText(path, simvaconf.ToJSON(4));
+                var simvaconf = new JObject
+                {
+                    ["study"] = Study,
+                    ["host"] = Host,
+                    ["protocol"] = Protocol,
+                    ["port"] = Port,
+                    ["sso"] = SSO,
+                    ["client_id"] = ClientId,
+                    ["url"] = URL,
+                    ["trace_storage"] = TraceStorage.ToString(),
+                    ["backup"] = Backup.ToString(),
+                    ["realtime"] = Realtime.ToString()
+                };
+                System.IO.File.WriteAllText(path, simvaconf.ToString(Newtonsoft.Json.Formatting.Indented));
             }
         }
     }
