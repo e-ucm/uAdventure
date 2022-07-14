@@ -1,8 +1,0 @@
-language: csharp
-solution: TrackerAsset.sln
-install:
-  - nuget restore TrackerAsset.sln
-  - nuget install NUnit.Runners -Version 2.6.4 -OutputDirectory testrunner
-script:
-  - xbuild /p:Configuration=Release TrackerAsset.sln
-  - mono ./testrunner/NUnit.Runners.2.6.4/tools/nunit-console.exe ./TrackerAssetUnitTests/bin/Release/TrackerAssetUnitTests.dll
