@@ -1,6 +1,4 @@
-﻿using AssetPackage;
-using SimpleJSON;
-using System;
+﻿using System;
 using System.IO;
 using uAdventure.Runner;
 using UnityEngine;
@@ -17,6 +15,7 @@ using System.Linq;
 using System.Collections;
 using Newtonsoft.Json;
 using uAdventure.Core;
+using Xasu.Auth.Protocols.OAuth2;
 
 namespace uAdventure.Simva
 {
@@ -33,7 +32,7 @@ namespace uAdventure.Simva
         private bool wasAutoSave;
         private bool firstTimeDisabling = true;
 
-        private AuthorizationInfo auth;
+        private OAuth2Token auth;
         private Schedule schedule;
         private SimvaApi<IStudentsApi> simvaController;
 
@@ -93,8 +92,6 @@ namespace uAdventure.Simva
                 return !string.IsNullOrEmpty(SimvaConf.Local.Study);
             }
         }
-
-        public SimvaBridge SimvaBridge { get; private set; }
 
         [Priority(10)]
         public override IEnumerator OnAfterGameLoad()
@@ -206,30 +203,30 @@ namespace uAdventure.Simva
             if (PlayerPrefs.HasKey("simva_auth"))
             {
                 NotifyLoading(true);
-                this.auth = JsonConvert.DeserializeObject<AuthorizationInfo>(PlayerPrefs.GetString("simva_auth"));
+                this.auth = JsonConvert.DeserializeObject<OAuth2Token>(PlayerPrefs.GetString("simva_auth"));
                 this.auth.ClientId = "uadventure";
                 SimvaApi<IStudentsApi>.Login(this.auth)
                     .Then(simvaController =>
-                {
-                    this.auth = simvaController.AuthorizationInfo;
-                    this.simvaController = simvaController;
-                    return UpdateSchedule();
-                })
-                .Then(schedule =>
-                {
-                    var result = new AsyncCompletionSource();
-                    StartCoroutine(AsyncCoroutine(LaunchActivity(schedule.Next), result));
-                    return result;
-                })
-                .Catch(error =>
-                {
-                    NotifyLoading(false);
-                    NotifyManagers(error.Message);
-                })
-                .Finally(() =>
-                {
-                    OpenIdUtility.tokenLogin = false;
-                });
+                    {
+                        this.auth = simvaController.AuthorizationInfo;
+                        this.simvaController = simvaController;
+                        return UpdateSchedule();
+                    })
+                    .Then(schedule =>
+                    {
+                        var result = new AsyncCompletionSource();
+                        StartCoroutine(AsyncCoroutine(LaunchActivity(schedule.Next), result));
+                        return result;
+                    })
+                    .Catch(error =>
+                    {
+                        NotifyLoading(false);
+                        NotifyManagers(error.Message);
+                    })
+                    .Finally(() =>
+                    {
+                        OpenIdUtility.tokenLogin = false;
+                    });
 
             }
             else if (HasLoginInfo())
