@@ -4,7 +4,8 @@ using System.Collections.Generic;
 using uAdventure.Core;
 using UnityEngine.EventSystems;
 using System.Linq;
-using AssetPackage;
+using Xasu;
+using Xasu.HighLevel;
 
 namespace uAdventure.Runner
 {
@@ -769,9 +770,9 @@ namespace uAdventure.Runner
                         || (movieplayer == MovieState.PLAYING && !movie.isPlaying())
                         || videoscene.isCanSkip())
                     {
-                        if (movieplayer == MovieState.PLAYING && TrackerAsset.Instance.Started)
+                        if (movieplayer == MovieState.PLAYING && XasuTracker.Instance.Status.State != TrackerState.Uninitialized)
                         {
-                            TrackerAsset.Instance.Accessible.Skipped(SceneData.getId(), AccessibleTracker.Accessible.Cutscene);
+                            AccessibleTracker.Instance.Skipped(SceneData.getId(), AccessibleTracker.AccessibleType.Cutscene);
                         }
                         movie.Stop();
                         movieplayer = MovieState.STOPPED;

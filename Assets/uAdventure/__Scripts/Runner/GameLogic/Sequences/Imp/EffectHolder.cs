@@ -5,7 +5,8 @@ using System.Xml;
 
 using uAdventure.Core;
 using UnityEngine.EventSystems;
-using AssetPackage;
+using Xasu;
+using Xasu.HighLevel;
 
 namespace uAdventure.Runner
 {
@@ -84,9 +85,9 @@ namespace uAdventure.Runner
                                 {
                                     Game.Instance.Talk(((SpeakCharEffect)effect).getLine(), ((SpeakCharEffect)effect).getTargetId());
                                 }
-                                if (TrackerAsset.Instance.Started)
+                                if (XasuTracker.Instance.Status.State != TrackerState.Uninitialized)
                                 {
-                                    TrackerAsset.Instance.Completable.Initialized(effect.GUID, CompletableTracker.Completable.DialogFragment);
+                                    CompletableTracker.Instance.Initialized(effect.GUID, CompletableTracker.CompletableType.DialogFragment);
                                 }
                                 forceWait = true;
                             }
@@ -95,14 +96,14 @@ namespace uAdventure.Runner
                                 if (GUIManager.Instance.InteractWithDialogue() == InteractuableResult.REQUIRES_MORE_INTERACTION)
                                 {
                                     forceWait = true;
-                                    if (TrackerAsset.Instance.Started)
+                                    if (XasuTracker.Instance.Status.State != TrackerState.Uninitialized)
                                     {
-                                        TrackerAsset.Instance.Completable.Progressed(effect.GUID, CompletableTracker.Completable.DialogFragment, 1f);
+                                        CompletableTracker.Instance.Progressed(effect.GUID, CompletableTracker.CompletableType.DialogFragment, 1f);
                                     }
                                 }
-                                else if(TrackerAsset.Instance.Started)
+                                else if(XasuTracker.Instance.Status.State != TrackerState.Uninitialized)
                                 {
-                                    TrackerAsset.Instance.Completable.Completed(effect.GUID, CompletableTracker.Completable.DialogFragment);
+                                    CompletableTracker.Instance.Completed(effect.GUID, CompletableTracker.CompletableType.DialogFragment);
                                 }
                             }
                             break;

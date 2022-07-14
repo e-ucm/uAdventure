@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
-using AssetPackage;
 using uAdventure.Runner;
+using Xasu;
 
 namespace uAdventure.Geo
 {
@@ -220,14 +220,14 @@ namespace uAdventure.Geo
                 geochar = FindObjectOfType<GeoPositionedCharacter>();
             }
 
-            if (timeSinceLastPositionUpdate > timeToFlush && TrackerAsset.Instance.Active)
+            if (timeSinceLastPositionUpdate > timeToFlush && XasuTracker.Instance.Status.State != TrackerState.Uninitialized)
             {
                 timeSinceLastPositionUpdate = 0;
 
                 if (IsStarted() || UsingDebugLocation || geochar)
                 {
                     var mapScene = Game.Instance.CurrentTargetRunner.Data as MapScene;
-                    TrackerExtension.Movement.Moved(mapScene != null ? mapScene.Id : "World", Location);
+                    MovementTracker.Instance.Moved(mapScene != null ? mapScene.Id : "World", Location);
                 }
             }
 

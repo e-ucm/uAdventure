@@ -3,8 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 
 using uAdventure.Core;
-using AssetPackage;
 using System.Linq;
+using Xasu.HighLevel;
+using Xasu;
+using Xasu.Util;
 
 namespace uAdventure.Runner
 {
@@ -24,7 +26,7 @@ namespace uAdventure.Runner
         private string xAPIQuestion;
         private string xAPIResponse;
         private bool xAPISuccess;
-        private TrackerAsset.TrackerEvent trace;
+        private StatementPromise trace;
         private float startTime;
 
         public bool TracePending { get { return isTracePending; } }
@@ -70,14 +72,14 @@ namespace uAdventure.Runner
                         if (GUIManager.Instance.InteractWithDialogue() == InteractuableResult.REQUIRES_MORE_INTERACTION)
                         {
                             forcewait = true;
-                            if (TrackerAsset.Instance.Started)
+                            if (XasuTracker.Instance.Status.State != TrackerState.Uninitialized)
                             {
-                                TrackerAsset.Instance.Completable.Progressed(initializedDialogNode, CompletableTracker.Completable.DialogFragment, 1f);
+                                CompletableTracker.Instance.Progressed(initializedDialogNode, CompletableTracker.CompletableType.DialogFragment, 1f);
                             }
                         }
-                        else if(TrackerAsset.Instance.Started)
+                        else if(XasuTracker.Instance.Status.State != TrackerState.Uninitialized)
                         {
-                            TrackerAsset.Instance.Completable.Completed(initializedDialogNode, CompletableTracker.Completable.DialogFragment);
+                            CompletableTracker.Instance.Completed(initializedDialogNode, CompletableTracker.CompletableType.DialogFragment);
                         }
                     }
 
@@ -89,9 +91,9 @@ namespace uAdventure.Runner
                             forcewait = true;
                             Game.Instance.Talk(l);
                             initializedDialogNode = conversation.getId() + "." + nodeIndex + "." + current_line;
-                            if (TrackerAsset.Instance.Started)
+                            if (XasuTracker.Instance.Status.State != TrackerState.Uninitialized)
                             {
-                                TrackerAsset.Instance.Completable.Initialized(initializedDialogNode, CompletableTracker.Completable.DialogFragment);
+                                CompletableTracker.Instance.Initialized(initializedDialogNode, CompletableTracker.CompletableType.DialogFragment);
                             }
                         }
                         current_line++;
@@ -147,17 +149,17 @@ namespace uAdventure.Runner
                 return;
             }
 
-            if (TrackerAsset.Instance.Started && !string.IsNullOrEmpty(onode.getXApiQuestion()))
+            if (XasuTracker.Instance.Status.State != TrackerState.Uninitialized && !string.IsNullOrEmpty(onode.getXApiQuestion()))
             {
                 holder.EndTracePending();
                 isTracePending = true;
                 xAPISuccess = onode.getLine(option).getXApiCorrect();
                 xAPIQuestion = onode.getXApiQuestion();
                 xAPIResponse = onode.getLine(option).getText().Replace(",", " ");
-                trace = TrackerAsset.Instance.Alternative.Selected(xAPIQuestion, xAPIResponse, AlternativeTracker.Alternative.Question);
+                trace = AlternativeTracker.Instance.Selected(xAPIQuestion, xAPIResponse, AlternativeTracker.AlternativeType.Question);
                 Game.Instance.GameState.BeginChangeAmbit(trace);
-                trace.Result.Duration = Time.realtimeSinceStartup - startTime;
-                trace.SetPartial();
+                trace.Statement.result.duration = System.TimeSpan.FromSeconds(Time.realtimeSinceStartup - startTime);
+                trace.Statement.SetPartial();
                 Game.Instance.OnActionCanceled += ActionCancelled;
             }
         }
@@ -170,9 +172,9 @@ namespace uAdventure.Runner
             }
 
             isTracePending = false;
-            TrackerAsset.Instance.setSuccess(xAPISuccess);
+            trace.WithSuccess(xAPISuccess);
             Game.Instance.GameState.EndChangeAmbitAsExtensions(trace);
-            trace.Completed();
+            trace.Statement.Complete();
             Game.Instance.OnActionCanceled -= ActionCancelled;
         }
 
@@ -218,8 +220,10 @@ namespace uAdventure.Runner
             if (current == null)
             {
                 current = nodes[0];
-                if (TrackerAsset.Instance.Started)
-                    TrackerAsset.Instance.Completable.Initialized(conversation.getId(), CompletableTracker.Completable.DialogNode);
+                if (XasuTracker.Instance.Status.State != TrackerState.Uninitialized)
+                {
+                    CompletableTracker.Instance.Initialized(conversation.getId(), CompletableTracker.CompletableType.DialogNode);
+                }
             }
 
             while (!forcewait)
@@ -248,8 +252,10 @@ namespace uAdventure.Runner
                         // When the conversation is over if there's a
                         // pending node, we end it
                         EndTracePending();
-                        if (TrackerAsset.Instance.Started)
-                            TrackerAsset.Instance.Completable.Completed(conversation.getId(), CompletableTracker.Completable.DialogNode);
+                        if (XasuTracker.Instance.Status.State != TrackerState.Uninitialized)
+                        {
+                            CompletableTracker.Instance.Completed(conversation.getId(), CompletableTracker.CompletableType.DialogNode);
+                        }
                         break;
                     }
                 }

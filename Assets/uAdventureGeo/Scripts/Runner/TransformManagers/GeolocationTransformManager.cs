@@ -1,8 +1,8 @@
-﻿using AssetPackage;
-using MapzenGo.Helpers;
+﻿using MapzenGo.Helpers;
 using System.Collections.Generic;
 using uAdventure.Runner;
 using UnityEngine;
+using Xasu;
 using static uAdventure.Geo.GeoElementMB;
 
 namespace uAdventure.Geo
@@ -154,11 +154,11 @@ namespace uAdventure.Geo
 #if UNITY_ANDROID || UNITY_IOS
                     Handheld.Vibrate();
 #endif
-                    if (TrackerAsset.Instance.Started)
+                    if (XasuTracker.Instance.Status.State != TrackerState.Uninitialized)
                     {
                         // TODO change this after: https://github.com/e-ucm/unity-tracker/issues/29
-                        TrackerAsset.Instance.setVar("geo_element_" + positioner.Element.getId(), 1);
-                        TrackerExtension.Movement.Moved(Game.Instance.GameState.CurrentTarget, GeoExtension.Instance.Location);
+                        MovementTracker.Instance.Moved(Game.Instance.GameState.CurrentTarget, GeoExtension.Instance.Location)
+                            .WithResultExtensions(new Dictionary<string, object> { { "geo_element_" + positioner.Element.getId(), 1 } });
                     }
                 }
                 if (hint)

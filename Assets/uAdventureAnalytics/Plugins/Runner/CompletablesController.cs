@@ -5,10 +5,11 @@ using uAdventure.Core;
 using System.Linq;
 using uAdventure.Runner;
 using System.Collections;
-using AssetPackage;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
-using System;
+using Xasu;
+using Xasu.HighLevel;
+using Xasu.Util;
 
 namespace uAdventure.Analytics
 {
@@ -19,9 +20,7 @@ namespace uAdventure.Analytics
         private List<CompletableController> controllers = new List<CompletableController>();
         [System.NonSerialized]
         private List<Completable> completables;
-        private TrackerAsset.TrackerEvent trace;
-        private Element element;
-        private Core.Action action;
+        private StatementPromise trace;
 
         public CompletablesController()
         {
@@ -189,10 +188,9 @@ namespace uAdventure.Analytics
 
         public void TargetChanged(IChapterTarget target)
         {
-            if (TrackerAsset.Instance.Started && !string.IsNullOrEmpty(target.getXApiClass()) && target.getXApiClass() == "accesible")
+            if (XasuTracker.Instance.Status.State != TrackerState.Uninitialized && !string.IsNullOrEmpty(target.getXApiClass()) && target.getXApiClass() == "accesible")
             {
-                TrackerAsset.Instance.Accessible.Accessed(target.getId(), ExParsers.ParseEnum<AccessibleTracker.Accessible>(target.getXApiType()));
-                TrackerAsset.Instance.Flush();
+                AccessibleTracker.Instance.Accessed(target.getId(), ExParsers.ParseEnum<AccessibleTracker.AccessibleType>(target.getXApiType()));
             }
 
             UpdateCompletables(completableController => completableController.UpdateMilestones(target));
@@ -200,7 +198,7 @@ namespace uAdventure.Analytics
 
         public void ElementInteracted(bool finished, Element element, Core.Action action)
         {
-            if (element == null || !TrackerAsset.Instance.Started)
+            if (element == null || XasuTracker.Instance.Status.State == TrackerState.Uninitialized)
             {
                 return;
             }
@@ -214,21 +212,21 @@ namespace uAdventure.Analytics
 
                 if (element is NPC)
                 {
-                    trace = TrackerAsset.Instance.GameObject.Interacted(element.getId(), GameObjectTracker.TrackedGameObject.Npc);
+                    trace = GameObjectTracker.Instance.Interacted(element.getId(), GameObjectTracker.TrackedGameObject.Npc);
                 }
                 else if (element is Item)
                 {
-                    trace = TrackerAsset.Instance.GameObject.Interacted(element.getId(), GameObjectTracker.TrackedGameObject.Item);
+                    trace = GameObjectTracker.Instance.Interacted(element.getId(), GameObjectTracker.TrackedGameObject.Item);
                 }
                 else if (element is ActiveArea)
                 {
-                    trace = TrackerAsset.Instance.GameObject.Interacted(element.getId(), GameObjectTracker.TrackedGameObject.Item);
+                    trace = GameObjectTracker.Instance.Interacted(element.getId(), GameObjectTracker.TrackedGameObject.Item);
                 }
                 else
                 {
-                    trace = TrackerAsset.Instance.GameObject.Interacted(element.getId(), GameObjectTracker.TrackedGameObject.GameObject);
+                    trace = GameObjectTracker.Instance.Interacted(element.getId(), GameObjectTracker.TrackedGameObject.GameObject);
                 }
-                trace.SetPartial();
+                trace.Statement.SetPartial();
                 Game.Instance.GameState.BeginChangeAmbit(trace);
                 //Game.Instance.OnActionCanceled += ActionCanceled;
 
@@ -249,18 +247,19 @@ namespace uAdventure.Analytics
                     case Core.Action.USE: actionType = "use"; break;
                     case Core.Action.USE_WITH: actionType = "use_with"; break;
                 }
-
+                var extesions = new Dictionary<string, object>();
                 if (!string.IsNullOrEmpty(action.getTargetId()))
                 {
-                    TrackerAsset.Instance.setVar("action_target", action.getTargetId());
+                    extesions.Add("action_target", action.getTargetId());
                 }
                 if (!string.IsNullOrEmpty(actionType))
                 {
-                    TrackerAsset.Instance.setVar("action_type", actionType);
+                    extesions.Add("action_type", actionType);
                 }
+                trace.WithResultExtensions(extesions);
 
                 Game.Instance.GameState.EndChangeAmbitAsExtensions(trace);
-                trace.Completed();
+                trace.Statement.Complete();
                 trace = null;
             }
         }
@@ -301,46 +300,47 @@ namespace uAdventure.Analytics
 
         public void TrackStarted(CompletableController completableController)
         {
-            if (!TrackerAsset.Instance.Started)
+            if (XasuTracker.Instance.Status.State == TrackerState.Uninitialized)
             {
                 return;
             }
 
             var completableId = completableController.GetCompletable().getId();
-            var completableType = (CompletableTracker.Completable)completableController.GetCompletable().getType() - 1;
+            var completableType = (CompletableTracker.CompletableType)completableController.GetCompletable().getType() - 1;
 
-            TrackerAsset.Instance.Completable.Initialized(completableId, completableType);
-            TrackerAsset.Instance.Completable.Progressed(completableId, completableType, 0);
+            CompletableTracker.Instance.Initialized(completableId, completableType);
+            CompletableTracker.Instance.Progressed(completableId, completableType, 0);
         }
 
         public void TrackProgressed(CompletableController completableController)
         {
-            if (!TrackerAsset.Instance.Started)
+            if (XasuTracker.Instance.Status.State == TrackerState.Uninitialized)
             {
                 return;
             }
 
             var completableId = completableController.GetCompletable().getId();
-            var completableType = (CompletableTracker.Completable)completableController.GetCompletable().getType() - 1;
+            var completableType = (CompletableTracker.CompletableType)completableController.GetCompletable().getType() - 1;
             var completableProgress = completableController.Progress;
 
-            TrackerAsset.Instance.Completable.Progressed(completableId, completableType, completableProgress);
+            CompletableTracker.Instance.Progressed(completableId, completableType, completableProgress);
         }
 
 
         public void TrackCompleted(CompletableController completableController, System.TimeSpan timeElapsed)
         {
-            if (!TrackerAsset.Instance.Started)
+            if (XasuTracker.Instance.Status.State == TrackerState.Uninitialized)
             {
                 return;
             }
 
             var completableId = completableController.GetCompletable().getId();
-            var completableType = (CompletableTracker.Completable)completableController.GetCompletable().getType() - 1;
+            var completableType = (CompletableTracker.CompletableType)completableController.GetCompletable().getType() - 1;
             var completableScore = completableController.Score;
 
-            TrackerAsset.Instance.setVar("time", timeElapsed.TotalSeconds);
-            TrackerAsset.Instance.Completable.Completed(completableId, completableType, true, completableScore);
+            CompletableTracker.Instance.Completed(completableId, completableType)
+                .WithScore(completableScore)
+                .WithResultExtensions(new Dictionary<string, object> { { "time", timeElapsed.TotalSeconds } });
         }
 
 

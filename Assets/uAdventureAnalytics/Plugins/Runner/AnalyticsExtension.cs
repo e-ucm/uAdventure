@@ -1,8 +1,9 @@
-﻿using AssetPackage;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System.Collections;
 using uAdventure.Runner;
 using UnityEngine;
+using Xasu;
+using Xasu.Util;
 
 namespace uAdventure.Analytics
 {
@@ -97,14 +98,25 @@ namespace uAdventure.Analytics
         [Priority(1)]
         public override IEnumerator OnGameFinished()
         {
-            if (TrackerAsset.Instance.Active)
+
+            if (XasuTracker.Instance.Status.State == TrackerState.NetworkRequired || XasuTracker.Instance.Status.State == TrackerState.Fallback)
+            {
+                // TODO Remember the player to connect in order to flush everything
+            }
+
+            if (XasuTracker.Instance.Status.State == TrackerState.Normal)
             {
                 var flushed = false;
-                TrackerAsset.Instance.ForceCompleteTraces();
-                TrackerAsset.Instance.FlushAll(() => flushed = true);
+                PartialStatements.CompleteAllStatements();
+                XasuTracker.Instance.Flush()
+                    .ContinueWith(t =>
+                    {
+                        // TODO check if flush failed
+                        flushed = true;
+                    });
                 var time = Time.time;
                 yield return new WaitUntil(() => flushed);
-                TrackerAsset.Instance.Stop();
+                XasuTracker.Instance.Stop();
             }
         }
 
