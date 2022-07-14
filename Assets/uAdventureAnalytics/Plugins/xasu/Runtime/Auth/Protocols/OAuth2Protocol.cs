@@ -46,6 +46,8 @@ namespace Xasu.Auth.Protocols
         private PKCETypes codeChallengeMethod;
         private OAuth2Token token;
 
+        public OAuth2Token Token { get { return token; } }
+
         /* a ro no ma men
         private readonly string audienceField = "audience";
         private readonly string connectionField = "connection";

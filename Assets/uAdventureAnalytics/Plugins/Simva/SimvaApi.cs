@@ -10,6 +10,7 @@ using System.Linq;
 using System;
 using Simva;
 using Simva.Api;
+using Xasu.Auth.Protocols.OAuth2;
 
 namespace SimvaPlugin
 {
@@ -21,7 +22,7 @@ namespace SimvaPlugin
         public T Api { get; private set; }
         public ApiClient ApiClient { get; private set; }
 
-        public AuthorizationInfo AuthorizationInfo
+        public OAuth2Token AuthorizationInfo
         {
             get
             {
@@ -139,7 +140,7 @@ namespace SimvaPlugin
             return result;
         }
 
-        public static IAsyncOperation<SimvaApi<T>> Login(AuthorizationInfo authorization)
+        public static IAsyncOperation<SimvaApi<T>> Login(OAuth2Token authorization)
         {
             var apiClient = new ApiClient
             {

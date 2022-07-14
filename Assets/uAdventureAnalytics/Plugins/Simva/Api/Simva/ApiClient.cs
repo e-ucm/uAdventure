@@ -11,6 +11,11 @@ using UnityFx.Async;
 using UnityFx.Async.Promises;
 using UnityEngine;
 using UnityEngine.Networking;
+using Xasu.Auth.Protocols.OAuth2;
+using Xasu.Auth;
+using Xasu.Auth.Protocols;
+using Xasu.Requests;
+using System.Threading.Tasks;
 
 namespace Simva
 {
@@ -52,10 +57,12 @@ namespace Simva
         /// Gets or sets the base path.
         /// </summary>
         /// <value>The authorization path</value>
+        /// 
+        private OAuth2Protocol protocol;
 
-        private AuthorizationInfo auth;
+        private OAuth2Token auth;
 
-        public AuthorizationInfo AuthorizationInfo
+        public OAuth2Token AuthorizationInfo
         {
             get { return auth; }
             set
@@ -71,7 +78,7 @@ namespace Simva
             }
         }
 
-        public delegate void OnAuthorizationInfoUpdate(AuthorizationInfo info);
+        public delegate void OnAuthorizationInfoUpdate(OAuth2Token info);
         public OnAuthorizationInfoUpdate onAuthorizationInfoUpdate;
         public IAsyncOperation InitOAuth(string clientId, string clientSecret = null,
             string realm = null, string appName = null, string scopeSeparator = ":", bool usePKCE = false,
@@ -93,16 +100,28 @@ namespace Simva
 
             var done = new AsyncCompletionSource();
 
-            OpenIdUtility.LoginWithAccessCode(authUrl, tokenUrl, clientId, null, string.Join(scopeSeparator, scopes), usePKCE)
-                .Then(authInfo =>
+            var authorization = AuthManager.InitAuth("oauth2", new Dictionary<string, string>()
+            {
+                { "grant_type", "code" },
+                { "auth_endpoint", authUrl },
+                { "token_endpoint", tokenUrl },
+                { "client_id", clientId },
+                { "code_challenge_method", "S256" },
+                { "scope", string.Join(scopeSeparator, scopes) }
+            }, null);
+
+            authorization.ContinueWith(t =>
+            {
+                if (t.IsFaulted)
                 {
-                    AuthorizationInfo = authInfo;
-                    done.SetCompleted();
-                })
-                .Catch(error =>
-                {
-                    done.SetException(new ApiException(500, error.Message));
-                });
+                    done.SetException(t.Exception);
+                    return;
+                }
+
+                protocol = (OAuth2Protocol)t.Result;
+                AuthorizationInfo = protocol.Token;
+                done.SetCompleted();
+            }, TaskScheduler.FromCurrentSynchronizationContext());
 
             return done;
         }
@@ -126,22 +145,35 @@ namespace Simva
 			var authUrl = AuthPath ?? "https://sso.simva.e-ucm.es/auth/realms/simva/protocol/openid-connect/auth";
 
 			var done = new AsyncCompletionSource();
+            
+            var authorization = AuthManager.InitAuth("oauth2", new Dictionary<string, string>()
+            {
+                { "grant_type", "password" },
+                { "token_endpoint", tokenUrl },
+                { "client_id", clientId },
+                { "username", username },
+                { "password", password },
+                { "code_challenge_method", "S256" },
+                { "scope", string.Join(scopeSeparator, scopes) }
+            }, null);
 
-			OpenIdUtility.LoginWithROPC(username, password, authUrl, tokenUrl, clientId, null, string.Join(scopeSeparator, scopes))
-				.Then(authInfo =>
-				{
-					AuthorizationInfo = authInfo;
-					done.SetCompleted();
-				})
-				.Catch(error =>
-				{
-					done.SetException(new ApiException(500, error.Message));
-				});
+            authorization.ContinueWith(t =>
+            {
+                if (t.IsFaulted)
+                {
+                    done.SetException(t.Exception);
+                    return;
+                }
+
+                protocol = (OAuth2Protocol)t.Result;
+                AuthorizationInfo = protocol.Token;
+                done.SetCompleted();
+            }, TaskScheduler.FromCurrentSynchronizationContext());
 
 			return done;
 		}
 
-		public IAsyncOperation InitOAuth(AuthorizationInfo authorizationInfo)
+		public IAsyncOperation InitOAuth(OAuth2Token authorizationInfo)
         {
             var scopes = new string[] { };
 
@@ -152,16 +184,25 @@ namespace Simva
 
 			try
 			{
-                OpenIdUtility.RefreshTokenAsync(tokenUrl, authorizationInfo.ClientId, authorizationInfo.RefreshToken)
-                    .Then(authInfo =>
+                var authorization = AuthManager.InitAuth("oauth2", new Dictionary<string, string>()
+                {
+                    { "grant_type", "refresh_token" },
+                    { "token_endpoint", tokenUrl },
+                    { "client_id", authorizationInfo.ClientId }
+                }, null);
+
+                authorization.ContinueWith(t =>
+                {
+                    if (t.IsFaulted)
                     {
-                        AuthorizationInfo = authInfo;
-                        done.SetCompleted();
-                    })
-                    .Catch(ex =>
-                    {
-                        done.SetException(ex);
-                    });
+                        done.SetException(t.Exception);
+                        return;
+                    }
+
+                    protocol = (OAuth2Protocol)t.Result;
+                    AuthorizationInfo = protocol.Token;
+                    done.SetCompleted();
+                }, TaskScheduler.FromCurrentSynchronizationContext());
 			}
             catch(ApiException ex)
             {
@@ -180,7 +221,8 @@ namespace Simva
 
             var done = new AsyncCompletionSource();
 
-            try
+            throw new NotSupportedException("WebGL not yet compatible");
+            /*try
             {
                 OpenIdUtility.TryContinueLogin(tokenUrl, clientId)
                     .Then(authInfo =>
@@ -192,7 +234,7 @@ namespace Simva
             catch (ApiException ex)
             {
                 done.SetException(new ApiException(ex.ErrorCode, "Failed to renew AuthorizationInfo: " + ex.Message));
-            }
+            }*/
 
             return done;
         }
@@ -241,7 +283,7 @@ namespace Simva
                     throw new ApiException(500, "Method not available: " + method);
             }
 
-            UpdateParamsForAuth(queryParams, headerParams, authSettings, true)
+            UpdateParamsForAuth(queryParams, headerParams)
                 .Then(() =>
                 {
                     // add default header, if any
@@ -436,68 +478,30 @@ namespace Simva
         /// <param name="queryParams">Query parameters.</param>
         /// <param name="headerParams">Header parameters.</param>
         /// <param name="authSettings">Authentication settings.</param>
-        public IAsyncOperation UpdateParamsForAuth(Dictionary<String, String> queryParams, Dictionary<String, String> headerParams, string[] authSettings, bool async)
+        public IAsyncOperation UpdateParamsForAuth(Dictionary<String, String> queryParams, Dictionary<String, String> headerParams)
         {
             var result = new AsyncCompletionSource();
 
-            if (authSettings == null || authSettings.Length == 0)
+            var myHttpRequest = new MyHttpRequest
             {
-                result.SetCompleted();
-                return result;
-            }
+                queryParams = queryParams,
+                headers = headerParams
+            };
 
-            foreach (string auth in authSettings)
-            {
-                // determine which one to use
-                switch(auth)
+            protocol.UpdateParamsForAuth(myHttpRequest)
+                .ContinueWith(t =>
                 {
-                    case "OAuth2":
-                        
-                        if(AuthorizationInfo == null)
-                        {
-                            result.SetException(new ApiException(500, "OAuth not inited, please init the authorization in ApiClient with InitOauth or set up the AuthorizationInfo!"));
-                            return result;
-                        }
-                        var tokenUrl = TokenPath ?? "https://sso.simva.e-ucm.es/auth/realms/simva/protocol/openid-connect/token";
-                        Action addAuthAndComplete = () => 
-                        {
-                            var tokenType = AuthorizationInfo.TokenType.First().ToString().ToUpper() + AuthorizationInfo.TokenType.Substring(1);
-                            headerParams.Add("Authorization", tokenType + " " + AuthorizationInfo.AccessToken);
-                            result.SetCompleted();
-                        };
-                        if (AuthorizationInfo.Expired)
-                        {
-                            if (async || Application.platform == RuntimePlatform.WebGLPlayer)
-                            {
-                                OpenIdUtility.RefreshTokenAsync(tokenUrl, AuthorizationInfo.ClientId, AuthorizationInfo.RefreshToken)
-                                    .Then(authInfo =>
-                                    {
-                                        AuthorizationInfo = authInfo;
-                                        addAuthAndComplete();
-                                    })
-                                    .Catch(ex =>
-                                    {
-                                        result.SetException(ex);
-                                    });
-                            }
-                            else
-                            {
-                                AuthorizationInfo = OpenIdUtility.RefreshToken(tokenUrl, AuthorizationInfo.ClientId, AuthorizationInfo.RefreshToken);
-                                addAuthAndComplete();
-                            }
-                        }
-                        else
-                        {
-                            addAuthAndComplete();
-                        }
-                                                
-                        break;
-                    default:
-                        //TODO show warning about security definition not found
-                        result.SetCompleted();
-                        break;
-                }
-            }
+                    if (t.IsFaulted)
+                    {
+                        result.SetException(t.Exception);
+                        return;
+                    }
+
+                    result.SetCompleted();
+                }, TaskScheduler.FromCurrentSynchronizationContext());
+
+
+            AuthorizationInfo = protocol.Token;
 
             return result;
         }
