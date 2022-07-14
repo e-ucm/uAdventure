@@ -271,6 +271,7 @@ namespace Xasu
                 throw new ArgumentNullException("Statement must be different than null!");
             }
 
+            statement.SetPoolExtensions();
             AddDefaultsToTrace(statement);
 
             // When all processors are done we notify the listener
