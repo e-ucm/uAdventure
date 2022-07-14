@@ -913,5 +913,17 @@ namespace uAdventure.Editor
                 }
             } 
         }
+
+        public bool AllowsZoom
+        {
+            get { return scene.AllowsZoom; }
+            set
+            {
+                if (value != scene.AllowsZoom)
+                {
+                    controller.AddTool(new ChangeBooleanValueTool(scene, value, "AllowsZoom"));
+                }
+            }
+        }
     }
 }

@@ -651,5 +651,21 @@ namespace uAdventure.Editor
 
             return descriptionController;
         }
+
+
+        //v1.4
+        public void setBehaviour(Item.BehaviourType behaviour)
+        {
+            if (behaviour != npc.getBehaviour())
+            {
+                Controller.Instance.AddTool(new ChangeIntegerValueTool(npc, (int)behaviour, "getBehaviourInteger", "setBehaviourInteger"));
+                Controller.Instance.DataModified();
+            }
+        }
+
+        public Item.BehaviourType getBehaviour()
+        {
+            return npc.getBehaviour();
+        }
     }
 }

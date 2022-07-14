@@ -63,9 +63,14 @@ namespace uAdventure.Core
         private bool initialScene;
 
         /**
-         * Stores if the scene should be loaded at the begining
+         * Stores if the scene should hide the inventory
          */
         private bool hideInventory;
+
+        /**
+         * Stores if the scene should allow the player to zoom in
+         */
+        private bool allowsZoom;
 
         /**
          * Stores if the user can save in the scene or not
@@ -82,6 +87,19 @@ namespace uAdventure.Core
             set
             {
                 hideInventory = value;
+            }
+        }
+
+        public bool AllowsZoom
+        {
+            get
+            {
+                return allowsZoom;
+            }
+
+            set
+            {
+                allowsZoom = value;
             }
         }
 

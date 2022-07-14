@@ -328,12 +328,16 @@ namespace uAdventure.Runner
                 }
                 else
                 {
-                    m.MoveFreely(position, observer, data =>
+                    Action<object> endMovement = data =>
                     {
                         EffectHolderNode tmp = (EffectHolderNode)data;
                         tmp.doPulse();
-                        Game.Instance.ContinueEffectExecution();
-                    }, null);
+                        if (!Game.Instance.IsRunningInBackground(tmp))
+                        {
+                            Game.Instance.ContinueEffectExecution();
+                        }
+                    };
+                    m.MoveFreely(position, observer, data => endMovement(data), data => endMovement(data));
                 }
             }else
             {

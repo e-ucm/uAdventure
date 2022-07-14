@@ -31,6 +31,12 @@ namespace uAdventure.Core
         private Orientation orientation;
 
         /**
+         * Orientation of the referenced element
+         */
+        [SerializeField]
+        private bool glow;
+
+        /**
          * Documentation of the element reference.
          */
         [SerializeField]
@@ -42,6 +48,7 @@ namespace uAdventure.Core
             this.idTarget = idTarget;
             this.conditions = new Conditions();
             this.orientation = Orientation.S;
+            this.glow = false;
         }
 
         public string TargetId
@@ -73,6 +80,13 @@ namespace uAdventure.Core
             get { return orientation; }
             set { this.orientation = value; }
         }
+
+        public bool Glow
+        {
+            get { return glow; }
+            set { this.glow = value; }
+        }
+
 
         public string getDocumentation()
         {

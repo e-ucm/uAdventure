@@ -45,6 +45,7 @@ namespace uAdventure.Core
 			string sceneId = element.GetAttribute("id");
 			bool initialScene = ExString.EqualsDefault(element.GetAttribute("start"), "yes", false);
             bool hideInventory = ExString.EqualsDefault(element.GetAttribute("hideInventory"), "yes", false);
+            bool allowsZoom = ExString.EqualsDefault(element.GetAttribute("allowsZoom"), "yes", false);
             bool allowsSavingGame = ExString.EqualsDefault(element.GetAttribute("allowsSavingGame"), "yes", true);
             int playerLayer = ExParsers.ParseDefault (element.GetAttribute("playerLayer"), -1);
 			float playerScale = ExParsers.ParseDefault (element.GetAttribute("playerScale"), CultureInfo.InvariantCulture, 1.0f);
@@ -52,7 +53,8 @@ namespace uAdventure.Core
 
             scene = new Scene(sceneId)
             {
-                HideInventory = hideInventory
+                HideInventory = hideInventory,
+                AllowsZoom = allowsZoom
             };
             scene.setPlayerLayer(playerLayer);
             scene.setPlayerScale(playerScale);
@@ -278,6 +280,7 @@ namespace uAdventure.Core
 
             float scale = ExParsers.ParseDefault (element.GetAttribute("scale"), CultureInfo.InvariantCulture, 0f);
 			int layer = ExParsers.ParseDefault (element.GetAttribute("layer"), -1);
+            bool glow = ExString.Default(element.GetAttribute("glow"), "yes").Equals("yes", System.StringComparison.InvariantCultureIgnoreCase);
 
 			int influenceX 		= ExParsers.ParseDefault (element.GetAttribute("influenceX"), 0), 
 				influenceY 		= ExParsers.ParseDefault (element.GetAttribute("influenceY"), 0), 
@@ -288,7 +291,8 @@ namespace uAdventure.Core
 
 			var currentElementReference = new ElementReference(idTarget, x, y, layer);
             currentElementReference.Orientation = orientation;
-			if (hasInfluence)
+            currentElementReference.Glow = glow;
+            if (hasInfluence)
 			{
 				InfluenceArea influenceArea = new InfluenceArea(influenceX, influenceY, influenceWidth, influenceHeight);
 				currentElementReference.setInfluenceArea(influenceArea);

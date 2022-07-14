@@ -13,6 +13,7 @@ namespace uAdventure.Simva
         private Color endColor;
         private Color endBackgroundColor;
         private Color endBorder;
+        public bool onlyFlushAndBackup;
 
         public FlushAllScene() : base("Simva.FlushAll")
         {
