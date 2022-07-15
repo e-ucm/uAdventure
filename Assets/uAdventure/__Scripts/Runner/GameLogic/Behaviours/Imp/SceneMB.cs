@@ -52,6 +52,7 @@ namespace uAdventure.Runner
         private Dictionary<ScenePositioner, float> heights;
         private SortedList<ScenePositioner, float> finalOrder;
         private bool wasDisabled;
+        private EffectHolder finishingEffects;
 
         // Movements
         private float minZ;
@@ -860,12 +861,13 @@ namespace uAdventure.Runner
                     break;
                 case GeneralScene.GeneralSceneSceneType.VIDEOSCENE:
                     var videoscene = (Videoscene)SceneData;
+                    res = InteractuableResult.REQUIRES_MORE_INTERACTION;
                     if (movieplayer == MovieState.NOT_MOVIE
                         || movieplayer == MovieState.STOPPED
                         || (movieplayer == MovieState.PLAYING && !movie.isPlaying())
                         || videoscene.isCanSkip())
                     {
-                        if (movieplayer == MovieState.PLAYING && TrackerAsset.Instance.Started)
+                        if (movieplayer == MovieState.PLAYING && TrackerAsset.Instance.Started && videoscene.isCanSkip())
                         {
                             TrackerAsset.Instance.Accessible.Skipped(SceneData.getId(), AccessibleTracker.Accessible.Cutscene);
                         }
@@ -884,42 +886,55 @@ namespace uAdventure.Runner
             InteractuableResult res = InteractuableResult.DOES_SOMETHING;
             TriggerSceneEffect triggerScene = null;
 
-            switch ((cutscene).getNext())
+            if(finishingEffects == null)
             {
-                default: // By default Cutscene.GOBACK
-                    var previousTarget = Game.Instance.GameState.PreviousChapterTarget;
-                    if (previousTarget == null)
-                    {
-                        var possibleTargets = Game.Instance.GameState.GetObjects<IChapterTarget>();
-                        previousTarget = possibleTargets.FirstOrDefault(t => t.getId() != this.SceneData.getId());
-                    }
-                    if(previousTarget != null)
-                    {
-                        triggerScene = new TriggerSceneEffect(previousTarget.getId(), int.MinValue, int.MinValue, 
-                            float.MinValue, cutscene.getTransitionTime(), (int)cutscene.getTransitionType());
-                    }
-                    break;
-                case Cutscene.NEWSCENE:
-                    triggerScene = new TriggerSceneEffect(cutscene.getTargetId(), int.MinValue, int.MinValue,
-                        float.MinValue, cutscene.getTransitionTime(), (int)cutscene.getTransitionType());
-                    break;
-                case Cutscene.ENDCHAPTER:
-                    // TODO: When we add more chapters, we must trigger the next chapter instead of quiting que aplication
-                    Game.Instance.ActionCanceled();
-                    Simva.SimvaExtension.Instance.OnGameCompleted();
-                    break;
-            }
-
-            if (triggerScene != null)
-            {
-                var effects = new Effects { triggerScene };
-                var cutsceneEffects = cutscene.getEffects();
-                if (cutsceneEffects != null)
+                switch ((cutscene).getNext())
                 {
-                    effects.AddRange(cutsceneEffects);
+                    default: // By default Cutscene.GOBACK
+                        var previousTarget = Game.Instance.GameState.PreviousChapterTarget;
+                        if (previousTarget == null)
+                        {
+                            var possibleTargets = Game.Instance.GameState.GetObjects<IChapterTarget>();
+                            previousTarget = possibleTargets.FirstOrDefault(t => t.getId() != this.SceneData.getId());
+                        }
+                        if (previousTarget != null)
+                        {
+                            triggerScene = new TriggerSceneEffect(previousTarget.getId(), int.MinValue, int.MinValue,
+                                float.MinValue, cutscene.getTransitionTime(), (int)cutscene.getTransitionType());
+                        }
+                        break;
+                    case Cutscene.NEWSCENE:
+                        triggerScene = new TriggerSceneEffect(cutscene.getTargetId(), int.MinValue, int.MinValue,
+                            float.MinValue, cutscene.getTransitionTime(), (int)cutscene.getTransitionType());
+                        break;
+                    case Cutscene.ENDCHAPTER:
+                        // TODO: When we add more chapters, we must trigger the next chapter instead of quiting que aplication
+                        Game.Instance.Quit();
+                        break;
                 }
 
-                Game.Instance.Execute(new EffectHolder(effects));
+                if (triggerScene != null)
+                {
+                    var effects = new Effects { triggerScene };
+                    var cutsceneEffects = cutscene.getEffects();
+                    if (cutsceneEffects != null)
+                    {
+                        effects.AddRange(cutsceneEffects);
+                    }
+                    finishingEffects = new EffectHolder(effects);
+                }
+            }
+            
+            if(finishingEffects != null)
+            {
+                if (finishingEffects.execute())
+                {
+                    res = InteractuableResult.REQUIRES_MORE_INTERACTION;
+                }
+                else
+                {
+                    res = InteractuableResult.IGNORES;
+                }
             }
 
             return res;
