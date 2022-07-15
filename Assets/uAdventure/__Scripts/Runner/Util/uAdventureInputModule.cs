@@ -144,6 +144,8 @@ namespace uAdventure.Runner
         {
             var mouseData = GetMousePointerEventData(id);
             var leftButtonData = mouseData.GetButtonState(PointerEventData.InputButton.Left).eventData;
+            var rightButtonData = mouseData.GetButtonState(PointerEventData.InputButton.Right).eventData;
+            var middleButtonData = mouseData.GetButtonState(PointerEventData.InputButton.Middle).eventData;
 
             // Process the first mouse button fully
             ProcessMousePress(leftButtonData);
@@ -151,10 +153,10 @@ namespace uAdventure.Runner
             ProcessDrag(leftButtonData.buttonData);
 
             // Now process right / middle clicks
-            ProcessMousePress(mouseData.GetButtonState(PointerEventData.InputButton.Right).eventData);
-            ProcessDrag(mouseData.GetButtonState(PointerEventData.InputButton.Right).eventData.buttonData);
-            ProcessMousePress(mouseData.GetButtonState(PointerEventData.InputButton.Middle).eventData);
-            ProcessDrag(mouseData.GetButtonState(PointerEventData.InputButton.Middle).eventData.buttonData);
+            ProcessMousePress(rightButtonData);
+            ProcessDrag(rightButtonData.buttonData);
+            ProcessMousePress(middleButtonData);
+            ProcessDrag(middleButtonData.buttonData);
 
             if (!Mathf.Approximately(leftButtonData.buttonData.scrollDelta.sqrMagnitude, 0.0f))
             {

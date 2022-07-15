@@ -3723,7 +3723,7 @@ namespace uAdventure.Editor
         {
             SimvaApi<StudentsApi>.LoginWithToken("myiq").Then(api =>
             {
-                api.Api.GetSchedule("6046a0f7c34511006e84f53d")
+                api.Api.GetSchedule(SimvaConf.Local.Study)
                 .Then(schedule =>
                 {
                     var act = schedule.Activities.First(a => a.Value.Name == "Gameplay");

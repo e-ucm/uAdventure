@@ -552,10 +552,6 @@ namespace uAdventure.Simva
                             Debug.Log("[SIMVA] Starting Gameplay...");
                             RestoreAutoSave();
                             Game.Instance.RunTarget(savedGameTarget, this);
-                            if(Game.Instance.GameState.CheckFlag("DisclaimerEnabled") == FlagCondition.FLAG_ACTIVE)
-                            {
-                                Game.Instance.GameState.SetFlag("SeeingDisclaimer", FlagCondition.FLAG_ACTIVE);
-                            }
                             break;
                     }
                 }

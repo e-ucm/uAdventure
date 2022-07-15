@@ -168,7 +168,7 @@ namespace Simva
             }
             else */
             
-            if (Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.WindowsPlayer)
+            /*if (Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.WindowsPlayer)
             {
                 windowProcess = new System.Diagnostics.Process();
                 if (tokenLogin)
@@ -193,7 +193,7 @@ namespace Simva
                     windowProcess = null;
                 }
             }
-            else if (Application.platform == RuntimePlatform.WebGLPlayer)
+            else */if (Application.platform == RuntimePlatform.WebGLPlayer)
             {
 #if UNITY_WEBGL
                 OpenUrl(url);

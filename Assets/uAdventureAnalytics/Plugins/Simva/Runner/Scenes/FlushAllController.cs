@@ -19,7 +19,7 @@ namespace uAdventure.Simva
         private bool ready;
         public Text trackerStatusText;
 
-        public object Data { get { return null; } set { } }
+        public object Data { get; set; }
 
         public bool IsReady { get { return ready; } }
 
@@ -32,7 +32,14 @@ namespace uAdventure.Simva
             SimvaExtension.Instance.NotifyLoading(true);
             this.transform.GetChild(0).gameObject.SetActive(true);
             InventoryManager.Instance.Show = false;
-            StartCoroutine(FinishTracker());
+            if((Data as FlushAllScene).onlyFlushAndBackup)
+            {
+                StartCoroutine(FlushTracker());
+            }
+            else
+            {
+                StartCoroutine(FinishTracker());
+            }
             ready = true;
         }
 
@@ -41,6 +48,15 @@ namespace uAdventure.Simva
             yield return AnalyticsExtension.Instance.OnGameFinished();
             SimvaExtension.Instance.AfterFlush();
         } 
+
+        private IEnumerator FlushTracker()
+        {
+            var flushed = false;
+            TrackerAsset.Instance.ForceCompleteTraces();
+            TrackerAsset.Instance.FlushAll(() => flushed = true);
+            yield return new WaitUntil(() => flushed);
+            SimvaExtension.Instance.AfterFlush();
+        }
 
         public void Destroy(float time, Action onDestroy)
         {
@@ -64,7 +80,7 @@ namespace uAdventure.Simva
 
         private void Update()
         {
-            if (!trackerStatusText || !trackerStatusText.IsActive())
+            if (!trackerStatusText || !trackerStatusText.isActiveAndEnabled)
             {
                 return;
             }
@@ -72,7 +88,7 @@ namespace uAdventure.Simva
             string text = "";
             foreach(var kv in TrackerAsset.Instance.GetTrackerStatus())
             {
-                text += kv.Key + ": " + kv.Value; 
+                text += kv.Key + ": " + kv.Value + " \n "; 
             }
             trackerStatusText.text = text;
         }
