@@ -375,6 +375,7 @@ namespace uAdventure.Runner
                     movie = Game.Instance.ResourceManager.getVideo(((Videoscene)SceneData).getResources()[0].getAssetPath(Videoscene.RESOURCE_TYPE_VIDEO));
                     movieplayer = MovieState.LOADING;
                     SetBackground(movie.Movie);
+                    ready = true;
                     break;
                 case GeneralScene.GeneralSceneSceneType.SCENE:
                     Scene scene = (Scene)SceneData;

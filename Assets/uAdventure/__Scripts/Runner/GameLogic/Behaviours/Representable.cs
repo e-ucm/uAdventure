@@ -211,6 +211,11 @@ namespace uAdventure.Runner
 
         public void Adaptate()
         {
+            if(rend == null)
+            {
+                rend = this.GetComponent<Renderer>();
+            }
+
             if (texture)
             {
                 rend.material.mainTexture = texture;

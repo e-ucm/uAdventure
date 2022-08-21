@@ -331,7 +331,7 @@ namespace uAdventure.Analytics
 
                 // Recursive cases (calculated based on subscores)
                 case Completable.Score.ScoreMethod.AVERAGE:
-                    score = completableScore.getSubScores().Average(s => CalculateScore(s));
+                    score = completableScore.getSubScores().Count > 0 ? completableScore.getSubScores().Average(s => CalculateScore(s)) : 1;
                     break;
                 case Completable.Score.ScoreMethod.SUM:
                     score = completableScore.getSubScores().Sum(s => CalculateScore(s));

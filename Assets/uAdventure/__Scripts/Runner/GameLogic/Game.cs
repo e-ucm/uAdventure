@@ -440,6 +440,7 @@ namespace uAdventure.Runner
                 catch (System.Exception ex)
                 {
                     Debug.LogError("Interacted execution exception: " + ex.Message + ex.StackTrace);
+                    Debug.LogException(ex);
                 }
 
                 if (requiresMore && !actionCanceled)
@@ -496,6 +497,7 @@ namespace uAdventure.Runner
                     catch (System.Exception ex)
                     {
                         Debug.Log("Execution OnFinished execution exception: " + ex.Message);
+                        Debug.LogException(ex);
                         if (actionCanceled)
                         {
                             executeStack.Clear();
