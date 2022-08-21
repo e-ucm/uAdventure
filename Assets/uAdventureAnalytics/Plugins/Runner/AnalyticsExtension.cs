@@ -10,22 +10,6 @@ namespace uAdventure.Analytics
 {
     public class AnalyticsExtension : GameExtension
     {
-
-        //#################################################################
-        //########################### SINGLETON ###########################
-        //#################################################################
-        #region Singleton
-        static AnalyticsExtension instance;
-
-        public static AnalyticsExtension Instance
-        {
-            get
-            {
-                return instance;
-            }
-        }
-        #endregion Singleton
-
         //##################################################################
         //########################### CONTROLLER ###########################
         //##################################################################
@@ -39,10 +23,10 @@ namespace uAdventure.Analytics
         public string User { get; set; }
         public string Password { get; set; }
 
-        protected void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             AutoStart = true;
-            instance = this;
         }
 
         public void Init()

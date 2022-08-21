@@ -263,6 +263,7 @@ namespace uAdventure.Geo
         // Abstract class
         private abstract class AbstractGeoActionManager : IGeoActionManager
         {
+            private GeoExtension geoExtension;
             public GMLGeometry Geometry { get; set; }
             public GeoPositionedCharacter Player { get; set; }
             public GameObject Holder { get; set; }
@@ -270,7 +271,7 @@ namespace uAdventure.Geo
             public GeoAction Action { get; set; }
             public abstract Type ActionType { get; }
 
-            public virtual void Start() { }
+            public virtual void Start() { geoExtension = GameExtension.GetInstance<GeoExtension>(); }
 
             public virtual void Update()
             {
@@ -298,7 +299,7 @@ namespace uAdventure.Geo
             {
                 get
                 {
-                    return GeoExtension.Instance.Location;
+                    return geoExtension.Location;
                 }
             }
 

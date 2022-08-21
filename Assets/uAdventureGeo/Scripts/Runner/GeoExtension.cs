@@ -7,14 +7,6 @@ namespace uAdventure.Geo
 {
     public class GeoExtension : GameExtension {
 
-        private static GeoExtension instance;
-        public static GeoExtension Instance {
-            get
-            {
-                return instance;
-            }
-        }
-
         public bool UsingDebugLocation
         {
             get { return memory.Get<bool>("using_debug_location"); }
@@ -62,12 +54,6 @@ namespace uAdventure.Geo
         private Texture2D pointer;
         private bool gameIsReady;
         private bool checkTargetRegistered;
-
-        void Awake()
-        {
-            instance = this;
-            //StartCoroutine(Restart());
-        }
 
         public void Start()
         {

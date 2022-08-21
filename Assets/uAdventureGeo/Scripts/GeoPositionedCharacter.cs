@@ -3,6 +3,7 @@ using MapzenGo.Models;
 using UnityStandardAssets.Characters.ThirdPerson;
 using MapzenGo.Helpers;
 using uAdventure.Geo;
+using uAdventure.Runner;
 
 public class GeoPositionedCharacter : MonoBehaviour
 {
@@ -11,6 +12,7 @@ public class GeoPositionedCharacter : MonoBehaviour
     public ThirdPersonCharacter thirdPersonCharacter;
     public SimpleSampleCharacterControl alternativeCharacter;
     public float minDistanceToWalk = 5; // 2 meters
+    private GeoExtension geoExtension;
 
     public void MoveTo(Vector2d latLon)
     {
@@ -50,6 +52,7 @@ public class GeoPositionedCharacter : MonoBehaviour
     void Start()
     {
         Input.compass.enabled = true;
+        geoExtension = GameExtension.GetInstance<GeoExtension>();
     }
 
     private Vector3 lastPos = Vector3.zero;
@@ -67,14 +70,14 @@ public class GeoPositionedCharacter : MonoBehaviour
                 Vector3.ClampMagnitude(new Vector3((float)destinationMeters.x, 0, (float)destinationMeters.y),
                     minDistanceToWalk * 3) / (minDistanceToWalk * 3), false, false);
         }
-        else if ((!Application.isMobilePlatform || PreviewManager.Instance.InPreviewMode) && !GeoExtension.Instance.IsStarted()
+        else if ((!Application.isMobilePlatform || PreviewManager.Instance.InPreviewMode) && !geoExtension.IsStarted()
             && (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0))// Debug GPS location
         {
             var movement = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
             thirdPersonCharacter.Move(movement, false, false);
             if (movement.sqrMagnitude > 0)
             {
-                GeoExtension.Instance.Location = GM.MetersToLatLon(transform.localPosition.ToVector2xz().ToVector2d() + tileManagerRelative);
+                geoExtension.Location = GM.MetersToLatLon(transform.localPosition.ToVector2xz().ToVector2d() + tileManagerRelative);
             }
         }
         else if (lastPos == transform.position) // It is not moving at all
