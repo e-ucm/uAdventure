@@ -536,7 +536,7 @@ namespace uAdventure.Geo
             {
                 if (XasuTracker.Instance.Status.State != TrackerState.Uninitialized)
                 {
-                    trace.WithResultExtensions(new Dictionary<string, object> { { "geocommand", "inspect" } });
+                    trace.WithResultExtensions(new Dictionary<string, object> { { "https://beaconing.e-ucm.es/xapi/geolocated/extensions/geocommand", "inspect" } });
                     Game.Instance.GameState.EndChangeAmbitAsExtensions(trace);
                     trace.Statement.Complete();
                 }

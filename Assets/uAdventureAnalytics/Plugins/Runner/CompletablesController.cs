@@ -250,11 +250,11 @@ namespace uAdventure.Analytics
                 var extesions = new Dictionary<string, object>();
                 if (!string.IsNullOrEmpty(action.getTargetId()))
                 {
-                    extesions.Add("action_target", action.getTargetId());
+                    extesions.Add("https://w3id.org/xapi/seriousgames/extensions/action_target", action.getTargetId());
                 }
                 if (!string.IsNullOrEmpty(actionType))
                 {
-                    extesions.Add("action_type", actionType);
+                    extesions.Add("https://w3id.org/xapi/seriousgames/extensions/action_type", actionType);
                 }
                 trace.WithResultExtensions(extesions);
 
@@ -340,7 +340,7 @@ namespace uAdventure.Analytics
 
             CompletableTracker.Instance.Completed(completableId, completableType)
                 .WithScore(completableScore)
-                .WithResultExtensions(new Dictionary<string, object> { { "time", timeElapsed.TotalSeconds } });
+                .WithResultExtensions(new Dictionary<string, object> { { "http://id.tincanapi.com/extension/time", timeElapsed.TotalSeconds } });
         }
 
 

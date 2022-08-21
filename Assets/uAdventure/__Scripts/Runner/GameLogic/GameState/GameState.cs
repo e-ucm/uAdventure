@@ -167,6 +167,11 @@ namespace uAdventure.Runner
             }
         }
 
+        private string GetGameRelativeUri(string name)
+        {
+            return data.getApplicationIdentifier() + "://" + name;
+        }
+
         private void InitPlayerContext()
         {
             var scene = GetChapterTarget(CurrentTarget) as Scene;
@@ -209,15 +214,16 @@ namespace uAdventure.Runner
             varFlags["flag_" + name] = state;
             bool bstate = state == FlagCondition.FLAG_ACTIVE;
             int intVal = bstate ? 1 : 0;
+            var nameUri = GetGameRelativeUri(name);
 
             // TODO check this after this: https://github.com/e-ucm/unity-tracker/issues/29
             if (varFlagChangeAmbits.Count > 0)
             {
-                varFlagChangeAmbits.Peek().Add(new KeyValuePair<string, int>(name, intVal));
+                varFlagChangeAmbits.Peek().Add(new KeyValuePair<string, int>(nameUri, intVal));
             }
             else
             {
-                ExtensionsPool.AddResultExtension(name, intVal);
+                ExtensionsPool.AddResultExtension(nameUri, intVal);
             }
             TimerController.Instance.CheckTimers();
             if (OnConditionChanged != null)
@@ -240,14 +246,15 @@ namespace uAdventure.Runner
         public void SetVariable(string name, int value)
         {
             varFlags["var_" + name] = value;
+            var nameUri = GetGameRelativeUri(name);
 
             if (varFlagChangeAmbits.Count > 0)
             {
-                varFlagChangeAmbits.Peek().Add(new KeyValuePair<string, int>(name, value));
+                varFlagChangeAmbits.Peek().Add(new KeyValuePair<string, int>(nameUri, value));
             }
             else
             {
-                ExtensionsPool.AddResultExtension(name, value);
+                ExtensionsPool.AddResultExtension(nameUri, value);
             }
 
             if (OnConditionChanged != null)
