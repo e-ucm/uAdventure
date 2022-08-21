@@ -171,7 +171,7 @@ namespace uAdventure.Analytics
 
                 Online = config.getStorageType() == TrackerConfig.StorageType.NET,
                 Fallback = true,
-                LRSEndpoint = config.getHost(),
+                LRSEndpoint = config.getHost() + config.getTrackEndpoint(),
 
                 Offline = config.getStorageType() == TrackerConfig.StorageType.LOCAL,
                 TraceFormat = Xasu.Config.TraceFormats.XAPI,

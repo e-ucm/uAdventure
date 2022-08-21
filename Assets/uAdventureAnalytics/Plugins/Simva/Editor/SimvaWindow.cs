@@ -1,4 +1,4 @@
-﻿using SimpleJSON;
+﻿using Newtonsoft.Json.Linq;
 using Simva;
 using Simva.Api;
 using Simva.Model;
@@ -20,6 +20,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityFx.Async;
 using UnityFx.Async.Promises;
+using Xasu.Auth.Protocols.OAuth2;
 
 namespace uAdventure.Simva
 {
@@ -93,11 +94,7 @@ namespace uAdventure.Simva
                 IAsyncOperation<SimvaApi<ITeachersApi>> loginCall = null;
                 if (ProjectConfigData.existsKey("Simva.RefreshToken"))
                 {
-                    loginCall = SimvaApi<ITeachersApi>.Login(new AuthorizationInfo
-                    {
-                        ClientId = "uadventure",
-                        RefreshToken = ProjectConfigData.getProperty("Simva.RefreshToken") 
-                    });
+                    loginCall = SimvaApi<ITeachersApi>.Login(ProjectConfigData.getProperty("Simva.RefreshToken"));
                 }
                 else
                 {
@@ -109,11 +106,7 @@ namespace uAdventure.Simva
                     this.simvaController = simvaController;
                     this.simvaConf = simvaController.SimvaConf;
                     var apiClient = ((TeachersApi)this.simvaController.Api).ApiClient;
-                    apiClient.onAuthorizationInfoUpdate += auth =>
-                    {
-                        ProjectConfigData.setProperty("Simva.RefreshToken", auth.RefreshToken);
-                    };
-                    ProjectConfigData.setProperty("Simva.RefreshToken", apiClient.AuthorizationInfo.RefreshToken);
+                    apiClient.Authorization.RegisterAuthInfoUpdate(auth => ProjectConfigData.setProperty("Simva.RefreshToken", auth.RefreshToken));
                     ProjectConfigData.storeToXML();
                 })
                     .Catch(error =>
@@ -226,7 +219,7 @@ namespace uAdventure.Simva
                 if (GUILayout.Button("Create"))
                 {
                     EditorUtility.DisplayProgressBar("Simva.Study.Creation.Title", "Simva.Study.Creation.Info", 0);
-                    JSONNode creationData = null;
+                    JObject creationData = null;
                     var createStudy = simvaController.CreateStudyWithTestAndUsers("uAdventure", "uAdventure", DateTime.Now.ToString("dd-M-yyyy"), participants)
                     .Then(result => creationData = result);
 
@@ -241,7 +234,7 @@ namespace uAdventure.Simva
                         EditorUtility.DisplayProgressBar("Simva.Study.Creation.Title", "Simva.Study.Activities.PreSurvey", 0.25f);
                         createStudy = createStudy.Then(() =>
                         {
-                            return simvaController.Api.AddActivityToTest(creationData["studyId"], creationData["testId"], new Activity
+                            return simvaController.Api.AddActivityToTest(creationData["studyId"].Value<string>(), creationData["testId"].Value<string>(), new Activity
                             {
                                 Name = "PreTest",
                                 Type = "limesurvey",
@@ -254,7 +247,7 @@ namespace uAdventure.Simva
                     {
                         EditorUtility.DisplayProgressBar("Simva.Study.Creation.Title", "Simva.Study.Activities.Gameplay", 0.50f);
 
-                        return simvaController.Api.AddActivityToTest(creationData["studyId"], creationData["testId"], new Activity
+                        return simvaController.Api.AddActivityToTest(creationData["studyId"].Value<string>(), creationData["testId"].Value<string>(), new Activity
                         {
                             Name = "Gameplay",
                             Type = "gameplay",
@@ -269,7 +262,7 @@ namespace uAdventure.Simva
                         createStudy = createStudy.Then(() =>
                         {
                             EditorUtility.DisplayProgressBar("Simva.Study.Creation.Title", "Simva.Study.Activities.PostSurvey", 0.75f);
-                            return simvaController.Api.AddActivityToTest(creationData["studyId"], creationData["testId"], new Activity
+                            return simvaController.Api.AddActivityToTest(creationData["studyId"].Value<string>(), creationData["testId"].Value<string>(), new Activity
                             {
                                 Name = "PostTest",
                                 Type = "limesurvey",
@@ -281,7 +274,7 @@ namespace uAdventure.Simva
                     createStudy.Then(() =>
                     {
                         EditorUtility.DisplayProgressBar("Simva.Study.Creation.Title", "Simva.Study.Activities.Completing", 0.99f);
-                        return simvaController.Api.GetStudy(creationData["studyId"]);
+                        return simvaController.Api.GetStudy(creationData["studyId"].Value<string>());
                     })
                     .Then(study =>
                     {
@@ -437,11 +430,7 @@ namespace uAdventure.Simva
                                     {
                                         this.simvaController = simvaController;
                                         var apiClient = ((TeachersApi)this.simvaController.Api).ApiClient;
-                                        apiClient.onAuthorizationInfoUpdate += auth =>
-                                        {
-                                            ProjectConfigData.setProperty("Simva.RefreshToken", auth.RefreshToken);
-                                        };
-                                        ProjectConfigData.setProperty("Simva.RefreshToken", apiClient.AuthorizationInfo.RefreshToken);
+                                        apiClient.Authorization.RegisterAuthInfoUpdate(auth => ProjectConfigData.setProperty("Simva.RefreshToken", auth.RefreshToken));
                                         ProjectConfigData.storeToXML();
                                     }
                                 })
@@ -516,11 +505,7 @@ namespace uAdventure.Simva
                                 {
                                     this.simvaController = simvaController;
                                     var apiClient = ((TeachersApi)this.simvaController.Api).ApiClient;
-                                    apiClient.onAuthorizationInfoUpdate += auth =>
-                                    {
-                                        ProjectConfigData.setProperty("Simva.RefreshToken", auth.RefreshToken);
-                                    };
-                                    ProjectConfigData.setProperty("Simva.RefreshToken", apiClient.AuthorizationInfo.RefreshToken);
+                                    apiClient.Authorization.RegisterAuthInfoUpdate(auth => ProjectConfigData.setProperty("Simva.RefreshToken", auth.RefreshToken));
                                     ProjectConfigData.storeToXML();
                                 }
                             })

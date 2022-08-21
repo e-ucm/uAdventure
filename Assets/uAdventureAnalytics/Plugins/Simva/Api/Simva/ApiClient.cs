@@ -57,29 +57,8 @@ namespace Simva
         /// Gets or sets the base path.
         /// </summary>
         /// <value>The authorization path</value>
-        /// 
-        private OAuth2Protocol protocol;
+        public OAuth2Protocol Authorization { get; private set; }
 
-        private OAuth2Token auth;
-
-        public OAuth2Token AuthorizationInfo
-        {
-            get { return auth; }
-            set
-            {
-                if (value != auth)
-                {
-                    auth = value;
-                    if(onAuthorizationInfoUpdate != null)
-                    {
-                        onAuthorizationInfoUpdate(value);
-                    }
-                }
-            }
-        }
-
-        public delegate void OnAuthorizationInfoUpdate(OAuth2Token info);
-        public OnAuthorizationInfoUpdate onAuthorizationInfoUpdate;
         public IAsyncOperation InitOAuth(string clientId, string clientSecret = null,
             string realm = null, string appName = null, string scopeSeparator = ":", bool usePKCE = false,
             Dictionary<string, string> aditionalQueryStringParams = null , bool scope_offline = false)
@@ -118,8 +97,7 @@ namespace Simva
                     return;
                 }
 
-                protocol = (OAuth2Protocol)t.Result;
-                AuthorizationInfo = protocol.Token;
+                Authorization = (OAuth2Protocol)t.Result;
                 done.SetCompleted();
             }, TaskScheduler.FromCurrentSynchronizationContext());
 
@@ -165,15 +143,14 @@ namespace Simva
                     return;
                 }
 
-                protocol = (OAuth2Protocol)t.Result;
-                AuthorizationInfo = protocol.Token;
+                Authorization = (OAuth2Protocol)t.Result;
                 done.SetCompleted();
             }, TaskScheduler.FromCurrentSynchronizationContext());
 
 			return done;
 		}
 
-		public IAsyncOperation InitOAuth(OAuth2Token authorizationInfo)
+		public IAsyncOperation InitOAuth(string refreshToken, string clientId)
         {
             var scopes = new string[] { };
 
@@ -188,7 +165,8 @@ namespace Simva
                 {
                     { "grant_type", "refresh_token" },
                     { "token_endpoint", tokenUrl },
-                    { "client_id", authorizationInfo.ClientId }
+                    { "client_id", clientId },
+                    { "refresh_token", refreshToken }
                 }, null);
 
                 authorization.ContinueWith(t =>
@@ -199,8 +177,7 @@ namespace Simva
                         return;
                     }
 
-                    protocol = (OAuth2Protocol)t.Result;
-                    AuthorizationInfo = protocol.Token;
+                    Authorization = (OAuth2Protocol)t.Result;
                     done.SetCompleted();
                 }, TaskScheduler.FromCurrentSynchronizationContext());
 			}
@@ -214,15 +191,15 @@ namespace Simva
 
         public IAsyncOperation ContinueOAuth(string clientId)
         {
+            throw new NotSupportedException("WebGL not yet compatible");
+            /*
             var scopes = new string[] { };
 
             var tokenUrl = TokenPath ?? "https://sso.simva.e-ucm.es/auth/realms/simva/protocol/openid-connect/token";
             var authUrl = AuthPath ?? "https://sso.simva.e-ucm.es/auth/realms/simva/protocol/openid-connect/auth";
 
             var done = new AsyncCompletionSource();
-
-            throw new NotSupportedException("WebGL not yet compatible");
-            /*try
+            try
             {
                 OpenIdUtility.TryContinueLogin(tokenUrl, clientId)
                     .Then(authInfo =>
@@ -234,9 +211,9 @@ namespace Simva
             catch (ApiException ex)
             {
                 done.SetException(new ApiException(ex.ErrorCode, "Failed to renew AuthorizationInfo: " + ex.Message));
-            }*/
+            }
 
-            return done;
+            return done;*/
         }
 
         /// <summary>
@@ -488,7 +465,7 @@ namespace Simva
                 headers = headerParams
             };
 
-            protocol.UpdateParamsForAuth(myHttpRequest)
+            Authorization.UpdateParamsForAuth(myHttpRequest)
                 .ContinueWith(t =>
                 {
                     if (t.IsFaulted)
@@ -499,9 +476,6 @@ namespace Simva
 
                     result.SetCompleted();
                 }, TaskScheduler.FromCurrentSynchronizationContext());
-
-
-            AuthorizationInfo = protocol.Token;
 
             return result;
         }

@@ -10,7 +10,7 @@ using System;
 using Simva;
 using Simva.Api;
 using Newtonsoft.Json.Linq;
-using Xasu.Auth.Protocols.OAuth2;
+using Xasu.Auth.Protocols;
 
 namespace SimvaPlugin
 {
@@ -22,7 +22,7 @@ namespace SimvaPlugin
         public T Api { get; private set; }
         public ApiClient ApiClient { get; private set; }
 
-        public OAuth2Token AuthorizationInfo
+        public OAuth2Protocol Authorization
         {
             get
             {
@@ -32,7 +32,7 @@ namespace SimvaPlugin
                 }
                 else
                 {
-                    return ApiClient.AuthorizationInfo;
+                    return ApiClient.Authorization;
                 }
             }
         }
@@ -140,7 +140,7 @@ namespace SimvaPlugin
             return result;
         }
 
-        public static IAsyncOperation<SimvaApi<T>> Login(OAuth2Token authorization)
+        public static IAsyncOperation<SimvaApi<T>> Login(string refresh_token)
         {
             var apiClient = new ApiClient
             {
@@ -150,7 +150,7 @@ namespace SimvaPlugin
             };
 
             var result = new AsyncCompletionSource<SimvaApi<T>>();
-            apiClient.InitOAuth(authorization).
+            apiClient.InitOAuth(refresh_token, SimvaConf.Local.ClientId).
                 Then(() =>
                 {
                     if (Inherits<T, IAdminsApi>())

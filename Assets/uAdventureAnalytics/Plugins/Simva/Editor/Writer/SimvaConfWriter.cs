@@ -1,4 +1,4 @@
-﻿using SimpleJSON;
+﻿using Newtonsoft.Json.Linq;
 using Simva;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,18 +11,19 @@ namespace uAdventure.Simva
     {
         public static void Write(this SimvaConf conf)
         {
-            JSONClass toWrite = new JSONClass();
+            JObject toWrite = new JObject
+            {
+                ["study"] = conf.Study,
+                ["host"] = conf.Host,
+                ["protocol"] = conf.Protocol,
+                ["port"] = conf.Port,
+                ["url"] = conf.URL,
+                ["trace_storage"] = conf.TraceStorage.ToString(),
+                ["backup"] = conf.Backup.ToString(),
+                ["realtime"] = conf.Realtime.ToString()
+            };
 
-            toWrite["study"] = conf.Study;
-            toWrite["host"] = conf.Host;
-            toWrite["protocol"] = conf.Protocol;
-            toWrite["port"] = conf.Port;
-            toWrite["url"] = conf.URL;
-            toWrite["trace_storage"] = conf.TraceStorage.ToString();
-            toWrite["backup"] = conf.Backup.ToString();
-            toWrite["realtime"] = conf.Realtime.ToString();
-
-            System.IO.File.WriteAllText(Application.streamingAssetsPath + "/simva.conf", toWrite.ToJSON(0));
+            System.IO.File.WriteAllText(Application.streamingAssetsPath + "/simva.conf", toWrite.ToString());
         }
     }
 }

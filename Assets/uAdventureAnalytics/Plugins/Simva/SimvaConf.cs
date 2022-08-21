@@ -84,21 +84,23 @@ namespace Simva
             {
                 Debug.Log("[SIMVA CONF] Simva.conf content: " + contents);
                 var simvaconf = JObject.Parse(contents);
-                Study = simvaconf["study"].Value<string>();
-                Host = simvaconf["host"].Value<string>();
-                Protocol = simvaconf["protocol"].Value<string>();
-                Port = simvaconf["port"].Value<string>();
-                SSO = simvaconf["sso"].Value<string>();
-                ClientId = simvaconf["client_id"].Value<string>();
-                TraceStorage = simvaconf["trace_storage"].Value<bool>();
-                Backup = simvaconf["backup"].Value<bool>();
-                Realtime = simvaconf["realtime"].Value<bool>();
+                Study = simvaconf.Value<string>("study");
+                Host = simvaconf.Value<string>("host");
+                Protocol = simvaconf.Value<string>("protocol");
+                Port = simvaconf.Value<string>("port");
+                SSO = simvaconf.Value<string>("sso");
+                ClientId = simvaconf.Value<string>("client_id");
+                TraceStorage = simvaconf.Value<bool>("trace_storage");
+                Backup = simvaconf.Value<bool>("backup");
+                Realtime = simvaconf.Value<bool>("realtime");
             }
         }
 
         private static UnityWebRequest GetReader()
         {
+#if UNITY_WEBPLAYER || UNITY_WEBGL || UNITY_ANDROID
             var FileName = "simva.conf";
+#endif
             UnityWebRequest reader = null;
             // Platform dependent StreamingAssets Load https://docs.unity3d.com/Manual/StreamingAssets.html
 #if UNITY_WEBPLAYER || UNITY_WEBGL
