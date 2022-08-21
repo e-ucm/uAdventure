@@ -1,10 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
-using System.Collections;
-
 using uAdventure.Core;
-using System.IO;
-using System.Windows.Forms;
 
 namespace uAdventure.Editor
 {

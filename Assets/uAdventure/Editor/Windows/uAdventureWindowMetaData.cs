@@ -16,9 +16,10 @@ namespace uAdventure.Editor
 		private SerializedObject serializedObject;
 		private SimpleMetaDataWindow simple;
 		private MultiMetaDataWindow multi;
-		private lomType metadata;
+        private Vector2 scroll;
+        public SerializedProperty property;
 
-		public static void OpenMetaDataWindow()
+        public static void OpenMetaDataWindow()
 		{
 			if (!Language.Initialized)
 				Language.Initialize();
@@ -43,7 +44,6 @@ namespace uAdventure.Editor
 					adventureMetadata = new lomType();
 					Controller.Instance.AdventureData.setImsCPMetadata(adventureMetadata);
 				}
-				metadata = wrapper.lom = adventureMetadata;
 				serializedObject.Update();
 			}
 			var lom = serializedObject.FindProperty("lom");
@@ -205,10 +205,6 @@ namespace uAdventure.Editor
 				listIcon = EditorGUIUtility.IconContent("align_horizontally_right");
 			}
 		}
-
-		private Vector2 scroll;
-		public SerializedProperty property;
-		private bool previousWasArray = false;
 
 		public void DrawProperty(int id, SerializedProperty property)
 		{

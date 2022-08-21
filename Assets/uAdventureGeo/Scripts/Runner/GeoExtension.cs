@@ -46,14 +46,17 @@ namespace uAdventure.Geo
 
         public float update = .1f; // 5 meters
         public float accuracy = 1; // 10 meters
-        private bool inMapScene = false;
-        private bool inZoneControl = false;
-        private bool hidden = false;
+        private bool gameIsReady;
+
+        // Obsolete Gui Map Parameters
+        /*private bool hidden = false;
         private GUIMap guiMap;
         private Rect debugWindowRect = new Rect(0, 0, 200, 200);
         private Texture2D pointer;
-        private bool gameIsReady;
+        private bool inMapScene = false;
+        private bool inZoneControl = false;
         private bool checkTargetRegistered;
+        */
 
         public void Start()
         {
@@ -66,7 +69,7 @@ namespace uAdventure.Geo
                 StartCoroutine(StartLocation());
             }
 
-            if (Application.isPlaying && !checkTargetRegistered)
+           /* if (Application.isPlaying && !checkTargetRegistered)
             {
                 Game.TargetChangedDelegate checkTarget = (newTarget) =>
                 {
@@ -79,7 +82,7 @@ namespace uAdventure.Geo
                 checkTargetRegistered = true;
             }
 
-            pointer = Resources.Load<Texture2D>("pointer");
+            pointer = Resources.Load<Texture2D>("pointer");*/
         }
 
         public override IEnumerator Restart()

@@ -14,8 +14,6 @@ namespace uAdventure.Editor
 
         //  private string oldName;
 
-        private Controller controller = Controller.Instance;
-
         private HasDescriptionSoundEnum type;
 
         protected static AssetInformation[] createAssetInfoArray()

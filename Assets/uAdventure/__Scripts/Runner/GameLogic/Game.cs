@@ -58,10 +58,9 @@ namespace uAdventure.Runner
         private ConversationNodeHolder guioptions;
         private float elapsedTime;
         private bool doTimeOut;
-        private Book openedBook;
         private BookDrawer bookDrawer;
         private List<GameExtension> gameExtensions;
-        private bool started;
+        //private bool started;
         private int pulsing = 0;
         private bool wasShowingInventory = false;
         private int loadedChapter = -1;
@@ -220,7 +219,7 @@ namespace uAdventure.Runner
         {
             Debug.Log("[START GAME] GameState Restart...");
             GameState.Restart();
-            started = true;
+            //started = true;
             Debug.Log("[START GAME] Game Resuming...");
             if (GameState.Data.isRestoreAfterOpen())
             {

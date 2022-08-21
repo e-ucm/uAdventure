@@ -3,12 +3,10 @@ using UnityEditor.Build;
 using UnityEditor.Callbacks;
 using UnityEditor.Build.Reporting;
 using WixSharp;
-using System.Windows.Forms;
 using WixSharp.CommonTasks;
 using System.IO;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.WSA;
 using System.Xml;
 using System.Xml.Linq;
 
@@ -184,8 +182,6 @@ namespace uAdventure.Simva
                     break;
 
                 // Linux
-                case BuildTarget.StandaloneLinux:
-                    break;
                 case BuildTarget.StandaloneLinux64:
                     break;
 

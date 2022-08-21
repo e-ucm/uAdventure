@@ -10,6 +10,7 @@ using UnityEngine;
 using MapzenGo.Models.Plugins;
 using System;
 using MapzenGo.Models.Factories;
+using UnityEngine.Networking;
 
 namespace MapzenGo.Models
 {
@@ -82,19 +83,21 @@ namespace MapzenGo.Models
             }
             else
             {
-                ObservableWWW.Get(url).Subscribe(
-                    success =>
-                    {
-                        var sr = File.CreateText(tilePath);
-                        sr.Write(success);
-                        sr.Close();
-                        ConstructTile(success, tile, finished);
-                    },
-                    error =>
-                    {
-                        Debug.Log(error);
-                        finished(false);
-                    });
+                var uwr = UnityWebRequest.Get(url);
+                yield return uwr.SendWebRequest();
+
+                if (uwr.isHttpError || uwr.isNetworkError)
+                {
+                    Debug.LogError(uwr.error);
+                    finished(false);
+                }
+                else
+                {
+                    var sr = File.CreateText(tilePath);
+                    sr.Write(uwr.downloadHandler.text);
+                    sr.Close();
+                    ConstructTile(uwr.downloadHandler.text, tile, finished);
+                }
             }
 
             yield return null;

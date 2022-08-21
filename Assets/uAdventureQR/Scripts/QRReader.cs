@@ -278,8 +278,6 @@ namespace dZine4D.Misc.QR
             }
         }
 
-
-        private int tries = 0;
         public void SwitchDevice()
         {
             StartCoroutine(SwitchDeviceRoutine());

@@ -21,6 +21,7 @@ using uAdventure.Core.Metadata;
 using SimvaPlugin;
 using Simva.Api;
 using UnityFx.Async.Promises;
+using UnityEngine.Networking;
 
 namespace uAdventure.Editor
 {
@@ -2190,29 +2191,29 @@ namespace uAdventure.Editor
             var projectPath = Directory.GetCurrentDirectory().Replace("\\", "/");
             var downloadPath = projectPath + folderName;
 
-            using (WWW www = new WWW(url))
+            using (var uwr = UnityWebRequest.Get(url))
             {
-                while (!www.isDone)
+                uwr.SendWebRequest();
+                while (!uwr.isDone)
                 {
-                    if (EditorUtility.DisplayCancelableProgressBar("Downloading", "Downloading "+ name + "...", www.progress))
+                    if (EditorUtility.DisplayCancelableProgressBar("Downloading", "Downloading "+ name + "...", uwr.downloadProgress))
                     {
                         EditorUtility.ClearProgressBar();
                         ready(false);
                         return;
                     }
-                    www.MoveNext();
                 }
                 EditorUtility.ClearProgressBar();
 
-                if (!string.IsNullOrEmpty(www.error))
+                if (!string.IsNullOrEmpty(uwr.error))
                 {
                     EditorUtility.DisplayDialog("Error!", "Download failed! Check your connection and try again. " +
-                        "If the problem persist download it manually and put it in the " + folderName +" folder at the root of the project. (" + www.error + ")", "Ok");
+                        "If the problem persist download it manually and put it in the " + folderName +" folder at the root of the project. (" + uwr.error + ")", "Ok");
                     ready(false);
                     return;
                 }
 
-                if (www.progress != 1f)
+                if (uwr.downloadProgress != 1f)
                 {
                     ready(false);
                     return;
@@ -2225,7 +2226,7 @@ namespace uAdventure.Editor
                     Directory.CreateDirectory(downloadPath);
                 }
 
-                File.WriteAllBytes(downloadPath + "/" + downloadFileName, www.bytes);
+                File.WriteAllBytes(downloadPath + "/" + downloadFileName, uwr.downloadHandler.data);
                 // Unzip it
                 EditorUtility.DisplayProgressBar("Extracting...", "Extracting " + name + " to " + downloadPath, 0f);
                 //ZipUtil.Unzip(downloadPath + "/" + downloadFileName, downloadPath);

@@ -5,7 +5,7 @@ using uAdventure.Editor;
 using UnityEditor;
 using QRCoder;
 using System.IO;
-using System.Windows.Forms;
+//using System.Windows.Forms;
 //using System.Drawing.Printing;
 using uAdventure.Core;
 

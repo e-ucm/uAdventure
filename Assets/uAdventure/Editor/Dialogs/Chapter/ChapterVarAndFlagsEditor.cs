@@ -73,11 +73,8 @@ namespace uAdventure.Editor
 			window.Show();
 		}
 
-        bool inited = false;
-
         public void OnEnable()
         {
-            inited = false;
 			if(!flagsTex)
 				flagsTex = (Texture2D)Resources.Load("EAdventureData/img/icons/flag16", typeof(Texture2D));
 			if(!varTex)
@@ -162,13 +159,6 @@ namespace uAdventure.Editor
             {
                 return;
             }
-            // Initialization
-            /*if ((!inited || varFlagSummary != Controller.Instance.VarFlagSummary) && Controller.Instance.Loaded)
-            {
-                RefreshList();
-                inited = true;
-                varFlagSummary = Controller.Instance.VarFlagSummary;
-            }*/
 
             varFlagSummary = Controller.Instance.VarFlagSummary;
             RefreshList();

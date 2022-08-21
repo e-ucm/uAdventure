@@ -275,7 +275,6 @@ namespace uAdventure.Editor
                 sceneList.DoList(160);
 
             }
-            private bool inited = false;
 
             protected override void DrawPreviewHeader()
             {

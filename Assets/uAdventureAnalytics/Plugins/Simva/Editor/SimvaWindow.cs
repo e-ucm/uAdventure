@@ -459,7 +459,7 @@ namespace uAdventure.Simva
                 }
 
                 return;
-
+                /*
                 // Username field
                 registerUser = EditorGUILayout.TextField("Username", registerUser);
                 // Password field
@@ -474,31 +474,31 @@ namespace uAdventure.Simva
                     if (GUILayout.Button("Create account") && ValidateRegister())
                     {
                         isLogin = true;
-                        //var randomUser = GenerateRandomBase58Key(32);
-                        /*SimvaApi<ITeachersApi>.Register(registerUser, email, registerPassword, true)
-                            .Then(registered =>
+                    //var randomUser = GenerateRandomBase58Key(32);
+                    SimvaApi<ITeachersApi>.Register(registerUser, email, registerPassword, true)
+                        .Then(registered =>
+                        {
+                            return registered ? SimvaApi<ITeachersApi>.LoginWithCredentials(registerUser, registerPassword) : null;
+                        })
+                        .Then(simvaController =>
+                        {
+                            if (simvaController != null)
                             {
-                                return registered ? SimvaApi<ITeachersApi>.LoginWithCredentials(registerUser, registerPassword) : null;
-                            })
-                            .Then(simvaController =>
-                            {
-                                if (simvaController != null)
+                                this.simvaController = simvaController;
+                                var apiClient = ((TeachersApi)this.simvaController.Api).ApiClient;
+                                apiClient.onAuthorizationInfoUpdate += auth =>
                                 {
-                                    this.simvaController = simvaController;
-                                    var apiClient = ((TeachersApi)this.simvaController.Api).ApiClient;
-                                    apiClient.onAuthorizationInfoUpdate += auth =>
-                                    {
-                                        ProjectConfigData.setProperty("Simva.RefreshToken", auth.RefreshToken);
-                                    };
-                                    ProjectConfigData.setProperty("Simva.RefreshToken", apiClient.AuthorizationInfo.RefreshToken);
-                                    ProjectConfigData.storeToXML();
-                                }
-                            })
-                            .Catch(error =>
-                            {
-                                Controller.Instance.ShowErrorDialog("Simva.Register.Failed.Title", "Simva.Register.Failed.Message");
-                            })
-                            .Finally(() => isLogin = false);*/
+                                    ProjectConfigData.setProperty("Simva.RefreshToken", auth.RefreshToken);
+                                };
+                                ProjectConfigData.setProperty("Simva.RefreshToken", apiClient.AuthorizationInfo.RefreshToken);
+                                ProjectConfigData.storeToXML();
+                            }
+                        })
+                        .Catch(error =>
+                        {
+                            Controller.Instance.ShowErrorDialog("Simva.Register.Failed.Title", "Simva.Register.Failed.Message");
+                        })
+                        .Finally(() => isLogin = false);
                     }
                 }
 
@@ -532,7 +532,7 @@ namespace uAdventure.Simva
                             {
                                 isLogin = false;
                             });
-                }
+                }*/
             });
         }
 

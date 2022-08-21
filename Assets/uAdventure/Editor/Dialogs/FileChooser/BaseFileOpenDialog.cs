@@ -1,9 +1,5 @@
-﻿using UnityEngine;
-using UnityEditor;
-using System.Collections;
+﻿using UnityEditor;
 using System.IO;
-using System.Windows.Forms;
-using Screen = UnityEngine.Screen;
 using uAdventure.Core;
 
 namespace uAdventure.Editor
@@ -85,7 +81,6 @@ namespace uAdventure.Editor
                     return AssetsConstants.CATEGORY_ARROW_BOOK;
                 case FileType.CURSOR:
                     return AssetsConstants.CATEGORY_CURSOR;
-                    break;
                 case FileType.BUTTON:
                 case FileType.BUTTON_OVER:
                     return AssetsConstants.CATEGORY_BUTTON;

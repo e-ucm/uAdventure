@@ -7,8 +7,6 @@ namespace uAdventure.Editor
 {
     public class SelectButtonTool : SelectResourceTool
     {
-        private static readonly string AUDIO = "audio";
-
         protected AdventureData adventureData;
 
         protected string type;

@@ -27,7 +27,6 @@ namespace uAdventure.Runner
 
         private int inventoryType = DescriptorData.INVENTORY_ICON_FREEPOS;
         private bool opened = false;
-        private bool hidden = false;
 
         public int InventoryType 
         { 
