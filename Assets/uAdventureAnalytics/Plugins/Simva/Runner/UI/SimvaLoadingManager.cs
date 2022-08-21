@@ -1,4 +1,5 @@
-﻿using uAdventure.Simva;
+﻿using uAdventure.Runner;
+using uAdventure.Simva;
 using UnityEngine;
 
 namespace Simva
@@ -10,12 +11,12 @@ namespace Simva
 
         protected void Start()
         {
-            SimvaExtension.Instance.AddLoadingManager(this);
+            GameExtension.GetInstance<SimvaExtension>().AddLoadingManager(this);
         }
 
         protected void OnDestroy()
         {
-            SimvaExtension.Instance.RemoveLoadingManager(this);
+            GameExtension.GetInstance<SimvaExtension>().RemoveLoadingManager(this);
         }
 
         public void IsLoading(bool state)

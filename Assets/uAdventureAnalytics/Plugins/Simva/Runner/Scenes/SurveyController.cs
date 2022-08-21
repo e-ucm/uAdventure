@@ -20,20 +20,21 @@ namespace uAdventure.Simva
 
         public void OpenSurvey()
         {
-            SimvaExtension.Instance.NotifyLoading(true);
-            string activityId = SimvaExtension.Instance.CurrentActivityId;
-            string username = SimvaExtension.Instance.API.AuthorizationInfo.Username;
-            SimvaExtension.Instance.API.Api.GetActivityTarget(activityId)
+            var simvaExtension = GameExtension.GetInstance<SimvaExtension>();
+            simvaExtension.NotifyLoading(true);
+            string activityId = simvaExtension.CurrentActivityId;
+            string username = simvaExtension.API.Authorization.Agent.name;
+            simvaExtension.API.Api.GetActivityTarget(activityId)
                 .Then(result =>
                 {
-                    SimvaExtension.Instance.NotifyLoading(false);
+                    simvaExtension.NotifyLoading(false);
                     surveyOpened = true;
                     Application.OpenURL(result[username]);
                 })
                 .Catch(error =>
                 {
-                    SimvaExtension.Instance.NotifyManagers(error.Message);
-                    SimvaExtension.Instance.NotifyLoading(false);
+                    simvaExtension.NotifyManagers(error.Message);
+                    simvaExtension.NotifyLoading(false);
                 });
         }
 
@@ -48,20 +49,21 @@ namespace uAdventure.Simva
 
         public void CheckSurvey()
         {
-            SimvaExtension.Instance.NotifyLoading(true);
-            string activityId = SimvaExtension.Instance.CurrentActivityId;
-            string username = SimvaExtension.Instance.API.AuthorizationInfo.Username;
-            SimvaExtension.Instance.API.Api.GetCompletion(activityId, username)
+            var simvaExtension = GameExtension.GetInstance<SimvaExtension>();
+            simvaExtension.NotifyLoading(true);
+            string activityId = simvaExtension.CurrentActivityId;
+            string username = simvaExtension.API.Authorization.Agent.name;
+            simvaExtension.API.Api.GetCompletion(activityId, username)
                 .Then(result =>
                 {
                     if (result[username])
                     {
-                        return SimvaExtension.Instance.UpdateSchedule();
+                        return simvaExtension.UpdateSchedule();
                     }
                     else
                     {
-                        SimvaExtension.Instance.NotifyManagers("Survey not completed");
-                        SimvaExtension.Instance.NotifyLoading(false);
+                        simvaExtension.NotifyManagers("Survey not completed");
+                        simvaExtension.NotifyLoading(false);
                         var nullresult = new AsyncCompletionSource<Schedule>();
                         nullresult.SetResult(null);
                         return nullresult;
@@ -72,7 +74,7 @@ namespace uAdventure.Simva
                     var result = new AsyncCompletionSource();
                     if (schedule != null)
                     {
-                        StartCoroutine(SimvaExtension.Instance.AsyncCoroutine(SimvaExtension.Instance.LaunchActivity(schedule.Next), result));
+                        StartCoroutine(simvaExtension.AsyncCoroutine(simvaExtension.LaunchActivity(schedule.Next), result));
                     }
                     else
                     {
@@ -82,8 +84,8 @@ namespace uAdventure.Simva
                 })
                 .Catch(error =>
                 {
-                    SimvaExtension.Instance.NotifyManagers(error.Message);
-                    SimvaExtension.Instance.NotifyLoading(false);
+                    simvaExtension.NotifyManagers(error.Message);
+                    simvaExtension.NotifyLoading(false);
                 });
         }
 

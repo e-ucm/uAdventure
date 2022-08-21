@@ -1,4 +1,5 @@
-﻿using uAdventure.Simva;
+﻿using uAdventure.Runner;
+using uAdventure.Simva;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,12 +11,12 @@ namespace Simva
 
         protected void Start()
         {
-            SimvaExtension.Instance.AddResponseManager(this);
+            GameExtension.GetInstance<SimvaExtension>().AddResponseManager(this);
         }
 
         protected void OnDestroy()
         {
-            SimvaExtension.Instance.RemoveResponseManager(this);
+            GameExtension.GetInstance<SimvaExtension>().RemoveResponseManager(this);
         }
 
         public void Notify(string message)

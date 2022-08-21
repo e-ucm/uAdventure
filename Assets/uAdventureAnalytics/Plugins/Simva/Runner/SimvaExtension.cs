@@ -21,8 +21,6 @@ namespace uAdventure.Simva
 {
     public class SimvaExtension : GameExtension, Interactuable
     {
-        private static SimvaExtension instance;
-
         public delegate void LoadingDelegate(bool loading);
         public delegate void ResponseDelegate(string message);
 
@@ -36,34 +34,7 @@ namespace uAdventure.Simva
         private Schedule schedule;
         private SimvaApi<IStudentsApi> simvaController;
 
-        protected void Awake()
-        {
-            instance = this;
-        }
 
-        public static SimvaExtension Instance
-        {
-            get
-            {
-                return instance;
-            }
-        }
-
-        public Schedule Schedule
-        {
-            get
-            {
-                return schedule;
-            }
-        }
-
-        public SimvaApi<IStudentsApi> API
-        {
-            get
-            {
-                return simvaController;
-            }
-        }
 
         public bool IsActive
         {
@@ -119,7 +90,7 @@ namespace uAdventure.Simva
             else
             {
                 Debug.Log("[SIMVA] Disabling tracker autostart...");
-                AnalyticsExtension.Instance.AutoStart = false;
+                GetInstance<AnalyticsExtension>().AutoStart = false;
 
                 //if(PlayerPrefs.GetString())
                 Debug.Log("[SIMVA] Adding scenes...");
@@ -194,7 +165,7 @@ namespace uAdventure.Simva
             }
             else
             {
-                yield return AnalyticsExtension.Instance.OnGameFinished();
+                yield return GetInstance<AnalyticsExtension>().OnGameFinished();
             }
         }
 
