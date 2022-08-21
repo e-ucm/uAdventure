@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace uAdventure.Simva
 {
-    public class FlushAllScene : SimvaScene
+    public class FinalizeScene : SimvaScene
     {
         private string endText;
         private string backgroundPath;
@@ -14,7 +14,7 @@ namespace uAdventure.Simva
         private Color endBackgroundColor;
         private Color endBorder;
 
-        public FlushAllScene() : base("Simva.FlushAll")
+        public FinalizeScene() : base("Simva.Finalize")
         {
         }
 

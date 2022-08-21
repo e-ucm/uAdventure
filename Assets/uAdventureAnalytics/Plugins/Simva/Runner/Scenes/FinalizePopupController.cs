@@ -1,15 +1,13 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using uAdventure.Simva;
+﻿using uAdventure.Simva;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Simva
 {
-    public class BackupPopupController : MonoBehaviour
+    public class FinalizePopupController : MonoBehaviour
     {
         private enum States { Appearing, Showing, Hiding }
-        private States state;
+        //private States state;
 
         public float fadeInTime = 0.5f;
         public float fadeOutTime = 3f;
@@ -21,11 +19,11 @@ namespace Simva
         private void Start()
         {
             backupPopup.alpha = 0;
-            state = States.Appearing;
+            //state = States.Appearing;
         }
 
         // Update is called once per frame
-        private void Update()
+        /*private void Update()
         {
             if (state == States.Appearing)
             {
@@ -36,9 +34,9 @@ namespace Simva
                 }
             }
 
-            if (SimvaExtension.Instance.backupOperation != null)
+            if (SimvaExtension.Instance.finalizeOperation != null)
             {
-                Debug.Log("Last progress: " + SimvaExtension.Instance.backupOperation.Progress);
+                Debug.Log("Last progress: " + SimvaExtension.Instance.finalizeOperation.Progress);*/
                 /*if (!progressCallbackAdded)
                 {
                     ((AsyncCompletionSource)SimvaExtension.Instance.backupOperation).AddProgressCallback((p) =>
@@ -47,24 +45,25 @@ namespace Simva
                     });
                     progressCallbackAdded = true;
                 }*/
-                var scaledProgress = (Mathf.Clamp(SimvaExtension.Instance.backupOperation.Progress, 0f, 0.5f)/0.5f) * 0.9f
-                    + (Mathf.Clamp(SimvaExtension.Instance.backupOperation.Progress - 0.5f, 0f, 0.5f)/0.5f) * 0.1f;
+
+                /*var scaledProgress = (Mathf.Clamp(SimvaExtension.Instance.finalizeOperation.Progress, 0f, 0.5f)/0.5f) * 0.9f
+                    + (Mathf.Clamp(SimvaExtension.Instance.finalizeOperation.Progress - 0.5f, 0f, 0.5f)/0.5f) * 0.1f;
                 progressBar.size = scaledProgress;
 
-                if (SimvaExtension.Instance.backupOperation.IsCompletedSuccessfully)
+                if (SimvaExtension.Instance.finalizeOperation.IsCompletedSuccessfully)
                 {
                     progressBar.transform.parent.gameObject.SetActive(false);
                     successText.gameObject.SetActive(true);
                     errorText.gameObject.SetActive(false);
                     state = States.Hiding;
                 }
-                else if (SimvaExtension.Instance.backupOperation.IsFaulted)
+                else if (SimvaExtension.Instance.finalizeOperation.IsFaulted)
                 {
                     progressBar.transform.parent.gameObject.SetActive(false);
                     successText.gameObject.SetActive(false);
                     errorText.gameObject.SetActive(true);
                     var errorMessage = errorText.transform.GetChild(0).GetComponent<Text>();
-                    errorMessage.text = SimvaExtension.Instance.backupOperation.Exception.Message;
+                    errorMessage.text = SimvaExtension.Instance.finalizeOperation.Exception.Message;
                 }
                 else
                 {
@@ -82,7 +81,7 @@ namespace Simva
                     DestroyImmediate(this.gameObject);
                 }
             }
-        }
+        }*/
     }
 }
 

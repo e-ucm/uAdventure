@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using uAdventure.Runner;
 using UnityEngine;
 using Xasu;
+using Xasu.Auth.Protocols;
 using Xasu.Util;
 
 namespace uAdventure.Analytics
@@ -66,12 +67,6 @@ namespace uAdventure.Analytics
             yield return true;
         }
 
-        private bool afterFlush;
-        public void AfterFlush()
-        {
-            afterFlush = true;
-        }
-
         [Priority(1)]
         public override IEnumerator OnGameFinished()
         {
@@ -91,7 +86,6 @@ namespace uAdventure.Analytics
                         // TODO check if flush failed
                         finalized = true;
                     });
-                var time = Time.time;
                 yield return new WaitUntil(() => finalized);
             }
         }
@@ -128,7 +122,7 @@ namespace uAdventure.Analytics
 
         #endregion GameExtension
                 
-        public IEnumerator StartTracker(TrackerConfig config, string backupFilename)
+        public IEnumerator StartTracker(TrackerConfig config, IAuthProtocol onlineProtocol = null, IAuthProtocol backupProtocol = null)
         {
             //trackerConfig = config;
             string domain = "";
@@ -159,13 +153,18 @@ namespace uAdventure.Analytics
                 }
                 Debug.Log("[ANALYTICS] Config: " + JsonConvert.SerializeObject(config));
             }
-            catch (System.Exception e)
+            catch (System.Exception)
             {
-                Debug.Log("Tracker error: Host bad format");
+                Debug.LogError("[ANALYTICS] Tracker error: Host bad format");
+                throw;
             }
 
+            var simva = config.getHost().Contains("simva");
             var trackerConfig = new Xasu.Config.TrackerConfig
             {
+                //Simva
+                Simva = simva,
+
                 FlushInterval = 3,
                 BatchSize = 256,
 
@@ -176,7 +175,9 @@ namespace uAdventure.Analytics
                 Offline = config.getStorageType() == TrackerConfig.StorageType.LOCAL,
                 TraceFormat = Xasu.Config.TraceFormats.XAPI,
 
-                // TODO backup
+                Backup = config.getRawCopy(),
+                BackupFileName = config.getBackupFileName(),
+                BackupEndpoint = config.getHost() + config.getBackupEndpoint()
             };
 
 
@@ -199,7 +200,7 @@ namespace uAdventure.Analytics
             Debug.Log("[ANALYTICS] Settings: " + JsonConvert.SerializeObject(trackerConfig));
 
             var done = false;
-            XasuTracker.Instance.Init(trackerConfig)
+            XasuTracker.Instance.Init(trackerConfig, onlineProtocol, backupProtocol)
                 .ContinueWith(t =>
                 {
                     // TODO fix 

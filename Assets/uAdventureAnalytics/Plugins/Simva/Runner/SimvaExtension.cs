@@ -98,8 +98,7 @@ namespace uAdventure.Simva
                 {
                     new LoginScene(),
                     new SurveyScene(),
-                    new FlushAllScene(),
-                    new BackupScene(),
+                    new FinalizeScene(),
                     new EndScene()
                 });
                 Debug.Log("[SIMVA] Setting current target to Simva.Login...");
@@ -133,19 +132,10 @@ namespace uAdventure.Simva
             }
         }
 
-        public IAsyncOperation backupOperation;
-        public Activity backupActivity;
-
-        private bool afterFlush;
-        public void AfterFlush()
+        private bool afterFinalize;
+        public void AfterFinalize()
         {
-            afterFlush = true;
-        }
-
-        private bool afterBackup;
-        public void AfterBackup()
-        {
-            afterBackup = true;
+            afterFinalize = true;
         }
 
 
@@ -156,8 +146,8 @@ namespace uAdventure.Simva
             {
                 var readyToClose = false;
                 DisableAutoSave();
-                Game.Instance.RunTarget("Simva.FlushAll", null, false);
-                yield return new WaitUntil(() => afterFlush);
+                Game.Instance.RunTarget("Simva.Finalize", null, false);
+                yield return new WaitUntil(() => afterFinalize);
                 Continue(CurrentActivityId, true)
                     .Then(() => readyToClose = true);
 
@@ -346,20 +336,6 @@ namespace uAdventure.Simva
             return API.Api.SetCompletion(activityId, API.Authorization.Agent.name, completed)
                 .Then(() =>
                 {
-                    backupActivity = GetActivity(CurrentActivityId);
-                    string activityType = backupActivity.Type;
-                    if (activityType.Equals("gameplay", StringComparison.InvariantCultureIgnoreCase)
-                    && backupActivity.Details != null && backupActivity.Details.ContainsKey("backup") && (bool)backupActivity.Details["backup"])
-                    {
-                        string traces = SimvaBridge.Load(((TrackerAssetSettings)TrackerAsset.Instance.Settings).BackupFile);
-                        Instantiate(Resources.Load("SimvaBackupPopup"));
-                        backupOperation = SaveActivity(CurrentActivityId, traces, true);
-                        backupOperation.Then(() =>
-                        {
-                            afterBackup = true;
-                        });
-                    }
-
                     return UpdateSchedule();
                 })
                 .Then(schedule =>
@@ -389,18 +365,9 @@ namespace uAdventure.Simva
         {
             if (activityId == null)
             {
-                if (backupOperation != null && !backupOperation.IsCompletedSuccessfully)
-                {
-                    Game.Instance.AbortQuit();
-                    DisableAutoSave();
-                    Game.Instance.RunTarget("Simva.Backup", null, false);
-                }
-                else
-                {
-                    DisableAutoSave();
-                    Game.Instance.RunTarget("Simva.End", null, false);
-                    schedule = null;
-                }
+                DisableAutoSave();
+                Game.Instance.RunTarget("Simva.End", null, false);
+                Schedule = null;
             }
             else
             {
@@ -423,8 +390,8 @@ namespace uAdventure.Simva
 
                             trackerConfig.setStorageType(TrackerConfig.StorageType.LOCAL);
                             trackerConfig.setTraceFormat(TrackerConfig.TraceFormat.XAPI);
-                            trackerConfig.setRawCopy(true);
                             trackerConfig.setDebug(true);
+                            trackerConfig.setRawCopy(true);
 
                             if (ActivityHasDetails(activity, "realtime", "trace_storage"))
                             {
@@ -433,8 +400,8 @@ namespace uAdventure.Simva
                                 trackerConfig.setHost(API.SimvaConf.URL);
                                 trackerConfig.setBasePath("");
                                 trackerConfig.setLoginEndpoint("/users/login");
-                                trackerConfig.setStartEndpoint("/activities/{0}/result");
-                                trackerConfig.setTrackEndpoint("/activities/{0}/result");
+                                trackerConfig.setStartEndpoint(string.Format("/activities/{0}", activityId));
+                                trackerConfig.setTrackEndpoint(string.Format("/activities/{0}", activityId));
                                 trackerConfig.setTrackingCode(activityId);
                                 trackerConfig.setUseBearerOnTrackEndpoint(true);
                                 Debug.Log("TrackingCode: " + activity.Id + " settings " + trackerConfig.getTrackingCode());
@@ -442,14 +409,16 @@ namespace uAdventure.Simva
 
                             if (ActivityHasDetails(activity, "backup"))
                             {
-                                // Local
+                                // Backup
                                 trackerConfig.setRawCopy(true);
+                                trackerConfig.setBackupEndpoint(string.Format("/activities/{0}/result", activityId));
+                                trackerConfig.setBackupFileName(auth.Username + "_" + activityId + "_backup.log");
                             }
 
                             if (ActivityHasDetails(activity, "realtime", "trace_storage", "backup"))
                             {
                                 Debug.Log("[SIMVA] Starting tracker...");
-                                yield return StartCoroutine(AnalyticsExtension.Instance.StartTracker(trackerConfig, auth.Username + "_" + activityId + "_backup.log", SimvaBridge));
+                                yield return StartCoroutine(GetInstance<AnalyticsExtension>().StartTracker(trackerConfig, API.Authorization, API.Authorization));
                             }
 
                             Debug.Log("[SIMVA] Starting Gameplay...");

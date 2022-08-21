@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 
 namespace uAdventure.Simva
 {
-    [ChapterTargetFactory(typeof(SimvaScene), typeof(LoginScene), typeof(SurveyScene), typeof(FlushAllScene), typeof(BackupScene), typeof(EndScene))]
+    [ChapterTargetFactory(typeof(SimvaScene), typeof(LoginScene), typeof(SurveyScene), typeof(FinalizeScene), typeof(EndScene))]
     public class SimvaSceneHandler : MonoBehaviour, IChapterTargetFactory
     {
         public IRunnerChapterTarget Instantiate(IChapterTarget modelObject)
@@ -19,11 +19,8 @@ namespace uAdventure.Simva
                 case "Simva.Survey":
                     form = GameObject.Instantiate(Resources.Load<GameObject>("SimvaSurvey"));
                     break;
-                case "Simva.FlushAll":
-                    form = GameObject.Instantiate(Resources.Load<GameObject>("SimvaFlushAll"));
-                    break;
-                case "Simva.Backup":
-                    form = GameObject.Instantiate(Resources.Load<GameObject>("SimvaBackup"));
+                case "Simva.Finalize":
+                    form = GameObject.Instantiate(Resources.Load<GameObject>("SimvaFinalize"));
                     break;
                 case "Simva.End":
                     form = GameObject.Instantiate(Resources.Load<GameObject>("SimvaEnd"));
