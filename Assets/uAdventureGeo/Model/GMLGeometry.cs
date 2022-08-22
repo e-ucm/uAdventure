@@ -116,6 +116,67 @@ public class GMLGeometry : ICloneable, ICheckable, Named
         }
     }
 
+    public int GetClosestSegment(Vector2d point)
+    {
+        if (this.Type == GeometryType.Polygon || this.Type == GeometryType.Point)
+        {
+            throw new NotImplementedException();
+        }
+
+        double distance = Mathf.Infinity;
+        int index = -1;
+        for (int i = 0; i < Points.Length - 1; i++)
+        {
+            var closestPoint = GetClosestPointOnLineSegment(Points[i], Points[i + 1], point);
+            var pointdistance = (closestPoint - point).sqrMagnitude;
+            if (distance > pointdistance)
+            {
+                distance = pointdistance;
+                index = i;
+            }
+        }
+        return index;
+    }
+
+    public Vector2d GetClosestPoint(Vector2d point)
+    {
+        if (this.Type == GeometryType.Polygon && InsideMargin(point, 0))
+        {
+            return point;
+        }
+
+        switch (this.Type)
+        {
+            case GeometryType.Point:
+                return point;
+
+            case GeometryType.LineString:
+            case GeometryType.Polygon:
+                Vector2d closest = Vector2d.zero;
+                double distance = Mathf.Infinity;
+                for (int i = 0; i < Points.Length - 1; i++)
+                {
+                    var closestPoint = GetClosestPointOnLineSegment(Points[i], Points[i+1], point);
+                    var pointdistance = (closestPoint - point).sqrMagnitude;
+                    if (distance > pointdistance)
+                    {
+                        distance = pointdistance;
+                        closest = closestPoint;
+                    }
+                }
+                if(closest == Vector2d.zero)
+                {
+                    return point;
+                }
+                else
+                {
+                    return closest;
+                }
+        }
+
+        return point;
+    }
+
     public bool InsideInfluence(Vector2d point)
     {
         return InsideInfluence(point, 0);

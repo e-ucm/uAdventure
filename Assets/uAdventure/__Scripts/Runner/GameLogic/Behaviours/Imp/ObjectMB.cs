@@ -12,11 +12,21 @@ namespace uAdventure.Runner
 
         private Representable representable;
 
-
-        protected override void Start()
+		protected override void Start()
         {
             base.Start();
             representable = GetComponent<Representable>();
+            OnPointerLeave();
+            representable.SetTexture(Item.RESOURCE_TYPE_IMAGE);
+        }
+
+        protected override void OnPointerEnter()
+        {
+            representable.SetTexture(Item.RESOURCE_TYPE_IMAGEOVER);
+        }
+
+        protected override void OnPointerLeave()
+        {
             representable.SetTexture(Item.RESOURCE_TYPE_IMAGE);
         }
 

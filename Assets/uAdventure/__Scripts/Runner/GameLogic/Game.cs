@@ -36,6 +36,7 @@ namespace uAdventure.Runner
 
         // Execution
         private bool waitingRunTarget = false, waitingTransition = false, waitingTargetDestroy = false;
+        private List<EffectHolderNode> background;
         private Stack<KeyValuePair<Interactuable, ExecutionEvent>> executeStack;
         private IRunnerChapterTarget runnerTarget;
         private GameState game_state;
@@ -130,6 +131,7 @@ namespace uAdventure.Runner
                 DontDestroyOnLoad(Camera.main);
 
                 executeStack = new Stack<KeyValuePair<Interactuable, ExecutionEvent>>();
+                background = new List<EffectHolderNode>();
 
                 skin = Resources.Load("basic") as GUISkin;
 
@@ -276,6 +278,22 @@ namespace uAdventure.Runner
 
         protected void Update()
         {
+            if (background.Count > 0)
+            {
+                foreach(var element in background.ToList())
+                {
+                    if (!element.execute())
+                    {
+                        background.Remove(element);
+                    }
+                }
+
+                if(background.Count == 0 && executeStack.Count == 0)
+                {
+                    FinalizeExecution();
+                }
+            }
+
             if (waitingRunTarget && runnerTarget.IsReady)
             {
                 Debug.Log("[UPDATE] Target Ready!");
@@ -373,6 +391,13 @@ namespace uAdventure.Runner
                 Debug.Log("[AUTO SAVE] Auto save is disabled. Skipping...");
                 return;
             }
+            
+            if (!GameState.GetChapterTarget(GameState.CurrentTarget).allowsSavingGame())
+            {
+                Debug.Log("[AUTO SAVE] Current scene doesn't allow saving. Cancelling save...");
+                return;
+            }
+
 
             Debug.Log("[AUTO SAVE] Performing auto-save...");
             SaveGame();
@@ -380,32 +405,47 @@ namespace uAdventure.Runner
 
         public void OnApplicationPause(bool paused)
         {
-            /*if (Application.isEditor)
+            if (!paused) // Ignore restores
             {
                 return;
-            }*/
-
-            if (!isSomethingRunning())
-            {
-                if (paused && GameState.Data.isSaveOnSuspend())
-                {
-                    GameState.OnGameSuspend();
-                }
-
-                /*if (!paused && GameState.Data.isRestoreAfterOpen())
-                {
-                    // TODO REPARE RESTORE AFTER OPEN
-                    GameState.OnGameResume();
-                    if (started)
-                    {
-                        var gameReadyOrderedExtensions = PriorityAttribute.OrderExtensionsByMethod("OnGameReady", gameExtensions);
-                        RunTarget(GameState.CurrentTarget);
-                        gameReadyOrderedExtensions.ForEach(g => g.OnGameReady());
-                        uAdventureInputModule.LookingForTarget = null;
-                    }
-                }*/
             }
 
+            if (isSomethingRunning())
+            {
+                Debug.Log("[SAVE ON SUSPEND] Not saved on suspend because something was running.");
+                return;
+            }
+
+            if (!GameState.GetChapterTarget(GameState.CurrentTarget).allowsSavingGame())
+            {
+                Debug.Log("[SAVE ON SUSPEND] Current scene doesn't allow saving. Cancelling save...");
+                return;
+            }
+
+            if (paused && GameState.Data.isSaveOnSuspend())
+            {
+                Debug.Log("[SAVE ON SUSPEND] Saving game...");
+                GameState.OnGameSuspend();
+            }
+
+            /*if (!paused && GameState.Data.isRestoreAfterOpen())
+            {
+                // TODO REPARE RESTORE AFTER OPEN
+                GameState.OnGameResume();
+                if (started)
+                {
+                    var gameReadyOrderedExtensions = PriorityAttribute.OrderExtensionsByMethod("OnGameReady", gameExtensions);
+                    RunTarget(GameState.CurrentTarget);
+                    gameReadyOrderedExtensions.ForEach(g => g.OnGameReady());
+                    uAdventureInputModule.LookingForTarget = null;
+                }
+            }*/
+
+        }
+
+        public void RunInBackground(EffectHolderNode effect)
+        {
+            background.Add(effect);
         }
 
         public bool Execute(Interactuable interactuable, ExecutionEvent callback = null)
@@ -416,7 +456,7 @@ namespace uAdventure.Runner
                 MenuMB.Instance.hide(true);
             }
 
-            if(executeStack.Count == 0)
+            if (executeStack.Count == 0)
             {
                 AutoSave();
             }
@@ -427,7 +467,7 @@ namespace uAdventure.Runner
                 Debug.Log("Pushed " + interactuable.ToString());
                 executeStack.Push(new KeyValuePair<Interactuable, ExecutionEvent>(interactuable, callback));
             }
-            while(executeStack.Count > 0)
+            while (executeStack.Count > 0)
             {
                 var preInteractSize = executeStack.Count;
                 var toExecute = executeStack.Peek();
@@ -450,7 +490,7 @@ namespace uAdventure.Runner
                 }
                 else
                 {
-                    Debug.Log("Execution finished " + toExecute.ToString()); 
+                    Debug.Log("Execution finished " + toExecute.ToString());
                     if (!actionCanceled)
                     {
                         if (preInteractSize != executeStack.Count)
@@ -475,7 +515,7 @@ namespace uAdventure.Runner
                             executeStack.Pop();
                         }
                     }
-                    
+
                     try
                     {
                         if (actionCanceled)
@@ -505,6 +545,17 @@ namespace uAdventure.Runner
                     }
                 }
             }
+            if(background.Count > 0)
+            {
+                return true;
+            }
+
+            FinalizeExecution();
+            return false;
+        }
+
+        private void FinalizeExecution()
+        {
             if (uAdventureRaycaster.Instance)
             {
                 uAdventureRaycaster.Instance.Override = null;
@@ -521,7 +572,6 @@ namespace uAdventure.Runner
             // In case any bubble is bugged
             GUIManager.Instance.DestroyBubbles();
             actionCanceled = false;
-            return false;
         }
 
         public void Quit()
@@ -563,6 +613,11 @@ namespace uAdventure.Runner
             }
             RunTarget(GameState.CurrentTarget);
             uAdventureInputModule.LookingForTarget = null;
+        }
+
+        public bool IsRunningInBackground(EffectHolderNode node)
+        {
+            return background.Contains(node);
         }
 
         public bool ContinueEffectExecution()
@@ -852,10 +907,13 @@ namespace uAdventure.Runner
             if (isSomethingRunning())
             {
                 this.actionCanceled = true; 
-                Delegate[] delegateList = OnActionCanceled.GetInvocationList();
-                for (int counter = delegateList.Length - 1; counter >= 0; counter--)
+                if(OnActionCanceled != null)
                 {
-                    ((ActionCanceledDelegate)delegateList[counter])();
+                    Delegate[] delegateList = OnActionCanceled.GetInvocationList();
+                    for (int counter = delegateList.Length - 1; counter >= 0; counter--)
+                    {
+                        ((ActionCanceledDelegate)delegateList[counter])();
+                    }
                 }
             }
             OnActionCanceled = null;

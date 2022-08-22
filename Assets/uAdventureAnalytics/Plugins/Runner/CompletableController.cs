@@ -150,6 +150,8 @@ namespace uAdventure.Analytics
         private bool completeOnExit;
         [SerializeField]
         private bool completed;
+        [SerializeField]
+        private float lastProgressedValue = float.MinValue;
 
         [NonSerialized]
         private Completable completable;
@@ -251,6 +253,7 @@ namespace uAdventure.Analytics
             if (Start.Reached)
             {
                 bool progressed = false;
+
                 foreach (var milestoneController in progressControllers)
                 {
                     progressed |= updateFunction(milestoneController);
@@ -258,6 +261,7 @@ namespace uAdventure.Analytics
 
                 if (progressed)
                 {
+                    lastProgressedValue = this.Progress;
                     analyticsExtension.CompletablesController.TrackProgressed(this);
                 }
 
@@ -266,7 +270,10 @@ namespace uAdventure.Analytics
                     completed = updateFunction(End);
                     if (completed)
                     {
-                        analyticsExtension.CompletablesController.TrackProgressed(this);
+                        if (lastProgressedValue != this.Progress)
+                        {
+                            analyticsExtension.CompletablesController.TrackProgressed(this);
+                        }
                         analyticsExtension.CompletablesController.TrackCompleted(this, DateTime.Now - startTime);
                     }
                 }

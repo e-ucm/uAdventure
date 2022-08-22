@@ -340,7 +340,7 @@ namespace uAdventure.Editor
          */
         public int getLineCount()
         {
-            return conversationNode.getChildCount();
+            return conversationNode.getLineCount();
         }
 
         /**

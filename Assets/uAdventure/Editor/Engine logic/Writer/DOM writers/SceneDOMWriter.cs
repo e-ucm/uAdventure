@@ -43,6 +43,7 @@ namespace uAdventure.Editor
             // Create the root node
             sceneElement.SetAttribute("id", scene.getId());
             sceneElement.SetAttribute("hideInventory", scene.HideInventory ? "yes" : "no");
+            sceneElement.SetAttribute("allowsZoom", scene.AllowsZoom ? "yes" : "no");
             sceneElement.SetAttribute("allowsSavingGame", scene.allowsSavingGame() ? "yes" : "no");
 
             if (options.Any(o => o is CIP && (o as CIP).TargetId.Equals(scene.getId())))
@@ -249,6 +250,7 @@ namespace uAdventure.Editor
                     itemReferenceElement.SetAttribute("x", itemReference.getX().ToString());
                     itemReferenceElement.SetAttribute("y", itemReference.getY().ToString());
                     itemReferenceElement.SetAttribute("scale", itemReference.Scale.ToString(CultureInfo.InvariantCulture));
+                    itemReferenceElement.SetAttribute("glow", itemReference.Glow ? "yes" : "no");
                     if (itemReference.getLayer() != -1)
                         itemReferenceElement.SetAttribute("layer", itemReference.getLayer().ToString());
                     if (itemReference.getInfluenceArea().isExists())
@@ -301,6 +303,7 @@ namespace uAdventure.Editor
                     npcReferenceElement.SetAttribute("y", characterReference.getY().ToString());
                     npcReferenceElement.SetAttribute("scale", characterReference.Scale.ToString(CultureInfo.InvariantCulture));
                     npcReferenceElement.SetAttribute("orientation", ((int)characterReference.Orientation).ToString());
+                    npcReferenceElement.SetAttribute("glow", characterReference.Glow ? "yes" : "no");
                     if (characterReference.getLayer() != -1)
                         npcReferenceElement.SetAttribute("layer", characterReference.getLayer().ToString());
                     if (characterReference.getInfluenceArea().isExists())
@@ -508,6 +511,7 @@ namespace uAdventure.Editor
                     atrezzoReferenceElement.SetAttribute("x", atrezzoReference.getX().ToString());
                     atrezzoReferenceElement.SetAttribute("y", atrezzoReference.getY().ToString());
                     atrezzoReferenceElement.SetAttribute("scale", atrezzoReference.Scale.ToString(CultureInfo.InvariantCulture));
+                    atrezzoReferenceElement.SetAttribute("glow", atrezzoReference.Glow ? "yes" : "no");
                     if (atrezzoReference.getLayer() != -1)
                         atrezzoReferenceElement.SetAttribute("layer", atrezzoReference.getLayer().ToString());
 

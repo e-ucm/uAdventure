@@ -155,7 +155,9 @@ namespace uAdventure.Runner
                 holder.EndTracePending();
                 isTracePending = true;
                 xAPISuccess = onode.getLine(option).getXApiCorrect();
-                xAPIQuestion = onode.getXApiQuestion();
+                xAPIQuestion = string.IsNullOrWhiteSpace(onode.getXApiQuestion()) 
+                    ? conversation.getId() + "." + conversation.getAllNodes().IndexOf(node) 
+                    : onode.getXApiQuestion();
                 xAPIResponse = onode.getLine(option).getText().Replace(",", " ");
                 trace = AlternativeTracker.Instance.Selected(xAPIQuestion, xAPIResponse, AlternativeTracker.AlternativeType.Question);
                 Game.Instance.GameState.BeginChangeAmbit(trace);

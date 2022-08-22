@@ -2287,6 +2287,7 @@
   <entry key="EditorWindow.CreateNew.Title">Warning!</entry>
   <entry key="EditorWindow.CreateNew.Body">Creating a new adventure deletes all previous existing files. Do you want to continue?</entry>
   <entry key="Scene.HideInventory">Hide Inventory</entry>
+  <entry key="Scene.AllowsZoom">Allows zooming (and pinching in mobile devices)</entry>
   <entry key="Scene.InventoryPosition">Inventory Position</entry>
 
   <entry key="Resources.DescriptionLineAudio">Audio</entry>

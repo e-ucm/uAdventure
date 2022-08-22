@@ -501,6 +501,12 @@ namespace uAdventure.Editor
             set { controller.AddTool(new ChangeFloatValueTool(elementReference, value, "Scale")); }
         }
 
+        public bool Glow
+        {
+            get { return elementReference.Glow; }
+            set { controller.AddTool(new ChangeBooleanValueTool(elementReference, value, "Glow")); }
+        }
+
         public override List<Searchable> getPathToDataControl(Searchable dataControl)
         {
 

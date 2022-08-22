@@ -53,6 +53,7 @@ namespace uAdventure.Runner
         private Dictionary<ScenePositioner, float> heights;
         private SortedList<ScenePositioner, float> finalOrder;
         private bool wasDisabled;
+        private EffectHolder finishingEffects;
 
         // Movements
         private float minZ;
@@ -72,6 +73,9 @@ namespace uAdventure.Runner
         private MovieHolder movie;
         private MovieState movieplayer = MovieState.NOT_MOVIE;
 
+        private bool isPinching = false;
+        private static float OriginalOrthoSize, LastOrthoSize;
+        private const float MinOrthoSize = 10, MaxOrthoSize = 30;
 
         public GeneralScene SceneData { get; set; }
 
@@ -117,11 +121,23 @@ namespace uAdventure.Runner
         protected void Start()
         {
             this.gameObject.name = SceneData.getId();
+
+            if (OriginalOrthoSize == 0)
+            {
+                LastOrthoSize = OriginalOrthoSize = Camera.main.orthographicSize;
+            }
+
+            Camera.main.orthographicSize = LastOrthoSize;
+            InventoryManager.Instance.Show = true;
         }
+
+        private bool touch0Set, touch1Set;
+        private Vector2 touchPosition0, touchPosition1;
+        private Vector2 touchDelta0, touchDelta1;
 
         protected void Update()
         {
-            if(!dragging && endDragSpeed != Vector2.zero)
+            if (!dragging && endDragSpeed != Vector2.zero)
             {
                 MoveCamera(endDragSpeed * -Time.deltaTime);
                 var lastSpeed = endDragSpeed;
@@ -131,7 +147,82 @@ namespace uAdventure.Runner
                     endDragSpeed = Vector2.zero;
                 }
             }
+
+            HandleZoom();
         }
+
+        private void HandleZoom()
+        {
+            if (!SceneData.AllowsZoom)
+            {
+                return;
+            }
+
+            SimulateTouches();
+            if ((uAdventureRaycaster.Instance.Override == null || uAdventureRaycaster.Instance.Override == gameObject) && (Input.touchCount >= 2 || IsSimulatingTouches()))
+            {
+                GetTouchInputs(out Touch touch0, out Touch touch1);
+
+                if (!isPinching)
+                {
+                    isPinching = true;
+                    uAdventureRaycaster.Instance.Override = this.gameObject;
+                }
+
+                // This is a camera movement zoom approach
+                if ((touch0.phase == TouchPhase.Moved || touch0.phase == TouchPhase.Stationary) &&
+                    (touch1.phase == TouchPhase.Moved || touch1.phase == TouchPhase.Stationary))
+                {
+                    var cam = GameObject.FindObjectOfType<Camera>();
+
+                    // First we get the old touch positions to compare them with the new ones
+                    var oldTouch0 = touch0.position - touch0.deltaPosition;
+                    var oldTouch1 = touch1.position - touch1.deltaPosition;
+
+                    // The camera moves as much as the center moves
+                    var previousTouchCenter = (cam.ScreenToWorldPoint(oldTouch1) + cam.ScreenToWorldPoint(oldTouch0)) / 2f;
+                    var touchCenter = (cam.ScreenToWorldPoint(touch1.position) + cam.ScreenToWorldPoint(touch0.position)) / 2f;
+                    var touchCenterMovement = touchCenter - previousTouchCenter;
+
+                    // Second, we calculate the camera growth based on the touch distance difference
+                    var oldDist = (oldTouch1 - oldTouch0).magnitude;
+                    var currentDist = (touch1.position - touch0.position).magnitude;
+                    var growthRatio = currentDist / oldDist;
+
+                    // The zoom moves towards the center proportionally to the growth
+                    // To do it, we calculate the vector from the camera center to the touch center.
+                    // This vector is scaled inversely to the camera growth so the camera moves towards this point when zooming.
+                    // (for instance, if the camera doubles the zoom, it will also move towards the touch center half the distance)
+                    var cameraCenter = cam.transform.position;
+                    var touchCenterToCameraVector = cameraCenter - touchCenter;
+                    var newTouchCenterToCameraVector = touchCenterToCameraVector / growthRatio;
+
+                    // Finally we calculate the new orthographic size inverse to the camera growth
+                    // (If the ratio of growth > 1 the ortho size decreases, zooming )
+                    var newOrtho = cam.orthographicSize / growthRatio;
+                    cam.orthographicSize = Mathf.Clamp(newOrtho, MinOrthoSize, MaxOrthoSize);
+
+                    // And we adjust the camera position based on:
+                    //  - The touch center (the point between the touches)
+                    //  - Plus the new scaled camera vector
+                    //  - Minus the movement of the touches (similar to dragging from the center point)
+                    cam.transform.position = touchCenter + newTouchCenterToCameraVector - touchCenterMovement;
+                }
+            }
+            else if (isPinching)
+            {
+                uAdventureRaycaster.Instance.Override = null;
+                isPinching = false;
+            }
+
+
+            if ((uAdventureRaycaster.Instance.Override == null || uAdventureRaycaster.Instance.Override == gameObject) && Input.mouseScrollDelta.y != 0)
+            {
+                var cam = GameObject.FindObjectOfType<Camera>();
+                cam.orthographicSize = Mathf.Clamp(cam.orthographicSize - Input.mouseScrollDelta.y, MinOrthoSize, MaxOrthoSize);
+            }
+        }
+
 
         protected void LateUpdate()
         {
@@ -250,6 +341,12 @@ namespace uAdventure.Runner
                         Game.Instance.ResourceManager.ClearImage(sr.getAssetPath(Scene.RESOURCE_TYPE_BACKGROUND));
                     }
                 }
+            }
+
+            if (Camera.main)
+            {
+                Camera.main.orthographic = true;
+                Camera.main.orthographicSize = OriginalOrthoSize;
             }
 
             onDestroy();
@@ -766,12 +863,13 @@ namespace uAdventure.Runner
                     break;
                 case GeneralScene.GeneralSceneSceneType.VIDEOSCENE:
                     var videoscene = (Videoscene)SceneData;
+                    res = InteractuableResult.REQUIRES_MORE_INTERACTION;
                     if (movieplayer == MovieState.NOT_MOVIE
                         || movieplayer == MovieState.STOPPED
                         || (movieplayer == MovieState.PLAYING && !movie.isPlaying())
                         || videoscene.isCanSkip())
                     {
-                        if (movieplayer == MovieState.PLAYING && XasuTracker.Instance.Status.State != TrackerState.Uninitialized)
+                        if (movieplayer == MovieState.PLAYING && XasuTracker.Instance.Status.State != TrackerState.Uninitialized && videoscene.isCanSkip())
                         {
                             AccessibleTracker.Instance.Skipped(SceneData.getId(), AccessibleTracker.AccessibleType.Cutscene);
                         }
@@ -790,41 +888,55 @@ namespace uAdventure.Runner
             InteractuableResult res = InteractuableResult.DOES_SOMETHING;
             TriggerSceneEffect triggerScene = null;
 
-            switch ((cutscene).getNext())
+            if(finishingEffects == null)
             {
-                default: // By default Cutscene.GOBACK
-                    var previousTarget = Game.Instance.GameState.PreviousChapterTarget;
-                    if (previousTarget == null)
-                    {
-                        var possibleTargets = Game.Instance.GameState.GetObjects<IChapterTarget>();
-                        previousTarget = possibleTargets.FirstOrDefault(t => t.getId() != this.SceneData.getId());
-                    }
-                    if(previousTarget != null)
-                    {
-                        triggerScene = new TriggerSceneEffect(previousTarget.getId(), int.MinValue, int.MinValue, 
-                            float.MinValue, cutscene.getTransitionTime(), (int)cutscene.getTransitionType());
-                    }
-                    break;
-                case Cutscene.NEWSCENE:
-                    triggerScene = new TriggerSceneEffect(cutscene.getTargetId(), int.MinValue, int.MinValue,
-                        float.MinValue, cutscene.getTransitionTime(), (int)cutscene.getTransitionType());
-                    break;
-                case Cutscene.ENDCHAPTER:
-                    // TODO: When we add more chapters, we must trigger the next chapter instead of quiting que aplication
-                    Game.Instance.Quit();
-                    break;
-            }
-
-            if (triggerScene != null)
-            {
-                var effects = new Effects { triggerScene };
-                var cutsceneEffects = cutscene.getEffects();
-                if (cutsceneEffects != null)
+                switch ((cutscene).getNext())
                 {
-                    effects.AddRange(cutsceneEffects);
+                    default: // By default Cutscene.GOBACK
+                        var previousTarget = Game.Instance.GameState.PreviousChapterTarget;
+                        if (previousTarget == null)
+                        {
+                            var possibleTargets = Game.Instance.GameState.GetObjects<IChapterTarget>();
+                            previousTarget = possibleTargets.FirstOrDefault(t => t.getId() != this.SceneData.getId());
+                        }
+                        if (previousTarget != null)
+                        {
+                            triggerScene = new TriggerSceneEffect(previousTarget.getId(), int.MinValue, int.MinValue,
+                                float.MinValue, cutscene.getTransitionTime(), (int)cutscene.getTransitionType());
+                        }
+                        break;
+                    case Cutscene.NEWSCENE:
+                        triggerScene = new TriggerSceneEffect(cutscene.getTargetId(), int.MinValue, int.MinValue,
+                            float.MinValue, cutscene.getTransitionTime(), (int)cutscene.getTransitionType());
+                        break;
+                    case Cutscene.ENDCHAPTER:
+                        // TODO: When we add more chapters, we must trigger the next chapter instead of quiting que aplication
+                        Game.Instance.Quit();
+                        break;
                 }
 
-                Game.Instance.Execute(new EffectHolder(effects));
+                if (triggerScene != null)
+                {
+                    var effects = new Effects { triggerScene };
+                    var cutsceneEffects = cutscene.getEffects();
+                    if (cutsceneEffects != null)
+                    {
+                        effects.AddRange(cutsceneEffects);
+                    }
+                    finishingEffects = new EffectHolder(effects);
+                }
+            }
+            
+            if(finishingEffects != null)
+            {
+                if (finishingEffects.execute())
+                {
+                    res = InteractuableResult.REQUIRES_MORE_INTERACTION;
+                }
+                else
+                {
+                    res = InteractuableResult.IGNORES;
+                }
             }
 
             return res;
@@ -862,7 +974,7 @@ namespace uAdventure.Runner
 
         public void OnBeginDrag(PointerEventData eventData)
         {
-            if(PlayerMB.Instance == null)
+            if(PlayerMB.Instance == null && !isPinching)
             {
                 eventData.Use();
                 dragging = true;
@@ -873,7 +985,7 @@ namespace uAdventure.Runner
 
         public void OnEndDrag(PointerEventData eventData)
         {
-            if (dragging)
+            if (dragging && !isPinching)
             {
                 dragging = false;
                 eventData.Use();
@@ -883,7 +995,7 @@ namespace uAdventure.Runner
 
         public void OnDrag(PointerEventData eventData)
         {
-            if (dragging)
+            if (dragging && !isPinching)
             {
                 eventData.Use();
                 MoveCamera(-eventData.delta);
@@ -904,9 +1016,84 @@ namespace uAdventure.Runner
 
         public void OnConfirmWantsDrag(PointerEventData data)
         {
-            if (SceneData is Scene)
+            if (SceneData is Scene && data.button == PointerEventData.InputButton.Left)
             {
                 data.Use();
+            }
+        }
+
+        // Touch Simulation for editor:
+        //  - Maintain control pressed.
+        //  - Left or right click fixes a touch point (0 or 1 respectively) 
+        //  - Left or right drag moves the touch point (only works when the other touch is set too)
+        //  - Releasing control also releases both touches
+
+        private void GetTouchInputs(out Touch touch0, out Touch touch1)
+        {
+            touch0 = touch0Set && Application.isEditor
+                ? new Touch
+                {
+                    phase = TouchPhase.Moved,
+                    position = touchPosition0,
+                    deltaPosition = touchDelta0
+                }
+                : Input.GetTouch(0);
+            touch1 = touch1Set && Application.isEditor
+                ? new Touch
+                {
+                    phase = TouchPhase.Moved,
+                    position = touchPosition1,
+                    deltaPosition = touchDelta1
+                }
+                : Input.GetTouch(1);
+        }
+
+        private bool IsSimulatingTouches()
+        {
+            return (touch0Set && touch1Set);
+        }
+
+        private void SimulateTouches()
+        {
+            if (!Application.isEditor)
+            {
+                return;
+            }
+
+            if (Input.GetKey(KeyCode.LeftControl))
+            {
+                var mousePos = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+                if (Input.GetMouseButton(0))
+                {
+                    if (!touch0Set)
+                    {
+                        touchDelta0 = Vector2.zero;
+                        touch0Set = true;
+                    }
+                    else
+                    {
+                        touchDelta0 = mousePos - touchPosition0;
+                    }
+                    touchPosition0 = mousePos;
+                }
+                if (Input.GetMouseButton(1))
+                {
+                    if (!touch1Set)
+                    {
+                        touchDelta1 = Vector2.zero;
+                        touch1Set = true;
+                    }
+                    else
+                    {
+                        touchDelta1 = mousePos - touchPosition1;
+                    }
+                    touchPosition1 = mousePos;
+                }
+            }
+            else
+            {
+                touch0Set = false;
+                touch1Set = false;
             }
         }
     }

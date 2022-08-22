@@ -86,6 +86,13 @@ namespace uAdventure.Editor
             {
                 workingScene.HideInventory = newHideInventory;
             }
+
+            EditorGUI.BeginChangeCheck();
+            var newAllowZoom = EditorGUILayout.Toggle("Scene.AllowsZoom".Traslate(), workingScene.AllowsZoom);
+            if (EditorGUI.EndChangeCheck())
+            {
+                workingScene.AllowsZoom = newAllowZoom;
+            }
         }
     }
 }

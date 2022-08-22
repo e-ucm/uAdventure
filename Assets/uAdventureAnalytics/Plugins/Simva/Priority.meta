@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/uAdventureAnalytics/Plugins/Simva/Priority.meta
 guid: 7b8604bace3057440831ba5670a96806
+========
+guid: 0994453c83bd38543a8259ef77a45130
+>>>>>>>> master:Assets/uAdventureAnalytics/Plugins/Simva/Plugins/UniRx/Scripts/Asynchronous.meta
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}
