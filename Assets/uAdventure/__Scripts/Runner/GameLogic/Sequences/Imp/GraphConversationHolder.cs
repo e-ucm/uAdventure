@@ -80,6 +80,7 @@ namespace uAdventure.Runner
                         else if(XasuTracker.Instance.Status.State != TrackerState.Uninitialized)
                         {
                             CompletableTracker.Instance.Completed(initializedDialogNode, CompletableTracker.CompletableType.DialogFragment);
+                            initializedDialogNode = null;
                         }
                     }
 
