@@ -22,6 +22,7 @@ using SimvaPlugin;
 using Simva.Api;
 using UnityFx.Async.Promises;
 using UnityEngine.Networking;
+using System.IO.Compression;
 
 namespace uAdventure.Editor
 {
@@ -2229,7 +2230,27 @@ namespace uAdventure.Editor
                 File.WriteAllBytes(downloadPath + "/" + downloadFileName, uwr.downloadHandler.data);
                 // Unzip it
                 EditorUtility.DisplayProgressBar("Extracting...", "Extracting " + name + " to " + downloadPath, 0f);
-                //ZipUtil.Unzip(downloadPath + "/" + downloadFileName, downloadPath);
+
+                var buffer = new byte[1024];
+                using (FileStream zipToOpen = new FileStream(downloadPath + "/" + downloadFileName, FileMode.Open))
+                {
+                    using (ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Read))
+                    {
+                        foreach(var entry in archive.Entries)
+                        {
+                            Directory.CreateDirectory(Path.GetDirectoryName(downloadPath + "/" + entry.FullName));
+                            using (var file = File.OpenWrite(downloadPath + "/" + entry.FullName))
+                            using (var s = entry.Open())
+                            {
+                                while(s.CanRead)
+                                {
+                                    var read = s.Read(buffer, 0, 1024);
+                                    file.Write(buffer, 0, read);
+                                }
+                            }
+                        }
+                    }
+                }
                 EditorUtility.DisplayProgressBar("Extracting...", "Extracting " + name + " to " + downloadPath, 1f);
                 EditorUtility.ClearProgressBar();
                 // Delete the zip
