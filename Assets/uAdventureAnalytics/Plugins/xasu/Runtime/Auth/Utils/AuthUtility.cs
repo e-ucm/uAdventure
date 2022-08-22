@@ -127,7 +127,11 @@ namespace Xasu.Auth.Utils
                     Debug.Log("Getting WebGLListener response from url: " + WebGLUtility.GetCompleteUrl());
                     WebGLUtility.SetWebGLListening(false);
                     string queryString = new Uri(WebGLUtility.GetCompleteUrl()).Query;
+#if NET_4_6
+                    var queryDictionary = UriHelper.DecodeQueryParameters(queryString);
+#else
                     var queryDictionary = System.Web.HttpUtility.ParseQueryString(queryString);
+#endif
                     authListener.OnAuthReply(queryDictionary);
                 }
                 else

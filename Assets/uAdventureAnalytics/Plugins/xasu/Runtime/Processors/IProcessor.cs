@@ -16,5 +16,6 @@ namespace Xasu.Processors
         Task<Statement> Enqueue(Statement statement);
         Task Process(bool complete = false);
         Task Finalize(IProgress<float> progress);
+        Task Reset();
     }
 }

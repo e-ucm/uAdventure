@@ -20,11 +20,11 @@ namespace Xasu.HighLevel
         }
 
         public Dictionary<Enum, string> verbIds = new Dictionary<Enum, string>()
-    {
-        { Verb.Initialized,   "http://adlnet.gov/expapi/verbs/initialized"  },
-        { Verb.Progressed,    "http://adlnet.gov/expapi/verbs/progressed"   },
-        { Verb.Completed,     "http://adlnet.gov/expapi/verbs/completed"    }
-    };
+        {
+            { Verb.Initialized,   "http://adlnet.gov/expapi/verbs/initialized"  },
+            { Verb.Progressed,    "http://adlnet.gov/expapi/verbs/progressed"   },
+            { Verb.Completed,     "http://adlnet.gov/expapi/verbs/completed"    }
+        };
 
         protected override Dictionary<Enum, string> VerbIds => verbIds;
 
@@ -57,10 +57,10 @@ namespace Xasu.HighLevel
             { CompletableType.Stage,           "https://w3id.org/xapi/seriousgames/activity-types/stage"           },
             { CompletableType.Combat,          "https://w3id.org/xapi/seriousgames/activity-types/combat"          },
             { CompletableType.StoryNode,       "https://w3id.org/xapi/seriousgames/activity-types/story-node"      },
-            { CompletableType.Race,            "https://w3id.org/xapi/seriousgames/activity-types/dialog-node"     },
-            { CompletableType.Completable,     "https://w3id.org/xapi/seriousgames/activity-types/dialog-fragment" },
-            { CompletableType.DialogNode,      "https://w3id.org/xapi/seriousgames/activity-types/race"            },
-            { CompletableType.DialogFragment,  "https://w3id.org/xapi/seriousgames/activity-types/completable"     }
+            { CompletableType.Race,            "https://w3id.org/xapi/seriousgames/activity-types/race"            },
+            { CompletableType.Completable,     "https://w3id.org/xapi/seriousgames/activity-types/completable"     },
+            { CompletableType.DialogNode,      "https://w3id.org/xapi/seriousgames/activity-types/dialog-node"     },
+            { CompletableType.DialogFragment,  "https://w3id.org/xapi/seriousgames/activity-types/dialog-fragment" }
         };
 
         protected override Dictionary<Enum, string> TypeIds => typeIds;
@@ -72,10 +72,10 @@ namespace Xasu.HighLevel
 
         private readonly Dictionary<Enum, string> extensionIds = new Dictionary<Enum, string>
         {
-            { Extensions.Progress,            "/progress"    }
+            { Extensions.Progress,            "https://w3id.org/xapi/seriousgames/extensions/progress"    }
         };
 
-        protected override Dictionary<Enum, string> ExtensionIds => null;
+        protected override Dictionary<Enum, string> ExtensionIds => extensionIds;
 
         /**********************
             * Static attributes
@@ -137,9 +137,9 @@ namespace Xasu.HighLevel
                 verb = GetVerb(Verb.Initialized),
                 target = GetTargetActivity(completableId, type),
                 result = SetResultExtensions(new Result(), new Dictionary<Enum, object>
-            {
-                { Extensions.Progress, value }
-            })
+                {
+                    { Extensions.Progress, value }
+                })
             });
         }
 
@@ -187,7 +187,7 @@ namespace Xasu.HighLevel
         {
             if (!hasDuration && !initializedTimes.ContainsKey(completableId))
             {
-                throw new Cmi5Exception("The completed statement for the specified id has not been initialized!");
+                throw new XApiException("The completed statement for the specified id has not been initialized!");
             }
 
             // Get the initialized statement time to calculate the duration

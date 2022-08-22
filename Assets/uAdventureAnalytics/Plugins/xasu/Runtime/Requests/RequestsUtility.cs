@@ -248,7 +248,11 @@ namespace Xasu.Requests
                 {
                     currentQueryString += "&";
                 }
+#if NET_4_6
+                currentQueryString += System.Net.WebUtility.UrlEncode(entry.Key) + "=" + System.Net.WebUtility.UrlEncode(entry.Value);
+#else
                 currentQueryString += System.Web.HttpUtility.UrlEncode(entry.Key) + "=" + System.Web.HttpUtility.UrlEncode(entry.Value);
+#endif
             }
 
             return currentQueryString;

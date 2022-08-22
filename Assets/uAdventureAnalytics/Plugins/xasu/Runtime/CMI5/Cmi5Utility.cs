@@ -25,13 +25,21 @@ namespace Xasu.CMI5
                 var cmi5Args = cliArgs[cmi5ParamIndex + 1];
 
                 var uri = new Uri(cmi5Args);
+#if NET_4_6
+                var queryDictionary = UriHelper.DecodeQueryParameters(uri.Query);
+#else
                 var queryDictionary = System.Web.HttpUtility.ParseQueryString(uri.Query);
+#endif
                 return queryDictionary.Get(name);
             }
             else if(Application.platform == RuntimePlatform.WindowsEditor)
             {
                 var uri = new Uri(GameObject.FindObjectOfType<ArgSimulator>().cmi5Arg);
+#if NET_4_6
+                var queryDictionary = UriHelper.DecodeQueryParameters(uri.Query);
+#else
                 var queryDictionary = System.Web.HttpUtility.ParseQueryString(uri.Query);
+#endif
                 return queryDictionary.Get(name);
             }
 

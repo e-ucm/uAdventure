@@ -307,7 +307,12 @@ namespace Xasu.Auth.Protocols.OAuth
             switch (signatureType)
             {
                 case SignatureTypes.PLAINTEXT:
+#if NET_4_6
+                    return System.Net.WebUtility.UrlEncode(string.Format("{0}&{1}", consumerSecret, tokenSecret));
+#else
                     return HttpUtility.UrlEncode(string.Format("{0}&{1}", consumerSecret, tokenSecret));
+#endif
+
                 case SignatureTypes.HMACSHA1:
                     string signatureBase = GenerateSignatureBase(url, consumerKey, token, tokenSecret, httpMethod, timeStamp, nonce, HMACSHA1SignatureType, out normalizedUrl, out normalizedRequestParameters);
 

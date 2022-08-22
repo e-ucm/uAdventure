@@ -46,6 +46,8 @@ namespace Xasu.Config
         // Backup Settings
         [JsonProperty("backup")]
         public bool Backup { get; set; }
+        [JsonProperty("backup_file_name")]
+        public string BackupFileName { get; set; } = "backup.log";
         [JsonProperty("backup_trace_format")]
         public TraceFormats BackupTraceFormat { get; set; }
         [JsonProperty("backup_endpoint")]

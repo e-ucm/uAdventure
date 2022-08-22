@@ -143,5 +143,11 @@ namespace Xasu.Processors
 
             return Task.FromResult(true);
         }
+
+        public virtual Task Reset()
+        {
+            State = ProcessorState.Working;
+            return Task.FromResult(true);
+        }
     }
 }

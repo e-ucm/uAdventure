@@ -1,0 +1,28 @@
+{
+    "name": "es.e-ucm.xasu",
+    "version": "0.0.1",
+    "displayName": "Xasu - xAPI Analytics Submitter / Cmi5 Tracker",
+    "description": "A xAPI Tracker with cmi5 and many QoL features.",
+    "keywords": ["xapi", "learning analytics", "cmi5"],
+    "dependencies": {
+        "com.unity.nuget.newtonsoft-json": "3.0.2"
+    },
+    "untiy": "2019.4",
+    "author": {
+        "name": "e-UCM Learning Group",
+        "email": "info@e-ucm.es",
+        "url": "https://github.com/e-ucm/xasu"
+    },
+    "samples": [
+        {
+            "displayName": "Simple Tester",
+            "description": "Contains a simple tracker tester.",
+            "path": "Samples~/SimpleTester"
+        },
+        {
+            "displayName": "Complete Tester With cmi5",
+            "description": "Contains a simple scene with a testing interface and a cmi5 control panel.",
+            "path": "Samples~/CompleteTesterWithCmi5"
+        }
+    ]
+}

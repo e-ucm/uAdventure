@@ -185,12 +185,28 @@ namespace Xasu.Processors
                 // Fallback behavior
                 if (!CircuitsClosed() && fallback)
                 {
-                    State = ProcessorState.Fallback;
-                    // The fallback mode saves traces locally until the circuit is closed again
-                    hasFallbackTraces = true;
-                    var prevSize = localQueue.Size;
-                    await base.Process();
-                    TracesToFallback += prevSize - localQueue.Size;
+                    do
+                    {
+                        State = ProcessorState.Fallback;
+                        // The fallback mode saves traces locally until the circuit is closed again
+                        hasFallbackTraces = true;
+                        var prevSize = localQueue.Size;
+                        await base.Process();
+                        TracesToFallback += prevSize - localQueue.Size;
+                    } while (complete && localQueue.Size > 0);
+                }
+
+                // When requesting a complete flush traces can be stored in fallback, but finalize has to stop, so we must raise an exception
+                if (complete && !CircuitsClosed())
+                {
+                    if (apiCircuitBreaker.CircuitState == CircuitState.Open || apiCircuitBreaker.CircuitState == CircuitState.Isolated)
+                    {
+                        throw apiCircuitBreaker.LastException;
+                    }
+                    else
+                    {
+                        throw networkCircuitBreaker.LastException;
+                    }
                 }
 
             } while (complete && (hasFallbackTraces || localQueue.Size > 0));
@@ -206,9 +222,12 @@ namespace Xasu.Processors
         {
             progress?.Report(0);
             float total = localQueue.Size;
-            while(localQueue.Size > 0)
+
+            // Asynchronous processing
+            var task = Process(true);
+            while (localQueue.Size > 0 && !task.IsCompleted)
             {
-                await Process();
+                await Task.Yield();
                 progress?.Report((total - localQueue.Size) / total);
             }
         }
@@ -403,6 +422,12 @@ namespace Xasu.Processors
                 hasFallbackTraces = false;
                 State = ProcessorState.Working;
             }
+        }
+
+        public override Task Reset()
+        {
+            State = hasFallbackTraces ? ProcessorState.Fallback : ProcessorState.Working;
+            return Task.FromResult(true);
         }
     }
 }

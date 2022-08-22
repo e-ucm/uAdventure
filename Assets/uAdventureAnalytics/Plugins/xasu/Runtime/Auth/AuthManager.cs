@@ -24,7 +24,7 @@ namespace Xasu.Auth
 
         public static async Task<IAuthProtocol> InitAuth(string authName, IDictionary<string, string> parameters, IAsyncPolicy policy)
         {
-            if (authName == "none" || authName == "disabled")
+            if (authName == null || authName == "none" || authName == "disabled")
             {
                 return null;
             }

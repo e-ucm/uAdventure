@@ -3,12 +3,14 @@ using Newtonsoft.Json.Linq;
 using Polly;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using TinCan;
 using UnityEngine;
 using Xasu.Auth.Protocols;
 using Xasu.Config;
+using Xasu.Exceptions;
 using Xasu.Requests;
 
 namespace Xasu.Processors
@@ -21,14 +23,14 @@ namespace Xasu.Processors
         private IAuthProtocol authorization;
         private IAsyncPolicy policy;
 
-        public BackupProcessor(TraceFormats traceFormat, string backupEndpoint,
+        public BackupProcessor(string backupFileName, TraceFormats traceFormat, string backupEndpoint,
             JObject backupRequestParameters, IAuthProtocol authorization, IAsyncPolicy policy)
-            : this(traceFormat, TCAPIVersion.V103, backupEndpoint, backupRequestParameters, authorization, policy)
+            : this(backupFileName, traceFormat, TCAPIVersion.V103, backupEndpoint, backupRequestParameters, authorization, policy)
         {
         }
 
-        public BackupProcessor(TraceFormats traceFormat, TCAPIVersion version, string backupEndpoint, 
-            JObject backupRequestParameters, IAuthProtocol authorization, IAsyncPolicy policy) : base("backup.log", traceFormat, version, true)
+        public BackupProcessor(string backupFileName, TraceFormats traceFormat, TCAPIVersion version, string backupEndpoint, 
+            JObject backupRequestParameters, IAuthProtocol authorization, IAsyncPolicy policy) : base(backupFileName, traceFormat, version, true)
         {
             this.backupEndpoint = backupEndpoint;
             this.backupRequestParameters = backupRequestParameters;
@@ -95,10 +97,31 @@ namespace Xasu.Processors
                 }
 
                 var myResponse = await RequestsUtility.DoRequest(myRequest, progress);
-                if (myResponse.status != 200) // Status >= 400 will throw APIException
+
+                // Response.success == false
+                if (myResponse.ex is APIException apiEx)
                 {
-                    var text = Encoding.UTF8.GetString(myResponse.content);
-                    Debug.LogWarning(string.Format("[TRACKER: Backup Processor] Backup upload returned status {0} with message: {1}", myResponse.status, text));
+                    switch ((HttpStatusCode)apiEx.HttpCode)
+                    {
+                        // Authorization issues are forwarded to the auth protocol
+                        case HttpStatusCode.Unauthorized:
+                            State = ProcessorState.Errored;
+                            ErrorMessage = "Unauthorized: " + apiEx.Message;
+                            authorization?.Unauthorized(apiEx);
+                            break;
+                        case HttpStatusCode.Forbidden:
+                            State = ProcessorState.Errored;
+                            ErrorMessage = "Forbidden: " + apiEx.Message;
+                            authorization?.Forbidden(apiEx);
+                            break;
+                        default:
+                            var text = Encoding.UTF8.GetString(myResponse.content);
+                            State = ProcessorState.Errored;
+                            XasuTracker.Instance.LogError(string.Format("[TRACKER: Backup Processor] Backup upload returned status {0} with message: {1}", myResponse.status, text));
+                            break;
+                    }
+
+                    throw apiEx;
                 }
             }
             else if (progress != null)

@@ -66,7 +66,7 @@ namespace Xasu
             await Init(await TrackerConfigLoader.LoadLocalAsync());
         }
 
-        public async Task Init(TrackerConfig trackerConfig)
+        public async Task Init(TrackerConfig trackerConfig, IAuthProtocol onlineAuthorization = null, IAuthProtocol backupAuthorization = null)
         {
             try
             {
@@ -83,8 +83,8 @@ namespace Xasu
                 // TODO: Implement a ProcessorFactory that performs generic initialization
                 if (TrackerConfig.Online)
                 {
-                    onlineAuthProtocol = await AuthManager.InitAuth(TrackerConfig.AuthProtocol, TrackerConfig.AuthParameters, null); // TODO: Auth Policies
-                    if (onlineAuthProtocol.State == AuthState.Errored)
+                    onlineAuthProtocol = onlineAuthorization ?? await AuthManager.InitAuth(TrackerConfig.AuthProtocol, TrackerConfig.AuthParameters, null); // TODO: Auth Policies
+                    if (onlineAuthProtocol?.State == AuthState.Errored)
                     {
                         LogError("[TRACKER] Failed to initialize auth for LRS: " + onlineAuthProtocol.ErrorMessage);
                         return;
@@ -117,7 +117,11 @@ namespace Xasu
 
                 if (TrackerConfig.Backup)
                 {
-                    if (!string.IsNullOrEmpty(TrackerConfig.BackupAuthProtocol))
+                    if(backupAuthorization != null)
+                    {
+                        backupAuthProtocol = backupAuthorization;
+                    }
+                    else if (!string.IsNullOrEmpty(TrackerConfig.BackupAuthProtocol))
                     {
                         backupAuthProtocol = TrackerConfig.BackupAuthProtocol == "same" 
                             ? onlineAuthProtocol 
@@ -131,15 +135,15 @@ namespace Xasu
                     }
 
                     Debug.Log("[TRACKER] Initializing backup processor...");
-                    backupProcessor = new BackupProcessor(TrackerConfig.BackupTraceFormat, TrackerConfig.BackupEndpoint,
-                        TrackerConfig.BackupRequestConfig, backupAuthProtocol, null); // TODO: Backup policy
+                    backupProcessor = new BackupProcessor(TrackerConfig.BackupFileName, TrackerConfig.BackupTraceFormat, 
+                        TrackerConfig.BackupEndpoint, TrackerConfig.BackupRequestConfig, backupAuthProtocol, null); // TODO: Backup policy
 
-                    await localProcessor.Init();
-                    processors.Add(localProcessor);
+                    await backupProcessor.Init();
+                    processors.Add(backupProcessor);
                 }
 
                 // Actor is obtained from authorization (e.g. OAuth contains username, CMI-5 obtains agent)
-                DefaultActor = onlineAuthProtocol != null ? onlineAuthProtocol.Agent : new Agent { name = "Dummy User" };
+                DefaultActor = onlineAuthProtocol != null ? onlineAuthProtocol.Agent : new Agent { name = "Dummy User", mbox = "dummy@user.com" };
 
                 traceProcessors = processors.ToArray();
 
@@ -162,6 +166,7 @@ namespace Xasu
             {
                 Status.InitException = ex;
                 LogError("[TRACKER] Init exception!", ex);
+                throw;
             }
             
         }
@@ -215,6 +220,7 @@ namespace Xasu
             {
                 Status.FinalizeException = ex;
                 LogError("[TRACKER] Finalize failed!", ex);
+                throw;
             }
         }
 
@@ -291,6 +297,18 @@ namespace Xasu
                     // All tasks return the same statement
                     return t.Result[0];
                 }, TaskScheduler.FromCurrentSynchronizationContext());
+        }
+
+        public async Task ResetState()
+        {
+            foreach(var p in traceProcessors)
+            {
+                await p.Reset();
+            }
+
+            Status.InitException = null;
+            Status.LoopException = null;
+            Status.FinalizeException = null;
         }
 
 

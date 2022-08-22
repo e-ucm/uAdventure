@@ -29,6 +29,7 @@ namespace Xasu.Auth.Protocols
         private const string tokenEndpointField = "token_endpoint";
         private const string grantTypeField = "grant_type";
         private const string usernameField = "username";
+        private const string refreshTokenField = "refresh_token";
         private const string passwordField = "password";
         private const string clientIdField = "client_id";
         private const string scopeField = "scope";
@@ -65,6 +66,9 @@ namespace Xasu.Auth.Protocols
 
         public Agent Agent { get; protected set; }
 
+        public delegate void OnAuthorizationInfoUpdate(OAuth2Token info);
+        private OnAuthorizationInfoUpdate onAuthorizationInfoUpdate;
+
         public async Task Init(IDictionary<string, string> config)
         {
             initConfig = config;
@@ -77,10 +81,10 @@ namespace Xasu.Auth.Protocols
 
             // Parse PKCE
             codeChallengeMethod = PKCETypes.None;
-            var codeChallengeMethodString = config.Value(codeChallengeMethodField).ToUpper();
             // We only support "S256" (SHA256) code challenge / PKCE method
-            if (!string.IsNullOrEmpty(codeChallengeMethodString))
-            { 
+            if (config.ContainsKey(codeChallengeMethodField))
+            {
+                var codeChallengeMethodString = config.Value(codeChallengeMethodField)?.ToUpper();
                 switch (codeChallengeMethodString)
                 {
                     case "S256": codeChallengeMethod = PKCETypes.S256; break;
@@ -97,7 +101,10 @@ namespace Xasu.Auth.Protocols
             switch (grantType)
             {
                 case "refresh_token":
-                    throw new NotSupportedException("Not yet supported!");
+                    var refresh_token = config.GetRequiredValue(refreshTokenField, fieldMissingMessage);
+                    token = await DoRefreshToken(tokenEndpoint, clientId, refresh_token);
+                    break;
+
                 case "code":
                     // TODO: support client secret
                     authEndpoint = config.GetRequiredValue(authEndpointField, fieldMissingMessage);
@@ -131,6 +138,7 @@ namespace Xasu.Auth.Protocols
             if (token.Expired)
             {
                 token = await DoRefreshToken(tokenEndpoint, clientId, token.RefreshToken);
+                onAuthorizationInfoUpdate?.Invoke(token);
             }
 
             // Capitalize
@@ -138,6 +146,17 @@ namespace Xasu.Auth.Protocols
 
             // Add authorization header
             request.headers.Add("Authorization", string.Format("{0} {1}", tokenType, token.AccessToken));
+        }
+
+        public void RegisterAuthInfoUpdate(OnAuthorizationInfoUpdate toRegister)
+        {
+            if (toRegister == null) return;
+
+            onAuthorizationInfoUpdate += toRegister;
+            if(token != null)
+            {
+                toRegister(token);
+            }
         }
 
         private static async Task<OAuth2Token> DoAccessCodeFlow(string authUrl, string tokenUrl, string clientId, PKCETypes pkceType,

@@ -8,7 +8,7 @@ namespace Xasu.Util
 {
     public static class NetworkInfo
     {
-        private static bool isWorking;
+        private static bool isWorking = true;
 
         public static bool IsWorking()
         {

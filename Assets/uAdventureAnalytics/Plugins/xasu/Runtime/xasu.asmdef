@@ -1,0 +1,15 @@
+{
+    "name": "xasu",
+    "references": [
+        "GUID:a5ca23f18daed2d45b37b1ee9fc9d9d7"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

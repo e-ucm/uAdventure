@@ -74,6 +74,25 @@ public class PackageDownloader
 
     private static void DecompressFile(string CompressedFileName, string DecompressedFileName)
     {
-        ZipUtil.Unzip(CompressedFileName, DecompressedFileName);
+        var buffer = new byte[1024];
+        using (FileStream zipToOpen = new FileStream(CompressedFileName, FileMode.Open))
+        {
+            using (ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Read))
+            {
+                foreach (var entry in archive.Entries)
+                {
+                    Directory.CreateDirectory(Path.GetDirectoryName(DecompressedFileName + "/" + entry.FullName));
+                    using (var file = File.OpenWrite(DecompressedFileName + "/" + entry.FullName))
+                    using (var s = entry.Open())
+                    {
+                        while (s.CanRead)
+                        {
+                            var read = s.Read(buffer, 0, 1024);
+                            file.Write(buffer, 0, read);
+                        }
+                    }
+                }
+            }
+        }
     }
 }
