@@ -6,21 +6,18 @@ using System;
 using UnityEngine.EventSystems;
 using UnityFx.Async;
 using Simva.Model;
+using Simva;
 
-namespace uAdventure.Simva
+namespace Simva
 {
     // Manager for "Simva.Survey"
-    public class SurveyController : MonoBehaviour, IRunnerChapterTarget
+    public class SurveyController : SimvaSceneController
     {
         private bool surveyOpened;
 
-        public object Data { get { return null; } set { } }
-
-        public bool IsReady { get { return true; } }
-
         public void OpenSurvey()
         {
-            var simvaExtension = GameExtension.GetInstance<SimvaExtension>();
+            var simvaExtension = SimvaManager.Instance;
             simvaExtension.NotifyLoading(true);
             string activityId = simvaExtension.CurrentActivityId;
             string username = simvaExtension.API.Authorization.Agent.name;
@@ -49,73 +46,21 @@ namespace uAdventure.Simva
 
         public void CheckSurvey()
         {
-            var simvaExtension = GameExtension.GetInstance<SimvaExtension>();
-            simvaExtension.NotifyLoading(true);
-            string activityId = simvaExtension.CurrentActivityId;
-            string username = simvaExtension.API.Authorization.Agent.name;
-            simvaExtension.API.Api.GetCompletion(activityId, username)
-                .Then(result =>
-                {
-                    if (result[username])
-                    {
-                        return simvaExtension.UpdateSchedule();
-                    }
-                    else
-                    {
-                        simvaExtension.NotifyManagers("Survey not completed");
-                        simvaExtension.NotifyLoading(false);
-                        var nullresult = new AsyncCompletionSource<Schedule>();
-                        nullresult.SetResult(null);
-                        return nullresult;
-                    }
-                })
-                .Then(schedule =>
-                {
-                    var result = new AsyncCompletionSource();
-                    if (schedule != null)
-                    {
-                        StartCoroutine(simvaExtension.AsyncCoroutine(simvaExtension.LaunchActivity(schedule.Next), result));
-                    }
-                    else
-                    {
-                        result.SetException(new Exception("No schedule!"));
-                    }
-                    return result;
-                })
-                .Catch(error =>
-                {
-                    simvaExtension.NotifyManagers(error.Message);
-                    simvaExtension.NotifyLoading(false);
-                });
+            SimvaManager.Instance.ContinueSurvey();
         }
 
-        public void RenderScene() 
+        public override void Render() 
         {
-            InventoryManager.Instance.Show = false;
+            Ready = true;
             //var background = GameObject.Find("background").GetComponent<Image>();
             /*var backgroundPath = 
             var backgroundSprite = Game.Instance.ResourceManager.getSprite();
             background.sprite = Game.Instance.ResourceManager.getSprite()*/
         }
 
-        public void Destroy(float time, Action onDestroy)
+        public override void Destroy()
         {
             GameObject.DestroyImmediate(gameObject);
-            onDestroy();
-        }
-
-        public InteractuableResult Interacted(PointerEventData pointerData = null)
-        {
-            return InteractuableResult.IGNORES;
-        }
-
-        public bool canBeInteracted()
-        {
-            return false;
-        }
-
-        public void setInteractuable(bool state)
-        {
         }
     }
 }

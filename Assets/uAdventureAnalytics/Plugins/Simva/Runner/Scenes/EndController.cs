@@ -1,56 +1,23 @@
 ﻿using UnityEngine;
-using UniRx;
-using UnityFx.Async.Promises;
-using uAdventure.Runner;
-using System;
-using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
-namespace uAdventure.Simva
+namespace Simva
 {
     // Manager for "Simva.End"
-    public class EndController : MonoBehaviour, IRunnerChapterTarget
+    public class EndController : SimvaSceneController
     {
-        private bool ready;
-
-        public object Data { get { return null; } set { } }
-
-        public bool IsReady { get { return ready; } }
-
-        protected void OnApplicationResume()
-        {
-        }
-
         public void Quit()
         {
             Application.Quit();
         }
 
-
-        public void RenderScene()
+        public override void Render()
         {
-            InventoryManager.Instance.Show = false;
-            ready = true;
+            Ready = true;
         }
 
-        public void Destroy(float time, Action onDestroy)
+        public override void Destroy()
         {
             GameObject.DestroyImmediate(this.gameObject);
-            onDestroy();
-        }
-
-        public InteractuableResult Interacted(PointerEventData pointerData = null)
-        {
-            return InteractuableResult.IGNORES;
-        }
-
-        public bool canBeInteracted()
-        {
-            return false;
-        }
-
-        public void setInteractuable(bool state)
-        {
         }
     }
 }

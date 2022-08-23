@@ -3,66 +3,23 @@ using System.IO;
 using uAdventure.Runner;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityFx.Async;
 using UnityFx.Async.Promises;
 using uAdventure.Analytics;
-using SimvaPlugin;
-using Simva.Api;
-using Simva.Model;
 using Simva;
-using System.Collections.Generic;
-using System.Linq;
 using System.Collections;
 using Newtonsoft.Json;
-using uAdventure.Core;
 using Xasu.Auth.Protocols.OAuth2;
+using Xasu.Auth.Protocols;
+using UnityFx.Async;
 
 namespace uAdventure.Simva
 {
-    public class SimvaExtension : GameExtension, Interactuable
+    public class SimvaExtension : GameExtension, Interactuable, ISimvaBridge
     {
-        public delegate void LoadingDelegate(bool loading);
-        public delegate void ResponseDelegate(string message);
-
-        private LoadingDelegate loadingListeners;
-        private ResponseDelegate responseListeners;
         private string savedGameTarget;
         private bool wasAutoSave;
         private bool firstTimeDisabling = true;
-
         private OAuth2Token auth;
-
-        public Schedule Schedule { get; private set; }
-
-        public SimvaApi<IStudentsApi> API { get; private set; }
-
-        public bool IsActive
-        {
-            get
-            {
-                return this.API != null && this.auth != null && Schedule != null;
-            }
-        }
-
-        public string CurrentActivityId
-        {
-            get
-            {
-                if (Schedule != null)
-                {
-                    return Schedule.Next;
-                }
-                return null;
-            }
-        }
-
-        public bool IsEnabled
-        {
-            get
-            {
-                return !string.IsNullOrEmpty(SimvaConf.Local.Study);
-            }
-        }
 
         [Priority(10)]
         public override IEnumerator OnAfterGameLoad()
@@ -76,12 +33,12 @@ namespace uAdventure.Simva
                 Debug.Log("[SIMVA] Conf Loaded...");
             }
 
-            if (!IsEnabled)
+            if (!SimvaManager.Instance.IsEnabled)
             {
                 Debug.Log("[SIMVA] Study is not set! Stopping...");
                 yield return null;
             }
-            else if (IsActive)
+            else if (SimvaManager.Instance.IsActive)
             {
                 Debug.Log("[SIMVA] Simva is already started...");
                 // No need to restart
@@ -132,24 +89,15 @@ namespace uAdventure.Simva
             }
         }
 
-        private bool afterFinalize;
-        public void AfterFinalize()
-        {
-            afterFinalize = true;
-        }
-
 
         [Priority(10)]
         public override IEnumerator OnGameFinished()
         {
             yield return new WaitWhile(() => Game.Instance.isSomethingRunning());
-            if (IsActive)
+            if (SimvaManager.Instance.IsActive)
             {
                 var readyToClose = false;
-                DisableAutoSave();
-                Game.Instance.RunTarget("Simva.Finalize", null, false);
-                yield return new WaitUntil(() => afterFinalize);
-                Continue(CurrentActivityId, true)
+                SimvaManager.Instance.OnGameFinished()
                     .Then(() => readyToClose = true);
 
                 yield return new WaitUntil(() => readyToClose);
@@ -164,32 +112,13 @@ namespace uAdventure.Simva
         {
             if (PlayerPrefs.HasKey("simva_auth"))
             {
-                NotifyLoading(true);
-                this.auth = JsonConvert.DeserializeObject<OAuth2Token>(PlayerPrefs.GetString("simva_auth"));
-                this.auth.ClientId = "uadventure";
-                SimvaApi<IStudentsApi>.Login(this.auth.RefreshToken)
-                    .Then(simvaController =>
-                    {
-                        this.API = simvaController;
-                        this.API.Authorization.RegisterAuthInfoUpdate(auth => this.auth = auth);
-                        return UpdateSchedule();
-                    })
-                    .Then(schedule =>
-                    {
-                        var result = new AsyncCompletionSource();
-                        StartCoroutine(AsyncCoroutine(LaunchActivity(schedule.Next), result));
-                        return result;
-                    })
-                    .Catch(error =>
-                    {
-                        NotifyLoading(false);
-                        NotifyManagers(error.Message);
-                    });
-
+                var auth = JsonConvert.DeserializeObject<OAuth2Token>(PlayerPrefs.GetString("simva_auth"));
+                auth.ClientId = "uadventure";
+                SimvaManager.Instance.LoginWithRefreshToken(auth.RefreshToken);
             }
             else if (HasLoginInfo())
             {
-                ContinueLoginAndSchedule();
+                SimvaManager.Instance.ContinueLoginAndSchedule();
             }
             yield return null;
         }
@@ -199,309 +128,6 @@ namespace uAdventure.Simva
             yield return null;
         }
 
-        public void InitUser()
-        {
-            LoginAndSchedule();
-        }
-
-        public void LoginAndSchedule()
-        {
-            NotifyLoading(true);
-            SimvaApi<IStudentsApi>.Login()
-                .Then(simvaController =>
-                {
-                    this.API = simvaController;
-                    this.API.Authorization.RegisterAuthInfoUpdate(auth => this.auth = auth);
-                    return UpdateSchedule();
-                })
-                .Then(schedule =>
-                {
-                    var result = new AsyncCompletionSource();
-                    StartCoroutine(AsyncCoroutine(LaunchActivity(schedule.Next), result));
-                    return result;
-                })
-                .Catch(error =>
-                {
-                    NotifyLoading(false);
-                    NotifyManagers(error.Message);
-                });
-        }
-
-        public void LoginAndSchedule(string token)
-        {
-            NotifyLoading(true);
-            SimvaApi<IStudentsApi>.LoginWithToken(token)
-                .Then(simvaController =>
-                {
-                    this.API = simvaController;
-                    this.API.Authorization.RegisterAuthInfoUpdate(auth => this.auth = auth);
-                    PlayerPrefs.SetString("simva_auth", JsonConvert.SerializeObject(auth));
-                    PlayerPrefs.Save();
-                    return UpdateSchedule();
-                })
-                .Then(schedule =>
-                {
-                    var result = new AsyncCompletionSource();
-                    StartCoroutine(AsyncCoroutine(LaunchActivity(schedule.Next), result));
-                    return result;
-                })
-                .Catch(error =>
-                {
-                    NotifyLoading(false);
-                    NotifyManagers(error.Message);
-                });
-        }
-
-        public void ContinueLoginAndSchedule()
-        {
-            NotifyLoading(true);
-            SimvaApi<IStudentsApi>.ContinueLogin()
-                .Then(simvaController =>
-                {
-                    this.API = simvaController;
-                    this.API.Authorization.RegisterAuthInfoUpdate(auth => this.auth = auth);
-                    return UpdateSchedule();
-                })
-                .Then(schedule =>
-                {
-                    var result = new AsyncCompletionSource();
-                    StartCoroutine(AsyncCoroutine(LaunchActivity(schedule.Next), result));
-                    return result;
-                })
-                .Catch(error =>
-                {
-                    NotifyLoading(false);
-                    NotifyManagers(error.Message);
-                });
-        }
-
-        public IAsyncOperation<Schedule> UpdateSchedule()
-        {
-            var result = new AsyncCompletionSource<Schedule>(); 
-                
-            API.Api.GetSchedule(API.SimvaConf.Study)
-                .Then(schedule =>
-                {
-                    this.Schedule = schedule;
-                    foreach(var a in schedule.Activities)
-                    {
-                        schedule.Activities[a.Key].Id = a.Key;
-                    }
-                    Debug.Log("[SIMVA] Schedule: " + JsonConvert.SerializeObject(schedule));
-                    result.SetResult(schedule);
-                })
-                .Catch(result.SetException);
-            return result;
-        }
-
-
-        public IAsyncOperation SaveActivity(string activityId, string traces, bool completed)
-        {
-            NotifyLoading(true);
-
-            var body = new Dictionary<string, object>();
-            if (!string.IsNullOrEmpty(traces))
-            {
-                body.Add("tofile", true);
-                body.Add("result", traces);
-            }
-
-            var result = new AsyncCompletionSource();
-
-            var response = (AsyncCompletionSource) API.Api.SetResult(activityId, API.Authorization.Agent.name, body);
-            response.AddProgressCallback((p) =>
-             {
-                 UnityEngine.Debug.Log("SaveActivityAndContinue progress: " + p);
-                 if (!result.IsCompleted && !result.IsCanceled)
-                 {
-                     result.SetProgress(p);
-                 }
-             });
-
-            response
-                .Then(() =>
-                {
-                    NotifyLoading(false);
-                    result.SetCompleted();
-                })
-                .Catch(e => {
-                    result.SetException(e);
-                });
-
-            return result;
-        }
-
-        public IAsyncOperation Continue(string activityId, bool completed)
-        {
-            NotifyLoading(true);
-            return API.Api.SetCompletion(activityId, API.Authorization.Agent.name, completed)
-                .Then(() =>
-                {
-                    return UpdateSchedule();
-                })
-                .Then(schedule =>
-                {
-                    var result = new AsyncCompletionSource();
-                    StartCoroutine(AsyncCoroutine(LaunchActivity(schedule.Next), result));
-                    return result;
-                })
-                .Finally(() =>
-                {
-                    NotifyLoading(false);
-                })
-                .Catch(error =>
-                {
-                    NotifyLoading(false);
-                    NotifyManagers(error.Message);
-                });
-        }
-
-        public Activity GetActivity(string activityId)
-        {
-            if (Schedule != null)
-            {
-                return Schedule.Activities[activityId];
-            }
-            return null;
-        }
-
-        public IEnumerator LaunchActivity(string activityId)
-        {
-            if (activityId == null)
-            {
-                DisableAutoSave();
-                Game.Instance.RunTarget("Simva.End", null, false);
-                Schedule = null;
-            }
-            else
-            {
-                Activity activity = GetActivity(activityId);
-
-                if (activity != null)
-                {
-                    Game.Instance.AbortQuit();
-                    Debug.Log("[SIMVA] Schedule: " + activity.Type + ". Name: " + activity.Name + " activityId " + activityId);
-                    switch (activity.Type)
-                    {
-                        case "limesurvey":
-                            Debug.Log("[SIMVA] Starting Survey...");
-                            DisableAutoSave();
-                            Game.Instance.RunTarget("Simva.Survey", null, false);
-                            break;
-                        case "gameplay":
-                        default:
-                            var trackerConfig = new TrackerConfig();
-
-                            trackerConfig.setStorageType(TrackerConfig.StorageType.LOCAL);
-                            trackerConfig.setTraceFormat(TrackerConfig.TraceFormat.XAPI);
-                            trackerConfig.setDebug(true);
-                            trackerConfig.setRawCopy(true);
-
-                            if (ActivityHasDetails(activity, "realtime", "trace_storage"))
-                            {
-                                // Realtime
-                                trackerConfig.setStorageType(TrackerConfig.StorageType.NET);
-                                trackerConfig.setHost(API.SimvaConf.URL);
-                                trackerConfig.setBasePath("");
-                                trackerConfig.setLoginEndpoint("/users/login");
-                                trackerConfig.setStartEndpoint(string.Format("/activities/{0}", activityId));
-                                trackerConfig.setTrackEndpoint(string.Format("/activities/{0}", activityId));
-                                trackerConfig.setTrackingCode(activityId);
-                                trackerConfig.setUseBearerOnTrackEndpoint(true);
-                                Debug.Log("TrackingCode: " + activity.Id + " settings " + trackerConfig.getTrackingCode());
-                            }
-
-                            if (ActivityHasDetails(activity, "backup"))
-                            {
-                                // Backup
-                                trackerConfig.setRawCopy(true);
-                                trackerConfig.setBackupEndpoint(string.Format("/activities/{0}/result", activityId));
-                                trackerConfig.setBackupFileName(auth.Username + "_" + activityId + "_backup.log");
-                            }
-
-                            if (ActivityHasDetails(activity, "realtime", "trace_storage", "backup"))
-                            {
-                                Debug.Log("[SIMVA] Starting tracker...");
-                                yield return StartCoroutine(GetInstance<AnalyticsExtension>().StartTracker(trackerConfig, API.Authorization, API.Authorization));
-                            }
-
-                            Debug.Log("[SIMVA] Starting Gameplay...");
-                            RestoreAutoSave();
-                            Game.Instance.RunTarget(savedGameTarget, this);
-                            break;
-                    }
-                }
-            }
-        }
-
-        private bool ActivityHasDetails(Activity activity, params string[] details)
-        {
-            if (activity.Details == null)
-            {
-                return false;
-            }
-
-            return details.Any(d => IsTrue(activity.Details, d));
-        }
-
-        private static bool IsTrue(Dictionary<string, object> details, string key)
-        {
-            return details.ContainsKey(key) && details[key] is bool && (bool)details[key];
-        }
-
-        // NOTIFIERS
-
-        public void AddResponseManager(SimvaResponseManager manager)
-        {
-            if (manager)
-            {
-                // To make sure we only have one instance of a notify per manager
-                // We first remove (as it is ignored if not present)
-                responseListeners -= manager.Notify;
-                // Then we add it
-                responseListeners += manager.Notify;
-            }
-        }
-
-        public void RemoveResponseManager(SimvaResponseManager manager)
-        {
-            if (manager)
-            {
-                // If a delegate is not present the method gets ignored
-                responseListeners -= manager.Notify;
-            }
-        }
-
-        public void AddLoadingManager(SimvaLoadingManager manager)
-        {
-            if (manager)
-            {
-                // To make sure we only have one instance of a notify per manager
-                // We first remove (as it is ignored if not present)
-                loadingListeners -= manager.IsLoading;
-                // Then we add it
-                loadingListeners += manager.IsLoading;
-            }
-        }
-
-        public void RemoveLoadingManager(SimvaLoadingManager manager)
-        {
-            if (manager)
-            {
-                // If a delegate is not present the method gets ignored
-                loadingListeners -= manager.IsLoading;
-            }
-        }
-
-        public void NotifyManagers(string message)
-        {
-            responseListeners?.Invoke(message);
-        }
-
-        public void NotifyLoading(bool state)
-        {
-            loadingListeners?.Invoke(state);
-        }
 
         public InteractuableResult Interacted(PointerEventData pointerData = null)
         {
@@ -522,10 +148,47 @@ namespace uAdventure.Simva
         {
         }
 
-        internal IEnumerator AsyncCoroutine(IEnumerator coroutine, IAsyncCompletionSource op)
+        public void StartGameplay()
         {
-            yield return coroutine;
-            op.SetCompleted();
+            RunScene(savedGameTarget);
+        }
+
+        public void RunScene(string name)
+        {
+            switch (name)
+            {
+                case "Simva.Login":
+                case "Simva.Survey":
+                case "Simva.Finalize":
+                case "Simva.End":
+                    DisableAutoSave();
+                    Game.Instance.RunTarget(name, null, false);
+                    break;
+                default:
+                    RestoreAutoSave();
+                    Game.Instance.RunTarget(name, null);
+                    break;
+            }
+        }
+
+        public IAsyncOperation StartTracker(Xasu.Config.TrackerConfig config, IAuthProtocol onlineProtocol, IAuthProtocol backupProtocol)
+        {
+            var result = new AsyncCompletionSource();
+
+
+
+            return result;
+        }
+
+        private IEnumerator StartTrackerRoutine(Xasu.Config.TrackerConfig config, IAuthProtocol onlineProtocol, IAuthProtocol backupProtocol, Action done)
+        {
+            yield return StartCoroutine(GetInstance<AnalyticsExtension>().StartTracker(config, onlineProtocol, backupProtocol));
+            done();
+        }
+
+        public void OnAuthUpdated(OAuth2Token token)
+        {
+            auth = token;
         }
     }
 }

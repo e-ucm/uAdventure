@@ -11,12 +11,12 @@ namespace Simva
 
         protected void Start()
         {
-            GameExtension.GetInstance<SimvaExtension>().AddLoadingManager(this);
+            SimvaManager.Instance.AddLoadingManager(this);
         }
 
         protected void OnDestroy()
         {
-            GameExtension.GetInstance<SimvaExtension>().RemoveLoadingManager(this);
+            SimvaManager.Instance.RemoveLoadingManager(this);
         }
 
         public void IsLoading(bool state)

@@ -87,6 +87,12 @@ namespace uAdventure.Geo
 
         public override IEnumerator Restart()
         {
+            if (PreviewManager.Instance.InPreviewMode)
+            {
+                GameExtension.GetInstance<Geo.GeoExtension>().UsingDebugLocation = true;
+                GameExtension.GetInstance<Geo.GeoExtension>().Location = new Vector2d(40.4436403741371, -3.72659319639157);
+            }
+            
             CreateNavigationAndZoneControl();
             yield return true;
         }

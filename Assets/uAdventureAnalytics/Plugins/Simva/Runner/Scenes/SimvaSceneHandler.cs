@@ -1,7 +1,7 @@
-﻿using uAdventure.Core;
+﻿using Simva;
+using uAdventure.Core;
 using uAdventure.Runner;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace uAdventure.Simva
 {
@@ -10,26 +10,12 @@ namespace uAdventure.Simva
     {
         public IRunnerChapterTarget Instantiate(IChapterTarget modelObject)
         {
-            GameObject form = null;
-            switch (modelObject.getId())
-            {
-                case "Simva.Login":
-                    form = GameObject.Instantiate(Resources.Load<GameObject>("SimvaLogin"));
-                    break;
-                case "Simva.Survey":
-                    form = GameObject.Instantiate(Resources.Load<GameObject>("SimvaSurvey"));
-                    break;
-                case "Simva.Finalize":
-                    form = GameObject.Instantiate(Resources.Load<GameObject>("SimvaFinalize"));
-                    break;
-                case "Simva.End":
-                    form = GameObject.Instantiate(Resources.Load<GameObject>("SimvaEnd"));
-                    break;
-            }
+            GameObject form = SimvaSceneManager.LoadPrefabScene(modelObject.getId());
 
             if (form != null)
             {
-                var runner = form.GetComponent<IRunnerChapterTarget>();
+                var runner = form.AddComponent<SimvaSceneWrapper>();
+                runner.SimvaSceneController = form.GetComponent<SimvaSceneController>();
                 runner.Data = modelObject;
                 return runner;
             }

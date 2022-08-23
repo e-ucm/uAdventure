@@ -10,18 +10,14 @@ using Xasu;
 using Xasu.Util;
 using System.Threading.Tasks;
 
-namespace uAdventure.Simva
+namespace Simva
 {
     // Manager for "Simva.Finalize"
-    public class FinalizeController : MonoBehaviour, IRunnerChapterTarget
+    public class FinalizeController : SimvaSceneController
     {
         public Scrollbar progressBar;
         public Text successText;
         public Text errorText;
-
-        public object Data { get { return null; } set { } }
-
-        public bool IsReady { get { return true; } }
         
         public async void Start()
         {
@@ -56,7 +52,7 @@ namespace uAdventure.Simva
                 errorText.gameObject.SetActive(false);
 
                 // Continue the Simva process
-                GameExtension.GetInstance<SimvaExtension>().AfterFinalize();
+                SimvaManager.Instance.AfterFinalize();
                 return true;
             }
             catch(Exception ex)
@@ -84,7 +80,7 @@ namespace uAdventure.Simva
                 return;
             }
 
-            string username = GameExtension.GetInstance<SimvaExtension>().API.Authorization.Agent.name;
+            string username = SimvaManager.Instance.API.Authorization.Agent.name;
             string traces = File.ReadAllText(Application.temporaryCachePath + "/" + XasuTracker.Instance.TrackerConfig.BackupFileName);
             string filePath = Path.Combine(Application.temporaryCachePath, "traces_backup_" + username + ".log");
             File.WriteAllBytes(filePath, Encoding.UTF8.GetBytes(traces));
@@ -100,34 +96,19 @@ namespace uAdventure.Simva
             Application.Quit();
         }
 
-        public void RenderScene()
+        public override void Destroy()
+        {
+            GameObject.DestroyImmediate(this.gameObject);
+        }
+
+        public override void Render()
         {
             this.transform.GetChild(0).gameObject.SetActive(true);
-            foreach(var backupPopup in FindObjectsOfType<FinalizePopupController>())
+            foreach (var backupPopup in FindObjectsOfType<FinalizePopupController>())
             {
                 DestroyImmediate(backupPopup.gameObject);
             }
-            InventoryManager.Instance.Show = false;
-        }
-
-        public void Destroy(float time, Action onDestroy)
-        {
-            GameObject.DestroyImmediate(this.gameObject);
-            onDestroy();
-        }
-
-        public InteractuableResult Interacted(PointerEventData pointerData = null)
-        {
-            return InteractuableResult.IGNORES;
-        }
-
-        public bool canBeInteracted()
-        {
-            return false;
-        }
-
-        public void setInteractuable(bool state)
-        {
+            Ready = true;
         }
     }
 }

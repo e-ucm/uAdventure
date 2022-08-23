@@ -6,10 +6,10 @@ using System;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace uAdventure.Simva
+namespace Simva
 {
     // Manager for "Simva.Survey"
-    public class LoginController : MonoBehaviour, IRunnerChapterTarget
+    public class LoginController : SimvaSceneController
     {
         private const string SIMVA_DISCLAIMER_ACCEPTED = "simva_disclaimer_accepted";
         private const int SIMVA_DISCLAIMER_ACCEPTED_TRUE = 1;
@@ -21,10 +21,6 @@ namespace uAdventure.Simva
         public GameObject preview;
 
         public InputField token;
-
-        public object Data { get { return null; } set { } }
-
-        public bool IsReady { get { return ready; } }
 
         public bool DisclaimerAccepted 
         { 
@@ -45,7 +41,7 @@ namespace uAdventure.Simva
 
         public void Login()
         {
-            var simvaExtension = GameExtension.GetInstance<SimvaExtension>();
+            var simvaExtension = SimvaManager.Instance;
             if (token == null || string.IsNullOrEmpty(token.text))
             {
                 simvaExtension.NotifyManagers("Please insert a token");
@@ -64,21 +60,7 @@ namespace uAdventure.Simva
 
         public void LoginWithKeykloak()
         {
-            GameExtension.GetInstance<SimvaExtension>().LoginAndSchedule();
-        }
-
-        public void RenderScene()
-        {
-            InventoryManager.Instance.Show = false;
-            if (DisclaimerAccepted)
-            {
-                AcceptDisclaimer();
-            }
-            //var background = GameObject.Find("background").GetComponent<Image>();
-            /*var backgroundPath = 
-            var backgroundSprite = Game.Instance.ResourceManager.getSprite();
-            background.sprite = Game.Instance.ResourceManager.getSprite()*/
-            ready = true;
+            SimvaManager.Instance.LoginAndSchedule();
         }
 
         public void AcceptDisclaimer()
@@ -92,32 +74,28 @@ namespace uAdventure.Simva
         public void Demo()
         {
             PreviewManager.Instance.InPreviewMode = true;
-            GameExtension.GetInstance<Geo.GeoExtension>().UsingDebugLocation = true;
-            GameExtension.GetInstance<Geo.GeoExtension>().Location = new Vector2d(40.4436403741371, -3.72659319639157);
             Game.Instance.Restart();
             Game.Instance.GameState.Data.setAutoSave(false);
             Game.Instance.GameState.Data.setSaveOnSuspend(false);
             Game.Instance.RunTarget(Game.Instance.GameState.InitialChapterTarget.getId());
         }
 
-        public void Destroy(float time, Action onDestroy)
+        public override void Destroy()
         {
             GameObject.DestroyImmediate(this.gameObject);
-            onDestroy();
         }
 
-        public InteractuableResult Interacted(PointerEventData pointerData = null)
+        public override void Render()
         {
-            return InteractuableResult.IGNORES;
-        }
-
-        public bool canBeInteracted()
-        {
-            return false;
-        }
-
-        public void setInteractuable(bool state)
-        {
+            if (DisclaimerAccepted)
+            {
+                AcceptDisclaimer();
+            }
+            //var background = GameObject.Find("background").GetComponent<Image>();
+            /*var backgroundPath = 
+            var backgroundSprite = Game.Instance.ResourceManager.getSprite();
+            background.sprite = Game.Instance.ResourceManager.getSprite()*/
+            Ready = true;
         }
     }
 }

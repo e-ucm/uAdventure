@@ -115,21 +115,22 @@ namespace uAdventure.Analytics
                 // Get the tracker config from the game settings
                 var trackerConfigs = Game.Instance.GameState.Data.getObjects<TrackerConfig>();
                 var trackerConfig = trackerConfigs.Count == 0 ? new TrackerConfig() : trackerConfigs[0];
-                yield return StartCoroutine(StartTracker(trackerConfig, null));
+                yield return StartCoroutine(StartTracker(ConvertConfig(trackerConfig)));
                 // TODO wait till start tracker is ready
             }
         }
 
         #endregion GameExtension
-                
-        public IEnumerator StartTracker(TrackerConfig config, IAuthProtocol onlineProtocol = null, IAuthProtocol backupProtocol = null)
+
+        private Xasu.Config.TrackerConfig ConvertConfig(TrackerConfig config)
         {
+            Debug.Log("[ANALYTICS] Setting up tracker config...");
+
             //trackerConfig = config;
             string domain = "";
             int port = 80;
-            bool secure = false;
-
-            Debug.Log("[ANALYTICS] Setting up tracker...");
+            bool secure = false; 
+            
             try
             {
                 if (config.getHost() != "")
@@ -159,6 +160,7 @@ namespace uAdventure.Analytics
                 throw;
             }
 
+
             var simva = config.getHost().Contains("simva");
             var trackerConfig = new Xasu.Config.TrackerConfig
             {
@@ -180,7 +182,6 @@ namespace uAdventure.Analytics
                 BackupEndpoint = config.getHost() + config.getBackupEndpoint()
             };
 
-
             if (config.getStorageType() == TrackerConfig.StorageType.NET && !string.IsNullOrEmpty(User) && !string.IsNullOrEmpty(Password))
             {
                 Debug.Log("[ANALYTICS] Setting up basic Loging...");
@@ -196,11 +197,15 @@ namespace uAdventure.Analytics
                 Debug.Log("[ANALYTICS] Starting tracker without login...");
             }
 
-
-            Debug.Log("[ANALYTICS] Settings: " + JsonConvert.SerializeObject(trackerConfig));
+            return trackerConfig;
+        }
+                
+        public IEnumerator StartTracker(Xasu.Config.TrackerConfig config, IAuthProtocol onlineProtocol = null, IAuthProtocol backupProtocol = null)
+        {
+            Debug.Log("[ANALYTICS] Settings: " + JsonConvert.SerializeObject(config));
 
             var done = false;
-            XasuTracker.Instance.Init(trackerConfig, onlineProtocol, backupProtocol)
+            XasuTracker.Instance.Init(config, onlineProtocol, backupProtocol)
                 .ContinueWith(t =>
                 {
                     // TODO fix 

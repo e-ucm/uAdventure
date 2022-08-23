@@ -11,12 +11,12 @@ namespace Simva
 
         protected void Start()
         {
-            GameExtension.GetInstance<SimvaExtension>().AddResponseManager(this);
+            SimvaManager.Instance.AddResponseManager(this);
         }
 
         protected void OnDestroy()
         {
-            GameExtension.GetInstance<SimvaExtension>().RemoveResponseManager(this);
+            SimvaManager.Instance.RemoveResponseManager(this);
         }
 
         public void Notify(string message)
