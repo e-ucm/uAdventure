@@ -214,13 +214,13 @@ namespace Xasu.Requests
             }
 
             // Network Error Exception
-            NetworkInfo.Worked();
             if (webRequest.isNetworkError)
             {
                 NetworkInfo.Failed();
                 throw new NetworkException(webRequest.error);
             }
-            
+            NetworkInfo.Worked();
+
             // API / Http Exception
             if (webRequest.isHttpError)
             {

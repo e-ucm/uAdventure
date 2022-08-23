@@ -18,22 +18,23 @@ namespace Simva
         public Scrollbar progressBar;
         public Text successText;
         public Text errorText;
+        public GameObject networkPopup;
         
         public async void Start()
         {
-            if (XasuTracker.Instance.Status.State == TrackerState.NetworkRequired || XasuTracker.Instance.Status.State == TrackerState.Fallback)
-            {
-                // TODO Remember the player to connect in order to flush everything
-            }
-
-            if (XasuTracker.Instance.Status.State == TrackerState.Normal)
-            {
-                await DoFinalize();
-            }
+            await DoFinalize();
         }
 
         private async Task<bool> DoFinalize()
         {
+            // Await for connection
+            do
+            {
+                networkPopup.SetActive(XasuTracker.Instance.Status.IsNetworkRequired);
+                await Task.Yield();
+
+            } while (networkPopup.activeSelf);
+
             // Configure visual elements
             progressBar.transform.parent.parent.gameObject.SetActive(true);
             successText.gameObject.SetActive(false);

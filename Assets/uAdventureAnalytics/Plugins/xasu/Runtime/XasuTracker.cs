@@ -22,6 +22,7 @@ namespace Xasu
         public float processingLoopTime = 1; // In Seconds
 
         private bool processing = false;
+        private string processingLock = "CoolLock";
         private bool flushRequested = false;
         private bool finalizeRequested = false;
         private float currentTime;
@@ -191,14 +192,10 @@ namespace Xasu
             }
 
             finalizeRequested = true;
-
+            
             try
             {
-                while (processing)
-                {
-                    await Task.Yield();
-                }
-
+                await LockProcessing();
                 var localProgress = new Progress<float>();
                 float processorsDone = 0;
                 float totalProcessors = (float)traceProcessors.Length;
@@ -215,11 +212,13 @@ namespace Xasu
                 }
 
                 progress?.Report(1f);
+                UnlockProcessing();
             }
             catch (Exception ex)
             {
                 Status.FinalizeException = ex;
                 LogError("[TRACKER] Finalize failed!", ex);
+                UnlockProcessing();
                 throw;
             }
         }
@@ -321,13 +320,11 @@ namespace Xasu
                 while (true)
                 {
                     await Task.Yield();
-                    if (processing) continue;
-
                     currentTime += Time.deltaTime;
                     var isFlushRequested = flushRequested;
                     if (HasToSendTraces())
                     {
-                        processing = true;
+                        await LockProcessing();
                         currentTime = 0;
                         foreach (var p in traceProcessors)
                         {
@@ -344,14 +341,16 @@ namespace Xasu
                         {
                             flushRequested = false;
                         }
-                        processing = false;
+                        UnlockProcessing();
                     }
+
                 }
             } 
             catch (Exception ex)
             {
                 Status.LoopException = ex;
                 LogError("[TRACKER] Main loop exception!", ex);
+                UnlockProcessing();
             }
         }
 
@@ -378,6 +377,40 @@ namespace Xasu
             if (statement.context == null)
             {
                 statement.context = DefaultContext;
+            }
+        }
+
+        private async Task LockProcessing()
+        {
+            lock (processingLock)
+            {
+                if (!processing)
+                {
+                    processing = true;
+                    return;
+                }
+            }
+
+            while (processing)
+            {
+                await Task.Yield();
+
+                lock (processingLock)
+                {
+                    if (!processing)
+                    {
+                        processing = true;
+                        return;
+                    }
+                }
+            }
+        }
+
+        private void UnlockProcessing()
+        {
+            lock (processingLock)
+            {
+                processing = false;
             }
         }
 

@@ -1,20 +1,15 @@
 ﻿using System;
-using System.IO;
 using uAdventure.Runner;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityFx.Async;
 using UnityFx.Async.Promises;
-using uAdventure.Analytics;
 using SimvaPlugin;
 using Simva.Api;
 using Simva.Model;
-using Simva;
 using System.Collections.Generic;
 using System.Linq;
 using System.Collections;
 using Newtonsoft.Json;
-using uAdventure.Core;
 using Xasu.Auth.Protocols.OAuth2;
 
 namespace Simva
@@ -360,6 +355,7 @@ namespace Simva
                             if (ActivityHasDetails(activity, "realtime", "trace_storage"))
                             {
                                 xasuTrackerConfig.Online = true;
+                                xasuTrackerConfig.Fallback = true;
                                 xasuTrackerConfig.LRSEndpoint = API.SimvaConf.URL + string.Format("/activities/{0}", activityId);
                             }
 

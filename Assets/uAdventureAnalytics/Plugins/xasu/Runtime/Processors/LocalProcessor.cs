@@ -27,6 +27,8 @@ namespace Xasu.Processors
 
         public int TracesFailed { get; protected set; }
 
+        public virtual int TracesPending { get { return localQueue.Size; } }
+
         public LocalProcessor(string filename, TraceFormats traceFormat, bool useTempDataPath = false)
             : this(filename, traceFormat, TCAPIVersion.V103, useTempDataPath)
         {

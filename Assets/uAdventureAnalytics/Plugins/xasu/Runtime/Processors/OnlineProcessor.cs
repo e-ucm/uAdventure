@@ -39,6 +39,8 @@ namespace Xasu.Processors
 
         public int TracesToFallback = 0, TracesFromFallbackSent = 0, TracesFromFallbackFailed = 0;
 
+        public override int TracesPending { get { return base.TracesPending + TracesToFallback - (TracesFromFallbackSent + TracesFromFallbackFailed); } }
+
         public OnlineProcessor(Uri lrsEndpoint, TCAPIVersion version, int batchSize, IAuthProtocol authProtocol,
             bool fallback) : this(lrsEndpoint.ToString(), version, batchSize, authProtocol, fallback)
         {
@@ -196,7 +198,7 @@ namespace Xasu.Processors
                     } while (complete && localQueue.Size > 0);
                 }
 
-                // When requesting a complete flush traces can be stored in fallback, but finalize has to stop, so we must raise an exception
+                // When requesting a complete flush traces can be stored in fallback, but finalize has to stop, and we must raise an exception
                 if (complete && !CircuitsClosed())
                 {
                     if (apiCircuitBreaker.CircuitState == CircuitState.Open || apiCircuitBreaker.CircuitState == CircuitState.Isolated)
@@ -220,15 +222,18 @@ namespace Xasu.Processors
 
         public override async Task Finalize(IProgress<float> progress)
         {
+            // Reset the circuits in case they are closed
+            ResetCircuits();
+
             progress?.Report(0);
-            float total = localQueue.Size;
+            float total = TracesPending;
 
             // Asynchronous processing
             var task = Process(true);
-            while (localQueue.Size > 0 && !task.IsCompleted)
+            while ((hasFallbackTraces || TracesPending > 0) && !task.IsCompleted)
             {
                 await Task.Yield();
-                progress?.Report((total - localQueue.Size) / total);
+                progress?.Report((total - TracesPending) / total);
             }
         }
 
@@ -427,7 +432,14 @@ namespace Xasu.Processors
         public override Task Reset()
         {
             State = hasFallbackTraces ? ProcessorState.Fallback : ProcessorState.Working;
+            ResetCircuits();
             return Task.FromResult(true);
+        }
+
+        private void ResetCircuits()
+        {
+            networkCircuitBreaker.Reset();
+            apiCircuitBreaker.Reset();
         }
     }
 }

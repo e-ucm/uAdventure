@@ -20,6 +20,7 @@ namespace Xasu
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
 
         public ProcessorState OnlineState { get; private set; }
+        public int OnlinePending { get; private set; }
         public int OnlineCompleted { get; private set; }
         public int OnlineFailed { get; private set; }
         public int ToFallback { get; private set; }
@@ -29,6 +30,7 @@ namespace Xasu
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
 
         public ProcessorState LocalState { get; private set; }
+        public int LocalPending { get; private set; }
         public int LocalCompleted { get; private set; }
         public int LocalFailed { get; private set; }
         public string LocalErrorMessage { get; private set; }
@@ -39,9 +41,12 @@ namespace Xasu
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
 
         public ProcessorState BackupState { get; private set; }
+        public int BackupPending { get; private set; }
         public int BackupCompleted { get; private set; }
         public int BackupFailed { get; private set; }
         public string BackupErrorMessage { get; private set; }
+
+        public bool IsNetworkRequired { get; private set; }
 
         private IProcessor onlineProcessor, localProcessor, backupProcessor;
         private IAuthProtocol onlineAuthProtocol, backupAuthProtocol;
@@ -74,7 +79,7 @@ namespace Xasu
                 return;
             }
 
-            State = NetworkInfo.IsWorking() ? TrackerState.Normal : TrackerState.NetworkRequired;
+            State = TrackerState.Normal;
 
             OnlineState = onlineProcessor?.State ?? ProcessorState.Disabled;
             LocalState = localProcessor?.State ?? ProcessorState.Disabled;
@@ -111,11 +116,14 @@ namespace Xasu
             // Online Status
             if(onlineProcessor != null)
             {
+                OnlinePending = onlineProcessor.TracesPending;
                 OnlineCompleted = onlineProcessor.TracesCompleted;
                 OnlineFailed = onlineProcessor.TracesFailed;
                 ToFallback = ((OnlineProcessor)onlineProcessor).TracesToFallback;
                 FallbackSent = ((OnlineProcessor)onlineProcessor).TracesFromFallbackSent;
                 FallbackFailed = ((OnlineProcessor)onlineProcessor).TracesFromFallbackFailed;
+
+                IsNetworkRequired = onlineProcessor.TracesPending > 0 && !NetworkInfo.IsWorking();
             }
             if (onlineAuthProtocol != null)
             {
@@ -134,13 +142,14 @@ namespace Xasu
             }
             else if (OnlineState == ProcessorState.Fallback)
             {
-                State = TrackerState.Fallback;
+                State = TrackerState.Normal;
                 OnlineErrorMessage = onlineProcessor.ErrorMessage;
             }
 
             // Local Status
             if (localProcessor != null)
             {
+                LocalPending = localProcessor.TracesPending;
                 LocalCompleted = localProcessor.TracesCompleted;
                 LocalFailed = localProcessor.TracesFailed;
             }
@@ -153,6 +162,7 @@ namespace Xasu
             // Backup Status
             if (backupProcessor != null)
             {
+                BackupPending = backupProcessor.TracesPending;
                 BackupCompleted = backupProcessor.TracesCompleted;
                 BackupFailed = backupProcessor.TracesFailed;
             }

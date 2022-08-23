@@ -70,11 +70,8 @@ namespace uAdventure.Analytics
         [Priority(1)]
         public override IEnumerator OnGameFinished()
         {
-
-            if (XasuTracker.Instance.Status.State == TrackerState.NetworkRequired || XasuTracker.Instance.Status.State == TrackerState.Fallback)
-            {
-                // TODO Remember the player to connect in order to flush everything
-            }
+            // TODO Remember the player to connect in order to flush everything
+            yield return new WaitUntil(() => !XasuTracker.Instance.Status.IsNetworkRequired);
 
             if (XasuTracker.Instance.Status.State == TrackerState.Normal)
             {

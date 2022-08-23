@@ -9,6 +9,7 @@ namespace Xasu.Processors
     public interface IProcessor
     {
         ProcessorState State { get; }
+        int TracesPending { get; }
         int TracesCompleted { get; }
         int TracesFailed { get; }
         string ErrorMessage { get; }
