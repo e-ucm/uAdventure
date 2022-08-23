@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using uAdventure.Core;
+using System.Linq;
 
 namespace uAdventure.Runner
 {
@@ -22,7 +23,10 @@ namespace uAdventure.Runner
 
         protected override void OnPointerEnter()
         {
-            representable.SetTexture(Item.RESOURCE_TYPE_IMAGEOVER);
+            if (representable.Element.getResources().Checked().First().existAsset(Item.RESOURCE_TYPE_IMAGEOVER))
+            {
+                representable.SetTexture(Item.RESOURCE_TYPE_IMAGEOVER);
+            }
         }
 
         protected override void OnPointerLeave()
