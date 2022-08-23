@@ -29,7 +29,6 @@ namespace uAdventure.Simva
         private string savedGameTarget;
         private bool wasAutoSave;
         private bool firstTimeDisabling = true;
-        private FlushAllScene flushAllScene;
 
         private OAuth2Token auth;
 
@@ -77,12 +76,7 @@ namespace uAdventure.Simva
                 Debug.Log("[SIMVA] Conf Loaded...");
             }
 
-            if (Cmi5Launcher.config != null)
-            {
-                Debug.Log("[SIMVA] CMI-5 config detected. Stopping...");
-                yield return null;
-            }
-            else if (!IsEnabled)
+            if (!IsEnabled)
             {
                 Debug.Log("[SIMVA] Study is not set! Stopping...");
                 yield return null;
@@ -163,43 +157,6 @@ namespace uAdventure.Simva
             else
             {
                 yield return GetInstance<AnalyticsExtension>().OnGameFinished();
-            }
-        }
-
-        public void OnGameCompleted()
-        {
-            StartCoroutine(OnGameCompletedRoutine());
-        }
-
-        private IEnumerator OnGameCompletedRoutine()
-        {
-            yield return new WaitWhile(() => Game.Instance.isSomethingRunning());
-
-            if (IsActive)
-            {
-                DisableAutoSave();
-                flushAllScene.onlyFlushAndBackup = true;
-                Game.Instance.RunTarget("Simva.FlushAll", null, false);
-                yield return new WaitUntil(() => afterFlush);
-                flushAllScene.onlyFlushAndBackup = false;
-                StartBackupIfNeeded();
-
-                UpdateSchedule()
-                    .Then(schedule =>
-                    {
-                        var result = new AsyncCompletionSource();
-                        StartCoroutine(AsyncCoroutine(LaunchActivity(schedule.Next), result));
-                        return result;
-                    })
-                    .Finally(() =>
-                    {
-                        NotifyLoading(false);
-                    })
-                    .Catch(error =>
-                    {
-                        NotifyLoading(false);
-                        NotifyManagers(error.Message);
-                    });
             }
         }
 
@@ -397,23 +354,6 @@ namespace uAdventure.Simva
                     NotifyLoading(false);
                     NotifyManagers(error.Message);
                 });
-        }
-
-        private void StartBackupIfNeeded()
-        {
-            backupActivity = GetActivity(CurrentActivityId);
-            string activityType = backupActivity.Type;
-            if (activityType.Equals("gameplay", StringComparison.InvariantCultureIgnoreCase)
-            && backupActivity.Details != null && backupActivity.Details.ContainsKey("backup") && (bool)backupActivity.Details["backup"])
-            {
-                string traces = SimvaBridge.Load(((TrackerAssetSettings)TrackerAsset.Instance.Settings).BackupFile);
-                Instantiate(Resources.Load("SimvaBackupPopup"));
-                backupOperation = SaveActivity(CurrentActivityId, traces, true);
-                backupOperation.Then(() =>
-                {
-                    afterBackup = true;
-                });
-            }
         }
 
         public Activity GetActivity(string activityId)

@@ -23,6 +23,8 @@ using Simva.Api;
 using UnityFx.Async.Promises;
 using UnityEngine.Networking;
 using System.IO.Compression;
+using Simva;
+using UniRx;
 
 namespace uAdventure.Editor
 {
@@ -3745,12 +3747,24 @@ namespace uAdventure.Editor
         {
             SimvaApi<StudentsApi>.LoginWithToken("myiq").Then(api =>
             {
-                api.Api.GetSchedule(SimvaConf.Local.Study)
-                .Then(schedule =>
+                System.Action onConfigReady = () =>
                 {
-                    var act = schedule.Activities.First(a => a.Value.Name == "Gameplay");
-                    api.Api.SetCompletion(act.Key, "myiq", false);
-                });
+                    api.Api.GetSchedule(SimvaConf.Local.Study)
+                    .Then(schedule =>
+                    {
+                        var act = schedule.Activities.First(a => a.Value.Name == "Gameplay");
+                        api.Api.SetCompletion(act.Key, "myiq", false);
+                    });
+                };
+                Debug.Log("[SIMVA] Starting...");
+                if (SimvaConf.Local == null)
+                {
+                    SimvaConf.Local = new SimvaConf();
+                    Observable.FromCoroutine(SimvaConf.Local.LoadAsync).Subscribe(_ => onConfigReady());
+                    Debug.Log("[SIMVA] Conf Loaded...");
+                }
+
+                onConfigReady();
             });
         }
         [UnityEditor.MenuItem("uAdventure/Screenshot", priority = 1)]

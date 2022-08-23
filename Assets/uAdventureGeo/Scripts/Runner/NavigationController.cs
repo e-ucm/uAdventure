@@ -363,7 +363,7 @@ namespace uAdventure.Geo
                 var geoElementMb = mb as GeoElementMB;
                 if(geoElementMb != null && geoElementMb.Geometry.Type == GMLGeometry.GeometryType.LineString)
                 {
-                    var location = GeoExtension.Instance.geochar.LatLon;
+                    var location = GameExtension.GetInstance<GeoExtension>().geochar.LatLon;
                     // Paint the arrow on top of the yellow line
                     var closestPoint = geoElementMb.Geometry.GetClosestPoint(location);
                     if (geoElementMb.Geometry.InsideInfluence(location))
@@ -504,7 +504,7 @@ namespace uAdventure.Geo
                     /*int step;
                     completedElementsForStep.TryGetValue(currentStep, out step);
                     return geometry.Points[step];*/
-                    return geometry.GetClosestPoint(GeoExtension.Instance.Location);
+                    return geometry.GetClosestPoint(GameExtension.GetInstance<GeoExtension>().Location);
                 default:
                 case GMLGeometry.GeometryType.Polygon:
                 case GMLGeometry.GeometryType.Point:
