@@ -116,16 +116,17 @@ namespace uAdventure.Geo
             }
 #endif
 
+            var geoExtension = GameExtension.GetInstance<GeoExtension>();
             // Start the gps just in case is not
-            if (!GeoExtension.Instance.IsStarted())
+            if (!geoExtension.IsStarted())
             {
-                GeoExtension.Instance.Start();
+                geoExtension.Start();
             }
 
             // If the location is valid
-            if(GeoExtension.Instance.IsLocationValid())
+            if(geoExtension.IsLocationValid())
             {
-                geoCharacter.InstantMoveTo(GeoExtension.Instance.Location);
+                geoCharacter.InstantMoveTo(geoExtension.Location);
             }
             else
             {
@@ -157,10 +158,11 @@ namespace uAdventure.Geo
         protected void Update()
         {
             ready = uAdventurePlugin.ready;
-            if (GeoExtension.Instance.IsLocationValid())
+            var geoExtension = GameExtension.GetInstance<GeoExtension>();
+            if (geoExtension.IsLocationValid())
             {
-                var inputLatLon = GeoExtension.Instance.Location;
-                if (GeoExtension.Instance.IsLocationValid() 
+                var inputLatLon = geoExtension.Location;
+                if (geoExtension.IsLocationValid() 
                     && (GM.LatLonToMeters(lastUpdatedPosition) - GM.LatLonToMeters(inputLatLon)).sqrMagnitude >= 1f)
                 {
                     lastUpdatedPosition = inputLatLon;
@@ -249,15 +251,16 @@ namespace uAdventure.Geo
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            if (!Application.isMobilePlatform || PreviewManager.Instance.InPreviewMode || GeoExtension.Instance.UsingDebugLocation)
+            var geoExtension = GameExtension.GetInstance<GeoExtension>();
+            if (!Application.isMobilePlatform || PreviewManager.Instance.InPreviewMode || geoExtension.UsingDebugLocation)
             {
-                GeoExtension.Instance.UsingDebugLocation = true;
+                geoExtension.UsingDebugLocation = true;
                 eventData.Use();
                 var tileManagerRelative = GM.LatLonToMeters(tileManager.Latitude, tileManager.Longitude);
                 var localPosition = tileManager.transform.worldToLocalMatrix.MultiplyPoint(eventData.pointerCurrentRaycast.worldPosition);
                 var meters = localPosition.ToVector2xz().ToVector2d();
                 var latLon = GM.MetersToLatLon(tileManagerRelative + meters);
-                GeoExtension.Instance.Location = latLon;
+                geoExtension.Location = latLon;
             }
         }
     }

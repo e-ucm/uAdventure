@@ -6,6 +6,7 @@ using uAdventure.Core;
 using System;
 using System.Linq;
 using System.Globalization;
+using UnityEditor;
 
 namespace uAdventure.Editor
 {
@@ -65,7 +66,7 @@ namespace uAdventure.Editor
 
             // Create and append the description
             XmlNode applicationIdentifierNode = doc.CreateElement("application-identifier");
-            applicationIdentifierNode.AppendChild(doc.CreateTextNode(adventureData.getApplicationIdentifier()));
+            applicationIdentifierNode.AppendChild(doc.CreateTextNode(PlayerSettings.applicationIdentifier));
             node.AppendChild(applicationIdentifierNode);
 
             // Create and append the "invalid" tag (if necessary)

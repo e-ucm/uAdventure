@@ -21,6 +21,10 @@ using uAdventure.Core.Metadata;
 using SimvaPlugin;
 using Simva.Api;
 using UnityFx.Async.Promises;
+using UnityEngine.Networking;
+using System.IO.Compression;
+using Simva;
+using UniRx;
 
 namespace uAdventure.Editor
 {
@@ -2190,29 +2194,29 @@ namespace uAdventure.Editor
             var projectPath = Directory.GetCurrentDirectory().Replace("\\", "/");
             var downloadPath = projectPath + folderName;
 
-            using (WWW www = new WWW(url))
+            using (var uwr = UnityWebRequest.Get(url))
             {
-                while (!www.isDone)
+                uwr.SendWebRequest();
+                while (!uwr.isDone)
                 {
-                    if (EditorUtility.DisplayCancelableProgressBar("Downloading", "Downloading "+ name + "...", www.progress))
+                    if (EditorUtility.DisplayCancelableProgressBar("Downloading", "Downloading "+ name + "...", uwr.downloadProgress))
                     {
                         EditorUtility.ClearProgressBar();
                         ready(false);
                         return;
                     }
-                    www.MoveNext();
                 }
                 EditorUtility.ClearProgressBar();
 
-                if (!string.IsNullOrEmpty(www.error))
+                if (!string.IsNullOrEmpty(uwr.error))
                 {
                     EditorUtility.DisplayDialog("Error!", "Download failed! Check your connection and try again. " +
-                        "If the problem persist download it manually and put it in the " + folderName +" folder at the root of the project. (" + www.error + ")", "Ok");
+                        "If the problem persist download it manually and put it in the " + folderName +" folder at the root of the project. (" + uwr.error + ")", "Ok");
                     ready(false);
                     return;
                 }
 
-                if (www.progress != 1f)
+                if (uwr.downloadProgress != 1f)
                 {
                     ready(false);
                     return;
@@ -2225,10 +2229,30 @@ namespace uAdventure.Editor
                     Directory.CreateDirectory(downloadPath);
                 }
 
-                File.WriteAllBytes(downloadPath + "/" + downloadFileName, www.bytes);
+                File.WriteAllBytes(downloadPath + "/" + downloadFileName, uwr.downloadHandler.data);
                 // Unzip it
                 EditorUtility.DisplayProgressBar("Extracting...", "Extracting " + name + " to " + downloadPath, 0f);
-                //ZipUtil.Unzip(downloadPath + "/" + downloadFileName, downloadPath);
+
+                var buffer = new byte[1024];
+                using (FileStream zipToOpen = new FileStream(downloadPath + "/" + downloadFileName, FileMode.Open))
+                {
+                    using (ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Read))
+                    {
+                        foreach(var entry in archive.Entries)
+                        {
+                            Directory.CreateDirectory(Path.GetDirectoryName(downloadPath + "/" + entry.FullName));
+                            using (var file = File.OpenWrite(downloadPath + "/" + entry.FullName))
+                            using (var s = entry.Open())
+                            {
+                                while(s.CanRead)
+                                {
+                                    var read = s.Read(buffer, 0, 1024);
+                                    file.Write(buffer, 0, read);
+                                }
+                            }
+                        }
+                    }
+                }
                 EditorUtility.DisplayProgressBar("Extracting...", "Extracting " + name + " to " + downloadPath, 1f);
                 EditorUtility.ClearProgressBar();
                 // Delete the zip
@@ -3723,12 +3747,24 @@ namespace uAdventure.Editor
         {
             SimvaApi<StudentsApi>.LoginWithToken("myiq").Then(api =>
             {
-                api.Api.GetSchedule(SimvaConf.Local.Study)
-                .Then(schedule =>
+                System.Action onConfigReady = () =>
                 {
-                    var act = schedule.Activities.First(a => a.Value.Name == "Gameplay");
-                    api.Api.SetCompletion(act.Key, "myiq", false);
-                });
+                    api.Api.GetSchedule(SimvaConf.Local.Study)
+                    .Then(schedule =>
+                    {
+                        var act = schedule.Activities.First(a => a.Value.Name == "Gameplay");
+                        api.Api.SetCompletion(act.Key, "myiq", false);
+                    });
+                };
+                Debug.Log("[SIMVA] Starting...");
+                if (SimvaConf.Local == null)
+                {
+                    SimvaConf.Local = new SimvaConf();
+                    Observable.FromCoroutine(SimvaConf.Local.LoadAsync).Subscribe(_ => onConfigReady());
+                    Debug.Log("[SIMVA] Conf Loaded...");
+                }
+
+                onConfigReady();
             });
         }
         [UnityEditor.MenuItem("uAdventure/Screenshot", priority = 1)]

@@ -15,8 +15,8 @@ public class SimpleSampleCharacterControl : MonoBehaviour
         Direct
     }
 
-    [SerializeField] private float m_moveSpeed = 2;
-    [SerializeField] private float m_turnSpeed = 200;
+    //[SerializeField] private float m_moveSpeed = 2;
+    //[SerializeField] private float m_turnSpeed = 200;
     [SerializeField] private float m_jumpForce = 4;
 
     [SerializeField] private Animator m_animator = null;
@@ -24,16 +24,16 @@ public class SimpleSampleCharacterControl : MonoBehaviour
 
     [SerializeField] private ControlMode m_controlMode = ControlMode.Direct;
 
-    private float m_currentV = 0;
-    private float m_currentH = 0;
+    //private float m_currentV = 0;
+    //private float m_currentH = 0;
 
-    private readonly float m_interpolation = 10;
+/*    private readonly float m_interpolation = 10;
     private readonly float m_walkScale = 0.33f;
     private readonly float m_backwardsWalkScale = 0.16f;
-    private readonly float m_backwardRunScale = 0.66f;
+    private readonly float m_backwardRunScale = 0.66f;*/
 
     private bool m_wasGrounded;
-    private Vector3 m_currentDirection = Vector3.zero;
+    //private Vector3 m_currentDirection = Vector3.zero;
 
     private float m_jumpTimeStamp = 0;
     private float m_minJumpInterval = 0.25f;
@@ -41,7 +41,7 @@ public class SimpleSampleCharacterControl : MonoBehaviour
 
     private bool m_isGrounded;
 
-    private List<Collider> m_collisions = new List<Collider>();
+    //private List<Collider> m_collisions = new List<Collider>();
     public float speed;
 
     private void Awake()

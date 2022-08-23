@@ -9,7 +9,6 @@ namespace uAdventure.Editor
 {
     public class ConversationEditor : CollapsibleGraphEditor<ConversationDataControl, ConversationNodeDataControl>
     {
-        private bool elegibleForClick = false;
         private readonly Dictionary<ConversationNodeDataControl, ConversationNodeEditor> editors = new Dictionary<ConversationNodeDataControl, ConversationNodeEditor>();
 
         protected override ConversationNodeDataControl[] ChildsFor(ConversationDataControl Content, ConversationNodeDataControl parent)

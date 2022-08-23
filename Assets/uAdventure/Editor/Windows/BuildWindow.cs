@@ -63,7 +63,7 @@ public class BuildWindow : EditorWindow {
         {
             GUILayout.BeginVertical("Box");
             {
-                PlayerSettings.displayResolutionDialog = (ResolutionDialogSetting) EditorGUILayout.EnumPopup("Startup", PlayerSettings.displayResolutionDialog);
+                PlayerSettings.fullScreenMode = (FullScreenMode)EditorGUILayout.EnumPopup("Fullscreen Mode", PlayerSettings.fullScreenMode);
                 PlayerSettings.productName = EditorGUILayout.TextField("Game Name", PlayerSettings.productName);
                 PlayerSettings.companyName = EditorGUILayout.TextField("Author", PlayerSettings.companyName);
                 PlayerSettings.Android.bundleVersionCode = EditorGUILayout.IntField("Version number", PlayerSettings.Android.bundleVersionCode);

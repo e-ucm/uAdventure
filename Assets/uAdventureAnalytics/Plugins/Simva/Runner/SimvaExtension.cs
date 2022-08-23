@@ -1,6 +1,4 @@
-﻿using AssetPackage;
-using SimpleJSON;
-using System;
+﻿using System;
 using System.IO;
 using uAdventure.Runner;
 using UnityEngine;
@@ -17,13 +15,12 @@ using System.Linq;
 using System.Collections;
 using Newtonsoft.Json;
 using uAdventure.Core;
+using Xasu.Auth.Protocols.OAuth2;
 
 namespace uAdventure.Simva
 {
     public class SimvaExtension : GameExtension, Interactuable
     {
-        private static SimvaExtension instance;
-
         public delegate void LoadingDelegate(bool loading);
         public delegate void ResponseDelegate(string message);
 
@@ -32,46 +29,18 @@ namespace uAdventure.Simva
         private string savedGameTarget;
         private bool wasAutoSave;
         private bool firstTimeDisabling = true;
-        private FlushAllScene flushAllScene;
 
-        private AuthorizationInfo auth;
-        private Schedule schedule;
-        private SimvaApi<IStudentsApi> simvaController;
+        private OAuth2Token auth;
 
-        protected void Awake()
-        {
-            instance = this;
-        }
+        public Schedule Schedule { get; private set; }
 
-        public static SimvaExtension Instance
-        {
-            get
-            {
-                return instance;
-            }
-        }
-
-        public Schedule Schedule
-        {
-            get
-            {
-                return schedule;
-            }
-        }
-
-        public SimvaApi<IStudentsApi> API
-        {
-            get
-            {
-                return simvaController;
-            }
-        }
+        public SimvaApi<IStudentsApi> API { get; private set; }
 
         public bool IsActive
         {
             get
             {
-                return this.simvaController != null && this.auth != null && Schedule != null;
+                return this.API != null && this.auth != null && Schedule != null;
             }
         }
 
@@ -79,7 +48,7 @@ namespace uAdventure.Simva
         {
             get
             {
-                if (schedule != null)
+                if (Schedule != null)
                 {
                     return Schedule.Next;
                 }
@@ -95,8 +64,6 @@ namespace uAdventure.Simva
             }
         }
 
-        public SimvaBridge SimvaBridge { get; private set; }
-
         [Priority(10)]
         public override IEnumerator OnAfterGameLoad()
         {
@@ -109,12 +76,7 @@ namespace uAdventure.Simva
                 Debug.Log("[SIMVA] Conf Loaded...");
             }
 
-            if (Cmi5Launcher.config != null)
-            {
-                Debug.Log("[SIMVA] CMI-5 config detected. Stopping...");
-                yield return null;
-            }
-            else if (!IsEnabled)
+            if (!IsEnabled)
             {
                 Debug.Log("[SIMVA] Study is not set! Stopping...");
                 yield return null;
@@ -128,7 +90,7 @@ namespace uAdventure.Simva
             else
             {
                 Debug.Log("[SIMVA] Disabling tracker autostart...");
-                AnalyticsExtension.Instance.AutoStart = false;
+                GetInstance<AnalyticsExtension>().AutoStart = false;
 
                 //if(PlayerPrefs.GetString())
                 Debug.Log("[SIMVA] Adding scenes...");
@@ -136,8 +98,7 @@ namespace uAdventure.Simva
                 {
                     new LoginScene(),
                     new SurveyScene(),
-                    flushAllScene = new FlushAllScene(),
-                    new BackupScene(),
+                    new FinalizeScene(),
                     new EndScene()
                 });
                 Debug.Log("[SIMVA] Setting current target to Simva.Login...");
@@ -171,19 +132,10 @@ namespace uAdventure.Simva
             }
         }
 
-        public IAsyncOperation backupOperation;
-        public Activity backupActivity;
-
-        private bool afterFlush;
-        public void AfterFlush()
+        private bool afterFinalize;
+        public void AfterFinalize()
         {
-            afterFlush = true;
-        }
-
-        private bool afterBackup;
-        public void AfterBackup()
-        {
-            afterBackup = true;
+            afterFinalize = true;
         }
 
 
@@ -195,8 +147,8 @@ namespace uAdventure.Simva
             {
                 var readyToClose = false;
                 DisableAutoSave();
-                Game.Instance.RunTarget("Simva.FlushAll", null, false);
-                yield return new WaitUntil(() => afterFlush);
+                Game.Instance.RunTarget("Simva.Finalize", null, false);
+                yield return new WaitUntil(() => afterFinalize);
                 Continue(CurrentActivityId, true)
                     .Then(() => readyToClose = true);
 
@@ -204,44 +156,7 @@ namespace uAdventure.Simva
             }
             else
             {
-                yield return AnalyticsExtension.Instance.OnGameFinished();
-            }
-        }
-
-        public void OnGameCompleted()
-        {
-            StartCoroutine(OnGameCompletedRoutine());
-        }
-
-        private IEnumerator OnGameCompletedRoutine()
-        {
-            yield return new WaitWhile(() => Game.Instance.isSomethingRunning());
-
-            if (IsActive)
-            {
-                DisableAutoSave();
-                flushAllScene.onlyFlushAndBackup = true;
-                Game.Instance.RunTarget("Simva.FlushAll", null, false);
-                yield return new WaitUntil(() => afterFlush);
-                flushAllScene.onlyFlushAndBackup = false;
-                StartBackupIfNeeded();
-
-                UpdateSchedule()
-                    .Then(schedule =>
-                    {
-                        var result = new AsyncCompletionSource();
-                        StartCoroutine(AsyncCoroutine(LaunchActivity(schedule.Next), result));
-                        return result;
-                    })
-                    .Finally(() =>
-                    {
-                        NotifyLoading(false);
-                    })
-                    .Catch(error =>
-                    {
-                        NotifyLoading(false);
-                        NotifyManagers(error.Message);
-                    });
+                yield return GetInstance<AnalyticsExtension>().OnGameFinished();
             }
         }
 
@@ -250,30 +165,26 @@ namespace uAdventure.Simva
             if (PlayerPrefs.HasKey("simva_auth"))
             {
                 NotifyLoading(true);
-                this.auth = JsonConvert.DeserializeObject<AuthorizationInfo>(PlayerPrefs.GetString("simva_auth"));
+                this.auth = JsonConvert.DeserializeObject<OAuth2Token>(PlayerPrefs.GetString("simva_auth"));
                 this.auth.ClientId = "uadventure";
-                SimvaApi<IStudentsApi>.Login(this.auth)
+                SimvaApi<IStudentsApi>.Login(this.auth.RefreshToken)
                     .Then(simvaController =>
-                {
-                    this.auth = simvaController.AuthorizationInfo;
-                    this.simvaController = simvaController;
-                    return UpdateSchedule();
-                })
-                .Then(schedule =>
-                {
-                    var result = new AsyncCompletionSource();
-                    StartCoroutine(AsyncCoroutine(LaunchActivity(schedule.Next), result));
-                    return result;
-                })
-                .Catch(error =>
-                {
-                    NotifyLoading(false);
-                    NotifyManagers(error.Message);
-                })
-                .Finally(() =>
-                {
-                    OpenIdUtility.tokenLogin = false;
-                });
+                    {
+                        this.API = simvaController;
+                        this.API.Authorization.RegisterAuthInfoUpdate(auth => this.auth = auth);
+                        return UpdateSchedule();
+                    })
+                    .Then(schedule =>
+                    {
+                        var result = new AsyncCompletionSource();
+                        StartCoroutine(AsyncCoroutine(LaunchActivity(schedule.Next), result));
+                        return result;
+                    })
+                    .Catch(error =>
+                    {
+                        NotifyLoading(false);
+                        NotifyManagers(error.Message);
+                    });
 
             }
             else if (HasLoginInfo())
@@ -296,12 +207,11 @@ namespace uAdventure.Simva
         public void LoginAndSchedule()
         {
             NotifyLoading(true);
-            OpenIdUtility.tokenLogin = true;
             SimvaApi<IStudentsApi>.Login()
                 .Then(simvaController =>
                 {
-                    this.auth = simvaController.AuthorizationInfo;
-                    this.simvaController = simvaController;
+                    this.API = simvaController;
+                    this.API.Authorization.RegisterAuthInfoUpdate(auth => this.auth = auth);
                     return UpdateSchedule();
                 })
                 .Then(schedule =>
@@ -314,10 +224,6 @@ namespace uAdventure.Simva
                 {
                     NotifyLoading(false);
                     NotifyManagers(error.Message);
-                })
-                .Finally(()=>
-                {
-                    OpenIdUtility.tokenLogin = false;
                 });
         }
 
@@ -327,8 +233,8 @@ namespace uAdventure.Simva
             SimvaApi<IStudentsApi>.LoginWithToken(token)
                 .Then(simvaController =>
                 {
-                    this.auth = simvaController.AuthorizationInfo;
-                    this.simvaController = simvaController;
+                    this.API = simvaController;
+                    this.API.Authorization.RegisterAuthInfoUpdate(auth => this.auth = auth);
                     PlayerPrefs.SetString("simva_auth", JsonConvert.SerializeObject(auth));
                     PlayerPrefs.Save();
                     return UpdateSchedule();
@@ -352,8 +258,8 @@ namespace uAdventure.Simva
             SimvaApi<IStudentsApi>.ContinueLogin()
                 .Then(simvaController =>
                 {
-                    this.auth = simvaController.AuthorizationInfo;
-                    this.simvaController = simvaController;
+                    this.API = simvaController;
+                    this.API.Authorization.RegisterAuthInfoUpdate(auth => this.auth = auth);
                     return UpdateSchedule();
                 })
                 .Then(schedule =>
@@ -366,10 +272,6 @@ namespace uAdventure.Simva
                 {
                     NotifyLoading(false);
                     NotifyManagers(error.Message);
-                })
-                .Finally(() =>
-                {
-                    OpenIdUtility.tokenLogin = false;
                 });
         }
 
@@ -377,10 +279,10 @@ namespace uAdventure.Simva
         {
             var result = new AsyncCompletionSource<Schedule>(); 
                 
-            simvaController.Api.GetSchedule(simvaController.SimvaConf.Study)
+            API.Api.GetSchedule(API.SimvaConf.Study)
                 .Then(schedule =>
                 {
-                    this.schedule = schedule;
+                    this.Schedule = schedule;
                     foreach(var a in schedule.Activities)
                     {
                         schedule.Activities[a.Key].Id = a.Key;
@@ -406,7 +308,7 @@ namespace uAdventure.Simva
 
             var result = new AsyncCompletionSource();
 
-            var response = (AsyncCompletionSource) API.Api.SetResult(activityId, API.AuthorizationInfo.Username, body);
+            var response = (AsyncCompletionSource) API.Api.SetResult(activityId, API.Authorization.Agent.name, body);
             response.AddProgressCallback((p) =>
              {
                  UnityEngine.Debug.Log("SaveActivityAndContinue progress: " + p);
@@ -432,10 +334,9 @@ namespace uAdventure.Simva
         public IAsyncOperation Continue(string activityId, bool completed)
         {
             NotifyLoading(true);
-            return API.Api.SetCompletion(activityId, API.AuthorizationInfo.Username, completed)
+            return API.Api.SetCompletion(activityId, API.Authorization.Agent.name, completed)
                 .Then(() =>
                 {
-                    StartBackupIfNeeded();
                     return UpdateSchedule();
                 })
                 .Then(schedule =>
@@ -455,26 +356,9 @@ namespace uAdventure.Simva
                 });
         }
 
-        private void StartBackupIfNeeded()
-        {
-            backupActivity = GetActivity(CurrentActivityId);
-            string activityType = backupActivity.Type;
-            if (activityType.Equals("gameplay", StringComparison.InvariantCultureIgnoreCase)
-            && backupActivity.Details != null && backupActivity.Details.ContainsKey("backup") && (bool)backupActivity.Details["backup"])
-            {
-                string traces = SimvaBridge.Load(((TrackerAssetSettings)TrackerAsset.Instance.Settings).BackupFile);
-                Instantiate(Resources.Load("SimvaBackupPopup"));
-                backupOperation = SaveActivity(CurrentActivityId, traces, true);
-                backupOperation.Then(() =>
-                {
-                    afterBackup = true;
-                });
-            }
-        }
-
         public Activity GetActivity(string activityId)
         {
-            if (schedule != null)
+            if (Schedule != null)
             {
                 return Schedule.Activities[activityId];
             }
@@ -485,18 +369,9 @@ namespace uAdventure.Simva
         {
             if (activityId == null)
             {
-                if (backupOperation != null && !backupOperation.IsCompletedSuccessfully)
-                {
-                    Game.Instance.AbortQuit();
-                    DisableAutoSave();
-                    Game.Instance.RunTarget("Simva.Backup", null, false);
-                }
-                else
-                {
-                    DisableAutoSave();
-                    Game.Instance.RunTarget("Simva.End", null, false);
-                    schedule = null;
-                }
+                DisableAutoSave();
+                Game.Instance.RunTarget("Simva.End", null, false);
+                Schedule = null;
             }
             else
             {
@@ -519,18 +394,18 @@ namespace uAdventure.Simva
 
                             trackerConfig.setStorageType(TrackerConfig.StorageType.LOCAL);
                             trackerConfig.setTraceFormat(TrackerConfig.TraceFormat.XAPI);
-                            trackerConfig.setRawCopy(true);
                             trackerConfig.setDebug(true);
+                            trackerConfig.setRawCopy(true);
 
                             if (ActivityHasDetails(activity, "realtime", "trace_storage"))
                             {
                                 // Realtime
                                 trackerConfig.setStorageType(TrackerConfig.StorageType.NET);
-                                trackerConfig.setHost(simvaController.SimvaConf.URL);
+                                trackerConfig.setHost(API.SimvaConf.URL);
                                 trackerConfig.setBasePath("");
                                 trackerConfig.setLoginEndpoint("/users/login");
-                                trackerConfig.setStartEndpoint("/activities/{0}/result");
-                                trackerConfig.setTrackEndpoint("/activities/{0}/result");
+                                trackerConfig.setStartEndpoint(string.Format("/activities/{0}", activityId));
+                                trackerConfig.setTrackEndpoint(string.Format("/activities/{0}", activityId));
                                 trackerConfig.setTrackingCode(activityId);
                                 trackerConfig.setUseBearerOnTrackEndpoint(true);
                                 Debug.Log("TrackingCode: " + activity.Id + " settings " + trackerConfig.getTrackingCode());
@@ -538,15 +413,16 @@ namespace uAdventure.Simva
 
                             if (ActivityHasDetails(activity, "backup"))
                             {
-                                // Local
+                                // Backup
                                 trackerConfig.setRawCopy(true);
+                                trackerConfig.setBackupEndpoint(string.Format("/activities/{0}/result", activityId));
+                                trackerConfig.setBackupFileName(auth.Username + "_" + activityId + "_backup.log");
                             }
 
                             if (ActivityHasDetails(activity, "realtime", "trace_storage", "backup"))
                             {
-                                SimvaBridge = new SimvaBridge(API.ApiClient);
                                 Debug.Log("[SIMVA] Starting tracker...");
-                                yield return StartCoroutine(AnalyticsExtension.Instance.StartTracker(trackerConfig, auth.Username + "_" + activityId + "_backup.log", SimvaBridge));
+                                yield return StartCoroutine(GetInstance<AnalyticsExtension>().StartTracker(trackerConfig, API.Authorization, API.Authorization));
                             }
 
                             Debug.Log("[SIMVA] Starting Gameplay...");
@@ -634,7 +510,7 @@ namespace uAdventure.Simva
 
         private static bool HasLoginInfo()
         {
-            return OpenIdUtility.HasLoginInfo();
+            return false;// OpenIdUtility.HasLoginInfo();
         }
 
         public bool canBeInteracted()

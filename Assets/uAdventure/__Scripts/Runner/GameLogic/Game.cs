@@ -59,10 +59,9 @@ namespace uAdventure.Runner
         private ConversationNodeHolder guioptions;
         private float elapsedTime;
         private bool doTimeOut;
-        private Book openedBook;
         private BookDrawer bookDrawer;
         private List<GameExtension> gameExtensions;
-        private bool started;
+        //private bool started;
         private int pulsing = 0;
         private bool wasShowingInventory = false;
         private int loadedChapter = -1;
@@ -222,7 +221,7 @@ namespace uAdventure.Runner
         {
             Debug.Log("[START GAME] GameState Restart...");
             GameState.Restart();
-            started = true;
+            //started = true;
             Debug.Log("[START GAME] Game Resuming...");
             if (GameState.Data.isRestoreAfterOpen())
             {
@@ -481,6 +480,7 @@ namespace uAdventure.Runner
                 catch (System.Exception ex)
                 {
                     Debug.LogError("Interacted execution exception: " + ex.Message + ex.StackTrace);
+                    Debug.LogException(ex);
                 }
 
                 if (requiresMore && !actionCanceled)
@@ -537,6 +537,7 @@ namespace uAdventure.Runner
                     catch (System.Exception ex)
                     {
                         Debug.Log("Execution OnFinished execution exception: " + ex.Message);
+                        Debug.LogException(ex);
                         if (actionCanceled)
                         {
                             executeStack.Clear();

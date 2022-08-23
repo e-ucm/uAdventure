@@ -1,19 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
-using AssetPackage;
 using uAdventure.Runner;
+using Xasu;
 
 namespace uAdventure.Geo
 {
     public class GeoExtension : GameExtension {
-
-        private static GeoExtension instance;
-        public static GeoExtension Instance {
-            get
-            {
-                return instance;
-            }
-        }
 
         public bool UsingDebugLocation
         {
@@ -54,20 +46,17 @@ namespace uAdventure.Geo
 
         public float update = .1f; // 5 meters
         public float accuracy = 1; // 10 meters
-        private bool inMapScene = false;
-        private bool inZoneControl = false;
-        private bool hidden = false;
+        private bool gameIsReady;
+
+        // Obsolete Gui Map Parameters
+        /*private bool hidden = false;
         private GUIMap guiMap;
         private Rect debugWindowRect = new Rect(0, 0, 200, 200);
         private Texture2D pointer;
-        private bool gameIsReady;
+        private bool inMapScene = false;
+        private bool inZoneControl = false;
         private bool checkTargetRegistered;
-
-        void Awake()
-        {
-            instance = this;
-            //StartCoroutine(Restart());
-        }
+        */
 
         public void Start()
         {
@@ -80,7 +69,7 @@ namespace uAdventure.Geo
                 StartCoroutine(StartLocation());
             }
 
-            if (Application.isPlaying && !checkTargetRegistered)
+           /* if (Application.isPlaying && !checkTargetRegistered)
             {
                 Game.TargetChangedDelegate checkTarget = (newTarget) =>
                 {
@@ -93,7 +82,7 @@ namespace uAdventure.Geo
                 checkTargetRegistered = true;
             }
 
-            pointer = Resources.Load<Texture2D>("pointer");
+            pointer = Resources.Load<Texture2D>("pointer");*/
         }
 
         public override IEnumerator Restart()
@@ -220,14 +209,14 @@ namespace uAdventure.Geo
                 geochar = FindObjectOfType<GeoPositionedCharacter>();
             }
 
-            if (timeSinceLastPositionUpdate > timeToFlush && TrackerAsset.Instance.Active)
+            if (timeSinceLastPositionUpdate > timeToFlush && XasuTracker.Instance.Status.State != TrackerState.Uninitialized)
             {
                 timeSinceLastPositionUpdate = 0;
 
                 if (IsStarted() || UsingDebugLocation || geochar)
                 {
                     var mapScene = Game.Instance.CurrentTargetRunner.Data as MapScene;
-                    TrackerExtension.Movement.Moved(mapScene != null ? mapScene.Id : "World", Location);
+                    MovementTracker.Instance.Moved(mapScene != null ? mapScene.Id : "World", Location);
                 }
             }
 

@@ -42,6 +42,7 @@ namespace uAdventure.Geo
         private Dictionary<NavigationStep, bool> stepCompleted;
         private Dictionary<NavigationStep, int> completedElementsForStep;
         private GeoPositionedCharacter character;
+        private GeoExtension geoExtension;
 
 
         // ----------------------
@@ -52,10 +53,11 @@ namespace uAdventure.Geo
         {
             if (!inited)
             {
+                geoExtension = GameExtension.GetInstance<GeoExtension>();
                 referenceCache = new Dictionary<string, MonoBehaviour>();
                 stepCompleted = new Dictionary<NavigationStep, bool>();
                 completedElementsForStep = new Dictionary<NavigationStep, int>();
-                inited = true;
+                inited = true; 
             }
         }
 
@@ -257,7 +259,7 @@ namespace uAdventure.Geo
                 var position = (Vector2d)wrap.Context.TransformManagerParameters["Position"];
                 var interactionRange = (float)wrap.Context.TransformManagerParameters["InteractionRange"];
 
-                var realDistance = GM.SeparationInMeters(position, GeoExtension.Instance.Location);
+                var realDistance = GM.SeparationInMeters(position, geoExtension.Location);
 
                 // Is inside if the character is in range but also the real coords are saying so
                 // Otherwise, if there is no character or gps, only one of the checks is valid
@@ -271,7 +273,7 @@ namespace uAdventure.Geo
                 // Is inside if the character is inside the influence but also the real coords are saying so
                 // Otherwise, if there is no character or gps, only one of the checks is valid                
 
-                var location = GeoExtension.Instance.Location;
+                var location = geoExtension.Location;
                 if (geomb.Geometry.InsideInfluence(location))
                 {
                     if (geomb.Geometry.Type == GMLGeometry.GeometryType.LineString)
@@ -361,7 +363,7 @@ namespace uAdventure.Geo
                 var geoElementMb = mb as GeoElementMB;
                 if(geoElementMb != null && geoElementMb.Geometry.Type == GMLGeometry.GeometryType.LineString)
                 {
-                    var location = GeoExtension.Instance.geochar.LatLon;
+                    var location = GameExtension.GetInstance<GeoExtension>().geochar.LatLon;
                     // Paint the arrow on top of the yellow line
                     var closestPoint = geoElementMb.Geometry.GetClosestPoint(location);
                     if (geoElementMb.Geometry.InsideInfluence(location))
@@ -426,7 +428,7 @@ namespace uAdventure.Geo
             {
                 latLon = character.LatLon; // use the position of the character to calculate distance
             }
-            else if (GeoExtension.Instance.IsLocationValid()) // If We have a location source we use it
+            else if (geoExtension.IsLocationValid()) // If We have a location source we use it
             {
                 latLon = Input.location.lastData.LatLonD();
             }
@@ -502,7 +504,7 @@ namespace uAdventure.Geo
                     /*int step;
                     completedElementsForStep.TryGetValue(currentStep, out step);
                     return geometry.Points[step];*/
-                    return geometry.GetClosestPoint(GeoExtension.Instance.Location);
+                    return geometry.GetClosestPoint(GameExtension.GetInstance<GeoExtension>().Location);
                 default:
                 case GMLGeometry.GeometryType.Polygon:
                 case GMLGeometry.GeometryType.Point:

@@ -28,7 +28,7 @@ namespace uAdventure.Geo
 
             if (Application.isEditor && Application.isPlaying)
             {
-                GeoExtension.Instance.Location = GeoExtension.Instance.Location; // This will activate debug location
+                GameExtension.GetInstance<GeoExtension>().Location = GameExtension.GetInstance<GeoExtension>().Location; // This will activate debug location
             }
 
             Game.Instance.RunTarget(effect.getTargetId(), effect.getTransitionTime(), effect.getTransitionType());
@@ -46,9 +46,9 @@ namespace uAdventure.Geo
 
         void Start()
         {
-            if (!GeoExtension.Instance.IsStarted())
+            if (!GameExtension.GetInstance<GeoExtension>().IsStarted())
             {
-                GeoExtension.Instance.Start();
+                GameExtension.GetInstance<GeoExtension>().Start();
                 Save(Game.Instance.GameState.GetMemory("geo_extension"));
             }
         }
@@ -60,10 +60,10 @@ namespace uAdventure.Geo
             {
                 return; // We have to respect if something is running, like a conversation or an effect
             }
-
-            if(GeoExtension.Instance.IsLocationValid())
+            var geoExtension = GameExtension.GetInstance<GeoExtension>();
+            if (geoExtension.IsLocationValid())
             {
-                if (!zone.InsideInfluence(GeoExtension.Instance.Location, 5))
+                if (!zone.InsideInfluence(geoExtension.Location, 5))
                 {
                     Debug.Log("No está en la influencia, pero la ubicación es válida");
                     Game.Instance.RunTarget(loadOnExit, 0, 0);
@@ -71,7 +71,7 @@ namespace uAdventure.Geo
                     DestroyImmediate(this.gameObject);
                 }
             }
-            else if (!GeoExtension.Instance.IsStarted() && !zone.InsideInfluence(GeoExtension.Instance.Location, 5))
+            else if (!geoExtension.IsStarted() && !zone.InsideInfluence(geoExtension.Location, 5))
             {
                 Debug.Log("No está en la influencia");
                 Game.Instance.RunTarget(loadOnExit, 0, 0);

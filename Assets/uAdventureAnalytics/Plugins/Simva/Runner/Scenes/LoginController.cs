@@ -45,9 +45,10 @@ namespace uAdventure.Simva
 
         public void Login()
         {
-            if(token == null || string.IsNullOrEmpty(token.text))
+            var simvaExtension = GameExtension.GetInstance<SimvaExtension>();
+            if (token == null || string.IsNullOrEmpty(token.text))
             {
-                SimvaExtension.Instance.NotifyManagers("Please insert a token");
+                simvaExtension.NotifyManagers("Please insert a token");
                 return;
             }
 
@@ -57,13 +58,13 @@ namespace uAdventure.Simva
             }
             else
             {
-                SimvaExtension.Instance.LoginAndSchedule(token.text);
+                simvaExtension.LoginAndSchedule(token.text);
             }
         }
 
         public void LoginWithKeykloak()
         {
-            SimvaExtension.Instance.LoginAndSchedule();
+            GameExtension.GetInstance<SimvaExtension>().LoginAndSchedule();
         }
 
         public void RenderScene()
@@ -91,8 +92,8 @@ namespace uAdventure.Simva
         public void Demo()
         {
             PreviewManager.Instance.InPreviewMode = true;
-            uAdventure.Geo.GeoExtension.Instance.UsingDebugLocation = true;
-            uAdventure.Geo.GeoExtension.Instance.Location = new Vector2d(40.4436403741371, -3.72659319639157);
+            GameExtension.GetInstance<Geo.GeoExtension>().UsingDebugLocation = true;
+            GameExtension.GetInstance<Geo.GeoExtension>().Location = new Vector2d(40.4436403741371, -3.72659319639157);
             Game.Instance.Restart();
             Game.Instance.GameState.Data.setAutoSave(false);
             Game.Instance.GameState.Data.setSaveOnSuspend(false);

@@ -1,0 +1,17 @@
+{
+    "name": "xasu-plugins",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "Polly.dll",
+        "xAPIClient.dll",
+        "xAPIModel.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

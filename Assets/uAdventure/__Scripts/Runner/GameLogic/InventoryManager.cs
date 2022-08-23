@@ -2,7 +2,8 @@
 using System.Linq;
 using UnityEngine;
 using uAdventure.Core;
-using AssetPackage;
+using Xasu;
+using Xasu.HighLevel;
 
 namespace uAdventure.Runner
 {
@@ -62,15 +63,15 @@ namespace uAdventure.Runner
                 }
                 if (inventory)
                 {
-                    if(inventory.Opened != value && TrackerAsset.Instance.Started)
+                    if(inventory.Opened != value && XasuTracker.Instance.Status.State != TrackerState.Uninitialized)
                     {
                         if (value)
                         {
-                            TrackerAsset.Instance.Accessible.Accessed("Inventory", AccessibleTracker.Accessible.Inventory);
+                            AccessibleTracker.Instance.Accessed("Inventory", AccessibleTracker.AccessibleType.Inventory);
                         }
                         else
                         {
-                            TrackerAsset.Instance.Accessible.Skipped("Inventory", AccessibleTracker.Accessible.Inventory);
+                            AccessibleTracker.Instance.Skipped("Inventory", AccessibleTracker.AccessibleType.Inventory);
                         }
                     }
 

@@ -1,8 +1,8 @@
-﻿using AssetPackage;
-using MapzenGo.Helpers;
+﻿using MapzenGo.Helpers;
 using System.Collections.Generic;
 using uAdventure.Runner;
 using UnityEngine;
+using Xasu;
 using static uAdventure.Geo.GeoElementMB;
 
 namespace uAdventure.Geo
@@ -28,6 +28,7 @@ namespace uAdventure.Geo
                 collider = transform.gameObject.GetComponent<Collider>();
                 renderer = transform.gameObject.GetComponent<Renderer>();
                 positioner = transform.gameObject.GetComponent<GeoPositioner>();
+                geoExtension = GameExtension.GetInstance<GeoExtension>();
 
                 var particlesGo = Object.Instantiate(particleSystemPrefab,transform);
                 particles = particlesGo.GetComponent<ParticleSystem>();
@@ -64,6 +65,7 @@ namespace uAdventure.Geo
         private bool shown = true;
         private bool hint;
         private List<IGeoActionManager> geoActionManagers;
+        private GeoExtension geoExtension;
 
         public void Configure(Dictionary<string, object> parameters)
         {
@@ -91,7 +93,7 @@ namespace uAdventure.Geo
             transform.localPosition = basePosition + centerVector;
             transform.localRotation = Quaternion.Euler(90, rotation, 0);
 
-            if (interactionRange <= 0 || GM.SeparationInMeters(GeoExtension.Instance.Location, latLon) <= interactionRange)
+            if (interactionRange <= 0 || GM.SeparationInMeters(geoExtension.Location, latLon) <= interactionRange)
             {
                 SetShown(true);
                 if (interactuable != null)
@@ -154,11 +156,11 @@ namespace uAdventure.Geo
 #if UNITY_ANDROID || UNITY_IOS
                     Handheld.Vibrate();
 #endif
-                    if (TrackerAsset.Instance.Started)
+                    if (XasuTracker.Instance.Status.State != TrackerState.Uninitialized)
                     {
                         // TODO change this after: https://github.com/e-ucm/unity-tracker/issues/29
-                        TrackerAsset.Instance.setVar("geo_element_" + positioner.Element.getId(), 1);
-                        TrackerExtension.Movement.Moved(Game.Instance.GameState.CurrentTarget, GeoExtension.Instance.Location);
+                        MovementTracker.Instance.Moved(Game.Instance.GameState.CurrentTarget, geoExtension.Location)
+                            .WithResultExtensions(new Dictionary<string, object> { { "geo_element_" + positioner.Element.getId(), 1 } });
                     }
                 }
                 if (hint)

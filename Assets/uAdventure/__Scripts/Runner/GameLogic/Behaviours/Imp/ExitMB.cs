@@ -1,8 +1,11 @@
 ﻿using uAdventure.Core;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using AssetPackage;
 using System;
+using TinCan;
+using Xasu;
+using Xasu.HighLevel;
+using Xasu.Util;
 
 namespace uAdventure.Runner
 {
@@ -74,9 +77,11 @@ namespace uAdventure.Runner
             return effectHolder;
         }
 
-        private TrackerAsset.TrackerEvent TraceExit(bool exited, IChapterTarget targetOnExit)
+        private StatementPromise TraceExit(bool exited, IChapterTarget targetOnExit)
         {
-            if (!TrackerAsset.Instance.Started)
+            if (XasuTracker.Instance.Status.State == TrackerState.Uninitialized
+                || XasuTracker.Instance.Status.State == TrackerState.Errored
+                || XasuTracker.Instance.Status.State == TrackerState.Finalized)
             {
                 return null;
             }
@@ -86,25 +91,25 @@ namespace uAdventure.Runner
             // ALTERNATIVE
             if ("alternative".Equals(targetOnExit.getXApiClass(), IgnoreCase))
             {
-                var parsedType = (AlternativeTracker.Alternative)Enum.Parse(typeof(AlternativeTracker.Alternative), targetOnExit.getXApiType(), true);
+                var parsedType = (AlternativeTracker.AlternativeType)Enum.Parse(typeof(AlternativeTracker.AlternativeType), targetOnExit.getXApiType(), true);
                 if (ConditionChecker.check(ed.getConditions()))
                 {
                     if (targetOnExit.getXApiType() == "menu")
                     {
-                        return TrackerAsset.Instance.Alternative.Selected(targetOnExit.getId(), ed.getNextSceneId(), parsedType);
+                        return AlternativeTracker.Instance.Selected(targetOnExit.getId(), ed.getNextSceneId(), parsedType);
                     }
                     else
                     {
-                        TrackerAsset.Instance.setSuccess(true);
-                        return TrackerAsset.Instance.Alternative.Selected(targetOnExit.getId(), ed.getNextSceneId(), parsedType);
+                        return AlternativeTracker.Instance.Selected(targetOnExit.getId(), ed.getNextSceneId(), parsedType)
+                            .WithSuccess(true);
                     }
                 }
                 else
                 {
                     if (targetOnExit.getXApiType() != "menu")
                     {
-                        TrackerAsset.Instance.setSuccess(false);
-                        return TrackerAsset.Instance.Alternative.Selected(targetOnExit.getId(), "Incorrect", parsedType);
+                        return AlternativeTracker.Instance.Selected(targetOnExit.getId(), "Incorrect", parsedType)
+                            .WithSuccess(false);
                     }
                 }
             }
@@ -189,7 +194,7 @@ namespace uAdventure.Runner
             private EffectHolder exitEffects;
             private bool exits;
             private IChapterTarget targetOnExit;
-            private TrackerAsset.TrackerEvent trace;
+            private StatementPromise trace;
 
             public IEffect Effect { get { return toRun; } set { toRun = value as ExecuteExitEffect; Init(); } }
 
@@ -200,7 +205,7 @@ namespace uAdventure.Runner
                 try
                 {
                     trace = toRun.ExitMb.TraceExit(exits, targetOnExit);
-                    trace?.SetPartial();
+                    trace?.Statement.SetPartial();
                 }
                 catch (Exception ex)
                 {
@@ -217,7 +222,7 @@ namespace uAdventure.Runner
                 {
                     // Last run
                     Game.Instance.GameState.EndChangeAmbitAsExtensions(trace);
-                    trace?.Completed();
+                    trace?.Statement.Complete();
                 }
                 return forceWait;
             }

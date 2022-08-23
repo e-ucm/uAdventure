@@ -17,7 +17,7 @@ namespace uAdventure.Geo
         /* ---------------------------------
          * Attributes
          * -------------------------------- */
-        private Vector2 location;
+        //private Vector2 location;
 
         /* ----------------------------------
          * GUI ELEMENTS
@@ -36,11 +36,11 @@ namespace uAdventure.Geo
         /* ----------------------------------
          * ON GUI: Used for drawing the window every unity event
          * ----------------------------------*/
-        protected void OnGUI()
+        /*protected void OnGUI()
         {
 
             // Location control
-           /* location = EditorGUILayout.Vector2Field("Location", location);
+            location = EditorGUILayout.Vector2Field("Location", location);
             var lastRect = GUILayoutUtility.GetLastRect();
             if (location != map.Center.ToVector2())
             {
@@ -117,15 +117,15 @@ namespace uAdventure.Geo
 
             location = map.Center.ToVector2();
             geometriesReorderableList.index = GUIMap.selectedGeometry != null ? geometries.IndexOf(map.selectedGeometry) : -1;
-            */
+            
             GUILayout.EndHorizontal();
-        }
+        }*/
 
         /*----------------------------
          * GML GEOMETRY OPERATIONS
          *----------------------------*/
 
-        private readonly Rect typePopupRect = new Rect(0, 2, 150, 15);
+        /*private readonly Rect typePopupRect = new Rect(0, 2, 150, 15);
         private readonly Rect infoRect = new Rect(9, 20, 150, 15);
         private readonly Rect centerButtonRect = new Rect(0, 40, 75, 15);
         private readonly Rect editButtonRect = new Rect(75, 40, 75, 15);
@@ -133,7 +133,7 @@ namespace uAdventure.Geo
         private void DrawGMLGeometryHeader(Rect rect)
         {
             GUI.Label(rect, "Geometries");
-        }
+        }*/
 
         /*private void DrawGMLGeometry(Rect rect, int index, bool active, bool focused)
         {

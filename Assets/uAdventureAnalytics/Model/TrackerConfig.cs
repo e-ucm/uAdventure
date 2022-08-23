@@ -17,6 +17,8 @@ namespace uAdventure.Analytics
         private string loginEndpoint = null;
         private string startEndpoint = null;
         private string trackEndpoint = null;
+        private string backupEndpoint = null;
+        private string backupFileName = null;
 
         private bool useBearerOnTrackEndpoint = false;
 
@@ -63,6 +65,14 @@ namespace uAdventure.Analytics
         public string getTrackEndpoint()
         {
             return this.trackEndpoint;
+        }
+        public string getBackupEndpoint()
+        {
+            return this.backupEndpoint;
+        }
+        public string getBackupFileName()
+        {
+            return this.backupFileName;
         }
         public bool getUseBearerOnTrackEndpoint()
         {
@@ -116,6 +126,14 @@ namespace uAdventure.Analytics
         public void setTrackEndpoint(string trackEndpoint)
         {
             this.trackEndpoint = trackEndpoint;
+        }
+        public void setBackupEndpoint(string backupEndpoint)
+        {
+            this.backupEndpoint = backupEndpoint;
+        }
+        public void setBackupFileName(string backupFileName)
+        {
+            this.backupFileName = backupFileName;
         }
         public void setUseBearerOnTrackEndpoint(bool useBearerOnTrackEndpoint)
         {

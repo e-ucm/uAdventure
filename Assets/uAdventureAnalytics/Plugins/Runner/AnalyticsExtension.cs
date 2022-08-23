@@ -1,49 +1,33 @@
-﻿using AssetPackage;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System.Collections;
+using System.Collections.Generic;
 using uAdventure.Runner;
 using UnityEngine;
+using Xasu;
+using Xasu.Auth.Protocols;
+using Xasu.Util;
 
 namespace uAdventure.Analytics
 {
     public class AnalyticsExtension : GameExtension
     {
-
-        //#################################################################
-        //########################### SINGLETON ###########################
-        //#################################################################
-        #region Singleton
-        static AnalyticsExtension instance;
-
-        public static AnalyticsExtension Instance
-        {
-            get
-            {
-                return instance;
-            }
-        }
-        #endregion Singleton
-
         //##################################################################
         //########################### CONTROLLER ###########################
         //##################################################################
         #region Controller
 
-
-        private float nextFlush = 0;
-        private bool flushRequested = true;
         public CompletablesController CompletablesController { get; private set; }
-        private TrackerConfig trackerConfig;
+        //private TrackerConfig trackerConfig;
         private bool inited = false;
 
         public bool AutoStart { get; set; }
         public string User { get; set; }
         public string Password { get; set; }
 
-        protected void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             AutoStart = true;
-            instance = this;
         }
 
         public void Init()
@@ -56,11 +40,6 @@ namespace uAdventure.Analytics
             inited = true;
 
             CompletablesController = new CompletablesController();
-        }
-
-        void Update()
-        {
-            CheckTrackerFlush();
         }
 
         #region GameExtension
@@ -88,23 +67,26 @@ namespace uAdventure.Analytics
             yield return true;
         }
 
-        private bool afterFlush;
-        public void AfterFlush()
-        {
-            afterFlush = true;
-        }
-
         [Priority(1)]
         public override IEnumerator OnGameFinished()
         {
-            if (TrackerAsset.Instance.Active)
+
+            if (XasuTracker.Instance.Status.State == TrackerState.NetworkRequired || XasuTracker.Instance.Status.State == TrackerState.Fallback)
             {
-                var flushed = false;
-                TrackerAsset.Instance.ForceCompleteTraces();
-                TrackerAsset.Instance.FlushAll(() => flushed = true);
-                var time = Time.time;
-                yield return new WaitUntil(() => flushed);
-                TrackerAsset.Instance.Stop();
+                // TODO Remember the player to connect in order to flush everything
+            }
+
+            if (XasuTracker.Instance.Status.State == TrackerState.Normal)
+            {
+                var finalized = false;
+                PartialStatements.CompleteAllStatements();
+                XasuTracker.Instance.Finalize()
+                    .ContinueWith(t =>
+                    {
+                        // TODO check if flush failed
+                        finalized = true;
+                    });
+                yield return new WaitUntil(() => finalized);
             }
         }
 
@@ -132,8 +114,7 @@ namespace uAdventure.Analytics
                 Debug.Log("[TRACKER] AutoStart!");
                 // Get the tracker config from the game settings
                 var trackerConfigs = Game.Instance.GameState.Data.getObjects<TrackerConfig>();
-                trackerConfig = trackerConfigs.Count == 0 ? new TrackerConfig() : trackerConfigs[0];
-
+                var trackerConfig = trackerConfigs.Count == 0 ? new TrackerConfig() : trackerConfigs[0];
                 yield return StartCoroutine(StartTracker(trackerConfig, null));
                 // TODO wait till start tracker is ready
             }
@@ -141,9 +122,9 @@ namespace uAdventure.Analytics
 
         #endregion GameExtension
                 
-        public IEnumerator StartTracker(TrackerConfig config, string backupFilename, IBridge bridge = null)
+        public IEnumerator StartTracker(TrackerConfig config, IAuthProtocol onlineProtocol = null, IAuthProtocol backupProtocol = null)
         {
-            trackerConfig = config;
+            //trackerConfig = config;
             string domain = "";
             int port = 80;
             bool secure = false;
@@ -172,158 +153,63 @@ namespace uAdventure.Analytics
                 }
                 Debug.Log("[ANALYTICS] Config: " + JsonConvert.SerializeObject(config));
             }
-            catch (System.Exception e)
+            catch (System.Exception)
             {
-                Debug.Log("Tracker error: Host bad format");
+                Debug.LogError("[ANALYTICS] Tracker error: Host bad format");
+                throw;
             }
 
-            TrackerAsset.TraceFormats format;
-            switch (config.getTraceFormat())
+            var simva = config.getHost().Contains("simva");
+            var trackerConfig = new Xasu.Config.TrackerConfig
             {
-                case TrackerConfig.TraceFormat.XAPI:
-                    format = TrackerAsset.TraceFormats.xapi;
-                    break;
-                default:
-                    format = TrackerAsset.TraceFormats.csv;
-                    break;
-            }
-            Debug.Log("[ANALYTICS] Format: " + format);
+                //Simva
+                Simva = simva,
 
-            TrackerAsset.StorageTypes storage;
-            switch (config.getStorageType())
-            {
-                case TrackerConfig.StorageType.NET:
-                    storage = TrackerAsset.StorageTypes.net;
-                    break;
-                default:
-                    storage = TrackerAsset.StorageTypes.local;
-                    break;
-            }
-            Debug.Log("[ANALYTICS] Storage: " + storage);
+                FlushInterval = 3,
+                BatchSize = 256,
 
-            TrackerAssetSettings tracker_settings = new TrackerAssetSettings()
-            {
-                Host = domain,
-                TrackingCode = config.getTrackingCode(),
-                BasePath = trackerConfig.getBasePath() ?? "/api",
-                LoginEndpoint = trackerConfig.getLoginEndpoint() ?? "login",
-                StartEndpoint = trackerConfig.getStartEndpoint() ?? "proxy/gleaner/collector/start/{0}",
-                TrackEndpoint = trackerConfig.getStartEndpoint() ?? "proxy/gleaner/collector/track",
-                Port = port,
-                Secure = secure,
-                StorageType = storage,
-                TraceFormat = format,
-                BackupStorage = config.getRawCopy(),
-                UseBearerOnTrackEndpoint = trackerConfig.getUseBearerOnTrackEndpoint()
+                Online = config.getStorageType() == TrackerConfig.StorageType.NET,
+                Fallback = true,
+                LRSEndpoint = config.getHost() + config.getTrackEndpoint(),
+
+                Offline = config.getStorageType() == TrackerConfig.StorageType.LOCAL,
+                TraceFormat = Xasu.Config.TraceFormats.XAPI,
+
+                Backup = config.getRawCopy(),
+                BackupFileName = config.getBackupFileName(),
+                BackupEndpoint = config.getHost() + config.getBackupEndpoint()
             };
 
-            if (!string.IsNullOrEmpty(backupFilename))
+
+            if (config.getStorageType() == TrackerConfig.StorageType.NET && !string.IsNullOrEmpty(User) && !string.IsNullOrEmpty(Password))
             {
-                tracker_settings.BackupFile = backupFilename;
-            }
-
-            Debug.Log("[ANALYTICS] Settings: " + JsonConvert.SerializeObject(tracker_settings));
-            TrackerAsset.Instance.StrictMode = false;
-            TrackerAsset.Instance.Bridge = bridge ?? new UnityBridge();
-            TrackerAsset.Instance.Settings = tracker_settings;
-            TrackerAsset.Instance.StrictMode = false;
-
-            var done = false;
-
-            if (storage == TrackerAsset.StorageTypes.net && !string.IsNullOrEmpty(User) && !string.IsNullOrEmpty(Password))
-            { 
-                Debug.Log("[ANALYTICS] Loging in...");
-                TrackerAsset.Instance.LoginAsync(User, Password, logged =>
+                Debug.Log("[ANALYTICS] Setting up basic Loging...");
+                trackerConfig.AuthProtocol = "basic";
+                trackerConfig.AuthParameters = new Dictionary<string, string>
                 {
-                    Debug.Log("[ANALYTICS] Logged");
-                    if (logged)
-                    {
-                        Debug.Log("[ANALYTICS] Starting tracker...");
-                        TrackerAsset.Instance.StartAsync(() => done = true);
-                    }
-                    else
-                    {
-                        done = true;
-                    }
-                });
+                    {"username", User },
+                    {"password", Password }
+                };
             }
             else
             {
                 Debug.Log("[ANALYTICS] Starting tracker without login...");
-                TrackerAsset.Instance.StartAsync(() => done = true);
             }
 
 
-            this.nextFlush = config.getFlushInterval();
+            Debug.Log("[ANALYTICS] Settings: " + JsonConvert.SerializeObject(trackerConfig));
+
+            var done = false;
+            XasuTracker.Instance.Init(trackerConfig, onlineProtocol, backupProtocol)
+                .ContinueWith(t =>
+                {
+                    // TODO fix 
+                    done = true;
+                });
 
             Debug.Log("[ANALYTICS] Waiting until start");
             yield return new WaitUntil(() => done);
-            Debug.Log("[ANALYTICS] Start done, result: " + TrackerAsset.Instance.Started);
-        }
-        
-        [System.Obsolete]
-        private void LoadTrackerSettings()
-        {
-            //Load tracker data
-            SimpleJSON.JSONNode hostfile = new SimpleJSON.JSONClass();
-            bool loaded = false;
-
-            if (!Application.isMobilePlatform && Application.platform != RuntimePlatform.WebGLPlayer /*&& useSystemIO*/)
-            {
-                if (!System.IO.File.Exists("host.cfg"))
-                {
-                    hostfile.Add("host", new SimpleJSON.JSONData("http://192.168.175.117:3000/api/proxy/gleaner/collector/"));
-                    hostfile.Add("trackingCode", new SimpleJSON.JSONData("57d81d5585b094006eab04d6ndecvjlvjss8aor"));
-                    System.IO.File.WriteAllText("host.cfg", hostfile.ToString());
-                }
-                else
-                {
-                    hostfile = SimpleJSON.JSON.Parse(System.IO.File.ReadAllText("host.cfg"));
-                }
-                loaded = true;
-            }
-
-            try
-            {
-                if (loaded)
-                {
-                    var settings = TrackerAsset.Instance.Settings as TrackerAssetSettings;
-                    settings.Host = hostfile["host"];
-                    settings.TrackingCode = hostfile["trackingCode"];
-                    //End tracker data loading
-                }
-            }
-            catch
-            {
-                Debug.Log("Error loading the tracker settings");
-            }
-        }
-
-        private void CheckTrackerFlush()
-        {
-            if (!TrackerAsset.Instance.Started)
-            {
-                return;
-            }
-
-            float delta = Time.deltaTime;
-            if (trackerConfig.getFlushInterval() >= 0)
-            {
-                nextFlush -= delta;
-                if (nextFlush <= 0)
-                {
-                    flushRequested = true;
-                }
-                while (nextFlush <= 0)
-                {
-                    nextFlush += trackerConfig.getFlushInterval();
-                }
-            }
-            if (flushRequested)
-            {
-                flushRequested = false;
-                TrackerAsset.Instance.Flush();
-            }
+            Debug.Log("[ANALYTICS] Start done, result: " + XasuTracker.Instance.Status.State);
         }
         
         #endregion Controller

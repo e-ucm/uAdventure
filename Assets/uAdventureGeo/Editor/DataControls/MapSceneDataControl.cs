@@ -6,6 +6,7 @@ using uAdventure.Core;
 using UnityEngine;
 
 using uAdventure.Editor;
+using Xasu.HighLevel;
 
 namespace uAdventure.Geo
 {
@@ -113,15 +114,15 @@ namespace uAdventure.Geo
 
             xApiOptions = new Dictionary<string, List<string>>();
 
-            var accessibleOptions = Enum.GetValues(typeof(AccessibleTracker.Accessible))
-                .Cast<AccessibleTracker.Accessible>()
+            var accessibleOptions = Enum.GetValues(typeof(AccessibleTracker.AccessibleType))
+                .Cast<AccessibleTracker.AccessibleType>()
                 .Select(v => v.ToString().ToLower())
                 .ToList();
 
             xApiOptions.Add("accesible", accessibleOptions);
 
-            var alternativeOptions = Enum.GetValues(typeof(AlternativeTracker.Alternative))
-                .Cast<AlternativeTracker.Alternative>()
+            var alternativeOptions = Enum.GetValues(typeof(AlternativeTracker.AlternativeType))
+                .Cast<AlternativeTracker.AlternativeType>()
                 .Select(v => v.ToString().ToLower())
                 .ToList();
 

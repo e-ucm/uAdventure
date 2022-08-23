@@ -161,10 +161,10 @@ namespace uAdventure.Editor
         public bool editStyledTextAssetPath()
         {
 
-            string selectedAsset = null;
             if (selectedPage < 0 || selectedPage >= bookPagesList.Count)
                 return false;
             ////TODO: implement
+            //string selectedAsset = null;
             //AssetChooser chooser = AssetsController.getAssetChooser(AssetsConstants.CATEGORY_STYLED_TEXT, AssetsController.FILTER_NONE);
             //int option = chooser.showAssetChooser(Controller.getInstance().peekWindow());
             ////In case the asset was selected from the zip file
@@ -216,10 +216,10 @@ namespace uAdventure.Editor
         public bool editImageAssetPath()
         {
 
-            string selectedAsset = null;
             if (selectedPage < 0 || selectedPage >= bookPagesList.Count)
                 return false;
             ////TODO: implement
+            //string selectedAsset = null;
             //AssetChooser chooser = AssetsController.getAssetChooser(AssetsConstants.CATEGORY_IMAGE, AssetsController.FILTER_NONE);
             //int option = chooser.showAssetChooser(Controller.getInstance().peekWindow());
             ////In case the asset was selected from the zip file

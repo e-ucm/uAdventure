@@ -1,0 +1,18 @@
+{
+    "name": "xasu-editor",
+    "references": [
+        "GUID:08e346b04c3ec374b8a3849fcc6b467c",
+        "GUID:5f68587534902db4d9c9031fc37339e0"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

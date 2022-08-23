@@ -3,12 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 
 using uAdventure.Core;
-using RAGE.Analytics;
 using System;
-using AssetPackage;
 using System.Linq;
 using UniRx;
-using static AssetPackage.TrackerAsset;
+using TinCan;
+using Xasu;
+using Xasu.HighLevel;
+using Xasu.Util;
 
 namespace uAdventure.Runner
 {
@@ -51,7 +52,7 @@ namespace uAdventure.Runner
         private Dictionary<string, List<ElementReference>> elementContexts;
         private Dictionary<string, int> varFlags;
         private Stack<List<KeyValuePair<string, int>>> varFlagChangeAmbits;
-        private Stack<TrackerEvent> ambitTraces;
+        private Stack<StatementPromise> ambitTraces;
 
         #region SerializationFields
         [SerializeField]
@@ -142,7 +143,7 @@ namespace uAdventure.Runner
             varFlags = new Dictionary<string, int>();
             elementContexts = new Dictionary<string, List<ElementReference>>();
             varFlagChangeAmbits = new Stack<List<KeyValuePair<string, int>>>();
-            ambitTraces = new Stack<TrackerEvent>();
+            ambitTraces = new Stack<StatementPromise>();
             memories = new Dictionary<string, Memory>();
             currentChapter = 0;
             playerContext = null;
@@ -164,6 +165,11 @@ namespace uAdventure.Runner
             {
                 RestoreFrom("save");
             }
+        }
+
+        private string GetGameRelativeUri(string name)
+        {
+            return data.getApplicationIdentifier() + "://" + name;
         }
 
         private void InitPlayerContext()
@@ -208,15 +214,16 @@ namespace uAdventure.Runner
             varFlags["flag_" + name] = state;
             bool bstate = state == FlagCondition.FLAG_ACTIVE;
             int intVal = bstate ? 1 : 0;
+            var nameUri = GetGameRelativeUri(name);
 
             // TODO check this after this: https://github.com/e-ucm/unity-tracker/issues/29
             if (varFlagChangeAmbits.Count > 0)
             {
-                varFlagChangeAmbits.Peek().Add(new KeyValuePair<string, int>(name, intVal));
+                varFlagChangeAmbits.Peek().Add(new KeyValuePair<string, int>(nameUri, intVal));
             }
             else
             {
-                TrackerAsset.Instance.setVar(name, intVal);
+                ExtensionsPool.AddResultExtension(nameUri, intVal);
             }
             TimerController.Instance.CheckTimers();
             if (OnConditionChanged != null)
@@ -239,14 +246,15 @@ namespace uAdventure.Runner
         public void SetVariable(string name, int value)
         {
             varFlags["var_" + name] = value;
+            var nameUri = GetGameRelativeUri(name);
 
             if (varFlagChangeAmbits.Count > 0)
             {
-                varFlagChangeAmbits.Peek().Add(new KeyValuePair<string, int>(name, value));
+                varFlagChangeAmbits.Peek().Add(new KeyValuePair<string, int>(nameUri, value));
             }
             else
             {
-                TrackerAsset.Instance.setVar(name, value);
+                ExtensionsPool.AddResultExtension(nameUri, value);
             }
 
             if (OnConditionChanged != null)
@@ -462,7 +470,7 @@ namespace uAdventure.Runner
         internal int ChangeAmbitCount { get { return varFlagChangeAmbits.Count; } }
 
         // Var flag change ambits
-        public void BeginChangeAmbit(TrackerEvent trace)
+        public void BeginChangeAmbit(StatementPromise trace)
         {
             this.ambitTraces.Push(trace);
             this.varFlagChangeAmbits.Push(new List<KeyValuePair<string, int>>());
@@ -484,14 +492,16 @@ namespace uAdventure.Runner
                 else
                 {
                     foreach (var varChange in currentAmbit)
-                        TrackerAsset.Instance.setVar(varChange.Key, varChange.Value);
+                    {
+                        ExtensionsPool.AddResultExtension(varChange.Key, varChange.Value);
+                    }
                 }
             }
 
             return currentAmbit;
         }
 
-        public void EndChangeAmbitAsExtensions(TrackerEvent trace)
+        public void EndChangeAmbitAsExtensions(StatementPromise trace)
         {
             var currentAmbitTrace = this.ambitTraces.Pop();
             var currentChanges = EndChangeAmbit(false);
@@ -502,11 +512,11 @@ namespace uAdventure.Runner
 
             foreach(var varChange in currentChanges)
             {
-                TrackerAsset.Instance.setVar(varChange.Key, varChange.Value);
+                ExtensionsPool.AddResultExtension(varChange.Key, varChange.Value);
             }
             if(trace != null)
             {
-                TrackerAsset.Instance.AddExtensionsToTrace(trace);
+                trace.Statement.SetPoolExtensions();
             }
         }
 

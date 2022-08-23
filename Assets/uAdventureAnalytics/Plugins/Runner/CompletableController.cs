@@ -13,6 +13,8 @@ namespace uAdventure.Analytics
     {
         [NonSerialized]
         private Completable.Milestone milestone;
+        [NonSerialized]
+        private AnalyticsExtension analyticsExtension;
 
         public Completable.Milestone GetMilestone()
         {
@@ -31,6 +33,7 @@ namespace uAdventure.Analytics
 
         public MilestoneController(Completable.Milestone milestone)
         {
+            analyticsExtension = GameExtension.GetInstance<AnalyticsExtension>();
             SetMilestone(milestone);
         }
 
@@ -111,7 +114,7 @@ namespace uAdventure.Analytics
                 switch (GetMilestone().getType())
                 {
                     case Completable.Milestone.MilestoneType.COMPLETABLE:
-                        var targetCompletable = AnalyticsExtension.Instance.CompletablesController.GetCompletable(GetMilestone().getId());
+                        var targetCompletable = analyticsExtension.CompletablesController.GetCompletable(GetMilestone().getId());
                         Reached = targetCompletable.End.Reached;
                         break;
                     case Completable.Milestone.MilestoneType.CONDITION:
@@ -152,6 +155,8 @@ namespace uAdventure.Analytics
 
         [NonSerialized]
         private Completable completable;
+        [NonSerialized]
+        private AnalyticsExtension analyticsExtension;
 
         public Completable GetCompletable()
         {
@@ -209,6 +214,7 @@ namespace uAdventure.Analytics
 
         public CompletableController(Completable completable)
         {
+            analyticsExtension = GameExtension.GetInstance<AnalyticsExtension>();
             this.SetCompletable(completable);
 
             this.startController = new MilestoneController(completable.getStart());
@@ -238,7 +244,7 @@ namespace uAdventure.Analytics
                 if (started)
                 {
                     startTime = DateTime.Now;
-                    AnalyticsExtension.Instance.CompletablesController.TrackStarted(this);
+                    analyticsExtension.CompletablesController.TrackStarted(this);
                 }
             }
 
@@ -256,7 +262,7 @@ namespace uAdventure.Analytics
                 if (progressed)
                 {
                     lastProgressedValue = this.Progress;
-                    AnalyticsExtension.Instance.CompletablesController.TrackProgressed(this);
+                    analyticsExtension.CompletablesController.TrackProgressed(this);
                 }
 
                 if (End != null)
@@ -266,9 +272,9 @@ namespace uAdventure.Analytics
                     {
                         if (lastProgressedValue != this.Progress)
                         {
-                            AnalyticsExtension.Instance.CompletablesController.TrackProgressed(this);
+                            analyticsExtension.CompletablesController.TrackProgressed(this);
                         }
-                        AnalyticsExtension.Instance.CompletablesController.TrackCompleted(this, DateTime.Now - startTime);
+                        analyticsExtension.CompletablesController.TrackCompleted(this, DateTime.Now - startTime);
                     }
                 }
             }
@@ -286,7 +292,7 @@ namespace uAdventure.Analytics
             if (completeOnExit && target.getId() != Start.GetMilestone().getId())
             {
                 completed = true;
-                AnalyticsExtension.Instance.CompletablesController.TrackCompleted(this, DateTime.Now - startTime);
+                analyticsExtension.CompletablesController.TrackCompleted(this, DateTime.Now - startTime);
             }
             else
             {
@@ -324,7 +330,7 @@ namespace uAdventure.Analytics
                             break;
                         case Completable.Score.ScoreType.COMPLETABLE:
                             // In case of completable type, the target id points to a completable
-                            var referencedCompletable = AnalyticsExtension.Instance.CompletablesController.GetCompletable(targetId);
+                            var referencedCompletable = analyticsExtension.CompletablesController.GetCompletable(targetId);
                             score = referencedCompletable.Score;
                             break;
                     }
@@ -332,7 +338,7 @@ namespace uAdventure.Analytics
 
                 // Recursive cases (calculated based on subscores)
                 case Completable.Score.ScoreMethod.AVERAGE:
-                    score = completableScore.getSubScores().Average(s => CalculateScore(s));
+                    score = completableScore.getSubScores().Count > 0 ? completableScore.getSubScores().Average(s => CalculateScore(s)) : 1;
                     break;
                 case Completable.Score.ScoreMethod.SUM:
                     score = completableScore.getSubScores().Sum(s => CalculateScore(s));

@@ -113,9 +113,11 @@ namespace uAdventure.Runner
                         videoPlayer.source = VideoSource.VideoClip;
                         Debug.Log("LoadVideo: " + path);
                         videoPlayer.clip = Resources.Load<VideoClip>(path);
-                        Debug.Log("LoadedClip: " + videoPlayer.clip.originalPath);
                         if (videoPlayer.clip)
+                        {
+                            Debug.Log("LoadedClip: " + videoPlayer.clip.originalPath);
                             videoPlayer.targetTexture = new RenderTexture((int)videoPlayer.clip.width, (int)videoPlayer.clip.height, 16, RenderTextureFormat.RGB565);
+                        }
                         else
                             videoPlayer.targetTexture = new RenderTexture(Screen.width, Screen.height, 16, RenderTextureFormat.RGB565);
                     }

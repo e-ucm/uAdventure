@@ -1,6 +1,4 @@
-﻿
-using AssetPackage;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Text;
 using UnityEngine;
@@ -16,8 +14,8 @@ namespace uAdventure.Simva
 
             try
             {
-                filename = ((TrackerAssetSettings)TrackerAsset.Instance.Settings).BackupFile;
-                traces = SimvaExtension.Instance.SimvaBridge.Load(((TrackerAssetSettings)TrackerAsset.Instance.Settings).BackupFile);
+                filename = Xasu.XasuTracker.Instance.TrackerConfig.BackupFileName;
+                traces = File.ReadAllText(Application.temporaryCachePath + Xasu.XasuTracker.Instance.TrackerConfig.BackupFileName);
             }
             catch (System.Exception ex){ Debug.Log("Couldn't read traces: " + ex.Message); }
 

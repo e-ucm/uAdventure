@@ -4,7 +4,8 @@ using System.Collections.Generic;
 using uAdventure.Core;
 using UnityEngine.EventSystems;
 using System.Linq;
-using AssetPackage;
+using Xasu;
+using Xasu.HighLevel;
 
 namespace uAdventure.Runner
 {
@@ -471,6 +472,7 @@ namespace uAdventure.Runner
                     movie = Game.Instance.ResourceManager.getVideo(((Videoscene)SceneData).getResources()[0].getAssetPath(Videoscene.RESOURCE_TYPE_VIDEO));
                     movieplayer = MovieState.LOADING;
                     SetBackground(movie.Movie);
+                    ready = true;
                     break;
                 case GeneralScene.GeneralSceneSceneType.SCENE:
                     Scene scene = (Scene)SceneData;
@@ -867,9 +869,9 @@ namespace uAdventure.Runner
                         || (movieplayer == MovieState.PLAYING && !movie.isPlaying())
                         || videoscene.isCanSkip())
                     {
-                        if (movieplayer == MovieState.PLAYING && TrackerAsset.Instance.Started && videoscene.isCanSkip())
+                        if (movieplayer == MovieState.PLAYING && XasuTracker.Instance.Status.State != TrackerState.Uninitialized && videoscene.isCanSkip())
                         {
-                            TrackerAsset.Instance.Accessible.Skipped(SceneData.getId(), AccessibleTracker.Accessible.Cutscene);
+                            AccessibleTracker.Instance.Skipped(SceneData.getId(), AccessibleTracker.AccessibleType.Cutscene);
                         }
                         movie.Stop();
                         movieplayer = MovieState.STOPPED;

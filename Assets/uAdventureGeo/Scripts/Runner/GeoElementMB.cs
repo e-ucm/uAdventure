@@ -11,7 +11,9 @@ using ClipperLib;
 
 using Path = System.Collections.Generic.List<ClipperLib.IntPoint>;
 using Paths = System.Collections.Generic.List<System.Collections.Generic.List<ClipperLib.IntPoint>>;
-using AssetPackage;
+using Xasu.HighLevel;
+using Xasu;
+using Xasu.Util;
 
 namespace uAdventure.Geo
 {
@@ -261,6 +263,7 @@ namespace uAdventure.Geo
         // Abstract class
         private abstract class AbstractGeoActionManager : IGeoActionManager
         {
+            private GeoExtension geoExtension;
             public GMLGeometry Geometry { get; set; }
             public GeoPositionedCharacter Player { get; set; }
             public GameObject Holder { get; set; }
@@ -268,7 +271,7 @@ namespace uAdventure.Geo
             public GeoAction Action { get; set; }
             public abstract Type ActionType { get; }
 
-            public virtual void Start() { }
+            public virtual void Start() { geoExtension = GameExtension.GetInstance<GeoExtension>(); }
 
             public virtual void Update()
             {
@@ -296,7 +299,7 @@ namespace uAdventure.Geo
             {
                 get
                 {
-                    return GeoExtension.Instance.Location;
+                    return geoExtension.Location;
                 }
             }
 
@@ -308,7 +311,7 @@ namespace uAdventure.Geo
             private bool first = true;
             private bool wasInside = false;
             private Vector2d latLonOnExecute;
-            private TrackerAsset.TrackerEvent trace;
+            private StatementPromise trace;
 
             public override Type ActionType { get { return typeof(EnterAction); } }
 
@@ -352,10 +355,10 @@ namespace uAdventure.Geo
                 {
                     NavigationController.Instance.SomethingReached(Holder);
                 }
-                if (TrackerAsset.Instance.Started)
+                if (XasuTracker.Instance.Status.State != TrackerState.Uninitialized)
                 {
-                    trace = TrackerExtension.Movement.Entered(Element, latLonOnExecute);
-                    trace.SetPartial();
+                    trace = MovementTracker.Instance.Entered(Element, latLonOnExecute);
+                    trace.Statement.SetPartial();
                     Game.Instance.GameState.BeginChangeAmbit(trace);
                 }
                 latLonOnExecute = LatLon;
@@ -364,10 +367,10 @@ namespace uAdventure.Geo
 
             protected override void ActionFinished(object interactuable)
             {
-                if (TrackerAsset.Instance.Started)
+                if (XasuTracker.Instance.Status.State != TrackerState.Uninitialized)
                 {
                     Game.Instance.GameState.EndChangeAmbitAsExtensions(trace);
-                    trace.Completed();
+                    trace.Statement.Complete();
                 }
             }
         }
@@ -377,7 +380,7 @@ namespace uAdventure.Geo
             private bool first = true;
             private bool wasOutside = false;
             private Vector2d latLonOnExecute;
-            private TrackerAsset.TrackerEvent trace;
+            private StatementPromise trace;
 
             public override Type ActionType { get { return typeof(ExitAction); } }
 
@@ -417,10 +420,10 @@ namespace uAdventure.Geo
 
             protected override void Execute()
             {
-                if (TrackerAsset.Instance.Started)
+                if (XasuTracker.Instance.Status.State != TrackerState.Uninitialized)
                 {
-                    trace = TrackerExtension.Movement.Exited(Element, latLonOnExecute);
-                    trace.SetPartial();
+                    trace = MovementTracker.Instance.Exited(Element, latLonOnExecute);
+                    trace.Statement.SetPartial();
                     Game.Instance.GameState.BeginChangeAmbit(trace);
                 }
                 latLonOnExecute = LatLon;
@@ -429,10 +432,10 @@ namespace uAdventure.Geo
 
             protected override void ActionFinished(object interactuable)
             {
-                if (TrackerAsset.Instance.Started)
+                if (XasuTracker.Instance.Status.State != TrackerState.Uninitialized)
                 {
                     Game.Instance.GameState.EndChangeAmbitAsExtensions(trace);
-                    trace.Completed();
+                    trace.Statement.Complete();
                 }
             }
         }
@@ -441,7 +444,7 @@ namespace uAdventure.Geo
         {
             private Vector3d orientationOnExecute;
             private Vector2d latLonOnExecute;
-            private TrackerAsset.TrackerEvent trace;
+            private StatementPromise trace;
 
             public override Type ActionType { get { return typeof(LookToAction); } }
 
@@ -468,10 +471,10 @@ namespace uAdventure.Geo
             protected override void Execute()
             {
 
-                if (TrackerAsset.Instance.Started)
+                if (XasuTracker.Instance.Status.State != TrackerState.Uninitialized)
                 {
-                    trace = TrackerExtension.Movement.Looked(Element, orientationOnExecute, latLonOnExecute);
-                    trace.SetPartial();
+                    trace = MovementTracker.Instance.Looked(Element, orientationOnExecute, latLonOnExecute);
+                    trace.Statement.SetPartial();
                     Game.Instance.GameState.BeginChangeAmbit(trace);
                 }
                 latLonOnExecute = LatLon;
@@ -481,10 +484,10 @@ namespace uAdventure.Geo
 
             protected override void ActionFinished(object interactuable)
             {
-                if (TrackerAsset.Instance.Started)
+                if (XasuTracker.Instance.Status.State != TrackerState.Uninitialized)
                 {
                     Game.Instance.GameState.EndChangeAmbitAsExtensions(trace);
-                    trace.Completed();
+                    trace.Statement.Complete();
                 }
             }
         }
@@ -492,7 +495,7 @@ namespace uAdventure.Geo
         private class InspectGeoActionManager : AbstractGeoActionManager
         {
             private Collider collider;
-            private TrackerAsset.TrackerEvent trace;
+            private StatementPromise trace;
             public override Type ActionType { get { return typeof(InspectAction); } }
 
             public override void Start()
@@ -520,10 +523,10 @@ namespace uAdventure.Geo
 
             protected override void Execute()
             {
-                if (TrackerAsset.Instance.Started)
+                if (XasuTracker.Instance.Status.State != TrackerState.Uninitialized)
                 {
-                    trace = TrackerAsset.Instance.GameObject.Interacted(Element, GameObjectTracker.TrackedGameObject.GameObject);
-                    trace.SetPartial();
+                    trace = GameObjectTracker.Instance.Interacted(Element, GameObjectTracker.TrackedGameObject.GameObject);
+                    trace.Statement.SetPartial();
                     Game.Instance.GameState.BeginChangeAmbit(trace);
                 }
                 base.Execute();
@@ -531,11 +534,11 @@ namespace uAdventure.Geo
 
             protected override void ActionFinished(object interactuable)
             {
-                if (TrackerAsset.Instance.Started)
+                if (XasuTracker.Instance.Status.State != TrackerState.Uninitialized)
                 {
-                    TrackerAsset.Instance.setVar("geocommand", "inspect");
+                    trace.WithResultExtensions(new Dictionary<string, object> { { "https://beaconing.e-ucm.es/xapi/geolocated/extensions/geocommand", "inspect" } });
                     Game.Instance.GameState.EndChangeAmbitAsExtensions(trace);
-                    trace.Completed();
+                    trace.Statement.Complete();
                 }
             }
         }
