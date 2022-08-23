@@ -46,6 +46,7 @@ namespace uAdventure.Simva
             }
             else
             {
+                SimvaManager.Instance.Bridge = this;
                 Debug.Log("[SIMVA] Disabling tracker autostart...");
                 GetInstance<AnalyticsExtension>().AutoStart = false;
 
@@ -174,9 +175,7 @@ namespace uAdventure.Simva
         public IAsyncOperation StartTracker(Xasu.Config.TrackerConfig config, IAuthProtocol onlineProtocol, IAuthProtocol backupProtocol)
         {
             var result = new AsyncCompletionSource();
-
-
-
+            StartCoroutine(StartTrackerRoutine(config, onlineProtocol, backupProtocol, () => result.SetCompleted()));
             return result;
         }
 

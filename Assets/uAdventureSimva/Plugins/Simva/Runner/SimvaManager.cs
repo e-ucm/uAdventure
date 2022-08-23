@@ -23,7 +23,18 @@ namespace Simva
     {
         private static SimvaManager instance;
 
-        public static SimvaManager Instance { get { return instance ?? (instance = new SimvaManager()); } }
+        public static SimvaManager Instance 
+        { 
+            get 
+            { 
+                if(instance == null)
+                {
+                    instance = new GameObject("SimvaManager", typeof(SimvaManager)).GetComponent<SimvaManager>();
+                    DontDestroyOnLoad(instance.gameObject);
+                }
+                return instance; 
+            } 
+        }
 
         public delegate void LoadingDelegate(bool loading);
         public delegate void ResponseDelegate(string message);
@@ -86,11 +97,11 @@ namespace Simva
         public IAsyncOperation LoginWithRefreshToken(string refreshToken)
         {
             NotifyLoading(true);
-            return SimvaApi<IStudentsApi>.Login(auth.RefreshToken)
+            return SimvaApi<IStudentsApi>.Login(refreshToken)
                     .Then(simvaController =>
                     {
                         this.API = simvaController;
-                        this.API.Authorization.RegisterAuthInfoUpdate(auth => this.auth = auth);
+                        this.API.Authorization.RegisterAuthInfoUpdate(OnAuthInfoUpdate);
                         return UpdateSchedule();
                     })
                     .Then(schedule =>
@@ -113,7 +124,7 @@ namespace Simva
                 .Then(simvaController =>
                 {
                     this.API = simvaController;
-                    this.API.Authorization.RegisterAuthInfoUpdate(auth => this.auth = auth);
+                    this.API.Authorization.RegisterAuthInfoUpdate(OnAuthInfoUpdate);
                     return UpdateSchedule();
                 })
                 .Then(schedule =>
@@ -136,7 +147,7 @@ namespace Simva
                 .Then(simvaController =>
                 {
                     this.API = simvaController;
-                    this.API.Authorization.RegisterAuthInfoUpdate(auth => this.auth = auth);
+                    this.API.Authorization.RegisterAuthInfoUpdate(OnAuthInfoUpdate);
                     PlayerPrefs.SetString("simva_auth", JsonConvert.SerializeObject(auth));
                     PlayerPrefs.Save();
                     return UpdateSchedule();
@@ -161,7 +172,7 @@ namespace Simva
                 .Then(simvaController =>
                 {
                     this.API = simvaController;
-                    this.API.Authorization.RegisterAuthInfoUpdate(auth => this.auth = auth);
+                    this.API.Authorization.RegisterAuthInfoUpdate(OnAuthInfoUpdate);
                     return UpdateSchedule();
                 })
                 .Then(schedule =>
@@ -307,6 +318,11 @@ namespace Simva
         }
 
 
+        private void OnAuthInfoUpdate(OAuth2Token token)
+        {
+            this.auth = token;
+            Bridge.OnAuthUpdated(token);
+        }
 
 
         private IEnumerator LaunchActivity(string activityId)
@@ -350,7 +366,7 @@ namespace Simva
                             if (ActivityHasDetails(activity, "backup"))
                             {
                                 // Backup
-                                xasuTrackerConfig.Offline = true;
+                                xasuTrackerConfig.Backup = true;
                                 xasuTrackerConfig.BackupEndpoint = API.SimvaConf.URL + string.Format("/activities/{0}/result", activityId);
                                 xasuTrackerConfig.BackupFileName = auth.Username + "_" + activityId + "_backup.log";
                             }
