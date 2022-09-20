@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -121,7 +122,7 @@ namespace Simva
             var path = GetFilePath();
             if (Application.isEditor && !Application.isPlaying)
             {
-                var simvaconf = new JObject
+                var dict = new Dictionary<string, string>
                 {
                     ["study"] = Study,
                     ["host"] = Host,
@@ -131,8 +132,18 @@ namespace Simva
                     ["client_id"] = ClientId,
                     ["url"] = URL,
                 };
+
+                var simvaConf = new JObject();
+                foreach(var kv in dict)
+                {
+                    if (!string.IsNullOrEmpty(kv.Value))
+                    {
+                        simvaConf.Add(kv.Key, kv.Value);
+                    }
+                }
+
                 System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(path));
-                System.IO.File.WriteAllText(path, simvaconf.ToString(Newtonsoft.Json.Formatting.Indented));
+                System.IO.File.WriteAllText(path, simvaConf.ToString(Newtonsoft.Json.Formatting.Indented));
             }
         }
     }

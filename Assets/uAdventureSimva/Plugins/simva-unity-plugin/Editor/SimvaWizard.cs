@@ -69,6 +69,8 @@ namespace Simva
                     SimvaConf.Local.Protocol = DEFAULT_PROTOCOL;
                     SimvaConf.Local.ClientId = DEFAULT_CLIENTID;
                     SimvaConf.Local.Save();
+                    AssetDatabase.ImportAsset("StreamingAssets/Simva.conf");
+                    AssetDatabase.Refresh();
                 }
 
                 if (PlayerPrefs.HasKey("Simva.RefreshToken"))
