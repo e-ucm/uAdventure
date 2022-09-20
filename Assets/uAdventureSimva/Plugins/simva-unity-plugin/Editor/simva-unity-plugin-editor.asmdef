@@ -1,0 +1,19 @@
+{
+    "name": "simva-unity-plugin-editor",
+    "references": [
+        "GUID:478a2357cc57436488a56e564b08d223",
+        "GUID:9306cfd555be57946b7a89e8f2d873e3",
+        "GUID:08e346b04c3ec374b8a3849fcc6b467c"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

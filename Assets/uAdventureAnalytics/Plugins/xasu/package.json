@@ -7,7 +7,7 @@
     "dependencies": {
         "com.unity.nuget.newtonsoft-json": "3.0.2"
     },
-    "untiy": "2019.4",
+    "unity": "2019.4",
     "author": {
         "name": "e-UCM Learning Group",
         "email": "info@e-ucm.es",

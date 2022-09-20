@@ -3745,7 +3745,7 @@ namespace uAdventure.Editor
         [UnityEditor.MenuItem("uAdventure/UnComplete", priority = 1)]
         public static void UnComplete()
         {
-            SimvaApi<StudentsApi>.LoginWithToken("myiq").Then(api =>
+            SimvaApi<StudentsApi>.LoginWithToken("8buk").Then(api =>
             {
                 System.Action onConfigReady = () =>
                 {
@@ -3753,7 +3753,7 @@ namespace uAdventure.Editor
                     .Then(schedule =>
                     {
                         var act = schedule.Activities.First(a => a.Value.Name == "Gameplay");
-                        api.Api.SetCompletion(act.Key, "myiq", false);
+                        api.Api.SetCompletion(act.Key, "8buk", false);
                     });
                 };
                 Debug.Log("[SIMVA] Starting...");

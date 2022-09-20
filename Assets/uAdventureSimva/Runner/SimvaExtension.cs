@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using uAdventure.Runner;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -151,11 +150,13 @@ namespace uAdventure.Simva
 
         public void StartGameplay()
         {
+            Game.Instance.AbortQuit();
             RunScene(savedGameTarget);
         }
 
         public void RunScene(string name)
         {
+            Game.Instance.AbortQuit();
             switch (name)
             {
                 case "Simva.Login":
@@ -188,6 +189,15 @@ namespace uAdventure.Simva
         public void OnAuthUpdated(OAuth2Token token)
         {
             auth = token;
+        }
+
+        public void Demo()
+        {
+            PreviewManager.Instance.InPreviewMode = true;
+            Game.Instance.Restart();
+            Game.Instance.GameState.Data.setAutoSave(false);
+            Game.Instance.GameState.Data.setSaveOnSuspend(false);
+            Game.Instance.RunTarget(Game.Instance.GameState.InitialChapterTarget.getId());
         }
     }
 }
