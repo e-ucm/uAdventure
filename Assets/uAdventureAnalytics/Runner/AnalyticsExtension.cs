@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using uAdventure.Runner;
@@ -145,10 +146,6 @@ namespace uAdventure.Analytics
                         }
                     }
                 }
-                else
-                {
-                    config.setHost("localhost");
-                }
                 Debug.Log("[ANALYTICS] Config: " + JsonConvert.SerializeObject(config));
             }
             catch (System.Exception)
@@ -157,6 +154,12 @@ namespace uAdventure.Analytics
                 throw;
             }
 
+            var currentTimestamp = DateTime.Now.ToFileTime().ToString();
+            var logName = currentTimestamp + ".log";
+            if (string.IsNullOrEmpty(config.getBackupFileName()))
+            {
+                config.setBackupFileName(DateTime.Now.ToFileTime().ToString() + "_backup.log");
+            }
 
             var simva = config.getHost().Contains("simva");
             var trackerConfig = new Xasu.Config.TrackerConfig
@@ -172,6 +175,7 @@ namespace uAdventure.Analytics
                 LRSEndpoint = config.getHost() + config.getTrackEndpoint(),
 
                 Offline = config.getStorageType() == TrackerConfig.StorageType.LOCAL,
+                FileName = logName,
                 TraceFormat = Xasu.Config.TraceFormats.XAPI,
 
                 Backup = config.getRawCopy(),
