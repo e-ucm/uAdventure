@@ -71,37 +71,44 @@ namespace uAdventure.Runner
 
         public static void AddExamineIfNotExists(Element element, List<Action> actions)
         {
-            if (!actions.Any(a => a.getType() == Action.EXAMINE))
+            if (actions.Any(a => a.getType() == Action.EXAMINE))
             {
-                var description = element.getDescriptions()
-                    .Find(d => ConditionChecker.check(d.getConditions()));
+                return;
+            }
 
-                if (description != null && !examineActions.ContainsKey(description))
+            var description = element.getDescriptions()
+                .Find(d => ConditionChecker.check(d.getConditions()));
+
+            if (description == null)
+            {
+                return;
+            }
+
+            if (!examineActions.ContainsKey(description))
+            {
+                var textToShow = description.getDetailedDescription();
+                if (string.IsNullOrEmpty(textToShow))
+                    textToShow = description.getDescription();
+                if (string.IsNullOrEmpty(textToShow))
+                    textToShow = description.getName();
+
+                // Only add the examine if there's text to show
+                if (!string.IsNullOrEmpty(textToShow))
                 {
-                    var textToShow = description.getDetailedDescription();
-                    if (string.IsNullOrEmpty(textToShow))
-                        textToShow = description.getDescription();
-                    if (string.IsNullOrEmpty(textToShow))
-                        textToShow = description.getName();
-
-                    // Only add the examine if there's text to show
-                    if (!string.IsNullOrEmpty(textToShow))
+                    var action = new Action(Action.EXAMINE)
                     {
-                        var action = new Action(Action.EXAMINE)
+                        Effects = new Effects
                         {
-                            Effects = new Effects
-                            {
-                                new SpeakPlayerEffect(textToShow)
-                            }
-                        };
-                        examineActions.Add(description, action);
-                    }
+                            new SpeakPlayerEffect(textToShow)
+                        }
+                    };
+                    examineActions.Add(description, action);
                 }
+            }
 
-                if (examineActions.ContainsKey(description))
-                {
-                    actions.Add(examineActions[description]);
-                }
+            if (examineActions.ContainsKey(description))
+            {
+                actions.Add(examineActions[description]);
             }
         }
     }

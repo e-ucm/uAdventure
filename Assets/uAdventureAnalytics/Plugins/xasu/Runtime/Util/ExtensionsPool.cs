@@ -69,7 +69,7 @@ namespace Xasu.Util
             jobject = statement.context.extensions.ToJObject();
             AddPoolToJObject(staticContextPool.ToList(), jobject);
             AddPoolToJObject(contextPool, jobject);
-            statement.result.extensions = new TinCan.Extensions(jobject);
+            statement.context.extensions = new TinCan.Extensions(jobject);
             // Empty Context Pool
             contextPool.Clear();
         }

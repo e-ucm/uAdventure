@@ -146,7 +146,6 @@ namespace uAdventure.Runner
             }
             else
             {
-                Debug.Log(eventData.ToString());
                 Interacted(eventData);
             }
         }

@@ -134,7 +134,7 @@ namespace Xasu.HighLevel
         {
             return Enqueue(new Statement
             {
-                verb = GetVerb(Verb.Initialized),
+                verb = GetVerb(Verb.Progressed),
                 target = GetTargetActivity(completableId, type),
                 result = SetResultExtensions(new Result(), new Dictionary<Enum, object>
                 {

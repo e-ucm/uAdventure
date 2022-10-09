@@ -44,7 +44,7 @@ namespace Xasu.HighLevel
         { AccessibleType.Area,        "https://w3id.org/xapi/seriousgames/activity-types/area"       },
         { AccessibleType.Zone,        "https://w3id.org/xapi/seriousgames/activity-types/zone"       },
         { AccessibleType.Cutscene,    "https://w3id.org/xapi/seriousgames/activity-types/cutscene"   },
-        { AccessibleType.Inventory,   "/inventory"                                                   },
+        { AccessibleType.Inventory,   "https://w3id.org/xapi/seriousgames/custom-types/inventory"    }, // WARN: Not in profile server
         { AccessibleType.Accessible,  "https://w3id.org/xapi/seriousgames/activity-types/accessible" }  // WARN: Not in profile server
     };
         protected override Dictionary<Enum, string> TypeIds => typeIds;
