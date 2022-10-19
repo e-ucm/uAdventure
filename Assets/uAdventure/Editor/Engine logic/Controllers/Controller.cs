@@ -1150,7 +1150,7 @@ namespace uAdventure.Editor
             return fileCreated;
         }
 
-        [UnityEditor.MenuItem("uAdventure/Configure Layout", priority = 4)]
+        [UnityEditor.MenuItem("uAdventure/Configure Layout", priority = 0)]
         public static void ConfigureWindowLayout()
         {
             ConfigData.LoadFromXML(ReleaseFolders.configFileEditorRelativePath());
@@ -3730,7 +3730,7 @@ namespace uAdventure.Editor
         }
 
 #region Windows
-        [UnityEditor.MenuItem("uAdventure/Welcome screen", priority = 1)]
+        [UnityEditor.MenuItem("uAdventure/Welcome screen", priority = -2)]
         public static void OpenWelcomeWindow()
         {
             if (!Language.Initialized)
@@ -3742,7 +3742,7 @@ namespace uAdventure.Editor
             window.Show();
         }
 
-        [UnityEditor.MenuItem("uAdventure/UnComplete", priority = 1)]
+        [UnityEditor.MenuItem("uAdventure/Experimental/Simva user UnComplete", priority = 1)]
         public static void UnComplete()
         {
             SimvaApi<StudentsApi>.LoginWithToken("8buk").Then(api =>
@@ -3767,7 +3767,7 @@ namespace uAdventure.Editor
                 onConfigReady();
             });
         }
-        [UnityEditor.MenuItem("uAdventure/Screenshot", priority = 1)]
+        [UnityEditor.MenuItem("uAdventure/Experimental/Screenshot", priority = 1)]
         public static void Screenshot()
         {
             ScreenCapture.CaptureScreenshot("Capture");
@@ -3775,7 +3775,7 @@ namespace uAdventure.Editor
         }
 
 
-        [UnityEditor.MenuItem("uAdventure/Editor", priority = 2)]
+        [UnityEditor.MenuItem("uAdventure/Editor", priority = -1)]
         public static void OpenEditorWindow()
         {
             if (!Language.Initialized)

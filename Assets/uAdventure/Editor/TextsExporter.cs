@@ -10,7 +10,7 @@ using UnityEngine.Assertions;
 
 public class TextsExporter {
 
-    [MenuItem("uAdventure/Export conversations")]
+    [MenuItem("uAdventure/Experimental/Export conversations")]
     public static void ExportConversations ()
     {
         if (!Controller.Instance.Initialized)
@@ -152,7 +152,7 @@ public class TextsExporter {
         }
     }
 
-    [MenuItem("uAdventure/Import conversations")]
+    [MenuItem("uAdventure/Experimental/Import conversations")]
     public static void ImportConversations()
     {
         if (!Controller.Instance.Initialized)
