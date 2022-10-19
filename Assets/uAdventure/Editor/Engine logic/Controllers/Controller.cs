@@ -3745,27 +3745,35 @@ namespace uAdventure.Editor
         [UnityEditor.MenuItem("uAdventure/Experimental/Simva user UnComplete", priority = 1)]
         public static void UnComplete()
         {
-            SimvaApi<StudentsApi>.LoginWithToken("8buk").Then(api =>
+            if(EditorUtility.DisplayDialog("Uncomplete?", "Do you want to un-complete a Simva token?", "Yes", "Cancel"))
             {
-                System.Action onConfigReady = () =>
+                Controller.Instance.ShowInputDialog("Uncomplete", "Insert token: ", (s, token) =>
                 {
-                    api.Api.GetSchedule(SimvaConf.Local.Study)
-                    .Then(schedule =>
+                    SimvaApi<StudentsApi>.LoginWithToken(token).Then(api =>
                     {
-                        var act = schedule.Activities.First(a => a.Value.Name == "Gameplay");
-                        api.Api.SetCompletion(act.Key, "8buk", false);
-                    });
-                };
-                Debug.Log("[SIMVA] Starting...");
-                if (SimvaConf.Local == null)
-                {
-                    SimvaConf.Local = new SimvaConf();
-                    Observable.FromCoroutine(SimvaConf.Local.LoadAsync).Subscribe(_ => onConfigReady());
-                    Debug.Log("[SIMVA] Conf Loaded...");
-                }
+                        System.Action onConfigReady = () =>
+                        {
+                            api.Api.GetSchedule(SimvaConf.Local.Study)
+                            .Then(schedule =>
+                            {
+                                var act = schedule.Activities.First(a => a.Value.Name == "Gameplay");
+                                api.Api.SetCompletion(act.Key, token, false);
+                            });
+                        };
+                        Debug.Log("[SIMVA] Starting...");
+                        if (SimvaConf.Local == null)
+                        {
+                            SimvaConf.Local = new SimvaConf();
+                            Observable.FromCoroutine(SimvaConf.Local.LoadAsync).Subscribe(_ => onConfigReady());
+                            Debug.Log("[SIMVA] Conf Loaded...");
+                        }
 
-                onConfigReady();
-            });
+                        onConfigReady();
+                    });
+                });
+            }
+
+            
         }
         [UnityEditor.MenuItem("uAdventure/Experimental/Screenshot", priority = 1)]
         public static void Screenshot()
