@@ -929,13 +929,20 @@ namespace uAdventure.Runner
             
             if(finishingEffects != null)
             {
-                if (finishingEffects.execute())
+                if (Game.Instance.isSomethingRunning())
                 {
-                    res = InteractuableResult.REQUIRES_MORE_INTERACTION;
+                    if (finishingEffects.execute())
+                    {
+                        res = InteractuableResult.REQUIRES_MORE_INTERACTION;
+                    }
+                    else
+                    {
+                        res = InteractuableResult.IGNORES;
+                    }
                 }
                 else
                 {
-                    res = InteractuableResult.IGNORES;
+                    Game.Instance.Execute(finishingEffects);
                 }
             }
 
