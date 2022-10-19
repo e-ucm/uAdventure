@@ -128,7 +128,6 @@ namespace uAdventure.Runner
             }
 
             Camera.main.orthographicSize = LastOrthoSize;
-            InventoryManager.Instance.Show = true;
         }
 
         private bool touch0Set, touch1Set;
