@@ -131,7 +131,7 @@ namespace uAdventure.Analytics
             
             try
             {
-                if (config.getHost() != "")
+                if (!string.IsNullOrEmpty(config.getHost()))
                 {
                     string[] splitted = config.getHost().Split('/');
 
@@ -161,11 +161,11 @@ namespace uAdventure.Analytics
                 config.setBackupFileName(DateTime.Now.ToFileTime().ToString() + "_backup.log");
             }
 
-            var simva = config.getHost().Contains("simva");
+            var simva = config.getHost()?.Contains("simva");
             var trackerConfig = new Xasu.Config.TrackerConfig
             {
                 //Simva
-                Simva = simva,
+                Simva = simva.HasValue ? simva.Value : false,
 
                 FlushInterval = 3,
                 BatchSize = 256,
