@@ -2199,7 +2199,7 @@ namespace uAdventure.Editor
                 uwr.SendWebRequest();
                 while (!uwr.isDone)
                 {
-                    if (EditorUtility.DisplayCancelableProgressBar("Downloading", "Downloading "+ name + "...", uwr.downloadProgress))
+                    if (EditorUtility.DisplayCancelableProgressBar("Downloading", "Downloading " + name + "...", uwr.downloadProgress))
                     {
                         EditorUtility.ClearProgressBar();
                         ready(false);
@@ -2211,7 +2211,7 @@ namespace uAdventure.Editor
                 if (!string.IsNullOrEmpty(uwr.error))
                 {
                     EditorUtility.DisplayDialog("Error!", "Download failed! Check your connection and try again. " +
-                        "If the problem persist download it manually and put it in the " + folderName +" folder at the root of the project. (" + uwr.error + ")", "Ok");
+                        "If the problem persist download it manually and put it in the " + folderName + " folder at the root of the project. (" + uwr.error + ")", "Ok");
                     ready(false);
                     return;
                 }
@@ -2231,29 +2231,7 @@ namespace uAdventure.Editor
 
                 File.WriteAllBytes(downloadPath + "/" + downloadFileName, uwr.downloadHandler.data);
                 // Unzip it
-                EditorUtility.DisplayProgressBar("Extracting...", "Extracting " + name + " to " + downloadPath, 0f);
-
-                var buffer = new byte[1024];
-                using (FileStream zipToOpen = new FileStream(downloadPath + "/" + downloadFileName, FileMode.Open))
-                {
-                    using (ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Read))
-                    {
-                        foreach(var entry in archive.Entries)
-                        {
-                            Directory.CreateDirectory(Path.GetDirectoryName(downloadPath + "/" + entry.FullName));
-                            using (var file = File.OpenWrite(downloadPath + "/" + entry.FullName))
-                            using (var s = entry.Open())
-                            {
-                                while(s.CanRead)
-                                {
-                                    var read = s.Read(buffer, 0, 1024);
-                                    file.Write(buffer, 0, read);
-                                }
-                            }
-                        }
-                    }
-                }
-                EditorUtility.DisplayProgressBar("Extracting...", "Extracting " + name + " to " + downloadPath, 1f);
+                DecompressFile(name, downloadPath, downloadFileName, downloadPath);
                 EditorUtility.ClearProgressBar();
                 // Delete the zip
                 File.Delete(downloadPath + "/" + downloadFileName);
@@ -2261,7 +2239,40 @@ namespace uAdventure.Editor
                 ready(true);
             }
         }
-        
+
+        private static void DecompressFile(string name, string filePath, string fileName, string destination)
+        {
+            EditorUtility.DisplayProgressBar("Extracting...", "Extracting " + name + " to " + filePath, 0f);
+
+            var buffer = new byte[1024];
+            using (FileStream zipToOpen = new FileStream(filePath + "/" + fileName, FileMode.Open))
+            {
+                using (ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Read))
+                {
+                    foreach (var entry in archive.Entries)
+                    {
+                        var finalEntryFilePath = destination + "/" + entry.FullName;
+                        var directoryName = Path.GetDirectoryName(finalEntryFilePath);
+                        Directory.CreateDirectory(directoryName);
+                        if (entry.FullName.EndsWith("/")) //We skip because it is a directory
+                            continue;
+                        using (var file = File.OpenWrite(finalEntryFilePath))
+                        using (var s = entry.Open())
+                        {
+                            while (s.CanRead)
+                            {
+                                var read = s.Read(buffer, 0, 1024);
+                                if (read == 0)
+                                    break;
+                                file.Write(buffer, 0, read);
+                            }
+                        }
+                    }
+                }
+            }
+            EditorUtility.DisplayProgressBar("Extracting...", "Extracting " + name + " to " + filePath, 1f);
+        }
+
         [PostProcessBuild(1)]
         public static void PostProcess(BuildTarget target, string pathToBuiltProject)
         {
