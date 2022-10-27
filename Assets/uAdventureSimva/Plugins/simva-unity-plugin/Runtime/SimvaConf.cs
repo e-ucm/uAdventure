@@ -73,6 +73,22 @@ namespace Simva
             yield return null;
         }
 
+
+#if UNITY_EDITOR
+        public void Load()
+        {
+            string contents = "";
+            Debug.Log("[SIMVA CONF] Loading...");
+ 
+            string filePath = GetFilePath();
+            if (System.IO.File.Exists(filePath))
+            {
+                contents = System.IO.File.ReadAllText(filePath);
+            }
+            ParseContents(contents);
+        }
+#endif
+
         private void ParseContents(string contents)
         {
             if (!string.IsNullOrEmpty(contents))

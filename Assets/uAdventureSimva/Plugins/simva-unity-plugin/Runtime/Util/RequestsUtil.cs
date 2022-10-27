@@ -68,6 +68,7 @@ namespace Simva
             {
                 asyncRequest = webRequest.SendWebRequest();
             }*/
+            asyncRequest = webRequest.SendWebRequest();
 #else
             if (inBackground)
             {

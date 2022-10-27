@@ -36,10 +36,10 @@ namespace uAdventure.Simva
                 string filePath = Path.Combine(Application.temporaryCachePath, filename);
                 File.WriteAllBytes(filePath, Encoding.UTF8.GetBytes(traces));
 
-                new NativeShare().AddFile(filePath)
+                /*new NativeShare().AddFile(filePath)
                     .SetSubject("Backup de " + filename).SetText("Backup adjunto")
                     .SetCallback((result, shareTarget) => Debug.Log("Share result: " + result + ", selected app: " + shareTarget))
-                    .Share();
+                    .Share();*/
             }
         }
     }
