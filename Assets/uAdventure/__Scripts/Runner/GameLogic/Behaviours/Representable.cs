@@ -178,9 +178,9 @@ namespace uAdventure.Runner
         
         private void OnConditionChanged(string condition, int value)
         {
-            checkResources();
             if (this && gameObject)
             {
+                checkResources();
                 gameObject.SetActive(!Context.IsRemoved() && ConditionChecker.check(Context.Conditions)); 
             }
         }
@@ -272,6 +272,7 @@ namespace uAdventure.Runner
         public bool Play(string animation, string then = null)
         {
             ResourceMode = ResourceType.ANIMATION;
+            this.currentFrame = 0;
             this.then = then;
             this.Animation = animation;
 
