@@ -1,10 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace uAdventure.Runner
 {
-    public class InventorySlider : MonoBehaviour {
+    public class InventorySlider : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
 
         private RectTransform rectTransform;
         private Vector2 velocity;
@@ -16,6 +17,8 @@ namespace uAdventure.Runner
 
         public Transform elementHolder;
 
+        public bool IsOpen { get; private set; }
+
 
         public void Start()
         {
@@ -26,15 +29,15 @@ namespace uAdventure.Runner
         {
             var openPos = new Vector2(0, rectTransform.rect.height);
             var closedPos = Vector2.zero;
-            var showingY = new Vector2(0, rectTransform.rect.height);
+            var showingY = new Vector2(0, 25);
             if(rectTransform.rect.y < 0)
             {
                 openPos = new Vector2(0, -rectTransform.rect.height);
-                showingY = new Vector2(Screen.height - rectTransform.rect.height, Screen.height);
+                showingY = new Vector2(Screen.height - 25, Screen.height);
             }
 
             var mouseInside = showingY.x < Input.mousePosition.y && Input.mousePosition.y < showingY.y;
-            if (!KeepClose && (mouseInside || KeepOpen))
+            if (!KeepClose && (mouseInside || KeepOpen || IsOpen))
             {
                 rectTransform.anchoredPosition = Vector2.SmoothDamp(rectTransform.anchoredPosition, openPos, ref velocity, time);
             }
@@ -51,6 +54,17 @@ namespace uAdventure.Runner
             }
         }
 
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            IsOpen = true;
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            if (MenuMB.Instance.IsShowing)
+                return;
+            IsOpen = false;
+        }
     }
 
 }

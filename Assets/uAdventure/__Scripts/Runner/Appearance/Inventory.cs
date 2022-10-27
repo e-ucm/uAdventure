@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using uAdventure.Core;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace uAdventure.Runner
 {
-    public class Inventory : MonoBehaviour
+    public class Inventory : MonoBehaviour, IPointerClickHandler
     {
         [SerializeField]
         public Button openButton;
@@ -160,6 +161,20 @@ namespace uAdventure.Runner
                 }
                 clones.Remove(element);
             }
+        }
+
+        private void Update()
+        {
+            if(InventoryType == DescriptorData.INVENTORY_TOP_BOTTOM)
+            {
+                bottomElement.KeepClose = topElement.IsOpen;
+                topElement.KeepClose = bottomElement.IsOpen;
+            }
+        }
+
+        public void OnPointerClick(PointerEventData eventData)
+        {
+            MenuMB.Instance.hide();
         }
     }
 }

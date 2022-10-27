@@ -21,6 +21,8 @@ namespace uAdventure.Runner
         
         public GameObject Option_Prefab;
 
+        public bool IsShowing { get; private set; }
+
         private Fading fading = Fading.NONE;
         private Quadrant quadrant = Quadrant.TOP;
         private List<Action> actions;
@@ -78,6 +80,7 @@ namespace uAdventure.Runner
 
         public void show(bool instant = false)
         {
+            IsShowing = true;
             if (instant)
             {
                 colorChilds(new Color(1, 1, 1, 0));
@@ -92,6 +95,7 @@ namespace uAdventure.Runner
 
         public void hide(bool instant = false)
         {
+            IsShowing = false;
             if (instant)
             {
                 destroyChilds();
@@ -175,7 +179,7 @@ namespace uAdventure.Runner
                 GameObject option = GameObject.Instantiate(Option_Prefab);
                 var optionMB = option.GetComponent<OptionMB>();
                 optionMB.setAction(action, receiver);
-                option.transform.parent = this.transform;
+                option.transform.SetParent(this.transform, false);
                 option.transform.localPosition = new Vector3(0, 0, 0);
                 option.transform.localScale = new Vector3(1f, 1f, 1f);
                 option.transform.localRotation = Quaternion.Euler(Vector3.zero);
