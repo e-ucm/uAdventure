@@ -2,6 +2,8 @@
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using TinCan;
+using UnityEngine;
+using Xasu.Util;
 
 namespace Xasu.HighLevel
 {
@@ -50,16 +52,26 @@ namespace Xasu.HighLevel
             var jObject = traceExtensions.ToJObject(TinCan.TCAPIVersion.V103);
             foreach (var stateExtension in extensions)
             {
-                if (stateExtension.Value is int)
+                ExtensionUtil.AddExtensionToJObject(stateExtension, jObject);
+            }
+
+            try
+            {
+                return new TinCan.Extensions(jObject);
+            }
+            catch(System.Exception ex)
+            {
+                if (XasuTracker.Instance.TrackerConfig.StrictMode)
                 {
-                    jObject.Add(stateExtension.Key, (int)stateExtension.Value);
+                    throw;
                 }
                 else
                 {
-                    jObject.Add(stateExtension.Key, stateExtension.Value.ToString());
+                    Debug.LogWarning("[STRICT=OFF] Error adding extensions to trace. Ignoring...");
+                    Debug.LogException(ex);
                 }
+                return traceExtensions;
             }
-            return new TinCan.Extensions(jObject);
         }
     }
 }

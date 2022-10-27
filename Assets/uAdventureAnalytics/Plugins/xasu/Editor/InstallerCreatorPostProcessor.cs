@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using UnityEditor;
@@ -9,6 +10,7 @@ using UnityEditor.Callbacks;
 using UnityEngine;
 using WixSharp;
 using WixSharp.CommonTasks;
+using Xasu.Config;
 
 public class InstallerCreatorPostProcessor : IPreprocessBuildWithReport
 {
@@ -16,8 +18,13 @@ public class InstallerCreatorPostProcessor : IPreprocessBuildWithReport
 
     public int callbackOrder => 1;
 
+    private static TrackerConfig trackerConfig;
+
     public void OnPreprocessBuild(BuildReport report)
     {
+        if (!IsBuildingForCmi5())
+            return;
+
         switch (report.summary.platform)
         {
 
@@ -93,10 +100,31 @@ public class InstallerCreatorPostProcessor : IPreprocessBuildWithReport
                 break;
         }
     }
-    
+
+    private static bool IsBuildingForCmi5()
+    {
+        try
+        {
+            trackerConfig = TrackerConfigLoader.LoadLocalAsync().GetAwaiter().GetResult();
+        }
+        catch (FileNotFoundException)
+        {
+            return false;
+        }
+        // If we are not building for cmi5 we just dont care
+        if (trackerConfig.AuthProtocol.Equals("cmi5", System.StringComparison.InvariantCultureIgnoreCase))
+            return true;
+
+        return false;
+    }
+
     [PostProcessBuild(0)]
     public static void OnPostprocessBuild(BuildTarget target, string pathToBuiltProject)
-    {
+    {        
+        // If we are not building for cmi5 we just dont care
+        if (!IsBuildingForCmi5())
+            return;
+
         switch (target)
         {
 
@@ -116,11 +144,12 @@ public class InstallerCreatorPostProcessor : IPreprocessBuildWithReport
 
                         if (!System.IO.File.Exists(wixsharpPath + "/Wix_bin/bin/Wix.dll"))
                         {
-                            var downloaded = PackageDownloader.Instance.DownloadPackage("WixSharp", "/WIXSHARP", WINDOWS_WIXSHARP_URL)
-                                .GetAwaiter().GetResult();
-
-                            if(downloaded)
-                                CreateWindowsInstaller(pathToBuiltProject);
+                            PackageDownloader.Instance.DownloadPackage("WixSharp", "/WIXSHARP", WINDOWS_WIXSHARP_URL)
+                                .ContinueWith(downloadTask =>
+                                {
+                                    if(downloadTask.IsCompleted && downloadTask.Result)
+                                        CreateWindowsInstaller(pathToBuiltProject);
+                                }, TaskScheduler.FromCurrentSynchronizationContext());
                         }
                         else
                         {

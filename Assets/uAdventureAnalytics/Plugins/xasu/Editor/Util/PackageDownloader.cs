@@ -38,7 +38,6 @@ public class PackageDownloader
         try
         {
             var request = await RequestsUtility.DoRequest(UnityWebRequest.Get(url), progress);
-            EditorUtility.ClearProgressBar();
 
             var downloadFileName = name.Replace(" ", "").Trim() + ".zip";
 
@@ -48,6 +47,7 @@ public class PackageDownloader
             }
 
             // Write the zip file
+            EditorUtility.DisplayProgressBar("Copying", "Copying downloaded file " + name + "...", 100);
             File.WriteAllBytes(downloadPath + "/" + downloadFileName, request.downloadHandler.data);
             // Unzip it
             EditorUtility.DisplayProgressBar("Extracting...", "Extracting " + name + " to " + downloadPath, 0f);
@@ -81,13 +81,18 @@ public class PackageDownloader
             {
                 foreach (var entry in archive.Entries)
                 {
-                    Directory.CreateDirectory(Path.GetDirectoryName(DecompressedFileName + "/" + entry.FullName));
+                    var directoryName = Path.GetDirectoryName(DecompressedFileName + "/" + entry.FullName);
+                    Directory.CreateDirectory(directoryName);
+                    if (entry.FullName.EndsWith("/")) //We skip because it is a directory
+                        continue;
                     using (var file = File.OpenWrite(DecompressedFileName + "/" + entry.FullName))
                     using (var s = entry.Open())
                     {
                         while (s.CanRead)
                         {
                             var read = s.Read(buffer, 0, 1024);
+                            if (read == 0)
+                                break;
                             file.Write(buffer, 0, read);
                         }
                     }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Xasu.Exceptions;
 using TinCan;
+using UnityEngine;
 
 namespace Xasu.HighLevel
 {
@@ -99,13 +100,22 @@ namespace Xasu.HighLevel
         /// <param name="type">Completable type.</param>
         public StatementPromise Initialized(string completableId, CompletableType type)
         {
-
+            bool addInitializedTime = true;
             if (initializedTimes.ContainsKey(completableId))
             {
-                throw new XApiException("The initialized statement for the specified id has already been sent!");
+                if (XasuTracker.Instance.TrackerConfig.StrictMode)
+                {
+                    throw new XApiException("The initialized statement for the specified id has already been sent!");
+                }
+                else
+                {
+                    Debug.LogWarning("The initialized statement for the specified id has already been sent!");
+                    addInitializedTime = false;
+                }
             }
 
-            initializedTimes.Add(completableId, DateTime.Now);
+            if(addInitializedTime)
+                initializedTimes.Add(completableId, DateTime.Now);
             return Enqueue(new Statement
             {
                 verb = GetVerb(Verb.Initialized),
@@ -187,24 +197,37 @@ namespace Xasu.HighLevel
         {
             if (!hasDuration && !initializedTimes.ContainsKey(completableId))
             {
-                throw new XApiException("The completed statement for the specified id has not been initialized!");
+                if (XasuTracker.Instance.TrackerConfig.StrictMode)
+                {
+                    throw new XApiException("The completed statement for the specified id has not been initialized!");
+                }
+                else
+                {
+                    hasDuration = true;
+                    durationInSeconds = 0f;
+                    Debug.LogWarning("The completed statement for the specified id has not been initialized and" +
+                        " therefore the duration is going to be 0.");
+                }
             }
 
             // Get the initialized statement time to calculate the duration
-            TimeSpan duration = hasDuration ? TimeSpan.FromSeconds(durationInSeconds) : initializedTimes[completableId] - DateTime.Now;
+            TimeSpan duration = hasDuration ? TimeSpan.FromSeconds(durationInSeconds) : DateTime.Now - initializedTimes[completableId];
             if (initializedTimes.ContainsKey(completableId))
             {
                 initializedTimes.Remove(completableId);
+            }
+
+            var result = new Result{ completion = true };
+            if (!hasDuration || durationInSeconds > 0f)
+            {
+                result.duration = duration;
             }
 
             return Enqueue(new Statement
             {
                 verb = GetVerb(Verb.Completed),
                 target = GetTargetActivity(completableId, type),
-                result = new Result
-                {
-                    completion = true
-                }
+                result = result
             });
         }
 

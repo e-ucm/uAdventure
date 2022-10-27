@@ -78,7 +78,7 @@ namespace Xasu.Util
         {
             for (int i = 0; i < pool.Count; i++)
             {
-                jobject.Add(resultsPool[i].Key, JToken.FromObject(resultsPool[i].Value));
+                ExtensionUtil.AddExtensionToJObject(pool[i], jobject);
             }
         }
 
