@@ -22,7 +22,7 @@ namespace uAdventure.Editor
 
         public void OpenFileDialog()
         {
-			var fileFilter = "eap";
+			var fileFilter = "eap,ead";
 			var result = EditorUtility.OpenFilePanel ("Select file", "C://", fileFilter);
 
 			if (result != "")

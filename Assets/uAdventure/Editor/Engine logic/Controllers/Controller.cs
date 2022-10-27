@@ -700,7 +700,16 @@ namespace uAdventure.Editor
             }
             else if (projectFile.Exists)
             {
-                if (projectFile.FullName.ToLower().EndsWith(".eap"))
+                if (projectFile.FullName.ToLower().EndsWith(".ead"))
+                {
+                    var temporaryPath = Application.temporaryCachePath + "/" + projectFile.Name.RemoveFromEnd(".ead");
+                    Directory.CreateDirectory(temporaryPath);
+                    DecompressFile(projectFile.Name, projectFile.DirectoryName, projectFile.Name, temporaryPath);
+                    string absolutePath = projectFile.FullName;
+                    Loaded = LoadFile(temporaryPath);
+                    Directory.Delete(temporaryPath, true);
+                }
+                else if (projectFile.FullName.ToLower().EndsWith(".eap"))
                 {
                     string absolutePath = projectFile.FullName;
                     Loaded = LoadFile(absolutePath.Substring(0, absolutePath.Length - 4));
