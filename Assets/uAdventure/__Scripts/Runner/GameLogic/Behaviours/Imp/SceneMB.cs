@@ -46,6 +46,7 @@ namespace uAdventure.Runner
         private Transform exitsHolder, activeAreasHolder, referencesHolder, background, foreground;
         private bool interactuable;
         private bool ready;
+        private bool makeReady = false;
         private bool firstRender = true;
         private bool dragging;
         private Vector2 endDragSpeed;
@@ -225,6 +226,13 @@ namespace uAdventure.Runner
 
         protected void LateUpdate()
         {
+            // This code lets Unity position the elements after the scene creation, preventing dialogs being launched at wrong positions
+            if (makeReady)
+            {
+                makeReady = false;
+                ready = true;
+            }
+
             if (!referencesHolder || referencesHolder.childCount == 0)
             {
                 return;
@@ -515,11 +523,11 @@ namespace uAdventure.Runner
                     if (!Game.Instance.GameState.IsFirstPerson && scene.isAllowPlayerLayer())
                     {
                         RefreshPlayerAndTrajectory(scene);
-                        ready = true;
+                        makeReady = true;
                     }
                     else
                     {
-                        ready = true;
+                        makeReady = true;
                     }
 
                     var playerFollower = FindObjectOfType<PlayerFollower>();
