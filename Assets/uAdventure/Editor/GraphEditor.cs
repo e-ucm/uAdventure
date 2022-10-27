@@ -50,6 +50,7 @@ namespace uAdventure.Editor
         protected readonly Color green = new Color(0.3f, 0.7f, 0.4f);
 
         int nodespositioned = 0;
+        private NodePositioner nodePositioner;
 
         // Graph control
         private int hovering = -1;
@@ -79,11 +80,27 @@ namespace uAdventure.Editor
 		 ******************************/
         public virtual void Init(T content)
         {
+            var nodes = GetNodes(content);
+            bool hasToRepositionNodes = true;
+            foreach(var node in nodes)
+            {
+                if(GetNodeRect(content, node).position != new Vector2(-1,-1))
+                {
+                    hasToRepositionNodes = false;
+                    break;
+                }
+            }
 
             if (selectedStyle == null)
                 selectedStyle = Resources.Load<GUISkin>("resplandor").box;
 
             Content = content;
+
+            if (nodes.Length > 0 && hasToRepositionNodes)
+            {
+                nodePositioner = new NodePositioner(GetNodes(content).Length, scrollRect);
+                InitWindowsRecursive(nodes[0]);
+            }
 
             ConversationNodeEditorFactory.Intance.ResetInstance();
             
@@ -94,7 +111,11 @@ namespace uAdventure.Editor
             if (!loopCheck.ContainsKey(node))
             {
                 loopCheck.Add(node, true);
-                
+                if (nodePositioner != null)
+                {
+                    SetNodeRect(Content, node, nodePositioner.getRectFor(nodespositioned));
+                }
+
                 nodespositioned++;
 
                 var childs = ChildsFor(Content, node);
