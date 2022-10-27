@@ -1446,20 +1446,14 @@ namespace uAdventure.Editor
                     EditorUtility.DisplayProgressBar("Importing project", "Adding special assets...", 0.25f);
                     AssetsController.addSpecialAssets();
                     AssetsController.copyAllFiles(new DirectoryInfo(path).FullName, currentZipFile);
-                    AssetsController.checkAssetFilesConsistency(incidences);
-                    Incidence.sortIncidences(incidences);
 
                     // Reload the adventure as probably the animations have been replaced
                     EditorUtility.DisplayProgressBar("Importing project", "Finished! Reloading project...", 100);
-                    ResourceManager = null;
                     Resources.UnloadUnusedAssets();
 
-                    if (incidences.Count == 0)
-                    {
-                        ResourceManager = ResourceManagerFactory.CreateLocal();
-                        loadedAdventureData = Loader.LoadAdventureData(ResourceManager, incidences);
-                        loadedAdventureData.setProjectName(currentZipName);
-                    }
+                    ResourceManager = ResourceManagerFactory.CreateLocal();
+                    loadedAdventureData = Loader.LoadAdventureData(ResourceManager, incidences);
+                    loadedAdventureData.setProjectName(currentZipName);
                     EditorUtility.ClearProgressBar();
                 }
                     
@@ -1471,6 +1465,9 @@ namespace uAdventure.Editor
                         adventureDataControl = new AdventureDataControl(loadedAdventureData);
                         chaptersController = new ChapterListDataControl(adventureDataControl.getChapters());
                         ProjectConfigData.LoadFromXML();
+
+                        AssetsController.checkAssetFilesConsistency(incidences);
+                        Incidence.sortIncidences(incidences);
 
                         dataModified_F = false;
                         fileLoaded = true;
@@ -1490,13 +1487,26 @@ namespace uAdventure.Editor
 
             if (incidences.Count > 0)
             {
+                if(!localLoaded)
+                {
+                    EditorUtility.DisplayDialog(TC.get("Operation.FileLoadedWithErrorTitle"),
+                        TC.get("Operation.FileLoadedWithErrorMessage"), TC.get("GeneralText.OK"));
+                }
 
-                EditorUtility.DisplayDialog(TC.get("Error.LoadAborted.Title"),
-                    TC.get("Error.LoadAborted.Message"), TC.get("GeneralText.OK"));
-                HasError = true;
-                Error = incidences.Select(i =>
-                    i.getImportance() + " | " + i.getType() + " | " + i.getAffectedArea() + " | " + i.getMessage() +
-                    " | " + i.getAffectedResource() + " | " + i.getException().ToString()).Aggregate((s1,s2) => s1 + "\n" + s2);
+                foreach (var incidence in incidences)
+                {
+                    if (incidence.getImportance() == Incidence.IMPORTANCE_CRITICAL)
+                    {
+                        Debug.LogError(incidence.ToString());
+                    }
+                    else
+                    {
+                        Debug.LogWarning(incidence.ToString());
+                    }
+                }
+
+
+
                 /*bool abort = fixIncidences(incidences);
                 if (abort)
                 {
