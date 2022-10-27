@@ -5,7 +5,7 @@
 
 <!--  GRAB: Since uAdventure grab action is performed through effects (as conversations) -->
   <!-- When it has no effects, we add a new effects node with remove and generate -->
-    <xsl:template match="grab[not(effect)]">
+    <xsl:template match="object/actions/grab[not(effect)]">
         <xsl:copy>
             <xsl:apply-templates select="node()|@*"/>
             <effect>
@@ -18,7 +18,7 @@
     </xsl:template>
 
   <!-- When it has effects, we append the remove and generate at the end  -->
-    <xsl:template match="grab/effect">
+    <xsl:template match="object/actions/grab/effect">
         <xsl:copy>
             <xsl:apply-templates select="node()|@*"/>
             <remove-element idTarget='{../../../@id}'/>

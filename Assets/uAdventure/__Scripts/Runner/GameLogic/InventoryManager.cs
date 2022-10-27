@@ -191,6 +191,12 @@ namespace uAdventure.Runner
 
         private bool AddElementToInventory(Element element, bool animate)
         {
+            if(element == null)
+            {
+                Debug.LogWarning("The element is null!!");
+                return false;
+            }
+
             if (elementObjects.ContainsKey(element))
             {
                 Debug.LogWarning("Adding the same element to the inventory twice!");
@@ -218,6 +224,12 @@ namespace uAdventure.Runner
 
         private bool RemoveElementFromInventory(Element element)
         {
+            if (element == null)
+            {
+                Debug.LogWarning("The element is null!!");
+                return false;
+            }
+
             if (!elementObjects.ContainsKey(element))
             {
                 Debug.LogWarning("Removing an element not existing in the inventory!");

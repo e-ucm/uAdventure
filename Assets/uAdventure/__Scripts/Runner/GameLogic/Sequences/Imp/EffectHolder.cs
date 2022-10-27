@@ -295,12 +295,18 @@ namespace uAdventure.Runner
                         case EffectType.GENERATE_OBJECT:
                             GenerateObjectEffect gen = (GenerateObjectEffect)effect;
                             var toAdd = Game.Instance.GameState.FindElement<Item>(gen.getTargetId());
-                            InventoryManager.Instance.AddElement(toAdd);
+                            if(toAdd == null)
+                                Debug.LogWarning("The element id you're trying to add to the inventory does not exist as an Item!");
+                            else
+                                InventoryManager.Instance.AddElement(toAdd);
                             break;
                         case EffectType.CONSUME_OBJECT:
                             ConsumeObjectEffect con = (ConsumeObjectEffect)effect;
                             var toRemove = Game.Instance.GameState.FindElement<Item>(con.getTargetId());
-                            InventoryManager.Instance.RemoveElement(toRemove);
+                            if (toRemove == null)
+                                Debug.LogWarning("The element id you're trying to remove from the inventory does not exist as an Item!");
+                            else
+                                InventoryManager.Instance.RemoveElement(toRemove);
                             break;
                         case EffectType.TRIGGER_BOOK:
                             if (timesRun == 0)
