@@ -325,7 +325,7 @@ namespace uAdventure.Core
          */
         protected string playerName = "";
 
-        protected int inventoryPosition = INVENTORY_TOP_BOTTOM;
+        protected int inventoryPosition = INVENTORY_ICON_FREEPOS;
 
         protected Vector2 inventoryCoords = new Vector2(675, 550);
 
