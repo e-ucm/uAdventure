@@ -101,7 +101,7 @@
 
 		 fixed4 color = lerp(color1, color2, _Blend);
 		 if (_TransitionSet == 0) {
-			 color = fixed4(color1.x, color1.y, color1.z, color1.w - _Blend);
+			 color = fixed4(color.x, color.y, color.z, color.w);
 		 }
 
 		 if (movedUv.x < 0 || movedUv.x >= 1 || movedUv.y < 0 || movedUv.y >= 1) {
