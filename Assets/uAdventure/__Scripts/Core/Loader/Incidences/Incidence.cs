@@ -318,5 +318,80 @@ namespace uAdventure.Core
                 }
             }
         }
+
+        private string getImportanceAsString()
+        {
+            string importance = "Unknown";
+            switch (this.getImportance())
+            {
+                case Incidence.IMPORTANCE_LOW:
+                    importance = "Low";
+                    break;
+                case Incidence.IMPORTANCE_MEDIUM:
+                    importance = "Medium";
+                    break;
+                case Incidence.IMPORTANCE_HIGH:
+                    importance = "High";
+                    break;
+                case Incidence.IMPORTANCE_CRITICAL:
+                    importance = "Critical";
+                    break;
+            }
+            return importance;
+        }
+        private string getTypeString()
+        {
+            string type = "Unknown";
+            switch (this.getImportance())
+            {
+                case Incidence.ASSET_INCIDENCE:
+                    type = "Asset";
+                    break;
+                case Incidence.XML_INCIDENCE:
+                    type = "Xml";
+                    break;
+            }
+            return type;
+        }
+        private string getAffectedAreaString()
+        {
+            string type = "Unknown";
+            switch (this.getImportance())
+            {
+                case Incidence.ASSESSMENT_INCIDENCE:
+                    type = "Assessment";
+                    break;
+                case Incidence.ADAPTATION_INCIDENCE:
+                    type = "Adaptation";
+                    break;
+                case Incidence.CHAPTER_INCIDENCE:
+                    type = "Chapter";
+                    break;
+                case Incidence.DESCRIPTOR_INCIDENCE:
+                    type = "Descriptor";
+                    break;
+            }
+            return type;
+        }
+
+
+        public override string ToString()
+        {
+            string incidenceString = getImportanceAsString() + " | " + getTypeString() + " | ";
+            
+            if(getType() == Incidence.XML_INCIDENCE)
+            {
+                incidenceString += getAffectedAreaString() + " | ";
+            }
+
+            incidenceString += getMessage() + " | " + getAffectedResource() + " | ";
+
+            if (getException() != null)
+            {
+                incidenceString += getException().ToString();
+            }
+
+            return incidenceString;
+        }
     }
 }

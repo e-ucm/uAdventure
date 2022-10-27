@@ -1866,7 +1866,7 @@
   <entry key="MenuFile.LOMProperties">Learning Object properties</entry>
   <entry key="ConversationLine.Type.Yell">Yell</entry>
   <entry key="TriggerCutsceneEffect.Title">Trigger cutscene effect</entry>
-  <entry key="Operation.FileLoadedWithErrorMessage">The project was loaded with incidences. Perhaps not all data was loaded.</entry>
+  <entry key="Operation.FileLoadedWithErrorMessage">The project was loaded with incidences. Perhaps not all data was loaded. Check the console to see the incidences.</entry>
   <entry key="Adventure.ModePlayerTransparent.Description">When this mode is selected, the player is not painted in the game, as if the user were directly embedded in the game. This mode is suitable for the production of Myst-like adventure games.</entry>
   <entry key="Effect.Increment">Increment</entry>
   <entry key="Conversation.OptionPreviewPartialConversation">Preview from selected node</entry>
