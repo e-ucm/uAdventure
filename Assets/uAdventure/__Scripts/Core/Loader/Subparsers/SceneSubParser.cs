@@ -166,11 +166,17 @@ namespace uAdventure.Core
 				currentExit.setNotEffects(DOMParserUtility.DOMParse (el.SelectSingleNode("not-effect"), parameters) as Effects ?? new Effects());
 				currentExit.setPostEffects(DOMParserUtility.DOMParse (el.SelectSingleNode("post-effect"), parameters) as Effects ?? new Effects());
 
+
+                foreach (XmlElement next_scene in el.SelectNodes("next-scene"))
+                {
+                    currentExit.addNextScene(ParseNextScene(parameters, next_scene));
+                }
+
                 if (currentExit.getNextScenes().Count > 0)
                 {
                     foreach (NextScene nextScene in currentExit.getNextScenes())
                     {
-                        Exit exit = (Exit)currentExit;
+                        Exit exit = (Exit)currentExit.Clone();
                         exit.setNextScenes(new List<NextScene>());
                         exit.setDestinyX(nextScene.getPositionX());
                         exit.setDestinyY(nextScene.getPositionY());
@@ -211,24 +217,10 @@ namespace uAdventure.Core
 
 			foreach (XmlElement el in element.SelectNodes("next-scene"))
             {
-				string idTarget = el.GetAttribute("idTarget");
-				int x 				= ExParsers.ParseDefault (el.GetAttribute ("x"), int.MinValue), 
-					y 				= ExParsers.ParseDefault (el.GetAttribute ("y"), int.MinValue),
-					transitionType 	= ExParsers.ParseDefault (el.GetAttribute ("transitionType"), 0), 
-					transitionTime 	= ExParsers.ParseDefault (el.GetAttribute ("transitionTime"), 0);
-
-                currentNextScene = new NextScene(idTarget, x, y);
-                currentNextScene.setTransitionType((TransitionType)transitionType);
-                currentNextScene.setTransitionTime(transitionTime);
-
-                currentNextScene.setExitLook(currentExitLook);
-
-				currentNextScene.setConditions(DOMParserUtility.DOMParse (el.SelectSingleNode("condition"), parameters) as Conditions ?? new Conditions());
-				currentNextScene.setEffects(DOMParserUtility.DOMParse (el.SelectSingleNode("effect"), parameters) 		as Effects ?? new Effects());
-				currentNextScene.setPostEffects(DOMParserUtility.DOMParse (el.SelectSingleNode("post-effect"), parameters) as Effects ?? new Effects());
+                ParseNextScene(parameters, el);
             }
 
-			foreach (XmlElement el in element.SelectNodes("objects/object-ref"))
+            foreach (XmlElement el in element.SelectNodes("objects/object-ref"))
 			{
 				currentElementReference = parseElementReference (el, parameters);
                 scene.addItemReference(currentElementReference);
@@ -270,7 +262,24 @@ namespace uAdventure.Core
 			return scene;
         }
 
-		private ElementReference parseElementReference(XmlElement element, params object[] parameters){
+        private NextScene ParseNextScene(object[] parameters, XmlElement el)
+        {
+            string idTarget = el.GetAttribute("idTarget");
+            int x = ExParsers.ParseDefault(el.GetAttribute("x"), int.MinValue), y = ExParsers.ParseDefault(el.GetAttribute("y"), int.MinValue), transitionType = ExParsers.ParseDefault(el.GetAttribute("transitionType"), 0), transitionTime = ExParsers.ParseDefault(el.GetAttribute("transitionTime"), 0);
+
+            var currentNextScene = new NextScene(idTarget, x, y);
+            currentNextScene.setTransitionType((TransitionType)transitionType);
+            currentNextScene.setTransitionTime(transitionTime);
+
+            currentNextScene.setExitLook(currentExitLook);
+
+            currentNextScene.setConditions(DOMParserUtility.DOMParse(el.SelectSingleNode("condition"), parameters) as Conditions ?? new Conditions());
+            currentNextScene.setEffects(DOMParserUtility.DOMParse(el.SelectSingleNode("effect"), parameters) as Effects ?? new Effects());
+            currentNextScene.setPostEffects(DOMParserUtility.DOMParse(el.SelectSingleNode("post-effect"), parameters) as Effects ?? new Effects());
+            return currentNextScene;
+        }
+
+        private ElementReference parseElementReference(XmlElement element, params object[] parameters){
 			string idTarget = element.GetAttribute("idTarget");	
 
 			int x = ExParsers.ParseDefault (element.GetAttribute ("x"), 0), 
