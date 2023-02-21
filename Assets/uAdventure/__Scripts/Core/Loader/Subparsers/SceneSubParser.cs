@@ -135,6 +135,7 @@ namespace uAdventure.Core
                     currentExit.setInfluenceArea(influenceArea);
                 }
 
+                var exitLooks = new List<ExitLook>();
 				foreach (XmlElement ell in el.SelectNodes("exit-look"))
                 {
                     currentExitLook = new ExitLook();

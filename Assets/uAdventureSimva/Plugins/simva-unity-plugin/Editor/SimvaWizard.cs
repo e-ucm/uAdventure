@@ -41,7 +41,7 @@ namespace Simva
 
         private bool preTest, postTest, saveTraces, realTime, backup;
         private int preId, postId, participants;
-        private string email, registerUser, registerPassword, user, password;
+        private string email, registerUser, registerPassword, user, password, name;
         private bool tos;
         private List<ActivityType> activityTypes;
         private IAsyncOperation loadingPromise;
@@ -177,6 +177,14 @@ namespace Simva
 
             DoBorderWithTitle("Create your study", () =>
             {
+                name = EditorGUILayout.TextField("Study name", name);
+                if (string.IsNullOrEmpty(name))
+                {
+                    EditorGUILayout.HelpBox("Please introduce a name", MessageType.Warning);
+                }
+
+                DoSeparator(" Structure ");
+
                 using (new GUILayout.HorizontalScope(GUILayout.ExpandWidth(true)))
                 {
                     preTest = GUILayout.Toggle(preTest, "Pre-Test", EditorStyles.toolbarButton);
@@ -227,94 +235,102 @@ namespace Simva
 
                 participants = Mathf.Clamp(1, EditorGUILayout.IntField("Participants", participants), 10000);
 
+                DoSeparator(" Create ");
 
-                if (GUILayout.Button("Create"))
+                using (new EditorGUI.DisabledScope(string.IsNullOrEmpty(name)))
                 {
-                    EditorUtility.DisplayProgressBar("Simva.Study.Creation.Title", "Simva.Study.Creation.Info", 0);
-                    JObject creationData = null;
-                    var createStudy = simvaController.CreateStudyWithTestAndUsers("uAdventure", "uAdventure", DateTime.Now.ToString("dd-M-yyyy"), participants)
-                    .Then(result => creationData = result);
-
-                    createStudy.ProgressChanged += (sender, args) =>
+                    if (GUILayout.Button("Create"))
                     {
-                        EditorUtility.DisplayProgressBar("Simva.Study.Creation.Title", "Simva.Study.Creation.Info", createStudy.Progress);
-                    };
-
-                    EditorUtility.DisplayProgressBar("Simva.Study.Creation.Title", "Simva.Study.Activities.Info", 0);
-                    if (preTest)
-                    {
-                        EditorUtility.DisplayProgressBar("Simva.Study.Creation.Title", "Simva.Study.Activities.PreSurvey", 0.25f);
-                        createStudy = createStudy.Then(() =>
-                        {
-                            return simvaController.Api.AddActivityToTest(creationData["studyId"].Value<string>(), creationData["testId"].Value<string>(), new Activity
-                            {
-                                Name = "PreTest",
-                                Type = "limesurvey",
-                                CopySurvey = preId.ToString()
-                            });
-                        });
+                        CreateStudy();
                     }
-
-                    createStudy = createStudy.Then(() =>
-                    {
-                        EditorUtility.DisplayProgressBar("Simva.Study.Creation.Title", "Simva.Study.Activities.Gameplay", 0.50f);
-
-                        return simvaController.Api.AddActivityToTest(creationData["studyId"].Value<string>(), creationData["testId"].Value<string>(), new Activity
-                        {
-                            Name = "Gameplay",
-                            Type = "gameplay",
-                            Backup = backup,
-                            TraceStorage = saveTraces,
-                            Realtime = realTime
-                        });
-                    });
-
-                    if (postTest)
-                    {
-                        createStudy = createStudy.Then(() =>
-                        {
-                            EditorUtility.DisplayProgressBar("Simva.Study.Creation.Title", "Simva.Study.Activities.PostSurvey", 0.75f);
-                            return simvaController.Api.AddActivityToTest(creationData["studyId"].Value<string>(), creationData["testId"].Value<string>(), new Activity
-                            {
-                                Name = "PostTest",
-                                Type = "limesurvey",
-                                CopySurvey = postId.ToString()
-                            });
-                        });
-                    }
-
-                    createStudy.Then(() =>
-                    {
-                        EditorUtility.DisplayProgressBar("Simva.Study.Creation.Title", "Simva.Study.Activities.Completing", 0.99f);
-                        return simvaController.Api.GetStudy(creationData["studyId"].Value<string>());
-                    })
-                    .Then(study =>
-                    {
-                        EditorUtility.ClearProgressBar();
-                        simvaController.SimvaConf.Study = study.Id;
-                        simvaController.SimvaConf.Save();
-                    })
-                    .Catch(error =>
-                    {
-                        Debug.LogException(error);
-                        EditorUtility.DisplayDialog("Simva: Error happened!", error.Message, "Ok");
-                        var apiEx = error as ApiException;
-                        if (apiEx != null)
-                        {
-                            Debug.LogError(apiEx.Message + ": " + apiEx.ErrorContent);
-                        }
-                        else
-                        {
-                            Debug.LogError(error.Message);
-                        }
-                    })
-                    .Finally(() =>
-                    {
-                        EditorUtility.ClearProgressBar();
-                    });
-
                 }
 
+            });
+        }
+
+        private void CreateStudy()
+        {
+            EditorUtility.DisplayProgressBar("Simva.Study.Creation.Title", "Simva.Study.Creation.Info", 0);
+            JObject creationData = null;
+            var createStudy = simvaController.CreateStudyWithTestAndUsers(name, "uAdventure", DateTime.Now.ToString("dd-M-yyyy"), participants)
+            .Then(result => creationData = result);
+
+            createStudy.ProgressChanged += (sender, args) =>
+            {
+                EditorUtility.DisplayProgressBar("Simva.Study.Creation.Title", "Simva.Study.Creation.Info", createStudy.Progress);
+            };
+
+            EditorUtility.DisplayProgressBar("Simva.Study.Creation.Title", "Simva.Study.Activities.Info", 0);
+            if (preTest)
+            {
+                EditorUtility.DisplayProgressBar("Simva.Study.Creation.Title", "Simva.Study.Activities.PreSurvey", 0.25f);
+                createStudy = createStudy.Then(() =>
+                {
+                    return simvaController.Api.AddActivityToTest(creationData["studyId"].Value<string>(), creationData["testId"].Value<string>(), new Activity
+                    {
+                        Name = "PreTest",
+                        Type = "limesurvey",
+                        CopySurvey = preId.ToString()
+                    });
+                });
+            }
+
+            createStudy = createStudy.Then(() =>
+            {
+                EditorUtility.DisplayProgressBar("Simva.Study.Creation.Title", "Simva.Study.Activities.Gameplay", 0.50f);
+
+                return simvaController.Api.AddActivityToTest(creationData["studyId"].Value<string>(), creationData["testId"].Value<string>(), new Activity
+                {
+                    Name = "Gameplay",
+                    Type = "gameplay",
+                    Backup = backup,
+                    TraceStorage = saveTraces,
+                    Realtime = realTime
+                });
+            });
+
+            if (postTest)
+            {
+                createStudy = createStudy.Then(() =>
+                {
+                    EditorUtility.DisplayProgressBar("Simva.Study.Creation.Title", "Simva.Study.Activities.PostSurvey", 0.75f);
+                    return simvaController.Api.AddActivityToTest(creationData["studyId"].Value<string>(), creationData["testId"].Value<string>(), new Activity
+                    {
+                        Name = "PostTest",
+                        Type = "limesurvey",
+                        CopySurvey = postId.ToString()
+                    });
+                });
+            }
+
+            createStudy.Then(() =>
+            {
+                EditorUtility.DisplayProgressBar("Simva.Study.Creation.Title", "Simva.Study.Activities.Completing", 0.99f);
+                return simvaController.Api.GetStudy(creationData["studyId"].Value<string>());
+            })
+            .Then(study =>
+            {
+                EditorUtility.ClearProgressBar();
+                simvaController.SimvaConf.Study = study.Id;
+                simvaController.SimvaConf.Save();
+            })
+            .Catch(error =>
+            {
+                Debug.LogException(error);
+                EditorUtility.DisplayDialog("Simva: Error happened!", error.Message, "Ok");
+                var apiEx = error as ApiException;
+                if (apiEx != null)
+                {
+                    Debug.LogError(apiEx.Message + ": " + apiEx.ErrorContent);
+                }
+                else
+                {
+                    Debug.LogError(error.Message);
+                }
+            })
+            .Finally(() =>
+            {
+                EditorUtility.ClearProgressBar();
             });
         }
 
@@ -573,10 +589,10 @@ namespace Simva
 
         private static void DoSeparator(string content)
         {
-            GUILayout.Space(50);
-            GUILayoutUtility.GetRect(GUIContent.none, GUI.skin.box, GUILayout.ExpandWidth(true), GUILayout.Height(50));
+            GUILayout.Space(10);
+            GUILayoutUtility.GetRect(GUIContent.none, GUI.skin.box, GUILayout.ExpandWidth(true), GUILayout.Height(30));
             var lastRect = GUILayoutUtility.GetLastRect();
-            GUILayout.Space(50);
+            GUILayout.Space(10);
             var or = new GUIContent(content);
             var lineRect = lastRect;
             lineRect.height = 1;
