@@ -1,0 +1,3 @@
+[submodule "Assets/uAdventureAnalytics/Plugins/xasu"]
+	path = Assets/uAdventureAnalytics/Plugins/xasu
+	url = https://github.com/e-ucm/xasu
