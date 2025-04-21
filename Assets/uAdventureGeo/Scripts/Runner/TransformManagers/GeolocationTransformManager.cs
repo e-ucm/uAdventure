@@ -160,7 +160,7 @@ namespace uAdventure.Geo
                     {
                         // TODO change this after: https://github.com/e-ucm/unity-tracker/issues/29
                         MovementTracker.Instance.Moved(Game.Instance.GameState.CurrentTarget, geoExtension.Location)
-                            .WithResultExtensions(new Dictionary<string, object> { { "geo_element_" + positioner.Element.getId(), 1 } });
+                            .WithResultExtensions(new Dictionary<string, object> { { Application.identifier + "://geo_element_" + positioner.Element.getId(), 1 } });
                     }
                 }
                 if (hint)
