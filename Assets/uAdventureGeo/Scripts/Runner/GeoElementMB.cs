@@ -271,10 +271,18 @@ namespace uAdventure.Geo
             public GeoAction Action { get; set; }
             public abstract Type ActionType { get; }
 
+            private bool started = false;
+
             public virtual void Start() { geoExtension = GameExtension.GetInstance<GeoExtension>(); }
 
             public virtual void Update()
             {
+                if (!started)
+                {
+                    started = true;
+                    Start();
+                }
+
                 if (Check())
                 {
                     Execute();
@@ -317,6 +325,7 @@ namespace uAdventure.Geo
 
             public override void Start()
             {
+                base.Start();
                 wasInside = Geometry.InsideInfluence(LatLon);
             }
 
@@ -386,6 +395,7 @@ namespace uAdventure.Geo
 
             public override void Start()
             {
+                base.Start();
                 wasOutside = Geometry.InsideInfluence(LatLon);
             }
 
