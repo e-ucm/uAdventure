@@ -281,7 +281,8 @@ namespace uAdventure.Runner
 
                     if (action != null)
                     {
-                        Game.Instance.Execute(new EffectHolder(action.getEffects()));
+                        OnActionStarted(action);
+                        Game.Instance.Execute(new EffectHolder(action.getEffects()), OnActionFinished);
                     }
                 }
             }
