@@ -317,7 +317,7 @@ namespace Xasu
             req.content = Encoding.UTF8.GetBytes(jarray.ToString());
 
             var res = await MakeAsyncRequest(req);
-            if (res.status != (int)HttpStatusCode.OK)
+            if (res.status != (int)HttpStatusCode.OK && res.status != (int)HttpStatusCode.NoContent)
             {
                 r.success = false;
                 r.httpException = res.ex;
@@ -325,14 +325,17 @@ namespace Xasu
                 return r;
             }
 
-            var ids = JArray.Parse(Encoding.UTF8.GetString(res.content));
-            for (int i = 0; i < ids.Count; i++)
+            if(res.status == (int)HttpStatusCode.OK)
             {
-                statements[i].id = new Guid((String)ids[i]);
+                var ids = JArray.Parse(Encoding.UTF8.GetString(res.content));
+                for (int i = 0; i < ids.Count; i++)
+                {
+                    statements[i].id = new Guid((String)ids[i]);
+                }
+                r.content = new StatementsResult(statements);
             }
 
             r.success = true;
-            r.content = new StatementsResult(statements);
 
             return r;
         }

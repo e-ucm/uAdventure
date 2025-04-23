@@ -25,7 +25,7 @@ namespace Xasu.Requests
                     request = UnityWebRequest.Get(myRequest.url);
                     break;
                 case "POST":
-                    request = UnityWebRequest.Post(myRequest.url, "");
+                    request = UnityWebRequest.PostWwwForm(myRequest.url, "");
                     break;
                 case "PUT":
                     request = UnityWebRequest.Put(myRequest.url, myRequest.content);
@@ -208,13 +208,13 @@ namespace Xasu.Requests
             }
 
             // Sometimes the webrequest is finished but the download is not
-            while (!webRequest.isNetworkError && !webRequest.isHttpError && !webRequest.downloadHandler.isDone && webRequest.downloadProgress != 0 && webRequest.downloadProgress != 1)
+            while (!(webRequest.result == UnityWebRequest.Result.ConnectionError) && !(webRequest.result == UnityWebRequest.Result.ProtocolError) && !webRequest.downloadHandler.isDone && webRequest.downloadProgress != 0 && webRequest.downloadProgress != 1)
             {
                 await Task.Yield();
             }
 
             // Network Error Exception
-            if (webRequest.isNetworkError)
+            if (webRequest.result == UnityWebRequest.Result.ConnectionError)
             {
                 NetworkInfo.Failed();
                 throw new NetworkException(webRequest.error);
@@ -222,7 +222,7 @@ namespace Xasu.Requests
             NetworkInfo.Worked();
 
             // API / Http Exception
-            if (webRequest.isHttpError)
+            if (webRequest.result == UnityWebRequest.Result.ProtocolError)
             {
                 throw new APIException((int)webRequest.responseCode, webRequest.downloadHandler.text, webRequest);
             }

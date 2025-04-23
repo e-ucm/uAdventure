@@ -92,7 +92,11 @@ namespace Xasu.Auth.Protocols
 
                 Agent = new Agent
                 {
-                    name = "OAuth with token " + doAccessTokenRequest.OAuthToken
+                    name = "OAuth with token " + doAccessTokenRequest.OAuthToken,
+                    account = new AgentAccount {
+                        homePage = authorizeEndpoint,
+                        name = "OAuth with token " + doAccessTokenRequest.OAuthToken
+                    }
                 };
             } 
             catch (NetworkException nex)

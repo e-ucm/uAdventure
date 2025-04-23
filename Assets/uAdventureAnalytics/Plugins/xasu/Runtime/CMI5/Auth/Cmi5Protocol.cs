@@ -31,7 +31,7 @@ namespace Xasu.Auth.Protocols
 
         private static async Task<Cmi5Fetch> DoFetch(System.Uri fetchUrl, IAsyncPolicy policy)
         {
-            return await RequestsUtility.DoRequest<Cmi5Fetch>(UnityWebRequest.Post(fetchUrl, ""));
+            return await RequestsUtility.DoRequest<Cmi5Fetch>(UnityWebRequest.PostWwwForm(fetchUrl, ""));
         }
 
         public Task UpdateParamsForAuth(MyHttpRequest request)

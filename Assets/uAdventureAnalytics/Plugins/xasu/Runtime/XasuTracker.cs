@@ -84,6 +84,10 @@ namespace Xasu
                 // TODO: Implement a ProcessorFactory that performs generic initialization
                 if (TrackerConfig.Online)
                 {
+                    if (!TrackerConfig.AuthParameters.ContainsKey("lrs_endpoint"))
+                    {
+                        TrackerConfig.AuthParameters["lrs_endpoint"] = TrackerConfig.LRSEndpoint;
+                    }
                     onlineAuthProtocol = onlineAuthorization ?? await AuthManager.InitAuth(TrackerConfig.AuthProtocol, TrackerConfig.AuthParameters, null); // TODO: Auth Policies
                     if (onlineAuthProtocol?.State == AuthState.Errored)
                     {
@@ -145,7 +149,12 @@ namespace Xasu
 
                 // Actor is obtained from authorization (e.g. OAuth contains username, CMI-5 obtains agent)
                 DefaultActor = onlineAuthProtocol != null ? onlineAuthProtocol.Agent : new Agent { name = "Dummy User", mbox = "dummy@user.com" };
-
+                
+                Activity sg = new Activity  { id = "https://w3id.org/xapi/seriousgames" };
+                List<Activity> list = new List<Activity>();
+                list.Add(sg);
+                DefaultContext = new Context { registration = Guid.NewGuid(),contextActivities=new ContextActivities{ category = list } };
+                
                 traceProcessors = processors.ToArray();
 
                 Status.Monitor(onlineProcessor, localProcessor, backupProcessor, onlineAuthProtocol, backupAuthProtocol);
@@ -371,7 +380,7 @@ namespace Xasu
             // Set the timestamp
             if (statement.timestamp == null || !statement.timestamp.HasValue)
             {
-                statement.timestamp = DateTime.Now;
+                statement.timestamp = DateTime.UtcNow;
             }
 
             if (statement.context == null)

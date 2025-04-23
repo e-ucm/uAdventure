@@ -37,7 +37,10 @@ namespace Xasu.Auth.Utils
         {
             string redirectUrl = null;
 
-            if (Application.isEditor)
+            if (Application.isEditor || 
+                Application.platform == RuntimePlatform.WindowsPlayer || 
+                Application.platform == RuntimePlatform.OSXPlayer || 
+                Application.platform == RuntimePlatform.LinuxPlayer)
             {
                 Task.Run(async () =>
                 {

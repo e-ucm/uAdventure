@@ -128,7 +128,11 @@ namespace Xasu.Auth.Protocols
                 Debug.Log("[OAuth2] Token obtained: " + token.AccessToken);
                 Agent = new Agent
                 {
-                    name = token.Username
+                    name = token.Username,
+                    account = new AgentAccount {
+                        homePage = authEndpoint,
+                        name = token.Username
+                    }
                 };
             }
         }
@@ -288,6 +292,7 @@ namespace Xasu.Auth.Protocols
             {
                 form.Add(param.Key, param.Value);
             }
+            // TODO add here &token if SIMVA and token variable
 
             // TODO: We might need to manually encode the form
 
