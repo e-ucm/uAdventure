@@ -126,7 +126,11 @@ public class ScrollableList
         // Scroll calculation
         var scrollRect = GUILayoutUtility.GetRect(0, height - (headerHeight + footerHeight), GUILayout.ExpandWidth(true));
         scrollRect.y -= 2;
-        var desiredHeight = Mathf.Max(elementHeight, elementHeight * reorderableList.list.Count);
+#if UNITY_6000_0_OR_NEWER
+        var desiredHeight = Mathf.Max(elementHeight, (elementHeight+2.2f) * reorderableList.list.Count);
+#else
+        var desiredHeight = Mathf.Max(elementHeight, (elementHeight + 2.2f) * reorderableList.list.Count);
+#endif
         var insideRect = new Rect(0, 0, scrollRect.width - (desiredHeight > scrollRect.height ? 15 : 0), desiredHeight);
 
         // Background correction

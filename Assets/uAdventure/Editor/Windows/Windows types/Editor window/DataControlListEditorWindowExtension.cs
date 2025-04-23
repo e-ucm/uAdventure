@@ -92,7 +92,7 @@ namespace uAdventure.Editor
         {
             try
             {
-                dataControlList.DoList(Math.Max(1, dataControlList.list.Count) * 25 + 30);
+                dataControlList.DoList(Math.Max(1, dataControlList.list.Count) * dataControlList.elementHeight + 30);
             }
             catch (System.Exception e)
             {
