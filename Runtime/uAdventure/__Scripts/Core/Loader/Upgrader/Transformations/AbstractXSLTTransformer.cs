@@ -37,7 +37,7 @@ namespace uAdventure.Core.XmlUpgrader
                 DtdProcessing = DtdProcessing.Ignore
 #else
                 ValidationType = ValidationType.None,
-                ProhibitDtd = false
+                DtdProcessing = DtdProcessing.Ignore
 #endif
             }; 
             using (XmlReader xri = XmlReader.Create(new StringReader(input), settings))

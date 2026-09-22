@@ -221,7 +221,7 @@ namespace uAdventure.Geo
             if (request != null && request.isDone)
             {
                 addresses = DataProcessingOSM(request.webRequest.downloadHandler.text);
-                if(addresses == null || request.webRequest.isHttpError || request.webRequest.isNetworkError)
+                if(addresses == null || request.webRequest.result == UnityWebRequest.Result.ConnectionError || request.webRequest.result == UnityWebRequest.Result.ProtocolError)
                 {
                     Controller.Instance.ShowErrorDialog("Geo.PlaceSearcher.ErrorNoResults.Title", "Geo.PlaceSearcher.ErrorNoResults.Message");
                     Debug.LogError("Cannot connect with address search server (err: " + request.webRequest.responseCode + "): " + request.webRequest.error);

@@ -86,7 +86,7 @@ namespace MapzenGo.Models
                 var uwr = UnityWebRequest.Get(url);
                 yield return uwr.SendWebRequest();
 
-                if (uwr.isHttpError || uwr.isNetworkError)
+                if (uwr.result == UnityWebRequest.Result.ConnectionError || uwr.result == UnityWebRequest.Result.ProtocolError)
                 {
                     Debug.LogError(uwr.error);
                     finished(false);

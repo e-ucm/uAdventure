@@ -53,7 +53,7 @@ namespace MapzenGo.Helpers.Search
             UnityWebRequest www = UnityWebRequest.Get(String.Format(seachUrl, System.Uri.EscapeDataString(namePlaceСache)));
             yield return www.SendWebRequest();
 
-            if (www.isNetworkError || www.isHttpError)
+            if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
             {
                 Debug.Log(www.error);
             }

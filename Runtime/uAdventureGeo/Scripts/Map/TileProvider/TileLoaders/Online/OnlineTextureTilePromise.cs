@@ -45,7 +45,7 @@ namespace uAdventure.Geo
 
             completed = true;
             var currRequest = obj as UnityWebRequestAsyncOperation;
-            if (currRequest.webRequest.isNetworkError || currRequest.webRequest.isHttpError )
+            if (currRequest.webRequest.result == UnityWebRequest.Result.ConnectionError || currRequest.webRequest.result == UnityWebRequest.Result.ProtocolError)
             {
                 if (tries < MaxTries)
                 {
