@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<comment> Project Configuration </comment>
+<entry key="Chapter0.SceneId.X">-1731</entry>
+<entry key="Chapter0.SceneId.Y">-31</entry>
+<entry key="Chapter0.Intro.X">-212</entry>
+<entry key="Chapter0.Intro.Y">271</entry>
+<entry key="Chapter0.elpueblo.X">723</entry>
+<entry key="Chapter0.elpueblo.Y">-28</entry>
+<entry key="Chapter0.presentacion.X">412</entry>
+<entry key="Chapter0.presentacion.Y">-29</entry>
+<entry key="Chapter0.laCasa.X">159</entry>
+<entry key="Chapter0.laCasa.Y">64</entry>
+<entry key="Chapter0.salaEstar.X">356</entry>
+<entry key="Chapter0.salaEstar.Y">154</entry>
+<entry key="Chapter0.habitacion.X">-25</entry>
+<entry key="Chapter0.habitacion.Y">438</entry>
+<entry key="Chapter0.librero1.X">206</entry>
+<entry key="Chapter0.librero1.Y">185</entry>
+<entry key="Chapter0.librero2.X">53</entry>
+<entry key="Chapter0.librero2.Y">194</entry>
+<entry key="Chapter0.pesadilla.X">338</entry>
+<entry key="Chapter0.pesadilla.Y">421</entry>
+<entry key="Chapter0.capitulo2.X">520</entry>
+<entry key="Chapter0.capitulo2.Y">334</entry>
+<entry key="Chapter0.creditosCap1.X">510</entry>
+<entry key="Chapter0.creditosCap1.Y">255</entry>
+<entry key="Chapter0.aprende.X">167</entry>
+<entry key="Chapter0.aprende.Y">277</entry>
+<entry key="Chapter0.C2folletozoom.X">929</entry>
+<entry key="Chapter0.C2folletozoom.Y">101</entry>
+<entry key="Simva.RefreshToken">eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI2Y2IwZWFmNC1iOWM1LTQ0ZWQtODYzZC05ZGRjMWU5ZmEyODMifQ.eyJpYXQiOjE2NjUwMDk3MDEsImp0aSI6IjE1N2FmMGU1LWNkNGQtNDk1Yy05YzBjLTExZGEzZDEzM2QyMCIsImlzcyI6Imh0dHBzOi8vc3NvLnNpbXZhLmUtdWNtLmVzL2F1dGgvcmVhbG1zL3NpbXZhIiwiYXVkIjoiaHR0cHM6Ly9zc28uc2ltdmEuZS11Y20uZXMvYXV0aC9yZWFsbXMvc2ltdmEiLCJzdWIiOiIyM2JjNTE5NC1iMDEwLTQ2ZGQtYWIwOS0xYmUwZjY0ZGJhNDAiLCJ0eXAiOiJPZmZsaW5lIiwiYXpwIjoidWFkdmVudHVyZSIsInNlc3Npb25fc3RhdGUiOiI2ZjJmODQwMC1lZjQ1LTQ3YzUtYTJmNi02MGJiNTYwMjRkZjUiLCJzY29wZSI6Im9mZmxpbmVfYWNjZXNzIHByb2ZpbGUgZW1haWwifQ.LI-fTJgD2lA_4HL930xd6NQPKiY9TcVr3JJP_WWTaWQ</entry>
+<entry key="Chapter0.ControlesJuego.X">-184</entry>
+<entry key="Chapter0.ControlesJuego.Y">88</entry>
+<entry key="Chapter0.elpuebloIntro.X">-354</entry>
+<entry key="Chapter0.elpuebloIntro.Y">439</entry>
+<entry key="Chapter0.Menu.X">331</entry>
+<entry key="Chapter0.Menu.Y">0</entry>
+<entry key="Chapter0.C2habitacion.X">618</entry>
+<entry key="Chapter0.C2habitacion.Y">149</entry>
+<entry key="Chapter0.c2Sala.X">596</entry>
+<entry key="Chapter0.c2Sala.Y">508</entry>
+<entry key="Chapter0.aprende2.X">305</entry>
+<entry key="Chapter0.aprende2.Y">272</entry>
+<entry key="Chapter0.cofre3.X">308</entry>
+<entry key="Chapter0.cofre3.Y">484</entry>
+<entry key="Chapter0.cofre4.X">765</entry>
+<entry key="Chapter0.cofre4.Y">498</entry>
+<entry key="Chapter0.entresueno.X">513</entry>
+<entry key="Chapter0.entresueno.Y">505</entry>
+<entry key="Chapter0.pesadilla2.X">653</entry>
+<entry key="Chapter0.pesadilla2.Y">476</entry>
+<entry key="Chapter0.elMonitor.X">-200</entry>
+<entry key="Chapter0.elMonitor.Y">348</entry>
+<entry key="Chapter0.c2Cparque.X">317</entry>
+<entry key="Chapter0.c2Cparque.Y">348</entry>
+<entry key="Chapter0.c2aprende2.X">341</entry>
+<entry key="Chapter0.c2aprende2.Y">90</entry>
+</properties>
+

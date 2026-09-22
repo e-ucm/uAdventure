@@ -1,0 +1,685 @@
+<!--################################################################################ 
+# eAdventure (formerly <e-Adventure> and <e-Game>) is a research project of the e-UCM
+#          research group.
+#   
+#    Copyright 2005-2012 e-UCM research group.
+#  
+#     e-UCM is a research group of the Department of Software Engineering
+#          and Artificial Intelligence at the Complutense University of Madrid
+#          (School of Computer Science).
+#  
+#          C Profesor Jose Garcia Santesmases sn,
+#          28040 Madrid (Madrid), Spain.
+#  
+#          For more info please visit:  <http://e-adventure.e-ucm.es> or
+#          <http://www.e-ucm.es>
+#  
+#  ****************************************************************************
+# This file is part of eAdventure, version 1.5.
+# 
+#   You can access a list of all the contributors to eAdventure at:
+#          http://e-adventure.e-ucm.es/contributors
+#  
+#  ****************************************************************************
+#       eAdventure is free software: you can redistribute it and/or modify
+#      it under the terms of the GNU Lesser General Public License as published by
+#      the Free Software Foundation, either version 3 of the License, or
+#      (at your option) any later version.
+#  
+#      eAdventure is distributed in the hope that it will be useful,
+#      but WITHOUT ANY WARRANTY; without even the implied warranty of
+#      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#      GNU Lesser General Public License for more details.
+#  
+#      You should have received a copy of the GNU Lesser General Public License
+#      along with Adventure.  If not, see <http://www.gnu.org/licenses/>.
+################################################################################ -->
+<!ENTITY % conversation "tree-conversation | graph-conversation">
+<!ENTITY % cutscene "videoscene | slidescene">
+
+<!ELEMENT eAdventure ((scene | %cutscene;)+, book*, object*, player, character*, (%conversation;)*, timer*, global-state*, macro*,atrezzoobject*,adaptation*,assessment*)>
+<!ATTLIST eAdventure
+	adaptProfile CDATA #IMPLIED
+	assessProfile CDATA #IMPLIED
+>
+<!ELEMENT scene (documentation?, resources+, name, default-initial-position?, exits?, objects?, characters?, active-areas?, barriers?, atrezzo?, trajectory?)>
+<!ATTLIST scene
+	id ID #REQUIRED
+	start (yes | no) "no"
+	playerLayer CDATA "-1"
+	playerScale CDATA "1"
+>
+<!ELEMENT documentation ANY>
+<!ELEMENT resources (condition?, asset+)>
+<!ATTLIST resources
+	id ID #IMPLIED
+	name CDATA ""
+>
+<!ELEMENT asset EMPTY>
+<!ATTLIST asset
+	type CDATA #REQUIRED
+	uri CDATA #REQUIRED
+	id ID #IMPLIED
+	md-uri CDATA #IMPLIED
+>
+<!ENTITY % position "x NMTOKEN #REQUIRED y NMTOKEN #REQUIRED">
+<!ENTITY % rectangle "%position; width NMTOKEN #REQUIRED height NMTOKEN #REQUIRED">
+<!ENTITY % influence_area "influenceX NMTOKEN #IMPLIED influenceY NMTOKEN #IMPLIED influenceWidth NMTOKEN #IMPLIED influenceHeight NMTOKEN #IMPLIED">
+<!ELEMENT default-initial-position EMPTY>
+<!ATTLIST default-initial-position
+	%position;
+>
+<!ELEMENT point EMPTY>
+<!ATTLIST point
+	%position;
+>
+<!ELEMENT exits (exit+)>
+<!ELEMENT exit (documentation?, exit-look?, next-scene*, point*, condition?, effect?, post-effect?, not-effect?)>
+<!ATTLIST exit
+	rectangular (yes | no) "yes"
+	%rectangle; 
+	hasInfluenceArea (yes | no) "no" 
+	%influence_area;
+	idTarget IDREF #IMPLIED
+	destinyX NMTOKEN "400"
+	destinyY NMTOKEN "300"
+	transitionTime CDATA "0"
+	transitionType CDATA "0"
+	not-effects (yes | no) "no"
+>
+<!ELEMENT exit-look EMPTY>
+<!ATTLIST exit-look 
+	text CDATA #IMPLIED
+	cursor-path CDATA #IMPLIED
+	sound-path CDATA #IMPLIED
+>
+
+<!ELEMENT next-scene (condition?, exit-look?, effect?, post-effect?)>
+<!ATTLIST next-scene
+	idTarget IDREF #REQUIRED
+	x NMTOKEN #IMPLIED
+	y NMTOKEN #IMPLIED
+	transitionTime CDATA "0"
+	transitionType CDATA "0"
+>
+<!ELEMENT trajectory (node*, initialnode?, side*)>
+<!ELEMENT node EMPTY>
+<!ATTLIST node
+	id ID #REQUIRED
+	x NMTOKEN #REQUIRED
+	y NMTOKEN #REQUIRED
+	scale CDATA #IMPLIED
+>
+<!ELEMENT side EMPTY>
+<!ATTLIST side
+   idStart IDREF #REQUIRED
+   idEnd IDREF #REQUIRED
+   length NMTOKEN "-1"
+>
+<!ELEMENT initialnode EMPTY>
+<!ATTLIST initialnode
+	id IDREF #REQUIRED
+>
+
+
+<!ELEMENT objects (object-ref+)>
+<!ELEMENT object-ref (documentation?, condition?)>
+<!ATTLIST object-ref
+	idTarget IDREF #REQUIRED
+	%position;
+	scale CDATA #IMPLIED
+	layer CDATA "-1"
+	hasInfluenceArea (yes | no) "no" 
+	%influence_area;
+>
+
+<!ELEMENT atrezzo (atrezzo-ref+)>
+<!ELEMENT atrezzo-ref (documentation?, condition?)>
+<!ATTLIST atrezzo-ref
+	idTarget IDREF #REQUIRED
+	%position;
+	scale CDATA #IMPLIED
+	layer CDATA "-1"
+>
+
+<!ELEMENT characters (character-ref+)>
+<!ELEMENT character-ref (documentation?, condition?)>
+<!ATTLIST character-ref
+	idTarget IDREF #REQUIRED
+	%position;
+	scale CDATA #IMPLIED
+	layer CDATA #IMPLIED
+	hasInfluenceArea (yes | no) "no" 
+	%influence_area;
+>
+
+<!ELEMENT active-areas (active-area+)>
+<!ELEMENT active-area (documentation?, condition?, description+, actions?, point*)>
+<!ATTLIST active-area 
+	id ID #IMPLIED
+	rectangular (yes | no) "yes"
+	%rectangle;  
+	hasInfluenceArea (yes | no) "no" 
+	%influence_area;
+>
+
+<!ELEMENT barriers (barrier+)>
+<!ELEMENT barrier (documentation?, condition?, description)>
+<!ATTLIST barrier
+	%rectangle;  
+>
+
+<!ELEMENT videoscene (documentation?, effect?,resources+, name, ( end-game? | next-scene* ))>
+<!ATTLIST videoscene
+	id ID #REQUIRED
+	start (yes | no) "no"
+	next (end-chapter | go-back | new-scene) "go-back"
+	idTarget IDREF #IMPLIED
+	destinyX NMTOKEN "400"
+	destinyY NMTOKEN "300"
+	transitionTime CDATA "0"
+	transitionType CDATA "0"
+	canSkip (yes | no) "yes"
+>
+
+<!ELEMENT slidescene (documentation?, effect?,resources+, name, ( end-game? | next-scene* ))>
+<!ATTLIST slidescene
+	id ID #REQUIRED
+	start (yes | no) "no"
+	next (end-chapter | go-back | new-scene) "go-back"
+	idTarget IDREF #IMPLIED
+	destinyX NMTOKEN "400"
+	destinyY NMTOKEN "300"
+	transitionTime CDATA "0"
+	transitionType CDATA "0"
+>
+
+<!ELEMENT end-game EMPTY>
+<!ELEMENT book (documentation?, resources+, (text | pages))>
+<!ATTLIST book
+	id ID #REQUIRED
+	xNextPage NMTOKEN #IMPLIED
+	yNextPage NMTOKEN #IMPLIED
+	xPreviousPage NMTOKEN #IMPLIED
+	yPreviousPage NMTOKEN #IMPLIED
+	
+>
+
+<!ELEMENT pages (page)*>
+<!ELEMENT page EMPTY>
+<!ATTLIST page
+	uri CDATA #REQUIRED
+	type (url | resource | image) "url"
+	margin CDATA #IMPLIED
+	marginEnd CDATA #IMPLIED
+	marginTop CDATA #IMPLIED
+	marginBottom CDATA #IMPLIED
+	scrollable (yes | no) "no" 
+>
+ 
+<!ELEMENT text (#PCDATA | title | bullet | img)*>
+<!ELEMENT title (#PCDATA)>
+<!ELEMENT bullet (#PCDATA)>
+<!ELEMENT img EMPTY>
+<!ATTLIST img
+	src CDATA #REQUIRED
+>
+<!ELEMENT atrezzoobject (documentation?, instance*, resources+, description+)>
+<!ATTLIST atrezzoobject
+	id ID #IMPLIED
+>
+
+<!ELEMENT object (documentation?, instance*, resources+, description+, actions?)>
+<!ATTLIST object
+	id ID #IMPLIED
+	returnsWhenDragged ( yes | no) "yes"
+	behaviour (normal | atrezzo | first-action) "normal"
+	resources-transition-time CDATA "0"
+>
+<!ELEMENT instance EMPTY>
+<!ATTLIST instance
+	id ID #REQUIRED
+>
+<!ELEMENT description (condition?, name, brief, detailed)>
+<!ELEMENT name (#PCDATA)>
+<!ATTLIST name 
+	soundPath CDATA #IMPLIED
+> 
+<!ELEMENT brief (#PCDATA)>
+<!ATTLIST brief 
+	soundPath CDATA #IMPLIED
+>
+<!ELEMENT detailed (#PCDATA)>
+<!ATTLIST detailed 
+	soundPath CDATA #IMPLIED
+>
+
+<!ELEMENT actions (examine | grab | use | use-with | give-to | custom | custom-interact | talk-to | drag-to)+>
+<!ELEMENT examine (documentation?, condition?, effect?,not-effect?)>
+<!ATTLIST examine
+	needsGoTo (yes | no) "yes"
+	keepDistance CDATA "10"
+	not-effects (yes | no) "no"
+>
+<!ELEMENT grab (documentation?, condition?, effect?,not-effect?)>
+<!ATTLIST grab
+	needsGoTo (yes | no) "yes"
+	keepDistance CDATA "10"
+	not-effects (yes | no) "no"
+>
+<!ELEMENT use (documentation?, condition?, effect?,not-effect?)>
+<!ATTLIST use
+	needsGoTo (yes | no) "yes"
+	keepDistance CDATA "10"
+	not-effects (yes | no) "no"
+>
+<!ELEMENT use-with (documentation?, condition?, effect?,not-effect?,click-effect?)>
+<!ATTLIST use-with
+	idTarget IDREF #REQUIRED
+	needsGoTo (yes | no) "yes"
+	keepDistance CDATA "10"
+	not-effects (yes | no) "no"
+	click-effects (yes | no) "no"
+>
+<!ELEMENT give-to (documentation?, condition?, effect?,not-effect?,click-effect?)>
+<!ATTLIST give-to
+	idTarget IDREF #REQUIRED
+	needsGoTo (yes | no) "yes"
+	keepDistance CDATA "35"
+	not-effects (yes | no) "no"
+	click-effects (yes | no) "no"
+>
+<!ELEMENT drag-to (documentation?, condition?, effect?,not-effect?,click-effect?)>
+<!ATTLIST drag-to
+	idTarget IDREF #REQUIRED
+	needsGoTo (yes | no) "no"
+	keepDistance CDATA "0"
+	not-effects (yes | no) "no"
+	click-effects (yes | no) "no"
+>
+<!ELEMENT talk-to (documentation?, condition?, effect?,not-effect?)>
+<!ATTLIST talk-to
+	needsGoTo (yes | no) "yes"
+	keepDistance CDATA "35"
+	not-effects (yes | no) "no"
+>
+<!ELEMENT custom (resources*, documentation?, condition?, effect?,not-effect?)>
+<!ATTLIST custom
+	name CDATA #REQUIRED
+	needsGoTo (yes | no) "no"
+	keepDistance CDATA "0"
+	not-effects (yes | no) "no"
+>
+<!ELEMENT custom-interact (resources*, documentation?, condition?, effect?,not-effect?,click-effect?)>
+<!ATTLIST custom-interact
+	idTarget IDREF #REQUIRED
+	name CDATA #REQUIRED
+	needsGoTo (yes | no) "no"
+	keepDistance CDATA "0"
+	not-effects (yes | no) "no"
+	click-effects (yes | no) "no"
+>
+
+<!ELEMENT voice EMPTY>
+<!ATTLIST voice
+	name CDATA #REQUIRED
+	synthesizeAlways (yes | no) "no"
+>
+
+<!ELEMENT player (documentation?, resources+, textcolor?, description+, voice?)>
+<!ELEMENT character (documentation?, resources+, textcolor?, description+, conversations?, voice?, actions?)>
+<!ATTLIST character
+	id ID #IMPLIED
+>
+<!ELEMENT textcolor (frontcolor, bordercolor)>
+<!ATTLIST textcolor
+	showsSpeechBubble (yes | no) "no"
+	bubbleBkgColor CDATA #IMPLIED
+	bubbleBorderColor CDATA #IMPLIED
+>
+<!ELEMENT frontcolor EMPTY>
+<!ATTLIST frontcolor
+	color CDATA #REQUIRED
+>
+<!ELEMENT bordercolor EMPTY>
+<!ATTLIST bordercolor
+	color CDATA #REQUIRED
+>
+<!ELEMENT conversations (conversation-ref+)>
+<!ELEMENT conversation-ref (documentation?, condition?)>
+<!ATTLIST conversation-ref
+	idTarget IDREF #REQUIRED
+>
+
+<!-- MODIFIED: EFFECT -->
+<!ENTITY % dialogue "(speak-char|speak-player)*, effect?">
+<!ENTITY % continuation "(response|end-conversation)">
+<!ELEMENT tree-conversation (%dialogue;, %continuation;)>
+<!ATTLIST tree-conversation
+	id ID #REQUIRED
+>
+<!ELEMENT graph-conversation (dialogue-node | option-node)+>
+<!ATTLIST graph-conversation
+	id ID #REQUIRED
+>
+
+<!-- MODIFIED: EFFECT -->
+<!ELEMENT dialogue-node (((speak-player | speak-char),condition?)*, (child | end-conversation), effect?)>
+<!ATTLIST dialogue-node
+	nodeindex CDATA #REQUIRED
+	keepShowing (yes | no) "no"
+	x CDATA #IMPLIED
+	y CDATA #IMPLIED
+	editor-x CDATA #IMPLIED
+	editor-y CDATA #IMPLIED
+>
+<!ELEMENT option-node ((speak-player,condition?, child)*,effect?)>
+<!ATTLIST option-node
+	nodeindex CDATA #REQUIRED
+	random (yes | no) "no"
+	keepShowing (yes | no) "no"
+	showUserOption (yes | no) "no"
+	preListening (yes | no) "no"
+	editor-x CDATA #IMPLIED
+	editor-y CDATA #IMPLIED
+	x NMTOKEN "10"
+	y NMTOKEN "480"	
+>
+<!ELEMENT child EMPTY>
+<!ATTLIST child
+	nodeindex CDATA #REQUIRED
+>
+<!ELEMENT speak-char (#PCDATA)>
+<!ATTLIST speak-char
+	idTarget IDREF #IMPLIED
+	uri CDATA #IMPLIED
+	synthesize (yes | no) "no"
+	keepShowing (yes | no) "no"
+>
+<!ELEMENT speak-player (#PCDATA)>
+<!ATTLIST speak-player
+	uri CDATA #IMPLIED
+	synthesize (yes | no) "no"
+	keepShowing (yes | no) "no"
+>
+<!ELEMENT response ((option)*, effect?)>
+<!ATTLIST response
+	random (yes | no) "no" 
+>
+<!ELEMENT option (speak-player, %dialogue;, (%continuation; | go-back))>
+
+<!ELEMENT go-back EMPTY>
+
+<!ELEMENT timer (documentation?, init-condition?, end-condition?, effect?, post-effect?, textcolor?)>
+<!ATTLIST timer 
+	time NMTOKEN #REQUIRED
+	usesEndCondition (yes | no) "yes"
+	runsInLoop (yes | no) "yes"
+	multipleStarts (yes | no) "yes"
+	showTime (yes | no) "no"
+	displayName CDATA "timer"
+	countDown (yes | no) "yes"
+	showWhenStopped (yes | no) "no"	
+>
+
+<!-- TODO: REMOVE EFFECT ONCE ALL SAMPLE GAMES HAD BEEN UPDATED -->
+<!ELEMENT end-conversation (effect?)>
+<!ENTITY % basic-condition "(active|inactive| 
+							greater-than| greater-equals-than | equals| less-equals-than | less-than |
+							global-state-ref | not-equals )?">
+<!ENTITY % general-condition "(%basic-condition; | either)+">
+<!ELEMENT condition %general-condition;>
+<!ELEMENT init-condition %general-condition;>
+<!ELEMENT end-condition %general-condition;>
+
+<!ELEMENT active EMPTY>
+<!ATTLIST active
+	flag NMTOKEN #REQUIRED
+>
+<!ELEMENT inactive EMPTY>
+<!ATTLIST inactive
+	flag NMTOKEN #REQUIRED
+>
+<!ELEMENT greater-than EMPTY>
+<!ATTLIST greater-than
+	var NMTOKEN #REQUIRED
+	value NMTOKEN #REQUIRED
+>
+<!ELEMENT greater-equals-than EMPTY>
+<!ATTLIST greater-equals-than
+	var NMTOKEN #REQUIRED
+	value NMTOKEN #REQUIRED
+>
+<!ELEMENT equals EMPTY>
+<!ATTLIST equals
+	var NMTOKEN #REQUIRED
+	value NMTOKEN #REQUIRED
+>
+
+<!ELEMENT not-equals EMPTY>
+<!ATTLIST not-equals
+	var NMTOKEN #REQUIRED
+	value NMTOKEN #REQUIRED
+>
+
+<!ELEMENT less-than EMPTY>
+<!ATTLIST less-than
+	var NMTOKEN #REQUIRED
+	value NMTOKEN #REQUIRED
+>
+<!ELEMENT less-equals-than EMPTY>
+<!ATTLIST less-equals-than
+	var NMTOKEN #REQUIRED
+	value NMTOKEN #REQUIRED
+>
+
+<!ELEMENT global-state-ref EMPTY>
+<!-- value in global-state-ref was added in v1.4 -->
+
+<!ATTLIST global-state-ref
+	id IDREF #REQUIRED
+	value (true | false) "true"
+>
+<!ELEMENT global-state (documentation?,%general-condition;)>
+<!ATTLIST global-state
+	id ID #REQUIRED
+>
+
+<!ELEMENT either (%basic-condition;)+>
+<!ENTITY % effects "((activate | deactivate | set-value | increment | decrement | macro-ref | consume-object | generate-object | cancel-action | speak-player | speak-char | play-sound | play-animation | move-player | move-npc | trigger-book | trigger-conversation | trigger-cutscene | trigger-scene | trigger-last-scene | random-effect | wait-time | show-text | highlight-item | move-object), condition?)*">
+<!ENTITY % simple-effect "(activate | deactivate | set-value | increment | decrement | macro-ref | consume-object | generate-object | speak-player | speak-char | play-sound | play-animation | move-player | move-npc | trigger-book | trigger-conversation | trigger-cutscene | trigger-scene | trigger-last-scene | wait-time | show-text | highlight-item | move-object)?">
+<!ELEMENT effect (%effects;)>
+<!ELEMENT random-effect (%simple-effect;, %simple-effect;,condition?)>
+<!ATTLIST random-effect
+	probability NMTOKEN #REQUIRED
+>
+<!ELEMENT post-effect (%effects;)>
+<!ELEMENT not-effect (%effects;)>
+<!ELEMENT click-effect (%effects;)>
+
+<!ELEMENT activate EMPTY>
+<!ATTLIST activate
+	flag NMTOKEN #REQUIRED
+>
+<!ELEMENT deactivate EMPTY>
+<!ATTLIST deactivate
+	flag NMTOKEN #REQUIRED
+>
+<!ELEMENT set-value EMPTY>
+<!ATTLIST set-value
+	var NMTOKEN #REQUIRED
+	value NMTOKEN #REQUIRED
+>
+<!ELEMENT increment EMPTY>
+<!ATTLIST increment
+	var NMTOKEN #REQUIRED
+	value NMTOKEN #REQUIRED
+>
+<!ELEMENT decrement EMPTY>
+<!ATTLIST decrement
+	var NMTOKEN #REQUIRED
+	value NMTOKEN #REQUIRED
+>
+<!ELEMENT macro (documentation?,%effects;)>
+<!ATTLIST macro
+	id ID #REQUIRED
+>
+
+<!ELEMENT macro-ref EMPTY>
+<!ATTLIST macro-ref
+	id IDREF #REQUIRED
+>
+
+<!ELEMENT consume-object EMPTY>
+<!ATTLIST consume-object
+	idTarget IDREF #REQUIRED
+>
+<!ELEMENT generate-object EMPTY>
+<!ATTLIST generate-object
+	idTarget IDREF #REQUIRED
+>
+<!ELEMENT cancel-action EMPTY>
+<!ELEMENT trigger-conversation EMPTY>
+<!ATTLIST trigger-conversation
+	idTarget IDREF #REQUIRED
+>
+<!ELEMENT trigger-book EMPTY>
+<!ATTLIST trigger-book
+	idTarget IDREF #REQUIRED
+>
+<!ELEMENT highlight-item EMPTY>
+<!ATTLIST highlight-item
+	idTarget IDREF #REQUIRED
+	animated (yes | no) "no"
+	type (none | blue | red | green | border) "none"
+>
+<!ELEMENT move-object EMPTY>
+<!ATTLIST move-object
+	idTarget IDREF #REQUIRED
+	x NMTOKEN #REQUIRED
+	y NMTOKEN #REQUIRED
+	scale NMTOKEN #REQUIRED
+	animated (yes | no) "yes"
+	translateSpeed NMTOKEN #REQUIRED
+	scaleSpeed NMTOKEN #REQUIRED
+>
+<!ELEMENT play-sound EMPTY>
+<!ATTLIST play-sound
+	background (yes | no) "yes"
+	uri CDATA #REQUIRED
+>
+<!ELEMENT play-animation EMPTY>
+<!ATTLIST play-animation
+	uri CDATA #REQUIRED
+	x NMTOKEN #REQUIRED
+	y NMTOKEN #REQUIRED
+>
+<!ELEMENT move-player EMPTY>
+<!ATTLIST move-player
+	x NMTOKEN #REQUIRED
+	y NMTOKEN #REQUIRED
+>
+<!ELEMENT move-npc EMPTY>
+<!ATTLIST move-npc
+	idTarget IDREF #REQUIRED
+	x NMTOKEN #REQUIRED
+	y NMTOKEN #REQUIRED
+>
+<!ELEMENT trigger-cutscene EMPTY>
+<!ATTLIST trigger-cutscene
+	idTarget IDREF #REQUIRED
+>
+<!ELEMENT trigger-last-scene EMPTY>
+<!ELEMENT trigger-scene EMPTY>
+<!ATTLIST trigger-scene
+	idTarget IDREF #REQUIRED
+	x NMTOKEN #REQUIRED
+	y NMTOKEN #REQUIRED
+>
+
+<!ELEMENT wait-time EMPTY>
+<!ATTLIST wait-time
+	time NMTOKEN #REQUIRED
+>
+<!ELEMENT show-text (#PCDATA)>
+<!ATTLIST show-text
+	x NMTOKEN #REQUIRED
+	y NMTOKEN #REQUIRED
+	frontColor NMTOKEN #REQUIRED
+	borderColor NMTOKEN #REQUIRED
+	uri CDATA #IMPLIED
+>
+
+<!-- #############################Adaptation info ##################################################################-->
+
+<!ELEMENT adaptation (initial-state?, adaptation-rule*)>
+<!ATTLIST adaptation
+	scorm12 (yes|no) "no"
+	scorm2004 (yes|no) "no"
+	name CDATA #REQUIRED
+>
+<!ELEMENT initial-state (initial-scene?, (activate | deactivate | set-value | increment | decrement)*)>
+<!ELEMENT adaptation-rule (ruleDescription, uol-state, game-state)>
+<!ELEMENT ruleDescription (#PCDATA)>
+<!ELEMENT uol-state (property*)>
+<!ELEMENT property EMPTY>
+<!ATTLIST property
+	id NMTOKEN #REQUIRED
+	value NMTOKEN #REQUIRED
+	operation (eq|gt|lt|ge|le) "eq" 
+>
+<!ELEMENT game-state (initial-scene?, (activate | deactivate | set-value | increment | decrement)*)>
+<!ELEMENT initial-scene EMPTY>
+<!ATTLIST initial-scene
+	idTarget NMTOKEN #REQUIRED
+>
+
+
+
+<!-- #############################Assessment info ##################################################################-->
+
+<!ELEMENT assessment (smtp-config?, (assessment-rule | timed-assessment-rule)*)>
+<!ATTLIST assessment
+	show-report-at-end ( yes | no ) "no"
+	send-to-email CDATA #IMPLIED
+	scorm12 (yes|no) "no"
+	scorm2004 (yes|no) "no"
+	name CDATA #REQUIRED
+>
+
+<!ELEMENT smtp-config EMPTY>
+<!ATTLIST smtp-config
+	smtp-ssl (yes | no) "no"
+	smtp-server CDATA #IMPLIED
+	smtp-port CDATA #IMPLIED
+	smtp-user CDATA #IMPLIED
+	smtp-pwd CDATA #IMPLIED
+>
+
+<!ELEMENT assessment-rule (concept?, condition?, assessEffect?)>
+<!ATTLIST assessment-rule
+	id NMTOKEN #REQUIRED
+	importance ( verylow | low | normal | high | veryhigh ) #REQUIRED
+	repeatRule (yes | no) "no"
+>
+
+<!ELEMENT timed-assessment-rule (concept?, init-condition?, end-condition?, assessEffect*)>
+<!ATTLIST timed-assessment-rule
+	id NMTOKEN #REQUIRED
+	importance ( verylow | low | normal | high | veryhigh ) #REQUIRED
+	usesEndConditions ( yes | no) "yes"
+	repeatRule (yes | no) "no"
+>
+<!ELEMENT concept (#PCDATA)>
+<!ELEMENT assessEffect (set-text?, set-property*)>
+<!ATTLIST assessEffect 
+	time-min NMTOKEN #IMPLIED
+	time-max NMTOKEN #IMPLIED
+>
+<!ELEMENT set-text (#PCDATA)>
+<!ELEMENT set-property EMPTY>
+<!ATTLIST set-property
+	id NMTOKEN #REQUIRED
+	value CDATA #REQUIRED
+	varName NMTOKEN #IMPLIED
+>

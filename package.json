@@ -1,0 +1,18 @@
+{
+    "name": "es.e-ucm.uadventure",
+    "version": "1.0.0",
+    "displayName": "uAdventure",
+    "description": "A Unity based framework for the creation of adventure games and educational games.",
+    "keywords": ["uadventure", "adventure game", "educational game", "e-adventure"],
+    "dependencies": {
+        "com.unity.nuget.newtonsoft-json": "3.0.2",
+        "es.e-ucm.xasu": "1.1.0",
+        "es.e-ucm.simva-unity-plugin": "1.0.0"
+    },
+    "unity": "2022.3",
+    "author": {
+        "name": "e-UCM Learning Group",
+        "email": "info@e-ucm.es",
+        "url": "https://github.com/e-ucm/uAdventure"
+    }
+}

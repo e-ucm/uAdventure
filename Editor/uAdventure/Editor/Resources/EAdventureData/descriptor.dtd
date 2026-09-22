@@ -1,0 +1,106 @@
+<!--################################################################################ 
+# eAdventure (formerly <e-Adventure> and <e-Game>) is a research project of the e-UCM
+#          research group.
+#   
+#    Copyright 2005-2012 e-UCM research group.
+#  
+#     e-UCM is a research group of the Department of Software Engineering
+#          and Artificial Intelligence at the Complutense University of Madrid
+#          (School of Computer Science).
+#  
+#          C Profesor Jose Garcia Santesmases sn,
+#          28040 Madrid (Madrid), Spain.
+#  
+#          For more info please visit:  <http://e-adventure.e-ucm.es> or
+#          <http://www.e-ucm.es>
+#  
+#  ****************************************************************************
+# This file is part of eAdventure, version 1.5.
+# 
+#   You can access a list of all the contributors to eAdventure at:
+#          http://e-adventure.e-ucm.es/contributors
+#  
+#  ****************************************************************************
+#       eAdventure is free software: you can redistribute it and/or modify
+#      it under the terms of the GNU Lesser General Public License as published by
+#      the Free Software Foundation, either version 3 of the License, or
+#      (at your option) any later version.
+#  
+#      eAdventure is distributed in the hope that it will be useful,
+#      but WITHOUT ANY WARRANTY; without even the implied warranty of
+#      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#      GNU Lesser General Public License for more details.
+#  
+#      You should have received a copy of the GNU Lesser General Public License
+#      along with Adventure.  If not, see <http://www.gnu.org/licenses/>.
+################################################################################ -->
+<!ELEMENT game-descriptor (title, description, invalid?, automatic-commentaries?,metadata?, configuration, contents)>
+<!ATTLIST game-descriptor
+	versionNumber CDATA "0"
+>
+
+<!ELEMENT title (#PCDATA)>
+<!ELEMENT description ANY>
+<!ELEMENT metadata (#PCDATA)>
+
+<!ELEMENT configuration (gui,mode,graphics?)>
+<!ATTLIST configuration 
+	keepShowing (yes|no) "yes"
+	defaultClickAction (showDetails | showActions) "showDetails"
+	perspective (regular | isometric) "regular"
+	dragBehaviour (considerNonTargets | ignoreNonTargets) "considerNonTargets"
+	keyboard-navigation (enabled | disabled) "disabled"
+>
+<!ELEMENT invalid EMPTY>
+<!ELEMENT gui (cursors?, buttons?, arrows?)>
+<!ATTLIST gui
+	type (traditional | contextual) "traditional"
+	inventoryPosition (none | top_bottom | top | bottom | fixed_top | fixed_bottom) "top_bottom"
+	customized (yes | no) "no"
+>
+<!ELEMENT cursors (cursor+)>
+<!ELEMENT cursor EMPTY>
+<!ATTLIST cursor
+	type (default | over | exit | action | use | look | examine | talk | grab | give) "default"
+	uri CDATA #REQUIRED
+>
+
+<!ELEMENT buttons (button+)>
+<!ELEMENT button EMPTY>
+<!ATTLIST button
+	action (talk | use-grab | examine | grab | use | use-with | give-to | drag-to ) "use-grab"
+	type (highlighted | normal | sound | pressed ) "normal"
+	uri CDATA #REQUIRED
+>
+
+<!ELEMENT arrows (arrow+)>
+<!ELEMENT arrow EMPTY>
+<!ATTLIST arrow
+	type (normalright | normalleft | soundleft | soundright | highlightedright | highlightedleft ) "normalright"
+	uri CDATA #REQUIRED
+>
+
+<!ELEMENT mode EMPTY>
+<!ATTLIST mode
+	playerTransparent (yes | no) "no"
+>
+
+<!ELEMENT graphics EMPTY>
+<!ATTLIST graphics
+	mode (windowed | fullscreen | blackbkg) "windowed"
+>
+
+<!ELEMENT contents (chapter+)>
+<!ELEMENT automatic-commentaries EMPTY>
+<!ELEMENT chapter (title, description, metadata?, adaptation-configuration?, assessment-configuration?)>
+<!ATTLIST chapter
+	path CDATA #REQUIRED
+>
+<!ELEMENT adaptation-configuration EMPTY>
+<!ATTLIST adaptation-configuration
+	path CDATA #REQUIRED
+>
+<!ELEMENT assessment-configuration EMPTY>
+<!ATTLIST assessment-configuration
+	path CDATA #REQUIRED
+>

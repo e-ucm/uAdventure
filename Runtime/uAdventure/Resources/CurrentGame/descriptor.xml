@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<game-descriptor versionNumber="0">
+  <title>Kiddoproject</title>
+  <description>Juego para educar en igualdad</description>
+  <application-identifier>es.e-ucm.kiddo</application-identifier>
+  <configuration keepShowing="no" keyboard-navigation="disabled" defaultClickAction="showDetails" perspective="regular" dragBehaviour="considerNonTargets" show-save-load="no" show-reset="no" autosave="yes" save-on-suspend="no" restore-after-open="yes">
+    <gui type="contextual" inventoryPosition="icon" inventoryImage="assets/special/DefaultInventory.png" inventoryX="710.3325" inventoryY="569.6912" inventoryScale="0.2" />
+    <mode playerTransparent="yes" />
+    <graphics mode="windowed" />
+  </configuration>
+  <extension-objects>
+    <tracker rawCopy="yes" storageType="LOCAL" traceFormat="CSV" host="" trackingCode="" flushInterval="3" debug="no" />
+  </extension-objects>
+  <contents>
+    <chapter path="chapter1.xml">
+      <title>
+      </title>
+      <description>
+      </description>
+    </chapter>
+  </contents>
+</game-descriptor>
