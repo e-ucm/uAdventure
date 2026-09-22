@@ -339,7 +339,7 @@ namespace uAdventure.Analytics
             var completableScore = completableController.Score;
 
             CompletableTracker.Instance.Completed(completableId, completableType)
-                .WithScore(completableScore)
+                .WithScore(new Dictionary<string, double> { { "raw", completableScore } })
                 .WithResultExtensions(new Dictionary<string, object> { { "http://id.tincanapi.com/extension/time", timeElapsed.TotalSeconds } });
         }
 

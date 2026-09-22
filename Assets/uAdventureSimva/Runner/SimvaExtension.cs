@@ -6,9 +6,14 @@ using UnityFx.Async.Promises;
 using uAdventure.Analytics;
 using Simva;
 using System.Collections;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Xasu;
 using Xasu.Auth.Protocols.OAuth2;
 using Xasu.Auth.Protocols;
+using Xasu.Config;
+using Xasu.Requests;
 using UnityFx.Async;
 
 namespace uAdventure.Simva
@@ -19,49 +24,174 @@ namespace uAdventure.Simva
         private bool wasAutoSave;
         private bool firstTimeDisabling = true;
         private OAuth2Token auth;
+        private bool hasStartedGameplay;
+
+        private global::Simva.SimvaPlugin Plugin => GetHiddenPlugin();
+
+        public IHttpRequestHandler RequestHandler
+        {
+            get
+            {
+                var plugin = Plugin;
+                if (plugin == null)
+                {
+                    return new UnityRequestHandler();
+                }
+                return plugin.RequestHandler ?? (plugin.RequestHandler = new UnityRequestHandler());
+            }
+            set
+            {
+                var plugin = Plugin;
+                if (plugin != null)
+                {
+                    plugin.RequestHandler = value;
+                }
+            }
+        }
+
+        public void ApplySettings(SimvaPluginSettings settings)
+        {
+            if (settings == null)
+            {
+                return;
+            }
+
+            var plugin = Plugin;
+            if (plugin == null)
+            {
+                return;
+            }
+
+            plugin.SaveAuthUntilCompleted = settings.SaveAuthUntilCompleted;
+            plugin.RunGameIfSimvaIsNotConfigured = settings.RunGameIfSimvaIsNotConfigured;
+            plugin.ContinueOnQuit = settings.ContinueOnQuit;
+            plugin.EnableLoginDemoButton = settings.EnableLoginDemoButton;
+            plugin.LanguageByDefault = settings.LanguageByDefault;
+            plugin.SaveDisclaimerAccepted = settings.SaveDisclaimerAccepted;
+            plugin.BasicScormXAPIDataManagementByGame = settings.BasicScormXAPIDataManagementByGame;
+            plugin.EnableDebugLogging = settings.EnableDebugLogging;
+        }
 
         [Priority(10)]
         public override IEnumerator OnAfterGameLoad()
         {
+            SimvaManager.Instance.Bridge = this;
+            var settings = Resources.Load<SimvaPluginSettings>("SimvaPluginSettings");
+            if (settings != null)
+            {
+                ApplySettings(settings);
+            }
 
-            Debug.Log("[SIMVA] Starting...");
-            if(SimvaConf.Local == null)
+            var plugin = Plugin;
+            Log("[SIMVA] Starting...");
+            if (SimvaConf.Local == null)
             {
                 SimvaConf.Local = new SimvaConf();
                 yield return StartCoroutine(SimvaConf.Local.LoadAsync());
-                Debug.Log("[SIMVA] Conf Loaded...");
+                plugin = Plugin;
+                Log("[SIMVA] Conf Loaded...");
+            }
+
+            if (PlayerPrefs.HasKey(global::Simva.SimvaPlugin.SIMVA_DISCLAIMER_ACCEPTED) && (plugin == null || !plugin.SaveDisclaimerAccepted))
+            {
+                PlayerPrefs.DeleteKey(global::Simva.SimvaPlugin.SIMVA_DISCLAIMER_ACCEPTED);
             }
 
             if (!SimvaManager.Instance.IsEnabled)
             {
-                Debug.Log("[SIMVA] Study is not set! Stopping...");
-                yield return null;
+                if (plugin == null || plugin.RunGameIfSimvaIsNotConfigured)
+                {
+                    Log("Simlet is not set! Running the game without Simva...");
+                    SimvaManager.Instance.Bridge = this;
+                    GetInstance<AnalyticsExtension>().AutoStart = false;
+                    if (XasuTracker.Instance.Status.State == TrackerState.Uninitialized)
+                    {
+                        var config = new Xasu.Config.TrackerConfig
+                        {
+                            Offline = true,
+                            TraceFormat = TraceFormats.XAPI,
+                            FileName = "traces.log",
+                            HomePage = "https://articoding/"
+                        };
+                        XasuTracker.Instance.Init(config, RequestHandler)
+                            .ContinueWith(t => {
+                                if (t.IsFaulted)
+                                    LogWarning("Tracker fallback init failed: " + t.Exception);
+                            }, TaskScheduler.FromCurrentSynchronizationContext());
+                    }
+                    savedGameTarget = Game.Instance.GameState.CurrentTarget;
+                }
+                else
+                {
+                    Log("Simlet is not set! Stopping...");
+                    if (Application.isEditor)
+                    {
+#if UNITY_EDITOR
+                        UnityEditor.EditorApplication.isPlaying = false;
+#endif
+                    }
+                    else
+                    {
+                        Application.Quit();
+                    }
+                }
+                yield break;
             }
             else if (SimvaManager.Instance.IsActive)
             {
-                Debug.Log("[SIMVA] Simva is already started...");
-                // No need to restart
+                Log("[SIMVA] Simva is already started...");
                 yield return null;
             }
             else
             {
                 SimvaManager.Instance.Bridge = this;
-                Debug.Log("[SIMVA] Disabling tracker autostart...");
+                Log("[SIMVA] Disabling tracker autostart...");
                 GetInstance<AnalyticsExtension>().AutoStart = false;
 
-                //if(PlayerPrefs.GetString())
-                Debug.Log("[SIMVA] Adding scenes...");
+                Log("[SIMVA] Adding scenes...");
                 Game.Instance.GameState.Data.getChapters()[0].getObjects<SimvaScene>().AddRange(new SimvaScene[]
                 {
                     new LoginScene(),
                     new SurveyScene(),
                     new FinalizeScene(),
+                    new ManualScene(),
+                    new DeviceLoginScene(),
                     new EndScene()
                 });
-                Debug.Log("[SIMVA] Setting current target to Simva.Login...");
-                DisableAutoSave();
-                savedGameTarget = Game.Instance.GameState.CurrentTarget;
-                Game.Instance.GameState.CurrentTarget = "Simva.Login";
+
+                if (plugin != null && plugin.ShowLoginOnStartup && plugin.AutoStart)
+                {
+                    LoadLanguageDictionaries(plugin.LanguageByDefault);
+                    string scene = "";
+                    if (SimvaConf.Local != null &&
+                        !string.IsNullOrEmpty(SimvaConf.Local.AuthProtocol) &&
+                        SimvaConf.Local.AuthProtocol.Equals("device", StringComparison.OrdinalIgnoreCase))
+                    {
+                        scene = "Simva.Device";
+                    }
+                    else
+                    {
+                        scene = plugin.EnableLoginDemoButton ? "Simva.Login.Demo" : "Simva.Login";
+                    }
+                    Log("[SIMVA] Setting current target to " + scene);
+                    DisableAutoSave();
+                    savedGameTarget = Game.Instance.GameState.CurrentTarget;
+                    Game.Instance.GameState.CurrentTarget = scene;
+                }
+
+                if (plugin != null && PlayerPrefs.HasKey("simva_auth") && plugin.SaveAuthUntilCompleted)
+                {
+                    var stored = JsonConvert.DeserializeObject<OAuth2Token>(PlayerPrefs.GetString("simva_auth"));
+                    yield return new WaitForFixedUpdate();
+                    stored.ClientId = "uadventure";
+                    SimvaManager.Instance.LoginWithRefreshToken(stored.RefreshToken);
+                }
+
+                if (plugin == null || plugin.ContinueOnQuit)
+                {
+                    Application.wantsToQuit -= WantsToQuit;
+                    Application.wantsToQuit += WantsToQuit;
+                }
             }
         }
 
@@ -83,12 +213,35 @@ namespace uAdventure.Simva
 
         public override void OnBeforeGameSave()
         {
-            if(auth != null)
+            var plugin = Plugin;
+            if (auth != null && (plugin == null || plugin.SaveAuthUntilCompleted))
             {
                 PlayerPrefs.SetString("simva_auth", JsonConvert.SerializeObject(auth));
             }
         }
 
+        private void OnApplicationPause(bool paused)
+        {
+            var plugin = Plugin;
+            if (paused && auth != null && (plugin == null || plugin.SaveAuthUntilCompleted))
+            {
+                PlayerPrefs.SetString("simva_auth", JsonConvert.SerializeObject(auth));
+            }
+        }
+
+        public bool WantsToQuit()
+        {
+            if (SimvaManager.Instance.IsActive && hasStartedGameplay && !SimvaManager.Instance.Finalized)
+            {
+                SimvaManager.Instance.OnGameFinished();
+                return false;
+            }
+            else
+            {
+                PlayerPrefs.DeleteKey("simva_auth");
+            }
+            return true;
+        }
 
         [Priority(10)]
         public override IEnumerator OnGameFinished()
@@ -110,11 +263,12 @@ namespace uAdventure.Simva
 
         public override IEnumerator OnGameReady()
         {
-            if (PlayerPrefs.HasKey("simva_auth"))
+            var plugin = Plugin;
+            if (PlayerPrefs.HasKey("simva_auth") && (plugin == null || plugin.SaveAuthUntilCompleted))
             {
-                var auth = JsonConvert.DeserializeObject<OAuth2Token>(PlayerPrefs.GetString("simva_auth"));
-                auth.ClientId = "uadventure";
-                SimvaManager.Instance.LoginWithRefreshToken(auth.RefreshToken);
+                var stored = JsonConvert.DeserializeObject<OAuth2Token>(PlayerPrefs.GetString("simva_auth"));
+                stored.ClientId = "uadventure";
+                SimvaManager.Instance.LoginWithRefreshToken(stored.RefreshToken);
             }
             else if (HasLoginInfo())
             {
@@ -150,18 +304,24 @@ namespace uAdventure.Simva
 
         public void StartGameplay()
         {
+            hasStartedGameplay = true;
             Game.Instance.AbortQuit();
+            Log("Starting Gameplay");
             RunScene(savedGameTarget);
         }
 
         public void RunScene(string name)
         {
             Game.Instance.AbortQuit();
+            Log("[SIMVA] Running scene: " + name);
             switch (name)
             {
                 case "Simva.Login":
+                case "Simva.Device":
+                case "Simva.Login.Demo":
                 case "Simva.Survey":
                 case "Simva.Finalize":
+                case "Simva.Manual":
                 case "Simva.End":
                     DisableAutoSave();
                     Game.Instance.RunTarget(name, null, false);
@@ -175,6 +335,7 @@ namespace uAdventure.Simva
 
         public IAsyncOperation StartTracker(Xasu.Config.TrackerConfig config, IAuthProtocol onlineProtocol, IAuthProtocol backupProtocol)
         {
+            Log("Starting Tracker");
             var result = new AsyncCompletionSource();
             StartCoroutine(StartTrackerRoutine(config, onlineProtocol, backupProtocol, () => result.SetCompleted()));
             return result;
@@ -186,9 +347,24 @@ namespace uAdventure.Simva
             done();
         }
 
+        public IAsyncOperation StopTracker()
+        {
+            var plugin = Plugin;
+            if (plugin != null)
+            {
+                return plugin.StopTracker();
+            }
+            return null;
+        }
+
         public void OnAuthUpdated(OAuth2Token token)
         {
             auth = token;
+            var hidden = GetHiddenPlugin();
+            if (hidden != null)
+            {
+                hidden.OnAuthUpdated(token);
+            }
         }
 
         public void Demo()
@@ -198,6 +374,90 @@ namespace uAdventure.Simva
             Game.Instance.GameState.Data.setAutoSave(false);
             Game.Instance.GameState.Data.setSaveOnSuspend(false);
             Game.Instance.RunTarget(Game.Instance.GameState.InitialChapterTarget.getId());
+        }
+
+        private void LoadLanguageDictionaries(string language)
+        {
+            var langCode = global::Simva.SimvaLanguageLoader.ExtractLangCode(language);
+            if (string.IsNullOrEmpty(langCode))
+            {
+                return;
+            }
+
+            var plugin = Plugin;
+            if (plugin == null)
+            {
+                return;
+            }
+
+            var jsonFiles = global::Simva.SimvaLanguageLoader.LoadLanguageJSON(langCode);
+            var dictionary = global::Simva.SimvaLanguageLoader.LoadDictionary(jsonFiles);
+            plugin.SetLanguageDictionary(dictionary, false);
+            plugin.SetLanguageDictionary(dictionary, true);
+        }
+
+        private global::Simva.SimvaPlugin GetHiddenPlugin()
+        {
+            try
+            {
+                return global::Simva.SimvaPlugin.Instance;
+            }
+            catch (Exception ex)
+            {
+                LogWarning("Hidden SimvaPlugin unavailable: " + ex.Message);
+                return null;
+            }
+        }
+
+        internal void Log(string message)
+        {
+            WriteLog(0, message);
+        }
+
+        internal void LogWarning(string message)
+        {
+            WriteLog(1, message);
+        }
+
+        internal void LogError(string message)
+        {
+            WriteLog(2, message);
+        }
+
+        private static bool writingLog;
+
+        private void WriteLog(int level, string message)
+        {
+            if (writingLog)
+            {
+                return;
+            }
+            writingLog = true;
+            try
+            {
+                var plugin = GetHiddenPlugin();
+                if (plugin != null && !plugin.EnableDebugLogging)
+                {
+                    return;
+                }
+                var text = "[SimvaExtension] " + message;
+                if (level == 1)
+                {
+                    Debug.LogWarning(text);
+                }
+                else if (level == 2)
+                {
+                    Debug.LogError(text);
+                }
+                else
+                {
+                    Debug.Log(text);
+                }
+            }
+            finally
+            {
+                writingLog = false;
+            }
         }
     }
 }

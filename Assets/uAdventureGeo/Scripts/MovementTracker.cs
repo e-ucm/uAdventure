@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using TinCan;
 using UnityEngine;
@@ -90,19 +89,15 @@ namespace uAdventure.Geo
         /// <param name="latLon">Actor latitude and longitude.</param>
         public StatementPromise Moved(string id, Type type, Vector2d latLon)
         {
-            var trace = Enqueue(new Statement
-            {
-                verb = GetVerb(Verb.Moved),
-                target = GetTargetActivity(id, type),
-            });
-
-            trace.Statement.result.extensions = GetExtensions(new()
-            {
-                { Extension.Location, latLon.x + "," + latLon.y },
-            });
-
-            return trace;
-
+            return Enqueue(new Statement
+                {
+                    verb = GetVerb(Verb.Moved),
+                    target = GetTargetActivity(id, type)
+                })
+                .WithResultExtensions(new Dictionary<string, object>
+                {
+                    { Extension.Location.ToString().ToLower(), latLon.x + "," + latLon.y }
+                });
         }
         #endregion
 
@@ -151,12 +146,10 @@ namespace uAdventure.Geo
         /// <param name="latLon">Actor latitude and longitude.</param>
         public StatementPromise Entered(string id, Type type, Vector2d latLon)
         {
-            var trace = Entered(id, type);
-            trace.Statement.result.extensions = GetExtensions(new()
+            return Entered(id, type).WithResultExtensions(new Dictionary<string, object>
             {
-                { Extension.Location , latLon.x + "," + latLon.y }
+                { Extension.Location.ToString().ToLower(), latLon.x + "," + latLon.y }
             });
-            return trace;
         }
 
         /// <summary>
@@ -180,13 +173,11 @@ namespace uAdventure.Geo
         /// <param name="orientation">Actor orientation.</param>
         public StatementPromise Entered(string id, Type type, Vector2d latLon, Vector3d orientation)
         {
-            var trace = Entered(id, type);
-            trace.Statement.result.extensions = GetExtensions(new()
+            return Entered(id, type).WithResultExtensions(new Dictionary<string, object>
             {
-                { Extension.Location, latLon.x + "," + latLon.y },
-                { Extension.Orientation, "{\"yaw\":" + orientation.x + ", \"pitch\": " + orientation.y + ", \"roll\": " + orientation.z + "}" }
+                { Extension.Location.ToString().ToLower(), latLon.x + "," + latLon.y },
+                { Extension.Orientation.ToString().ToLower(), "{\"yaw\":" + orientation.x + ", \"pitch\": " + orientation.y + ", \"roll\": " + orientation.z + "}" }
             });
-            return trace;
         }
 
         #endregion
@@ -236,12 +227,11 @@ namespace uAdventure.Geo
         /// <param name="latLon">Actor latitude and longitude.</param>
         public StatementPromise Exited(string id, Type type, Vector2d latLon)
         {
-            var trace = Exited(id, type);
-            trace.Statement.result.extensions = GetExtensions(new()
+            return Exited(id, type)
+            .WithResultExtensions(new Dictionary<string, object>
             {
-                { Extension.Location, latLon.x + "," + latLon.y },
+                { Extension.Location.ToString().ToLower(), latLon.x + "," + latLon.y }
             });
-            return trace;
         }
 
         /// <summary>
@@ -265,13 +255,11 @@ namespace uAdventure.Geo
         /// <param name="orientation">Actor orientation.</param>
         public StatementPromise Exited(string id, Type type, Vector2d latLon, Vector3d orientation)
         {
-            var trace = Exited(id, type);
-            trace.Statement.result.extensions = GetExtensions(new()
+            return Exited(id, type).WithResultExtensions(new Dictionary<string, object>
             {
-                { Extension.Location, latLon.x + "," + latLon.y },
-                { Extension.Orientation, "{\"yaw\":" + orientation.x + ", \"pitch\": " + orientation.y + ", \"roll\": " + orientation.z + "}" }
+                { Extension.Location.ToString().ToLower(), latLon.x + "," + latLon.y },
+                { Extension.Orientation.ToString().ToLower(), "{\"yaw\":" + orientation.x + ", \"pitch\": " + orientation.y + ", \"roll\": " + orientation.z + "}" }
             });
-            return trace;
         }
 
         #endregion
@@ -297,17 +285,15 @@ namespace uAdventure.Geo
         /// <param name="latLon">Actor latitude and longitude.</param>
         public StatementPromise Looked(string id, Type type, Vector3d orientation)
         {
-            var trace = Enqueue(new Statement
+            return Enqueue(new Statement
             {
                 verb = GetVerb(Verb.Looked),
                 target = GetTargetActivity(id, type)
-            });
-
-            trace.Statement.result.extensions = GetExtensions(new()
+            })
+            .WithResultExtensions(new Dictionary<string, object>
             {
-                { Extension.Orientation, "{\"yaw\":" + orientation.x + ", \"pitch\": " + orientation.y + ", \"roll\": " + orientation.z + "}" }
+                { Extension.Orientation.ToString().ToLower(), "{\"yaw\":" + orientation.x + ", \"pitch\": " + orientation.y + ", \"roll\": " + orientation.z + "}" }
             });
-            return trace;
         }
 
         /// <summary>
@@ -331,17 +317,16 @@ namespace uAdventure.Geo
         /// <param name="orientation">Actor orientation.</param>
         public StatementPromise Looked(string id, Type type, Vector3d orientation, Vector2d latLon)
         {
-            var trace = Enqueue(new Statement
+            return Enqueue(new Statement
             {
                 verb = GetVerb(Verb.Looked),
                 target = GetTargetActivity(id, type)
-            });
-            trace.Statement.result.extensions = GetExtensions(new()
+            })
+            .WithResultExtensions(new Dictionary<string, object>
             {
-                { Extension.Location, latLon.x + "," + latLon.y },
-                { Extension.Orientation, "{\"yaw\":" + orientation.x + ", \"pitch\": " + orientation.y + ", \"roll\": " + orientation.z + "}" }
+                { Extension.Location.ToString().ToLower(), latLon.x + "," + latLon.y },
+                { Extension.Orientation.ToString().ToLower(), "{\"yaw\":" + orientation.x + ", \"pitch\": " + orientation.y + ", \"roll\": " + orientation.z + "}" }
             });
-            return trace;
         }
 
         #endregion
@@ -370,13 +355,10 @@ namespace uAdventure.Geo
         /// <param name="guide">Array of indications the user is following.</param> 
         public StatementPromise Followed(string id, string[] guide)
         {
-            var trace = Followed(id);
-            trace.Statement.result.extensions = GetExtensions(new()
+            return Followed(id).WithResultExtensions(new Dictionary<string, object>
             {
-                { Extension.Guide, "[" + guide.Select(i => "\"" + i + "\"").Aggregate((i1,i2) => i1 + ", " + i2) + "]" }
+                { Extension.Guide.ToString().ToLower(), "[" + guide.Select(i => "\"" + i + "\"").Aggregate((i1,i2) => i1 + ", " + i2) + "]" }
             });
-            return trace;
-
         }
 
         #endregion

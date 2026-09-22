@@ -413,7 +413,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0.69803923, b: 0.058823533, a: 1}
+  m_Color: {r: 0.14231041, g: 0.4095626, b: 0.735849, a: 1}
   m_RaycastTarget: 1
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -668,8 +668,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 8ac913a1a13692040ab8b255ed2c164f, type: 3}
-  m_Type: 1
+  m_Sprite: {fileID: 21300000, guid: eb5263802c6dc9340b501dd10d7f1562, type: 3}
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -1000,7 +1000,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0.69803923, b: 0.058823533, a: 1}
+  m_Color: {r: 0.14231041, g: 0.4095626, b: 0.735849, a: 1}
   m_RaycastTarget: 1
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -1814,7 +1814,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: uAdventure
+  m_Text: e-UCM - Kiddo
 --- !u!114 &720082051224364726
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2173,7 +2173,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0.69803923, b: 0.058823533, a: 1}
+  m_Color: {r: 0.23876593, g: 0.7372549, b: 0.14117646, a: 1}
   m_RaycastTarget: 1
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -2541,10 +2541,10 @@ RectTransform:
   m_Father: {fileID: 7885432570861456188}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 19.9}
-  m_SizeDelta: {x: 511.87, y: 254.3}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 16.65}
+  m_SizeDelta: {x: -30, y: -63.3}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8682961362159992143
 CanvasRenderer:
@@ -2586,12 +2586,11 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "uAdventure <modify this text>. \n\nTus datos de juego (tus interacciones
-    con elementos, elecciones y tu ubicaci\xF3n) ser\xE1n recopilados durante la
-    partida an\xF3nimamente con un c\xF3digo que recibir\xE1s del investigador tras
-    entregar el consentimiento informado firmado. La aplicaci\xF3n NO recopila datos
-    de caracter personal. \n\nLa versi\xF3n \"Demo\" no recopila datos ni utiliza
-    GPS."
+  m_Text: "\xA1Hola! Te doy la bienvenida a Kiddo Project, un juego serio del grupo
+    e-UCM para fines de investigaci\xF3n.\n\nTus datos de juego (tus interacciones
+    con elementos y elecciones) ser\xE1n recopilados durante la partida an\xF3nimamente
+    con un c\xF3digo que recibir\xE1s del investigador tras entregar el consentimiento
+    informado firmado. La aplicaci\xF3n NO recopila datos de caracter personal. "
 --- !u!114 &5209462643667968111
 MonoBehaviour:
   m_ObjectHideFlags: 0

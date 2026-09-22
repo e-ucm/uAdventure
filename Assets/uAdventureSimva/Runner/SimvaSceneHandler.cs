@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace uAdventure.Simva
 {
-    [ChapterTargetFactory(typeof(SimvaScene), typeof(LoginScene), typeof(SurveyScene), typeof(FinalizeScene), typeof(EndScene))]
+    [ChapterTargetFactory(typeof(SimvaScene), typeof(LoginScene), typeof(SurveyScene), typeof(FinalizeScene), typeof(ManualScene), typeof(DeviceLoginScene), typeof(EndScene))]
     public class SimvaSceneHandler : MonoBehaviour, IChapterTargetFactory
     {
         public IRunnerChapterTarget Instantiate(IChapterTarget modelObject)

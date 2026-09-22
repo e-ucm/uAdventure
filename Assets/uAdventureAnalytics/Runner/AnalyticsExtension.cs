@@ -6,6 +6,7 @@ using uAdventure.Runner;
 using UnityEngine;
 using Xasu;
 using Xasu.Auth.Protocols;
+using Xasu.Requests;
 using Xasu.Util;
 
 namespace uAdventure.Analytics
@@ -206,7 +207,7 @@ namespace uAdventure.Analytics
             Debug.Log("[ANALYTICS] Settings: " + JsonConvert.SerializeObject(config));
 
             var done = false;
-            XasuTracker.Instance.Init(config, onlineProtocol, backupProtocol)
+            XasuTracker.Instance.Init(config, new UnityRequestHandler(), onlineProtocol, backupProtocol)
                 .ContinueWith(t =>
                 {
                     // TODO fix 

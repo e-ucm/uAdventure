@@ -1028,10 +1028,10 @@ namespace uAdventure.Runner
             public LoadingScreen()
             {
                 backgroundColor = new Texture2D(1, 1);
-                backgroundColor.SetPixel(0, 0, new Color(0.6f, 0.3f, 0.1f));
+                backgroundColor.SetPixel(0, 0, new Color(0.01f, 0.01f, 0.01f, 1f));
                 backgroundStyle = new GUIStyle();
                 backgroundStyle.alignment = TextAnchor.MiddleCenter;
-                backgroundStyle.normal.background = backgroundColor;
+                backgroundStyle.active.background = backgroundColor;
                 showing = true;
             }
 
@@ -1041,8 +1041,9 @@ namespace uAdventure.Runner
                 {
                     return;
                 }
-                using (new GUILayout.AreaScope(new Rect(0, 0, Screen.width, Screen.height)))
-                using (new GUILayout.VerticalScope(backgroundStyle, GUILayout.ExpandWidth(true)))
+                using (new GUILayout.AreaScope(new Rect(0, 0, Screen.width, Screen.height),"", backgroundStyle))
+                using (new GUILayout.VerticalScope(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true)))
+                using (new GUILayout.HorizontalScope(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true)))
                 {
                     GUILayout.FlexibleSpace();
 
@@ -1071,7 +1072,7 @@ namespace uAdventure.Runner
 
         private LoadingScreen ShowLoading()
         {
-            return loadingScreen = new LoadingScreen();
+            return loadingScreen = new LoadingScreen { Text = "Loading..." };
         }
 
         private List<GUILayoutOption> auxLimitList = new List<GUILayoutOption>();

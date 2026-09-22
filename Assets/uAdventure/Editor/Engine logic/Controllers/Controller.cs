@@ -2147,8 +2147,8 @@ namespace uAdventure.Editor
 
             if (config.BuildWindows)
             {
-                /*var b = createBasic(scenes, config.path + "/Windows/" + name + ".exe", BuildTarget.StandaloneWindows, BuildOptions.None);
-                builds.Add(b);*/
+                var b = createBasic(scenes, config.path + "/Windows/" + name + ".exe", BuildTarget.StandaloneWindows, BuildOptions.None);
+                builds.Add(b);
 
                 var b64 = createBasic(scenes, config.path + "/Windows64/" + name + ".exe", BuildTarget.StandaloneWindows64, BuildOptions.None);
                 builds.Add(b64);
@@ -3783,7 +3783,7 @@ namespace uAdventure.Editor
                     {
                         System.Action onConfigReady = () =>
                         {
-                            api.Api.GetSchedule(SimvaConf.Local.Study)
+                            api.Api.GetSchedule(SimvaConf.Local.Simlet)
                             .Then(schedule =>
                             {
                                 var act = schedule.Activities.First(a => a.Value.Name == "Gameplay");

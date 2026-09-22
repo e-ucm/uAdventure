@@ -456,7 +456,7 @@ TextureImporter:
       213: 21300300
     second: poi_icons_18@2x_150
   externalObjects: {}
-  serializedVersion: 11
+  serializedVersion: 13
   mipmaps:
     mipMapMode: 0
     enableMipMap: 1
@@ -473,9 +473,12 @@ TextureImporter:
     externalNormalMap: 0
     heightScale: 0.25
     normalMapFilter: 0
+    flipGreenChannel: 0
   isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -484,9 +487,9 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: -1
+    filterMode: 1
     aniso: 16
-    mipBias: -100
+    mipBias: 0
     wrapU: 1
     wrapV: 1
     wrapW: 1
@@ -507,10 +510,15 @@ TextureImporter:
   textureType: 8
   textureShape: 1
   singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
   maxTextureSizeSet: 0
   compressionQualitySet: 0
   textureFormatSet: 0
+  ignorePngGamma: 0
   applyGammaDecoding: 1
+  swizzle: 50462976
+  cookieLightType: 1
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
@@ -522,6 +530,33 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 1
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 1
+  - serializedVersion: 3
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 1
   spriteSheet:
@@ -3708,9 +3743,160 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-  spritePackingTag: 
+    nameFileIdTable:
+      poi_icons_18@2x_0: 21300000
+      poi_icons_18@2x_1: 21300002
+      poi_icons_18@2x_10: 21300020
+      poi_icons_18@2x_100: 21300200
+      poi_icons_18@2x_101: 21300202
+      poi_icons_18@2x_102: 21300204
+      poi_icons_18@2x_103: 21300206
+      poi_icons_18@2x_104: 21300208
+      poi_icons_18@2x_105: 21300210
+      poi_icons_18@2x_106: 21300212
+      poi_icons_18@2x_107: 21300214
+      poi_icons_18@2x_108: 21300216
+      poi_icons_18@2x_109: 21300218
+      poi_icons_18@2x_11: 21300022
+      poi_icons_18@2x_110: 21300220
+      poi_icons_18@2x_111: 21300222
+      poi_icons_18@2x_112: 21300224
+      poi_icons_18@2x_113: 21300226
+      poi_icons_18@2x_114: 21300228
+      poi_icons_18@2x_115: 21300230
+      poi_icons_18@2x_116: 21300232
+      poi_icons_18@2x_117: 21300234
+      poi_icons_18@2x_118: 21300236
+      poi_icons_18@2x_119: 21300238
+      poi_icons_18@2x_12: 21300024
+      poi_icons_18@2x_120: 21300240
+      poi_icons_18@2x_121: 21300242
+      poi_icons_18@2x_122: 21300244
+      poi_icons_18@2x_123: 21300246
+      poi_icons_18@2x_124: 21300248
+      poi_icons_18@2x_125: 21300250
+      poi_icons_18@2x_126: 21300252
+      poi_icons_18@2x_127: 21300254
+      poi_icons_18@2x_128: 21300256
+      poi_icons_18@2x_129: 21300258
+      poi_icons_18@2x_13: 21300026
+      poi_icons_18@2x_130: 21300260
+      poi_icons_18@2x_131: 21300262
+      poi_icons_18@2x_132: 21300264
+      poi_icons_18@2x_133: 21300266
+      poi_icons_18@2x_134: 21300268
+      poi_icons_18@2x_135: 21300270
+      poi_icons_18@2x_136: 21300272
+      poi_icons_18@2x_137: 21300274
+      poi_icons_18@2x_138: 21300276
+      poi_icons_18@2x_139: 21300278
+      poi_icons_18@2x_14: 21300028
+      poi_icons_18@2x_140: 21300280
+      poi_icons_18@2x_141: 21300282
+      poi_icons_18@2x_142: 21300284
+      poi_icons_18@2x_143: 21300286
+      poi_icons_18@2x_144: 21300288
+      poi_icons_18@2x_145: 21300290
+      poi_icons_18@2x_146: 21300292
+      poi_icons_18@2x_147: 21300294
+      poi_icons_18@2x_148: 21300296
+      poi_icons_18@2x_149: 21300298
+      poi_icons_18@2x_15: 21300030
+      poi_icons_18@2x_150: 21300300
+      poi_icons_18@2x_16: 21300032
+      poi_icons_18@2x_17: 21300034
+      poi_icons_18@2x_18: 21300036
+      poi_icons_18@2x_19: 21300038
+      poi_icons_18@2x_2: 21300004
+      poi_icons_18@2x_20: 21300040
+      poi_icons_18@2x_21: 21300042
+      poi_icons_18@2x_22: 21300044
+      poi_icons_18@2x_23: 21300046
+      poi_icons_18@2x_24: 21300048
+      poi_icons_18@2x_25: 21300050
+      poi_icons_18@2x_26: 21300052
+      poi_icons_18@2x_27: 21300054
+      poi_icons_18@2x_28: 21300056
+      poi_icons_18@2x_29: 21300058
+      poi_icons_18@2x_3: 21300006
+      poi_icons_18@2x_30: 21300060
+      poi_icons_18@2x_31: 21300062
+      poi_icons_18@2x_32: 21300064
+      poi_icons_18@2x_33: 21300066
+      poi_icons_18@2x_34: 21300068
+      poi_icons_18@2x_35: 21300070
+      poi_icons_18@2x_36: 21300072
+      poi_icons_18@2x_37: 21300074
+      poi_icons_18@2x_38: 21300076
+      poi_icons_18@2x_39: 21300078
+      poi_icons_18@2x_4: 21300008
+      poi_icons_18@2x_40: 21300080
+      poi_icons_18@2x_41: 21300082
+      poi_icons_18@2x_42: 21300084
+      poi_icons_18@2x_43: 21300086
+      poi_icons_18@2x_44: 21300088
+      poi_icons_18@2x_45: 21300090
+      poi_icons_18@2x_46: 21300092
+      poi_icons_18@2x_47: 21300094
+      poi_icons_18@2x_48: 21300096
+      poi_icons_18@2x_49: 21300098
+      poi_icons_18@2x_5: 21300010
+      poi_icons_18@2x_50: 21300100
+      poi_icons_18@2x_51: 21300102
+      poi_icons_18@2x_52: 21300104
+      poi_icons_18@2x_53: 21300106
+      poi_icons_18@2x_54: 21300108
+      poi_icons_18@2x_55: 21300110
+      poi_icons_18@2x_56: 21300112
+      poi_icons_18@2x_57: 21300114
+      poi_icons_18@2x_58: 21300116
+      poi_icons_18@2x_59: 21300118
+      poi_icons_18@2x_6: 21300012
+      poi_icons_18@2x_60: 21300120
+      poi_icons_18@2x_61: 21300122
+      poi_icons_18@2x_62: 21300124
+      poi_icons_18@2x_63: 21300126
+      poi_icons_18@2x_64: 21300128
+      poi_icons_18@2x_65: 21300130
+      poi_icons_18@2x_66: 21300132
+      poi_icons_18@2x_67: 21300134
+      poi_icons_18@2x_68: 21300136
+      poi_icons_18@2x_69: 21300138
+      poi_icons_18@2x_7: 21300014
+      poi_icons_18@2x_70: 21300140
+      poi_icons_18@2x_71: 21300142
+      poi_icons_18@2x_72: 21300144
+      poi_icons_18@2x_73: 21300146
+      poi_icons_18@2x_74: 21300148
+      poi_icons_18@2x_75: 21300150
+      poi_icons_18@2x_76: 21300152
+      poi_icons_18@2x_77: 21300154
+      poi_icons_18@2x_78: 21300156
+      poi_icons_18@2x_79: 21300158
+      poi_icons_18@2x_8: 21300016
+      poi_icons_18@2x_80: 21300160
+      poi_icons_18@2x_81: 21300162
+      poi_icons_18@2x_82: 21300164
+      poi_icons_18@2x_83: 21300166
+      poi_icons_18@2x_84: 21300168
+      poi_icons_18@2x_85: 21300170
+      poi_icons_18@2x_86: 21300172
+      poi_icons_18@2x_87: 21300174
+      poi_icons_18@2x_88: 21300176
+      poi_icons_18@2x_89: 21300178
+      poi_icons_18@2x_9: 21300018
+      poi_icons_18@2x_90: 21300180
+      poi_icons_18@2x_91: 21300182
+      poi_icons_18@2x_92: 21300184
+      poi_icons_18@2x_93: 21300186
+      poi_icons_18@2x_94: 21300188
+      poi_icons_18@2x_95: 21300190
+      poi_icons_18@2x_96: 21300192
+      poi_icons_18@2x_97: 21300194
+      poi_icons_18@2x_98: 21300196
+      poi_icons_18@2x_99: 21300198
+  mipmapLimitGroupName: 
   pSDRemoveMatte: 0
-  pSDShowRemoveMatteOption: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 

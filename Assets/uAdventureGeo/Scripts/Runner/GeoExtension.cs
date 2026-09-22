@@ -248,7 +248,7 @@ namespace uAdventure.Geo
 
             if (paintSimbol && Event.current.type == EventType.Repaint)
             {
-                GUI.DrawTexture(new Rect(Screen.width - iconWidth - 5, 5, iconWidth, iconHeight), paintSimbol);
+                // GUI.DrawTexture(new Rect(Screen.width - iconWidth - 5, 5, iconWidth, iconHeight), paintSimbol);
             }
 
             if (UsingDebugLocation)

@@ -72,6 +72,12 @@ namespace uAdventure.Runner
             UpdateMovement();
         }
 
+        private void OnDestroy()
+        {
+            if(moving && onMovementCancelled != null)
+                onMovementCancelled?.Invoke(data);
+        }
+
         // Public movement methods
 
         public bool Move(Vector2 point)

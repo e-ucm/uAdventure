@@ -450,12 +450,103 @@
         <text lang="English">Global states</text>
       </label>
       
-      <label id="MACROS">
+<label id="MACROS">
         <text lang="Polski">Makra</text>
         <text lang="English">Macros</text>
       </label>
-    
-    
-
-    </labels>
+      
+      <!-- Simva Plugin -->
+      
+      <label id="Simva.Title">
+        <text lang="Polski">Simva</text>
+        <text lang="English">Simva</text>
+      </label>
+      
+      <label id="Simva.Tab.Configuration">
+        <text lang="Polski">Konfiguracja</text>
+        <text lang="English">Configuration</text>
+      </label>
+      
+      <label id="Simva.Tab.Wizard">
+        <text lang="Polski">Kreator</text>
+        <text lang="English">Wizard</text>
+      </label>
+      
+      <label id="Simva.SaveAuthUntilCompleted">
+        <text lang="Polski">Zapisz autoryzację do ukończenia</text>
+        <text lang="English">Save Auth Until Completed</text>
+      </label>
+      
+      <label id="Simva.ShowLoginOnStartup">
+        <text lang="Polski">Pokaż logowanie na starcie</text>
+        <text lang="English">Show Login On Startup</text>
+      </label>
+      
+      <label id="Simva.RunGameIfSimvaIsNotConfigured">
+        <text lang="Polski">Uruchom grę jeśli Simva nie jest skonfigurowane</text>
+        <text lang="English">Run Game If Simva Not Configured</text>
+      </label>
+      
+      <label id="Simva.ContinueOnQuit">
+        <text lang="Polski">Kontynuuj przy zamykaniu</text>
+        <text lang="English">Continue On Quit</text>
+      </label>
+      
+      <label id="Simva.EnableLoginDemoButton">
+        <text lang="Polski">Włącz przycisk Demo logowania</text>
+        <text lang="English">Enable Login Demo Button</text>
+      </label>
+      
+      <label id="Simva.EnableLanguageScene">
+        <text lang="Polski">Włącz scenę języka</text>
+        <text lang="English">Enable Language Scene</text>
+      </label>
+      
+      <label id="Simva.SaveDisclaimerAccepted">
+        <text lang="Polski">Zapisz zaakceptowane zrzeczenie</text>
+        <text lang="English">Save Disclaimer Accepted</text>
+      </label>
+      
+      <label id="Simva.BasicScormXAPIDataManagementByGame">
+        <text lang="Polski">Podstawowe zarządzanie danymi SCORM xAPI przez grę</text>
+        <text lang="English">Basic SCORM xAPI Data Management By Game</text>
+      </label>
+      
+      <label id="Simva.EnableDebugLogging">
+        <text lang="Polski">Włącz logowanie debug</text>
+        <text lang="English">Enable Debug Logging</text>
+      </label>
+      
+      <label id="Simva.AutoStart">
+        <text lang="Polski">Auto start</text>
+        <text lang="English">Auto Start</text>
+      </label>
+      
+      <label id="Simva.StartScene">
+        <text lang="Polski">Scena startowa</text>
+        <text lang="English">Start Scene</text>
+      </label>
+      
+      <label id="Simva.GamePlayScene">
+        <text lang="Polski">Scena rozgrywki</text>
+        <text lang="English">Gameplay Scene</text>
+      </label>
+      
+      <label id="Simva.SelectedLanguages">
+        <text lang="Polski">Wybrane języki</text>
+        <text lang="English">Selected Languages</text>
+      </label>
+      
+      <label id="Simva.LanguageByDefault">
+        <text lang="Polski">Język domyślny</text>
+        <text lang="English">Language By Default</text>
+      </label>
+      
+      <label id="Simva.SettingsSaved">
+        <text lang="Polski">Ustawienia zapisane pomyślnie!</text>
+        <text lang="English">Settings saved successfully!</text>
+      </label>
+     
+     
+</labels>
 </root>
