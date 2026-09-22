@@ -1170,7 +1170,19 @@ namespace uAdventure.Editor
             }
 
             string path = Path.Combine(Directory.GetCurrentDirectory(), UAdventurePaths.PACKAGE_ASSET_PATH + "/Editor/uAdventure/Editor/Layouts/uAdventure.wlt");
-            EditorUtility.LoadWindowLayout(path); 
+            if (!File.Exists(path))
+            {
+                Debug.LogWarning("uAdventure layout not found at: " + path);
+                return;
+            }
+            try
+            {
+                EditorUtility.LoadWindowLayout(path);
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogWarning("Couldn't load uAdventure layout: " + e.Message);
+            }
         }
 
         //    //public void showLoadingScreen(string message)

@@ -12,7 +12,7 @@
     "com.unity.timeline": "1.7.7",
     "com.unity.ugui": "1.0.0",
     "es.e-ucm.simva-unity-plugin": "file:C:/GitHub/TRACKER/simva-unity-plugin",
-    "es.e-ucm.uadventure": "file:../UAdventurePackage",
+    "es.e-ucm.uadventure": "file:C:/GitHub/TRACKER/uAdventure",
     "es.e-ucm.xasu": "file:C:/GitHub/TRACKER/xasu",
     "com.unity.modules.ai": "1.0.0",
     "com.unity.modules.androidjni": "1.0.0",

@@ -114,7 +114,7 @@
       }
     },
     "es.e-ucm.uadventure": {
-      "version": "file:../UAdventurePackage",
+      "version": "file:C:/GitHub/TRACKER/uAdventure",
       "depth": 0,
       "source": "local",
       "dependencies": {
